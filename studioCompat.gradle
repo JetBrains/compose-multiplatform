@@ -1,0 +1,146 @@
+/*
+ * Copyright (C) 2016 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import android.support.build.ApiModule
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+/**
+ * To add platform specific code to a library:
+ * 1) add the related source set into the studioCompat map (defined below)
+ * 2) In your build gradle file, call:
+ *    * createApiSourceSets(project, gradle.ext.studioCompat.modules.<PROJECT>.apiTargets)
+ *    * setApiModuleDependencies(project, dependencies, gradle.ext.studioCompat.modules.<PROJECT>.dependencies)
+ */
+
+def studioCompat = [
+    enableApiModules : hasProperty('android.injected.invoked.from.ide'),
+    modules : [
+        v4 : [
+            apiTargets : [
+                new ApiModule("donut",4),
+                new ApiModule("eclair",5),
+                new ApiModule("eclair-mr1", 7),
+                new ApiModule("froyo",8),
+                new ApiModule("gingerbread",9),
+                new ApiModule("honeycomb",11),
+                new ApiModule("honeycomb_mr1",12),
+                new ApiModule("honeycomb_mr2",13),
+                new ApiModule("ics",14),
+                new ApiModule("ics-mr1",15),
+                new ApiModule("jellybean", 16),
+                new ApiModule("jellybean-mr1",17),
+                new ApiModule("jellybean-mr2",18),
+                new ApiModule("kitkat",19),
+                new ApiModule("api20",20),
+                new ApiModule("api21",21),
+                new ApiModule("api22",22),
+                new ApiModule("api23",23),
+                new ApiModule("api24", ApiModule.CURRENT)
+            ],
+            dependencies : [":support-annotations"],
+            folder : "v4",
+            moduleName : "support-v4"
+        ],
+        v13 : [
+            apiTargets : [
+                new ApiModule("ics", 14),
+                new ApiModule("ics-mr1", 15),
+                new ApiModule("api23", 23),
+                new ApiModule("api24", ApiModule.CURRENT)
+            ],
+            dependencies : [":support-v4"],
+            folder : "v13",
+            moduleName : "support-v13"
+        ]
+    ]
+]
+
+/**
+ * Adds a link to the previous ApiModule for each module. This information is later used when
+ * setting dependencies.
+ */
+def setupDependencies(projectConfig) {
+    projectConfig.apiTargets.eachWithIndex { entry, index ->
+        entry.parentModuleName = projectConfig.moduleName
+        entry.prev = index == 0 ? null : projectConfig.apiTargets[index - 1]
+    }
+}
+gradle.ext.currentSdk = studioCompat.enableApiModules ? ApiModule.CURRENT : 'current'
+
+// the hashmap from apiModuleProjectFolder -> ApiModule
+gradle.ext.folderToApiModuleMapping = new HashMap()
+
+/**
+ * For each APIModule in the given projectConfig, creates a gradle module. These modules use the
+ * common `apiModule.gradle` build file.
+ */
+def createModules(projectConfig) {
+    Path buildFile = Paths.get(file("apiModule.gradle").toURI())
+    projectConfig.apiTargets.each { ApiModule module  ->
+        logger.info "creating ${module.moduleName}"
+        module.setParentModuleDependencies(projectConfig.dependencies)
+        include "${module.moduleName}"
+        def folder = new File(rootDir, "${projectConfig.folder}/${module.folderName}")
+        project("${module.moduleName}").projectDir = folder
+        project("${module.moduleName}").buildFileName = Paths.get(folder.toURI()).relativize(buildFile)
+        gradle.ext.folderToApiModuleMapping[folder.canonicalPath] = module
+    }
+}
+
+/**
+ * returns the APIModule for the given project.
+ */
+ApiModule getApiModule(Project project) {
+    return gradle.ext.folderToApiModuleMapping[project.projectDir.canonicalPath]
+}
+
+studioCompat.modules.each { k, v ->
+    setupDependencies(v)
+}
+// create these fake modules only if Studio opens the project.
+if (studioCompat.enableApiModules) {
+    // validate we have the 99 folder, otherwise it wont work
+    def currentSdkPrebuilt = file("${rootProject.projectDir}/../../prebuilts/sdk/" +
+            "${ApiModule.CURRENT}/")
+    if (!currentSdkPrebuilt.exists()) {
+        throw new GradleScriptException(
+                "You need a symlink in prebuilts/sdk/${ApiModule.CURRENT} that points to"
+                        + " prebuilts/sdk/current."
+                        + "Without it, studio cannot understand current SDK.\n"
+                        + "> ln -s ../../prebuilts/sdk/current "
+                        + "../../prebuilts/sdk/${ApiModule.CURRENT}\n"
+                , new Exception())
+    }
+    Properties localProps = new Properties()
+    def localPropsStream = new FileInputStream(file("${rootProject.projectDir}/local.properties"))
+    try {
+        localProps.load(localPropsStream)
+        def sdkDir = localProps.get("sdk.dir")
+        if (sdkDir != null && sdkDir != "") {
+            throw new GradleScriptException("You should not have sdk.dir in local.properties because"
+                    + " it overrides android.dir and prevents studio from seeing current sdk. "
+                    + " Studio may add it by mistake, just remove it and it will work fine.",
+            new Exception())
+        }
+    } finally {
+        localPropsStream.close()
+    }
+    studioCompat.modules.each { k, v ->
+        createModules(v)
+    }
+}
+gradle.ext.studioCompat = studioCompat
+gradle.ext.getApiModule = this.&getApiModule

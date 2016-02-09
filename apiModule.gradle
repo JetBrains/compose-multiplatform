@@ -1,0 +1,67 @@
+/*
+ * Copyright (C) 2016 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Generic build.gradle file that can be used for API specific support lib implementations.
+ * This file is used only if Android Studio opens the project.
+ */
+apply plugin: 'com.android.library'
+def apiModule = gradle.ext.getApiModule(project)
+logger.info ("apiModule for ${project.projectDir} is $apiModule. "
+        + "compileSDK: ${apiModule.apiForSourceSet} minSDK: ${apiModule.api}")
+android {
+    compileSdkVersion apiModule.apiForSourceSet
+    // these api modules all use the same package name so we should not package their BuildConfig
+    // files.
+    packageBuildConfig false
+
+    sourceSets {
+        main.manifest.srcFile '../AndroidManifest.xml'
+        main.java.srcDirs = ['.']
+
+        apiModule.resourceFolders.each {
+            main.res.srcDirs += "../$it"
+        }
+        apiModule.assetFolders.each {
+            main.assets.srcDirs += "../$it"
+        }
+        apiModule.javaResourceFolders.each {
+            main.resources.srcDirs += "../$it"
+        }
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+
+    enforceUniquePackageName = false
+}
+
+
+dependencies {
+    if (apiModule.prev != null) {
+        compile project(apiModule.prev.moduleName)
+    } else {
+        apiModule.parentModuleDependencies.each { dep ->
+            compile project(dep)
+        }
+    }
+}
