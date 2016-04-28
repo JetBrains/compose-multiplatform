@@ -64,6 +64,17 @@ def studioCompat = [
             dependencies : [":support-v4"],
             folder : "v13",
             moduleName : "support-v13"
+        ],
+        mediaRouter : [
+            apiTargets : [
+                new ApiModule("jellybean", 16),
+                new ApiModule("jellybean-mr1", 17),
+                new ApiModule("jellybean-mr2", 18),
+                new ApiModule("api24", ApiModule.CURRENT)
+            ],
+            dependencies : [':support-appcompat-v7', ':support-palette-v7'],
+            folder : "v7/mediarouter",
+            moduleName : "support-mediarouter-v7"
         ]
     ]
 ]
