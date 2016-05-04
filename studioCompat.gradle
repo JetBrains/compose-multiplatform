@@ -28,7 +28,7 @@ import java.nio.file.Paths;
 def studioCompat = [
     enableApiModules : hasProperty('android.injected.invoked.from.ide'),
     modules : [
-        v4 : [
+        compat : [
             apiTargets : [
                 new ApiModule("donut",4),
                 new ApiModule("eclair",5),
@@ -44,15 +44,35 @@ def studioCompat = [
                 new ApiModule("jellybean-mr1",17),
                 new ApiModule("jellybean-mr2",18),
                 new ApiModule("kitkat",19),
-                new ApiModule("api20",20),
                 new ApiModule("api21",21),
                 new ApiModule("api22",22),
                 new ApiModule("api23",23),
                 new ApiModule("api24", ApiModule.CURRENT)
             ],
             dependencies : [":support-annotations"],
+            folder : "compat",
+            moduleName : "support-compat"
+        ],
+        core : [
+            apiTargets : [
+                new ApiModule("donut",4),
+                new ApiModule("eclair",5),
+                new ApiModule("froyo",8),
+                new ApiModule("gingerbread",9),
+                new ApiModule("honeycomb",11),
+                new ApiModule("ics",14),
+                new ApiModule("jellybean", 16),
+                new ApiModule("jellybean-mr2",18),
+                new ApiModule("kitkat",19),
+                new ApiModule("api20",20),
+                new ApiModule("api21",21),
+                new ApiModule("api22",22),
+                new ApiModule("api23",23),
+                new ApiModule("api24", ApiModule.CURRENT)
+            ],
+            dependencies : [":support-compat"],
             folder : "v4",
-            moduleName : "support-v4"
+            moduleName : "support-core"
         ],
         v13 : [
             apiTargets : [
