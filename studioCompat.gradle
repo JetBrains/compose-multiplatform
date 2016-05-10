@@ -49,6 +49,21 @@ def studioCompat = [
             folder : "compat",
             moduleName : "support-compat"
         ],
+        mediacompat : [
+                apiTargets : [
+                        new ApiModule("froyo",8),
+                        new ApiModule("ics",14),
+                        new ApiModule("jellybean-mr2",18),
+                        new ApiModule("kitkat",19),
+                        new ApiModule("api21",21),
+                        new ApiModule("api22",22),
+                        new ApiModule("api23",23),
+                        new ApiModule("api24", ApiModule.CURRENT)
+                ],
+                dependencies : [":support-annotations", ":support-compat"],
+                folder : "media-compat",
+                moduleName : "support-media-compat"
+        ],
         core : [
             apiTargets : [
                 new ApiModule("donut",4),
