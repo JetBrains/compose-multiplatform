@@ -60,27 +60,46 @@ def studioCompat = [
                         new ApiModule("api23",23),
                         new ApiModule("api24", ApiModule.CURRENT)
                 ],
-                dependencies : [":support-annotations", ":support-compat"],
+                dependencies : [":support-compat"],
                 folder : "media-compat",
                 moduleName : "support-media-compat"
         ],
-        core : [
-            apiTargets : [
-                new ApiModule("gingerbread",9),
-                new ApiModule("honeycomb",11),
-                new ApiModule("ics",14),
-                new ApiModule("jellybean", 16),
-                new ApiModule("jellybean-mr2",18),
-                new ApiModule("kitkat",19),
-                new ApiModule("api20",20),
-                new ApiModule("api21",21),
-                new ApiModule("api22",22),
-                new ApiModule("api23",23),
-                new ApiModule("api24", ApiModule.CURRENT)
-            ],
-            dependencies : [":support-compat"],
-            folder : "v4",
-            moduleName : "support-core"
+        coreutils : [
+                apiTargets : [
+                        new ApiModule("gingerbread",9),
+                        new ApiModule("honeycomb",11),
+                        new ApiModule("jellybean", 16),
+                        new ApiModule("kitkat",19),
+                        new ApiModule("api20",20),
+                        new ApiModule("api21",21),
+                        new ApiModule("api23",23),
+                        new ApiModule("api24", ApiModule.CURRENT)
+                ],
+                dependencies : [":support-compat"],
+                folder : "v4",
+                moduleName : "support-core-utils"
+        ],
+        coreui : [
+                apiTargets : [
+                        new ApiModule("honeycomb",11),
+                        new ApiModule("ics",14),
+                        new ApiModule("jellybean-mr2",18),
+                        new ApiModule("api21",21)
+                ],
+                dependencies : [":support-compat"],
+                folder : "core-ui",
+                moduleName : "support-core-ui"
+        ],
+        fragment : [
+                apiTargets : [
+                        new ApiModule("gingerbread",9),
+                        new ApiModule("honeycomb",11),
+                        new ApiModule("jellybean", 16),
+                        new ApiModule("api21",21)
+                ],
+                dependencies : [":support-media-compat", ":support-core-ui"],
+                folder : "fragment",
+                moduleName : "support-fragment"
         ],
         v13 : [
             apiTargets : [
