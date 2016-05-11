@@ -30,7 +30,7 @@ def studioCompat = [
     modules : [
         compat : [
             apiTargets : [
-                new ApiModule("donut",9),
+                new ApiModule("gingerbread",9),
                 new ApiModule("honeycomb",11),
                 new ApiModule("honeycomb_mr1",12),
                 new ApiModule("honeycomb_mr2",13),
@@ -52,7 +52,6 @@ def studioCompat = [
         ],
         mediacompat : [
                 apiTargets : [
-                        new ApiModule("froyo",8),
                         new ApiModule("ics",14),
                         new ApiModule("jellybean-mr2",18),
                         new ApiModule("kitkat",19),
@@ -67,9 +66,7 @@ def studioCompat = [
         ],
         core : [
             apiTargets : [
-                new ApiModule("donut",4),
-                new ApiModule("eclair",5),
-                new ApiModule("froyo",8),
+                new ApiModule("gingerbread",9),
                 new ApiModule("honeycomb",11),
                 new ApiModule("ics",14),
                 new ApiModule("jellybean", 16),
