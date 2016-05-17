@@ -97,7 +97,7 @@ def studioCompat = [
                         new ApiModule("jellybean", 16),
                         new ApiModule("api21",21)
                 ],
-                dependencies : [":support-media-compat", ":support-core-ui"],
+                dependencies : [":support-media-compat", ":support-core-ui", ":support-core-utils"],
                 folder : "fragment",
                 moduleName : "support-fragment"
         ],
