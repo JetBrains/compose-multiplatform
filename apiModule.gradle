@@ -31,13 +31,15 @@ android {
     sourceSets {
         main.manifest.srcFile '../AndroidManifest.xml'
         main.java.srcDirs = ['.']
-
+        main.res.srcDirs = []
         apiModule.resourceFolders.each {
             main.res.srcDirs += "../$it"
         }
+        main.assets.srcDirs = []
         apiModule.assetFolders.each {
             main.assets.srcDirs += "../$it"
         }
+        main.resources.srcDirs = []
         apiModule.javaResourceFolders.each {
             main.resources.srcDirs += "../$it"
         }
