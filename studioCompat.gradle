@@ -25,9 +25,8 @@ import java.nio.file.Paths;
  *    * setApiModuleDependencies(project, dependencies, gradle.ext.studioCompat.modules.<PROJECT>.dependencies)
  */
 
-final boolean enableApiModules = hasProperty('android.injected.invoked.from.ide');
-
 def studioCompat = [
+    enableApiModules : hasProperty('android.injected.invoked.from.ide'),
     modules : [
         compat : [
             apiTargets : [
@@ -115,14 +114,9 @@ def studioCompat = [
         ],
         mediaRouter : [
             apiTargets : [
-                // MR depends on AppCompat which contains resources which need the current SDK.
-                // Android Studio can't handle this and tries to compile AppCompat with the
-                // ApiModule's SDK version which then breaks (AppCompat can't be compiled
-                // against 16, etc). To work around this, we compile the ApiModules against current
-                // when we're using AS only.
-                new ApiModule("jellybean", enableApiModules ? ApiModule.CURRENT : 16),
-                new ApiModule("jellybean-mr1", enableApiModules ? ApiModule.CURRENT : 17),
-                new ApiModule("jellybean-mr2", enableApiModules ? ApiModule.CURRENT : 18),
+                new ApiModule("jellybean", 16),
+                new ApiModule("jellybean-mr1", 17),
+                new ApiModule("jellybean-mr2", 18),
                 new ApiModule("api24", ApiModule.CURRENT)
             ],
             dependencies : [':support-appcompat-v7', ':support-palette-v7'],
@@ -142,7 +136,7 @@ def setupDependencies(projectConfig) {
         entry.prev = index == 0 ? null : projectConfig.apiTargets[index - 1]
     }
 }
-gradle.ext.currentSdk = enableApiModules ? ApiModule.CURRENT : 'current'
+gradle.ext.currentSdk = studioCompat.enableApiModules ? ApiModule.CURRENT : 'current'
 
 // the hashmap from apiModuleProjectFolder -> ApiModule
 gradle.ext.folderToApiModuleMapping = new HashMap()
@@ -175,7 +169,7 @@ studioCompat.modules.each { k, v ->
     setupDependencies(v)
 }
 // create these fake modules only if Studio opens the project.
-if (enableApiModules) {
+if (studioCompat.enableApiModules) {
     // validate we have the 99 folder, otherwise it wont work
     def currentSdkPrebuilt = file("${rootProject.projectDir}/../../prebuilts/sdk/" +
             "${ApiModule.CURRENT}/")
