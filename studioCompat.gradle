@@ -106,7 +106,8 @@ def studioCompat = [
                 new ApiModule("ics", 14),
                 new ApiModule("ics-mr1", 15),
                 new ApiModule("api23", 23),
-                new ApiModule("api24", ApiModule.CURRENT)
+                new ApiModule("api24", 24),
+                new ApiModule("api25", ApiModule.CURRENT)
             ],
             dependencies : [":support-v4"],
             folder : "v13",
