@@ -76,7 +76,7 @@ def studioCompat = [
                         new ApiModule("api24", ApiModule.CURRENT)
                 ],
                 dependencies : [":support-compat"],
-                folder : "v4",
+                folder : "core-utils",
                 moduleName : "support-core-utils"
         ],
         coreui : [
