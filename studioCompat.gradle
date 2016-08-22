@@ -58,7 +58,8 @@ def studioCompat = [
                         new ApiModule("api21",21),
                         new ApiModule("api22",22),
                         new ApiModule("api23",23),
-                        new ApiModule("api24", ApiModule.CURRENT)
+                        new ApiModule("api24",24),
+                        new ApiModule("api25",ApiModule.CURRENT)
                 ],
                 dependencies : [":support-compat"],
                 folder : "media-compat",
