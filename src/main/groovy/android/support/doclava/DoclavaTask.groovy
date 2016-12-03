@@ -137,6 +137,21 @@ public class DoclavaTask extends Javadoc {
         options.docletpath = docletpath as List
     }
 
+    public void setDoclavaErrors(Collection errors) {
+        // Make it serializable.
+        doclavaErrors = errors as int[]
+    }
+
+    public void setDoclavaWarnings(Collection warnings) {
+        // Make it serializable.
+        doclavaWarnings = warnings as int[]
+    }
+
+    public void setDoclavaHidden(Collection hidden) {
+        // Make it serializable.
+        doclavaHidden = hidden as int[]
+    }
+
     private static boolean verifyAndGetGenerateApiFiles(File apiFile, File removedApiFile) {
         if (apiFile == null) {
             if (removedApiFile == null) {
