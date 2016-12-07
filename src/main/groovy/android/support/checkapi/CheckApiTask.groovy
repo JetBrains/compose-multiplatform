@@ -15,8 +15,10 @@ import org.gradle.process.ExecResult
 
 /**
  * A task to invoke Doclava's ApiCheck tool.
- * By default, any API changes will be flagged as errors (strict mode). This can be losened to
- * merely backwards compatibility checks using {@link #configureAsBackwardsCompatCheck()}.
+ * <p>
+ * By default, any API changes will be flagged as errors (strict mode). This
+ * can be loosened to merely backwards compatibility checks using
+ * {@link #configureAsBackwardsCompatCheck()}.
  */
 @ParallelizableTask
 public class CheckApiTask extends DefaultTask {
@@ -273,6 +275,21 @@ All of these must be distinct files.""")
         checkApiWarnings = DEFAULT_CHECK_API_BACKWARDS_COMPAT_WARNINGS
         checkApiHidden = DEFAULT_CHECK_API_BACKWARDS_COMPAT_HIDDEN
         mOnFailMessage = DEFAULT_ERROR_MESSAGE_FOR_BACKWARDS_COMPAT
+    }
+
+    public void setCheckApiErrors(Collection errors) {
+        // Make it serializable.
+        checkApiErrors = errors as int[]
+    }
+
+    public void setCheckApiWarnings(Collection warnings) {
+        // Make it serializable.
+        checkApiWarnings = warnings as int[]
+    }
+
+    public void setCheckApiHidden(Collection hidden) {
+        // Make it serializable.
+        checkApiHidden = hidden as int[]
     }
 
     @TaskAction
