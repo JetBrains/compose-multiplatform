@@ -1,9 +1,0 @@
-apply plugin: 'groovy'
-
-repositories {
-    maven { url '../../../prebuilts/gradle-plugin' }
-}
-dependencies {
-    // Keep gradle plugin version in sync with ub_supportlib-master manifest.
-    compile 'com.android.tools.build:gradle:2.2.4'
-}
