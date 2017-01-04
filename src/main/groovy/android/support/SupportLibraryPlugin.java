@@ -18,12 +18,16 @@ package android.support;
 
 import com.android.build.gradle.LibraryExtension;
 import com.android.build.gradle.api.AndroidSourceSet;
+import com.android.build.gradle.api.LibraryVariant;
+import com.android.builder.core.BuilderConstants;
 
 import com.google.common.collect.ImmutableMap;
 
+import org.gradle.api.Action;
 import org.gradle.api.JavaVersion;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.tasks.bundling.Jar;
 
 /**
  * Support library specific com.android.library plugin that sets common configurations needed for
@@ -55,5 +59,20 @@ public class SupportLibraryPlugin implements Plugin<Project> {
         // Set compile options
         library.getCompileOptions().setSourceCompatibility(JavaVersion.VERSION_1_7);
         library.getCompileOptions().setTargetCompatibility(JavaVersion.VERSION_1_7);
+
+        // Create sources jar for release builds
+        library.getLibraryVariants().all(new Action<LibraryVariant>() {
+            @Override
+            public void execute(LibraryVariant libraryVariant) {
+                if (!libraryVariant.getBuildType().getName().equals(BuilderConstants.RELEASE)) {
+                    return; // Skip non-release builds.
+                }
+
+                Jar sourceJar = project.getTasks().create("sourceJarRelease", Jar.class);
+                sourceJar.setClassifier("sources");
+                sourceJar.from(library.getSourceSets().findByName("main").getJava().getSrcDirs());
+                project.getArtifacts().add("archives", sourceJar);
+            }
+        });
     }
 }
