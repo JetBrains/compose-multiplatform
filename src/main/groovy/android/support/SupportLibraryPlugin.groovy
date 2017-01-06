@@ -26,6 +26,7 @@ import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.maven.MavenDeployer
+import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.tasks.Upload
 import org.gradle.api.tasks.bundling.Jar
 
@@ -84,6 +85,13 @@ class SupportLibraryPlugin implements Plugin<Project> {
         uploadTask.getRepositories().withType(MavenDeployer.class, new Action<MavenDeployer>() {
             @Override
             public void execute(MavenDeployer mavenDeployer) {
+                ExtraPropertiesExtension ext = project.getRootProject().getExtensions()
+                        .findByType(ExtraPropertiesExtension.class);
+                URI uri = project.uri(ext.get("supportRepoOut"));
+                Map<String, Object> repo = new HashMap<String, Object>();
+                repo.put("url", uri);
+                mavenDeployer.repository(repo);
+
                 mavenDeployer.getPom().project {
                     name supportLibraryExtension.getName()
                     description supportLibraryExtension.getDescription()
