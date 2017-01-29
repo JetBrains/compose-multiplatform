@@ -46,9 +46,15 @@ class SupportLibraryPlugin implements Plugin<Project> {
         LibraryExtension library =
                 project.getExtensions().findByType(LibraryExtension.class);
 
+        library.setCompileSdkVersion(project.ext.currentSdk)
+
         // Main sourceSet related options
         AndroidSourceSet mainSet = library.getSourceSets().findByName("main");
         mainSet.getManifest().srcFile("AndroidManifest.xml");
+
+        // Update the version meta-data in each Manifest
+        library.getDefaultConfig().addManifestPlaceholders(
+                ["support-version": project.rootProject.ext.supportVersion])
 
         // Set test related options
         library.getDefaultConfig().setTestInstrumentationRunner(INSTRUMENTATION_RUNNER);
