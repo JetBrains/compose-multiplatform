@@ -20,6 +20,9 @@ import android.support.checkapi.UpdateApiTask
 import android.support.doclava.DoclavaMultilineJavadocOptionFileOption
 import android.support.doclava.DoclavaTask
 import android.support.jdiff.JDiffTask
+
+import org.gradle.api.InvalidUserDataException
+
 import groovy.io.FileType
 
 // Generates online docs.
@@ -105,6 +108,43 @@ task updateApi(type: UpdateApiTask, dependsOn: generateApi) {
     oldApiFile = new File(supportRootFolder, 'api/current.txt')
     newRemovedApiFile = new File(project.docsDir, 'release/removed.txt')
     oldRemovedApiFile = new File(supportRootFolder, 'api/removed.txt')
+}
+
+// Finalizes the API file for a release version.
+task finalizeApi(type: Copy, dependsOn: updateApi) {
+    group JavaBasePlugin.VERIFICATION_GROUP
+    description 'Finalize the API definition for the current release.'
+
+    def apiVersion = project.supportVersion;
+    if (project.hasProperty("revision")) {
+        apiVersion = revision;
+    }
+
+    File currentApiFile = new File(project.rootDir, 'api/current.txt')
+    File finalizedApiFile = new File(currentApiFile.parentFile, "${apiVersion}.txt")
+
+    from currentApiFile.absolutePath
+    into finalizedApiFile.parent
+    rename { finalizedApiFile.name }
+
+    doFirst {
+        // Verify this is a proper release version.
+        if (!(apiVersion ==~ /^\d+\.\d+\.\d+$/)) {
+            throw new InvalidUserDataException("${apiVersion} is not valid release version format. "
+                    + "Use -Prevision=X.Y.Z to specify an explicit version.")
+        }
+
+        // Verify that we're not accidentally overwriting an existing API file.
+        if (finalizedApiFile.exists() && !(project.hasProperty("overwrite") && overwrite)) {
+            throw new InvalidUserDataException("Version ${apiVersion} has already been "
+                    + "finalized. Use -Poverwrite=true to overwrite.")
+        }
+    }
+
+    doLast {
+        project.logger.warn("Wrote ${finalizedApiFile.getParentFile().name}/"
+                + "${finalizedApiFile.name} API file.")
+    }
 }
 
 // Checks generated API files against current version.
