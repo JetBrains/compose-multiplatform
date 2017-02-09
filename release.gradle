@@ -1,0 +1,110 @@
+/*
+ * Copyright (C) 2017 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import com.google.common.base.Charsets
+import com.google.common.io.Files
+import com.google.common.hash.HashCode
+import com.google.common.hash.HashFunction
+import com.google.common.hash.Hashing
+import java.nio.charset.Charset
+
+// Main task called by the build server.
+task(createArchive)
+
+// upload anchor for subprojects to upload their artifacts
+// to the local repo.
+task(mainUpload)
+
+// repository creation task
+task createRepository(type: Zip, dependsOn: mainUpload) {
+    from project.ext.supportRepoOut
+    destinationDir project.ext.distDir
+    into 'm2repository'
+    baseName = String.format("sdk-repo-linux-m2repository-%s", project.ext.buildNumber)
+}
+createArchive.dependsOn createRepository
+
+// prepare repository with older versions
+task unzipRepo(type: Copy) {
+    from "${init.prebuiltsRoot}/maven_repo/android"
+    into project.ext.supportRepoOut
+}
+
+unzipRepo.doFirst {
+    project.ext.supportRepoOut.deleteDir()
+    project.ext.supportRepoOut.mkdirs()
+}
+
+// anchor for prepare repo. This is post unzip + sourceProp.
+task(prepareRepo)
+
+task(createXml).doLast({
+    def repoArchive = createRepository.archivePath
+    def repoArchiveName = createRepository.archiveName
+    def size = repoArchive.length()
+    def sha1 = getSha1(repoArchive)
+
+    def xml =
+            "<sdk:sdk-addon xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:sdk=\"http://schemas.android.com/sdk/android/addon/6\">\n\
+  <sdk:extra>\n\
+    <sdk:revision>\n\
+      <sdk:major>${project.ext.extraVersion}</sdk:major>\n\
+    </sdk:revision>\n\
+    <sdk:vendor-display>Android</sdk:vendor-display>\n\
+    <sdk:vendor-id>android</sdk:vendor-id>\n\
+    <sdk:name-display>Local Maven repository for Support Libraries</sdk:name-display>\n\
+    <sdk:path>m2repository</sdk:path>\n\
+    <sdk:archives>\n\
+      <sdk:archive>\n\
+       <sdk:size>${size}</sdk:size>\n\
+       <sdk:checksum type=\"sha1\">${sha1}</sdk:checksum>\n\
+       <sdk:url>${repoArchiveName}</sdk:url>\n\
+      </sdk:archive>\n\
+    </sdk:archives>\n\
+  </sdk:extra>\n\
+</sdk:sdk-addon>"
+
+    Files.write(xml, new File(project.ext.distDir, 'repo-extras.xml'), Charsets.UTF_8)
+})
+createArchive.dependsOn createXml
+createXml.dependsOn createRepository
+
+task(createSourceProp).doLast({
+    def sourceProp =
+            "Extra.VendorDisplay=Android\n\
+Extra.Path=m2repository\n\
+Archive.Arch=ANY\n\
+Extra.NameDisplay=Android Support Repository\n\
+Archive.Os=ANY\n\
+Pkg.Desc=Local Maven repository for Support Libraries\n\
+Pkg.Revision=${project.ext.extraVersion}.0.0\n\
+Extra.VendorId=android"
+
+    Files.write(sourceProp, new File(project.ext.supportRepoOut, 'source.properties'), Charsets.UTF_8)
+})
+createSourceProp.dependsOn unzipRepo
+prepareRepo.dependsOn createSourceProp
+
+/**
+ * Generates SHA1 hash for the specified file's absolute path.
+ *
+ * @param inputFile file to hash
+ * @return SHA1 hash
+ */
+String getSha1(File inputFile) {
+    HashFunction hashFunction = Hashing.sha1()
+    HashCode hashCode = hashFunction.hashString(inputFile.getAbsolutePath(), Charset.forName("UTF-8"))
+    return hashCode.toString()
+}

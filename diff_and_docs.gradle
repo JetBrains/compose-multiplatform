@@ -1,0 +1,313 @@
+/*
+ * Copyright (C) 2017 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import android.support.checkapi.ApiXmlConversionTask
+import android.support.checkapi.CheckApiTask
+import android.support.checkapi.UpdateApiTask
+import android.support.doclava.DoclavaMultilineJavadocOptionFileOption
+import android.support.doclava.DoclavaTask
+import android.support.jdiff.JDiffTask
+import groovy.io.FileType
+
+// Generates online docs.
+task generateDocs(type: DoclavaTask, dependsOn: configurations.doclava) {
+    group = JavaBasePlugin.DOCUMENTATION_GROUP
+    description = 'Generates d.android.com style documentation.'
+    docletpath = configurations.doclava.resolve()
+    destinationDir = new File(project.docsDir, "online")
+
+    // Base classpath is Android SDK, sub-projects add their own.
+    classpath = project.ext.androidJar
+
+    def hdfOption = new DoclavaMultilineJavadocOptionFileOption('hdf')
+    hdfOption.add(
+            ['android.whichdoc', 'online'],
+            ['android.hasSamples', 'true']);
+
+    // Default hidden errors + hidden superclass (111) and
+    // deprecation mismatch (113) to match framework docs.
+    final def hidden = [105, 107, 111, 112, 113, 115, 116, 121]
+
+    doclavaErrors = (101..122) - hidden
+    doclavaWarnings = []
+    doclavaHidden += hidden
+
+    options {
+        addStringOption "templatedir",
+                "${supportRootFolder}/../../build/tools/droiddoc/templates-sdk"
+        addStringOption "federate Android", "http://developer.android.com"
+        addStringOption "stubpackages", "android.support.*"
+        addStringOption "samplesdir", "${supportRootFolder}/samples"
+        addOption hdfOption
+    }
+
+    exclude '**/BuildConfig.java'
+}
+
+JDiffTask createApiDiffsTask(String taskName, File oldApiXml, File newApiXml, File outDir,
+                             Configuration jdiff, Task... dependencies) {
+    return tasks.create(name: taskName, type: JDiffTask.class) {
+        dependsOn jdiff
+        dependsOn dependencies
+
+        docletpath = jdiff.resolve()
+
+        oldApiXmlFile oldApiXml
+        newApiXmlFile newApiXml
+        destinationDir = outDir
+
+        // This prefix is based on the assumption that the output diffs will
+        // ultimately land in frameworks/base/docs/html/sdk/support_api_diff/.
+        newJavadocPrefix = "../reference/"
+    }
+}
+
+// Generates API files.
+task generateApi(type: DoclavaTask, dependsOn: configurations.doclava) {
+    docletpath = configurations.doclava.resolve()
+    destinationDir = project.docsDir
+
+    // Base classpath is Android SDK, sub-projects add their own.
+    classpath = project.ext.androidJar
+
+    apiFile = new File(project.docsDir, 'release/current.txt')
+    removedApiFile = new File(project.docsDir, 'release/removed.txt')
+    generateDocs = false
+
+    options {
+        addStringOption "templatedir",
+                "${supportRootFolder}/../../build/tools/droiddoc/templates-sdk"
+        addStringOption "federate Android", "http://developer.android.com"
+        addStringOption "stubpackages", "android.support.*"
+    }
+    exclude '**/BuildConfig.java'
+    exclude '**/R.java'
+}
+
+// Copies generated API files to current version.
+task updateApi(type: UpdateApiTask, dependsOn: generateApi) {
+    group JavaBasePlugin.VERIFICATION_GROUP
+    description 'Invoke Doclava\'s ApiCheck tool to update current.txt based on current changes.'
+    newApiFile = new File(project.docsDir, 'release/current.txt')
+    oldApiFile = new File(supportRootFolder, 'api/current.txt')
+    newRemovedApiFile = new File(project.docsDir, 'release/removed.txt')
+    oldRemovedApiFile = new File(supportRootFolder, 'api/removed.txt')
+}
+
+// Checks generated API files against current version.
+task checkApi(type: CheckApiTask, dependsOn: generateApi) {
+    doclavaClasspath = generateApi.docletpath
+
+    checkApiTaskPath = name
+    updateApiTaskPath = updateApi.name
+
+    // Check that the API we're building hasn't changed from the development
+    // version. These typed of changes require an explicit API file update.
+    checkApiErrors = (2..30)-[22]
+    checkApiWarnings = []
+    checkApiHidden = [22]
+
+    newApiFile = new File(project.docsDir, 'release/current.txt')
+    oldApiFile = new File(supportRootFolder, 'api/current.txt')
+    newRemovedApiFile = new File(project.docsDir, 'release/removed.txt')
+    oldRemovedApiFile = new File(supportRootFolder, 'api/removed.txt')
+}
+
+rootProject.createArchive.dependsOn checkApi
+
+
+// Checks generated API files against current version.
+task checkApiStable(type: CheckApiTask, dependsOn: generateApi) {
+    doclavaClasspath = generateApi.docletpath
+
+    checkApiTaskPath = name
+    updateApiTaskPath = updateApi.name
+
+    // Check that the API we're building hasn't broken the last-released
+    // library version. These types of changes are forbidden.
+    checkApiErrors = (7..18)
+    checkApiWarnings = [23, 24]
+    checkApiHidden = (2..6) + (19..22) + (25..30)
+
+    newApiFile = new File(project.docsDir, 'release/current.txt')
+    oldApiFile = getReleasedApiFile()
+    newRemovedApiFile = new File(project.docsDir, 'release/removed.txt')
+    oldRemovedApiFile = new File(supportRootFolder, 'api/removed.txt')
+}
+
+checkApi.dependsOn checkApiStable
+
+
+/**
+ * Converts the <code>toApi</code>.txt file (or current.txt if not explicitly
+ * defined using -PtoAPi=<file>) to XML format for use by JDiff.
+ */
+task newApiXml(type: ApiXmlConversionTask, dependsOn: configurations.doclava) {
+    classpath configurations.doclava.resolve()
+
+    if (project.hasProperty("toApi")) {
+        // Use an explicit API file.
+        inputApiFile = new File(rootProject.ext.supportRootFolder, "api/${toApi}.txt")
+    } else {
+        // Use the current API file (e.g. current.txt).
+        inputApiFile = generateApi.apiFile
+        dependsOn generateApi
+    }
+
+    int lastDot = inputApiFile.name.lastIndexOf('.')
+    outputApiXmlFile = new File(project.docsDir,
+            "release/" + inputApiFile.name.substring(0, lastDot) + ".xml")
+}
+
+/**
+ * Converts the <code>fromApi</code>.txt file (or the most recently released
+ * X.Y.Z.txt if not explicitly defined using -PfromAPi=<file>) to XML format
+ * for use by JDiff.
+ */
+task oldApiXml(type: ApiXmlConversionTask, dependsOn: configurations.doclava) {
+    classpath configurations.doclava.resolve()
+
+    if (project.hasProperty("fromApi")) {
+        // Use an explicit API file.
+        inputApiFile = new File(rootProject.ext.supportRootFolder, "api/${fromApi}.txt")
+    } else if (project.hasProperty("toApi") && toApi.matches(~/(\d+\.){2}\d+/)) {
+        // If toApi matches released API (X.Y.Z) format, use the most recently
+        // released API file prior to toApi.
+        inputApiFile = getReleasedApiFile(toApi)
+    } else {
+        // Use the most recently released API file.
+        inputApiFile = getReleasedApiFile();
+    }
+
+    int lastDot = inputApiFile.name.lastIndexOf('.')
+    outputApiXmlFile = new File(project.docsDir,
+            "release/" + inputApiFile.name.substring(0, lastDot) + ".xml")
+}
+
+/**
+ * Generates API diffs.
+ * <p>
+ * By default, diffs are generated for the delta between current.txt and the
+ * next most recent X.Y.Z.txt API file. Behavior may be changed by specifying
+ * one or both of -PtoApi and -PfromApi.
+ * <p>
+ * If both fromApi and toApi are specified, diffs will be generated for
+ * fromApi -> toApi. For example, 25.0.0 -> 26.0.0 diffs could be generated by
+ * using:
+ * <br><code>
+ *   ./gradlew generateDiffs -PfromApi=25.0.0 -PtoApi=26.0.0
+ * </code>
+ * <p>
+ * If only toApi is specified, it MUST be specified as X.Y.Z and diffs will be
+ * generated for (release before toApi) -> toApi. For example, 24.2.0 -> 25.0.0
+ * diffs could be generated by using:
+ * <br><code>
+ *   ./gradlew generateDiffs -PtoApi=25.0.0
+ * </code>
+ * <p>
+ * If only fromApi is specified, diffs will be generated for fromApi -> current.
+ * For example, lastApiReview -> current diffs could be generated by using:
+ * <br><code>
+ *   ./gradlew generateDiffs -PfromApi=lastApiReview
+ * </code>
+ * <p>
+ */
+task generateDiffs(type: JDiffTask, dependsOn: [configurations.jdiff, configurations.doclava,
+                                                oldApiXml, newApiXml, generateDocs]) {
+    // Base classpath is Android SDK, sub-projects add their own.
+    classpath = project.ext.androidJar
+
+    // JDiff properties.
+    oldApiXmlFile = oldApiXml.outputApiXmlFile
+    newApiXmlFile = newApiXml.outputApiXmlFile
+    newJavadocPrefix = "../../../../reference/"
+
+    String newApi = newApiXmlFile.name
+    int lastDot = newApi.lastIndexOf('.')
+    newApi = newApi.substring(0, lastDot)
+
+    // Javadoc properties.
+    docletpath = configurations.jdiff.resolve()
+    destinationDir = new File(project.docsDir, "online/sdk/support_api_diff/$newApi")
+    title = "Support&nbsp;Library&nbsp;API&nbsp;Differences&nbsp;Report"
+
+    exclude '**/BuildConfig.java'
+    exclude '**/R.java'
+}
+
+/**
+ * Returns the most recently released API, optionally restricting to APIs
+ * before <code>beforeApi</code>.
+ *
+ * @param beforeApi the API to find an API file before, ex. 25.0.0
+ * @return the most recently released API file
+ */
+File getReleasedApiFile(String beforeApi = null) {
+    String beforeApiFileName = beforeApi != null ? beforeApi + ".txt" : null
+    File lastReleasedApiFile = null
+    File apiDir = new File(ext.supportRootFolder, 'api')
+
+    apiDir.eachFileMatch FileType.FILES, ~/(\d+\.){3}txt/, { File apiFile ->
+        // Is the current API file newer than the last one we saw?
+        if (lastReleasedApiFile == null || apiFile.name > lastReleasedApiFile.name) {
+            // Is the current API file older than the "before" API?
+            if (beforeApiFileName == null || apiFile.name < beforeApiFileName) {
+                lastReleasedApiFile = apiFile
+            }
+        }
+    }
+
+    return lastReleasedApiFile
+}
+
+// configuration file for setting up api diffs and api docs
+void registerForDocsTask(Task task, Project subProject, releaseVariant) {
+    task.dependsOn releaseVariant.javaCompile
+    task.source {
+        def buildConfig = fileTree(releaseVariant.getGenerateBuildConfig().sourceOutputDir)
+        return releaseVariant.javaCompile.source.minus(buildConfig) +
+                fileTree(releaseVariant.aidlCompile.sourceOutputDir) +
+                fileTree(releaseVariant.outputs[0].processResources.sourceOutputDir)
+    }
+    task.classpath += files(releaseVariant.javaCompile.classpath) +
+            files(releaseVariant.javaCompile.destinationDir)
+}
+
+// configuration file for setting up api diffs and api docs
+void registerJavaProjectForDocsTask(Task task, Project subProject, javaCompileTask) {
+    task.dependsOn javaCompileTask
+    task.source javaCompileTask.source
+    task.classpath += files(javaCompileTask.classpath) +
+            files(javaCompileTask.destinationDir)
+}
+
+subprojects { subProject ->
+    subProject.afterEvaluate { p ->
+        if (!p.hasProperty("noDocs") || !p.noDocs) {
+            if (p.hasProperty('android') && p.android.hasProperty('libraryVariants')) {
+                p.android.libraryVariants.all { v ->
+                    if (v.name == 'release') {
+                        registerForDocsTask(rootProject.generateDocs, p, v)
+                        registerForDocsTask(rootProject.generateApi, p, v)
+                        registerForDocsTask(rootProject.generateDiffs, p, v)
+                    }
+                }
+            } else if (p.hasProperty("compileJava")) {
+                registerJavaProjectForDocsTask(rootProject.generateDocs, p, p.compileJava)
+            }
+        }
+    }
+}

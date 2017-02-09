@@ -1,0 +1,342 @@
+/*
+ * Copyright (C) 2017 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import com.android.build.gradle.internal.coverage.JacocoPlugin
+import com.android.build.gradle.internal.coverage.JacocoReportTask
+import com.android.build.gradle.internal.tasks.DeviceProviderInstrumentTestTask
+import com.google.common.base.Charsets
+import com.google.common.io.Files
+import org.gradle.internal.os.OperatingSystem
+
+def supportRoot = ext.supportRootFolder
+if (supportRoot == null) {
+    throw new RuntimeException("variable supportRootFolder is not set. you must set it before" +
+            " including this script")
+}
+def init = new Properties()
+ext.init = init
+ext.init.checkoutRoot = "${supportRoot}/../.."
+ext.init.prebuiltsRoot = "${init.checkoutRoot}/prebuilts"
+ext.init.prebuiltsRootUri = "file://${init.prebuiltsRoot}"
+ext.init.enablePublicRepos = System.getenv("ALLOW_PUBLIC_REPOS") != null
+
+ext.repoNames = ["${init.prebuiltsRoot}/gradle-plugin",
+                 "${init.prebuiltsRoot}/tools/common/m2/repository",
+                 "${init.prebuiltsRoot}/tools/common/m2/internal",
+                 "${init.prebuiltsRoot}/maven_repo/android"]
+
+apply from: "${supportRoot}/buildSrc/dependencies.gradle"
+
+
+def loadDefaultVersions() {
+    apply from: "${supportRootFolder}/buildSrc/versions.gradle"
+}
+
+def addMavenRepositories(RepositoryHandler handler) {
+    repoNames.each { repo ->
+        handler.maven {
+            url repo
+        }
+        if (ext.init.enablePublicRepos) {
+            handler.mavenCentral()
+            handler.jcenter()
+        }
+    }
+}
+
+def enableDoclavaAndJDiff(p) {
+    p.configurations {
+        doclava
+        jdiff
+    }
+
+    p.dependencies {
+        doclava project(':doclava')
+        jdiff project(':jdiff')
+        jdiff libs.xml_parser_apis
+        jdiff libs.xerces_impl
+    }
+    apply from: "${ext.supportRootFolder}/buildSrc/diff_and_docs.gradle"
+}
+
+def setSdkInLocalPropertiesFile() {
+    final String platform = OperatingSystem.current().isMacOsX() ? 'darwin' : 'linux'
+    System.setProperty('android.dir', "${supportRootFolder}/../../")
+    final String fullSdkPath = "${init.prebuiltsRoot}/fullsdk-${platform}"
+    if (file(fullSdkPath).exists()) {
+        gradle.ext.currentSdk = 26
+        ext.buildToolsVersion = '26.0.0'
+        project.ext.androidJar = files("${fullSdkPath}/platforms/android-${gradle.ext.currentSdk}" +
+                "/android.jar")
+        System.setProperty('android.home', "${init.prebuiltsRoot}/fullsdk-${platform}")
+        File props = file("local.properties")
+        props.write "sdk.dir=${fullSdkPath}"
+    } else {
+        gradle.ext.currentSdk = 'current'
+        ext.buildToolsVersion = '24.0.1'
+        project.ext.androidJar = files("${init.prebuiltsRoot}/sdk/current/android.jar")
+        File props = file("local.properties")
+        props.write "android.dir=../../"
+    }
+}
+
+def setupRepoOutAndBuildNumber() {
+    ext.supportRepoOut = ''
+    ext.buildNumber = Integer.toString(ext.extraVersion)
+
+    /*
+     * With the build server you are given two env variables.
+     * The OUT_DIR is a temporary directory you can use to put things during the build.
+     * The DIST_DIR is where you want to save things from the build.
+     *
+     * The build server will copy the contents of DIST_DIR to somewhere and make it available.
+     */
+    if (System.env.DIST_DIR != null && System.env.OUT_DIR != null) {
+        buildDir = new File(System.env.OUT_DIR + '/gradle/frameworks/support/build')
+                .getCanonicalFile()
+        project.ext.distDir = new File(System.env.DIST_DIR).getCanonicalFile()
+
+        // the build server does not pass the build number so we infer it from the last folder of
+        // the dist path.
+        ext.buildNumber = project.ext.distDir.getName()
+    } else {
+        buildDir = file("${ext.supportRootFolder}/../../out/host/gradle/frameworks/support/build")
+        project.ext.distDir = new File("${ext.supportRootFolder}/../../out/dist")
+    }
+    subprojects {
+        // Change buildDir first so that all plugins pick up the new value.
+        project.buildDir = new File("$project.parent.buildDir/../$project.name/build")
+    }
+    ext.supportRepoOut = new File(buildDir, 'support_repo')
+    ext.testApkDistOut = ext.distDir
+    ext.docsDir = new File(buildDir, 'javadoc')
+}
+
+def configureSubProjects() {
+    // lint every library
+    def lintTask = project.tasks.create("lint")
+    subprojects {
+        // Only modify Android projects.
+        if (project.name.equals('doclava') || project.name.equals('jdiff')) return;
+
+        // Current SDK is set in studioCompat.gradle.
+        project.ext.currentSdk = gradle.ext.currentSdk
+        apply plugin: 'maven'
+
+        version = rootProject.ext.supportVersion
+        group = 'com.android.support'
+
+        init.addMavenRepositories(repositories)
+        project.plugins.whenPluginAdded { plugin ->
+            def isAndroidLibrary = "com.android.build.gradle.LibraryPlugin"
+                    .equals(plugin.class.name)
+            def isAndroidApp = "com.android.build.gradle.AppPlugin".equals(plugin.class.name)
+            def isJavaLibrary = "org.gradle.api.plugins.JavaPlugin".equals(plugin.class.name)
+
+            if (isAndroidLibrary || isAndroidApp) {
+                project.android.buildToolsVersion = rootProject.buildToolsVersion
+
+                // Enable code coverage for debug builds only if we are not running inside the IDE,
+                // since enabling coverage reports breaks the method parameter resolution in the IDE
+                // debugger.
+                project.android.buildTypes.debug.testCoverageEnabled =
+                        !hasProperty('android.injected.invoked.from.ide')
+
+                // Copy the class files in a jar to be later used to generate code coverage report
+                project.android.testVariants.all { v ->
+                    // check if the variant has any source files
+                    // and test coverage is enabled
+                    if (v.buildType.testCoverageEnabled
+                            && v.sourceSets.any { !it.java.sourceFiles.isEmpty() }) {
+                        def jarifyTask = project.tasks.create(
+                                name: "package${v.name.capitalize()}ClassFilesForCoverageReport",
+                                type: Jar) {
+                            from v.testedVariant.javaCompile.destinationDir
+                            exclude "**/R.class"
+                            exclude "**/R\$*.class"
+                            exclude "**/BuildConfig.class"
+                            destinationDir file(project.distDir)
+                            archiveName "${project.archivesBaseName}-${v.baseName}-allclasses.jar"
+                        }
+                        def jacocoAntConfig =
+                                project.configurations[JacocoPlugin.ANT_CONFIGURATION_NAME]
+                        def jacocoAntArtifacts = jacocoAntConfig.resolvedConfiguration
+                                .resolvedArtifacts
+                        def version = jacocoAntArtifacts.find { "org.jacoco.ant".equals(it.name) }
+                                .moduleVersion.id.version
+                        def collectJacocoAntPackages = project.tasks.create(
+                                name: "collectJacocoAntPackages",
+                                type: Jar) {
+                            from(jacocoAntArtifacts.collect { zipTree(it.getFile()) }) {
+                                // exclude all the signatures the jar might have
+                                exclude "META-INF/*.SF"
+                                exclude "META-INF/*.DSA"
+                                exclude "META-INF/*.RSA"
+                            }
+                            destinationDir file(project.distDir)
+                            archiveName "jacocoant-" + version + ".jar"
+                        }
+                        jarifyTask.dependsOn v.getJavaCompiler()
+                        v.assemble.dependsOn jarifyTask, collectJacocoAntPackages
+                    }
+                }
+
+                // Enforce NewApi lint check as fatal.
+                project.android.lintOptions.check 'NewApi'
+                project.android.lintOptions.fatal 'NewApi'
+                lintTask.dependsOn project.lint
+            }
+
+            if (isAndroidLibrary || isJavaLibrary) {
+                // Add library to the aggregate dependency report.
+                task allDeps(type: DependencyReportTask) {}
+
+                // Create release and separate zip task for library.
+                task release(type: Upload) {
+                    configuration = configurations.archives
+                    repositories {
+                        mavenDeployer {
+                            repository(url: uri("$rootProject.ext.supportRepoOut"))
+
+                            // Disable unique names for SNAPSHOTS so they can be updated in place.
+                            setUniqueVersion(false)
+                            doLast {
+                                // Remove any invalid maven-metadata.xml files that may have been
+                                // created for SNAPSHOT versions that are *not* uniquely versioned.
+                                pom*.each { pom ->
+                                    if (pom.version.endsWith('-SNAPSHOT')) {
+                                        final File artifactDir = new File(
+                                                rootProject.ext.supportRepoOut,
+                                                pom.groupId.replace('.', '/')
+                                                        + '/' + pom.artifactId
+                                                        + '/' + pom.version)
+                                        delete fileTree(dir: artifactDir,
+                                                include: 'maven-metadata.xml*')
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                def deployer = release.repositories.mavenDeployer
+                deployer.pom*.whenConfigured { pom ->
+                    pom.dependencies.findAll { dep ->
+                        dep.groupId == 'com.android.support' &&
+                                dep.artifactId != 'support-annotations'
+                    }*.type = 'aar'
+                }
+
+                ext.versionDir = {
+                    def groupDir = new File(rootProject.ext.supportRepoOut,
+                            project.group.replace('.', '/'))
+                    def artifactDir = new File(groupDir, archivesBaseName)
+                    return new File(artifactDir, version)
+                }
+
+                task generateSourceProps(dependsOn: createRepository)
+                generateSourceProps.doLast({
+                    def content = "Maven.GroupId=$deployer.pom.groupId\n" +
+                            "Maven.ArtifactId=$deployer.pom.artifactId\n" +
+                            "Maven.Version=$deployer.pom.version\n" +
+                            "Extra.VendorDisplay=Android\n" +
+                            "Extra.VendorId=android\n" +
+                            "Pkg.Desc=$project.name\n" +
+                            "Pkg.Revision=1\n" +
+                            "Maven.Dependencies=" +
+                            String.join(",", project.configurations.compile.allDependencies
+                                    .collect {
+                                def p = parent.findProject(it.name)
+                                return p ? "$p.group:$p.archivesBaseName:$p.version" : null
+                            }.grep()) +
+                            "\n"
+                    Files.write(content, new File(versionDir(), 'source.properties'),
+                            Charsets.UTF_8)
+                })
+
+                task createSeparateZip(type: Zip, dependsOn: generateSourceProps) {
+                    into archivesBaseName
+                    destinationDir project.parent.ext.distDir
+                    baseName = project.group
+                    version = project.parent.ext.buildNumber
+                }
+                project.parent.createArchive.dependsOn createSeparateZip
+
+                // Before the upload, make sure the repo is ready.
+                release.dependsOn rootProject.tasks.prepareRepo
+
+                // Make the mainupload depend on this one.
+                mainUpload.dependsOn release
+            }
+        }
+
+        project.afterEvaluate {
+            // The archivesBaseName isn't available initially, so set it now
+            def createZipTask = project.tasks.findByName("createSeparateZip")
+            if (createZipTask != null) {
+                createZipTask.appendix = archivesBaseName
+                createZipTask.from versionDir()
+            }
+
+            // Copy instrumentation test APK into the dist dir
+            def assembleTestTask = project.tasks.findByPath('assembleAndroidTest')
+            if (assembleTestTask != null) {
+                assembleTestTask.doLast {
+                    // If the project actually has some instrumentation tests, copy its APK
+                    if (!project.android.sourceSets.androidTest.java.sourceFiles.isEmpty()) {
+                        def pkgTask = project.tasks.findByPath('packageDebugAndroidTest')
+                        copy {
+                            from(pkgTask.outputFile)
+                            into(rootProject.ext.testApkDistOut)
+                        }
+                    }
+                }
+            }
+        }
+
+        project.afterEvaluate { p ->
+            // remove dependency on the test so that we still get coverage even if some tests fail
+            p.tasks.findAll { it instanceof JacocoReportTask }.each { task ->
+                def toBeRemoved = new ArrayList()
+                def dependencyList = task.taskDependencies.values
+                dependencyList.each { dep ->
+                    if (dep instanceof String) {
+                        def t = tasks.findByName(dep)
+                        if (t instanceof DeviceProviderInstrumentTestTask) {
+                            toBeRemoved.add(dep)
+                            task.mustRunAfter(t)
+                        }
+                    }
+                }
+                toBeRemoved.each { dep ->
+                    dependencyList.remove(dep)
+                }
+            }
+        }
+    }
+}
+
+def setupRelease() {
+    apply from: "${ext.supportRootFolder}/buildSrc/release.gradle"
+}
+
+ext.init.addMavenRepositories = this.&addMavenRepositories
+ext.init.enableDoclavaAndJDiff = this.&enableDoclavaAndJDiff
+ext.init.setSdkInLocalPropertiesFile = this.&setSdkInLocalPropertiesFile
+ext.init.setupRepoOutAndBuildNumber = this.&setupRepoOutAndBuildNumber
+ext.init.setupRelease = this.&setupRelease
+ext.init.loadDefaultVersions = this.&loadDefaultVersions
+ext.init.configureSubProjects = this.&configureSubProjects
