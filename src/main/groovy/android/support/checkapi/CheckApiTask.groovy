@@ -198,6 +198,7 @@ To make these errors go away, you have two choices:
 
     public CheckApiTask() {
         group = 'Verification'
+        description = 'Invoke Doclava\'s ApiCheck tool to make sure current.txt is up to date.'
     }
 
     private Set<File> collectAndVerifyInputs() {
