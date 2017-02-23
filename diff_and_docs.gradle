@@ -38,7 +38,16 @@ task generateDocs(type: DoclavaTask, dependsOn: configurations.doclava) {
     def hdfOption = new DoclavaMultilineJavadocOptionFileOption('hdf')
     hdfOption.add(
             ['android.whichdoc', 'online'],
-            ['android.hasSamples', 'true']);
+            ['android.hasSamples', 'true'])
+
+    // Track API change history.
+    def apiFilePattern = /(\d+\.\d+\.\d).txt/
+    def sinceOption = new DoclavaMultilineJavadocOptionFileOption('since')
+    File apiDir = new File(supportRootFolder, 'api')
+    apiDir.eachFileMatch FileType.FILES, ~apiFilePattern, { File apiFile ->
+        def apiLevel = (apiFile.name =~ apiFilePattern)[0][1]
+        sinceOption.add([apiFile.absolutePath, apiLevel])
+    }
 
     // Default hidden errors + hidden superclass (111) and
     // deprecation mismatch (113) to match framework docs.
@@ -55,6 +64,7 @@ task generateDocs(type: DoclavaTask, dependsOn: configurations.doclava) {
         addStringOption "stubpackages", "android.support.*"
         addStringOption "samplesdir", "${supportRootFolder}/samples"
         addOption hdfOption
+        addOption sinceOption
     }
 
     exclude '**/BuildConfig.java'
@@ -336,18 +346,16 @@ void registerJavaProjectForDocsTask(Task task, Project subProject, javaCompileTa
 
 subprojects { subProject ->
     subProject.afterEvaluate { p ->
-        if (!p.hasProperty("noDocs") || !p.noDocs) {
-            if (p.hasProperty('android') && p.android.hasProperty('libraryVariants')) {
-                p.android.libraryVariants.all { v ->
-                    if (v.name == 'release') {
-                        registerForDocsTask(rootProject.generateDocs, p, v)
-                        registerForDocsTask(rootProject.generateApi, p, v)
-                        registerForDocsTask(rootProject.generateDiffs, p, v)
-                    }
+        if (p.hasProperty('android') && p.android.hasProperty('libraryVariants')) {
+            p.android.libraryVariants.all { v ->
+                if (v.name == 'release') {
+                    registerForDocsTask(rootProject.generateDocs, p, v)
+                    registerForDocsTask(rootProject.generateApi, p, v)
+                    registerForDocsTask(rootProject.generateDiffs, p, v)
                 }
-            } else if (p.hasProperty("compileJava")) {
-                registerJavaProjectForDocsTask(rootProject.generateDocs, p, p.compileJava)
             }
+        } else if (p.hasProperty("compileJava")) {
+            registerJavaProjectForDocsTask(rootProject.generateDocs, p, p.compileJava)
         }
     }
 }

@@ -43,7 +43,7 @@ public class DoclavaMultilineJavadocOptionFileOption extends
     public void setValue(List<List<String>> value) {
         final List<List<String>> args = getValue();
         if (args == null) {
-            super.setValue(value);
+            super.setValue(new ArrayList<List<String>>(value));
         } else {
             args.addAll(value);
         }
@@ -52,7 +52,7 @@ public class DoclavaMultilineJavadocOptionFileOption extends
     public void add(List<String>... moreArgs) {
         final List<List<String>> args = getValue();
         if (args == null) {
-            super.setValue(Arrays.asList(moreArgs));
+            super.setValue(new ArrayList<List<String>>(Arrays.asList(moreArgs)));
         } else {
             args.addAll(Arrays.asList(moreArgs));
         }
