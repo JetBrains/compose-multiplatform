@@ -28,7 +28,8 @@ import groovy.io.FileType
 // Generates online docs.
 task generateDocs(type: DoclavaTask, dependsOn: configurations.doclava) {
     group = JavaBasePlugin.DOCUMENTATION_GROUP
-    description = 'Generates d.android.com style documentation.'
+    description = 'Generates d.android.com-style documentation.'
+
     docletpath = configurations.doclava.resolve()
     destinationDir = new File(project.docsDir, "online")
 
@@ -68,6 +69,21 @@ task generateDocs(type: DoclavaTask, dependsOn: configurations.doclava) {
     }
 
     exclude '**/BuildConfig.java'
+}
+
+// Generates a distribution artifact for online docs.
+task distDocs(type: Zip, dependsOn: generateDocs) {
+    group = JavaBasePlugin.DOCUMENTATION_GROUP
+    description = 'Generates distribution artifact for d.android.com-style documentation.'
+
+    from generateDocs.destinationDir
+    destinationDir project.distDir
+    baseName = "android-support-docs"
+    version = project.buildNumber
+
+    doLast {
+        logger.lifecycle('Wrote API reference to ${archivePath}')
+    }
 }
 
 JDiffTask createApiDiffsTask(String taskName, File oldApiXml, File newApiXml, File outDir,
