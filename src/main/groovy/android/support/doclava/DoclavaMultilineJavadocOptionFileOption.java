@@ -16,55 +16,56 @@
 
 package android.support.doclava;
 
-import org.gradle.external.javadoc.JavadocOptionFileOption;
+import org.gradle.external.javadoc.internal.AbstractJavadocOptionFileOption;
 import org.gradle.external.javadoc.internal.JavadocOptionFileWriterContext;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 /**
  * This class is used to hold complex argument(s) to doclava
  */
-public class DoclavaMultilineJavadocOptionFileOption implements JavadocOptionFileOption<List<List<String>>> {
-    private final String option;
-    private List<List<String>> args;
+public class DoclavaMultilineJavadocOptionFileOption extends
+        AbstractJavadocOptionFileOption<List<List<String>>> {
 
     public DoclavaMultilineJavadocOptionFileOption(String option) {
-        this.option = option;
+        super(option, null);
     }
 
-    public List<List<String>> getValue() {
-        return args;
+    public DoclavaMultilineJavadocOptionFileOption(String option, List<List<String>> value) {
+        super(option, value);
     }
 
+    @Override
     public void setValue(List<List<String>> value) {
-        if (this.args == null) {
-            this.args = new ArrayList<List<String>>(value.size());
+        final List<List<String>> args = getValue();
+        if (args == null) {
+            super.setValue(value);
+        } else {
+            args.addAll(value);
         }
-        this.args.addAll(value);
     }
 
     public void add(List<String>... moreArgs) {
-        if (this.args == null) {
-            this.args = new ArrayList<List<String>>(moreArgs.length);
-        }
-        for (List<String> arg : moreArgs) {
-            this.args.add(arg);
+        final List<List<String>> args = getValue();
+        if (args == null) {
+            super.setValue(Arrays.asList(moreArgs));
+        } else {
+            args.addAll(Arrays.asList(moreArgs));
         }
     }
 
-    public String getOption() {
-        return option;
-    }
-
+    @Override
     public void write(JavadocOptionFileWriterContext writerContext) throws IOException {
+        final List<List<String>> args = getValue();
         if (args != null && !args.isEmpty()) {
             for (List<String> arg : args) {
                 writerContext.writeOptionHeader(getOption());
                 if (!arg.isEmpty()) {
-                    Iterator<String> iter = arg.iterator();
+                    final Iterator<String> iter = arg.iterator();
                     while (true) {
                         writerContext.writeValue(iter.next());
                         if (!iter.hasNext()) {
@@ -76,5 +77,17 @@ public class DoclavaMultilineJavadocOptionFileOption implements JavadocOptionFil
                 writerContext.newLine();
             }
         }
+    }
+
+    /**
+     * @return a deep copy of the option
+     */
+    public DoclavaMultilineJavadocOptionFileOption duplicate() {
+        final List<List<String>> value = getValue();
+        final ArrayList<List<String>> valueCopy = new ArrayList<>(value.size());
+        for (List<String> item : value) {
+            valueCopy.add(new ArrayList<>(item));
+        }
+        return new DoclavaMultilineJavadocOptionFileOption(getOption(), valueCopy);
     }
 }
