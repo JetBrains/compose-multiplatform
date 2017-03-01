@@ -68,7 +68,6 @@ class SupportLibraryPlugin implements Plugin<Project> {
             manifest.srcFile 'tests/AndroidManifest.xml'
         }
 
-        /*
         // Always lint check NewApi as fatal.
         library.lintOptions {
             abortOnError true
@@ -88,7 +87,6 @@ class SupportLibraryPlugin implements Plugin<Project> {
             // Always fail on NewApi.
             error 'NewApi'
         }
-        */
 
         // Library projects don't run lint by default, so set up dependency.
         project.tasks.release.dependsOn project.tasks.lint
