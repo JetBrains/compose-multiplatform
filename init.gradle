@@ -32,6 +32,7 @@ ext.init.checkoutRoot = "${supportRoot}/../.."
 ext.init.prebuiltsRoot = "${init.checkoutRoot}/prebuilts"
 ext.init.prebuiltsRootUri = "file://${init.prebuiltsRoot}"
 ext.init.enablePublicRepos = System.getenv("ALLOW_PUBLIC_REPOS") != null
+ext.runningInBuildServer = System.env.DIST_DIR != null && System.env.OUT_DIR != null
 
 ext.repoNames = ["${init.prebuiltsRoot}/gradle-plugin",
                  "${init.prebuiltsRoot}/tools/common/m2/repository",
@@ -104,7 +105,7 @@ def setupRepoOutAndBuildNumber() {
      *
      * The build server will copy the contents of DIST_DIR to somewhere and make it available.
      */
-    if (System.env.DIST_DIR != null && System.env.OUT_DIR != null) {
+    if (ext.runningInBuildServer) {
         buildDir = new File(System.env.OUT_DIR + '/gradle/frameworks/support/build')
                 .getCanonicalFile()
         project.ext.distDir = new File(System.env.DIST_DIR).getCanonicalFile()
@@ -122,6 +123,7 @@ def setupRepoOutAndBuildNumber() {
     }
     ext.supportRepoOut = new File(buildDir, 'support_repo')
     ext.testApkDistOut = ext.distDir
+    ext.testResultsDistDir = new File(distDir, "host-test-reports")
     ext.docsDir = new File(buildDir, 'javadoc')
 }
 
@@ -130,7 +132,15 @@ def configureSubProjects() {
     def lintTask = project.tasks.create("lint")
     subprojects {
         // Only modify Android projects.
-        if (project.name.equals('doclava') || project.name.equals('jdiff')) return;
+        if (project.name.equals('doclava') || project.name.equals('jdiff')) {
+            // disable tests and return
+            project.tasks.whenTaskAdded { task ->
+                if (task instanceof org.gradle.api.tasks.testing.Test) {
+                    task.enabled = false
+                }
+            }
+            return
+        }
 
         // Current SDK is set in studioCompat.gradle.
         project.ext.currentSdk = gradle.ext.currentSdk
@@ -269,11 +279,11 @@ def configureSubProjects() {
 
                 task createSeparateZip(type: Zip, dependsOn: generateSourceProps) {
                     into archivesBaseName
-                    destinationDir project.parent.ext.distDir
+                    destinationDir rootProject.ext.distDir
                     baseName = project.group
-                    version = project.parent.ext.buildNumber
+                    version = rootProject.ext.buildNumber
                 }
-                project.parent.createArchive.dependsOn createSeparateZip
+                rootProject.createArchive.dependsOn createSeparateZip
 
                 // Before the upload, make sure the repo is ready.
                 release.dependsOn rootProject.tasks.prepareRepo
@@ -283,27 +293,58 @@ def configureSubProjects() {
             }
         }
 
+        // Copy instrumentation test APKs and app APKs into the dist dir
+        // For test apks, they are uploaded only if we have java test sources.
+        // For regular app apks, they are uploaded only if they have java sources.
+        project.tasks.whenTaskAdded { task ->
+            if (task.name.startsWith("packageDebug")) {
+                def testApk = task.name.contains("AndroidTest")
+                task.doLast {
+                    def source = testApk ? project.android.sourceSets.androidTest
+                            : project.android.sourceSets.main
+                    if (task.hasProperty("outputFile") && !source.java.sourceFiles.isEmpty()) {
+                        copy {
+                            from(task.outputFile)
+                            into(rootProject.ext.testApkDistOut)
+                            rename { String fileName ->
+                                // multiple modules may have the same name so prefix the name with
+                                // the module's path to ensure it is unique.
+                                // e.g. palette-v7-debug-androidTest.apk becomes
+                                // support-palette-v7_palette-v7-debug-androidTest.apk
+                                "${project.getPath().replace(':', '-').substring(1)}_${fileName}"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // copy host side test results to DIST
+        project.tasks.whenTaskAdded { task ->
+            if (task instanceof org.gradle.api.tasks.testing.Test) {
+                def junitReport = task.reports.junitXml
+                if (junitReport.enabled) {
+                    def zipTask = project.tasks.create(name : "zipResultsOf${task.name.capitalize()}", type : Zip) {
+                        destinationDir(testResultsDistDir)
+                        archiveName("${project.name}.zip")
+                    }
+                    if (project.rootProject.ext.runningInBuildServer) {
+                        task.ignoreFailures = true
+                    }
+                    task.finalizedBy zipTask
+                    task.doFirst {
+                        zipTask.from(junitReport.destination)
+                    }
+                }
+            }
+        }
+
         project.afterEvaluate {
             // The archivesBaseName isn't available initially, so set it now
             def createZipTask = project.tasks.findByName("createSeparateZip")
             if (createZipTask != null) {
                 createZipTask.appendix = archivesBaseName
                 createZipTask.from versionDir()
-            }
-
-            // Copy instrumentation test APK into the dist dir
-            def assembleTestTask = project.tasks.findByPath('assembleAndroidTest')
-            if (assembleTestTask != null) {
-                assembleTestTask.doLast {
-                    // If the project actually has some instrumentation tests, copy its APK
-                    if (!project.android.sourceSets.androidTest.java.sourceFiles.isEmpty()) {
-                        def pkgTask = project.tasks.findByPath('packageDebugAndroidTest')
-                        copy {
-                            from(pkgTask.outputFile)
-                            into(rootProject.ext.testApkDistOut)
-                        }
-                    }
-                }
             }
         }
 
