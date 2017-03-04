@@ -76,10 +76,10 @@ def enableDoclavaAndJDiff(p) {
 def setSdkInLocalPropertiesFile() {
     final String platform = OperatingSystem.current().isMacOsX() ? 'darwin' : 'linux'
     System.setProperty('android.dir', "${supportRootFolder}/../../")
+    ext.buildToolsVersion = '26.0.0'
     final String fullSdkPath = "${init.prebuiltsRoot}/fullsdk-${platform}"
     if (file(fullSdkPath).exists()) {
         gradle.ext.currentSdk = 26
-        ext.buildToolsVersion = '26.0.0'
         project.ext.androidJar = files("${fullSdkPath}/platforms/android-${gradle.ext.currentSdk}" +
                 "/android.jar")
         System.setProperty('android.home', "${init.prebuiltsRoot}/fullsdk-${platform}")
@@ -87,7 +87,6 @@ def setSdkInLocalPropertiesFile() {
         props.write "sdk.dir=${fullSdkPath}"
     } else {
         gradle.ext.currentSdk = 'current'
-        ext.buildToolsVersion = '24.0.1'
         project.ext.androidJar = files("${init.prebuiltsRoot}/sdk/current/android.jar")
         File props = file("local.properties")
         props.write "android.dir=../../"
