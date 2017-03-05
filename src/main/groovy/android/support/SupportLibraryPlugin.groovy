@@ -89,8 +89,7 @@ class SupportLibraryPlugin implements Plugin<Project> {
         }
 
         // Library projects don't run lint by default, so set up dependency.
-        // Disabled temporarily until we switch to Android Gradle Plugin 2.3
-        // project.tasks.release.dependsOn project.tasks.lint
+        project.tasks.release.dependsOn project.tasks.lint
 
         // Java 8 is only fully supported on API 24+ and not all Java 8 features are binary
         // compatible with API < 24, so use Java 7 for both source AND target.
