@@ -17,7 +17,10 @@
 package android.support.checkapi;
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.Nullable
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.WorkResult
@@ -28,10 +31,19 @@ public class UpdateApiTask extends DefaultTask {
     @InputFile
     File newRemovedApiFile
 
+    @Input
+    @Optional
+    Set whitelistErrors = []
+
     @OutputFile
     File oldApiFile
     @OutputFile
     File oldRemovedApiFile
+
+    @OutputFile
+    @Optional
+    @Nullable
+    File whitelistErrorsFile
 
     private WorkResult copyFromToFile(File src, File dest) {
         return project.copy {
@@ -45,6 +57,15 @@ public class UpdateApiTask extends DefaultTask {
     public void doUpdate() {
         copyFromToFile(getNewApiFile(), getOldApiFile())
         copyFromToFile(getNewRemovedApiFile(), getOldRemovedApiFile())
-        project.logger.warn("Updated ${getOldApiFile().name} and ${getOldRemovedApiFile().name} API files.")
+
+        if (whitelistErrorsFile && !whitelistErrors.empty) {
+            if (whitelistErrorsFile.exists()) {
+                whitelistErrors.removeAll(whitelistErrorsFile.readLines())
+            }
+            whitelistErrors.each { whitelistErrorsFile << "$it\n" }
+            logger.lifecycle "Whitelisted ${whitelistErrors.size()} error(s)..."
+        }
+
+        logger.lifecycle "Wrote public API definition to ${oldApiFile.name}"
     }
 }

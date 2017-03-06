@@ -29,130 +29,64 @@ import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.process.ExecResult
 
+import java.security.MessageDigest
+
 /**
- * A task to invoke Doclava's ApiCheck tool.
+ * Task used to verify changes between two API files.
  * <p>
- * By default, any API changes will be flagged as errors (strict mode). This
- * can be loosened to merely backwards compatibility checks using
- * {@link #configureAsBackwardsCompatCheck()}.
+ * This task may be configured to ignore, warn, or fail with a message for a specific set of
+ * Doclava-defined error codes. See {@link com.google.doclava.Errors} for a complete list of
+ * supported error codes.
+ * <p>
+ * Specific failures may be ignored by specifying a list of SHAs in {@link #whitelistErrors}. Each
+ * SHA is unique to a specific API change and is logged to the error output on failure.
  */
 @ParallelizableTask
 public class CheckApiTask extends DefaultTask {
+    /** Character that resets console output color. */
+    private static final String ANSI_RESET = "\u001B[0m";
 
-    // see external/doclava/src/com/google/doclava/Errors.java for error code meanings.
+    /** Character that sets console output color to red. */
+    private static final String ANSI_RED = "\u001B[31m";
 
-    // 2-6 are all the error represented added APIs.
-    private static final def API_ADDITIONS = (2..6)
+    /** Character that sets console output color to yellow. */
+    private static final String ANSI_YELLOW = "\u001B[33m";
 
-    // Everything past the addition errors except for:
-    // 15: CHANGED_VOLATILE
-    // 17: CHANGED_VALUE
-    // 22: CHANGED_NATIVE
-    // 27: REMOVED_FINAL
-    private static final def API_CHANGES_AND_REMOVALS = (7..27) - [15, 17, 22, 27]
-
-    // ApiCheck error types which will cause the build to fail
-    // Basically, error on everything but
-    // 15: CHANGED_VOLATILE
-    // 17: CHANGED_VALUE
-    // 22: CHANGED_NATIVE
-    // 27: REMOVED_FINAL
-    // But include the "catch all"
-    // 1: PARSE_ERROR
-    public static final def DEFAULT_CHECK_API_ERRORS = Collections.unmodifiableSet(
-            ([1] + API_ADDITIONS + API_CHANGES_AND_REMOVALS) as Set
-    )
-
-    // Ones we want to emit warnings for.
-    // 15: CHANGED_VOLATILE
-    // 17: CHANGED_VALUE
-    // 27: REMOVED_FINAL
-    public static final def DEFAULT_CHECK_API_WARNINGS = Collections.unmodifiableSet(
-            [15, 17, 27] as Set
-    )
-
-    // Ones to just to just ignore as they usually aren't useful.
-    // 22: CHANGED_NATIVE
-    public static final def DEFAULT_CHECK_API_HIDDEN = Collections.singleton(22)
-
-    // ApiCheck error types for backwards compatiblity API checks which will cause the build to fail.
-    // Allow additions, but not removals or changes, except for deprecation changes.
-    // 24: CHANGED_DEPRECATED
-    // But include the "catch all"
-    // 1: PARSE_ERROR
-    public static final def DEFAULT_CHECK_API_BACKWARDS_COMPAT_ERRORS = Collections.unmodifiableSet(
-            ([1] + API_CHANGES_AND_REMOVALS - [24]) as Set
-    )
-
-    // Same as the normal warnings, but with deprecation added as a warning type.
-    public static final def DEFAULT_CHECK_API_BACKWARDS_COMPAT_WARNINGS = Collections.unmodifiableSet(
-            (DEFAULT_CHECK_API_WARNINGS + [24]) as Set
-    )
-
-    // Same as the normal hidden ones + all API addition errors.
-    public static final def DEFAULT_CHECK_API_BACKWARDS_COMPAT_HIDDEN = Collections.unmodifiableSet(
-            (DEFAULT_CHECK_API_HIDDEN + API_ADDITIONS) as Set
-    )
-
-
-    // Error messages shamelessly ripped from AOSP's check-api error message.
-    // For these templates, the parameters are:
-    // See #getOnFailMessage()
-    // 1: oldApiFile.name
-    // 2: oldRemovedApiFile.name
-    // 3: updateApiTaskPath
-    // 4: checkApiTaskPath
-    private static final String DEFAULT_ERROR_MESSAGE_WITH_UPDATE_TASK =
-            '''******************************
-You have tried to change the API from what has been previously approved.
-
-To make these errors go away, you have two choices:
-   1) You can add "@hide" javadoc comments to the methods, etc. listed in the
-      errors above.
-
-   2) You can update %1$s and %2$s
-      by executing the following command:
-          ./gradlew %3$s
-
-      To submit the revised %1$s and %2$s
-      to the main repository, you will need approval.
-
-   You can re-run just the API checks using the command:
-       ./gradlew %4$s
-******************************'''
-
-    private static final String DEFAULT_ERROR_MESSAGE_WITHOUT_UPDATE_TASK =
-            '''******************************
-    You have tried to change the API from what has been previously approved.
-
-    To make these errors go away you can add "@hide" javadoc comments to the methods, etc. listed
-    in the errors above.
-
-    You can re-run just the API checks using the command:
-        ./gradlew %4$s
-******************************'''
-
-    private static final String DEFAULT_ERROR_MESSAGE_FOR_BACKWARDS_COMPAT =
-            '''******************************
-    You have tried to change the API from what has been previously released in
-    an SDK.  Please fix the errors listed above.
-
-    You can re-run just the API checks using the command:
-        ./gradlew %4$s
-******************************'''
-
+    /** API file that represents the existing API surface. */
     @InputFile
     File oldApiFile
+
+    /** API file that represents the existing API surface's removals. */
     @InputFile
     File oldRemovedApiFile
 
+    /** API file that represents the candidate API surface. */
     @InputFile
     File newApiFile
+
+    /** API file that represents the candidate API surface's removals. */
     @InputFile
     File newRemovedApiFile
 
+    /** Optional file containing a newline-delimited list of error SHAs to ignore. */
+    @Nullable
+    File whitelistErrorsFile
+
+    @Optional
+    @Nullable
+    @InputFile
+    File getWhiteListErrorsFileInput() {
+        // Gradle requires non-null InputFiles to exist -- even with Optional -- so work around that
+        // by returning null for this field if the file doesn't exist.
+        if (whitelistErrorsFile && whitelistErrorsFile.exists()) {
+            return whitelistErrorsFile;
+        }
+        return null;
+    }
+
     /**
-     * If non-null, the list of packages to ignore any API checks on.<br>
+     * Optional list of packages to ignore.
+     * <p>
      * Packages names will be matched exactly; sub-packages are not automatically recognized.
      */
     @Optional
@@ -161,14 +95,24 @@ To make these errors go away, you have two choices:
     Collection ignoredPackages = null
 
     /**
-     * If non-null, the list of classes to ignore any API checks on.<br>
-     * Class names will be matched exactly by their full qualified names; inner classes are not
+     * Optional list of classes to ignore.
+     * <p>
+     * Class names will be matched exactly by their fully-qualified names; inner classes are not
      * automatically recognized.
      */
     @Optional
     @Nullable
     @Input
     Collection ignoredClasses = null
+
+    /**
+     * Optional set of error SHAs to ignore.
+     * <p>
+     * Each error SHA is unique to a specific API change.
+     */
+    @Optional
+    @Input
+    Set whitelistErrors = []
 
     @InputFiles
     Collection<File> doclavaClasspath
@@ -189,28 +133,33 @@ To make these errors go away, you have two choices:
         mOutputFile = outputFile
     }
 
+    /**
+     * List of Doclava error codes to treat as errors.
+     * <p>
+     * See {@link com.google.doclava.Errors} for a complete list of error codes.
+     */
     @Input
-    Collection checkApiErrors = DEFAULT_CHECK_API_ERRORS
+    Collection checkApiErrors
 
+    /**
+     * List of Doclava error codes to treat as warnings.
+     * <p>
+     * See {@link com.google.doclava.Errors} for a complete list of error codes.
+     */
     @Input
-    Collection checkApiWarnings = DEFAULT_CHECK_API_WARNINGS
+    Collection checkApiWarnings
 
+    /**
+     * List of Doclava error codes to ignore.
+     * <p>
+     * See {@link com.google.doclava.Errors} for a complete list of error codes.
+     */
     @Input
-    Collection checkApiHidden = DEFAULT_CHECK_API_HIDDEN
+    Collection checkApiHidden
 
-    // The following are optional. They are only used for constructing the failure message.
-    @Nullable
-    @Optional
-    String checkApiTaskPath;
-    @Nullable
-    @Optional
-    String updateApiTaskPath;
-
-    private String checkApiTaskPathToPrint() {
-        return getCheckApiTaskPath() ?: this.path
-    }
-
-    private def mOnFailMessage
+    /** Message to display on API check failure. */
+    @Input
+    String onFailMessage
 
     public CheckApiTask() {
         group = 'Verification'
@@ -218,7 +167,8 @@ To make these errors go away, you have two choices:
     }
 
     private Set<File> collectAndVerifyInputs() {
-        Set<File> apiFiles = [getOldApiFile(), getNewApiFile(), getOldRemovedApiFile(), getNewRemovedApiFile()] as Set
+        Set<File> apiFiles = [getOldApiFile(), getNewApiFile(), getOldRemovedApiFile(),
+                              getNewRemovedApiFile()] as Set
         if (apiFiles.size() != 4) {
             throw new InvalidUserDataException("""Conflicting input files:
     oldApiFile: ${getOldApiFile()}
@@ -228,70 +178,6 @@ To make these errors go away, you have two choices:
 All of these must be distinct files.""")
         }
         return apiFiles;
-    }
-
-    /**
-     * Returns the preprocessed failure message.<br>
-     * This string will be passed to {@link String#format(String, Object[])} as the format
-     * string with the given parameters to get the failure message.<br>
-     * The arguments used are:<br>
-     * 1 (String): oldApiFile.name<br>
-     * 2 (String): oldRemovedApiFile.name<br>
-     * 3 (String): updateApiTaskPath<br>
-     * 4 (String): checkApiTaskPath<br>
-     * The format string need not use all, or even any, of these arguments.
-     */
-    public String getOnFailMessage() {
-        return (mOnFailMessage == null ?
-                (getUpdateApiTaskPath() == null ?
-                        DEFAULT_ERROR_MESSAGE_WITHOUT_UPDATE_TASK :
-                        DEFAULT_ERROR_MESSAGE_WITH_UPDATE_TASK
-                ) : mOnFailMessage.toString())
-    }
-
-    /**
-     * Returns the failure error message after all the arguments have been processed through
-     * {@link String#format(String, Object[])}. This String is what will be used as the
-     * error mesage upon failure.<br>
-     * See {@link #getOnFailMessage()} for how the arguments are evaluated.
-     */
-    public String getOnFailMessageFormatted() {
-        return String.format(getOnFailMessage(),
-                getOldApiFile().name,
-                getOldRemovedApiFile().name,
-                getUpdateApiTaskPath(),
-                getCheckApiTaskPath())
-    }
-
-    /**
-     * Sets the preprocessed failure message.<br>
-     * The given string will be passed to {@link String#format(String, Object[])} as the format
-     * string with the given parameters to get the final failure message.<br>
-     * The arguments used are:<br>
-     * 1 (String): oldApiFileName<br>
-     * 2 (String): oldRemovedApiFileName<br>
-     * 3 (String): updateApiTaskPath<br>
-     * 4 (String): checkApiTaskPath<br>
-     * The format string need not use all, or even any, of these arguments.
-     */
-    public void setOnFailMessage(Object onFailMessage) {
-        mOnFailMessage = onFailMessage
-    }
-
-    /**
-     * Configures this CheckApiTask with reasonable defaults for backwards compatibility checks,
-     * which are a bit looser than the normal defaults of erroring on any changes.<br>
-     * In particular, this will cause the api check to allow additions of new APIs, though removals
-     * and changes of existing APIs will still be marked as errors.<p>
-     *
-     * Please note that this will set several properties of this task, overwriting any values they
-     * may already be set to. This method is meant to be called first thing when configuring this CheckApiTask.
-     */
-    public void configureAsBackwardsCompatCheck() {
-        checkApiErrors = DEFAULT_CHECK_API_BACKWARDS_COMPAT_ERRORS
-        checkApiWarnings = DEFAULT_CHECK_API_BACKWARDS_COMPAT_WARNINGS
-        checkApiHidden = DEFAULT_CHECK_API_BACKWARDS_COMPAT_HIDDEN
-        mOnFailMessage = DEFAULT_ERROR_MESSAGE_FOR_BACKWARDS_COMPAT
     }
 
     public void setCheckApiErrors(Collection errors) {
@@ -311,13 +197,12 @@ All of these must be distinct files.""")
 
     @TaskAction
     public void exec() {
-        // TODO(csyoung) Option to run this within the build JVM rather than always fork?
         final def apiFiles = collectAndVerifyInputs()
-        // TODO(csyoung) Right now, it is difficult to get the exit code of an ExecTask (including
-        // JavaExec), and it is also difficult to have a custom error message on failure. But it is
-        // easy to get the exit code with Project#javaexec.
+
+        OutputStream errStream = new ByteArrayOutputStream()
+
         // If either of those gets tweaked, then this should be refactored to extend JavaExec.
-        ExecResult result = project.javaexec {
+        project.javaexec {
             // Put Doclava on the classpath so we can get the ApiCheck class.
             classpath(getDoclavaClasspath())
             main = 'com.google.doclava.apicheck.ApiCheck'
@@ -343,12 +228,45 @@ All of these must be distinct files.""")
 
             args(apiFiles.collect( { it.absolutePath } ))
 
+            // Redirect error output so that we can whitelist specific errors.
+            errorOutput = errStream
+
             // We will be handling failures ourselves with a custom message.
             ignoreExitValue = true
         }
 
-        if (result.exitValue != 0) {
-            throw new GradleException(getOnFailMessageFormatted())
+        // Load the whitelist file, if present.
+        if (whitelistErrorsFile && whitelistErrorsFile.exists()) {
+            whitelistErrors += whitelistErrorsFile.readLines()
+        }
+
+        // Parse the error output.
+        def unparsedErrors = []
+        def ignoredErrors = []
+        def parsedErrors = []
+        errStream.toString().split("\n").each {
+            if (it) {
+                def matcher = it =~ ~/^(.+):(.+): (\w+) (\d+): (.+)$/
+                if (!matcher) {
+                    unparsedErrors += [it]
+                } else if (matcher[0][3] == "error") {
+                    def hash = getShortHash(matcher[0][5]);
+                    def error = matcher[0][1..-1] + [hash]
+                    if (hash in whitelistErrors) {
+                        ignoredErrors += [error]
+                    } else {
+                        parsedErrors += [error]
+                    }
+                }
+            }
+        }
+
+        unparsedErrors.each { error -> logger.error "$ANSI_RED$error$ANSI_RESET" }
+        parsedErrors.each { logger.error "$ANSI_RED${it[5]}$ANSI_RESET ${it[4]}"}
+        ignoredErrors.each { logger.warn "$ANSI_YELLOW${it[5]}$ANSI_RESET ${it[4]}"}
+
+        if (unparsedErrors || parsedErrors) {
+            throw new GradleException(onFailMessage)
         }
 
         // Just create a dummy file upon completion. Without any outputs, Gradle will run this task
@@ -356,5 +274,12 @@ All of these must be distinct files.""")
         File outputFile = getOutputFile()
         outputFile.parentFile.mkdirs()
         outputFile.createNewFile()
+    }
+
+    def getShortHash(src) {
+        return MessageDigest.getInstance("SHA-1")
+                .digest(src.toString().bytes)
+                .encodeHex()
+                .toString()[-7..-1]
     }
 }

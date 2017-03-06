@@ -25,6 +25,9 @@ import org.gradle.api.InvalidUserDataException
 
 import groovy.io.FileType
 
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
 // Set up platform API files for federation.
 if (project.androidApiTxt != null) {
     task generateSdkApi(type: Copy) {
@@ -142,6 +145,74 @@ task distDocs(type: Zip, dependsOn: generateDocs) {
     }
 }
 
+def MSG_HIDE_API =
+        "If you are adding APIs that should be excluded from the public API surface,\n" +
+        "consider using package or private visibility. If the API must have public\n" +
+        "visibility, you may exclude it from public API by using the @hide javadoc\n" +
+        "annotation paired with the @RestrictTo(LIBRARY_GROUP) code annotation."
+
+// Check that the API we're building hasn't broken compatibility with the
+// previously released version. These types of changes are forbidden.
+def CHECK_API_CONFIG_RELEASE = [
+    onFailMessage:
+            "Compatibility with previously released public APIs has been broken. Please\n" +
+            "verify your change with Support API Council and provide error output,\n" +
+            "including the error messages and associated SHAs.\n" +
+            "\n" +
+            "If you are removing APIs, they must be deprecated first before being removed\n" +
+            "in a subsequent release.\n" +
+            "\n" + MSG_HIDE_API,
+    errors: (7..18),
+    warnings: [],
+    hidden: (2..6) + (19..30)
+]
+
+// Check that the API we're building hasn't changed from the development
+// version. These types of changes require an explicit API file update.
+def CHECK_API_CONFIG_DEVELOP = [
+    onFailMessage:
+            "Public API definition has changed. Please run ./gradlew updateApi to confirm\n" +
+            "these changes are intentional by updating the public API definition.\n" +
+            "\n" + MSG_HIDE_API,
+    errors: (2..30)-[22],
+    warnings: [],
+    hidden: [22]
+]
+
+// This is a patch or finalized release. Check that the API we're building
+// hasn't changed from the current.
+def CHECK_API_CONFIG_PATCH = [
+    onFailMessage:
+            "Public API definition may not change in finalized or patch releases.\n" +
+            "\n" + MSG_HIDE_API,
+    errors: (2..30)-[22],
+    warnings: [],
+    hidden: [22]
+]
+
+CheckApiTask createCheckApiTask(String taskName, def checkApiConfig, File oldApi, File newApi,
+                                File whitelist = null) {
+    return tasks.create(name: taskName, type: CheckApiTask.class) {
+        doclavaClasspath = generateApi.docletpath
+
+        onFailMessage = checkApiConfig.onFailMessage
+        checkApiErrors = checkApiConfig.errors
+        checkApiWarnings = checkApiConfig.warnings
+        checkApiHidden = checkApiConfig.hidden
+
+        newApiFile = newApi
+        oldApiFile = oldApi
+        newRemovedApiFile = new File(project.docsDir, 'release/removed.txt')
+        oldRemovedApiFile = new File(supportRootFolder, 'api/removed.txt')
+
+        whitelistErrorsFile = whitelist
+
+        doLast {
+            logger.lifecycle "Verified ${newApi.name} against ${oldApi.name}..."
+        }
+    }
+}
+
 // Generates API files.
 task generateApi(type: DoclavaTask, dependsOn: configurations.doclava) {
     docletpath = configurations.doclava.resolve()
@@ -163,96 +234,103 @@ task generateApi(type: DoclavaTask, dependsOn: configurations.doclava) {
     exclude '**/R.java'
 }
 
-// Copies generated API files to current version.
-task updateApi(type: UpdateApiTask, dependsOn: generateApi) {
-    group JavaBasePlugin.VERIFICATION_GROUP
-    description 'Invoke Doclava\'s ApiCheck tool to update current.txt based on current changes.'
-    newApiFile = new File(project.docsDir, 'release/current.txt')
-    oldApiFile = new File(supportRootFolder, 'api/current.txt')
-    newRemovedApiFile = new File(project.docsDir, 'release/removed.txt')
-    oldRemovedApiFile = new File(supportRootFolder, 'api/removed.txt')
-}
+/**
+ * Returns the most recent API, optionally restricting to APIs before
+ * <code>beforeApi</code>.
+ *
+ * @param refApi the reference API version, ex. 25.0.0-SNAPSHOT
+ * @return the most recently released API file
+ */
+File getApiFile(String refApi = supportVersion, boolean previous = false, boolean release = false) {
+    def refMatcher = refApi =~ /^(\d+)\.(\d+)\.(\d+)(-.+)?$/
+    def refMajor = refMatcher[0][1] as int
+    def refMinor = refMatcher[0][2] as int
+    def refPatch = refMatcher[0][3] as int
+    def refExtra = refMatcher[0][4]
 
-// Finalizes the API file for a release version.
-task finalizeApi(type: Copy, dependsOn: updateApi) {
-    group JavaBasePlugin.VERIFICATION_GROUP
-    description 'Finalize the API definition for the current release.'
+    File apiDir = new File(ext.supportRootFolder, 'api')
 
-    def apiVersion = project.supportVersion;
-    if (project.hasProperty("revision")) {
-        apiVersion = revision;
+    if (!previous) {
+        // If this is a patch or release version, ignore the extra.
+        return new File(apiDir, "$refMajor.$refMinor.0" +
+                (refPatch || release ? "" : refExtra) + ".txt")
     }
 
-    File currentApiFile = new File(project.rootDir, 'api/current.txt')
-    File finalizedApiFile = new File(currentApiFile.parentFile, "${apiVersion}.txt")
+    File lastFile = null
+    def lastMajor
+    def lastMinor
 
-    from currentApiFile.absolutePath
-    into finalizedApiFile.parent
-    rename { finalizedApiFile.name }
+    // Only look at released versions, e.g. X.Y.0.txt.
+    apiDir.eachFileMatch FileType.FILES, ~/(\d+)\.(\d+)\.0\.txt/, { File file ->
+        def matcher = file.name =~ /(\d+)\.(\d+)\.0\.txt/
+        def major = matcher[0][1] as int
+        def minor = matcher[0][2] as int
 
-    doFirst {
-        // Verify this is a proper release version.
-        if (!(apiVersion ==~ /^\d+\.\d+\.\d+$/)) {
-            throw new InvalidUserDataException("${apiVersion} is not valid release version format. "
-                    + "Use -Prevision=X.Y.Z to specify an explicit version.")
+        if (lastFile == null || major > lastMajor || (major == lastMajor && minor > lastMinor)) {
+            if (refMajor > major || (refMajor == major && refMinor > minor)) {
+                lastFile = file
+                lastMajor = major;
+                lastMinor = minor;
+            }
         }
-
-        // Verify that we're not accidentally overwriting an existing API file.
-        if (finalizedApiFile.exists() && !(project.hasProperty("overwrite") && overwrite)) {
-            throw new InvalidUserDataException("Version ${apiVersion} has already been "
-                    + "finalized. Use -Poverwrite=true to overwrite.")
-        }
     }
 
-    doLast {
-        project.logger.warn("Wrote ${finalizedApiFile.getParentFile().name}/"
-                + "${finalizedApiFile.name} API file.")
-    }
+    return lastFile
 }
 
-// Checks generated API files against current version.
-task checkApi(type: CheckApiTask, dependsOn: generateApi) {
-    doclavaClasspath = generateApi.docletpath
-
-    checkApiTaskPath = name
-    updateApiTaskPath = updateApi.name
-
-    // Check that the API we're building hasn't changed from the development
-    // version. These typed of changes require an explicit API file update.
-    checkApiErrors = (2..30)-[22]
-    checkApiWarnings = []
-    checkApiHidden = [22]
-
-    newApiFile = new File(project.docsDir, 'release/current.txt')
-    oldApiFile = new File(supportRootFolder, 'api/current.txt')
-    newRemovedApiFile = new File(project.docsDir, 'release/removed.txt')
-    oldRemovedApiFile = new File(supportRootFolder, 'api/removed.txt')
+String stripExtension(String fileName) {
+    return fileName[0..fileName.lastIndexOf('.')-1]
 }
+
+// Make sure the API surface has not broken since the last release.
+def isPatchVersion = supportVersion ==~ /\d+\.\d+.[1-9]\d*(-.+)?/
+def isSnapshotVersion = supportVersion ==~ /\d+\.\d+.\d+-SNAPSHOT/
+def previousApiFile = getApiFile(project.supportVersion, !isPatchVersion)
+def whitelistFile = new File(
+        previousApiFile.parentFile, stripExtension(previousApiFile.name) + ".ignore")
+def checkApiRelease = createCheckApiTask("checkApiRelease", CHECK_API_CONFIG_RELEASE,
+        previousApiFile, generateApi.apiFile, whitelistFile).dependsOn(generateApi)
+
+// Allow a comma-delimited list of whitelisted errors.
+if (project.hasProperty("ignore")) {
+    checkApiRelease.whitelistErrors = ignore.split(',')
+}
+
+// Check whether the development API surface has changed.
+def verifyConfig = isPatchVersion != 0 ? CHECK_API_CONFIG_DEVELOP : CHECK_API_CONFIG_PATCH;
+def checkApi = createCheckApiTask("checkApi", verifyConfig, getApiFile(), generateApi.apiFile)
+        .dependsOn(generateApi, checkApiRelease)
+
+checkApi.group JavaBasePlugin.VERIFICATION_GROUP
+checkApi.description 'Verify the API surface.'
 
 rootProject.createArchive.dependsOn checkApi
 
-
-// Checks generated API files against current version.
-task checkApiStable(type: CheckApiTask, dependsOn: generateApi) {
-    doclavaClasspath = generateApi.docletpath
-
-    checkApiTaskPath = name
-    updateApiTaskPath = updateApi.name
-
-    // Check that the API we're building hasn't broken the last-released
-    // library version. These types of changes are forbidden.
-    checkApiErrors = (7..18)
-    checkApiWarnings = [23, 24]
-    checkApiHidden = (2..6) + (19..22) + (25..30)
-
-    newApiFile = new File(project.docsDir, 'release/current.txt')
-    oldApiFile = getReleasedApiFile()
-    newRemovedApiFile = new File(project.docsDir, 'release/removed.txt')
-    oldRemovedApiFile = new File(supportRootFolder, 'api/removed.txt')
+task verifyUpdateApiAllowed() {
+    // This could be moved to doFirst inside updateApi, but using it as a
+    // dependency with no inputs forces it to run even when updateApi is a
+    // no-op.
+    doLast {
+        if (isPatchVersion) {
+            throw new GradleException("Public APIs may not be modified in patch releases.")
+        } else if (isSnapshotVersion && getApiFile(supportVersion, false, true).exists()) {
+            throw new GradleException("Inconsistent version. Public API file already exists.")
+        } else if (!isSnapshotVersion && getApiFile().exists() && !project.hasProperty("force")) {
+            throw new GradleException("Public APIs may not be modified in finalized releases.")
+        }
+    }
 }
 
-checkApi.dependsOn checkApiStable
-
+task updateApi(type: UpdateApiTask, dependsOn: [checkApiRelease, verifyUpdateApiAllowed]) {
+    group JavaBasePlugin.VERIFICATION_GROUP
+    description 'Updates the candidate API file to incorporate valid changes.'
+    newApiFile = checkApiRelease.newApiFile
+    oldApiFile = getApiFile()
+    newRemovedApiFile = new File(project.docsDir, 'release/removed.txt')
+    oldRemovedApiFile = new File(supportRootFolder, 'api/removed.txt')
+    whitelistErrors = checkApiRelease.whitelistErrors
+    whitelistErrorsFile = checkApiRelease.whitelistErrorsFile
+}
 
 /**
  * Converts the <code>toApi</code>.txt file (or current.txt if not explicitly
@@ -289,10 +367,10 @@ task oldApiXml(type: ApiXmlConversionTask, dependsOn: configurations.doclava) {
     } else if (project.hasProperty("toApi") && toApi.matches(~/(\d+\.){2}\d+/)) {
         // If toApi matches released API (X.Y.Z) format, use the most recently
         // released API file prior to toApi.
-        inputApiFile = getReleasedApiFile(toApi)
+        inputApiFile = getApiFile(toApi, true)
     } else {
         // Use the most recently released API file.
-        inputApiFile = getReleasedApiFile();
+        inputApiFile = getApiFile();
     }
 
     int lastDot = inputApiFile.name.lastIndexOf('.')
@@ -349,31 +427,6 @@ task generateDiffs(type: JDiffTask, dependsOn: [configurations.jdiff, configurat
 
     exclude '**/BuildConfig.java'
     exclude '**/R.java'
-}
-
-/**
- * Returns the most recently released API, optionally restricting to APIs
- * before <code>beforeApi</code>.
- *
- * @param beforeApi the API to find an API file before, ex. 25.0.0
- * @return the most recently released API file
- */
-File getReleasedApiFile(String beforeApi = null) {
-    String beforeApiFileName = beforeApi != null ? beforeApi + ".txt" : null
-    File lastReleasedApiFile = null
-    File apiDir = new File(ext.supportRootFolder, 'api')
-
-    apiDir.eachFileMatch FileType.FILES, ~/(\d+\.){3}txt/, { File apiFile ->
-        // Is the current API file newer than the last one we saw?
-        if (lastReleasedApiFile == null || apiFile.name > lastReleasedApiFile.name) {
-            // Is the current API file older than the "before" API?
-            if (beforeApiFileName == null || apiFile.name < beforeApiFileName) {
-                lastReleasedApiFile = apiFile
-            }
-        }
-    }
-
-    return lastReleasedApiFile
 }
 
 // configuration file for setting up api diffs and api docs
