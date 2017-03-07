@@ -346,16 +346,18 @@ void registerJavaProjectForDocsTask(Task task, Project subProject, javaCompileTa
 
 subprojects { subProject ->
     subProject.afterEvaluate { p ->
-        if (p.hasProperty('android') && p.android.hasProperty('libraryVariants')) {
-            p.android.libraryVariants.all { v ->
-                if (v.name == 'release') {
-                    registerForDocsTask(rootProject.generateDocs, p, v)
-                    registerForDocsTask(rootProject.generateApi, p, v)
-                    registerForDocsTask(rootProject.generateDiffs, p, v)
+        if (!p.hasProperty("noDocs") || !p.noDocs) {
+            if (p.hasProperty('android') && p.android.hasProperty('libraryVariants')) {
+                p.android.libraryVariants.all { v ->
+                    if (v.name == 'release') {
+                        registerForDocsTask(rootProject.generateDocs, p, v)
+                        registerForDocsTask(rootProject.generateApi, p, v)
+                        registerForDocsTask(rootProject.generateDiffs, p, v)
+                    }
                 }
+            } else if (p.hasProperty("compileJava")) {
+                registerJavaProjectForDocsTask(rootProject.generateDocs, p, p.compileJava)
             }
-        } else if (p.hasProperty("compileJava")) {
-            registerJavaProjectForDocsTask(rootProject.generateDocs, p, p.compileJava)
         }
     }
 }
