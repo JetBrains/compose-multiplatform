@@ -21,6 +21,8 @@ import com.android.build.gradle.api.AndroidSourceSet
 import com.android.build.gradle.api.LibraryVariant
 import com.android.builder.core.BuilderConstants
 import com.google.common.collect.ImmutableMap
+import net.ltgt.gradle.errorprone.ErrorProneBasePlugin
+import net.ltgt.gradle.errorprone.ErrorProneToolChain
 import org.gradle.api.Action
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
@@ -43,6 +45,8 @@ class SupportLibraryPlugin implements Plugin<Project> {
                 project.getExtensions().create("supportLibrary", SupportLibraryExtension);
 
         project.apply(ImmutableMap.of("plugin", "com.android.library"));
+        project.apply(ImmutableMap.of("plugin", ErrorProneBasePlugin.class));
+
         LibraryExtension library =
                 project.getExtensions().findByType(LibraryExtension.class);
 
@@ -151,5 +155,29 @@ class SupportLibraryPlugin implements Plugin<Project> {
                 }
             });
         }
+
+        final ErrorProneToolChain toolChain = ErrorProneToolChain.create(project);
+        library.getBuildTypes().create("errorProne")
+        library.getLibraryVariants().all(new Action<LibraryVariant>() {
+            @Override
+            void execute(LibraryVariant libraryVariant) {
+                if (libraryVariant.getBuildType().getName().equals("errorProne")) {
+                    libraryVariant.getJavaCompile().setToolChain(toolChain);
+
+                    // TODO(aurimas): remove this once all these warnings are fixed.
+                    libraryVariant.getJavaCompile().options.compilerArgs += [
+                            '-Xep:MissingCasesInEnumSwitch:WARN',
+                            '-Xep:TypeParameterUnusedInFormals:WARN',
+                            '-Xep:MissingOverride:WARN',
+                            '-Xep:ArrayToString:WARN',
+                            '-Xep:IdentityBinaryExpression:WARN',
+                            '-Xep:MislabeledAndroidString:WARN',
+                            '-Xep:SelfEquals:WARN',
+                            '-Xep:RectIntersectReturnValueIgnored:WARN',
+                            '-Xep:FallThrough:WARN'
+                    ]
+                }
+            }
+        })
     }
 }
