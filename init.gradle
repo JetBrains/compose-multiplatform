@@ -80,8 +80,10 @@ def setSdkInLocalPropertiesFile() {
     final String fullSdkPath = "${init.prebuiltsRoot}/fullsdk-${platform}"
     if (file(fullSdkPath).exists()) {
         gradle.ext.currentSdk = 26
-        project.ext.androidJar = files("${fullSdkPath}/platforms/android-${gradle.ext.currentSdk}" +
-                "/android.jar")
+        project.ext.androidJar =
+                files("${fullSdkPath}/platforms/android-${gradle.currentSdk}/android.jar")
+        project.ext.androidSrcJar =
+                file("${fullSdkPath}/platforms/android-${gradle.currentSdk}/android-stubs-src.jar")
         System.setProperty('android.home', "${init.prebuiltsRoot}/fullsdk-${platform}")
         File props = file("local.properties")
         props.write "sdk.dir=${fullSdkPath}"
@@ -89,6 +91,7 @@ def setSdkInLocalPropertiesFile() {
     } else {
         gradle.ext.currentSdk = 'current'
         project.ext.androidJar = files("${init.prebuiltsRoot}/sdk/current/android.jar")
+        project.ext.androidSrcJar = files("${init.prebuiltsRoot}/sdk/current/android-stubs-src.jar")
         File props = file("local.properties")
         props.write "android.dir=../../"
         ext.usingFullSdk = false
