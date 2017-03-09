@@ -168,6 +168,7 @@ class SupportLibraryPlugin implements Plugin<Project> {
 
                     // TODO(aurimas): remove this once all these warnings are fixed.
                     libraryVariant.getJavaCompile().options.compilerArgs += [
+                            '-Xep:EqualsHashCode:OFF',
                             '-Xep:MissingCasesInEnumSwitch:WARN',
                             '-Xep:TypeParameterUnusedInFormals:WARN',
                             '-Xep:MissingOverride:WARN',
