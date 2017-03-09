@@ -85,11 +85,13 @@ def setSdkInLocalPropertiesFile() {
         System.setProperty('android.home', "${init.prebuiltsRoot}/fullsdk-${platform}")
         File props = file("local.properties")
         props.write "sdk.dir=${fullSdkPath}"
+        ext.usingFullSdk = true
     } else {
         gradle.ext.currentSdk = 'current'
         project.ext.androidJar = files("${init.prebuiltsRoot}/sdk/current/android.jar")
         File props = file("local.properties")
         props.write "android.dir=../../"
+        ext.usingFullSdk = false
     }
 }
 

@@ -92,8 +92,10 @@ class SupportLibraryPlugin implements Plugin<Project> {
             error 'NewApi'
         }
 
-        // Library projects don't run lint by default, so set up dependency.
-        project.tasks.release.dependsOn project.tasks.lint
+        if (project.rootProject.ext.usingFullSdk) {
+            // Library projects don't run lint by default, so set up dependency.
+            project.tasks.release.dependsOn project.tasks.lint
+        }
 
         // Java 8 is only fully supported on API 24+ and not all Java 8 features are binary
         // compatible with API < 24, so use Java 7 for both source AND target.
