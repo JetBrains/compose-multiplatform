@@ -172,7 +172,6 @@ class SupportLibraryPlugin implements Plugin<Project> {
                             '-Xep:TypeParameterUnusedInFormals:WARN',
                             '-Xep:MissingOverride:WARN',
                             '-Xep:ArrayToString:WARN',
-                            '-Xep:IdentityBinaryExpression:WARN',
                             '-Xep:MislabeledAndroidString:WARN',
                             '-Xep:SelfEquals:WARN',
                             '-Xep:RectIntersectReturnValueIgnored:WARN',
