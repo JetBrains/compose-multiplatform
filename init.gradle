@@ -327,7 +327,8 @@ def configureSubProjects() {
                 if (junitReport.enabled) {
                     def zipTask = project.tasks.create(name : "zipResultsOf${task.name.capitalize()}", type : Zip) {
                         destinationDir(testResultsDistDir)
-                        archiveName("${project.name}.zip")
+                        // first one is always :, drop it.
+                        archiveName("${project.getPath().split(":").join("_").substring(1)}.zip")
                     }
                     if (project.rootProject.ext.runningInBuildServer) {
                         task.ignoreFailures = true
