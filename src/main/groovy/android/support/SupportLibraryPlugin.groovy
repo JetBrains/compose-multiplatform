@@ -168,7 +168,6 @@ class SupportLibraryPlugin implements Plugin<Project> {
 
                     // TODO(aurimas): remove this once all these warnings are fixed.
                     libraryVariant.getJavaCompile().options.compilerArgs += [
-                            '-Xep:EqualsHashCode:OFF',
                             '-Xep:MissingCasesInEnumSwitch:WARN',
                             '-Xep:TypeParameterUnusedInFormals:WARN',
                             '-Xep:MissingOverride:WARN',
@@ -176,7 +175,8 @@ class SupportLibraryPlugin implements Plugin<Project> {
                             '-Xep:MislabeledAndroidString:WARN',
                             '-Xep:SelfEquals:WARN',
                             '-Xep:RectIntersectReturnValueIgnored:WARN',
-                            '-Xep:FallThrough:WARN'
+                            '-Xep:FallThrough:WARN',
+                            '-XDcompilePolicy=simple' // Workaround for b/36098770
                     ]
                 }
             }
