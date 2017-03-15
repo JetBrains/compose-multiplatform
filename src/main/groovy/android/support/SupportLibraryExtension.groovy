@@ -16,11 +16,38 @@
 
 package android.support;
 
+import org.gradle.api.Project
+
 /**
  * Extension for {@link SupportLibraryPlugin}.
  */
 class SupportLibraryExtension {
+    Project project
     String name;
     String description;
     String inceptionYear;
+    Collection<License> licenses = [];
+
+    SupportLibraryExtension(Project project) {
+        this.project = project
+    }
+
+    License license(Closure closure) {
+        def license = project.configure(new License(), closure)
+        licenses.add(license)
+        return license
+    }
+
+    class License {
+        String name;
+        String url;
+
+        void url(String p) {
+            url = p
+        }
+
+        void name(String p) {
+            name = p
+        }
+    }
 }
