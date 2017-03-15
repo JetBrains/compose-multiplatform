@@ -20,7 +20,7 @@ ext['android.builder.sdkDownload'] = false
 ext.supportVersion = "26.0.0-SNAPSHOT"
 
 // This number gets incremented for each public release.
-ext.extraVersion = 44
+ext.extraVersion = 45
 
 // Enforce the use of prebuilt dependencies in all sub-projects. This is
 // required for the doclava dependency.
