@@ -61,9 +61,14 @@ public class DoclavaJavadocOptionFileOption extends
      */
     public DoclavaJavadocOptionFileOption duplicate() {
         final Iterable<String> value = getValue();
-        final ArrayList<String> valueCopy = new ArrayList<>();
-        for (String item : value) {
-            valueCopy.add(item);
+        final ArrayList<String> valueCopy;
+        if (value != null) {
+            valueCopy = new ArrayList<>();
+            for (String item : value) {
+                valueCopy.add(item);
+            }
+        } else {
+            valueCopy = null;
         }
         return new DoclavaJavadocOptionFileOption(getOption(), valueCopy);
     }
