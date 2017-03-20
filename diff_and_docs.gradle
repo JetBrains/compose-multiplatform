@@ -25,20 +25,43 @@ import org.gradle.api.InvalidUserDataException
 
 import groovy.io.FileType
 
-// Generates API files for the current SDK. This is necessary for federation.
-task generateSdkApi(type: DoclavaTask, dependsOn: [configurations.doclava]) {
-    docletpath = configurations.doclava.resolve()
-    destinationDir = project.docsDir
+// Set up platform API files for federation.
+if (project.androidApiTxt != null) {
+    task generateSdkApi(type: Copy) {
+        description = 'Copies the API files for the current SDK.'
 
-    classpath = project.androidJar
-    source zipTree(project.androidSrcJar)
+        // Export the API files so this looks like a DoclavaTask.
+        ext.apiFile = new File(project.docsDir, 'release/sdk_current.txt')
+        ext.removedApiFile = new File(project.docsDir, 'release/sdk_removed.txt')
 
-    apiFile = new File(project.docsDir, 'release/sdk_current.txt')
-    removedApiFile = new File(project.docsDir, 'release/sdk_removed.txt')
-    generateDocs = false
+        from project.androidApiTxt.absolutePath
+        into apiFile.parent
+        rename { apiFile.name }
 
-    options {
-        addStringOption "stubpackages", "android.*"
+        // Register the fake removed file as an output.
+        outputs.file removedApiFile
+
+        doLast {
+            removedApiFile.createNewFile()
+        }
+    }
+} else {
+    task generateSdkApi(type: DoclavaTask, dependsOn: [configurations.doclava]) {
+        description = 'Generates API files for the current SDK.'
+
+        docletpath = configurations.doclava.resolve()
+        destinationDir = project.docsDir
+
+        classpath = project.androidJar
+        source zipTree(project.androidSrcJar)
+
+        apiFile = new File(project.docsDir, 'release/sdk_current.txt')
+        removedApiFile = new File(project.docsDir, 'release/sdk_removed.txt')
+        generateDocs = false
+
+        options {
+            addStringOption "stubpackages", "android.*"
+        }
     }
 }
 
