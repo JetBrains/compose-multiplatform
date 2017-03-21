@@ -42,7 +42,7 @@ class SupportLibraryPlugin implements Plugin<Project> {
     @Override
     public void apply(Project project) {
         SupportLibraryExtension supportLibraryExtension =
-                project.getExtensions().create("supportLibrary", SupportLibraryExtension);
+                project.getExtensions().create("supportLibrary", SupportLibraryExtension, project);
 
         project.apply(ImmutableMap.of("plugin", "com.android.library"));
         project.apply(ImmutableMap.of("plugin", ErrorProneBasePlugin.class));
@@ -141,6 +141,15 @@ class SupportLibraryPlugin implements Plugin<Project> {
                                 name 'The Apache Software License, Version 2.0'
                                 url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
                                 distribution 'repo'
+                            }
+
+                            supportLibraryExtension.getLicenses().each {
+                                SupportLibraryExtension.License supportLicense ->
+                                    license {
+                                        name supportLicense.name
+                                        url supportLicense.url
+                                        distribution 'repo'
+                                    }
                             }
                         }
 
