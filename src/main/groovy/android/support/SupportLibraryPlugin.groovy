@@ -42,34 +42,43 @@ class SupportLibraryPlugin implements Plugin<Project> {
     @Override
     public void apply(Project project) {
         SupportLibraryExtension supportLibraryExtension =
-                project.getExtensions().create("supportLibrary", SupportLibraryExtension, project);
+                project.extensions.create("supportLibrary", SupportLibraryExtension, project);
 
         project.apply(ImmutableMap.of("plugin", "com.android.library"));
         project.apply(ImmutableMap.of("plugin", ErrorProneBasePlugin.class));
 
-        LibraryExtension library =
-                project.getExtensions().findByType(LibraryExtension.class);
+        LibraryExtension library = project.extensions.findByType(LibraryExtension.class);
 
-        library.compileSdkVersion project.ext.currentSdk
-
-        // We use a non-standard manifest path.
-        AndroidSourceSet mainSet = library.getSourceSets().findByName("main");
-        mainSet.manifest.srcFile 'AndroidManifest.xml'
+        library.compileSdkVersion project.currentSdk
 
         library.defaultConfig {
             // Update the version meta-data in each Manifest.
-            addManifestPlaceholders(["support-version": project.rootProject.ext.supportVersion])
+            addManifestPlaceholders(["support-version": project.rootProject.supportVersion])
 
             // Set test related options.
             testInstrumentationRunner INSTRUMENTATION_RUNNER
         }
 
-        // We use a non-standard test directory structure.
-        library.sourceSets.androidTest {
-            root 'tests'
-            java.srcDir 'tests/src'
-            res.srcDir 'tests/res'
-            manifest.srcFile 'tests/AndroidManifest.xml'
+        library.signingConfigs {
+            debug {
+                // Use a local debug keystore to avoid build server issues.
+                storeFile project.rootProject.init.debugKeystore
+            }
+        }
+
+        library.sourceSets {
+            main {
+                // We use a non-standard manifest path.
+                manifest.srcFile 'AndroidManifest.xml'
+            }
+
+            androidTest {
+                // We use a non-standard test directory structure.
+                root 'tests'
+                java.srcDir 'tests/src'
+                res.srcDir 'tests/res'
+                manifest.srcFile 'tests/AndroidManifest.xml'
+            }
         }
 
         // Always lint check NewApi as fatal.
@@ -92,16 +101,16 @@ class SupportLibraryPlugin implements Plugin<Project> {
             error 'NewApi'
         }
 
-        if (project.rootProject.ext.usingFullSdk) {
-            // Library projects don't run lint by default, so set up dependency.
-            project.tasks.release.dependsOn project.tasks.lint
-        }
-
         // Java 8 is only fully supported on API 24+ and not all Java 8 features are binary
         // compatible with API < 24, so use Java 7 for both source AND target.
         library.compileOptions {
             sourceCompatibility JavaVersion.VERSION_1_7
             targetCompatibility JavaVersion.VERSION_1_7
+        }
+
+        if (project.rootProject.usingFullSdk) {
+            // Library projects don't run lint by default, so set up dependency.
+            project.tasks.release.dependsOn project.tasks.lint
         }
 
         // Create sources jar for release builds
@@ -124,7 +133,7 @@ class SupportLibraryPlugin implements Plugin<Project> {
         project.afterEvaluate {
             uploadTask.repositories {
                 mavenDeployer {
-                    repository(url: project.uri(project.rootProject.ext.supportRepoOut))
+                    repository(url: project.uri(project.rootProject.supportRepoOut))
                 }
             };
             uploadTask.getRepositories().withType(MavenDeployer.class, new Action<MavenDeployer>() {

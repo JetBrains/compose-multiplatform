@@ -29,6 +29,7 @@ if (supportRoot == null) {
 def init = new Properties()
 ext.init = init
 ext.init.checkoutRoot = "${supportRoot}/../.."
+ext.init.debugKeystore = file("${supportRoot}/development/keystore/debug.keystore")
 ext.init.prebuiltsRoot = "${init.checkoutRoot}/prebuilts"
 ext.init.prebuiltsRootUri = "file://${init.prebuiltsRoot}"
 ext.init.enablePublicRepos = System.getenv("ALLOW_PUBLIC_REPOS") != null
