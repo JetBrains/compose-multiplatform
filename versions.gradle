@@ -17,7 +17,7 @@
 ext['android.builder.sdkDownload'] = false
 
 // Version code of the support library components.
-ext.supportVersion = "26.0.0-alpha1"
+ext.supportVersion = "26.0.0-SNAPSHOT"
 
 // This number gets incremented for each public release.
 ext.extraVersion = 46
