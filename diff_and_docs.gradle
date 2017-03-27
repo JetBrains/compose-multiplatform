@@ -79,7 +79,8 @@ task generateDocs(type: DoclavaTask, dependsOn: [configurations.doclava, generat
     def hdfOption = new DoclavaMultilineJavadocOptionFileOption('hdf')
     hdfOption.add(
             ['android.whichdoc', 'online'],
-            ['android.hasSamples', 'true'])
+            ['android.hasSamples', 'true'],
+            ['dac', 'true'])
 
     def federateOption = new DoclavaMultilineJavadocOptionFileOption('federate')
     federateOption.add(['Android', 'https://developer.android.com'])
