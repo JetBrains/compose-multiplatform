@@ -113,6 +113,11 @@ task generateDocs(type: DoclavaTask, dependsOn: [configurations.doclava, generat
         addOption federationapiOption
         addOption hdfOption
         addOption sinceOption
+
+        // Specific to reference docs.
+        addStringOption "toroot", "/"
+        addBooleanOption "devsite", true
+        addBooleanOption "androidSupportRef", true
     }
 
     exclude '**/BuildConfig.java'
@@ -129,7 +134,7 @@ task distDocs(type: Zip, dependsOn: generateDocs) {
     version = project.buildNumber
 
     doLast {
-        logger.lifecycle('Wrote API reference to ${archivePath}')
+        logger.lifecycle("'Wrote API reference to ${archivePath}")
     }
 }
 
