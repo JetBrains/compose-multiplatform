@@ -41,7 +41,7 @@ ext.repoNames = ["${init.prebuiltsRoot}/gradle-plugin",
                  "${init.prebuiltsRoot}/maven_repo/android"]
 
 apply from: "${supportRoot}/buildSrc/dependencies.gradle"
-
+ext.buildOfflineDocs = rootProject.getProperties().containsKey("offlineDocs")
 
 def loadDefaultVersions() {
     apply from: "${supportRootFolder}/buildSrc/versions.gradle"

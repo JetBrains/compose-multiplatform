@@ -67,11 +67,12 @@ if (project.androidApiTxt != null) {
 
 // Generates online docs.
 task generateDocs(type: DoclavaTask, dependsOn: [configurations.doclava, generateSdkApi]) {
+    def offlineDocs = project.buildOfflineDocs
     group = JavaBasePlugin.DOCUMENTATION_GROUP
     description = 'Generates d.android.com-style documentation.'
 
     docletpath = configurations.doclava.resolve()
-    destinationDir = new File(project.docsDir, "online")
+    destinationDir = new File(project.docsDir, offlineDocs ? "offline" : "online")
 
     // Base classpath is Android SDK, sub-projects add their own.
     classpath = project.ext.androidJar
@@ -116,9 +117,11 @@ task generateDocs(type: DoclavaTask, dependsOn: [configurations.doclava, generat
         addOption sinceOption
 
         // Specific to reference docs.
-        addStringOption "toroot", "/"
-        addBooleanOption "devsite", true
-        addBooleanOption "androidSupportRef", true
+        if (!offlineDocs) {
+            addStringOption "toroot", "/"
+            addBooleanOption "devsite", true
+            addBooleanOption "androidSupportRef", true
+        }
     }
 
     exclude '**/BuildConfig.java'
