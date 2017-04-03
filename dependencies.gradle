@@ -26,7 +26,7 @@ libs.espresso_core = 'com.android.support.test.espresso:espresso-core:2.3-alpha'
 libs.espresso_contrib = 'com.android.support.test.espresso:espresso-contrib:2.3-alpha'
 
 // Keep gradle plugin version in sync with ub_supportlib-master manifest.
-libs.gradle = 'com.android.tools.build:gradle:2.3.0'
+libs.gradle = 'com.android.tools.build:gradle:2.4.0-alpha3'
 
 // Other dependencies
 libs.xml_parser_apis = 'xerces:xmlParserAPIs:2.6.2'
