@@ -59,12 +59,6 @@ class SupportLibraryPlugin implements Plugin<Project> {
             testInstrumentationRunner INSTRUMENTATION_RUNNER
         }
 
-        // A workaround for b.android.com/293641 where Android Gradle Plugin delays Jacoco
-        // dependency resolution if it is not set explicitly.
-        project.dependencies {
-            androidJacocoAnt "org.jacoco:org.jacoco.ant:0.7.4.201502262128"
-        }
-
         library.signingConfigs {
             debug {
                 // Use a local debug keystore to avoid build server issues.
