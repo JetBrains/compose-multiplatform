@@ -284,14 +284,6 @@ def configureSubProjects() {
                             Charsets.UTF_8)
                 })
 
-                task createSeparateZip(type: Zip, dependsOn: generateSourceProps) {
-                    into archivesBaseName
-                    destinationDir rootProject.ext.distDir
-                    baseName = project.group
-                    version = rootProject.ext.buildNumber
-                }
-                rootProject.createArchive.dependsOn createSeparateZip
-
                 // Before the upload, make sure the repo is ready.
                 release.dependsOn rootProject.tasks.prepareRepo
 
