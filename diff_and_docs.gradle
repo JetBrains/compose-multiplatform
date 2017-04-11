@@ -100,7 +100,7 @@ task generateDocs(type: DoclavaTask, dependsOn: [configurations.doclava, generat
 
     // Default hidden errors + hidden superclass (111) and
     // deprecation mismatch (113) to match framework docs.
-    final def hidden = [105, 107, 111, 112, 113, 115, 116, 121]
+    final def hidden = [105, 106, 107, 111, 112, 113, 115, 116, 121]
 
     doclavaErrors = (101..122) - hidden
     doclavaWarnings = []
