@@ -62,7 +62,7 @@ class SupportLibraryPlugin implements Plugin<Project> {
         // A workaround for b.android.com/293641 where Android Gradle Plugin delays Jacoco
         // dependency resolution if it is not set explicitly.
         project.dependencies {
-            androidJacocoAnt "org.jacoco:org.jacoco.ant:0.7.4.201502262128"
+            androidJacocoAnt "org.jacoco:org.jacoco.ant:0.7.5.201505241946"
         }
 
         library.signingConfigs {
