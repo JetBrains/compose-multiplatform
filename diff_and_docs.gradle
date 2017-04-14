@@ -72,7 +72,8 @@ if (project.androidApiTxt != null) {
 task generateDocs(type: DoclavaTask, dependsOn: [configurations.doclava, generateSdkApi]) {
     def offlineDocs = project.buildOfflineDocs
     group = JavaBasePlugin.DOCUMENTATION_GROUP
-    description = 'Generates d.android.com-style documentation.'
+    description = 'Generates d.android.com-style documentation. To generate offline docs use ' +
+            '\'-PofflineDocs=true\' parameter.'
 
     docletpath = configurations.doclava.resolve()
     destinationDir = new File(project.docsDir, offlineDocs ? "offline" : "online")
