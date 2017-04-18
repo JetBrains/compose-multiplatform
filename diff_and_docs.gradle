@@ -124,7 +124,8 @@ task generateDocs(type: DoclavaTask, dependsOn: [configurations.doclava, generat
         if (!offlineDocs) {
             addStringOption "toroot", "/"
             addBooleanOption "devsite", true
-            addBooleanOption "androidSupportRef", true
+            addStringOption "dac_libraryroot", "android/support/"
+            addStringOption "dac_dataname", "SUPPORT_DATA"
         }
     }
 
