@@ -31,7 +31,7 @@ libs.gradle = 'com.android.tools.build:gradle:2.4.0-alpha6'
 // Other dependencies
 libs.xml_parser_apis = 'xerces:xmlParserAPIs:2.6.2'
 libs.xerces_impl = 'xerces:xercesImpl:2.6.2'
-libs.error_prone = 'net.ltgt.gradle:gradle-errorprone-plugin:0.0.9'
+libs.error_prone = 'net.ltgt.gradle:gradle-errorprone-plugin:0.0.10'
 
 // jarjar plugin
 libs.jarjar_gradle = 'org.anarres.jarjar:jarjar-gradle:1.0.0'
