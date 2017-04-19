@@ -25,8 +25,14 @@ libs.test_runner = 'com.android.support.test:runner:0.6-alpha'
 libs.espresso_core = 'com.android.support.test.espresso:espresso-core:2.3-alpha'
 libs.espresso_contrib = 'com.android.support.test.espresso:espresso-contrib:2.3-alpha'
 
-// Keep gradle plugin version in sync with ub_supportlib-master manifest.
-libs.gradle = 'com.android.tools.build:gradle:2.4.0-alpha6'
+def androidPluginVersionOverride = System.getenv("GRADLE_PLUGIN_VERSION")
+
+if (androidPluginVersionOverride != null) {
+    libs.gradle = 'com.android.tools.build:gradle:' + androidPluginVersionOverride
+} else {
+    // Keep gradle plugin version in sync with ub_supportlib-master manifest.
+    libs.gradle = 'com.android.tools.build:gradle:2.4.0-alpha6'
+}
 
 // Other dependencies
 libs.xml_parser_apis = 'xerces:xmlParserAPIs:2.6.2'

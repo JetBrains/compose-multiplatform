@@ -19,6 +19,7 @@ import com.android.build.gradle.internal.coverage.JacocoReportTask
 import com.android.build.gradle.internal.tasks.DeviceProviderInstrumentTestTask
 import com.google.common.base.Charsets
 import com.google.common.io.Files
+
 import org.gradle.internal.os.OperatingSystem
 
 def supportRoot = ext.supportRootFolder
@@ -28,35 +29,15 @@ if (supportRoot == null) {
 }
 def init = new Properties()
 ext.init = init
-ext.init.checkoutRoot = "${supportRoot}/../.."
 ext.init.debugKeystore = file("${supportRoot}/development/keystore/debug.keystore")
-ext.init.prebuiltsRoot = "${init.checkoutRoot}/prebuilts"
-ext.init.prebuiltsRootUri = "file://${init.prebuiltsRoot}"
-ext.init.enablePublicRepos = System.getenv("ALLOW_PUBLIC_REPOS") != null
-ext.runningInBuildServer = System.env.DIST_DIR != null && System.env.OUT_DIR != null
 
-ext.repoNames = ["${init.prebuiltsRoot}/gradle-plugin",
-                 "${init.prebuiltsRoot}/tools/common/m2/repository",
-                 "${init.prebuiltsRoot}/tools/common/m2/internal",
-                 "${init.prebuiltsRoot}/maven_repo/android"]
+ext.runningInBuildServer = System.env.DIST_DIR != null && System.env.OUT_DIR != null
 
 apply from: "${supportRoot}/buildSrc/dependencies.gradle"
 ext.buildOfflineDocs = rootProject.getProperties().containsKey("offlineDocs")
 
 def loadDefaultVersions() {
     apply from: "${supportRootFolder}/buildSrc/versions.gradle"
-}
-
-def addMavenRepositories(RepositoryHandler handler) {
-    repoNames.each { repo ->
-        handler.maven {
-            url repo
-        }
-        if (ext.init.enablePublicRepos) {
-            handler.mavenCentral()
-            handler.jcenter()
-        }
-    }
 }
 
 def enableDoclavaAndJDiff(p) {
@@ -78,7 +59,7 @@ def setSdkInLocalPropertiesFile() {
     final String platform = OperatingSystem.current().isMacOsX() ? 'darwin' : 'linux'
     System.setProperty('android.dir', "${supportRootFolder}/../../")
     ext.buildToolsVersion = '26.0.0'
-    final String fullSdkPath = "${init.prebuiltsRoot}/fullsdk-${platform}"
+    final String fullSdkPath = "${repos.prebuiltsRoot}/fullsdk-${platform}"
     if (file(fullSdkPath).exists()) {
         gradle.ext.currentSdk = 26
         project.ext.androidJar =
@@ -86,15 +67,15 @@ def setSdkInLocalPropertiesFile() {
         project.ext.androidSrcJar =
                 file("${fullSdkPath}/platforms/android-${gradle.currentSdk}/android-stubs-src.jar")
         project.ext.androidApiTxt = null
-        System.setProperty('android.home', "${init.prebuiltsRoot}/fullsdk-${platform}")
+        System.setProperty('android.home', "${repos.prebuiltsRoot}/fullsdk-${platform}")
         File props = file("local.properties")
         props.write "sdk.dir=${fullSdkPath}"
         ext.usingFullSdk = true
     } else {
         gradle.ext.currentSdk = 'current'
-        project.ext.androidJar = files("${init.prebuiltsRoot}/sdk/current/android.jar")
+        project.ext.androidJar = files("${repos.prebuiltsRoot}/sdk/current/android.jar")
         project.ext.androidSrcJar = null
-        project.ext.androidApiTxt = file("${init.prebuiltsRoot}/sdk/api/26.txt")
+        project.ext.androidApiTxt = file("${repos.prebuiltsRoot}/sdk/api/26.txt")
         File props = file("local.properties")
         props.write "android.dir=../../"
         ext.usingFullSdk = false
@@ -156,7 +137,7 @@ def configureSubProjects() {
         version = rootProject.ext.supportVersion
         group = 'com.android.support'
 
-        init.addMavenRepositories(repositories)
+        repos.addMavenRepositories(repositories)
         project.plugins.whenPluginAdded { plugin ->
             def isAndroidLibrary = "com.android.build.gradle.LibraryPlugin"
                     .equals(plugin.class.name)
@@ -374,7 +355,6 @@ def setupRelease() {
     apply from: "${ext.supportRootFolder}/buildSrc/release.gradle"
 }
 
-ext.init.addMavenRepositories = this.&addMavenRepositories
 ext.init.enableDoclavaAndJDiff = this.&enableDoclavaAndJDiff
 ext.init.setSdkInLocalPropertiesFile = this.&setSdkInLocalPropertiesFile
 ext.init.setupRepoOutAndBuildNumber = this.&setupRepoOutAndBuildNumber

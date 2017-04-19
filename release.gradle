@@ -32,7 +32,7 @@ rootProject.ext.repoWithHistoryOut = new File(buildDir, 'support_repo_with_histo
 // repository creation task
 task createRepository(type: Zip, dependsOn: mainUpload) {
     from rootProject.ext.supportRepoOut
-    from "${init.prebuiltsRoot}/maven_repo/android"
+    from "${repos.prebuiltsRoot}/maven_repo/android"
     // if there are duplicates, pick the first one.
     duplicatesStrategy "EXCLUDE"
     destinationDir project.ext.distDir
