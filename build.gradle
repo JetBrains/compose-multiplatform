@@ -9,6 +9,7 @@ repos.addMavenRepositories(repositories)
 
 dependencies {
     compile libs.gradle
+    compile libs.jacoco
     compile libs.error_prone
     compile libs.jarjar_gradle
 }
