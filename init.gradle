@@ -20,6 +20,7 @@ import com.android.build.gradle.internal.tasks.DeviceProviderInstrumentTestTask
 import com.google.common.base.Charsets
 import com.google.common.io.Files
 
+import org.gradle.api.logging.configuration.ShowStacktrace
 
 def supportRoot = ext.supportRootFolder
 if (supportRoot == null) {
@@ -103,6 +104,9 @@ def setupRepoOutAndBuildNumber() {
         // the build server does not pass the build number so we infer it from the last folder of
         // the dist path.
         ext.buildNumber = project.ext.distDir.getName()
+
+        // the build server should always print out full stack traces for any failures.
+        gradle.startParameter.showStacktrace = ShowStacktrace.ALWAYS
     } else {
         buildDir = file("${ext.supportRootFolder}/../../out/host/gradle/frameworks/support/build")
         project.ext.distDir = new File("${ext.supportRootFolder}/../../out/dist")
