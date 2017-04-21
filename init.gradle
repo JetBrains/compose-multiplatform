@@ -20,7 +20,6 @@ import com.android.build.gradle.internal.tasks.DeviceProviderInstrumentTestTask
 import com.google.common.base.Charsets
 import com.google.common.io.Files
 
-import org.gradle.internal.os.OperatingSystem
 
 def supportRoot = ext.supportRootFolder
 if (supportRoot == null) {
@@ -56,7 +55,10 @@ def enableDoclavaAndJDiff(p) {
 }
 
 def setSdkInLocalPropertiesFile() {
-    final String platform = OperatingSystem.current().isMacOsX() ? 'darwin' : 'linux'
+    final String osName = System.getProperty("os.name").toLowerCase();
+    final boolean isMacOsX =
+            osName.contains("mac os x") || osName.contains("darwin") || osName.contains("osx");
+    final String platform = isMacOsX ? 'darwin' : 'linux'
     System.setProperty('android.dir', "${supportRootFolder}/../../")
     ext.buildToolsVersion = '26.0.0'
     final String fullSdkPath = "${repos.prebuiltsRoot}/fullsdk-${platform}"
