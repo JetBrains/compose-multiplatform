@@ -24,6 +24,7 @@ libs.junit = 'junit:junit:4.12'
 libs.test_runner = 'com.android.support.test:runner:0.6-alpha'
 libs.espresso_core = 'com.android.support.test.espresso:espresso-core:2.3-alpha'
 libs.espresso_contrib = 'com.android.support.test.espresso:espresso-contrib:2.3-alpha'
+libs.jacoco = 'org.jacoco:org.jacoco.core:0.7.8'
 
 def androidPluginVersionOverride = System.getenv("GRADLE_PLUGIN_VERSION")
 
