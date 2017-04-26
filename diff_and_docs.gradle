@@ -209,8 +209,8 @@ CheckApiTask createCheckApiTask(String taskName, def checkApiConfig, File oldApi
 
         whitelistErrorsFile = whitelist
 
-        doLast {
-            logger.lifecycle "Verified ${newApi.name} against ${oldApi.name}..."
+        doFirst {
+            logger.lifecycle "Verifying ${newApi.name} against ${oldApi.name}..."
         }
     }
 }
@@ -262,9 +262,9 @@ File getApiFile(String refApi = supportVersion, boolean previous = false, boolea
     def lastMajor
     def lastMinor
 
-    // Only look at released versions, e.g. X.Y.0.txt.
-    apiDir.eachFileMatch FileType.FILES, ~/(\d+)\.(\d+)\.0\.txt/, { File file ->
-        def matcher = file.name =~ /(\d+)\.(\d+)\.0\.txt/
+    // Only look at released versions and snapshots thereof, ex. X.Y.0.txt or X.Y.0-SNAPSHOT.txt.
+    apiDir.eachFileMatch FileType.FILES, ~/(\d+)\.(\d+)\.0(-SNAPSHOT)?\.txt/, { File file ->
+        def matcher = file.name =~ /(\d+)\.(\d+)\.0(-SNAPSHOT)?\.txt/
         def major = matcher[0][1] as int
         def minor = matcher[0][2] as int
 
