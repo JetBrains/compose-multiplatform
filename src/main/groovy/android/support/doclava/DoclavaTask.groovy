@@ -224,6 +224,8 @@ public class DoclavaTask extends Javadoc {
                 options.addStringOption('stubpackages', stubPackages.join(':'))
             }
         }
+        // Always treat this as an Android docs task.
+        options.addOption(new DoclavaJavadocOptionFileOption('android'))
     }
 
     @Override
