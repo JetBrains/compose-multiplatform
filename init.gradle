@@ -34,7 +34,12 @@ ext.init.debugKeystore = file("${supportRoot}/development/keystore/debug.keystor
 ext.runningInBuildServer = System.env.DIST_DIR != null && System.env.OUT_DIR != null
 
 apply from: "${supportRoot}/buildSrc/dependencies.gradle"
-ext.buildOfflineDocs = rootProject.getProperties().containsKey("offlineDocs")
+ext.docs = [:]
+ext.docs.offline = rootProject.getProperties().containsKey("offlineDocs")
+ext.docs.dac = [
+        libraryroot: "android/support",
+        dataname: "SUPPORT_DATA"
+]
 
 def loadDefaultVersions() {
     apply from: "${supportRootFolder}/buildSrc/versions.gradle"

@@ -70,7 +70,7 @@ if (project.androidApiTxt != null) {
 
 // Generates online docs.
 task generateDocs(type: DoclavaTask, dependsOn: [configurations.doclava, generateSdkApi]) {
-    def offlineDocs = project.buildOfflineDocs
+    def offlineDocs = project.docs.offline
     group = JavaBasePlugin.DOCUMENTATION_GROUP
     description = 'Generates d.android.com-style documentation. To generate offline docs use ' +
             '\'-PofflineDocs=true\' parameter.'
@@ -124,7 +124,8 @@ task generateDocs(type: DoclavaTask, dependsOn: [configurations.doclava, generat
         if (!offlineDocs) {
             addStringOption "toroot", "/"
             addBooleanOption "devsite", true
-            addBooleanOption "androidSupportRef", true
+            addStringOption "dac_libraryroot", project.docs.dac.libraryroot
+            addStringOption "dac_dataname", project.docs.dac.dataname
         }
     }
 
