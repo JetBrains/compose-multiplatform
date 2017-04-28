@@ -162,7 +162,7 @@ def configureSubProjects() {
                 // since enabling coverage reports breaks the method parameter resolution in the IDE
                 // debugger.
                 project.android.buildTypes.debug.testCoverageEnabled =
-                        !hasProperty('android.injected.invoked.from.ide')
+                        !project.hasProperty('android.injected.invoked.from.ide')
 
                 // Copy the class files in a jar to be later used to generate code coverage report
                 project.android.testVariants.all { v ->
