@@ -43,7 +43,7 @@ task createRepository(type: Zip, dependsOn: mainUpload) {
 task createTopOfTreeRepository(type : Zip) {
     description "Creates a maven repository that includes just the libraries compiled in this" +
             " project, without any history from prebuilts."
-    from rootProject.ext.supportRepoOut
+    from rootProject.ext.artifactoryRepoOut
     destinationDir rootProject.ext.distDir
     into 'm2repository'
     baseName = String.format("top-of-tree-m2repository-%s", project.ext.buildNumber)
@@ -60,6 +60,8 @@ task nukeRepoOut() {
     doFirst {
         rootProject.ext.supportRepoOut.deleteDir()
         rootProject.ext.supportRepoOut.mkdirs()
+        rootProject.ext.artifactoryRepoOut.deleteDir()
+        rootProject.ext.artifactoryRepoOut.mkdirs()
     }
 }
 
