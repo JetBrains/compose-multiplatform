@@ -130,8 +130,13 @@ def configureSubProjects() {
     // lint every library
     def lintTask = project.tasks.create("lint")
     subprojects {
+        repos.addMavenRepositories(repositories)
+
         // Only modify Android projects.
-        if (project.name.equals('doclava') || project.name.equals('jdiff')) {
+        if (project.name.equals('doclava')
+                || project.name.equals('jdiff')
+                || project.name.equals('support-testutils')
+                || project.name.equals('noto-emoji-compat')) {
             // disable tests and return
             project.tasks.whenTaskAdded { task ->
                 if (task instanceof org.gradle.api.tasks.testing.Test) {
@@ -148,7 +153,6 @@ def configureSubProjects() {
         version = rootProject.ext.supportVersion
         group = 'com.android.support'
 
-        repos.addMavenRepositories(repositories)
         project.plugins.whenPluginAdded { plugin ->
             def isAndroidLibrary = "com.android.build.gradle.LibraryPlugin"
                     .equals(plugin.class.name)
@@ -213,47 +217,41 @@ def configureSubProjects() {
                 // Add library to the aggregate dependency report.
                 task allDeps(type: DependencyReportTask) {}
 
-                // Create release and separate zip task for library.
-                task release(type: Upload) {
-                    configuration = configurations.archives
-                    repositories {
-                        mavenDeployer {
-                            repository(url: uri("$rootProject.ext.supportRepoOut"))
+                project.afterEvaluate {
+                    Upload uploadTask = (Upload) project.tasks.uploadArchives;
+                    uploadTask.repositories.mavenDeployer {
+                        // Disable unique names for SNAPSHOTS so they can be updated in place.
+                        setUniqueVersion(false)
 
-                            // Disable unique names for SNAPSHOTS so they can be updated in place.
-                            setUniqueVersion(false)
-                            doLast {
-                                // Remove any invalid maven-metadata.xml files that may have been
-                                // created for SNAPSHOT versions that are *not* uniquely versioned.
-                                pom*.each { pom ->
-                                    if (pom.version.endsWith('-SNAPSHOT')) {
-                                        final File artifactDir = new File(
-                                                rootProject.ext.supportRepoOut,
-                                                pom.groupId.replace('.', '/')
-                                                        + '/' + pom.artifactId
-                                                        + '/' + pom.version)
-                                        delete fileTree(dir: artifactDir,
-                                                include: 'maven-metadata.xml*')
-                                    }
-                                }
+                        // Remove any invalid maven-metadata.xml files that may have been
+                        // created for SNAPSHOT versions that are *not* uniquely versioned.
+                        pom*.each { pom ->
+                            if (pom.version.endsWith('-SNAPSHOT')) {
+                                final File artifactDir = new File(
+                                        rootProject.ext.supportRepoOut,
+                                        pom.groupId.replace('.', '/')
+                                                + '/' + pom.artifactId
+                                                + '/' + pom.version)
+                                delete fileTree(dir: artifactDir,
+                                        include: 'maven-metadata.xml*')
                             }
                         }
                     }
+
+                    uploadTask.repositories.mavenDeployer.pom*.whenConfigured { pom ->
+                        pom.dependencies.findAll { dep ->
+                            dep.groupId == 'com.android.support' &&
+                                    dep.artifactId != 'support-annotations'
+                        }*.type = 'aar'
+                    }
+
+                    // Before the upload, make sure the repo is ready.
+                    uploadTask.dependsOn rootProject.tasks.prepareRepo
+
+                    // Make the mainupload depend on this one.
+                    mainUpload.dependsOn uploadTask
                 }
 
-                def deployer = release.repositories.mavenDeployer
-                deployer.pom*.whenConfigured { pom ->
-                    pom.dependencies.findAll { dep ->
-                        dep.groupId == 'com.android.support' &&
-                                dep.artifactId != 'support-annotations'
-                    }*.type = 'aar'
-                }
-
-                // Before the upload, make sure the repo is ready.
-                release.dependsOn rootProject.tasks.prepareRepo
-
-                // Make the mainupload depend on this one.
-                mainUpload.dependsOn release
             }
         }
 
