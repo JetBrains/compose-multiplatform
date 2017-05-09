@@ -264,33 +264,6 @@ def configureSubProjects() {
                     }*.type = 'aar'
                 }
 
-                ext.versionDir = {
-                    def groupDir = new File(rootProject.ext.supportRepoOut,
-                            project.group.replace('.', '/'))
-                    def artifactDir = new File(groupDir, archivesBaseName)
-                    return new File(artifactDir, version)
-                }
-
-                task generateSourceProps(dependsOn: createRepository)
-                generateSourceProps.doLast({
-                    def content = "Maven.GroupId=$deployer.pom.groupId\n" +
-                            "Maven.ArtifactId=$deployer.pom.artifactId\n" +
-                            "Maven.Version=$deployer.pom.version\n" +
-                            "Extra.VendorDisplay=Android\n" +
-                            "Extra.VendorId=android\n" +
-                            "Pkg.Desc=$project.name\n" +
-                            "Pkg.Revision=1\n" +
-                            "Maven.Dependencies=" +
-                            String.join(",", project.configurations.compile.allDependencies
-                                    .collect {
-                                def p = parent.findProject(it.name)
-                                return p ? "$p.group:$p.archivesBaseName:$p.version" : null
-                            }.grep()) +
-                            "\n"
-                    Files.write(content, new File(versionDir(), 'source.properties'),
-                            Charsets.UTF_8)
-                })
-
                 // Before the upload, make sure the repo is ready.
                 release.dependsOn rootProject.tasks.prepareRepo
 
