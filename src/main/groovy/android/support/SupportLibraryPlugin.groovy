@@ -108,11 +108,6 @@ class SupportLibraryPlugin implements Plugin<Project> {
             targetCompatibility JavaVersion.VERSION_1_7
         }
 
-        if (project.rootProject.usingFullSdk) {
-            // Library projects don't run lint by default, so set up dependency.
-            project.tasks.release.dependsOn project.tasks.lint
-        }
-
         // Create sources jar for release builds
         library.getLibraryVariants().all(new Action<LibraryVariant>() {
             @Override
@@ -174,6 +169,11 @@ class SupportLibraryPlugin implements Plugin<Project> {
                     }
                 }
             });
+        }
+
+        if (project.rootProject.usingFullSdk) {
+            // Library projects don't run lint by default, so set up dependency.
+            uploadTask.dependsOn project.tasks.lint
         }
 
         final ErrorProneToolChain toolChain = ErrorProneToolChain.create(project);
