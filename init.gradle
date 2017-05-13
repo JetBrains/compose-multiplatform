@@ -227,10 +227,11 @@ def configureSubProjects() {
 
                         // Disable unique names for SNAPSHOTS so they can be updated in place.
                         setUniqueVersion(false)
-
+                    }
+                    uploadTask.doLast {
                         // Remove any invalid maven-metadata.xml files that may have been
                         // created for SNAPSHOT versions that are *not* uniquely versioned.
-                        pom*.each { pom ->
+                        repositories.mavenDeployer.pom*.each { pom ->
                             if (pom.version.endsWith('-SNAPSHOT')) {
                                 final File artifactDir = new File(
                                         rootProject.ext.supportRepoOut,
