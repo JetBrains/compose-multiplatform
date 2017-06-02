@@ -190,6 +190,7 @@ class SupportLibraryPlugin implements Plugin<Project> {
 
                             // Enforce the following checks.
                             '-Xep:MissingOverride:ERROR',
+                            '-Xep:ClassNewInstance:ERROR',
                     ]
                 }
             }
