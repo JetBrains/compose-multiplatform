@@ -189,7 +189,9 @@ class SupportLibraryPlugin implements Plugin<Project> {
 
                             // Enforce the following checks.
                             '-Xep:MissingOverride:ERROR',
+                            '-Xep:NarrowingCompoundAssignment:ERROR',
                             '-Xep:ClassNewInstance:ERROR',
+                            '-Xep:ClassCanBeStatic:ERROR',
                             '-Xep:SynchronizeOnNonFinalField:ERROR'
                     ]
                 }
