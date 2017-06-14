@@ -169,11 +169,11 @@ class SupportLibraryPlugin implements Plugin<Project> {
                     }
                 }
             });
-        }
 
-        if (project.rootProject.usingFullSdk) {
-            // Library projects don't run lint by default, so set up dependency.
-            uploadTask.dependsOn project.tasks.lint
+            if (project.rootProject.usingFullSdk) {
+                // Library projects don't run lint by default, so set up dependency.
+                uploadTask.dependsOn project.getTasks().getByName("lintRelease")
+            }
         }
 
         final ErrorProneToolChain toolChain = ErrorProneToolChain.create(project);
