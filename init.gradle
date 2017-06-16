@@ -212,7 +212,6 @@ def configureSubProjects() {
                 }
 
                 // Enforce NewApi lint check as fatal.
-                project.android.lintOptions.check 'NewApi'
                 project.android.lintOptions.fatal 'NewApi'
                 lintTask.dependsOn project.lint
             }
