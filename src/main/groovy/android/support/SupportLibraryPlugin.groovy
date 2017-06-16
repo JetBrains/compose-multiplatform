@@ -102,10 +102,16 @@ class SupportLibraryPlugin implements Plugin<Project> {
 
             // TODO(aurimas): figure out the issue with missing translation check
             disable 'MissingTranslation' 
-
-            // Set baseline file for all legacy lint warnings.
-            baseline new File(project.projectDir, "/lint-baseline.xml")
         }
+
+        // Set baseline file for all legacy lint warnings.
+        if (System.getenv("GRADLE_PLUGIN_VERSION") != null) {
+            library.lintOptions.baseline new File(project.projectDir, "/lint-baseline-custom.xml")
+        } else {
+            library.lintOptions.baseline new File(project.projectDir, "/lint-baseline.xml")
+
+        }
+
 
         // Java 8 is only fully supported on API 24+ and not all Java 8 features are binary
         // compatible with API < 24, so use Java 7 for both source AND target.
