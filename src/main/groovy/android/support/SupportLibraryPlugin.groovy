@@ -90,7 +90,7 @@ class SupportLibraryPlugin implements Plugin<Project> {
             textOutput 'stderr'
             textReport true
             htmlReport false
-            xmlReport false
+            //xmlReport false
 
             // Format output for convenience.
             explainIssues true
@@ -99,6 +99,12 @@ class SupportLibraryPlugin implements Plugin<Project> {
 
             // Always fail on NewApi.
             error 'NewApi'
+
+            // TODO(aurimas): figure out the issue with missing translation check
+            disable 'MissingTranslation' 
+
+            // Set baseline file for all legacy lint warnings.
+            baseline new File(project.projectDir, "/lint-baseline.xml")
         }
 
         // Java 8 is only fully supported on API 24+ and not all Java 8 features are binary
