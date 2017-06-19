@@ -130,6 +130,23 @@ def setupRepoOutAndBuildNumber() {
     ext.docsDir = new File(buildDir, 'javadoc')
 }
 
+def configureBuildOnServer() {
+    def buildOnServerTask = rootProject.tasks.create("buildOnServer")
+    rootProject.tasks.whenTaskAdded { task ->
+        if ("createArchive".equals(task.name)) {
+            buildOnServerTask.dependsOn task
+        }
+    }
+
+    subprojects {
+        project.tasks.whenTaskAdded { task ->
+            if ("assembleErrorProne".equals(task.name) || "assembleAndroidTest".equals(task.name)) {
+                buildOnServerTask.dependsOn task
+            }
+        }
+    }
+}
+
 def configureSubProjects() {
     // lint every library
     def lintTask = project.tasks.create("lint")
@@ -363,3 +380,4 @@ ext.init.setupRepoOutAndBuildNumber = this.&setupRepoOutAndBuildNumber
 ext.init.setupRelease = this.&setupRelease
 ext.init.loadDefaultVersions = this.&loadDefaultVersions
 ext.init.configureSubProjects = this.&configureSubProjects
+ext.init.configureBuildOnServer = this.&configureBuildOnServer
