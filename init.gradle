@@ -17,9 +17,6 @@
 import com.android.build.gradle.internal.coverage.JacocoPlugin
 import com.android.build.gradle.internal.coverage.JacocoReportTask
 import com.android.build.gradle.internal.tasks.DeviceProviderInstrumentTestTask
-import com.google.common.base.Charsets
-import com.google.common.io.Files
-
 import org.gradle.api.logging.configuration.ShowStacktrace
 
 def supportRoot = ext.supportRootFolder
@@ -60,14 +57,17 @@ def enableDoclavaAndJDiff(p) {
     apply from: "${ext.supportRootFolder}/buildSrc/diff_and_docs.gradle"
 }
 
-def setSdkInLocalPropertiesFile() {
+def getFullSdkPath() {
     final String osName = System.getProperty("os.name").toLowerCase();
     final boolean isMacOsX =
             osName.contains("mac os x") || osName.contains("darwin") || osName.contains("osx");
     final String platform = isMacOsX ? 'darwin' : 'linux'
-    System.setProperty('android.dir', "${supportRootFolder}/../../")
+    return "${repos.prebuiltsRoot}/fullsdk-${platform}"
+}
+
+def setSdkInLocalPropertiesFile() {
     ext.buildToolsVersion = '26.0.0'
-    final String fullSdkPath = "${repos.prebuiltsRoot}/fullsdk-${platform}"
+    final String fullSdkPath = getFullSdkPath();
     if (file(fullSdkPath).exists()) {
         gradle.ext.currentSdk = 26
         project.ext.androidJar =
@@ -75,7 +75,6 @@ def setSdkInLocalPropertiesFile() {
         project.ext.androidSrcJar =
                 file("${fullSdkPath}/platforms/android-${gradle.currentSdk}/android-stubs-src.jar")
         project.ext.androidApiTxt = null
-        System.setProperty('android.home', "${repos.prebuiltsRoot}/fullsdk-${platform}")
         File props = file("local.properties")
         props.write "sdk.dir=${fullSdkPath}"
         ext.usingFullSdk = true
@@ -84,6 +83,7 @@ def setSdkInLocalPropertiesFile() {
         project.ext.androidJar = files("${repos.prebuiltsRoot}/sdk/current/android.jar")
         project.ext.androidSrcJar = null
         project.ext.androidApiTxt = file("${repos.prebuiltsRoot}/sdk/api/26.txt")
+        System.setProperty('android.dir', "${supportRootFolder}/../../")
         File props = file("local.properties")
         props.write "android.dir=../../"
         ext.usingFullSdk = false
