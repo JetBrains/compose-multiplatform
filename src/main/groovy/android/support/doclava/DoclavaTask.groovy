@@ -24,9 +24,7 @@ import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
-import org.gradle.api.tasks.ParallelizableTask
 
-@ParallelizableTask
 public class DoclavaTask extends Javadoc {
 
     // external/doclava/src/com/google/doclava/Errors.java
