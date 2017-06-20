@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package android.support.checkapi;
+package android.support.checkapi
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.Nullable
 import org.gradle.api.GradleException
 import org.gradle.api.InvalidUserDataException
+import org.gradle.api.Nullable
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.ParallelizableTask
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
-import org.gradle.process.ExecResult
 
 import java.security.MessageDigest
 
@@ -41,7 +39,6 @@ import java.security.MessageDigest
  * Specific failures may be ignored by specifying a list of SHAs in {@link #whitelistErrors}. Each
  * SHA is unique to a specific API change and is logged to the error output on failure.
  */
-@ParallelizableTask
 public class CheckApiTask extends DefaultTask {
     /** Character that resets console output color. */
     private static final String ANSI_RESET = "\u001B[0m";
