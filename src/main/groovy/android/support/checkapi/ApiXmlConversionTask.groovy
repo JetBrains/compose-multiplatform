@@ -16,12 +16,10 @@
 
 package android.support.checkapi
 
-import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.ParallelizableTask
+import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.OutputFile
 
-@ParallelizableTask
 public class ApiXmlConversionTask extends JavaExec {
 
     @InputFile
