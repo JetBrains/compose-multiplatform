@@ -205,26 +205,29 @@ def configureSubProjects() {
                             destinationDir file(project.distDir)
                             archiveName "${project.archivesBaseName}-${v.baseName}-allclasses.jar"
                         }
+
                         def jacocoAntConfig =
                                 project.configurations[JacocoPlugin.ANT_CONFIGURATION_NAME]
                         def jacocoAntArtifacts = jacocoAntConfig.resolvedConfiguration
                                 .resolvedArtifacts
-                        def version = jacocoAntArtifacts.find { "org.jacoco.ant".equals(it.name) }
-                                .moduleVersion.id.version
+
                         def collectJacocoAntPackages = project.tasks.create(
                                 name: "collectJacocoAntPackages",
                                 type: Jar) {
-                            from(jacocoAntArtifacts.collect { zipTree(it.getFile()) }) {
-                                // exclude all the signatures the jar might have
-                                exclude "META-INF/*.SF"
-                                exclude "META-INF/*.DSA"
-                                exclude "META-INF/*.RSA"
-                            }
+                            inputs.files project.configurations[JacocoPlugin.ANT_CONFIGURATION_NAME]
+                            from {
+                                jacocoAntArtifacts.collect{ zipTree(it.getFile()) }} {
+                                    // exclude all the signatures the jar might have
+                                    exclude "META-INF/*.SF"
+                                    exclude "META-INF/*.DSA"
+                                    exclude "META-INF/*.RSA"
+                                }
                             destinationDir file(project.distDir)
-                            archiveName "jacocoant-" + version + ".jar"
+                            archiveName "jacocoant.jar"
                         }
+
                         jarifyTask.dependsOn v.getJavaCompiler()
-                        v.assemble.dependsOn jarifyTask, collectJacocoAntPackages
+                        v.assemble.dependsOn jarifyTask , collectJacocoAntPackages
                     }
                 }
 
