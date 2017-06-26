@@ -206,17 +206,14 @@ def configureSubProjects() {
                             archiveName "${project.archivesBaseName}-${v.baseName}-allclasses.jar"
                         }
 
-                        def jacocoAntConfig =
-                                project.configurations[JacocoPlugin.ANT_CONFIGURATION_NAME]
-                        def jacocoAntArtifacts = jacocoAntConfig.resolvedConfiguration
-                                .resolvedArtifacts
-
                         def collectJacocoAntPackages = project.tasks.create(
                                 name: "collectJacocoAntPackages",
                                 type: Jar) {
                             inputs.files project.configurations[JacocoPlugin.ANT_CONFIGURATION_NAME]
                             from {
-                                jacocoAntArtifacts.collect{ zipTree(it.getFile()) }} {
+                                project.configurations[JacocoPlugin.ANT_CONFIGURATION_NAME]
+                                        .resolvedConfiguration
+                                        .resolvedArtifacts.collect{ zipTree(it.getFile()) }} {
                                     // exclude all the signatures the jar might have
                                     exclude "META-INF/*.SF"
                                     exclude "META-INF/*.DSA"
