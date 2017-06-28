@@ -101,12 +101,12 @@ class SupportLibraryPlugin implements Plugin<Project> {
             error 'NewApi'
 
             // TODO(aurimas): figure out the issue with missing translation check
-            disable 'MissingTranslation' 
+            disable 'MissingTranslation'
         }
 
         // Set baseline file for all legacy lint warnings.
         if (System.getenv("GRADLE_PLUGIN_VERSION") != null) {
-            library.lintOptions.baseline new File(project.projectDir, "/lint-baseline-custom.xml")
+            library.lintOptions.check 'NewApi'
         } else {
             library.lintOptions.baseline new File(project.projectDir, "/lint-baseline.xml")
 
