@@ -440,15 +440,8 @@ void registerForDocsTask(Task task, Project subProject, releaseVariant) {
                 fileTree(releaseVariant.aidlCompile.sourceOutputDir) +
                 fileTree(releaseVariant.outputs[0].processResources.sourceOutputDir)
     }
-    // NASTY WORKAROUND to allow building with both Android Studio Plugin 2.4.0-alpha6
-    // and 2.4.0-alpha8
-    if (releaseVariant.metaClass.respondsTo(releaseVariant, 'getCompileClasspath', Object)) {
-        task.classpath += releaseVariant.getCompileClasspath(null) +
-                files(releaseVariant.javaCompile.destinationDir)
-    } else {
-        task.classpath += files{releaseVariant.javaCompile.classpath.files} +
-                files(releaseVariant.javaCompile.destinationDir)
-    }
+    task.classpath += releaseVariant.getCompileClasspath(null) +
+            files(releaseVariant.javaCompile.destinationDir)
 }
 
 // configuration file for setting up api diffs and api docs
