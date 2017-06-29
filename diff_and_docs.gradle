@@ -440,7 +440,7 @@ void registerForDocsTask(Task task, Project subProject, releaseVariant) {
                 fileTree(releaseVariant.aidlCompile.sourceOutputDir) +
                 fileTree(releaseVariant.outputs[0].processResources.sourceOutputDir)
     }
-    task.classpath += files{releaseVariant.javaCompile.classpath.files} +
+    task.classpath += releaseVariant.getCompileClasspath(null) +
             files(releaseVariant.javaCompile.destinationDir)
 }
 
