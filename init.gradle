@@ -301,9 +301,10 @@ def configureSubProjects() {
                 task.doLast {
                     def source = testApk ? project.android.sourceSets.androidTest
                             : project.android.sourceSets.main
-                    if (task.hasProperty("outputFile") && !source.java.sourceFiles.isEmpty()) {
+                    if (task.hasProperty("outputDirectory") && !source.java.sourceFiles.isEmpty()) {
                         copy {
-                            from(task.outputFile)
+                            from(task.outputDirectory)
+                            include '*.apk'
                             into(rootProject.ext.testApkDistOut)
                             rename { String fileName ->
                                 // multiple modules may have the same name so prefix the name with
