@@ -13,14 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// Prevent the Android Gradle plug-in from automatically downloading SDK dependencies.
-ext['android.builder.sdkDownload'] = false
 
 // Version code of the support library components.
 ext.supportVersion = "26.0.0-SNAPSHOT"
-
-// This number gets incremented for each public release.
-ext.extraVersion = 46
 
 // Enforce the use of prebuilt dependencies in all sub-projects. This is
 // required for the doclava dependency.
