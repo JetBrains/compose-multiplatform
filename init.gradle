@@ -95,8 +95,7 @@ def setupRepoOutAndBuildNumber() {
     ext.supportRepoOut = ''
     // files in artifactoryRepoOut can be safely copied into a real artifactory.
     ext.artifactoryRepoOut = ''
-    ext.buildNumber = Integer.toString(ext.extraVersion)
-
+    ext.buildNumber = "0"
     /*
      * With the build server you are given two env variables.
      * The OUT_DIR is a temporary directory you can use to put things during the build.
@@ -167,7 +166,6 @@ def configureSubProjects() {
             return
         }
 
-        // Current SDK is set in studioCompat.gradle.
         project.ext.currentSdk = gradle.ext.currentSdk
         apply plugin: 'maven'
 
@@ -203,7 +201,7 @@ def configureSubProjects() {
                             exclude "**/R\$*.class"
                             exclude "**/BuildConfig.class"
                             destinationDir file(project.distDir)
-                            archiveName "${project.archivesBaseName}-${v.baseName}-allclasses.jar"
+                            archiveName "${project.name}-${v.baseName}-allclasses.jar"
                         }
 
                         def collectJacocoAntPackages = project.tasks.create(
@@ -288,7 +286,6 @@ def configureSubProjects() {
                     mainUpload.dependsOn uploadTask
                     mainUpload.dependsOn artifactoryRelease
                 }
-
             }
         }
 
@@ -337,15 +334,6 @@ def configureSubProjects() {
                         zipTask.from(junitReport.destination)
                     }
                 }
-            }
-        }
-
-        project.afterEvaluate {
-            // The archivesBaseName isn't available initially, so set it now
-            def createZipTask = project.tasks.findByName("createSeparateZip")
-            if (createZipTask != null) {
-                createZipTask.appendix = archivesBaseName
-                createZipTask.from versionDir()
             }
         }
 
