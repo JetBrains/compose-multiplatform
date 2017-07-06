@@ -258,13 +258,6 @@ def configureSubProjects() {
                         }
                     }
 
-                    uploadTask.repositories.mavenDeployer.pom*.whenConfigured { pom ->
-                        pom.dependencies.findAll { dep ->
-                            dep.groupId == 'com.android.support' &&
-                                    dep.artifactId != 'support-annotations'
-                        }*.type = 'aar'
-                    }
-
                     // create a release task that produces artifactory friends artifacts
                     // a.k.a. unique versions for snapshots with their maven-metadata files.
                     task artifactoryRelease(type : Upload) {
