@@ -44,6 +44,7 @@ def addMavenRepositories(RepositoryHandler handler) {
     if (System.getenv("ALLOW_PUBLIC_REPOS") != null) {
         handler.mavenCentral()
         handler.jcenter()
+        handler.google()
     }
     def androidPluginRepoOverride = System.getenv("GRADLE_PLUGIN_REPO")
     if (androidPluginRepoOverride != null) {
