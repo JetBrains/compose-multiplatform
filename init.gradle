@@ -49,8 +49,8 @@ def enableDoclavaAndJDiff(p) {
     }
 
     p.dependencies {
-        doclava "com.android:doclava:1.0.6"
-        jdiff "com.android:jdiff:1.1.0"
+        doclava project(':doclava')
+        jdiff project(':jdiff')
         jdiff libs.xml_parser_apis
         jdiff libs.xerces_impl
     }
@@ -150,7 +150,9 @@ def configureSubProjects() {
         repos.addMavenRepositories(repositories)
 
         // Only modify Android projects.
-        if (project.name.equals('support-testutils')
+        if (project.name.equals('doclava')
+                || project.name.equals('jdiff')
+                || project.name.equals('support-testutils')
                 || project.name.equals('noto-emoji-compat')) {
             // disable tests and return
             project.tasks.whenTaskAdded { task ->
