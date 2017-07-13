@@ -16,7 +16,3 @@
 
 // Version code of the support library components.
 ext.supportVersion = "26.0.0-SNAPSHOT"
-
-// Enforce the use of prebuilt dependencies in all sub-projects. This is
-// required for the doclava dependency.
-ext.usePrebuilts = "true"
