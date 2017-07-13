@@ -21,7 +21,3 @@ ext.supportVersion = "26.0.0-SNAPSHOT"
 
 // This number gets incremented for each public release.
 ext.extraVersion = 46
-
-// Enforce the use of prebuilt dependencies in all sub-projects. This is
-// required for the doclava dependency.
-ext.usePrebuilts = "true"
