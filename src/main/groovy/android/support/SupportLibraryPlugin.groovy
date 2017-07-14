@@ -198,7 +198,8 @@ class SupportLibraryPlugin implements Plugin<Project> {
                             '-Xep:NarrowingCompoundAssignment:ERROR',
                             '-Xep:ClassNewInstance:ERROR',
                             '-Xep:ClassCanBeStatic:ERROR',
-                            '-Xep:SynchronizeOnNonFinalField:ERROR'
+                            '-Xep:SynchronizeOnNonFinalField:ERROR',
+                            '-Xep:OperatorPrecedence:ERROR'
                     ]
                 }
             }
