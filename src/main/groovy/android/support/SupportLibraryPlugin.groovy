@@ -52,7 +52,7 @@ class SupportLibraryPlugin implements Plugin<Project> {
 
         library.defaultConfig {
             // Update the version meta-data in each Manifest.
-            addManifestPlaceholders(["support-version": project.rootProject.supportVersion,
+            addManifestPlaceholders(["support-version": LibraryVersions.SUPPORT_LIBRARY.toString(),
                                      "target-sdk-version": project.currentSdk])
 
             // Set test related options.

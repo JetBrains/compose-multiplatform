@@ -68,4 +68,9 @@ public class Version implements Comparable<Version> {
     public String getExtra() {
         return mExtra;
     }
+
+    @Override
+    public String toString() {
+        return mMajor + "." + mMinor + "." + mPatch + (mExtra != null ? mExtra : "");
+    }
 }

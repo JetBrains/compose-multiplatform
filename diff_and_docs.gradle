@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
+import android.support.LibraryVersions
+import android.support.Version
 import android.support.checkapi.ApiXmlConversionTask
 import android.support.checkapi.CheckApiTask
 import android.support.checkapi.UpdateApiTask
 import android.support.doclava.DoclavaTask
 import android.support.jdiff.JDiffTask
-import android.support.Version
-
-import org.gradle.api.InvalidUserDataException
-
 import groovy.io.FileType
-import groovy.transform.Field;
-
-import java.util.regex.Matcher
-import java.util.regex.Pattern
+import groovy.transform.Field
 
 // Set up platform API files for federation.
 if (project.androidApiTxt != null) {
@@ -490,7 +485,7 @@ boolean hasJavaSources(releaseVariant) {
 }
 
 if (hasApiFolder(rootProject)) {
-    rootProject.version = rootProject.supportVersion
+    rootProject.version = LibraryVersions.SUPPORT_LIBRARY.toString();
     initializeApiChecksForProject(rootProject)
 }
 

@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import android.support.LibraryVersions
 import com.android.build.gradle.internal.coverage.JacocoPlugin
 import com.android.build.gradle.internal.coverage.JacocoReportTask
 import com.android.build.gradle.internal.tasks.DeviceProviderInstrumentTestTask
@@ -37,10 +38,6 @@ ext.docs.dac = [
         libraryroot: "android/support",
         dataname: "SUPPORT_DATA"
 ]
-
-def loadDefaultVersions() {
-    apply from: "${supportRootFolder}/buildSrc/versions.gradle"
-}
 
 def enableDoclavaAndJDiff(p) {
     p.configurations {
@@ -170,7 +167,7 @@ def configureSubProjects() {
         project.ext.currentSdk = gradle.ext.currentSdk
         apply plugin: 'maven'
 
-        version = rootProject.ext.supportVersion
+        version = LibraryVersions.SUPPORT_LIBRARY.toString();
         group = 'com.android.support'
 
         project.plugins.whenPluginAdded { plugin ->
@@ -361,6 +358,5 @@ ext.init.enableDoclavaAndJDiff = this.&enableDoclavaAndJDiff
 ext.init.setSdkInLocalPropertiesFile = this.&setSdkInLocalPropertiesFile
 ext.init.setupRepoOutAndBuildNumber = this.&setupRepoOutAndBuildNumber
 ext.init.setupRelease = this.&setupRelease
-ext.init.loadDefaultVersions = this.&loadDefaultVersions
 ext.init.configureSubProjects = this.&configureSubProjects
 ext.init.configureBuildOnServer = this.&configureBuildOnServer
