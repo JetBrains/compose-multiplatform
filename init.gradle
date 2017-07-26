@@ -156,7 +156,8 @@ def configureSubProjects() {
         if (project.name.equals('doclava')
                 || project.name.equals('jdiff')
                 || project.name.equals('support-testutils')
-                || project.name.equals('noto-emoji-compat')) {
+                || project.name.equals('noto-emoji-compat')
+                || project.name.equals('support-media-compat-test-lib')) {
             // disable tests and return
             project.tasks.whenTaskAdded { task ->
                 if (task instanceof org.gradle.api.tasks.testing.Test) {
