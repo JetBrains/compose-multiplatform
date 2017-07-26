@@ -13,4 +13,5 @@ dependencies {
     compile libs.jacoco
     compile libs.error_prone
     compile libs.jarjar_gradle
+    compile gradleApi()
 }

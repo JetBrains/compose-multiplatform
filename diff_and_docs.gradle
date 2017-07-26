@@ -17,7 +17,6 @@
 import android.support.checkapi.ApiXmlConversionTask
 import android.support.checkapi.CheckApiTask
 import android.support.checkapi.UpdateApiTask
-import android.support.doclava.DoclavaMultilineJavadocOptionFileOption
 import android.support.doclava.DoclavaTask
 import android.support.jdiff.JDiffTask
 import android.support.Version
@@ -103,25 +102,13 @@ task generateDocs(type: DoclavaTask, dependsOn: [configurations.doclava, generat
     // Base classpath is Android SDK, sub-projects add their own.
     classpath = project.ext.androidJar
 
-    def hdfOption = new DoclavaMultilineJavadocOptionFileOption('hdf')
-    hdfOption.add(
-            ['android.whichdoc', 'online'],
-            ['android.hasSamples', 'true'],
-            ['dac', 'true'])
-
-    def federateOption = new DoclavaMultilineJavadocOptionFileOption('federate')
-    federateOption.add(['Android', 'https://developer.android.com'])
-
-    def federationapiOption = new DoclavaMultilineJavadocOptionFileOption('federationapi')
-    federationapiOption.add(['Android', generateSdkApi.apiFile.absolutePath])
-
     // Track API change history.
     def apiFilePattern = /(\d+\.\d+\.\d).txt/
-    def sinceOption = new DoclavaMultilineJavadocOptionFileOption('since')
+    def sinceValues = []
     File apiDir = new File(supportRootFolder, 'api')
     apiDir.eachFileMatch FileType.FILES, ~apiFilePattern, { File apiFile ->
         def apiLevel = (apiFile.name =~ apiFilePattern)[0][1]
-        sinceOption.add([apiFile.absolutePath, apiLevel])
+        sinceValues.add([apiFile.absolutePath, apiLevel])
     }
 
     // Default hidden errors + hidden superclass (111) and
@@ -137,10 +124,19 @@ task generateDocs(type: DoclavaTask, dependsOn: [configurations.doclava, generat
                 "${supportRootFolder}/../../external/doclava/res/assets/templates-sdk"
         addStringOption "stubpackages", "android.support.*"
         addStringOption "samplesdir", "${supportRootFolder}/samples"
-        addOption federateOption
-        addOption federationapiOption
-        addOption hdfOption
-        addOption sinceOption
+
+        addMultilineMultiValueOption("federate").setValue([
+                ['Android', 'https://developer.android.com']
+        ])
+        addMultilineMultiValueOption("federationapi").setValue([
+                ['Android', generateSdkApi.apiFile.absolutePath]
+        ])
+        addMultilineMultiValueOption("since").setValue(sinceValues)
+        addMultilineMultiValueOption("hdf").setValue([
+                ['android.whichdoc', 'online'],
+                ['android.hasSamples', 'true'],
+                ['dac', 'true']
+        ])
 
         // Specific to reference docs.
         if (!offlineDocs) {

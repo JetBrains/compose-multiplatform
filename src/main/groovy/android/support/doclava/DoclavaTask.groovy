@@ -24,6 +24,7 @@ import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
+import org.gradle.external.javadoc.JavadocOptionFileOption;
 
 public class DoclavaTask extends Javadoc {
 
@@ -184,18 +185,22 @@ public class DoclavaTask extends Javadoc {
      */
     private configureDoclava() {
         options.docletpath = getDocletpath() as List
+
         // configure doclava error/warning/hide levels
-        options.addOption(new DoclavaMultilineJavadocOptionFileOption('hide'))
-                .setValue(getDoclavaHidden().collect({[it.toString()]}))
-        options.addOption(new DoclavaMultilineJavadocOptionFileOption('warning'))
-                .setValue(getDoclavaWarnings().collect({[it.toString()]}))
-        options.addOption(new DoclavaMultilineJavadocOptionFileOption('error'))
-                .setValue(getDoclavaErrors().collect({[it.toString()]}))
+        JavadocOptionFileOption hide = options.addMultilineMultiValueOption("hide")
+        hide.setValue(getDoclavaHidden().collect({[it.toString()]}))
+
+        JavadocOptionFileOption warning = options.addMultilineMultiValueOption("warning")
+        warning.setValue(getDoclavaWarnings().collect({[it.toString()]}))
+
+        JavadocOptionFileOption error = options.addMultilineMultiValueOption("error")
+        error.setValue(getDoclavaErrors().collect({[it.toString()]}))
 
         Collection hiddenPackages = getHiddenPackages()
         if (hiddenPackages) {
-            options.addOption(new DoclavaMultilineJavadocOptionFileOption('hidePackage'))
-                    .setValue(hiddenPackages.collect({[it.toString()]}))
+            JavadocOptionFileOption hidePackage =
+                    options.addMultilineMultiValueOption("hidePackage")
+            hidePackage.setValue(hiddenPackages.collect({[it.toString()]}))
         }
 
         if (!getGenerateDocs()) {
