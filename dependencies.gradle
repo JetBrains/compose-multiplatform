@@ -19,7 +19,6 @@ def libs = [:]
 // Testing dependencies
 libs.mockito_core = 'org.mockito:mockito-core:2.7.6'
 libs.dexmaker_mockito = 'com.linkedin.dexmaker:dexmaker-mockito:2.2.0'
-libs.multidex = 'com.android.support:multidex:1.0.1'
 libs.junit = 'junit:junit:4.12'
 libs.test_runner = 'com.android.support.test:runner:1.0.0'
 libs.test_rules = 'com.android.support.test:rules:1.0.0'
