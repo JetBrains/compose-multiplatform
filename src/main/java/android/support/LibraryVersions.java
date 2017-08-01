@@ -28,7 +28,7 @@ public class LibraryVersions {
     /**
      * Version code of the flatfoot libraries.
      */
-    public static final Version FLATFOOT = new Version("1.0.0-alpha7");
+    public static final Version FLATFOOT = new Version("1.0.0-alpha8");
 
     /**
      * Version code of the lifecycles library.
