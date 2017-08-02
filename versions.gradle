@@ -15,5 +15,5 @@
  */
 
 // Version code of the support library components.
-ext.supportVersion = "26.1.0-SNAPSHOT"
+ext.supportVersion = "27.0.0-SNAPSHOT"
 
