@@ -23,7 +23,7 @@ public class LibraryVersions {
     /**
      * Version code of the support library components.
      */
-    public static final Version SUPPORT_LIBRARY = new Version("26.1.0-SNAPSHOT");
+    public static final Version SUPPORT_LIBRARY = new Version("27.0.0-SNAPSHOT");
 
     /**
      * Version code of the flatfoot libraries.
