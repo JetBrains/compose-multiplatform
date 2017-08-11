@@ -86,6 +86,9 @@ void registerJavaProjectForDocsTask(Task task, javaCompileTask) {
 
 // Generates online docs.
 task generateDocs(type: DoclavaTask, dependsOn: [configurations.doclava, generateSdkApi]) {
+    ext.artifacts = []
+    ext.sinces = []
+
     def offlineDocs = project.docs.offline
     group = JavaBasePlugin.DOCUMENTATION_GROUP
     description = 'Generates d.android.com-style documentation. To generate offline docs use ' +
@@ -97,15 +100,6 @@ task generateDocs(type: DoclavaTask, dependsOn: [configurations.doclava, generat
     // Base classpath is Android SDK, sub-projects add their own.
     classpath = project.ext.androidJar
 
-    // Track API change history.
-    def apiFilePattern = /(\d+\.\d+\.\d).txt/
-    def sinceValues = []
-    File apiDir = new File(supportRootFolder, 'api')
-    apiDir.eachFileMatch FileType.FILES, ~apiFilePattern, { File apiFile ->
-        def apiLevel = (apiFile.name =~ apiFilePattern)[0][1]
-        sinceValues.add([apiFile.absolutePath, apiLevel])
-    }
-
     // Default hidden errors + hidden superclass (111) and
     // deprecation mismatch (113) to match framework docs.
     final def hidden = [105, 106, 107, 111, 112, 113, 115, 116, 121]
@@ -114,19 +108,25 @@ task generateDocs(type: DoclavaTask, dependsOn: [configurations.doclava, generat
     doclavaWarnings = []
     doclavaHidden += hidden
 
+    // Track API change history prior to split versioning.
+    def apiFilePattern = /(\d+\.\d+\.\d).txt/
+    File apiDir = new File(supportRootFolder, 'api')
+    apiDir.eachFileMatch FileType.FILES, ~apiFilePattern, { File apiFile ->
+        def apiLevel = (apiFile.name =~ apiFilePattern)[0][1]
+        sinces.add([apiFile.absolutePath, apiLevel])
+    }
+
     options {
         addStringOption "templatedir",
                 "${supportRootFolder}/../../external/doclava/res/assets/templates-sdk"
         addStringOption "stubpackages", "android.support.*"
         addStringOption "samplesdir", "${supportRootFolder}/samples"
-
         addMultilineMultiValueOption("federate").setValue([
                 ['Android', 'https://developer.android.com']
         ])
         addMultilineMultiValueOption("federationapi").setValue([
                 ['Android', generateSdkApi.apiFile.absolutePath]
         ])
-        addMultilineMultiValueOption("since").setValue(sinceValues)
         addMultilineMultiValueOption("hdf").setValue([
                 ['android.whichdoc', 'online'],
                 ['android.hasSamples', 'true'],
@@ -143,6 +143,15 @@ task generateDocs(type: DoclavaTask, dependsOn: [configurations.doclava, generat
     }
 
     exclude '**/BuildConfig.java'
+
+    doFirst {
+        if (artifacts.size() > 0) {
+            options.addMultilineMultiValueOption("artifact").setValue(artifacts)
+        }
+        if (sinces.size() > 0) {
+            options.addMultilineMultiValueOption("since").setValue(sinces)
+        }
+    }
 }
 
 // Generates a distribution artifact for online docs.
@@ -217,8 +226,8 @@ CheckApiTask createCheckApiTask(Project project, String taskName, def checkApiCo
 
         newApiFile = newApi
         oldApiFile = oldApi
-        newRemovedApiFile = new File(project.docsDir, 'release/removed.txt')
-        oldRemovedApiFile = new File(project.projectDir, 'api/removed.txt')
+        newRemovedApiFile = new File(project.docsDir, 'release/' + project.name + '/removed.txt')
+        oldRemovedApiFile = new File(project.projectDir, 'api/' + project.name + '/removed.txt')
 
         whitelistErrorsFile = whitelist
 
@@ -236,8 +245,8 @@ DoclavaTask createGenerateApiTask(Project project) {
 
         // Base classpath is Android SDK, sub-projects add their own.
         classpath = rootProject.ext.androidJar
-        apiFile = new File(project.docsDir, 'release/current.txt')
-        removedApiFile = new File(project.docsDir, 'release/removed.txt')
+        apiFile = new File(project.docsDir, 'release/' + project.name + '/current.txt')
+        removedApiFile = new File(project.docsDir, 'release/' + project.name + '/removed.txt')
         generateDocs = false
 
         options {
@@ -294,6 +303,7 @@ void initializeApiChecksForProject(Project project) {
     if (!project.hasProperty("docsDir")) {
         project.ext.docsDir = new File(rootProject.docsDir, project.name)
     }
+    def artifact = project.group + ":" + project.name + ":" + project.version
     def version = new Version(project.version)
     def workingDir = project.projectDir
 
@@ -327,6 +337,19 @@ void initializeApiChecksForProject(Project project) {
     createNewApiXmlTask(project)
     createOldApiXml(project)
     createGenerateDiffsTask(project)
+
+    // Track API change history.
+    def apiFilePattern = /(\d+\.\d+\.\d).txt/
+    File apiDir = new File(project.projectDir, 'api')
+    File lastApiFile;
+    apiDir.eachFileMatch FileType.FILES, ~apiFilePattern, { File apiFile ->
+        def apiLevel = (apiFile.name =~ apiFilePattern)[0][1]
+        rootProject.generateDocs.sinces.add([apiFile.absolutePath, apiLevel])
+        lastApiFile = apiFile
+    }
+
+    // Associate latest API surface with the Maven artifact.
+    rootProject.generateDocs.artifacts.add([lastApiFile.absolutePath, artifact])
 
     rootProject.createArchive.dependsOn checkApi
 }
@@ -482,11 +505,6 @@ boolean hasJavaSources(releaseVariant) {
         file.name != "R.java" && file.name != "BuildConfig.java"
     }
     return !fs.isEmpty();
-}
-
-if (hasApiFolder(rootProject)) {
-    rootProject.version = LibraryVersions.SUPPORT_LIBRARY.toString();
-    initializeApiChecksForProject(rootProject)
 }
 
 subprojects { subProject ->
