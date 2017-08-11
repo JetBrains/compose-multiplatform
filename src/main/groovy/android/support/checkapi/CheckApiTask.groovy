@@ -50,10 +50,12 @@ public class CheckApiTask extends DefaultTask {
     private static final String ANSI_YELLOW = "\u001B[33m";
 
     /** API file that represents the existing API surface. */
+    @Optional
     @InputFile
     File oldApiFile
 
     /** API file that represents the existing API surface's removals. */
+    @Optional
     @InputFile
     File oldRemovedApiFile
 
@@ -62,15 +64,14 @@ public class CheckApiTask extends DefaultTask {
     File newApiFile
 
     /** API file that represents the candidate API surface's removals. */
+    @Optional
     @InputFile
     File newRemovedApiFile
 
     /** Optional file containing a newline-delimited list of error SHAs to ignore. */
-    @Nullable
     File whitelistErrorsFile
 
     @Optional
-    @Nullable
     @InputFile
     File getWhiteListErrorsFileInput() {
         // Gradle requires non-null InputFiles to exist -- even with Optional -- so work around that
@@ -87,9 +88,8 @@ public class CheckApiTask extends DefaultTask {
      * Packages names will be matched exactly; sub-packages are not automatically recognized.
      */
     @Optional
-    @Nullable
     @Input
-    Collection ignoredPackages = null
+    Collection ignoredPackages
 
     /**
      * Optional list of classes to ignore.
@@ -98,9 +98,8 @@ public class CheckApiTask extends DefaultTask {
      * automatically recognized.
      */
     @Optional
-    @Nullable
     @Input
-    Collection ignoredClasses = null
+    Collection ignoredClasses
 
     /**
      * Optional set of error SHAs to ignore.
@@ -117,8 +116,7 @@ public class CheckApiTask extends DefaultTask {
     // A dummy output file meant only to tag when this check was last ran.
     // Without any outputs, Gradle will run this task every time.
     @Optional
-    @Nullable
-    private File mOutputFile = null;
+    private File mOutputFile
 
     @OutputFile
     public File getOutputFile() {
@@ -164,17 +162,12 @@ public class CheckApiTask extends DefaultTask {
     }
 
     private Set<File> collectAndVerifyInputs() {
-        Set<File> apiFiles = [getOldApiFile(), getNewApiFile(), getOldRemovedApiFile(),
-                              getNewRemovedApiFile()] as Set
-        if (apiFiles.size() != 4) {
-            throw new InvalidUserDataException("""Conflicting input files:
-    oldApiFile: ${getOldApiFile()}
-    newApiFile: ${getNewApiFile()}
-    oldRemovedApiFile: ${getOldRemovedApiFile()}
-    newRemovedApiFile: ${getNewRemovedApiFile()}
-All of these must be distinct files.""")
+        if (getOldRemovedApiFile() != null && getNewRemovedApiFile() != null) {
+            return [getOldApiFile(), getNewApiFile(), getOldRemovedApiFile(),
+                    getNewRemovedApiFile()] as Set
+        } else {
+            return [getOldApiFile(), getNewApiFile()] as Set
         }
-        return apiFiles;
     }
 
     public void setCheckApiErrors(Collection errors) {
@@ -194,6 +187,11 @@ All of these must be distinct files.""")
 
     @TaskAction
     public void exec() {
+        if (getOldApiFile() == null) {
+            // Nothing to do.
+            return
+        }
+
         final def apiFiles = collectAndVerifyInputs()
 
         OutputStream errStream = new ByteArrayOutputStream()
@@ -206,8 +204,6 @@ All of these must be distinct files.""")
 
             minHeapSize = '128m'
             maxHeapSize = '1024m'
-
-            // [other options] old_api.txt new_api.txt old_removed_api.txt new_removed_api.txt
 
             // add -error LEVEL for every error level we want to fail the build on.
             getCheckApiErrors().each { args('-error', it) }
