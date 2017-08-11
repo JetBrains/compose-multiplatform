@@ -19,7 +19,6 @@ package android.support.checkapi;
 import com.google.common.io.Files;
 
 import org.gradle.api.DefaultTask;
-import org.gradle.api.Nullable;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.Optional;
@@ -57,6 +56,7 @@ public class UpdateApiTask extends DefaultTask {
     }
 
     @InputFile
+    @Optional
     public File getNewRemovedApiFile() {
         return mNewRemovedApiFile;
     }
@@ -85,6 +85,7 @@ public class UpdateApiTask extends DefaultTask {
     }
 
     @OutputFile
+    @Optional
     public File getOldRemovedApiFile() {
         return mOldRemovedApiFile;
     }
@@ -95,7 +96,6 @@ public class UpdateApiTask extends DefaultTask {
 
     @OutputFile
     @Optional
-    @Nullable
     public File getWhitelistErrorsFile() {
         return mWhitelistErrorsFile;
     }
@@ -110,7 +110,14 @@ public class UpdateApiTask extends DefaultTask {
     @TaskAction
     public void doUpdate() throws Exception {
         Files.copy(getNewApiFile(), getOldApiFile());
-        Files.copy(getNewRemovedApiFile(), getOldRemovedApiFile());
+
+        if (getOldRemovedApiFile() != null) {
+            if (getNewRemovedApiFile() != null) {
+                Files.copy(getNewRemovedApiFile(), getOldRemovedApiFile());
+            } else {
+                getOldRemovedApiFile().delete();
+            }
+        }
 
         if (mWhitelistErrorsFile != null && !mWhitelistErrors.isEmpty()) {
             if (mWhitelistErrorsFile.exists()) {

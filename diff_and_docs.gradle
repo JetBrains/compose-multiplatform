@@ -226,27 +226,25 @@ CheckApiTask createCheckApiTask(Project project, String taskName, def checkApiCo
 
         newApiFile = newApi
         oldApiFile = oldApi
-        newRemovedApiFile = new File(project.docsDir, 'release/' + project.name + '/removed.txt')
-        oldRemovedApiFile = new File(project.projectDir, 'api/' + project.name + '/removed.txt')
 
         whitelistErrorsFile = whitelist
 
         doFirst {
-            logger.lifecycle "Verifying ${newApi.name} against ${oldApi.name}..."
+            logger.lifecycle "Verifying ${newApi.name} against ${oldApi ? oldApi.name : "nothing"}..."
         }
     }
 }
 
 DoclavaTask createGenerateApiTask(Project project) {
     // Generates API files
-    return project.tasks.create(name: "generateApi", type: DoclavaTask.class, dependsOn: configurations.doclava) {
+    return project.tasks.create(name: "generateApi", type: DoclavaTask.class,
+            dependsOn: configurations.doclava) {
         docletpath = configurations.doclava.resolve()
         destinationDir = project.docsDir
 
         // Base classpath is Android SDK, sub-projects add their own.
         classpath = rootProject.ext.androidJar
         apiFile = new File(project.docsDir, 'release/' + project.name + '/current.txt')
-        removedApiFile = new File(project.docsDir, 'release/' + project.name + '/removed.txt')
         generateDocs = false
 
         options {
@@ -307,17 +305,18 @@ void initializeApiChecksForProject(Project project) {
     def version = new Version(project.version)
     def workingDir = project.projectDir
 
-    def generateApi = createGenerateApiTask(project)
+    DoclavaTask generateApi = createGenerateApiTask(project)
     createVerifyUpdateApiAllowedTask(project)
 
     // Make sure the API surface has not broken since the last release.
     def previousApiFile = version.isPatch() ? getApiFile(workingDir, project.version)
             : getPreviousApiFile(workingDir, project.version)
 
-    def whitelistFile = new File(
+    def whitelistFile = previousApiFile == null ? null : new File(
             previousApiFile.parentFile, stripExtension(previousApiFile.name) + ".ignore")
-    def checkApiRelease = createCheckApiTask(project, "checkApiRelease", CHECK_API_CONFIG_RELEASE,
-            previousApiFile, generateApi.apiFile, whitelistFile).dependsOn(generateApi)
+    def checkApiRelease = createCheckApiTask(project, "checkApiRelease",
+            CHECK_API_CONFIG_RELEASE, previousApiFile, generateApi.apiFile, whitelistFile)
+            .dependsOn(generateApi)
 
     // Allow a comma-delimited list of whitelisted errors.
     if (project.hasProperty("ignore")) {
@@ -341,15 +340,13 @@ void initializeApiChecksForProject(Project project) {
     // Track API change history.
     def apiFilePattern = /(\d+\.\d+\.\d).txt/
     File apiDir = new File(project.projectDir, 'api')
-    File lastApiFile;
     apiDir.eachFileMatch FileType.FILES, ~apiFilePattern, { File apiFile ->
         def apiLevel = (apiFile.name =~ apiFilePattern)[0][1]
         rootProject.generateDocs.sinces.add([apiFile.absolutePath, apiLevel])
-        lastApiFile = apiFile
     }
 
-    // Associate latest API surface with the Maven artifact.
-    rootProject.generateDocs.artifacts.add([lastApiFile.absolutePath, artifact])
+    // Associate current API surface with the Maven artifact.
+    rootProject.generateDocs.artifacts.add([generateApi.apiFile.absolutePath, artifact])
 
     rootProject.createArchive.dependsOn checkApi
 }
@@ -383,8 +380,6 @@ UpdateApiTask createUpdateApiTask(Project project) {
         description 'Updates the candidate API file to incorporate valid changes.'
         newApiFile = project.checkApiRelease.newApiFile
         oldApiFile = getApiFile(project.projectDir, project.version)
-        newRemovedApiFile = project.checkApiRelease.newRemovedApiFile
-        oldRemovedApiFile = new File(project.projectDir, 'api/removed.txt')
         whitelistErrors = project.checkApiRelease.whitelistErrors
         whitelistErrorsFile = project.checkApiRelease.whitelistErrorsFile
     }
