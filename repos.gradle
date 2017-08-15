@@ -16,6 +16,14 @@
 
 import org.gradle.api.artifacts.dsl.RepositoryHandler;
 
+String getFullSdkPath(String prebuiltsRoot) {
+    final String osName = System.getProperty("os.name").toLowerCase()
+    final boolean isMacOsX =
+            osName.contains("mac os x") || osName.contains("darwin") || osName.contains("osx");
+    final String platform = isMacOsX ? 'darwin' : 'linux'
+    return "${prebuiltsRoot}/fullsdk-${platform}"
+}
+
 def supportRoot = ext.supportRootFolder
 if (supportRoot == null) {
     throw new RuntimeException("variable supportRootFolder is not set. you must set it before" +
@@ -30,7 +38,8 @@ ext.repos.prebuiltsRootUri = "file://${repos.prebuiltsRoot}"
 ext.repoNames = ["${repos.prebuiltsRoot}/gradle-plugin",
                  "${repos.prebuiltsRoot}/tools/common/m2/repository",
                  "${repos.prebuiltsRoot}/tools/common/m2/internal",
-                 "${repos.prebuiltsRoot}/maven_repo/android"]
+                 "${repos.prebuiltsRoot}/maven_repo/android",
+                 "${getFullSdkPath(repos.prebuiltsRoot)}/extras/m2repository"]
 
 /**
  * Adds maven repositories to the given repository handler.
