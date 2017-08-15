@@ -347,6 +347,7 @@ void initializeApiChecksForProject(Project project) {
 
     // Associate current API surface with the Maven artifact.
     rootProject.generateDocs.artifacts.add([generateApi.apiFile.absolutePath, artifact])
+    rootProject.generateDocs.dependsOn generateApi
 
     rootProject.createArchive.dependsOn checkApi
 }
