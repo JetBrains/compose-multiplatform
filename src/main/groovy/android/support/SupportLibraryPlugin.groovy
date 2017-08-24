@@ -138,11 +138,6 @@ class SupportLibraryPlugin implements Plugin<Project> {
         // Set uploadArchives options.
         Upload uploadTask = (Upload) project.getTasks().getByName("uploadArchives");
         project.afterEvaluate {
-            uploadTask.repositories {
-                mavenDeployer {
-                    repository(url: project.uri(project.rootProject.supportRepoOut))
-                }
-            };
             uploadTask.getRepositories().withType(MavenDeployer.class, new Action<MavenDeployer>() {
                 @Override
                 public void execute(MavenDeployer mavenDeployer) {
