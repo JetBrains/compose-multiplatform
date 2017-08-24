@@ -36,7 +36,7 @@ class SupportLibraryMavenUploader {
                         mavenDeployer.getPom().project {
                             name supportLibraryExtension.getName()
                             description supportLibraryExtension.getDescription()
-                            url 'http://developer.android.com/tools/extras/support-library.html'
+                            url supportLibraryExtension.getUrl()
                             inceptionYear supportLibraryExtension.getInceptionYear()
 
                             licenses {
