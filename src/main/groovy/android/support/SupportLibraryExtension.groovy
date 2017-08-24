@@ -27,6 +27,7 @@ class SupportLibraryExtension {
     String description;
     String inceptionYear;
     Collection<License> licenses = [];
+    boolean publish = false;
 
     SupportLibraryExtension(Project project) {
         this.project = project

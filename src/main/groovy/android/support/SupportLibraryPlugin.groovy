@@ -138,48 +138,51 @@ class SupportLibraryPlugin implements Plugin<Project> {
         // Set uploadArchives options.
         Upload uploadTask = (Upload) project.getTasks().getByName("uploadArchives");
         project.afterEvaluate {
-            uploadTask.getRepositories().withType(MavenDeployer.class, new Action<MavenDeployer>() {
-                @Override
-                public void execute(MavenDeployer mavenDeployer) {
-                    mavenDeployer.getPom().project {
-                        name supportLibraryExtension.getName()
-                        description supportLibraryExtension.getDescription()
-                        url 'http://developer.android.com/tools/extras/support-library.html'
-                        inceptionYear supportLibraryExtension.getInceptionYear()
+            if (supportLibraryExtension.publish) {
+                uploadTask.getRepositories().withType(MavenDeployer.class, new Action<MavenDeployer>() {
+                    @Override
+                    public void execute(MavenDeployer mavenDeployer) {
+                        mavenDeployer.getPom().project {
+                            name supportLibraryExtension.getName()
+                            description supportLibraryExtension.getDescription()
+                            url 'http://developer.android.com/tools/extras/support-library.html'
+                            inceptionYear supportLibraryExtension.getInceptionYear()
 
-                        licenses {
-                            license {
-                                name 'The Apache Software License, Version 2.0'
-                                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                                distribution 'repo'
+                            licenses {
+                                license {
+                                    name 'The Apache Software License, Version 2.0'
+                                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                                    distribution 'repo'
+                                }
+
+                                supportLibraryExtension.getLicenses().each {
+                                    SupportLibraryExtension.License supportLicense ->
+                                        license {
+                                            name supportLicense.name
+                                            url supportLicense.url
+                                            distribution 'repo'
+                                        }
+                                }
                             }
 
-                            supportLibraryExtension.getLicenses().each {
-                                SupportLibraryExtension.License supportLicense ->
-                                    license {
-                                        name supportLicense.name
-                                        url supportLicense.url
-                                        distribution 'repo'
-                                    }
+                            scm {
+                                url "http://source.android.com"
+                                connection "scm:git:https://android.googlesource.com/platform/frameworks/support"
                             }
-                        }
-
-                        scm {
-                            url "http://source.android.com"
-                            connection "scm:git:https://android.googlesource.com/platform/frameworks/support"
-                        }
-                        developers {
-                            developer {
-                                name 'The Android Open Source Project'
+                            developers {
+                                developer {
+                                    name 'The Android Open Source Project'
+                                }
                             }
                         }
                     }
+                });
+                if (project.rootProject.usingFullSdk) {
+                    // Library projects don't run lint by default, so set up dependency.
+                    uploadTask.dependsOn project.getTasks().getByName("lintRelease")
                 }
-            });
-
-            if (project.rootProject.usingFullSdk) {
-                // Library projects don't run lint by default, so set up dependency.
-                uploadTask.dependsOn project.getTasks().getByName("lintRelease")
+            } else {
+                uploadTask.enabled = false;
             }
         }
 
