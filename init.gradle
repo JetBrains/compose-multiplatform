@@ -90,8 +90,6 @@ def setSdkInLocalPropertiesFile() {
 def setupRepoOutAndBuildNumber() {
     // common support repo folder which works well for prebuilts.
     ext.supportRepoOut = ''
-    // files in artifactoryRepoOut can be safely copied into a real artifactory.
-    ext.artifactoryRepoOut = ''
     ext.buildNumber = "0"
     /*
      * With the build server you are given two env variables.
@@ -120,7 +118,6 @@ def setupRepoOutAndBuildNumber() {
         project.buildDir = new File("$project.parent.buildDir/../$project.name/build")
     }
     ext.supportRepoOut = new File(buildDir, 'support_repo')
-    ext.artifactoryRepoOut =  new File(buildDir, 'artifactory_repo')
     ext.testApkDistOut = ext.distDir
     ext.testResultsDistDir = new File(distDir, "host-test-reports")
     ext.docsDir = new File(buildDir, 'javadoc')
@@ -236,46 +233,15 @@ def configureSubProjects() {
                 project.afterEvaluate {
                     Upload uploadTask = (Upload) project.tasks.uploadArchives;
                     uploadTask.repositories.mavenDeployer {
-
-                        // Disable unique names for SNAPSHOTS so they can be updated in place.
-                        setUniqueVersion(false)
-                    }
-                    uploadTask.doLast {
-                        // Remove any invalid maven-metadata.xml files that may have been
-                        // created for SNAPSHOT versions that are *not* uniquely versioned.
-                        repositories.mavenDeployer.pom*.each { pom ->
-                            if (pom.version.endsWith('-SNAPSHOT')) {
-                                final File artifactDir = new File(
-                                        rootProject.ext.supportRepoOut,
-                                        pom.groupId.replace('.', '/')
-                                                + '/' + pom.artifactId
-                                                + '/' + pom.version)
-                                delete fileTree(dir: artifactDir,
-                                        include: 'maven-metadata.xml*')
-                            }
-                        }
-                    }
-
-                    // create a release task that produces artifactory friends artifacts
-                    // a.k.a. unique versions for snapshots with their maven-metadata files.
-                    task artifactoryRelease(type : Upload) {
-                        configuration = uploadTask.configuration
-                        repositories {
-                            mavenDeployer {
-                                repository(url: uri("$rootProject.ext.artifactoryRepoOut"))
-                                setUniqueVersion(true)
-                            }
-                        }
+                        repository(url: uri("$rootProject.ext.supportRepoOut"))
+                        setUniqueVersion(true)
                     }
 
                     // Before the upload, make sure the repo is ready.
                     uploadTask.dependsOn rootProject.tasks.prepareRepo
 
-                    artifactoryRelease.dependsOn uploadTask
-
                     // Make the mainupload depend on this one.
                     mainUpload.dependsOn uploadTask
-                    mainUpload.dependsOn artifactoryRelease
                 }
             }
         }
