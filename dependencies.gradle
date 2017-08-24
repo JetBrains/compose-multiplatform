@@ -35,6 +35,9 @@ if (androidPluginVersionOverride != null) {
     libs.gradle = 'com.android.tools.build:gradle:3.0.0-beta2'
 }
 
+//arch components
+libs.arch_lifecycle_runtime = "android.arch.lifecycle:runtime:1.0.0"
+
 // Other dependencies
 libs.xml_parser_apis = 'xerces:xmlParserAPIs:2.6.2'
 libs.xerces_impl = 'xerces:xercesImpl:2.6.2'
