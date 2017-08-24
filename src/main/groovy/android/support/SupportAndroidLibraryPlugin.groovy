@@ -26,15 +26,13 @@ import org.gradle.api.Action
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.artifacts.maven.MavenDeployer
-import org.gradle.api.tasks.Upload
 import org.gradle.api.tasks.bundling.Jar
 
 /**
  * Support library specific com.android.library plugin that sets common configurations needed for
  * support library modules.
  */
-class SupportLibraryPlugin implements Plugin<Project> {
+class SupportAndroidLibraryPlugin implements Plugin<Project> {
     private static final String INSTRUMENTATION_RUNNER =
             "android.support.test.runner.AndroidJUnitRunner";
 
@@ -42,6 +40,7 @@ class SupportLibraryPlugin implements Plugin<Project> {
     public void apply(Project project) {
         SupportLibraryExtension supportLibraryExtension =
                 project.extensions.create("supportLibrary", SupportLibraryExtension, project);
+        SupportLibraryMavenUploader.apply(project, supportLibraryExtension);
 
         project.apply(ImmutableMap.of("plugin", "com.android.library"));
         project.apply(ImmutableMap.of("plugin", ErrorProneBasePlugin.class));
@@ -109,9 +108,12 @@ class SupportLibraryPlugin implements Plugin<Project> {
             library.lintOptions.check 'NewApi'
         } else {
             library.lintOptions.baseline new File(project.projectDir, "/lint-baseline.xml")
-
         }
 
+        if (project.rootProject.usingFullSdk) {
+            // Library projects don't run lint by default, so set up dependency.
+            project.uploadArchives.dependsOn "lintRelease"
+        }
 
         // Java 8 is only fully supported on API 24+ and not all Java 8 features are binary
         // compatible with API < 24, so use Java 7 for both source AND target.
@@ -134,54 +136,6 @@ class SupportLibraryPlugin implements Plugin<Project> {
                 project.getArtifacts().add("archives", sourceJar);
             }
         });
-
-        // Set uploadArchives options.
-        Upload uploadTask = (Upload) project.getTasks().getByName("uploadArchives");
-        project.afterEvaluate {
-            uploadTask.getRepositories().withType(MavenDeployer.class, new Action<MavenDeployer>() {
-                @Override
-                public void execute(MavenDeployer mavenDeployer) {
-                    mavenDeployer.getPom().project {
-                        name supportLibraryExtension.getName()
-                        description supportLibraryExtension.getDescription()
-                        url 'http://developer.android.com/tools/extras/support-library.html'
-                        inceptionYear supportLibraryExtension.getInceptionYear()
-
-                        licenses {
-                            license {
-                                name 'The Apache Software License, Version 2.0'
-                                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                                distribution 'repo'
-                            }
-
-                            supportLibraryExtension.getLicenses().each {
-                                SupportLibraryExtension.License supportLicense ->
-                                    license {
-                                        name supportLicense.name
-                                        url supportLicense.url
-                                        distribution 'repo'
-                                    }
-                            }
-                        }
-
-                        scm {
-                            url "http://source.android.com"
-                            connection "scm:git:https://android.googlesource.com/platform/frameworks/support"
-                        }
-                        developers {
-                            developer {
-                                name 'The Android Open Source Project'
-                            }
-                        }
-                    }
-                }
-            });
-
-            if (project.rootProject.usingFullSdk) {
-                // Library projects don't run lint by default, so set up dependency.
-                uploadTask.dependsOn project.getTasks().getByName("lintRelease")
-            }
-        }
 
         final ErrorProneToolChain toolChain = ErrorProneToolChain.create(project);
         library.getBuildTypes().create("errorProne")

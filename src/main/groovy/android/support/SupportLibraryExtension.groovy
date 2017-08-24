@@ -19,7 +19,7 @@ package android.support;
 import org.gradle.api.Project
 
 /**
- * Extension for {@link SupportLibraryPlugin}.
+ * Extension for {@link SupportAndroidLibraryPlugin} and {@link SupportJavaLibraryPlugin}.
  */
 class SupportLibraryExtension {
     Project project
@@ -27,6 +27,7 @@ class SupportLibraryExtension {
     String description;
     String inceptionYear;
     Collection<License> licenses = [];
+    boolean publish = false;
 
     SupportLibraryExtension(Project project) {
         this.project = project
