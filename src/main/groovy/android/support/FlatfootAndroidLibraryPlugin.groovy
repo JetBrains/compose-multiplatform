@@ -22,21 +22,16 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 
 /**
- * Support java library specific plugin that sets common configurations needed for
- * support library modules.
+ * Flatfoot Android library specific plugin that sets common configurations needed for
+ * flatfoot library modules.
  */
-class SupportJavaLibraryPlugin implements Plugin<Project> {
+class FlatfootAndroidLibraryPlugin implements Plugin<Project> {
     @Override
     public void apply(Project project) {
         SupportLibraryExtension supportLibraryExtension =
                 project.extensions.create("supportLibrary", SupportLibraryExtension, project);
         SupportLibraryMavenUploader.apply(project, supportLibraryExtension);
 
-        project.apply(ImmutableMap.of("plugin", "java"));
-
-        project.compileJava {
-            sourceCompatibility = JavaVersion.VERSION_1_7
-            targetCompatibility = JavaVersion.VERSION_1_7
-        }
+        project.apply(ImmutableMap.of("plugin", "com.android.library"));
     }
 }
