@@ -208,7 +208,7 @@ task distDocs(type: Zip, dependsOn: generateDocs) {
 @Field def CHECK_API_CONFIG_PATCH = [
         onFailMessage:
                 "Public API definition may not change in finalized or patch releases.\n" +
-                        "\n" + MSG_HIDE_API,
+                "\n" + MSG_HIDE_API,
         errors: (2..30)-[22],
         warnings: [],
         hidden: [22]
@@ -256,29 +256,32 @@ DoclavaTask createGenerateApiTask(Project project) {
 }
 
 /**
- * Returns the most recent API, optionally restricting to APIs before
- * <code>beforeApi</code>.
+ * Returns the API file for the specified reference version.
  *
  * @param refApi the reference API version, ex. 25.0.0-SNAPSHOT
  * @return the most recently released API file
  */
-File getApiFile(File rootFolder, String refApi, boolean release = false) {
-    Version refVersion = new Version(refApi)
-    File apiDir = new File(rootFolder, 'api')
-    // If this is a patch or release version, ignore the extra.
-    return new File(apiDir, "$refVersion.major.$refVersion.minor.0" +
-            (refVersion.patch || release ? "" : refVersion.extra) + ".txt")
+File getApiFile(File rootDir, Version refVersion, boolean forceRelease = false) {
+    File apiDir = new File(rootDir, 'api')
+
+    if (!refVersion.isSnapshot() || forceRelease) {
+        // Release API file is always X.Y.0.txt.
+        return new File(apiDir, "$refVersion.major.$refVersion.minor.0.txt")
+    }
+
+    // Non-release API file is always current.txt.
+    return new File(apiDir, 'current.txt')
 }
 
-File getPreviousApiFile(File rootFolder, String refApi) {
+File getLastReleasedApiFile(File rootFolder, String refApi) {
     Version refVersion = new Version(refApi)
     File apiDir = new File(rootFolder, 'api')
 
     File lastFile = null
     Version lastVersion = null
 
-    // Only look at released versions and snapshots thereof, ex. X.Y.0.txt or X.Y.0-SNAPSHOT.txt.
-    apiDir.eachFileMatch FileType.FILES, ~/(\d+)\.(\d+)\.0(-SNAPSHOT)?\.txt/, { File file ->
+    // Only look at released versions and snapshots thereof, ex. X.Y.0.txt.
+    apiDir.eachFileMatch FileType.FILES, ~/(\d+)\.(\d+)\.0\.txt/, { File file ->
         Version version = new Version(stripExtension(file.name))
         if ((lastFile == null || lastVersion < version) && version < refVersion) {
             lastFile = file
@@ -309,14 +312,12 @@ void initializeApiChecksForProject(Project project) {
     createVerifyUpdateApiAllowedTask(project)
 
     // Make sure the API surface has not broken since the last release.
-    def previousApiFile = version.isPatch() ? getApiFile(workingDir, project.version)
-            : getPreviousApiFile(workingDir, project.version)
+    File lastReleasedApiFile = getLastReleasedApiFile(workingDir, project.version)
 
-    def whitelistFile = previousApiFile == null ? null : new File(
-            previousApiFile.parentFile, stripExtension(previousApiFile.name) + ".ignore")
-    def checkApiRelease = createCheckApiTask(project, "checkApiRelease",
-            CHECK_API_CONFIG_RELEASE, previousApiFile, generateApi.apiFile, whitelistFile)
-            .dependsOn(generateApi)
+    def whitelistFile = lastReleasedApiFile == null ? null : new File(
+            lastReleasedApiFile.parentFile, stripExtension(lastReleasedApiFile.name) + ".ignore")
+    def checkApiRelease = createCheckApiTask(project, "checkApiRelease", CHECK_API_CONFIG_RELEASE,
+            lastReleasedApiFile, generateApi.apiFile, whitelistFile).dependsOn(generateApi)
 
     // Allow a comma-delimited list of whitelisted errors.
     if (project.hasProperty("ignore")) {
@@ -324,9 +325,10 @@ void initializeApiChecksForProject(Project project) {
     }
 
     // Check whether the development API surface has changed.
-    def verifyConfig = version.isPatch() ? CHECK_API_CONFIG_DEVELOP : CHECK_API_CONFIG_PATCH
+    def verifyConfig = version.isPatch() ? CHECK_API_CONFIG_PATCH : CHECK_API_CONFIG_DEVELOP
+    File currentApiFile = getApiFile(workingDir, new Version(project.version))
     def checkApi = createCheckApiTask(project, "checkApi", verifyConfig,
-            getApiFile(workingDir, project.version), project.generateApi.apiFile)
+            currentApiFile, project.generateApi.apiFile)
             .dependsOn(generateApi, checkApiRelease)
 
     checkApi.group JavaBasePlugin.VERIFICATION_GROUP
@@ -359,14 +361,13 @@ Task createVerifyUpdateApiAllowedTask(Project project) {
         // no-op.
         doLast {
             def rootFolder = project.projectDir
-            def versionString = project.version
-            def version = new Version(versionString)
+            Version version = new Version(project.version)
 
             if (version.isPatch()) {
                 throw new GradleException("Public APIs may not be modified in patch releases.")
-            } else if (version.isSnapshot() && getApiFile(rootFolder, versionString, true).exists()) {
+            } else if (version.isSnapshot() && getApiFile(rootFolder, version, true).exists()) {
                 throw new GradleException("Inconsistent version. Public API file already exists.")
-            } else if (!version.isSnapshot() && getApiFile(rootFolder, versionString).exists()
+            } else if (!version.isSnapshot() && getApiFile(rootFolder, version).exists()
                     && !project.hasProperty("force")) {
                 throw new GradleException("Public APIs may not be modified in finalized releases.")
             }
@@ -380,7 +381,7 @@ UpdateApiTask createUpdateApiTask(Project project) {
         group JavaBasePlugin.VERIFICATION_GROUP
         description 'Updates the candidate API file to incorporate valid changes.'
         newApiFile = project.checkApiRelease.newApiFile
-        oldApiFile = getApiFile(project.projectDir, project.version)
+        oldApiFile = getApiFile(project.projectDir, new Version(project.version))
         whitelistErrors = project.checkApiRelease.whitelistErrors
         whitelistErrorsFile = project.checkApiRelease.whitelistErrorsFile
     }
@@ -427,7 +428,7 @@ ApiXmlConversionTask createOldApiXml(Project project) {
             inputApiFile = getPreviousApiFile(rootFolder, toApi)
         } else {
             // Use the most recently released API file.
-            inputApiFile = getApiFile(rootFolder, project.version);
+            inputApiFile = getApiFile(rootFolder, new Version(project.version))
         }
 
         outputApiXmlFile = new File(project.docsDir,
