@@ -261,16 +261,16 @@ def configureSubProjects() {
                             include '*.apk'
                             into(rootProject.ext.testApkDistOut)
                             rename { String fileName ->
-                                // multiple modules may have the same name so prefix the name with
-                                // the module's path to ensure it is unique.
-                                // e.g. palette-v7-debug-androidTest.apk becomes
-                                // support-palette-v7_palette-v7-debug-androidTest.apk
-                                "${project.getPath().replace(':', '-').substring(1)}_${fileName}"
-
                                 // Exclude media-compat-test-* modules from existing support library
                                 // presubmit tests.
                                 if (fileName.contains("media-compat-test")) {
                                     fileName.replace("-debug-androidTest", "")
+                                } else {
+                                    // multiple modules may have the same name so prefix the name with
+                                    // the module's path to ensure it is unique.
+                                    // e.g. palette-v7-debug-androidTest.apk becomes
+                                    // support-palette-v7_palette-v7-debug-androidTest.apk
+                                    "${project.getPath().replace(':', '-').substring(1)}_${fileName}"
                                 }
                             }
                         }
