@@ -69,4 +69,9 @@ public class LibraryVersions {
      * Version code for shared testing code of flatfoot
      */
     public static final Version ARCH_CORE_TESTING = FLATFOOT_1_0_BATCH;
+
+    /**
+     * Version code for Background WorkManager
+     */
+    public static final Version WORKMANAGER = new Version("1.0.0-alpha1");
 }
