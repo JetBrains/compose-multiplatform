@@ -69,4 +69,9 @@ public class LibraryVersions {
      * Version code for shared testing code of flatfoot
      */
     public static final Version ARCH_CORE_TESTING = FLATFOOT_1_0_BATCH;
+
+    /**
+     * Version code for Navigation
+     */
+    public static final Version NAVIGATION = new Version("0.5.0-alpha1");
 }
