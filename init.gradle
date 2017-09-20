@@ -224,7 +224,7 @@ def configureSubProjects() {
 
                 // Enforce NewApi lint check as fatal.
                 project.android.lintOptions.fatal 'NewApi'
-                lintTask.dependsOn project.lint
+                lintTask.dependsOn {project.lint}
             }
 
             if (isAndroidLibrary || isJavaLibrary) {
