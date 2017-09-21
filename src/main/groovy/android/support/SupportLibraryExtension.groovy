@@ -33,6 +33,7 @@ class SupportLibraryExtension {
     String inceptionYear;
     String url = SUPPORT_URL;
     Collection<License> licenses = [];
+    boolean java8Library = false;
     boolean publish = false;
 
     SupportLibraryExtension(Project project) {
