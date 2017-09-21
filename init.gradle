@@ -19,6 +19,7 @@ import com.android.build.gradle.internal.coverage.JacocoPlugin
 import com.android.build.gradle.internal.coverage.JacocoReportTask
 import com.android.build.gradle.internal.tasks.DeviceProviderInstrumentTestTask
 import org.gradle.api.logging.configuration.ShowStacktrace
+import android.support.gmaven.GMavenVersionChecker
 
 def supportRoot = ext.supportRootFolder
 if (supportRoot == null) {
@@ -28,7 +29,7 @@ if (supportRoot == null) {
 def init = new Properties()
 ext.init = init
 ext.init.debugKeystore = file("${supportRoot}/development/keystore/debug.keystore")
-
+rootProject.ext.versionChecker = new GMavenVersionChecker(rootProject)
 ext.runningInBuildServer = System.env.DIST_DIR != null && System.env.OUT_DIR != null
 
 apply from: "${supportRoot}/buildSrc/dependencies.gradle"
