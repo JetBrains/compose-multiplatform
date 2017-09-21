@@ -98,9 +98,6 @@ class SupportAndroidLibraryPlugin implements Plugin<Project> {
 
             // Always fail on NewApi.
             error 'NewApi'
-
-            // TODO(aurimas): figure out the issue with missing translation check
-            disable 'MissingTranslation'
         }
 
         // Set baseline file for all legacy lint warnings.
