@@ -42,7 +42,29 @@ public class Version implements Comparable<Version> {
 
     @Override
     public int compareTo(Version version) {
-        return mMajor != version.mMajor ? mMajor - version.mMajor : mMinor - version.mMinor;
+        if (mMajor != version.mMajor) {
+            return mMajor - version.mMajor;
+        }
+        if (mMinor != version.mMinor) {
+            return mMinor - version.mMinor;
+        }
+        if (mPatch != version.mPatch) {
+            return mPatch - version.mPatch;
+        }
+        if (mExtra == null) {
+            if (version.mExtra == null) {
+                return 0;
+            }
+            // not having any extra is always a later version
+            return 1;
+        } else {
+            if (version.mExtra == null) {
+                // not having any extra is always a later version
+                return -1;
+            }
+            // gradle uses lexicographic ordering
+            return mExtra.compareTo(version.mExtra);
+        }
     }
 
     public boolean isPatch() {
@@ -72,5 +94,27 @@ public class Version implements Comparable<Version> {
     @Override
     public String toString() {
         return mMajor + "." + mMinor + "." + mPatch + (mExtra != null ? mExtra : "");
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Version version = (Version) o;
+
+        if (mMajor != version.mMajor) return false;
+        if (mMinor != version.mMinor) return false;
+        if (mPatch != version.mPatch) return false;
+        return mExtra != null ? mExtra.equals(version.mExtra) : version.mExtra == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = mMajor;
+        result = 31 * result + mMinor;
+        result = 31 * result + mPatch;
+        result = 31 * result + (mExtra != null ? mExtra.hashCode() : 0);
+        return result;
     }
 }
