@@ -33,10 +33,13 @@ class SupportJavaLibraryPlugin implements Plugin<Project> {
         SupportLibraryMavenUploader.apply(project, supportLibraryExtension);
 
         project.apply(ImmutableMap.of("plugin", "java"));
-
-        project.compileJava {
-            sourceCompatibility = JavaVersion.VERSION_1_7
-            targetCompatibility = JavaVersion.VERSION_1_7
+        project.afterEvaluate {
+            project.compileJava {
+                def version = supportLibraryExtension.java8Library ?
+                    JavaVersion.VERSION_1_8 : JavaVersion.VERSION_1_7
+                sourceCompatibility = version
+                targetCompatibility = version
+            }
         }
     }
 }
