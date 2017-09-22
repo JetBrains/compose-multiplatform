@@ -48,7 +48,7 @@ public class LibraryVersions {
     /**
      * Version code for Lifecycle libs that are required by the support library
      */
-    public static final Version LIFECYCLES_CORE = new Version("1.0.0");
+    public static final Version LIFECYCLES_CORE = new Version("1.0.1");
 
     /**
      * Version code for Lifecycle runtime libs that are required by the support library
