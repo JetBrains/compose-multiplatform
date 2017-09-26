@@ -20,10 +20,10 @@ def libs = [:]
 libs.mockito_core = 'org.mockito:mockito-core:2.7.6'
 libs.dexmaker_mockito = 'com.linkedin.dexmaker:dexmaker-mockito:2.2.0'
 libs.junit = 'junit:junit:4.12'
-libs.test_runner = 'com.android.support.test:runner:1.0.0'
-libs.test_rules = 'com.android.support.test:rules:1.0.0'
-libs.espresso_core = 'com.android.support.test.espresso:espresso-core:3.0.0'
-libs.espresso_contrib = 'com.android.support.test.espresso:espresso-contrib:3.0.0'
+libs.test_runner = 'com.android.support.test:runner:1.0.1'
+libs.test_rules = 'com.android.support.test:rules:1.0.1'
+libs.espresso_core = 'com.android.support.test.espresso:espresso-core:3.0.1'
+libs.espresso_contrib = 'com.android.support.test.espresso:espresso-contrib:3.0.1'
 libs.jacoco = 'org.jacoco:org.jacoco.core:0.7.8'
 
 def androidPluginVersionOverride = System.getenv("GRADLE_PLUGIN_VERSION")
