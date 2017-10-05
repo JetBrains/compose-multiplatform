@@ -42,6 +42,28 @@ class SupportAndroidLibraryPlugin implements Plugin<Project> {
                 project.extensions.create("supportLibrary", SupportLibraryExtension, project);
         SupportLibraryMavenUploader.apply(project, supportLibraryExtension);
 
+        project.afterEvaluate {
+            LibraryExtension library = project.extensions.findByType(LibraryExtension.class);
+
+            // Java 8 is only fully supported on API 24+ and not all Java 8 features are binary
+            // compatible with API < 24, so use Java 7 for both source AND target.
+            final JavaVersion javaVersion;
+            if (supportLibraryExtension.java8Library) {
+                if (library.defaultConfig.minSdkVersion < 24) {
+                    throw IllegalArgumentException("Libraries can only support Java 8 if "
+                            + "minSdkVersion is 24 or higher");
+                }
+                javaVersion = JavaVersion.VERSION_1_8
+            } else {
+                javaVersion = JavaVersion.VERSION_1_7
+            }
+
+            library.compileOptions {
+                sourceCompatibility javaVersion
+                targetCompatibility javaVersion
+            }
+        }
+
         project.apply(ImmutableMap.of("plugin", "com.android.library"));
         project.apply(ImmutableMap.of("plugin", ErrorProneBasePlugin.class));
 
@@ -110,13 +132,6 @@ class SupportAndroidLibraryPlugin implements Plugin<Project> {
         if (project.rootProject.usingFullSdk) {
             // Library projects don't run lint by default, so set up dependency.
             project.uploadArchives.dependsOn "lintRelease"
-        }
-
-        // Java 8 is only fully supported on API 24+ and not all Java 8 features are binary
-        // compatible with API < 24, so use Java 7 for both source AND target.
-        library.compileOptions {
-            sourceCompatibility JavaVersion.VERSION_1_7
-            targetCompatibility JavaVersion.VERSION_1_7
         }
 
         // Create sources jar for release builds
