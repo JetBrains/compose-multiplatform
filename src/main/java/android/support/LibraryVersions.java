@@ -73,5 +73,5 @@ public class LibraryVersions {
     /**
      * Version code for Navigation
      */
-    public static final Version NAVIGATION = new Version("0.5.0-alpha1");
+    public static final Version NAVIGATION = new Version("0.6.0-alpha1");
 }
