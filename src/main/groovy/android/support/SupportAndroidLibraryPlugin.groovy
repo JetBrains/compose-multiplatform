@@ -51,8 +51,8 @@ class SupportAndroidLibraryPlugin implements Plugin<Project> {
             // compatible with API < 24, so use Java 7 for both source AND target.
             final JavaVersion javaVersion;
             if (supportLibraryExtension.java8Library) {
-                if (library.defaultConfig.minSdkVersion < 24) {
-                    throw IllegalArgumentException("Libraries can only support Java 8 if "
+                if (library.defaultConfig.minSdkVersion.apiLevel < 24) {
+                    throw new IllegalArgumentException("Libraries can only support Java 8 if "
                             + "minSdkVersion is 24 or higher");
                 }
                 javaVersion = JavaVersion.VERSION_1_8
