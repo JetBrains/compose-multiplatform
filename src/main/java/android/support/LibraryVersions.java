@@ -43,7 +43,7 @@ public class LibraryVersions {
     /**
      * Version code for RecyclerView & Room paging
      */
-    public static final Version PAGING = new Version("1.0.0-alpha2");
+    public static final Version PAGING = new Version("1.0.0-alpha3");
 
     /**
      * Version code for Lifecycle libs that are required by the support library
