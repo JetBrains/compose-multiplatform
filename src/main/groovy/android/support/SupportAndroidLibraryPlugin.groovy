@@ -35,8 +35,6 @@ import org.gradle.api.tasks.bundling.Jar
 class SupportAndroidLibraryPlugin implements Plugin<Project> {
     private static final String INSTRUMENTATION_RUNNER =
             "android.support.test.runner.AndroidJUnitRunner";
-    private static final String VERSION_FILE_PATH =
-            "generatedResources/META-INF/%s_%s.version"
 
     @Override
     public void apply(Project project) {
@@ -64,24 +62,9 @@ class SupportAndroidLibraryPlugin implements Plugin<Project> {
                 sourceCompatibility javaVersion
                 targetCompatibility javaVersion
             }
-
-            // Add a java resource file to the library jar for version tracking purposes.
-            String artifactName = String.format(VERSION_FILE_PATH, project.group, project.name)
-
-            def writeVersionFile =
-                    project.tasks.create("writeVersionFile", VersionFileWriterTask.class) {
-                        version project.version
-                        outputFile new File(project.buildDir,  artifactName)
-                    }
-
-            library.libraryVariants.all {
-                it.processJavaResources.dependsOn(writeVersionFile)
-            }
-
-            library.sourceSets.main.resources {
-                srcDir new File(project.buildDir, "generatedResources")
-            }
         }
+
+        VersionFileWriterTask.setUpAndroidLibrary(project);
 
         project.apply(ImmutableMap.of("plugin", "com.android.library"));
         project.apply(ImmutableMap.of("plugin", ErrorProneBasePlugin.class));

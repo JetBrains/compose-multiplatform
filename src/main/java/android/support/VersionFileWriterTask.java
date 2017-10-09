@@ -16,7 +16,11 @@
 
 package android.support;
 
+import com.android.build.gradle.LibraryExtension;
+
+import org.gradle.api.Action;
 import org.gradle.api.DefaultTask;
+import org.gradle.api.Project;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
@@ -29,8 +33,49 @@ import java.io.PrintWriter;
  * Task that allows to write a version to a given output file.
  */
 public class VersionFileWriterTask extends DefaultTask {
+    public static final String RESOURCE_DIRECTORY = "generatedResources";
+    public static final String VERSION_FILE_PATH =
+            RESOURCE_DIRECTORY + "/META-INF/%s_%s.version";
+
     private String mVersion;
     private File mOutputFile;
+
+    /**
+     * Sets up Android Library project to have a task that generates a version file.
+     *
+     * @param project an Android Library project.
+     */
+    public static void setUpAndroidLibrary(Project project) {
+        project.afterEvaluate(new Action<Project>() {
+            @Override
+            public void execute(Project project) {
+                LibraryExtension library =
+                        project.getExtensions().findByType(LibraryExtension.class);
+
+                String group = (String) project.getProperties().get("group");
+                String artifactId = (String) project.getProperties().get("name");
+                String version = (String) project.getProperties().get("version");
+
+                // Add a java resource file to the library jar for version tracking purposes.
+                File artifactName = new File(project.getBuildDir(),
+                        String.format(VersionFileWriterTask.VERSION_FILE_PATH,
+                                group, artifactId));
+
+                VersionFileWriterTask writeVersionFile =
+                        project.getTasks().create("writeVersionFile", VersionFileWriterTask.class);
+                writeVersionFile.setVersion(version);
+                writeVersionFile.setOutputFile(artifactName);
+
+                library.getLibraryVariants().all(
+                        libraryVariant -> libraryVariant.getProcessJavaResources().dependsOn(
+                                writeVersionFile));
+
+                library.getSourceSets().getByName("main").getResources().srcDir(
+                        new File(project.getBuildDir(), VersionFileWriterTask.RESOURCE_DIRECTORY)
+                );
+            }
+        });
+    }
 
     @Input
     public String getVersion() {
