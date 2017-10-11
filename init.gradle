@@ -127,7 +127,7 @@ def setupRepoOutAndBuildNumber() {
 def configureBuildOnServer() {
     def buildOnServerTask = rootProject.tasks.create("buildOnServer")
     rootProject.tasks.whenTaskAdded { task ->
-        if ("createArchive".equals(task.name)) {
+        if ("createArchive".equals(task.name) || "distDocs".equals(task.name)) {
             buildOnServerTask.dependsOn task
         }
     }
