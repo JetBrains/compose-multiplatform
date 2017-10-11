@@ -16,20 +16,29 @@
 
 import android.support.ModifiedProjectsReporter
 
+def supportRoot = ext.supportRootFolder
 task(reportModifications) {
-    doLast{
-        if (!rootProject.hasProperty("SHAs")) {
-            throw new GradleException("You must specify SHAs range: -PSHAs=<rev1>...<rev2>")
+    doLast {
+        if (!rootProject.hasProperty("SHAs") && !rootProject.hasProperty("buildIds")) {
+            throw new GradleException("You must specify SHAs range: -PSHAs=<rev1>...<rev2>"
+                    + "or builds range: -PbuildIds=<buildId1>..<buildId2>")
         }
-        def range = SHAs.tokenize('...')
-        if (range.size() != 2) {
-            throw new GradleException("You must specify SHAs in format: <rev1>...<rev2>")
+        def modificationsReporter = new ModifiedProjectsReporter()
+        if (rootProject.hasProperty("SHAs")) {
+            def range = SHAs.tokenize('...')
+            if (range.size() != 2) {
+                throw new GradleException("You must specify SHAs in format: <rev1>...<rev2>")
+            }
+            modificationsReporter.printModifiedProjectsSHAs(supportRoot, range[0], range[1], rootProject)
         }
-        printModifications(range[0], range[1])
-    }
-}
 
-def printModifications(sha1, sha2) {
-    def modificationsReporter = new ModifiedProjectsReporter()
-    modificationsReporter.printModifiedProjects(ext.supportRootFolder, sha1, sha2, rootProject)
+        if (rootProject.hasProperty("buildIds")) {
+            def range = buildIds.tokenize('...')
+            if (range.size() != 2) {
+                throw new GradleException("You must specify builds in format: <buildId1>..<buildId2")
+            }
+            modificationsReporter.printModifiedProjectsbyBuildIds(supportRoot, range[0].toInteger(),
+                    range[1].toInteger(), rootProject)
+        }
+    }
 }

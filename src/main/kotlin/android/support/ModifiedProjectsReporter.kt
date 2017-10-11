@@ -16,21 +16,32 @@
 
 package android.support
 
-import org.gradle.api.GradleException
-import java.io.File
-import java.util.concurrent.Executors
-import java.util.concurrent.Future
-import java.util.concurrent.TimeUnit
 import org.gradle.api.Project
+import java.io.File
+import java.util.concurrent.Future
 
+private const val REPO_PROP = "repo.prop"
 
 @Suppress("unused")
 class ModifiedProjectsReporter {
 
-    private val ioExecutor = Executors.newFixedThreadPool(5)
-    private fun <T> ioThread(f: () -> T): Future<T> = ioExecutor.submit(f)
+    private fun fetchRepoProps(rootProject: Project, buildId: Int): Future<File> {
+        val workingDir = File(rootProject.buildDir, "$buildId")
+        if (workingDir.exists()) {
+            workingDir.deleteRecursively()
+        }
+        workingDir.mkdir()
+        return fetch(rootProject.buildDir, buildId, "support_library_app_toolkit", REPO_PROP)
+    }
 
-    fun printModifiedProjects(gitRoot: File,
+    fun printModifiedProjectsbyBuildIds(gitRoot: File, buildIdFirst: Int, buildIdSecond: Int,
+                              rootProject: Project) {
+        val sha1 = frameworksSupportSHA(fetchRepoProps(rootProject, buildIdFirst).get())
+        val sha2 = frameworksSupportSHA(fetchRepoProps(rootProject, buildIdSecond).get())
+        printModifiedProjectsSHAs(gitRoot, sha1, sha2, rootProject)
+    }
+
+    fun printModifiedProjectsSHAs(gitRoot: File,
                               shaFirst: String, shaLast: String, rootProject: Project) {
 
         val modifiedRootProjects = rootProject.subprojects
@@ -78,14 +89,7 @@ class ModifiedProjectsReporter {
         val process = ProcessBuilder("git", "log", "$shaFirst..$shaLast", "--",
                 projectDir.absolutePath).start()
 
-        val awaitResult = process.waitFor(1, TimeUnit.SECONDS)
-        if (!awaitResult) {
-            throw GradleException("Failed to await for git")
-        }
-        if (process.exitValue() != 0) {
-            val errorMessage = process.errorStream.bufferedReader().use { it.readText() }
-            throw GradleException("Git command failed: $errorMessage")
-        }
+        process.awaitSuccess("Git log")
         process.inputStream.bufferedReader().use { !it.readLine().isNullOrEmpty() }
     }
 }
