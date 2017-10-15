@@ -45,15 +45,17 @@ public class LibraryVersions {
      */
     public static final Version PAGING = new Version("1.0.0-alpha3");
 
+    private static final Version LIFECYCLES = new Version("1.0.2");
+
     /**
      * Version code for Lifecycle libs that are required by the support library
      */
-    public static final Version LIFECYCLES_CORE = new Version("1.0.2");
+    public static final Version LIFECYCLES_CORE = LIFECYCLES;
 
     /**
      * Version code for Lifecycle runtime libs that are required by the support library
      */
-    public static final Version LIFECYCLES_RUNTIME = new Version("1.0.0");
+    public static final Version LIFECYCLES_RUNTIME = LIFECYCLES;
 
     /**
      * Version code for shared code of flatfoot
