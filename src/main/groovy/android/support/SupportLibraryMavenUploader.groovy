@@ -16,9 +16,11 @@
 
 package android.support
 
+import com.android.build.gradle.LibraryPlugin
 import com.google.common.collect.ImmutableMap
 import org.gradle.api.Action
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.artifacts.maven.MavenDeployer
 import org.gradle.api.tasks.Upload
 
@@ -66,11 +68,45 @@ class SupportLibraryMavenUploader {
                                 }
                             }
                         }
+
+                        uploadTask.doFirst {
+                            Set<ProjectDependency> allDeps = new HashSet<>();
+                            collectDependenciesForConfiguration(allDeps, project, "api");
+                            collectDependenciesForConfiguration(allDeps, project, "implementation");
+                            collectDependenciesForConfiguration(allDeps, project, "compile");
+
+                            mavenDeployer.getPom().whenConfigured {
+                                it.dependencies.forEach { dep ->
+                                    if (isAndroidProject(dep.groupId, dep.artifactId, allDeps)) {
+                                        dep.type = "aar"
+                                    }
+                                }
+                            }
+                        }
                     }
                 });
             } else {
                 uploadTask.enabled = false;
             }
         }
+    }
+
+    private static void collectDependenciesForConfiguration(Set<ProjectDependency> dependencies,
+            Project project, String name) {
+        def config = project.configurations.findByName(name);
+        if (config != null) {
+            config.dependencies.withType(ProjectDependency.class).forEach {
+                dep -> dependencies.add(dep)
+            }
+        }
+    }
+
+    private static boolean isAndroidProject(String groupId, String artifactId, Set<ProjectDependency> deps) {
+        for (ProjectDependency dep : deps) {
+            if (dep.group == groupId && dep.name == artifactId) {
+                return dep.getDependencyProject().plugins.hasPlugin(LibraryPlugin.class)
+            }
+        }
+        return false;
     }
 }
