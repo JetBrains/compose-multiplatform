@@ -1,20 +1,12 @@
-buildscript {
-    ext.supportRootFolder = project.projectDir.getParentFile()
-    apply from: 'repos.gradle'
-    repos.addMavenRepositories(repositories)
-    apply from: "dependencies.gradle"
-    dependencies {
-        classpath libs.kotlin.gradle_plugin
-    }
-}
+apply plugin: 'groovy'
+apply plugin: 'java'
+
+apply from: "dependencies.gradle"
 
 ext.supportRootFolder = project.projectDir.getParentFile()
 apply from: 'repos.gradle'
-repos.addMavenRepositories(repositories)
 
-apply plugin: 'groovy'
-apply plugin: 'java'
-apply plugin: 'kotlin'
+repos.addMavenRepositories(repositories)
 
 dependencies {
     compile libs.gradle
