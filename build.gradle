@@ -1,4 +1,5 @@
 apply plugin: 'groovy'
+apply plugin: 'java'
 
 apply from: "dependencies.gradle"
 

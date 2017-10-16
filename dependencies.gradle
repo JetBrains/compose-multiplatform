@@ -17,14 +17,14 @@
 def libs = [:]
 
 // Testing dependencies
-libs.mockito_core = 'org.mockito:mockito-core:1.9.5'
-libs.dexmaker = 'com.google.dexmaker:dexmaker:1.2'
-libs.dexmaker_mockito = 'com.google.dexmaker:dexmaker-mockito:1.2'
+libs.mockito_core = 'org.mockito:mockito-core:2.7.6'
+libs.dexmaker_mockito = 'com.linkedin.dexmaker:dexmaker-mockito:2.2.0'
 libs.junit = 'junit:junit:4.12'
 libs.test_runner = 'com.android.support.test:runner:0.6-alpha'
 libs.espresso_core = 'com.android.support.test.espresso:espresso-core:2.3-alpha'
 libs.espresso_contrib = 'com.android.support.test.espresso:espresso-contrib:2.3-alpha'
 libs.jacoco = 'org.jacoco:org.jacoco.core:0.7.8'
+libs.test_rules = 'com.android.support.test:rules:0.6-alpha'
 
 def androidPluginVersionOverride = System.getenv("GRADLE_PLUGIN_VERSION")
 
@@ -32,8 +32,11 @@ if (androidPluginVersionOverride != null) {
     libs.gradle = 'com.android.tools.build:gradle:' + androidPluginVersionOverride
 } else {
     // Keep gradle plugin version in sync with ub_supportlib-master manifest.
-    libs.gradle = 'com.android.tools.build:gradle:2.4.0-alpha6'
+    libs.gradle = 'com.android.tools.build:gradle:3.0.0-beta2'
 }
+
+//arch components
+libs.arch_lifecycle_runtime = "android.arch.lifecycle:runtime:1.0.0"
 
 // Other dependencies
 libs.xml_parser_apis = 'xerces:xmlParserAPIs:2.6.2'

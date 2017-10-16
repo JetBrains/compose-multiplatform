@@ -254,8 +254,8 @@ File getApiFile(String refApi = supportVersion, boolean previous = false, boolea
 
     if (!previous) {
         // If this is a patch or release version, ignore the extra.
-        return new File(apiDir, "$refMajor.$refMinor.0" +
-                (refPatch || release ? "" : refExtra) + ".txt")
+        return new File(apiDir, "$refMajor.$refMinor.0"
+                + (!refExtra || refPatch || release ? "" : refExtra) + ".txt")
     }
 
     File lastFile = null
@@ -271,8 +271,8 @@ File getApiFile(String refApi = supportVersion, boolean previous = false, boolea
         if (lastFile == null || major > lastMajor || (major == lastMajor && minor > lastMinor)) {
             if (refMajor > major || (refMajor == major && refMinor > minor)) {
                 lastFile = file
-                lastMajor = major;
-                lastMinor = minor;
+                lastMajor = major
+                lastMinor = minor
             }
         }
     }
@@ -440,15 +440,9 @@ void registerForDocsTask(Task task, Project subProject, releaseVariant) {
                 fileTree(releaseVariant.aidlCompile.sourceOutputDir) +
                 fileTree(releaseVariant.outputs[0].processResources.sourceOutputDir)
     }
-    // NASTY WORKAROUND to allow building with both Android Studio Plugin 2.4.0-alpha6
-    // and 2.4.0-alpha8
-    if (releaseVariant.metaClass.respondsTo(releaseVariant, 'getCompileClasspath', Object)) {
-        task.classpath += releaseVariant.getCompileClasspath(null) +
-                files(releaseVariant.javaCompile.destinationDir)
-    } else {
-        task.classpath += files{releaseVariant.javaCompile.classpath.files} +
-                files(releaseVariant.javaCompile.destinationDir)
-    }
+
+    task.classpath += releaseVariant.getCompileClasspath(null) +
+            files(releaseVariant.javaCompile.destinationDir)
 }
 
 // configuration file for setting up api diffs and api docs

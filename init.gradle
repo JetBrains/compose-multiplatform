@@ -17,9 +17,6 @@
 import com.android.build.gradle.internal.coverage.JacocoPlugin
 import com.android.build.gradle.internal.coverage.JacocoReportTask
 import com.android.build.gradle.internal.tasks.DeviceProviderInstrumentTestTask
-import com.google.common.base.Charsets
-import com.google.common.io.Files
-
 import org.gradle.api.logging.configuration.ShowStacktrace
 
 def supportRoot = ext.supportRootFolder
@@ -60,14 +57,17 @@ def enableDoclavaAndJDiff(p) {
     apply from: "${ext.supportRootFolder}/buildSrc/diff_and_docs.gradle"
 }
 
-def setSdkInLocalPropertiesFile() {
+def getFullSdkPath() {
     final String osName = System.getProperty("os.name").toLowerCase();
     final boolean isMacOsX =
             osName.contains("mac os x") || osName.contains("darwin") || osName.contains("osx");
     final String platform = isMacOsX ? 'darwin' : 'linux'
-    System.setProperty('android.dir', "${supportRootFolder}/../../")
+    return "${repos.prebuiltsRoot}/fullsdk-${platform}"
+}
+
+def setSdkInLocalPropertiesFile() {
     ext.buildToolsVersion = '26.0.0'
-    final String fullSdkPath = "${repos.prebuiltsRoot}/fullsdk-${platform}"
+    final String fullSdkPath = getFullSdkPath();
     if (file(fullSdkPath).exists()) {
         gradle.ext.currentSdk = 26
         project.ext.androidJar =
@@ -75,7 +75,6 @@ def setSdkInLocalPropertiesFile() {
         project.ext.androidSrcJar =
                 file("${fullSdkPath}/platforms/android-${gradle.currentSdk}/android-stubs-src.jar")
         project.ext.androidApiTxt = null
-        System.setProperty('android.home', "${repos.prebuiltsRoot}/fullsdk-${platform}")
         File props = file("local.properties")
         props.write "sdk.dir=${fullSdkPath}"
         ext.usingFullSdk = true
@@ -84,6 +83,7 @@ def setSdkInLocalPropertiesFile() {
         project.ext.androidJar = files("${repos.prebuiltsRoot}/sdk/current/android.jar")
         project.ext.androidSrcJar = null
         project.ext.androidApiTxt = file("${repos.prebuiltsRoot}/sdk/api/26.txt")
+        System.setProperty('android.dir', "${supportRootFolder}/../../")
         File props = file("local.properties")
         props.write "android.dir=../../"
         ext.usingFullSdk = false
@@ -128,6 +128,23 @@ def setupRepoOutAndBuildNumber() {
     ext.testApkDistOut = ext.distDir
     ext.testResultsDistDir = new File(distDir, "host-test-reports")
     ext.docsDir = new File(buildDir, 'javadoc')
+}
+
+def configureBuildOnServer() {
+    def buildOnServerTask = rootProject.tasks.create("buildOnServer")
+    rootProject.tasks.whenTaskAdded { task ->
+        if ("createArchive".equals(task.name)) {
+            buildOnServerTask.dependsOn task
+        }
+    }
+
+    subprojects {
+        project.tasks.whenTaskAdded { task ->
+            if ("assembleErrorProne".equals(task.name) || "assembleAndroidTest".equals(task.name)) {
+                buildOnServerTask.dependsOn task
+            }
+        }
+    }
 }
 
 def configureSubProjects() {
@@ -188,31 +205,30 @@ def configureSubProjects() {
                             destinationDir file(project.distDir)
                             archiveName "${project.archivesBaseName}-${v.baseName}-allclasses.jar"
                         }
-                        def jacocoAntConfig =
-                                project.configurations[JacocoPlugin.ANT_CONFIGURATION_NAME]
-                        def jacocoAntArtifacts = jacocoAntConfig.resolvedConfiguration
-                                .resolvedArtifacts
-                        def version = jacocoAntArtifacts.find { "org.jacoco.ant".equals(it.name) }
-                                .moduleVersion.id.version
+
                         def collectJacocoAntPackages = project.tasks.create(
                                 name: "collectJacocoAntPackages",
                                 type: Jar) {
-                            from(jacocoAntArtifacts.collect { zipTree(it.getFile()) }) {
-                                // exclude all the signatures the jar might have
-                                exclude "META-INF/*.SF"
-                                exclude "META-INF/*.DSA"
-                                exclude "META-INF/*.RSA"
-                            }
+                            inputs.files project.configurations[JacocoPlugin.ANT_CONFIGURATION_NAME]
+                            from {
+                                project.configurations[JacocoPlugin.ANT_CONFIGURATION_NAME]
+                                        .resolvedConfiguration
+                                        .resolvedArtifacts.collect{ zipTree(it.getFile()) }} {
+                                    // exclude all the signatures the jar might have
+                                    exclude "META-INF/*.SF"
+                                    exclude "META-INF/*.DSA"
+                                    exclude "META-INF/*.RSA"
+                                }
                             destinationDir file(project.distDir)
-                            archiveName "jacocoant-" + version + ".jar"
+                            archiveName "jacocoant.jar"
                         }
+
                         jarifyTask.dependsOn v.getJavaCompiler()
-                        v.assemble.dependsOn jarifyTask, collectJacocoAntPackages
+                        v.assemble.dependsOn jarifyTask , collectJacocoAntPackages
                     }
                 }
 
                 // Enforce NewApi lint check as fatal.
-                project.android.lintOptions.check 'NewApi'
                 project.android.lintOptions.fatal 'NewApi'
                 lintTask.dependsOn project.lint
             }
@@ -244,25 +260,6 @@ def configureSubProjects() {
                         }
                     }
 
-                    uploadTask.repositories.mavenDeployer.pom*.whenConfigured { pom ->
-                        pom.dependencies.findAll { dep ->
-                            dep.groupId == 'com.android.support' &&
-                                    dep.artifactId != 'support-annotations'
-                        }*.type = 'aar'
-                    }
-
-                    // create a release task that produces artifactory friends artifacts
-                    // a.k.a. unique versions for snapshots with their maven-metadata files.
-                    task artifactoryRelease(type : Upload) {
-                        configuration = uploadTask.configuration
-                        repositories {
-                            mavenDeployer {
-                                repository(url: uri("$rootProject.ext.artifactoryRepoOut"))
-                                setUniqueVersion(true)
-                            }
-                        }
-                    }
-
                     // Before the upload, make sure the repo is ready.
                     uploadTask.dependsOn rootProject.tasks.prepareRepo
 
@@ -285,9 +282,10 @@ def configureSubProjects() {
                 task.doLast {
                     def source = testApk ? project.android.sourceSets.androidTest
                             : project.android.sourceSets.main
-                    if (task.hasProperty("outputFile") && !source.java.sourceFiles.isEmpty()) {
+                    if (task.hasProperty("outputDirectory") && !source.java.sourceFiles.isEmpty()) {
                         copy {
-                            from(task.outputFile)
+                            from(task.outputDirectory)
+                            include '*.apk'
                             into(rootProject.ext.testApkDistOut)
                             rename { String fileName ->
                                 // multiple modules may have the same name so prefix the name with
@@ -364,3 +362,4 @@ ext.init.setupRepoOutAndBuildNumber = this.&setupRepoOutAndBuildNumber
 ext.init.setupRelease = this.&setupRelease
 ext.init.loadDefaultVersions = this.&loadDefaultVersions
 ext.init.configureSubProjects = this.&configureSubProjects
+ext.init.configureBuildOnServer = this.&configureBuildOnServer

@@ -52,7 +52,8 @@ class SupportLibraryPlugin implements Plugin<Project> {
 
         library.defaultConfig {
             // Update the version meta-data in each Manifest.
-            addManifestPlaceholders(["support-version": project.rootProject.supportVersion])
+            addManifestPlaceholders(["support-version": project.rootProject.supportVersion,
+                                     "target-sdk-version": project.currentSdk])
 
             // Set test related options.
             testInstrumentationRunner INSTRUMENTATION_RUNNER
@@ -89,7 +90,7 @@ class SupportLibraryPlugin implements Plugin<Project> {
             textOutput 'stderr'
             textReport true
             htmlReport false
-            xmlReport false
+            //xmlReport false
 
             // Format output for convenience.
             explainIssues true
@@ -98,6 +99,12 @@ class SupportLibraryPlugin implements Plugin<Project> {
 
             // Always fail on NewApi.
             error 'NewApi'
+
+            // TODO(aurimas): figure out the issue with missing translation check
+            disable 'MissingTranslation', 'ExtraTranslation'
+
+            // Set baseline file for all legacy lint warnings.
+            baseline new File(project.projectDir, "/lint-baseline.xml")
         }
 
         // Java 8 is only fully supported on API 24+ and not all Java 8 features are binary
@@ -168,11 +175,11 @@ class SupportLibraryPlugin implements Plugin<Project> {
                     }
                 }
             });
-        }
 
-        if (project.rootProject.usingFullSdk) {
-            // Library projects don't run lint by default, so set up dependency.
-            uploadTask.dependsOn project.tasks.lint
+            if (project.rootProject.usingFullSdk) {
+                // Library projects don't run lint by default, so set up dependency.
+                uploadTask.dependsOn project.getTasks().getByName("lintRelease")
+            }
         }
 
         final ErrorProneToolChain toolChain = ErrorProneToolChain.create(project);
@@ -188,7 +195,10 @@ class SupportLibraryPlugin implements Plugin<Project> {
 
                             // Enforce the following checks.
                             '-Xep:MissingOverride:ERROR',
+                            '-Xep:NarrowingCompoundAssignment:ERROR',
                             '-Xep:ClassNewInstance:ERROR',
+                            '-Xep:ClassCanBeStatic:ERROR',
+                            '-Xep:SynchronizeOnNonFinalField:ERROR'
                     ]
                 }
             }
