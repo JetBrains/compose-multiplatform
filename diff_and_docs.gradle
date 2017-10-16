@@ -384,6 +384,11 @@ UpdateApiTask createUpdateApiTask(Project project) {
         oldApiFile = getApiFile(project.projectDir, new Version(project.version))
         whitelistErrors = project.checkApiRelease.whitelistErrors
         whitelistErrorsFile = project.checkApiRelease.whitelistErrorsFile
+
+        doFirst {
+            // Replace the expected whitelist with the detected whitelist.
+            whitelistErrors = project.checkApiRelease.detectedWhitelistErrors
+        }
     }
 }
 
@@ -425,7 +430,7 @@ ApiXmlConversionTask createOldApiXml(Project project) {
         } else if (project.hasProperty("toApi") && toApi.matches(~/(\d+\.){2}\d+/)) {
             // If toApi matches released API (X.Y.Z) format, use the most recently
             // released API file prior to toApi.
-            inputApiFile = getPreviousApiFile(rootFolder, toApi)
+            inputApiFile = getLastReleasedApiFile(rootFolder, toApi)
         } else {
             // Use the most recently released API file.
             inputApiFile = getApiFile(rootFolder, new Version(project.version))
