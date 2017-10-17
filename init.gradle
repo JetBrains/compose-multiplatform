@@ -332,6 +332,3 @@ ext.init.setupRepoOutAndBuildNumber = this.&setupRepoOutAndBuildNumber
 ext.init.setupRelease = this.&setupRelease
 ext.init.configureSubProjects = this.&configureSubProjects
 ext.init.configureBuildOnServer = this.&configureBuildOnServer
-ext.init.enableModificationsReporter = this.&enableModificationsReporter
-
-apply from: "${ext.supportRootFolder}/buildSrc/modifications_reporter.gradle"
