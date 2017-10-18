@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-import android.support.LibraryVersions
 import android.support.Version
 import android.support.checkapi.ApiXmlConversionTask
 import android.support.checkapi.CheckApiTask
 import android.support.checkapi.UpdateApiTask
 import android.support.doclava.DoclavaTask
 import android.support.jdiff.JDiffTask
+import com.android.build.gradle.api.LibraryVariant
 import groovy.io.FileType
 import groovy.transform.Field
+import org.gradle.api.tasks.compile.JavaCompile
 
 // Set up platform API files for federation.
 if (project.androidApiTxt != null) {
@@ -65,19 +66,21 @@ if (project.androidApiTxt != null) {
 }
 
 // configuration file for setting up api diffs and api docs
-void registerAndroidProjectForDocsTask(Task task, releaseVariant) {
+void registerAndroidProjectForDocsTask(Task task, LibraryVariant releaseVariant) {
     task.dependsOn releaseVariant.javaCompile
     task.source {
-        return releaseVariant.javaCompile.source +
-                fileTree(releaseVariant.aidlCompile.sourceOutputDir) +
-                fileTree(releaseVariant.outputs[0].processResources.sourceOutputDir)
+        // Exclude generated R.java files that don't belong to this project.
+        String packageDir = releaseVariant.getApplicationId().replace('.', '/')
+        return releaseVariant.javaCompile.source.filter { File file ->
+            return !file.name.equals('R.java') || file.parent.endsWith(packageDir)
+        }
     }
     task.classpath += releaseVariant.getCompileClasspath(null) +
             files(releaseVariant.javaCompile.destinationDir)
 }
 
 // configuration file for setting up api diffs and api docs
-void registerJavaProjectForDocsTask(Task task, javaCompileTask) {
+void registerJavaProjectForDocsTask(Task task, JavaCompile javaCompileTask) {
     task.dependsOn javaCompileTask
     task.source javaCompileTask.source
     task.classpath += files(javaCompileTask.classpath) +
@@ -117,10 +120,9 @@ task generateDocs(type: DoclavaTask, dependsOn: [configurations.doclava, generat
     }
 
     options {
-        addStringOption "templatedir",
+        addStringOption 'templatedir',
                 "${supportRootFolder}/../../external/doclava/res/assets/templates-sdk"
-        addStringOption "stubpackages", "android.support.*"
-        addStringOption "samplesdir", "${supportRootFolder}/samples"
+        addStringOption 'samplesdir', "${supportRootFolder}/samples"
         addMultilineMultiValueOption("federate").setValue([
                 ['Android', 'https://developer.android.com']
         ])
@@ -512,22 +514,23 @@ boolean hasJavaSources(releaseVariant) {
 subprojects { subProject ->
     subProject.afterEvaluate { project ->
         if (project.hasProperty("noDocs") && project.noDocs) {
+            logger.warn("Project $project.name specified noDocs, ignoring API tasks.")
+            return
+        }
+        if (project.hasProperty("supportLibrary") && !project.supportLibrary.publish) {
+            logger.warn("Project $project.name is not published, ignoring API tasks.")
             return
         }
         if (project.hasProperty('android') && project.android.hasProperty('libraryVariants')) {
             project.android.libraryVariants.all { variant ->
                 if (variant.name == 'release') {
                     registerAndroidProjectForDocsTask(rootProject.generateDocs, variant)
-                    if (rootProject.tasks.findByPath("generateApi")) {
-                        registerAndroidProjectForDocsTask(rootProject.generateApi, variant)
-                        registerAndroidProjectForDocsTask(rootProject.generateDiffs, variant)
-                    }
                     if (!hasJavaSources(variant)) {
                         return
                     }
                     if (!hasApiFolder(project)) {
                         logger.warn("Project $project.name doesn't have an api folder, " +
-                                "ignoring API tasks")
+                                "ignoring API tasks.")
                         return
                     }
                     initializeApiChecksForProject(project)
@@ -539,7 +542,7 @@ subprojects { subProject ->
             registerJavaProjectForDocsTask(rootProject.generateDocs, project.compileJava)
             if (!hasApiFolder(project)) {
                 logger.warn("Project $project.name doesn't have an api folder, " +
-                        "ignoring API tasks")
+                        "ignoring API tasks.")
                 return
             }
             initializeApiChecksForProject(project)
