@@ -144,6 +144,7 @@ class SupportAndroidLibraryPlugin implements Plugin<Project> {
                 }
 
                 Jar sourceJar = project.getTasks().create("sourceJarRelease", Jar.class);
+                sourceJar.preserveFileTimestamps = false;
                 sourceJar.setClassifier("sources");
                 sourceJar.from(library.getSourceSets().findByName("main").getJava().getSrcDirs());
                 project.getArtifacts().add("archives", sourceJar);
