@@ -67,7 +67,7 @@ def setSdkInLocalPropertiesFile() {
     ext.buildToolsVersion = '27.0.0'
     final String fullSdkPath = getFullSdkPath();
     if (file(fullSdkPath).exists()) {
-        gradle.ext.currentSdk = 28
+        gradle.ext.currentSdk = 26
         project.ext.androidJar =
                 files("${fullSdkPath}/platforms/android-${gradle.currentSdk}/android.jar")
         project.ext.androidSrcJar =
