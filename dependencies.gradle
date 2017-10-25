@@ -32,7 +32,7 @@ if (androidPluginVersionOverride != null) {
     libs.gradle = 'com.android.tools.build:gradle:' + androidPluginVersionOverride
 } else {
     // Keep gradle plugin version in sync with ub_supportlib-master manifest.
-    libs.gradle = 'com.android.tools.build:gradle:3.0.0-beta7'
+    libs.gradle = 'com.android.tools.build:gradle:3.0.0'
 }
 
 //arch components
