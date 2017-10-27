@@ -65,6 +65,11 @@ task createDiffArchive(type : Zip) {
         includeFilters.forEach {
             include it
         }
+        if (includeFilters.isEmpty()) {
+            // not providing any include would mean include everything so we provide a dummy
+            // include constraint.
+            include "do-not-include-anything"
+        }
     }
     from rootProject.ext.supportRepoOut
     destinationDir rootProject.ext.distDir
