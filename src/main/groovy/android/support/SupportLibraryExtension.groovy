@@ -19,14 +19,22 @@ package android.support;
 import org.gradle.api.Project
 
 /**
- * Extension for {@link SupportLibraryPlugin}.
+ * Extension for {@link SupportAndroidLibraryPlugin} and {@link SupportJavaLibraryPlugin}.
  */
 class SupportLibraryExtension {
+    static final String ARCHITECTURE_URL =
+            "https://developer.android.com/topic/libraries/architecture/index.html";
+    static final String SUPPORT_URL =
+            "http://developer.android.com/tools/extras/support-library.html";
+
     Project project
     String name;
     String description;
     String inceptionYear;
+    String url = SUPPORT_URL;
     Collection<License> licenses = [];
+    boolean java8Library = false;
+    boolean publish = false;
 
     SupportLibraryExtension(Project project) {
         this.project = project

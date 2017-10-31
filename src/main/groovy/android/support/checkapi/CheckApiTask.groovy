@@ -18,8 +18,6 @@ package android.support.checkapi
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
-import org.gradle.api.InvalidUserDataException
-import org.gradle.api.Nullable
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
@@ -50,10 +48,12 @@ public class CheckApiTask extends DefaultTask {
     private static final String ANSI_YELLOW = "\u001B[33m";
 
     /** API file that represents the existing API surface. */
+    @Optional
     @InputFile
     File oldApiFile
 
     /** API file that represents the existing API surface's removals. */
+    @Optional
     @InputFile
     File oldRemovedApiFile
 
@@ -62,15 +62,14 @@ public class CheckApiTask extends DefaultTask {
     File newApiFile
 
     /** API file that represents the candidate API surface's removals. */
+    @Optional
     @InputFile
     File newRemovedApiFile
 
     /** Optional file containing a newline-delimited list of error SHAs to ignore. */
-    @Nullable
     File whitelistErrorsFile
 
     @Optional
-    @Nullable
     @InputFile
     File getWhiteListErrorsFileInput() {
         // Gradle requires non-null InputFiles to exist -- even with Optional -- so work around that
@@ -87,9 +86,8 @@ public class CheckApiTask extends DefaultTask {
      * Packages names will be matched exactly; sub-packages are not automatically recognized.
      */
     @Optional
-    @Nullable
     @Input
-    Collection ignoredPackages = null
+    Collection ignoredPackages
 
     /**
      * Optional list of classes to ignore.
@@ -98,9 +96,8 @@ public class CheckApiTask extends DefaultTask {
      * automatically recognized.
      */
     @Optional
-    @Nullable
     @Input
-    Collection ignoredClasses = null
+    Collection ignoredClasses
 
     /**
      * Optional set of error SHAs to ignore.
@@ -111,14 +108,16 @@ public class CheckApiTask extends DefaultTask {
     @Input
     Set whitelistErrors = []
 
+    // Errors that were both detected and whitelisted.
+    Set detectedWhitelistErrors = []
+
     @InputFiles
     Collection<File> doclavaClasspath
 
     // A dummy output file meant only to tag when this check was last ran.
     // Without any outputs, Gradle will run this task every time.
     @Optional
-    @Nullable
-    private File mOutputFile = null;
+    private File mOutputFile
 
     @OutputFile
     public File getOutputFile() {
@@ -164,17 +163,12 @@ public class CheckApiTask extends DefaultTask {
     }
 
     private Set<File> collectAndVerifyInputs() {
-        Set<File> apiFiles = [getOldApiFile(), getNewApiFile(), getOldRemovedApiFile(),
-                              getNewRemovedApiFile()] as Set
-        if (apiFiles.size() != 4) {
-            throw new InvalidUserDataException("""Conflicting input files:
-    oldApiFile: ${getOldApiFile()}
-    newApiFile: ${getNewApiFile()}
-    oldRemovedApiFile: ${getOldRemovedApiFile()}
-    newRemovedApiFile: ${getNewRemovedApiFile()}
-All of these must be distinct files.""")
+        if (getOldRemovedApiFile() != null && getNewRemovedApiFile() != null) {
+            return [getOldApiFile(), getNewApiFile(), getOldRemovedApiFile(),
+                    getNewRemovedApiFile()] as Set
+        } else {
+            return [getOldApiFile(), getNewApiFile()] as Set
         }
-        return apiFiles;
     }
 
     public void setCheckApiErrors(Collection errors) {
@@ -194,6 +188,11 @@ All of these must be distinct files.""")
 
     @TaskAction
     public void exec() {
+        if (getOldApiFile() == null) {
+            // Nothing to do.
+            return
+        }
+
         final def apiFiles = collectAndVerifyInputs()
 
         OutputStream errStream = new ByteArrayOutputStream()
@@ -206,8 +205,6 @@ All of these must be distinct files.""")
 
             minHeapSize = '128m'
             maxHeapSize = '1024m'
-
-            // [other options] old_api.txt new_api.txt old_removed_api.txt new_removed_api.txt
 
             // add -error LEVEL for every error level we want to fail the build on.
             getCheckApiErrors().each { args('-error', it) }
@@ -238,9 +235,9 @@ All of these must be distinct files.""")
         }
 
         // Parse the error output.
-        def unparsedErrors = []
-        def ignoredErrors = []
-        def parsedErrors = []
+        Set unparsedErrors = []
+        Set detectedErrors = []
+        Set parsedErrors = []
         errStream.toString().split("\n").each {
             if (it) {
                 def matcher = it =~ ~/^(.+):(.+): (\w+) (\d+): (.+)$/
@@ -250,7 +247,8 @@ All of these must be distinct files.""")
                     def hash = getShortHash(matcher[0][5]);
                     def error = matcher[0][1..-1] + [hash]
                     if (hash in whitelistErrors) {
-                        ignoredErrors += [error]
+                        detectedErrors += [error]
+                        detectedWhitelistErrors += error[5]
                     } else {
                         parsedErrors += [error]
                     }
@@ -260,7 +258,7 @@ All of these must be distinct files.""")
 
         unparsedErrors.each { error -> logger.error "$ANSI_RED$error$ANSI_RESET" }
         parsedErrors.each { logger.error "$ANSI_RED${it[5]}$ANSI_RESET ${it[4]}"}
-        ignoredErrors.each { logger.warn "$ANSI_YELLOW${it[5]}$ANSI_RESET ${it[4]}"}
+        detectedErrors.each { logger.warn "$ANSI_YELLOW${it[5]}$ANSI_RESET ${it[4]}"}
 
         if (unparsedErrors || parsedErrors) {
             throw new GradleException(onFailMessage)

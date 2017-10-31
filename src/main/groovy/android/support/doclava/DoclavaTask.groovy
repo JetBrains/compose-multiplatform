@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package android.support.doclava;
+package android.support.doclava
 
-import org.gradle.api.InvalidUserDataException
-import org.gradle.api.Nullable
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
+import org.gradle.external.javadoc.JavadocOptionFileOption
 
 public class DoclavaTask extends Javadoc {
 
@@ -63,9 +62,8 @@ public class DoclavaTask extends Javadoc {
      * Packages names will be matched exactly; sub-packages are not automatically recognized.
      */
     @Optional
-    @Nullable
     @Input
-    Collection hiddenPackages = null
+    Collection hiddenPackages
 
     /**
      * If non-null and not-empty, the whitelist of packages that will be present in the generated
@@ -73,9 +71,8 @@ public class DoclavaTask extends Javadoc {
      * Wildcards are accepted.
      */
     @Optional
-    @Nullable
     @Input
-    Set<String> stubPackages = null
+    Set<String> stubPackages
 
     @Input
     boolean generateDocs = true
@@ -85,34 +82,30 @@ public class DoclavaTask extends Javadoc {
      * If this is non-null, then {@link #removedApiFile} must be non-null as well.
      */
     @Optional
-    @Nullable
     @OutputFile
-    File apiFile = null
+    File apiFile
 
     /**
      * If non-null, the location of where to place the generated removed api file.
      * If this is non-null, then {@link #apiFile} must be non-null as well.
      */
     @Optional
-    @Nullable
     @OutputFile
-    File removedApiFile = null
+    File removedApiFile
 
     /**
      * If non-null, the location of the generated keep list.
      */
     @Optional
-    @Nullable
     @OutputFile
-    File keepListFile = null
+    File keepListFile
 
     /**
      * If non-null, the location to put the generated stub sources.
      */
     @Optional
-    @Nullable
     @OutputDirectory
-    File stubsDir = null
+    File stubsDir
 
     public DoclavaTask() {
         failOnError = true
@@ -122,10 +115,10 @@ public class DoclavaTask extends Javadoc {
         // doclava doesn't understand '-doctitle'
         title = null
         maxMemory = "1280m"
-        // TODO(csyoung) Some way to override this?
-        // If none of generateDocs, apiFile, keepListFile, or stubJarsDir are true, then there is no work to do.
+        // If none of generateDocs, apiFile, keepListFile, or stubJarsDir are true, then there is
+        // no work to do.
         onlyIf( { getGenerateDocs() ||
-                (getApiFile() != null && getRemovedApiFile() != null) ||
+                getApiFile() != null ||
                 getKeepListFile() != null ||
                 getStubsDir() != null } )
     }
@@ -166,48 +159,45 @@ public class DoclavaTask extends Javadoc {
         doclavaHidden = hidden as int[]
     }
 
-    private static boolean verifyAndGetGenerateApiFiles(File apiFile, File removedApiFile) {
-        if (apiFile == null) {
-            if (removedApiFile == null) {
-                return false
-            } else {
-                throw new InvalidUserDataException('removedApiFile specified but not apiFile')
-            }
-        } else {
-            return true
-        }
-    }
-
     /**
      * "Configures" this DoclavaTask with parameters that might not be at their final values
      * until this task is run.
      */
     private configureDoclava() {
         options.docletpath = getDocletpath() as List
+
         // configure doclava error/warning/hide levels
-        options.addOption(new DoclavaMultilineJavadocOptionFileOption('hide'))
-                .setValue(getDoclavaHidden().collect({[it.toString()]}))
-        options.addOption(new DoclavaMultilineJavadocOptionFileOption('warning'))
-                .setValue(getDoclavaWarnings().collect({[it.toString()]}))
-        options.addOption(new DoclavaMultilineJavadocOptionFileOption('error'))
-                .setValue(getDoclavaErrors().collect({[it.toString()]}))
+        JavadocOptionFileOption hide = options.addMultilineMultiValueOption("hide")
+        hide.setValue(getDoclavaHidden().collect({ [it.toString()] }))
+
+        JavadocOptionFileOption warning = options.addMultilineMultiValueOption("warning")
+        warning.setValue(getDoclavaWarnings().collect({ [it.toString()] }))
+
+        JavadocOptionFileOption error = options.addMultilineMultiValueOption("error")
+        error.setValue(getDoclavaErrors().collect({ [it.toString()] }))
 
         Collection hiddenPackages = getHiddenPackages()
         if (hiddenPackages) {
-            options.addOption(new DoclavaMultilineJavadocOptionFileOption('hidePackage'))
-                    .setValue(hiddenPackages.collect({[it.toString()]}))
+            JavadocOptionFileOption hidePackage =
+                    options.addMultilineMultiValueOption("hidePackage")
+            hidePackage.setValue(hiddenPackages.collect({ [it.toString()] }))
         }
 
         if (!getGenerateDocs()) {
             options.addOption(new DoclavaJavadocOptionFileOption('nodocs'))
         }
-        // If requested, generate the api files.
+
+        // If requested, generate the API files.
         File apiFile = getApiFile()
-        File removedApiFile = getRemovedApiFile()
-        if (verifyAndGetGenerateApiFiles(apiFile, removedApiFile)) {
+        if (apiFile != null) {
             options.addStringOption('api', apiFile.absolutePath)
-            options.addStringOption('removedApi', removedApiFile.absolutePath)
+
+            File removedApiFile = getRemovedApiFile()
+            if (removedApiFile != null) {
+                options.addStringOption('removedApi', removedApiFile.absolutePath)
+            }
         }
+
         // If requested, generate the keep list.
         File keepListFile = getKeepListFile()
         if (keepListFile != null) {
@@ -228,7 +218,7 @@ public class DoclavaTask extends Javadoc {
 
     @Override
     public void generate() {
-        configureDoclava();
-        super.generate();
+        configureDoclava()
+        super.generate()
     }
 }
