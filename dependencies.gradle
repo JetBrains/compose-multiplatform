@@ -32,11 +32,11 @@ if (androidPluginVersionOverride != null) {
     libs.gradle = 'com.android.tools.build:gradle:' + androidPluginVersionOverride
 } else {
     // Keep gradle plugin version in sync with ub_supportlib-master manifest.
-    libs.gradle = 'com.android.tools.build:gradle:3.0.0-beta6'
+    libs.gradle = 'com.android.tools.build:gradle:3.0.0-beta7'
 }
 
 //arch components
-libs.arch_lifecycle_runtime = "android.arch.lifecycle:runtime:1.0.0"
+libs.arch_lifecycle_runtime = "android.arch.lifecycle:runtime:1.0.0@aar"
 
 // Other dependencies
 libs.xml_parser_apis = 'xerces:xmlParserAPIs:2.6.2'

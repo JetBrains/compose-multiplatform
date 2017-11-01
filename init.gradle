@@ -64,7 +64,7 @@ def getFullSdkPath() {
 }
 
 def setSdkInLocalPropertiesFile() {
-    ext.buildToolsVersion = '26.0.0'
+    ext.buildToolsVersion = '27.0.0'
     final String fullSdkPath = getFullSdkPath();
     if (file(fullSdkPath).exists()) {
         gradle.ext.currentSdk = 26
@@ -127,7 +127,7 @@ def setupRepoOutAndBuildNumber() {
 def configureBuildOnServer() {
     def buildOnServerTask = rootProject.tasks.create("buildOnServer")
     rootProject.tasks.whenTaskAdded { task ->
-        if ("createArchive".equals(task.name)) {
+        if ("createArchive".equals(task.name) || "distDocs".equals(task.name)) {
             buildOnServerTask.dependsOn task
         }
     }

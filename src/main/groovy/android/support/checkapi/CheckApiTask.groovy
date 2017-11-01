@@ -18,8 +18,6 @@ package android.support.checkapi
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
-import org.gradle.api.InvalidUserDataException
-import org.gradle.api.Nullable
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
@@ -109,6 +107,9 @@ public class CheckApiTask extends DefaultTask {
     @Optional
     @Input
     Set whitelistErrors = []
+
+    // Errors that were both detected and whitelisted.
+    Set detectedWhitelistErrors = []
 
     @InputFiles
     Collection<File> doclavaClasspath
@@ -234,9 +235,9 @@ public class CheckApiTask extends DefaultTask {
         }
 
         // Parse the error output.
-        def unparsedErrors = []
-        def ignoredErrors = []
-        def parsedErrors = []
+        Set unparsedErrors = []
+        Set detectedErrors = []
+        Set parsedErrors = []
         errStream.toString().split("\n").each {
             if (it) {
                 def matcher = it =~ ~/^(.+):(.+): (\w+) (\d+): (.+)$/
@@ -246,7 +247,8 @@ public class CheckApiTask extends DefaultTask {
                     def hash = getShortHash(matcher[0][5]);
                     def error = matcher[0][1..-1] + [hash]
                     if (hash in whitelistErrors) {
-                        ignoredErrors += [error]
+                        detectedErrors += [error]
+                        detectedWhitelistErrors += error[5]
                     } else {
                         parsedErrors += [error]
                     }
@@ -256,7 +258,7 @@ public class CheckApiTask extends DefaultTask {
 
         unparsedErrors.each { error -> logger.error "$ANSI_RED$error$ANSI_RESET" }
         parsedErrors.each { logger.error "$ANSI_RED${it[5]}$ANSI_RESET ${it[4]}"}
-        ignoredErrors.each { logger.warn "$ANSI_YELLOW${it[5]}$ANSI_RESET ${it[4]}"}
+        detectedErrors.each { logger.warn "$ANSI_YELLOW${it[5]}$ANSI_RESET ${it[4]}"}
 
         if (unparsedErrors || parsedErrors) {
             throw new GradleException(onFailMessage)
