@@ -34,6 +34,7 @@ class SupportLibraryExtension {
     String url = SUPPORT_URL;
     Collection<License> licenses = [];
     boolean java8Library = false;
+    boolean legacySourceLocation = false;
     boolean publish = false;
 
     SupportLibraryExtension(Project project) {
