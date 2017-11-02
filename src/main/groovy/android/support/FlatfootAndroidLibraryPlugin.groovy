@@ -16,6 +16,7 @@
 
 package android.support
 
+import com.android.build.gradle.LibraryExtension
 import com.google.common.collect.ImmutableMap
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -33,5 +34,8 @@ class FlatfootAndroidLibraryPlugin implements Plugin<Project> {
         VersionFileWriterTask.setUpAndroidLibrary(project);
 
         project.apply(ImmutableMap.of("plugin", "com.android.library"));
+
+        LibraryExtension library = project.extensions.findByType(LibraryExtension.class);
+        SourceJarTaskHelper.setUpAndroidProject(project, library);
     }
 }
