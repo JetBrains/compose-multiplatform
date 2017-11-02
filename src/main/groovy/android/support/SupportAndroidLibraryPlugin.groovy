@@ -135,21 +135,7 @@ class SupportAndroidLibraryPlugin implements Plugin<Project> {
             project.uploadArchives.dependsOn "lintRelease"
         }
 
-        // Create sources jar for release builds
-        library.getLibraryVariants().all(new Action<LibraryVariant>() {
-            @Override
-            public void execute(LibraryVariant libraryVariant) {
-                if (!libraryVariant.getBuildType().getName().equals(BuilderConstants.RELEASE)) {
-                    return; // Skip non-release builds.
-                }
-
-                Jar sourceJar = project.getTasks().create("sourceJarRelease", Jar.class);
-                sourceJar.preserveFileTimestamps = false;
-                sourceJar.setClassifier("sources");
-                sourceJar.from(library.getSourceSets().findByName("main").getJava().getSrcDirs());
-                project.getArtifacts().add("archives", sourceJar);
-            }
-        });
+        SourceJarTaskHelper.setUpAndroidProject(project, library);
 
         final ErrorProneToolChain toolChain = ErrorProneToolChain.create(project);
         library.getBuildTypes().create("errorProne")
