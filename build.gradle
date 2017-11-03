@@ -1,17 +1,37 @@
-apply plugin: 'groovy'
-apply plugin: 'java'
+buildscript {
+    def supportRootFolder = project.projectDir.getParentFile()
+    repositories {
+        maven {
+            url "${supportRootFolder}/../../prebuilts/tools/common/m2/repository"
+        }
+    }
 
-apply from: "dependencies.gradle"
+    apply from: "build_dependencies.gradle"
+
+    dependencies {
+        classpath build_libs.kotlin.gradle_plugin
+    }
+}
+
+apply from: "build_dependencies.gradle"
 
 ext.supportRootFolder = project.projectDir.getParentFile()
 apply from: 'repos.gradle'
 
 repos.addMavenRepositories(repositories)
 
+apply plugin: 'groovy'
+apply plugin: 'java'
+apply plugin: 'kotlin'
+
+compileGroovy {
+    dependsOn tasks.getByPath('compileKotlin')
+    classpath += files(compileKotlin.destinationDir)
+}
 dependencies {
-    compile libs.gradle
-    compile libs.jacoco
-    compile libs.error_prone
-    compile libs.jarjar_gradle
+    compile build_libs.gradle
+    compile build_libs.jacoco
+    compile build_libs.error_prone
+    compile build_libs.jarjar_gradle
     compile gradleApi()
 }
