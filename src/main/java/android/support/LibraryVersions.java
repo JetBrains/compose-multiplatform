@@ -28,7 +28,7 @@ public class LibraryVersions {
     /**
      * Version code for flatfoot 1.0 projects (room, lifecycles)
      */
-    private static final Version FLATFOOT_1_0_BATCH = new Version("1.0.0-rc1");
+    private static final Version FLATFOOT_1_0_BATCH = new Version("1.0.0");
 
     /**
      * Version code for Room
