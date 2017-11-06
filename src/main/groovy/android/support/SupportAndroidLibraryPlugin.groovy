@@ -38,6 +38,8 @@ class SupportAndroidLibraryPlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
+        KotlinNoOp noOp = new KotlinNoOp()
+        noOp.noOp()
         SupportLibraryExtension supportLibraryExtension =
                 project.extensions.create("supportLibrary", SupportLibraryExtension, project);
         SupportLibraryMavenUploader.apply(project, supportLibraryExtension);
