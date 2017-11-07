@@ -47,6 +47,23 @@ class SupportAndroidLibraryPlugin implements Plugin<Project> {
         project.afterEvaluate {
             LibraryExtension library = project.extensions.findByType(LibraryExtension.class);
 
+            if (supportLibraryExtension.legacySourceLocation) {
+                library.sourceSets {
+                    main {
+                        // We use a non-standard manifest path.
+                        manifest.srcFile 'AndroidManifest.xml'
+                    }
+
+                    androidTest {
+                        // We use a non-standard test directory structure.
+                        root 'tests'
+                        java.srcDir 'tests/src'
+                        res.srcDir 'tests/res'
+                        manifest.srcFile 'tests/AndroidManifest.xml'
+                    }
+                }
+            }
+
             // Java 8 is only fully supported on API 24+ and not all Java 8 features are binary
             // compatible with API < 24, so use Java 7 for both source AND target.
             final JavaVersion javaVersion;
@@ -87,21 +104,6 @@ class SupportAndroidLibraryPlugin implements Plugin<Project> {
             debug {
                 // Use a local debug keystore to avoid build server issues.
                 storeFile project.rootProject.init.debugKeystore
-            }
-        }
-
-        library.sourceSets {
-            main {
-                // We use a non-standard manifest path.
-                manifest.srcFile 'AndroidManifest.xml'
-            }
-
-            androidTest {
-                // We use a non-standard test directory structure.
-                root 'tests'
-                java.srcDir 'tests/src'
-                res.srcDir 'tests/res'
-                manifest.srcFile 'tests/AndroidManifest.xml'
             }
         }
 
