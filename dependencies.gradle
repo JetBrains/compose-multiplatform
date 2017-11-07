@@ -36,7 +36,7 @@ if (androidPluginVersionOverride != null) {
 }
 
 //arch components
-libs.arch_lifecycle_runtime = "android.arch.lifecycle:runtime:1.0.0@aar"
+libs.arch_lifecycle_runtime = "android.arch.lifecycle:runtime:1.0.3@aar"
 
 // Other dependencies
 libs.xml_parser_apis = 'xerces:xmlParserAPIs:2.6.2'
