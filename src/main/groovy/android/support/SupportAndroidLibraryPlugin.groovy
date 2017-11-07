@@ -151,7 +151,7 @@ class SupportAndroidLibraryPlugin implements Plugin<Project> {
                             '-XDcompilePolicy=simple', // Workaround for b/36098770
 
                             // Enforce the following checks.
-                            '-Xep:MissingOverride:ERROR',
+                            //'-Xep:MissingOverride:ERROR',
                             '-Xep:NarrowingCompoundAssignment:ERROR',
                             '-Xep:ClassNewInstance:ERROR',
                             '-Xep:ClassCanBeStatic:ERROR',
