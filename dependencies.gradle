@@ -26,7 +26,7 @@ libs.espresso_core = 'com.android.support.test.espresso:espresso-core:3.0.1'
 libs.espresso_contrib = 'com.android.support.test.espresso:espresso-contrib:3.0.1'
 
 //arch components
-libs.arch_lifecycle_runtime = "android.arch.lifecycle:runtime:1.0.0@aar"
+libs.arch_lifecycle_runtime = "android.arch.lifecycle:runtime:1.0.3@aar"
 
 // Other dependencies
 libs.xml_parser_apis = 'xerces:xmlParserAPIs:2.6.2'
