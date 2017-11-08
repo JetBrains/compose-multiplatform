@@ -26,6 +26,15 @@ import org.gradle.api.tasks.Upload
 
 class SupportLibraryMavenUploader {
     static void apply(Project project, SupportLibraryExtension supportLibraryExtension) {
+        project.afterEvaluate {
+            if (supportLibraryExtension.publish) {
+                if (supportLibraryExtension.mavenGroup == null) {
+                    throw Exception("You must specify mavenGroup for " + project.name + " project");
+                }
+                project.group = supportLibraryExtension.mavenGroup
+            }
+        }
+
         project.apply(ImmutableMap.of("plugin", "maven"));
 
         // Set uploadArchives options.
