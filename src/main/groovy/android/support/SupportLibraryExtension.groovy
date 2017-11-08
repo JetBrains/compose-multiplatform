@@ -29,6 +29,7 @@ class SupportLibraryExtension {
 
     Project project
     String name;
+    String mavenGroup;
     String description;
     String inceptionYear;
     String url = SUPPORT_URL;
