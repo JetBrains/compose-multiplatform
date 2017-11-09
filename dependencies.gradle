@@ -24,16 +24,6 @@ libs.test_runner = 'com.android.support.test:runner:1.0.1'
 libs.test_rules = 'com.android.support.test:rules:1.0.1'
 libs.espresso_core = 'com.android.support.test.espresso:espresso-core:3.0.1'
 libs.espresso_contrib = 'com.android.support.test.espresso:espresso-contrib:3.0.1'
-libs.jacoco = 'org.jacoco:org.jacoco.core:0.7.8'
-
-def androidPluginVersionOverride = System.getenv("GRADLE_PLUGIN_VERSION")
-
-if (androidPluginVersionOverride != null) {
-    libs.gradle = 'com.android.tools.build:gradle:' + androidPluginVersionOverride
-} else {
-    // Keep gradle plugin version in sync with ub_supportlib-master manifest.
-    libs.gradle = 'com.android.tools.build:gradle:3.0.0'
-}
 
 //arch components
 libs.arch_lifecycle_runtime = "android.arch.lifecycle:runtime:1.0.3@aar"
@@ -41,9 +31,5 @@ libs.arch_lifecycle_runtime = "android.arch.lifecycle:runtime:1.0.3@aar"
 // Other dependencies
 libs.xml_parser_apis = 'xerces:xmlParserAPIs:2.6.2'
 libs.xerces_impl = 'xerces:xercesImpl:2.6.2'
-libs.error_prone = 'net.ltgt.gradle:gradle-errorprone-plugin:0.0.10'
-
-// jarjar plugin
-libs.jarjar_gradle = 'org.anarres.jarjar:jarjar-gradle:1.0.0'
 
 rootProject.ext['libs'] = libs
