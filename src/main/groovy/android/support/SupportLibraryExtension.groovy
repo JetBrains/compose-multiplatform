@@ -29,6 +29,7 @@ class SupportLibraryExtension {
 
     Project project
     String name;
+    Version mavenVersion;
     String mavenGroup;
     String description;
     String inceptionYear;

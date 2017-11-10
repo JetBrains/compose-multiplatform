@@ -545,9 +545,11 @@ subprojects { subProject ->
                         "ignoring API tasks.")
                 return
             }
-            initializeApiChecksForProject(project)
-            registerJavaProjectForDocsTask(project.generateApi, project.compileJava)
-            registerJavaProjectForDocsTask(project.generateDiffs, project.compileJava)
+            project.afterEvaluate {
+                initializeApiChecksForProject(project)
+                registerJavaProjectForDocsTask(project.generateApi, project.compileJava)
+                registerJavaProjectForDocsTask(project.generateDiffs, project.compileJava)
+            }
         }
     }
 }

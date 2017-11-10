@@ -31,7 +31,11 @@ class SupportLibraryMavenUploader {
                 if (supportLibraryExtension.mavenGroup == null) {
                     throw Exception("You must specify mavenGroup for " + project.name + " project");
                 }
+                if (supportLibraryExtension.mavenVersion == null) {
+                    throw Exception("You must specify mavenVersion for " + project.name + " project");
+                }
                 project.group = supportLibraryExtension.mavenGroup
+                project.version = supportLibraryExtension.mavenVersion.toString()
             }
         }
 
