@@ -62,7 +62,7 @@ class SupportLibraryMavenUploader {
                                 }
 
                                 supportLibraryExtension.getLicenses().each {
-                                    SupportLibraryExtension.License supportLicense ->
+                                    License supportLicense ->
                                         license {
                                             name supportLicense.name
                                             url supportLicense.url
