@@ -29,6 +29,6 @@ if (androidPluginVersionOverride != null) {
 build_libs.jarjar_gradle = 'org.anarres.jarjar:jarjar-gradle:1.0.0'
 build_libs.error_prone = 'net.ltgt.gradle:gradle-errorprone-plugin:0.0.10'
 build_libs.jacoco = 'org.jacoco:org.jacoco.core:0.7.8'
-build_libs.kotlin = [gradle_plugin: "org.jetbrains.kotlin:kotlin-gradle-plugin:1.1.3"]
+build_libs.kotlin = [gradle_plugin: "org.jetbrains.kotlin:kotlin-gradle-plugin:1.1.51"]
 
 rootProject.ext['build_libs'] = build_libs
