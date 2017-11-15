@@ -255,7 +255,20 @@ def configureSubProjects() {
                 task.doLast {
                     def source = testApk ? project.android.sourceSets.androidTest
                             : project.android.sourceSets.main
-                    if (task.hasProperty("outputDirectory") && !source.java.sourceFiles.isEmpty()) {
+                    def hasKotlinSources = false
+                    if (source.hasProperty('kotlin')) {
+                        if (!source.kotlin.files.isEmpty()) {
+                            hasKotlinSources = true
+                        } else {
+                            // kotlin files does not show in java sources due to the *.java filter
+                            // so we need to check them manually
+                            hasKotlinSources = source.java.sourceDirectoryTrees.any {
+                                !fileTree(dir: it.dir, include:'**/*.kt').files.isEmpty()
+                            }
+                        }
+                    }
+                    def hasSourceCode = !source.java.sourceFiles.isEmpty() || hasKotlinSources
+                    if (task.hasProperty("outputDirectory") && (hasSourceCode || !testApk)) {
                         copy {
                             from(task.outputDirectory)
                             include '*.apk'
