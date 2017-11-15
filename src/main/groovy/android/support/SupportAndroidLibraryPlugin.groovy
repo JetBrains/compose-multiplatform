@@ -100,6 +100,8 @@ class SupportAndroidLibraryPlugin implements Plugin<Project> {
             testInstrumentationRunner INSTRUMENTATION_RUNNER
         }
 
+        library.testOptions.unitTests.returnDefaultValues = true
+
         library.signingConfigs {
             debug {
                 // Use a local debug keystore to avoid build server issues.
