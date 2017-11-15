@@ -27,4 +27,5 @@ public class LibraryGroups {
     public static final String ARCH_CORE = "android.arch.core";
     public static final String PAGING = "android.arch.paging";
     public static final String NAVIGATION = "android.arch.navigation";
+    public static final String SLICES = "androidx.app.slice";
 }
