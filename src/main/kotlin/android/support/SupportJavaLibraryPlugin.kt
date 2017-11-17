@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 The Android Open Source Project
+ * Copyright 2017 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package android.support
 
-import com.google.common.collect.ImmutableMap
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -26,23 +25,25 @@ import org.gradle.api.plugins.JavaPluginConvention
  * Support java library specific plugin that sets common configurations needed for
  * support library modules.
  */
-class SupportJavaLibraryPlugin implements Plugin<Project> {
-    @Override
-    public void apply(Project project) {
-        SupportLibraryExtension supportLibraryExtension =
-                project.extensions.create("supportLibrary", SupportLibraryExtension, project);
-        SupportLibraryMavenUploader.apply(project, supportLibraryExtension);
+class SupportJavaLibraryPlugin : Plugin<Project> {
 
-        project.apply(ImmutableMap.of("plugin", "java"));
+    override fun apply(project: Project) {
+        val supportLibraryExtension = project.extensions.create("supportLibrary",
+                SupportLibraryExtension::class.java, project)
+        apply(project, supportLibraryExtension)
+
+        project.apply(mapOf("plugin" to "java"))
         project.afterEvaluate {
-            project.compileJava {
-                def version = supportLibraryExtension.java8Library ?
-                    JavaVersion.VERSION_1_8 : JavaVersion.VERSION_1_7
-                sourceCompatibility = version
-                targetCompatibility = version
+            val convention = project.convention.getPlugin(JavaPluginConvention::class.java)
+            if (supportLibraryExtension.java8Library) {
+                convention.sourceCompatibility = JavaVersion.VERSION_1_8
+                convention.targetCompatibility = JavaVersion.VERSION_1_8
+            } else {
+                convention.sourceCompatibility = JavaVersion.VERSION_1_7
+                convention.targetCompatibility = JavaVersion.VERSION_1_7
             }
         }
 
-        SourceJarTaskHelper.setUpJavaProject(project);
+        SourceJarTaskHelper.setUpJavaProject(project)
     }
 }
