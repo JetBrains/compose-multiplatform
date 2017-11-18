@@ -12,6 +12,10 @@ buildscript {
         classpath build_libs.kotlin.gradle_plugin
     }
 }
+def runningInBuildServer = System.env.DIST_DIR != null && System.env.OUT_DIR != null
+if (runningInBuildServer) {
+    System.setProperty("kotlin.compiler.execution.strategy", "in-process")
+}
 
 apply from: "build_dependencies.gradle"
 
