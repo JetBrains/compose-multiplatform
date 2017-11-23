@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+
+import android.support.DacOptions
+import android.support.DiffAndDocs
 import android.support.LibraryVersions
 import com.android.build.gradle.internal.coverage.JacocoPlugin
 import com.android.build.gradle.internal.coverage.JacocoReportTask
@@ -33,12 +36,7 @@ rootProject.ext.versionChecker = new GMavenVersionChecker(rootProject)
 ext.runningInBuildServer = System.env.DIST_DIR != null && System.env.OUT_DIR != null
 
 apply from: "${supportRoot}/buildSrc/dependencies.gradle"
-ext.docs = [:]
-ext.docs.offline = rootProject.getProperties().containsKey("offlineDocs")
-ext.docs.dac = [
-        libraryroot: "android/support",
-        dataname: "SUPPORT_DATA"
-]
+ext.docsDac = new DacOptions("android/support", "SUPPORT_DATA")
 
 def enableDoclavaAndJDiff(p) {
     p.configurations {
@@ -52,7 +50,7 @@ def enableDoclavaAndJDiff(p) {
         jdiff libs.xml_parser_apis
         jdiff libs.xerces_impl
     }
-    apply from: "${ext.supportRootFolder}/buildSrc/diff_and_docs.gradle"
+    DiffAndDocs.configureDiffAndDocs(rootProject, createArchive, supportRootFolder)
 }
 
 def getFullSdkPath() {
