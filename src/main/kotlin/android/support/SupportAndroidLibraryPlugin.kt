@@ -24,7 +24,7 @@ import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import java.io.File
-import java.util.*
+import java.util.Properties
 
 /**
  * Support library specific com.android.library plugin that sets common configurations needed for
@@ -55,11 +55,11 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
 
             // Java 8 is only fully supported on API 24+ and not all Java 8 features are binary
             // compatible with API < 24, so use Java 7 for both source AND target.
-            val javaVersion: JavaVersion;
+            val javaVersion: JavaVersion
             if (supportLibraryExtension.java8Library) {
                 if (library.defaultConfig.minSdkVersion.apiLevel < 24) {
                     throw IllegalArgumentException("Libraries can only support Java 8 if "
-                            + "minSdkVersion is 24 or higher");
+                            + "minSdkVersion is 24 or higher")
                 }
                 javaVersion = JavaVersion.VERSION_1_8
             } else {
@@ -111,7 +111,7 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
         library.libraryVariants.all { libraryVariant ->
             if (libraryVariant.getBuildType().getName().equals("errorProne")) {
                 @Suppress("DEPRECATION")
-                libraryVariant.getJavaCompile().setToolChain(toolChain);
+                libraryVariant.getJavaCompile().setToolChain(toolChain)
 
                 @Suppress("DEPRECATION")
                 val compilerArgs = libraryVariant.getJavaCompile().options.compilerArgs
@@ -119,6 +119,7 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
                         "-XDcompilePolicy=simple", // Workaround for b/36098770
 
                         // Enforce the following checks.
+                        "-Xep:RestrictTo:OFF",
                         "-Xep:MissingOverride:ERROR",
                         "-Xep:NarrowingCompoundAssignment:ERROR",
                         "-Xep:ClassNewInstance:ERROR",
