@@ -20,6 +20,11 @@ libs.exclude_annotations = {
     exclude module: 'support-annotations'
 }
 
+libs.exclude_annotations_transitive = {
+    exclude module: 'support-annotations'
+    transitive = true
+}
+
 libs.exclude_bytebuddy = {
     exclude group: 'net.bytebuddy'
 }
@@ -28,11 +33,9 @@ libs.exclude_support = {
     exclude group: 'com.android.support'
 }
 
-//arch components
-libs.arch_lifecycle_runtime = "android.arch.lifecycle:runtime:1.0.3@aar"
-
-// Other dependencies
-libs.xml_parser_apis = 'xerces:xmlParserAPIs:2.6.2'
-libs.xerces_impl = 'xerces:xercesImpl:2.6.2'
+libs.support_exclude_config = {
+    exclude group: 'android.arch.core'
+    exclude group: 'android.arch.lifecycle'
+}
 
 rootProject.ext['libs'] = libs
