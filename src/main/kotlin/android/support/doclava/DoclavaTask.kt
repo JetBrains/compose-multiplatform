@@ -202,6 +202,9 @@ open class DoclavaTask : Javadoc() {
         addOption(DoclavaJavadocOptionFileOption("android"))
     }
 
+    fun coreJavadocOptions(configure: CoreJavadocOptions.() -> Unit) =
+            (options as CoreJavadocOptions).configure()
+
     override fun generate() {
         configureDoclava()
         super.generate()
