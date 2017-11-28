@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 The Android Open Source Project
+ * Copyright 2017 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,26 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// Add ext.libs for library versions
-def libs = [:]
 
-libs.exclude_annotations = {
-    exclude module: 'support-annotations'
-}
+package android.support.dependencies
 
-libs.exclude_bytebuddy = {
-    exclude group: 'net.bytebuddy'
-}
-
-libs.exclude_support = {
-    exclude group: 'com.android.support'
-}
-
-//arch components
-libs.arch_lifecycle_runtime = "android.arch.lifecycle:runtime:1.0.3@aar"
-
-// Other dependencies
-libs.xml_parser_apis = 'xerces:xmlParserAPIs:2.6.2'
-libs.xerces_impl = 'xerces:xercesImpl:2.6.2'
-
-rootProject.ext['libs'] = libs
+const val MOCKITO_CORE = "org.mockito:mockito-core:2.7.6"
+const val DEXMAKER_MOCKITO = "com.linkedin.dexmaker:dexmaker-mockito:2.2.0"
+const val JUNIT = "junit:junit:4.12"
+const val TEST_RUNNER = "com.android.support.test:runner:1.0.1"
+const val TEST_RULES = "com.android.support.test:rules:1.0.1"
+const val ESPRESSO_CORE = "com.android.support.test.espresso:espresso-core:3.0.1"
+const val ESPRESSO_CONTRIB = "com.android.support.test.espresso:espresso-contrib:3.0.1"
