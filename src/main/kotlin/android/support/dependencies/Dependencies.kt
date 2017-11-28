@@ -16,10 +16,31 @@
 
 package android.support.dependencies
 
-const val MOCKITO_CORE = "org.mockito:mockito-core:2.7.6"
+const val AUTO_COMMON = "com.google.auto:auto-common:0.6"
+const val ANTLR = "org.antlr:antlr4:4.5.3"
+const val APACHE_COMMONS_CODEC = "commons-codec:commons-codec:1.10"
 const val DEXMAKER_MOCKITO = "com.linkedin.dexmaker:dexmaker-mockito:2.2.0"
+const val ESPRESSO_CONTRIB = "com.android.support.test.espresso:espresso-contrib:3.0.1"
+const val ESPRESSO_CORE = "com.android.support.test.espresso:espresso-core:3.0.1"
+const val FIREBASE_JOBDISPATCHER = "com.firebase:firebase-jobdispatcher:0.8.3"
+const val GOOGLE_COMPILE_TESTING = "com.google.testing.compile:compile-testing:0.11"
+const val GSON = "com.google.code.gson:gson:2.8.0"
+const val GUAVA = "com.google.guava:guava:21.0"
+const val INTELLIJ_ANNOTATIONS = "com.intellij:annotations:12.0"
+const val JAVAPOET = "com.squareup:javapoet:1.8.0"
+const val JSR250 = "javax.annotation:javax.annotation-api:1.2"
 const val JUNIT = "junit:junit:4.12"
+const val KOTLIN_STDLIB = "org.jetbrains.kotlin:kotlin-stdlib:1.1.51"
+const val MOCKITO_CORE = "org.mockito:mockito-core:2.7.6"
+const val REACTIVE_STREAMS = "org.reactivestreams:reactive-streams:1.0.0"
+const val RX_JAVA = "io.reactivex.rxjava2:rxjava:2.0.6"
 const val TEST_RUNNER = "com.android.support.test:runner:1.0.1"
 const val TEST_RULES = "com.android.support.test:rules:1.0.1"
-const val ESPRESSO_CORE = "com.android.support.test.espresso:espresso-core:3.0.1"
-const val ESPRESSO_CONTRIB = "com.android.support.test.espresso:espresso-contrib:3.0.1"
+/**
+ * this Xerial version is newer than we want but we need it to fix
+ * https://github.com/xerial/sqlite-jdbc/issues/97
+ * https://github.com/xerial/sqlite-jdbc/issues/267
+ */
+const val XERIAL = "org.xerial:sqlite-jdbc:3.20.1"
+
+const val SUPPORT_V4 = "com.android.support:support-v4:26.1.0"
