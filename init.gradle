@@ -62,7 +62,7 @@ def getFullSdkPath() {
 }
 
 def setSdkInLocalPropertiesFile() {
-    ext.buildToolsVersion = '27.0.0'
+    ext.buildToolsVersion = '27.0.1'
     final String fullSdkPath = getFullSdkPath();
     if (file(fullSdkPath).exists()) {
         gradle.ext.currentSdk = 26
