@@ -122,6 +122,7 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
                         "-Xep:RestrictTo:OFF",
                         "-Xep:ParameterNotNullable:ERROR",
                         "-Xep:MissingOverride:ERROR",
+                        "-Xep:JdkObsolete:ERROR",
                         "-Xep:NarrowingCompoundAssignment:ERROR",
                         "-Xep:ClassNewInstance:ERROR",
                         "-Xep:ClassCanBeStatic:ERROR",
