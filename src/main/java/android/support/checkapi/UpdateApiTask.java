@@ -29,7 +29,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -120,11 +119,6 @@ public class UpdateApiTask extends DefaultTask {
         }
 
         if (mWhitelistErrorsFile != null && !mWhitelistErrors.isEmpty()) {
-            if (mWhitelistErrorsFile.exists()) {
-                List<String> lines =
-                        Files.readLines(mWhitelistErrorsFile, Charset.defaultCharset());
-                mWhitelistErrors.removeAll(lines);
-            }
             try (BufferedWriter writer = Files.newWriter(
                     mWhitelistErrorsFile, Charset.defaultCharset())) {
                 for (String error : mWhitelistErrors) {
