@@ -35,9 +35,17 @@ ext.repos = new Properties()
 ext.repos.prebuiltsRoot = "${checkoutRoot}/prebuilts"
 ext.repos.prebuiltsRootUri = "file://${repos.prebuiltsRoot}"
 
-ext.repoNames = ["${repos.prebuiltsRoot}/gradle-plugin",
+ext.repoNames = [// Android Gradle Plugin prebuilts updated manually
+                 "${repos.prebuiltsRoot}/gradle-plugin",
+                 // Miscellaneous prebuilts updated sporadically
                  "${repos.prebuiltsRoot}/tools/common/m2/repository",
+                 // Historical releases updated as part of public release
                  "${repos.prebuiltsRoot}/maven_repo/android",
+                 // Manually constructed, but soon to be updated by update_current.py
+                 "${repos.prebuiltsRoot}/sdk/current/extras/material-design",
+                 // Full checkout prebuilts updated by update_current.py
+                 "${repos.prebuiltsRoot}/sdk/current/support/m2repository",
+                 // Unbundled checkout prebuilts updated by fullsdk drop
                  "${getFullSdkPath(repos.prebuiltsRoot)}/extras/m2repository"]
 
 /**
