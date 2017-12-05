@@ -37,6 +37,8 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
                 SupportLibraryExtension::class.java, project)
         apply(project, supportLibraryExtension)
 
+        val isCoreSupportLibrary = project.rootProject.name == "support"
+
         project.afterEvaluate {
             val library = project.extensions.findByType(LibraryExtension::class.java)
                     ?: return@afterEvaluate
@@ -74,6 +76,21 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
 
         project.apply(mapOf("plugin" to "com.android.library"))
         project.apply(mapOf("plugin" to ErrorProneBasePlugin::class.java))
+
+        project.configurations.all { configuration ->
+            if (isCoreSupportLibrary) {
+                // In projects which compile as part of the "core" support libraries (which include
+                // the annotations), replace any transitive pointer to the deployed Maven
+                // coordinate version of annotations with a reference to the local project. These
+                // usually originate from test dependencies and otherwise cause multiple copies on
+                // the classpath. We do not do this for non-"core" projects as they need to
+                // depend on the Maven coordinate variant.
+                configuration.resolutionStrategy.dependencySubstitution.apply {
+                    substitute(module("com.android.support:support-annotations"))
+                            .with(project(":support-annotations"))
+                }
+            }
+        }
 
         val library = project.extensions.findByType(LibraryExtension::class.java)
                 ?: throw Exception("Failed to find Android extension")
