@@ -578,12 +578,12 @@ private fun configure(root: Project, createArchiveTask: Task, supportRootFolder:
     root.subprojects { subProject ->
         subProject.afterEvaluate { project ->
             if (project.hasProperty("noDocs") && (project.properties["noDocs"] as Boolean)) {
-                project.logger.warn("Project $project.name specified noDocs, ignoring API tasks.")
+                project.logger.info("Project $project.name specified noDocs, ignoring API tasks.")
                 return@afterEvaluate
             }
             if (project.hasProperty("supportLibrary")
                     && !(project.properties["supportLibrary"] as SupportLibraryExtension).publish) {
-                project.logger.warn("Project ${project.name} is not published, ignoring API tasks.")
+                project.logger.info("Project ${project.name} is not published, ignoring API tasks.")
                 return@afterEvaluate
             }
             val library = project.extensions.findByType(LibraryExtension::class.java)
@@ -595,7 +595,7 @@ private fun configure(root: Project, createArchiveTask: Task, supportRootFolder:
                             return@all
                         }
                         if (!hasApiFolder(project)) {
-                            project.logger.warn("Project ${project.name} doesn't have " +
+                            project.logger.info("Project ${project.name} doesn't have " +
                                     "an api folder, ignoring API tasks.")
                             return@all
                         }
@@ -609,7 +609,7 @@ private fun configure(root: Project, createArchiveTask: Task, supportRootFolder:
                 val compileJava = project.properties["compileJava"] as JavaCompile
                 registerJavaProjectForDocsTask(generateDocsTask, compileJava)
                 if (!hasApiFolder(project)) {
-                    project.logger.warn("Project $project.name doesn't have an api folder, " +
+                    project.logger.info("Project $project.name doesn't have an api folder, " +
                             "ignoring API tasks.")
                     return@afterEvaluate
                 }
