@@ -16,10 +16,6 @@
 // Add ext.libs for library versions
 def libs = [:]
 
-libs.exclude_annotations = {
-    exclude module: 'support-annotations'
-}
-
 libs.exclude_bytebuddy = {
     exclude group: 'net.bytebuddy'
 }
