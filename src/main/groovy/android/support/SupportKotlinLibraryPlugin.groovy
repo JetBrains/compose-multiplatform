@@ -30,7 +30,7 @@ class SupportKotlinLibraryPlugin implements Plugin<Project> {
     public void apply(Project project) {
         SupportLibraryExtension supportLibraryExtension =
                 project.extensions.create("supportLibrary", SupportLibraryExtension, project);
-        SupportLibraryMavenUploader.apply(project, supportLibraryExtension);
+        MavenUploadHelperKt.apply(project, supportLibraryExtension);
 
         project.apply(ImmutableMap.of("plugin", "kotlin"));
         project.apply(ImmutableMap.of("plugin", "kotlin-kapt"));
