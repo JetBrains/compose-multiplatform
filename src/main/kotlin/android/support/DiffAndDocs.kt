@@ -580,12 +580,12 @@ private fun configure(root: Project, createArchiveTask: Task, supportRootFolder:
                 null
             }
             if (extension == null || !extension.publish) {
-                project.logger.warn("Project ${project.name} is not published, ignoring API tasks.")
+                project.logger.info("Project ${project.name} is not published, ignoring API tasks.")
                 return@afterEvaluate
             }
 
             if (!extension.generateDocs) {
-                project.logger.warn("Project ${project.name} specified generateDocs = false, " +
+                project.logger.info("Project ${project.name} specified generateDocs = false, " +
                         "ignoring API tasks.")
                 return@afterEvaluate
             }
@@ -599,7 +599,7 @@ private fun configure(root: Project, createArchiveTask: Task, supportRootFolder:
                             return@all
                         }
                         if (!hasApiFolder(project)) {
-                            project.logger.warn("Project ${project.name} doesn't have " +
+                            project.logger.info("Project ${project.name} doesn't have " +
                                     "an api folder, ignoring API tasks.")
                             return@all
                         }
@@ -613,7 +613,7 @@ private fun configure(root: Project, createArchiveTask: Task, supportRootFolder:
                 val compileJava = project.properties["compileJava"] as JavaCompile
                 registerJavaProjectForDocsTask(generateDocsTask, compileJava)
                 if (!hasApiFolder(project)) {
-                    project.logger.warn("Project ${project.name} doesn't have an api folder, " +
+                    project.logger.info("Project ${project.name} doesn't have an api folder, " +
                             "ignoring API tasks.")
                     return@afterEvaluate
                 }
