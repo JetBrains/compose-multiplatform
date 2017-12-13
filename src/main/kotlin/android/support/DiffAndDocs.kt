@@ -163,7 +163,6 @@ private fun createVerifyUpdateApiAllowedTask(project: Project) =
             }
         }
 
-
 // Generates API files
 private fun createGenerateApiTask(project: Project, docletpathParam: Collection<File>) =
         project.tasks.createWithConfig("generateApi", DoclavaTask::class.java) {
@@ -285,7 +284,7 @@ private fun createNewApiXmlTask(
 
             if (toApi != null) {
                 // Use an explicit API file.
-                inputApiFile = File(project.projectDir, "api/${toApi}.txt")
+                inputApiFile = File(project.projectDir, "api/$toApi.txt")
             } else {
                 // Use the current API file (e.g. current.txt).
                 inputApiFile = generateApi.apiFile
@@ -295,7 +294,6 @@ private fun createNewApiXmlTask(
             outputApiXmlFile = File(project.docsDir(),
                     "release/${stripExtension(inputApiFile.name)}.xml")
         }
-
 
 /**
  * Generates API diffs.
@@ -351,7 +349,6 @@ private fun createGenerateDiffsTask(
             exclude("**/BuildConfig.java", "**/R.java")
             dependsOn(oldApiTask, newApiTask, jdiffConfig)
         }
-
 
 // Generates a distribution artifact for online docs.
 private fun createDistDocsTask(project: Project, generateDocs: DoclavaTask) =
@@ -577,15 +574,22 @@ private fun configure(root: Project, createArchiveTask: Task, supportRootFolder:
 
     root.subprojects { subProject ->
         subProject.afterEvaluate { project ->
-            if (project.hasProperty("noDocs") && (project.properties["noDocs"] as Boolean)) {
-                project.logger.info("Project $project.name specified noDocs, ignoring API tasks.")
-                return@afterEvaluate
+            val extension = if (project.hasProperty("supportLibrary")) {
+                project.properties["supportLibrary"] as SupportLibraryExtension
+            } else {
+                null
             }
-            if (project.hasProperty("supportLibrary")
-                    && !(project.properties["supportLibrary"] as SupportLibraryExtension).publish) {
+            if (extension == null || !extension.publish) {
                 project.logger.info("Project ${project.name} is not published, ignoring API tasks.")
                 return@afterEvaluate
             }
+
+            if (!extension.generateDocs) {
+                project.logger.info("Project ${project.name} specified generateDocs = false, " +
+                        "ignoring API tasks.")
+                return@afterEvaluate
+            }
+
             val library = project.extensions.findByType(LibraryExtension::class.java)
             if (library != null) {
                 library.libraryVariants.all { variant ->
@@ -609,7 +613,7 @@ private fun configure(root: Project, createArchiveTask: Task, supportRootFolder:
                 val compileJava = project.properties["compileJava"] as JavaCompile
                 registerJavaProjectForDocsTask(generateDocsTask, compileJava)
                 if (!hasApiFolder(project)) {
-                    project.logger.info("Project $project.name doesn't have an api folder, " +
+                    project.logger.info("Project ${project.name} doesn't have an api folder, " +
                             "ignoring API tasks.")
                     return@afterEvaluate
                 }
@@ -625,15 +629,15 @@ private fun configure(root: Project, createArchiveTask: Task, supportRootFolder:
     }
 }
 
-
 private fun sdkApiFile(project: Project) = File(project.docsDir(), "release/sdk_current.txt")
 private fun removedSdkApiFile(project: Project) = File(project.docsDir(), "release/sdk_removed.txt")
 
 private fun TaskContainer.createWithConfig(name: String, config: Task.() -> Unit) =
         create(name) { task -> task.config() }
 
-private fun <T : Task> TaskContainer.createWithConfig(name: String, taskClass: Class<T>,
-                                                      config: T.() -> Unit) =
+private fun <T : Task> TaskContainer.createWithConfig(
+        name: String, taskClass: Class<T>,
+        config: T.() -> Unit) =
         create(name, taskClass) { task -> task.config() }
 
 // Nasty part. Get rid of that eventually!
@@ -648,7 +652,6 @@ private fun Project.version() = Version(project.properties["version"] as String)
 private fun Project.buildNumber() = properties["buildNumber"] as String
 
 private fun Project.androidApiTxt() = properties["androidApiTxt"] as? File
-
 
 private fun Project.docsDac() = properties["docsDac"] as DacOptions
 

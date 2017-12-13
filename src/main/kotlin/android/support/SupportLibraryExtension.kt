@@ -34,6 +34,13 @@ open class SupportLibraryExtension(val project: Project) {
     var java8Library = false
     var legacySourceLocation = false
     var publish = false
+    /**
+     * This flag works only if publish flag is "true".
+     * It is useful for modules that are used for tooling. For example room annotation
+     * processor module is published, but we don't want to expose any docs, because we don't
+     * support using it as a library.
+     */
+    var generateDocs = true
 
     fun license(closure: Closure<*>): License {
         val license = project.configure(License(), closure) as License
@@ -47,7 +54,8 @@ open class SupportLibraryExtension(val project: Project) {
 
     companion object {
         @JvmField
-        val ARCHITECTURE_URL = "https://developer.android.com/topic/libraries/architecture/index.html"
+        val ARCHITECTURE_URL
+                = "https://developer.android.com/topic/libraries/architecture/index.html"
         @JvmField
         val SUPPORT_URL = "http://developer.android.com/tools/extras/support-library.html"
     }
