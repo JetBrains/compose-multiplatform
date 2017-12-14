@@ -31,6 +31,7 @@ const val JSR250 = "javax.annotation:javax.annotation-api:1.2"
 const val JUNIT = "junit:junit:4.12"
 const val KOTLIN_STDLIB = "org.jetbrains.kotlin:kotlin-stdlib:1.2.0"
 const val MOCKITO_CORE = "org.mockito:mockito-core:2.7.6"
+const val MULTIDEX = "com.android.support:multidex:1.0.1"
 const val REACTIVE_STREAMS = "org.reactivestreams:reactive-streams:1.0.0"
 const val RX_JAVA = "io.reactivex.rxjava2:rxjava:2.0.6"
 const val TEST_RUNNER = "com.android.support.test:runner:1.0.1"
@@ -41,3 +42,18 @@ const val TEST_RULES = "com.android.support.test:rules:1.0.1"
  * https://github.com/xerial/sqlite-jdbc/issues/267
  */
 const val XERIAL = "org.xerial:sqlite-jdbc:3.20.1"
+
+// Support library dependencies needed for projects that compile against prebuilt versions
+// instead of source directly.
+private const val SUPPORT_VERSION = "26.1.0"
+const val SUPPORT_ANNOTATIONS = "com.android.support:support-annotations:$SUPPORT_VERSION"
+const val SUPPORT_APPCOMPAT = "com.android.support:appcompat-v7:$SUPPORT_VERSION"
+const val SUPPORT_CARDVIEW = "com.android.support:cardview-v7:$SUPPORT_VERSION"
+const val SUPPORT_CORE_UTILS = "com.android.support:support-core-utils:$SUPPORT_VERSION"
+const val SUPPORT_DESIGN = "com.android.support:design:$SUPPORT_VERSION"
+const val SUPPORT_FRAGMENTS = "com.android.support:support-fragment:$SUPPORT_VERSION"
+const val SUPPORT_RECYCLERVIEW = "com.android.support:recyclerview-v7:$SUPPORT_VERSION"
+const val SUPPORT_V4 = "com.android.support:support-v4:$SUPPORT_VERSION"
+
+// Arch libraries
+const val ARCH_LIFECYCLE_RUNTIME = "android.arch.lifecycle:runtime:1.0.3@aar"
