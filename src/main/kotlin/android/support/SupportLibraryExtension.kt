@@ -41,6 +41,10 @@ open class SupportLibraryExtension(val project: Project) {
      * support using it as a library.
      */
     var generateDocs = true
+    /**
+     * If unset minSdkVersion will be 14.
+     */
+    var minSdkVersion: Int = 14
 
     fun license(closure: Closure<*>): License {
         val license = project.configure(License(), closure) as License
