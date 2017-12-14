@@ -78,7 +78,12 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
         project.apply(mapOf("plugin" to ErrorProneBasePlugin::class.java))
 
         project.configurations.all { configuration ->
-            if (isCoreSupportLibrary) {
+            if (isCoreSupportLibrary && project.name != "support-annotations") {
+                // While this usually happens naturally due to normal project dependencies, force
+                // evaluation on the annotations project in case the below substitution is the only
+                // dependency to this project. See b/70650240 on what happens when this is missing.
+                project.evaluationDependsOn(":support-annotations")
+
                 // In projects which compile as part of the "core" support libraries (which include
                 // the annotations), replace any transitive pointer to the deployed Maven
                 // coordinate version of annotations with a reference to the local project. These
