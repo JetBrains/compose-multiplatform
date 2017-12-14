@@ -21,6 +21,11 @@ libs.exclude_annotations_transitive = {
     transitive = true
 }
 
+libs.exclude_annotations_transitive = {
+    exclude module: 'support-annotations'
+    transitive = true
+}
+
 libs.exclude_bytebuddy = {
     exclude group: 'net.bytebuddy'
 }
