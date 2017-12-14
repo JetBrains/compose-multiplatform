@@ -41,6 +41,8 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
             val library = project.extensions.findByType(LibraryExtension::class.java)
                     ?: return@afterEvaluate
 
+            library.defaultConfig.minSdkVersion(supportLibraryExtension.minSdkVersion)
+
             if (supportLibraryExtension.legacySourceLocation) {
                 // We use a non-standard manifest path.
                 library.sourceSets.getByName("main").manifest.srcFile("AndroidManifest.xml")
