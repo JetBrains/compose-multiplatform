@@ -17,12 +17,11 @@
 
 import android.support.DacOptions
 import android.support.DiffAndDocs
-import android.support.LibraryVersions
+import android.support.gmaven.GMavenVersionChecker
 import com.android.build.gradle.internal.coverage.JacocoPlugin
 import com.android.build.gradle.internal.coverage.JacocoReportTask
 import com.android.build.gradle.internal.tasks.DeviceProviderInstrumentTestTask
 import org.gradle.api.logging.configuration.ShowStacktrace
-import android.support.gmaven.GMavenVersionChecker
 
 def supportRoot = ext.supportRootFolder
 if (supportRoot == null) {
@@ -36,6 +35,7 @@ rootProject.ext.versionChecker = new GMavenVersionChecker(rootProject)
 ext.runningInBuildServer = System.env.DIST_DIR != null && System.env.OUT_DIR != null
 
 apply from: "${supportRoot}/buildSrc/dependencies.gradle"
+apply from: "${supportRoot}/buildSrc/build_dependencies.gradle"
 ext.docsDac = new DacOptions("android/support", "SUPPORT_DATA")
 
 def enableDoclavaAndJDiff(p) {
@@ -47,8 +47,8 @@ def enableDoclavaAndJDiff(p) {
     p.dependencies {
         doclava project(':doclava')
         jdiff project(':jdiff')
-        jdiff libs.xml_parser_apis
-        jdiff libs.xerces_impl
+        jdiff build_libs.xml_parser_apis
+        jdiff build_libs.xerces_impl
     }
     DiffAndDocs.configureDiffAndDocs(rootProject, createArchive, supportRootFolder)
 }
