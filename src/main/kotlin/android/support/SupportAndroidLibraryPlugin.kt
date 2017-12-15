@@ -163,6 +163,9 @@ private fun setUpLint(lintOptions: LintOptions, baseline: File) {
     lintOptions.isAbortOnError = true
     lintOptions.isIgnoreWarnings = true
 
+    // Skip lintVital tasks on assemble. We explicitly run lintRelease for libraries.
+    lintOptions.isCheckReleaseBuilds = false
+
     // Write output directly to the console (and nowhere else).
     lintOptions.textOutput("stderr")
     lintOptions.textReport = true
