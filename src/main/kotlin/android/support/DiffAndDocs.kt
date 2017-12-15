@@ -20,6 +20,7 @@ import android.support.checkapi.ApiXmlConversionTask
 import android.support.checkapi.CheckApiTask
 import android.support.checkapi.UpdateApiTask
 import android.support.doclava.DoclavaTask
+import android.support.docs.GenerateDocsTask
 import android.support.jdiff.JDiffTask
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.LibraryVariant
@@ -42,8 +43,8 @@ object DiffAndDocs {
     @JvmStatic
     fun configureDiffAndDocs(
             root: Project,
-            createArchiveTask: Task,
-            supportRootFolder: File) = configure(root, createArchiveTask, supportRootFolder)
+            supportRootFolder: File,
+            dacOptions: DacOptions) = configure(root, supportRootFolder, dacOptions)
 }
 
 private data class CheckApiConfig(
@@ -58,6 +59,7 @@ private const val MSG_HIDE_API =
                 "visibility, you may exclude it from public API by using the @hide javadoc\n" +
                 "annotation paired with the @RestrictTo(LIBRARY_GROUP) code annotation."
 
+@Suppress("DEPRECATION")
 private fun hasJavaSources(variant: LibraryVariant) = !variant.javaCompile.source
         .filter { file -> file.name != "R.java" && file.name != "BuildConfig.java" }
         .isEmpty
@@ -98,22 +100,17 @@ private fun hasApiFolder(project: Project) = File(project.projectDir, "api").exi
 
 private fun stripExtension(fileName: String) = fileName.substringBeforeLast('.')
 
-private fun getLastReleasedApiFile(rootFolder: File, refApi: String): File? {
-    val refVersion = Version(refApi)
+private fun getLastReleasedApiFile(rootFolder: File, refVersion: Version): File? {
     val apiDir = File(rootFolder, "api")
 
     var lastFile: File? = null
     var lastVersion: Version? = null
-    val regex = Regex("(\\d+)\\.(\\d+)\\.0\\.txt")
-    // Only look at released versions and snapshots thereof, ex. X.Y.0.txt.
-    apiDir.listFiles().filter { file ->
-        regex.matches(file.name) && file.isFile
-    }.forEach { file ->
-        val version = Version(stripExtension(file.name))
-
-        if ((lastFile == null || lastVersion!! < version) && version < refVersion) {
-            lastFile = file
-            lastVersion = version
+    apiDir.listFiles().forEach { file ->
+        Version.from(file)?.let { version ->
+            if ((lastFile == null || lastVersion!! < version) && version < refVersion) {
+                lastFile = file
+                lastVersion = version
+            }
         }
     }
     return lastFile
@@ -215,12 +212,15 @@ private fun registerJavaProjectForDocsTask(task: Javadoc, javaCompileTask: JavaC
 
 // configuration file for setting up api diffs and api docs
 private fun registerAndroidProjectForDocsTask(task: Javadoc, releaseVariant: LibraryVariant) {
+    @Suppress("DEPRECATION")
     task.dependsOn(releaseVariant.javaCompile)
     val packageDir = releaseVariant.applicationId.replace('.', '/')
+    @Suppress("DEPRECATION")
     val sources = releaseVariant.javaCompile.source.filter { file ->
         file.name != "R.java" || file.parent.endsWith(packageDir)
     }
     task.source(sources)
+    @Suppress("DEPRECATION")
     task.classpath += releaseVariant.getCompileClasspath(null) +
             task.project.files(releaseVariant.javaCompile.destinationDir)
 }
@@ -247,15 +247,14 @@ private fun createUpdateApiTask(project: Project, checkApiRelease: CheckApiTask)
  */
 private fun createOldApiXml(project: Project, doclavaConfig: Configuration) =
         project.tasks.createWithConfig("oldApiXml", ApiXmlConversionTask::class.java) {
-            val regex = Regex("(\\d+\\.){2}\\d+")
-            val toApi = project.processProperty("toApi")
+            val toApi = project.processProperty("toApi")?.let(Version::from)
             val fromApi = project.processProperty("fromApi")
             classpath = project.files(doclavaConfig.resolve())
             val rootFolder = project.projectDir
             if (fromApi != null) {
                 // Use an explicit API file.
                 inputApiFile = File(rootFolder, "api/$fromApi.txt")
-            } else if (toApi != null && regex.matches(toApi)) {
+            } else if (toApi != null) {
                 // If toApi matches released API (X.Y.Z) format, use the most recently
                 // released API file prior to toApi.
                 inputApiFile = getLastReleasedApiFile(rootFolder, toApi)
@@ -401,7 +400,8 @@ private fun createGenerateDocsTask(
         project: Project,
         generateSdkApiTask: Task,
         doclavaConfig: Configuration,
-        supportRootFolder: File) =
+        supportRootFolder: File,
+        dacOptions: DacOptions) =
         project.tasks.createWithConfig("generateDocs", GenerateDocsTask::class.java) {
             dependsOn(generateSdkApiTask, doclavaConfig)
             group = JavaBasePlugin.DOCUMENTATION_GROUP
@@ -439,8 +439,8 @@ private fun createGenerateDocsTask(
                 if (!offline) {
                     addStringOption("toroot", "/")
                     addBooleanOption("devsite", true)
-                    addStringOption("dac_libraryroot", project.docsDac().libraryroot)
-                    addStringOption("dac_dataname", project.docsDac().dataname)
+                    addStringOption("dac_libraryroot", dacOptions.libraryroot)
+                    addStringOption("dac_dataname", dacOptions.dataname)
                 }
 
                 exclude("**/BuildConfig.java")
@@ -449,10 +449,12 @@ private fun createGenerateDocsTask(
             addArtifactsAndSince()
         }
 
-private fun initializeApiChecksForProject(
-        project: Project,
-        generateDocs: GenerateDocsTask,
-        createArchive: Task): Pair<DoclavaTask, JDiffTask> {
+private data class Tasks(
+        val generateApi: DoclavaTask,
+        val generateDiffs: JDiffTask,
+        val checkApiTask: CheckApiTask)
+
+private fun initializeApiChecksForProject(project: Project, generateDocs: GenerateDocsTask): Tasks {
     if (!project.hasProperty("docsDir")) {
         project.extensions.add("docsDir", File(project.rootProject.docsDir(), project.name))
     }
@@ -467,7 +469,7 @@ private fun initializeApiChecksForProject(
     val verifyUpdateTask = createVerifyUpdateApiAllowedTask(project)
 
     // Make sure the API surface has not broken since the last release.
-    val lastReleasedApiFile = getLastReleasedApiFile(workingDir, version.toString())
+    val lastReleasedApiFile = getLastReleasedApiFile(workingDir, version)
 
     val whitelistFile = lastReleasedApiFile?.let { apiFile ->
         File(lastReleasedApiFile.parentFile, stripExtension(apiFile.name) + ".ignore")
@@ -520,56 +522,16 @@ private fun initializeApiChecksForProject(
     // Associate current API surface with the Maven artifact.
     generateDocs.addArtifact(generateApi.apiFile!!.absolutePath, artifact)
     generateDocs.dependsOn(generateApi)
-    createArchive.dependsOn(checkApi)
-    return (generateApi to generateDiffTask)
+    return Tasks(generateApi, generateDiffTask, checkApi)
 }
 
-private open class GenerateDocsTask : DoclavaTask() {
-
-    private data class Since(val path: String, val apiLevel: String)
-    private data class Artifact(val path: String, val artifact: String)
-
-    private val sinces = mutableListOf<Since>()
-    private val artifacts = mutableListOf<Artifact>()
-
-    fun addArtifactsAndSince() {
-        doFirst {
-            coreJavadocOptions {
-                if (sinces.isNotEmpty()) {
-                    addMultilineMultiValueOption("since").value = sinces.map { (path, apiLevel) ->
-                        listOf(path, apiLevel)
-                    }
-                }
-
-                if (artifacts.isNotEmpty()) {
-                    addMultilineMultiValueOption("artifact").value = artifacts.map { artifact ->
-                        listOf(artifact.path, artifact.artifact)
-                    }
-                }
-            }
-        }
-    }
-
-    fun addSinceFilesFrom(dir: File) {
-        val regex = Regex("(\\d+\\.\\d+\\.\\d).txt")
-        val apiDir = File(dir, "api")
-        apiDir.listFiles { file ->
-            file.isFile && regex.matches(file.name)
-        }.forEach { apiFile ->
-            val matchResult = regex.matchEntire(apiFile.name)!!
-            sinces.add(Since(apiFile.absolutePath, matchResult.groups[1]!!.value))
-        }
-    }
-
-    fun addArtifact(path: String, artifact: String) = artifacts.add(Artifact(path, artifact))
-}
-
-private fun configure(root: Project, createArchiveTask: Task, supportRootFolder: File) {
+private fun configure(root: Project, supportRootFolder: File, dacOptions: DacOptions): Task {
+    val allChecks = root.tasks.create("AnchorCheckApis")
     val doclavaConfiguration = root.configurations.getByName("doclava")
     val generateSdkApiTask = createGenerateSdkApiTask(root, doclavaConfiguration)
 
     val generateDocsTask = createGenerateDocsTask(root, generateSdkApiTask,
-            doclavaConfiguration, supportRootFolder)
+            doclavaConfiguration, supportRootFolder, dacOptions)
     createDistDocsTask(root, generateDocsTask)
 
     root.subprojects { subProject ->
@@ -603,10 +565,10 @@ private fun configure(root: Project, createArchiveTask: Task, supportRootFolder:
                                     "an api folder, ignoring API tasks.")
                             return@all
                         }
-                        val (generateApi, generateDiffs) = initializeApiChecksForProject(project,
-                                generateDocsTask, createArchiveTask)
-                        registerAndroidProjectForDocsTask(generateApi, variant)
-                        registerAndroidProjectForDocsTask(generateDiffs, variant)
+                        val tasks = initializeApiChecksForProject(project, generateDocsTask)
+                        registerAndroidProjectForDocsTask(tasks.generateApi, variant)
+                        registerAndroidProjectForDocsTask(tasks.generateDiffs, variant)
+                        allChecks.dependsOn(tasks.checkApiTask)
                     }
                 }
             } else if (project.hasProperty("compileJava")) {
@@ -618,15 +580,15 @@ private fun configure(root: Project, createArchiveTask: Task, supportRootFolder:
                     return@afterEvaluate
                 }
                 project.afterEvaluate { proj ->
-                    val (generateApi, generateDiffs) = initializeApiChecksForProject(proj,
-                            generateDocsTask,
-                            createArchiveTask)
-                    registerJavaProjectForDocsTask(generateApi, compileJava)
-                    registerJavaProjectForDocsTask(generateDiffs, compileJava)
+                    val tasks = initializeApiChecksForProject(proj, generateDocsTask)
+                    registerJavaProjectForDocsTask(tasks.generateApi, compileJava)
+                    registerJavaProjectForDocsTask(tasks.generateDiffs, compileJava)
+                    allChecks.dependsOn(tasks.checkApiTask)
                 }
             }
         }
     }
+    return allChecks
 }
 
 private fun sdkApiFile(project: Project) = File(project.docsDir(), "release/sdk_current.txt")
@@ -647,13 +609,11 @@ private fun Project.androidJar() = rootProject.properties["androidJar"] as FileC
 
 private fun Project.androidSrcJar() = rootProject.properties["androidSrcJar"] as File
 
-private fun Project.version() = Version(project.properties["version"] as String)
+private fun Project.version() = Version(project.version as String)
 
 private fun Project.buildNumber() = properties["buildNumber"] as String
 
 private fun Project.androidApiTxt() = properties["androidApiTxt"] as? File
-
-private fun Project.docsDac() = properties["docsDac"] as DacOptions
 
 private fun Project.processProperty(name: String) =
         if (hasProperty(name)) {
