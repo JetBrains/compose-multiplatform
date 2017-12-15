@@ -16,6 +16,7 @@
 
 package android.support;
 
+import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,17 +24,28 @@ import java.util.regex.Pattern;
  * Utility class which represents a version
  */
 public class Version implements Comparable<Version> {
+    private static final Pattern VERSION_FILE_REGEX = Pattern.compile("^(\\d+\\.\\d+\\.\\d+).txt$");
+    private static final Pattern VERSION_REGEX = Pattern
+            .compile("^(\\d+)\\.(\\d+)\\.(\\d+)(-.+)?$");
+
     private final int mMajor;
     private final int mMinor;
     private final int mPatch;
     private final String mExtra;
 
     public Version(String versionString) {
-        Pattern compile = Pattern.compile("^(\\d+)\\.(\\d+)\\.(\\d+)(-.+)?$");
-        Matcher matcher = compile.matcher(versionString);
+        this(checkedMatcher(versionString));
+    }
+
+    private static Matcher checkedMatcher(String versionString) {
+        Matcher matcher = VERSION_REGEX.matcher(versionString);
         if (!matcher.matches()) {
             throw new IllegalArgumentException("Can not parse version: " + versionString);
         }
+        return matcher;
+    }
+
+    private Version(Matcher matcher) {
         mMajor = Integer.parseInt(matcher.group(1));
         mMinor = Integer.parseInt(matcher.group(2));
         mPatch = Integer.parseInt(matcher.group(3));
@@ -116,5 +128,30 @@ public class Version implements Comparable<Version> {
         result = 31 * result + mPatch;
         result = 31 * result + (mExtra != null ? mExtra.hashCode() : 0);
         return result;
+    }
+
+    /**
+     * @return Version or null, if a name of the given file doesn't match
+     */
+    public static Version from(File file) {
+        if (!file.isFile()) {
+            return null;
+        }
+        Matcher matcher = VERSION_FILE_REGEX.matcher(file.getName());
+        if (!matcher.matches()) {
+            return null;
+        }
+        return new Version(matcher.group(1));
+    }
+
+    /**
+     * @return Version or null, if the given string doesn't match
+     */
+    public static Version from(String versionString) {
+        Matcher matcher = VERSION_REGEX.matcher(versionString);
+        if (!matcher.matches()) {
+            return null;
+        }
+        return new Version(matcher);
     }
 }
