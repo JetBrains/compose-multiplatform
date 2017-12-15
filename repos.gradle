@@ -37,7 +37,6 @@ ext.repos.prebuiltsRootUri = "file://${repos.prebuiltsRoot}"
 
 ext.repoNames = ["${repos.prebuiltsRoot}/gradle-plugin",
                  "${repos.prebuiltsRoot}/tools/common/m2/repository",
-                 "${repos.prebuiltsRoot}/tools/common/m2/internal",
                  "${repos.prebuiltsRoot}/maven_repo/android",
                  "${repos.prebuiltsRoot}/maven_repo/google-play-service-client-libraries-3p",
                  "${getFullSdkPath(repos.prebuiltsRoot)}/extras/m2repository"]
