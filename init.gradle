@@ -17,7 +17,6 @@
 
 import android.support.DiffAndDocs
 import android.support.gmaven.GMavenVersionChecker
-import com.android.build.gradle.internal.coverage.JacocoPlugin
 import com.android.build.gradle.internal.coverage.JacocoReportTask
 import com.android.build.gradle.internal.tasks.DeviceProviderInstrumentTestTask
 import org.gradle.api.logging.configuration.ShowStacktrace
@@ -136,6 +135,29 @@ def configureBuildOnServer() {
             }
         }
     }
+    buildOnServerTask.dependsOn createJacocoAntUberJarTask()
+}
+
+def createJacocoAntUberJarTask() {
+    def myJacoco = project.configurations.create('myJacoco')
+    project.dependencies.add('myJacoco', build_libs.jacoco_ant)
+
+    return project.tasks.create(
+            name: "JacocoAntUberJar",
+            type: Jar) {
+        inputs.files myJacoco
+        from {
+            myJacoco
+                    .resolvedConfiguration
+                    .resolvedArtifacts.collect{ zipTree(it.getFile()) }} {
+            // exclude all the signatures the jar might have
+            exclude "META-INF/*.SF"
+            exclude "META-INF/*.DSA"
+            exclude "META-INF/*.RSA"
+        }
+        destinationDir file(project.distDir)
+        archiveName "jacocoant.jar"
+    }
 }
 
 def configureSubProjects() {
@@ -192,25 +214,8 @@ def configureSubProjects() {
                             archiveName "${project.name}-${v.baseName}-allclasses.jar"
                         }
 
-                        def collectJacocoAntPackages = project.tasks.create(
-                                name: "collectJacocoAntPackages",
-                                type: Jar) {
-                            inputs.files project.configurations[JacocoPlugin.ANT_CONFIGURATION_NAME]
-                            from {
-                                project.configurations[JacocoPlugin.ANT_CONFIGURATION_NAME]
-                                        .resolvedConfiguration
-                                        .resolvedArtifacts.collect{ zipTree(it.getFile()) }} {
-                                    // exclude all the signatures the jar might have
-                                    exclude "META-INF/*.SF"
-                                    exclude "META-INF/*.DSA"
-                                    exclude "META-INF/*.RSA"
-                                }
-                            destinationDir file(project.distDir)
-                            archiveName "jacocoant.jar"
-                        }
-
                         jarifyTask.dependsOn v.getJavaCompiler()
-                        v.assemble.dependsOn jarifyTask , collectJacocoAntPackages
+                        v.assemble.dependsOn jarifyTask
                     }
                 }
 
