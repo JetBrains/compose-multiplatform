@@ -22,6 +22,8 @@ import com.android.build.gradle.internal.coverage.JacocoReportTask
 import com.android.build.gradle.internal.tasks.DeviceProviderInstrumentTestTask
 import org.gradle.api.logging.configuration.ShowStacktrace
 
+import javax.tools.ToolProvider
+
 def supportRoot = ext.supportRootFolder
 if (supportRoot == null) {
     throw new RuntimeException("variable supportRootFolder is not set. you must set it before" +
@@ -43,8 +45,10 @@ def enableDoclavaAndJDiff(p, dacOptions) {
     }
 
     p.dependencies {
-        doclava project(':doclava')
-        jdiff project(':jdiff')
+        doclava build_libs.doclava
+        // tools.jar required for com.sun.javadoc
+        doclava files(((URLClassLoader) ToolProvider.getSystemToolClassLoader()).getURLs())
+        jdiff build_libs.jdiff
         jdiff build_libs.xml_parser_apis
         jdiff build_libs.xerces_impl
     }
@@ -145,9 +149,7 @@ def configureSubProjects() {
         repos.addMavenRepositories(repositories)
 
         // Only modify Android projects.
-        if (project.name.equals('doclava')
-                || project.name.equals('jdiff')
-                || project.name.equals('noto-emoji-compat')
+        if (project.name.equals('noto-emoji-compat')
                 || project.name.equals('support-media-compat-test-lib')) {
             // disable tests and return
             project.tasks.whenTaskAdded { task ->

@@ -31,7 +31,10 @@ build_libs.error_prone = 'net.ltgt.gradle:gradle-errorprone-plugin:0.0.13'
 build_libs.jacoco = 'org.jacoco:org.jacoco.core:0.7.8'
 build_libs.kotlin = [gradle_plugin: "org.jetbrains.kotlin:kotlin-gradle-plugin:1.2.0"]
 // jdiff dependencies
+build_libs.jdiff = 'com.android:jdiff:1.1.0'
 build_libs.xml_parser_apis = 'xerces:xmlParserAPIs:2.6.2'
 build_libs.xerces_impl = 'xerces:xercesImpl:2.6.2'
+
+build_libs.doclava = 'com.android:doclava:1.0.6'
 
 rootProject.ext['build_libs'] = build_libs
