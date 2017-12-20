@@ -16,6 +16,7 @@
 
 package android.support
 
+import android.support.SupportConfig.INSTRUMENTATION_RUNNER
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.dsl.LintOptions
 import net.ltgt.gradle.errorprone.ErrorProneBasePlugin
@@ -24,7 +25,6 @@ import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import java.io.File
-import java.util.Properties
 
 /**
  * Support library specific com.android.library plugin that sets common configurations needed for
@@ -86,6 +86,8 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
             is String -> library.compileSdkVersion(currentSdk)
         }
 
+        library.buildToolsVersion = SupportConfig.getBuildTools(project)
+
         // Update the version meta-data in each Manifest.
         library.defaultConfig.addManifestPlaceholders(mapOf("target-sdk-version" to currentSdk))
 
@@ -95,13 +97,12 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
         library.testOptions.unitTests.isReturnDefaultValues = true
 
         // Use a local debug keystore to avoid build server issues.
-        val key = ((project.rootProject.property("init") as Properties)
-                .getValue("debugKeystore")) as File
-        library.signingConfigs.findByName("debug")?.storeFile = key
+        library.signingConfigs.findByName("debug")?.storeFile =
+                SupportConfig.getKeystore(project)
 
-        setUpLint(library.lintOptions, File(project.projectDir, "/lint-baseline.xml"))
+        setUpLint(library.lintOptions, SupportConfig.getLintBaseline(project))
 
-        if (project.rootProject.property("usingFullSdk") as Boolean) {
+        if (SupportConfig.isUsingFullSdk(project)) {
             // Library projects don't run lint by default, so set up dependency.
             project.tasks.getByName("uploadArchives").dependsOn("lintRelease")
         }
@@ -113,10 +114,10 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
         library.libraryVariants.all { libraryVariant ->
             if (libraryVariant.getBuildType().getName().equals("errorProne")) {
                 @Suppress("DEPRECATION")
-                libraryVariant.getJavaCompile().setToolChain(toolChain)
+                libraryVariant.getJavaCompile().toolChain = toolChain
 
                 @Suppress("DEPRECATION")
-                val compilerArgs = libraryVariant.getJavaCompile().options.compilerArgs
+                val compilerArgs = libraryVariant.javaCompile.options.compilerArgs
                 compilerArgs += arrayListOf(
                         "-XDcompilePolicy=simple", // Workaround for b/36098770
 
@@ -131,10 +132,6 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
                 )
             }
         }
-    }
-
-    companion object {
-        private val INSTRUMENTATION_RUNNER = "android.support.test.runner.AndroidJUnitRunner"
     }
 }
 
