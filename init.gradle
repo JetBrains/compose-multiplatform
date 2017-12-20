@@ -30,7 +30,6 @@ if (supportRoot == null) {
 }
 def init = new Properties()
 ext.init = init
-ext.init.debugKeystore = file("${supportRoot}/development/keystore/debug.keystore")
 rootProject.ext.versionChecker = new GMavenVersionChecker(rootProject)
 ext.runningInBuildServer = System.env.DIST_DIR != null && System.env.OUT_DIR != null
 
@@ -67,11 +66,11 @@ def setSdkInLocalPropertiesFile() {
     ext.buildToolsVersion = '27.0.1'
     final String fullSdkPath = getFullSdkPath();
     if (file(fullSdkPath).exists()) {
-        gradle.ext.currentSdk = 28
+        project.ext.currentSdk = 28
         project.ext.androidJar =
-                files("${fullSdkPath}/platforms/android-${gradle.currentSdk}/android.jar")
+                files("${fullSdkPath}/platforms/android-${project.currentSdk}/android.jar")
         project.ext.androidSrcJar =
-                file("${fullSdkPath}/platforms/android-${gradle.currentSdk}/android-stubs-src.jar")
+                file("${fullSdkPath}/platforms/android-${project.currentSdk}/android-stubs-src.jar")
         project.ext.androidApiTxt = null
         File props = file("local.properties")
         props.write "sdk.dir=${fullSdkPath}"
@@ -181,7 +180,7 @@ def configureSubProjects() {
             return
         }
 
-        project.ext.currentSdk = gradle.ext.currentSdk
+        project.ext.currentSdk = rootProject.ext.currentSdk
 
         project.plugins.whenPluginAdded { plugin ->
             def isAndroidLibrary = "com.android.build.gradle.LibraryPlugin"
@@ -190,8 +189,6 @@ def configureSubProjects() {
             def isJavaLibrary = "org.gradle.api.plugins.JavaPlugin".equals(plugin.class.name)
 
             if (isAndroidLibrary || isAndroidApp) {
-                project.android.buildToolsVersion = rootProject.buildToolsVersion
-
                 // Enable code coverage for debug builds only if we are not running inside the IDE,
                 // since enabling coverage reports breaks the method parameter resolution in the IDE
                 // debugger.
