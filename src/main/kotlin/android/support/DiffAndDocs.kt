@@ -106,7 +106,7 @@ private fun getLastReleasedApiFile(rootFolder: File, refVersion: Version): File?
     var lastFile: File? = null
     var lastVersion: Version? = null
     apiDir.listFiles().forEach { file ->
-        Version.from(file)?.let { version ->
+        Version.parseOrNull(file)?.let { version ->
             if ((lastFile == null || lastVersion!! < version) && version < refVersion) {
                 lastFile = file
                 lastVersion = version
@@ -129,7 +129,7 @@ private fun getApiFile(rootDir: File, refVersion: Version): File {
 private fun getApiFile(rootDir: File, refVersion: Version, forceRelease: Boolean = false): File {
     val apiDir = File(rootDir, "api")
 
-    if (!refVersion.isSnapshot || forceRelease) {
+    if (!refVersion.isSnapshot() || forceRelease) {
         // Release API file is always X.Y.0.txt.
         return File(apiDir, "${refVersion.major}.${refVersion.minor}.0.txt")
     }
@@ -147,13 +147,13 @@ private fun createVerifyUpdateApiAllowedTask(project: Project) =
                 val rootFolder = project.projectDir
                 val version = Version(project.version as String)
 
-                if (version.isPatch) {
+                if (version.isPatch()) {
                     throw GradleException("Public APIs may not be modified in patch releases.")
-                } else if (version.isSnapshot && getApiFile(rootFolder,
+                } else if (version.isSnapshot() && getApiFile(rootFolder,
                         version,
                         true).exists()) {
                     throw GradleException("Inconsistent version. Public API file already exists.")
-                } else if (!version.isSnapshot && getApiFile(rootFolder, version).exists()
+                } else if (!version.isSnapshot() && getApiFile(rootFolder, version).exists()
                         && !project.hasProperty("force")) {
                     throw GradleException("Public APIs may not be modified in finalized releases.")
                 }
@@ -247,7 +247,7 @@ private fun createUpdateApiTask(project: Project, checkApiRelease: CheckApiTask)
  */
 private fun createOldApiXml(project: Project, doclavaConfig: Configuration) =
         project.tasks.createWithConfig("oldApiXml", ApiXmlConversionTask::class.java) {
-            val toApi = project.processProperty("toApi")?.let(Version::from)
+            val toApi = project.processProperty("toApi")?.let { Version.parseOrNull(it) }
             val fromApi = project.processProperty("fromApi")
             classpath = project.files(doclavaConfig.resolve())
             val rootFolder = project.projectDir
@@ -490,7 +490,7 @@ private fun initializeApiChecksForProject(project: Project, generateDocs: Genera
     }
 
     // Check whether the development API surface has changed.
-    val verifyConfig = if (version.isPatch) CHECK_API_CONFIG_PATCH else CHECK_API_CONFIG_DEVELOP
+    val verifyConfig = if (version.isPatch()) CHECK_API_CONFIG_PATCH else CHECK_API_CONFIG_DEVELOP
     val currentApiFile = getApiFile(workingDir, version)
     val checkApi = createCheckApiTask(project,
             "checkApi",

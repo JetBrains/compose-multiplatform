@@ -48,7 +48,7 @@ open class GenerateDocsTask : DoclavaTask() {
 
     fun addSinceFilesFrom(dir: File) {
         File(dir, "api").listFiles().forEach { file ->
-            Version.from(file)?.let { version ->
+            Version.parseOrNull(file)?.let { version ->
                 sinces.add(Since(file.absolutePath, version.toString()))
             }
         }
