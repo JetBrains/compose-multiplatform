@@ -16,6 +16,7 @@
 
 
 import android.support.DiffAndDocs
+import android.support.SupportConfig
 import android.support.gmaven.GMavenVersionChecker
 import com.android.build.gradle.internal.coverage.JacocoReportTask
 import com.android.build.gradle.internal.tasks.DeviceProviderInstrumentTestTask
@@ -63,27 +64,15 @@ def getFullSdkPath() {
 }
 
 def setSdkInLocalPropertiesFile() {
-    ext.buildToolsVersion = '27.0.1'
-    final String fullSdkPath = getFullSdkPath();
-    if (file(fullSdkPath).exists()) {
-        project.ext.currentSdk = 28
-        project.ext.androidJar =
-                files("${fullSdkPath}/platforms/android-${project.currentSdk}/android.jar")
-        project.ext.androidSrcJar =
-                file("${fullSdkPath}/platforms/android-${project.currentSdk}/android-stubs-src.jar")
-        project.ext.androidApiTxt = null
+    final File fullSdkPath = file(getFullSdkPath())
+    if (fullSdkPath.exists()) {
+        project.ext.fullSdkPath = fullSdkPath
         File props = file("local.properties")
-        props.write "sdk.dir=${fullSdkPath}"
+        props.write "sdk.dir=${fullSdkPath.getAbsolutePath()}"
         ext.usingFullSdk = true
     } else {
-        gradle.ext.currentSdk = 'current'
-        project.ext.androidJar = files("${repos.prebuiltsRoot}/sdk/current/android.jar")
-        project.ext.androidSrcJar = null
-        project.ext.androidApiTxt = file("${repos.prebuiltsRoot}/sdk/api/26.txt")
-        System.setProperty('android.dir', "${supportRootFolder}/../../")
-        File props = file("local.properties")
-        props.write "android.dir=../../"
-        ext.usingFullSdk = false
+        throw Exception("You are using non ub-supportlib-* checkout. You need to check out "
+                + "ub-supportlib-* to work on support library. See go/supportlib for details.")
     }
 }
 
@@ -179,8 +168,6 @@ def configureSubProjects() {
             }
             return
         }
-
-        project.ext.currentSdk = rootProject.ext.currentSdk
 
         project.plugins.whenPluginAdded { plugin ->
             def isAndroidLibrary = "com.android.build.gradle.LibraryPlugin"

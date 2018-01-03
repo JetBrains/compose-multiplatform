@@ -102,16 +102,13 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
         val library = project.extensions.findByType(LibraryExtension::class.java)
                 ?: throw Exception("Failed to find Android extension")
 
-        val currentSdk = project.property("currentSdk")
-        when (currentSdk) {
-            is Int -> library.compileSdkVersion(currentSdk)
-            is String -> library.compileSdkVersion(currentSdk)
-        }
+        library.compileSdkVersion(SupportConfig.CURRENT_SDK_VERSION)
 
-        library.buildToolsVersion = SupportConfig.getBuildTools(project)
+        library.buildToolsVersion = SupportConfig.BUILD_TOOLS_VERSION
 
         // Update the version meta-data in each Manifest.
-        library.defaultConfig.addManifestPlaceholders(mapOf("target-sdk-version" to currentSdk))
+        library.defaultConfig.addManifestPlaceholders(
+                mapOf("target-sdk-version" to SupportConfig.CURRENT_SDK_VERSION))
 
         // Set test runner.
         library.defaultConfig.testInstrumentationRunner = INSTRUMENTATION_RUNNER
@@ -124,10 +121,7 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
 
         setUpLint(library.lintOptions, SupportConfig.getLintBaseline(project))
 
-        if (SupportConfig.isUsingFullSdk(project)) {
-            // Library projects don't run lint by default, so set up dependency.
-            project.tasks.getByName("uploadArchives").dependsOn("lintRelease")
-        }
+        project.tasks.getByName("uploadArchives").dependsOn("lintRelease")
 
         SourceJarTaskHelper.setUpAndroidProject(project, library)
 
