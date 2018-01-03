@@ -30,7 +30,6 @@ import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.JavaBasePlugin
-import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.compile.JavaCompile
@@ -166,7 +165,7 @@ private fun createGenerateApiTask(project: Project, docletpathParam: Collection<
             setDocletpath(docletpathParam)
             destinationDir = project.docsDir()
             // Base classpath is Android SDK, sub-projects add their own.
-            classpath = project.androidJar()
+            classpath = androidJarFile(project)
             apiFile = File(project.docsDir(), "release/${project.name}/current.txt")
             generateDocs = false
 
@@ -329,7 +328,7 @@ private fun createGenerateDiffsTask(
         jdiffConfig: Configuration) =
         project.tasks.createWithConfig("generateDiffs", JDiffTask::class.java) {
             // Base classpath is Android SDK, sub-projects add their own.
-            classpath = project.androidJar()
+            classpath = androidJarFile(project)
 
             // JDiff properties.
             oldApiXmlFile = oldApiTask.outputApiXmlFile
@@ -366,33 +365,18 @@ private fun createDistDocsTask(project: Project, generateDocs: DoclavaTask) =
 
 // Set up platform API files for federation.
 private fun createGenerateSdkApiTask(project: Project, doclavaConfig: Configuration): Task =
-        if (project.androidApiTxt() != null) {
-            project.tasks.createWithConfig("generateSdkApi", Copy::class.java) {
-                description = "Copies the API files for the current SDK."
-                // Export the API files so this looks like a DoclavaTask.
-                from(project.androidApiTxt()!!.absolutePath)
-                val apiFile = sdkApiFile(project)
-                into(apiFile.parent)
-                rename { apiFile.name }
-                // Register the fake removed file as an output.
-                val removedApiFile = removedSdkApiFile(project)
-                outputs.file(removedApiFile)
-                doLast { removedApiFile.createNewFile() }
-            }
-        } else {
-            project.tasks.createWithConfig("generateSdkApi", DoclavaTask::class.java) {
-                dependsOn(doclavaConfig)
-                description = "Generates API files for the current SDK."
-                setDocletpath(doclavaConfig.resolve())
-                destinationDir = project.docsDir()
-                classpath = project.androidJar()
-                source(project.zipTree(project.androidSrcJar()))
-                apiFile = sdkApiFile(project)
-                removedApiFile = removedSdkApiFile(project)
-                generateDocs = false
-                coreJavadocOptions {
-                    addStringOption("stubpackages", "android.*")
-                }
+        project.tasks.createWithConfig("generateSdkApi", DoclavaTask::class.java) {
+            dependsOn(doclavaConfig)
+            description = "Generates API files for the current SDK."
+            setDocletpath(doclavaConfig.resolve())
+            destinationDir = project.docsDir()
+            classpath = androidJarFile(project)
+            source(project.zipTree(androidSrcJarFile(project)))
+            apiFile = sdkApiFile(project)
+            removedApiFile = removedSdkApiFile(project)
+            generateDocs = false
+            coreJavadocOptions {
+                addStringOption("stubpackages", "android.*")
             }
         }
 
@@ -411,7 +395,7 @@ private fun createGenerateDocsTask(
             setDocletpath(doclavaConfig.resolve())
             val offline = project.processProperty("offlineDocs") != null
             destinationDir = File(project.docsDir(), if (offline) "offline" else "online")
-            classpath = project.androidJar()
+            classpath = androidJarFile(project)
             val hidden = listOf<Int>(105, 106, 107, 111, 112, 113, 115, 116, 121)
             doclavaErrors = ((101..122) - hidden).toSet()
             doclavaWarnings = emptySet()
@@ -602,18 +586,21 @@ private fun <T : Task> TaskContainer.createWithConfig(
         config: T.() -> Unit) =
         create(name, taskClass) { task -> task.config() }
 
+private fun androidJarFile(project: Project): FileCollection =
+        project.files(arrayOf(File(project.fullSdkPath(),
+                "platforms/android-${SupportConfig.CURRENT_SDK_VERSION}/android.jar")))
+
+private fun androidSrcJarFile(project: Project): File = File(project.fullSdkPath(),
+        "platforms/android-${SupportConfig.CURRENT_SDK_VERSION}/android-stubs-src.jar")
+
 // Nasty part. Get rid of that eventually!
 private fun Project.docsDir(): File = properties["docsDir"] as File
 
-private fun Project.androidJar() = rootProject.properties["androidJar"] as FileCollection
-
-private fun Project.androidSrcJar() = rootProject.properties["androidSrcJar"] as File
+private fun Project.fullSdkPath(): File = rootProject.properties["fullSdkPath"] as File
 
 private fun Project.version() = Version(project.version as String)
 
 private fun Project.buildNumber() = properties["buildNumber"] as String
-
-private fun Project.androidApiTxt() = properties["androidApiTxt"] as? File
 
 private fun Project.processProperty(name: String) =
         if (hasProperty(name)) {
