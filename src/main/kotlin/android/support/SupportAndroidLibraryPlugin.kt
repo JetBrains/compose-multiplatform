@@ -153,7 +153,7 @@ private fun setUpLint(lintOptions: LintOptions, baseline: File) {
     lintOptions.isNoLines = false
     lintOptions.isQuiet = true
 
-    lintOptions.error("NewApi")
+    lintOptions.fatal("NewApi")
 
     // Set baseline file for all legacy lint warnings.
     if (System.getenv("GRADLE_PLUGIN_VERSION") != null) {
