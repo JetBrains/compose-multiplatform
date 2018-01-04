@@ -153,8 +153,6 @@ def createJacocoAntUberJarTask() {
 }
 
 def configureSubProjects() {
-    // lint every library
-    def lintTask = project.tasks.create("lint")
     subprojects {
         repos.addMavenRepositories(repositories)
 
@@ -173,7 +171,6 @@ def configureSubProjects() {
             def isAndroidLibrary = "com.android.build.gradle.LibraryPlugin"
                     .equals(plugin.class.name)
             def isAndroidApp = "com.android.build.gradle.AppPlugin".equals(plugin.class.name)
-            def isJavaLibrary = "org.gradle.api.plugins.JavaPlugin".equals(plugin.class.name)
 
             if (isAndroidLibrary || isAndroidApp) {
                 // Enable code coverage for debug builds only if we are not running inside the IDE,
@@ -202,29 +199,6 @@ def configureSubProjects() {
                         jarifyTask.dependsOn v.getJavaCompiler()
                         v.assemble.dependsOn jarifyTask
                     }
-                }
-
-                // Enforce NewApi lint check as fatal.
-                project.android.lintOptions.fatal 'NewApi'
-                lintTask.dependsOn {project.lint}
-            }
-
-            if (isAndroidLibrary || isJavaLibrary) {
-                // Add library to the aggregate dependency report.
-                task allDeps(type: DependencyReportTask) {}
-
-                project.afterEvaluate {
-                    Upload uploadTask = (Upload) project.tasks.uploadArchives;
-                    uploadTask.repositories.mavenDeployer {
-                        repository(url: uri("$rootProject.ext.supportRepoOut"))
-                        setUniqueVersion(true)
-                    }
-
-                    // Before the upload, make sure the repo is ready.
-                    uploadTask.dependsOn rootProject.tasks.prepareRepo
-
-                    // Make the mainupload depend on this one.
-                    mainUpload.dependsOn uploadTask
                 }
             }
         }

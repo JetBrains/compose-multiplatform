@@ -21,15 +21,16 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.artifacts.maven.MavenDeployer
 import org.gradle.api.tasks.Upload
+import java.io.File
 
 fun apply(project: Project, extension: SupportLibraryExtension) {
     project.afterEvaluate {
         if (extension.publish) {
             if (extension.mavenGroup == null) {
-                throw Exception("You must specify mavenGroup for " + project.name + " project");
+                throw Exception("You must specify mavenGroup for ${project.name}  project")
             }
             if (extension.mavenVersion == null) {
-                throw Exception("You must specify mavenVersion for " + project.name + " project");
+                throw Exception("You must specify mavenVersion for ${project.name}  project")
             }
             project.group = extension.mavenGroup!!
             project.version = extension.mavenVersion.toString()
@@ -40,9 +41,22 @@ fun apply(project: Project, extension: SupportLibraryExtension) {
 
     // Set uploadArchives options.
     val uploadTask = project.tasks.getByName("uploadArchives") as Upload
+
+    val repo = project.uri(project.rootProject.property("supportRepoOut") as File)
+            ?: throw Exception("supportRepoOut not set")
+
+    uploadTask.repositories {
+        it.withGroovyBuilder {
+            "mavenDeployer" {
+                "repository"(mapOf("url" to repo))
+            }
+        }
+    }
+
     project.afterEvaluate {
         if (extension.publish) {
             uploadTask.repositories.withType(MavenDeployer::class.java) { mavenDeployer ->
+                mavenDeployer.isUniqueVersion = true
 
                 mavenDeployer.getPom().project {
                     it.withGroovyBuilder {
@@ -83,9 +97,9 @@ fun apply(project: Project, extension: SupportLibraryExtension) {
                 // https://github.com/gradle/gradle/issues/3170
                 uploadTask.doFirst {
                     val allDeps = HashSet<ProjectDependency>()
-                    collectDependenciesForConfiguration(allDeps, project, "api");
-                    collectDependenciesForConfiguration(allDeps, project, "implementation");
-                    collectDependenciesForConfiguration(allDeps, project, "compile");
+                    collectDependenciesForConfiguration(allDeps, project, "api")
+                    collectDependenciesForConfiguration(allDeps, project, "implementation")
+                    collectDependenciesForConfiguration(allDeps, project, "compile")
 
                     mavenDeployer.getPom().whenConfigured {
                         it.dependencies.forEach { dep ->
@@ -95,10 +109,10 @@ fun apply(project: Project, extension: SupportLibraryExtension) {
 
                             val getGroupIdMethod =
                                     dep::class.java.getDeclaredMethod("getGroupId")
-                            val groupId : String = getGroupIdMethod.invoke(dep) as String
+                            val groupId: String = getGroupIdMethod.invoke(dep) as String
                             val getArtifactIdMethod =
                                     dep::class.java.getDeclaredMethod("getArtifactId")
-                            val artifactId : String = getArtifactIdMethod.invoke(dep) as String
+                            val artifactId: String = getArtifactIdMethod.invoke(dep) as String
 
                             if (isAndroidProject(groupId, artifactId, allDeps)) {
                                 val setTypeMethod = dep::class.java.getDeclaredMethod("setType",
@@ -109,14 +123,23 @@ fun apply(project: Project, extension: SupportLibraryExtension) {
                     }
                 }
             }
+
+            // Before the upload, make sure the repo is ready.
+            uploadTask.dependsOn(project.rootProject.tasks.getByName("prepareRepo"))
+
+            // Make the mainUpload depend on this uploadTask one.
+            project.rootProject.tasks.getByName("mainUpload").dependsOn(uploadTask)
         } else {
             uploadTask.enabled = false
         }
     }
 }
 
-private fun collectDependenciesForConfiguration(projectDependencies : MutableSet<ProjectDependency>,
-                                                project : Project, name : String) {
+private fun collectDependenciesForConfiguration(
+        projectDependencies: MutableSet<ProjectDependency>,
+        project: Project,
+        name: String
+) {
     val config = project.configurations.findByName(name)
     if (config != null) {
         config.dependencies.withType(ProjectDependency::class.java).forEach {
@@ -125,8 +148,11 @@ private fun collectDependenciesForConfiguration(projectDependencies : MutableSet
     }
 }
 
-private fun isAndroidProject(groupId : String, artifactId : String,
-                             deps : Set<ProjectDependency>) : Boolean {
+private fun isAndroidProject(
+        groupId: String,
+        artifactId: String,
+        deps: Set<ProjectDependency>
+): Boolean {
     for (dep in deps) {
         if (dep.group == groupId && dep.name == artifactId) {
             return dep.getDependencyProject().plugins.hasPlugin(LibraryPlugin::class.java)
