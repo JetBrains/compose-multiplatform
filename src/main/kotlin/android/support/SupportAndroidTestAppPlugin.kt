@@ -42,19 +42,10 @@ class SupportAndroidTestAppPlugin : Plugin<Project> {
         val application = project.extensions.findByType(AppExtension::class.java)
                 ?: throw Exception("Failed to find Android extension")
 
-        val currentSdk = project.property("currentSdk")
-        when (currentSdk) {
-            is Int -> {
-                application.compileSdkVersion(currentSdk)
-                application.defaultConfig.targetSdkVersion(currentSdk)
-            }
-            is String -> {
-                application.compileSdkVersion(currentSdk)
-                application.defaultConfig.targetSdkVersion(currentSdk)
-            }
-        }
+        application.compileSdkVersion(SupportConfig.CURRENT_SDK_VERSION)
+        application.defaultConfig.targetSdkVersion(SupportConfig.CURRENT_SDK_VERSION)
 
-        application.buildToolsVersion = SupportConfig.getBuildTools(project)
+        application.buildToolsVersion = SupportConfig.BUILD_TOOLS_VERSION
 
         application.defaultConfig.versionCode = 1
         application.defaultConfig.versionName = "1.0"
