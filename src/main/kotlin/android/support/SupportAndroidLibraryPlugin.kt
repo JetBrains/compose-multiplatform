@@ -119,7 +119,10 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
         library.signingConfigs.findByName("debug")?.storeFile =
                 SupportConfig.getKeystore(project)
 
-        setUpLint(library.lintOptions, SupportConfig.getLintBaseline(project))
+        project.afterEvaluate {
+            setUpLint(library.lintOptions, SupportConfig.getLintBaseline(project),
+                    (supportLibraryExtension.mavenVersion?.isSnapshot) ?: true)
+        }
 
         project.tasks.getByName("uploadArchives").dependsOn("lintRelease")
 
@@ -154,7 +157,7 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
     }
 }
 
-private fun setUpLint(lintOptions: LintOptions, baseline: File) {
+private fun setUpLint(lintOptions: LintOptions, baseline: File, snapshotVersion: Boolean) {
     // Always lint check NewApi as fatal.
     lintOptions.isAbortOnError = true
     lintOptions.isIgnoreWarnings = true
@@ -173,6 +176,13 @@ private fun setUpLint(lintOptions: LintOptions, baseline: File) {
     lintOptions.isQuiet = true
 
     lintOptions.fatal("NewApi")
+
+    if (snapshotVersion) {
+        // Do not run missing translations checks on snapshot versions of the library.
+        lintOptions.disable("MissingTranslation")
+    } else {
+        lintOptions.fatal("MissingTranslation")
+    }
 
     // Set baseline file for all legacy lint warnings.
     if (System.getenv("GRADLE_PLUGIN_VERSION") != null) {
