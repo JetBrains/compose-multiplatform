@@ -121,7 +121,7 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
 
         project.afterEvaluate {
             setUpLint(library.lintOptions, SupportConfig.getLintBaseline(project),
-                    (supportLibraryExtension.mavenVersion?.isSnapshot) ?: true)
+                    (supportLibraryExtension.mavenVersion?.isSnapshot()) ?: true)
         }
 
         project.tasks.getByName("uploadArchives").dependsOn("lintRelease")
