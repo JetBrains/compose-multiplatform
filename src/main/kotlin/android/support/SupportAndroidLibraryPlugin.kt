@@ -72,9 +72,9 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
 
             library.compileOptions.setSourceCompatibility(javaVersion)
             library.compileOptions.setTargetCompatibility(javaVersion)
-        }
 
-        VersionFileWriterTask.setUpAndroidLibrary(project)
+            VersionFileWriterTask.setUpAndroidLibrary(project, library)
+        }
 
         project.apply(mapOf("plugin" to "com.android.library"))
         project.apply(mapOf("plugin" to ErrorProneBasePlugin::class.java))
