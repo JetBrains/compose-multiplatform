@@ -357,7 +357,7 @@ private fun createDistDocsTask(project: Project, generateDocs: DoclavaTask) =
             from(generateDocs.destinationDir)
             baseName = "android-support-docs"
             version = project.buildNumber()
-
+            destinationDir = project.distDir()
             doLast {
                 logger.lifecycle("'Wrote API reference to $archivePath")
             }
@@ -601,6 +601,8 @@ private fun Project.fullSdkPath(): File = rootProject.properties["fullSdkPath"] 
 private fun Project.version() = Version(project.version as String)
 
 private fun Project.buildNumber() = properties["buildNumber"] as String
+
+private fun Project.distDir(): File = rootProject.properties["distDir"] as File
 
 private fun Project.processProperty(name: String) =
         if (hasProperty(name)) {
