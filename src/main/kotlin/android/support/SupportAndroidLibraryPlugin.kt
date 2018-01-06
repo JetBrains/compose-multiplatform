@@ -19,6 +19,7 @@ package android.support
 import android.support.SupportConfig.INSTRUMENTATION_RUNNER
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.dsl.LintOptions
+import com.android.build.gradle.tasks.GenerateBuildConfig
 import net.ltgt.gradle.errorprone.ErrorProneBasePlugin
 import net.ltgt.gradle.errorprone.ErrorProneToolChain
 import org.gradle.api.JavaVersion
@@ -78,6 +79,15 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
 
         project.apply(mapOf("plugin" to "com.android.library"))
         project.apply(mapOf("plugin" to ErrorProneBasePlugin::class.java))
+
+        project.afterEvaluate {
+            project.tasks.all({
+                if (it is GenerateBuildConfig) {
+                    // Disable generating BuildConfig.java
+                    it.enabled = false
+                }
+            })
+        }
 
         project.configurations.all { configuration ->
             if (isCoreSupportLibrary && project.name != "support-annotations") {
