@@ -21,6 +21,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.artifacts.maven.MavenDeployer
 import org.gradle.api.tasks.Upload
+import org.gradle.kotlin.dsl.withGroovyBuilder
 import java.io.File
 
 fun apply(project: Project, extension: SupportLibraryExtension) {
@@ -82,7 +83,7 @@ fun apply(project: Project, extension: SupportLibraryExtension) {
 
                         "scm" {
                             "url"("http://source.android.com")
-                            "connection"("scm:git:https://android.googlesource.com/platform/frameworks/support")
+                            "connection"(ANDROID_GIT_URL)
                         }
 
                         "developers" {
@@ -160,3 +161,6 @@ private fun isAndroidProject(
     }
     return false
 }
+
+private const val ANDROID_GIT_URL =
+        "scm:git:https://android.googlesource.com/platform/frameworks/support"
