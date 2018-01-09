@@ -32,7 +32,6 @@ apply from: 'repos.gradle'
 
 repos.addMavenRepositories(repositories)
 
-apply plugin: 'groovy'
 apply plugin: 'java'
 apply plugin: 'kotlin'
 
