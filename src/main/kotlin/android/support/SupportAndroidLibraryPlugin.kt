@@ -149,10 +149,12 @@ private fun setUpLint(lintOptions: LintOptions, baseline: File) {
 
     lintOptions.fatal("NewApi")
 
-    // Set baseline file for all legacy lint warnings.
     if (System.getenv("GRADLE_PLUGIN_VERSION") != null) {
         lintOptions.check("NewApi")
-    } else if (baseline.exists()) {
+    }
+
+    // Set baseline file for all legacy lint warnings.
+    if (baseline.exists()) {
         lintOptions.baseline(baseline)
     }
 }
