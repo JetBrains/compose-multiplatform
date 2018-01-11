@@ -128,7 +128,7 @@ private fun getApiFile(rootDir: File, refVersion: Version): File {
 private fun getApiFile(rootDir: File, refVersion: Version, forceRelease: Boolean = false): File {
     val apiDir = File(rootDir, "api")
 
-    if (!refVersion.isSnapshot() || forceRelease) {
+    if (refVersion.isFinalApi() || forceRelease) {
         // Release API file is always X.Y.0.txt.
         return File(apiDir, "${refVersion.major}.${refVersion.minor}.0.txt")
     }
@@ -148,11 +148,11 @@ private fun createVerifyUpdateApiAllowedTask(project: Project) =
 
                 if (version.isPatch()) {
                     throw GradleException("Public APIs may not be modified in patch releases.")
-                } else if (version.isSnapshot() && getApiFile(rootFolder,
+                } else if (!version.isFinalApi() && getApiFile(rootFolder,
                         version,
                         true).exists()) {
                     throw GradleException("Inconsistent version. Public API file already exists.")
-                } else if (!version.isSnapshot() && getApiFile(rootFolder, version).exists()
+                } else if (version.isFinalApi() && getApiFile(rootFolder, version).exists()
                         && !project.hasProperty("force")) {
                     throw GradleException("Public APIs may not be modified in finalized releases.")
                 }

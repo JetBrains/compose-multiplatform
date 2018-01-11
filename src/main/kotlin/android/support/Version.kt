@@ -41,6 +41,10 @@ data class Version(
 
     fun isSnapshot(): Boolean = "-SNAPSHOT" == extra
 
+    fun isAlpha(): Boolean = extra?.toLowerCase()?.startsWith("-alpha") ?: false
+
+    fun isFinalApi(): Boolean = !isSnapshot() && !isAlpha()
+
     override fun compareTo(other: Version) = compareValuesBy(this, other,
             { it.major },
             { it.minor },
