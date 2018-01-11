@@ -26,19 +26,14 @@ public class LibraryVersions {
     public static final Version SUPPORT_LIBRARY = new Version("28.0.0-SNAPSHOT");
 
     /**
-     * Version code for flatfoot 1.0 projects (room, lifecycles)
-     */
-    private static final Version FLATFOOT_1_0_BATCH = new Version("1.1.0-SNAPSHOT");
-
-    /**
      * Version code for Room
      */
-    public static final Version ROOM = FLATFOOT_1_0_BATCH;
+    public static final Version ROOM = new Version("1.1.0-alpha1");
 
     /**
      * Version code for Lifecycle extensions (ProcessLifecycleOwner, Fragment support)
      */
-    public static final Version LIFECYCLES_EXT = new Version("1.1.0-SNAPSHOT");
+    public static final Version LIFECYCLES_EXT = new Version("1.1.0");
 
     /**
      * Version code for Lifecycle LiveData
@@ -53,9 +48,9 @@ public class LibraryVersions {
     /**
      * Version code for RecyclerView & Room paging
      */
-    public static final Version PAGING = new Version("1.0.0-alpha4-1");
+    public static final Version PAGING = new Version("1.0.0-alpha5");
 
-    private static final Version LIFECYCLES = new Version("1.0.3");
+    private static final Version LIFECYCLES = new Version("1.1.0");
 
     /**
      * Version code for Lifecycle libs that are required by the support library
@@ -70,15 +65,15 @@ public class LibraryVersions {
     /**
      * Version code for shared code of flatfoot
      */
-    public static final Version ARCH_CORE = new Version("1.0.0");
+    public static final Version ARCH_CORE = new Version("1.1.0");
 
     /**
      * Version code for shared code of flatfoot runtime
      */
-    public static final Version ARCH_RUNTIME = FLATFOOT_1_0_BATCH;
+    public static final Version ARCH_RUNTIME = ARCH_CORE;
 
     /**
      * Version code for shared testing code of flatfoot
      */
-    public static final Version ARCH_CORE_TESTING = FLATFOOT_1_0_BATCH;
+    public static final Version ARCH_CORE_TESTING = ARCH_CORE;
 }
