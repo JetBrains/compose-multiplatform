@@ -35,6 +35,8 @@ ext.runningInBuildServer = System.env.DIST_DIR != null && System.env.OUT_DIR != 
 
 apply from: "${supportRoot}/buildSrc/dependencies.gradle"
 apply from: "${supportRoot}/buildSrc/build_dependencies.gradle"
+apply from: "${supportRoot}/buildSrc/unbundled_check.gradle"
+
 
 def enableDoclavaAndJDiff(p, dacOptions) {
     p.configurations {
@@ -55,11 +57,53 @@ def enableDoclavaAndJDiff(p, dacOptions) {
 }
 
 def getFullSdkPath() {
-    final String osName = System.getProperty("os.name").toLowerCase();
-    final boolean isMacOsX =
-            osName.contains("mac os x") || osName.contains("darwin") || osName.contains("osx");
-    final String platform = isMacOsX ? 'darwin' : 'linux'
-    return "${repos.prebuiltsRoot}/fullsdk-${platform}"
+    if (isUnbundledBuild(ext.supportRootFolder)) {
+        Properties properties = new Properties()
+        File propertiesFile = new File('local.properties')
+        if (propertiesFile.exists()) {
+            propertiesFile.withInputStream {
+                properties.load(it)
+            }
+        }
+        File location = findSdkLocation(properties, supportRootFolder)
+        return location.getAbsolutePath()
+    } else {
+        final String osName = System.getProperty("os.name").toLowerCase();
+        final boolean isMacOsX =
+                osName.contains("mac os x") || osName.contains("darwin") || osName.contains("osx");
+        final String platform = isMacOsX ? 'darwin' : 'linux'
+        return "${repos.prebuiltsRoot}/fullsdk-${platform}"
+    }
+}
+
+/**
+ * Adapted from com.android.build.gradle.internal.SdkHandler
+ */
+public static File findSdkLocation(Properties properties, File rootDir) {
+    String sdkDirProp = properties.getProperty("sdk.dir");
+    if (sdkDirProp != null) {
+        File sdk = new File(sdkDirProp);
+        if (!sdk.isAbsolute()) {
+            sdk = new File(rootDir, sdkDirProp);
+        }
+        return sdk
+    }
+
+    sdkDirProp = properties.getProperty("android.dir");
+    if (sdkDirProp != null) {
+        return new File(rootDir, sdkDirProp);
+    }
+
+    String envVar = System.getenv("ANDROID_HOME");
+    if (envVar != null) {
+        return new File(envVar);
+    }
+
+    String property = System.getProperty("android.home");
+    if (property != null) {
+        return new File(property);
+    }
+    return null;
 }
 
 def setSdkInLocalPropertiesFile() {
