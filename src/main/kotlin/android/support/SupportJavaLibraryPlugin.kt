@@ -44,6 +44,6 @@ class SupportJavaLibraryPlugin : Plugin<Project> {
             }
         }
 
-        SourceJarTaskHelper.setUpJavaProject(project)
+        setUpSourceJarTaskForJavaProject(project)
     }
 }

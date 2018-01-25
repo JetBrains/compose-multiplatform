@@ -29,22 +29,15 @@ if (runningInBuildServer) {
     System.setProperty("kotlin.compiler.execution.strategy", "in-process")
 }
 
-apply from: "build_dependencies.gradle"
-
 ext.supportRootFolder = project.projectDir.getParentFile()
 apply from: 'repos.gradle'
+apply from: "build_dependencies.gradle"
+apply from: "kotlin-dsl-dependency.gradle.kts"
 
 repos.addMavenRepositories(repositories)
 
-apply plugin: 'java'
 apply plugin: 'kotlin'
 
-apply from: "kotlin-dsl-dependency.gradle.kts"
-
-compileGroovy {
-    dependsOn tasks.getByPath('compileKotlin')
-    classpath += files(compileKotlin.destinationDir)
-}
 dependencies {
     compile build_libs.gradle
     compile build_libs.jacoco
