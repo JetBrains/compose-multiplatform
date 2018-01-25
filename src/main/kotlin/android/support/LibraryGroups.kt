@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package android.support;
+package android.support
 
 /**
  * The list of maven group names of all the libraries in this project.
  */
-public class LibraryGroups {
-    public static final String SUPPORT = "com.android.support";
-    public static final String ROOM = "android.arch.persistence.room";
-    public static final String PERSISTENCE = "android.arch.persistence";
-    public static final String LIFECYCLE = "android.arch.lifecycle";
-    public static final String ARCH_CORE = "android.arch.core";
-    public static final String PAGING = "android.arch.paging";
-    public static final String NAVIGATION = "android.arch.navigation";
+object LibraryGroups {
+    const val SUPPORT = "com.android.support"
+    const val ROOM = "android.arch.persistence.room"
+    const val PERSISTENCE = "android.arch.persistence"
+    const val LIFECYCLE = "android.arch.lifecycle"
+    const val ARCH_CORE = "android.arch.core"
+    const val PAGING = "android.arch.paging"
+    const val NAVIGATION = "android.arch.navigation"
 }

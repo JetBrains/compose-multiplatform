@@ -136,7 +136,7 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
 
         project.tasks.getByName("uploadArchives").dependsOn("lintRelease")
 
-        SourceJarTaskHelper.setUpAndroidProject(project, library)
+        setUpSoureJarTaskForAndroidProject(project, library)
 
         val toolChain = ErrorProneToolChain.create(project)
         library.buildTypes.create("errorProne")

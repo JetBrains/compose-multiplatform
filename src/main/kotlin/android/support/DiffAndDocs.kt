@@ -256,7 +256,7 @@ private fun createOldApiXml(project: Project, doclavaConfig: Configuration) =
             } else if (toApi != null) {
                 // If toApi matches released API (X.Y.Z) format, use the most recently
                 // released API file prior to toApi.
-                inputApiFile = getLastReleasedApiFile(rootFolder, toApi)
+                inputApiFile = getLastReleasedApiFile(rootFolder, toApi)!!
             } else {
                 // Use the most recently released API file.
                 inputApiFile = getApiFile(rootFolder, project.version())
@@ -285,7 +285,7 @@ private fun createNewApiXmlTask(
                 inputApiFile = File(project.projectDir, "api/$toApi.txt")
             } else {
                 // Use the current API file (e.g. current.txt).
-                inputApiFile = generateApi.apiFile
+                inputApiFile = generateApi.apiFile!!
                 dependsOn(generateApi, doclavaConfig)
             }
 
