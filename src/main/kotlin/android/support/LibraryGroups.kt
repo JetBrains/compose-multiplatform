@@ -27,5 +27,6 @@ object LibraryGroups {
     const val ARCH_CORE = "android.arch.core"
     const val PAGING = "android.arch.paging"
     const val NAVIGATION = "android.arch.navigation"
-    const val SLICES = "androidx.app.slice";
+    const val SLICES = "androidx.app.slice"
+    const val JETIFIER = "com.android.support.jetifier"
 }

@@ -76,4 +76,9 @@ object LibraryVersions {
      * Version code for shared testing code of flatfoot
      */
     val ARCH_CORE_TESTING = ARCH_CORE
+
+    /**
+     * Version code for Jetifier
+     */
+    val JETIFIER = Version("0.2.0")
 }
