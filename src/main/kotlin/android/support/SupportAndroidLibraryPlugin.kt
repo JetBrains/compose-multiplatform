@@ -158,6 +158,7 @@ private fun setUpLint(lintOptions: LintOptions, baseline: File, verifyTranslatio
     lintOptions.isQuiet = true
 
     lintOptions.fatal("NewApi")
+    lintOptions.fatal("ObsoleteSdkInt")
 
     if (verifyTranslations) {
         lintOptions.fatal("MissingTranslation")
