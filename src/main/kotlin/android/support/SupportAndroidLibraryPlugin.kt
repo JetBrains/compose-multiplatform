@@ -143,30 +143,7 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
         library.libraryVariants.all { libraryVariant ->
             if (libraryVariant.getBuildType().getName().equals("errorProne")) {
                 @Suppress("DEPRECATION")
-                libraryVariant.getJavaCompile().toolChain = toolChain
-
-                @Suppress("DEPRECATION")
-                val compilerArgs = libraryVariant.javaCompile.options.compilerArgs
-                compilerArgs += arrayListOf(
-                        "-XDcompilePolicy=simple", // Workaround for b/36098770
-
-                        // Enforce the following checks.
-                        "-Xep:RestrictTo:OFF",
-                        "-Xep:ParameterNotNullable:ERROR",
-                        "-Xep:MissingOverride:ERROR",
-                        "-Xep:JdkObsolete:ERROR",
-                        "-Xep:NarrowingCompoundAssignment:ERROR",
-                        "-Xep:ClassNewInstance:ERROR",
-                        "-Xep:ClassCanBeStatic:ERROR",
-                        "-Xep:SynchronizeOnNonFinalField:ERROR",
-                        "-Xep:OperatorPrecedence:ERROR",
-                        "-Xep:IntLongMath:ERROR",
-
-                        // Nullaway
-                        "-XepIgnoreUnknownCheckNames", // https://github.com/uber/NullAway/issues/25
-                        "-Xep:NullAway:ERROR",
-                        "-XepOpt:NullAway:AnnotatedPackages=android.arch,android.support"
-                )
+                libraryVariant.javaCompile.configureWithErrorProne(toolChain)
             }
         }
     }

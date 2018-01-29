@@ -16,10 +16,13 @@
 
 package android.support
 
+import net.ltgt.gradle.errorprone.ErrorProneBasePlugin
+import net.ltgt.gradle.errorprone.ErrorProneToolChain
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.tasks.compile.JavaCompile
 
 /**
  * Support java library specific plugin that sets common configurations needed for
@@ -43,6 +46,11 @@ class SupportJavaLibraryPlugin : Plugin<Project> {
                 convention.targetCompatibility = JavaVersion.VERSION_1_7
             }
         }
+
+        project.apply(mapOf("plugin" to ErrorProneBasePlugin::class.java))
+        val toolChain = ErrorProneToolChain.create(project)
+        val compileTasks = project.tasks.withType(JavaCompile::class.java)
+        compileTasks.all { it.configureWithErrorProne(toolChain) }
 
         setUpSourceJarTaskForJavaProject(project)
     }
