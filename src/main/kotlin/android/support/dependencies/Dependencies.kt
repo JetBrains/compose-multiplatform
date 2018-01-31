@@ -60,4 +60,6 @@ const val SUPPORT_V4 = "com.android.support:support-v4:$SUPPORT_VERSION"
 
 // Arch libraries
 const val ARCH_LIFECYCLE_RUNTIME = "android.arch.lifecycle:runtime:1.1.0@aar"
+const val ARCH_LIFECYCLE_LIVEDATA_CORE = "android.arch.lifecycle:livedata-core:1.1.0@aar"
+const val ARCH_LIFECYCLE_VIEWMODEL = "android.arch.lifecycle:viewmodel:1.1.0@aar"
 const val ARCH_LIFECYCLE_EXTENSIONS = "android.arch.lifecycle:extensions:1.1.0@aar"
