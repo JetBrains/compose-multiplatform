@@ -14,71 +14,71 @@
  * limitations under the License.
  */
 
-package android.support;
+package android.support
 
 /**
  * The list of versions codes of all the libraries in this project.
  */
-public class LibraryVersions {
+object LibraryVersions {
     /**
      * Version code of the support library components.
      */
-    public static final Version SUPPORT_LIBRARY = new Version("27.0.2");
+    val SUPPORT_LIBRARY = Version("27.1.0-SNAPSHOT")
 
     /**
      * Version code for Room
      */
-    public static final Version ROOM = new Version("1.1.0-alpha1");
+    val ROOM = Version("1.1.0-alpha1")
 
     /**
      * Version code for Lifecycle extensions (ProcessLifecycleOwner, Fragment support)
      */
-    public static final Version LIFECYCLES_EXT = new Version("1.1.0");
+    val LIFECYCLES_EXT = Version("1.1.0")
 
     /**
      * Version code for Lifecycle LiveData
      */
-    public static final Version LIFECYCLES_LIVEDATA = LIFECYCLES_EXT;
+    val LIFECYCLES_LIVEDATA = LIFECYCLES_EXT
 
     /**
      * Version code for Lifecycle ViewModel
      */
-    public static final Version LIFECYCLES_VIEWMODEL = LIFECYCLES_EXT;
+    val LIFECYCLES_VIEWMODEL = LIFECYCLES_EXT
 
     /**
      * Version code for RecyclerView & Room paging
      */
-    public static final Version PAGING = new Version("1.0.0-alpha5");
+    val PAGING = Version("1.0.0-alpha5")
 
-    private static final Version LIFECYCLES = new Version("1.1.0");
+    private val LIFECYCLES = Version("1.1.0")
 
     /**
      * Version code for Lifecycle libs that are required by the support library
      */
-    public static final Version LIFECYCLES_CORE = LIFECYCLES;
+    val LIFECYCLES_CORE = LIFECYCLES
 
     /**
      * Version code for Lifecycle runtime libs that are required by the support library
      */
-    public static final Version LIFECYCLES_RUNTIME = LIFECYCLES;
+    val LIFECYCLES_RUNTIME = LIFECYCLES
 
     /**
      * Version code for shared code of flatfoot
      */
-    public static final Version ARCH_CORE = new Version("1.1.0");
+    val ARCH_CORE = Version("1.1.0")
 
     /**
      * Version code for shared code of flatfoot runtime
      */
-    public static final Version ARCH_RUNTIME = ARCH_CORE;
+    val ARCH_RUNTIME = ARCH_CORE
 
     /**
      * Version code for shared testing code of flatfoot
      */
-    public static final Version ARCH_CORE_TESTING = ARCH_CORE;
+    val ARCH_CORE_TESTING = ARCH_CORE
 
     /**
      * Version code for Navigation
      */
-    public static final Version NAVIGATION = new Version("0.6.0-alpha1");
+    val NAVIGATION = Version("0.6.0-alpha1")
 }

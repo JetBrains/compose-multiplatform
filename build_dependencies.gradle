@@ -14,6 +14,13 @@
  * limitations under the License.
  */
 
+def build_versions = [:]
+
+build_versions.kotlin = '1.2.0'
+
+rootProject.ext['build_versions'] = build_versions
+
+
 def build_libs = [:]
 
 def androidPluginVersionOverride = System.getenv("GRADLE_PLUGIN_VERSION")
@@ -30,7 +37,10 @@ build_libs.jarjar_gradle = 'org.anarres.jarjar:jarjar-gradle:1.0.0'
 build_libs.error_prone = 'net.ltgt.gradle:gradle-errorprone-plugin:0.0.13'
 build_libs.jacoco = 'org.jacoco:org.jacoco.core:0.7.8'
 build_libs.jacoco_ant = 'org.jacoco:org.jacoco.ant:0.7.8'
-build_libs.kotlin = [gradle_plugin: "org.jetbrains.kotlin:kotlin-gradle-plugin:1.2.0"]
+build_libs.jetifier = 'androidx.tools.jetifier:gradle-plugin:0.1'
+build_libs.kotlin = [
+        gradle_plugin: "org.jetbrains.kotlin:kotlin-gradle-plugin:${build_versions.kotlin}"
+]
 // jdiff dependencies
 build_libs.jdiff = 'com.android:jdiff:1.1.0'
 build_libs.xml_parser_apis = 'xerces:xmlParserAPIs:2.6.2'
