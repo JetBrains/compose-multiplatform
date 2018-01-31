@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import org.gradle.api.artifacts.dsl.RepositoryHandler;
-
 String getFullSdkPath(String prebuiltsRoot) {
     final String osName = System.getProperty("os.name").toLowerCase()
     final boolean isMacOsX =
@@ -30,15 +28,25 @@ if (supportRoot == null) {
             " including this script")
 }
 
-def checkoutRoot = "${supportRoot}/../.."
+apply from: "${supportRoot}/buildSrc/unbundled_check.gradle"
+
+def checkoutRoot = "${ext.supportRootFolder}/../.."
 ext.repos = new Properties()
 ext.repos.prebuiltsRoot = "${checkoutRoot}/prebuilts"
 ext.repos.prebuiltsRootUri = "file://${repos.prebuiltsRoot}"
 
-ext.repoNames = ["${repos.prebuiltsRoot}/gradle-plugin",
+ext.repoNames = [// Android Gradle Plugin prebuilts updated manually
+                 "${repos.prebuiltsRoot}/gradle-plugin",
+                 // Miscellaneous prebuilts updated sporadically
                  "${repos.prebuiltsRoot}/tools/common/m2/repository",
+                 // Historical releases updated as part of public release
                  "${repos.prebuiltsRoot}/maven_repo/android",
                  "${repos.prebuiltsRoot}/maven_repo/google-play-service-client-libraries-3p",
+                 // Manually constructed, but soon to be updated by update_current.py
+                 "${repos.prebuiltsRoot}/sdk/current/extras/material-design",
+                 // Full checkout prebuilts updated by update_current.py
+                 "${repos.prebuiltsRoot}/sdk/current/support/m2repository",
+                 // Unbundled checkout prebuilts updated by fullsdk drop
                  "${getFullSdkPath(repos.prebuiltsRoot)}/extras/m2repository"]
 
 /**
@@ -50,10 +58,13 @@ def addMavenRepositories(RepositoryHandler handler) {
             url repo
         }
     }
-    if (System.getenv("ALLOW_PUBLIC_REPOS") != null) {
+    if (System.getenv("ALLOW_PUBLIC_REPOS") != null || (isUnbundledBuild(ext.supportRootFolder))) {
         handler.mavenCentral()
         handler.jcenter()
         handler.google()
+        handler.maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
     def androidPluginRepoOverride = System.getenv("GRADLE_PLUGIN_REPO")
     if (androidPluginRepoOverride != null) {

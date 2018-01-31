@@ -19,6 +19,7 @@ package android.support
 import android.support.SupportConfig.INSTRUMENTATION_RUNNER
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.dsl.LintOptions
+import com.android.build.gradle.tasks.GenerateBuildConfig
 import net.ltgt.gradle.errorprone.ErrorProneBasePlugin
 import net.ltgt.gradle.errorprone.ErrorProneToolChain
 import org.gradle.api.JavaVersion
@@ -36,6 +37,8 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
         val supportLibraryExtension = project.extensions.create("supportLibrary",
                 SupportLibraryExtension::class.java, project)
         apply(project, supportLibraryExtension)
+
+        val isCoreSupportLibrary = project.rootProject.name == "support"
 
         project.afterEvaluate {
             val library = project.extensions.findByType(LibraryExtension::class.java)
@@ -77,6 +80,35 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
         project.apply(mapOf("plugin" to "com.android.library"))
         project.apply(mapOf("plugin" to ErrorProneBasePlugin::class.java))
 
+        project.afterEvaluate {
+            project.tasks.all({
+                if (it is GenerateBuildConfig) {
+                    // Disable generating BuildConfig.java
+                    it.enabled = false
+                }
+            })
+        }
+
+        project.configurations.all { configuration ->
+            if (isCoreSupportLibrary && project.name != "support-annotations") {
+                // While this usually happens naturally due to normal project dependencies, force
+                // evaluation on the annotations project in case the below substitution is the only
+                // dependency to this project. See b/70650240 on what happens when this is missing.
+                project.evaluationDependsOn(":support-annotations")
+
+                // In projects which compile as part of the "core" support libraries (which include
+                // the annotations), replace any transitive pointer to the deployed Maven
+                // coordinate version of annotations with a reference to the local project. These
+                // usually originate from test dependencies and otherwise cause multiple copies on
+                // the classpath. We do not do this for non-"core" projects as they need to
+                // depend on the Maven coordinate variant.
+                configuration.resolutionStrategy.dependencySubstitution.apply {
+                    substitute(module("com.android.support:support-annotations"))
+                            .with(project(":support-annotations"))
+                }
+            }
+        }
+
         val library = project.extensions.findByType(LibraryExtension::class.java)
                 ?: throw Exception("Failed to find Android extension")
 
@@ -97,39 +129,27 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
         library.signingConfigs.findByName("debug")?.storeFile =
                 SupportConfig.getKeystore(project)
 
-        setUpLint(library.lintOptions, SupportConfig.getLintBaseline(project))
+        project.afterEvaluate {
+            setUpLint(library.lintOptions, SupportConfig.getLintBaseline(project),
+                    (supportLibraryExtension.mavenVersion?.isSnapshot()) ?: true)
+        }
 
         project.tasks.getByName("uploadArchives").dependsOn("lintRelease")
 
-        SourceJarTaskHelper.setUpAndroidProject(project, library)
+        setUpSoureJarTaskForAndroidProject(project, library)
 
         val toolChain = ErrorProneToolChain.create(project)
         library.buildTypes.create("errorProne")
         library.libraryVariants.all { libraryVariant ->
             if (libraryVariant.getBuildType().getName().equals("errorProne")) {
                 @Suppress("DEPRECATION")
-                libraryVariant.getJavaCompile().toolChain = toolChain
-
-                @Suppress("DEPRECATION")
-                val compilerArgs = libraryVariant.javaCompile.options.compilerArgs
-                compilerArgs += arrayListOf(
-                        "-XDcompilePolicy=simple", // Workaround for b/36098770
-
-                        // Enforce the following checks.
-                        "-Xep:RestrictTo:OFF",
-                        //"-Xep:MissingOverride:ERROR",
-                        "-Xep:NarrowingCompoundAssignment:ERROR",
-                        "-Xep:ClassNewInstance:ERROR",
-                        "-Xep:ClassCanBeStatic:ERROR",
-                        "-Xep:SynchronizeOnNonFinalField:ERROR",
-                        "-Xep:OperatorPrecedence:ERROR"
-                )
+                libraryVariant.javaCompile.configureWithErrorProne(toolChain)
             }
         }
     }
 }
 
-private fun setUpLint(lintOptions: LintOptions, baseline: File) {
+private fun setUpLint(lintOptions: LintOptions, baseline: File, snapshotVersion: Boolean) {
     // Always lint check NewApi as fatal.
     lintOptions.isAbortOnError = true
     lintOptions.isIgnoreWarnings = true
@@ -148,6 +168,13 @@ private fun setUpLint(lintOptions: LintOptions, baseline: File) {
     lintOptions.isQuiet = true
 
     lintOptions.fatal("NewApi")
+
+    if (snapshotVersion) {
+        // Do not run missing translations checks on snapshot versions of the library.
+        lintOptions.disable("MissingTranslation")
+    } else {
+        lintOptions.fatal("MissingTranslation")
+    }
 
     if (System.getenv("GRADLE_PLUGIN_VERSION") != null) {
         lintOptions.check("NewApi")

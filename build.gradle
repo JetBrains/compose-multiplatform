@@ -1,8 +1,12 @@
 buildscript {
     def supportRootFolder = project.projectDir.getParentFile()
+    apply from: "unbundled_check.gradle"
     repositories {
         maven {
             url "${supportRootFolder}/../../prebuilts/tools/common/m2/repository"
+        }
+        if (isUnbundledBuild(supportRootFolder)) {
+            jcenter()
         }
     }
 
@@ -11,28 +15,29 @@ buildscript {
     dependencies {
         classpath build_libs.kotlin.gradle_plugin
     }
+
+    configurations.classpath.resolutionStrategy {
+        eachDependency { details ->
+            if (details.requested.group == 'org.jetbrains.kotlin') {
+                details.useVersion build_versions.kotlin
+            }
+        }
+    }
 }
 def runningInBuildServer = System.env.DIST_DIR != null && System.env.OUT_DIR != null
 if (runningInBuildServer) {
     System.setProperty("kotlin.compiler.execution.strategy", "in-process")
 }
 
-apply from: "build_dependencies.gradle"
-
 ext.supportRootFolder = project.projectDir.getParentFile()
 apply from: 'repos.gradle'
+apply from: "build_dependencies.gradle"
+apply from: "kotlin-dsl-dependency.gradle.kts"
 
 repos.addMavenRepositories(repositories)
 
-apply plugin: 'java'
 apply plugin: 'kotlin'
 
-apply from: "kotlin-dsl-dependency.gradle.kts"
-
-compileGroovy {
-    dependsOn tasks.getByPath('compileKotlin')
-    classpath += files(compileKotlin.destinationDir)
-}
 dependencies {
     compile build_libs.gradle
     compile build_libs.jacoco

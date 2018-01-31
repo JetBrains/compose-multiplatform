@@ -24,9 +24,10 @@ import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import java.io.*
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.File
 import java.security.MessageDigest
-
 
 /** Character that resets console output color. */
 private const val ANSI_RESET = "\u001B[0m"
@@ -78,7 +79,7 @@ open class CheckApiTask : DefaultTask() {
 
     /** API file that represents the candidate API surface. */
     @InputFile
-    var newApiFile: File? = null
+    lateinit var newApiFile: File
 
     /** API file that represents the candidate API surface's removals. */
     @Optional
@@ -120,9 +121,11 @@ open class CheckApiTask : DefaultTask() {
 
     @OutputFile
     fun getOutputFile(): File {
-        return if (mOutputFile != null)
+        return if (mOutputFile != null) {
             mOutputFile!!
-        else File(project.buildDir, "checkApi/${name}-completed")
+        } else {
+            File(project.buildDir, "checkApi/$name-completed")
+        }
     }
 
     @Optional
@@ -165,9 +168,9 @@ open class CheckApiTask : DefaultTask() {
 
     private fun collectAndVerifyInputs(): Set<File> {
         if (oldRemovedApiFile != null && newRemovedApiFile != null) {
-            return setOf(oldApiFile!!, newApiFile!!, oldRemovedApiFile!!, newRemovedApiFile!!)
+            return setOf(oldApiFile!!, newApiFile, oldRemovedApiFile!!, newRemovedApiFile!!)
         } else {
-            return setOf(oldApiFile!!, newApiFile!!)
+            return setOf(oldApiFile!!, newApiFile)
         }
     }
 
@@ -205,7 +208,6 @@ open class CheckApiTask : DefaultTask() {
                 setIgnoreExitValue(true)
             }
         }
-
 
         // Load the whitelist file, if present.
         val whitelistFile = whitelistErrorsFile
