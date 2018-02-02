@@ -32,11 +32,10 @@ if (runningInBuildServer) {
 ext.supportRootFolder = project.projectDir.getParentFile()
 apply from: 'repos.gradle'
 apply from: "build_dependencies.gradle"
+apply plugin: "kotlin"
 apply from: "kotlin-dsl-dependency.gradle.kts"
 
 repos.addMavenRepositories(repositories)
-
-apply plugin: 'kotlin'
 
 dependencies {
     compile build_libs.gradle
