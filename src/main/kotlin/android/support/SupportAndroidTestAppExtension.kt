@@ -27,4 +27,13 @@ open class SupportAndroidTestAppExtension(val project: Project) {
      * If unset minSdkVersion will be [DEFAULT_MIN_SDK_VERSION].
      */
     var minSdkVersion: Int = DEFAULT_MIN_SDK_VERSION
+
+    /**
+     * Modifies the java compile tasks to run with error prone.
+     * This can be useful for code generators to assert that the generated code won't cause trouble
+     * for the developers.
+     * <p>
+     * Enabling this modifies all of the Javac tasks in the project to run with error prone.
+     */
+    var enableErrorProne: Boolean = false
 }
