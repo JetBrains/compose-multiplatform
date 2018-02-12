@@ -126,7 +126,8 @@ open class DoclavaTask : Javadoc() {
 
     /**
      * The doclet path which has the {@code com.gogole.doclava.Doclava} class.
-     * This option will override any doclet path set in this instance's {@link #options JavadocOptions}.
+     * This option will override any doclet path set in this instance's
+     * {@link #options JavadocOptions}.
      * @see MinimalJavadocOptions#getDocletpath()
      */
     @InputFiles
@@ -136,7 +137,8 @@ open class DoclavaTask : Javadoc() {
 
     /**
      * Sets the doclet path which has the {@code com.gogole.doclava.Doclava} class.
-     * This option will override any doclet path set in this instance's {@link #options JavadocOptions}.
+     * This option will override any doclet path set in this instance's
+     * {@link #options JavadocOptions}.
      * @see MinimalJavadocOptions#setDocletpath(java.util.List)
      */
     fun setDocletpath(docletpath: Collection<File>) {
@@ -178,7 +180,7 @@ open class DoclavaTask : Javadoc() {
         }
 
         if (!generateDocs) {
-            addOption(DoclavaJavadocOptionFileOption("nodocs"))
+            addBooleanOption("nodocs", true)
         }
 
         // If requested, generate the API files.
@@ -199,7 +201,7 @@ open class DoclavaTask : Javadoc() {
             }
         }
         // Always treat this as an Android docs task.
-        addOption(DoclavaJavadocOptionFileOption("android"))
+        addBooleanOption("android", true)
     }
 
     fun coreJavadocOptions(configure: CoreJavadocOptions.() -> Unit) =
