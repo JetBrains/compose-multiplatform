@@ -17,6 +17,7 @@
 
 import android.support.DiffAndDocs
 import android.support.gmaven.GMavenVersionChecker
+import android.support.license.CheckExternalDependencyLicensesTask
 import com.android.build.gradle.internal.coverage.JacocoReportTask
 import com.android.build.gradle.internal.tasks.DeviceProviderInstrumentTestTask
 import org.gradle.api.logging.configuration.ShowStacktrace
@@ -158,7 +159,9 @@ def setupRepoOutAndBuildNumber() {
 def configureBuildOnServer() {
     def buildOnServerTask = rootProject.tasks.create("buildOnServer")
     rootProject.tasks.whenTaskAdded { task ->
-        if ("createArchive".equals(task.name) || "distDocs".equals(task.name)) {
+        if ("createArchive".equals(task.name)
+                || "distDocs".equals(task.name)
+                || CheckExternalDependencyLicensesTask.ROOT_TASK_NAME.equals(task.name)) {
             buildOnServerTask.dependsOn task
         }
     }

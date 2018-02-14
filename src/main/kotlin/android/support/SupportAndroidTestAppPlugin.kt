@@ -17,6 +17,7 @@
 package android.support
 
 import android.support.SupportConfig.INSTRUMENTATION_RUNNER
+import android.support.license.CheckExternalDependencyLicensesTask
 import com.android.build.gradle.AppExtension
 import net.ltgt.gradle.errorprone.ErrorProneBasePlugin
 import net.ltgt.gradle.errorprone.ErrorProneToolChain
@@ -33,7 +34,7 @@ class SupportAndroidTestAppPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val testAppExtension = project.extensions.create("supportTestApp",
                 SupportAndroidTestAppExtension::class.java, project)
-
+        CheckExternalDependencyLicensesTask.configure(project)
         project.afterEvaluate {
             val application = project.extensions.findByType(AppExtension::class.java)
                     ?: throw Exception("Failed to find Android extension")
