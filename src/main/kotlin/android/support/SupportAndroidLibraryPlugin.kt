@@ -47,9 +47,6 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
             library.defaultConfig.minSdkVersion(supportLibraryExtension.minSdkVersion)
 
             if (supportLibraryExtension.legacySourceLocation) {
-                // We use a non-standard manifest path.
-                library.sourceSets.getByName("main").manifest.srcFile("AndroidManifest.xml")
-
                 // We use a non-standard test directory structure.
                 val androidTest = library.sourceSets.getByName("androidTest")
                 androidTest.setRoot("tests")
