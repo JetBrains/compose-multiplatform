@@ -15,6 +15,7 @@
  */
 package android.support
 
+import android.support.license.CheckExternalDependencyLicensesTask
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -31,5 +32,6 @@ class SupportKotlinLibraryPlugin : Plugin<Project> {
         val convention = project.convention.getPlugin(JavaPluginConvention::class.java)
         convention.sourceCompatibility = JavaVersion.VERSION_1_8
         convention.targetCompatibility = JavaVersion.VERSION_1_8
+        CheckExternalDependencyLicensesTask.configure(project)
     }
 }
