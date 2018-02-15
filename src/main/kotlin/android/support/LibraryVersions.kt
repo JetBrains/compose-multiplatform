@@ -80,5 +80,5 @@ object LibraryVersions {
     /**
      * Version code for Navigation
      */
-    val NAVIGATION = Version("0.6.0-alpha1")
+    val NAVIGATION = Version("0.7.0-alpha1")
 }
