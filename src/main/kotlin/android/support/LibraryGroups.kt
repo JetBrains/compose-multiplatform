@@ -26,5 +26,5 @@ object LibraryGroups {
     const val LIFECYCLE = "android.arch.lifecycle"
     const val ARCH_CORE = "android.arch.core"
     const val PAGING = "android.arch.paging"
-    const val NAVIGATION = "android.arch.navigation"
+    const val NAVIGATION = "androidx.navigation"
 }
