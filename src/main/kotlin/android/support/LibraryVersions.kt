@@ -78,7 +78,7 @@ object LibraryVersions {
     val ARCH_CORE_TESTING = ARCH_CORE
 
     /**
-     * Version code for Background WorkManager
+     * Version code for WorkManager
      */
-    val WORKMANAGER = Version("1.0.0-alpha1");
+    val WORKMANAGER = Version("1.0.0-alpha1")
 }
