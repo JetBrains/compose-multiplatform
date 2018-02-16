@@ -50,6 +50,7 @@ class SupportJavaLibraryPlugin : Plugin<Project> {
 
         project.apply(mapOf("plugin" to ErrorProneBasePlugin::class.java))
         val toolChain = ErrorProneToolChain.create(project)
+        project.dependencies.add("errorprone", ERROR_PRONE_VERSION)
         val compileTasks = project.tasks.withType(JavaCompile::class.java)
         compileTasks.all { it.configureWithErrorProne(toolChain) }
 

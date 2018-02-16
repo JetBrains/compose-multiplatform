@@ -19,6 +19,8 @@ package android.support
 import net.ltgt.gradle.errorprone.ErrorProneToolChain
 import org.gradle.api.tasks.compile.JavaCompile
 
+const val ERROR_PRONE_VERSION = "com.google.errorprone:error_prone_core:2.2.0"
+
 fun JavaCompile.configureWithErrorProne(toolChain: ErrorProneToolChain) {
     this.toolChain = toolChain
 

@@ -137,6 +137,7 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
         setUpSoureJarTaskForAndroidProject(project, library)
 
         val toolChain = ErrorProneToolChain.create(project)
+        project.dependencies.add("errorprone", ERROR_PRONE_VERSION)
         library.buildTypes.create("errorProne")
         library.libraryVariants.all { libraryVariant ->
             if (libraryVariant.getBuildType().getName().equals("errorProne")) {

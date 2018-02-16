@@ -72,6 +72,7 @@ class SupportAndroidTestAppPlugin : Plugin<Project> {
         }
 
         val toolChain = ErrorProneToolChain.create(project)
+        project.dependencies.add("errorprone", ERROR_PRONE_VERSION)
 
         project.afterEvaluate {
             if (testAppExtension.enableErrorProne) {
