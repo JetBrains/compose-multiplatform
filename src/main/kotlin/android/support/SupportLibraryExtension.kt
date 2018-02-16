@@ -33,7 +33,6 @@ open class SupportLibraryExtension(val project: Project) {
     var url = SUPPORT_URL
     private var licenses: MutableCollection<License> = ArrayList()
     var java8Library = false
-    var legacySourceLocation = false
     var publish = false
     /**
      * This flag works only if publish flag is "true".

@@ -47,15 +47,6 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
 
             library.defaultConfig.minSdkVersion(supportLibraryExtension.minSdkVersion)
 
-            if (supportLibraryExtension.legacySourceLocation) {
-                // We use a non-standard test directory structure.
-                val androidTest = library.sourceSets.getByName("androidTest")
-                androidTest.setRoot("tests")
-                androidTest.java.srcDir("tests/src")
-                androidTest.res.srcDir("tests/res")
-                androidTest.manifest.srcFile("tests/AndroidManifest.xml")
-            }
-
             // Java 8 is only fully supported on API 24+ and not all Java 8 features are binary
             // compatible with API < 24, so use Java 7 for both source AND target.
             val javaVersion: JavaVersion
