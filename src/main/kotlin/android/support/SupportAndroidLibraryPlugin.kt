@@ -174,10 +174,6 @@ private fun setUpLint(lintOptions: LintOptions, baseline: File, snapshotVersion:
         lintOptions.fatal("MissingTranslation")
     }
 
-    if (System.getenv("GRADLE_PLUGIN_VERSION") != null) {
-        lintOptions.check("NewApi")
-    }
-
     // Set baseline file for all legacy lint warnings.
     if (baseline.exists()) {
         lintOptions.baseline(baseline)
