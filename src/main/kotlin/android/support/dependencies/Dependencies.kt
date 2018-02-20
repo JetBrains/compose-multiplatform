@@ -52,6 +52,12 @@ const val XERIAL = "org.xerial:sqlite-jdbc:3.20.1"
 
 // Support library dependencies needed for projects that compile against prebuilt versions
 // instead of source directly.
+// NOTE: _27 versions exist for modules that have opted-in to 27, and tests that depend on those
+// modules. Other projects may stick to older versions to avoid forcing users to update.
+private const val SUPPORT_VERSION_27 = "27.1.0"
+const val SUPPORT_RECYCLERVIEW_27 = "com.android.support:recyclerview-v7:$SUPPORT_VERSION_27"
+const val SUPPORT_APPCOMPAT_27 = "com.android.support:appcompat-v7:$SUPPORT_VERSION_27"
+
 private const val SUPPORT_VERSION = "26.1.0"
 const val SUPPORT_ANNOTATIONS = "com.android.support:support-annotations:$SUPPORT_VERSION"
 const val SUPPORT_APPCOMPAT = "com.android.support:appcompat-v7:$SUPPORT_VERSION"
