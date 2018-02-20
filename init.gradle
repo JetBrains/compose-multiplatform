@@ -54,7 +54,7 @@ def enableDoclavaAndJDiff(p, dacOptions) {
         jdiff build_libs.xerces_impl
     }
     def allChecks = DiffAndDocs.configureDiffAndDocs(rootProject, supportRootFolder, dacOptions)
-    createArchive.dependsOn(allChecks)
+    //createArchive.dependsOn(allChecks)
 }
 
 def getFullSdkPath() {

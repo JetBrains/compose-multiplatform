@@ -23,7 +23,7 @@ object LibraryVersions {
     /**
      * Version code of the support library components.
      */
-    val SUPPORT_LIBRARY = Version("28.0.0-alpha1")
+    val SUPPORT_LIBRARY = Version("1.0.0-SNAPSHOT")
 
     /**
      * Version code for Room
