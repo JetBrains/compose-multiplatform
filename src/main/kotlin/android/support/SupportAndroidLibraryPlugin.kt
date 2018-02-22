@@ -131,7 +131,7 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
 
         project.afterEvaluate {
             setUpLint(library.lintOptions, SupportConfig.getLintBaseline(project),
-                    (supportLibraryExtension.mavenVersion?.isSnapshot()) ?: true)
+                    (supportLibraryExtension.mavenVersion?.isFinalApi()) ?: false)
         }
 
         project.tasks.getByName("uploadArchives").dependsOn("lintRelease")
@@ -149,7 +149,7 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
     }
 }
 
-private fun setUpLint(lintOptions: LintOptions, baseline: File, snapshotVersion: Boolean) {
+private fun setUpLint(lintOptions: LintOptions, baseline: File, verifyTranslations: Boolean) {
     // Always lint check NewApi as fatal.
     lintOptions.isAbortOnError = true
     lintOptions.isIgnoreWarnings = true
@@ -169,11 +169,10 @@ private fun setUpLint(lintOptions: LintOptions, baseline: File, snapshotVersion:
 
     lintOptions.fatal("NewApi")
 
-    if (snapshotVersion) {
-        // Do not run missing translations checks on snapshot versions of the library.
-        lintOptions.disable("MissingTranslation")
-    } else {
+    if (verifyTranslations) {
         lintOptions.fatal("MissingTranslation")
+    } else {
+        lintOptions.disable("MissingTranslation")
     }
 
     if (System.getenv("GRADLE_PLUGIN_VERSION") != null) {
