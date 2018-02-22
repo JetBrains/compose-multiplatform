@@ -33,7 +33,7 @@ object LibraryVersions {
     /**
      * Version code for Lifecycle extensions (ProcessLifecycleOwner, Fragment support)
      */
-    val LIFECYCLES_EXT = Version("1.1.0")
+    val LIFECYCLES_EXT = Version("1.2.0-alpha1")
 
     /**
      * Version code for Lifecycle LiveData
