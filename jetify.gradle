@@ -16,37 +16,16 @@
 def standaloneProject = project(":jetifier-standalone")
 def jetifierBin = file("${standaloneProject.buildDir}/install/jetifier-standalone/bin/jetifier-standalone")
 
-task jetifyArchive(type: Exec) {
-    description "Produces a zip of jetified artifacts by running Jetifier against top-of-tree*.zip" +
-            " This task only exists to enable dejetifyArchive to have a realistic archive to test " +
-            " with. This task should be deleted once Jetpack exists."
+task dejetifyArchive(type: Exec) {
+    description "Produces a zip of dejetified artifacts by running Dejetifier against refactored" +
+            " artifacts, for temporary usage by external clients that haven't upgraded to Jetpack" +
+            " yet."
 
     dependsOn tasks['createArchive']
     dependsOn ':jetifier-standalone:installDist'
     inputs.file project.tasks['createArchive'].archivePath
 
-    outputs.file "${buildDir}/top-of-tree-m2-repository-jetified-${project.ext.buildNumber}.zip"
-
-    commandLine ("bash", "-c",
-        "if ${jetifierBin} -s -outputfile ${outputs.files.singleFile} -i ${inputs.files.singleFile}; then\n" +
-        "  echo success;\n" +
-        "else\n" +
-        "  echo jetifyArchive was not expected to work anyway. Ask jeffrygaston@ or pavlis@ to make it work.\n" +
-        "  exit 1\n" +
-        "fi")
-}
-
-task dejetifyArchive(type: Exec) {
-    description "Produces a zip of dejetified artifacts by running Dejetifier against jetified" +
-            " artifacts, for temporary usage by external clients that haven't upgraded to Jetpack" +
-            " yet."
-
-    dependsOn tasks['jetifyArchive']
-    inputs.file project.tasks['jetifyArchive'].outputs.files.singleFile
-
     outputs.file "${buildDir}/top-of-tree-m2-repository-dejetified-${project.ext.buildNumber}.zip"
 
-
-    commandLine ("${jetifierBin}", "-s", "-outputfile", "${outputs.files.singleFile}",  "-i", "${inputs.files.singleFile}")
+    commandLine ("${jetifierBin}", "-s", "-r", "-outputfile", "${outputs.files.singleFile}",  "-i", "${inputs.files.singleFile}", "-l", "error")
 }
-
