@@ -137,28 +137,6 @@ private fun getApiFile(rootDir: File, refVersion: Version, forceRelease: Boolean
     return File(apiDir, "current.txt")
 }
 
-private fun createVerifyUpdateApiAllowedTask(project: Project) =
-        project.tasks.createWithConfig("verifyUpdateApiAllowed") {
-            // This could be moved to doFirst inside updateApi, but using it as a
-            // dependency with no inputs forces it to run even when updateApi is a
-            // no-op.
-            doLast {
-                val rootFolder = project.projectDir
-                val version = Version(project.version as String)
-
-                if (version.isPatch()) {
-                    throw GradleException("Public APIs may not be modified in patch releases.")
-                } else if (!version.isFinalApi() && getApiFile(rootFolder,
-                        version,
-                        true).exists()) {
-                    throw GradleException("Inconsistent version. Public API file already exists.")
-                } else if (version.isFinalApi() && getApiFile(rootFolder, version).exists()
-                        && !project.hasProperty("force")) {
-                    throw GradleException("Public APIs may not be modified in finalized releases.")
-                }
-            }
-        }
-
 // Generates API files
 private fun createGenerateApiTask(project: Project, docletpathParam: Collection<File>) =
         project.tasks.createWithConfig("generateApi", DoclavaTask::class.java) {
@@ -232,8 +210,12 @@ private fun createUpdateApiTask(project: Project, checkApiRelease: CheckApiTask)
             oldApiFile = getApiFile(project.projectDir, project.version())
             whitelistErrors = checkApiRelease.whitelistErrors
             whitelistErrorsFile = checkApiRelease.whitelistErrorsFile
-
             doFirst {
+                val version = project.version()
+                if (!version.isFinalApi() &&
+                        getApiFile(project.projectDir, version, true).exists()) {
+                    throw GradleException("Inconsistent version. Public API file already exists.")
+                }
                 // Replace the expected whitelist with the detected whitelist.
                 whitelistErrors = checkApiRelease.detectedWhitelistErrors
             }
@@ -450,7 +432,6 @@ private fun initializeApiChecksForProject(project: Project, generateDocs: Genera
     val docletClasspath = doclavaConfiguration.resolve()
     val generateApi = createGenerateApiTask(project, docletClasspath)
     generateApi.dependsOn(doclavaConfiguration)
-    val verifyUpdateTask = createVerifyUpdateApiAllowedTask(project)
 
     // Make sure the API surface has not broken since the last release.
     val lastReleasedApiFile = getLastReleasedApiFile(workingDir, version)
@@ -489,7 +470,7 @@ private fun initializeApiChecksForProject(project: Project, generateDocs: Genera
     checkApi.description = "Verify the API surface."
 
     val updateApiTask = createUpdateApiTask(project, checkApiRelease)
-    updateApiTask.dependsOn(checkApiRelease, verifyUpdateTask)
+    updateApiTask.dependsOn(checkApiRelease)
     val newApiTask = createNewApiXmlTask(project, generateApi, doclavaConfiguration)
     val oldApiTask = createOldApiXml(project, doclavaConfiguration)
 
@@ -577,9 +558,6 @@ private fun configure(root: Project, supportRootFolder: File, dacOptions: DacOpt
 
 private fun sdkApiFile(project: Project) = File(project.docsDir(), "release/sdk_current.txt")
 private fun removedSdkApiFile(project: Project) = File(project.docsDir(), "release/sdk_removed.txt")
-
-private fun TaskContainer.createWithConfig(name: String, config: Task.() -> Unit) =
-        create(name) { task -> task.config() }
 
 private fun <T : Task> TaskContainer.createWithConfig(
         name: String, taskClass: Class<T>,
