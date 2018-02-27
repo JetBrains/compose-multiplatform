@@ -15,9 +15,9 @@
  */
 
 
-import android.support.DiffAndDocs
-import android.support.gmaven.GMavenVersionChecker
-import android.support.license.CheckExternalDependencyLicensesTask
+import androidx.build.DiffAndDocs
+import androidx.build.gmaven.GMavenVersionChecker
+import androidx.build.license.CheckExternalDependencyLicensesTask
 import com.android.build.gradle.internal.coverage.JacocoReportTask
 import com.android.build.gradle.internal.tasks.DeviceProviderInstrumentTestTask
 import org.gradle.api.logging.configuration.ShowStacktrace
