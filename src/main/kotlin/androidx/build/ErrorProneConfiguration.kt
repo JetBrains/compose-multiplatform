@@ -40,6 +40,7 @@ fun JavaCompile.configureWithErrorProne(toolChain: ErrorProneToolChain) {
             "-Xep:OperatorPrecedence:ERROR",
             "-Xep:IntLongMath:ERROR",
             "-Xep:MissingFail:ERROR",
+            "-Xep:JavaLangClash:ERROR",
 
             // Nullaway
             "-XepIgnoreUnknownCheckNames", // https://github.com/uber/NullAway/issues/25
