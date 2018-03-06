@@ -54,7 +54,7 @@ def enableDoclavaAndJDiff(p, dacOptions) {
         jdiff build_libs.xerces_impl
     }
     def allChecks = DiffAndDocs.configureDiffAndDocs(rootProject, supportRootFolder, dacOptions)
-    createArchive.dependsOn(allChecks)
+    //createArchive.dependsOn(allChecks)
 }
 
 def getFullSdkPath() {
@@ -157,23 +157,29 @@ def setupRepoOutAndBuildNumber() {
 }
 
 def configureBuildOnServer() {
+    def preBuildOnServerTask = rootProject.tasks.create("preBuildOnServer")
     def buildOnServerTask = rootProject.tasks.create("buildOnServer")
     rootProject.tasks.whenTaskAdded { task ->
         if ("createArchive".equals(task.name)
                 || "distDocs".equals(task.name)
                 || CheckExternalDependencyLicensesTask.ROOT_TASK_NAME.equals(task.name)) {
-            buildOnServerTask.dependsOn task
+            preBuildOnServerTask.dependsOn task
         }
     }
 
     subprojects {
         project.tasks.whenTaskAdded { task ->
-            if ("assembleErrorProne".equals(task.name) || "assembleAndroidTest".equals(task.name)) {
+            if ("assembleErrorProne".equals(task.name)) {
+                preBuildOnServerTask.dependsOn task
+            }
+            if ("assembleAndroidTest".equals(task.name)) {
                 buildOnServerTask.dependsOn task
+                task.dependsOn preBuildOnServerTask
             }
         }
     }
-    buildOnServerTask.dependsOn createJacocoAntUberJarTask()
+    preBuildOnServerTask.dependsOn createJacocoAntUberJarTask()
+    buildOnServerTask.dependsOn preBuildOnServerTask
 }
 
 def createJacocoAntUberJarTask() {

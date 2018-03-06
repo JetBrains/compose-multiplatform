@@ -17,7 +17,7 @@
 def libs = [:]
 
 libs.exclude_annotations_transitive = {
-    exclude group: 'com.android.support'
+    exclude group: 'androidx.annotation'
     transitive = true
 }
 
@@ -27,6 +27,7 @@ libs.exclude_bytebuddy = {
 
 libs.exclude_support = {
     exclude group: 'com.android.support'
+    exclude group: 'androidx.annotation'
 }
 
 libs.support_exclude_config = {

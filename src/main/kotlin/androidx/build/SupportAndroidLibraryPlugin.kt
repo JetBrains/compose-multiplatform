@@ -79,11 +79,11 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
         }
 
         project.configurations.all { configuration ->
-            if (isCoreSupportLibrary && project.name != "support-annotations") {
+            if (isCoreSupportLibrary && project.name != "annotations") {
                 // While this usually happens naturally due to normal project dependencies, force
                 // evaluation on the annotations project in case the below substitution is the only
                 // dependency to this project. See b/70650240 on what happens when this is missing.
-                project.evaluationDependsOn(":support-annotations")
+                project.evaluationDependsOn(":annotation")
 
                 // In projects which compile as part of the "core" support libraries (which include
                 // the annotations), replace any transitive pointer to the deployed Maven
@@ -93,7 +93,7 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
                 // depend on the Maven coordinate variant.
                 configuration.resolutionStrategy.dependencySubstitution.apply {
                     substitute(module("com.android.support:support-annotations"))
-                            .with(project(":support-annotations"))
+                            .with(project(":annotation"))
                 }
             }
         }
@@ -157,8 +157,11 @@ private fun setUpLint(lintOptions: LintOptions, baseline: File, verifyTranslatio
     lintOptions.isNoLines = false
     lintOptions.isQuiet = true
 
-    lintOptions.fatal("NewApi")
+    //lintOptions.fatal("NewApi")
     lintOptions.fatal("ObsoleteSdkInt")
+    lintOptions.disable("NewApi")
+    lintOptions.disable("MissingPermission")
+    lintOptions.disable("ResourceType")
 
     if (verifyTranslations) {
         lintOptions.fatal("MissingTranslation")
