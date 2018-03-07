@@ -5,6 +5,9 @@ buildscript {
         maven {
             url "${supportRootFolder}/../../prebuilts/tools/common/m2/repository"
         }
+        maven {
+            url "${supportRootFolder}/../../prebuilts/gradle-plugin"
+        }
         if (isUnbundledBuild(supportRootFolder)) {
             jcenter()
         }
@@ -14,6 +17,7 @@ buildscript {
 
     dependencies {
         classpath build_libs.kotlin.gradle_plugin
+        classpath build_libs.lint
     }
 
     configurations.classpath.resolutionStrategy {
@@ -39,9 +43,11 @@ repos.addMavenRepositories(repositories)
 
 dependencies {
     compile build_libs.gradle
+    compile build_libs.lint
     compile build_libs.jacoco
     compile build_libs.error_prone_gradle
     compile build_libs.jarjar_gradle
     compile gradleApi()
     testCompile "junit:junit:4.12"
 }
+
