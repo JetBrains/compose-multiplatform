@@ -35,7 +35,7 @@ const val KOTLIN_STDLIB = "org.jetbrains.kotlin:kotlin-stdlib:1.2.20"
 const val KOTLIN_METADATA = "me.eugeniomarletti:kotlin-metadata:1.2.1"
 const val LINT = "com.android.tools.lint:lint:26.0.0"
 const val MOCKITO_CORE = "org.mockito:mockito-core:2.7.6"
-const val MULTIDEX = "com.android.support:multidex:1.0.1"
+const val MULTIDEX = "androidx.multidex:multidex:2.0.0"
 const val NULLAWAY = "com.uber.nullaway:nullaway:0.2.0"
 const val REACTIVE_STREAMS = "org.reactivestreams:reactive-streams:1.0.0"
 const val RX_JAVA = "io.reactivex.rxjava2:rxjava:2.0.6"
@@ -54,24 +54,19 @@ const val ESPRESSO_CORE_TMP = "com.android.temp.support.test.espresso:espresso-c
 const val TEST_RUNNER_TMP = "com.android.temp.support.test:runner:1.0.1"
 const val TEST_RULES_TMP = "com.android.temp.support.test:rules:1.0.1"
 
-// Support library dependencies needed for projects that compile against prebuilt versions
-// instead of source directly.
-// NOTE: _27 versions exist for modules that have opted-in to 27, and tests that depend on those
-// modules. Other projects may stick to older versions to avoid forcing users to update.
-private const val SUPPORT_VERSION_27 = "27.1.0"
-const val SUPPORT_RECYCLERVIEW_27 = "com.android.support:recyclerview-v7:$SUPPORT_VERSION_27"
-const val SUPPORT_APPCOMPAT_27 = "com.android.support:appcompat-v7:$SUPPORT_VERSION_27"
-
-private const val SUPPORT_VERSION = "26.1.0"
-const val SUPPORT_ANNOTATIONS = "com.android.support:support-annotations:$SUPPORT_VERSION"
-const val SUPPORT_APPCOMPAT = "com.android.support:appcompat-v7:$SUPPORT_VERSION"
-const val SUPPORT_CORE_UTILS = "com.android.support:support-core-utils:$SUPPORT_VERSION"
-const val SUPPORT_FRAGMENTS = "com.android.support:support-fragment:$SUPPORT_VERSION"
-const val SUPPORT_RECYCLERVIEW = "com.android.support:recyclerview-v7:$SUPPORT_VERSION"
+// AndroidX libraries
+private const val SUPPORT_VERSION = "1.0.0-SNAPSHOT"
+const val SUPPORT_ANNOTATIONS = "androidx.annotation:annotation:$SUPPORT_VERSION"
+const val SUPPORT_APPCOMPAT = "androidx.appcompat:appcompat:$SUPPORT_VERSION"
+const val SUPPORT_CARDVIEW = "androidx.cardview:cardview:$SUPPORT_VERSION"
+const val SUPPORT_CORE_UTILS = "androidx.legacy:legacy-support-core-utils:$SUPPORT_VERSION"
+const val SUPPORT_DESIGN = "com.google.android.material:material:$SUPPORT_VERSION@aar"
+const val SUPPORT_FRAGMENTS = "androidx.fragment:fragment:$SUPPORT_VERSION"
+const val SUPPORT_RECYCLERVIEW = "androidx.recyclerview:recyclerview:$SUPPORT_VERSION"
+const val SUPPORT_V4 = "androidx.legacy:legacy-support-v4:$SUPPORT_VERSION"
 
 // Arch libraries
-const val ARCH_LIFECYCLE_RUNTIME = "androidx.temp.arch.lifecycle:runtime:2.0.0-alpha1@aar"
-const val ARCH_LIFECYCLE_LIVEDATA_CORE =
-        "androidx.temp.arch.lifecycle:livedata-core:2.0.0-alpha1@aar"
-const val ARCH_LIFECYCLE_VIEWMODEL = "androidx.temp.arch.lifecycle:viewmodel:2.0.0-alpha1@aar"
-const val ARCH_LIFECYCLE_EXTENSIONS = "androidx.temp.arch.lifecycle:extensions:2.0.0-alpha1@aar"
+const val ARCH_LIFECYCLE_RUNTIME = "androidx.lifecycle:lifecycle-runtime:2.0.0-SNAPSHOT@aar"
+const val ARCH_LIFECYCLE_LIVEDATA_CORE = "androidx.lifecycle:lifecycle-livedata-core:2.0.0-SNAPSHOT@aar"
+const val ARCH_LIFECYCLE_VIEWMODEL = "androidx.lifecycle:lifecycle-viewmodel:2.0.0-SNAPSHOT@aar"
+const val ARCH_LIFECYCLE_EXTENSIONS = "androidx.lifecycle:lifecycle-extensions:2.0.0-SNAPSHOT@aar"

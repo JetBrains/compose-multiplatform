@@ -28,12 +28,12 @@ object LibraryVersions {
     /**
      * Version code for Room
      */
-    val ROOM = Version("1.1.0-beta1")
+    val ROOM = Version("2.0.0-SNAPSHOT")
 
     /**
      * Version code for Lifecycle extensions (ProcessLifecycleOwner, Fragment support)
      */
-    val LIFECYCLES_EXT = Version("1.2.0-alpha1")
+    val LIFECYCLES_EXT = Version("2.0.0-SNAPSHOT")
 
     /**
      * Version code for Lifecycle LiveData
@@ -48,9 +48,9 @@ object LibraryVersions {
     /**
      * Version code for Paging
      */
-    val PAGING = Version("1.0.0-alpha7")
+    val PAGING = Version("2.0.0-SNAPSHOT")
 
-    private val LIFECYCLES = Version("1.1.1")
+    private val LIFECYCLES = Version("2.0.0-SNAPSHOT")
 
     /**
      * Version code for Lifecycle libs that are required by the support library
@@ -65,7 +65,7 @@ object LibraryVersions {
     /**
      * Version code for shared code of flatfoot
      */
-    val ARCH_CORE = Version("1.1.1")
+    val ARCH_CORE = Version("2.0.0-SNAPSHOT")
 
     /**
      * Version code for shared code of flatfoot runtime

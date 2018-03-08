@@ -94,6 +94,8 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
                 configuration.resolutionStrategy.dependencySubstitution.apply {
                     substitute(module("com.android.support:support-annotations"))
                             .with(project(":annotation"))
+                    substitute(module("androidx.annotation:annotation"))
+                            .with(project(":annotation"))
                 }
             }
         }
