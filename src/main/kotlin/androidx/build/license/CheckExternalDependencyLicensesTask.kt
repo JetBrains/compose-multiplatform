@@ -50,6 +50,9 @@ open class CheckExternalDependencyLicensesTask : DefaultTask() {
                             .filterNot {
                                 it.group?.startsWith("android.arch") == true
                             }
+                            .filterNot {
+                                it.group?.startsWith("androidx") == true
+                            }
                 }
                 .forEach {
                     checkerConfig.dependencies.add(it)
