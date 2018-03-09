@@ -41,19 +41,18 @@ const val REACTIVE_STREAMS = "org.reactivestreams:reactive-streams:1.0.0"
 const val RX_JAVA = "io.reactivex.rxjava2:rxjava:2.0.6"
 const val TEST_RUNNER = "com.android.support.test:runner:1.0.1"
 const val TEST_RULES = "com.android.support.test:rules:1.0.1"
-
-const val ESPRESSO_CONTRIB_TMP = "com.android.temp.support.test.espresso:espresso-contrib:3.0.1"
-const val ESPRESSO_CORE_TMP = "com.android.temp.support.test.espresso:espresso-core:3.0.1"
-const val TEST_RUNNER_TMP = "com.android.temp.support.test:runner:1.0.1"
-const val TEST_RULES_TMP = "com.android.temp.support.test:rules:1.0.1"
-
-
+const val TRUTH = "com.google.truth:truth:0.34"
 /**
  * this Xerial version is newer than we want but we need it to fix
  * https://github.com/xerial/sqlite-jdbc/issues/97
  * https://github.com/xerial/sqlite-jdbc/issues/267
  */
 const val XERIAL = "org.xerial:sqlite-jdbc:3.20.1"
+
+const val ESPRESSO_CONTRIB_TMP = "com.android.temp.support.test.espresso:espresso-contrib:3.0.1"
+const val ESPRESSO_CORE_TMP = "com.android.temp.support.test.espresso:espresso-core:3.0.1"
+const val TEST_RUNNER_TMP = "com.android.temp.support.test:runner:1.0.1"
+const val TEST_RULES_TMP = "com.android.temp.support.test:rules:1.0.1"
 
 // Support library dependencies needed for projects that compile against prebuilt versions
 // instead of source directly.
