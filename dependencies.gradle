@@ -30,6 +30,13 @@ libs.exclude_support = {
     exclude group: 'androidx.annotation'
 }
 
+libs.exclude_for_espresso = {
+    exclude group: 'androidx.annotation'
+    exclude group: 'androidx.appcompat'
+    exclude group: 'androidx.recyclerview'
+    exclude group: 'androidx.legacy'
+}
+
 libs.support_exclude_config = {
     exclude group: 'android.arch.core'
     exclude group: 'android.arch.lifecycle'
