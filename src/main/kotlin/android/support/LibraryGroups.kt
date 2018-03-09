@@ -27,5 +27,5 @@ object LibraryGroups {
     const val ARCH_CORE = "android.arch.core"
     const val PAGING = "android.arch.paging"
     const val NAVIGATION = "android.arch.navigation"
-    const val WORKMANAGER = "androidx.work.workmanager"
+    const val WORKMANAGER = "androidx.work"
 }
