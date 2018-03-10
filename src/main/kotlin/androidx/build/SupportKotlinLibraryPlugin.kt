@@ -29,9 +29,17 @@ class SupportKotlinLibraryPlugin : Plugin<Project> {
         project.apply(mapOf("plugin" to "kotlin"))
         project.apply(mapOf("plugin" to "kotlin-kapt"))
 
-        val convention = project.convention.getPlugin(JavaPluginConvention::class.java)
-        convention.sourceCompatibility = JavaVersion.VERSION_1_8
-        convention.targetCompatibility = JavaVersion.VERSION_1_8
+        project.afterEvaluate {
+            val convention = project.convention.getPlugin(JavaPluginConvention::class.java)
+            if (supportLibraryExtension.java8Library) {
+                convention.sourceCompatibility = JavaVersion.VERSION_1_8
+                convention.targetCompatibility = JavaVersion.VERSION_1_8
+            } else {
+                convention.sourceCompatibility = JavaVersion.VERSION_1_7
+                convention.targetCompatibility = JavaVersion.VERSION_1_7
+            }
+        }
+
         CheckExternalDependencyLicensesTask.configure(project)
     }
 }
