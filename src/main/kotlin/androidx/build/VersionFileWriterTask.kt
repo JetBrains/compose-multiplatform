@@ -73,9 +73,13 @@ open class VersionFileWriterTask : DefaultTask() {
                 it.processJavaResources.dependsOn(writeVersionFile)
             }
 
-            library.sourceSets.getByName("main").resources.srcDir(
-                    File(project.buildDir, RESOURCE_DIRECTORY)
-            )
+            val resources = library.sourceSets.getByName("main").resources
+            resources.srcDir(File(project.buildDir, RESOURCE_DIRECTORY))
+            if (!resources.includes.isEmpty()) {
+                val includes = resources.includes
+                includes.add("META-INF/*.version")
+                resources.setIncludes(includes)
+            }
         }
     }
 }
