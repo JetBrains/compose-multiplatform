@@ -65,15 +65,13 @@ const val SUPPORT_APPCOMPAT_27 = "com.android.support:appcompat-v7:$SUPPORT_VERS
 private const val SUPPORT_VERSION = "26.1.0"
 const val SUPPORT_ANNOTATIONS = "com.android.support:support-annotations:$SUPPORT_VERSION"
 const val SUPPORT_APPCOMPAT = "com.android.support:appcompat-v7:$SUPPORT_VERSION"
-const val SUPPORT_CARDVIEW = "com.android.support:cardview-v7:$SUPPORT_VERSION"
 const val SUPPORT_CORE_UTILS = "com.android.support:support-core-utils:$SUPPORT_VERSION"
-const val SUPPORT_DESIGN = "com.android.support:design:$SUPPORT_VERSION"
 const val SUPPORT_FRAGMENTS = "com.android.support:support-fragment:$SUPPORT_VERSION"
 const val SUPPORT_RECYCLERVIEW = "com.android.support:recyclerview-v7:$SUPPORT_VERSION"
-const val SUPPORT_V4 = "com.android.support:support-v4:$SUPPORT_VERSION"
 
 // Arch libraries
 const val ARCH_LIFECYCLE_RUNTIME = "androidx.temp.arch.lifecycle:runtime:2.0.0-alpha1@aar"
-const val ARCH_LIFECYCLE_LIVEDATA_CORE = "androidx.temp.arch.lifecycle:livedata-core:2.0.0-alpha1@aar"
+const val ARCH_LIFECYCLE_LIVEDATA_CORE =
+        "androidx.temp.arch.lifecycle:livedata-core:2.0.0-alpha1@aar"
 const val ARCH_LIFECYCLE_VIEWMODEL = "androidx.temp.arch.lifecycle:viewmodel:2.0.0-alpha1@aar"
 const val ARCH_LIFECYCLE_EXTENSIONS = "androidx.temp.arch.lifecycle:extensions:2.0.0-alpha1@aar"
