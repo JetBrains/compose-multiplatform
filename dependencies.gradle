@@ -42,10 +42,4 @@ libs.support_exclude_config = {
     exclude group: 'android.arch.lifecycle'
 }
 
-libs.exclude_paging_transitive = {
-    exclude group: 'android.arch.core'
-    exclude group: 'android.arch.lifecycle'
-    transitive = true
-}
-
 rootProject.ext['libs'] = libs
