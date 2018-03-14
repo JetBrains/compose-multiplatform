@@ -20,11 +20,11 @@ package androidx.build
  * The list of maven group names of all the libraries in this project.
  */
 object LibraryGroups {
-    const val SUPPORT = "com.android.support"
     const val ANNOTATION = "androidx.annotation"
     const val APPCOMPAT = "androidx.appcompat"
     const val ASYNCLAYOUTINFLATER = "androidx.asynclayoutinflater"
     const val BROWSER = "androidx.browser"
+    const val CAR = "androidx.cardview"
     const val CARDVIEW = "androidx.cardview"
     const val COLLECTION = "androidx.collection"
     const val CONTENTPAGING = "androidx.contentpaging"
