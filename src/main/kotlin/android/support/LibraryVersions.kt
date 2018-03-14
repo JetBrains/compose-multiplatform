@@ -50,7 +50,7 @@ object LibraryVersions {
      */
     val PAGING = Version("1.0.0-alpha6")
 
-    private val LIFECYCLES = Version("1.1.0")
+    private val LIFECYCLES = Version("1.1.1-alpha1")
 
     /**
      * Version code for Lifecycle libs that are required by the support library
@@ -65,7 +65,7 @@ object LibraryVersions {
     /**
      * Version code for shared code of flatfoot
      */
-    val ARCH_CORE = Version("1.1.0")
+    val ARCH_CORE = Version("1.1.1-alpha1")
 
     /**
      * Version code for shared code of flatfoot runtime
