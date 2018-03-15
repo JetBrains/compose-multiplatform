@@ -78,14 +78,3 @@ const val ARCH_LIFECYCLE_RUNTIME = "androidx.temp.arch.lifecycle:runtime:2.0.0-a
 const val ARCH_LIFECYCLE_LIVEDATA_CORE = "androidx.temp.arch.lifecycle:livedata-core:2.0.0-alpha1@aar"
 const val ARCH_LIFECYCLE_VIEWMODEL = "androidx.temp.arch.lifecycle:viewmodel:2.0.0-alpha1@aar"
 const val ARCH_LIFECYCLE_EXTENSIONS = "androidx.temp.arch.lifecycle:extensions:2.0.0-alpha1@aar"
-
-// Pre-androidx libraries, used by paging and paging samples
-const val ARCH_COMMON_1 = "android.arch.core:common:1.1.0"
-const val ARCH_RUNTIME_1 = "android.arch.core:runtime:1.1.0@aar"
-const val ARCH_LIFECYCLE_COMMON_1 = "android.arch.lifecycle:common:1.1.0"
-const val ARCH_LIFECYCLE_RUNTIME_1 = "android.arch.lifecycle:runtime:1.1.0@aar"
-const val ARCH_LIFECYCLE_LIVEDATA_1 = "android.arch.lifecycle:livedata:1.1.0@aar"
-const val ARCH_LIFECYCLE_LIVEDATA_CORE_1 = "android.arch.lifecycle:livedata-core:1.1.0@aar"
-const val ARCH_LIFECYCLE_VIEWMODEL_1 = "android.arch.lifecycle:viewmodel:1.1.0@aar"
-const val ARCH_LIFECYCLE_EXTENSIONS_1 = "android.arch.lifecycle:extensions:1.1.0@aar"
-
