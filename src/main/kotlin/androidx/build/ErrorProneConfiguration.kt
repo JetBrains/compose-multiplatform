@@ -45,6 +45,6 @@ fun JavaCompile.configureWithErrorProne(toolChain: ErrorProneToolChain) {
             // Nullaway
             "-XepIgnoreUnknownCheckNames", // https://github.com/uber/NullAway/issues/25
             "-Xep:NullAway:ERROR",
-            "-XepOpt:NullAway:AnnotatedPackages=android.arch,android.support"
+            "-XepOpt:NullAway:AnnotatedPackages=android.arch,android.support,androidx"
     )
 }
