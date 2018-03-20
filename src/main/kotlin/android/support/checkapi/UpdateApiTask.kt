@@ -16,8 +16,10 @@
 
 package android.support.checkapi
 
+import android.support.Version
 import com.google.common.io.Files
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
@@ -52,6 +54,18 @@ open class UpdateApiTask : DefaultTask() {
      */
     @TaskAction
     fun doUpdate() {
+        if (oldApiFile.exists() && newApiFile.readText() == oldApiFile.readText()) {
+            // whatever nothing changed
+            return
+        }
+
+        val version = Version(project.version as String)
+        if (version.isPatch()) {
+            throw GradleException("Public APIs may not be modified in patch releases.")
+        } else if (version.isFinalApi() && oldApiFile.exists() && !project.hasProperty("force")) {
+            throw GradleException("Public APIs may not be modified in finalized releases.")
+        }
+
         Files.copy(newApiFile, oldApiFile)
 
         if (oldRemovedApiFile != null) {
