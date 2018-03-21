@@ -39,7 +39,7 @@ libs.exclude_for_espresso = {
 
 libs.support_exclude_config = {
     exclude group: 'android.arch.core'
-    exclude group: 'android.arch.lifecycle'
+    exclude group: 'androidx.lifecycle'
 }
 
 rootProject.ext['libs'] = libs
