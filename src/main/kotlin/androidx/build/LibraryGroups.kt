@@ -24,7 +24,7 @@ object LibraryGroups {
     const val APPCOMPAT = "androidx.appcompat"
     const val ASYNCLAYOUTINFLATER = "androidx.asynclayoutinflater"
     const val BROWSER = "androidx.browser"
-    const val CAR = "androidx.cardview"
+    const val CAR = "androidx.car"
     const val CARDVIEW = "androidx.cardview"
     const val COLLECTION = "androidx.collection"
     const val CONTENTPAGING = "androidx.contentpaging"
