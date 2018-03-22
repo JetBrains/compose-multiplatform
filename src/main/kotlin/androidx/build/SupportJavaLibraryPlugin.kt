@@ -46,6 +46,7 @@ class SupportJavaLibraryPlugin : Plugin<Project> {
                 convention.sourceCompatibility = JavaVersion.VERSION_1_7
                 convention.targetCompatibility = JavaVersion.VERSION_1_7
             }
+            DiffAndDocs.registerJavaProject(project, supportLibraryExtension)
         }
 
         project.apply(mapOf("plugin" to ErrorProneBasePlugin::class.java))
