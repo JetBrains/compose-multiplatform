@@ -64,6 +64,7 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
             library.compileOptions.setTargetCompatibility(javaVersion)
 
             VersionFileWriterTask.setUpAndroidLibrary(project, library)
+            DiffAndDocs.registerAndroidProject(project, library, supportLibraryExtension)
         }
 
         project.apply(mapOf("plugin" to "com.android.library"))

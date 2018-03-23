@@ -39,11 +39,60 @@ import java.io.File
 data class DacOptions(val libraryroot: String, val dataname: String)
 
 object DiffAndDocs {
+    private lateinit var allChecksTask: Task
+    private lateinit var generateDocsTask: GenerateDocsTask
+
     @JvmStatic
-    fun configureDiffAndDocs(
-            root: Project,
-            supportRootFolder: File,
-            dacOptions: DacOptions) = configure(root, supportRootFolder, dacOptions)
+    fun configureDiffAndDocs(root: Project, supportRootFolder: File, dacOptions: DacOptions): Task {
+        allChecksTask = root.tasks.create("anchorCheckApis")
+        val doclavaConfiguration = root.configurations.getByName("doclava")
+        val generateSdkApiTask = createGenerateSdkApiTask(root, doclavaConfiguration)
+        generateDocsTask = createGenerateDocsTask(root, generateSdkApiTask,
+                doclavaConfiguration, supportRootFolder, dacOptions)
+        createDistDocsTask(root, generateDocsTask)
+        return allChecksTask
+    }
+
+    fun registerJavaProject(project: Project, extension: SupportLibraryExtension) {
+        if (!hasApiTasks(project, extension)) {
+            return
+        }
+        val compileJava = project.properties["compileJava"] as JavaCompile
+        registerJavaProjectForDocsTask(generateDocsTask, compileJava)
+        if (!hasApiFolder(project)) {
+            project.logger.info("Project ${project.name} doesn't have an api folder, " +
+                    "ignoring API tasks.")
+            return
+        }
+        val tasks = initializeApiChecksForProject(project, generateDocsTask)
+        registerJavaProjectForDocsTask(tasks.generateApi, compileJava)
+        registerJavaProjectForDocsTask(tasks.generateDiffs, compileJava)
+        allChecksTask.dependsOn(tasks.checkApiTask)
+    }
+
+    fun registerAndroidProject(project: Project, library: LibraryExtension,
+            extension: SupportLibraryExtension) {
+        if (!hasApiTasks(project, extension)) {
+            return
+        }
+        library.libraryVariants.all { variant ->
+            if (variant.name == "release") {
+                registerAndroidProjectForDocsTask(generateDocsTask, variant)
+                if (!hasJavaSources(variant)) {
+                    return@all
+                }
+                if (!hasApiFolder(project)) {
+                    project.logger.info("Project ${project.name} doesn't have " +
+                            "an api folder, ignoring API tasks.")
+                    return@all
+                }
+                val tasks = initializeApiChecksForProject(project, generateDocsTask)
+                registerAndroidProjectForDocsTask(tasks.generateApi, variant)
+                registerAndroidProjectForDocsTask(tasks.generateDiffs, variant)
+                allChecksTask.dependsOn(tasks.checkApiTask)
+            }
+        }
+    }
 }
 
 private data class CheckApiConfig(
@@ -492,70 +541,18 @@ private fun initializeApiChecksForProject(project: Project, generateDocs: Genera
     return Tasks(generateApi, generateDiffTask, checkApi)
 }
 
-private fun configure(root: Project, supportRootFolder: File, dacOptions: DacOptions): Task {
-    val allChecks = root.tasks.create("AnchorCheckApis")
-    val doclavaConfiguration = root.configurations.getByName("doclava")
-    val generateSdkApiTask = createGenerateSdkApiTask(root, doclavaConfiguration)
-
-    val generateDocsTask = createGenerateDocsTask(root, generateSdkApiTask,
-            doclavaConfiguration, supportRootFolder, dacOptions)
-    createDistDocsTask(root, generateDocsTask)
-
-    root.subprojects { subProject ->
-        subProject.afterEvaluate { project ->
-            val extension = if (project.hasProperty("supportLibrary")) {
-                project.properties["supportLibrary"] as SupportLibraryExtension
-            } else {
-                null
-            }
-            if (extension == null || !extension.publish) {
-                project.logger.info("Project ${project.name} is not published, ignoring API tasks.")
-                return@afterEvaluate
-            }
-
-            if (!extension.generateDocs) {
-                project.logger.info("Project ${project.name} specified generateDocs = false, " +
-                        "ignoring API tasks.")
-                return@afterEvaluate
-            }
-
-            val library = project.extensions.findByType(LibraryExtension::class.java)
-            if (library != null) {
-                library.libraryVariants.all { variant ->
-                    if (variant.name == "release") {
-                        registerAndroidProjectForDocsTask(generateDocsTask, variant)
-                        if (!hasJavaSources(variant)) {
-                            return@all
-                        }
-                        if (!hasApiFolder(project)) {
-                            project.logger.info("Project ${project.name} doesn't have " +
-                                    "an api folder, ignoring API tasks.")
-                            return@all
-                        }
-                        val tasks = initializeApiChecksForProject(project, generateDocsTask)
-                        registerAndroidProjectForDocsTask(tasks.generateApi, variant)
-                        registerAndroidProjectForDocsTask(tasks.generateDiffs, variant)
-                        allChecks.dependsOn(tasks.checkApiTask)
-                    }
-                }
-            } else if (project.hasProperty("compileJava")) {
-                val compileJava = project.properties["compileJava"] as JavaCompile
-                registerJavaProjectForDocsTask(generateDocsTask, compileJava)
-                if (!hasApiFolder(project)) {
-                    project.logger.info("Project ${project.name} doesn't have an api folder, " +
-                            "ignoring API tasks.")
-                    return@afterEvaluate
-                }
-                project.afterEvaluate { proj ->
-                    val tasks = initializeApiChecksForProject(proj, generateDocsTask)
-                    registerJavaProjectForDocsTask(tasks.generateApi, compileJava)
-                    registerJavaProjectForDocsTask(tasks.generateDiffs, compileJava)
-                    allChecks.dependsOn(tasks.checkApiTask)
-                }
-            }
-        }
+fun hasApiTasks(project: Project, extension: SupportLibraryExtension): Boolean {
+    if (!extension.publish) {
+        project.logger.info("Project ${project.name} is not published, ignoring API tasks.")
+        return false
     }
-    return allChecks
+
+    if (!extension.generateDocs) {
+        project.logger.info("Project ${project.name} specified generateDocs = false, " +
+                "ignoring API tasks.")
+        return false
+    }
+    return true
 }
 
 private fun sdkApiFile(project: Project) = File(project.docsDir(), "release/sdk_current.txt")
