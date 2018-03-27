@@ -55,7 +55,7 @@ const val TEST_RUNNER_TMP = "com.android.temp.support.test:runner:1.0.1"
 const val TEST_RULES_TMP = "com.android.temp.support.test:rules:1.0.1"
 
 // AndroidX libraries
-private const val SUPPORT_VERSION = "1.0.0-SNAPSHOT"
+private const val SUPPORT_VERSION = "1.0.0-alpha1"
 const val SUPPORT_ANNOTATIONS = "androidx.annotation:annotation:$SUPPORT_VERSION"
 const val SUPPORT_APPCOMPAT = "androidx.appcompat:appcompat:$SUPPORT_VERSION"
 const val SUPPORT_CARDVIEW = "androidx.cardview:cardview:$SUPPORT_VERSION"
@@ -66,7 +66,8 @@ const val SUPPORT_RECYCLERVIEW = "androidx.recyclerview:recyclerview:$SUPPORT_VE
 const val SUPPORT_V4 = "androidx.legacy:legacy-support-v4:$SUPPORT_VERSION"
 
 // Arch libraries
-const val ARCH_LIFECYCLE_RUNTIME = "androidx.lifecycle:lifecycle-runtime:2.0.0-SNAPSHOT@aar"
-const val ARCH_LIFECYCLE_LIVEDATA_CORE = "androidx.lifecycle:lifecycle-livedata-core:2.0.0-SNAPSHOT@aar"
-const val ARCH_LIFECYCLE_VIEWMODEL = "androidx.lifecycle:lifecycle-viewmodel:2.0.0-SNAPSHOT@aar"
-const val ARCH_LIFECYCLE_EXTENSIONS = "androidx.lifecycle:lifecycle-extensions:2.0.0-SNAPSHOT@aar"
+const val ARCH_LIFECYCLE_RUNTIME = "androidx.lifecycle:lifecycle-runtime:2.0.0-alpha1@aar"
+const val ARCH_LIFECYCLE_LIVEDATA_CORE =
+        "androidx.lifecycle:lifecycle-livedata-core:2.0.0-alpha1@aar"
+const val ARCH_LIFECYCLE_VIEWMODEL = "androidx.lifecycle:lifecycle-viewmodel:2.0.0-alpha1@aar"
+const val ARCH_LIFECYCLE_EXTENSIONS = "androidx.lifecycle:lifecycle-extensions:2.0.0-alpha1@aar"
