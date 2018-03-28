@@ -25,7 +25,7 @@ task dejetifyArchive(type: Exec) {
     dependsOn ':jetifier-standalone:installDist'
     inputs.file project.tasks['createArchive'].archivePath
 
-    outputs.file "${rootProject.ext.distDir}/top-of-tree-m2-repository-dejetified-${project.ext.buildNumber}.zip"
+    outputs.file "${rootProject.ext.distDir}/top-of-tree-m2repository-dejetified-${project.ext.buildNumber}.zip"
 
     commandLine ("${jetifierBin}", "-s", "-r", "-outputfile", "${outputs.files.singleFile}",  "-i", "${inputs.files.singleFile}", "-l", "error", "-rebuildTopOfTree")
 }
