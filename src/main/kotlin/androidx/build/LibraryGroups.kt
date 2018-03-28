@@ -70,5 +70,5 @@ object LibraryGroups {
     const val ARCH_CORE = "androidx.arch.core"
     const val PAGING = "androidx.paging"
     const val NAVIGATION = "androidx.navigation"
-    const val JETIFIER = "com.android.support.jetifier"
+    const val JETIFIER = "com.android.tools.build.jetifier"
 }
