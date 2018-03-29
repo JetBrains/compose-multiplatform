@@ -24,7 +24,7 @@ object SupportConfig {
     const val DEFAULT_MIN_SDK_VERSION = 14
     const val INSTRUMENTATION_RUNNER = "android.support.test.runner.AndroidJUnitRunner"
     const val BUILD_TOOLS_VERSION = "27.0.3"
-    const val CURRENT_SDK_VERSION = 27
+    const val CURRENT_SDK_VERSION = 28
 
     fun getKeystore(project: Project): File {
         val supportRoot = (project.rootProject.property("ext") as ExtraPropertiesExtension)
