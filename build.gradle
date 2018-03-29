@@ -17,7 +17,6 @@ buildscript {
 
     dependencies {
         classpath build_libs.kotlin.gradle_plugin
-        classpath build_libs.lint
     }
 
     configurations.classpath.resolutionStrategy {
@@ -43,7 +42,6 @@ repos.addMavenRepositories(repositories)
 
 dependencies {
     compile build_libs.gradle
-    compile build_libs.lint
     compile build_libs.jacoco
     compile build_libs.error_prone_gradle
     compile build_libs.jarjar_gradle

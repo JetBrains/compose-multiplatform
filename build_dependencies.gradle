@@ -29,15 +29,7 @@ if (androidPluginVersionOverride != null) {
     build_libs.gradle = 'com.android.tools.build:gradle:' + androidPluginVersionOverride
 } else {
     // Keep gradle plugin version in sync with ub_supportlib-master manifest.
-    build_libs.gradle = 'com.android.tools.build:gradle:3.0.0'
-}
-
-// lint
-def lintPluginVersionOverride = System.getenv("LINT_PLUGIN_VERSION")
-if (lintPluginVersionOverride != null) {
-  build_libs.lint = 'com.android.tools.lint:lint:' + lintPluginVersionOverride
-} else {
-  build_libs.lint = 'com.android.tools.lint:lint:26.0.0'
+    build_libs.gradle = 'com.android.tools.build:gradle:3.2.0-alpha08'
 }
 
 // jarjar plugin
