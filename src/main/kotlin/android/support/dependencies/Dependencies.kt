@@ -58,7 +58,7 @@ private const val SUPPORT_VERSION_27 = "27.1.0"
 const val SUPPORT_RECYCLERVIEW_27 = "com.android.support:recyclerview-v7:$SUPPORT_VERSION_27"
 const val SUPPORT_APPCOMPAT_27 = "com.android.support:appcompat-v7:$SUPPORT_VERSION_27"
 
-private const val SUPPORT_VERSION = "27.0.0"
+private const val SUPPORT_VERSION = "27.1.0"
 const val SUPPORT_ANNOTATIONS = "com.android.support:support-annotations:$SUPPORT_VERSION"
 const val SUPPORT_APPCOMPAT = "com.android.support:appcompat-v7:$SUPPORT_VERSION"
 const val SUPPORT_CARDVIEW = "com.android.support:cardview-v7:$SUPPORT_VERSION"
