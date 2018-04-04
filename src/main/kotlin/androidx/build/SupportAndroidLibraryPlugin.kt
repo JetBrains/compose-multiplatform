@@ -65,6 +65,20 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
 
             VersionFileWriterTask.setUpAndroidLibrary(project, library)
             DiffAndDocs.registerAndroidProject(project, library, supportLibraryExtension)
+
+            library.libraryVariants.all { libraryVariant ->
+                if (libraryVariant.getBuildType().getName().equals("debug")) {
+                    @Suppress("DEPRECATION")
+                    val javaCompile = libraryVariant.javaCompile
+                    if (supportLibraryExtension.failOnUncheckedWarnings) {
+                        javaCompile.options.compilerArgs.add("-Xlint:unchecked")
+                    }
+                    if (supportLibraryExtension.failOnDeprecationWarnings) {
+                        javaCompile.options.compilerArgs.add("-Xlint:deprecation")
+                    }
+                    javaCompile.options.compilerArgs.add("-Werror")
+                }
+            }
         }
 
         project.apply(mapOf("plugin" to "com.android.library"))
