@@ -20,6 +20,7 @@ import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.tasks.bundling.Jar
 
 class SupportKotlinLibraryPlugin : Plugin<Project> {
     override fun apply(project: Project) {
@@ -38,6 +39,12 @@ class SupportKotlinLibraryPlugin : Plugin<Project> {
                 convention.sourceCompatibility = JavaVersion.VERSION_1_7
                 convention.targetCompatibility = JavaVersion.VERSION_1_7
             }
+
+            project.tasks.withType(Jar::class.java) { jarTask ->
+                jarTask.setReproducibleFileOrder(true)
+                jarTask.setPreserveFileTimestamps(false)
+            }
+
         }
 
         CheckExternalDependencyLicensesTask.configure(project)
