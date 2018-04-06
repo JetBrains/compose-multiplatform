@@ -34,6 +34,9 @@ open class SupportLibraryExtension(val project: Project) {
     private var licenses: MutableCollection<License> = ArrayList()
     var java8Library = false
     var publish = false
+    var failOnUncheckedWarnings = true
+    var failOnDeprecationWarnings = true
+
     /**
      * This flag works only if publish flag is "true".
      * It is useful for modules that are used for tooling. For example room annotation
