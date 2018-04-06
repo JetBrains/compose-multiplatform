@@ -146,4 +146,9 @@ object LibraryVersions {
      * Version code for slice-builder-ktx
      */
     val SLICE_BUILDER_KTX = Version("1.0.0-alpha4")
+
+    /**
+     * Version code for Biometric
+     */
+    val BIOMETRIC = Version("1.0.0-alpha01")
 }
