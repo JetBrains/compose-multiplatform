@@ -176,6 +176,7 @@ private fun setUpLint(lintOptions: LintOptions, baseline: File, verifyTranslatio
 
     lintOptions.fatal("NewApi")
     lintOptions.fatal("ObsoleteSdkInt")
+    lintOptions.fatal("VisibleForTests")
 
     if (verifyTranslations) {
         lintOptions.fatal("MissingTranslation")
