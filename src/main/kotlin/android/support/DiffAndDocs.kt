@@ -405,6 +405,7 @@ private fun createGenerateDocsTask(
                 if (!offline) {
                     addStringOption("toroot", "/")
                     addBooleanOption("devsite", true)
+                    addBooleanOption("yamlV2", true)
                     addStringOption("dac_libraryroot", dacOptions.libraryroot)
                     addStringOption("dac_dataname", dacOptions.dataname)
                 }
