@@ -32,6 +32,7 @@ class R4ACommandLineProcessor : CommandLineProcessor {
 class R4AComponentRegistrar : ComponentRegistrar {
     override fun registerProjectComponents(project: MockProject, configuration: CompilerConfiguration) {
         AnalysisHandlerExtension.registerExtension(project, PackageAnalysisHandlerExtension())
+        AnalysisHandlerExtension.registerExtension(project, R4aClassAnalisysHandlerExtension())
         AnalysisHandlerExtension.registerExtension(project, TrueFalseAnalysisHandlerExtension())
         PackageFragmentProviderExtension.registerExtension(project, R4aGradlePackageFragmentProviderExtension());
         ExpressionCodegenExtension.registerExtension(project, StaticWrapperCreatorFunctionCodegenExtension())

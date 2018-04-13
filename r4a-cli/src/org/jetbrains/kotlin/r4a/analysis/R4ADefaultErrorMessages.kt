@@ -11,5 +11,8 @@ object R4ADefaultErrorMessages : DefaultErrorMessages.Extension {
         MAP.put(
                 R4AErrors.DUPLICATE_ATTRIBUTE,
                 "Duplicate attribute; Attributes must appear at most once per tag.")
+        MAP.put(
+                R4AErrors.OPEN_COMPONENT,
+                "Component is open. Components cannot be an open or abstract class.")
     }
 }

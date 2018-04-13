@@ -8,6 +8,7 @@ import static org.jetbrains.kotlin.diagnostics.Severity.ERROR;
 
 public interface R4AErrors {
     DiagnosticFactory0<PsiElement> DUPLICATE_ATTRIBUTE = DiagnosticFactory0.create(ERROR);
+    DiagnosticFactory0<PsiElement> OPEN_COMPONENT = DiagnosticFactory0.create(ERROR);
 
 
     @SuppressWarnings("UnusedDeclaration")
