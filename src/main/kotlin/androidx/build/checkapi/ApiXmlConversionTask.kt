@@ -18,6 +18,7 @@ package androidx.build.checkapi
 
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.JavaExec
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
 import java.io.File
 
@@ -25,8 +26,9 @@ import java.io.File
  * Task that converts the given API file to XML format.
  */
 open class ApiXmlConversionTask : JavaExec() {
-    @get:InputFile
-    lateinit var inputApiFile: File
+    @Optional
+    @InputFile
+    var inputApiFile: File? = null
 
     @get:OutputFile
     lateinit var outputApiXmlFile: File
@@ -40,7 +42,13 @@ open class ApiXmlConversionTask : JavaExec() {
     }
 
     override fun exec() {
-        args = listOf("-convert2xml", inputApiFile.absolutePath, outputApiXmlFile.absolutePath)
-        super.exec()
+        val input = inputApiFile
+        if (input != null) {
+            args = listOf("-convert2xml", input.absolutePath, outputApiXmlFile.absolutePath)
+            super.exec()
+        } else {
+            outputApiXmlFile.delete()
+            outputApiXmlFile.writeText("<api>\n</api>")
+        }
     }
 }
