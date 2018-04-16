@@ -53,6 +53,10 @@ object DiffAndDocs {
         return allChecksTask
     }
 
+    /**
+     * Registers a Java project for global docs generation, local API file generation, and
+     * local API diff generation tasks.
+     */
     fun registerJavaProject(project: Project, extension: SupportLibraryExtension) {
         if (!hasApiTasks(project, extension)) {
             return
@@ -70,8 +74,15 @@ object DiffAndDocs {
         allChecksTask.dependsOn(tasks.checkApiTask)
     }
 
-    fun registerAndroidProject(project: Project, library: LibraryExtension,
-            extension: SupportLibraryExtension) {
+    /**
+     * Registers an Android project for global docs generation, local API file generation, and
+     * local API diff generation tasks.
+     */
+    fun registerAndroidProject(
+            project: Project,
+            library: LibraryExtension,
+            extension: SupportLibraryExtension
+    ) {
         if (!hasApiTasks(project, extension)) {
             return
         }
@@ -148,19 +159,29 @@ private fun hasApiFolder(project: Project) = File(project.projectDir, "api").exi
 
 private fun stripExtension(fileName: String) = fileName.substringBeforeLast('.')
 
-private fun getLastReleasedApiFile(rootFolder: File, refVersion: Version): File? {
+private fun getLastReleasedApiFile(rootFolder: File, refVersion: Version?): File? {
     val apiDir = File(rootFolder, "api")
+    val lastFile = getLastReleasedApiFileFromDir(apiDir, refVersion)
+    if (lastFile != null) {
+        return lastFile
+    }
 
+    return null
+}
+
+private fun getLastReleasedApiFileFromDir(apiDir: File, refVersion: Version?): File? {
     var lastFile: File? = null
     var lastVersion: Version? = null
     apiDir.listFiles().forEach { file ->
         Version.parseOrNull(file)?.let { version ->
-            if ((lastFile == null || lastVersion!! < version) && version < refVersion) {
+            if ((lastFile == null || lastVersion!! < version)
+                    && (refVersion == null || version < refVersion)) {
                 lastFile = file
                 lastVersion = version
             }
         }
     }
+
     return lastFile
 }
 
@@ -227,7 +248,18 @@ private fun createCheckApiTask(
             }
         }
 
-// configuration file for setting up api diffs and api docs
+/**
+ * Registers a Java project on the given Javadocs task.
+ * <p>
+ * <ul>
+ * <li>Sets up a dependency to ensure the project is compiled prior to running the task
+ * <li>Adds the project's source files to the Javadoc task's source files
+ * <li>Adds the project's compilation classpath (e.g. dependencies) to the task classpath to ensure
+ *     that references in the source files may be resolved
+ * <li>Adds the project's output artifacts to the task classpath to ensure that source references to
+ *     generated code may be resolved
+ * </ul>
+ */
 private fun registerJavaProjectForDocsTask(task: Javadoc, javaCompileTask: JavaCompile) {
     task.dependsOn(javaCompileTask)
     task.source(javaCompileTask.source)
@@ -236,8 +268,14 @@ private fun registerJavaProjectForDocsTask(task: Javadoc, javaCompileTask: JavaC
             project.files(javaCompileTask.destinationDir)
 }
 
-// configuration file for setting up api diffs and api docs
+/**
+ * Registers an Android project on the given Javadocs task.
+ * <p>
+ * @see #registerJavaProjectForDocsTask
+ */
 private fun registerAndroidProjectForDocsTask(task: Javadoc, releaseVariant: LibraryVariant) {
+    // This code makes a number of unsafe assumptions about Android Gradle Plugin,
+    // and there's a good chance that this will break in the near future.
     @Suppress("DEPRECATION")
     task.dependsOn(releaseVariant.javaCompile)
     val packageDir = releaseVariant.applicationId.replace('.', '/')
@@ -251,6 +289,18 @@ private fun registerAndroidProjectForDocsTask(task: Javadoc, releaseVariant: Lib
             task.project.files(releaseVariant.javaCompile.destinationDir)
 }
 
+/**
+ * Constructs a new task to copy a generated API file to an appropriately-named "official" API file
+ * suitable for source control. This task should be called prior to source control check-in whenever
+ * the public API has been modified.
+ * <p>
+ * The output API file varies according to version:
+ * <ul>
+ * <li>Snapshot and pre-release versions (e.g. X.Y.Z-SNAPSHOT, X.Y.Z-alphaN) output to current.txt
+ * <li>Release versions (e.g. X.Y.Z) output to X.Y.0.txt, throwing an exception if the API has been
+ *     finalized and the file already exists
+ * </ul>
+ */
 private fun createUpdateApiTask(project: Project, checkApiRelease: CheckApiTask) =
         project.tasks.createWithConfig("updateApi", UpdateApiTask::class.java) {
             group = JavaBasePlugin.VERIFICATION_GROUP
@@ -286,17 +336,13 @@ private fun createOldApiXml(project: Project, doclavaConfig: Configuration) =
             if (fromApi != null) {
                 // Use an explicit API file.
                 inputApiFile = File(rootFolder, "api/$fromApi.txt")
-            } else if (toApi != null) {
-                // If toApi matches released API (X.Y.Z) format, use the most recently
-                // released API file prior to toApi.
-                inputApiFile = getLastReleasedApiFile(rootFolder, toApi)!!
             } else {
-                // Use the most recently released API file.
-                inputApiFile = getApiFile(rootFolder, project.version())
+                // Use the most recently released API file bounded by toApi.
+                inputApiFile = getLastReleasedApiFile(rootFolder, toApi)
             }
 
             outputApiXmlFile = File(project.docsDir(),
-                    "release/${stripExtension(inputApiFile.name)}.xml")
+                    "release/${stripExtension(inputApiFile?.name ?: "creation")}.xml")
 
             dependsOn(doclavaConfig)
         }
@@ -323,7 +369,7 @@ private fun createNewApiXmlTask(
             }
 
             outputApiXmlFile = File(project.docsDir(),
-                    "release/${stripExtension(inputApiFile.name)}.xml")
+                    "release/${stripExtension(inputApiFile?.name ?: "creation")}.xml")
         }
 
 /**
@@ -358,7 +404,7 @@ private fun createGenerateDiffsTask(
         project: Project,
         oldApiTask: ApiXmlConversionTask,
         newApiTask: ApiXmlConversionTask,
-        jdiffConfig: Configuration) =
+        jdiffConfig: Configuration): JDiffTask =
         project.tasks.createWithConfig("generateDiffs", JDiffTask::class.java) {
             // Base classpath is Android SDK, sub-projects add their own.
             classpath = androidJarFile(project)
@@ -382,7 +428,7 @@ private fun createGenerateDiffsTask(
         }
 
 // Generates a distribution artifact for online docs.
-private fun createDistDocsTask(project: Project, generateDocs: DoclavaTask) =
+private fun createDistDocsTask(project: Project, generateDocs: DoclavaTask): Zip =
         project.tasks.createWithConfig("distDocs", Zip::class.java) {
             dependsOn(generateDocs)
             group = JavaBasePlugin.DOCUMENTATION_GROUP
@@ -396,8 +442,12 @@ private fun createDistDocsTask(project: Project, generateDocs: DoclavaTask) =
             }
         }
 
-// Set up platform API files for federation.
-private fun createGenerateSdkApiTask(project: Project, doclavaConfig: Configuration): Task =
+/**
+ * Creates a task to generate an API file from the platform SDK's source and stub JARs.
+ * <p>
+ * This is useful for federating docs against the platform SDK when no API XML file is available.
+ */
+private fun createGenerateSdkApiTask(project: Project, doclavaConfig: Configuration): DoclavaTask =
         project.tasks.createWithConfig("generateSdkApi", DoclavaTask::class.java) {
             dependsOn(doclavaConfig)
             description = "Generates API files for the current SDK."
@@ -406,7 +456,6 @@ private fun createGenerateSdkApiTask(project: Project, doclavaConfig: Configurat
             classpath = androidJarFile(project)
             source(project.zipTree(androidSrcJarFile(project)))
             apiFile = sdkApiFile(project)
-            removedApiFile = removedSdkApiFile(project)
             generateDocs = false
             coreJavadocOptions {
                 addStringOption("stubpackages", "android.*")
@@ -415,10 +464,10 @@ private fun createGenerateSdkApiTask(project: Project, doclavaConfig: Configurat
 
 private fun createGenerateDocsTask(
         project: Project,
-        generateSdkApiTask: Task,
+        generateSdkApiTask: DoclavaTask,
         doclavaConfig: Configuration,
         supportRootFolder: File,
-        dacOptions: DacOptions) =
+        dacOptions: DacOptions): GenerateDocsTask =
         project.tasks.createWithConfig("generateDocs", GenerateDocsTask::class.java) {
             dependsOn(generateSdkApiTask, doclavaConfig)
             group = JavaBasePlugin.DOCUMENTATION_GROUP
@@ -444,7 +493,7 @@ private fun createGenerateDocsTask(
                         listOf("Android", "https://developer.android.com")
                 )
                 addMultilineMultiValueOption("federationapi").value = listOf(
-                        listOf("Android", sdkApiFile(project).absolutePath)
+                        listOf("Android", generateSdkApiTask.apiFile?.absolutePath)
                 )
                 addMultilineMultiValueOption("hdf").value = listOf(
                         listOf("android.whichdoc", "online"),
@@ -557,7 +606,6 @@ fun hasApiTasks(project: Project, extension: SupportLibraryExtension): Boolean {
 }
 
 private fun sdkApiFile(project: Project) = File(project.docsDir(), "release/sdk_current.txt")
-private fun removedSdkApiFile(project: Project) = File(project.docsDir(), "release/sdk_removed.txt")
 
 private fun <T : Task> TaskContainer.createWithConfig(
         name: String, taskClass: Class<T>,
