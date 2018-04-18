@@ -1,0 +1,31 @@
+/*
+ * Copyright (C) 2018 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+def standaloneProject = project(":jetifier-standalone")
+def jetifierBin = file("${standaloneProject.buildDir}/install/jetifier-standalone/bin/jetifier-standalone")
+
+task dejetifyArchive(type: Exec) {
+    description "Produces a zip of dejetified artifacts by running Dejetifier against refactored" +
+            " artifacts, for temporary usage by external clients that haven't upgraded to Jetpack" +
+            " yet."
+
+    dependsOn tasks['createArchive']
+    dependsOn ':jetifier-standalone:installDist'
+    inputs.file project.tasks['createArchive'].archivePath
+
+    outputs.file "${rootProject.ext.distDir}/top-of-tree-m2repository-dejetified-${project.ext.buildNumber}.zip"
+
+    commandLine ("${jetifierBin}", "-s", "-r", "-outputfile", "${outputs.files.singleFile}",  "-i", "${inputs.files.singleFile}", "-l", "error", "-rebuildTopOfTree")
+}

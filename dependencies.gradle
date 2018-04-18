@@ -17,12 +17,7 @@
 def libs = [:]
 
 libs.exclude_annotations_transitive = {
-    exclude module: 'support-annotations'
-    transitive = true
-}
-
-libs.exclude_annotations_transitive = {
-    exclude module: 'support-annotations'
+    exclude group: 'androidx.annotation'
     transitive = true
 }
 
@@ -32,11 +27,19 @@ libs.exclude_bytebuddy = {
 
 libs.exclude_support = {
     exclude group: 'com.android.support'
+    exclude group: 'androidx.annotation'
+}
+
+libs.exclude_for_espresso = {
+    exclude group: 'androidx.annotation'
+    exclude group: 'androidx.appcompat'
+    exclude group: 'androidx.recyclerview'
+    exclude group: 'androidx.legacy'
 }
 
 libs.support_exclude_config = {
     exclude group: 'android.arch.core'
-    exclude group: 'android.arch.lifecycle'
+    exclude group: 'androidx.lifecycle'
 }
 
 rootProject.ext['libs'] = libs
