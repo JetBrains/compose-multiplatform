@@ -29,15 +29,14 @@ if (androidPluginVersionOverride != null) {
     build_libs.gradle = 'com.android.tools.build:gradle:' + androidPluginVersionOverride
 } else {
     // Keep gradle plugin version in sync with ub_supportlib-master manifest.
-    build_libs.gradle = 'com.android.tools.build:gradle:3.0.0'
+    build_libs.gradle = 'com.android.tools.build:gradle:3.2.0-alpha09'
 }
 
 // jarjar plugin
 build_libs.jarjar_gradle = 'org.anarres.jarjar:jarjar-gradle:1.0.0'
-build_libs.error_prone = 'net.ltgt.gradle:gradle-errorprone-plugin:0.0.13'
+build_libs.error_prone_gradle = 'net.ltgt.gradle:gradle-errorprone-plugin:0.0.13'
 build_libs.jacoco = 'org.jacoco:org.jacoco.core:0.7.8'
 build_libs.jacoco_ant = 'org.jacoco:org.jacoco.ant:0.7.8'
-build_libs.jetifier = 'androidx.tools.jetifier:gradle-plugin:0.1'
 build_libs.kotlin = [
         gradle_plugin: "org.jetbrains.kotlin:kotlin-gradle-plugin:${build_versions.kotlin}"
 ]

@@ -15,9 +15,9 @@
  */
 
 
-import android.support.DiffAndDocs
-import android.support.gmaven.GMavenVersionChecker
-import android.support.license.CheckExternalDependencyLicensesTask
+import androidx.build.DiffAndDocs
+import androidx.build.gmaven.GMavenVersionChecker
+import androidx.build.license.CheckExternalDependencyLicensesTask
 import com.android.build.gradle.internal.coverage.JacocoReportTask
 import com.android.build.gradle.internal.tasks.DeviceProviderInstrumentTestTask
 import org.gradle.api.logging.configuration.ShowStacktrace
@@ -161,11 +161,11 @@ def configureBuildOnServer() {
     rootProject.tasks.whenTaskAdded { task ->
         if ("createArchive".equals(task.name)
                 || "distDocs".equals(task.name)
+                || "dejetifyArchive".equals(task.name)
                 || CheckExternalDependencyLicensesTask.ROOT_TASK_NAME.equals(task.name)) {
             buildOnServerTask.dependsOn task
         }
     }
-
     subprojects {
         project.tasks.whenTaskAdded { task ->
             if ("assembleErrorProne".equals(task.name) || "assembleAndroidTest".equals(task.name)) {
