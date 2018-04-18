@@ -48,6 +48,10 @@ class R4aElementBuilderDSL : MarkupBuilder() {
         stack.push(Element(type))
     }
 
+    fun startComponent(type: KClass<*>) {
+        startComponent(type.java)
+    }
+
     fun startComponent(type: String) {
         stack.push(Element(type))
     }

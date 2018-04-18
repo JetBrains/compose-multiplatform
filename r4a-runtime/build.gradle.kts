@@ -4,7 +4,10 @@ import javax.xml.ws.Endpoint.publish
 
 description = "R4A Runtime"
 
-apply { plugin("kotlin") }
+plugins {
+    kotlin("jvm")
+    id("jps-compatible")
+}
 
 jvmTarget = "1.6"
 

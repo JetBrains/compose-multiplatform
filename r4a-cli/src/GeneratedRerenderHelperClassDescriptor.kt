@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameUnsafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
+import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.utils.Printer
 
@@ -44,7 +45,7 @@ open class GeneratedRerenderHelperClassDescriptor: ClassDescriptor {
 
     fun initialize(supertypes: List<KotlinType>) {
         this.supertypes = supertypes
-        this.typeConstructor = ClassTypeConstructorImpl(this, emptyList(), supertypes)
+        this.typeConstructor = ClassTypeConstructorImpl(this, emptyList(), supertypes, LockBasedStorageManager.NO_LOCKS)
         this.defaultType = TypeUtils.makeUnsubstitutedType(this, unsubstitutedMemberScope)
     }
 
@@ -101,7 +102,14 @@ open class GeneratedRerenderHelperClassDescriptor: ClassDescriptor {
     override fun getUnsubstitutedInnerClassesScope(): MemberScope = genScope()
     override fun getUnsubstitutedMemberScope(): MemberScope = genScope()
 
+    var primaryConstructor: ClassConstructorDescriptor? = null
+
     override fun getUnsubstitutedPrimaryConstructor(): ClassConstructorDescriptor? {
+        if(primaryConstructor == null) primaryConstructor = generateUnsubstitutedPrimaryConstructor()
+        return primaryConstructor!!
+    }
+
+    fun generateUnsubstitutedPrimaryConstructor(): ClassConstructorDescriptor? {
         val constructor = ClassConstructorDescriptorImpl.create(this, Annotations.EMPTY, false, SourceElement.NO_SOURCE)
         val viewgroupParameter = ValueParameterDescriptorImpl(
                 constructor,
@@ -149,11 +157,8 @@ open class GeneratedRerenderHelperClassDescriptor: ClassDescriptor {
             "GeneratedViewClassDescriptor($fqNameUnsafe)"
 
     fun getRunMethodDescriptor() : SimpleFunctionDescriptor {
-
-        val unitType : SimpleType = this.builtIns.unitType
         val newMethod = SimpleFunctionDescriptorImpl.create(this, annotations, Name.identifier("run"), CallableMemberDescriptor.Kind.SYNTHESIZED, SourceElement.NO_SOURCE)
-        newMethod.initialize(null, this.thisAsReceiverParameter, emptyList(), emptyList(), unitType, Modality.FINAL, Visibilities.PUBLIC)
-
+        newMethod.initialize(null, this.thisAsReceiverParameter, emptyList(), emptyList(), builtIns.unitType, Modality.FINAL, Visibilities.PUBLIC)
         return newMethod
     }
 }

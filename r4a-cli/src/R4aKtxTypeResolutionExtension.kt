@@ -89,7 +89,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
                 if (param != null) {
                     if (valueType.isSubtypeOf(param.type)) {
                         // its valid
-                        context.trace.record(BindingContext.REFERENCE_TARGET, keyNode, param)
+         //               context.trace.record(BindingContext.REFERENCE_TARGET, keyNode, param)
                     } else {
                         context.trace.reportFromPlugin(
                             MISMATCHED_ATTRIBUTE_TYPE.on(attribute, keyStr, param.type, valueType),

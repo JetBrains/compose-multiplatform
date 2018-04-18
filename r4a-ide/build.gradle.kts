@@ -1,7 +1,10 @@
 
 description = "R4A IDEA Plugin"
 
-apply { plugin("kotlin") }
+plugins {
+    kotlin("jvm")
+    id("jps-compatible")
+}
 
 jvmTarget = "1.6"
 
@@ -15,7 +18,7 @@ dependencies {
     compile(project(":plugins:annotation-based-compiler-plugins-ide-support"))
     compileOnly(intellijDep()) { includeJars("openapi", "idea", "util", "extensions") }
     //compile(ideaPluginDeps("maven", plugin = "maven"))
-    compileOnly(intellijPluginDep("gradle")) { includeJars("gradle-api", "gradle", rootProject = rootProject) }
+    compileOnly(intellijPluginDep("gradle"))
 }
 
 
