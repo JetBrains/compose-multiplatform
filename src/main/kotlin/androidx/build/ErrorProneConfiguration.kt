@@ -34,6 +34,7 @@ fun JavaCompile.configureWithErrorProne(toolChain: ErrorProneToolChain) {
             "-Xep:ParameterNotNullable:ERROR",
             "-Xep:MissingOverride:ERROR",
             "-Xep:JdkObsolete:ERROR",
+            "-Xep:EqualsHashCode:ERROR",
             "-Xep:NarrowingCompoundAssignment:ERROR",
             "-Xep:ClassNewInstance:ERROR",
             "-Xep:ClassCanBeStatic:ERROR",
