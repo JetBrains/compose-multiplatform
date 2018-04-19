@@ -80,6 +80,11 @@ object LibraryVersions {
     val ARCH_CORE_TESTING = ARCH_CORE
 
     /**
+     * Version code for Navigation
+     */
+    val NAVIGATION = Version("1.0.0-alpha01")
+
+    /**
      * Version code for Jetifier
      */
     val JETIFIER = Version("0.0.1")
