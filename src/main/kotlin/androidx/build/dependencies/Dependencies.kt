@@ -51,13 +51,25 @@ const val TRUTH = "com.google.truth:truth:0.34"
  * https://github.com/xerial/sqlite-jdbc/issues/267
  */
 const val XERIAL = "org.xerial:sqlite-jdbc:3.20.1"
+const val XPP3 = "xpp3:xpp3:1.1.4c"
+const val XMLPULL = "xmlpull:xmlpull:1.1.3.1"
 
 const val ESPRESSO_CONTRIB_TMP = "com.android.temp.support.test.espresso:espresso-contrib:3.0.1"
 const val ESPRESSO_CORE_TMP = "com.android.temp.support.test.espresso:espresso-core:3.0.1"
 const val TEST_RUNNER_TMP = "com.android.temp.support.test:runner:1.0.1"
 const val TEST_RULES_TMP = "com.android.temp.support.test:rules:1.0.1"
 
-// AndroidX libraries
+private const val NAV_SUPPORT_VERSION = "27.1.0"
+const val NAV_SUPPORT_ANNOTATIONS = "com.android.support:support-annotations:$NAV_SUPPORT_VERSION"
+const val NAV_SUPPORT_APPCOMPAT = "com.android.support:appcompat-v7:$NAV_SUPPORT_VERSION"
+const val NAV_SUPPORT_CARDVIEW = "com.android.support:cardview-v7:$NAV_SUPPORT_VERSION"
+const val NAV_SUPPORT_COMPAT = "com.android.support:support-compat:$NAV_SUPPORT_VERSION"
+const val NAV_SUPPORT_CORE_UTILS = "com.android.support:support-core-utils:$NAV_SUPPORT_VERSION"
+const val NAV_SUPPORT_DESIGN = "com.android.support:design:$NAV_SUPPORT_VERSION"
+const val NAV_SUPPORT_FRAGMENTS = "com.android.support:support-fragment:$NAV_SUPPORT_VERSION"
+const val NAV_SUPPORT_RECYCLERVIEW = "com.android.support:recyclerview-v7:$NAV_SUPPORT_VERSION"
+const val NAV_SUPPORT_V4 = "com.android.support:support-v4:$NAV_SUPPORT_VERSION"
+
 private const val SUPPORT_VERSION = "1.0.0-alpha1"
 const val SUPPORT_ANNOTATIONS = "androidx.annotation:annotation:$SUPPORT_VERSION"
 const val SUPPORT_APPCOMPAT = "androidx.appcompat:appcompat:$SUPPORT_VERSION"
