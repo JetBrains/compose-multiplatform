@@ -22,11 +22,11 @@ class R4aCompletionContributor : CompletionContributor() {
             // we are in a Ktx element about to type an attribute
             return true
         }
-        if (typeChar == ' ' && position.parent is KtReferenceExpression && position.parent.prevSibling.node.elementType == LT) {
+        if (typeChar == ' ' && position.parent is KtReferenceExpression && position.parent?.prevSibling?.node?.elementType == LT) {
             // we have hit space after the tagname of a ktx open tag
             return true
         }
-        if (typeChar == ' ' && position.parent is KtxAttribute && position.node.elementType == RBRACE) {
+        if (typeChar == ' ' && position.parent is KtxAttribute && position.node?.elementType == RBRACE) {
             // we have hit space after the closing brace of a ktx attribute
             return true
         }
