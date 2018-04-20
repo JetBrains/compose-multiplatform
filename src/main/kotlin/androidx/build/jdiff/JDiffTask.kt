@@ -33,7 +33,7 @@ import java.util.ArrayList
 open class JDiffTask : Javadoc() {
 
     /**
-     * Sets the doclet path which has the `com.google.doclava.Doclava` class.
+     * Sets the doclet path, which will be used to locate the `com.google.doclava.Doclava` class.
      *
      *
      * This option will override any doclet path set in this instance's
@@ -82,7 +82,7 @@ open class JDiffTask : Javadoc() {
     }
 
     /**
-     * "Configures" this JDiffTask with parameters that might not be at their final values
+     * Configures this JDiffTask with parameters that might not be at their final values
      * until this task is run.
      */
     private fun configureJDiffTask() {
