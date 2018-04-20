@@ -40,16 +40,16 @@ import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
 class R4aCompletionExtension : KotlinCompletionExtension() {
     override fun perform(parameters: CompletionParameters, result: CompletionResultSet): Boolean {
         val expr = parameters.position
-        val superParent = expr.parent.parent
+        val superParent = expr.parent?.parent
 
         when (superParent) {
             is PsiErrorElement -> {
-                if (superParent.firstChild.node.elementType == LT) {
+                if (superParent.firstChild?.node?.elementType == LT) {
                     return performKtxTagCompletion(parameters, result)
                 }
             }
             is KtxAttribute -> {
-                if (expr.parent.prevSibling?.node?.elementType == LBRACE) {
+                if (expr.parent?.prevSibling?.node?.elementType == LBRACE) {
                     // we are inside of a ktx expression value... use normal autocomplete
                     return false
                 }
@@ -67,7 +67,7 @@ class R4aCompletionExtension : KotlinCompletionExtension() {
         val keyExpr = params.position.parent as? KtSimpleNameExpression ?: return false
         val attrExpr = keyExpr.parent as? KtxAttribute ?: return false
         val elementExpr = attrExpr.parent // the element tag could be a PsiErrorElement, so we need to handle resolution ourselves
-        val tagNameExpr = elementExpr.getChildOfType<KtReferenceExpression>()
+        val tagNameExpr = elementExpr?.getChildOfType<KtReferenceExpression>()
                 ?: return false // the first reference expression will be the tag name
 
         // TODO(lmr): support qualified identifiers for the tagName
