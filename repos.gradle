@@ -41,6 +41,7 @@ ext.repoNames = [// Android Gradle Plugin prebuilts updated manually
                  "${repos.prebuiltsRoot}/tools/common/m2/repository",
                  // Historical releases updated as part of public release
                  "${repos.prebuiltsRoot}/maven_repo/android",
+                 "${repos.prebuiltsRoot}/maven_repo/google-play-service-client-libraries-3p",
                  // Manually constructed, but soon to be updated by update_current.py
                  "${repos.prebuiltsRoot}/sdk/current/extras/material-design",
                  // Full checkout prebuilts updated by update_current.py
