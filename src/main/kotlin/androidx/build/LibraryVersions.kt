@@ -85,6 +85,11 @@ object LibraryVersions {
     val NAVIGATION = Version("1.0.0-alpha01")
 
     /**
+     * Version code for WorkManager
+     */
+    val WORKMANAGER = Version("1.0.0-alpha01")
+
+    /**
      * Version code for Jetifier
      */
     val JETIFIER = Version("0.0.1")
