@@ -18,6 +18,7 @@ import org.jetbrains.kotlin.psi.KtxAttribute
 import org.jetbrains.kotlin.psi.KtxElement
 import org.jetbrains.kotlin.r4a.analysis.R4ADefaultErrorMessages
 import org.jetbrains.kotlin.r4a.analysis.R4AErrors
+import org.jetbrains.kotlin.r4a.analysis.R4AErrors.*
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.descriptorUtil.isSubclassOf
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
@@ -37,10 +38,10 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
 
 
         val openingDescriptor = R4aUtils.resolveDeclaration(
-                expression = openingTagExpr,
-                moduleDescriptor = context.scope.ownerDescriptor.module,
-                trace = context.trace,
-                scopeForFirstPart = context.scope
+            expression = openingTagExpr,
+            moduleDescriptor = context.scope.ownerDescriptor.module,
+            trace = context.trace,
+            scopeForFirstPart = context.scope
         ) ?: return
 
         val possibleAttributes = R4aUtils.getPossibleAttributesForDescriptor(openingDescriptor)
@@ -60,10 +61,10 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
 
         // resolving this allows for Cmd-Click to work on the closing tag as well as the opening tag, which we want.
         val closingDescriptor = R4aUtils.resolveDeclaration(
-                expression = closingTagExpr,
-                moduleDescriptor = context.scope.ownerDescriptor.module,
-                trace = context.trace,
-                scopeForFirstPart = context.scope
+            expression = closingTagExpr,
+            moduleDescriptor = context.scope.ownerDescriptor.module,
+            trace = context.trace,
+            scopeForFirstPart = context.scope
         ) ?: return
     }
 
@@ -90,12 +91,16 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
                         // its valid
                         context.trace.record(BindingContext.REFERENCE_TARGET, keyNode, param)
                     } else {
-                        // TODO(lmr): Error - provided X type, expected Y type
-                        context.trace.report(UNRESOLVED_REFERENCE.on(keyNode, keyNode))
+                        context.trace.reportFromPlugin(
+                            MISMATCHED_ATTRIBUTE_TYPE.on(attribute, keyStr, param.type, valueType),
+                            R4ADefaultErrorMessages
+                        )
                     }
                 } else {
-                    // TODO(lmr): Error - no setter, prop with name found
-                    context.trace.report(UNRESOLVED_REFERENCE.on(keyNode, keyNode))
+                    context.trace.reportFromPlugin(
+                        UNRESOLVED_ATTRIBUTE_KEY.on(attribute, descriptor, keyStr, valueType),
+                        R4ADefaultErrorMessages
+                    )
                 }
             }
             is ClassDescriptor -> {
@@ -103,40 +108,54 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
                 // handle precedence here and deal with error messages. Come back in here and figure out the best way to make this
                 // use the AttributeInfo data structure
                 val setterFunctions = descriptor.unsubstitutedMemberScope.getContributedFunctions(
-                        Name.identifier(R4aUtils.setterMethodFromPropertyName(keyStr)),
-                        NoLookupLocation.WHEN_RESOLVE_DECLARATION
+                    Name.identifier(R4aUtils.setterMethodFromPropertyName(keyStr)),
+                    NoLookupLocation.WHEN_RESOLVE_DECLARATION
                 )
                 val validSetterFunction = setterFunctions.find { fn ->
                     if (fn.valueParameters.size != 1) false
                     else valueType.isSubtypeOf(fn.valueParameters.first().type) && Visibilities.isVisibleIgnoringReceiver(
-                            fn,
-                            context.scope.ownerDescriptor
+                        fn,
+                        context.scope.ownerDescriptor
                     )
                 }
                 val properties = descriptor.unsubstitutedMemberScope.getContributedVariables(
-                        Name.identifier(keyStr),
-                        NoLookupLocation.FROM_BACKEND
+                    Name.identifier(keyStr),
+                    NoLookupLocation.FROM_BACKEND
                 )
                 val validProperty = properties.find { prop ->
                     valueType.isSubtypeOf(prop.type) && Visibilities.isVisibleIgnoringReceiver(
-                            prop,
-                            context.scope.ownerDescriptor
+                        prop,
+                        context.scope.ownerDescriptor
                     )
                 }
 
-                if (validSetterFunction != null) {
-                    context.trace.record(BindingContext.REFERENCE_TARGET, keyNode, validSetterFunction)
-                } else if (validProperty != null) {
-                    context.trace.record(BindingContext.REFERENCE_TARGET, keyNode, validProperty)
-                } else {
-                    if (setterFunctions.isNotEmpty()) {
-                        //TODO(lmr): Error - types dont match, but a setter exist. Error as "type mismatch"
-                    } else if (properties.isNotEmpty()) {
-                        //TODO(lmr): Error - property exists, but types dont match. Error as "type mismatch"
-                    } else {
-                        //TODO(lmr): Error - we dont see anything that looks like this prop... just error as unresolved reference
+                when {
+                    validSetterFunction != null -> context.trace.record(BindingContext.REFERENCE_TARGET, keyNode, validSetterFunction)
+                    validProperty != null -> context.trace.record(BindingContext.REFERENCE_TARGET, keyNode, validProperty)
+                    setterFunctions.isNotEmpty() -> {
+                        setterFunctions.singleOrNull { it.valueParameters.size == 1 }?.let {
+                            // there exists a single parameter setter fn, but the types don't match
+                            val param = it.valueParameters.first()
+                            context.trace.reportFromPlugin(
+                                MISMATCHED_ATTRIBUTE_TYPE.on(attribute, keyStr, param.type, valueType),
+                                R4ADefaultErrorMessages
+                            )
+                        } ?: setterFunctions.singleOrNull()?.let {
+                            // there are no single param setter functions
+                            context.trace.reportFromPlugin(
+                                MISMATCHED_ATTRIBUTE_TYPE_NO_SINGLE_PARAM_SETTER_FNS.on(attribute, it),
+                                R4ADefaultErrorMessages
+                            )
+                        }
                     }
-                    context.trace.report(UNRESOLVED_REFERENCE.on(keyNode, keyNode))
+                    properties.isNotEmpty() -> {
+                        val prop = properties.first()
+                        context.trace.reportFromPlugin(
+                            MISMATCHED_ATTRIBUTE_TYPE.on(attribute, keyStr, prop.type, valueType),
+                            R4ADefaultErrorMessages
+                        )
+                    }
+                    else -> context.trace.report(UNRESOLVED_REFERENCE.on(keyNode, keyNode))
                 }
                 // TODO(lmr): check for public fields that match the attribute name in addition to setter methods.
             }
@@ -177,57 +196,60 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
             for (dup in duplicates) {
                 dup.key?.let {
                     context.trace.reportFromPlugin(
-                            R4AErrors.DUPLICATE_ATTRIBUTE.on(it),
-                            R4ADefaultErrorMessages
+                        R4AErrors.DUPLICATE_ATTRIBUTE.on(it),
+                        R4ADefaultErrorMessages
                     )
                 }
             }
 
             val missing = getMissing(
-                    requiredAttributes,
-                    attributes,
-                    { param -> param.name },
-                    { attr -> attr.key?.text ?: "" }
+                requiredAttributes,
+                attributes,
+                { param -> param.name },
+                { attr -> attr.key?.text ?: "" }
             )
             if (missing.isNotEmpty()) {
-                // TODO(lmr): Error - provide the list of missing attributes to this error
-                context.trace.report(EXPRESSION_EXPECTED.on(element, element))
+                context.trace.reportFromPlugin(
+                    MISSING_REQUIRED_ATTRIBUTES.on(element, missing.map { it.descriptor }),
+                    R4ADefaultErrorMessages
+                )
             }
         } else {
             if (requiredAttributes.isNotEmpty()) {
-                // TODO(lmr): Error - report missing attributes
                 // TODO(lmr): we will probably need to add special treatment for children types...
-                context.trace.report(EXPRESSION_EXPECTED.on(element, element))
+                context.trace.reportFromPlugin(
+                    MISSING_REQUIRED_ATTRIBUTES.on(element, requiredAttributes.map { it.descriptor }),
+                    R4ADefaultErrorMessages
+                )
             }
         }
 
         when (descriptor) {
             is ClassDescriptor -> {
                 if (!descriptor.isSubclassOf(r4aComponentDescriptor) && !descriptor.isSubclassOf(androidViewDescriptor)) {
-                    // TODO(lmr): we expect either a View or a Component. How do we signal to the user that we allow for either?
-                    context.trace.report(EXPECTED_TYPE_MISMATCH.on(tagExpression, r4aComponentDescriptor.defaultType))
+                    val validTypes = listOf(r4aComponentDescriptor.defaultType, androidViewDescriptor.defaultType)
+                    context.trace.reportFromPlugin(
+                        INVALID_TAG_TYPE.on(tagExpression, descriptor.defaultType, validTypes),
+                        R4ADefaultErrorMessages
+                    )
                 }
                 // TODO(lmr): mark whether or not its a component or a view, so we can highlight after-the-fact differently for each
             }
             is FunctionDescriptor -> {
                 if (descriptor.isSuspend) {
-                    // TODO(lmr): Error - we don't allow suspend functions to be renderable (yet?)
-                    context.trace.report(EXPRESSION_EXPECTED.on(element, element))
+                    // we don't allow suspend functions to be renderable (yet?)
+                    context.trace.reportFromPlugin(SUSPEND_FUNCTION_USED_AS_SFC.on(tagExpression), R4ADefaultErrorMessages)
                 }
                 // TODO(lmr): do we want to ensure that the function actually has ktx in it?
                 descriptor.returnType?.let {
                     if (!it.isUnit()) {
-                        // TODO(lmr): Error - report expected function that returns unit type
-                        context.trace.report(EXPRESSION_EXPECTED.on(element, element))
+                        context.trace.reportFromPlugin(INVALID_TYPE_SIGNATURE_SFC.on(tagExpression), R4ADefaultErrorMessages)
                     }
                 }
             }
-            is PackageViewDescriptor -> {
-                context.trace.report(EXPECTED_TYPE_MISMATCH.on(tagExpression, r4aComponentDescriptor.defaultType))
-            }
             else -> {
-                // TODO(lmr): Error - in this case the user has provided us with something we didn't expect. we should probably error out
-                // and tell the user that we expect a component or view
+                val validTypes = listOf(r4aComponentDescriptor.defaultType, androidViewDescriptor.defaultType)
+                context.trace.reportFromPlugin(INVALID_TAG_DESCRIPTOR.on(tagExpression, validTypes), R4ADefaultErrorMessages)
             }
         }
     }
