@@ -29,7 +29,7 @@ if (androidPluginVersionOverride != null) {
     build_libs.gradle = 'com.android.tools.build:gradle:' + androidPluginVersionOverride
 } else {
     // Keep gradle plugin version in sync with ub_supportlib-master manifest.
-    build_libs.gradle = 'com.android.tools.build:gradle:3.2.0-alpha09'
+    build_libs.gradle = 'com.android.tools.build:gradle:3.2.0-alpha13'
 }
 
 // jarjar plugin
