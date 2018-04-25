@@ -71,5 +71,5 @@ object LibraryGroups {
     const val PAGING = "androidx.paging"
     const val NAVIGATION = "androidx.navigation"
     const val JETIFIER = "com.android.tools.build.jetifier"
-    const val WORKMANAGER = "androidx.work"
+    const val WORKMANAGER = "android.arch.work"
 }
