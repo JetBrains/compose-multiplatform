@@ -16,9 +16,6 @@
 
 package androidx.build.dependencies
 
-import org.gradle.api.artifacts.ExternalModuleDependency
-import org.gradle.kotlin.dsl.exclude
-
 const val AUTO_COMMON = "com.google.auto:auto-common:0.6"
 const val ANTLR = "org.antlr:antlr4:4.5.3"
 const val APACHE_COMMONS_CODEC = "commons-codec:commons-codec:1.10"
@@ -88,15 +85,3 @@ const val ARCH_LIFECYCLE_LIVEDATA_CORE =
         "androidx.lifecycle:lifecycle-livedata-core:2.0.0-alpha1@aar"
 const val ARCH_LIFECYCLE_VIEWMODEL = "androidx.lifecycle:lifecycle-viewmodel:2.0.0-alpha1@aar"
 const val ARCH_LIFECYCLE_EXTENSIONS = "androidx.lifecycle:lifecycle-extensions:2.0.0-alpha1@aar"
-
-// Excludes
-val ESPRESSO_EXCLUDE: ExternalModuleDependency.() -> Unit = {
-    exclude(group = "androidx.annotation")
-    exclude(group = "androidx.appcompat")
-    exclude(group = "androidx.recyclerview")
-    exclude(group = "androidx.legacy")
-}
-
-val BYTEBUDDY_EXCLUDE: ExternalModuleDependency.() -> Unit = {
-    exclude(group = "net.bytebuddy")
-}
