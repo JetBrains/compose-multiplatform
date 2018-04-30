@@ -23,7 +23,11 @@ dependencies {
     runtime(projectRuntimeJar(":kotlin-compiler"))
     runtime(projectDist(":kotlin-stdlib"))
 
-
+    testCompile(project(":compiler:backend"))
+    testCompile(project(":compiler:cli"))
+    testCompile(project(":compiler:tests-common"))
+    testCompile(projectTests(":compiler:tests-common"))
+    testCompile(commonDep("junit:junit"))
 }
 
 sourceSets {
