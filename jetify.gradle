@@ -16,14 +16,62 @@
 def standaloneProject = project(":jetifier-standalone")
 def jetifierBin = file("${standaloneProject.buildDir}/install/jetifier-standalone/bin/jetifier-standalone")
 
+task stripArchive(type: Zip) {
+    dependsOn tasks['createArchive']
+    from zipTree(project.tasks['createArchive'].archivePath)
+    destinationDir rootProject.buildDir
+    archiveName "stripped_archive.zip"
+    include "m2repository/androidx/annotation/**",
+            "m2repository/androidx/appcompat/**",
+            "m2repository/androidx/asynclayoutinflater/**",
+            "m2repository/androidx/browser/**",
+            "m2repository/androidx/car/**",
+            "m2repository/androidx/cardview/**",
+            "m2repository/androidx/collection/**",
+            "m2repository/androidx/coordinatorlayout/**",
+            "m2repository/androidx/core/**",
+            "m2repository/androidx/cursoradapter/**",
+            "m2repository/androidx/customview/**",
+            "m2repository/androidx/documentfile/**",
+            "m2repository/androidx/drawerlayout/**",
+            "m2repository/androidx/dynamicanimation/**",
+            "m2repository/androidx/emoji/**",
+            "m2repository/androidx/exifinterface/**",
+            "m2repository/androidx/fragment/**",
+            "m2repository/androidx/gridlayout/**",
+            "m2repository/androidx/heifwriter/**",
+            "m2repository/androidx/interpolator/**",
+            "m2repository/androidx/leanback/**",
+            "m2repository/androidx/legacy/**",
+            "m2repository/androidx/loader/**",
+            "m2repository/androidx/localbroadcastmanager/**",
+            "m2repository/androidx/media/**",
+            "m2repository/androidx/mediarouter/**",
+            "m2repository/androidx/palette/**",
+            "m2repository/androidx/percentlayout/**",
+            "m2repository/androidx/preference/**",
+            "m2repository/androidx/print/**",
+            "m2repository/androidx/recommendation/**",
+            "m2repository/androidx/recyclerview/**",
+            "m2repository/androidx/slice/**",
+            "m2repository/androidx/slidingpanelayout/**",
+            "m2repository/androidx/swiperefreshlayout/**",
+            "m2repository/androidx/transition/**",
+            "m2repository/androidx/tvprovider/**",
+            "m2repository/androidx/vectordrawable/**",
+            "m2repository/androidx/viewpager/**",
+            "m2repository/androidx/wear/**",
+            "m2repository/androidx/webkit/**"
+}
+
 task dejetifyArchive(type: Exec) {
     description "Produces a zip of dejetified artifacts by running Dejetifier against refactored" +
             " artifacts, for temporary usage by external clients that haven't upgraded to Jetpack" +
             " yet."
 
-    dependsOn tasks['createArchive']
     dependsOn ':jetifier-standalone:installDist'
-    inputs.file project.tasks['createArchive'].archivePath
+    dependsOn project.tasks['stripArchive']
+    inputs.file project.tasks['stripArchive'].archivePath
 
     outputs.file "${rootProject.ext.distDir}/top-of-tree-m2repository-dejetified-${project.ext.buildNumber}.zip"
 
