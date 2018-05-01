@@ -5,14 +5,15 @@
 
 package org.jetbrains.kotlin.r4a
 
-import org.jetbrains.kotlin.descriptors.*
-import org.jetbrains.kotlin.diagnostics.Errors.*
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.descriptors.findClassAcrossModuleDependencies
 import org.jetbrains.kotlin.diagnostics.reportFromPlugin
 import org.jetbrains.kotlin.extensions.KtxTypeResolutionExtension
-import org.jetbrains.kotlin.incremental.components.NoLookupLocation
+import org.jetbrains.kotlin.idea.caches.resolve.getResolutionFacade
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtxAttribute
 import org.jetbrains.kotlin.psi.KtxElement
@@ -20,6 +21,8 @@ import org.jetbrains.kotlin.r4a.analysis.R4ADefaultErrorMessages
 import org.jetbrains.kotlin.r4a.analysis.R4AErrors
 import org.jetbrains.kotlin.r4a.analysis.R4AErrors.*
 import org.jetbrains.kotlin.resolve.BindingContext
+import org.jetbrains.kotlin.resolve.TemporaryBindingTrace
+import org.jetbrains.kotlin.resolve.calls.context.ContextDependency
 import org.jetbrains.kotlin.resolve.descriptorUtil.isSubclassOf
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.types.expressions.ExpressionTypingContext
@@ -36,6 +39,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
     ) {
         val openingTagExpr = element.qualifiedTagName ?: element.simpleTagName ?: return
 
+        val resolutionFacade = element.getResolutionFacade()
 
         val openingDescriptor = R4aUtils.resolveDeclaration(
             expression = openingTagExpr,
@@ -44,7 +48,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
             scopeForFirstPart = context.scope
         ) ?: return
 
-        val possibleAttributes = R4aUtils.getPossibleAttributesForDescriptor(openingDescriptor)
+        val possibleAttributes = R4aUtils.getPossibleAttributesForDescriptor(openingDescriptor, context.scope, resolutionFacade)
 
         validateTagDescriptor(element, openingTagExpr, possibleAttributes, openingDescriptor, context, facade)
 
@@ -70,7 +74,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
 
     private fun visitKtxAttributeAfterElement(
         attribute: KtxAttribute,
-        possibleAttributes: List<R4aUtils.AttributeInfo>,
+        possibleAttributes: Collection<R4aUtils.AttributeInfo>,
         element: KtxElement,
         context: ExpressionTypingContext,
         facade: ExpressionTypingFacade
@@ -81,91 +85,50 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
         val keyNode = attribute.key ?: return
         val keyStr = keyNode.text
 
-        val valueType = facade.getTypeInfo(valueExpr, context).type ?: return
+        val namedAttributes = possibleAttributes
+            .filter { attr -> attr.name == keyStr }
 
-        when (descriptor) {
-            is FunctionDescriptor -> {
-                val param = possibleAttributes.find { attr -> attr.name == keyStr }?.descriptor as? ValueParameterDescriptor
-                if (param != null) {
-                    if (valueType.isSubtypeOf(param.type)) {
-                        // its valid
-         //               context.trace.record(BindingContext.REFERENCE_TARGET, keyNode, param)
-                    } else {
-                        context.trace.reportFromPlugin(
-                            MISMATCHED_ATTRIBUTE_TYPE.on(attribute, keyStr, param.type, valueType),
-                            R4ADefaultErrorMessages
-                        )
-                    }
-                } else {
-                    context.trace.reportFromPlugin(
-                        UNRESOLVED_ATTRIBUTE_KEY.on(attribute, descriptor, keyStr, valueType),
-                        R4ADefaultErrorMessages
-                    )
-                }
-            }
-            is ClassDescriptor -> {
-                // TODO(lmr): i'm looking these up manually instead of using the possibleParameters list because its easier to
-                // handle precedence here and deal with error messages. Come back in here and figure out the best way to make this
-                // use the AttributeInfo data structure
-                val setterFunctions = descriptor.unsubstitutedMemberScope.getContributedFunctions(
-                    Name.identifier(R4aUtils.setterMethodFromPropertyName(keyStr)),
-                    NoLookupLocation.WHEN_RESOLVE_DECLARATION
-                )
-                val validSetterFunction = setterFunctions.find { fn ->
-                    if (fn.valueParameters.size != 1) false
-                    else valueType.isSubtypeOf(fn.valueParameters.first().type) && Visibilities.isVisibleIgnoringReceiver(
-                        fn,
-                        context.scope.ownerDescriptor
-                    )
-                }
-                val properties = descriptor.unsubstitutedMemberScope.getContributedVariables(
-                    Name.identifier(keyStr),
-                    NoLookupLocation.FROM_BACKEND
-                )
-                val validProperty = properties.find { prop ->
-                    valueType.isSubtypeOf(prop.type) && Visibilities.isVisibleIgnoringReceiver(
-                        prop,
-                        context.scope.ownerDescriptor
-                    )
-                }
+        val resolvedAttribute = namedAttributes
+            .firstOrNull { param ->
+                val temporaryTrace = TemporaryBindingTrace.create(context.trace, "trace to resolve ktx attribute", valueExpr)
+                val newContext = context
+                    .replaceExpectedType(param.type)
+                    .replaceBindingTrace(temporaryTrace)
+                    .replaceContextDependency(ContextDependency.INDEPENDENT)
 
-                when {
-                    validSetterFunction != null -> context.trace.record(BindingContext.REFERENCE_TARGET, keyNode, validSetterFunction)
-                    validProperty != null -> context.trace.record(BindingContext.REFERENCE_TARGET, keyNode, validProperty)
-                    setterFunctions.isNotEmpty() -> {
-                        setterFunctions.singleOrNull { it.valueParameters.size == 1 }?.let {
-                            // there exists a single parameter setter fn, but the types don't match
-                            val param = it.valueParameters.first()
-                            context.trace.reportFromPlugin(
-                                MISMATCHED_ATTRIBUTE_TYPE.on(attribute, keyStr, param.type, valueType),
-                                R4ADefaultErrorMessages
-                            )
-                        } ?: setterFunctions.singleOrNull()?.let {
-                            // there are no single param setter functions
-                            context.trace.reportFromPlugin(
-                                MISMATCHED_ATTRIBUTE_TYPE_NO_SINGLE_PARAM_SETTER_FNS.on(attribute, it),
-                                R4ADefaultErrorMessages
-                            )
-                        }
-                    }
-                    properties.isNotEmpty() -> {
-                        val prop = properties.first()
-                        context.trace.reportFromPlugin(
-                            MISMATCHED_ATTRIBUTE_TYPE.on(attribute, keyStr, prop.type, valueType),
-                            R4ADefaultErrorMessages
-                        )
-                    }
-                    else -> context.trace.report(UNRESOLVED_REFERENCE.on(keyNode, keyNode))
-                }
-                // TODO(lmr): check for public fields that match the attribute name in addition to setter methods.
+                val valueType = facade.getTypeInfo(valueExpr, newContext).type ?: return@firstOrNull false
+                if (valueType.isSubtypeOf(param.type)) {
+                    // its valid
+                    context.trace.record(BindingContext.REFERENCE_TARGET, keyNode, param.descriptor)
+                    newContext.trace.record(BindingContext.REFERENCE_TARGET, keyNode, param.descriptor)
+                    temporaryTrace.commit()
+                    true
+                } else false
             }
+
+        if (resolvedAttribute != null) return
+        val param = possibleAttributes.find { attr -> attr.name == keyStr }
+        if (param != null) {
+            val newContext = context.replaceExpectedType(param.type)
+            val valueType = facade.getTypeInfo(valueExpr, newContext).type ?: return
+
+            context.trace.reportFromPlugin(
+                MISMATCHED_ATTRIBUTE_TYPE.on(attribute, keyStr, param.type, valueType),
+                R4ADefaultErrorMessages
+            )
+        } else {
+            val valueType = facade.getTypeInfo(valueExpr, context).type ?: return
+            context.trace.reportFromPlugin(
+                UNRESOLVED_ATTRIBUTE_KEY.on(attribute, descriptor, keyStr, valueType),
+                R4ADefaultErrorMessages
+            )
         }
     }
 
     private fun validateTagDescriptor(
         element: KtxElement,
         tagExpression: KtExpression,
-        possibleAttributes: List<R4aUtils.AttributeInfo>,
+        possibleAttributes: Collection<R4aUtils.AttributeInfo>,
         descriptor: DeclarationDescriptor,
         context: ExpressionTypingContext,
         facade: ExpressionTypingFacade

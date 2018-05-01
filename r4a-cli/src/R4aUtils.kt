@@ -3,6 +3,7 @@ package org.jetbrains.kotlin.r4a
 import com.intellij.util.SmartList
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.diagnostics.Errors
+import org.jetbrains.kotlin.idea.resolve.ResolutionFacade
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtProperty
@@ -13,14 +14,18 @@ import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.QualifiedExpressionResolver
 import org.jetbrains.kotlin.resolve.calls.checkers.UnderscoreUsageChecker
 import org.jetbrains.kotlin.resolve.calls.components.hasDefaultValue
-import org.jetbrains.kotlin.resolve.scopes.LexicalScope
+import org.jetbrains.kotlin.resolve.scopes.*
 import org.jetbrains.kotlin.resolve.scopes.receivers.*
+import org.jetbrains.kotlin.resolve.scopes.utils.collectAllFromMeAndParent
 import org.jetbrains.kotlin.resolve.scopes.utils.findClassifier
 import org.jetbrains.kotlin.resolve.scopes.utils.findFunction
 import org.jetbrains.kotlin.resolve.scopes.utils.findVariable
 import org.jetbrains.kotlin.resolve.source.getPsi
+import org.jetbrains.kotlin.synthetic.SamAdapterExtensionFunctionDescriptor
 import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.typeUtil.isSubtypeOf
 import org.jetbrains.kotlin.types.typeUtil.isUnit
+import org.jetbrains.kotlin.types.typeUtil.supertypes
 
 
 object R4aUtils {
@@ -44,15 +49,22 @@ object R4aUtils {
         return name.startsWith("set") && name.length > 3 && !name[3].isLowerCase() // use !lower to capture non-alpha chars
     }
 
-    fun getPossibleAttributesForDescriptor(descriptor: DeclarationDescriptor): List<AttributeInfo> {
+    private fun getSyntheticDescriptors(types: Collection<KotlinType>, facade: ResolutionFacade): Collection<DeclarationDescriptor> {
+        val scope = facade.getFrontendService(SyntheticScopes::class.java)
+        return scope.collectSyntheticMemberFunctions(types) + scope.collectSyntheticExtensionProperties(types)
+    }
+
+    fun getPossibleAttributesForDescriptor(descriptor: DeclarationDescriptor, scope: LexicalScope, facade: ResolutionFacade): Collection<AttributeInfo> {
         return when (descriptor) {
-            is ClassDescriptor -> descriptor.unsubstitutedMemberScope.getContributedDescriptors().mapNotNull { d ->
-                when (d) {
-                    is FunctionDescriptor -> {
-                        if (d.returnType?.isUnit() != true) null // only void setters are allowed
-                        else if (!isSetterMethodName(d.name.identifier)) null
-                        else if (d.valueParameters.size != 1) null
-                        else AttributeInfo(
+            is ClassDescriptor -> {
+                val realGettersSetters = descriptor.unsubstitutedMemberScope.getContributedDescriptors().mapNotNull { d ->
+                    when (d) {
+                        is FunctionDescriptor -> {
+                            if (d.returnType?.isUnit() != true) null // only void setters are allowed
+                            else if (!isSetterMethodName(d.name.identifier)) null
+                            else if (d.valueParameters.size != 1) null
+                            else if (!Visibilities.isVisibleIgnoringReceiver(d, scope.ownerDescriptor)) null
+                            else AttributeInfo(
                                 name = propertyNameFromSetterMethod(d.name.identifier),
                                 descriptor = d,
                                 type = d.valueParameters[0].type,
@@ -60,11 +72,11 @@ object R4aUtils {
                                 // In the future, we should provide some sort of "@Required" annotation so that we can check to see if
                                 // that exists, and then mark it as required in that case.
                                 required = false
-                        )
-                    }
-                    is PropertyDescriptor -> {
-                        if (d.visibility == Visibilities.PRIVATE) null // TODO(lmr): handle visibility better
-                        else AttributeInfo(
+                            )
+                        }
+                        is PropertyDescriptor -> {
+                            if (!Visibilities.isVisibleIgnoringReceiver(d, scope.ownerDescriptor)) null
+                            else AttributeInfo(
                                 name = d.name.identifier,
                                 descriptor = d,
                                 type = d.type,
@@ -81,11 +93,71 @@ object R4aUtils {
                                 // otherwise, assume its required!
                                     else -> true
                                 }
-                        )
+                            )
 
+                        }
+                        else -> null
                     }
-                    else -> null
                 }
+
+                val extensionGettersSetters = scope
+                    .collectAllFromMeAndParent { s -> s.getContributedDescriptors() }
+                    .mapNotNull { d ->
+                        when (d) {
+                            is PropertyDescriptor -> {
+                                val receiverParam = d.extensionReceiverParameter
+                                if (receiverParam == null || !descriptor.defaultType.isSubtypeOf(receiverParam.value.type)) null
+                                else if (!Visibilities.isVisibleIgnoringReceiver(d, scope.ownerDescriptor)) null
+                                else AttributeInfo(
+                                    name = d.name.identifier,
+                                    descriptor = d,
+                                    type = d.type,
+                                    required = false
+                                )
+                            }
+                            is FunctionDescriptor -> {
+                                val receiverParam = d.extensionReceiverParameter
+                                if (d.returnType?.isUnit() != true) null // only void setters are allowed
+                                else if (!isSetterMethodName(d.name.identifier)) null
+                                else if (receiverParam == null || d.valueParameters.size != 1) null
+                                else if (!Visibilities.isVisibleIgnoringReceiver(d, scope.ownerDescriptor)) null
+                                else if (descriptor.defaultType.isSubtypeOf(receiverParam.value.type)) AttributeInfo(
+                                    name = propertyNameFromSetterMethod(d.name.identifier),
+                                    descriptor = d,
+                                    type = d.valueParameters[0].type,
+                                    required = false
+                                )
+                                else null
+                            }
+                            else -> null
+                        }
+                    }
+
+                val types = mutableListOf<KotlinType>(descriptor.defaultType)
+                types.addAll(descriptor.defaultType.supertypes())
+                val syntheticGettersSetters = getSyntheticDescriptors(types, facade)
+                    .mapNotNull { d ->
+                        when (d) {
+                            // only extension functions exist right now, but in the future, properties might...
+                            is SamAdapterExtensionFunctionDescriptor -> {
+                                if (d.returnType?.isUnit() != true) null // only void setters are allowed
+                                else if (!isSetterMethodName(d.name.identifier)) null
+                                else if (d.valueParameters.size != 1) null
+                                else if (!Visibilities.isVisibleIgnoringReceiver(d, scope.ownerDescriptor)) null
+                                else AttributeInfo(
+                                    name = propertyNameFromSetterMethod(d.name.identifier),
+                                    descriptor = d,
+                                    type = d.valueParameters[0].type,
+                                    // For now, we just assume that setter methods are not required attributes...
+                                    // In the future, we should provide some sort of "@Required" annotation so that we can check to see if
+                                    // that exists, and then mark it as required in that case.
+                                    required = false
+                                )
+                            }
+                            else -> null
+                        }
+                    }
+                return realGettersSetters + extensionGettersSetters + syntheticGettersSetters
             }
             is FunctionDescriptor -> descriptor.valueParameters.map { param ->
                 AttributeInfo(

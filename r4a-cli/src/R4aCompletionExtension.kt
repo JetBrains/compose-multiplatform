@@ -1,41 +1,34 @@
 package org.jetbrains.kotlin.r4a
 
 import com.intellij.codeInsight.AutoPopupController
-import com.intellij.codeInsight.completion.*
-import com.intellij.codeInsight.lookup.Lookup
+import com.intellij.codeInsight.completion.CompletionParameters
+import com.intellij.codeInsight.completion.CompletionResultSet
+import com.intellij.codeInsight.completion.InsertHandler
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiErrorElement
 import com.intellij.psi.PsiNamedElement
-import org.jetbrains.kotlin.KtNodeTypes
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.findClassAcrossModuleDependencies
 import org.jetbrains.kotlin.idea.caches.resolve.getResolutionFacade
-import org.jetbrains.kotlin.idea.caches.resolve.util.javaResolutionFacade
-import org.jetbrains.kotlin.idea.completion.CompletionBindingContextProvider
-import org.jetbrains.kotlin.idea.completion.KEEP_OLD_ARGUMENT_LIST_ON_TAB_KEY
 import org.jetbrains.kotlin.idea.completion.KotlinCompletionExtension
-import org.jetbrains.kotlin.idea.completion.handlers.WithTailInsertHandler
-import org.jetbrains.kotlin.idea.completion.handlers.isCharAt
-import org.jetbrains.kotlin.idea.completion.handlers.skipSpacesAndLineBreaks
-import org.jetbrains.kotlin.idea.completion.smart.SmartCompletion
-import org.jetbrains.kotlin.idea.completion.tryGetOffset
 import org.jetbrains.kotlin.idea.util.getResolutionScope
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.lexer.KtTokens
-import org.jetbrains.kotlin.lexer.KtTokens.LBRACE
-import org.jetbrains.kotlin.lexer.KtTokens.LT
-import org.jetbrains.kotlin.lexer.KtTokens.GT
+import org.jetbrains.kotlin.lexer.KtTokens.*
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.psi.*
+import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.psi.KtReferenceExpression
+import org.jetbrains.kotlin.psi.KtSimpleNameExpression
+import org.jetbrains.kotlin.psi.KtxAttribute
 import org.jetbrains.kotlin.psi.psiUtil.getChildOfType
 import org.jetbrains.kotlin.psi.psiUtil.getChildrenOfType
-import org.jetbrains.kotlin.psi.psiUtil.getStrictParentOfType
-import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.descriptorUtil.isSubclassOf
-import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
+import org.jetbrains.kotlin.resolve.scopes.utils.collectAllFromMeAndParent
+import org.jetbrains.kotlin.types.typeUtil.isUnit
 
 class R4aCompletionExtension : KotlinCompletionExtension() {
     override fun perform(parameters: CompletionParameters, result: CompletionResultSet): Boolean {
@@ -88,7 +81,7 @@ class R4aCompletionExtension : KotlinCompletionExtension() {
         ) ?: return false
 
 
-        val possibleAttributes = R4aUtils.getPossibleAttributesForDescriptor(declarationDescriptor)
+        val possibleAttributes = R4aUtils.getPossibleAttributesForDescriptor(declarationDescriptor, scope, resolutionFacade)
 
         val usedAttributes = elementExpr.getChildrenOfType<KtxAttribute>()
         val usedAttributesNameSet = usedAttributes.mapNotNull { attr -> attr.key?.getIdentifier()?.text }.toSet()
@@ -124,7 +117,6 @@ class R4aCompletionExtension : KotlinCompletionExtension() {
         val module = resolutionFacade.moduleDescriptor
 
         // TODO(lmr): add support for fully-qualified expressions
-        // TODO(lmr); add resolution for local in-scope things.
         // TODO(lmr): add resolution for SFCs
         // TODO(lmr): have a different insertion handler for view groups or components that accept children than for those that don't
         // TODO(lmr): weigh based on proximity or usage???
@@ -137,33 +129,14 @@ class R4aCompletionExtension : KotlinCompletionExtension() {
         val androidViewId = ClassId.topLevel(FqName("android.view.View"))
         val androidViewDescriptor = module.findClassAcrossModuleDependencies(androidViewId) ?: return false
 
-        val importedClassifiers = file.importDirectives
-            .filter { !it.isAllUnder }
-            .mapNotNull { it.importedFqName }
-            .mapNotNull { module.findClassAcrossModuleDependencies(ClassId.topLevel(it)) }
-            .filter { it.isSubclassOf(androidViewDescriptor) || it.isSubclassOf(r4aComponentDescriptor) }
-            .mapNotNull { cd ->
-                val psi = cd.findPsi() as? PsiNamedElement
-
-                if (psi != null) {
-                    // TODO(lmr): make the elements look pretty!
-                    LookupElementBuilder
-                        .create(psi)
-                        .withTailText(" (Kompose)", true)
-                        .withInsertHandler(Companion.CLOSE_TAG_INSERTION_HANDLER)
-                } else null
-            }
-
-
-        val importedWildcards = file.importDirectives
-            .filter { it.isAllUnder }
-            .mapNotNull { it.importedFqName }
-            .map { module.getPackage(it).memberScope }
-            .flatMap { scope -> scope.getDescriptorsFiltered() }
-            .filter {
-                when (it) {
-                    is ClassDescriptor -> it.isSubclassOf(androidViewDescriptor) || it.isSubclassOf(r4aComponentDescriptor)
-                    else -> false // TODO(lmr): can we handle SFCs here?
+        val inScopeElements = expression
+            .getResolutionScope()
+            .collectAllFromMeAndParent { s -> s.getContributedDescriptors() }
+            .filter { d ->
+                when (d) {
+                    is ClassDescriptor -> d.isSubclassOf(androidViewDescriptor) || d.isSubclassOf(r4aComponentDescriptor)
+                    is FunctionDescriptor -> !d.isSuspend && !d.isInline && d.extensionReceiverParameter == null && d.returnType?.isUnit() ?: true
+                    else -> false
                 }
             }
             .mapNotNull { cd ->
@@ -178,8 +151,7 @@ class R4aCompletionExtension : KotlinCompletionExtension() {
                 } else null
             }
 
-        result.addAllElements(importedClassifiers)
-        result.addAllElements(importedWildcards)
+        result.addAllElements(inScopeElements)
 
         return true
     }
