@@ -144,9 +144,8 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
 
         val toolChain = ErrorProneToolChain.create(project)
         project.dependencies.add("errorprone", ERROR_PRONE_VERSION)
-        library.buildTypes.create("errorProne")
         library.libraryVariants.all { libraryVariant ->
-            if (libraryVariant.getBuildType().getName().equals("errorProne")) {
+            if (libraryVariant.getBuildType().getName().equals("debug")) {
                 @Suppress("DEPRECATION")
                 libraryVariant.javaCompile.configureWithErrorProne(toolChain)
             }
