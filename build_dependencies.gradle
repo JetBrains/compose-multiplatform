@@ -16,7 +16,7 @@
 
 def build_versions = [:]
 
-build_versions.kotlin = '1.2.20'
+build_versions.kotlin = '1.2.41'
 
 rootProject.ext['build_versions'] = build_versions
 
