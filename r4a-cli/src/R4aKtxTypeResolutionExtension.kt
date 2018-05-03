@@ -39,7 +39,14 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
     ) {
         val openingTagExpr = element.qualifiedTagName ?: element.simpleTagName ?: return
 
-        val resolutionFacade = element.getResolutionFacade()
+        val resolutionFacade = try {
+            element.getResolutionFacade()
+        } catch (e: NoClassDefFoundError) {
+            // TODO(lmr): we shouldn't need this, but I can't quite figure out how to get the resolution facade when we are building from
+            // the command line. The class doesn't seem to be on the path anywhere. It's really important that we fix this ASAP.
+            System.err.println("Shamefully swallowed exception: ${e.message}")
+            null
+        }
 
         val openingDescriptor = R4aUtils.resolveDeclaration(
             expression = openingTagExpr,

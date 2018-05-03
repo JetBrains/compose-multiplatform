@@ -49,12 +49,12 @@ object R4aUtils {
         return name.startsWith("set") && name.length > 3 && !name[3].isLowerCase() // use !lower to capture non-alpha chars
     }
 
-    private fun getSyntheticDescriptors(types: Collection<KotlinType>, facade: ResolutionFacade): Collection<DeclarationDescriptor> {
-        val scope = facade.getFrontendService(SyntheticScopes::class.java)
+    private fun getSyntheticDescriptors(types: Collection<KotlinType>, facade: ResolutionFacade?): Collection<DeclarationDescriptor> {
+        val scope = facade?.getFrontendService(SyntheticScopes::class.java) ?: return listOf()
         return scope.collectSyntheticMemberFunctions(types) + scope.collectSyntheticExtensionProperties(types)
     }
 
-    fun getPossibleAttributesForDescriptor(descriptor: DeclarationDescriptor, scope: LexicalScope, facade: ResolutionFacade): Collection<AttributeInfo> {
+    fun getPossibleAttributesForDescriptor(descriptor: DeclarationDescriptor, scope: LexicalScope, facade: ResolutionFacade?): Collection<AttributeInfo> {
         return when (descriptor) {
             is ClassDescriptor -> {
                 val realGettersSetters = descriptor.unsubstitutedMemberScope.getContributedDescriptors().mapNotNull { d ->

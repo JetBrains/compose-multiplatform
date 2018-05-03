@@ -79,6 +79,7 @@ class R4aSyntheticPackageFragmentDescriptor: PackageFragmentDescriptorImpl {
             // TODO: This feels hacky; can a PackageFragmentDescriptor really only return a single class descriptor?
             // TODO: Is this really the right place to be returning this, or is it mostly an accident that it works?
             // TODO: Are sure this fqName check is actually doing its intended job? (IIRC, it is not filtering the fqName properly, but I don't remember the exact bug)
+            if (name.isSpecial) return null
             if(generatedViewClassDescriptor.fqNameSafe == FqName(fqName.toString()+"."+name.identifier))
                 return generatedViewClassDescriptor;
             return null
