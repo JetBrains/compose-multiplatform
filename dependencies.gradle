@@ -30,6 +30,18 @@ libs.exclude_support = {
     exclude group: 'androidx.annotation'
 }
 
+libs.exclude_for_material = {
+    transitive = true
+    exclude group: 'androidx.annotation'
+    exclude group: 'androidx.core'
+    exclude group: 'androidx.legacy'
+    exclude group: 'androidx.fragment'
+    exclude group: 'androidx.transition'
+    exclude group: 'androidx.appcompat'
+    exclude group: 'androidx.recyclerview'
+    exclude group: 'androidx.cardview'
+}
+
 libs.exclude_for_espresso = {
     exclude group: 'androidx.annotation'
     exclude group: 'androidx.appcompat'
