@@ -168,7 +168,9 @@ def configureBuildOnServer() {
     }
     subprojects {
         project.tasks.whenTaskAdded { task ->
-            if ("assembleErrorProne".equals(task.name) || "assembleAndroidTest".equals(task.name)) {
+            if ("assembleErrorProne".equals(task.name)
+                    || "assembleAndroidTest".equals(task.name)
+                    || "assembleDebug".equals(task.name)) {
                 buildOnServerTask.dependsOn task
             }
         }
