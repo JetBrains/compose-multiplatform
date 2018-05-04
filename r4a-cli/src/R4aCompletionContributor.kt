@@ -4,18 +4,19 @@ import com.intellij.codeInsight.completion.CompletionContributor
 import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.lexer.KtTokens.LT
 import org.jetbrains.kotlin.lexer.KtTokens.RBRACE
-import org.jetbrains.kotlin.psi.KtBlockExpression
-import org.jetbrains.kotlin.psi.KtReferenceExpression
-import org.jetbrains.kotlin.psi.KtxAttribute
-import org.jetbrains.kotlin.psi.KtxElement
+import org.jetbrains.kotlin.psi.*
 
 
 class R4aCompletionContributor : CompletionContributor() {
     override fun invokeAutoPopup(position: PsiElement, typeChar: Char): Boolean {
         // TODO(lmr): how can we "auto-close" on </ characters?
-        if (typeChar == '<' && position.parent is KtBlockExpression) {
+        if (typeChar == '<' && KtPsiUtil.isStatementContainer(position.parent)) {
             // if the user types a bracket inside of a block, there is a high probability that they are
             // starting a ktx tag
+            return true
+        }
+        if (typeChar == '<' && position.parent is KtxElement) {
+            // this also happens inside of a KTX Body in some cases
             return true
         }
         if (typeChar == ' ' && position.parent is KtxElement) {

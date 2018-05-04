@@ -6,6 +6,7 @@ import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.completion.InsertHandler
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiErrorElement
 import com.intellij.psi.PsiNamedElement
@@ -26,6 +27,9 @@ import org.jetbrains.kotlin.psi.KtSimpleNameExpression
 import org.jetbrains.kotlin.psi.KtxAttribute
 import org.jetbrains.kotlin.psi.psiUtil.getChildOfType
 import org.jetbrains.kotlin.psi.psiUtil.getChildrenOfType
+import org.jetbrains.kotlin.renderer.DescriptorRenderer
+import org.jetbrains.kotlin.renderer.render
+import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.isSubclassOf
 import org.jetbrains.kotlin.resolve.scopes.utils.collectAllFromMeAndParent
 import org.jetbrains.kotlin.types.typeUtil.isUnit
@@ -74,10 +78,10 @@ class R4aCompletionExtension : KotlinCompletionExtension() {
         val module = resolutionFacade.moduleDescriptor
 
         val declarationDescriptor = R4aUtils.resolveDeclaration(
-                expression = tagNameExpr,
-                moduleDescriptor = module,
-                scopeForFirstPart = scope,
-                trace = null
+            expression = tagNameExpr,
+            moduleDescriptor = module,
+            scopeForFirstPart = scope,
+            trace = null
         ) ?: return false
 
 
@@ -89,11 +93,16 @@ class R4aCompletionExtension : KotlinCompletionExtension() {
         val elements = possibleAttributes
             .filter { !usedAttributesNameSet.contains(it.name) }
             .map { attr ->
+                val typeString = when (attr.descriptor) {
+                    is FunctionDescriptor -> SHORT_NAMES_RENDERER.renderValueParameters(attr.descriptor.valueParameters, false).let { it.substring(1, it.length - 1) }
+                    else -> SHORT_NAMES_RENDERER.renderType(attr.type)
+                }
+
                 // TODO(lmr): make the elements look pretty!
                 LookupElementBuilder
-                    .create(attr.name)
+                    .create(attr.descriptor, attr.name)
                     .withPresentableText(attr.name)
-                    .withTailText("={${attr.type}}", true)
+                    .withTailText("={${typeString}}", true)
                     .withInsertHandler(ATTRIBUTE_INSERTION_HANDLER)
             }
 
@@ -129,6 +138,9 @@ class R4aCompletionExtension : KotlinCompletionExtension() {
         val androidViewId = ClassId.topLevel(FqName("android.view.View"))
         val androidViewDescriptor = module.findClassAcrossModuleDependencies(androidViewId) ?: return false
 
+        val androidViewGroupId = ClassId.topLevel(FqName("android.view.ViewGroup"))
+        val androidViewGroupDescriptor = module.findClassAcrossModuleDependencies(androidViewGroupId) ?: return false
+
         val inScopeElements = expression
             .getResolutionScope()
             .collectAllFromMeAndParent { s -> s.getContributedDescriptors() }
@@ -142,12 +154,21 @@ class R4aCompletionExtension : KotlinCompletionExtension() {
             .mapNotNull { cd ->
                 val psi = cd.findPsi() as? PsiNamedElement
 
+                val allowsChildren = when (cd) {
+                    is ClassDescriptor -> cd.isSubclassOf(androidViewGroupDescriptor)
+                    else -> false // TODO(lmr): handle @Content annotations on components and SFCs
+                }
+
                 if (psi != null) {
                     // TODO(lmr): make the elements look pretty!
                     LookupElementBuilder
                         .create(psi)
-                        .withTailText(" (Kompose)", true)
+                        .withBoldness(true)
+                        .withPresentableText("<${cd.name.asString()} />")
+                        .withBoldness(false)
+                        .appendTailText(" (${cd.fqNameSafe.parent().render()})", true)
                         .withInsertHandler(CLOSE_TAG_INSERTION_HANDLER)
+                        .apply { putUserData(ALLOWS_CHILDREN, allowsChildren) }
                 } else null
             }
 
@@ -157,6 +178,9 @@ class R4aCompletionExtension : KotlinCompletionExtension() {
     }
 
     companion object {
+        val ALLOWS_CHILDREN = Key<Boolean>("r4a.allows_children")
+        val SHORT_NAMES_RENDERER = DescriptorRenderer.SHORT_NAMES_IN_TYPES.withOptions { parameterNamesInFunctionalTypes = false }
+
         private val CLOSE_TAG_INSERTION_HANDLER = InsertHandler<LookupElement> { context, item ->
             val document = context.document
             val psiDocumentManager = PsiDocumentManager.getInstance(context.project)
@@ -172,9 +196,11 @@ class R4aCompletionExtension : KotlinCompletionExtension() {
                 // if the tag has a GT token, then we don't need to close it
                 if (gt != null) return@InsertHandler
 
+                val allowsChildren = item.getUserData(ALLOWS_CHILDREN) ?: false
+
                 val tailOffset = context.tailOffset
                 val moveCaret = context.editor.caretModel.offset == tailOffset
-                val textToInsert = " />"
+                val textToInsert = if (allowsChildren) " ></${item.lookupString}>" else " />"
                 document.insertString(tailOffset, textToInsert)
 
                 if (moveCaret) {
