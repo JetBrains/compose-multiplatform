@@ -5,15 +5,13 @@
 
 package org.jetbrains.kotlin.r4a.analysis
 
-import org.jetbrains.kotlin.descriptors.ModuleDescriptor
-import org.jetbrains.kotlin.psi.KtClass
-import org.jetbrains.kotlin.r4a.GeneratedViewClassDescriptor
+import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.util.slicedMap.BasicWritableSlice
 import org.jetbrains.kotlin.util.slicedMap.RewritePolicy
 import org.jetbrains.kotlin.util.slicedMap.WritableSlice
 import java.util.HashSet
 
 object R4AWritableSlices {
-    public val COMPONENT_CLASSES: WritableSlice<ModuleDescriptor, HashSet<KtClass>> = BasicWritableSlice(RewritePolicy.DO_NOTHING)
-    public val WRAPPER_VIEW: WritableSlice<KtClass, GeneratedViewClassDescriptor> = BasicWritableSlice(RewritePolicy.DO_NOTHING)
+    val KTX_TAG_TYPE_DESCRIPTOR: WritableSlice<KtExpression, DeclarationDescriptor> = BasicWritableSlice(RewritePolicy.DO_NOTHING)
 }

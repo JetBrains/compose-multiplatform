@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.psiUtil.getSuperNames
+import org.jetbrains.kotlin.r4a.analysis.ComponentMetadata
 import org.jetbrains.kotlin.r4a.analysis.R4AWritableSlices
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.DescriptorFactory
@@ -22,6 +23,7 @@ import org.jetbrains.kotlin.resolve.jvm.annotations.findJvmOverloadsAnnotation
 import org.jetbrains.kotlin.resolve.jvm.diagnostics.JvmDeclarationOrigin
 import org.jetbrains.kotlin.resolve.jvm.jvmSignature.JvmMethodSignature
 import org.jetbrains.kotlin.resolve.lazy.LazyClassContext
+import org.jetbrains.kotlin.resolve.lazy.declarations.ClassMemberDeclarationProvider
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.resolve.source.getPsi
 import org.jetbrains.kotlin.types.KotlinType
@@ -36,46 +38,32 @@ import kotlin.coroutines.experimental.EmptyCoroutineContext.plus
 
 class StaticWrapperCreatorFunctionResolveExtension() : SyntheticResolveExtension {
 
-    companion object {
-        fun generateTheFunction(componentClassDescriptor: ClassDescriptor, wrapperViewDescriptor: GeneratedViewClassDescriptor, annotated: Boolean) : SimpleFunctionDescriptor {
-            val returnType : SimpleType = wrapperViewDescriptor.defaultType
-            val annotations = if(annotated) AnnotationsImpl(listOf(AnnotationDescriptorImpl(componentClassDescriptor.module.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("kotlin.jvm.JvmStatic")))!!.defaultType, HashMap<Name, ConstantValue<*>>(), SourceElement.NO_SOURCE))) else Annotations.EMPTY
-            val newMethod = SimpleFunctionDescriptorImpl.create(componentClassDescriptor, annotations, Name.identifier("createInstance"), CallableMemberDescriptor.Kind.SYNTHESIZED, SourceElement.NO_SOURCE)
-            val contextParameter = ValueParameterDescriptorImpl(
-                    newMethod,
-                    null, 0, Annotations.EMPTY,
-                    Name.identifier("context"),
-                    componentClassDescriptor.module.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("android.content.Context")))!!.defaultType,
-                    false,
-                    false,
-                    false, null, SourceElement.NO_SOURCE)
-            newMethod.initialize(null, if(componentClassDescriptor.isCompanionObject) componentClassDescriptor.thisAsReceiverParameter else null, emptyList(), listOf(contextParameter), returnType, Modality.OPEN, Visibilities.PUBLIC)
-
-            return newMethod
-        }
+    override fun getSyntheticCompanionObjectNameIfNeeded(thisDescriptor: ClassDescriptor): Name? {
+        return if(ComponentMetadata.isR4AComponent(thisDescriptor)) Name.identifier("R4H-StaticRenderCompanion") else null
     }
 
-    override fun getSyntheticCompanionObjectNameIfNeeded(thisDescriptor: ClassDescriptor): Name? {
-        val cls = thisDescriptor.source.getPsi() as? KtClass ?: return null
-        if(!cls.getSuperNames().contains("Component")) return null; // TODO: Check/resolve fully-qualified name.
-        if(thisDescriptor.isCompanionObject) return null;
-        if("Component" == thisDescriptor.getSuperClassNotAny()?.fqNameSafe?.shortName()?.identifier)
-        {
-            return Name.identifier("Companion2")
+    override fun generateSyntheticClasses(
+        thisDescriptor: ClassDescriptor,
+        name: Name,
+        ctx: LazyClassContext,
+        declarationProvider: ClassMemberDeclarationProvider,
+        result: MutableSet<ClassDescriptor>
+    ) {
+        super.generateSyntheticClasses(thisDescriptor, name, ctx, declarationProvider, result)
+
+        if(ComponentMetadata.isR4AComponent(thisDescriptor)) {
+            val wrapperViewDescriptor = ComponentMetadata.fromDescriptor(thisDescriptor).wrapperViewDescriptor;
+            if (wrapperViewDescriptor.name == name) result.add(wrapperViewDescriptor)
         }
-        return null;
     }
 
     override fun generateSyntheticMethods(cls: ClassDescriptor, name: Name, context: LazyClassContext, fromSupertypes: List<SimpleFunctionDescriptor>, result: MutableCollection<SimpleFunctionDescriptor>) {
 
-        if(name != Name.identifier("createInstance")) return
+        if (!ComponentMetadata.isComponentCompanion(cls)) return;
+        if (name != Name.identifier("createInstance")) return
 
-        val componentClassName = "c" + ('p' - booleanArrayOf(true).size).toChar() + "m.google.r4a.Component"
-
-            val containingClass = cls.containingDeclaration as? ClassDescriptor ?: return
-            if (containingClass.getSuperClassNotAny()?.fqNameSafe != FqName(componentClassName)) return;
-
-        val wrapperView = context.trace.bindingContext.get(R4AWritableSlices.WRAPPER_VIEW, containingClass.source.getPsi() as KtClass)
-        result.add(wrapperView!!.getInstanceCreatorFunction(cls))
+        val containingClass = cls.containingDeclaration as? ClassDescriptor ?: return
+        val wrapperView = ComponentMetadata.fromDescriptor(containingClass).wrapperViewDescriptor
+        result.add(wrapperView.getInstanceCreatorFunction(cls))
     }
 }

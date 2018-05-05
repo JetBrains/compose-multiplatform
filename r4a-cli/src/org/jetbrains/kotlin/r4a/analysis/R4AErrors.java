@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.types.KotlinType;
 import java.util.Collection;
 
 import static org.jetbrains.kotlin.diagnostics.Severity.ERROR;
+import static org.jetbrains.kotlin.diagnostics.Severity.WARNING;
 
 public interface R4AErrors {
     DiagnosticFactory0<PsiElement> DUPLICATE_ATTRIBUTE = DiagnosticFactory0.create(ERROR);
@@ -24,7 +25,9 @@ public interface R4AErrors {
     DiagnosticFactory1<KtxElement, Collection<DeclarationDescriptor>> MISSING_REQUIRED_ATTRIBUTES = DiagnosticFactory1.create(ERROR);
     DiagnosticFactory2<KtElement, KotlinType, Collection<KotlinType>> INVALID_TAG_TYPE = DiagnosticFactory2.create(ERROR);
     DiagnosticFactory1<KtElement, Collection<KotlinType>> INVALID_TAG_DESCRIPTOR = DiagnosticFactory1.create(ERROR);
+    DiagnosticFactory1<KtElement, String> SVC_INVOCATION = DiagnosticFactory1.create(ERROR);
     DiagnosticFactory0<KtElement> SUSPEND_FUNCTION_USED_AS_SFC = DiagnosticFactory0.create(ERROR);
+    DiagnosticFactory0<PsiElement> KTX_IN_NON_COMPOSABLE = DiagnosticFactory0.create(WARNING);
     DiagnosticFactory0<KtElement> INVALID_TYPE_SIGNATURE_SFC = DiagnosticFactory0.create(ERROR);
 
 

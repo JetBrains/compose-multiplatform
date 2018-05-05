@@ -1,5 +1,9 @@
 package org.jetbrains.kotlin.r4a
 
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+
+import org.jetbrains.kotlin.r4a.analysis.ComponentMetadata
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.*
@@ -8,6 +12,7 @@ import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.descriptorUtil.builtIns
+import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameUnsafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
@@ -16,15 +21,14 @@ import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.utils.Printer
 
-open class GeneratedRerenderHelperClassDescriptor: ClassDescriptor {
-    private val containingDeclaration: DeclarationDescriptor
+open class GeneratedRerenderHelperClassDescriptor(val componentMetadata: ComponentMetadata): ClassDescriptor {
     private val name: Name
     private val wrapperClassDescriptor: GeneratedViewClassDescriptor
 
-    constructor(helperClassNameIdentifier: String, containingDeclaration: DeclarationDescriptor, wrapperClassDescriptor: GeneratedViewClassDescriptor) {
-        name = Name.identifier(helperClassNameIdentifier)
-        this.containingDeclaration = containingDeclaration
-        this.wrapperClassDescriptor = wrapperClassDescriptor;
+    init {
+        this.wrapperClassDescriptor = componentMetadata.wrapperViewDescriptor
+
+        name = Name.identifier(componentMetadata.wrapperViewDescriptor.fqNameSafe.shortName().identifier + "\$RenderHelper")
         val superType = module.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("java.lang.Runnable")))!!.defaultType
         initialize(listOf(superType))
     }
@@ -52,10 +56,22 @@ open class GeneratedRerenderHelperClassDescriptor: ClassDescriptor {
     override fun isActual(): Boolean = false
     override fun getCompanionObjectDescriptor(): ClassDescriptor? = null
     override fun getConstructors(): Collection<ClassConstructorDescriptor> = listOf(getUnsubstitutedPrimaryConstructor()!!)
-    override fun getContainingDeclaration(): DeclarationDescriptor = containingDeclaration
+    override fun getContainingDeclaration(): DeclarationDescriptor = componentMetadata.wrapperViewDescriptor.containingDeclaration
     override fun getDeclaredTypeParameters(): List<TypeParameterDescriptor> = emptyList()
     override fun getKind(): ClassKind = kind
     override fun getSealedSubclasses(): Collection<ClassDescriptor> = emptyList()
+
+    val componentInstancePropertyDescriptor by lazy {
+        val propertyDescriptor = PropertyDescriptorImpl.create(this, Annotations.EMPTY, Modality.FINAL, Visibilities.PRIVATE, true, Name.identifier("componentInstance"), CallableMemberDescriptor.Kind.SYNTHESIZED, SourceElement.NO_SOURCE, false, false, true, true, false, false)
+        propertyDescriptor.setType(KotlinTypeFactory.simpleType(Annotations.EMPTY, (componentMetadata.descriptor as ClassDescriptor).typeConstructor, emptyList<TypeProjection>(), true), emptyList<TypeParameterDescriptor>(), componentMetadata.descriptor.thisAsReceiverParameter, null as ReceiverParameterDescriptor?)
+        propertyDescriptor
+    }
+
+    val viewPropertyDescriptor by lazy {
+        val viewFieldDescriptor = PropertyDescriptorImpl.create(this, Annotations.EMPTY, Modality.FINAL, Visibilities.PRIVATE, true, Name.identifier("view"), CallableMemberDescriptor.Kind.SYNTHESIZED, SourceElement.NO_SOURCE, false, false, true, true, false, false)
+        viewFieldDescriptor.setType(KotlinTypeFactory.simpleType(Annotations.EMPTY, (componentMetadata.wrapperViewDescriptor as ClassDescriptor).typeConstructor, emptyList<TypeProjection>(), true), emptyList<TypeParameterDescriptor>(), componentMetadata.renderHelperClassDescriptor.thisAsReceiverParameter, null as ReceiverParameterDescriptor?)
+        viewFieldDescriptor
+    }
 
     fun genScope(): MemberScope {
 
@@ -86,7 +102,7 @@ open class GeneratedRerenderHelperClassDescriptor: ClassDescriptor {
 
             override fun getContributedFunctions(name: Name, location: LookupLocation): Collection<SimpleFunctionDescriptor>
             {
-                if(name == Name.identifier("run")) return listOf(getRunMethodDescriptor())
+                if(name == Name.identifier("run")) return listOf(runMethodDescriptor)
                 return emptyList()
             }
 
@@ -102,12 +118,9 @@ open class GeneratedRerenderHelperClassDescriptor: ClassDescriptor {
     override fun getUnsubstitutedInnerClassesScope(): MemberScope = genScope()
     override fun getUnsubstitutedMemberScope(): MemberScope = genScope()
 
-    var primaryConstructor: ClassConstructorDescriptor? = null
+    val primaryConstructor by lazy {generateUnsubstitutedPrimaryConstructor()}
 
-    override fun getUnsubstitutedPrimaryConstructor(): ClassConstructorDescriptor? {
-        if(primaryConstructor == null) primaryConstructor = generateUnsubstitutedPrimaryConstructor()
-        return primaryConstructor!!
-    }
+    override fun getUnsubstitutedPrimaryConstructor(): ClassConstructorDescriptor? = primaryConstructor
 
     fun generateUnsubstitutedPrimaryConstructor(): ClassConstructorDescriptor? {
         val constructor = ClassConstructorDescriptorImpl.create(this, Annotations.EMPTY, false, SourceElement.NO_SOURCE)
@@ -121,9 +134,7 @@ open class GeneratedRerenderHelperClassDescriptor: ClassDescriptor {
                 false, null, SourceElement.NO_SOURCE)
          constructor.initialize(listOf(viewgroupParameter), Visibilities.PUBLIC)
 
-        constructor.apply {
-            returnType = containingDeclaration.defaultType
-        }
+        constructor.returnType = defaultType
 
         return constructor
     }
@@ -156,9 +167,9 @@ open class GeneratedRerenderHelperClassDescriptor: ClassDescriptor {
     override fun toString(): String =
             "GeneratedViewClassDescriptor($fqNameUnsafe)"
 
-    fun getRunMethodDescriptor() : SimpleFunctionDescriptor {
+    val runMethodDescriptor: SimpleFunctionDescriptor by lazy  {
         val newMethod = SimpleFunctionDescriptorImpl.create(this, annotations, Name.identifier("run"), CallableMemberDescriptor.Kind.SYNTHESIZED, SourceElement.NO_SOURCE)
         newMethod.initialize(null, this.thisAsReceiverParameter, emptyList(), emptyList(), builtIns.unitType, Modality.FINAL, Visibilities.PUBLIC)
-        return newMethod
+        newMethod
     }
 }

@@ -56,9 +56,18 @@ object R4ADefaultErrorMessages : DefaultErrorMessages.Extension {
             "Only Unit-returning functions are allowed to be used as R4A Components"
         )
         MAP.put(
-            R4AErrors.INVALID_TAG_DESCRIPTOR,
-            "Invalid KTX tag type. Expected ''{1}",
-            Renderers.commaSeparated(Renderers.RENDER_TYPE)
+                R4AErrors.INVALID_TAG_DESCRIPTOR,
+                "Invalid KTX tag type. Expected ''{1}",
+                Renderers.commaSeparated(Renderers.RENDER_TYPE)
+        )
+        MAP.put(
+                R4AErrors.SVC_INVOCATION,
+                "Stateless Functional Components (SFCs) should not be invoked, use <{1} /> syntax instead",
+                Renderers.STRING
+        )
+        MAP.put(
+                R4AErrors.KTX_IN_NON_COMPOSABLE,
+                "Stateless Functional Components (SFCs) containing KTX Tags should be marked with the @Composable annotation"
         )
     }
 }

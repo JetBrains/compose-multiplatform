@@ -17,6 +17,7 @@ dependencies {
     compileOnly(project(":compiler:backend-common"))
     compileOnly(project(":compiler:backend"))
     compileOnly(project(":idea:idea-core"))
+    compile(project(":idea:ide-common"))
     compileOnly(project(":idea"))
     compileOnly(intellijCoreDep()) { includeJars("intellij-core") }
 

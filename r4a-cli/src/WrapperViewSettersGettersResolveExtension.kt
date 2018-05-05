@@ -4,7 +4,6 @@ import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.SimpleFunctionDescriptorImpl
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.calls.components.hasDefaultValue
 import org.jetbrains.kotlin.resolve.descriptorUtil.*
 import org.jetbrains.kotlin.resolve.extensions.SyntheticResolveExtension
@@ -32,11 +31,5 @@ class WrapperViewSettersGettersResolveExtension : SyntheticResolveExtension {
         newMethod.initialize(null, null, emptyList(), emptyList(), unitType, Modality.FINAL, Visibilities.PUBLIC)
 
         return newMethod
-    }
-
-    private fun ClassConstructorDescriptor.isZeroParameterConstructor(): Boolean {
-        val parameters = this.valueParameters
-        return parameters.isEmpty()
-               || (parameters.all { it.hasDefaultValue() } && (isPrimary || findJvmOverloadsAnnotation() != null))
     }
 }

@@ -8,10 +8,9 @@ import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
 import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.extensions.KtxTypeResolutionExtension
+import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
 import org.jetbrains.kotlin.psi2ir.extensions.SyntheticIrExtension
 import org.jetbrains.kotlin.resolve.extensions.SyntheticResolveExtension
-import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisHandlerExtension
-import org.jetbrains.kotlin.resolve.jvm.extensions.PackageFragmentProviderExtension
 
 
 class R4ACommandLineProcessor : CommandLineProcessor {
@@ -29,15 +28,13 @@ class R4ACommandLineProcessor : CommandLineProcessor {
 
 class R4AComponentRegistrar : ComponentRegistrar {
     override fun registerProjectComponents(project: MockProject, configuration: CompilerConfiguration) {
-        AnalysisHandlerExtension.registerExtension(project, PackageAnalysisHandlerExtension())
-        AnalysisHandlerExtension.registerExtension(project, R4aClassAnalisysHandlerExtension())
-        AnalysisHandlerExtension.registerExtension(project, TrueFalseAnalysisHandlerExtension())
-        PackageFragmentProviderExtension.registerExtension(project, R4aGradlePackageFragmentProviderExtension());
+        StorageComponentContainerContributor.registerExtension(project, ComponentsClosedDeclarationChecker())
+        StorageComponentContainerContributor.registerExtension(project, ComposableAnnotationChecker())
         KtxTypeResolutionExtension.registerExtension(project, R4aKtxTypeResolutionExtension())
         SyntheticResolveExtension.registerExtension(project, StaticWrapperCreatorFunctionResolveExtension())
         SyntheticResolveExtension.registerExtension(project, WrapperViewSettersGettersResolveExtension())
         ClassBuilderInterceptorExtension.registerExtension(project, ReflectiveFragmentInjectorInterceptorExtension())
-     //   ClassBuilderInterceptorExtension.registerExtension(project, ComponentMutationRerenderInjectorInterceptorExtension())
         SyntheticIrExtension.registerExtension(project, R4ASyntheticIrExtension())
     }
 }
+

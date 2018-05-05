@@ -6,11 +6,11 @@ import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationsImpl
 import org.jetbrains.kotlin.descriptors.impl.*
 import org.jetbrains.kotlin.incremental.components.LookupLocation
+import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtClass
-import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.constants.ConstantValue
 import org.jetbrains.kotlin.resolve.descriptorUtil.builtIns
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
@@ -39,25 +39,23 @@ open class GeneratedViewClassDescriptor: ClassDescriptor {
         }
     }
 */
-    private val componentKtClass: KtClass;
-    private val bindingContext: BindingContext
+    private val componentClassDescriptor: ClassDescriptor
     private val module: ModuleDescriptor
-    private val containingDeclaration: PackageFragmentDescriptor
+    private val containingDeclaration: ClassDescriptor
 
-    constructor(module: ModuleDescriptor, componentKtClass: KtClass, bindingContext: BindingContext) {
-        this.componentKtClass = componentKtClass
-        this.bindingContext = bindingContext
-        this.module = module
+    constructor(componentClassDescriptor: ClassDescriptor) {
+        this.componentClassDescriptor = componentClassDescriptor
+        this.module = componentClassDescriptor.module
         val superType = module.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("android.widget.LinearLayout")))!!.defaultType
-        initialize(emptyList(), listOf(superType, module.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("c" + ('p' - booleanArrayOf(true).size).toChar() + "m.google.r4a.Rerenderable")))!!.defaultType))
-        this.containingDeclaration = R4aSyntheticPackageFragmentDescriptor(module, componentKtClass.fqName!!.parent(), this, bindingContext)
+        initialize(emptyList(), listOf(superType, module.findClassAcrossModuleDependencies(ClassId.topLevel(FqName(R4aUtils.generateR4APackageName()+".Recomposable")))!!.defaultType))
+        this.containingDeclaration = componentClassDescriptor
 
         onAttachDescriptor = generateOnAttachDescriptor()
         flushComponentRerenderDescriptor = generateFlushComponentRerenderDescriptor()
     }
 
     override fun isInline(): Boolean = false
-    override fun getName() = Name.identifier(componentKtClass.fqName!!.shortName().identifier + "WrapperView")
+    override fun getName() = Name.identifier((componentClassDescriptor.findPsi() as KtClass).fqName!!.shortName().identifier + "WrapperView")
 
     override fun isExpect(): Boolean = false
     override fun isActual(): Boolean = false
@@ -124,7 +122,7 @@ open class GeneratedViewClassDescriptor: ClassDescriptor {
 
             override fun getContributedFunctions(name: Name, location: LookupLocation): Collection<SimpleFunctionDescriptor>
             {
-                if(name == Name.identifier("rerender")) return listOf(getRerenderMethodDescriptor());
+                if(name == Name.identifier("recompose")) return listOf(getRerenderMethodDescriptor());
                 if(name == Name.identifier("flushComponentRerender")) return listOf(getFlushMethodDescriptor());
                 return getSetterMethodDescriptors().filter { name == it.fqNameSafe.shortName() };
             }
@@ -142,9 +140,8 @@ open class GeneratedViewClassDescriptor: ClassDescriptor {
     override fun getUnsubstitutedMemberScope(): MemberScope = genScope()
 
     fun genComponentInstanceField(): PropertyDescriptor {
-        val component = bindingContext.get(BindingContext.CLASS, componentKtClass)!!
         val propertyDescriptor = PropertyDescriptorImpl.create(this, Annotations.EMPTY, Modality.FINAL, Visibilities.PRIVATE, true, Name.identifier("componentInstance"), CallableMemberDescriptor.Kind.SYNTHESIZED, SourceElement.NO_SOURCE, false, false, true, true, false, false)
-        propertyDescriptor.setType(KotlinTypeFactory.simpleType(Annotations.EMPTY, component.typeConstructor, emptyList<TypeProjection>(), true), emptyList<TypeParameterDescriptor>(), component.thisAsReceiverParameter, null as ReceiverParameterDescriptor?)
+        propertyDescriptor.setType(KotlinTypeFactory.simpleType(Annotations.EMPTY, componentClassDescriptor.typeConstructor, emptyList<TypeProjection>(), true), emptyList<TypeParameterDescriptor>(), componentClassDescriptor.thisAsReceiverParameter, null as ReceiverParameterDescriptor?)
         return propertyDescriptor
     }
 
@@ -213,7 +210,7 @@ open class GeneratedViewClassDescriptor: ClassDescriptor {
     }
 
     fun getRerenderMethodDescriptor() : SimpleFunctionDescriptor {
-        val newMethod = SimpleFunctionDescriptorImpl.create(this, annotations, Name.identifier("rerender"), CallableMemberDescriptor.Kind.SYNTHESIZED, SourceElement.NO_SOURCE)
+        val newMethod = SimpleFunctionDescriptorImpl.create(this, annotations, Name.identifier("recompose"), CallableMemberDescriptor.Kind.SYNTHESIZED, SourceElement.NO_SOURCE)
         newMethod.initialize(null, this.thisAsReceiverParameter, emptyList(), emptyList(), builtIns.unitType, Modality.FINAL, Visibilities.PUBLIC)
         return newMethod
     }

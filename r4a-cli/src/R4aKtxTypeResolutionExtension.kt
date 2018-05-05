@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.psi.KtxElement
 import org.jetbrains.kotlin.r4a.analysis.R4ADefaultErrorMessages
 import org.jetbrains.kotlin.r4a.analysis.R4AErrors
 import org.jetbrains.kotlin.r4a.analysis.R4AErrors.*
+import org.jetbrains.kotlin.r4a.analysis.R4AWritableSlices
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.TemporaryBindingTrace
 import org.jetbrains.kotlin.resolve.calls.context.ContextDependency
@@ -59,7 +60,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
 
         validateTagDescriptor(element, openingTagExpr, possibleAttributes, openingDescriptor, context, facade)
 
-        context.trace.record(BindingContext.KTX_TAG_TYPE_DESCRIPTOR, element, openingDescriptor)
+        context.trace.record(R4AWritableSlices.KTX_TAG_TYPE_DESCRIPTOR, element, openingDescriptor)
 
         element.attributes?.let { attributes ->
             for (attribute in attributes) {
@@ -86,7 +87,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
         context: ExpressionTypingContext,
         facade: ExpressionTypingFacade
     ) {
-        val descriptor = context.trace[BindingContext.KTX_TAG_TYPE_DESCRIPTOR, element] ?: return
+        val descriptor = context.trace[R4AWritableSlices.KTX_TAG_TYPE_DESCRIPTOR, element] ?: return
 
         val valueExpr = attribute.value ?: return // TODO: allow for attribute "punning"
         val keyNode = attribute.key ?: return
@@ -125,11 +126,11 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
             )
         } else {
             val valueType = facade.getTypeInfo(valueExpr, context).type ?: return
-            context.trace.reportFromPlugin(
+       /*     context.trace.reportFromPlugin(
                 UNRESOLVED_ATTRIBUTE_KEY.on(attribute, descriptor, keyStr, valueType),
                 R4ADefaultErrorMessages
             )
-        }
+      */  }
     }
 
     private fun validateTagDescriptor(

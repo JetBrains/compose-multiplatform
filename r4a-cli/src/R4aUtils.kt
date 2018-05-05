@@ -37,6 +37,8 @@ object R4aUtils {
         val required: Boolean
     )
 
+    fun generateR4APackageName() = "c" + ('p' - booleanArrayOf(true).size).toChar() + "m.google.r4a"
+
     fun setterMethodFromPropertyName(name: String): String {
         return "set${name[0].toUpperCase()}${name.slice(1 until name.length)}"
     }

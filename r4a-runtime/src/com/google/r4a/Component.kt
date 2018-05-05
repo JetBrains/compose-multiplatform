@@ -1,19 +1,17 @@
 package com.google.r4a
 
-import android.os.Handler
-import android.os.Looper
-
+@Composable
 public abstract class Component {
 
     protected var markupBuilder : R4aElementBuilderDSL? = null
 
     companion object {
-        private var wrappers = HashSet<Rerenderable>()
+        private var wrappers = HashSet<Recomposable>()
         @JvmStatic
-        public fun addWrapper(wrapper: Rerenderable) {wrappers.add(wrapper)}
+        public fun addWrapper(wrapper: Recomposable) {wrappers.add(wrapper)}
     }
 
-    public abstract fun render();
+    public abstract fun compose();
     protected fun markup(content : MarkupBuilder.()->Unit) : Unit {
         markupBuilder = null
         val builder = R4aElementBuilderDSL()
@@ -22,7 +20,7 @@ public abstract class Component {
         // throw UnsupportedOperationException("Please compile using the R4A compiler prior to running")
     }
 
-    final fun rerender() {
-        for(wrapper in HashSet(wrappers)) wrapper.rerender()
+    final fun recompose() {
+        for(wrapper in HashSet(wrappers)) wrapper.recompose()
     }
 }
