@@ -22,7 +22,7 @@ import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.utils.Printer
 
-open class GeneratedViewClassDescriptor: ClassDescriptor {
+open class GeneratedViewClassDescriptor(val componentClassDescriptor: ClassDescriptor): ClassDescriptor {
 /*
     companion object {
         fun createSynthetic(name: Name, containingDeclaration: DeclarationDescriptor) {
@@ -39,20 +39,9 @@ open class GeneratedViewClassDescriptor: ClassDescriptor {
         }
     }
 */
-    private val componentClassDescriptor: ClassDescriptor
     private val module: ModuleDescriptor
     private val containingDeclaration: ClassDescriptor
 
-    constructor(componentClassDescriptor: ClassDescriptor) {
-        this.componentClassDescriptor = componentClassDescriptor
-        this.module = componentClassDescriptor.module
-        val superType = module.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("android.widget.LinearLayout")))!!.defaultType
-        initialize(emptyList(), listOf(superType, module.findClassAcrossModuleDependencies(ClassId.topLevel(FqName(R4aUtils.generateR4APackageName()+".Recomposable")))!!.defaultType))
-        this.containingDeclaration = componentClassDescriptor
-
-        onAttachDescriptor = generateOnAttachDescriptor()
-        flushComponentRerenderDescriptor = generateFlushComponentRerenderDescriptor()
-    }
 
     override fun isInline(): Boolean = false
     override fun getName() = Name.identifier((componentClassDescriptor.findPsi() as KtClass).fqName!!.shortName().identifier + "WrapperView")
@@ -69,9 +58,61 @@ open class GeneratedViewClassDescriptor: ClassDescriptor {
     private lateinit var declaredTypeParameters: List<TypeParameterDescriptor>
     private var unsubstitutedPrimaryConstructor: ClassConstructorDescriptor? = null
 
-    var componentInstanceField: PropertyDescriptor? = null
-    val onAttachDescriptor: SimpleFunctionDescriptor
-    val flushComponentRerenderDescriptor: SimpleFunctionDescriptor
+
+    val componentInstanceField by lazy {
+        val propertyDescriptor = PropertyDescriptorImpl.create(this, Annotations.EMPTY, Modality.FINAL, Visibilities.PRIVATE, true, Name.identifier("componentInstance"), CallableMemberDescriptor.Kind.SYNTHESIZED, SourceElement.NO_SOURCE, false, false, true, true, false, false)
+        propertyDescriptor.setType(KotlinTypeFactory.simpleType(Annotations.EMPTY, componentClassDescriptor.typeConstructor, emptyList<TypeProjection>(), true), emptyList<TypeParameterDescriptor>(), componentClassDescriptor.thisAsReceiverParameter, null as ReceiverParameterDescriptor?)
+        propertyDescriptor
+    }
+    val onAttachDescriptor by lazy {
+
+        val newMethod = SimpleFunctionDescriptorImpl.create(
+            this,
+            Annotations.EMPTY,
+            Name.identifier("onAttachedToWindow"),
+            CallableMemberDescriptor.Kind.SYNTHESIZED,
+            SourceElement.NO_SOURCE
+        )
+
+        newMethod.initialize(
+            null,
+            this.thisAsReceiverParameter,
+            emptyList(),
+            emptyList(),
+            builtIns.unitType,
+            Modality.OPEN,
+            Visibilities.PUBLIC
+        )
+        newMethod
+    }
+
+    val flushComponentRerenderDescriptor by lazy {
+        val newMethod = SimpleFunctionDescriptorImpl.create(
+            this,
+            Annotations.EMPTY,
+            Name.identifier("flushComponentRerender"),
+            CallableMemberDescriptor.Kind.SYNTHESIZED,
+            SourceElement.NO_SOURCE
+        )
+
+        newMethod.initialize(
+            null,
+            this.thisAsReceiverParameter,
+            emptyList(),
+            emptyList(),
+            builtIns.unitType,
+            Modality.FINAL,
+            Visibilities.PUBLIC
+        )
+        newMethod
+    }
+
+    init {
+        this.module = componentClassDescriptor.module
+        val superType = module.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("android.widget.LinearLayout")))!!.defaultType
+        initialize(emptyList(), listOf(superType, module.findClassAcrossModuleDependencies(ClassId.topLevel(FqName(R4aUtils.generateR4APackageName()+".Recomposable")))!!.defaultType))
+        this.containingDeclaration = componentClassDescriptor
+    }
 
     private val thisAsReceiverParameter = LazyClassReceiverParameterDescriptor(this)
 
@@ -114,8 +155,7 @@ open class GeneratedViewClassDescriptor: ClassDescriptor {
             override fun getContributedVariables(name: Name, location: LookupLocation): Collection<PropertyDescriptor>
             {
                 if(name.identifier == "componentInstance") {
-                    if(componentInstanceField == null) componentInstanceField = genComponentInstanceField()
-                    return listOf(componentInstanceField!!)
+                    return listOf(componentInstanceField)
                 }
                 return emptyList()
             }
@@ -138,12 +178,6 @@ open class GeneratedViewClassDescriptor: ClassDescriptor {
     override fun getStaticScope(): MemberScope = genScope()
     override fun getUnsubstitutedInnerClassesScope(): MemberScope = genScope()
     override fun getUnsubstitutedMemberScope(): MemberScope = genScope()
-
-    fun genComponentInstanceField(): PropertyDescriptor {
-        val propertyDescriptor = PropertyDescriptorImpl.create(this, Annotations.EMPTY, Modality.FINAL, Visibilities.PRIVATE, true, Name.identifier("componentInstance"), CallableMemberDescriptor.Kind.SYNTHESIZED, SourceElement.NO_SOURCE, false, false, true, true, false, false)
-        propertyDescriptor.setType(KotlinTypeFactory.simpleType(Annotations.EMPTY, componentClassDescriptor.typeConstructor, emptyList<TypeProjection>(), true), emptyList<TypeParameterDescriptor>(), componentClassDescriptor.thisAsReceiverParameter, null as ReceiverParameterDescriptor?)
-        return propertyDescriptor
-    }
 
     override fun getUnsubstitutedPrimaryConstructor(): ClassConstructorDescriptor {
         unsubstitutedPrimaryConstructor?.let { return it }
@@ -217,7 +251,7 @@ open class GeneratedViewClassDescriptor: ClassDescriptor {
 
     fun getSetterMethodDescriptors() : Collection<SimpleFunctionDescriptor> {
         val descriptors = ArrayList<SimpleFunctionDescriptor>()
-        for(property in componentKtClass.getProperties()) {
+/*        for(property in componentKtClass.getProperties()) {
 
             if(property.annotationEntries.size == 0) continue
             // TODO: Check that the annotation is an instance of com.google.r4a.Attribute
@@ -238,7 +272,7 @@ open class GeneratedViewClassDescriptor: ClassDescriptor {
             newMethod.initialize(null, this.thisAsReceiverParameter, emptyList(), listOf(parameter), unitType, Modality.FINAL, Visibilities.PUBLIC)
             descriptors.add(newMethod);
         }
-
+*/
         return descriptors
     }
 
@@ -258,50 +292,6 @@ open class GeneratedViewClassDescriptor: ClassDescriptor {
                 false, null, SourceElement.NO_SOURCE)
         newMethod.initialize(null, if(componentClassDescriptor.isCompanionObject) componentClassDescriptor.thisAsReceiverParameter else null, emptyList(), listOf(contextParameter), returnType, Modality.OPEN, Visibilities.PUBLIC)
         instanceCreatorFunction = newMethod
-        return newMethod
-    }
-
-
-
-    private fun generateOnAttachDescriptor(): SimpleFunctionDescriptor {
-        val newMethod = SimpleFunctionDescriptorImpl.create(
-                this,
-                Annotations.EMPTY,
-                Name.identifier("onAttachedToWindow"),
-                CallableMemberDescriptor.Kind.SYNTHESIZED,
-                SourceElement.NO_SOURCE
-        )
-
-        newMethod.initialize(
-                null,
-                this.thisAsReceiverParameter,
-                emptyList(),
-                emptyList(),
-                builtIns.unitType,
-                Modality.OPEN,
-                Visibilities.PUBLIC
-        )
-        return newMethod
-    }
-
-    private fun generateFlushComponentRerenderDescriptor(): SimpleFunctionDescriptor {
-        val newMethod = SimpleFunctionDescriptorImpl.create(
-                this,
-                Annotations.EMPTY,
-                Name.identifier("flushComponentRerender"),
-                CallableMemberDescriptor.Kind.SYNTHESIZED,
-                SourceElement.NO_SOURCE
-        )
-
-        newMethod.initialize(
-                null,
-                this.thisAsReceiverParameter,
-                emptyList(),
-                emptyList(),
-                builtIns.unitType,
-                Modality.FINAL,
-                Visibilities.PUBLIC
-        )
         return newMethod
     }
 }

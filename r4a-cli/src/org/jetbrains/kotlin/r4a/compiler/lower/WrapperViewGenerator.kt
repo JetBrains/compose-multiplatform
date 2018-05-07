@@ -27,26 +27,27 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.classId
 import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperClassNotAny
 import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperClassOrAny
 
-fun generateWrapperView(context: GeneratorContext, componentMetadata: ComponentMetadata, component: IrClass): IrClass {
+fun generateWrapperView(context: GeneratorContext, componentMetadata: ComponentMetadata): IrClass {
     val syntheticClassDescriptor = componentMetadata.wrapperViewDescriptor
     val wrapperViewIrClass = context.symbolTable.declareClass(-1, -1, IrDeclarationOrigin.DEFINED, syntheticClassDescriptor)
 
     wrapperViewIrClass.createParameterDeclarations()
     wrapperViewIrClass.declarations.add(generateComponentInstanceProperty(context, componentMetadata))
-    wrapperViewIrClass.declarations.add(generateConstructor(context, componentMetadata, syntheticClassDescriptor, wrapperViewIrClass, component))
-    wrapperViewIrClass.declarations.add(generateOnAttachFunction(context, componentMetadata, syntheticClassDescriptor, wrapperViewIrClass))
-    wrapperViewIrClass.declarations.add(generateFlushComponentRerender(context, componentMetadata, syntheticClassDescriptor, wrapperViewIrClass))
-    wrapperViewIrClass.declarations.add(generateRerenderMethod(context, componentMetadata, syntheticClassDescriptor, wrapperViewIrClass))
+    wrapperViewIrClass.declarations.add(generateConstructor(context, componentMetadata))
+    wrapperViewIrClass.declarations.add(generateOnAttachFunction(context, componentMetadata))
+    wrapperViewIrClass.declarations.add(generateFlushComponentRerender(context, componentMetadata))
+    wrapperViewIrClass.declarations.add(generateRerenderMethod(context, componentMetadata))
     wrapperViewIrClass.declarations.add(generateRerenderHelper(context, componentMetadata))
 
     return wrapperViewIrClass
 }
 
-private fun generateConstructor(context: GeneratorContext, componentMetadata: ComponentMetadata, syntheticClassDescriptor: GeneratedViewClassDescriptor, wrapperViewIrClass: IrClass, component: IrClass): IrConstructor {
+private fun generateConstructor(context: GeneratorContext, componentMetadata: ComponentMetadata): IrConstructor {
+    val syntheticClassDescriptor = componentMetadata.wrapperViewDescriptor
     val constructor = context.symbolTable.declareConstructor(-1, -1, IrDeclarationOrigin.DEFINED, syntheticClassDescriptor.unsubstitutedPrimaryConstructor!!)
         .buildWithScope(context) { constructor ->
-
             constructor.createParameterDeclarations()
+            val wrapperViewAsThisReceiver = context.symbolTable.declareValueParameter(-1, -1, IrDeclarationOrigin.DEFINED, syntheticClassDescriptor.thisAsReceiverParameter).symbol
 
             val statements = mutableListOf<IrStatement>()
             val superConstructor = context.symbolTable.referenceConstructor(componentMetadata.wrapperViewDescriptor.getSuperClassNotAny()!!.constructors.single{it.valueParameters.size == 1})
@@ -77,43 +78,44 @@ private fun generateConstructor(context: GeneratorContext, componentMetadata: Co
                     addWrapperFunction, null
             )
             addWrapperCall.dispatchReceiver = IrGetObjectValueImpl(-1, -1, topLevelComponentCompanion.defaultType, context.symbolTable.referenceClass(topLevelComponentCompanion))
-            addWrapperCall.putValueArgument(0, IrGetValueImpl(-1, -1, wrapperViewIrClass.thisReceiver!!.symbol))
+            addWrapperCall.putValueArgument(0, IrGetValueImpl(-1, -1, wrapperViewAsThisReceiver))
             statements.add(addWrapperCall)
 
 
 
             val setLayoutParamsFunction = linearLayoutClass.unsubstitutedMemberScope.getContributedFunctions(Name.identifier("setLayoutParams"), NoLookupLocation.FROM_BACKEND).single()
-            statements.add(IrInstanceInitializerCallImpl(-1, -1, wrapperViewIrClass.symbol))
+            statements.add(IrInstanceInitializerCallImpl(-1, -1, context.symbolTable.referenceClass(syntheticClassDescriptor)))
             val setLayoutParamsCall = org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl(
                     -1, -1, context.moduleDescriptor.builtIns.unitType,
                     context.symbolTable.referenceSimpleFunction(setLayoutParamsFunction),
                     setLayoutParamsFunction, null
             )
-            setLayoutParamsCall.dispatchReceiver = IrGetValueImpl(-1, -1, wrapperViewIrClass.thisReceiver!!.symbol)
+            setLayoutParamsCall.dispatchReceiver = IrGetValueImpl(-1, -1, wrapperViewAsThisReceiver)
             setLayoutParamsCall.putValueArgument(0, layoutParams)
             statements.add(setLayoutParamsCall)
 
 
 
-            val componentInstanceProperty = wrapperViewIrClass.declarations.filter { it.descriptor is PropertyDescriptor && it.descriptor.name.identifier == "componentInstance" }.single().descriptor as PropertyDescriptor
-            val componentConstructor = component.declarations.filter { it is IrConstructor }.single() as IrConstructor // TODO: don't use component
+            val componentInstanceProperty = syntheticClassDescriptor.componentInstanceField
+            val componentConstructorDescriptor = (componentMetadata.descriptor as ClassDescriptor).unsubstitutedPrimaryConstructor!!
+            val componentConstructor = context.symbolTable.referenceConstructor(componentConstructorDescriptor)
             val componentConstructorCall = IrCallImpl(-1, -1, (componentMetadata.descriptor as ClassDescriptor).defaultType, // TODO: rethink cast
-                                                      componentConstructor.symbol,
-                                                      componentConstructor.descriptor, null)
-            statements.add(IrSetFieldImpl(-1, -1, context.symbolTable.referenceField(componentInstanceProperty), IrGetValueImpl(-1, -1, wrapperViewIrClass.thisReceiver!!.symbol), componentConstructorCall))
+                                                      componentConstructor,
+                                                      componentConstructorDescriptor, null)
+            statements.add(IrSetFieldImpl(-1, -1, context.symbolTable.referenceField(componentInstanceProperty), IrGetValueImpl(-1, -1, wrapperViewAsThisReceiver), componentConstructorCall))
 
             constructor.body = IrBlockBodyImpl(-1, -1, statements)
         }
     return constructor
 }
 
-private fun generateOnAttachFunction(context: GeneratorContext, componentMetadata: ComponentMetadata, syntheticClassDescriptor: GeneratedViewClassDescriptor, wrapperViewIrClass: IrClass): IrFunction {
+private fun generateOnAttachFunction(context: GeneratorContext, componentMetadata: ComponentMetadata): IrFunction {
+    val syntheticClassDescriptor = componentMetadata.wrapperViewDescriptor
     val functionDescriptor = syntheticClassDescriptor.onAttachDescriptor
     val irFunction = context.symbolTable.declareSimpleFunction(-1, -1, IrDeclarationOrigin.DEFINED, functionDescriptor)
         .buildWithScope(context) { irFunction ->
-
             irFunction.createParameterDeclarations()
-
+            val wrapperViewAsThisReceiver = irFunction.dispatchReceiverParameter!!.symbol
 
             val flushFunction = context.symbolTable.referenceFunction(syntheticClassDescriptor.flushComponentRerenderDescriptor)
             val flushCall = org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl(
@@ -122,7 +124,7 @@ private fun generateOnAttachFunction(context: GeneratorContext, componentMetadat
                     flushFunction.descriptor
                     , null
             )
-            flushCall.dispatchReceiver = IrGetValueImpl(-1, -1, wrapperViewIrClass.thisReceiver!!.symbol)
+            flushCall.dispatchReceiver = IrGetValueImpl(-1, -1, wrapperViewAsThisReceiver)
 
             val linearLayoutClassDescriptor = context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("android.widget.LinearLayout")))!!
             val superFunction = linearLayoutClassDescriptor.unsubstitutedMemberScope.getContributedFunctions(Name.identifier("onAttachedToWindow"), NoLookupLocation.FROM_BACKEND).single()
@@ -132,25 +134,27 @@ private fun generateOnAttachFunction(context: GeneratorContext, componentMetadat
                     superFunction
                     , null, null, context.symbolTable.referenceClass(syntheticClassDescriptor.getSuperClassNotAny()!!)
             )
-            superCall.dispatchReceiver = IrGetValueImpl(-1, -1, wrapperViewIrClass.thisReceiver!!.symbol)
+            superCall.dispatchReceiver = IrGetValueImpl(-1, -1, wrapperViewAsThisReceiver)
 
             irFunction.body = IrBlockBodyImpl(-1, -1, listOf(flushCall, superCall))
         }
     return irFunction
 }
 
-private fun generateFlushComponentRerender(context: GeneratorContext, componentMetadata: ComponentMetadata, syntheticClassDescriptor: GeneratedViewClassDescriptor, wrapperViewIrClass: IrClass): IrFunction {
+private fun generateFlushComponentRerender(context: GeneratorContext, componentMetadata: ComponentMetadata): IrFunction {
+    val syntheticClassDescriptor = componentMetadata.wrapperViewDescriptor
     val functionDescriptor = syntheticClassDescriptor.flushComponentRerenderDescriptor
     val irFunction = context.symbolTable.declareSimpleFunction(-1, -1, IrDeclarationOrigin.DEFINED, functionDescriptor)
         .buildWithScope(context) { irFunction ->
-
+            irFunction.createParameterDeclarations()
+            val wrapperViewAsThisReceiver = irFunction.dispatchReceiverParameter!!.symbol
 
             val childCountDescriptor = componentMetadata.wrapperViewDescriptor.getSuperClassNotAny()!!.unsubstitutedMemberScope.getContributedFunctions(
                     Name.identifier("getChildCount"), NoLookupLocation.FROM_BACKEND).single {it.valueParameters.size == 0}
             val childCountCall = IrGetterCallImpl(-1, -1,
                                                   context.symbolTable.referenceSimpleFunction(childCountDescriptor),
                                                   childCountDescriptor, 0)
-            childCountCall.dispatchReceiver = IrGetValueImpl(-1, -1, wrapperViewIrClass.thisReceiver!!.symbol)
+            childCountCall.dispatchReceiver = IrGetValueImpl(-1, -1, wrapperViewAsThisReceiver)
 
             val renderIntoDescriptor = componentMetadata.renderIntoViewGroupDescriptor
             val renderIntoCall = org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl(
@@ -159,10 +163,10 @@ private fun generateFlushComponentRerender(context: GeneratorContext, componentM
                     renderIntoDescriptor, null
             )
             val componentInstanceField = syntheticClassDescriptor.unsubstitutedMemberScope.getContributedVariables(Name.identifier("componentInstance"), NoLookupLocation.FROM_BACKEND).single()
-            renderIntoCall.putValueArgument(0, IrGetValueImpl(-1, -1, wrapperViewIrClass.thisReceiver!!.symbol))
+            renderIntoCall.putValueArgument(0, IrGetValueImpl(-1, -1, wrapperViewAsThisReceiver))
             renderIntoCall.putValueArgument(1, IrConstImpl.int(-1, -1, context.builtIns.intType, 0))
             renderIntoCall.putValueArgument(2, childCountCall)
-            renderIntoCall.dispatchReceiver = IrGetFieldImpl(-1, -1, context.symbolTable.referenceField(componentInstanceField), IrGetValueImpl(-1, -1, wrapperViewIrClass.thisReceiver!!.symbol))
+            renderIntoCall.dispatchReceiver = IrGetFieldImpl(-1, -1, context.symbolTable.referenceField(componentInstanceField), IrGetValueImpl(-1, -1, wrapperViewAsThisReceiver))
 
             val exceptionClassDescriptor = context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("java.lang.Exception")))!!
             val catchVariableDescriptor = LocalVariableDescriptor(irFunction.descriptor, Annotations.EMPTY, Name.identifier("e"), exceptionClassDescriptor.defaultType, SourceElement.NO_SOURCE)
@@ -205,10 +209,13 @@ private fun generateFlushComponentRerender(context: GeneratorContext, componentM
     return irFunction
 }
 
-private fun generateRerenderMethod(context: GeneratorContext, componentMetadata: ComponentMetadata, syntheticClassDescriptor: GeneratedViewClassDescriptor, wrapperViewIrClass: IrClass): IrFunction {
+private fun generateRerenderMethod(context: GeneratorContext, componentMetadata: ComponentMetadata): IrFunction {
+    val syntheticClassDescriptor = componentMetadata.wrapperViewDescriptor
     val functionDescriptor = syntheticClassDescriptor.getRerenderMethodDescriptor()
     val irFunction = context.symbolTable.declareSimpleFunction(-1, -1, IrDeclarationOrigin.DEFINED, functionDescriptor)
         .buildWithScope(context) { irFunction ->
+            irFunction.createParameterDeclarations()
+            val wrapperViewAsThisReceiver = irFunction.dispatchReceiverParameter!!.symbol
 
             val looperClassDescriptor = context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("android.os.Looper")))!!
             val mainLooperFunction = looperClassDescriptor.staticScope.getContributedFunctions(Name.identifier("getMainLooper"), NoLookupLocation.FROM_BACKEND).single()
@@ -227,7 +234,7 @@ private fun generateRerenderMethod(context: GeneratorContext, componentMetadata:
             val helperConstructorCall = IrCallImpl(-1, -1, componentMetadata.renderHelperClassDescriptor.defaultType,
                                                    context.symbolTable.referenceConstructor(helperConstructor),
                                                    helperConstructor, null)
-            helperConstructorCall.putValueArgument(0, IrGetValueImpl(-1, -1, wrapperViewIrClass.thisReceiver!!.symbol))
+            helperConstructorCall.putValueArgument(0, IrGetValueImpl(-1, -1, wrapperViewAsThisReceiver))
 
             val postFunction = handlerClassDescriptor.unsubstitutedMemberScope.getContributedFunctions(Name.identifier("post"), NoLookupLocation.FROM_BACKEND).single()
             val postFunctionCall = org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl(

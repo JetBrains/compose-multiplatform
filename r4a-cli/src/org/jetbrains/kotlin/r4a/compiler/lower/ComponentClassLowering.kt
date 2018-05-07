@@ -36,10 +36,10 @@ import org.jetbrains.kotlin.types.TypeProjectionImpl
  * Creates synthetics and applies KTX lowering on a class-component.
  */
 fun lowerComponentClass(context: GeneratorContext, metadata: ComponentMetadata, component: IrClass) {
-    component.declarations.add(generateElementsHolderField(context, component)) // TODO: should not need component
-    component.declarations.add(generateRenderIntoViewGroupHelperFunction(context, component)) // TODO: should not need component
-    component.declarations.add(generateWrapperView(context, metadata, component)) // TODO: should not need component
-    component.declarations.add(generateComponentCompanionObject(context, metadata, component)) // TODO: should not need component
+    component.declarations.add(generateElementsHolderField(context, metadata))
+    component.declarations.add(generateRenderIntoViewGroupHelperFunction(context, metadata))
+    component.declarations.add(generateWrapperView(context, metadata))
+    component.declarations.add(generateComponentCompanionObject(context, metadata))
 
     lowerComposeFunction(context, component)
 }
@@ -126,8 +126,8 @@ private fun transform(context: GeneratorContext, component: IrClass, function: I
     return output
 }
 
-fun generateElementsHolderField(context: GeneratorContext, component: IrClass): IrField {
-    return context.symbolTable.declareField(-1, -1, IrDeclarationOrigin.DEFINED, ComponentMetadata.fromDescriptor(component.descriptor).elementsFieldDescriptor)
+fun generateElementsHolderField(context: GeneratorContext, componentMetadata: ComponentMetadata): IrField {
+    return context.symbolTable.declareField(-1, -1, IrDeclarationOrigin.DEFINED, componentMetadata.elementsFieldDescriptor)
 }
 
 private fun lowerComposeFunction(context: GeneratorContext, component: IrClass) {
@@ -164,31 +164,29 @@ private fun lowerComposeFunction(context: GeneratorContext, component: IrClass) 
     }, null)
 }
 
-fun generateRenderIntoViewGroupHelperFunction(context: GeneratorContext, component: IrClass): IrFunction {
-    val metadata = ComponentMetadata.fromDescriptor(component.descriptor)
-    val functionDescriptor = metadata.renderIntoViewGroupDescriptor
+fun generateRenderIntoViewGroupHelperFunction(context: GeneratorContext, componentMetadata: ComponentMetadata): IrFunction {
+    val functionDescriptor = componentMetadata.renderIntoViewGroupDescriptor
     val irFunction = context.symbolTable.declareSimpleFunction(-1, -1, IrDeclarationOrigin.DEFINED, functionDescriptor)
         .buildWithScope(context) { irFunction ->
-
             irFunction.createParameterDeclarations()
-
+            val componentAsThisReceiver = context.symbolTable.declareValueParameter(-1, -1, IrDeclarationOrigin.DEFINED, (componentMetadata.descriptor as ClassDescriptor).thisAsReceiverParameter).symbol
             val statements = mutableListOf<IrStatement>()
 
 
-            val renderFunction = context.symbolTable.referenceFunction(component.descriptor.unsubstitutedMemberScope.getContributedFunctions(Name.identifier("compose"), NoLookupLocation.FROM_BACKEND).single())
+            val renderFunction = context.symbolTable.referenceFunction(componentMetadata.descriptor.unsubstitutedMemberScope.getContributedFunctions(Name.identifier("compose"), NoLookupLocation.FROM_BACKEND).single())
             val renderCall = IrCallImpl(-1, -1, context.moduleDescriptor.builtIns.unitType,
                                         renderFunction,
                                         renderFunction.descriptor
                                         , null)
-            renderCall.dispatchReceiver = IrGetValueImpl(-1, -1, component.thisReceiver!!.symbol)
+            renderCall.dispatchReceiver = IrGetValueImpl(-1, -1, componentAsThisReceiver)
             statements.add(renderCall)
 
 
-            val getMarkupBuilderFunction = component.descriptor.unsubstitutedMemberScope.getContributedVariables(Name.identifier("markupBuilder"), NoLookupLocation.FROM_BACKEND).single().getter!!
+            val getMarkupBuilderFunction = componentMetadata.descriptor.unsubstitutedMemberScope.getContributedVariables(Name.identifier("markupBuilder"), NoLookupLocation.FROM_BACKEND).single().getter!!
             val getMarkupBuilderCall = IrGetterCallImpl(-1, -1,
                                                         context.symbolTable.referenceSimpleFunction(getMarkupBuilderFunction),
                                                         getMarkupBuilderFunction, 0)
-            getMarkupBuilderCall.dispatchReceiver = IrGetValueImpl(-1, -1,component.thisReceiver!!.symbol)
+            getMarkupBuilderCall.dispatchReceiver = IrGetValueImpl(-1, -1,componentAsThisReceiver)
 
             val dslBuilderClassDescriptor = context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(FqName(R4aUtils.generateR4APackageName()+".R4aElementBuilderDSL")))!!
 
@@ -203,14 +201,14 @@ fun generateRenderIntoViewGroupHelperFunction(context: GeneratorContext, compone
             val staticRenderIntoCall = IrCallImpl(-1, -1, context.moduleDescriptor.builtIns.unitType,
                                                   context.symbolTable.referenceSimpleFunction(staticRenderIntoDescriptor),
                                                   staticRenderIntoDescriptor, null)
-            staticRenderIntoCall.putValueArgument(0, IrGetFieldImpl(-1, -1, context.symbolTable.referenceField(metadata.elementsFieldDescriptor), IrGetValueImpl(-1, -1, component.thisReceiver!!.symbol)))
+            staticRenderIntoCall.putValueArgument(0, IrGetFieldImpl(-1, -1, context.symbolTable.referenceField(componentMetadata.elementsFieldDescriptor), IrGetValueImpl(-1, -1, componentAsThisReceiver)))
             staticRenderIntoCall.putValueArgument(1, renderResultsMethodCall)
             staticRenderIntoCall.putValueArgument(2, IrGetValueImpl(-1, -1, irFunction.valueParameters[0].symbol))
             staticRenderIntoCall.putValueArgument(3, IrGetValueImpl(-1, -1, irFunction.valueParameters[1].symbol))
             staticRenderIntoCall.putValueArgument(4, IrGetValueImpl(-1, -1, irFunction.valueParameters[2].symbol))
             statements.add(staticRenderIntoCall)
 
-            statements.add(IrSetFieldImpl(-1, -1, context.symbolTable.referenceField(metadata.elementsFieldDescriptor), IrGetValueImpl(-1, -1, component.thisReceiver!!.symbol), renderResultsMethodCall))
+            statements.add(IrSetFieldImpl(-1, -1, context.symbolTable.referenceField(componentMetadata.elementsFieldDescriptor), IrGetValueImpl(-1, -1, componentAsThisReceiver), renderResultsMethodCall))
 
             irFunction.body = IrBlockBodyImpl(-1, -1, statements)
         }
