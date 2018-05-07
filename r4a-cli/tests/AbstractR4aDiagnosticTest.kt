@@ -16,7 +16,8 @@ import org.jetbrains.kotlin.config.languageVersionSettings
 import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.diagnostics.DiagnosticWithParameters1
 import org.jetbrains.kotlin.diagnostics.RenderedDiagnostic
-import org.jetbrains.kotlin.r4a.R4aClassAnalisysHandlerExtension
+import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
+import org.jetbrains.kotlin.r4a.ComponentsClosedDeclarationChecker
 import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisHandlerExtension
 import org.jetbrains.kotlin.test.ConfigurationKind
 import org.jetbrains.kotlin.test.KotlinTestUtils
@@ -106,8 +107,8 @@ abstract class AbstractR4aDiagnosticsTest: TestCase() {
     }
 
     fun setupEnvironment(environment: KotlinCoreEnvironment) {
-        // Add analysis extensions here
-        AnalysisHandlerExtension.registerExtension(environment.project, R4aClassAnalisysHandlerExtension())
+        // Add checkers here
+        StorageComponentContainerContributor.registerExtension(environment.project, ComponentsClosedDeclarationChecker())
     }
 
     override fun tearDown() {
