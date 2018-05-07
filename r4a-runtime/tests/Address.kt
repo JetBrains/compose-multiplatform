@@ -3,8 +3,9 @@ import com.google.r4a.frames.Holder
 import com.google.r4a.frames.frameId
 import com.google.r4a.frames.readable
 import com.google.r4a.frames.writable
+import com.google.r4a.frames.Record
 
-class Address(street: String, city: String): Holder<Address.AddressRecord> {
+class Address(street: String, city: String): Holder {
     var street: String
         get() = next.readable().street
         set(value: String) { next.writable(this).street = value }
@@ -24,22 +25,24 @@ class Address(street: String, city: String): Holder<Address.AddressRecord> {
         next.minFrame = frameId
     }
 
-    class AddressRecord() : AbstractRecord<AddressRecord>() {
-        var street: String = ""
-        var city: String = ""
-
-        override fun create() = AddressRecord()
-        override fun assign(value: AddressRecord) {
-            street = value.street
-            city = value.city
-        }
-    }
-
-    override fun prepend(r: AddressRecord) {
+    override fun prepend(r: Record) {
         r.next = next
-        next = r
+        next = r as AddressRecord
     }
 
     override val first: AddressRecord get() = next
 }
+
+class AddressRecord() : AbstractRecord() {
+    var street: String = ""
+    var city: String = ""
+
+    override fun create(): Record = AddressRecord()
+    override fun assign(value: Record) {
+        val other = value as AddressRecord
+        street = other.street
+        city = other.city
+    }
+}
+
 

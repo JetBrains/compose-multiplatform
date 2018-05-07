@@ -267,9 +267,9 @@ inline fun <reified T: Throwable> expectThrow(@Suppress("UNUSED_PARAMETER") e: K
     Assert.assertTrue(thrown)
 }
 
-val <T: Record<T>> T.length: Int
+val Record.length: Int
     get() {
-        var current: T? = this
+        var current: Record? = this
         var len = 0
         while (current != null) {
             len++

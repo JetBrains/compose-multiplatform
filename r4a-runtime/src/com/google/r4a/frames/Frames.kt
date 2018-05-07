@@ -5,24 +5,24 @@ import java.util.BitSet
 
 class FrameAborted(val frame: FrameData) : RuntimeException("Frame aborted") {}
 
-interface Record<T> where T : Record<T> {
+interface Record {
     var minFrame: Int
     var maxFrame: Int
-    var next: T?
-    fun assign(value: T)
-    fun create(): T
+    var next: Record?
+    fun assign(value: Record)
+    fun create(): Record
 }
 
-abstract class AbstractRecord<T>: Record<T>  where T: Record<T> {
+abstract class AbstractRecord: Record {
     override var minFrame: Int = 0
     override var maxFrame: Int = Int.MAX_VALUE
-    override var next: T? = null
+    override var next: Record? = null
 }
 
 internal val threadFrame = ThreadLocal<FrameData>()
 
 class FrameData(val id: Int, internal val invalid: BitSet, readOnly: Boolean, internal val implicit: Boolean) {
-    internal val modified = if (readOnly) null else HashSet<Holder<*>>()
+    internal val modified = if (readOnly) null else HashSet<Holder>()
 
     val readonly: Boolean
         get() = modified == null
@@ -236,17 +236,17 @@ private fun valid(currentFrame: Int, candidateFrame: Int, invalid: BitSet): Bool
 }
 
 // Determine if the given data is valid for the frame.
-private fun <T : Record<T>> valid(data: T, frame: Int, invalid: BitSet): Boolean {
+private fun valid(data: Record, frame: Int, invalid: BitSet): Boolean {
     // A frame is valid if the birth frame (i.e. min frame) is valid and the death frame (i.e. the max frame)
     // is invalid.
     return valid(frame, data.minFrame, invalid) && !valid(frame, data.maxFrame, invalid)
 }
 
-private fun <T: Record<T>> readable(r: T, id: Int, invalid: BitSet): T {
+private fun <T: Record> readable(r: T, id: Int, invalid: BitSet): T {
     // The readable data is the first valid data with respect to the current frame.
     // This assumes the frames are in order.
-    var current: T? = r
-    var candidate: T? = null
+    var current: Record? = r
+    var candidate: Record? = null
     while(current != null) {
         if (valid(current, id, invalid)) {
             candidate = if (candidate == null) current else if (candidate.minFrame < current.minFrame) current else candidate
@@ -254,29 +254,29 @@ private fun <T: Record<T>> readable(r: T, id: Int, invalid: BitSet): T {
         current = current.next
     }
     if (candidate != null) {
-        return candidate
+        return candidate as T
     }
     throw IllegalStateException("Could not find a current")
 }
 
-fun <T> T.readable(): T where T: Record<T> {
+fun <T: Record> T.readable(): T {
     return this.readable(currentFrameData())
 }
 
-fun <T> T.readable(frame: FrameData): T where T: Record<T> {
+fun <T: Record> T.readable(frame: FrameData): T {
     return readable(this, frame.id, frame.invalid)
 }
 
-interface Holder<T> where T: Record<T> {
-    val first: T
-    fun prepend(r: T)
+interface Holder {
+    val first: Record
+    fun prepend(r: Record)
 
     fun canCommit(current: Int, invalid: BitSet, start: Int, startSet: BitSet): Boolean {
         return readable(first, current, invalid) == readable(first, start, startSet)
     }
 }
 
-fun <T> T.writable(holder: Holder<T>): T where T: Record<T> {
+fun <T: Record> T.writable(holder: Holder): T {
     return this.writable(holder, currentFrameData())
 }
 
@@ -286,8 +286,8 @@ fun <T> T.writable(holder: Holder<T>): T where T: Record<T> {
  * maxFrame of 0 is indicates that the record is in the process of being created (possibly on another thread) and
  * should not be reused.
  */
-private fun <T: Record<T>> used(holder: Holder<T>): T? {
-    var current: T? = holder.first
+private fun used(holder: Holder): Record? {
+    var current: Record? = holder.first
     val min = minOpenId
     while (current != null) {
         if (current.maxFrame != 0 && ((current.maxFrame < min && !abortedFrames[current.maxFrame]) || abortedFrames[current.minFrame]))
@@ -298,7 +298,7 @@ private fun <T: Record<T>> used(holder: Holder<T>): T? {
 }
 
 
-fun <T> T.writable(holder: Holder<T>, frame: FrameData): T where T: Record<T> {
+fun <T: Record> T.writable(holder: Holder, frame: FrameData): T {
     if (frame.readonly) throw IllegalStateException("In a readonly frame")
     val id = frame.id
     val readData = readable<T>(this, id, frame.invalid)
@@ -307,8 +307,8 @@ fun <T> T.writable(holder: Holder<T>, frame: FrameData): T where T: Record<T> {
     if (readData.minFrame == frame.id) return readData
 
     // Otherwise, make a copy of the readable data and mark it as born in this frame, making it writable.
-    val used = used(holder)
-    val newData = used ?: readData.create().apply { maxFrame = 0; minFrame = 0; holder.prepend(this) }
+    val used = used(holder) as T?
+    val newData = used ?: readData.create().apply { maxFrame = 0; minFrame = 0; holder.prepend(this as T) } as T
     newData.assign(readData)
     newData.minFrame = id
     newData.maxFrame = Int.MAX_VALUE
