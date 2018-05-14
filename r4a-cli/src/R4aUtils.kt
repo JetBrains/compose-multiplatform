@@ -4,16 +4,22 @@ import com.intellij.util.SmartList
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.idea.resolve.ResolutionFacade
+import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtQualifiedExpression
 import org.jetbrains.kotlin.psi.KtSimpleNameExpression
+import org.jetbrains.kotlin.r4a.analysis.ComponentMetadata
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.QualifiedExpressionResolver
 import org.jetbrains.kotlin.resolve.calls.checkers.UnderscoreUsageChecker
 import org.jetbrains.kotlin.resolve.calls.components.hasDefaultValue
+import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
+import org.jetbrains.kotlin.resolve.descriptorUtil.getAllSuperclassesWithoutAny
+import org.jetbrains.kotlin.resolve.descriptorUtil.isSubclassOf
+import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.scopes.*
 import org.jetbrains.kotlin.resolve.scopes.receivers.*
 import org.jetbrains.kotlin.resolve.scopes.utils.collectAllFromMeAndParent
@@ -39,11 +45,13 @@ object R4aUtils {
 
     fun generateR4APackageName() = "c" + ('p' - booleanArrayOf(true).size).toChar() + "m.google.r4a"
 
+    fun r4aFqName(cname: String) = FqName("${generateR4APackageName()}.$cname")
+
     fun setterMethodFromPropertyName(name: String): String {
         return "set${name[0].toUpperCase()}${name.slice(1 until name.length)}"
     }
 
-    private fun propertyNameFromSetterMethod(name: String): String {
+    fun propertyNameFromSetterMethod(name: String): String {
         return if (name.startsWith("set")) "${name[3].toLowerCase()}${name.slice(4 until name.length)}" else name
     }
 
@@ -54,6 +62,14 @@ object R4aUtils {
     private fun getSyntheticDescriptors(types: Collection<KotlinType>, facade: ResolutionFacade?): Collection<DeclarationDescriptor> {
         val scope = facade?.getFrontendService(SyntheticScopes::class.java) ?: return listOf()
         return scope.collectSyntheticMemberFunctions(types) + scope.collectSyntheticExtensionProperties(types)
+    }
+
+    private fun getAllAttributeAdapters(scope: LexicalScope, module: ModuleDescriptor): Collection<ClassDescriptor> {
+        val attributeAdapterName = r4aFqName("AttributeAdapter").asString()
+        return scope
+            .collectAllFromMeAndParent { s -> s.getContributedDescriptors() }
+            .mapNotNull { it as? ClassDescriptor }
+            .filter { it.name.asString().indexOf("AttributeAdapter") != -1 }
     }
 
     fun getPossibleAttributesForDescriptor(descriptor: DeclarationDescriptor, scope: LexicalScope, facade: ResolutionFacade?): Collection<AttributeInfo> {
@@ -101,6 +117,27 @@ object R4aUtils {
                         else -> null
                     }
                 }
+
+                val adapterSetters = getAllAttributeAdapters(scope, scope.ownerDescriptor.module)
+                    .flatMap { cd ->
+                        cd
+                            .unsubstitutedMemberScope
+                            .getContributedDescriptors()
+                            .mapNotNull { it as? FunctionDescriptor }
+                            .mapNotNull { fn ->
+                                if (fn.valueParameters.size != 2) null
+                                else if (fn.returnType?.isUnit() != true) null
+                                else if (!isSetterMethodName(fn.name.identifier)) null
+                                else if (!Visibilities.isVisibleIgnoringReceiver(fn, scope.ownerDescriptor)) null
+                                else if (descriptor.defaultType.isSubtypeOf(fn.valueParameters[0].type)) AttributeInfo(
+                                    name = propertyNameFromSetterMethod(fn.name.identifier),
+                                    descriptor = fn,
+                                    type = fn.valueParameters[1].type,
+                                    required = false
+                                )
+                                else null
+                            }
+                    }
 
                 val extensionGettersSetters = scope
                     .collectAllFromMeAndParent { s -> s.getContributedDescriptors() }
@@ -159,7 +196,8 @@ object R4aUtils {
                             else -> null
                         }
                     }
-                return realGettersSetters + extensionGettersSetters + syntheticGettersSetters
+
+                return realGettersSetters + extensionGettersSetters + syntheticGettersSetters + adapterSetters
             }
             is FunctionDescriptor -> descriptor.valueParameters.map { param ->
                 AttributeInfo(

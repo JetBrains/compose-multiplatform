@@ -1,255 +1,447 @@
 package org.jetbrains.kotlin.r4a.compiler.lower
 
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.descriptors.PropertyDescriptor
-import org.jetbrains.kotlin.descriptors.SourceElement
-import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.findClassAcrossModuleDependencies
-import org.jetbrains.kotlin.descriptors.impl.LocalVariableDescriptor
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrFunction
-import org.jetbrains.kotlin.ir.declarations.impl.IrFieldImpl
 import org.jetbrains.kotlin.ir.expressions.impl.*
 import org.jetbrains.kotlin.ir.util.createParameterDeclarations
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
-import org.jetbrains.kotlin.r4a.GeneratedViewClassDescriptor
 import org.jetbrains.kotlin.r4a.R4aUtils
 import org.jetbrains.kotlin.r4a.analysis.ComponentMetadata
 import org.jetbrains.kotlin.r4a.compiler.ir.buildWithScope
-import org.jetbrains.kotlin.resolve.descriptorUtil.classId
 import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperClassNotAny
-import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperClassOrAny
 
 fun generateWrapperView(context: GeneratorContext, componentMetadata: ComponentMetadata): IrClass {
     val syntheticClassDescriptor = componentMetadata.wrapperViewDescriptor
     val wrapperViewIrClass = context.symbolTable.declareClass(-1, -1, IrDeclarationOrigin.DEFINED, syntheticClassDescriptor)
 
     wrapperViewIrClass.createParameterDeclarations()
-    wrapperViewIrClass.declarations.add(generateComponentInstanceProperty(context, componentMetadata))
     wrapperViewIrClass.declarations.add(generateConstructor(context, componentMetadata))
+    wrapperViewIrClass.declarations.addAll(generateProperties(context, componentMetadata))
     wrapperViewIrClass.declarations.add(generateOnAttachFunction(context, componentMetadata))
-    wrapperViewIrClass.declarations.add(generateFlushComponentRerender(context, componentMetadata))
-    wrapperViewIrClass.declarations.add(generateRerenderMethod(context, componentMetadata))
-    wrapperViewIrClass.declarations.add(generateRerenderHelper(context, componentMetadata))
+    wrapperViewIrClass.declarations.add(generateOnDetachFunction(context, componentMetadata))
+    wrapperViewIrClass.declarations.add(generateOnPreDrawFunction(context, componentMetadata))
+    wrapperViewIrClass.declarations.addAll(generateAttributeSetterFunctions(context, componentMetadata))
 
     return wrapperViewIrClass
 }
 
 private fun generateConstructor(context: GeneratorContext, componentMetadata: ComponentMetadata): IrConstructor {
     val syntheticClassDescriptor = componentMetadata.wrapperViewDescriptor
-    val constructor = context.symbolTable.declareConstructor(-1, -1, IrDeclarationOrigin.DEFINED, syntheticClassDescriptor.unsubstitutedPrimaryConstructor!!)
+    return context.symbolTable.declareConstructor(
+        -1,
+        -1,
+        IrDeclarationOrigin.DEFINED,
+        syntheticClassDescriptor.unsubstitutedPrimaryConstructor
+    )
         .buildWithScope(context) { constructor ->
             constructor.createParameterDeclarations()
-            val wrapperViewAsThisReceiver = context.symbolTable.declareValueParameter(-1, -1, IrDeclarationOrigin.DEFINED, syntheticClassDescriptor.thisAsReceiverParameter).symbol
+            val wrapperViewAsThisReceiver = context.symbolTable.declareValueParameter(
+                -1,
+                -1,
+                IrDeclarationOrigin.DEFINED,
+                syntheticClassDescriptor.thisAsReceiverParameter
+            ).symbol
+            val getThisExpr = IrGetValueImpl(-1, -1, wrapperViewAsThisReceiver)
 
             val statements = mutableListOf<IrStatement>()
-            val superConstructor = context.symbolTable.referenceConstructor(componentMetadata.wrapperViewDescriptor.getSuperClassNotAny()!!.constructors.single{it.valueParameters.size == 1})
-            val superCall = IrDelegatingConstructorCallImpl(-1, -1, superConstructor, superConstructor.descriptor, 0)
-            superCall.putValueArgument(0, IrGetValueImpl(-1, -1, constructor.valueParameters[0].symbol))
+            val superConstructor =
+                context.symbolTable.referenceConstructor(componentMetadata.wrapperViewDescriptor.getSuperClassNotAny()!!.constructors.single { it.valueParameters.size == 1 })
+            val superCall = IrDelegatingConstructorCallImpl(-1, -1, superConstructor, superConstructor.descriptor, 0).apply {
+                putValueArgument(0, IrGetValueImpl(-1, -1, constructor.valueParameters[0].symbol))
+            }
+
             statements.add(superCall)
-            val linearLayoutClass = context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("android.widget.LinearLayout")))!!
-            val linearLayoutParamsClass = linearLayoutClass.unsubstitutedMemberScope.getContributedClassifier(Name.identifier("LayoutParams"), NoLookupLocation.FROM_BACKEND)!! as ClassDescriptor
-            val linearLayoutParamsConstructor = context.symbolTable.referenceConstructor(linearLayoutParamsClass.constructors.single { it.valueParameters.size == 2 && it.valueParameters[0].type == context.moduleDescriptor.builtIns.intType }!!)
 
-            val layoutParams = IrCallImpl(-1, -1, linearLayoutParamsClass.defaultType,
-                                          linearLayoutParamsConstructor,
-                                          linearLayoutParamsConstructor.descriptor, null)
-            layoutParams.putValueArgument(0, IrGetFieldImpl(-1, -1, context.symbolTable.referenceField(linearLayoutParamsClass.staticScope.getContributedVariables(
-                    Name.identifier("MATCH_PARENT"), NoLookupLocation.FROM_BACKEND).single()))
+
+            val linearLayoutClass =
+                context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("android.widget.LinearLayout")))!!
+            val linearLayoutParamsClass = linearLayoutClass.unsubstitutedMemberScope.getContributedClassifier(
+                Name.identifier("LayoutParams"),
+                NoLookupLocation.FROM_BACKEND
+            )!! as ClassDescriptor
+            val linearLayoutParamsConstructor =
+                context.symbolTable.referenceConstructor(linearLayoutParamsClass.constructors.single { it.valueParameters.size == 2 && it.valueParameters[0].type == context.moduleDescriptor.builtIns.intType }!!)
+
+            val layoutParams = IrCallImpl(
+                -1, -1, linearLayoutParamsClass.defaultType,
+                linearLayoutParamsConstructor,
+                linearLayoutParamsConstructor.descriptor, null
             )
-            layoutParams.putValueArgument(1, IrGetFieldImpl(-1, -1, context.symbolTable.referenceField(linearLayoutParamsClass.staticScope.getContributedVariables(
-                    Name.identifier("WRAP_CONTENT"), NoLookupLocation.FROM_BACKEND).single()))
+            layoutParams.putValueArgument(
+                0, IrGetFieldImpl(
+                    -1, -1, context.symbolTable.referenceField(
+                        linearLayoutParamsClass.staticScope.getContributedVariables(
+                            Name.identifier("MATCH_PARENT"), NoLookupLocation.FROM_BACKEND
+                        ).single()
+                    )
+                )
+            )
+            layoutParams.putValueArgument(
+                1, IrGetFieldImpl(
+                    -1, -1, context.symbolTable.referenceField(
+                        linearLayoutParamsClass.staticScope.getContributedVariables(
+                            Name.identifier("WRAP_CONTENT"), NoLookupLocation.FROM_BACKEND
+                        ).single()
+                    )
+                )
             )
 
-
-
-            val topLevelComponentCompanion = context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(FqName(R4aUtils.generateR4APackageName()+".Component")))!!.companionObjectDescriptor!!
-            val addWrapperFunction = topLevelComponentCompanion.unsubstitutedMemberScope.getContributedFunctions(Name.identifier("addWrapper"), NoLookupLocation.FROM_BACKEND).single()
-            val addWrapperCall = org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl(
-                    -1, -1, context.moduleDescriptor.builtIns.unitType,
-                    context.symbolTable.referenceSimpleFunction(addWrapperFunction),
-                    addWrapperFunction, null
-            )
-            addWrapperCall.dispatchReceiver = IrGetObjectValueImpl(-1, -1, topLevelComponentCompanion.defaultType, context.symbolTable.referenceClass(topLevelComponentCompanion))
-            addWrapperCall.putValueArgument(0, IrGetValueImpl(-1, -1, wrapperViewAsThisReceiver))
-            statements.add(addWrapperCall)
-
-
-
-            val setLayoutParamsFunction = linearLayoutClass.unsubstitutedMemberScope.getContributedFunctions(Name.identifier("setLayoutParams"), NoLookupLocation.FROM_BACKEND).single()
+            val setLayoutParamsFunction = linearLayoutClass.unsubstitutedMemberScope.getContributedFunctions(
+                Name.identifier("setLayoutParams"),
+                NoLookupLocation.FROM_BACKEND
+            ).single()
             statements.add(IrInstanceInitializerCallImpl(-1, -1, context.symbolTable.referenceClass(syntheticClassDescriptor)))
             val setLayoutParamsCall = org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl(
-                    -1, -1, context.moduleDescriptor.builtIns.unitType,
-                    context.symbolTable.referenceSimpleFunction(setLayoutParamsFunction),
-                    setLayoutParamsFunction, null
+                -1, -1, context.moduleDescriptor.builtIns.unitType,
+                context.symbolTable.referenceSimpleFunction(setLayoutParamsFunction),
+                setLayoutParamsFunction, null
             )
-            setLayoutParamsCall.dispatchReceiver = IrGetValueImpl(-1, -1, wrapperViewAsThisReceiver)
+            setLayoutParamsCall.dispatchReceiver = getThisExpr
             setLayoutParamsCall.putValueArgument(0, layoutParams)
             statements.add(setLayoutParamsCall)
 
 
-
             val componentInstanceProperty = syntheticClassDescriptor.componentInstanceField
-            val componentConstructorDescriptor = (componentMetadata.descriptor as ClassDescriptor).unsubstitutedPrimaryConstructor!!
+            val componentConstructorDescriptor = componentMetadata.descriptor.unsubstitutedPrimaryConstructor!!
             val componentConstructor = context.symbolTable.referenceConstructor(componentConstructorDescriptor)
-            val componentConstructorCall = IrCallImpl(-1, -1, (componentMetadata.descriptor as ClassDescriptor).defaultType, // TODO: rethink cast
-                                                      componentConstructor,
-                                                      componentConstructorDescriptor, null)
-            statements.add(IrSetFieldImpl(-1, -1, context.symbolTable.referenceField(componentInstanceProperty), IrGetValueImpl(-1, -1, wrapperViewAsThisReceiver), componentConstructorCall))
+            val componentConstructorCall = IrCallImpl(
+                -1, -1, componentMetadata.descriptor.defaultType,
+                componentConstructor,
+                componentConstructorDescriptor, null
+            )
+            // this.componentInstance = ComponentClass()
+            statements.add(
+                IrSetFieldImpl(
+                    -1,
+                    -1,
+                    context.symbolTable.referenceField(componentInstanceProperty),
+                    getThisExpr,
+                    componentConstructorCall
+                )
+            )
+
+            // this.dirty = true
+            statements.add(
+                IrSetFieldImpl(
+                    -1, -1,
+                    context.symbolTable.referenceField(syntheticClassDescriptor.dirtyField),
+                    getThisExpr,
+                    IrConstImpl.boolean(-1, -1, context.builtIns.booleanType, true)
+                )
+            )
+
+            val ccClass =
+                context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(R4aUtils.r4aFqName("CompositionContext")))!!
+
+            val ccCreateDescriptor = ccClass
+                .companionObjectDescriptor
+                ?.unsubstitutedMemberScope
+                ?.getContributedFunctions(Name.identifier("create"), NoLookupLocation.FROM_BACKEND)
+                ?.single()!!
+
+            val ccCreateCall = IrCallImpl(
+                -1, -1,
+                context.symbolTable.referenceSimpleFunction(ccCreateDescriptor),
+                ccCreateDescriptor
+            )
+
+            ccCreateCall.dispatchReceiver = IrGetObjectValueImpl(
+                -1, -1,
+                ccClass.companionObjectDescriptor!!.defaultType,
+                context.symbolTable.referenceClass(ccClass.companionObjectDescriptor!!)
+            )
+
+            // context (Context)
+            ccCreateCall.putValueArgument(0, IrGetValueImpl(-1, -1, constructor.valueParameters[0].symbol))
+
+            // this (ViewGroup)
+            ccCreateCall.putValueArgument(1, getThisExpr)
+
+            // this.componentInstance (Component)
+            ccCreateCall.putValueArgument(
+                2, IrGetFieldImpl(
+                    -1, -1,
+                    context.symbolTable.referenceField(componentInstanceProperty),
+                    getThisExpr
+                )
+            )
+
+            // this.compositionContext = CompositionContext.factory(context, this, instance)
+            statements.add(
+                IrSetFieldImpl(
+                    -1, -1,
+                    context.symbolTable.referenceField(syntheticClassDescriptor.compositionContextField),
+                    getThisExpr,
+                    ccCreateCall
+                )
+            )
 
             constructor.body = IrBlockBodyImpl(-1, -1, statements)
         }
-    return constructor
 }
 
 private fun generateOnAttachFunction(context: GeneratorContext, componentMetadata: ComponentMetadata): IrFunction {
     val syntheticClassDescriptor = componentMetadata.wrapperViewDescriptor
     val functionDescriptor = syntheticClassDescriptor.onAttachDescriptor
-    val irFunction = context.symbolTable.declareSimpleFunction(-1, -1, IrDeclarationOrigin.DEFINED, functionDescriptor)
+    val viewDescriptor = context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("android.view.View")))!!
+    val viewGroupDescriptor =
+        context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("android.view.ViewGroup")))!!
+    val viewTreeObserverDescriptor =
+        context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("android.view.ViewTreeObserver")))!!
+    return context.symbolTable.declareSimpleFunction(-1, -1, IrDeclarationOrigin.DEFINED, functionDescriptor)
         .buildWithScope(context) { irFunction ->
             irFunction.createParameterDeclarations()
-            val wrapperViewAsThisReceiver = irFunction.dispatchReceiverParameter!!.symbol
+            val wrapperViewAsThisReceiver = context.symbolTable.declareValueParameter(
+                -1,
+                -1,
+                IrDeclarationOrigin.DEFINED,
+                syntheticClassDescriptor.thisAsReceiverParameter
+            ).symbol
+            val getThisExpr = IrGetValueImpl(-1, -1, wrapperViewAsThisReceiver)
 
-            val flushFunction = context.symbolTable.referenceFunction(syntheticClassDescriptor.flushComponentRerenderDescriptor)
-            val flushCall = org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl(
-                    -1, -1, context.moduleDescriptor.builtIns.unitType,
-                    flushFunction,
-                    flushFunction.descriptor
-                    , null
+            val superFunction = viewGroupDescriptor.unsubstitutedMemberScope.getContributedFunctions(
+                Name.identifier("onAttachedToWindow"),
+                NoLookupLocation.FROM_BACKEND
+            ).single()
+            val superCall = IrCallImpl(
+                -1, -1,
+                context.moduleDescriptor.builtIns.unitType,
+                context.symbolTable.referenceSimpleFunction(superFunction),
+                superFunction
+                , null, null, context.symbolTable.referenceClass(syntheticClassDescriptor.getSuperClassNotAny()!!)
             )
-            flushCall.dispatchReceiver = IrGetValueImpl(-1, -1, wrapperViewAsThisReceiver)
+            superCall.dispatchReceiver = getThisExpr
 
-            val linearLayoutClassDescriptor = context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("android.widget.LinearLayout")))!!
-            val superFunction = linearLayoutClassDescriptor.unsubstitutedMemberScope.getContributedFunctions(Name.identifier("onAttachedToWindow"), NoLookupLocation.FROM_BACKEND).single()
-            val superCall = org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl(
-                    -1, -1, context.moduleDescriptor.builtIns.unitType,
-                    context.symbolTable.referenceSimpleFunction(superFunction),
-                    superFunction
-                    , null, null, context.symbolTable.referenceClass(syntheticClassDescriptor.getSuperClassNotAny()!!)
+            val getViewTreeObserverFunction = viewDescriptor
+                .unsubstitutedMemberScope
+                .getContributedFunctions(Name.identifier("getViewTreeObserver"), NoLookupLocation.FROM_BACKEND)
+                .single()
+            val getViewTreeObserverCall = IrCallImpl(
+                -1, -1,
+                context.symbolTable.referenceSimpleFunction(getViewTreeObserverFunction)
             )
-            superCall.dispatchReceiver = IrGetValueImpl(-1, -1, wrapperViewAsThisReceiver)
+            getViewTreeObserverCall.dispatchReceiver = getThisExpr
 
-            irFunction.body = IrBlockBodyImpl(-1, -1, listOf(flushCall, superCall))
+            val addOnPreDrawListenerFunction = viewTreeObserverDescriptor
+                .unsubstitutedMemberScope
+                .getContributedFunctions(Name.identifier("addOnPreDrawListener"), NoLookupLocation.FROM_BACKEND)
+                .single()
+
+            val addOnPreDrawListenerCall = IrCallImpl(
+                -1, -1,
+                context.symbolTable.referenceSimpleFunction(addOnPreDrawListenerFunction)
+            )
+
+            addOnPreDrawListenerCall.dispatchReceiver = getViewTreeObserverCall
+            addOnPreDrawListenerCall.putValueArgument(0, getThisExpr)
+
+            irFunction.body = IrBlockBodyImpl(-1, -1, listOf(superCall, addOnPreDrawListenerCall))
         }
-    return irFunction
 }
 
-private fun generateFlushComponentRerender(context: GeneratorContext, componentMetadata: ComponentMetadata): IrFunction {
+private fun generateOnDetachFunction(context: GeneratorContext, componentMetadata: ComponentMetadata): IrFunction {
     val syntheticClassDescriptor = componentMetadata.wrapperViewDescriptor
-    val functionDescriptor = syntheticClassDescriptor.flushComponentRerenderDescriptor
-    val irFunction = context.symbolTable.declareSimpleFunction(-1, -1, IrDeclarationOrigin.DEFINED, functionDescriptor)
+    val functionDescriptor = syntheticClassDescriptor.onDetachDescriptor
+    val viewDescriptor = context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("android.view.View")))!!
+    val viewGroupDescriptor =
+        context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("android.view.ViewGroup")))!!
+    val viewTreeObserverDescriptor =
+        context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("android.view.ViewTreeObserver")))!!
+    return context.symbolTable.declareSimpleFunction(-1, -1, IrDeclarationOrigin.DEFINED, functionDescriptor)
         .buildWithScope(context) { irFunction ->
             irFunction.createParameterDeclarations()
-            val wrapperViewAsThisReceiver = irFunction.dispatchReceiverParameter!!.symbol
+            val wrapperViewAsThisReceiver = context.symbolTable.declareValueParameter(
+                -1,
+                -1,
+                IrDeclarationOrigin.DEFINED,
+                syntheticClassDescriptor.thisAsReceiverParameter
+            ).symbol
+            val getThisExpr = IrGetValueImpl(-1, -1, wrapperViewAsThisReceiver)
 
-            val childCountDescriptor = componentMetadata.wrapperViewDescriptor.getSuperClassNotAny()!!.unsubstitutedMemberScope.getContributedFunctions(
-                    Name.identifier("getChildCount"), NoLookupLocation.FROM_BACKEND).single {it.valueParameters.size == 0}
-            val childCountCall = IrGetterCallImpl(-1, -1,
-                                                  context.symbolTable.referenceSimpleFunction(childCountDescriptor),
-                                                  childCountDescriptor, 0)
-            childCountCall.dispatchReceiver = IrGetValueImpl(-1, -1, wrapperViewAsThisReceiver)
-
-            val renderIntoDescriptor = componentMetadata.renderIntoViewGroupDescriptor
-            val renderIntoCall = org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl(
-                    -1, -1, context.moduleDescriptor.builtIns.unitType,
-                    context.symbolTable.referenceSimpleFunction(renderIntoDescriptor),
-                    renderIntoDescriptor, null
+            val superFunction = viewGroupDescriptor.unsubstitutedMemberScope.getContributedFunctions(
+                Name.identifier("onDetachedFromWindow"),
+                NoLookupLocation.FROM_BACKEND
+            ).single()
+            val superCall = IrCallImpl(
+                -1, -1,
+                context.moduleDescriptor.builtIns.unitType,
+                context.symbolTable.referenceSimpleFunction(superFunction),
+                superFunction
+                , null, null, context.symbolTable.referenceClass(syntheticClassDescriptor.getSuperClassNotAny()!!)
             )
-            val componentInstanceField = syntheticClassDescriptor.unsubstitutedMemberScope.getContributedVariables(Name.identifier("componentInstance"), NoLookupLocation.FROM_BACKEND).single()
-            renderIntoCall.putValueArgument(0, IrGetValueImpl(-1, -1, wrapperViewAsThisReceiver))
-            renderIntoCall.putValueArgument(1, IrConstImpl.int(-1, -1, context.builtIns.intType, 0))
-            renderIntoCall.putValueArgument(2, childCountCall)
-            renderIntoCall.dispatchReceiver = IrGetFieldImpl(-1, -1, context.symbolTable.referenceField(componentInstanceField), IrGetValueImpl(-1, -1, wrapperViewAsThisReceiver))
+            superCall.dispatchReceiver = getThisExpr
 
-            val exceptionClassDescriptor = context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("java.lang.Exception")))!!
-            val catchVariableDescriptor = LocalVariableDescriptor(irFunction.descriptor, Annotations.EMPTY, Name.identifier("e"), exceptionClassDescriptor.defaultType, SourceElement.NO_SOURCE)
-            val ctch = IrCatchImpl(-1, -1, context.symbolTable.declareVariable(-1, -1, IrDeclarationOrigin.CATCH_PARAMETER, catchVariableDescriptor))
+            val getViewTreeObserverFunction = viewDescriptor
+                .unsubstitutedMemberScope
+                .getContributedFunctions(Name.identifier("getViewTreeObserver"), NoLookupLocation.FROM_BACKEND)
+                .single()
+            val getViewTreeObserverCall = IrCallImpl(
+                -1, -1,
+                context.symbolTable.referenceSimpleFunction(getViewTreeObserverFunction)
+            )
+            getViewTreeObserverCall.dispatchReceiver = getThisExpr
 
-            val throwableClassDescriptor = context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("kotlin.Throwable")))!!
-            val runtimeExceptionDescriptor = context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("java.lang.RuntimeException")))!!
-            val runtimeExceptionConstructor = runtimeExceptionDescriptor.constructors.single { it.valueParameters.size == 1 && (it.valueParameters[0].type.constructor.declarationDescriptor as ClassDescriptor).classId == throwableClassDescriptor.classId }
-            val runtimeExceptionCall = IrCallImpl(-1, -1, runtimeExceptionDescriptor.defaultType,
-                                                  context.symbolTable.referenceConstructor(runtimeExceptionConstructor),
-                                                  runtimeExceptionConstructor, null)
-            runtimeExceptionCall.putValueArgument(0, IrGetValueImpl(-1, -1, context.symbolTable.referenceVariable(catchVariableDescriptor)))
+            val removeOnPreDrawListenerFunction = viewTreeObserverDescriptor
+                .unsubstitutedMemberScope
+                .getContributedFunctions(Name.identifier("removeOnPreDrawListener"), NoLookupLocation.FROM_BACKEND)
+                .single()
 
-            val irThrow = org.jetbrains.kotlin.ir.expressions.impl.IrThrowImpl(
-                    -1,
-                    -1,
-                    context.builtIns.nothingType,
-                    runtimeExceptionCall
+            val removeOnPreDrawListenerCall = IrCallImpl(
+                -1, -1,
+                context.symbolTable.referenceSimpleFunction(removeOnPreDrawListenerFunction)
             )
 
-            ctch.result = org.jetbrains.kotlin.ir.expressions.impl.IrBlockImpl(-1, -1, context.builtIns.unitType, null, listOf(irThrow))
+            removeOnPreDrawListenerCall.dispatchReceiver = getViewTreeObserverCall
+            removeOnPreDrawListenerCall.putValueArgument(0, getThisExpr)
 
-            val tri = org.jetbrains.kotlin.ir.expressions.impl.IrTryImpl(
-                    -1,
-                    -1,
+            irFunction.body = IrBlockBodyImpl(-1, -1, listOf(superCall, removeOnPreDrawListenerCall))
+        }
+}
+
+private fun generateOnPreDrawFunction(context: GeneratorContext, componentMetadata: ComponentMetadata): IrFunction {
+    val syntheticClassDescriptor = componentMetadata.wrapperViewDescriptor
+    val functionDescriptor = syntheticClassDescriptor.onPreDraw
+    val compositionContextDescriptor =
+        context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(R4aUtils.r4aFqName("CompositionContext")))!!
+    return context.symbolTable.declareSimpleFunction(-1, -1, IrDeclarationOrigin.DEFINED, functionDescriptor)
+        .buildWithScope(context) { irFunction ->
+            irFunction.createParameterDeclarations()
+            val wrapperViewAsThisReceiver = context.symbolTable.declareValueParameter(
+                -1,
+                -1,
+                IrDeclarationOrigin.DEFINED,
+                syntheticClassDescriptor.thisAsReceiverParameter
+            ).symbol
+            val getThisExpr = IrGetValueImpl(-1, -1, wrapperViewAsThisReceiver)
+
+
+            val getDirtyCall = IrGetFieldImpl(
+                -1, -1,
+                context.symbolTable.referenceField(syntheticClassDescriptor.dirtyField),
+                getThisExpr
+            )
+
+            val setDirtyFalseCall = IrSetFieldImpl(
+                -1, -1,
+                context.symbolTable.referenceField(syntheticClassDescriptor.dirtyField),
+                getThisExpr,
+                IrConstImpl.boolean(-1, -1, context.builtIns.booleanType, false)
+            )
+
+            val getCompositionContextCall = IrGetFieldImpl(
+                -1, -1,
+                context.symbolTable.referenceField(syntheticClassDescriptor.compositionContextField),
+                getThisExpr
+            )
+
+            val recomposeFromRootFunction = compositionContextDescriptor
+                .unsubstitutedMemberScope
+                .getContributedFunctions(Name.identifier("recomposeFromRoot"), NoLookupLocation.FROM_BACKEND)
+                .single()
+            val recomposeFromRootExpr = IrCallImpl(
+                -1, -1,
+                context.symbolTable.referenceFunction(recomposeFromRootFunction)
+            )
+            recomposeFromRootExpr.dispatchReceiver = getCompositionContextCall
+
+            val ifDirtyExpr = IrIfThenElseImpl(
+                -1, -1,
+                context.builtIns.unitType,
+                getDirtyCall,
+
+                IrBlockImpl(
+                    -1, -1,
                     context.builtIns.unitType,
-                    org.jetbrains.kotlin.ir.expressions.impl.IrBlockImpl(
-                            -1,
-                            -1,
-                            context.builtIns.unitType,
-                            null,
-                            listOf(renderIntoCall)
-                    ),
-                    listOf(ctch),
-                    null
+                    null,
+                    listOf(recomposeFromRootExpr, setDirtyFalseCall)
+                )
             )
 
-            irFunction.body = IrBlockBodyImpl(-1, -1, listOf(tri))
+            val returnTrue = IrReturnImpl(-1, -1, irFunction.symbol, IrConstImpl.boolean(-1, -1, context.builtIns.booleanType, true))
+
+            irFunction.body = IrBlockBodyImpl(-1, -1, listOf(ifDirtyExpr, returnTrue))
         }
-    return irFunction
 }
 
-private fun generateRerenderMethod(context: GeneratorContext, componentMetadata: ComponentMetadata): IrFunction {
-    val syntheticClassDescriptor = componentMetadata.wrapperViewDescriptor
-    val functionDescriptor = syntheticClassDescriptor.getRerenderMethodDescriptor()
-    val irFunction = context.symbolTable.declareSimpleFunction(-1, -1, IrDeclarationOrigin.DEFINED, functionDescriptor)
-        .buildWithScope(context) { irFunction ->
-            irFunction.createParameterDeclarations()
-            val wrapperViewAsThisReceiver = irFunction.dispatchReceiverParameter!!.symbol
+private fun generateAttributeSetterFunctions(context: GeneratorContext, componentMetadata: ComponentMetadata): Collection<IrFunction> {
+    val output = mutableListOf<IrFunction>()
+    for (functionDescriptor in componentMetadata.wrapperViewDescriptor.setterMethodDescriptors) {
+        val irFunction = context.symbolTable.declareSimpleFunction(-1, -1, IrDeclarationOrigin.DEFINED, functionDescriptor)
+            .buildWithScope(context) { irFunction ->
+                irFunction.createParameterDeclarations()
+                val wrapperViewAsThisReceiver = irFunction.dispatchReceiverParameter!!.symbol
 
-            val looperClassDescriptor = context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("android.os.Looper")))!!
-            val mainLooperFunction = looperClassDescriptor.staticScope.getContributedFunctions(Name.identifier("getMainLooper"), NoLookupLocation.FROM_BACKEND).single()
-            val mainLooperFunctionCall = IrCallImpl(-1, -1, looperClassDescriptor.defaultType,
-                                                    context.symbolTable.referenceSimpleFunction(mainLooperFunction),
-                                                    mainLooperFunction, null)
+                val componentInstanceField = componentMetadata.wrapperViewDescriptor.componentInstanceField
+                context.symbolTable.introduceValueParameter(irFunction.valueParameters[0])
 
-            val handlerClassDescriptor = context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("android.os.Handler")))!!
-            val handlerConstructor = handlerClassDescriptor.constructors.filter { it.valueParameters.size == 1 && (it.valueParameters[0].type.constructor.declarationDescriptor as ClassDescriptor).classId == looperClassDescriptor.classId}.single()
-            val handlerConstructorCall = IrCallImpl(-1, -1, handlerClassDescriptor.defaultType,
-                                                    context.symbolTable.referenceConstructor(handlerConstructor),
-                                                    handlerConstructor, null)
-            handlerConstructorCall.putValueArgument(0, mainLooperFunctionCall)
+                val componentAttribute = componentMetadata.getAttributeDescriptors()
+                    .single({ it.name.identifier == R4aUtils.propertyNameFromSetterMethod(irFunction.name.identifier) })
 
-            val helperConstructor = componentMetadata.renderHelperClassDescriptor.unsubstitutedPrimaryConstructor!!
-            val helperConstructorCall = IrCallImpl(-1, -1, componentMetadata.renderHelperClassDescriptor.defaultType,
-                                                   context.symbolTable.referenceConstructor(helperConstructor),
-                                                   helperConstructor, null)
-            helperConstructorCall.putValueArgument(0, IrGetValueImpl(-1, -1, wrapperViewAsThisReceiver))
+                val componentInstance = IrGetFieldImpl(
+                    -1,
+                    -1,
+                    context.symbolTable.referenceField(componentInstanceField),
+                    IrGetValueImpl(-1, -1, wrapperViewAsThisReceiver)
+                )
 
-            val postFunction = handlerClassDescriptor.unsubstitutedMemberScope.getContributedFunctions(Name.identifier("post"), NoLookupLocation.FROM_BACKEND).single()
-            val postFunctionCall = org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl(
-                    -1, -1, context.moduleDescriptor.builtIns.booleanType,
-                    context.symbolTable.referenceSimpleFunction(postFunction),
-                    postFunction, null
-            )
-            postFunctionCall.putValueArgument(0, helperConstructorCall)
-            postFunctionCall.dispatchReceiver = handlerConstructorCall
+                val newAttributeValue =
+                    IrGetValueImpl(-1, -1, context.symbolTable.referenceValueParameter(functionDescriptor.valueParameters[0]))
 
+                val setAttributeOnComponentInstruction =
+                    if (componentAttribute.setter != null) {
+                        val setAttributeOnComponentCall = IrSetterCallImpl(
+                            -1,
+                            -1,
+                            context.symbolTable.referenceFunction(componentAttribute.setter!!),
+                            componentAttribute.setter!!,
+                            0
+                        )
+                        setAttributeOnComponentCall.dispatchReceiver = componentInstance
+                        setAttributeOnComponentCall.putValueArgument(0, newAttributeValue)
+                        setAttributeOnComponentCall
+                    } else {
+                        IrSetFieldImpl(-1, -1, context.symbolTable.referenceField(componentAttribute), componentInstance, newAttributeValue)
+                    }
 
-            irFunction.body = IrBlockBodyImpl(-1, -1, listOf(postFunctionCall))
-        }
-    return irFunction;
+                // TODO: Invalidate the WrapperView using Leland's new WrapperView API (pending commit of that API)
+
+                irFunction.body = IrBlockBodyImpl(-1, -1, listOf(setAttributeOnComponentInstruction /*, invalidateCall */))
+            }
+        output.add(irFunction)
+    }
+    return output
 }
 
 
-private fun generateComponentInstanceProperty(context: GeneratorContext, componentMetadata: ComponentMetadata) = context.symbolTable.declareField(-1, -1, IrDeclarationOrigin.DEFINED, componentMetadata.wrapperViewDescriptor.unsubstitutedMemberScope.getContributedVariables(Name.identifier("componentInstance"), NoLookupLocation.FROM_BACKEND).single())
+private fun generateProperties(context: GeneratorContext, componentMetadata: ComponentMetadata) = listOf(
+    context.symbolTable.declareField(
+        -1, -1,
+        IrDeclarationOrigin.DEFINED,
+        componentMetadata
+            .wrapperViewDescriptor
+            .componentInstanceField
+    ),
+    context.symbolTable.declareField(
+        -1, -1,
+        IrDeclarationOrigin.DEFINED,
+        componentMetadata
+            .wrapperViewDescriptor
+            .compositionContextField
+    ),
+    context.symbolTable.declareField(
+        -1, -1,
+        IrDeclarationOrigin.DEFINED,
+        componentMetadata
+            .wrapperViewDescriptor
+            .dirtyField
+    )
+)

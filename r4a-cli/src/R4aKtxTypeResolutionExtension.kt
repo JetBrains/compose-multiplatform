@@ -5,10 +5,7 @@
 
 package org.jetbrains.kotlin.r4a
 
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
-import org.jetbrains.kotlin.descriptors.FunctionDescriptor
-import org.jetbrains.kotlin.descriptors.findClassAcrossModuleDependencies
+import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.diagnostics.reportFromPlugin
 import org.jetbrains.kotlin.extensions.KtxTypeResolutionExtension
 import org.jetbrains.kotlin.idea.caches.resolve.getResolutionFacade
@@ -40,6 +37,8 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
     ) {
         val openingTagExpr = element.qualifiedTagName ?: element.simpleTagName ?: return
 
+        val module = context.scope.ownerDescriptor.module
+
         val resolutionFacade = try {
             element.getResolutionFacade()
         } catch (e: NoClassDefFoundError) {
@@ -47,11 +46,13 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
             // the command line. The class doesn't seem to be on the path anywhere. It's really important that we fix this ASAP.
             System.err.println("Shamefully swallowed exception: ${e.message}")
             null
+        } catch (e: Exception) {
+            null
         }
 
         val openingDescriptor = R4aUtils.resolveDeclaration(
             expression = openingTagExpr,
-            moduleDescriptor = context.scope.ownerDescriptor.module,
+            moduleDescriptor = module,
             trace = context.trace,
             scopeForFirstPart = context.scope
         ) ?: return
@@ -61,6 +62,8 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
         validateTagDescriptor(element, openingTagExpr, possibleAttributes, openingDescriptor, context, facade)
 
         context.trace.record(R4AWritableSlices.KTX_TAG_TYPE_DESCRIPTOR, element, openingDescriptor)
+
+        context.trace.record(R4AWritableSlices.KTX_TAG_COMPONENT_TYPE, element, getComponentType(openingDescriptor, module))
 
         element.attributes?.let { attributes ->
             for (attribute in attributes) {
@@ -106,6 +109,9 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
 
                 val valueType = facade.getTypeInfo(valueExpr, newContext).type ?: return@firstOrNull false
                 if (valueType.isSubtypeOf(param.type)) {
+
+                    context.trace.record(R4AWritableSlices.KTX_ATTR_DESCRIPTOR, attribute, param.descriptor)
+                    context.trace.record(R4AWritableSlices.KTX_ATTR_TYPE, attribute, valueType)
                     // its valid
                     context.trace.record(BindingContext.REFERENCE_TARGET, keyNode, param.descriptor)
                     newContext.trace.record(BindingContext.REFERENCE_TARGET, keyNode, param.descriptor)
@@ -126,11 +132,30 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
             )
         } else {
             val valueType = facade.getTypeInfo(valueExpr, context).type ?: return
-       /*     context.trace.reportFromPlugin(
+            context.trace.reportFromPlugin(
                 UNRESOLVED_ATTRIBUTE_KEY.on(attribute, descriptor, keyStr, valueType),
                 R4ADefaultErrorMessages
             )
-      */  }
+        }
+    }
+
+    private fun getComponentType(tagDescriptor: DeclarationDescriptor, module: ModuleDescriptor): Int {
+        // NOTE: we may want to cache this
+        val r4aComponentId = ClassId.topLevel(R4aUtils.r4aFqName("Component"))
+        val r4aComponentDescriptor = module.findClassAcrossModuleDependencies(r4aComponentId) ?: return -11
+
+        // NOTE: we may want to cache this
+        val androidViewId = ClassId.topLevel(FqName("android.view.View"))
+        val androidViewDescriptor = module.findClassAcrossModuleDependencies(androidViewId) ?: return -10
+
+        return when (tagDescriptor) {
+            is ClassDescriptor -> {
+                if (tagDescriptor.isSubclassOf(r4aComponentDescriptor)) 1
+                else if (tagDescriptor.isSubclassOf(androidViewDescriptor)) 0
+                else -12
+            }
+            else -> -13
+        }
     }
 
     private fun validateTagDescriptor(

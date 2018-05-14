@@ -93,8 +93,14 @@ class R4aCompletionExtension : KotlinCompletionExtension() {
         val elements = possibleAttributes
             .filter { !usedAttributesNameSet.contains(it.name) }
             .map { attr ->
-                val typeString = when (attr.descriptor) {
-                    is FunctionDescriptor -> SHORT_NAMES_RENDERER.renderValueParameters(attr.descriptor.valueParameters, false).let { it.substring(1, it.length - 1) }
+                val d = attr.descriptor
+                val typeString = when (d) {
+                    is FunctionDescriptor -> {
+                        when (d.valueParameters.size) {
+                            2 -> SHORT_NAMES_RENDERER.renderType(attr.type)
+                            else -> SHORT_NAMES_RENDERER.renderValueParameters(d.valueParameters, false).let { it.substring(1, it.length - 1) }
+                        }
+                    }
                     else -> SHORT_NAMES_RENDERER.renderType(attr.type)
                 }
 

@@ -1,0 +1,85 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="DisplayTextStyle" parent="@android:style/Widget.Material.Light.TextView">
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:inputType">textNoSuggestions</item>
+        <item name="android:gravity">bottom|end</item>
+        <item name="android:textAlignment">viewEnd</item>
+    </style>
+
+    <style name="PadButtonStyle">
+        <item name="android:background">@drawable/pad_button_background</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:gravity">center</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:minWidth">0dip</item>
+        <item name="android:minHeight">0dip</item>
+        <item name="android:onClick">onButtonClick</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/pad_button_text_color</item>
+
+        <!-- Attributes from android.support.v7.gridlayout -->
+        <item name="layout_gravity">fill</item>
+        <item name="layout_rowWeight">1</item>
+        <item name="layout_columnWeight">1</item>
+    </style>
+
+    <style name="PadButtonStyle.Numeric2">
+        <item name="android:textSize">36dip</item>
+    </style>
+
+    <style name="PadButtonStyle.Numeric2.Equals">
+        <item name="android:visibility">visible</item>
+    </style>
+
+    <style name="PadButtonStyle.Operator">
+        <item name="android:textSize">27dip</item>
+    </style>
+
+    <style name="PadButtonStyle.Operator.Text">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">20dip</item>
+    </style>
+
+    <style name="PadLayoutStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
+
+    <style name="PadLayoutStyle.Numeric">
+        <item name="android:background">@drawable/pad_button_background</item>
+        <item name="android:layout_width">0dip</item>
+        <item name="android:paddingTop">8dip</item>
+        <item name="android:paddingBottom">4dip</item>
+        <item name="android:paddingStart">4dip</item>
+        <item name="android:paddingEnd">8dip</item>
+
+        <!-- TODO: (jsproch) figure out why the old values don't work
+        <item name="android:layout_width">0dip</item>
+        <item name="android:paddingTop">12dip</item>
+        <item name="android:paddingBottom">20dip</item>
+        <item name="android:paddingStart">12dip</item>
+        <item name="android:paddingEnd">12dip</item>
+        -->
+    </style>
+
+    <style name="PadLayoutStyle.Operator">
+        <item name="android:background">@drawable/pad_button_background</item>
+        <item name="android:layout_width">0dip</item>
+        <item name="android:layout_weight">3</item>
+        <item name="android:paddingTop">8dip</item>
+        <item name="android:paddingBottom">4dip</item>
+        <item name="android:paddingStart">4dip</item>
+        <item name="android:paddingEnd">8dip</item>
+    </style>
+
+</resources>

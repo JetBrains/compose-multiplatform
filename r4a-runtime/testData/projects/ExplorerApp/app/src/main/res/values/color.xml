@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (C) 2015 The Android Open Source Project
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+
+<resources>
+
+    <!-- Default accent color. -->
+    <color name="calculator_accent_color">#0097A7</color>
+
+    <!-- Primary color (Color for the toolbars). -->
+    <color name="calculator_primary_color">#00BCD4</color>
+
+    <!-- Status bar color. -->
+    <color name="calculator_statusbar_color">#9C000000</color>
+
+    <!-- Color to indicate an error has occured. -->
+    <color name="calculator_error_color">#C2185B</color>
+
+    <!-- Background color of the calculator display. -->
+    <color name="display_background_color">#FFF</color>
+
+    <!-- Text color for the formula in the calculator display. -->
+    <color name="display_formula_text_color">#000000</color>
+
+    <!-- Text color for the result in the calculator display. -->
+    <color name="display_result_text_color">#6C000000</color>
+
+    <!-- Lighter color for exponent while scrolling. -->
+    <color name="display_result_exponent_text_color">#40000000</color>
+
+    <!-- Background color for the numeric pad. -->
+    <color name="pad_numeric_background_color">#434343</color>
+
+    <!-- Background color for the operator pad. -->
+    <color name="pad_operator_background_color">#636363</color>
+
+    <!-- Text color for a button in a pad. -->
+    <color name="pad_button_text_color">#FFF</color>
+
+    <!-- Color of the expand/collapse arrow. -->
+    <color name="arrow_fill_color">#00695c</color>
+
+    <!-- Ripple color when a button is pressed in a pad. -->
+    <color name="pad_button_ripple_color">#33FFFFFF</color>
+
+</resources>

@@ -33,7 +33,6 @@ class R4AComponentRegistrar : ComponentRegistrar {
         KtxTypeResolutionExtension.registerExtension(project, R4aKtxTypeResolutionExtension())
         SyntheticResolveExtension.registerExtension(project, StaticWrapperCreatorFunctionResolveExtension())
         SyntheticResolveExtension.registerExtension(project, WrapperViewSettersGettersResolveExtension())
-        ClassBuilderInterceptorExtension.registerExtension(project, ReflectiveFragmentInjectorInterceptorExtension())
         SyntheticIrExtension.registerExtension(project, R4ASyntheticIrExtension())
     }
 }

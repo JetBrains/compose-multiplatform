@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (C) 2015 The Android Open Source Project
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+<resources>
+    <string name="app_name">ExplorerApp</string>
+
+
+    <!-- Constant for Euler's number (i.e. "2.7182…"). [CHAR_LIMIT=1] -->
+    <string name="const_e" translatable="false">e</string>
+    <!-- Constant for pi (i.e. "3.1415…"). [CHAR_LIMIT=1] -->
+    <string name="const_pi" translatable="false">π</string>
+
+    <!-- Left parenthesis (e.g. "log(", "2 × (3 - 1)". [CHAR_LIMIT=1] -->
+    <string name="lparen" translatable="false">(</string>
+    <!-- Right parenthesis (e.g. "log(2)", "(3 - 1) × 2". [CHAR_LIMIT=1] -->
+    <string name="rparen" translatable="false">)</string>
+
+    <!--
+      Decimal separator (e.g. "1.23" or "1,23").
+
+      This should be whatever character is appropriate for use as a decimal sign for a given locale
+      when used with Arabic numerals (i.e. 0, 1, 2, 3, ...)
+
+      [CHAR_LIMIT=1]
+      -->
+    <string name="dec_point">.</string>
+
+    <!-- Decimal representation of zero (e.g. "0", "10", "1.0", "1e0"). [CHAR_LIMIT=1] -->
+    <string name="digit_0" translatable="false">0</string>
+    <!-- Decimal representation of one (e.g. "1", "11", "1.1", "1e1"). [CHAR_LIMIT=1] -->
+    <string name="digit_1" translatable="false">1</string>
+    <!-- Decimal representation of two (e.g. "2", "22", "2.2", "2e2"). [CHAR_LIMIT=1] -->
+    <string name="digit_2" translatable="false">2</string>
+    <!-- Decimal representation of three (e.g. "3", "33", "3.3", "3e3"). [CHAR_LIMIT=1] -->
+    <string name="digit_3" translatable="false">3</string>
+    <!-- Decimal representation of four (e.g. "4", "44", "4.4", "4e4"). [CHAR_LIMIT=1] -->
+    <string name="digit_4" translatable="false">4</string>
+    <!-- Decimal representation of five (e.g. "5", "55", "5.5", "5e5"). [CHAR_LIMIT=1] -->
+    <string name="digit_5" translatable="false">5</string>
+    <!-- Decimal representation of six (e.g. "6", "66", "6.6", "6e6"). [CHAR_LIMIT=1] -->
+    <string name="digit_6" translatable="false">6</string>
+    <!-- Decimal representation of seven (e.g. "7", "77", "7.7", "7e7"). [CHAR_LIMIT=1] -->
+    <string name="digit_7" translatable="false">7</string>
+    <!-- Decimal representation of eight (e.g. "8", "88", "8.8", "8e8"). [CHAR_LIMIT=1] -->
+    <string name="digit_8" translatable="false">8</string>
+    <!-- Decimal representation of eight (e.g. "9", "99", "9.9", "9e9"). [CHAR_LIMIT=1] -->
+    <string name="digit_9" translatable="false">9</string>
+
+    <!-- Addition operator (e.g. "1 + 2"). [CHAR_LIMIT=1] -->
+    <string name="op_add" translatable="false">+</string>
+    <!-- Divide operator (e.g. "1 ÷ 2"). [CHAR_LIMIT=1] -->
+    <string name="op_div" translatable="false">÷</string>
+    <!-- Factorial operator (e.g. "2!"). [CHAR_LIMIT=1] -->
+    <string name="op_fact" translatable="false">!</string>
+    <!-- Multiply operator (e.g. "1 × 2"). [CHAR_LIMIT=1] -->
+    <string name="op_mul" translatable="false">×</string>
+    <!-- Percent operator (e.g. "25%"). [CHAR_LIMIT=1] -->
+    <string name="op_pct" translatable="false">%</string>
+    <!-- Power operator (e.g. "1 ^ 2"). [CHAR_LIMIT=1] -->
+    <string name="op_pow" translatable="false">^</string>
+    <!-- Square root operator (e.g. "√1"). [CHAR_LIMIT=1] -->
+    <string name="op_sqrt" translatable="false">√</string>
+    <!-- Subtraction operator (e.g. "1 - 2"). [CHAR_LIMIT=1] -->
+    <string name="op_sub" translatable="false">−</string>
+
+    <!-- Abbrev. name of cosine function (e.g. "cos(π)"). [CHAR_LIMIT=4] -->
+    <string name="fun_cos" translatable="false">cos</string>
+    <!-- Natural logarithm function (e.g. "ln(2)"). [CHAR_LIMIT=4] -->
+    <string name="fun_ln" translatable="false">ln</string>
+    <!-- Logarithm function (e.g. "log(10)"). [CHAR_LIMIT=4] -->
+    <string name="fun_log" translatable="false">log</string>
+    <!-- Abbrev. name of sine function (e.g. "sin(π)"). [CHAR_LIMIT=4] -->
+    <string name="fun_sin" translatable="false">sin</string>
+    <!-- Abbrev. name of tangent function (e.g. "tan(π)"). [CHAR_LIMIT=4] -->
+    <string name="fun_tan" translatable="false">tan</string>
+    <!-- Abbrev. name of cosine function (e.g. "arccos(π)"). [CHAR_LIMIT=5] -->
+    <string name="fun_arccos" translatable="false">cos\u207B\u00B9</string>
+    <!-- Abbrev. name of sine function (e.g. "arcsin(π)"). [CHAR_LIMIT=5] -->
+    <string name="fun_arcsin" translatable="false">sin\u207B\u00B9</string>
+    <!-- Abbrev. name of tangent function (e.g. "arctan(π)"). [CHAR_LIMIT=5] -->
+    <string name="fun_arctan" translatable="false">tan\u207B\u00B9</string>
+
+    <!-- Abbrev. name of base 10 exponential function (e.g. "10^6"). [CHAR_LIMIT=5] -->
+    <string name="fun_10pow" translatable="false">10\u02E3</string>
+    <!-- Abbrev. name of exponential function (e.g. "e^6"). [CHAR_LIMIT=5] -->
+    <string name="fun_exp" translatable="false">e\u02E3</string>
+    <!-- Abbrev. name of suffix square function on key (e.g. "17^2"). [CHAR_LIMIT=5] -->
+    <string name="op_sqr" translatable="false">x\u00B2</string>
+    <!--
+      Abbrev. name of suffix square function in formula.
+      "^2" does not work, since it blends into a later constant.
+      -->
+    <string name="squared" translatable="false">²</string>
+    <!-- Abbrev. name of exponential function in formula.  -->
+    <string name="exponential" translatable = "false">exp</string>
+
+    <!-- Equals button (e.g. "1 + 2 = ?"). [CHAR_LIMIT=1] -->
+    <string name="eq" translatable="false">=</string>
+    <!-- Clear button to clear the currently entered expression. [CHAR_LIMIT=4] -->
+    <string name="clr">clr</string>
+    <!--
+      Announced when all characters are removed from Formula, e.g. after clear. [CHAR_LIMIT=NONE]
+      -->
+    <string name="cleared">cleared</string>
+    <!-- Delete button to remove last entered token. [CHAR_LIMIT=4] -->
+    <string name="del">del</string>
+    <!-- Toggle button to show/hide inverse functions. [CHAR_LIMIT=4] -->
+    <string name="inv" translatable="false">inv</string>
+
+    <!--
+      Item on Formula context menu used to paste from the Memory into the edit field. [CHAR_LIMIT=2]
+      -->
+    <string name="memory_recall" translatable="false">MR</string>
+    <!-- Content description for MR button. [CHAR_LIMIT=NONE] -->
+    <string name="desc_memory_recall">Memory recall</string>
+    <!-- Item on Result context menu used to store the result in memory. [CHAR_LIMIT=2] -->
+    <string name="memory_store" translatable="false">MS</string>
+    <!-- Content description for MS button. [CHAR_LIMIT=NONE] -->
+    <string name="desc_memory_store">Memory store</string>
+    <!--
+      Item on Result context menu, which subtracts the current result from the number in memory.
+      [CHAR_LIMIT=2]
+      -->
+    <string name="memory_subtract" translatable="false">M\u2212</string>
+    <!-- Content description for M- button. [CHAR_LIMIT=NONE] -->
+    <string name="desc_memory_subtract">Memory minus</string>
+    <!--
+      Item on Result context menu, which adds the current result to the number in memory.
+      [CHAR_LIMIT=2]
+      -->
+    <string name="memory_add" translatable="false">M+</string>
+    <!-- Content description for M+ button. [CHAR_LIMIT=NONE] -->
+    <string name="desc_memory_add">Memory add</string>
+
+    <!-- Content description for 'e' button. [CHAR_LIMIT=NONE] -->
+    <string name="desc_const_e">Euler\'s number</string>
+    <!-- Content description for 'π' button. [CHAR_LIMIT=NONE] -->
+    <string name="desc_const_pi">pi</string>
+
+    <!-- Content description for '.' button. [CHAR_LIMIT=NONE] -->
+    <string name="desc_dec_point">point</string>
+
+    <!-- Content description for '(' button. [CHAR_LIMIT=NONE] -->
+    <string name="desc_lparen">left parenthesis</string>
+    <!-- Content description for ')' button. [CHAR_LIMIT=NONE] -->
+    <string name="desc_rparen">right parenthesis</string>
+
+    <!-- Content description for 'cos' button. [CHAR_LIMIT=NONE] -->
+    <string name="desc_fun_cos">cosine</string>
+    <!-- Content description for 'ln' button. [CHAR_LIMIT=NONE] -->
+    <string name="desc_fun_ln">natural logarithm</string>
+    <!-- Content description for 'log' button. [CHAR_LIMIT=NONE] -->
+    <string name="desc_fun_log">logarithm</string>
+    <!-- Content description for 'sin' button. [CHAR_LIMIT=NONE] -->
+    <string name="desc_fun_sin">sine</string>
+    <!-- Content description for 'tan' button. [CHAR_LIMIT=NONE] -->
+    <string name="desc_fun_tan">tangent</string>
+    <!-- Content description for 'arccos' button. [CHAR_LIMIT=NONE] -->
+    <string name="desc_fun_arccos">inverse cosine</string>
+    <!-- Content description for 'arcsin' button. [CHAR_LIMIT=NONE] -->
+    <string name="desc_fun_arcsin">inverse sine</string>
+    <!-- Content description for 'arctan' button. [CHAR_LIMIT=NONE] -->
+    <string name="desc_fun_arctan">inverse tangent</string>
+
+    <!--
+      Content description for 10^ button. This button is used to raise 10 to the subsequently
+      entered power. E.g. <10^>3 would yield 1000.
+      [CHAR_LIMIT=NONE]
+      -->
+    <string name="desc_fun_10pow">ten to the power of</string>
+    <!-- Content description for e^ (exponential function) button. [CHAR_LIMIT=NONE] -->
+    <string name="desc_fun_exp">exponential function</string>
+    <!--
+      Content description for ^2 button. This button is used to square the previously entered
+      number. E.g. 3<^2> would yield 9.
+      [CHAR_LIMIT=NONE]
+      -->
+    <string name="desc_op_sqr">squared</string>
+
+    <!-- Content description for '+' button. [CHAR_LIMIT=NONE] -->
+    <string name="desc_op_add">plus</string>
+    <!-- Content description for '÷' button. [CHAR_LIMIT=NONE] -->
+    <string name="desc_op_div">divide</string>
+    <!-- Content description for '!' button. [CHAR_LIMIT=NONE] -->
+    <string name="desc_op_fact">factorial</string>
+    <!-- Content description for '×' button. [CHAR_LIMIT=NONE] -->
+    <string name="desc_op_mul">multiply</string>
+    <!-- Content description for '%' button. [CHAR_LIMIT=NONE] -->
+    <string name="desc_op_pct">percent</string>
+    <!-- Content description for '^' button. [CHAR_LIMIT=NONE] -->
+    <string name="desc_op_pow">power</string>
+    <!-- Content description for '√' button. [CHAR_LIMIT=NONE] -->
+    <string name="desc_op_sqrt">square root</string>
+    <!-- Content description for '-' button. [CHAR_LIMIT=NONE] -->
+    <string name="desc_op_sub">minus</string>
+
+    <!-- Content description for switch to degree button. [CHAR_LIMIT=NONE] -->
+    <string name="desc_switch_deg">switch to degrees</string>
+    <!-- Content description for switch to radian button. [CHAR_LIMIT=NONE] -->
+    <string name="desc_switch_rad">switch to radians</string>
+
+    <!-- Content description for '=' button. [CHAR_LIMIT=NONE] -->
+    <string name="desc_eq">equals</string>
+    <!-- Content description for "clr" button. Deletes entire formula. [CHAR_LIMIT=NONE] -->
+    <string name="desc_clr">clear</string>
+    <!--
+      Content description for "del" button. Deletes single character. Should differ
+      from desc_clr. [CHAR_LIMIT=NONE]
+      -->
+    <string name="desc_del">delete</string>
+    <!-- Content description for "inv" button to show inverse functions. [CHAR_LIMIT=NONE] -->
+    <string name="desc_inv_off">show inverse functions</string>
+    <!-- Content description for "inv" button to hide inverse functions. [CHAR_LIMIT=NONE] -->
+    <string name="desc_inv_on">hide inverse functions</string>
+
+    <!-- Content description for formula field when it is empty. [CHAR_LIMIT=NONE] -->
+    <string name="desc_formula">No formula</string>
+    <!-- Content description for result field when it is empty. [CHAR_LIMIT=NONE] -->
+    <string name="desc_result">No result</string>
+
+    <!-- Content description for the numeric/operation pad when slide-able. [CHAR_LIMIT=NONE] -->
+    <string name="desc_num_pad">Numbers and basic operations</string>
+    <!-- Content description for the advanced pad when slide-able. [CHAR_LIMIT=NONE] -->
+    <string name="desc_adv_pad">Advanced operations</string>
+    <!-- Content description for the pad pages when slide-able. -->
+    <string-array name="desc_pad_pages" translatable="false">
+        <item>@string/desc_num_pad</item>
+        <item>@string/desc_adv_pad</item>
+    </string-array>
+
+    <!-- Error displayed when expression evaluates to an undefined result. [CHAR_LIMIT=20] -->
+    <string name="error_nan">Not a number</string>
+    <!-- Error displayed when expression contains a syntax error. [CHAR_LIMIT=20] -->
+    <string name="error_syntax">Bad expression</string>
+    <!-- Error displayed when evaluation is manually aborted. [CHAR_LIMIT=20] -->
+    <string name="error_aborted">Aborted</string>
+    <!-- Error displayed when excessive precision is required. [CHAR_LIMIT=20] -->
+    <string name="error_overflow">Infinite?</string>
+    <!--
+      Error displayed when division by zero is detected.
+
+      If the translation does not fit within the given limit, then a shortened version must
+      be used, e.g. "Division by 0". Exceeding the limit will result in a truncated string.
+
+      [CHAR_LIMIT=20]
+      -->
+    <string name="error_zero_divide">Can\'t divide by 0</string>
+
+    <!-- Toast shown when text is copied to the clipboard. [CHAR_LIMIT=40] -->
+    <string name="text_copied_toast">Text copied</string>
+
+    <!-- Dialog message when a computation is cancelled by the user. [CHAR_LIMIT=NONE] -->
+    <string name="cancelled">Computation cancelled.</string>
+    <!-- Dialog message when a computation times out. [CHAR_LIMIT=NONE] -->
+    <string name="timeout">Value may be infinite or undefined.</string>
+    <!--
+      Button label to allow future computations with a longer timeout.
+
+      When evaluating a result takes too long, we show a "timed out" dialog. This button allows
+      the user to increase the maximum amount of time we attempt to evaluate the expression before
+      "timing out".
+
+      [CHAR_LIMIT=40]
+      -->
+    <string name="ok_remove_timeout">Use longer timeouts</string>
+    <!-- Button label to dismiss informative text message. [CHAR_LIMIT=40] -->
+    <string name="dismiss">Dismiss</string>
+    <!-- Appended indicator (for "leading" display) that result is exact. [CHAR_LIMIT=NONE] -->
+    <string name="exact">(exact)</string>
+    <!-- Indicator (for "leading" display) that result is inexact. [CHAR_LIMIT=NONE] -->
+    <string name="approximate">(±1 in last digit)</string>
+
+    <!-- Action bar navigate up description in history page. [CHAR_LIMIT=40] -->
+    <string name="desc_navigate_up">Navigate up</string>
+
+    <!-- Title for alert dialog when calculation takes too long (timeout). [CHAR_LIMIT=30] -->
+    <string name="dialog_timeout">Timeout</string>
+
+
+    <!-- Title for "current expression" in history page. [CHAR_LIMIT=40] -->
+    <string name="title_current_expression">Current Expression</string>
+
+</resources>
