@@ -58,6 +58,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
         ) ?: return
 
         val possibleAttributes = R4aUtils.getPossibleAttributesForDescriptor(openingDescriptor, context.scope, resolutionFacade)
+        val possibleAttributesByName = possibleAttributes.groupBy { it.name }
 
         validateTagDescriptor(element, openingTagExpr, possibleAttributes, openingDescriptor, context, facade)
 
@@ -67,7 +68,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
 
         element.attributes?.let { attributes ->
             for (attribute in attributes) {
-                visitKtxAttributeAfterElement(attribute, possibleAttributes, element, context, facade)
+                visitKtxAttributeAfterElement(attribute, possibleAttributesByName, element, context, facade)
             }
         }
 
@@ -85,7 +86,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
 
     private fun visitKtxAttributeAfterElement(
         attribute: KtxAttribute,
-        possibleAttributes: Collection<R4aUtils.AttributeInfo>,
+        possibleAttributesByName: Map<String, Collection<R4aUtils.AttributeInfo>>,
         element: KtxElement,
         context: ExpressionTypingContext,
         facade: ExpressionTypingFacade
@@ -96,8 +97,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
         val keyNode = attribute.key ?: return
         val keyStr = keyNode.text
 
-        val namedAttributes = possibleAttributes
-            .filter { attr -> attr.name == keyStr }
+        val namedAttributes = possibleAttributesByName[keyStr] ?: listOf()
 
         val resolvedAttribute = namedAttributes
             .firstOrNull { param ->
@@ -121,7 +121,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
             }
 
         if (resolvedAttribute != null) return
-        val param = possibleAttributes.find { attr -> attr.name == keyStr }
+        val param = namedAttributes.firstOrNull()
         if (param != null) {
             val newContext = context.replaceExpectedType(param.type)
             val valueType = facade.getTypeInfo(valueExpr, newContext).type ?: return
@@ -142,19 +142,19 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
     private fun getComponentType(tagDescriptor: DeclarationDescriptor, module: ModuleDescriptor): Int {
         // NOTE: we may want to cache this
         val r4aComponentId = ClassId.topLevel(R4aUtils.r4aFqName("Component"))
-        val r4aComponentDescriptor = module.findClassAcrossModuleDependencies(r4aComponentId) ?: return -11
+        val r4aComponentDescriptor = module.findClassAcrossModuleDependencies(r4aComponentId) ?: return -1
 
         // NOTE: we may want to cache this
         val androidViewId = ClassId.topLevel(FqName("android.view.View"))
-        val androidViewDescriptor = module.findClassAcrossModuleDependencies(androidViewId) ?: return -10
+        val androidViewDescriptor = module.findClassAcrossModuleDependencies(androidViewId) ?: return -1
 
         return when (tagDescriptor) {
             is ClassDescriptor -> {
                 if (tagDescriptor.isSubclassOf(r4aComponentDescriptor)) 1
                 else if (tagDescriptor.isSubclassOf(androidViewDescriptor)) 0
-                else -12
+                else -1
             }
-            else -> -13
+            else -> -1
         }
     }
 

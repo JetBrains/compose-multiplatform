@@ -1,6 +1,7 @@
 package org.jetbrains.kotlin.r4a
 
 import com.intellij.util.SmartList
+import com.intellij.util.containers.SLRUCache
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.idea.resolve.ResolutionFacade
@@ -10,16 +11,12 @@ import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtQualifiedExpression
 import org.jetbrains.kotlin.psi.KtSimpleNameExpression
-import org.jetbrains.kotlin.r4a.analysis.ComponentMetadata
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.QualifiedExpressionResolver
 import org.jetbrains.kotlin.resolve.calls.checkers.UnderscoreUsageChecker
 import org.jetbrains.kotlin.resolve.calls.components.hasDefaultValue
-import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
-import org.jetbrains.kotlin.resolve.descriptorUtil.getAllSuperclassesWithoutAny
-import org.jetbrains.kotlin.resolve.descriptorUtil.isSubclassOf
-import org.jetbrains.kotlin.resolve.descriptorUtil.module
+import org.jetbrains.kotlin.resolve.descriptorUtil.*
 import org.jetbrains.kotlin.resolve.scopes.*
 import org.jetbrains.kotlin.resolve.scopes.receivers.*
 import org.jetbrains.kotlin.resolve.scopes.utils.collectAllFromMeAndParent
@@ -31,14 +28,97 @@ import org.jetbrains.kotlin.synthetic.SamAdapterExtensionFunctionDescriptor
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.typeUtil.isSubtypeOf
 import org.jetbrains.kotlin.types.typeUtil.isUnit
-import org.jetbrains.kotlin.types.typeUtil.supertypes
 
 
 object R4aUtils {
 
+    private val realGetterSetterCache = object : SLRUCache<DeclarationDescriptor, Collection<AttributeInfo>>(10, 10) {
+        override fun createValue(descriptor: DeclarationDescriptor?): Collection<AttributeInfo> {
+            if (descriptor == null) return listOf()
+            return when (descriptor) {
+                is ClassDescriptor -> {
+                    descriptor
+                        .unsubstitutedMemberScope
+                        .getContributedDescriptors()
+                        .mapNotNull { d ->
+                            when (d) {
+                                is FunctionDescriptor -> {
+                                    if (d.overriddenDescriptors.isNotEmpty()) null
+                                    else if (d.valueParameters.size != 1) null
+                                    else if (d.returnType?.isUnit() != true) null // only void setters are allowed
+                                    else if (!isSetterMethodName(d.name.identifier)) null
+                                    else AttributeInfo(
+                                        name = propertyNameFromSetterMethod(d.name.identifier),
+                                        descriptor = d,
+                                        type = d.valueParameters[0].type,
+                                        // For now, we just assume that setter methods are not required attributes...
+                                        // In the future, we should provide some sort of "@Required" annotation so that we can check to see if
+                                        // that exists, and then mark it as required in that case.
+                                        required = false
+                                    )
+                                }
+                                is PropertyDescriptor -> {
+                                    if (d.overriddenDescriptors.isNotEmpty()) null
+                                    else AttributeInfo(
+                                        name = d.name.identifier,
+                                        descriptor = d,
+                                        type = d.type,
+                                        required = when {
+                                        // nullable types are never required. If the attribute is omitted, we can provide null by default
+                                            d.type.isMarkedNullable -> false
+
+                                        // if there is a compile-time initializer, then its not required
+                                            d.compileTimeInitializer != null -> false
+
+                                        // if the property has an initializer expression, then its not required
+                                            (d.source.getPsi() as? KtProperty)?.initializer != null -> false
+
+                                        // otherwise, assume its required!
+                                            else -> true
+                                        }
+                                    )
+                                }
+                                else -> null
+                            }
+                        }
+                }
+                is FunctionDescriptor -> descriptor.valueParameters.map { param ->
+                    AttributeInfo(
+                        name = param.name.identifier,
+                        descriptor = param,
+                        type = param.type,
+                        required = !param.hasDefaultValue()
+                    )
+                }
+                else -> listOf()
+            }
+        }
+    }
+
+    private val adapterSetterCache = object : SLRUCache<ClassDescriptor, Collection<AttributeInfo>>(10, 10) {
+        override fun createValue(cd: ClassDescriptor?): Collection<AttributeInfo> {
+            if (cd == null) return listOf()
+            return cd
+                .unsubstitutedMemberScope
+                .getContributedDescriptors()
+                .mapNotNull { it as? FunctionDescriptor }
+                .mapNotNull { fn ->
+                    if (fn.valueParameters.size != 2) null
+                    else if (fn.returnType?.isUnit() != true) null
+                    else if (!isSetterMethodName(fn.name.identifier)) null
+                    else AttributeInfo(
+                        name = propertyNameFromSetterMethod(fn.name.identifier),
+                        descriptor = fn,
+                        type = fn.valueParameters[1].type,
+                        required = false
+                    )
+                }
+        }
+    }
+
     data class AttributeInfo(
         val name: String,
-        val descriptor: DeclarationDescriptor,
+        val descriptor: DeclarationDescriptorWithVisibility,
         val type: KotlinType,
         val required: Boolean
     )
@@ -64,120 +144,89 @@ object R4aUtils {
         return scope.collectSyntheticMemberFunctions(types) + scope.collectSyntheticExtensionProperties(types)
     }
 
-    private fun getAllAttributeAdapters(scope: LexicalScope, module: ModuleDescriptor): Collection<ClassDescriptor> {
-        val attributeAdapterName = r4aFqName("AttributeAdapter").asString()
-        return scope
-            .collectAllFromMeAndParent { s -> s.getContributedDescriptors() }
-            .mapNotNull { it as? ClassDescriptor }
-            .filter { it.name.asString().indexOf("AttributeAdapter") != -1 }
-    }
-
-    fun getPossibleAttributesForDescriptor(descriptor: DeclarationDescriptor, scope: LexicalScope, facade: ResolutionFacade?): Collection<AttributeInfo> {
+    fun getPossibleAttributesForDescriptor(
+        descriptor: DeclarationDescriptor,
+        scope: LexicalScope,
+        facade: ResolutionFacade?
+    ): Collection<AttributeInfo> {
+        val module = scope.ownerDescriptor.module
+        val adapterDescriptor = module.findClassAcrossModuleDependencies(ClassId.topLevel(r4aFqName("AttributeAdapter"))) ?: return listOf()
         return when (descriptor) {
             is ClassDescriptor -> {
-                val realGettersSetters = descriptor.unsubstitutedMemberScope.getContributedDescriptors().mapNotNull { d ->
-                    when (d) {
-                        is FunctionDescriptor -> {
-                            if (d.returnType?.isUnit() != true) null // only void setters are allowed
-                            else if (!isSetterMethodName(d.name.identifier)) null
-                            else if (d.valueParameters.size != 1) null
-                            else if (!Visibilities.isVisibleIgnoringReceiver(d, scope.ownerDescriptor)) null
-                            else AttributeInfo(
-                                name = propertyNameFromSetterMethod(d.name.identifier),
-                                descriptor = d,
-                                type = d.valueParameters[0].type,
-                                // For now, we just assume that setter methods are not required attributes...
-                                // In the future, we should provide some sort of "@Required" annotation so that we can check to see if
-                                // that exists, and then mark it as required in that case.
-                                required = false
-                            )
-                        }
-                        is PropertyDescriptor -> {
-                            if (!Visibilities.isVisibleIgnoringReceiver(d, scope.ownerDescriptor)) null
-                            else AttributeInfo(
-                                name = d.name.identifier,
-                                descriptor = d,
-                                type = d.type,
-                                required = when {
-                                // nullable types are never required. If the attribute is omitted, we can provide null by default
-                                    d.type.isMarkedNullable -> false
+                var cd: ClassDescriptor? = descriptor
+                val result = mutableListOf<AttributeInfo>()
 
-                                // if there is a compile-time initializer, then its not required
-                                    d.compileTimeInitializer != null -> false
-
-                                // if the property has an initializer expression, then its not required
-                                    (d.source.getPsi() as? KtProperty)?.initializer != null -> false
-
-                                // otherwise, assume its required!
-                                    else -> true
-                                }
-                            )
-
-                        }
-                        else -> null
+                while (cd != null) {
+                    val validAttributes = realGetterSetterCache[cd].filter { d ->
+                        Visibilities.isVisibleIgnoringReceiver(d.descriptor, scope.ownerDescriptor)
                     }
+                    result.addAll(validAttributes)
+                    cd = cd.getSuperClassNotAny()
                 }
 
-                val adapterSetters = getAllAttributeAdapters(scope, scope.ownerDescriptor.module)
-                    .flatMap { cd ->
-                        cd
-                            .unsubstitutedMemberScope
-                            .getContributedDescriptors()
-                            .mapNotNull { it as? FunctionDescriptor }
-                            .mapNotNull { fn ->
-                                if (fn.valueParameters.size != 2) null
-                                else if (fn.returnType?.isUnit() != true) null
-                                else if (!isSetterMethodName(fn.name.identifier)) null
-                                else if (!Visibilities.isVisibleIgnoringReceiver(fn, scope.ownerDescriptor)) null
-                                else if (descriptor.defaultType.isSubtypeOf(fn.valueParameters[0].type)) AttributeInfo(
-                                    name = propertyNameFromSetterMethod(fn.name.identifier),
-                                    descriptor = fn,
-                                    type = fn.valueParameters[1].type,
-                                    required = false
-                                )
-                                else null
-                            }
-                    }
 
-                val extensionGettersSetters = scope
+                val allDescriptorsInScope = scope
                     .collectAllFromMeAndParent { s -> s.getContributedDescriptors() }
-                    .mapNotNull { d ->
-                        when (d) {
-                            is PropertyDescriptor -> {
-                                val receiverParam = d.extensionReceiverParameter
-                                if (receiverParam == null || !descriptor.defaultType.isSubtypeOf(receiverParam.value.type)) null
-                                else if (!Visibilities.isVisibleIgnoringReceiver(d, scope.ownerDescriptor)) null
-                                else AttributeInfo(
-                                    name = d.name.identifier,
-                                    descriptor = d,
-                                    type = d.type,
-                                    required = false
+
+                for (d in allDescriptorsInScope) {
+                    when (d) {
+                        is ClassDescriptor -> {
+                            if (d.defaultType.isSubtypeOf(adapterDescriptor.defaultType)) {
+                                val validAttributes = adapterSetterCache[d].filter {
+                                    val fn = it.descriptor as? FunctionDescriptor ?: return@filter false
+                                    Visibilities.isVisibleIgnoringReceiver(fn, scope.ownerDescriptor) &&
+                                            descriptor.defaultType.isSubtypeOf(fn.valueParameters[0].type)
+                                }
+                                result.addAll(validAttributes)
+                            }
+                        }
+                    // extension properties
+                        is PropertyDescriptor -> {
+                            val receiverParam = d.extensionReceiverParameter
+                            if (
+                                (receiverParam != null) &&
+                                (descriptor.defaultType.isSubtypeOf(receiverParam.value.type)) &&
+                                (Visibilities.isVisibleIgnoringReceiver(d, scope.ownerDescriptor))
+                            ) {
+                                result.add(
+                                    AttributeInfo(
+                                        name = d.name.identifier,
+                                        descriptor = d,
+                                        type = d.type,
+                                        required = false
+                                    )
                                 )
                             }
-                            is FunctionDescriptor -> {
-                                val receiverParam = d.extensionReceiverParameter
-                                if (d.returnType?.isUnit() != true) null // only void setters are allowed
-                                else if (!isSetterMethodName(d.name.identifier)) null
-                                else if (receiverParam == null || d.valueParameters.size != 1) null
-                                else if (!Visibilities.isVisibleIgnoringReceiver(d, scope.ownerDescriptor)) null
-                                else if (descriptor.defaultType.isSubtypeOf(receiverParam.value.type)) AttributeInfo(
-                                    name = propertyNameFromSetterMethod(d.name.identifier),
-                                    descriptor = d,
-                                    type = d.valueParameters[0].type,
-                                    required = false
+                        }
+                    // extension functions
+                        is FunctionDescriptor -> {
+                            val receiverParam = d.extensionReceiverParameter
+                            if (
+                                (receiverParam != null) &&
+                                (d.valueParameters.size == 1) &&
+                                (d.returnType?.isUnit() != false) &&
+                                (isSetterMethodName(d.name.identifier)) &&
+                                (Visibilities.isVisibleIgnoringReceiver(d, scope.ownerDescriptor)) &&
+                                (descriptor.defaultType.isSubtypeOf(receiverParam.value.type))
+                            ) {
+                                result.add(
+                                    AttributeInfo(
+                                        name = propertyNameFromSetterMethod(d.name.identifier),
+                                        descriptor = d,
+                                        type = d.valueParameters[0].type,
+                                        required = false
+                                    )
                                 )
-                                else null
                             }
-                            else -> null
                         }
                     }
 
-                val types = mutableListOf<KotlinType>(descriptor.defaultType)
-                types.addAll(descriptor.defaultType.supertypes())
-                val syntheticGettersSetters = getSyntheticDescriptors(types, facade)
+                }
+
+                val syntheticGettersSetters = getSyntheticDescriptors(listOf(descriptor.defaultType), facade)
                     .mapNotNull { d ->
                         when (d) {
-                            // only extension functions exist right now, but in the future, properties might...
+                        // only extension functions exist right now, but in the future, properties might...
                             is SamAdapterExtensionFunctionDescriptor -> {
                                 if (d.returnType?.isUnit() != true) null // only void setters are allowed
                                 else if (!isSetterMethodName(d.name.identifier)) null
@@ -196,17 +245,11 @@ object R4aUtils {
                             else -> null
                         }
                     }
+                result.addAll(syntheticGettersSetters)
 
-                return realGettersSetters + extensionGettersSetters + syntheticGettersSetters + adapterSetters
+                result
             }
-            is FunctionDescriptor -> descriptor.valueParameters.map { param ->
-                AttributeInfo(
-                        name = param.name.identifier,
-                        descriptor = param,
-                        type = param.type,
-                        required = !param.hasDefaultValue()
-                )
-            }
+            is FunctionDescriptor -> realGetterSetterCache[descriptor]
             else -> listOf()
         }
     }
@@ -270,7 +313,8 @@ object R4aUtils {
         currentDescriptor = currentDescriptor ?: scopeForFirstPart.findVariable(firstPart.name, firstPart.location)
         currentDescriptor = currentDescriptor ?: scopeForFirstPart.findFunction(firstPart.name, firstPart.location)
         currentDescriptor = currentDescriptor ?: scopeForFirstPart.findClassifier(firstPart.name, firstPart.location)
-        currentDescriptor = currentDescriptor ?: moduleDescriptor.getPackage(FqName.topLevel(firstPart.name)).let { if (it.isEmpty()) null else it }
+        currentDescriptor = currentDescriptor ?:
+                moduleDescriptor.getPackage(FqName.topLevel(firstPart.name)).let { if (it.isEmpty()) null else it }
 
         if (currentDescriptor == null) {
             trace?.report(Errors.UNRESOLVED_REFERENCE.on(firstPart.expression, firstPart.expression))
@@ -292,39 +336,39 @@ object R4aUtils {
                     is ClassDescriptor -> {
                         var next: DeclarationDescriptor? = null
                         next = next ?: currentDescriptor.unsubstitutedInnerClassesScope.getContributedClassifier(
-                                qualifierPart.name,
-                                qualifierPart.location
+                            qualifierPart.name,
+                            qualifierPart.location
                         )
                         next = next ?: currentDescriptor.unsubstitutedInnerClassesScope.getContributedFunctions(
-                                qualifierPart.name,
-                                qualifierPart.location
+                            qualifierPart.name,
+                            qualifierPart.location
                         ).singleOrNull()
                         if (currentDescriptor.kind == ClassKind.OBJECT) {
                             next = next ?: currentDescriptor.unsubstitutedMemberScope.getContributedFunctions(
-                                    qualifierPart.name,
-                                    qualifierPart.location
+                                qualifierPart.name,
+                                qualifierPart.location
                             ).singleOrNull()
                         }
                         val cod = currentDescriptor.companionObjectDescriptor
                         if (cod != null) {
                             next = next ?: cod.unsubstitutedMemberScope.getContributedClassifier(qualifierPart.name, qualifierPart.location)
                             next = next ?: cod.unsubstitutedMemberScope.getContributedFunctions(
-                                    qualifierPart.name,
-                                    qualifierPart.location
+                                qualifierPart.name,
+                                qualifierPart.location
                             ).singleOrNull()
                             next = next ?: cod.unsubstitutedMemberScope.getContributedVariables(
-                                    qualifierPart.name,
-                                    qualifierPart.location
+                                qualifierPart.name,
+                                qualifierPart.location
                             ).singleOrNull()
                         }
                         next = next ?: currentDescriptor.staticScope.getContributedClassifier(qualifierPart.name, qualifierPart.location)
                         next = next ?: currentDescriptor.staticScope.getContributedFunctions(
-                                qualifierPart.name,
-                                qualifierPart.location
+                            qualifierPart.name,
+                            qualifierPart.location
                         ).singleOrNull()
                         next = next ?: currentDescriptor.staticScope.getContributedVariables(
-                                qualifierPart.name,
-                                qualifierPart.location
+                            qualifierPart.name,
+                            qualifierPart.location
                         ).singleOrNull()
                         next
                     }
