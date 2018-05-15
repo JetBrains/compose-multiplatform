@@ -16,46 +16,8 @@ class WrapperViewSettersGettersResolveExtension : SyntheticResolveExtension {
     override fun generateSyntheticMethods(thisDescriptor: ClassDescriptor, name: Name, ctx: LazyClassContext, fromSupertypes: List<SimpleFunctionDescriptor>, result: MutableCollection<SimpleFunctionDescriptor>) {
 
         if (!ComponentMetadata.isWrapperView(thisDescriptor)) return
-        val wrapperView = thisDescriptor as GeneratedViewClassDescriptor
 
-        val metadata = ComponentMetadata.fromDescriptor(wrapperView.containingDeclaration)
-
-        val unitType : SimpleType = thisDescriptor.builtIns.unitType
-
-        for (attr in metadata.getAttributeDescriptors()) {
-            val newMethod = SimpleFunctionDescriptorImpl.create(
-                metadata.wrapperViewDescriptor,
-                Annotations.EMPTY,
-                Name.identifier(R4aUtils.setterMethodFromPropertyName(attr.name.identifier)),
-                CallableMemberDescriptor.Kind.SYNTHESIZED, SourceElement.NO_SOURCE
-            )
-
-            newMethod.initialize(
-                null,
-                null,
-                emptyList(),
-                listOf(
-                    ValueParameterDescriptorImpl(
-                        newMethod,
-                        null,
-                        0,
-                        Annotations.EMPTY,
-                        attr.name,
-                        attr.type,
-                        false,
-                        false,
-                        false,
-                        null,
-                        SourceElement.NO_SOURCE
-                    )
-                ),
-                unitType,
-                Modality.FINAL,
-                Visibilities.PUBLIC
-            )
-
-            result.add(newMethod)
-        }
+        result.addAll((thisDescriptor as GeneratedViewClassDescriptor).attributeSetters)
     }
 
 }

@@ -161,6 +161,47 @@ open class GeneratedViewClassDescriptor(val metadata: ComponentMetadata): ClassD
         }
     }
 
+    val attributeSetters: Collection<SimpleFunctionDescriptor> by lazy {
+
+        val output = mutableListOf<SimpleFunctionDescriptor>()
+
+        for (attr in metadata.getAttributeDescriptors()) {
+            val newMethod = SimpleFunctionDescriptorImpl.create(
+                metadata.wrapperViewDescriptor,
+                Annotations.EMPTY,
+                Name.identifier(R4aUtils.setterMethodFromPropertyName(attr.name.identifier)),
+                CallableMemberDescriptor.Kind.SYNTHESIZED, SourceElement.NO_SOURCE
+            )
+
+            newMethod.initialize(
+                null,
+                null,
+                emptyList(),
+                listOf(
+                    ValueParameterDescriptorImpl(
+                        newMethod,
+                        null,
+                        0,
+                        Annotations.EMPTY,
+                        attr.name,
+                        attr.type,
+                        false,
+                        false,
+                        false,
+                        null,
+                        SourceElement.NO_SOURCE
+                    )
+                ),
+                builtIns.unitType,
+                Modality.FINAL,
+                Visibilities.PUBLIC
+            )
+
+            output.add(newMethod)
+        }
+        output
+    }
+
 
     private val thisAsReceiverParameter = LazyClassReceiverParameterDescriptor(this)
 
