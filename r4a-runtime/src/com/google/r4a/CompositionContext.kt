@@ -11,9 +11,8 @@ abstract class CompositionContext {
         private val TAG_COMPOSITION_CONTEXT = "r4aCompositionContext".hashCode()
         private val COMPONENTS_TO_CONTEXT = WeakHashMap<Component, CompositionContext>()
 
-        lateinit var factory: Function3<Context, ViewGroup, Component, CompositionContext>
-        lateinit var current: CompositionContext
-
+        var factory: Function3<Context, ViewGroup, Component, CompositionContext> = CompositionContextImpl.factory
+        var current: CompositionContext = CompositionContextImpl()
 
         fun create(context: Context, view: ViewGroup, component: Component): CompositionContext {
             return factory(context, view, component)
@@ -49,4 +48,5 @@ abstract class CompositionContext {
     abstract fun setInstance(instance: Any)
     abstract fun updAttr(key: String, value: Any?): Boolean
     abstract fun compose()
+    abstract fun debug()
 }
