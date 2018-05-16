@@ -8,11 +8,11 @@ import com.google.r4a.frames.Record
 class Address(street: String, city: String): Holder {
     var street: String
         get() = next.readable().street
-        set(value: String) { next.writable(this).street = value }
+        set(value) { next.writable(this).street = value }
 
     var city: String
         get() = next.readable().city
-        set(value: String) { next.writable(this).city = value }
+        set(value) { next.writable(this).city = value }
 
 
     private var next: AddressRecord
@@ -25,15 +25,15 @@ class Address(street: String, city: String): Holder {
         next.minFrame = frameId
     }
 
-    override fun prepend(r: Record) {
-        r.next = next
-        next = r as AddressRecord
+    override fun prepend(value: Record) {
+        value.next = next
+        next = value as AddressRecord
     }
 
     override val first: AddressRecord get() = next
 }
 
-class AddressRecord() : AbstractRecord() {
+class AddressRecord : AbstractRecord() {
     var street: String = ""
     var city: String = ""
 
@@ -44,5 +44,3 @@ class AddressRecord() : AbstractRecord() {
         city = other.city
     }
 }
-
-

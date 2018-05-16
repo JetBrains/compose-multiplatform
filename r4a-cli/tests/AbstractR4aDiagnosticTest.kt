@@ -1,6 +1,5 @@
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.util.Disposer
-import com.intellij.openapi.util.text.StringUtil
 import junit.framework.TestCase
 import org.jetbrains.kotlin.checkers.BaseDiagnosticsTest
 import org.jetbrains.kotlin.checkers.CheckerTestUtil
@@ -25,8 +24,7 @@ import org.jetbrains.kotlin.test.TestJdkKind
 import org.jetbrains.kotlin.test.testFramework.KtUsefulTestCase
 import java.io.File
 
-abstract class AbstractR4aDiagnosticsTest: TestCase() {
-    protected val myTestRootDisposable: Disposable = TestDisposable()
+abstract class AbstractR4aDiagnosticsTest: KtUsefulTestCase() {
 
     fun doTest(expectedText: String) {
         // Setup the environment for the analysis
@@ -110,20 +108,6 @@ abstract class AbstractR4aDiagnosticsTest: TestCase() {
         // Add checkers here
         StorageComponentContainerContributor.registerExtension(environment.project, ComponentsClosedDeclarationChecker())
     }
-
-    override fun tearDown() {
-        Disposer.dispose(myTestRootDisposable)
-        super.tearDown()
-    }
-
-    inner class TestDisposable : Disposable {
-        override fun dispose() {}
-
-        override fun toString(): String {
-            return this.javaClass.name
-        }
-    };
-
 }
 
 

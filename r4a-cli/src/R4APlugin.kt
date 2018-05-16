@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.extensions.KtxTypeResolutionExtension
 import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
 import org.jetbrains.kotlin.psi2ir.extensions.SyntheticIrExtension
+import org.jetbrains.kotlin.r4a.frames.FrameTransformExtension
 import org.jetbrains.kotlin.resolve.extensions.SyntheticResolveExtension
 
 
@@ -34,6 +35,7 @@ class R4AComponentRegistrar : ComponentRegistrar {
         SyntheticResolveExtension.registerExtension(project, StaticWrapperCreatorFunctionResolveExtension())
         SyntheticResolveExtension.registerExtension(project, WrapperViewSettersGettersResolveExtension())
         SyntheticIrExtension.registerExtension(project, R4ASyntheticIrExtension())
+        SyntheticIrExtension.registerExtension(project, FrameTransformExtension())
     }
 }
 

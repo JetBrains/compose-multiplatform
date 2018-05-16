@@ -23,6 +23,7 @@ dependencies {
 
     runtime(projectRuntimeJar(":kotlin-compiler"))
     runtime(projectDist(":kotlin-stdlib"))
+    testCompile(project(":r4a-runtime"))
 
     testCompile(project(":compiler:backend"))
     testCompile(project(":compiler:cli"))

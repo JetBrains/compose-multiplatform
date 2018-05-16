@@ -1,0 +1,24 @@
+/*
+ * Copyright 2010-2018 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
+ * that can be found in the license/LICENSE.txt file.
+ */
+
+package org.jetbrains.kotlin.r4a.frames
+
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.ModuleDescriptor
+import org.jetbrains.kotlin.descriptors.findClassAcrossModuleDependencies
+import org.jetbrains.kotlin.name.ClassId
+import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.r4a.R4aUtils
+import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
+import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperClassNotAny
+
+internal val r4aPackageName = FqName(R4aUtils.generateR4APackageName())
+internal val framesPackageName = r4aPackageName.child(Name.identifier("frames"))
+internal val abstractRecordClassName = framesPackageName.child(Name.identifier("AbstractRecord"))
+internal val recordClassName = framesPackageName.child(Name.identifier("Record"))
+internal val componentClassName = r4aPackageName.child(Name.identifier("Component"))
+internal fun ClassDescriptor.isFramed(): Boolean = getSuperClassNotAny()?.fqNameSafe == componentClassName
+internal fun ModuleDescriptor.findTopLevel(name: FqName) = findClassAcrossModuleDependencies(ClassId.topLevel(name)) ?: error("Could not find $name")

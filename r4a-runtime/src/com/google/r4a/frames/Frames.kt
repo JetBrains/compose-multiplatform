@@ -2,6 +2,7 @@ package com.google.r4a.frames
 
 import java.util.TreeSet
 import java.util.BitSet
+import java.util.HashSet
 
 class FrameAborted(val frame: FrameData) : RuntimeException("Frame aborted") {}
 
@@ -14,7 +15,7 @@ interface Record {
 }
 
 abstract class AbstractRecord: Record {
-    override var minFrame: Int = 0
+    override var minFrame: Int = frameId
     override var maxFrame: Int = Int.MAX_VALUE
     override var next: Record? = null
 }
@@ -136,7 +137,8 @@ fun commit(frame: FrameData) {
             val start = frame.invalid.copy().apply { set(frame.id) }
             val id = frame.id
             for (holder in frame.modified) {
-                if (!holder.canCommit(nextFrame, current, id, start)) {
+                val first = holder.first
+                if (readable(first, nextFrame, current) != readable(first, id, start)) {
                     abort(frame)
                 }
             }
@@ -267,13 +269,12 @@ fun <T: Record> T.readable(frame: FrameData): T {
     return readable(this, frame.id, frame.invalid)
 }
 
+fun _readable(r: Record): Record = r.readable()
+fun _writable(r: Record, holder: Holder): Record = r.writable(holder)
+
 interface Holder {
     val first: Record
-    fun prepend(r: Record)
-
-    fun canCommit(current: Int, invalid: BitSet, start: Int, startSet: BitSet): Boolean {
-        return readable(first, current, invalid) == readable(first, start, startSet)
-    }
+    fun prepend(value: Record)
 }
 
 fun <T: Record> T.writable(holder: Holder): T {
