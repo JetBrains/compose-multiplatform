@@ -23,6 +23,7 @@ const val CONSTRAINT_LAYOUT = "androidx.constraintlayout:constraintlayout:1.1.0@
 const val DEXMAKER_MOCKITO = "com.linkedin.dexmaker:dexmaker-mockito:2.2.0"
 const val ESPRESSO_CONTRIB = "com.android.support.test.espresso:espresso-contrib:3.0.1"
 const val ESPRESSO_CORE = "com.android.support.test.espresso:espresso-core:3.0.1"
+const val FINDBUGS = "com.google.code.findbugs:jsr305:2.0.1"
 const val FIREBASE_JOBDISPATCHER = "com.firebase:firebase-jobdispatcher:0.8.5"
 const val GOOGLE_COMPILE_TESTING = "com.google.testing.compile:compile-testing:0.11"
 const val GSON = "com.google.code.gson:gson:2.8.0"
