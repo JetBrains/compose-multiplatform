@@ -3,13 +3,16 @@ package com.google.r4a
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
+import java.util.*
 
 private class Slot(val sourceHash: Int, val key: Any?) {
     lateinit var parent: Slot
 
+    var container: Container? = null
     var instance: Any? = null
     var attributes = mutableMapOf<String, Any?>()
     var child: Slot? = null
+    // TODO(lmr): I think we can get rid of prevSibling
     var prevSibling: Slot? = null
     var nextSibling: Slot? = null
     var open = true
@@ -56,6 +59,7 @@ private class Container {
 internal class CompositionContextImpl: CompositionContext() {
 
     companion object {
+        private val COMPONENTS_TO_SLOTS = WeakHashMap<Component, Slot>()
         val factory = object: Function3<Context, ViewGroup, Component, CompositionContext> {
             override fun invoke(context: Context, root: ViewGroup, component: Component): CompositionContext {
                 val result = CompositionContextImpl()
@@ -77,20 +81,33 @@ internal class CompositionContextImpl: CompositionContext() {
 
     init {
         ROOT_SLOT.parent = ROOT_SLOT
+        ROOT_SLOT.container = ROOT_CONTAINER
     }
 
     override fun debug() {
         ROOT_SLOT.print(0)
     }
 
-    override fun recomposeFromRoot() {
-        currentSlot = ROOT_SLOT
-        currentContainer = ROOT_CONTAINER
-        currentContainer.index = 0
+    override fun recompose(component: Component) {
+        val slot = COMPONENTS_TO_SLOTS[component] ?: throw Exception("tried to recompose but could not find slot for component")
+        recomposeFrom(slot)
+    }
+
+    private fun recomposeFrom(slot: Slot) {
+        currentSlot = slot
+        currentContainer = slot.container ?: throw Exception("slot has no container")
+        // TODO(lmr): this won't be quite good enough... as index could be out of sync if a sibling
+        // updated and changed the number of children that it created
+        currentContainer.index = slot.index
+
 
         val prevContext = CompositionContext.current
         CompositionContext.current = this
+        // NOTE: It's important that we open the slot before composing. We could also potentially
+        // call start(...) and end(...) here, but I think that that may not really be what we want.
+        slot.open = true
         compose()
+        slot.open = false
         // restore previous context to whatever it was
         CompositionContext.current = prevContext
     }
@@ -218,6 +235,9 @@ internal class CompositionContextImpl: CompositionContext() {
         }
     }
 
+    // TODO(lmr): we could add an int that specifies the number of attributes on the element so we can
+    // initialize an array of that length to store the attributes since that information is known at compile time
+    // and is constant
     override fun start(sourceHash: Int): Any? = start(sourceHash, null)
     override fun start(sourceHash: Int, key: Any?): Any? {
         val current = currentSlot
@@ -268,6 +288,8 @@ internal class CompositionContextImpl: CompositionContext() {
         }
         if (instance is Component) {
             CompositionContext.associate(instance, this)
+            slot.container = container
+            COMPONENTS_TO_SLOTS[instance] = slot
         }
         slot.instance = instance
         slot.index = index
@@ -304,7 +326,7 @@ internal class CompositionContextImpl: CompositionContext() {
         }
 
         if (instance is ViewGroup) {
-            // TODO(lmr): remove slot from container.children
+            slot.container?.children?.remove(slot)
             slot.child = null
             if (child != null) {
                 unmountTail(child, instance)

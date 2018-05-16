@@ -26,6 +26,10 @@ abstract class CompositionContext {
             COMPONENTS_TO_CONTEXT[component] = context
         }
 
+        fun recompose(component: Component) {
+            find(component)?.recompose(component)
+        }
+
         fun find(view: View): CompositionContext? {
             var node: View? = view
             while (node != null) {
@@ -41,7 +45,7 @@ abstract class CompositionContext {
         }
     }
     abstract var context: Context
-    abstract fun recomposeFromRoot()
+    abstract fun recompose(component: Component)
     abstract fun start(sourceHash: Int): Any?
     abstract fun start(sourceHash: Int, key: Any?): Any?
     abstract fun end()

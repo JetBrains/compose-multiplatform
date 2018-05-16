@@ -175,7 +175,7 @@ private fun generateConstructor(context: GeneratorContext, componentMetadata: Co
                 )
             )
 
-            // this.compositionContext = CompositionContext.factory(context, this, instance)
+            // this.compositionContext = CompositionContext.create(context, this, instance)
             statements.add(
                 IrSetFieldImpl(
                     -1, -1,
@@ -345,13 +345,20 @@ private fun generateOnPreDrawFunction(context: GeneratorContext, componentMetada
 
             val recomposeFromRootFunction = compositionContextDescriptor
                 .unsubstitutedMemberScope
-                .getContributedFunctions(Name.identifier("recomposeFromRoot"), NoLookupLocation.FROM_BACKEND)
+                .getContributedFunctions(Name.identifier("recompose"), NoLookupLocation.FROM_BACKEND)
                 .single()
             val recomposeFromRootExpr = IrCallImpl(
                 -1, -1,
                 context.symbolTable.referenceFunction(recomposeFromRootFunction)
-            )
-            recomposeFromRootExpr.dispatchReceiver = getCompositionContextCall
+            ).apply {
+                dispatchReceiver = getCompositionContextCall
+                putValueArgument(0, IrGetFieldImpl(
+                    -1,
+                    -1,
+                    context.symbolTable.referenceField(syntheticClassDescriptor.componentInstanceField),
+                    getThisExpr
+                ))
+            }
 
             val ifDirtyExpr = IrIfThenElseImpl(
                 -1, -1,
