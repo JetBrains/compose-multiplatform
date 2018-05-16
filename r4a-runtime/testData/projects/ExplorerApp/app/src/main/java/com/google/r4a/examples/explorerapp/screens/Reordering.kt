@@ -5,7 +5,6 @@ import android.widget.*
 import android.view.*
 import com.google.r4a.CompositionContext
 import com.google.r4a.AttributeAdapterLocal
-import com.google.r4a.CompositionContextImpl
 
 class Reordering : Component() {
     // state
@@ -26,8 +25,10 @@ class Reordering : Component() {
 
     private val printTreeHandler = object: View.OnClickListener {
         override fun onClick(v: View?) {
-            val cc = CompositionContext.find(this@Reordering) as CompositionContextImpl
-            cc.printSlots()
+            val cc = CompositionContext.find(this@Reordering)
+            if (cc != null) {
+                cc.debug()
+            }
         }
     }
 

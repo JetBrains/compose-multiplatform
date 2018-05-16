@@ -53,7 +53,7 @@ private class Container {
 }
 
 
-class CompositionContextImpl: CompositionContext() {
+internal class CompositionContextImpl: CompositionContext() {
 
     companion object {
         val factory = object: Function3<Context, ViewGroup, Component, CompositionContext> {
@@ -65,7 +65,6 @@ class CompositionContextImpl: CompositionContext() {
                 return result
             }
         }
-        val DUMMY = CompositionContextImpl()
     }
 
     override lateinit var context: Context
@@ -80,7 +79,7 @@ class CompositionContextImpl: CompositionContext() {
         ROOT_SLOT.parent = ROOT_SLOT
     }
 
-    fun printSlots() {
+    override fun debug() {
         ROOT_SLOT.print(0)
     }
 
