@@ -160,6 +160,7 @@ def configureBuildOnServer() {
     def buildOnServerTask = rootProject.tasks.create("buildOnServer")
     rootProject.tasks.whenTaskAdded { task ->
         if ("createArchive".equals(task.name)
+                || "createDiffArchive".equals(task.name)
                 || "distDocs".equals(task.name)
                 || "dejetifyArchive".equals(task.name)
                 || CheckExternalDependencyLicensesTask.ROOT_TASK_NAME.equals(task.name)) {
