@@ -58,7 +58,7 @@ object R4aUtils {
                                     )
                                 }
                                 is PropertyDescriptor -> {
-                                    if (d.overriddenDescriptors.isNotEmpty()) null
+                                    if (d.kind == CallableMemberDescriptor.Kind.FAKE_OVERRIDE || d.overriddenDescriptors.isNotEmpty()) null
                                     else AttributeInfo(
                                         name = d.name.identifier,
                                         descriptor = d,
@@ -150,13 +150,14 @@ object R4aUtils {
         facade: ResolutionFacade?
     ): Collection<AttributeInfo> {
         val module = scope.ownerDescriptor.module
+        val componentClass = module.findClassAcrossModuleDependencies(ClassId.topLevel(r4aFqName("Component"))) ?: error("Could not find component")
         val adapterDescriptor = module.findClassAcrossModuleDependencies(ClassId.topLevel(r4aFqName("AttributeAdapter"))) ?: return listOf()
         return when (descriptor) {
             is ClassDescriptor -> {
                 var cd: ClassDescriptor? = descriptor
                 val result = mutableListOf<AttributeInfo>()
 
-                while (cd != null) {
+                while (cd != null && cd != componentClass) {
                     val validAttributes = realGetterSetterCache[cd].filter { d ->
                         Visibilities.isVisibleIgnoringReceiver(d.descriptor, scope.ownerDescriptor)
                     }

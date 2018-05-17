@@ -57,7 +57,7 @@ class ComponentMetadata(val descriptor: ClassDescriptor) { // TODO(lmr): ClassDe
     fun getAttributeDescriptors(): List<PropertyDescriptor> {
         return descriptor.unsubstitutedMemberScope.getContributedDescriptors()
             .mapNotNull { it as? PropertyDescriptor }
-            .filter { it.containingDeclaration == descriptor && !Visibilities.isPrivate(it.visibility) }
+            .filter { it.containingDeclaration == descriptor && !Visibilities.isPrivate(it.visibility) && it.kind != CallableMemberDescriptor.Kind.FAKE_OVERRIDE }
             .sortedBy { it.name }
     }
 
