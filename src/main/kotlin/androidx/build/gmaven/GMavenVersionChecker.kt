@@ -153,7 +153,13 @@ private data class GroupVersionData(
             xml.childNodes().forEach {
                 val node = it as Node
                 val versions = (node.attributes()["versions"] as String).split(",").map {
-                    Version(it)
+                    if (it == "0.1" || it == "0.2" || it == "0.3") {
+                        // androidx.core:core-ktx shipped versions 0.1, 0.2, and 0.3 which do not
+                        // comply with our versioning scheme.
+                        Version(it + ".0")
+                    } else {
+                        Version(it)
+                    }
                 }.toSet()
                 artifacts.put(it.name(), ArtifactVersionData(it.name(), versions))
             }
