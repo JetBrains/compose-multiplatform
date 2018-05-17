@@ -5,7 +5,7 @@ class R4aClassAnalisysHandlerExtensionTests: AbstractR4aDiagnosticsTest() {
             import com.google.r4a.Component;
 
             open class <!OPEN_COMPONENT!>MyComponent<!> : Component() {
-               override fun render() { }
+               override fun compose() { }
             }
         """)
     }
@@ -15,7 +15,7 @@ class R4aClassAnalisysHandlerExtensionTests: AbstractR4aDiagnosticsTest() {
             import com.google.r4a.Component;
 
             class MyComponent: Component() {
-               override fun render() { }
+               override fun compose() { }
             }
         """)
     }
@@ -25,7 +25,7 @@ class R4aClassAnalisysHandlerExtensionTests: AbstractR4aDiagnosticsTest() {
             import com.google.r4a.Component;
 
             abstract class <!OPEN_COMPONENT!>MyComponent<!>: Component() {
-               override fun render() { }
+               override fun compose() { }
             }
         """)
     }
