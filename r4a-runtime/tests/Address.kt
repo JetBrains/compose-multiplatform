@@ -1,6 +1,5 @@
 import com.google.r4a.frames.AbstractRecord
 import com.google.r4a.frames.Framed
-import com.google.r4a.frames.frameId
 import com.google.r4a.frames.readable
 import com.google.r4a.frames.writable
 import com.google.r4a.frames.Record
@@ -21,8 +20,6 @@ class Address(street: String, city: String): Framed {
         next = AddressRecord()
         next.street = street
         next.city = city
-        next.maxFrame = Int.MAX_VALUE
-        next.minFrame = frameId
     }
 
     override fun prepend(value: Record) {

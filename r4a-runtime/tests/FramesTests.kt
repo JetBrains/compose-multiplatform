@@ -186,7 +186,7 @@ class FrameTest: TestCase() {
 
     fun testRaw() {
         val count = 1000
-        val addresses = (0..count).map { AddressRaw(OLD_STREET, OLD_CITY)}
+        val addresses = (0..count).map { AddressRaw(OLD_STREET)}
         for (i in 0..count) {
             addresses[i].street = "From index $i"
             Assert.assertEquals("From index $i", addresses[i].street)
@@ -198,7 +198,7 @@ class FrameTest: TestCase() {
 
     fun testProp() {
         val count = 10000
-        val addresses = (0..count).map { AddressProp(OLD_STREET, OLD_CITY)}
+        val addresses = (0..count).map { AddressProp(OLD_STREET)}
         for (i in 0..count) {
             addresses[i].street = "From index $i"
             Assert.assertEquals("From index $i", addresses[i].street)
@@ -213,7 +213,7 @@ class FrameTest: TestCase() {
 // Helpers for the above tests
 
 inline fun <T> frame(crossinline block: ()->T): T {
-    open(false, false)
+    open(false)
     try {
         return block()
     } catch (e: Exception) {
@@ -225,7 +225,7 @@ inline fun <T> frame(crossinline block: ()->T): T {
 }
 
 inline fun suspended(crossinline block: ()->Unit): Frame {
-    open(false, false)
+    open(false)
     try {
         block()
         return suspend()
@@ -248,7 +248,7 @@ inline fun <T> restored(frame: Frame, crossinline block: ()->T): T {
 }
 
 inline fun aborted(crossinline block: ()->Unit) {
-    open(false, false)
+    open(false)
     try {
         block()
     } finally {
@@ -279,17 +279,12 @@ val Record.length: Int
     }
 
 
-class AddressRaw(var street: String, var city: String)
+class AddressRaw(var street: String)
 
-class AddressProp(streetValue: String, cityValue: String) {
+class AddressProp(streetValue: String) {
     var _street = streetValue
-    var _city = cityValue
 
     var street: String
         get() = _street
-        set(value: String) {_street = value }
-
-    var city: String
-        get() = _city
-        set(value: String) { _city = value }
+        set(value) {_street = value }
 }
