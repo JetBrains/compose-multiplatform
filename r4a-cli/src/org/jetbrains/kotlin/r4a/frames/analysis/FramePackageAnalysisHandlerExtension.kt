@@ -28,8 +28,8 @@ class PackageAnalysisHandlerExtension : AnalysisHandlerExtension {
             for (file in files) {
                 for (declaration in file.declarations) {
                     val ktClass = declaration as? KtClass ?: continue
-                    val holderDescriptor = resolveSession.resolveToDescriptor(declaration) as? ClassDescriptor ?: continue
-                    if (!holderDescriptor.isSubclassOf(componentDescriptor)) continue
+                    val framedDescriptor = resolveSession.resolveToDescriptor(declaration) as? ClassDescriptor ?: continue
+                    if (!framedDescriptor.isSubclassOf(componentDescriptor)) continue
                     val classFqName = ktClass.fqName!!
                     val recordFqName = classFqName.parent().child(Name.identifier("${classFqName.shortName()}\$Record"))
                     val recordSimpleName = recordFqName.shortName()
@@ -38,11 +38,11 @@ class PackageAnalysisHandlerExtension : AnalysisHandlerExtension {
                     val recordDescriptor = module.findTopLevel(recordClassName)
                     val baseType = baseTypeDescriptor.defaultType
                     val frameClass = FrameRecordClassDescriptor(recordSimpleName, recordPackage, recordDescriptor,
-                            holderDescriptor, listOf(baseType))
+                            framedDescriptor, listOf(baseType))
 
                     recordPackage.setClassDescriptor(frameClass)
                     bindingTrace.record(FrameWritableSlices.RECORD_CLASS, classFqName, frameClass)
-                    bindingTrace.record(FrameWritableSlices.HOLDER_DESCRIPTOR, classFqName, holderDescriptor)
+                    bindingTrace.record(FrameWritableSlices.FRAMED_DESCRIPTOR, classFqName, framedDescriptor)
                 }
             }
         }

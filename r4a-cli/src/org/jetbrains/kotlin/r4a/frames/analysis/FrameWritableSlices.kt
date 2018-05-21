@@ -14,5 +14,5 @@ import org.jetbrains.kotlin.util.slicedMap.WritableSlice
 
 object FrameWritableSlices {
     val RECORD_CLASS: WritableSlice<FqName, FrameRecordClassDescriptor> = BasicWritableSlice(RewritePolicy.DO_NOTHING)
-    val HOLDER_DESCRIPTOR: WritableSlice<FqName, ClassDescriptor> = BasicWritableSlice(RewritePolicy.DO_NOTHING)
+    val FRAMED_DESCRIPTOR: WritableSlice<FqName, ClassDescriptor> = BasicWritableSlice(RewritePolicy.DO_NOTHING)
 }

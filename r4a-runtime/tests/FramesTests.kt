@@ -1,5 +1,5 @@
 import com.google.r4a.frames.FrameAborted
-import com.google.r4a.frames.FrameData
+import com.google.r4a.frames.Frame
 import com.google.r4a.frames.Record
 import com.google.r4a.frames.abortHandler
 import com.google.r4a.frames.commit
@@ -171,7 +171,7 @@ class FrameTest: TestCase() {
 
     fun testManySimultaniousFrames() {
         val frameCount = 1000
-        val frames = ArrayDeque<FrameData>()
+        val frames = ArrayDeque<Frame>()
         val addresses = frame { (0..frameCount).map { Address(OLD_STREET, OLD_CITY) } }
         for (i in 0..frameCount) {
             frames.push(suspended { addresses[i].street = "From index $i" })
@@ -224,7 +224,7 @@ inline fun <T> frame(crossinline block: ()->T): T {
     }
 }
 
-inline fun suspended(crossinline block: ()->Unit): FrameData {
+inline fun suspended(crossinline block: ()->Unit): Frame {
     open(false, false)
     try {
         block()
@@ -235,7 +235,7 @@ inline fun suspended(crossinline block: ()->Unit): FrameData {
     }
 }
 
-inline fun <T> restored(frame: FrameData, crossinline block: ()->T): T {
+inline fun <T> restored(frame: Frame, crossinline block: ()->T): T {
     restore(frame)
     try {
         return block()

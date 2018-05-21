@@ -1,11 +1,11 @@
 import com.google.r4a.frames.AbstractRecord
-import com.google.r4a.frames.Holder
+import com.google.r4a.frames.Framed
 import com.google.r4a.frames.frameId
 import com.google.r4a.frames.readable
 import com.google.r4a.frames.writable
 import com.google.r4a.frames.Record
 
-class Address(street: String, city: String): Holder {
+class Address(street: String, city: String): Framed {
     var street: String
         get() = next.readable().street
         set(value) { next.writable(this).street = value }

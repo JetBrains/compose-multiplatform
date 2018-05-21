@@ -17,9 +17,6 @@ import org.jetbrains.kotlin.types.KotlinType
  *   - an `assign` method that copies values from the value into the record
  * - All framed properties redirect to the current readable or writable record for the class corresponding to
  *   the current open frame.
- * - The framed class also gets:
- *   - a `first` field which overrides the Holder<T>.first field
- *   - a `prepend` method which overrides the Holder<T>.prepend
  *
  *   For example, given the declaration:
  *
@@ -42,8 +39,8 @@ import org.jetbrains.kotlin.types.KotlinType
  *
  *     init {
  *       next = MyComponent_Record()
- *       next.some = "Default some"
- *       next.data = "Default data"
+ *       (next as MyComponent_Record).some = "Default some"
+ *       (next as MyComponent_Record).data = "Default data"
  *     }
  *   }
  *
@@ -58,17 +55,17 @@ import org.jetbrains.kotlin.types.KotlinType
  *     }
  *   }
  */
-class FrameMetadata(private val holderClassDescriptor: ClassDescriptor) {
+class FrameMetadata(private val framedClassDescriptor: ClassDescriptor) {
     /**
-     * Get the list of properties on the holder class that should be framed
+     * Get the list of properties on the framed class that should be framed
      */
-    fun getHolderFramedProperties() = framedProperties
+    fun getFramedProperties() = myFramedProperties
 
     /**
-     * Get the list of the record's properties (on for each public property of the holder)
+     * Get the list of the record's properties (on for each public property of the framed object)
      */
     fun getRecordPropertyDescriptors(recordClassDescriptor: ClassDescriptor): List<PropertyDescriptor> {
-        return framedProperties.map { syntheticProperty(recordClassDescriptor, it.name, it.returnType!!) }
+        return myFramedProperties.map { syntheticProperty(recordClassDescriptor, it.name, it.returnType!!) }
     }
 
     /**
@@ -83,8 +80,8 @@ class FrameMetadata(private val holderClassDescriptor: ClassDescriptor) {
                 Parameter("value", recordDescriptor.defaultType)))
     }
 
-    private val framedProperties: List<PropertyDescriptor> by lazy {
-        holderClassDescriptor.unsubstitutedMemberScope.getContributedDescriptors().mapNotNull {
+    private val myFramedProperties: List<PropertyDescriptor> by lazy {
+        framedClassDescriptor.unsubstitutedMemberScope.getContributedDescriptors().mapNotNull {
             if (it is PropertyDescriptor &&
                 it.kind == CallableMemberDescriptor.Kind.DECLARATION &&
                 it.isVar &&

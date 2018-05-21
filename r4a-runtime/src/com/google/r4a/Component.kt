@@ -1,10 +1,10 @@
 package com.google.r4a
 
-import com.google.r4a.frames.Holder
+import com.google.r4a.frames.Framed
 import com.google.r4a.frames.Record
 
 @Composable
-abstract class Component : Holder {
+abstract class Component : Framed {
     abstract fun compose()
     protected fun recompose() {
         CompositionContext.recompose(this)

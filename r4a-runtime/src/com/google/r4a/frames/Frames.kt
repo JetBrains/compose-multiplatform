@@ -4,7 +4,7 @@ import java.util.TreeSet
 import java.util.BitSet
 import java.util.HashSet
 
-class FrameAborted(val frame: FrameData) : RuntimeException("Frame aborted") {}
+class FrameAborted(val frame: Frame) : RuntimeException("Frame aborted") {}
 
 interface Record {
     var minFrame: Int
@@ -20,16 +20,16 @@ abstract class AbstractRecord: Record {
     override var next: Record? = null
 }
 
-internal val threadFrame = ThreadLocal<FrameData>()
+internal val threadFrame = ThreadLocal<Frame>()
 
-class FrameData(val id: Int, internal val invalid: BitSet, readOnly: Boolean, internal val implicit: Boolean) {
-    internal val modified = if (readOnly) null else HashSet<Holder>()
+class Frame(val id: Int, internal val invalid: BitSet, readOnly: Boolean, internal val implicit: Boolean) {
+    internal val modified = if (readOnly) null else HashSet<Framed>()
 
     val readonly: Boolean
         get() = modified == null
 }
 
-private fun validateInFrame(data: FrameData?) {
+private fun validateInFrame(data: Frame?) {
     if (data == null) throw IllegalStateException("Not in a frame")
 }
 
@@ -37,13 +37,13 @@ private fun validateNotInFrame() {
     if (threadFrame.get() != null) throw IllegalStateException("In an existing frame")
 }
 
-fun currentFrameData(): FrameData {
-    val data = threadFrame.get()
-    validateInFrame(data)
-    return data
+fun currentFrame(): Frame {
+    val frame = threadFrame.get()
+    validateInFrame(frame)
+    return frame
 }
 
-val frameId: Int get() = currentFrameData().id
+val frameId: Int get() = currentFrame().id
 
 // A global synchronization object
 private val sync = Object()
@@ -78,12 +78,12 @@ private fun BitSet.copy(): BitSet {
  * @param implicit true if committing the frame implicitly causes another one to be created
  * @return the newly created frame's data
  */
-fun open(readOnly: Boolean, implicit: Boolean): FrameData {
+fun open(readOnly: Boolean, implicit: Boolean): Frame {
     validateNotInFrame()
     synchronized(sync) {
         val id = ++maxFrameId
         val invalid = currentInvalid()
-        val frame = FrameData(id, invalid, readOnly, implicit)
+        val frame = Frame(id, invalid, readOnly, implicit)
         openFrames.set(id)
         openFrameIds.add(id)
         threadFrame.set(frame)
@@ -101,13 +101,13 @@ fun commitHandler() = threadFrame.get()?.let { commit(it) }
  * committed frame. Throws IllegalStateException no frame is open (use `commitHandler()` to commit a frame
  * if one is open).
  */
-fun commit() = commit(currentFrameData())
+fun commit() = commit(currentFrame())
 
 /**
  * Commit the given frame. Throws FrameAborted if changes in the frame collides with the current
  * committed frame.
  */
-fun commit(frame: FrameData) {
+fun commit(frame: Frame) {
     // NOTE: the this algorithm is currently does not guarantee a serializable frame operation as it doesn't prevent
     // crossing writes as described here https://arxiv.org/pdf/1412.2324.pdf
 
@@ -126,18 +126,18 @@ fun commit(frame: FrameData) {
             // If there are modifications we need to ensure none of the modifications have collisions.
 
             // A record is guaranteed not collide if no other write was performed to the record by a committed
-            // frame since this frame was opened. No writes to a holder occurred if, ignoring this frame, the readable
-            // records for the holder is the same. If they are different, and the records could be merged, (such
-            // as considering writes to different fields as not colliding) could be allowed here but, for now, the
-            // all writes to a record are considered atomic. Additionally, if the field values can be merged this
-            // could also be allowed here.
+            // frame since this frame was opened. No writes to a framed object occurred if, ignoring this frame, the
+            // readable records for the framed object are the same. If they are different, and the records could be
+            // =merged, (such as considering writes to different fields as not colliding) could be allowed here but,
+            // for now, the all writes to a record are considered atomic. Additionally, if the field values can be
+            // merged this could also be allowed here.
 
             val current = currentInvalid()
             val nextFrame = maxFrameId + 1
             val start = frame.invalid.copy().apply { set(frame.id) }
             val id = frame.id
-            for (holder in frame.modified) {
-                val first = holder.first
+            for (framed in frame.modified) {
+                val first = framed.first
                 if (readable(first, nextFrame, current) != readable(first, id, start)) {
                     abort(frame)
                 }
@@ -155,7 +155,7 @@ fun commit(frame: FrameData) {
 /**
  * Throw an exception if a frame is not open
  */
-private fun validateOpen(frame: FrameData) {
+private fun validateOpen(frame: Frame) {
     if (!openFrames[frame.id]) throw IllegalStateException("Frame not open")
 }
 
@@ -164,13 +164,13 @@ private fun validateOpen(frame: FrameData) {
  * is open (use `abortHandler` to abort a frame without throwing an exception or to abort a frame if one is open).
  */
 fun abort() {
-    abort(currentFrameData())
+    abort(currentFrame())
 }
 
 /**
  * Abort the given frame and throw a FrameAborted exception.
  */
-fun abort(frame: FrameData) {
+fun abort(frame: Frame) {
     abortHandler(frame)
     throw FrameAborted(frame)
 }
@@ -186,7 +186,7 @@ fun abortHandler() {
 /**
  * Abort the given frame.
  */
-fun abortHandler(frame: FrameData) {
+fun abortHandler(frame: Frame) {
     synchronized(sync) {
         validateOpen(frame)
         abortedFrames.set(frame.id)
@@ -201,8 +201,8 @@ fun abortHandler(frame: FrameData) {
  * Suspend the given frame. After calling suspend() the thread's no longer has an open frame. Call `restore()` to
  * restore a suspended thread.
  */
-fun suspend(): FrameData {
-    val frame = currentFrameData()
+fun suspend(): Frame {
+    val frame = currentFrame()
     threadFrame.set(null)
     return frame
 }
@@ -210,7 +210,7 @@ fun suspend(): FrameData {
 /**
  * Restore the given frame to the thread.
  */
-fun restore(frame: FrameData) {
+fun restore(frame: Frame) {
     validateNotInFrame()
     synchronized(sync) {
         validateOpen(frame)
@@ -218,7 +218,7 @@ fun restore(frame: FrameData) {
     }
 }
 
-private fun closeFrame(frame: FrameData) {
+private fun closeFrame(frame: Frame) {
     openFrames.clear(frame.id)
     openFrameIds.remove(frame.id)
     minOpenId = if (openFrameIds.size > 0) openFrameIds.first() else maxFrameId + 1
@@ -262,23 +262,23 @@ private fun <T: Record> readable(r: T, id: Int, invalid: BitSet): T {
 }
 
 fun <T: Record> T.readable(): T {
-    return this.readable(currentFrameData())
+    return this.readable(currentFrame())
 }
 
-fun <T: Record> T.readable(frame: FrameData): T {
+fun <T: Record> T.readable(frame: Frame): T {
     return readable(this, frame.id, frame.invalid)
 }
 
 fun _readable(r: Record): Record = r.readable()
-fun _writable(r: Record, holder: Holder): Record = r.writable(holder)
+fun _writable(r: Record, framed: Framed): Record = r.writable(framed)
 
-interface Holder {
+interface Framed {
     val first: Record
     fun prepend(value: Record)
 }
 
-fun <T: Record> T.writable(holder: Holder): T {
-    return this.writable(holder, currentFrameData())
+fun <T: Record> T.writable(framed: Framed): T {
+    return this.writable(framed, currentFrame())
 }
 
 /**
@@ -287,8 +287,8 @@ fun <T: Record> T.writable(holder: Holder): T {
  * maxFrame of 0 is indicates that the record is in the process of being created (possibly on another thread) and
  * should not be reused.
  */
-private fun used(holder: Holder): Record? {
-    var current: Record? = holder.first
+private fun used(framed: Framed): Record? {
+    var current: Record? = framed.first
     val min = minOpenId
     while (current != null) {
         if (current.maxFrame != 0 && ((current.maxFrame < min && !abortedFrames[current.maxFrame]) || abortedFrames[current.minFrame]))
@@ -299,7 +299,7 @@ private fun used(holder: Holder): Record? {
 }
 
 
-fun <T: Record> T.writable(holder: Holder, frame: FrameData): T {
+fun <T: Record> T.writable(framed: Framed, frame: Frame): T {
     if (frame.readonly) throw IllegalStateException("In a readonly frame")
     val id = frame.id
     val readData = readable<T>(this, id, frame.invalid)
@@ -308,8 +308,8 @@ fun <T: Record> T.writable(holder: Holder, frame: FrameData): T {
     if (readData.minFrame == frame.id) return readData
 
     // Otherwise, make a copy of the readable data and mark it as born in this frame, making it writable.
-    val used = used(holder) as T?
-    val newData = used ?: readData.create().apply { maxFrame = 0; minFrame = 0; holder.prepend(this as T) } as T
+    val used = used(framed) as T?
+    val newData = used ?: readData.create().apply { maxFrame = 0; minFrame = 0; framed.prepend(this as T) } as T
     newData.assign(readData)
     newData.minFrame = id
     newData.maxFrame = Int.MAX_VALUE
@@ -317,7 +317,7 @@ fun <T: Record> T.writable(holder: Holder, frame: FrameData): T {
     // Mark the readData as obscured by this write
     readData.maxFrame = id
 
-    frame.modified?.add(holder)
+    frame.modified?.add(framed)
 
     return newData
 }

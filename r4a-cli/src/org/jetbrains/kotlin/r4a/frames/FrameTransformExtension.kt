@@ -25,9 +25,8 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi2ir.extensions.SyntheticIrExtension
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
-import org.jetbrains.kotlin.r4a.R4aUtils
 import org.jetbrains.kotlin.r4a.frames.analysis.FrameMetadata
-import org.jetbrains.kotlin.r4a.frames.analysis.FrameWritableSlices.HOLDER_DESCRIPTOR
+import org.jetbrains.kotlin.r4a.frames.analysis.FrameWritableSlices.FRAMED_DESCRIPTOR
 import org.jetbrains.kotlin.r4a.frames.analysis.FrameWritableSlices.RECORD_CLASS
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperClassNotAny
@@ -63,7 +62,7 @@ class FrameTransformExtension : SyntheticIrExtension {
 
             val file = irModuleFragment.find { it is IrFile && it.anyChild { it == framedClass } }.single() as IrFile
 
-            val recordClassInfo = addHolderStateRecord(context, file, recordDescriptor)
+            val recordClassInfo = addFramedStateRecord(context, file, recordDescriptor)
             augmentFramedClass(context, className, framedClass, recordDescriptor, recordClassInfo)
         }
     }
@@ -71,7 +70,7 @@ class FrameTransformExtension : SyntheticIrExtension {
 
 class RecordClassInfo(val irClass: IrClass, val fields: List<IrField>, val constructorSymbol: IrConstructorSymbol)
 
-fun addHolderStateRecord(context: GeneratorContext, file: IrFile, recordClassDescriptor: FrameRecordClassDescriptor): RecordClassInfo {
+fun addFramedStateRecord(context: GeneratorContext, file: IrFile, recordClassDescriptor: FrameRecordClassDescriptor): RecordClassInfo {
     val recordTypeDescriptor = context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(recordClassName)) ?: error("Cannot find the Record class")
 
     // Declare the state record
@@ -87,7 +86,7 @@ fun addHolderStateRecord(context: GeneratorContext, file: IrFile, recordClassDes
         val superConstructor = context.symbolTable.referenceConstructor(recordClassDescriptor.getSuperClassNotAny()!!.constructors.single())
         val superCall = syntheticConstructorDelegatingCall(superConstructor, superConstructor.descriptor)
 
-        // Fields are left uninitialized as they will be set either by the holder's constructor or by a call to assign()
+        // Fields are left uninitialized as they will be set either by the framed object's constructor or by a call to assign()
 
         constructor.body = syntheticBlockBody(listOf(superCall))
     }
@@ -147,12 +146,12 @@ fun augmentFramedClass(
     recordDescriptor: ClassDescriptor,
     recordClassInfo: RecordClassInfo
 ) {
-    val holderDescriptor = context.bindingContext.get(HOLDER_DESCRIPTOR, name) ?: error("Could not find holder descriptor")
-    val metadata = FrameMetadata(holderDescriptor)
+    val framedDescriptor = context.bindingContext.get(FRAMED_DESCRIPTOR, name) ?: error("Could not find framed class descriptor")
+    val metadata = FrameMetadata(framedDescriptor)
     val recordTypeDescriptor = context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(recordClassName)) ?: error("Cannot find the Record class")
 
     // Find the next field
-    val nextPropertyDescriptor = holderDescriptor.unsubstitutedMemberScope.getContributedVariables(Name.identifier("next"),
+    val nextPropertyDescriptor = framedDescriptor.unsubstitutedMemberScope.getContributedVariables(Name.identifier("next"),
             NoLookupLocation.FROM_BACKEND).single()
     val nextGetterDescriptor = nextPropertyDescriptor.getter ?: error("Expected next property to have a getter")
     val nextGetter = context.symbolTable.referenceFunction(nextGetterDescriptor)
@@ -169,7 +168,7 @@ fun augmentFramedClass(
     fun getRecord() = toRecord(syntheticGetterCall(nextGetter, nextGetterDescriptor, syntheticGetValue(thisSymbol)))
 
     // Move property initializer to an anonymous initializer as the backing field is moved to the record
-    context.symbolTable.declareAnonymousInitializer(UNDEFINED_OFFSET, UNDEFINED_OFFSET, IrDeclarationOrigin.DEFINED, holderDescriptor)
+    context.symbolTable.declareAnonymousInitializer(UNDEFINED_OFFSET, UNDEFINED_OFFSET, IrDeclarationOrigin.DEFINED, framedDescriptor)
         .buildWithScope(context) { irInitializer ->
             val statements = mutableListOf<IrStatement>()
 
@@ -183,13 +182,13 @@ fun augmentFramedClass(
                     )))
 
             // Assign the fields
-            metadata.getHolderFramedProperties().forEach { propertyDescriptor ->
+            metadata.getFramedProperties().forEach { propertyDescriptor ->
                 // Move backing field initializer to an anonymous initializer of the record field
-                val irHolderProperty = framedClass.declarations.find { it.descriptor.name == propertyDescriptor.name } as? IrProperty
+                val irFramedProperty = framedClass.declarations.find { it.descriptor.name == propertyDescriptor.name } as? IrProperty
                         ?: error("Could not find ir representation of ${propertyDescriptor.name}")
                 val irRecordField =
                         recordClassInfo.fields.find { it.name == propertyDescriptor.name } ?: error("Could not find record field for $name")
-                val backingField = irHolderProperty.backingField ?: TODO("Properties without a backing class are not supported yet")
+                val backingField = irFramedProperty.backingField ?: TODO("Properties without a backing class are not supported yet")
                 backingField.initializer?.let { initializer ->
                     // (this.next as <record>).<field> = <initializer>
                     statements.add(syntheticSetField(irRecordField.symbol, getRecord(), initializer.expression))
@@ -211,13 +210,13 @@ fun augmentFramedClass(
                     NoLookupLocation.FROM_BACKEND).single()
     val readableSymbol = context.symbolTable.referenceSimpleFunction(readableDescriptor)
     val writableSymbol = context.symbolTable.referenceSimpleFunction(writableDescriptor)
-    metadata.getHolderFramedProperties().forEach { propertyDescriptor ->
-        val irHolderProperty = framedClass.declarations.find { it.descriptor.name == propertyDescriptor.name } as? IrProperty
+    metadata.getFramedProperties().forEach { propertyDescriptor ->
+        val irFramedProperty = framedClass.declarations.find { it.descriptor.name == propertyDescriptor.name } as? IrProperty
                 ?: error("Could not find ir representation of ${propertyDescriptor.name}")
         val irRecordField = recordClassInfo.fields.find { it.name == propertyDescriptor.name }
                 ?: error("Could not find record field of ${propertyDescriptor.name}")
-        irHolderProperty.backingField = null
-        irHolderProperty.getter?.let { getter ->
+        irFramedProperty.backingField = null
+        irFramedProperty.getter?.let { getter ->
             // (_readable(this.next) as <record>).<field>
             getter.body =
                     syntheticExpressionBody(
@@ -237,7 +236,7 @@ fun augmentFramedClass(
                     )
         }
 
-        irHolderProperty.setter?.let { setter ->
+        irFramedProperty.setter?.let { setter ->
             // (_writable(this.next) as <record>).<field> = value
             val valueParameter = setter.valueParameters[0].symbol
             setter.body = syntheticExpressionBody(
@@ -412,7 +411,7 @@ class FrameRecordClassDescriptor(
     private val myName: Name,
     private val myContainingDeclaration: DeclarationDescriptor,
     val recordDescriptor: ClassDescriptor,
-    myHolderClassDescriptor: ClassDescriptor,
+    myFramedClassDescriptor: ClassDescriptor,
     mySuperTypes: Collection<KotlinType>
 ) : ClassDescriptor {
     override fun getKind() = ClassKind.CLASS
@@ -482,7 +481,7 @@ class FrameRecordClassDescriptor(
 
     private val thisAsReceiverParameter = LazyClassReceiverParameterDescriptor(this)
     private val myTypeConstructor = ClassTypeConstructorImpl(this, declaredTypeParameters, mySuperTypes, LockBasedStorageManager.NO_LOCKS)
-    private val myMetadata = FrameMetadata(myHolderClassDescriptor)
+    private val myMetadata = FrameMetadata(myFramedClassDescriptor)
 
     private fun genScope(): MemberScope {
         return object : MemberScopeImpl() {
