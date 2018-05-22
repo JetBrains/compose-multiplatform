@@ -297,7 +297,7 @@ internal class CompositionContextImpl: CompositionContext() {
         slot.index = index
     }
 
-    override fun updAttr(key: String, value: Any?): Boolean {
+    override fun updateAttribute(value: Any?): Boolean {
         val slot = currentSlot
         val i = slot.argIndex
         slot.argIndex++

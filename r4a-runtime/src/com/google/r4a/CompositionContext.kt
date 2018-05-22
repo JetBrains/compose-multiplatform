@@ -56,7 +56,7 @@ abstract class CompositionContext {
     abstract fun start(sourceHash: Int, key: Any?): Any?
     abstract fun end()
     abstract fun setInstance(instance: Any)
-    abstract fun updAttr(key: String, value: Any?): Boolean
+    abstract fun updateAttribute(value: Any?): Boolean
     abstract fun compose()
     abstract fun debug()
 }
