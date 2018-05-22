@@ -6,6 +6,7 @@ import com.google.r4a.frames.commit
 import com.google.r4a.frames.commitHandler
 import com.google.r4a.frames.open
 import com.google.r4a.frames.restore
+import com.google.r4a.frames.speculate
 import com.google.r4a.frames.suspend
 import junit.framework.TestCase
 import org.junit.Assert
@@ -76,6 +77,51 @@ class FrameTest: TestCase() {
         frame {
             Assert.assertEquals(OLD_STREET, address.street)
         }
+    }
+
+    fun testReuseAborted() {
+        val address = frame { Address(OLD_STREET, OLD_CITY) }
+        Assert.assertEquals(1, address.first.length)
+        aborted { address.street = NEW_STREET }
+        Assert.assertEquals(2, address.first.length)
+        frame { address.street = "other street" }
+        Assert.assertEquals(2, address.first.length)
+    }
+
+    fun testSpeculation() {
+        val address = frame {Address(OLD_STREET, OLD_CITY)}
+        speculation {
+            address.street = NEW_STREET
+            Assert.assertEquals(NEW_STREET, address.street)
+        }
+        frame {
+            Assert.assertEquals(OLD_STREET, address.street)
+        }
+    }
+
+    fun testSpeculationIsolation() {
+        val address = frame {Address(OLD_STREET, OLD_CITY)}
+        speculate()
+        address.street = NEW_STREET
+        val speculation = suspend()
+        frame {
+            Assert.assertEquals(OLD_STREET, address.street)
+        }
+        restore(speculation)
+        Assert.assertEquals(NEW_STREET, address.street)
+        abortHandler()
+        frame {
+            Assert.assertEquals(OLD_STREET, address.street)
+        }
+    }
+
+    fun testReuseSpeculation() {
+        val address = frame { Address(OLD_STREET, OLD_CITY) }
+        Assert.assertEquals(1, address.first.length)
+        speculation { address.street = NEW_STREET }
+        Assert.assertEquals(2, address.first.length)
+        frame { address.street = "other street" }
+        Assert.assertEquals(2, address.first.length)
     }
 
     fun testCommitAbortInteraction() {
@@ -169,7 +215,7 @@ class FrameTest: TestCase() {
         }
     }
 
-    fun testManySimultaniousFrames() {
+    fun testManySimultaneousFrames() {
         val frameCount = 1000
         val frames = ArrayDeque<Frame>()
         val addresses = frame { (0..frameCount).map { Address(OLD_STREET, OLD_CITY) } }
@@ -249,6 +295,15 @@ inline fun <T> restored(frame: Frame, crossinline block: ()->T): T {
 
 inline fun aborted(crossinline block: ()->Unit) {
     open(false)
+    try {
+        block()
+    } finally {
+        abortHandler()
+    }
+}
+
+inline fun speculation(crossinline block: ()->Unit) {
+    speculate()
     try {
         block()
     } finally {

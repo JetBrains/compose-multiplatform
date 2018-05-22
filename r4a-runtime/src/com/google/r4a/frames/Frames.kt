@@ -57,16 +57,11 @@ private fun BitSet.copy(): BitSet {
     return BitSet().apply { or(this@copy) }
 }
 
-/**
- * Open a frame
- *
- * @param readOnly true if the frame can only be read from
- * @return the newly created frame's data
- */
-fun open(readOnly: Boolean): Frame {
+private fun open(readOnly: Boolean, speculative: Boolean): Frame {
     validateNotInFrame()
     synchronized(sync) {
-        val id = ++maxFrameId
+        maxFrameId += 2
+        val id = if (speculative) maxFrameId or 1 else maxFrameId
         val invalid = currentInvalid()
         val frame = Frame(id, invalid, readOnly)
         openFrames.set(id)
@@ -74,8 +69,23 @@ fun open(readOnly: Boolean): Frame {
         return frame
     }
 }
+/**
+ * Open a frame
+ *
+ * @param readOnly true if the frame can only be read from
+ * @return the newly created frame's data
+ */
+fun open(readOnly: Boolean = false) = open(readOnly, false)
 
 /**
+ * Open a speculative frame. A speculative frame can only be aborted and can be used to
+ * speculate on how a set of framed objects might react to changes. This allows, for example,
+ * expensive calculations to be pre-calculated on a separate thread and later replayed on
+ * the primary thread without affecting the primary thread.
+ */
+fun speculate() = open(false, true)
+
+/*
  * Commits the pending frame if there one is open. Intended to be used in a `finally` clause
  */
 fun commitHandler() = threadFrame.get()?.let { commit(it) }
@@ -104,6 +114,7 @@ fun commit(frame: Frame) {
     val modified = frame.modified
     synchronized(sync) {
         if (!openFrames[frame.id]) throw IllegalStateException("Frame not open")
+        if (frame.id and 1 != 0) throw IllegalStateException("Speculative frames cannot be committed")
         if (modified == null || modified.size == 0) {
             closeFrame(frame)
         } else {
@@ -169,7 +180,8 @@ fun abortHandler() {
 fun abortHandler(frame: Frame) {
     synchronized(sync) {
         validateOpen(frame)
-        abortedFrames.set(frame.id)
+        if (frame.id and 1 == 0)
+            abortedFrames.set(frame.id)
         closeFrame(frame)
     }
 }
@@ -200,6 +212,8 @@ private fun closeFrame(frame: Frame) {
     threadFrame.set(null)
 }
 
+private fun speculationFrame(candidateFrame: Int, currentFrame: Int) = candidateFrame != currentFrame && (candidateFrame and 1 == 1)
+
 private fun valid(currentFrame: Int, candidateFrame: Int, invalid: BitSet): Boolean {
     // A candidate frame is valid if the it is less than or equal to the current frame
     // and it wasn't specifically marked as invalid when the frame started.
@@ -209,7 +223,7 @@ private fun valid(currentFrame: Int, candidateFrame: Int, invalid: BitSet): Bool
     //
     // All frames born after the current frame are considered invalid since they occur after the
     // current frame was open.
-    return candidateFrame != 0 && candidateFrame <= currentFrame && !invalid.get(candidateFrame)
+    return candidateFrame != 0 && candidateFrame <= currentFrame && !speculationFrame(candidateFrame, currentFrame) && !invalid.get(candidateFrame)
 }
 
 // Determine if the given data is valid for the frame.
@@ -262,7 +276,8 @@ private fun used(framed: Framed, id: Int, invalid: BitSet): Record? {
     var current: Record? = framed.first
     var validRecord: Record? = null
     while (current != null) {
-        if (abortedFrames[current.frameId])
+        val currentId = current.frameId
+        if (speculationFrame(currentId, id) || abortedFrames[currentId])
             return current
         if (valid(current, id-1, invalid)) {
             if (validRecord == null) {
