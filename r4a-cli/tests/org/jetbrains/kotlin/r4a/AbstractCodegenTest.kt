@@ -5,41 +5,37 @@ import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.codegen.CodegenTestCase
 import org.jetbrains.kotlin.codegen.CodegenTestFiles
-import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.config.JVMConfigurationKeys
-import org.jetbrains.kotlin.config.JvmTarget
-import org.jetbrains.kotlin.psi2ir.extensions.SyntheticIrExtension
-import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisHandlerExtension
+import org.jetbrains.kotlin.config.*
+import org.jetbrains.kotlin.psi.KtFile
+
+import org.jetbrains.kotlin.resolve.AnalyzingUtils
 import org.jetbrains.kotlin.test.ConfigurationKind
 import org.jetbrains.kotlin.test.KotlinTestUtils
 import org.jetbrains.kotlin.test.TestJdkKind
-import java.io.File
-import java.util.*
 
-abstract class AbstractCodeGenTest: CodegenTestCase() {
+import java.io.File
+
+abstract class AbstractCodeGenTest : CodegenTestCase() {
     override fun setUp() {
         super.setUp()
-        val classPath = mutableListOf<File>(
-            KotlinTestUtils.getAnnotationsJar(),
-            assertExists(File("dist/kotlinc/lib/r4a-runtime.jar")),
-            assertExists(File("dependencies/android.jar"))
+        val classPath = listOf(
+                KotlinTestUtils.getAnnotationsJar(),
+                assertExists(File("dist/kotlinc/lib/r4a-runtime.jar")),
+                assertExists(File("dependencies/android.jar"))
         )
         val configuration = createConfiguration(
-            ConfigurationKind.ALL,
-            TestJdkKind.MOCK_JDK,
-            classPath,
-            Collections.emptyList(),
-            Collections.emptyList()
+                ConfigurationKind.ALL,
+                TestJdkKind.MOCK_JDK,
+                classPath,
+                emptyList(),
+                emptyList()
         )
         updateConfiguration(configuration)
 
-        additionalDependencies = listOf(
-            File("dist/kotlinc/lib/r4a-runtime.jar"),
-            File("dependencies/android.jar")
-        )
+        additionalDependencies = listOf(File("dist/kotlinc/lib/r4a-runtime.jar"))
 
         myEnvironment = KotlinCoreEnvironment.createForTests(
-            getTestRootDisposable(), configuration, EnvironmentConfigFiles.JVM_CONFIG_FILES
+                testRootDisposable, configuration, EnvironmentConfigFiles.JVM_CONFIG_FILES
         )
     }
 
@@ -52,16 +48,39 @@ abstract class AbstractCodeGenTest: CodegenTestCase() {
         return ConfigurationKind.ALL
     }
 
+    protected open fun helperFiles(): List<KtFile> = emptyList()
+
+    protected fun testFile(source: String) {
+        val files = mutableListOf<KtFile>()
+        files.addAll(helperFiles())
+        files.add(sourceFile("Test.kt", source))
+        myFiles = CodegenTestFiles.create(files)
+        val loader = createClassLoader()
+        val loadedClass = loader.loadClass("Test")
+        val instance = loadedClass.newInstance()
+        val instanceClass = instance::class.java
+        val testMethod = instanceClass.getMethod("test")
+        testMethod.invoke(instance)
+    }
+
+    protected fun testCompile(source: String) {
+        val files = mutableListOf<KtFile>()
+        files.addAll(helperFiles())
+        files.add(sourceFile("Test.kt", source))
+        myFiles = CodegenTestFiles.create(files)
+        val loader = createClassLoader()
+    }
+
+    protected fun sourceFile(name: String, source: String): KtFile {
+        val result = KotlinTestUtils.createFile(name, source, myEnvironment!!.project)
+        val ranges = AnalyzingUtils.getSyntaxErrorRanges(result)
+        assert(ranges.isEmpty()) { "Syntax errors found in $name: $ranges" }
+        return result
+    }
+
     protected fun loadClass(className: String, source: String): Class<*> {
         myFiles = CodegenTestFiles.create("file.kt", source, myEnvironment!!.project)
         val loader = createClassLoader()
         return loader.loadClass(className)
-    }
-
-    protected fun createClassFile(className: String, source: String): ByteArray {
-        myFiles = CodegenTestFiles.create("file.kt", source, myEnvironment!!.project)
-        val classFiles = generateClassesInFile().asList()
-        val classFileForObject = classFiles.first { it.relativePath.endsWith("$className.class") }
-        return classFileForObject.asByteArray()
     }
 }

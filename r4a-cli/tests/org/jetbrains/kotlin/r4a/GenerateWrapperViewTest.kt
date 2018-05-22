@@ -4,28 +4,17 @@ import junit.framework.TestCase
 import org.jetbrains.kotlin.extensions.KtxTypeResolutionExtension
 import org.jetbrains.kotlin.psi2ir.extensions.SyntheticIrExtension
 import org.jetbrains.kotlin.resolve.extensions.SyntheticResolveExtension
-import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisHandlerExtension
+import java.io.File
 
 class GenerateWrapperViewTest : AbstractCodeGenTest() {
     override fun setUp() {
         super.setUp()
+        additionalDependencies = additionalDependencies + listOf(File("dependencies/android.jar"))
+
         KtxTypeResolutionExtension.registerExtension(myEnvironment.project, R4aKtxTypeResolutionExtension())
         SyntheticIrExtension.registerExtension(myEnvironment.project, R4ASyntheticIrExtension())
         SyntheticResolveExtension.registerExtension(myEnvironment.project, StaticWrapperCreatorFunctionResolveExtension())
         SyntheticResolveExtension.registerExtension(myEnvironment.project, WrapperViewSettersGettersResolveExtension())
-    }
-
-    fun testKeyAttributes() {
-        val klass = loadClass("Foo", """
-            import com.google.r4a.Component
-
-            class Foo : Component() {
-                var key: Int = 0
-                override fun compose() {
-                    <Foo key={123} />
-                }
-            }
-        """)
     }
 
     fun testWrapperViewGeneration() {

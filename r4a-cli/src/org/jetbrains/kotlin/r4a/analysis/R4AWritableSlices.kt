@@ -16,7 +16,8 @@ import org.jetbrains.kotlin.util.slicedMap.WritableSlice
 
 object R4AWritableSlices {
     val KTX_TAG_TYPE_DESCRIPTOR: WritableSlice<KtExpression, DeclarationDescriptor> = BasicWritableSlice(RewritePolicy.DO_NOTHING)
-    val KTX_TAG_COMPONENT_TYPE: WritableSlice<KtxElement, Int> = BasicWritableSlice(RewritePolicy.DO_NOTHING)
+    val KTX_TAG_INSTANCE_TYPE: WritableSlice<KtExpression, KotlinType> = BasicWritableSlice(RewritePolicy.DO_NOTHING)
+    val KTX_TAG_COMPOSABLE_TYPE: WritableSlice<KtxElement, ComposableType> = BasicWritableSlice(RewritePolicy.DO_NOTHING)
 
     val KTX_ATTR_DESCRIPTOR: WritableSlice<KtxAttribute, DeclarationDescriptor> = BasicWritableSlice(RewritePolicy.DO_NOTHING)
     val KTX_ATTR_TYPE: WritableSlice<KtxAttribute, KotlinType> = BasicWritableSlice(RewritePolicy.DO_NOTHING)

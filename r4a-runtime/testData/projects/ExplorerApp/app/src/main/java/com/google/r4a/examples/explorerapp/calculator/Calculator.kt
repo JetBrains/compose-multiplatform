@@ -7,9 +7,9 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import com.google.r4a.Component
+import com.google.r4a.*
+import com.google.r4a.adapters.*
 import com.google.r4a.examples.explorerapp.R
-import com.google.r4a.AttributeAdapterLocal
 
 class Calculator : Component() {
 
@@ -20,6 +20,7 @@ class Calculator : Component() {
     private val WRAP = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
 
     override fun compose() {
+
         <LinearLayout orientation="vertical" layoutParams={FILL}>
             <LinearLayout
                 orientation="vertical"
@@ -109,6 +110,7 @@ class Calculator : Component() {
             GridLayout.spec(column, GridLayout.CENTER, 0f)
     )
 }
+
 
 private class CalculatorButton : Component() {
 

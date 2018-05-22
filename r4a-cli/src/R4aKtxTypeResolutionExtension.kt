@@ -5,6 +5,9 @@
 
 package org.jetbrains.kotlin.r4a
 
+import org.jetbrains.kotlin.builtins.getReturnTypeFromFunctionType
+import org.jetbrains.kotlin.builtins.getValueParameterTypesFromFunctionType
+import org.jetbrains.kotlin.builtins.isNonExtensionFunctionType
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.diagnostics.reportFromPlugin
 import org.jetbrains.kotlin.extensions.KtxTypeResolutionExtension
@@ -14,6 +17,7 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtxAttribute
 import org.jetbrains.kotlin.psi.KtxElement
+import org.jetbrains.kotlin.r4a.analysis.ComposableType
 import org.jetbrains.kotlin.r4a.analysis.R4ADefaultErrorMessages
 import org.jetbrains.kotlin.r4a.analysis.R4AErrors
 import org.jetbrains.kotlin.r4a.analysis.R4AErrors.*
@@ -23,6 +27,7 @@ import org.jetbrains.kotlin.resolve.TemporaryBindingTrace
 import org.jetbrains.kotlin.resolve.calls.context.ContextDependency
 import org.jetbrains.kotlin.resolve.descriptorUtil.isSubclassOf
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
+import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.expressions.ExpressionTypingContext
 import org.jetbrains.kotlin.types.expressions.ExpressionTypingFacade
 import org.jetbrains.kotlin.types.typeUtil.isSubtypeOf
@@ -64,7 +69,13 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
 
         context.trace.record(R4AWritableSlices.KTX_TAG_TYPE_DESCRIPTOR, element, openingDescriptor)
 
-        context.trace.record(R4AWritableSlices.KTX_TAG_COMPONENT_TYPE, element, getComponentType(openingDescriptor, module))
+        context.trace.record(R4AWritableSlices.KTX_TAG_INSTANCE_TYPE, element, when (openingDescriptor) {
+            is ClassDescriptor -> openingDescriptor.defaultType
+            is VariableDescriptor -> openingDescriptor.type
+            else -> context.expectedType
+        })
+
+        context.trace.record(R4AWritableSlices.KTX_TAG_COMPOSABLE_TYPE, element, getComposableType(openingDescriptor, module))
 
         element.attributes?.let { attributes ->
             for (attribute in attributes) {
@@ -111,7 +122,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
                 if (valueType.isSubtypeOf(param.type)) {
 
                     context.trace.record(R4AWritableSlices.KTX_ATTR_DESCRIPTOR, attribute, param.descriptor)
-                    context.trace.record(R4AWritableSlices.KTX_ATTR_TYPE, attribute, valueType)
+                    context.trace.record(R4AWritableSlices.KTX_ATTR_TYPE, attribute, param.type)
                     // its valid
                     context.trace.record(BindingContext.REFERENCE_TARGET, keyNode, param.descriptor)
                     newContext.trace.record(BindingContext.REFERENCE_TARGET, keyNode, param.descriptor)
@@ -139,22 +150,23 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
         }
     }
 
-    private fun getComponentType(tagDescriptor: DeclarationDescriptor, module: ModuleDescriptor): Int {
+    private fun getComposableType(tagDescriptor: DeclarationDescriptor, module: ModuleDescriptor): ComposableType {
         // NOTE: we may want to cache this
         val r4aComponentId = ClassId.topLevel(R4aUtils.r4aFqName("Component"))
-        val r4aComponentDescriptor = module.findClassAcrossModuleDependencies(r4aComponentId) ?: return -1
+        val r4aComponentDescriptor = module.findClassAcrossModuleDependencies(r4aComponentId) ?: return ComposableType.UNKNOWN
 
         // NOTE: we may want to cache this
         val androidViewId = ClassId.topLevel(FqName("android.view.View"))
-        val androidViewDescriptor = module.findClassAcrossModuleDependencies(androidViewId) ?: return -1
+        val androidViewDescriptor = module.findClassAcrossModuleDependencies(androidViewId) ?: return ComposableType.UNKNOWN
 
         return when (tagDescriptor) {
+            is VariableDescriptor -> ComposableType.FUNCTION_VAR
             is ClassDescriptor -> {
-                if (tagDescriptor.isSubclassOf(r4aComponentDescriptor)) 1
-                else if (tagDescriptor.isSubclassOf(androidViewDescriptor)) 0
-                else -1
+                if (tagDescriptor.isSubclassOf(r4aComponentDescriptor)) ComposableType.COMPONENT
+                else if (tagDescriptor.isSubclassOf(androidViewDescriptor)) ComposableType.VIEW
+                else ComposableType.UNKNOWN
             }
-            else -> -1
+            else -> ComposableType.UNKNOWN
         }
     }
 
@@ -241,6 +253,15 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
                     if (!it.isUnit()) {
                         context.trace.reportFromPlugin(INVALID_TYPE_SIGNATURE_SFC.on(tagExpression), R4ADefaultErrorMessages)
                     }
+                }
+            }
+            is VariableDescriptor -> {
+                val type = R4aUtils.getFunctionTypeFromType(descriptor.type)
+                if (type != null && type.getReturnTypeFromFunctionType().isUnit()) {
+                    // this is allowed...
+                } else {
+                    val validTypes = listOf(r4aComponentDescriptor.defaultType, androidViewDescriptor.defaultType)
+                    context.trace.reportFromPlugin(INVALID_TAG_DESCRIPTOR.on(tagExpression, validTypes), R4ADefaultErrorMessages)
                 }
             }
             else -> {
