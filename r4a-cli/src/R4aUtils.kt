@@ -4,10 +4,15 @@ import com.intellij.util.SmartList
 import com.intellij.util.containers.SLRUCache
 import com.intellij.util.containers.hash.EqualityPolicy
 import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.builtins.getReturnTypeFromFunctionType
+import org.jetbrains.kotlin.builtins.getValueParameterTypesFromFunctionType
+import org.jetbrains.kotlin.builtins.isNonExtensionFunctionType
 import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.idea.resolve.ResolutionFacade
+import org.jetbrains.kotlin.incremental.KotlinLookupLocation
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtQualifiedExpression
@@ -20,15 +25,13 @@ import org.jetbrains.kotlin.resolve.calls.components.hasDefaultValue
 import org.jetbrains.kotlin.resolve.descriptorUtil.*
 import org.jetbrains.kotlin.resolve.scopes.*
 import org.jetbrains.kotlin.resolve.scopes.receivers.*
-import org.jetbrains.kotlin.resolve.scopes.utils.collectAllFromMeAndParent
-import org.jetbrains.kotlin.resolve.scopes.utils.findClassifier
-import org.jetbrains.kotlin.resolve.scopes.utils.findFunction
-import org.jetbrains.kotlin.resolve.scopes.utils.findVariable
+import org.jetbrains.kotlin.resolve.scopes.utils.*
 import org.jetbrains.kotlin.resolve.source.getPsi
 import org.jetbrains.kotlin.synthetic.SamAdapterExtensionFunctionDescriptor
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.typeUtil.isSubtypeOf
 import org.jetbrains.kotlin.types.typeUtil.isUnit
+import org.jetbrains.kotlin.types.typeUtil.supertypes
 
 
 object R4aUtils {
@@ -161,6 +164,11 @@ object R4aUtils {
         return scope.collectSyntheticMemberFunctions(types) + scope.collectSyntheticExtensionProperties(types)
     }
 
+    internal fun getFunctionTypeFromType(type: KotlinType): KotlinType? {
+        if (type.isNonExtensionFunctionType) return type
+        return type.supertypes().firstOrNull { it.isNonExtensionFunctionType }
+    }
+
     fun getPossibleAttributesForDescriptor(
         descriptor: DeclarationDescriptor,
         scope: LexicalScope,
@@ -168,8 +176,23 @@ object R4aUtils {
     ): Collection<AttributeInfo> {
         val module = scope.ownerDescriptor.module
         val componentClass = module.findClassAcrossModuleDependencies(ClassId.topLevel(r4aFqName("Component"))) ?: error("Could not find component")
-        val adapterDescriptor = module.findClassAcrossModuleDependencies(ClassId.topLevel(r4aFqName("AttributeAdapter"))) ?: return listOf()
+        val adapterDescriptor = module.findClassAcrossModuleDependencies(ClassId.topLevel(r4aFqName("adapters.AttributeAdapter"))) ?: return listOf()
         return when (descriptor) {
+            is VariableDescriptor -> {
+                val type = getFunctionTypeFromType(descriptor.type)
+                if (type != null && type.getReturnTypeFromFunctionType().isUnit()) {
+                    return type.getValueParameterTypesFromFunctionType().mapIndexed { index, param ->
+                        AttributeInfo(
+                            name = "arg$index",
+                            required = true,
+                            type = param.type,
+                            descriptor = descriptor
+                        )
+                    }
+                } else {
+                    return listOf()
+                }
+            }
             is ClassDescriptor -> {
                 var cd: ClassDescriptor? = descriptor
                 val result = mutableListOf<AttributeInfo>()

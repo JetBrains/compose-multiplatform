@@ -8,14 +8,16 @@ import java.util.*
 abstract class CompositionContext {
     companion object {
 
-        private val TAG_COMPOSITION_CONTEXT = "r4aCompositionContext".hashCode()
+        private val TAG_ROOT_COMPONENT = "r4aRootComponent".hashCode()
         private val COMPONENTS_TO_CONTEXT = WeakHashMap<Component, CompositionContext>()
 
         var factory: Function3<Context, ViewGroup, Component, CompositionContext> = CompositionContextImpl.factory
         var current: CompositionContext = CompositionContextImpl()
 
         fun create(context: Context, view: ViewGroup, component: Component): CompositionContext {
-            return factory(context, view, component)
+            val cc = factory(context, view, component)
+            setRoot(view, component)
+            return cc
         }
 
         fun find(component: Component): CompositionContext? {
@@ -30,18 +32,22 @@ abstract class CompositionContext {
             find(component)?.recompose(component)
         }
 
-        fun find(view: View): CompositionContext? {
+        fun find(view: View): Component? {
             var node: View? = view
             while (node != null) {
-                val cc = node.getTag(TAG_COMPOSITION_CONTEXT) as? CompositionContext
+                val cc = node.getTag(TAG_ROOT_COMPONENT) as? Component
                 if (cc != null) return cc
                 node = node.parent as? View
             }
             return null
         }
 
-        fun setRoot(view: View, context: CompositionContext) {
-            view.setTag(TAG_COMPOSITION_CONTEXT, context)
+        fun getRootComponent(view: View): Component? {
+            return view.getTag(TAG_ROOT_COMPONENT) as? Component
+        }
+
+        fun setRoot(view: View, component: Component) {
+            view.setTag(TAG_ROOT_COMPONENT, component)
         }
     }
     abstract var context: Context

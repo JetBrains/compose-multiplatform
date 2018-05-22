@@ -2,8 +2,8 @@ package com.google.r4a.examples.explorerapp.infinitescroll
 
 
 import android.widget.*
-import com.google.r4a.Component
-import com.google.r4a.AttributeAdapterLocal
+import com.google.r4a.*
+import com.google.r4a.adapters.*
 
 /** This component represents an individual feed story, including a title, optional description, and photo **/
 class NewsFeedStoryComponent : Component() {

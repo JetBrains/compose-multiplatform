@@ -1,40 +1,32 @@
 package org.jetbrains.kotlin.r4a.compiler.lower
 
+import org.jetbrains.kotlin.backend.jvm.codegen.IrExpressionLambda
 import org.jetbrains.kotlin.descriptors.*
-import org.jetbrains.kotlin.descriptors.annotations.Annotations
-import org.jetbrains.kotlin.descriptors.impl.LocalVariableDescriptor
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrKtxStatement
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.declarations.impl.IrFieldImpl
 import org.jetbrains.kotlin.ir.descriptors.IrTemporaryVariableDescriptor
 import org.jetbrains.kotlin.ir.descriptors.IrTemporaryVariableDescriptorImpl
-import org.jetbrains.kotlin.ir.expressions.IrBlockBody
-import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
-import org.jetbrains.kotlin.ir.expressions.IrStatementOriginImpl
-import org.jetbrains.kotlin.ir.expressions.IrTypeOperator
+import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.*
-import org.jetbrains.kotlin.ir.util.createParameterDeclarations
 import org.jetbrains.kotlin.ir.util.withScope
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 import org.jetbrains.kotlin.name.ClassId
-import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.psi.KtExpression
+import org.jetbrains.kotlin.psi.KtxElement
 import org.jetbrains.kotlin.psi.psiUtil.endOffset
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
-import org.jetbrains.kotlin.r4a.R4ASyntheticIrExtension
 import org.jetbrains.kotlin.r4a.compiler.ir.IrKtxTag
 import org.jetbrains.kotlin.r4a.R4aUtils
 import org.jetbrains.kotlin.r4a.analysis.ComponentMetadata
+import org.jetbrains.kotlin.r4a.analysis.ComposableType
 import org.jetbrains.kotlin.r4a.analysis.R4AWritableSlices
-import org.jetbrains.kotlin.r4a.compiler.ir.buildWithScope
-import org.jetbrains.kotlin.r4a.compiler.ir.find
 import org.jetbrains.kotlin.resolve.descriptorUtil.*
-import org.jetbrains.kotlin.types.KotlinTypeFactory
-import org.jetbrains.kotlin.types.TypeProjectionImpl
+import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.typeUtil.makeNullable
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
@@ -49,8 +41,6 @@ fun lowerComponentClass(context: GeneratorContext, metadata: ComponentMetadata, 
     // }
 
     component.declarations.add(generateComponentCompanionObject(context, metadata))
-
-    lowerComposeFunction(context, component)
 }
 
 /**
@@ -96,76 +86,73 @@ fun lowerComponentClass(context: GeneratorContext, metadata: ComponentMetadata, 
  */
 private fun transform(
     context: GeneratorContext,
-    component: IrClass,
-    function: IrFunction,
     tag: IrKtxTag,
-    ccVariable: IrTemporaryVariableDescriptor,
-    uniqueIndex: () -> Int
+    helper: ComposeFunctionHelper
 ): List<IrStatement> {
-    val slotIndex = uniqueIndex()
+    val slotIndex = helper.uniqueIndex()
     val output: MutableList<IrStatement> = mutableListOf()
 
     val element = tag.element // TODO(jim): Should transform pure IR rather than relying on the element
     val tagNameElement = element.simpleTagName ?: element.qualifiedTagName ?: throw NullPointerException("tag name not found")
 
-    val tagType = context.bindingContext.get(
+    val tagDescriptor = context.bindingContext.get(
         R4AWritableSlices.KTX_TAG_TYPE_DESCRIPTOR,
         element
-    ) as ClassifierDescriptor? ?: throw NullPointerException("KTX tag does not know descriptor: " + element.text)
+    ) ?: throw Exception("no tag descriptor found") // as ClassifierDescriptor? ?: throw NullPointerException("KTX tag does not know descriptor: " + element.text)
 
-    val componentType = context.bindingContext.get(
-        R4AWritableSlices.KTX_TAG_COMPONENT_TYPE,
+    val tagType = context.bindingContext.get(
+        R4AWritableSlices.KTX_TAG_INSTANCE_TYPE,
         element
-    ) ?: -1
+    ) ?: throw Exception("no tag type found")
 
-    val ccClass = context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(R4aUtils.r4aFqName("CompositionContext")))!!
+    val composableType = context.bindingContext.get(
+        R4AWritableSlices.KTX_TAG_COMPOSABLE_TYPE,
+        element
+    ) ?: ComposableType.UNKNOWN
 
-    val getCc = IrGetValueImpl(element.startOffset, element.endOffset, context.symbolTable.referenceVariable(ccVariable))
 
     val keyAttribute = tag.attributes.find { it.element.key?.getReferencedName() == "key" }
     val parameterSize = if (keyAttribute != null) 2 else 1
-    println("parameterSize: $parameterSize")
-
-    val ccStartMethod = ccClass.unsubstitutedMemberScope.getContributedFunctions(
-        Name.identifier("start"),
-        NoLookupLocation.FROM_BACKEND
-    ).find { it.valueParameters.size == parameterSize }!!
+    val ccStartMethod = if (keyAttribute != null) helper.ccStartMethodWithKey else helper.ccStartMethodWithoutKey
 
     val ccStartMethodCall = IrCallImpl(
         element.startOffset, element.endOffset,
         context.symbolTable.referenceFunction(ccStartMethod)
     ).apply {
-        dispatchReceiver = getCc
+        dispatchReceiver = helper.getCc
         putValueArgument(
             0,
             IrConstImpl.int(
                 element.startOffset,
                 element.endOffset,
                 context.builtIns.intType,
-                md5IntHash("${component.descriptor.fqNameSafe.asString()}::$slotIndex")
+                md5IntHash("${helper.functionDescription}::$slotIndex")
             )
         )
         if (keyAttribute != null) {
-             putValueArgument(1, keyAttribute.value!!)
+            putValueArgument(1, keyAttribute.value!!)
         }
     }
+    val nullableTagType = tagType.makeNullable()
 
-    val nullableTagType = tagType.defaultType.makeNullable()
+    val elVariable = IrTemporaryVariableDescriptorImpl(
+        helper.compose.descriptor,
+        Name.identifier("__el$slotIndex"),
+        nullableTagType,
+        false
+    )
+
+    val classifier = tagDescriptor as? ClassifierDescriptor
+            ?: tagType.constructor.declarationDescriptor
+            ?: throw Exception("couldnt get type")
 
     val getNullableInstanceStartCall = IrTypeOperatorCallImpl(
         element.startOffset, element.endOffset,
         context.builtIns.nullableAnyType,
         IrTypeOperator.SAFE_CAST,
-        tagType.defaultType,
+        tagType,
         ccStartMethodCall,
-        context.symbolTable.referenceClassifier(tagType)
-    )
-
-    val elVariable = IrTemporaryVariableDescriptorImpl(
-        function.descriptor,
-        Name.identifier("__el$slotIndex"),
-        nullableTagType,
-        false
+        context.symbolTable.referenceClassifier(classifier)
     )
 
     val elVariableDeclaration = context.symbolTable.declareVariable(
@@ -175,11 +162,12 @@ private fun transform(
         getNullableInstanceStartCall
     )
 
+    // OUTPUT: var el = cc.start(...) as? TagType
+    output.add(elVariableDeclaration)
+
     val elSymbol = context.symbolTable.referenceVariable(elVariable)
     val getEl = IrGetValueImpl(tagNameElement.startOffset, tagNameElement.endOffset, elSymbol)
 
-    // OUTPUT: var el = cc.start(...) as? TagType
-    output.add(elVariableDeclaration)
 
     val elIsNullExpr = IrBinaryPrimitiveImpl(
         tagNameElement.startOffset, tagNameElement.endOffset,
@@ -189,48 +177,34 @@ private fun transform(
         IrConstImpl.constNull(tagNameElement.startOffset, tagNameElement.endOffset, context.builtIns.nullableNothingType)
     )
 
-    val instanceCtorCall = when (componentType) {
-    // Native View
-        0 -> {
-            val instanceCtor = (tagType as ClassDescriptor).constructors.find { it.valueParameters.size == 1 }!!
-
-            val contextGetter = ccClass.unsubstitutedMemberScope.getContributedVariables(
-                Name.identifier("context"),
-                NoLookupLocation.FROM_BACKEND
-            ).single().getter!!
-            val getContextCall = IrCallImpl(
-                tagNameElement.startOffset,
-                tagNameElement.endOffset,
-                context.symbolTable.referenceFunction(contextGetter)
-            ).apply {
-                dispatchReceiver = getCc
-            }
+    val instanceCtorCall = when (composableType) {
+        ComposableType.VIEW -> {
+            val instanceCtor = (tagDescriptor as ClassDescriptor).constructors.find { it.valueParameters.size == 1 }!!
 
             IrCallImpl(tagNameElement.startOffset, tagNameElement.endOffset, context.symbolTable.referenceConstructor(instanceCtor)).apply {
-                putValueArgument(0, getContextCall)
+                putValueArgument(0, helper.getAndroidContextCall)
             }
         }
-    // Composite Component
-        1 -> {
-            val instanceCtor = (tagType as ClassDescriptor).constructors.find { it.valueParameters.size == 0 }!!
+        ComposableType.COMPONENT -> {
+            val instanceCtor = (tagDescriptor as ClassDescriptor).constructors.find { it.valueParameters.size == 0 }!!
             IrCallImpl(tagNameElement.startOffset, tagNameElement.endOffset, context.symbolTable.referenceConstructor(instanceCtor))
         }
-        else -> throw Exception("unknown component type found: $componentType")
+        ComposableType.FUNCTION_VAR -> {
+            // we already have the instance... its the open tag itself
+            tag.openTagExpr ?: throw Exception("open tag expression expected")
+        }
+        ComposableType.FUNCTION -> TODO()
+        ComposableType.UNKNOWN -> throw Exception("unknown component type found: $composableType")
     }
 
     val storeInstanceExpr =
         IrSetVariableImpl(tagNameElement.startOffset, tagNameElement.endOffset, elSymbol, instanceCtorCall, KTX_TAG_ORIGIN)
 
-    val ccSetInstanceFunctionDescriptor = ccClass.unsubstitutedMemberScope.getContributedFunctions(
-        Name.identifier("setInstance"),
-        NoLookupLocation.FROM_BACKEND
-    ).single() // only one of these for now
-
     val callSetInstanceExpr = IrCallImpl(
         tagNameElement.startOffset, tagNameElement.endOffset,
-        context.symbolTable.referenceFunction(ccSetInstanceFunctionDescriptor)
+        context.symbolTable.referenceFunction(helper.ccSetInstanceFunctionDescriptor)
     ).apply {
-        dispatchReceiver = getCc
+        dispatchReceiver = helper.getCc
         putValueArgument(0, getEl)
     }
 
@@ -255,12 +229,6 @@ private fun transform(
     // }
     output.add(ifNullExpr)
 
-    val ccUpdAttrFunctionDescriptor = ccClass.unsubstitutedMemberScope.getContributedFunctions(
-        Name.identifier("updAttr"),
-        NoLookupLocation.FROM_BACKEND
-    ).single()
-
-
     for (attr in tag.attributes) {
 
         // for each attribute, we call into the context to see if we need to call the updater, and call if it we need to do so.
@@ -269,17 +237,6 @@ private fun transform(
 
         val key = attrElement.key!!.getReferencedName()
 
-        val attributeDescriptor = context.bindingContext.get(
-            R4AWritableSlices.KTX_ATTR_DESCRIPTOR,
-            attrElement
-        ) ?: throw Exception("setter $key not found")
-
-        val setterFunctionDescriptor = when (attributeDescriptor) {
-            is FunctionDescriptor -> attributeDescriptor
-            is PropertyDescriptor -> attributeDescriptor.setter!!
-            else -> throw Exception("dont know how to handle setting attr $key")
-        }
-
         val attributeType = context.bindingContext.get(
             R4AWritableSlices.KTX_ATTR_TYPE,
             attrElement
@@ -287,7 +244,7 @@ private fun transform(
 
         // store expression into tmp variable
         val attrVariable = IrTemporaryVariableDescriptorImpl(
-            function.descriptor,
+            helper.compose.descriptor,
             Name.identifier("__el${slotIndex}_$key"),
             attributeType,
             false
@@ -307,9 +264,9 @@ private fun transform(
 
         val callUpdAttrExpr = IrCallImpl(
             attrElement.startOffset, attrElement.endOffset,
-            context.symbolTable.referenceFunction(ccUpdAttrFunctionDescriptor)
+            context.symbolTable.referenceFunction(helper.ccUpdAttrFunctionDescriptor)
         ).apply {
-            dispatchReceiver = getCc
+            dispatchReceiver = helper.getCc
             putValueArgument(
                 0,
                 IrConstImpl.string(
@@ -322,133 +279,108 @@ private fun transform(
             putValueArgument(1, getAttr)
         }
 
-        val thenUpdBranchExpr = IrCallImpl(
-            attrElement.startOffset, attrElement.endOffset,
-            context.symbolTable.referenceFunction(setterFunctionDescriptor)
-        )
+        when (composableType) {
+            // NOTE(lmr): right now component/view look the same, but whenever we move off of the main thread
+            // they will look different
+            ComposableType.COMPONENT, ComposableType.VIEW -> {
+                val attributeDescriptor = context.bindingContext.get(
+                    R4AWritableSlices.KTX_ATTR_DESCRIPTOR,
+                    attrElement
+                ) ?: throw Exception("setter $key not found")
 
-        when (setterFunctionDescriptor.valueParameters.size) {
-            1 -> {
-                // if single parameter, its a setter function and the element is the receiver
-                thenUpdBranchExpr.dispatchReceiver = getEl
-                thenUpdBranchExpr.putValueArgument(0, getAttr)
-            }
-            2 -> {
-                // if there are two parameters, its an "adapter" setter function, in which case the element
-                // is the first argument, the attribute value is the second, and the receiver is some static class
-                // instance.
-                val staticInstDescriptor = setterFunctionDescriptor.containingDeclaration as ClassDescriptor
-                thenUpdBranchExpr.dispatchReceiver = IrGetObjectValueImpl(
+                val setterFunctionDescriptor = when (attributeDescriptor) {
+                    is FunctionDescriptor -> attributeDescriptor
+                    is PropertyDescriptor -> attributeDescriptor.setter!!
+                    else -> throw Exception("dont know how to handle setting attr $key")
+                }
+
+                val thenUpdBranchExpr = IrCallImpl(
                     attrElement.startOffset, attrElement.endOffset,
-                    staticInstDescriptor.defaultType,
-                    context.symbolTable.referenceClass(staticInstDescriptor)
+                    context.symbolTable.referenceFunction(setterFunctionDescriptor)
                 )
-                thenUpdBranchExpr.putValueArgument(0, getEl)
-                thenUpdBranchExpr.putValueArgument(1, getAttr)
+
+                when (setterFunctionDescriptor.valueParameters.size) {
+                    1 -> {
+                        // if single parameter, its a setter function and the element is the receiver
+                        thenUpdBranchExpr.dispatchReceiver = getEl
+                        thenUpdBranchExpr.putValueArgument(0, getAttr)
+                    }
+                    2 -> {
+                        // if there are two parameters, its an "adapter" setter function, in which case the element
+                        // is the first argument, the attribute value is the second, and the receiver is some static class
+                        // instance.
+                        val staticInstDescriptor = setterFunctionDescriptor.containingDeclaration as ClassDescriptor
+                        thenUpdBranchExpr.dispatchReceiver = IrGetObjectValueImpl(
+                            attrElement.startOffset, attrElement.endOffset,
+                            staticInstDescriptor.defaultType,
+                            context.symbolTable.referenceClass(staticInstDescriptor)
+                        )
+                        thenUpdBranchExpr.putValueArgument(0, getEl)
+                        thenUpdBranchExpr.putValueArgument(1, getAttr)
+                    }
+                }
+
+                val updateIfNeededExpr = IrIfThenElseImpl(
+                    attrElement.startOffset, attrElement.endOffset,
+                    context.builtIns.unitType,
+                    callUpdAttrExpr, // condition
+                    thenUpdBranchExpr
+                )
+
+                // OUTPUT:
+                // if (cc.updAttr("someAttribute", _el_attrName)) {
+                //   el.setSomeAttribute(_el_attrName)
+                // }
+                output.add(updateIfNeededExpr)
             }
+            ComposableType.FUNCTION_VAR -> {
+                // OUTPUT: cc.updAttr("someAttribute", _el_attrName)
+                output.add(callUpdAttrExpr)
+            }
+            ComposableType.FUNCTION, ComposableType.UNKNOWN -> TODO()
         }
-
-        val updateIfNeededExpr = IrIfThenElseImpl(
-            attrElement.startOffset, attrElement.endOffset,
-            context.builtIns.unitType,
-            callUpdAttrExpr, // condition
-            thenUpdBranchExpr
-        )
-
-        // OUTPUT:
-        // if (cc.updAttr("someAttribute", _el_attrName)) {
-        //   el.setSomeAttribute(_el_attrName)
-        // }
-        output.add(updateIfNeededExpr)
     }
 
     if (tag.body != null)
         for (statement in tag.body) {
-            if (statement is IrKtxTag) output.addAll(transform(context, component, function, statement, ccVariable, uniqueIndex))
+            if (statement is IrKtxTag) output.addAll(transform(context, statement, helper))
             else output.add(statement)
         }
 
-    when (componentType) {
-        1 -> {
+    when (composableType) {
+        ComposableType.COMPONENT, ComposableType.FUNCTION_VAR -> {
+            // NOTE(lmr): right now we just call cc.compose() for function var composables. This is because internally we end up
+            // using reflection to invoke the function with the arguments passed in. This is less than ideal so will likely diverge
+            // in the future, but I could not figure out how to invoke the function locally properly using IR.
+
             // if the component type is a composite component, we need to call "compose" now to recurse down the tree
-            val ccComposeMethod = ccClass.unsubstitutedMemberScope.getContributedFunctions(
-                Name.identifier("compose"),
-                NoLookupLocation.FROM_BACKEND
-            ).single() // only one of these for now
-
-            val ccComposeMethodCall =
-                IrCallImpl(element.startOffset, element.endOffset, context.symbolTable.referenceFunction(ccComposeMethod))
-            ccComposeMethodCall.dispatchReceiver = getCc
-
-            // TODO(lmr): eventually, we can prune this call if none of the attributes have updated. We can't at the moment since every
-            // "recompose" is done from the root, and private state changes won't be reflected. To fix, we need to figure out how to
-            // mark a subtree as dirty, and recompose only that subtree.
-
             // OUTPUT: cc.compose()
-            output.add(ccComposeMethodCall)
+            output.add(helper.ccComposeMethodCall)
         }
+        ComposableType.VIEW -> Unit
+        ComposableType.UNKNOWN -> TODO()
+        ComposableType.FUNCTION -> TODO()
     }
 
-    val ccEndMethod = ccClass.unsubstitutedMemberScope.getContributedFunctions(
-        Name.identifier("end"),
-        NoLookupLocation.FROM_BACKEND
-    ).single()
-
-    val ccEndMethodCall = IrCallImpl(element.startOffset, element.endOffset, context.symbolTable.referenceFunction(ccEndMethod))
-    ccEndMethodCall.dispatchReceiver = getCc
-
     // OUTPUT: cc.end()
-    output.add(ccEndMethodCall)
+    output.add(helper.ccEndMethodCall)
 
     return output
 }
 
-private fun lowerComposeFunction(context: GeneratorContext, component: IrClass) {
-    val compose = component.declarations
-        .mapNotNull { it as? IrSimpleFunction }
-        .find { it.name.toString() == "compose" && it.descriptor.valueParameters.size == 0 } ?: return
-
-    // make a local unique index generator for tmp var creation and slotting
-    val uniqueIndex = run { var i = 0; { i++ } }
-
-    // TODO(lmr): try using this in order to utilize the builder DSL
-//        val builder = context.createIrBuilder(newIrFunction.symbol)
-//        val body = builder.irBlockBody(irFunction) {
-
+fun lowerComposeFunction(context: GeneratorContext, compose: IrFunction) {
     context.symbolTable.withScope(compose.descriptor) {
 
+        val helper = ComposeFunctionHelper(context, compose)
         // at the beginning of every compose function, we store CompositionContext.current into a local variable. This is just temporary
         // until we figure out the best way to properly thread context through. This current design is assuming everything is done on the
         // main thread, so we have some wiggle room.
 
-        val ccClass =
-            context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(R4aUtils.r4aFqName("CompositionContext")))!!
-
-        val getCurrentCcFunction = ccClass.companionObjectDescriptor!!.unsubstitutedMemberScope.getContributedVariables(
-            Name.identifier("current"),
-            NoLookupLocation.FROM_BACKEND
-        ).single().getter!!
-
-        val getCurrentCcCall = IrGetterCallImpl(
-            -1, -1,
-            context.symbolTable.referenceSimpleFunction(getCurrentCcFunction),
-            getCurrentCcFunction,
-            0
-        ).apply {
-            dispatchReceiver = IrGetObjectValueImpl(
-                -1, -1,
-                ccClass.companionObjectDescriptor!!.defaultType,
-                context.symbolTable.referenceClass(ccClass.companionObjectDescriptor!!)
-            )
-        }
-
-        val ccVariable = IrTemporaryVariableDescriptorImpl(compose.descriptor, Name.identifier("__cc"), ccClass.defaultType, false)
-
         val ccVariableDeclaration = context.symbolTable.declareVariable(
             -1, -1,
             IrDeclarationOrigin.IR_TEMPORARY_VARIABLE,
-            ccVariable,
-            getCurrentCcCall
+            helper.ccVariable,
+            helper.getCurrentCcCall
         )
 
         // OUTPUT: val __cc = CompositionContext.current
@@ -458,11 +390,11 @@ private fun lowerComposeFunction(context: GeneratorContext, component: IrClass) 
         compose.body!!.accept(object : IrElementTransformer<Nothing?> {
             override fun visitKtxStatement(expression: IrKtxStatement, data: Nothing?): IrElement {
                 val block = IrBlockImpl(
-                    -1,
-                    -1,
+                    expression.startOffset,
+                    expression.endOffset,
                     context.moduleDescriptor.builtIns.unitType,
                     KTX_TAG_ORIGIN,
-                    transform(context, component, compose, expression as IrKtxTag, ccVariable, uniqueIndex)
+                    transform(context, expression as IrKtxTag, helper)
                 )
                 block.accept(this, data)
                 return block
@@ -478,4 +410,116 @@ private fun md5IntHash(string: String): Int {
     val md = MessageDigest.getInstance("MD5")
     md.update(string.toByteArray(Charset.defaultCharset()))
     return ByteBuffer.wrap(md.digest()).int
+}
+
+private class ComposeFunctionHelper(val context: GeneratorContext, val compose: IrFunction) {
+    // make a local unique index generator for tmp var creation and slotting
+    val uniqueIndex = run { var i = 0; { i++ } }
+
+    val functionDescription by lazy {
+        compose.descriptor.fqNameSafe.asString()
+    }
+
+    val ccClass by lazy {
+        context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(R4aUtils.r4aFqName("CompositionContext")))!!
+    }
+
+    val getCurrentCcFunction by lazy {
+        ccClass.companionObjectDescriptor!!.unsubstitutedMemberScope.getContributedVariables(
+            Name.identifier("current"),
+            NoLookupLocation.FROM_BACKEND
+        ).single().getter!!
+    }
+
+    val getCurrentCcCall by lazy {
+        IrGetterCallImpl(
+            -1, -1,
+            context.symbolTable.referenceSimpleFunction(getCurrentCcFunction),
+            getCurrentCcFunction,
+            0
+        ).apply {
+            dispatchReceiver = IrGetObjectValueImpl(
+                -1, -1,
+                ccClass.companionObjectDescriptor!!.defaultType,
+                context.symbolTable.referenceClass(ccClass.companionObjectDescriptor!!)
+            )
+        }
+    }
+
+    val ccVariable by lazy {
+        IrTemporaryVariableDescriptorImpl(compose.descriptor, Name.identifier("__cc"), ccClass.defaultType, false)
+    }
+
+    val getCc by lazy {
+        IrGetValueImpl(-1, -1, context.symbolTable.referenceVariable(ccVariable))
+    }
+
+    val ccStartMethodWithKey by lazy {
+        ccClass.unsubstitutedMemberScope.getContributedFunctions(
+            Name.identifier("start"),
+            NoLookupLocation.FROM_BACKEND
+        ).find { it.valueParameters.size == 2 }!!
+    }
+
+    val ccStartMethodWithoutKey by lazy {
+        ccClass.unsubstitutedMemberScope.getContributedFunctions(
+            Name.identifier("start"),
+            NoLookupLocation.FROM_BACKEND
+        ).find { it.valueParameters.size == 1 }!!
+    }
+
+    val androidContextGetter by lazy {
+        ccClass.unsubstitutedMemberScope.getContributedVariables(
+            Name.identifier("context"),
+            NoLookupLocation.FROM_BACKEND
+        ).single().getter!!
+    }
+
+    val getAndroidContextCall by lazy{
+        IrCallImpl(
+            -1,
+            -1,
+            context.symbolTable.referenceFunction(androidContextGetter)
+        ).apply {
+            dispatchReceiver = getCc
+        }
+    }
+
+    val ccSetInstanceFunctionDescriptor by lazy {
+        ccClass.unsubstitutedMemberScope.getContributedFunctions(
+            Name.identifier("setInstance"),
+            NoLookupLocation.FROM_BACKEND
+        ).single() // only one of these for now
+    }
+
+    val ccUpdAttrFunctionDescriptor by lazy {
+        ccClass.unsubstitutedMemberScope.getContributedFunctions(
+            Name.identifier("updAttr"),
+            NoLookupLocation.FROM_BACKEND
+        ).single()
+    }
+
+    val ccComposeMethod by lazy {
+        ccClass.unsubstitutedMemberScope.getContributedFunctions(
+            Name.identifier("compose"),
+            NoLookupLocation.FROM_BACKEND
+        ).single() // only one of these for now
+    }
+
+    val ccComposeMethodCall by lazy {
+        IrCallImpl(-1, -1, context.symbolTable.referenceFunction(ccComposeMethod)).apply {
+            dispatchReceiver = getCc
+        }
+    }
+
+    val ccEndMethod = ccClass.unsubstitutedMemberScope.getContributedFunctions(
+        Name.identifier("end"),
+        NoLookupLocation.FROM_BACKEND
+    ).single()
+
+    val ccEndMethodCall by lazy {
+        IrCallImpl(-1, -1, context.symbolTable.referenceFunction(ccEndMethod)).apply {
+            dispatchReceiver = getCc
+        }
+    }
 }

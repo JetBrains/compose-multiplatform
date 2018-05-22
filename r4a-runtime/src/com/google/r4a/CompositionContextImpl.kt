@@ -10,12 +10,13 @@ private class Slot(val sourceHash: Int, val key: Any?) {
 
     var container: Container? = null
     var instance: Any? = null
-    var attributes = mutableMapOf<String, Any?>()
+    var attributes = mutableListOf<Any?>()
     var child: Slot? = null
     // TODO(lmr): I think we can get rid of prevSibling
     var prevSibling: Slot? = null
     var nextSibling: Slot? = null
     var open = true
+    var argIndex = 0
     var index = 0
     // TODO: store inc of children?
     // TODO: store map of children? lazily?
@@ -186,6 +187,7 @@ internal class CompositionContextImpl: CompositionContext() {
         val container = currentContainer
         // update on top of existing slot
         it.open = true
+        it.argIndex = 0
         // push container stack if its a
         val index = container.index
         if (it.instance is View) {
@@ -296,19 +298,46 @@ internal class CompositionContextImpl: CompositionContext() {
     }
 
     override fun updAttr(key: String, value: Any?): Boolean {
-        if (!currentSlot.attributes.contains(key)) {
-            currentSlot.attributes[key] = value
+        val slot = currentSlot
+        val i = slot.argIndex
+        slot.argIndex++
+        if (slot.attributes.size == i) {
+            currentSlot.attributes.add(value)
             return true
         } else {
-            val current = currentSlot.attributes[key]
-            currentSlot.attributes[key] = value
+            val current = slot.attributes[i]
+            slot.attributes[i] = value
             return current != value
         }
     }
 
     override fun compose() {
-        val component = currentSlot.instance as Component
-        component.compose()
+        val slot = currentSlot
+        val instance = slot.instance
+        when (instance) {
+            is Component -> {
+                instance.compose()
+            }
+            else -> {
+                // TODO(lmr): we should *really* use something other than reflection here, but I am having a lot of trouble
+                // getting the IR code to work in a reasonable way. This is good enough for prototyping etc, but we should
+                // aim to get back to this if we can.
+                if (instance == null) {
+                    println("instance was null!")
+                    return // throw
+                }
+                val args = slot.attributes
+                val klass = instance::class.java
+                val method = klass.methods.firstOrNull { it.name == "invoke" }
+                // HACK: remove instance now so that compose always updates/sets the instance afterwards
+                slot.instance = null
+                if (method != null) {
+                    method.invoke(instance, *args.toTypedArray())
+                } else {
+                    println("couldnt find invoke method!")
+                }
+            }
+        }
     }
 
     private fun unmountTail(slot: Slot, container: ViewGroup) {

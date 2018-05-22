@@ -1,10 +1,10 @@
 package com.google.r4a.examples.explorerapp.screens
 
-import com.google.r4a.Component
+import com.google.r4a.*
+import com.google.r4a.adapters.*
 import android.widget.*
 import android.view.*
 import com.google.r4a.CompositionContext
-import com.google.r4a.AttributeAdapterLocal
 
 class Reordering : Component() {
     // state
