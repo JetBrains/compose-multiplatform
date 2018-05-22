@@ -167,7 +167,11 @@ def configureBuildOnServer() {
             buildOnServerTask.dependsOn task
         }
     }
+    def docsProject = rootProject.findProject(":docs-fake")
     subprojects {
+        if (docsProject == project) {
+            return
+        }
         project.tasks.whenTaskAdded { task ->
             if ("assembleErrorProne".equals(task.name)
                     || "assembleAndroidTest".equals(task.name)
