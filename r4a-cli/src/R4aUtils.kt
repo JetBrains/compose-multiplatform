@@ -2,6 +2,7 @@ package org.jetbrains.kotlin.r4a
 
 import com.intellij.util.SmartList
 import com.intellij.util.containers.SLRUCache
+import com.intellij.util.containers.hash.EqualityPolicy
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.idea.resolve.ResolutionFacade
@@ -32,8 +33,21 @@ import org.jetbrains.kotlin.types.typeUtil.isUnit
 
 object R4aUtils {
 
-    private val realGetterSetterCache = object : SLRUCache<DeclarationDescriptor, Collection<AttributeInfo>>(10, 10) {
-        override fun createValue(descriptor: DeclarationDescriptor?): Collection<AttributeInfo> {
+    private val DESCRIPTOR_EQUALITY_POLICY = object: EqualityPolicy<DeclarationDescriptorWithSource> {
+        override fun getHashCode(d: DeclarationDescriptorWithSource?) = d?.source?.hashCode() ?: 0
+        override fun isEqual(a: DeclarationDescriptorWithSource?, b: DeclarationDescriptorWithSource?) = a?.source == b?.source
+    }
+
+    private val CLASS_DESCRIPTOR_EQUALITY_POLICY = object: EqualityPolicy<ClassDescriptor> {
+        override fun getHashCode(d: ClassDescriptor?) = d?.source?.hashCode() ?: 0
+        override fun isEqual(a: ClassDescriptor?, b: ClassDescriptor?) = a?.source == b?.source
+    }
+
+    private val realGetterSetterCache = object : SLRUCache<DeclarationDescriptorWithSource, Collection<AttributeInfo>>(
+        10, 10,
+        DESCRIPTOR_EQUALITY_POLICY
+    ) {
+        override fun createValue(descriptor: DeclarationDescriptorWithSource?): Collection<AttributeInfo> {
             if (descriptor == null) return listOf()
             return when (descriptor) {
                 is ClassDescriptor -> {
@@ -95,7 +109,10 @@ object R4aUtils {
         }
     }
 
-    private val adapterSetterCache = object : SLRUCache<ClassDescriptor, Collection<AttributeInfo>>(10, 10) {
+    private val adapterSetterCache = object : SLRUCache<ClassDescriptor, Collection<AttributeInfo>>(
+        10, 10,
+        CLASS_DESCRIPTOR_EQUALITY_POLICY
+    ) {
         override fun createValue(cd: ClassDescriptor?): Collection<AttributeInfo> {
             if (cd == null) return listOf()
             return cd
