@@ -59,6 +59,7 @@ task stripArchive(type: Zip) {
             "m2repository/androidx/transition/**",
             "m2repository/androidx/tvprovider/**",
             "m2repository/androidx/vectordrawable/**",
+            "m2repository/androidx/versionedparcelable/**",
             "m2repository/androidx/viewpager/**",
             "m2repository/androidx/wear/**",
             "m2repository/androidx/webkit/**"

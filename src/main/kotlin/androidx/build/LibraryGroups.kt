@@ -72,4 +72,5 @@ object LibraryGroups {
     const val NAVIGATION = "android.arch.navigation"
     const val JETIFIER = "com.android.tools.build.jetifier"
     const val WORKMANAGER = "android.arch.work"
+    const val VERSIONEDPARCELABLE = "androidx.versionedparcelable"
 }
