@@ -1,13 +1,11 @@
 package org.jetbrains.kotlin.r4a.compiler.lower
 
-import org.jetbrains.kotlin.backend.jvm.codegen.IrExpressionLambda
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrKtxStatement
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.descriptors.IrTemporaryVariableDescriptor
 import org.jetbrains.kotlin.ir.descriptors.IrTemporaryVariableDescriptorImpl
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.*
@@ -15,8 +13,6 @@ import org.jetbrains.kotlin.ir.util.withScope
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.psi.KtExpression
-import org.jetbrains.kotlin.psi.KtxElement
 import org.jetbrains.kotlin.psi.psiUtil.endOffset
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
@@ -26,7 +22,6 @@ import org.jetbrains.kotlin.r4a.analysis.ComponentMetadata
 import org.jetbrains.kotlin.r4a.analysis.ComposableType
 import org.jetbrains.kotlin.r4a.analysis.R4AWritableSlices
 import org.jetbrains.kotlin.resolve.descriptorUtil.*
-import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.typeUtil.makeNullable
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
@@ -65,11 +60,11 @@ fun lowerComponentClass(context: GeneratorContext, metadata: ComponentMetadata, 
  *
  *     // we then iterate over each attribute, setting only the ones that have changed
  *     val tmpBar = expr1
- *     if (cc.updAttr("bar", tmpBar)) {
+ *     if (cc.updateAttribute(tmpBar)) {
  *         tmpEl.setBar(tmpBar)
  *     }
  *     val tmpBam = expr2
- *     if (cc.updAttr("bam", tmpBam)) {
+ *     if (cc.updateAttribute(tmpBam)) {
  *         tmpEl.setBar(tmpBam)
  *     }
  *
@@ -262,21 +257,12 @@ private fun transform(
 
         val getAttr = IrGetValueImpl(attrElement.startOffset, attrElement.endOffset, context.symbolTable.referenceVariable(attrVariable))
 
-        val callUpdAttrExpr = IrCallImpl(
+        val callUpdateAttributeExpr = IrCallImpl(
             attrElement.startOffset, attrElement.endOffset,
-            context.symbolTable.referenceFunction(helper.ccUpdAttrFunctionDescriptor)
+            context.symbolTable.referenceFunction(helper.ccUpdateAttributeFunctionDescriptor)
         ).apply {
             dispatchReceiver = helper.getCc
-            putValueArgument(
-                0,
-                IrConstImpl.string(
-                    attrElement.key!!.startOffset,
-                    attrElement.key!!.endOffset,
-                    context.builtIns.stringType,
-                    key
-                )
-            )
-            putValueArgument(1, getAttr)
+            putValueArgument(0, getAttr)
         }
 
         when (composableType) {
@@ -323,19 +309,19 @@ private fun transform(
                 val updateIfNeededExpr = IrIfThenElseImpl(
                     attrElement.startOffset, attrElement.endOffset,
                     context.builtIns.unitType,
-                    callUpdAttrExpr, // condition
+                    callUpdateAttributeExpr, // condition
                     thenUpdBranchExpr
                 )
 
                 // OUTPUT:
-                // if (cc.updAttr("someAttribute", _el_attrName)) {
+                // if (cc.updateAttribute(_el_attrName)) {
                 //   el.setSomeAttribute(_el_attrName)
                 // }
                 output.add(updateIfNeededExpr)
             }
             ComposableType.FUNCTION_VAR -> {
-                // OUTPUT: cc.updAttr("someAttribute", _el_attrName)
-                output.add(callUpdAttrExpr)
+                // OUTPUT: cc.updateAttribute(_el_attrName)
+                output.add(callUpdateAttributeExpr)
             }
             ComposableType.FUNCTION, ComposableType.UNKNOWN -> TODO()
         }
@@ -492,9 +478,9 @@ private class ComposeFunctionHelper(val context: GeneratorContext, val compose: 
         ).single() // only one of these for now
     }
 
-    val ccUpdAttrFunctionDescriptor by lazy {
+    val ccUpdateAttributeFunctionDescriptor by lazy {
         ccClass.unsubstitutedMemberScope.getContributedFunctions(
-            Name.identifier("updAttr"),
+            Name.identifier("updateAttribute"),
             NoLookupLocation.FROM_BACKEND
         ).single()
     }
