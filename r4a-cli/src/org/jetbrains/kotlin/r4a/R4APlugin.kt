@@ -35,7 +35,6 @@ class R4AComponentRegistrar : ComponentRegistrar {
         SyntheticResolveExtension.registerExtension(project, StaticWrapperCreatorFunctionResolveExtension())
         SyntheticResolveExtension.registerExtension(project, WrapperViewSettersGettersResolveExtension())
         SyntheticIrExtension.registerExtension(project, R4ASyntheticIrExtension())
-        SyntheticIrExtension.registerExtension(project, FrameTransformExtension())
     }
 }
 
