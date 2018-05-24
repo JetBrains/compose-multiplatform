@@ -82,6 +82,9 @@ val RELEASE_RULE = docsRules("public") {
     tipOfTree(LibraryGroups.LIFECYCLE, "lifecycle-service")
     prebuilts(LibraryGroups.LIFECYCLE, flatfootVersion)
     prebuilts(LibraryGroups.ARCH_CORE, flatfootVersion)
+    tipOfTree(LibraryGroups.PAGING, "paging-common-ktx")
+    tipOfTree(LibraryGroups.PAGING, "paging-runtime-ktx")
+    tipOfTree(LibraryGroups.PAGING, "paging-rxjava2-ktx")
     prebuilts(LibraryGroups.PAGING, "paging-rxjava2", "1.0.0-alpha1")
     prebuilts(LibraryGroups.PAGING, "2.0.0-alpha1")
     // navigation & workmanager don't have prebuilts currently
