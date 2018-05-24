@@ -18,7 +18,12 @@ class Calculator : Component() {
     private val FILL = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
     private val WRAP_HORIZ = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
     private val WRAP = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-
+    private val onClick = object : Function1<String, Unit>  {
+        override fun invoke(p1: String) {
+            formula.append(p1)
+            recompose()
+        }
+    }
     override fun compose() {
 
         <LinearLayout orientation="vertical" layoutParams={FILL}>
@@ -72,21 +77,9 @@ class Calculator : Component() {
                     columnCount={3}
                     backgroundColor="#434343"
                 >
-                    <CalculatorButton formula={formula} value="7" layoutParams={grid(0, 0)} />
-                    <CalculatorButton formula={formula} value="8" layoutParams={grid(0, 1)} />
-                    <CalculatorButton formula={formula} value="9" layoutParams={grid(0, 2)} />
-
-                    <CalculatorButton formula={formula} value="4" layoutParams={grid(1, 0)} />
-                    <CalculatorButton formula={formula} value="5" layoutParams={grid(1, 1)} />
-                    <CalculatorButton formula={formula} value="6" layoutParams={grid(1, 2)} />
-
-                    <CalculatorButton formula={formula} value="1" layoutParams={grid(2, 0)} />
-                    <CalculatorButton formula={formula} value="2" layoutParams={grid(2, 1)} />
-                    <CalculatorButton formula={formula} value="3" layoutParams={grid(2, 2)} />
-
-                    <CalculatorButton formula={formula} value="." layoutParams={grid(3, 0)} />
-                    <CalculatorButton formula={formula} value="0" layoutParams={grid(3, 1)} />
-                    <CalculatorButton formula={formula} value="=" layoutParams={grid(3, 2)} />
+                    listOf("7", "8", "9", "4", "5", "6", "1", "2", "3", ".", "0", "=").forEachIndexed { index, value ->
+                        <CalculatorButton value={value} onClick={onClick} layoutParams={grid(index / 3, index % 3)} />
+                    }
                 </GridLayout>
                 <GridLayout
                     rowCount={5}
@@ -94,11 +87,10 @@ class Calculator : Component() {
                     backgroundColor="#636363"
                     layoutParams={LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 3f)}
                 >
-                    <CalculatorButton formula={formula} value={CalculatorFormula.DELETE} layoutParams={grid(0, 0)} />
-                    <CalculatorButton formula={formula} value={CalculatorFormula.DIVIDE} layoutParams={grid(1, 0)} />
-                    <CalculatorButton formula={formula} value={CalculatorFormula.MULTIPLY} layoutParams={grid(2, 0)} />
-                    <CalculatorButton formula={formula} value={CalculatorFormula.SUBTRACT} layoutParams={grid(3, 0)} />
-                    <CalculatorButton formula={formula} value={CalculatorFormula.ADD} layoutParams={grid(4, 0)} />
+                    listOf(CalculatorFormula.DELETE, CalculatorFormula.DIVIDE, CalculatorFormula.MULTIPLY,
+                            CalculatorFormula.SUBTRACT, CalculatorFormula.ADD).forEachIndexed { index, value ->
+                        <CalculatorButton value={value} onClick={onClick} layoutParams={grid(index, 0)} />
+                    }
                 </GridLayout>
             </LinearLayout>
         </LinearLayout>
@@ -114,14 +106,13 @@ class Calculator : Component() {
 
 private class CalculatorButton : Component() {
 
-    lateinit var formula: CalculatorFormula
     lateinit var value: String
     lateinit var layoutParams: GridLayout.LayoutParams
+    lateinit var onClick: (op: String) -> Unit
 
-    private val onClick = object: View.OnClickListener {
+    private val myOnClick = object: View.OnClickListener {
         override fun onClick(v: View?) {
-            formula.append(value)
-            recompose()
+            onClick(value)
         }
     }
 
@@ -138,7 +129,7 @@ private class CalculatorButton : Component() {
             textSize="8sp"
             textColor={Color.WHITE}
             backgroundResource={R.drawable.pad_button_background}
-            onClickListener={onClick}
+            onClickListener={myOnClick}
         />
     }
 }
