@@ -58,7 +58,7 @@ const val ESPRESSO_CORE_TMP = "com.android.temp.support.test.espresso:espresso-c
 const val TEST_RUNNER_TMP = "com.android.temp.support.test:runner:1.0.1"
 const val TEST_RULES_TMP = "com.android.temp.support.test:rules:1.0.1"
 
-private const val NAV_SUPPORT_VERSION = "27.1.0"
+private const val NAV_SUPPORT_VERSION = "27.1.1"
 const val NAV_SUPPORT_ANNOTATIONS = "com.android.support:support-annotations:$NAV_SUPPORT_VERSION"
 const val NAV_SUPPORT_APPCOMPAT = "com.android.support:appcompat-v7:$NAV_SUPPORT_VERSION"
 const val NAV_SUPPORT_CARDVIEW = "com.android.support:cardview-v7:$NAV_SUPPORT_VERSION"
