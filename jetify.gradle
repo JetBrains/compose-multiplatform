@@ -75,5 +75,13 @@ task dejetifyArchive(type: Exec) {
 
     outputs.file "${rootProject.ext.distDir}/top-of-tree-m2repository-dejetified-${project.ext.buildNumber}.zip"
 
-    commandLine ("${jetifierBin}", "-s", "-r", "-outputfile", "${outputs.files.singleFile}",  "-i", "${inputs.files.singleFile}", "-l", "error", "-rebuildTopOfTree")
+    commandLine (
+        "${jetifierBin}",
+        "-i", "${inputs.files.singleFile}",
+        "-o", "${outputs.files.singleFile}",
+        "--versions", "inDev",
+        "--log", "warning",
+        "--reversed",
+        "--rebuildTopOfTree"
+    )
 }
