@@ -142,10 +142,10 @@ const val HELPERS = """
     import com.google.r4a.frames.commit
     import com.google.r4a.frames.suspend
     import com.google.r4a.frames.restore
-    import com.google.r4a.frames.FrameData
+    import com.google.r4a.frames.Frame
 
     inline fun <T> frame(crossinline block: ()->T): T {
-        open(false, false)
+        open(false)
         try {
           return block()
         } finally {
@@ -153,19 +153,19 @@ const val HELPERS = """
         }
     }
 
-    inline fun suspended(crossinline block: ()->Unit): FrameData {
-      open(false, false)
+    inline fun suspended(crossinline block: ()->Unit): Frame {
+      open(false)
       block()
       return suspend()
     }
 
-    inline fun restored(frame: FrameData, crossinline block: ()->Unit) {
+    inline fun restored(frame: Frame, crossinline block: ()->Unit) {
       restore(frame)
       block()
       commit()
     }
 
-    inline fun continued(frame: FrameData, crossinline block: ()->Unit): FrameData {
+    inline fun continued(frame: Frame, crossinline block: ()->Unit): Frame {
       restore(frame)
       block()
       return suspend()
