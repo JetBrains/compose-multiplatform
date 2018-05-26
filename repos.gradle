@@ -47,7 +47,9 @@ ext.repoNames = [// Android Gradle Plugin prebuilts updated manually
                  // Full checkout prebuilts updated by update_current.py
                  "${repos.prebuiltsRoot}/sdk/current/support/m2repository",
                  // Unbundled checkout prebuilts updated by fullsdk drop
-                 "${getFullSdkPath(repos.prebuiltsRoot)}/extras/android/m2repository"]
+                 "${getFullSdkPath(repos.prebuiltsRoot)}/extras/android/m2repository",
+                 // temporary: com.android.support.constraint:constraint-layout:1.0.2 is there
+                 "${getFullSdkPath(repos.prebuiltsRoot)}/extras/m2repository/"]
 
 /**
  * Adds maven repositories to the given repository handler.
