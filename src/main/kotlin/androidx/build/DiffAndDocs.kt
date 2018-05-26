@@ -16,41 +16,150 @@
 
 package androidx.build
 
+import androidx.build.PublishDocsRules.Strategy.Prebuilts
+import androidx.build.PublishDocsRules.Strategy.TipOfTree
 import androidx.build.checkapi.ApiXmlConversionTask
 import androidx.build.checkapi.CheckApiTask
 import androidx.build.checkapi.UpdateApiTask
 import androidx.build.doclava.DoclavaTask
 import androidx.build.docs.GenerateDocsTask
 import androidx.build.jdiff.JDiffTask
+import com.android.build.gradle.AppExtension
 import com.android.build.gradle.LibraryExtension
+import com.android.build.gradle.api.BaseVariant
 import com.android.build.gradle.api.LibraryVariant
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.FileCollection
+import org.gradle.api.file.FileTree
 import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.javadoc.Javadoc
 import java.io.File
+import kotlin.collections.Collection
+import kotlin.collections.List
+import kotlin.collections.MutableMap
+import kotlin.collections.emptyList
+import kotlin.collections.emptySet
+import kotlin.collections.filter
+import kotlin.collections.find
+import kotlin.collections.forEach
+import kotlin.collections.listOf
+import kotlin.collections.mapNotNull
+import kotlin.collections.minus
+import kotlin.collections.mutableMapOf
+import kotlin.collections.plus
+import kotlin.collections.set
+import kotlin.collections.toList
+import kotlin.collections.toSet
 
 data class DacOptions(val libraryroot: String, val dataname: String)
 
 object DiffAndDocs {
     private lateinit var allChecksTask: Task
     private lateinit var generateDocsTask: GenerateDocsTask
+    private var docsProject: Project? = null
+
+    private val rules: List<PublishDocsRules> = listOf(RELEASE_RULE)
+    private val docsTasks: MutableMap<String, DoclavaTask> = mutableMapOf()
 
     @JvmStatic
     fun configureDiffAndDocs(root: Project, supportRootFolder: File, dacOptions: DacOptions): Task {
+        docsProject = root.findProject(":docs-fake")
         allChecksTask = root.tasks.create("anchorCheckApis")
         val doclavaConfiguration = root.configurations.getByName("doclava")
         val generateSdkApiTask = createGenerateSdkApiTask(root, doclavaConfiguration)
-        generateDocsTask = createGenerateDocsTask(root, generateSdkApiTask,
-                doclavaConfiguration, supportRootFolder, dacOptions)
+        generateDocsTask = createGenerateDocsTask(
+                project = root, generateSdkApiTask = generateSdkApiTask,
+                doclavaConfig = doclavaConfiguration, supportRootFolder = supportRootFolder,
+                dacOptions = dacOptions, destDir = root.docsDir())
+
+        rules.forEach {
+            val task = createGenerateDocsTask(
+                    project = root, generateSdkApiTask = generateSdkApiTask,
+                    doclavaConfig = doclavaConfiguration,
+                    supportRootFolder = supportRootFolder, dacOptions = dacOptions,
+                    destDir = File(root.docsDir(), it.name),
+                    taskName = "${it.name}DocsTask")
+            docsTasks[it.name] = task
+        }
+
+        setupDocsProject()
         createDistDocsTask(root, generateDocsTask)
         return allChecksTask
+    }
+
+    private fun prebuiltSources(root: Project, mavenId: String): FileTree {
+        val configName = "docs-temp_$mavenId"
+        val configuration = root.configurations.create(configName)
+        root.dependencies.add(configName, mavenId)
+
+        val artifacts = configuration.resolvedConfiguration.resolvedArtifacts
+        val artifact = artifacts.find { it.moduleVersion.id.toString() == mavenId }
+                ?: throw GradleException("Failed to resolve $mavenId")
+
+        val folder = artifact.file.parentFile
+        val tree = root.zipTree(File(folder, "${artifact.file.nameWithoutExtension}-sources.jar"))
+                    .matching {
+                        it.exclude("**/*.MF")
+                        it.exclude("**/*.aidl")
+                        it.exclude("**/*.html")
+                        it.exclude("**/*.kt")
+                    }
+        root.configurations.remove(configuration)
+        return tree
+    }
+
+    private fun setupDocsProject() {
+        docsProject?.afterEvaluate { docs ->
+            val appExtension = docs.extensions.findByType(AppExtension::class.java)
+                    ?: throw GradleException("Android app plugin is missing on docsProject")
+
+            rules.forEach { rule ->
+                appExtension.productFlavors.create(rule.name) {
+                    it.dimension = "library-group"
+                }
+            }
+            appExtension.applicationVariants.all { v ->
+                val task = docsTasks[v.flavorName]
+                if (v.buildType.name == "release" && task != null) {
+                    registerAndroidProjectForDocsTask(task, v)
+                    task.exclude { fileTreeElement ->
+                        fileTreeElement.path.endsWith(v.rFile())
+                    }
+                }
+            }
+        }
+
+        docsProject?.rootProject?.subprojects
+                ?.filter { docsProject != it }
+                ?.forEach { docsProject?.evaluationDependsOn(it.path) }
+    }
+
+    private fun registerPrebuilts(extension: SupportLibraryExtension)
+            = docsProject?.afterEvaluate { docs ->
+        val depHandler = docs.dependencies
+        val root = docs.rootProject
+        rules.mapNotNull { rule ->
+            (rule.resolve(extension) as? Prebuilts)?.let { rule.name to it } }
+                .forEach { (name, prebuilt) ->
+                    val dependency = prebuilt.dependency(extension)
+                    depHandler.add("${name}Implementation", dependency)
+                    prebuilt.stubs?.forEach { path ->
+                        depHandler.add("${name}CompileOnly", root.files(path))
+                    }
+                    docsTasks[name]!!.source(prebuiltSources(root, dependency))
+                }
+    }
+
+    private fun tipOfTreeTasks(extension: SupportLibraryExtension, setup: (DoclavaTask) -> Unit) {
+        rules.filter { rule -> rule.resolve(extension) == TipOfTree }
+                .mapNotNull { rule -> docsTasks[rule.name] }
+                .forEach(setup)
     }
 
     /**
@@ -63,6 +172,13 @@ object DiffAndDocs {
         }
         val compileJava = project.properties["compileJava"] as JavaCompile
         registerJavaProjectForDocsTask(generateDocsTask, compileJava)
+
+        registerPrebuilts(extension)
+
+        tipOfTreeTasks(extension) { task ->
+            registerJavaProjectForDocsTask(task, compileJava)
+        }
+
         if (!hasApiFolder(project)) {
             project.logger.info("Project ${project.name} doesn't have an api folder, " +
                     "ignoring API tasks.")
@@ -86,9 +202,24 @@ object DiffAndDocs {
         if (!hasApiTasks(project, extension)) {
             return
         }
+
+        registerPrebuilts(extension)
+
         library.libraryVariants.all { variant ->
             if (variant.name == "release") {
                 registerAndroidProjectForDocsTask(generateDocsTask, variant)
+
+                // include R.file generated for prebuilts
+                rules.filter { it.resolve(extension) is Prebuilts }.forEach { rule ->
+                    docsTasks[rule.name]?.include { fileTreeElement ->
+                        fileTreeElement.path.endsWith(variant.rFile())
+                    }
+                }
+
+                tipOfTreeTasks(extension) { task ->
+                    registerAndroidProjectForDocsTask(task, variant)
+                }
+
                 if (!hasJavaSources(variant)) {
                     return@all
                 }
@@ -273,17 +404,15 @@ private fun registerJavaProjectForDocsTask(task: Javadoc, javaCompileTask: JavaC
  * <p>
  * @see #registerJavaProjectForDocsTask
  */
-private fun registerAndroidProjectForDocsTask(task: Javadoc, releaseVariant: LibraryVariant) {
+private fun registerAndroidProjectForDocsTask(task: Javadoc, releaseVariant: BaseVariant) {
     // This code makes a number of unsafe assumptions about Android Gradle Plugin,
     // and there's a good chance that this will break in the near future.
     @Suppress("DEPRECATION")
     task.dependsOn(releaseVariant.javaCompile)
-    val packageDir = releaseVariant.applicationId.replace('.', '/')
+    task.include { fileTreeElement ->
+        fileTreeElement.name != "R.java" || fileTreeElement.path.endsWith(releaseVariant.rFile()) }
     @Suppress("DEPRECATION")
-    val sources = releaseVariant.javaCompile.source.filter { file ->
-        file.name != "R.java" || file.parent.endsWith(packageDir)
-    }
-    task.source(sources)
+    task.source(releaseVariant.javaCompile.source)
     @Suppress("DEPRECATION")
     task.classpath += releaseVariant.getCompileClasspath(null) +
             task.project.files(releaseVariant.javaCompile.destinationDir)
@@ -467,8 +596,10 @@ private fun createGenerateDocsTask(
         generateSdkApiTask: DoclavaTask,
         doclavaConfig: Configuration,
         supportRootFolder: File,
-        dacOptions: DacOptions): GenerateDocsTask =
-        project.tasks.createWithConfig("generateDocs", GenerateDocsTask::class.java) {
+        dacOptions: DacOptions,
+        destDir: File,
+        taskName: String = "generateDocs"): GenerateDocsTask =
+        project.tasks.createWithConfig(taskName, GenerateDocsTask::class.java) {
             dependsOn(generateSdkApiTask, doclavaConfig)
             group = JavaBasePlugin.DOCUMENTATION_GROUP
             description = "Generates d.android.com-style documentation. To generate offline docs " +
@@ -476,9 +607,9 @@ private fun createGenerateDocsTask(
 
             setDocletpath(doclavaConfig.resolve())
             val offline = project.processProperty("offlineDocs") != null
-            destinationDir = File(project.docsDir(), if (offline) "offline" else "online")
+            destinationDir = File(destDir, if (offline) "offline" else "online")
             classpath = androidJarFile(project)
-            val hidden = listOf<Int>(105, 106, 107, 111, 112, 113, 115, 116, 121)
+            val hidden = listOf(105, 106, 107, 111, 112, 113, 115, 116, 121)
             doclavaErrors = ((101..122) - hidden).toSet()
             doclavaWarnings = emptySet()
             doclavaHidden += hidden
@@ -618,6 +749,14 @@ private fun androidJarFile(project: Project): FileCollection =
 
 private fun androidSrcJarFile(project: Project): File = File(project.fullSdkPath(),
         "platforms/android-${SupportConfig.CURRENT_SDK_VERSION}/android-stubs-src.jar")
+
+private fun PublishDocsRules.resolve(extension: SupportLibraryExtension) =
+        resolve(extension.mavenGroup!!, extension.project.name)
+
+private fun Prebuilts.dependency(extension: SupportLibraryExtension) =
+        "${extension.mavenGroup}:${extension.project.name}:$version"
+
+private fun BaseVariant.rFile() = "${applicationId.replace('.', '/')}/R.java"
 
 // Nasty part. Get rid of that eventually!
 private fun Project.docsDir(): File = properties["docsDir"] as File
