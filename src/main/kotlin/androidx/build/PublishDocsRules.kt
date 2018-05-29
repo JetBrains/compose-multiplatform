@@ -54,6 +54,7 @@ val RELEASE_RULE = docsRules("public") {
     prebuilts(LibraryGroups.MEDIAROUTER, defaultVersion)
     prebuilts(LibraryGroups.PALETTE, defaultVersion)
     prebuilts(LibraryGroups.PERCENTLAYOUT, defaultVersion)
+    ignore(LibraryGroups.PREFERENCE, "preference-ktx")
     prebuilts(LibraryGroups.PREFERENCE, defaultVersion)
     prebuilts(LibraryGroups.PRINT, defaultVersion)
     prebuilts(LibraryGroups.RECOMMENDATION, defaultVersion)
