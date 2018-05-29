@@ -45,7 +45,7 @@ task stripArchive(type: Zip) {
             "m2repository/androidx/legacy/**",
             "m2repository/androidx/loader/**",
             "m2repository/androidx/localbroadcastmanager/**",
-            "m2repository/androidx/media/**",
+            "m2repository/androidx/media/media/**",
             "m2repository/androidx/mediarouter/**",
             "m2repository/androidx/palette/palette/**",
             "m2repository/androidx/percentlayout/**",
