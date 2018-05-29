@@ -1,9 +1,12 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 description = "R4A IDEA Plugin"
 
 plugins {
     kotlin("jvm")
     id("jps-compatible")
+    id("com.adarshr.test-logger").version("1.2.0")
 }
 
 jvmTarget = "1.6"
@@ -31,3 +34,18 @@ runtimeJar()
 
 ideaPlugin()
 
+
+tasks.withType<Test> {
+    testLogging {
+        showStandardStreams = true
+        events = setOf(TestLogEvent.FAILED,
+                       TestLogEvent.PASSED,
+                       TestLogEvent.SKIPPED,
+                       TestLogEvent.STANDARD_ERROR,
+                       TestLogEvent.STANDARD_OUT)
+        exceptionFormat = TestExceptionFormat.FULL
+        showCauses = true
+        showExceptions = true
+        showStackTraces = true
+    }
+}
