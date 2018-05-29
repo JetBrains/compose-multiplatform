@@ -9,8 +9,6 @@ class KtxTransformationTest: AbstractCodeGenTest() {
 
     override fun setUp() {
         super.setUp()
-        additionalDependencies = additionalDependencies + listOf(File("dependencies/android.jar"))
-
         KtxTypeResolutionExtension.registerExtension(myEnvironment.project, R4aKtxTypeResolutionExtension())
         SyntheticIrExtension.registerExtension(myEnvironment.project, R4ASyntheticIrExtension())
         SyntheticResolveExtension.registerExtension(myEnvironment.project, StaticWrapperCreatorFunctionResolveExtension())
