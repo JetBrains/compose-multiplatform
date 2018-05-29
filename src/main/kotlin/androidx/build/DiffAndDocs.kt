@@ -179,7 +179,7 @@ object DiffAndDocs {
             registerJavaProjectForDocsTask(task, compileJava)
         }
 
-        if (!hasApiFolder(project)) {
+        if (!project.hasApiFolder()) {
             project.logger.info("Project ${project.name} doesn't have an api folder, " +
                     "ignoring API tasks.")
             return
@@ -220,10 +220,10 @@ object DiffAndDocs {
                     registerAndroidProjectForDocsTask(task, variant)
                 }
 
-                if (!hasJavaSources(variant)) {
+                if (!variant.hasJavaSources()) {
                     return@all
                 }
-                if (!hasApiFolder(project)) {
+                if (!project.hasApiFolder()) {
                     project.logger.info("Project ${project.name} doesn't have " +
                             "an api folder, ignoring API tasks.")
                     return@all
@@ -250,7 +250,7 @@ private const val MSG_HIDE_API =
                 "annotation paired with the @RestrictTo(LIBRARY_GROUP) code annotation."
 
 @Suppress("DEPRECATION")
-private fun hasJavaSources(variant: LibraryVariant) = !variant.javaCompile.source
+private fun LibraryVariant.hasJavaSources() = !javaCompile.source
         .filter { file -> file.name != "R.java" && file.name != "BuildConfig.java" }
         .isEmpty
 
@@ -286,7 +286,7 @@ private val CHECK_API_CONFIG_PATCH = CHECK_API_CONFIG_DEVELOP.copy(
         onFailMessage = "Public API definition may not change in finalized or patch releases.\n" +
                 "\n" + MSG_HIDE_API)
 
-private fun hasApiFolder(project: Project) = File(project.projectDir, "api").exists()
+fun Project.hasApiFolder() = File(projectDir, "api").exists()
 
 private fun stripExtension(fileName: String) = fileName.substringBeforeLast('.')
 
