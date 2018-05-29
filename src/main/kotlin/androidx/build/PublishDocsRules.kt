@@ -66,7 +66,6 @@ val RELEASE_RULE = docsRules("public") {
     prebuilts(LibraryGroups.TVPROVIDER, defaultVersion)
     prebuilts(LibraryGroups.VECTORDRAWABLE, defaultVersion)
     prebuilts(LibraryGroups.VIEWPAGER, defaultVersion)
-    prebuilts(LibraryGroups.VIEWPAGER2, defaultVersion)
     prebuilts(LibraryGroups.WEAR, defaultVersion)
             .addStubs("wear/wear_stubs/com.google.android.wearable-stubs.jar")
     prebuilts(LibraryGroups.WEBKIT, defaultVersion)
@@ -101,8 +100,8 @@ fun docsRules(name: String, init: PublishDocsRulesBuilder.() -> Unit): PublishDo
 
 class PublishDocsRulesBuilder(private val name: String) {
 
-    private val rules: MutableList<Pair<ArtifactsPredicate, PublishDocsRules.Strategy>>
-            = mutableListOf()
+    private val rules: MutableList<Pair<ArtifactsPredicate, PublishDocsRules.Strategy>> =
+            mutableListOf()
 
     private fun groupPredicate(name: String) = { group: String, _: String -> name == group }
 
@@ -129,7 +128,7 @@ class PublishDocsRulesBuilder(private val name: String) {
      * docs for a project with the given [groupName] and [name] will be built from a prebuilt with
      * the given [version].
      */
-    fun prebuilts(groupName: String, moduleName: String , version: String) {
+    fun prebuilts(groupName: String, moduleName: String, version: String) {
         rules.add(artifactPredicate(groupName, moduleName) to Prebuilts(Version(version)))
     }
 
@@ -172,8 +171,8 @@ class PublishDocsRulesBuilder(private val name: String) {
 }
 
 class PublishDocsRules(
-        val name: String,
-        private val rules: List<Pair<ArtifactsPredicate, Strategy>>
+    val name: String,
+    private val rules: List<Pair<ArtifactsPredicate, Strategy>>
 ) {
     sealed class Strategy {
         object TipOfTree : Strategy()
