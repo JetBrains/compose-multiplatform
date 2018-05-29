@@ -54,6 +54,7 @@ val RELEASE_RULE = docsRules("public") {
     prebuilts(LibraryGroups.MEDIAROUTER, defaultVersion)
     prebuilts(LibraryGroups.PALETTE, defaultVersion)
     prebuilts(LibraryGroups.PERCENTLAYOUT, defaultVersion)
+    ignore(LibraryGroups.PREFERENCE, "preference-ktx")
     prebuilts(LibraryGroups.PREFERENCE, defaultVersion)
     prebuilts(LibraryGroups.PRINT, defaultVersion)
     prebuilts(LibraryGroups.RECOMMENDATION, defaultVersion)
@@ -101,8 +102,8 @@ fun docsRules(name: String, init: PublishDocsRulesBuilder.() -> Unit): PublishDo
 
 class PublishDocsRulesBuilder(private val name: String) {
 
-    private val rules: MutableList<Pair<ArtifactsPredicate, PublishDocsRules.Strategy>>
-            = mutableListOf()
+    private val rules: MutableList<Pair<ArtifactsPredicate, PublishDocsRules.Strategy>> =
+            mutableListOf()
 
     private fun groupPredicate(name: String) = { group: String, _: String -> name == group }
 
@@ -129,7 +130,7 @@ class PublishDocsRulesBuilder(private val name: String) {
      * docs for a project with the given [groupName] and [name] will be built from a prebuilt with
      * the given [version].
      */
-    fun prebuilts(groupName: String, moduleName: String , version: String) {
+    fun prebuilts(groupName: String, moduleName: String, version: String) {
         rules.add(artifactPredicate(groupName, moduleName) to Prebuilts(Version(version)))
     }
 
@@ -172,8 +173,8 @@ class PublishDocsRulesBuilder(private val name: String) {
 }
 
 class PublishDocsRules(
-        val name: String,
-        private val rules: List<Pair<ArtifactsPredicate, Strategy>>
+    val name: String,
+    private val rules: List<Pair<ArtifactsPredicate, Strategy>>
 ) {
     sealed class Strategy {
         object TipOfTree : Strategy()
