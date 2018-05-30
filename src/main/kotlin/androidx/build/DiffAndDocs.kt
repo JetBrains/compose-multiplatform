@@ -61,7 +61,7 @@ import kotlin.collections.toSet
 data class DacOptions(val libraryroot: String, val dataname: String)
 
 object DiffAndDocs {
-    private lateinit var allChecksTask: Task
+    private lateinit var anchorTask: Task
     private var docsProject: Project? = null
 
     private lateinit var rules: List<PublishDocsRules>
@@ -76,7 +76,7 @@ object DiffAndDocs {
     ): Task {
         rules = additionalRules + TIP_OF_TREE
         docsProject = root.findProject(":docs-fake")
-        allChecksTask = root.tasks.create("anchorCheckApis")
+        anchorTask = root.tasks.create("anchorDocsTask")
         val doclavaConfiguration = root.configurations.getByName("doclava")
         val generateSdkApiTask = createGenerateSdkApiTask(root, doclavaConfiguration)
         rules.forEach {
@@ -87,13 +87,13 @@ object DiffAndDocs {
                     destDir = File(root.docsDir(), it.name),
                     taskName = "${it.name}DocsTask")
             docsTasks[it.name] = task
+            anchorTask.dependsOn(createDistDocsTask(root, task, it.name))
         }
 
         root.tasks.create("generateDocs").dependsOn(docsTasks[TIP_OF_TREE.name])
 
         setupDocsProject()
-        createDistDocsTask(root, docsTasks[TIP_OF_TREE.name]!!)
-        return allChecksTask
+        return anchorTask
     }
 
     private fun prebuiltSources(
@@ -206,7 +206,7 @@ object DiffAndDocs {
         registerJavaProjectForDocsTask(tasks.generateApi, compileJava)
         registerJavaProjectForDocsTask(tasks.generateDiffs, compileJava)
         setupDocsTasks(project, tasks)
-        allChecksTask.dependsOn(tasks.checkApiTask)
+        anchorTask.dependsOn(tasks.checkApiTask)
     }
 
     /**
@@ -249,7 +249,7 @@ object DiffAndDocs {
                 registerAndroidProjectForDocsTask(tasks.generateApi, variant)
                 registerAndroidProjectForDocsTask(tasks.generateDiffs, variant)
                 setupDocsTasks(project, tasks)
-                allChecksTask.dependsOn(tasks.checkApiTask)
+                anchorTask.dependsOn(tasks.checkApiTask)
             }
         }
     }
@@ -494,12 +494,12 @@ private fun createOldApiXml(project: Project, doclavaConfig: Configuration) =
             val fromApi = project.processProperty("fromApi")
             classpath = project.files(doclavaConfig.resolve())
             val rootFolder = project.projectDir
-            if (fromApi != null) {
+            inputApiFile = if (fromApi != null) {
                 // Use an explicit API file.
-                inputApiFile = File(rootFolder, "api/$fromApi.txt")
+                File(rootFolder, "api/$fromApi.txt")
             } else {
                 // Use the most recently released API file bounded by toApi.
-                inputApiFile = getLastReleasedApiFile(rootFolder, toApi)
+                getLastReleasedApiFile(rootFolder, toApi)
             }
 
             outputApiXmlFile = File(project.docsDir(),
@@ -591,13 +591,13 @@ private fun createGenerateDiffsTask(
         }
 
 // Generates a distribution artifact for online docs.
-private fun createDistDocsTask(project: Project, generateDocs: DoclavaTask): Zip =
-        project.tasks.createWithConfig("distDocs", Zip::class.java) {
+private fun createDistDocsTask(project: Project, generateDocs: DoclavaTask, ruleName: String = ""): Zip =
+        project.tasks.createWithConfig("dist${ruleName}Docs", Zip::class.java) {
             dependsOn(generateDocs)
             group = JavaBasePlugin.DOCUMENTATION_GROUP
             description = "Generates distribution artifact for d.android.com-style documentation."
             from(generateDocs.destinationDir)
-            baseName = "android-support-docs"
+            baseName = "android-support-$ruleName-docs"
             version = project.buildNumber()
             destinationDir = project.distDir()
             doLast {
