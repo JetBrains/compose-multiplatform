@@ -61,23 +61,23 @@ data class DacOptions(val libraryroot: String, val dataname: String)
 
 object DiffAndDocs {
     private lateinit var allChecksTask: Task
-    private lateinit var generateDocsTask: GenerateDocsTask
     private var docsProject: Project? = null
 
-    private val rules: List<PublishDocsRules> = listOf(RELEASE_RULE)
-    private val docsTasks: MutableMap<String, DoclavaTask> = mutableMapOf()
+    private lateinit var rules: List<PublishDocsRules>
+    private val docsTasks: MutableMap<String, GenerateDocsTask> = mutableMapOf()
 
     @JvmStatic
-    fun configureDiffAndDocs(root: Project, supportRootFolder: File, dacOptions: DacOptions): Task {
+    fun configureDiffAndDocs(
+        root: Project,
+        supportRootFolder: File,
+        dacOptions: DacOptions,
+        additionalRules: List<PublishDocsRules> = emptyList()
+    ): Task {
+        rules = additionalRules + TIP_OF_TREE
         docsProject = root.findProject(":docs-fake")
         allChecksTask = root.tasks.create("anchorCheckApis")
         val doclavaConfiguration = root.configurations.getByName("doclava")
         val generateSdkApiTask = createGenerateSdkApiTask(root, doclavaConfiguration)
-        generateDocsTask = createGenerateDocsTask(
-                project = root, generateSdkApiTask = generateSdkApiTask,
-                doclavaConfig = doclavaConfiguration, supportRootFolder = supportRootFolder,
-                dacOptions = dacOptions, destDir = root.docsDir())
-
         rules.forEach {
             val task = createGenerateDocsTask(
                     project = root, generateSdkApiTask = generateSdkApiTask,
@@ -88,8 +88,10 @@ object DiffAndDocs {
             docsTasks[it.name] = task
         }
 
+        root.tasks.create("generateDocs").dependsOn(docsTasks[TIP_OF_TREE.name])
+
         setupDocsProject()
-        createDistDocsTask(root, generateDocsTask)
+        createDistDocsTask(root, docsTasks[TIP_OF_TREE.name]!!)
         return allChecksTask
     }
 
@@ -140,8 +142,8 @@ object DiffAndDocs {
                 ?.forEach { docsProject?.evaluationDependsOn(it.path) }
     }
 
-    private fun registerPrebuilts(extension: SupportLibraryExtension)
-            = docsProject?.afterEvaluate { docs ->
+    private fun registerPrebuilts(extension: SupportLibraryExtension) =
+            docsProject?.afterEvaluate { docs ->
         val depHandler = docs.dependencies
         val root = docs.rootProject
         rules.mapNotNull { rule ->
@@ -171,7 +173,6 @@ object DiffAndDocs {
             return
         }
         val compileJava = project.properties["compileJava"] as JavaCompile
-        registerJavaProjectForDocsTask(generateDocsTask, compileJava)
 
         registerPrebuilts(extension)
 
@@ -184,9 +185,10 @@ object DiffAndDocs {
                     "ignoring API tasks.")
             return
         }
-        val tasks = initializeApiChecksForProject(project, generateDocsTask)
+        val tasks = initializeApiChecksForProject(project)
         registerJavaProjectForDocsTask(tasks.generateApi, compileJava)
         registerJavaProjectForDocsTask(tasks.generateDiffs, compileJava)
+        setupDocsTasks(project, tasks)
         allChecksTask.dependsOn(tasks.checkApiTask)
     }
 
@@ -195,9 +197,9 @@ object DiffAndDocs {
      * local API diff generation tasks.
      */
     fun registerAndroidProject(
-            project: Project,
-            library: LibraryExtension,
-            extension: SupportLibraryExtension
+        project: Project,
+        library: LibraryExtension,
+        extension: SupportLibraryExtension
     ) {
         if (!hasApiTasks(project, extension)) {
             return
@@ -207,8 +209,6 @@ object DiffAndDocs {
 
         library.libraryVariants.all { variant ->
             if (variant.name == "release") {
-                registerAndroidProjectForDocsTask(generateDocsTask, variant)
-
                 // include R.file generated for prebuilts
                 rules.filter { it.resolve(extension) is Prebuilts }.forEach { rule ->
                     docsTasks[rule.name]?.include { fileTreeElement ->
@@ -228,20 +228,34 @@ object DiffAndDocs {
                             "an api folder, ignoring API tasks.")
                     return@all
                 }
-                val tasks = initializeApiChecksForProject(project, generateDocsTask)
+                val tasks = initializeApiChecksForProject(project)
                 registerAndroidProjectForDocsTask(tasks.generateApi, variant)
                 registerAndroidProjectForDocsTask(tasks.generateDiffs, variant)
+                setupDocsTasks(project, tasks)
                 allChecksTask.dependsOn(tasks.checkApiTask)
             }
+        }
+    }
+
+    private fun setupDocsTasks(project: Project, tasks: Tasks) {
+        docsTasks.values.forEach { docs ->
+            tasks.generateDiffs.dependsOn(docs)
+            // Track API change history.
+            docs.addSinceFilesFrom(project.projectDir)
+            // Associate current API surface with the Maven artifact.
+            val artifact = "${project.group}:${project.name}:${project.version}"
+            docs.addArtifact(tasks.generateApi.apiFile!!.absolutePath, artifact)
+            docs.dependsOn(tasks.generateApi)
         }
     }
 }
 
 private data class CheckApiConfig(
-        val onFailMessage: String,
-        val errors: List<Int>,
-        val warnings: List<Int>,
-        val hidden: List<Int>)
+    val onFailMessage: String,
+    val errors: List<Int>,
+    val warnings: List<Int>,
+    val hidden: List<Int>
+)
 
 private const val MSG_HIDE_API =
         "If you are adding APIs that should be excluded from the public API surface,\n" +
@@ -305,8 +319,8 @@ private fun getLastReleasedApiFileFromDir(apiDir: File, refVersion: Version?): F
     var lastVersion: Version? = null
     apiDir.listFiles().forEach { file ->
         Version.parseOrNull(file)?.let { version ->
-            if ((lastFile == null || lastVersion!! < version)
-                    && (refVersion == null || version < refVersion)) {
+            if ((lastFile == null || lastVersion!! < version) &&
+                    (refVersion == null || version < refVersion)) {
                 lastFile = file
                 lastVersion = version
             }
@@ -357,13 +371,14 @@ private fun createGenerateApiTask(project: Project, docletpathParam: Collection<
         }
 
 private fun createCheckApiTask(
-        project: Project,
-        taskName: String,
-        docletpath: Collection<File>,
-        checkApiConfig: CheckApiConfig,
-        oldApi: File?,
-        newApi: File,
-        whitelist: File? = null) =
+    project: Project,
+    taskName: String,
+    docletpath: Collection<File>,
+    checkApiConfig: CheckApiConfig,
+    oldApi: File?,
+    newApi: File,
+    whitelist: File? = null
+) =
         project.tasks.createWithConfig(taskName, CheckApiTask::class.java) {
             doclavaClasspath = docletpath
             onFailMessage = checkApiConfig.onFailMessage
@@ -481,9 +496,10 @@ private fun createOldApiXml(project: Project, doclavaConfig: Configuration) =
  * defined using -PtoApi=<file>) to XML format for use by JDiff.
  */
 private fun createNewApiXmlTask(
-        project: Project,
-        generateApi: DoclavaTask,
-        doclavaConfig: Configuration) =
+    project: Project,
+    generateApi: DoclavaTask,
+    doclavaConfig: Configuration
+) =
         project.tasks.createWithConfig("newApiXml", ApiXmlConversionTask::class.java) {
             classpath = project.files(doclavaConfig.resolve())
             val toApi = project.processProperty("toApi")
@@ -530,10 +546,11 @@ private fun createNewApiXmlTask(
  * <p>
  */
 private fun createGenerateDiffsTask(
-        project: Project,
-        oldApiTask: ApiXmlConversionTask,
-        newApiTask: ApiXmlConversionTask,
-        jdiffConfig: Configuration): JDiffTask =
+    project: Project,
+    oldApiTask: ApiXmlConversionTask,
+    newApiTask: ApiXmlConversionTask,
+    jdiffConfig: Configuration
+): JDiffTask =
         project.tasks.createWithConfig("generateDiffs", JDiffTask::class.java) {
             // Base classpath is Android SDK, sub-projects add their own.
             classpath = androidJarFile(project)
@@ -592,13 +609,14 @@ private fun createGenerateSdkApiTask(project: Project, doclavaConfig: Configurat
         }
 
 private fun createGenerateDocsTask(
-        project: Project,
-        generateSdkApiTask: DoclavaTask,
-        doclavaConfig: Configuration,
-        supportRootFolder: File,
-        dacOptions: DacOptions,
-        destDir: File,
-        taskName: String = "generateDocs"): GenerateDocsTask =
+    project: Project,
+    generateSdkApiTask: DoclavaTask,
+    doclavaConfig: Configuration,
+    supportRootFolder: File,
+    dacOptions: DacOptions,
+    destDir: File,
+    taskName: String = "generateDocs"
+): GenerateDocsTask =
         project.tasks.createWithConfig(taskName, GenerateDocsTask::class.java) {
             dependsOn(generateSdkApiTask, doclavaConfig)
             group = JavaBasePlugin.DOCUMENTATION_GROUP
@@ -648,15 +666,15 @@ private fun createGenerateDocsTask(
         }
 
 private data class Tasks(
-        val generateApi: DoclavaTask,
-        val generateDiffs: JDiffTask,
-        val checkApiTask: CheckApiTask)
+    val generateApi: DoclavaTask,
+    val generateDiffs: JDiffTask,
+    val checkApiTask: CheckApiTask
+)
 
-private fun initializeApiChecksForProject(project: Project, generateDocs: GenerateDocsTask): Tasks {
+private fun initializeApiChecksForProject(project: Project): Tasks {
     if (!project.hasProperty("docsDir")) {
         project.extensions.add("docsDir", File(project.rootProject.docsDir(), project.name))
     }
-    val artifact = "${project.group}:${project.name}:${project.version}"
     val version = project.version()
     val workingDir = project.projectDir
 
@@ -711,14 +729,6 @@ private fun initializeApiChecksForProject(project: Project, generateDocs: Genera
             oldApiTask,
             newApiTask,
             jdiffConfiguration)
-    generateDiffTask.dependsOn(generateDocs)
-
-    // Track API change history.
-    generateDocs.addSinceFilesFrom(project.projectDir)
-
-    // Associate current API surface with the Maven artifact.
-    generateDocs.addArtifact(generateApi.apiFile!!.absolutePath, artifact)
-    generateDocs.dependsOn(generateApi)
     return Tasks(generateApi, generateDiffTask, checkApi)
 }
 
@@ -739,8 +749,10 @@ fun hasApiTasks(project: Project, extension: SupportLibraryExtension): Boolean {
 private fun sdkApiFile(project: Project) = File(project.docsDir(), "release/sdk_current.txt")
 
 private fun <T : Task> TaskContainer.createWithConfig(
-        name: String, taskClass: Class<T>,
-        config: T.() -> Unit) =
+    name: String,
+    taskClass: Class<T>,
+    config: T.() -> Unit
+) =
         create(name, taskClass) { task -> task.config() }
 
 private fun androidJarFile(project: Project): FileCollection =
