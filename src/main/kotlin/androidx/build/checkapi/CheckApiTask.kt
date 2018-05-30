@@ -16,6 +16,7 @@
 
 package androidx.build.checkapi
 
+import androidx.build.doclava.ChecksConfig
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.Input
@@ -133,33 +134,8 @@ open class CheckApiTask : DefaultTask() {
         mOutputFile = outputFile
     }
 
-    /**
-     * List of Doclava error codes to treat as errors.
-     * <p>
-     * See {@link com.google.doclava.Errors} for a complete list of error codes.
-     */
     @Input
-    var checkApiErrors: Collection<Int> = emptyList()
-
-    /**
-     * List of Doclava error codes to treat as warnings.
-     * <p>
-     * See {@link com.google.doclava.Errors} for a complete list of error codes.
-     */
-    @Input
-    var checkApiWarnings: Collection<Int> = emptyList()
-
-    /**
-     * List of Doclava error codes to ignore.
-     * <p>
-     * See {@link com.google.doclava.Errors} for a complete list of error codes.
-     */
-    @Input
-    var checkApiHidden: Collection<Int> = emptyList()
-
-    /** Message to display on API check failure. */
-    @Input
-    var onFailMessage: String = "Failed."
+    lateinit var checksConfig: ChecksConfig
 
     init {
         group = "Verification"
@@ -196,9 +172,9 @@ open class CheckApiTask : DefaultTask() {
                 maxHeapSize = "1024m"
 
                 // add -error LEVEL for every error level we want to fail the build on.
-                checkApiErrors.forEach { args("-error", it) }
-                checkApiWarnings.forEach { args("-warning", it) }
-                checkApiHidden.forEach { args("-hide", it) }
+                checksConfig.errors.forEach { args("-error", it) }
+                checksConfig.warnings.forEach { args("-warning", it) }
+                checksConfig.hidden.forEach { args("-hide", it) }
 
                 spec.args(apiFiles.map { it.absolutePath })
 
@@ -241,7 +217,7 @@ open class CheckApiTask : DefaultTask() {
         detectedErrors.forEach { logger.warn("$ANSI_YELLOW${it[5]}$ANSI_RESET ${it[4]}") }
 
         if (unparsedErrors.isNotEmpty() || parsedErrors.isNotEmpty()) {
-            throw GradleException(onFailMessage)
+            throw GradleException(checksConfig.onFailMessage ?: "")
         }
 
         // Just create a dummy file upon completion. Without any outputs, Gradle will run this task
