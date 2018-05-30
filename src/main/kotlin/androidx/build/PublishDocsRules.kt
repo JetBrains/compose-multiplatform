@@ -87,6 +87,10 @@ val RELEASE_RULE = docsRules("public") {
     default(Ignore)
 }
 
+val TIP_OF_TREE = docsRules("tipOfTree") {
+    default(TipOfTree)
+}
+
 typealias ArtifactsPredicate = (String, String) -> Boolean
 
 /**

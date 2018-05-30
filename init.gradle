@@ -16,6 +16,7 @@
 
 
 import androidx.build.DiffAndDocs
+import androidx.build.PublishDocsRulesKt
 import androidx.build.gmaven.GMavenVersionChecker
 import androidx.build.license.CheckExternalDependencyLicensesTask
 import com.android.build.gradle.internal.coverage.JacocoReportTask
@@ -39,7 +40,7 @@ apply from: "${supportRoot}/buildSrc/build_dependencies.gradle"
 apply from: "${supportRoot}/buildSrc/unbundled_check.gradle"
 
 
-def enableDoclavaAndJDiff(p, dacOptions) {
+def enableDoclavaAndJDiff(p, dacOptions, rules = []) {
     p.configurations {
         doclava
         jdiff
@@ -53,7 +54,9 @@ def enableDoclavaAndJDiff(p, dacOptions) {
         jdiff build_libs.xml_parser_apis
         jdiff build_libs.xerces_impl
     }
-    def allChecks = DiffAndDocs.configureDiffAndDocs(rootProject, supportRootFolder, dacOptions)
+
+    def allChecks = DiffAndDocs.configureDiffAndDocs(rootProject, supportRootFolder,
+            dacOptions, rules)
     createArchive.dependsOn(allChecks)
 }
 
