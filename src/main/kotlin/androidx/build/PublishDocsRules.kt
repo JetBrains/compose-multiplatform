@@ -16,9 +16,12 @@
 
 package androidx.build
 
-import androidx.build.PublishDocsRules.Strategy.TipOfTree
-import androidx.build.PublishDocsRules.Strategy.Prebuilts
-import androidx.build.PublishDocsRules.Strategy.Ignore
+import androidx.build.ArtifactsPredicate.All
+import androidx.build.ArtifactsPredicate.Exact
+import androidx.build.ArtifactsPredicate.Group
+import androidx.build.Strategy.TipOfTree
+import androidx.build.Strategy.Prebuilts
+import androidx.build.Strategy.Ignore
 
 val RELEASE_RULE = docsRules("public") {
     val defaultVersion = "1.0.0-alpha1"
@@ -91,8 +94,6 @@ val TIP_OF_TREE = docsRules("tipOfTree") {
     default(TipOfTree)
 }
 
-typealias ArtifactsPredicate = (String, String) -> Boolean
-
 /**
  * Rules are resolved in addition order. So if you have two rules that specify how docs should be
  * built for a module, first defined rule wins.
@@ -105,28 +106,19 @@ fun docsRules(name: String, init: PublishDocsRulesBuilder.() -> Unit): PublishDo
 
 class PublishDocsRulesBuilder(private val name: String) {
 
-    private val rules: MutableList<Pair<ArtifactsPredicate, PublishDocsRules.Strategy>> =
-            mutableListOf()
-
-    private fun groupPredicate(name: String) = { group: String, _: String -> name == group }
-
-    private fun artifactPredicate(group: String, name: String) = {
-        inGroup: String, inName: String -> group == inGroup && name == inName }
-
-    private val allPredicate = { _: String, _: String -> true }
-
+    private val rules: MutableList<DocsRule> = mutableListOf()
     /**
      * docs for projects within [groupName] will be built from sources.
      */
     fun tipOfTree(groupName: String) {
-        rules.add(groupPredicate(groupName) to TipOfTree)
+        rules.add(DocsRule(Group(groupName), TipOfTree))
     }
 
     /**
      * docs for a project with the given [groupName] and [name] will be built from sources.
      */
     fun tipOfTree(groupName: String, name: String) {
-        rules.add(artifactPredicate(groupName, name) to TipOfTree)
+        rules.add(DocsRule(Exact(groupName, name), TipOfTree))
     }
 
     /**
@@ -134,7 +126,7 @@ class PublishDocsRulesBuilder(private val name: String) {
      * the given [version].
      */
     fun prebuilts(groupName: String, moduleName: String, version: String) {
-        rules.add(artifactPredicate(groupName, moduleName) to Prebuilts(Version(version)))
+        rules.add(DocsRule(Exact(groupName, moduleName), Prebuilts(Version(version))))
     }
 
     /**
@@ -147,54 +139,80 @@ class PublishDocsRulesBuilder(private val name: String) {
      */
     fun prebuilts(groupName: String, version: Version): Prebuilts {
         val strategy = Prebuilts(version)
-        rules.add(groupPredicate(groupName) to strategy)
+        rules.add(DocsRule(Group(groupName), strategy))
         return strategy
     }
 
     /**
      * defines a default strategy for building docs
      */
-    fun default(strategy: PublishDocsRules.Strategy) {
-        rules.add(allPredicate to strategy)
+    fun default(strategy: Strategy) {
+        rules.add(DocsRule(All, strategy))
     }
 
     /**
      * docs for projects within [groupName] won't be built
      */
     fun ignore(groupName: String) {
-        rules.add(groupPredicate(groupName) to Ignore)
+        rules.add(DocsRule(Group(groupName), Ignore))
     }
 
     /**
      * docs for a specified project won't be built
      */
     fun ignore(groupName: String, name: String) {
-        rules.add(artifactPredicate(groupName, name) to Ignore)
+        rules.add(DocsRule(Exact(groupName, name), Ignore))
     }
 
     fun build() = PublishDocsRules(name, rules)
 }
 
-class PublishDocsRules(
-    val name: String,
-    private val rules: List<Pair<ArtifactsPredicate, Strategy>>
-) {
-    sealed class Strategy {
-        object TipOfTree : Strategy()
-        object Ignore : Strategy()
-        class Prebuilts(val version: Version) : Strategy() {
-            var stubs: MutableList<String>? = null
-            constructor(version: String) : this(Version(version))
-            fun addStubs(path: String) {
-                if (stubs == null) {
-                    stubs = mutableListOf()
-                }
-                stubs!!.add(path)
-            }
+sealed class ArtifactsPredicate {
+    abstract fun apply(inGroup: String, inName: String): Boolean
+    object All : ArtifactsPredicate() {
+        override fun apply(inGroup: String, inName: String) = true
+    }
+    class Group(val group: String) : ArtifactsPredicate() {
+        override fun apply(inGroup: String, inName: String) = inGroup == group
+        override fun toString() = "\"$group\""
+    }
+    class Exact(val group: String, val name: String) : ArtifactsPredicate() {
+        override fun apply(inGroup: String, inName: String) = group == inGroup && name == inName
+        override fun toString() = "\"$group\", \"$name\""
+    }
+}
+
+data class DocsRule(val predicate: ArtifactsPredicate, val strategy: Strategy) {
+    override fun toString(): String {
+        if (predicate is All) {
+            return "default($strategy)"
+        }
+        return when (strategy) {
+            is Prebuilts -> "prebuilts($predicate, \"${strategy.version}\")"
+            is Ignore -> "ignore($predicate)"
+            is TipOfTree -> "tipOfTree($predicate)"
         }
     }
+}
 
-    fun resolve(groupName: String, moduleName: String): Strategy {
-        return rules.find { it.first(groupName, moduleName) }?.second ?: throw Error()
+sealed class Strategy {
+    object TipOfTree : Strategy()
+    object Ignore : Strategy()
+    class Prebuilts(val version: Version) : Strategy() {
+        var stubs: MutableList<String>? = null
+        fun addStubs(path: String) {
+            if (stubs == null) {
+                stubs = mutableListOf()
+            }
+            stubs!!.add(path)
+        }
+
+        override fun toString() = "Prebuilts(\"$version\")"
+    }
+}
+
+class PublishDocsRules(val name: String, private val rules: List<DocsRule>) {
+    fun resolve(groupName: String, moduleName: String): DocsRule {
+        return rules.find { it.predicate.apply(groupName, moduleName) } ?: throw Error()
     }
 }
