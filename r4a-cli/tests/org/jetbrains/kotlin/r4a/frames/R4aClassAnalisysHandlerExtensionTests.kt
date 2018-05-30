@@ -1,3 +1,5 @@
+package org.jetbrains.kotlin.r4a.frames
+
 class R4aClassAnalisysHandlerExtensionTests: AbstractR4aDiagnosticsTest() {
 
     fun testReportOpen() {

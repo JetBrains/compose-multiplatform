@@ -1,12 +1,12 @@
 package org.jetbrains.kotlin.r4a
 
-import assertExists
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.codegen.CodegenTestCase
 import org.jetbrains.kotlin.codegen.CodegenTestFiles
 import org.jetbrains.kotlin.config.*
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.r4a.frames.assertExists
 
 import org.jetbrains.kotlin.resolve.AnalyzingUtils
 import org.jetbrains.kotlin.test.ConfigurationKind

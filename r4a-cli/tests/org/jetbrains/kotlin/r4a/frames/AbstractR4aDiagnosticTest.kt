@@ -1,6 +1,5 @@
-import com.intellij.openapi.Disposable
-import com.intellij.openapi.util.Disposer
-import junit.framework.TestCase
+package org.jetbrains.kotlin.r4a.frames
+
 import org.jetbrains.kotlin.checkers.BaseDiagnosticsTest
 import org.jetbrains.kotlin.checkers.CheckerTestUtil
 import org.jetbrains.kotlin.checkers.CompilerTestLanguageVersionSettings
@@ -17,7 +16,6 @@ import org.jetbrains.kotlin.diagnostics.DiagnosticWithParameters1
 import org.jetbrains.kotlin.diagnostics.RenderedDiagnostic
 import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
 import org.jetbrains.kotlin.r4a.ComponentsClosedDeclarationChecker
-import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisHandlerExtension
 import org.jetbrains.kotlin.test.ConfigurationKind
 import org.jetbrains.kotlin.test.KotlinTestUtils
 import org.jetbrains.kotlin.test.TestJdkKind

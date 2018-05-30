@@ -1,3 +1,5 @@
+package org.jetbrains.kotlin.r4a.frames
+
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi2ir.extensions.SyntheticIrExtension
 import org.jetbrains.kotlin.r4a.AbstractCodeGenTest
