@@ -16,8 +16,8 @@
 
 package androidx.build
 
-import androidx.build.PublishDocsRules.Strategy.Prebuilts
-import androidx.build.PublishDocsRules.Strategy.TipOfTree
+import androidx.build.Strategy.Prebuilts
+import androidx.build.Strategy.TipOfTree
 import androidx.build.checkapi.ApiXmlConversionTask
 import androidx.build.checkapi.CheckApiTask
 import androidx.build.checkapi.UpdateApiTask
@@ -32,6 +32,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.ResolveException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTree
 import org.gradle.api.plugins.JavaBasePlugin
@@ -95,14 +96,27 @@ object DiffAndDocs {
         return allChecksTask
     }
 
-    private fun prebuiltSources(root: Project, mavenId: String): FileTree {
+    private fun prebuiltSources(
+        root: Project,
+        mavenId: String,
+        originName: String,
+        originRule: DocsRule
+    ): FileTree {
         val configName = "docs-temp_$mavenId"
         val configuration = root.configurations.create(configName)
         root.dependencies.add(configName, mavenId)
 
-        val artifacts = configuration.resolvedConfiguration.resolvedArtifacts
+        val artifacts = try {
+            configuration.resolvedConfiguration.resolvedArtifacts
+        } catch (e: ResolveException) {
+            throw GradleException("Failed to find prebuilts for $mavenId. " +
+                    "A matching rule $originRule in docsRules(\"$originName\") " +
+                    "in PublishDocsRules.kt requires it. You should either add a prebuilt, " +
+                    "or add overriding \"ignore\" or \"tipOfTree\" rules", e)
+        }
+
         val artifact = artifacts.find { it.moduleVersion.id.toString() == mavenId }
-                ?: throw GradleException("Failed to resolve $mavenId")
+                ?: throw GradleException()
 
         val folder = artifact.file.parentFile
         val tree = root.zipTree(File(folder, "${artifact.file.nameWithoutExtension}-sources.jar"))
@@ -146,20 +160,23 @@ object DiffAndDocs {
             docsProject?.afterEvaluate { docs ->
         val depHandler = docs.dependencies
         val root = docs.rootProject
-        rules.mapNotNull { rule ->
-            (rule.resolve(extension) as? Prebuilts)?.let { rule.name to it } }
-                .forEach { (name, prebuilt) ->
-                    val dependency = prebuilt.dependency(extension)
-                    depHandler.add("${name}Implementation", dependency)
-                    prebuilt.stubs?.forEach { path ->
-                        depHandler.add("${name}CompileOnly", root.files(path))
-                    }
-                    docsTasks[name]!!.source(prebuiltSources(root, dependency))
+        rules.forEach { rule ->
+            val resolvedRule = rule.resolve(extension)
+            val strategy = resolvedRule.strategy
+            if (strategy is Prebuilts) {
+                val dependency = strategy.dependency(extension)
+                depHandler.add("${rule.name}Implementation", dependency)
+                strategy.stubs?.forEach { path ->
+                    depHandler.add("${rule.name}CompileOnly", root.files(path))
                 }
+                docsTasks[rule.name]!!.source(prebuiltSources(root, dependency,
+                        rule.name, resolvedRule))
+            }
+        }
     }
 
     private fun tipOfTreeTasks(extension: SupportLibraryExtension, setup: (DoclavaTask) -> Unit) {
-        rules.filter { rule -> rule.resolve(extension) == TipOfTree }
+        rules.filter { rule -> rule.resolve(extension).strategy == TipOfTree }
                 .mapNotNull { rule -> docsTasks[rule.name] }
                 .forEach(setup)
     }
@@ -210,7 +227,7 @@ object DiffAndDocs {
         library.libraryVariants.all { variant ->
             if (variant.name == "release") {
                 // include R.file generated for prebuilts
-                rules.filter { it.resolve(extension) is Prebuilts }.forEach { rule ->
+                rules.filter { it.resolve(extension).strategy is Prebuilts }.forEach { rule ->
                     docsTasks[rule.name]?.include { fileTreeElement ->
                         fileTreeElement.path.endsWith(variant.rFile())
                     }
