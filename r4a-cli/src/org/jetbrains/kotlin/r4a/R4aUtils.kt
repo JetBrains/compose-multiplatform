@@ -33,25 +33,24 @@ import org.jetbrains.kotlin.types.typeUtil.isSubtypeOf
 import org.jetbrains.kotlin.types.typeUtil.isUnit
 import org.jetbrains.kotlin.types.typeUtil.supertypes
 
+abstract class LRUCache<Key, Value>(private val capacity: Int): LinkedHashMap<Key, Value>(capacity * 4/3, 0.75f, true) {
+    override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Key, Value>?): Boolean = size > capacity
+    override operator fun get(key: Key): Value {
+        var entry = super.get(key)
+        if (entry == null) {
+            entry = createValue(key)
+            put(key, entry)
+            return entry
+        } else {
+            return entry
+        }
+    }
+    abstract fun createValue(key: Key): Value
+}
 
 object R4aUtils {
-
-    private val DESCRIPTOR_EQUALITY_POLICY = object: EqualityPolicy<DeclarationDescriptorWithSource> {
-        override fun getHashCode(d: DeclarationDescriptorWithSource?) = d?.source?.hashCode() ?: 0
-        override fun isEqual(a: DeclarationDescriptorWithSource?, b: DeclarationDescriptorWithSource?) = a?.source == b?.source
-    }
-
-    private val CLASS_DESCRIPTOR_EQUALITY_POLICY = object: EqualityPolicy<ClassDescriptor> {
-        override fun getHashCode(d: ClassDescriptor?) = d?.source?.hashCode() ?: 0
-        override fun isEqual(a: ClassDescriptor?, b: ClassDescriptor?) = a?.source == b?.source
-    }
-
-    private val realGetterSetterCache = object : SLRUCache<DeclarationDescriptorWithSource, Collection<AttributeInfo>>(
-        10, 10,
-        DESCRIPTOR_EQUALITY_POLICY
-    ) {
-        override fun createValue(descriptor: DeclarationDescriptorWithSource?): Collection<AttributeInfo> {
-            if (descriptor == null) return listOf()
+    private val realGetterSetterCache = object : LRUCache<DeclarationDescriptorWithSource, Collection<AttributeInfo>>(10) {
+        override fun createValue(descriptor: DeclarationDescriptorWithSource): Collection<AttributeInfo> {
             return when (descriptor) {
                 is ClassDescriptor -> {
                     descriptor
@@ -112,12 +111,8 @@ object R4aUtils {
         }
     }
 
-    private val adapterSetterCache = object : SLRUCache<ClassDescriptor, Collection<AttributeInfo>>(
-        10, 10,
-        CLASS_DESCRIPTOR_EQUALITY_POLICY
-    ) {
-        override fun createValue(cd: ClassDescriptor?): Collection<AttributeInfo> {
-            if (cd == null) return listOf()
+    private val adapterSetterCache = object : LRUCache<ClassDescriptor, Collection<AttributeInfo>>(10) {
+        override fun createValue(cd: ClassDescriptor): Collection<AttributeInfo> {
             return cd
                 .unsubstitutedMemberScope
                 .getContributedDescriptors()
