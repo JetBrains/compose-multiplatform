@@ -26,22 +26,24 @@ import org.gradle.external.javadoc.CoreJavadocOptions
 import java.io.File
 
 // external/doclava/src/com/google/doclava/Errors.java
-private val DEFAULT_DOCLAVA_ERRORS = setOf<Int>(
-        101,  // unresolved link
-        103,  // unknown tag
-        104   // unknown param name
-)
-
-private val DEFAULT_DOCLAVA_WARNINGS = setOf<Int>(121 /* hidden type param */)
-
-private val DEFAULT_DOCLAVA_HIDDEN = setOf<Int>(
-        111,  // hidden super class
-        113   // @deprecation mismatch
+val DEFAULT_DOCLAVA_CONFIG = ChecksConfig(
+        errors = listOf(
+                101,  // unresolved link
+                103,  // unknown tag
+                104   // unknown param name
+        ),
+        warnings = listOf(121 /* hidden type param */),
+        hidden = listOf(
+                111,  // hidden super class
+                113   // @deprecation mismatch
+        )
 )
 
 private fun <E> CoreJavadocOptions.addMultilineMultiValueOption(
-        name: String, values: Collection<E>) {
-    addMultilineMultiValueOption(name).setValue(values.map { listOf(it.toString()) })
+    name: String,
+    values: Collection<E>
+) {
+    addMultilineMultiValueOption(name).value = values.map { listOf(it.toString()) }
 }
 
 open class DoclavaTask : Javadoc() {
@@ -49,16 +51,8 @@ open class DoclavaTask : Javadoc() {
     // All lowercase name to match MinimalJavadocOptions#docletpath
     private var docletpath: List<File> = emptyList()
 
-    // doclava error types which will cause the build to fail
     @Input
-    var doclavaErrors = DEFAULT_DOCLAVA_ERRORS
-
-    @Input
-    var doclavaWarnings = DEFAULT_DOCLAVA_WARNINGS
-
-    // spammy doclava warnings which we want to hide
-    @Input
-    var doclavaHidden = DEFAULT_DOCLAVA_HIDDEN
+    var checksConfig: ChecksConfig = DEFAULT_DOCLAVA_CONFIG
 
     /**
      * If non-null, the list of packages that will be treated as if they were
@@ -147,21 +141,6 @@ open class DoclavaTask : Javadoc() {
         options.docletpath = docletpath.toList()
     }
 
-    fun setDoclavaErrors(errors: List<Int> ) {
-        // Make it serializable.
-        doclavaErrors = errors.toSet()
-    }
-
-    fun setDoclavaWarnings(warnings: List<Int>) {
-        // Make it serializable.
-        doclavaWarnings = warnings.toSet()
-    }
-
-    fun setDoclavaHidden(hidden: List<Int>) {
-        // Make it serializable.
-        doclavaHidden = hidden.toSet()
-    }
-
     /**
      * "Configures" this DoclavaTask with parameters that might not be at their final values
      * until this task is run.
@@ -171,9 +150,9 @@ open class DoclavaTask : Javadoc() {
         docletpath = this@DoclavaTask.docletpath
 
         // configure doclava error/warning/hide levels
-        addMultilineMultiValueOption("hide", doclavaHidden)
-        addMultilineMultiValueOption("warning", doclavaWarnings)
-        addMultilineMultiValueOption("error", doclavaErrors)
+        addMultilineMultiValueOption("hide", checksConfig.hidden)
+        addMultilineMultiValueOption("warning", checksConfig.warnings)
+        addMultilineMultiValueOption("error", checksConfig.errors)
 
         if (hiddenPackages != null) {
             addMultilineMultiValueOption("hidePackage", hiddenPackages!!)
@@ -212,4 +191,3 @@ open class DoclavaTask : Javadoc() {
         super.generate()
     }
 }
-
