@@ -21,7 +21,7 @@ abstract class AbstractCodeGenTest : CodegenTestCase() {
         val classPath = listOf(
                 KotlinTestUtils.getAnnotationsJar(),
                 assertExists(File("dist/kotlinc/lib/r4a-runtime.jar")),
-                assertExists(File("dependencies/android.jar"))
+                assertExists(File("dependencies/androidSDK/platforms/android-26/android.jar"))
         )
         val configuration = createConfiguration(
                 ConfigurationKind.ALL,
@@ -32,7 +32,10 @@ abstract class AbstractCodeGenTest : CodegenTestCase() {
         )
         updateConfiguration(configuration)
 
-        additionalDependencies = listOf(File("dist/kotlinc/lib/r4a-runtime.jar"))
+        additionalDependencies = listOf(
+            File("dist/kotlinc/lib/r4a-runtime.jar"),
+            File("dependencies/androidSDK/platforms/android-26/android.jar")
+        )
 
         myEnvironment = KotlinCoreEnvironment.createForTests(
                 testRootDisposable, configuration, EnvironmentConfigFiles.JVM_CONFIG_FILES
