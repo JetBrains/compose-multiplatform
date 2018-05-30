@@ -1,9 +1,12 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 description = "Kotlin AllOpen Compiler Plugin"
 
 plugins {
     kotlin("jvm")
     id("jps-compatible")
+    id("com.adarshr.test-logger").version("1.2.0")
 }
 
 dependencies {
@@ -54,5 +57,20 @@ projectTest {
     workingDir = rootDir
     doFirst {
         systemProperty("idea.home.path", intellijRootDir().canonicalPath)
+    }
+}
+
+tasks.withType<Test> {
+    testLogging {
+        showStandardStreams = true
+        events = setOf(TestLogEvent.FAILED,
+            TestLogEvent.PASSED,
+            TestLogEvent.SKIPPED,
+            TestLogEvent.STANDARD_ERROR,
+            TestLogEvent.STANDARD_OUT)
+        exceptionFormat = TestExceptionFormat.FULL
+        showCauses = true
+        showExceptions = true
+        showStackTraces = true
     }
 }
