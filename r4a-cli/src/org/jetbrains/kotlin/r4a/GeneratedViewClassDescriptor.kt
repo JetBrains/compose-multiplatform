@@ -363,7 +363,10 @@ open class GeneratedViewClassDescriptor(val metadata: ComponentMetadata): ClassD
     fun getInstanceCreatorFunction(componentClassDescriptor: ClassDescriptor) : SimpleFunctionDescriptor {
         if(instanceCreatorFunction != null) return instanceCreatorFunction!!
         val returnType : SimpleType = this.defaultType
-        val annotations = AnnotationsImpl(listOf(AnnotationDescriptorImpl(componentClassDescriptor.module.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("kotlin.jvm.JvmStatic")))!!.defaultType, HashMap<Name, ConstantValue<*>>(), SourceElement.NO_SOURCE)))
+
+        // JvmStatic annotation was removed because it causes illegal bytecode to be generated due to a bug in the compiler.  Add it back once fixed.
+        val annotations = Annotations.EMPTY //TODO: AnnotationsImpl(listOf(AnnotationDescriptorImpl(componentClassDescriptor.module.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("kotlin.jvm.JvmStatic")))!!.defaultType, HashMap<Name, ConstantValue<*>>(), SourceElement.NO_SOURCE)))
+
         val newMethod = SimpleFunctionDescriptorImpl.create(componentClassDescriptor, annotations, Name.identifier("createInstance"), CallableMemberDescriptor.Kind.SYNTHESIZED, SourceElement.NO_SOURCE)
         val contextParameter = ValueParameterDescriptorImpl(
                 newMethod,

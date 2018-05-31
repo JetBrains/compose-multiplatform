@@ -47,7 +47,7 @@ class GenerateWrapperViewTest : AbstractCodeGenTest() {
         val setFoo = wrapperClass.declaredMethods.find { it.name == "setFoo" }
         TestCase.assertNotNull("has a setter method for properties", setFoo)
 
-        val companionClass = klass.declaredClasses.find { it.name == "MainComponent\$R4H-StaticRenderCompanion" }
+        val companionClass = klass.declaredClasses.find { it.name == "MainComponent\$R4HStaticRenderCompanion" }
         TestCase.assertNotNull("companion class gets generated", companionClass)
         if (companionClass == null) return
         val createInstanceFn = companionClass.declaredMethods.find { it.name == "createInstance" }
