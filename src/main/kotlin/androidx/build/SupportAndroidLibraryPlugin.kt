@@ -52,8 +52,8 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
             val javaVersion: JavaVersion
             if (supportLibraryExtension.java8Library) {
                 if (library.defaultConfig.minSdkVersion.apiLevel < 24) {
-                    throw IllegalArgumentException("Libraries can only support Java 8 if "
-                            + "minSdkVersion is 24 or higher")
+                    throw IllegalArgumentException("Libraries can only support Java 8 if " +
+                            "minSdkVersion is 24 or higher")
                 }
                 javaVersion = JavaVersion.VERSION_1_8
             } else {
@@ -137,8 +137,6 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
             setUpLint(library.lintOptions, SupportConfig.getLintBaseline(project),
                     (supportLibraryExtension.mavenVersion?.isFinalApi()) ?: false)
         }
-
-        project.tasks.getByName("uploadArchives").dependsOn("lintRelease")
 
         setUpSoureJarTaskForAndroidProject(project, library)
 
