@@ -16,7 +16,9 @@ jvmTarget = "1.6"
 
 dependencies {
     compile(project(":kotlin-stdlib"))
-    compileOnly(commonDep("com.google.android", "android"))
+    compileOnly("com.google.android:android:4.1.1.4")
+    testCompile("com.google.android:android:4.1.1.4")
+    testCompile("org.robolectric:robolectric:3.8")
     testCompile(commonDep("junit:junit"))
 }
 

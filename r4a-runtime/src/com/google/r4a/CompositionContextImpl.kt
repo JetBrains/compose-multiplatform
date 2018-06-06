@@ -1,11 +1,21 @@
 package com.google.r4a
 
 import android.content.Context
+import android.view.Choreographer
 import android.view.View
 import android.view.ViewGroup
 import java.util.*
 
-private class Slot(val sourceHash: Int, val key: Any?) {
+
+// NOTE(lmr): we use data class to get the hashCode() implementation, but we use identity for equality. The data class properties are all
+// final, so hashCode() should be stable.
+internal data class Slot(
+    val sourceHash: Int,
+    val key: Any?,
+    val depth: Int
+) {
+    override fun equals(other: Any?) = other === this
+    // TODO(lmr): we could probably replace parent with a stack
     lateinit var parent: Slot
 
     var container: Container? = null
@@ -49,7 +59,7 @@ private class Slot(val sourceHash: Int, val key: Any?) {
     }
 }
 
-private class Container {
+internal class Container {
     lateinit var view: ViewGroup
     var index: Int = 0
     var parent: Container = this
@@ -70,15 +80,16 @@ internal class CompositionContextImpl: CompositionContext() {
                 return result
             }
         }
+        private val SLOT_DEPTH_COMPARATOR = { a: Slot, b: Slot -> a.depth - b.depth }
     }
 
     override lateinit var context: Context
 
-    private val ROOT_CONTAINER = Container()
-    private var currentContainer: Container = ROOT_CONTAINER
+    internal val ROOT_CONTAINER = Container()
+    internal var currentContainer: Container = ROOT_CONTAINER
 
-    private val ROOT_SLOT = Slot(0, 0)
-    private var currentSlot: Slot = ROOT_SLOT
+    internal val ROOT_SLOT = Slot(0, 0, 0)
+    internal var currentSlot: Slot = ROOT_SLOT
 
     init {
         ROOT_SLOT.parent = ROOT_SLOT
@@ -89,9 +100,60 @@ internal class CompositionContextImpl: CompositionContext() {
         ROOT_SLOT.print(0)
     }
 
+    private var hasPendingFrame = false
+    private var isComposing = false
+
+    /**
+     * We keep a queue of slots that need to be recomposed. You can think of calling `recompose(Component)` as similar
+     * to `invalidate()` or `requestLayout()`. We essentially mark the slot to be recomposed. It will either happen
+     * synchronously or on the next frame. Those slots are stored in this TreeSet, where they are ordered based on tree
+     * depth. The highest in the tree will be recomposed first, which may end up recomposing elements that are in the
+     * set, which will then get removed during iteration. Additionally, slots may get added to this set during recompose
+     * in the case of Ambient values changing. As a result, the iterator() of this object should not be used, and
+     * instead it should only be iterated over using `while (isNotEmpty()) { pollFirst() }`
+     */
+    private val composeQueue = ComposeQueue<Slot>(SLOT_DEPTH_COMPARATOR)
+
+    private val frameCallback = Choreographer.FrameCallback {
+        hasPendingFrame = false
+        recomposePending()
+    }
+
+    private fun recomposePending() {
+        val queue = composeQueue
+        if (isComposing) return
+        try {
+            isComposing = true
+            // NOTE(lmr): we are not checking whether or not this results in an infinite recursion where recomposing a
+            // slot always results in itself being added to the queue again. Perhaps we should...
+            while (queue.isNotEmpty()) {
+                queue.pop()?.let { recomposeFrom(it) }
+            }
+        } finally {
+            isComposing = false
+        }
+    }
+
     override fun recompose(component: Component) {
-        val slot = COMPONENTS_TO_SLOTS[component] ?: throw Exception("tried to recompose but could not find slot for component")
-        recomposeFrom(slot)
+        val slot = COMPONENTS_TO_SLOTS[component] ?: error("tried to recompose but could not find slot for component")
+        composeQueue.add(slot)
+
+        // if we're not currently composing and a frame hasn't been scheduled, we want to schedule it
+        if (!isComposing && !hasPendingFrame) {
+            hasPendingFrame = true
+            Choreographer.getInstance().postFrameCallback(frameCallback)
+        }
+    }
+
+    // NOTE(lmr): when we move to a multi-threaded model, this will have to do some concurrency management in the case
+    // that a recompose() is called from the main thread while a recompose is occurring on the background thread. Leaving
+    // this out for now as it doesn't really make sense until we move into the multi-threaded model
+    override fun recomposeSync(component: Component) {
+        val slot = COMPONENTS_TO_SLOTS[component] ?: error("tried to recompose but could not find slot for component")
+        composeQueue.add(slot)
+        if (!isComposing) {
+            recomposePending()
+        }
     }
 
     private fun recomposeFrom(slot: Slot) {
@@ -108,7 +170,7 @@ internal class CompositionContextImpl: CompositionContext() {
         // call start(...) and end(...) here, but I think that that may not really be what we want.
         slot.open = true
         compose()
-        slot.open = false
+        end()
         // restore previous context to whatever it was
         CompositionContext.current = prevContext
     }
@@ -131,11 +193,12 @@ internal class CompositionContextImpl: CompositionContext() {
     private fun findOrCreate(
         start: Slot?,
         sourceHash: Int,
-        key: Any?
+        key: Any?,
+        depth: Int
     ): Slot {
         // common case: mounting on first pass
         if (start == null) {
-            val next = Slot(sourceHash, key)
+            val next = Slot(sourceHash, key, depth)
             initializeSlot(next)
             return next
         }
@@ -178,7 +241,7 @@ internal class CompositionContextImpl: CompositionContext() {
             }
             next = next.nextSibling
         }
-        next = Slot(sourceHash, key)
+        next = Slot(sourceHash, key, depth)
         initializeSlot(next)
         return next
     }
@@ -226,12 +289,18 @@ internal class CompositionContextImpl: CompositionContext() {
         if (current.open) {
             val currentChild = current.child
             current.child = it
-            it.nextSibling = currentChild
+            if (currentChild != null) {
+                it.nextSibling = currentChild
+                currentChild.prevSibling = it
+            }
             it.parent = current
         } else {
             val currentNextSibling = current.nextSibling
             current.nextSibling = it
-            it.nextSibling = currentNextSibling
+            if (currentNextSibling != null) {
+                it.nextSibling = currentNextSibling
+                currentNextSibling.prevSibling = it
+            }
             it.prevSibling = current
             it.parent = current.parent
         }
@@ -244,7 +313,8 @@ internal class CompositionContextImpl: CompositionContext() {
     override fun start(sourceHash: Int, key: Any?): Any? {
         val current = currentSlot
         val start = if (current.open) current.child else current.nextSibling
-        val next = findOrCreate(start, sourceHash, key)
+        val depth = if (current.open) current.depth + 1 else current.depth
+        val next = findOrCreate(start, sourceHash, key, depth)
         currentSlot = next
         return next.instance
     }
@@ -316,6 +386,8 @@ internal class CompositionContextImpl: CompositionContext() {
         val instance = slot.instance
         when (instance) {
             is Component -> {
+                // if it had a pending recompose, we are recomposing it now so we can remove
+                composeQueue.remove(slot)
                 instance.compose()
             }
             else -> {
@@ -323,18 +395,17 @@ internal class CompositionContextImpl: CompositionContext() {
                 // getting the IR code to work in a reasonable way. This is good enough for prototyping etc, but we should
                 // aim to get back to this if we can.
                 if (instance == null) {
-                    println("instance was null!")
-                    return // throw
+                    error("instance was null!")
                 }
                 val args = slot.attributes
                 val klass = instance::class.java
                 val method = klass.methods.firstOrNull { it.name == "invoke" }
-                // HACK: remove instance now so that compose always updates/sets the instance afterwards
+                // NOTE(lmr): we remove instance now so that compose always updates/sets the instance afterwards
                 slot.instance = null
                 if (method != null) {
                     method.invoke(instance, *args.toTypedArray())
                 } else {
-                    println("couldnt find invoke method!")
+                    error("couldnt find invoke method!")
                 }
             }
         }
@@ -345,6 +416,9 @@ internal class CompositionContextImpl: CompositionContext() {
         val child = slot.child
         val prevSibling = slot.prevSibling
         val nextSibling = slot.nextSibling
+
+        // if the slot had a pending recompose, we cancel it now since it is being unmounted
+        composeQueue.remove(slot)
 
 
         slot.parent = slot

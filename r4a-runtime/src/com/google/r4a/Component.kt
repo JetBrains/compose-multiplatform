@@ -10,6 +10,10 @@ abstract class Component : Framed {
         CompositionContext.recompose(this)
     }
 
+    protected fun recomposeSync() {
+        CompositionContext.recomposeSync(this)
+    }
+
     protected lateinit var next: Record
     override val first: Record get() = next
     override fun prepend(value: Record) {

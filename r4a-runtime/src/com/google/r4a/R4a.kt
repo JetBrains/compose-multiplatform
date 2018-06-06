@@ -21,10 +21,10 @@ object R4a {
             root = Root()
             root.composable = composable
             val cc = CompositionContext.create(container.getContext(), container, root)
-            cc.recompose(root)
+            cc.recomposeSync(root)
         } else {
             root.composable = composable
-            CompositionContext.recompose(root)
+            CompositionContext.recomposeSync(root)
         }
     }
 }
