@@ -46,6 +46,7 @@ object LibraryGroups {
     const val LOADER = "androidx.loader"
     const val LOCALBROADCASTMANAGER = "androidx.localbroadcastmanager"
     const val MEDIA = "androidx.media"
+    const val MEDIA2 = "androidx.media2"
     const val MEDIAROUTER = "androidx.mediarouter"
     const val PALETTE = "androidx.palette"
     const val PERCENTLAYOUT = "androidx.percentlayout"
