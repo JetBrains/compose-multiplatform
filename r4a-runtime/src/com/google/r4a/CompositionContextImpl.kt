@@ -50,7 +50,7 @@ internal data class Slot(
         val inst = instance
         val suffix = "<$sourceHash-$key> (open: $open, index: $index)"
         val name = when {
-            parent == this -> "<ROOT>"
+            parent === this -> "<ROOT>"
             inst == null -> "(EMPTY)"
             else -> inst.javaClass.getSimpleName()
         }
@@ -304,6 +304,27 @@ internal class CompositionContextImpl: CompositionContext() {
             it.prevSibling = current
             it.parent = current.parent
         }
+    }
+
+    override fun <T> getAmbient(key: Ambient<T>): T = getAmbient(key, currentSlot)
+
+    override fun <T> getAmbient(key: Ambient<T>, component: Component): T {
+        val slot = COMPONENTS_TO_SLOTS[component] ?: error("Couldn't find slot for compoenent")
+        return getAmbient(key, slot)
+    }
+
+    private fun <T> getAmbient(key: Ambient<T>, slot: Slot): T {
+        var slot = slot
+        while (slot.key !== key && slot.parent !== slot) {
+            slot = slot.parent
+        }
+        if (slot.parent === slot) {
+            // we made it to the root of the tree... return the default value
+            return key.defaultValue
+        }
+        val instance = slot.parent.instance as? Ambient<*>.Provider ?: error("Expected Ambient<>.Provider")
+        instance.subscribers.add(slot)
+        return instance.value as T
     }
 
     // TODO(lmr): we could add an int that specifies the number of attributes on the element so we can

@@ -53,10 +53,14 @@ abstract class CompositionContext {
         fun setRoot(view: View, component: Component) {
             view.setTag(TAG_ROOT_COMPONENT, component)
         }
+
+        fun <T : Any?> getAmbient(key: Ambient<T>, component: Component): T = find(component)!!.getAmbient(key)
     }
     abstract var context: Context
     abstract fun recompose(component: Component)
     abstract fun recomposeSync(component: Component)
+    abstract fun <T : Any?> getAmbient(key: Ambient<T>): T
+    abstract fun <T : Any?> getAmbient(key: Ambient<T>, component: Component): T
     abstract fun start(sourceHash: Int): Any?
     abstract fun start(sourceHash: Int, key: Any?): Any?
     abstract fun end()
