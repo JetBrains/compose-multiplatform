@@ -91,4 +91,9 @@ object LibraryVersions {
      * Version code for Jetifier
      */
     val JETIFIER = Version("1.0.0-alpha07")
+
+    /**
+     * Version code for Car
+     */
+    val CAR = Version("1.0.0-alpha3")
 }
