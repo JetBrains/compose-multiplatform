@@ -24,7 +24,7 @@ import androidx.build.Strategy.Prebuilts
 import androidx.build.Strategy.Ignore
 
 val RELEASE_RULE = docsRules("public") {
-    val defaultVersion = "1.0.0-alpha1"
+    val defaultVersion = "1.0.0-alpha3"
     prebuilts(LibraryGroups.ANNOTATION, defaultVersion)
     prebuilts(LibraryGroups.APPCOMPAT, defaultVersion)
     prebuilts(LibraryGroups.ASYNCLAYOUTINFLATER, defaultVersion)
@@ -33,9 +33,7 @@ val RELEASE_RULE = docsRules("public") {
             .addStubs("car/car-stubs/android.car.jar")
     prebuilts(LibraryGroups.CARDVIEW, defaultVersion)
     prebuilts(LibraryGroups.COLLECTION, defaultVersion)
-    // misses prebuilts, because it was released under different name in alpha1
-    tipOfTree(LibraryGroups.CONTENTPAGER)
-
+    prebuilts(LibraryGroups.CONTENTPAGER, defaultVersion)
     prebuilts(LibraryGroups.COORDINATORLAYOUT, defaultVersion)
     prebuilts(LibraryGroups.CORE, defaultVersion)
     prebuilts(LibraryGroups.CURSORADAPTER, defaultVersion)
@@ -57,7 +55,6 @@ val RELEASE_RULE = docsRules("public") {
     prebuilts(LibraryGroups.MEDIAROUTER, defaultVersion)
     prebuilts(LibraryGroups.PALETTE, defaultVersion)
     prebuilts(LibraryGroups.PERCENTLAYOUT, defaultVersion)
-    ignore(LibraryGroups.PREFERENCE, "preference-ktx")
     prebuilts(LibraryGroups.PREFERENCE, defaultVersion)
     prebuilts(LibraryGroups.PRINT, defaultVersion)
     prebuilts(LibraryGroups.RECOMMENDATION, defaultVersion)
@@ -76,17 +73,11 @@ val RELEASE_RULE = docsRules("public") {
     val flatfootVersion = "2.0.0-alpha1"
     prebuilts(LibraryGroups.ROOM, flatfootVersion)
     prebuilts(LibraryGroups.PERSISTENCE, flatfootVersion)
-    // lifecycle-viewmodel-ktx / lifecycle-process / lifecycle-service miss their prebuilts
-    tipOfTree(LibraryGroups.LIFECYCLE, "lifecycle-viewmodel-ktx")
-    tipOfTree(LibraryGroups.LIFECYCLE, "lifecycle-process")
-    tipOfTree(LibraryGroups.LIFECYCLE, "lifecycle-service")
     prebuilts(LibraryGroups.LIFECYCLE, flatfootVersion)
     prebuilts(LibraryGroups.ARCH_CORE, flatfootVersion)
-    prebuilts(LibraryGroups.PAGING, "paging-rxjava2", "1.0.0-alpha1")
-    prebuilts(LibraryGroups.PAGING, "2.0.0-alpha1")
-    // navigation & workmanager don't have prebuilts currently
-    tipOfTree(LibraryGroups.NAVIGATION)
-    tipOfTree(LibraryGroups.WORKMANAGER)
+    prebuilts(LibraryGroups.PAGING, flatfootVersion)
+    prebuilts(LibraryGroups.NAVIGATION, "1.0.0-alpha01")
+    prebuilts(LibraryGroups.WORKMANAGER, "1.0.0-alpha02")
     default(Ignore)
 }
 
