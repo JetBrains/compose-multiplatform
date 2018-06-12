@@ -32,7 +32,7 @@ class ComponentMetadata(val descriptor: ClassDescriptor) { // TODO(lmr): ClassDe
 
         fun isComponentCompanion(cls: ClassDescriptor): Boolean {
             if(!cls.isCompanionObject()) return false;
-            if(!cls.name.identifier.contains("R4HStaticRenderCompanion")) return false;
+            if(!cls.name.identifier.contains("R4H-StaticRenderCompanion")) return false;
             val containingClass = cls.containingDeclaration as? ClassDescriptor ?: return false
             if (!isR4AComponent(containingClass)) return false;
             return true;

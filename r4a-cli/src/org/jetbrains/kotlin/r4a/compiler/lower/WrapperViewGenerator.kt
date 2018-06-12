@@ -4,10 +4,11 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.findClassAcrossModuleDependencies
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.ir.IrStatement
-import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.declarations.impl.IrValueParameterImpl
+import org.jetbrains.kotlin.ir.declarations.IrClass
+import org.jetbrains.kotlin.ir.declarations.IrConstructor
+import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
+import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.expressions.impl.*
-import org.jetbrains.kotlin.ir.symbols.IrValueParameterSymbol
 import org.jetbrains.kotlin.ir.util.createParameterDeclarations
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
@@ -23,18 +24,17 @@ fun generateWrapperView(context: GeneratorContext, componentMetadata: ComponentM
     val wrapperViewIrClass = context.symbolTable.declareClass(-1, -1, IrDeclarationOrigin.DEFINED, syntheticClassDescriptor)
 
     wrapperViewIrClass.createParameterDeclarations()
-    val wrapperViewReceiverSymbol = wrapperViewIrClass.thisReceiver!!
-    wrapperViewIrClass.declarations.add(generateConstructor(wrapperViewReceiverSymbol, context, componentMetadata))
+    wrapperViewIrClass.declarations.add(generateConstructor(context, componentMetadata))
     wrapperViewIrClass.declarations.addAll(generateProperties(context, componentMetadata))
-    wrapperViewIrClass.declarations.add(generateOnAttachFunction(wrapperViewReceiverSymbol, context, componentMetadata))
-    wrapperViewIrClass.declarations.add(generateOnDetachFunction(wrapperViewReceiverSymbol, context, componentMetadata))
-    wrapperViewIrClass.declarations.add(generateOnPreDrawFunction(wrapperViewReceiverSymbol, context, componentMetadata))
+    wrapperViewIrClass.declarations.add(generateOnAttachFunction(context, componentMetadata))
+    wrapperViewIrClass.declarations.add(generateOnDetachFunction(context, componentMetadata))
+    wrapperViewIrClass.declarations.add(generateOnPreDrawFunction(context, componentMetadata))
     wrapperViewIrClass.declarations.addAll(generateAttributeSetterFunctions(context, componentMetadata))
 
     return wrapperViewIrClass
 }
 
-private fun generateConstructor(wrapperViewAsThisReceiver: IrValueParameter, context: GeneratorContext, componentMetadata: ComponentMetadata): IrConstructor {
+private fun generateConstructor(context: GeneratorContext, componentMetadata: ComponentMetadata): IrConstructor {
     val syntheticClassDescriptor = componentMetadata.wrapperViewDescriptor
     return context.symbolTable.declareConstructor(
         -1,
@@ -44,8 +44,13 @@ private fun generateConstructor(wrapperViewAsThisReceiver: IrValueParameter, con
     )
         .buildWithScope(context) { constructor ->
             constructor.createParameterDeclarations()
-            context.symbolTable.introduceValueParameter(wrapperViewAsThisReceiver)
-            val getThisExpr = IrGetValueImpl(-1, -1, wrapperViewAsThisReceiver.symbol)
+            val wrapperViewAsThisReceiver = context.symbolTable.declareValueParameter(
+                -1,
+                -1,
+                IrDeclarationOrigin.DEFINED,
+                syntheticClassDescriptor.thisAsReceiverParameter
+            ).symbol
+            val getThisExpr = IrGetValueImpl(-1, -1, wrapperViewAsThisReceiver)
 
             val statements = mutableListOf<IrStatement>()
             val superConstructor =
@@ -184,19 +189,24 @@ private fun generateConstructor(wrapperViewAsThisReceiver: IrValueParameter, con
         }
 }
 
-private fun generateOnAttachFunction(wrapperViewAsThisReceiver: IrValueParameter, context: GeneratorContext, componentMetadata: ComponentMetadata): IrFunction {
+private fun generateOnAttachFunction(context: GeneratorContext, componentMetadata: ComponentMetadata): IrFunction {
     val syntheticClassDescriptor = componentMetadata.wrapperViewDescriptor
     val functionDescriptor = syntheticClassDescriptor.onAttachDescriptor
     val viewDescriptor = context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("android.view.View")))!!
-        val viewGroupDescriptor =
+    val viewGroupDescriptor =
         context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("android.view.ViewGroup")))!!
     val viewTreeObserverDescriptor =
         context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("android.view.ViewTreeObserver")))!!
     return context.symbolTable.declareSimpleFunction(-1, -1, IrDeclarationOrigin.DEFINED, functionDescriptor)
         .buildWithScope(context) { irFunction ->
             irFunction.createParameterDeclarations()
-            context.symbolTable.introduceValueParameter(wrapperViewAsThisReceiver)
-            val getThisExpr = IrGetValueImpl(-1, -1, wrapperViewAsThisReceiver.symbol)
+            val wrapperViewAsThisReceiver = context.symbolTable.declareValueParameter(
+                -1,
+                -1,
+                IrDeclarationOrigin.DEFINED,
+                syntheticClassDescriptor.thisAsReceiverParameter
+            ).symbol
+            val getThisExpr = IrGetValueImpl(-1, -1, wrapperViewAsThisReceiver)
 
             val superFunction = viewGroupDescriptor.unsubstitutedMemberScope.getContributedFunctions(
                 Name.identifier("onAttachedToWindow"),
@@ -238,7 +248,7 @@ private fun generateOnAttachFunction(wrapperViewAsThisReceiver: IrValueParameter
         }
 }
 
-private fun generateOnDetachFunction(wrapperViewAsThisReceiver: IrValueParameter, context: GeneratorContext, componentMetadata: ComponentMetadata): IrFunction {
+private fun generateOnDetachFunction(context: GeneratorContext, componentMetadata: ComponentMetadata): IrFunction {
     val syntheticClassDescriptor = componentMetadata.wrapperViewDescriptor
     val functionDescriptor = syntheticClassDescriptor.onDetachDescriptor
     val viewDescriptor = context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("android.view.View")))!!
@@ -249,8 +259,13 @@ private fun generateOnDetachFunction(wrapperViewAsThisReceiver: IrValueParameter
     return context.symbolTable.declareSimpleFunction(-1, -1, IrDeclarationOrigin.DEFINED, functionDescriptor)
         .buildWithScope(context) { irFunction ->
             irFunction.createParameterDeclarations()
-            context.symbolTable.introduceValueParameter(wrapperViewAsThisReceiver)
-            val getThisExpr = IrGetValueImpl(-1, -1, wrapperViewAsThisReceiver.symbol)
+            val wrapperViewAsThisReceiver = context.symbolTable.declareValueParameter(
+                -1,
+                -1,
+                IrDeclarationOrigin.DEFINED,
+                syntheticClassDescriptor.thisAsReceiverParameter
+            ).symbol
+            val getThisExpr = IrGetValueImpl(-1, -1, wrapperViewAsThisReceiver)
 
             val superFunction = viewGroupDescriptor.unsubstitutedMemberScope.getContributedFunctions(
                 Name.identifier("onDetachedFromWindow"),
@@ -292,7 +307,7 @@ private fun generateOnDetachFunction(wrapperViewAsThisReceiver: IrValueParameter
         }
 }
 
-private fun generateOnPreDrawFunction(wrapperViewAsThisReceiver: IrValueParameter, context: GeneratorContext, componentMetadata: ComponentMetadata): IrFunction {
+private fun generateOnPreDrawFunction(context: GeneratorContext, componentMetadata: ComponentMetadata): IrFunction {
     val syntheticClassDescriptor = componentMetadata.wrapperViewDescriptor
     val functionDescriptor = syntheticClassDescriptor.onPreDraw
     val compositionContextDescriptor =
@@ -300,8 +315,13 @@ private fun generateOnPreDrawFunction(wrapperViewAsThisReceiver: IrValueParamete
     return context.symbolTable.declareSimpleFunction(-1, -1, IrDeclarationOrigin.DEFINED, functionDescriptor)
         .buildWithScope(context) { irFunction ->
             irFunction.createParameterDeclarations()
-            context.symbolTable.introduceValueParameter(wrapperViewAsThisReceiver)
-            val getThisExpr = IrGetValueImpl(-1, -1, wrapperViewAsThisReceiver.symbol)
+            val wrapperViewAsThisReceiver = context.symbolTable.declareValueParameter(
+                -1,
+                -1,
+                IrDeclarationOrigin.DEFINED,
+                syntheticClassDescriptor.thisAsReceiverParameter
+            ).symbol
+            val getThisExpr = IrGetValueImpl(-1, -1, wrapperViewAsThisReceiver)
 
 
             val getDirtyCall = IrGetFieldImpl(

@@ -1,7 +1,7 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
-description = "Kotlin R4A Compiler Plugin"
+description = "Kotlin AllOpen Compiler Plugin"
 
 plugins {
     kotlin("jvm")
@@ -10,7 +10,8 @@ plugins {
 }
 
 dependencies {
-    compileOnly(intellijDep()) { includeJars("extensions", "openapi", "util", "idea", "platform-api", "platform-impl", "android-base-common", rootProject = rootProject) }
+    compileOnly(intellijDep()) { includeJars("extensions", "openapi", "util", "idea", "android-base-common", rootProject = rootProject) }
+    compileOnly(intellijCoreDep()) { includeJars("intellij-core") }
     compileOnly(intellijDep()) { includeJars("asm-all") }
     testRuntime(intellijDep())
     compileOnly(project(":compiler:plugin-api"))
