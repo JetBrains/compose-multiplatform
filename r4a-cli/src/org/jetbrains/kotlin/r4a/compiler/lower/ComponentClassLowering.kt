@@ -287,8 +287,13 @@ private fun transform(
 
                 when (setterFunctionDescriptor.valueParameters.size) {
                     1 -> {
-                        // if single parameter, its a setter function and the element is the receiver
-                        thenUpdBranchExpr.dispatchReceiver = getEl
+                        if (setterFunctionDescriptor.extensionReceiverParameter != null) {
+                            // it's an extension function setter, so the element is the extension receiver
+                            thenUpdBranchExpr.extensionReceiver = getEl
+                        } else {
+                            // it's a true setter, so the element is the dispatch receiver
+                            thenUpdBranchExpr.dispatchReceiver = getEl
+                        }
                         thenUpdBranchExpr.putValueArgument(0, getAttr)
                     }
                     2 -> {

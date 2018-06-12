@@ -359,4 +359,20 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
     )
 
+    fun testExtensionFunctions() = testCompile(
+        """
+
+        import com.google.r4a.*
+        import android.widget.*
+
+        fun LinearLayout.setSomeExtension(x: Int) {
+        }
+        class X : Component() {
+            override fun compose() {
+                <LinearLayout someExtension={123} />
+            }
+        }
+        """
+    )
+
 }
