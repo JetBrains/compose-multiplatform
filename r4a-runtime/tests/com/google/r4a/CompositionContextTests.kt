@@ -3,6 +3,7 @@
 package com.google.r4a
 
 import android.view.View
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import org.junit.Test
@@ -433,6 +434,51 @@ class CompositionContextTests : ComposeTestCase() {
         cc.recompose(component)
         val after = cc.treeAsString()
         assertEquals(before, after)
+    }
+
+
+
+    @Test
+    fun testCorrectViewTree() = compose { cc ->
+        var el0 = cc.start(123) as? LinearLayout
+        if (el0 == null) {
+            el0 = LinearLayout(cc.context)
+            cc.setInstance(el0)
+        }
+
+        var el0x0 = cc.start(123) as? LinearLayout
+        if (el0x0 == null) {
+            el0x0 = LinearLayout(cc.context)
+            cc.setInstance(el0x0)
+        }
+        cc.end()
+
+        var el0x1 = cc.start(123) as? LinearLayout
+        if (el0x1 == null) {
+            el0x1 = LinearLayout(cc.context)
+            cc.setInstance(el0x1)
+        }
+        cc.end()
+
+        cc.end()
+
+        var el1 = cc.start(123) as? LinearLayout
+        if (el1 == null) {
+            el1 = LinearLayout(cc.context)
+            cc.setInstance(el1)
+        }
+        cc.end()
+
+    }.then { cc, component, root, activity ->
+        assertEquals(2, root.childCount)
+        val el0 = root.getChildAt(0) as ViewGroup
+        val el1 = root.getChildAt(1) as ViewGroup
+        assertEquals(2, el0.childCount)
+        assertEquals(0, el1.childCount)
+        val el0x0 = el0.getChildAt(0) as ViewGroup
+        val el0x1 = el0.getChildAt(1) as ViewGroup
+        assertEquals(0, el0x0.childCount)
+        assertEquals(0, el0x1.childCount)
     }
 
 }

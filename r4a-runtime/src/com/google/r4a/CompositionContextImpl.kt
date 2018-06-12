@@ -343,16 +343,17 @@ internal class CompositionContextImpl: CompositionContext() {
     override fun end() {
         val current = currentSlot
         val container = currentContainer
+
+        if (current.instance is ViewGroup) {
+            currentContainer = container.parent
+        }
+
         // end of current...
         if (current.open) {
             current.open = false
         } else {
             // we are moving up the tree
             currentSlot = current.parent
-
-            if (currentSlot.instance is ViewGroup) {
-                currentContainer = container.parent
-            }
             currentSlot.open = false
 
             val next = current.nextSibling
