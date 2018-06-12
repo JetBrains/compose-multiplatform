@@ -178,7 +178,7 @@ def configureBuildOnServer() {
             if ("assembleErrorProne".equals(task.name)
                     || "assembleAndroidTest".equals(task.name)
                     || "assembleDebug".equals(task.name)
-                    || "lintRelease".equals(task.name)) {
+                    || "lintDebug".equals(task.name)) {
                 buildOnServerTask.dependsOn task
             }
         }
