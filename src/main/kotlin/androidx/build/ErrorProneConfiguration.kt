@@ -47,6 +47,7 @@ fun JavaCompile.configureWithErrorProne(toolChain: ErrorProneToolChain) {
             "-Xep:TypeParameterUnusedInFormals:ERROR",
             "-Xep:StringSplitter:ERROR",
             "-Xep:ReferenceEquality:ERROR",
+            "-Xep:AssertionFailureIgnored:ERROR",
 
             // Nullaway
             "-XepIgnoreUnknownCheckNames", // https://github.com/uber/NullAway/issues/25
