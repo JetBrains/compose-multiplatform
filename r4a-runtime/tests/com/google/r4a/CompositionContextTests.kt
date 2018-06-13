@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import junit.framework.TestCase
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -437,9 +438,14 @@ class CompositionContextTests : ComposeTestCase() {
     }
 
 
-
     @Test
     fun testCorrectViewTree() = compose { cc ->
+        // <LinearLayout>
+        //   <LinearLayout />
+        //   <LinearLayout />
+        // </LinearLayout>
+        // <LinearLayout />
+
         var el0 = cc.start(123) as? LinearLayout
         if (el0 == null) {
             el0 = LinearLayout(cc.context)
@@ -470,15 +476,98 @@ class CompositionContextTests : ComposeTestCase() {
         cc.end()
 
     }.then { cc, component, root, activity ->
-        assertEquals(2, root.childCount)
-        val el0 = root.getChildAt(0) as ViewGroup
-        val el1 = root.getChildAt(1) as ViewGroup
-        assertEquals(2, el0.childCount)
-        assertEquals(0, el1.childCount)
-        val el0x0 = el0.getChildAt(0) as ViewGroup
-        val el0x1 = el0.getChildAt(1) as ViewGroup
-        assertEquals(0, el0x0.childCount)
-        assertEquals(0, el0x1.childCount)
+        assertChildHierarchy(root) {
+            """
+                <LinearLayout>
+                    <LinearLayout />
+                    <LinearLayout />
+                </LinearLayout>
+                <LinearLayout />
+            """
+        }
+    }
+
+    @Test
+    fun testCorrectViewTreeWithComponents() {
+
+        class B : Component() {
+            override fun compose() {
+                val cc = CompositionContext.current
+                // <TextView />
+                var elb = cc.start(123) as? TextView
+                if (elb == null) {
+                    elb = TextView(cc.context)
+                    cc.setInstance(elb)
+                }
+                cc.end()
+            }
+        }
+
+        compose { cc ->
+            // <LinearLayout>
+            //   <LinearLayout>
+            //     <B />
+            //   </LinearLayout>
+            //   <LinearLayout>
+            //     <B />
+            //   </LinearLayout>
+            // </LinearLayout>
+
+            var el0 = cc.start(123) as? LinearLayout
+            if (el0 == null) {
+                el0 = LinearLayout(cc.context)
+                cc.setInstance(el0)
+            }
+
+            var el0x0 = cc.start(123) as? LinearLayout
+            if (el0x0 == null) {
+                el0x0 = LinearLayout(cc.context)
+                cc.setInstance(el0x0)
+            }
+
+            var el0x0x0 = cc.start(123) as? B
+            if (el0x0x0 == null) {
+                el0x0x0 = B()
+                cc.setInstance(el0x0x0)
+            }
+
+            cc.compose()
+            cc.end()
+            cc.end()
+
+            var el0x1 = cc.start(123) as? LinearLayout
+            if (el0x1 == null) {
+                el0x1 = LinearLayout(cc.context)
+                cc.setInstance(el0x1)
+            }
+
+            var el0x1x0 = cc.start(123) as? B
+            if (el0x1x0 == null) {
+                el0x1x0 = B()
+                cc.setInstance(el0x1x0)
+            }
+
+            cc.compose()
+            cc.end()
+            cc.end()
+
+            cc.end()
+
+        }.then { cc, component, root, activity ->
+
+            assertChildHierarchy(root) {
+                """
+                <LinearLayout>
+                    <LinearLayout>
+                        <TextView />
+                    </LinearLayout>
+                    <LinearLayout>
+                        <TextView />
+                    </LinearLayout>
+                </LinearLayout>
+                """
+            }
+        }
     }
 
 }

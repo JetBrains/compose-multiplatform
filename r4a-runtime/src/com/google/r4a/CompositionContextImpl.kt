@@ -344,10 +344,6 @@ internal class CompositionContextImpl: CompositionContext() {
         val current = currentSlot
         val container = currentContainer
 
-        if (current.instance is ViewGroup) {
-            currentContainer = container.parent
-        }
-
         // end of current...
         if (current.open) {
             current.open = false
@@ -360,6 +356,9 @@ internal class CompositionContextImpl: CompositionContext() {
             if (next != null) {
                 unmountTail(next, container.view)
             }
+        }
+        if (currentSlot.instance is ViewGroup) {
+            currentContainer = container.parent
         }
     }
 

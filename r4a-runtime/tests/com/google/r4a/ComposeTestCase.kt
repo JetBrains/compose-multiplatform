@@ -2,8 +2,10 @@ package com.google.r4a
 
 import android.app.Activity
 import android.os.Bundle
+import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.TextView
 import junit.framework.TestCase
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
@@ -76,6 +78,73 @@ abstract class ComposeTestCase : TestCase() {
         fn(result)
         CompositionContext.current = prev
 
+    }
+
+
+    fun assertChildHierarchy(root: ViewGroup, getHierarchy: () -> String) {
+        val realHierarchy = printChildHierarchy(root)
+
+        TestCase.assertEquals(
+            normalizeString(getHierarchy()),
+            realHierarchy.trim()
+        )
+    }
+
+    fun normalizeString(str: String): String {
+        val lines = str.split('\n').dropWhile { it.isBlank() }.dropLastWhile { it.isBlank() }
+        if (lines.isEmpty()) return ""
+        val toRemove = lines.first().takeWhile { it == ' ' }.length
+        return lines.joinToString("\n") { it.substring(Math.min(toRemove, it.length)) }
+    }
+
+
+    fun printHierarchy(root: View): String {
+        val sb = StringBuilder()
+        printView(root, 0, sb)
+        return sb.toString()
+    }
+
+    fun printChildHierarchy(root: ViewGroup): String {
+        val sb = StringBuilder()
+        for (i in 0 until root.childCount) {
+            printView(root.getChildAt(i), 0, sb)
+        }
+        return sb.toString()
+    }
+
+    fun printView(view: View, indent: Int, sb: StringBuilder) {
+        val whitespace = " ".repeat(indent)
+        val name = view.javaClass.simpleName
+        val attributes = printAttributes(view)
+        if (view is ViewGroup && view.childCount > 0) {
+            sb.appendln("$whitespace<$name$attributes>")
+            for (i in 0 until view.childCount) {
+                printView(view.getChildAt(i), indent + 4, sb)
+            }
+            sb.appendln("$whitespace</$name>")
+        } else {
+            sb.appendln("$whitespace<$name$attributes />")
+        }
+    }
+
+    fun printAttributes(view: View): String {
+        val attrs = mutableListOf<String>()
+
+        // NOTE: right now we only look for id and text as attributes to print out... but we are
+        // free to add more if it makes sense
+        if (view.id != -1) {
+            attrs.add("id=${view.id}")
+        }
+
+        if (view is TextView && view.text.length > 0) {
+            attrs.add("text='${view.text}'")
+        }
+
+        val result = attrs.joinToString(" ", prefix = " ")
+        if (result.length == 1) {
+            return ""
+        }
+        return result
     }
 
     class ComposeTest(val component: Component) {
