@@ -61,11 +61,12 @@ class ItemComponent: Component() {
 
         <CardView
             cardBackgroundColor={Color.WHITE}
-            radius="0dp"
-            maxCardElevation="1dp"
-            cardElevation="0.7dp"
-            contentPadding="10dp"
-            contentPaddingBottom="0dp"
+            radius={0.dp}
+            maxCardElevation={1.dp}
+            cardElevation={0.7.dp}
+            contentPaddingHorizontal={10.dp}
+            contentPaddingTop={10.dp}
+            contentPaddingBottom={0.dp}
             preventCornerOverlap={true}
             useCompatPadding={true}
         >
@@ -82,7 +83,7 @@ class ItemComponent: Component() {
                     fontFamily="sans-serif"
                     gravity={Gravity.CENTER_VERTICAL}
                     text="Joshua Sortino - Via Unsplash"
-                    textSize="18sp"
+                    textSize={18.sp}
                 />
                 <ImageButton
                     layoutParams={imgButtonLayout}

@@ -17,7 +17,7 @@
 
 <resources>
 
-    <style name="Theme" parent="@android:style/Theme.Material.Light.DarkActionBar">
+    <style name="Theme" parent="@android:style/Theme.NoTitleBar">
         <item name="android:colorPrimary">@color/calculator_primary_color</item>
         <item name="android:colorAccent">@color/calculator_accent_color</item>
         <item name="android:statusBarColor">@color/calculator_statusbar_color</item>

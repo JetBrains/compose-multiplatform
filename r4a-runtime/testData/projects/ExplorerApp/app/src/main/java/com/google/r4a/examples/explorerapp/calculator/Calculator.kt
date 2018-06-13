@@ -30,14 +30,14 @@ class Calculator : Component() {
             <LinearLayout
                 orientation="vertical"
                 layoutParams={WRAP_HORIZ}
-                elevation="4dip"
+                elevation={4.dip}
                 backgroundColor={Color.WHITE}
             >
                 <Toolbar popupTheme={R.style.ThemeOverlay_Popup} layoutParams={WRAP_HORIZ}>
                     <TextView
                         layoutParams={WRAP}
                         allCaps={true}
-                        textSize="6sp"
+                        textSize={6.sp}
                         typeface={Typeface.create("sans-serif-medium", Typeface.NORMAL)}
                         text="RAD"
                         contentDescription="radian mode"
@@ -49,7 +49,7 @@ class Calculator : Component() {
                     ellipsize={TextUtils.TruncateAt.END}
                     maxLines={1}
                     textColor={Color.BLACK}
-                    textSize="7dip"
+                    textSize={7.dip}
                     typeface={Typeface.create("sans-serif-medium", Typeface.NORMAL)}
                     text={formula.formulaString}
                     bufferType={TextView.BufferType.EDITABLE}
@@ -63,9 +63,9 @@ class Calculator : Component() {
                     text={formula.previewString}
                     bufferType={TextView.BufferType.SPANNABLE}
                     typeface={Typeface.create("sans-serif-light", Typeface.NORMAL)}
-                    textSize="7dip"
-                    paddingHorizontal="3dip"
-                    paddingVertical="6dip"
+                    textSize={7.dip}
+                    paddingHorizontal={3.dip}
+                    paddingVertical={6.dip}
                     gravity={Gravity.BOTTOM or Gravity.RIGHT}
                     cursorVisible={true}
                 />
@@ -126,7 +126,7 @@ private class CalculatorButton : Component() {
             gravity={Gravity.CENTER}
             includeFontPadding={false}
             typeface={Typeface.create("sans-serif-light", Typeface.NORMAL)}
-            textSize="8sp"
+            textSize={8.sp}
             textColor={Color.WHITE}
             backgroundResource={R.drawable.pad_button_background}
             onClickListener={myOnClick}

@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="img" type="id" />
+    <item name="key_text_watcher" type="id"/>
+    <item name="rb_one" type="id"/>
+    <item name="rb_two" type="id"/>
+    <item name="rb_three" type="id"/>
 </resources>

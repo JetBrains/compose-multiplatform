@@ -7,7 +7,6 @@ import android.text.TextWatcher
 import android.widget.EditText
 import com.google.r4a.annotations.ConflictsWith
 import com.google.r4a.annotations.RequiresOneOf
-import com.google.r4a.annotations.UseInsteadOf
 
 private val key = tagKey("EditTextInputController")
 

@@ -21,8 +21,8 @@ import java.util.regex.Pattern
 object AttributeAdapterLocal: AttributeAdapter() {
 
     // does this requires a support lib?
-    fun setElevation(view: View, elevation: String) {
-        view.setElevation(stringToFloatPx(elevation, displayMetrics(view)))
+    fun setElevation(view: View, elevation: Dimension) {
+        view.setElevation(elevation.toFloatPixels(displayMetrics(view)))
     }
 
     fun setUri(view: ImageView, uri: String) {
