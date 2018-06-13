@@ -3,9 +3,23 @@ package com.google.r4a.adapters
 import android.util.DisplayMetrics
 import android.util.TypedValue
 import android.view.View
+import android.widget.EditText
 import java.util.regex.Pattern
 
+internal val View.metrics: DisplayMetrics get() = resources.displayMetrics
+
+/**
+ * This function will take in a string and pass back a valid resource identifier for View.setTag(...). We should eventually move this
+ * to a resource id that's actually generated via AAPT but doing that in this project is proving to be complicated, so for now I'm
+ * just doing this as a stop-gap.
+ */
+internal fun tagKey(key: String): Int {
+    return (3 shl 24) or key.hashCode()
+}
+
 internal object Utils {
+
+
 
     private val DIMENSION_PATTERN = Pattern.compile("^\\s*(\\d+(\\.\\d+)*)\\s*([a-zA-Z]+)\\s*$")
     private val DIMENSION_UNIT = mapOf(
@@ -48,9 +62,5 @@ internal object Utils {
     }
 
     private class Dim(val value: Float, val unit: Int)
-
-    internal fun displayMetrics(view: View): DisplayMetrics {
-        return view.getResources().getDisplayMetrics()
-    }
 
 }
