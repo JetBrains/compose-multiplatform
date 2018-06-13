@@ -9,7 +9,6 @@ import java.io.File
 class GenerateWrapperViewTest : AbstractCodeGenTest() {
     override fun setUp() {
         super.setUp()
-        additionalDependencies = additionalDependencies + listOf(File("dependencies/android.jar"))
 
         KtxTypeResolutionExtension.registerExtension(myEnvironment.project, R4aKtxTypeResolutionExtension())
         SyntheticIrExtension.registerExtension(myEnvironment.project, R4ASyntheticIrExtension())

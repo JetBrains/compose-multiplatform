@@ -27,6 +27,7 @@ dependencies {
     runtime(projectRuntimeJar(":kotlin-compiler"))
     runtime(projectDist(":kotlin-stdlib"))
     testCompile(project(":r4a-runtime"))
+    testRuntime(intellijPluginDep("android"))
 
     testCompile(project(":compiler:backend"))
     testCompile(project(":compiler:cli"))
@@ -58,6 +59,9 @@ projectTest {
     doFirst {
         systemProperty("idea.home.path", intellijRootDir().canonicalPath)
     }
+
+    useAndroidSdk()
+    useAndroidJar()
 }
 
 tasks.withType<Test> {
