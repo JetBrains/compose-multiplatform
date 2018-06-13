@@ -26,6 +26,12 @@ android {
 
 }
 
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    kotlinOptions {
+        useIR = true
+    }
+}
+
 dependencies {
     api "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
