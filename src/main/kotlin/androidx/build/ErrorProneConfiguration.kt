@@ -19,7 +19,7 @@ package androidx.build
 import net.ltgt.gradle.errorprone.ErrorProneToolChain
 import org.gradle.api.tasks.compile.JavaCompile
 
-const val ERROR_PRONE_VERSION = "com.google.errorprone:error_prone_core:2.2.0"
+const val ERROR_PRONE_VERSION = "com.google.errorprone:error_prone_core:2.3.1"
 
 fun JavaCompile.configureWithErrorProne(toolChain: ErrorProneToolChain) {
     this.toolChain = toolChain
@@ -29,8 +29,12 @@ fun JavaCompile.configureWithErrorProne(toolChain: ErrorProneToolChain) {
             "-XDcompilePolicy=simple", // Workaround for b/36098770
             "-XepExcludedPaths:.*/(build/generated|external)/.*",
 
-            // Enforce the following checks.
+            // Disable the following checks.
             "-Xep:RestrictTo:OFF",
+            "-Xep:ObjectToString:OFF",
+            "-Xep:CatchAndPrintStackTrace:OFF",
+
+            // Enforce the following checks.
             "-Xep:ParameterNotNullable:ERROR",
             "-Xep:MissingOverride:ERROR",
             "-Xep:JdkObsolete:ERROR",
