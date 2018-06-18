@@ -23,17 +23,17 @@ object LibraryVersions {
     /**
      * Version code of the support library components.
      */
-    val SUPPORT_LIBRARY = Version("1.0.0-alpha3")
+    val SUPPORT_LIBRARY = Version("1.0.0-beta01")
 
     /**
      * Version code for Room
      */
-    val ROOM = Version("2.0.0-alpha1")
+    val ROOM = Version("2.0.0-beta01")
 
     /**
      * Version code for Lifecycle extensions (ProcessLifecycleOwner, Fragment support)
      */
-    val LIFECYCLES_EXT = Version("2.0.0-alpha1")
+    val LIFECYCLES_EXT = Version("2.0.0-beta01")
 
     /**
      * Version code for Lifecycle LiveData
@@ -48,9 +48,9 @@ object LibraryVersions {
     /**
      * Version code for Paging
      */
-    val PAGING = Version("2.0.0-alpha1")
+    val PAGING = Version("2.0.0-beta01")
 
-    private val LIFECYCLES = Version("2.0.0-alpha1")
+    private val LIFECYCLES = Version("2.0.0-beta01")
 
     /**
      * Version code for Lifecycle libs that are required by the support library
@@ -65,7 +65,7 @@ object LibraryVersions {
     /**
      * Version code for shared code of flatfoot
      */
-    val ARCH_CORE = Version("2.0.0-alpha1")
+    val ARCH_CORE = Version("2.0.0-beta01")
 
     /**
      * Version code for shared code of flatfoot runtime
@@ -96,4 +96,9 @@ object LibraryVersions {
      * Version code for Car
      */
     val CAR = Version("1.0.0-alpha3")
+
+    /**
+     * Version code for Media2
+     */
+    val MEDIA2 = Version("1.0.0-alpha01")
 }
