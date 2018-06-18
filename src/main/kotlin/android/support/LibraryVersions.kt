@@ -28,7 +28,7 @@ object LibraryVersions {
     /**
      * Version code for Room
      */
-    val ROOM = Version("1.1.1-rc1")
+    val ROOM = Version("1.1.1")
 
     /**
      * Version code for Lifecycle extensions (ProcessLifecycleOwner, Fragment support)
