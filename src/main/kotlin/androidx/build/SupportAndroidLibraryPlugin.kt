@@ -173,6 +173,7 @@ private fun setUpLint(lintOptions: LintOptions, baseline: File, verifyTranslatio
     lintOptions.fatal("ObsoleteSdkInt")
     lintOptions.fatal("VisibleForTests")
     lintOptions.fatal("NoHardKeywords")
+    lintOptions.fatal("SyntheticAccessor")
 
     if (verifyTranslations) {
         lintOptions.fatal("MissingTranslation")
