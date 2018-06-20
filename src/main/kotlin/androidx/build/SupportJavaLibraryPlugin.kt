@@ -17,14 +17,11 @@
 package androidx.build
 
 import androidx.build.license.CheckExternalDependencyLicensesTask
-import net.ltgt.gradle.errorprone.ErrorProneBasePlugin
-import net.ltgt.gradle.errorprone.ErrorProneToolChain
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.bundling.Jar
-import org.gradle.api.tasks.compile.JavaCompile
 
 /**
  * Support java library specific plugin that sets common configurations needed for
@@ -55,11 +52,7 @@ class SupportJavaLibraryPlugin : Plugin<Project> {
             }
         }
 
-        project.apply(mapOf("plugin" to ErrorProneBasePlugin::class.java))
-        val toolChain = ErrorProneToolChain.create(project)
-        project.dependencies.add("errorprone", ERROR_PRONE_VERSION)
-        val compileTasks = project.tasks.withType(JavaCompile::class.java)
-        compileTasks.all { it.configureWithErrorProne(toolChain) }
+        project.configureErrorProneForJava()
 
         setUpSourceJarTaskForJavaProject(project)
         CheckExternalDependencyLicensesTask.configure(project)

@@ -19,8 +19,6 @@ package androidx.build
 import androidx.build.SupportConfig.INSTRUMENTATION_RUNNER
 import androidx.build.license.CheckExternalDependencyLicensesTask
 import com.android.build.gradle.AppExtension
-import net.ltgt.gradle.errorprone.ErrorProneBasePlugin
-import net.ltgt.gradle.errorprone.ErrorProneToolChain
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -42,7 +40,6 @@ class SupportAndroidTestAppPlugin : Plugin<Project> {
         }
 
         project.apply(mapOf("plugin" to "com.android.application"))
-        project.apply(mapOf("plugin" to ErrorProneBasePlugin::class.java))
 
         val application = project.extensions.findByType(AppExtension::class.java)
                 ?: throw Exception("Failed to find Android extension")
@@ -71,9 +68,7 @@ class SupportAndroidTestAppPlugin : Plugin<Project> {
             application.lintOptions.baseline(baseline)
         }
 
-        val toolChain = ErrorProneToolChain.create(project)
-        project.dependencies.add("errorprone", ERROR_PRONE_VERSION)
-
+        val toolChain = project.createErrorProneToolChain()
         project.afterEvaluate {
             if (testAppExtension.enableErrorProne) {
                 project.tasks.forEach {

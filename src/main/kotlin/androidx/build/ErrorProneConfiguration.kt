@@ -16,10 +16,48 @@
 
 package androidx.build
 
+import com.android.build.gradle.api.BaseVariant
+import net.ltgt.gradle.errorprone.ErrorProneBasePlugin
 import net.ltgt.gradle.errorprone.ErrorProneToolChain
+import org.gradle.api.DomainObjectSet
+import org.gradle.api.Project
+import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.withType
 
-const val ERROR_PRONE_VERSION = "com.google.errorprone:error_prone_core:2.3.1"
+private const val ERROR_PRONE_VERSION = "com.google.errorprone:error_prone_core:2.3.1"
+private val log = Logging.getLogger("ErrorProneConfiguration")
+
+fun Project.configureErrorProneForJava() {
+    val toolChain = createErrorProneToolChain()
+    tasks.withType<JavaCompile>().all {
+        log.info("Configuring error-prone for ${it.path}")
+        it.configureWithErrorProne(toolChain)
+    }
+}
+
+fun Project.configureErrorProneForAndroid(variants: DomainObjectSet<out BaseVariant>) {
+    val toolChain = createErrorProneToolChain()
+    variants.all { variant ->
+        if (variant.buildType.name == "debug") {
+            @Suppress("DEPRECATION")
+            val task = variant.javaCompile
+
+            log.info("Configuring error-prone for ${task.path}")
+            task.configureWithErrorProne(toolChain)
+        }
+    }
+}
+
+fun Project.createErrorProneToolChain(): ErrorProneToolChain {
+    apply<ErrorProneBasePlugin>()
+
+    val toolChain = ErrorProneToolChain.create(this)
+    // Pin a specific version of the compiler. By default a dependency wildcard is used.
+    dependencies.add(ErrorProneBasePlugin.CONFIGURATION_NAME, ERROR_PRONE_VERSION)
+    return toolChain
+}
 
 fun JavaCompile.configureWithErrorProne(toolChain: ErrorProneToolChain) {
     this.toolChain = toolChain
