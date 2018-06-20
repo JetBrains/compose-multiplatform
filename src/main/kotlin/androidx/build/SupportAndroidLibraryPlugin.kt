@@ -21,8 +21,6 @@ import androidx.build.license.CheckExternalDependencyLicensesTask
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.dsl.LintOptions
 import com.android.build.gradle.tasks.GenerateBuildConfig
-import net.ltgt.gradle.errorprone.ErrorProneBasePlugin
-import net.ltgt.gradle.errorprone.ErrorProneToolChain
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -82,7 +80,6 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
         }
 
         project.apply(mapOf("plugin" to "com.android.library"))
-        project.apply(mapOf("plugin" to ErrorProneBasePlugin::class.java))
 
         project.afterEvaluate {
             project.tasks.all({
@@ -140,14 +137,7 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
 
         setUpSoureJarTaskForAndroidProject(project, library)
 
-        val toolChain = ErrorProneToolChain.create(project)
-        project.dependencies.add("errorprone", ERROR_PRONE_VERSION)
-        library.libraryVariants.all { libraryVariant ->
-            if (libraryVariant.getBuildType().getName().equals("debug")) {
-                @Suppress("DEPRECATION")
-                libraryVariant.javaCompile.configureWithErrorProne(toolChain)
-            }
-        }
+        project.configureErrorProneForAndroid(library.libraryVariants)
     }
 }
 
