@@ -19,12 +19,10 @@ package androidx.build
 import androidx.build.SupportConfig.INSTRUMENTATION_RUNNER
 import androidx.build.license.CheckExternalDependencyLicensesTask
 import com.android.build.gradle.LibraryExtension
-import com.android.build.gradle.internal.dsl.LintOptions
 import com.android.build.gradle.tasks.GenerateBuildConfig
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import java.io.File
 
 /**
  * Support library specific com.android.library plugin that sets common configurations needed for
@@ -130,49 +128,10 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
         library.signingConfigs.findByName("debug")?.storeFile =
                 SupportConfig.getKeystore(project)
 
-        project.afterEvaluate {
-            setUpLint(library.lintOptions, SupportConfig.getLintBaseline(project),
-                    (supportLibraryExtension.mavenVersion?.isFinalApi()) ?: false)
-        }
+        project.configureLint(library.lintOptions, supportLibraryExtension)
 
         setUpSoureJarTaskForAndroidProject(project, library)
 
         project.configureErrorProneForAndroid(library.libraryVariants)
-    }
-}
-
-private fun setUpLint(lintOptions: LintOptions, baseline: File, verifyTranslations: Boolean) {
-    // Always lint check NewApi as fatal.
-    lintOptions.isAbortOnError = true
-    lintOptions.isIgnoreWarnings = true
-
-    // Skip lintVital tasks on assemble. We explicitly run lintRelease for libraries.
-    lintOptions.isCheckReleaseBuilds = false
-
-    // Write output directly to the console (and nowhere else).
-    lintOptions.textOutput("stderr")
-    lintOptions.textReport = true
-    lintOptions.htmlReport = false
-
-    // Format output for convenience.
-    lintOptions.isExplainIssues = true
-    lintOptions.isNoLines = false
-    lintOptions.isQuiet = true
-
-    lintOptions.fatal("NewApi")
-    lintOptions.fatal("ObsoleteSdkInt")
-    lintOptions.fatal("VisibleForTests")
-    lintOptions.fatal("NoHardKeywords")
-    lintOptions.fatal("SyntheticAccessor")
-
-    if (verifyTranslations) {
-        lintOptions.fatal("MissingTranslation")
-    } else {
-        lintOptions.disable("MissingTranslation")
-    }
-
-    // Set baseline file for all legacy lint warnings.
-    if (baseline.exists()) {
-        lintOptions.baseline(baseline)
     }
 }
