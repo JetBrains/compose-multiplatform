@@ -31,8 +31,4 @@ object SupportConfig {
                 .get("supportRootFolder") as File
         return File(supportRoot, "development/keystore/debug.keystore")
     }
-
-    fun getLintBaseline(project: Project): File {
-        return File(project.projectDir, "/lint-baseline.xml")
-    }
 }
