@@ -16,6 +16,7 @@
 
 
 import androidx.build.DiffAndDocs
+import androidx.build.Release
 import androidx.build.PublishDocsRulesKt
 import androidx.build.gmaven.GMavenVersionChecker
 import androidx.build.license.CheckExternalDependencyLicensesTask
@@ -153,6 +154,7 @@ def setupRepoOutAndBuildNumber() {
         project.buildDir = new File("$project.parent.buildDir/../$project.name/build")
     }
     ext.supportRepoOut = new File(buildDir, 'support_repo')
+    ext.supportRepoOut.mkdirs()
     ext.testApkDistOut = ext.distDir
     ext.testResultsDistDir = new File(distDir, "host-test-reports")
     ext.docsDir = new File(buildDir, 'javadoc')
@@ -161,8 +163,8 @@ def setupRepoOutAndBuildNumber() {
 def configureBuildOnServer() {
     def buildOnServerTask = rootProject.tasks.create("buildOnServer")
     rootProject.tasks.whenTaskAdded { task ->
-        if ("createArchive".equals(task.name)
-                || "createDiffArchive".equals(task.name)
+        if (Release.FULL_ARCHIVE_TASK_NAME.equals(task.name)
+                || task.name.startsWith(Release.DIFF_TASK_PREFIX)
                 || "distDocs".equals(task.name)
                 || "dejetifyArchive".equals(task.name)
                 || CheckExternalDependencyLicensesTask.ROOT_TASK_NAME.equals(task.name)) {
@@ -350,7 +352,8 @@ def configureSubProjects() {
 }
 
 def setupRelease() {
-    apply from: "${ext.supportRootFolder}/buildSrc/release.gradle"
+    // needed for jetify since it accesses the task name directly
+    Release.createGlobalArchiveTask(rootProject)
 }
 
 ext.init.enableDoclavaAndJDiff = this.&enableDoclavaAndJDiff

@@ -125,11 +125,8 @@ fun apply(project: Project, extension: SupportLibraryExtension) {
                 }
             }
 
-            // Before the upload, make sure the repo is ready.
-            uploadTask.dependsOn(project.rootProject.tasks.getByName("prepareRepo"))
-
-            // Make the mainUpload depend on this uploadTask one.
-            project.rootProject.tasks.getByName("mainUpload").dependsOn(uploadTask)
+            // Register it as part of release so that we create a Zip file for it
+            Release.register(project, extension)
         } else {
             uploadTask.enabled = false
         }
@@ -137,9 +134,9 @@ fun apply(project: Project, extension: SupportLibraryExtension) {
 }
 
 private fun collectDependenciesForConfiguration(
-        projectDependencies: MutableSet<ProjectDependency>,
-        project: Project,
-        name: String
+    projectDependencies: MutableSet<ProjectDependency>,
+    project: Project,
+    name: String
 ) {
     val config = project.configurations.findByName(name)
     if (config != null) {
@@ -150,9 +147,9 @@ private fun collectDependenciesForConfiguration(
 }
 
 private fun isAndroidProject(
-        groupId: String,
-        artifactId: String,
-        deps: Set<ProjectDependency>
+    groupId: String,
+    artifactId: String,
+    deps: Set<ProjectDependency>
 ): Boolean {
     for (dep in deps) {
         if (dep.group == groupId && dep.name == artifactId) {
