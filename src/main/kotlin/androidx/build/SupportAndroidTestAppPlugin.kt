@@ -63,7 +63,7 @@ class SupportAndroidTestAppPlugin : Plugin<Project> {
                 SupportConfig.getKeystore(project)
 
         application.lintOptions.isAbortOnError = true
-        val baseline = SupportConfig.getLintBaseline(project)
+        val baseline = project.lintBaseline
         if (baseline.exists()) {
             application.lintOptions.baseline(baseline)
         }
