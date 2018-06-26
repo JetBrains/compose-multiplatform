@@ -24,12 +24,12 @@ import androidx.build.Strategy.Prebuilts
 import androidx.build.Strategy.Ignore
 
 val RELEASE_RULE = docsRules("public") {
-    val defaultVersion = "1.0.0-alpha3"
+    val defaultVersion = "1.0.0-beta01"
     prebuilts(LibraryGroups.ANNOTATION, defaultVersion)
     prebuilts(LibraryGroups.APPCOMPAT, defaultVersion)
     prebuilts(LibraryGroups.ASYNCLAYOUTINFLATER, defaultVersion)
     prebuilts(LibraryGroups.BROWSER, defaultVersion)
-    prebuilts(LibraryGroups.CAR, defaultVersion)
+    prebuilts(LibraryGroups.CAR, "1.0.0-alpha3")
             .addStubs("car/car-stubs/android.car.jar")
     prebuilts(LibraryGroups.CARDVIEW, defaultVersion)
     prebuilts(LibraryGroups.COLLECTION, defaultVersion)
