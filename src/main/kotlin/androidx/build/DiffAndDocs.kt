@@ -128,6 +128,7 @@ object DiffAndDocs {
                         it.exclude("**/*.aidl")
                         it.exclude("**/*.html")
                         it.exclude("**/*.kt")
+                        it.exclude("**/META-INF/**")
                     }
         root.configurations.remove(configuration)
         return tree
@@ -546,19 +547,22 @@ private fun createGenerateDiffsTask(
         }
 
 // Generates a distribution artifact for online docs.
-private fun createDistDocsTask(project: Project, generateDocs: DoclavaTask, ruleName: String = ""): Zip =
-        project.tasks.createWithConfig("dist${ruleName}Docs", Zip::class.java) {
-            dependsOn(generateDocs)
-            group = JavaBasePlugin.DOCUMENTATION_GROUP
-            description = "Generates distribution artifact for d.android.com-style documentation."
-            from(generateDocs.destinationDir)
-            baseName = "android-support-$ruleName-docs"
-            version = project.buildNumber()
-            destinationDir = project.distDir()
-            doLast {
-                logger.lifecycle("'Wrote API reference to $archivePath")
-            }
-        }
+private fun createDistDocsTask(
+    project: Project,
+    generateDocs: DoclavaTask,
+    ruleName: String = ""
+): Zip = project.tasks.createWithConfig("dist${ruleName}Docs", Zip::class.java) {
+    dependsOn(generateDocs)
+    group = JavaBasePlugin.DOCUMENTATION_GROUP
+    description = "Generates distribution artifact for d.android.com-style documentation."
+    from(generateDocs.destinationDir)
+    baseName = "android-support-$ruleName-docs"
+    version = project.buildNumber()
+    destinationDir = project.distDir()
+    doLast {
+        logger.lifecycle("'Wrote API reference to $archivePath")
+    }
+}
 
 /**
  * Creates a task to generate an API file from the platform SDK's source and stub JARs.
