@@ -31,10 +31,11 @@ private const val ERROR_PRONE_VERSION = "com.google.errorprone:error_prone_core:
 private val log = Logging.getLogger("ErrorProneConfiguration")
 
 fun Project.configureErrorProneForJava() {
+    val project = this
     val toolChain = createErrorProneToolChain()
-    tasks.withType<JavaCompile>().all {
-        log.info("Configuring error-prone for ${it.path}")
-        it.configureWithErrorProne(toolChain)
+    tasks.withType<JavaCompile>().all { task ->
+        log.info("Configuring error-prone for ${task.path}")
+        makeErrorProneTask(project, task, toolChain)
     }
 }
 
