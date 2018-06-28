@@ -167,6 +167,7 @@ def configureBuildOnServer() {
                 || task.name.startsWith(Release.DIFF_TASK_PREFIX)
                 || "distDocs".equals(task.name)
                 || "dejetifyArchive".equals(task.name)
+                || "runErrorProne".equals(task.name)
                 || CheckExternalDependencyLicensesTask.ROOT_TASK_NAME.equals(task.name)) {
             buildOnServerTask.dependsOn task
         }

@@ -25,6 +25,7 @@ import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.withType
+import java.io.File
 
 private const val ERROR_PRONE_VERSION = "com.google.errorprone:error_prone_core:2.3.1"
 private val log = Logging.getLogger("ErrorProneConfiguration")
@@ -38,6 +39,7 @@ fun Project.configureErrorProneForJava() {
 }
 
 fun Project.configureErrorProneForAndroid(variants: DomainObjectSet<out BaseVariant>) {
+    val project = this
     val toolChain = createErrorProneToolChain()
     variants.all { variant ->
         if (variant.buildType.name == "debug") {
@@ -45,7 +47,7 @@ fun Project.configureErrorProneForAndroid(variants: DomainObjectSet<out BaseVari
             val task = variant.javaCompile
 
             log.info("Configuring error-prone for ${task.path}")
-            task.configureWithErrorProne(toolChain)
+            makeErrorProneTask(project, task, toolChain)
         }
     }
 }
@@ -59,6 +61,7 @@ fun Project.createErrorProneToolChain(): ErrorProneToolChain {
     return toolChain
 }
 
+// Given an existing JavaCompile task, reconfigures the task to use the ErrorProne compiler
 fun JavaCompile.configureWithErrorProne(toolChain: ErrorProneToolChain) {
     this.toolChain = toolChain
 
@@ -96,4 +99,26 @@ fun JavaCompile.configureWithErrorProne(toolChain: ErrorProneToolChain) {
             "-Xep:NullAway:ERROR",
             "-XepOpt:NullAway:AnnotatedPackages=android.arch,android.support,androidx"
     )
+}
+
+// Given a JavaCompile task, creates a task that runs the ErrorProne compiler with the same settings
+private fun makeErrorProneTask(project: Project, compileTask: JavaCompile, toolChain: ErrorProneToolChain) {
+    val newTaskName = "runErrorProne"
+
+    if (project.tasks.findByName(newTaskName) != null) {
+        return
+    }
+
+    val errorProneTask = project.tasks.create(newTaskName, JavaCompile::class.java)
+    errorProneTask.classpath = compileTask.classpath
+
+    errorProneTask.source = compileTask.source
+    errorProneTask.destinationDir = project.file(File(project.buildDir, "errorProne"))
+    errorProneTask.options.compilerArgs = ArrayList<String>(compileTask.options.compilerArgs)
+    errorProneTask.options.bootstrapClasspath = compileTask.options.bootstrapClasspath
+    errorProneTask.sourceCompatibility = compileTask.sourceCompatibility
+    errorProneTask.targetCompatibility = compileTask.targetCompatibility
+    errorProneTask.configureWithErrorProne(toolChain)
+
+    project.tasks.getByName("check").dependsOn(errorProneTask)
 }
