@@ -95,10 +95,30 @@ object LibraryVersions {
     /**
      * Version code for Car
      */
-    val CAR = Version("1.0.0-alpha3")
+    val CAR = Version("1.0.0-alpha4")
+
+    /*
+     * Version code for mediarouter (depends on media2)
+     */
+    val MEDIAROUTER = Version("1.0.0-alpha4")
 
     /**
-     * Version code for Media2
+     * Version code for media-widget (depends on media2)
+     */
+    val MEDIA_WIDGET = Version("1.0.0-alpha4")
+
+    /**
+     * Version code for media2
      */
     val MEDIA2 = Version("1.0.0-alpha01")
+
+    /**
+     * Version code for slice-builders-ktx
+     */
+    val SLICE_BUILDERS_KTX = Version("1.0.0-alpha4")
+
+    /**
+     * Version code for slice-builder-ktx
+     */
+    val SLICE_BUILDER_KTX = Version("1.0.0-alpha4")
 }
