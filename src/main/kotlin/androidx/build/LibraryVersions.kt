@@ -122,6 +122,11 @@ object LibraryVersions {
      */
     val MEDIA2 = Version("1.0.0-alpha01")
 
+    /*
+     * Version code for Benchmark
+     */
+    val BENCHMARK = Version("1.0.0-alpha01")
+
     /**
      * Version code for Leanback
      */
