@@ -69,7 +69,7 @@ private const val SUPPORT_VERSION = "1.0.0-beta01"
 const val SUPPORT_ANNOTATIONS = "androidx.annotation:annotation:$SUPPORT_VERSION"
 const val SUPPORT_APPCOMPAT = "androidx.appcompat:appcompat:$SUPPORT_VERSION"
 const val SUPPORT_CORE_UTILS = "androidx.legacy:legacy-support-core-utils:$SUPPORT_VERSION"
-const val SUPPORT_DESIGN = "com.google.android.material:material:1.0.0-alpha1@aar"
+const val SUPPORT_DESIGN = "com.google.android.material:material:1.0.0-beta01@aar"
 const val SUPPORT_FRAGMENTS = "androidx.fragment:fragment:$SUPPORT_VERSION"
 const val SUPPORT_RECYCLERVIEW = "androidx.recyclerview:recyclerview:$SUPPORT_VERSION"
 
