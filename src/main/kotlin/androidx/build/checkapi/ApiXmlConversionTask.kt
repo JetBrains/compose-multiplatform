@@ -23,7 +23,7 @@ import org.gradle.api.tasks.OutputFile
 import java.io.File
 
 /**
- * Task that converts the given API file to XML format.
+ * Task that converts the given API txt file to XML format.
  */
 open class ApiXmlConversionTask : JavaExec() {
     @Optional
