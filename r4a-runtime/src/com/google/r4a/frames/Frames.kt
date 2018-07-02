@@ -1,18 +1,38 @@
 package com.google.r4a.frames
 
-import java.util.TreeSet
 import java.util.BitSet
 import java.util.HashSet
 
 class FrameAborted(val frame: Frame) : RuntimeException("Frame aborted") {}
 
+/**
+ * Frame local values of a framed object.
+ */
 interface Record {
+    /**
+     * The frame id of the frame in which the record was created.
+     */
     var frameId: Int
+
+    /**
+     * Reference of the next frame record. Frame records are stored in a linked list.
+     */
     var next: Record?
+
+    /**
+     * Copy the value into this frame record from another for the same framed object.
+     */
     fun assign(value: Record)
+
+    /**
+     * Create a new frame record for the same framed object.
+     */
     fun create(): Record
 }
 
+/**
+ * Base implementation of a frame record
+ */
 abstract class AbstractRecord: Record {
     override var frameId: Int = currentFrame().id
     override var next: Record? = null
@@ -20,9 +40,30 @@ abstract class AbstractRecord: Record {
 
 internal val threadFrame = ThreadLocal<Frame>()
 
-class Frame(val id: Int, internal val invalid: BitSet, readOnly: Boolean) {
+/**
+ * Information about a frame including the frame id and whether or not it is read only.
+ */
+class Frame(
+    /**
+     * The id of the frame. This value is monotonically increasing for each frame created.
+     */
+    val id: Int,
+
+    /**
+     * A set of all the frames that should be treated as invalid. That is the set of all frames open
+     * or aborted.
+     */
+    internal val invalid: BitSet,
+
+    /**
+     * True if the frame is read only
+     */
+    readOnly: Boolean) {
     internal val modified = if (readOnly) null else HashSet<Framed>()
 
+    /**
+     * True if any change to a frame object will throw.
+     */
     val readonly: Boolean
         get() = modified == null
 }
@@ -31,6 +72,9 @@ private fun validateNotInFrame() {
     if (threadFrame.get() != null) throw IllegalStateException("In an existing frame")
 }
 
+/**
+ * Return the thread's active frame. This will throw if no frame is active for the thread.
+ */
 fun currentFrame(): Frame {
     return threadFrame.get() ?: throw IllegalStateException("Not in a frame")
 }
@@ -208,7 +252,9 @@ fun restore(frame: Frame) {
 }
 
 private fun closeFrame(frame: Frame) {
-    openFrames.clear(frame.id)
+    synchronized(sync) {
+        openFrames.clear(frame.id)
+    }
     threadFrame.set(null)
 }
 
@@ -242,6 +288,7 @@ private fun <T: Record> readable(r: T, id: Int, invalid: BitSet): T {
         current = current.next
     }
     if (candidate != null) {
+        @Suppress("UNCHECKED_CAST")
         return candidate as T
     }
     throw IllegalStateException("Could not find a current")
@@ -268,9 +315,8 @@ fun <T: Record> T.writable(framed: Framed): T {
 }
 
 /**
- * A record can be reused if no other frame will see it as valid. This is always true for a record
- * created in an aborted frame. It is also true if the record is valid in the previous frame and is
- * obscured by another record also valid in the previous frame record.
+ * A record can be reused if no other frame will see it as valid. This is always true for a record created in an aborted frame. It is also
+ * true if the record is valid in the previous frame and is obscured by another record also valid in the previous frame record.
  */
 private fun used(framed: Framed, id: Int, invalid: BitSet): Record? {
     var current: Record? = framed.first
@@ -293,6 +339,14 @@ private fun used(framed: Framed, id: Int, invalid: BitSet): Record? {
     return null
 }
 
+/**
+ * Return a writable frame record for the given record. It is assumed that this is called for the first framed record in a frame object. If
+ * the frame is read-only calling this will throw. A record is writable if it was created in the current writable frame. A writable record
+ * will always be the readable record (as all newer records are invalid it must be the newest valid record). This means that if the readable
+ * record is not from the current frame, a new record must be created. To create a new writable record, a record can be reused, if possible,
+ * and the readable record is applied to it. If a record cannot be reused, a new record is created and the readable record is applied to it.
+ * Once the values are correct the record is made live by giving it the current frame id.
+ */
 fun <T: Record> T.writable(framed: Framed, frame: Frame): T {
     if (frame.readonly) throw IllegalStateException("In a readonly frame")
     val id = frame.id
@@ -302,8 +356,19 @@ fun <T: Record> T.writable(framed: Framed, frame: Frame): T {
     if (readData.frameId == frame.id) return readData
 
     // Otherwise, make a copy of the readable data and mark it as born in this frame, making it writable.
-    val used = used(framed, id, frame.invalid) as T?
-    val newData = used ?: readData.create().apply { frameId = Int.MAX_VALUE; framed.prepend(this as T) } as T
+    val newData = synchronized(framed) {
+        // Calling used() on a framed object might return the same record for each thread calling used() therefore selecting the record to
+        // reuse should guarded.
+
+        // Note: setting the frameId to Int.MAX_VALUE will make it invalid for all frames. This means we can release the lock on the object
+        // as used() will no longer select it. Using id could also be used but it puts the object into a state where the reused value
+        // appears to be the current valid value for the the frame. This is not an issue if the frame is only being read from a single
+        // thread but using Int.MAX_VALUE allows multiple readers, single writer, of a frame. Note that threads reading a mutating
+        // frame should not cache the result of readable() as the mutating thread calls to writable() can change the result of readable().
+        @Suppress("UNCHECKED_CAST")
+        (used(framed, id, frame.invalid) as T?)?.apply { frameId = Int.MAX_VALUE } ?:
+            readData.create().apply { frameId = Int.MAX_VALUE; framed.prepend(this as T) } as T
+    }
     newData.assign(readData)
     newData.frameId = id
 
