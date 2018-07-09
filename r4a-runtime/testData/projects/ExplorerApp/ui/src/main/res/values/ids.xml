@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="rb_one" type="id"/>
+    <item name="rb_two" type="id"/>
+    <item name="rb_three" type="id"/>
+    <item name="img" type="id"/>
+    <item name="screen_login" type="id"/>
+    <item name="screen_settings" type="id"/>
+    <item name="screen_link_list" type="id"/>
+    <item name="screen_link_detail" type="id"/>
+    <item name="screen_signup" type="id"/>
+    <item name="screen_examples" type="id"/>
+    <item name="screen_example" type="id"/>
+    <item name="nav_to_examples" type="id"/>
+    <item name="nav_to_example" type="id"/>
+    <item name="nav_to_login" type="id"/>
+    <item name="nav_to_settings" type="id"/>
+    <item name="nav_to_signup" type="id"/>
+    <item name="nav_to_detail" type="id"/>
+    <item name="nav_to_home" type="id"/>
+</resources>

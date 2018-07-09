@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:android="http://schemas.android.com/apk/res/android" >
+    <group android:checkableBehavior="none">
+        <item
+                android:id="@+id/nav_home"
+                android:title="Home"
+                android:icon="@android:drawable/ic_menu_today"
+        />
+        <item
+                android:id="@+id/nav_ui_examples"
+                android:title="UI Examples"
+                android:icon="@android:drawable/ic_menu_agenda"
+        />
+        <item
+                android:id="@+id/nav_settings"
+                android:title="Settings"
+                android:icon="@android:drawable/ic_menu_preferences"
+        />
+    </group>
+    <group>
+        <item
+                android:id="@+id/nav_log_out"
+                android:title="Log Out"
+                android:icon="@drawable/ic_exit_to_app_black_24dp"
+        />
+    </group>
+</menu>

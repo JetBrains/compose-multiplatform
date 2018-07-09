@@ -220,3 +220,9 @@ inline fun <reified T> CompositionContext.consumeAmbient(
     }
     el.compose()
 }
+
+inline fun CompositionContext.portal(location: Int, noinline children: (Ambient.Reference) -> Unit) {
+    emitComponent(location, { Ambient.Portal(children) }) {
+        set(children) { this.children = it }
+    }
+}
