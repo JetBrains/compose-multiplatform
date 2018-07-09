@@ -37,6 +37,8 @@ open class SupportLibraryExtension(val project: Project) {
     var failOnUncheckedWarnings = true
     var failOnDeprecationWarnings = true
 
+    var useMetalava = false
+
     /**
      * This flag works only if publish flag is "true".
      * It is useful for modules that are used for tooling. For example room annotation
