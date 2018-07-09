@@ -1,5 +1,6 @@
 package org.jetbrains.kotlin.r4a
 
+import org.jetbrains.kotlin.backend.common.validateIrFile
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrKtxStatement
 import org.jetbrains.kotlin.ir.IrStatement
@@ -39,8 +40,13 @@ class R4ASyntheticIrExtension : SyntheticIrExtension {
         class TaggedFunction(val fn: IrFunction) { var hasKtx = false }
 
         val functions = LinkedList<TaggedFunction>()
+        val tasks = mutableListOf<()->Unit>()
 
+        // Lowering should not be done during traversal (concurrent modification); collect work to be done, defer execution
         irModuleFragment.accept(object : IrElementVisitorVoid {
+
+            val classes = LinkedList<IrClass>()
+
             override fun visitElement(element: IrElement) {
                 element.acceptChildren(this, null)
             }
@@ -50,14 +56,17 @@ class R4ASyntheticIrExtension : SyntheticIrExtension {
                 super.visitFunction(declaration)
                 val fn = functions.pop()
                 if (fn.hasKtx) {
-                    lowerComposeFunction(context, fn.fn)
+                    val containingClass = classes.last
+                    tasks.add({lowerComposeFunction(context, containingClass, fn.fn)})
                 }
             }
 
             override fun visitClass(declaration: IrClass) {
+                classes.push(declaration)
                 super.visitClass(declaration)
+                classes.pop()
                 if (ComponentMetadata.isR4AComponent(declaration.descriptor)) {
-                    lowerComponentClass(context, ComponentMetadata.fromDescriptor(declaration.descriptor), declaration)
+                    tasks.add({lowerComponentClass(context, ComponentMetadata.fromDescriptor(declaration.descriptor), declaration)})
                 }
             }
 
@@ -67,6 +76,7 @@ class R4ASyntheticIrExtension : SyntheticIrExtension {
             }
         }, null)
 
-
+        // Execute the collected tasks
+        for(task in tasks) task()
     }
 }

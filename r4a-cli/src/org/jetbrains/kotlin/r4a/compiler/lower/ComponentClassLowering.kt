@@ -1,17 +1,21 @@
 package org.jetbrains.kotlin.r4a.compiler.lower
 
 import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.descriptors.impl.PropertyDescriptorImpl
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrKtxStatement
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.*
+import org.jetbrains.kotlin.ir.declarations.impl.IrConstructorImpl
+import org.jetbrains.kotlin.ir.declarations.impl.IrFunctionImpl
 import org.jetbrains.kotlin.ir.descriptors.IrTemporaryVariableDescriptorImpl
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.*
 import org.jetbrains.kotlin.ir.util.withScope
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 import org.jetbrains.kotlin.name.ClassId
+import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.psiUtil.endOffset
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
@@ -81,6 +85,7 @@ fun lowerComponentClass(context: GeneratorContext, metadata: ComponentMetadata, 
  */
 private fun transform(
     context: GeneratorContext,
+    containingClass: IrClass,
     tag: IrKtxTag,
     helper: ComposeFunctionHelper
 ): List<IrStatement> {
@@ -332,11 +337,45 @@ private fun transform(
         }
     }
 
-    if (tag.body != null)
-        for (statement in tag.body) {
-            if (statement is IrKtxTag) output.addAll(transform(context, statement, helper))
-            else output.add(statement)
+    if (tag.body != null) {
+
+
+        when (composableType) {
+            ComposableType.COMPONENT -> {
+                val childrenAttributeInfo = context.bindingContext.get(R4AWritableSlices.KTX_TAG_CHILDRENLAMBDA, tag.element)
+
+                val childrenLambdaIrClass = generateChildrenLambda(context, containingClass.descriptor, tag.body)
+                lowerComposeFunction(context, childrenLambdaIrClass, childrenLambdaIrClass.declarations.single { it is IrFunctionImpl && it.name.identifier == "invoke" } as IrFunction)
+                containingClass.declarations.add(childrenLambdaIrClass)
+
+                val lambdaConstructorCall = IrCallImpl(
+                    element.startOffset, element.endOffset,
+                    (childrenLambdaIrClass.declarations.single { it is IrConstructor } as IrConstructorImpl).symbol
+                )
+
+                val attributeSetterCall = IrCallImpl(
+                    element.startOffset, element.endOffset,
+                    context.symbolTable.referenceFunction((childrenAttributeInfo!!.descriptor as PropertyDescriptorImpl).setter!!)
+                ).apply {
+                    dispatchReceiver = getEl
+                    putValueArgument(
+                        0,
+                        lambdaConstructorCall
+                    )
+                }
+
+                output.add(attributeSetterCall)
+            }
+            ComposableType.VIEW -> {
+                for (statement in tag.body) {
+                    if (statement is IrKtxTag) output.addAll(transform(context, containingClass, statement, helper))
+                    else output.add(statement)
+                }
+            }
+            ComposableType.FUNCTION_VAR -> TODO()
+            ComposableType.FUNCTION, ComposableType.UNKNOWN -> TODO()
         }
+    }
 
     when (composableType) {
         ComposableType.COMPONENT, ComposableType.FUNCTION_VAR -> {
@@ -359,7 +398,7 @@ private fun transform(
     return output
 }
 
-fun lowerComposeFunction(context: GeneratorContext, compose: IrFunction) {
+fun lowerComposeFunction(context: GeneratorContext, containingClass: IrClass, compose: IrFunction) {
     context.symbolTable.withScope(compose.descriptor) {
 
         val helper = ComposeFunctionHelper(context, compose)
@@ -385,7 +424,7 @@ fun lowerComposeFunction(context: GeneratorContext, compose: IrFunction) {
                     expression.endOffset,
                     context.moduleDescriptor.builtIns.unitType,
                     KTX_TAG_ORIGIN,
-                    transform(context, expression as IrKtxTag, helper)
+                    transform(context, containingClass, expression as IrKtxTag, helper)
                 )
                 block.accept(this, data)
                 return block

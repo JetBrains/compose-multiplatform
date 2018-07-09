@@ -375,4 +375,46 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
     )
 
+    fun testChildrenOfComponent() = testCompile(
+        """
+        import android.widget.*
+        import com.google.r4a.*
+
+        class HelperComponent : Component() {
+            @Children lateinit var children: ()->Unit
+            public override fun compose() {
+                val children = this.children
+                <children />
+            }
+        }
+
+        class MainComponent : Component() {
+            public var name = "World"
+            public override fun compose() {
+                <HelperComponent>
+                    <TextView text="some child content2!" />
+                    <TextView text="some child content!3" />
+                </HelperComponent>
+            }
+        }
+        """
+    )
+
+    fun testChildrenOfNaiveView() = testCompile(
+        """
+        import android.widget.*
+        import com.google.r4a.*
+
+        class MainComponent : Component() {
+            public override fun compose() {
+                <LinearLayout>
+                    <TextView text="some child content2!" />
+                    <TextView text="some child content!3" />
+                </LinearLayout>
+            }
+        }
+        """
+    )
+
+
 }

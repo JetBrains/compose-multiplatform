@@ -1,10 +1,6 @@
-/*
- * Copyright 2000-2018 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
- * that can be found in the license/LICENSE.txt file.
- */
-
 package org.jetbrains.kotlin.r4a
 
+import org.gradle.internal.resource.ResourceExceptions.getMissing
 import org.jetbrains.kotlin.builtins.getReturnTypeFromFunctionType
 import org.jetbrains.kotlin.builtins.getValueParameterTypesFromFunctionType
 import org.jetbrains.kotlin.builtins.isNonExtensionFunctionType
@@ -12,6 +8,7 @@ import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.diagnostics.reportFromPlugin
 import org.jetbrains.kotlin.extensions.KtxTypeResolutionExtension
 import org.jetbrains.kotlin.idea.caches.resolve.getResolutionFacade
+import org.jetbrains.kotlin.idea.util.psi.patternMatching.KotlinPsiRange.Empty.elements
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtExpression
@@ -22,6 +19,7 @@ import org.jetbrains.kotlin.r4a.analysis.R4ADefaultErrorMessages
 import org.jetbrains.kotlin.r4a.analysis.R4AErrors
 import org.jetbrains.kotlin.r4a.analysis.R4AErrors.*
 import org.jetbrains.kotlin.r4a.analysis.R4AWritableSlices
+import org.jetbrains.kotlin.r4a.analysis.R4AWritableSlices.KTX_TAG_CHILDRENLAMBDA
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.TemporaryBindingTrace
 import org.jetbrains.kotlin.resolve.calls.context.ContextDependency
@@ -76,6 +74,13 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
         })
 
         context.trace.record(R4AWritableSlices.KTX_TAG_COMPOSABLE_TYPE, element, getComposableType(openingDescriptor, module))
+
+        val possibleChildren = possibleAttributes.filter { it.descriptor.annotations.findAnnotation(FqName(R4aUtils.generateR4APackageName()+".Children")) != null }    //    context.trace.record(R4AWritableSlices.KTX_TAG_CHILDRENLAMBDA, element, getComposableType(openingDescriptor, module))
+        if(element.body != null && possibleChildren.size == 1) {
+            val childAttributeInfo = possibleChildren.single()
+            context.trace.record(R4AWritableSlices.KTX_TAG_CHILDRENLAMBDA, element, childAttributeInfo)
+        }
+
 
         element.attributes?.let { attributes ->
             for (attribute in attributes) {
@@ -179,7 +184,6 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
         facade: ExpressionTypingFacade
     ) {
         val module = context.scope.ownerDescriptor.module
-        val attributes = element.attributes
 
         // NOTE: we may want to cache this
         val r4aComponentId = ClassId.topLevel(FqName("com.google.r4a.Component"))
@@ -195,42 +199,9 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
 
         // TODO(lmr): if its a view (and not a component) and children are provided, ensure that its a ViewGroup subclass
 
-        val requiredAttributes = possibleAttributes.filter { it.required }
 
-        // report duplicate attributes on the element. this is never allowed
-        if (attributes != null) {
-            val duplicates = getDuplicates(attributes, { attr -> attr.key?.text ?: "" })
-
-            for (dup in duplicates) {
-                dup.key?.let {
-                    context.trace.reportFromPlugin(
-                        R4AErrors.DUPLICATE_ATTRIBUTE.on(it),
-                        R4ADefaultErrorMessages
-                    )
-                }
-            }
-
-            val missing = getMissing(
-                requiredAttributes,
-                attributes,
-                { param -> param.name },
-                { attr -> attr.key?.text ?: "" }
-            )
-            if (missing.isNotEmpty()) {
-                context.trace.reportFromPlugin(
-                    MISSING_REQUIRED_ATTRIBUTES.on(element, missing.map { it.descriptor }),
-                    R4ADefaultErrorMessages
-                )
-            }
-        } else {
-            if (requiredAttributes.isNotEmpty()) {
-                // TODO(lmr): we will probably need to add special treatment for children types...
-                context.trace.reportFromPlugin(
-                    MISSING_REQUIRED_ATTRIBUTES.on(element, requiredAttributes.map { it.descriptor }),
-                    R4ADefaultErrorMessages
-                )
-            }
-        }
+        reportDuplicateAttributes(context, element, possibleAttributes)
+        reportMissingAttributes(context, element, possibleAttributes)
 
         when (descriptor) {
             is ClassDescriptor -> {
@@ -271,34 +242,53 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
         }
     }
 
-    private fun <T, V> getMissing(required: List<T>, provided: List<V>, keyRequired: (T) -> String, keyProvided: (V) -> String): List<T> {
-        val requiredMap = HashMap<String, T>()
-        for (el in required) requiredMap[keyRequired(el)] = el
+    private fun reportDuplicateAttributes(context: ExpressionTypingContext, element: KtxElement, possibleAttributes: Collection<R4aUtils.AttributeInfo>) {
 
-        for (el in provided) {
-            val key = keyProvided(el)
+        val childrenAttributeName = possibleAttributes.singleOrNull { it == context.trace[R4AWritableSlices.KTX_TAG_CHILDRENLAMBDA, element] }?.name
+
+        val duplicates = mutableListOf<KtxAttribute>()
+        val set = HashSet<String>()
+        childrenAttributeName?.let { set.add(it) }
+        for (attr in element.attributes) {
+            val key = attr.key?.text ?: ""
+            if (set.contains(key)) {
+                duplicates.add(attr)
+            } else {
+                set.add(key)
+            }
+        }
+
+        for (dup in duplicates) {
+            dup.key?.let {
+                context.trace.reportFromPlugin(
+                    R4AErrors.DUPLICATE_ATTRIBUTE.on(it),
+                    R4ADefaultErrorMessages
+                )
+            }
+        }
+    }
+
+    private fun reportMissingAttributes(context: ExpressionTypingContext, element: KtxElement, possibleAttributes: Collection<R4aUtils.AttributeInfo>) {
+        val requiredAttributes = possibleAttributes.filter { it.required }
+
+        val requiredMap = HashMap<String, R4aUtils.AttributeInfo>()
+        for (el in requiredAttributes) requiredMap[el.name] = el
+
+        for (attr in element.attributes) {
+            val key = attr.key?.text ?: ""
             val value = requiredMap[key]
             if (value != null) {
                 requiredMap.remove(key)
             }
         }
 
-        return requiredMap.values.toList()
-    }
+        val missing = requiredMap.values.toList().filter { it == context.trace[R4AWritableSlices.KTX_TAG_CHILDRENLAMBDA, element] }
 
-    private fun <T> getDuplicates(elements: List<T>, keyFn: (T) -> String): List<T> {
-        val result = mutableListOf<T>()
-        val set = HashSet<String>()
-        for (el in elements) {
-            val key = keyFn(el)
-            if (set.contains(key)) {
-                result.add(el)
-            } else {
-                set.add(key)
-            }
+        if (missing.isNotEmpty()) {
+            context.trace.reportFromPlugin(
+                MISSING_REQUIRED_ATTRIBUTES.on(element, missing.map { it.descriptor }),
+                R4ADefaultErrorMessages
+            )
         }
-
-        return result
     }
-
 }
