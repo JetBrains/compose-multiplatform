@@ -47,6 +47,10 @@ libs.exclude_for_espresso = {
     exclude group: 'androidx.appcompat'
     exclude group: 'androidx.recyclerview'
     exclude group: 'androidx.legacy'
+    exclude group: 'androidx.cardview'
+    exclude group: 'androidx.fragment'
+    exclude group: 'com.google.android.material'
+    exclude group: 'androidx.core'
 }
 
 libs.support_exclude_config = {
