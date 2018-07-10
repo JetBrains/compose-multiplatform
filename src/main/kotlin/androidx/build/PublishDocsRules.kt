@@ -76,7 +76,7 @@ val RELEASE_RULE = docsRules("public") {
     prebuilts(LibraryGroups.WEAR, defaultVersion)
             .addStubs("wear/wear_stubs/com.google.android.wearable-stubs.jar")
     prebuilts(LibraryGroups.WEBKIT, defaultVersion)
-    val flatfootVersion = "2.0.0-alpha1"
+    val flatfootVersion = "2.0.0-beta01"
     prebuilts(LibraryGroups.ROOM, flatfootVersion)
     prebuilts(LibraryGroups.PERSISTENCE, flatfootVersion)
     prebuilts(LibraryGroups.LIFECYCLE, flatfootVersion)
