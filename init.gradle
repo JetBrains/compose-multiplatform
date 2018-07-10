@@ -44,13 +44,20 @@ apply from: "${supportRoot}/buildSrc/unbundled_check.gradle"
 def enableDoclavaAndJDiff(p, dacOptions, rules = []) {
     p.configurations {
         doclava
+        metalava
         jdiff
     }
+
+    def aospRoot = rootProject.projectDir.parentFile.parentFile
+    def metalavaJar = new File(aospRoot, 'prebuilts/tools/common/metalava/metalava.jar')
 
     p.dependencies {
         doclava build_libs.doclava
         // tools.jar required for com.sun.javadoc
         doclava files(((URLClassLoader) ToolProvider.getSystemToolClassLoader()).getURLs())
+
+        metalava files(metalavaJar)
+
         jdiff build_libs.jdiff
         jdiff build_libs.xml_parser_apis
         jdiff build_libs.xerces_impl

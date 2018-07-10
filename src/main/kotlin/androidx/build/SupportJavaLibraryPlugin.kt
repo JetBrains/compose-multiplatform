@@ -44,7 +44,12 @@ class SupportJavaLibraryPlugin : Plugin<Project> {
                 convention.sourceCompatibility = JavaVersion.VERSION_1_7
                 convention.targetCompatibility = JavaVersion.VERSION_1_7
             }
-            DiffAndDocs.registerJavaProject(project, supportLibraryExtension)
+
+            if (supportLibraryExtension.useMetalava) {
+                throw UnsupportedOperationException("Metalava not supported for java libraries yet")
+            } else {
+                DiffAndDocs.registerJavaProject(project, supportLibraryExtension)
+            }
 
             project.tasks.withType(Jar::class.java) { jarTask ->
                 jarTask.setReproducibleFileOrder(true)

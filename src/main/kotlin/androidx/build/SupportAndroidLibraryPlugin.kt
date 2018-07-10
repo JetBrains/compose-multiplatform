@@ -18,6 +18,7 @@ package androidx.build
 
 import androidx.build.SupportConfig.INSTRUMENTATION_RUNNER
 import androidx.build.license.CheckExternalDependencyLicensesTask
+import androidx.build.metalava.Metalava
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.tasks.GenerateBuildConfig
 import org.gradle.api.JavaVersion
@@ -60,7 +61,12 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
             library.compileOptions.setTargetCompatibility(javaVersion)
 
             VersionFileWriterTask.setUpAndroidLibrary(project, library)
-            DiffAndDocs.registerAndroidProject(project, library, supportLibraryExtension)
+
+            if (supportLibraryExtension.useMetalava) {
+                Metalava.registerAndroidProject(project, library, supportLibraryExtension)
+            } else {
+                DiffAndDocs.registerAndroidProject(project, library, supportLibraryExtension)
+            }
 
             library.libraryVariants.all { libraryVariant ->
                 if (libraryVariant.getBuildType().getName().equals("debug")) {
