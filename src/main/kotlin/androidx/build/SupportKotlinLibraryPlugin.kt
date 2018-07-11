@@ -16,6 +16,7 @@
 package androidx.build
 
 import androidx.build.license.CheckExternalDependencyLicensesTask
+import androidx.build.metalava.Metalava
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -45,6 +46,7 @@ class SupportKotlinLibraryPlugin : Plugin<Project> {
                 jarTask.setPreserveFileTimestamps(false)
             }
 
+            Metalava.registerJavaProject(project, supportLibraryExtension)
         }
 
         CheckExternalDependencyLicensesTask.configure(project)
