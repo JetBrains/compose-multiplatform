@@ -22,9 +22,12 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.kotlin.dsl.apply
 
 class SupportKotlinLibraryPlugin : Plugin<Project> {
     override fun apply(project: Project) {
+        project.apply<AndroidXPlugin>()
+
         val supportLibraryExtension = project.extensions.create("supportLibrary",
                 SupportLibraryExtension::class.java, project)
         apply(project, supportLibraryExtension)

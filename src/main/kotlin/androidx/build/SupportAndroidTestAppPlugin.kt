@@ -22,6 +22,7 @@ import com.android.build.gradle.AppExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.apply
 
 /**
  * Support library specific com.android.application plugin that sets common configurations needed
@@ -29,6 +30,8 @@ import org.gradle.api.Project
  */
 class SupportAndroidTestAppPlugin : Plugin<Project> {
     override fun apply(project: Project) {
+        project.apply<AndroidXPlugin>()
+
         val testAppExtension = project.extensions.create("supportTestApp",
                 SupportAndroidTestAppExtension::class.java, project)
         CheckExternalDependencyLicensesTask.configure(project)
@@ -66,7 +69,5 @@ class SupportAndroidTestAppPlugin : Plugin<Project> {
         if (baseline.exists()) {
             application.lintOptions.baseline(baseline)
         }
-
-        project.configureErrorProneForAndroid(application.applicationVariants)
     }
 }
