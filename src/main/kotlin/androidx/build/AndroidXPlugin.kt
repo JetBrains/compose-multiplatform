@@ -25,6 +25,8 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaLibraryPlugin
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.tasks.bundling.Jar
+import org.gradle.kotlin.dsl.withType
 
 /**
  * A plugin which enables all of the Gradle customizations for AndroidX.
@@ -47,6 +49,13 @@ class AndroidXPlugin : Plugin<Project> {
                     project.configureErrorProneForAndroid(extension.applicationVariants)
                 }
             }
+        }
+
+        // Disable timestamps and ensure filesystem-independent archive ordering to maximize
+        // cross-machine byte-for-byte reproducibility of artifacts.
+        project.tasks.withType<Jar> {
+            isReproducibleFileOrder = true
+            isPreserveFileTimestamps = false
         }
     }
 }
