@@ -22,7 +22,6 @@ import com.android.build.gradle.AppExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.tasks.compile.JavaCompile
 
 /**
  * Support library specific com.android.application plugin that sets common configurations needed
@@ -68,13 +67,6 @@ class SupportAndroidTestAppPlugin : Plugin<Project> {
             application.lintOptions.baseline(baseline)
         }
 
-        val toolChain = project.createErrorProneToolChain()
-        project.afterEvaluate {
-            if (testAppExtension.enableErrorProne) {
-                project.tasks.forEach {
-                    (it as? JavaCompile)?.configureWithErrorProne(toolChain)
-                }
-            }
-        }
+        project.configureErrorProneForAndroid(application.applicationVariants)
     }
 }
