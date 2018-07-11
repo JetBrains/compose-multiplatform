@@ -772,7 +772,7 @@ private fun <T : Task> TaskContainer.createWithConfig(
 ) =
         create(name, taskClass) { task -> task.config() }
 
-private fun androidJarFile(project: Project): FileCollection =
+fun androidJarFile(project: Project): FileCollection =
         project.files(arrayOf(File(project.fullSdkPath(),
                 "platforms/android-${SupportConfig.CURRENT_SDK_VERSION}/android.jar")))
 

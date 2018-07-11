@@ -17,6 +17,7 @@
 package androidx.build
 
 import androidx.build.license.CheckExternalDependencyLicensesTask
+import androidx.build.metalava.Metalava
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -46,7 +47,7 @@ class SupportJavaLibraryPlugin : Plugin<Project> {
             }
 
             if (supportLibraryExtension.useMetalava) {
-                throw UnsupportedOperationException("Metalava not supported for java libraries yet")
+                Metalava.registerJavaProject(project, supportLibraryExtension)
             } else {
                 DiffAndDocs.registerJavaProject(project, supportLibraryExtension)
             }
