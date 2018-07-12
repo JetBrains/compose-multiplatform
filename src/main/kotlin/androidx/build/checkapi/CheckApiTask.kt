@@ -72,6 +72,14 @@ open class CheckApiTask : DefaultTask() {
     @Optional
     @InputFile
     var oldApiFile: File? = null
+        get() {
+            val result = field
+            if (result != null && !result.exists()) {
+                throw GradleException("Can't check api against non-existent file $result. " +
+                        "Please run updateApi to fix that.")
+            }
+            return result
+        }
 
     /** API file that represents the existing API surface's removals. */
     @Optional
@@ -79,8 +87,18 @@ open class CheckApiTask : DefaultTask() {
     var oldRemovedApiFile: File? = null
 
     /** API file that represents the candidate API surface. */
-    @InputFile
     lateinit var newApiFile: File
+
+//  defines input. (newApiFile may not exist, so we want to create in this case)
+    @Suppress("unused")
+    @InputFile
+    fun getNewApiFileForInputs(): File {
+        if (!newApiFile.exists()) {
+            newApiFile.parentFile.mkdirs()
+            newApiFile.createNewFile()
+        }
+        return newApiFile
+    }
 
     /** API file that represents the candidate API surface's removals. */
     @Optional

@@ -33,7 +33,6 @@ import androidx.build.jdiff.JDiffTask
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.BaseVariant
-import com.android.build.gradle.api.LibraryVariant
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -92,7 +91,8 @@ object DiffAndDocs {
         val doclavaConfiguration = root.configurations.getByName("doclava")
         val generateSdkApiTask = createGenerateSdkApiTask(root, doclavaConfiguration)
         val now = LocalDateTime.now()
-        // The diff output assumes that each library is of the same version, but our libraries may each be of different versions
+        // The diff output assumes that each library is of the same version,
+        // but our libraries may each be of different versions
         // So, we display the date as the new version
         val newVersion = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
         rules.forEach {
@@ -110,10 +110,12 @@ object DiffAndDocs {
 
         val docletClasspath = doclavaConfiguration.resolve()
 
-        aggregateOldApiTxtsTask = root.tasks.create("aggregateOldApiTxts", ConcatenateFilesTask::class.java)
+        aggregateOldApiTxtsTask = root.tasks.create("aggregateOldApiTxts",
+                ConcatenateFilesTask::class.java)
         aggregateOldApiTxtsTask.Output = File(root.docsDir(), "previous.txt")
 
-        val oldApisTask = root.tasks.createWithConfig("oldApisXml", ApiXmlConversionTask::class.java) {
+        val oldApisTask = root.tasks.createWithConfig("oldApisXml",
+                ApiXmlConversionTask::class.java) {
             classpath = root.files(docletClasspath)
             dependsOn(doclavaConfiguration)
 
@@ -123,10 +125,12 @@ object DiffAndDocs {
             outputApiXmlFile = File(root.docsDir(), "previous.xml")
         }
 
-        aggregateNewApiTxtsTask = root.tasks.create("aggregateNewApiTxts", ConcatenateFilesTask::class.java)
-        aggregateNewApiTxtsTask.Output = File(root.docsDir(), "$newVersion")
+        aggregateNewApiTxtsTask = root.tasks.create("aggregateNewApiTxts",
+                ConcatenateFilesTask::class.java)
+        aggregateNewApiTxtsTask.Output = File(root.docsDir(), newVersion)
 
-        val newApisTask = root.tasks.createWithConfig("newApisXml", ApiXmlConversionTask::class.java) {
+        val newApisTask = root.tasks.createWithConfig("newApisXml",
+                ApiXmlConversionTask::class.java) {
             classpath = root.files(docletClasspath)
 
             inputApiFile = aggregateNewApiTxtsTask.Output
@@ -247,13 +251,8 @@ object DiffAndDocs {
         tipOfTreeTasks(extension) { task ->
             registerJavaProjectForDocsTask(task, compileJava)
         }
-
-        if (!project.hasApiFolder()) {
-            project.logger.info("Project ${project.name} doesn't have an api folder, " +
-                    "ignoring API tasks.")
-            return
-        }
-        val tasks = initializeApiChecksForProject(project, aggregateOldApiTxtsTask, aggregateNewApiTxtsTask)
+        val tasks = initializeApiChecksForProject(project,
+                aggregateOldApiTxtsTask, aggregateNewApiTxtsTask)
         registerJavaProjectForDocsTask(tasks.generateApi, compileJava)
         registerJavaProjectForDocsTask(generateDiffsTask, compileJava)
         setupDocsTasks(project, tasks)
@@ -288,15 +287,8 @@ object DiffAndDocs {
                     registerAndroidProjectForDocsTask(task, variant)
                 }
 
-                if (!variant.hasJavaSources()) {
-                    return@all
-                }
-                if (!project.hasApiFolder()) {
-                    project.logger.info("Project ${project.name} doesn't have " +
-                            "an api folder, ignoring API tasks.")
-                    return@all
-                }
-                val tasks = initializeApiChecksForProject(project, aggregateOldApiTxtsTask, aggregateNewApiTxtsTask)
+                val tasks = initializeApiChecksForProject(project, aggregateOldApiTxtsTask,
+                        aggregateNewApiTxtsTask)
                 registerAndroidProjectForDocsTask(tasks.generateApi, variant)
                 registerAndroidProjectForDocsTask(generateDiffsTask, variant)
                 setupDocsTasks(project, tasks)
@@ -318,11 +310,6 @@ object DiffAndDocs {
     }
 }
 
-@Suppress("DEPRECATION")
-private fun LibraryVariant.hasJavaSources() = !javaCompile.source
-        .filter { file -> file.name != "R.java" && file.name != "BuildConfig.java" }
-        .isEmpty
-
 fun Project.hasApiFolder() = File(projectDir, "api").exists()
 
 private fun stripExtension(fileName: String) = fileName.substringBeforeLast('.')
@@ -341,8 +328,8 @@ private fun getLastReleasedApiFileFromDir(apiDir: File, refVersion: Version?): F
     apiDir.listFiles().forEach { file ->
         val parsed = Version.parseOrNull(file)
         parsed?.let { version ->
-            if ((lastFile == null || lastVersion!! < version)
-                    && (refVersion == null || version < refVersion)) {
+            if ((lastFile == null || lastVersion!! < version) &&
+                    (refVersion == null || version < refVersion)) {
                 lastFile = file
                 lastVersion = version
             }
@@ -373,7 +360,6 @@ private fun getApiFile(rootDir: File, refVersion: Version, forceRelease: Boolean
     // Non-release API file is always current.txt.
     return File(apiDir, "current.txt")
 }
-
 
 // Creates a new task on the project for generating API files
 private fun createGenerateApiTask(project: Project, docletpathParam: Collection<File>) =
@@ -503,7 +489,6 @@ private fun getOldApiTxt(project: Project): File? {
     }
 }
 
-
 data class FileProvider(val file: File, val task: Task?)
 
 private fun getNewApiTxt(project: Project, generateApi: DoclavaTask): FileProvider {
@@ -515,7 +500,6 @@ private fun getNewApiTxt(project: Project, generateApi: DoclavaTask): FileProvid
         // Use the current API file (e.g. current.txt).
         return FileProvider(generateApi.apiFile!!, generateApi)
     }
-
 }
 
 /**
@@ -683,7 +667,11 @@ private data class Tasks(
 /**
  * Sets up api tasks for the given project
  */
-private fun initializeApiChecksForProject(project: Project, aggregateOldApiTxtsTask: ConcatenateFilesTask, aggregateNewApiTxtsTask:ConcatenateFilesTask): Tasks {
+private fun initializeApiChecksForProject(
+    project: Project,
+    aggregateOldApiTxtsTask: ConcatenateFilesTask,
+    aggregateNewApiTxtsTask: ConcatenateFilesTask
+): Tasks {
     if (!project.hasProperty("docsDir")) {
         project.extensions.add("docsDir", File(project.rootProject.docsDir(), project.name))
     }
@@ -734,7 +722,6 @@ private fun initializeApiChecksForProject(project: Project, aggregateOldApiTxtsT
     val updateApiTask = createUpdateApiTask(project, checkApiRelease)
     updateApiTask.dependsOn(checkApiRelease)
 
-
     val oldApiTxt = getOldApiTxt(project)
     if (oldApiTxt != null) {
         aggregateOldApiTxtsTask.addInput(project.name, oldApiTxt)
@@ -750,17 +737,27 @@ private fun initializeApiChecksForProject(project: Project, aggregateOldApiTxtsT
 }
 
 fun hasApiTasks(project: Project, extension: SupportLibraryExtension): Boolean {
-    if (!extension.publish) {
-        project.logger.info("Project ${project.name} is not published, ignoring API tasks.")
+    if (extension.toolingProject) {
+        project.logger.info("Project ${project.name} is tooling project ignoring API tasks.")
         return false
     }
 
-    if (!extension.generateDocs) {
-        project.logger.info("Project ${project.name} specified generateDocs = false, " +
-                "ignoring API tasks.")
+    if (project.hasApiFolder()) {
+        return true
+    }
+
+    if (!extension.publish) {
+        project.logger.info("Project ${project.name} is not published, ignoring API tasks." +
+                "If you still want to trackApi, simply create \"api\" folder in your project path")
         return false
     }
-    return true
+
+    if (extension.publish && project.version().isFinalApi()) {
+        throw GradleException("Project ${project.name} must track API before stabilizing API\n." +
+                "To do that create \"api\" in your project directory and " +
+                "run \"./gradlew updateApi\" command")
+    }
+    return false
 }
 
 private fun sdkApiFile(project: Project) = File(project.docsDir(), "release/sdk_current.txt")

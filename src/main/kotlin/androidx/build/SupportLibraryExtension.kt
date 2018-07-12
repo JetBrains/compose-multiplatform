@@ -40,12 +40,12 @@ open class SupportLibraryExtension(val project: Project) {
     var useMetalava = false
 
     /**
-     * This flag works only if publish flag is "true".
-     * It is useful for modules that are used for tooling. For example room annotation
-     * processor module is published, but we don't want to expose any docs, because we don't
-     * support using it as a library.
+     * It disables docs generation and api tracking for tooling modules like annotation processors.
+     * We don't expect such modules to be used by developers as libraries, so we don't guarantee
+     * any api stability and don't expose any docs about them.
      */
-    var generateDocs = true
+    var toolingProject = false
+
     /**
      * If unset minSdkVersion will be [DEFAULT_MIN_SDK_VERSION].
      */
@@ -63,8 +63,8 @@ open class SupportLibraryExtension(val project: Project) {
 
     companion object {
         @JvmField
-        val ARCHITECTURE_URL
-                = "https://developer.android.com/topic/libraries/architecture/index.html"
+        val ARCHITECTURE_URL =
+                "https://developer.android.com/topic/libraries/architecture/index.html"
         @JvmField
         val SUPPORT_URL = "http://developer.android.com/tools/extras/support-library.html"
     }
