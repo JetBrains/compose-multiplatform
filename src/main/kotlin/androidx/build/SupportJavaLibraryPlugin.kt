@@ -22,7 +22,7 @@ import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginConvention
-import org.gradle.api.tasks.bundling.Jar
+import org.gradle.kotlin.dsl.apply
 
 /**
  * Support java library specific plugin that sets common configurations needed for
@@ -31,6 +31,8 @@ import org.gradle.api.tasks.bundling.Jar
 class SupportJavaLibraryPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
+        project.apply<AndroidXPlugin>()
+
         val supportLibraryExtension = project.extensions.create("supportLibrary",
                 SupportLibraryExtension::class.java, project)
         apply(project, supportLibraryExtension)
@@ -51,14 +53,7 @@ class SupportJavaLibraryPlugin : Plugin<Project> {
             } else {
                 DiffAndDocs.registerJavaProject(project, supportLibraryExtension)
             }
-
-            project.tasks.withType(Jar::class.java) { jarTask ->
-                jarTask.setReproducibleFileOrder(true)
-                jarTask.setPreserveFileTimestamps(false)
-            }
         }
-
-        project.configureErrorProneForJava()
 
         setUpSourceJarTaskForJavaProject(project)
         CheckExternalDependencyLicensesTask.configure(project)

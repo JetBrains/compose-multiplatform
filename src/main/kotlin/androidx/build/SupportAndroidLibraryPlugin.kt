@@ -24,6 +24,7 @@ import com.android.build.gradle.tasks.GenerateBuildConfig
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.apply
 
 /**
  * Support library specific com.android.library plugin that sets common configurations needed for
@@ -32,6 +33,8 @@ import org.gradle.api.Project
 class SupportAndroidLibraryPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
+        project.apply<AndroidXPlugin>()
+
         val supportLibraryExtension = project.extensions.create("supportLibrary",
                 SupportLibraryExtension::class.java, project)
         apply(project, supportLibraryExtension)
@@ -137,7 +140,5 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
         project.configureLint(library.lintOptions, supportLibraryExtension)
 
         setUpSoureJarTaskForAndroidProject(project, library)
-
-        project.configureErrorProneForAndroid(library.libraryVariants)
     }
 }
