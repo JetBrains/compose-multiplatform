@@ -17,7 +17,6 @@
 package androidx.build
 
 import androidx.build.SupportConfig.INSTRUMENTATION_RUNNER
-import androidx.build.license.CheckExternalDependencyLicensesTask
 import com.android.build.gradle.AppExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
@@ -34,7 +33,6 @@ class SupportAndroidTestAppPlugin : Plugin<Project> {
 
         val testAppExtension = project.extensions.create("supportTestApp",
                 SupportAndroidTestAppExtension::class.java, project)
-        CheckExternalDependencyLicensesTask.configure(project)
         project.afterEvaluate {
             val application = project.extensions.findByType(AppExtension::class.java)
                     ?: throw Exception("Failed to find Android extension")

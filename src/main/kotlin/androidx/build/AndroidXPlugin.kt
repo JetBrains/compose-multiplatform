@@ -17,6 +17,7 @@
 package androidx.build
 
 import androidx.build.gradle.getByType
+import androidx.build.license.configureExternalDependencyLicenseCheck
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryExtension
@@ -52,6 +53,8 @@ class AndroidXPlugin : Plugin<Project> {
                 }
             }
         }
+
+        project.configureExternalDependencyLicenseCheck()
 
         // Disable timestamps and ensure filesystem-independent archive ordering to maximize
         // cross-machine byte-for-byte reproducibility of artifacts.

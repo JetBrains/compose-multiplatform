@@ -15,6 +15,7 @@
  */
 package androidx.build.license
 
+import androidx.build.gradle.getOrCreate
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -37,7 +38,7 @@ open class CheckExternalDependencyLicensesTask : DefaultTask() {
                 .get("supportRootFolder") as File
         val prebuiltsRoot = File(supportRoot, "../../prebuilts").canonicalFile
 
-        val checkerConfig = project.configurations.getByName(CONFIG)
+        val checkerConfig = project.configurations.getByName(CONFIGURATION_NAME)
 
         project
                 .configurations
@@ -97,16 +98,15 @@ open class CheckExternalDependencyLicensesTask : DefaultTask() {
     }
 
     companion object {
-        private const val CONFIG = "allExternalDependencies"
-        const val ROOT_TASK_NAME = "checkExternalLicenses"
-        private const val PER_PROJECT_TASK_NAME = ROOT_TASK_NAME
-        fun configure(project: Project) {
-            val task = project.tasks.create(PER_PROJECT_TASK_NAME,
-                    CheckExternalDependencyLicensesTask::class.java)
-            project.configurations.create(CONFIG)
-            val rootTask = project.rootProject.tasks.findByName(ROOT_TASK_NAME)
-                    ?: project.rootProject.tasks.create(ROOT_TASK_NAME)
-            rootTask.dependsOn(task)
-        }
+        internal const val CONFIGURATION_NAME = "allExternalDependencies"
+        const val TASK_NAME = "checkExternalLicenses"
     }
+}
+
+fun Project.configureExternalDependencyLicenseCheck() {
+    val task = tasks.create(CheckExternalDependencyLicensesTask.TASK_NAME,
+            CheckExternalDependencyLicensesTask::class.java)
+    configurations.create(CheckExternalDependencyLicensesTask.CONFIGURATION_NAME)
+    val rootTask = rootProject.tasks.getOrCreate(CheckExternalDependencyLicensesTask.TASK_NAME)
+    rootTask.dependsOn(task)
 }
