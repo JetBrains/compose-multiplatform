@@ -138,7 +138,5 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
                 SupportConfig.getKeystore(project)
 
         project.configureLint(library.lintOptions, supportLibraryExtension)
-
-        setUpSoureJarTaskForAndroidProject(project, library)
     }
 }

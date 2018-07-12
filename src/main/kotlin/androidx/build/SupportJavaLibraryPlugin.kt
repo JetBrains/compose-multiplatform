@@ -55,7 +55,6 @@ class SupportJavaLibraryPlugin : Plugin<Project> {
             }
         }
 
-        setUpSourceJarTaskForJavaProject(project)
         CheckExternalDependencyLicensesTask.configure(project)
     }
 }

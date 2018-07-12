@@ -22,7 +22,8 @@ import androidx.build.hasApiFolder
 import androidx.build.hasApiTasks
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Project
-import org.gradle.api.tasks.SourceSetContainer
+import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.kotlin.dsl.getPlugin
 
 object Metalava {
     fun registerAndroidProject(
@@ -83,8 +84,8 @@ object Metalava {
         val metalavaConfiguration = project.rootProject.configurations.getByName("metalava")
         val apiTxt = project.file("api/current.txt")
 
-        val sourceSets = project.properties["sourceSets"] as SourceSetContainer
-        val mainSourceSet = sourceSets.getByName("main")
+        val javaPluginConvention = project.convention.getPlugin<JavaPluginConvention>()
+        val mainSourceSet = javaPluginConvention.sourceSets.getByName("main")
 
         val checkApi = project.tasks.create("checkApi", CheckApiTask::class.java) { task ->
             task.configuration = metalavaConfiguration
