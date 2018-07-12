@@ -22,33 +22,34 @@ import com.android.builder.core.BuilderConstants
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.kotlin.dsl.getPlugin
 
 /**
  * Sets up a source jar task for an Android library project.
  */
-fun setUpSoureJarTaskForAndroidProject(project: Project, extension: LibraryExtension) {
-    // Create sources jar for release builds
-    extension.libraryVariants.all { libraryVariant ->
-        if (libraryVariant.buildType.name != BuilderConstants.RELEASE) {
+fun Project.configureSourceJarForAndroid(extension: LibraryExtension) {
+    extension.libraryVariants.all { variant ->
+        if (variant.buildType.name != BuilderConstants.RELEASE) {
             return@all // Skip non-release builds.
         }
 
-        val sourceJar = project.tasks.create("sourceJarRelease", Jar::class.java)
-        sourceJar.isPreserveFileTimestamps = false
-        sourceJar.classifier = "sources"
-        sourceJar.from(extension.sourceSets.findByName("main")!!.java.srcDirs)
-        project.artifacts.add("archives", sourceJar)
+        val sourceJar = tasks.create("sourceJar${variant.name.capitalize()}", Jar::class.java) {
+            it.classifier = "sources"
+            it.from(extension.sourceSets.getByName("main").java.srcDirs)
+        }
+        artifacts.add("archives", sourceJar)
     }
 }
 
 /**
  * Sets up a source jar task for a Java library project.
  */
-fun setUpSourceJarTaskForJavaProject(project: Project) {
-    val sourceJar = project.tasks.create("sourceJar", Jar::class.java)
-    sourceJar.isPreserveFileTimestamps = false
-    sourceJar.classifier = "sources"
-    val convention = project.convention.getPlugin(JavaPluginConvention::class.java)
-    sourceJar.from(convention.sourceSets.findByName("main")!!.allSource.srcDirs)
-    project.artifacts.add("archives", sourceJar)
+fun Project.configureSourceJarForJava() {
+    val sourceJar = tasks.create("sourceJar", Jar::class.java) {
+        it.classifier = "sources"
+
+        val convention = convention.getPlugin<JavaPluginConvention>()
+        it.from(convention.sourceSets.getByName("main").allSource.srcDirs)
+    }
+    artifacts.add("archives", sourceJar)
 }

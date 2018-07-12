@@ -39,10 +39,12 @@ class AndroidXPlugin : Plugin<Project> {
                 is JavaPlugin,
                 is JavaLibraryPlugin -> {
                     project.configureErrorProneForJava()
+                    project.configureSourceJarForJava()
                 }
                 is LibraryPlugin -> {
                     val extension = project.extensions.getByType<LibraryExtension>()
                     project.configureErrorProneForAndroid(extension.libraryVariants)
+                    project.configureSourceJarForAndroid(extension)
                 }
                 is AppPlugin -> {
                     val extension = project.extensions.getByType<AppExtension>()
