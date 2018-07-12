@@ -16,7 +16,6 @@
 
 package androidx.build
 
-import androidx.build.license.CheckExternalDependencyLicensesTask
 import androidx.build.metalava.Metalava
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
@@ -54,7 +53,5 @@ class SupportJavaLibraryPlugin : Plugin<Project> {
                 DiffAndDocs.registerJavaProject(project, supportLibraryExtension)
             }
         }
-
-        CheckExternalDependencyLicensesTask.configure(project)
     }
 }

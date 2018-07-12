@@ -17,7 +17,6 @@
 package androidx.build
 
 import androidx.build.SupportConfig.INSTRUMENTATION_RUNNER
-import androidx.build.license.CheckExternalDependencyLicensesTask
 import androidx.build.metalava.Metalava
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.tasks.GenerateBuildConfig
@@ -38,7 +37,6 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
         val supportLibraryExtension = project.extensions.create("supportLibrary",
                 SupportLibraryExtension::class.java, project)
         apply(project, supportLibraryExtension)
-        CheckExternalDependencyLicensesTask.configure(project)
         val isCoreSupportLibrary = project.rootProject.name == "support"
 
         project.afterEvaluate {
