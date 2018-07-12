@@ -53,7 +53,7 @@ fun Project.configureErrorProneForAndroid(variants: DomainObjectSet<out BaseVari
     }
 }
 
-fun Project.createErrorProneToolChain(): ErrorProneToolChain {
+private fun Project.createErrorProneToolChain(): ErrorProneToolChain {
     apply<ErrorProneBasePlugin>()
 
     val toolChain = ErrorProneToolChain.create(this)
@@ -63,7 +63,7 @@ fun Project.createErrorProneToolChain(): ErrorProneToolChain {
 }
 
 // Given an existing JavaCompile task, reconfigures the task to use the ErrorProne compiler
-fun JavaCompile.configureWithErrorProne(toolChain: ErrorProneToolChain) {
+private fun JavaCompile.configureWithErrorProne(toolChain: ErrorProneToolChain) {
     this.toolChain = toolChain
 
     val compilerArgs = this.options.compilerArgs
