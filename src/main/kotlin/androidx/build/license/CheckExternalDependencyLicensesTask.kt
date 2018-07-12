@@ -88,8 +88,8 @@ open class CheckExternalDependencyLicensesTask : DefaultTask() {
             }
 
             val found = folder.listFiles().firstOrNull {
-                it.name.toUpperCase().startsWith("NOTICE")
-                        || it.name.toUpperCase().startsWith("LICENSE")
+                it.name.startsWith("NOTICE", ignoreCase = true) ||
+                        it.name.startsWith("LICENSE", ignoreCase = true)
             }
             return found ?: recurse(folder.parentFile)
         }
