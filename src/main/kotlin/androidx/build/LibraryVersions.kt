@@ -85,7 +85,7 @@ object LibraryVersions {
     /**
      * Version code for WorkManager
      */
-    val WORKMANAGER = Version("1.0.0-alpha04")
+    val WORKMANAGER = Version("1.0.0-alpha05")
 
     /**
      * Version code for Jetifier
