@@ -17,10 +17,8 @@
 package androidx.build
 
 import androidx.build.metalava.Metalava
-import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.kotlin.dsl.apply
 
 /**
@@ -38,15 +36,6 @@ class SupportJavaLibraryPlugin : Plugin<Project> {
 
         project.apply(mapOf("plugin" to "java"))
         project.afterEvaluate {
-            val convention = project.convention.getPlugin(JavaPluginConvention::class.java)
-            if (supportLibraryExtension.java8Library) {
-                convention.sourceCompatibility = JavaVersion.VERSION_1_8
-                convention.targetCompatibility = JavaVersion.VERSION_1_8
-            } else {
-                convention.sourceCompatibility = JavaVersion.VERSION_1_7
-                convention.targetCompatibility = JavaVersion.VERSION_1_7
-            }
-
             if (supportLibraryExtension.useMetalava) {
                 Metalava.registerJavaProject(project, supportLibraryExtension)
             } else {

@@ -22,11 +22,15 @@ import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
+import org.gradle.api.JavaVersion.VERSION_1_7
+import org.gradle.api.JavaVersion.VERSION_1_8
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaLibraryPlugin
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.kotlin.dsl.getPlugin
 import org.gradle.kotlin.dsl.withType
 
 /**
@@ -41,11 +45,35 @@ class AndroidXPlugin : Plugin<Project> {
                 is JavaLibraryPlugin -> {
                     project.configureErrorProneForJava()
                     project.configureSourceJarForJava()
+
+                    project.convention.getPlugin<JavaPluginConvention>().apply {
+                        sourceCompatibility = VERSION_1_7
+                        targetCompatibility = VERSION_1_7
+                    }
                 }
                 is LibraryPlugin -> {
                     val extension = project.extensions.getByType<LibraryExtension>()
+
                     project.configureErrorProneForAndroid(extension.libraryVariants)
                     project.configureSourceJarForAndroid(extension)
+
+                    extension.compileOptions.apply {
+                        setSourceCompatibility(VERSION_1_7)
+                        setTargetCompatibility(VERSION_1_7)
+                    }
+
+                    project.afterEvaluate {
+                        // Java 8 is only fully supported on API 24+ and not all Java 8 features are
+                        // binary compatible with API < 24
+                        val compilesAgainstJava8 =
+                                extension.compileOptions.sourceCompatibility >= VERSION_1_8 ||
+                                        extension.compileOptions.targetCompatibility >= VERSION_1_8
+                        val minSdkLessThan24 = extension.defaultConfig.minSdkVersion.apiLevel < 24
+                        if (compilesAgainstJava8 && minSdkLessThan24) {
+                            throw IllegalArgumentException("Libraries can only support Java 8 if " +
+                                    "minSdkVersion is 24 or higher")
+                        }
+                    }
                 }
                 is AppPlugin -> {
                     val extension = project.extensions.getByType<AppExtension>()

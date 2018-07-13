@@ -20,7 +20,6 @@ import androidx.build.SupportConfig.INSTRUMENTATION_RUNNER
 import androidx.build.metalava.Metalava
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.tasks.GenerateBuildConfig
-import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
@@ -44,22 +43,6 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
                     ?: return@afterEvaluate
 
             library.defaultConfig.minSdkVersion(supportLibraryExtension.minSdkVersion)
-
-            // Java 8 is only fully supported on API 24+ and not all Java 8 features are binary
-            // compatible with API < 24, so use Java 7 for both source AND target.
-            val javaVersion: JavaVersion
-            if (supportLibraryExtension.java8Library) {
-                if (library.defaultConfig.minSdkVersion.apiLevel < 24) {
-                    throw IllegalArgumentException("Libraries can only support Java 8 if " +
-                            "minSdkVersion is 24 or higher")
-                }
-                javaVersion = JavaVersion.VERSION_1_8
-            } else {
-                javaVersion = JavaVersion.VERSION_1_7
-            }
-
-            library.compileOptions.setSourceCompatibility(javaVersion)
-            library.compileOptions.setTargetCompatibility(javaVersion)
 
             VersionFileWriterTask.setUpAndroidLibrary(project, library)
 

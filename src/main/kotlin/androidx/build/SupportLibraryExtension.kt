@@ -32,7 +32,6 @@ open class SupportLibraryExtension(val project: Project) {
     var inceptionYear: String? = null
     var url = SUPPORT_URL
     private var licenses: MutableCollection<License> = ArrayList()
-    var java8Library = false
     var publish = false
     var failOnUncheckedWarnings = true
     var failOnDeprecationWarnings = true
