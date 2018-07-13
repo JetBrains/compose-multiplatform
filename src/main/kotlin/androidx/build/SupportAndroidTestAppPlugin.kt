@@ -18,6 +18,7 @@ package androidx.build
 
 import androidx.build.SupportConfig.INSTRUMENTATION_RUNNER
 import com.android.build.gradle.AppExtension
+import com.android.build.gradle.AppPlugin
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -30,16 +31,7 @@ import org.gradle.kotlin.dsl.apply
 class SupportAndroidTestAppPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.apply<AndroidXPlugin>()
-
-        val testAppExtension = project.extensions.create("supportTestApp",
-                SupportAndroidTestAppExtension::class.java, project)
-        project.afterEvaluate {
-            val application = project.extensions.findByType(AppExtension::class.java)
-                    ?: throw Exception("Failed to find Android extension")
-            application.defaultConfig.minSdkVersion(testAppExtension.minSdkVersion)
-        }
-
-        project.apply(mapOf("plugin" to "com.android.application"))
+        project.apply<AppPlugin>()
 
         val application = project.extensions.findByType(AppExtension::class.java)
                 ?: throw Exception("Failed to find Android extension")

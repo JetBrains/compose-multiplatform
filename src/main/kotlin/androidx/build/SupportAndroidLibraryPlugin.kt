@@ -19,6 +19,7 @@ package androidx.build
 import androidx.build.SupportConfig.INSTRUMENTATION_RUNNER
 import androidx.build.metalava.Metalava
 import com.android.build.gradle.LibraryExtension
+import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.tasks.GenerateBuildConfig
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -41,8 +42,6 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
         project.afterEvaluate {
             val library = project.extensions.findByType(LibraryExtension::class.java)
                     ?: return@afterEvaluate
-
-            library.defaultConfig.minSdkVersion(supportLibraryExtension.minSdkVersion)
 
             VersionFileWriterTask.setUpAndroidLibrary(project, library)
 
@@ -67,7 +66,7 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
             }
         }
 
-        project.apply(mapOf("plugin" to "com.android.library"))
+        project.apply<LibraryPlugin>()
 
         project.afterEvaluate {
             project.tasks.all({

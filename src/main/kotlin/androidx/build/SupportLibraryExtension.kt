@@ -16,7 +16,6 @@
 
 package androidx.build
 
-import androidx.build.SupportConfig.DEFAULT_MIN_SDK_VERSION
 import groovy.lang.Closure
 import org.gradle.api.Project
 import java.util.ArrayList
@@ -44,11 +43,6 @@ open class SupportLibraryExtension(val project: Project) {
      * any api stability and don't expose any docs about them.
      */
     var toolingProject = false
-
-    /**
-     * If unset minSdkVersion will be [DEFAULT_MIN_SDK_VERSION].
-     */
-    var minSdkVersion: Int = DEFAULT_MIN_SDK_VERSION
 
     fun license(closure: Closure<*>): License {
         val license = project.configure(License(), closure) as License

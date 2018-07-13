@@ -16,10 +16,12 @@
 
 package androidx.build
 
+import androidx.build.SupportConfig.DEFAULT_MIN_SDK_VERSION
 import androidx.build.gradle.getByType
 import androidx.build.license.configureExternalDependencyLicenseCheck
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
+import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
 import org.gradle.api.JavaVersion.VERSION_1_7
@@ -56,6 +58,7 @@ class AndroidXPlugin : Plugin<Project> {
 
                     project.configureErrorProneForAndroid(extension.libraryVariants)
                     project.configureSourceJarForAndroid(extension)
+                    project.configureDefaultMinSdkVersion(extension)
 
                     extension.compileOptions.apply {
                         setSourceCompatibility(VERSION_1_7)
@@ -78,6 +81,7 @@ class AndroidXPlugin : Plugin<Project> {
                 is AppPlugin -> {
                     val extension = project.extensions.getByType<AppExtension>()
                     project.configureErrorProneForAndroid(extension.applicationVariants)
+                    project.configureDefaultMinSdkVersion(extension)
                 }
             }
         }
@@ -89,6 +93,17 @@ class AndroidXPlugin : Plugin<Project> {
         project.tasks.withType<Jar> {
             isReproducibleFileOrder = true
             isPreserveFileTimestamps = false
+        }
+    }
+
+    private fun Project.configureDefaultMinSdkVersion(extension: BaseExtension) {
+        extension.defaultConfig.minSdkVersion(DEFAULT_MIN_SDK_VERSION)
+
+        afterEvaluate {
+            val minSdkVersion = extension.defaultConfig.minSdkVersion.apiLevel
+            check(minSdkVersion >= DEFAULT_MIN_SDK_VERSION) {
+                "minSdkVersion $minSdkVersion lower than the default of $DEFAULT_MIN_SDK_VERSION"
+            }
         }
     }
 }
