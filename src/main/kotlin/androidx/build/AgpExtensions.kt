@@ -16,18 +16,15 @@
 
 package androidx.build
 
-import com.android.build.gradle.AppPlugin
-import org.gradle.api.Plugin
-import org.gradle.api.Project
-import org.gradle.kotlin.dsl.apply
+import com.android.build.gradle.AppExtension
+import com.android.build.gradle.BaseExtension
+import com.android.build.gradle.LibraryExtension
+import com.android.build.gradle.api.BaseVariant
+import org.gradle.api.DomainObjectSet
 
-/**
- * Support library specific com.android.application plugin that sets common configurations needed
- * for support library test apps.
- */
-class SupportAndroidTestAppPlugin : Plugin<Project> {
-    override fun apply(project: Project) {
-        project.apply<AndroidXPlugin>()
-        project.apply<AppPlugin>()
+val BaseExtension.variants: DomainObjectSet<out BaseVariant>
+    get() = when (this) {
+        is AppExtension -> applicationVariants
+        is LibraryExtension -> libraryVariants
+        else -> error("Unhandled plugin ${this::class.java}")
     }
-}

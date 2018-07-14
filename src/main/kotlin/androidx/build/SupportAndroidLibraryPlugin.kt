@@ -16,11 +16,9 @@
 
 package androidx.build
 
-import androidx.build.SupportConfig.INSTRUMENTATION_RUNNER
 import androidx.build.metalava.Metalava
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
-import com.android.build.gradle.tasks.GenerateBuildConfig
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
@@ -68,15 +66,6 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
 
         project.apply<LibraryPlugin>()
 
-        project.afterEvaluate {
-            project.tasks.all({
-                if (it is GenerateBuildConfig) {
-                    // Disable generating BuildConfig.java
-                    it.enabled = false
-                }
-            })
-        }
-
         project.configurations.all { configuration ->
             if (isCoreSupportLibrary && project.name != "annotations") {
                 // While this usually happens naturally due to normal project dependencies, force
@@ -99,23 +88,6 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
 
         val library = project.extensions.findByType(LibraryExtension::class.java)
                 ?: throw Exception("Failed to find Android extension")
-
-        library.compileSdkVersion(SupportConfig.CURRENT_SDK_VERSION)
-
-        library.buildToolsVersion = SupportConfig.BUILD_TOOLS_VERSION
-
-        // Update the version meta-data in each Manifest.
-        library.defaultConfig.addManifestPlaceholders(
-                mapOf("target-sdk-version" to SupportConfig.CURRENT_SDK_VERSION))
-
-        // Set test runner.
-        library.defaultConfig.testInstrumentationRunner = INSTRUMENTATION_RUNNER
-
-        library.testOptions.unitTests.isReturnDefaultValues = true
-
-        // Use a local debug keystore to avoid build server issues.
-        library.signingConfigs.findByName("debug")?.storeFile =
-                SupportConfig.getKeystore(project)
 
         project.configureLint(library.lintOptions, supportLibraryExtension)
     }

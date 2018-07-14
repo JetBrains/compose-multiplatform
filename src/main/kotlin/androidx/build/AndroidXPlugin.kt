@@ -16,7 +16,10 @@
 
 package androidx.build
 
+import androidx.build.SupportConfig.BUILD_TOOLS_VERSION
+import androidx.build.SupportConfig.CURRENT_SDK_VERSION
 import androidx.build.SupportConfig.DEFAULT_MIN_SDK_VERSION
+import androidx.build.SupportConfig.INSTRUMENTATION_RUNNER
 import androidx.build.gradle.getByType
 import androidx.build.license.configureExternalDependencyLicenseCheck
 import com.android.build.gradle.AppExtension
@@ -58,7 +61,7 @@ class AndroidXPlugin : Plugin<Project> {
 
                     project.configureErrorProneForAndroid(extension.libraryVariants)
                     project.configureSourceJarForAndroid(extension)
-                    project.configureDefaultMinSdkVersion(extension)
+                    project.configureAndroidCommonOptions(extension)
 
                     extension.compileOptions.apply {
                         setSourceCompatibility(VERSION_1_7)
@@ -81,7 +84,8 @@ class AndroidXPlugin : Plugin<Project> {
                 is AppPlugin -> {
                     val extension = project.extensions.getByType<AppExtension>()
                     project.configureErrorProneForAndroid(extension.applicationVariants)
-                    project.configureDefaultMinSdkVersion(extension)
+                    project.configureAndroidCommonOptions(extension)
+                    project.configureAndroidApplicationOptions(extension)
                 }
             }
         }
@@ -96,13 +100,53 @@ class AndroidXPlugin : Plugin<Project> {
         }
     }
 
-    private fun Project.configureDefaultMinSdkVersion(extension: BaseExtension) {
-        extension.defaultConfig.minSdkVersion(DEFAULT_MIN_SDK_VERSION)
+    private fun Project.configureAndroidCommonOptions(extension: BaseExtension) {
+        extension.compileSdkVersion(CURRENT_SDK_VERSION)
+        extension.buildToolsVersion = BUILD_TOOLS_VERSION
 
+        // Expose the compilation SDK for use as the target SDK in test manifests.
+        extension.defaultConfig.addManifestPlaceholders(
+                mapOf("target-sdk-version" to CURRENT_SDK_VERSION))
+
+        extension.defaultConfig.testInstrumentationRunner = INSTRUMENTATION_RUNNER
+        extension.testOptions.unitTests.isReturnDefaultValues = true
+
+        extension.defaultConfig.minSdkVersion(DEFAULT_MIN_SDK_VERSION)
         afterEvaluate {
             val minSdkVersion = extension.defaultConfig.minSdkVersion.apiLevel
             check(minSdkVersion >= DEFAULT_MIN_SDK_VERSION) {
                 "minSdkVersion $minSdkVersion lower than the default of $DEFAULT_MIN_SDK_VERSION"
+            }
+        }
+
+        // Use a local debug keystore to avoid build server issues.
+        extension.signingConfigs.getByName("debug").storeFile = SupportConfig.getKeystore(this)
+
+        // Disable generating BuildConfig.java
+        extension.variants.all {
+            it.generateBuildConfig.enabled = false
+        }
+    }
+
+    private fun Project.configureAndroidApplicationOptions(extension: AppExtension) {
+        extension.defaultConfig.apply {
+            targetSdkVersion(CURRENT_SDK_VERSION)
+
+            versionCode = 1
+            versionName = "1.0"
+        }
+
+        extension.compileOptions.apply {
+            setSourceCompatibility(VERSION_1_8)
+            setTargetCompatibility(VERSION_1_8)
+        }
+
+        extension.lintOptions.apply {
+            isAbortOnError = true
+
+            val baseline = lintBaseline
+            if (baseline.exists()) {
+                baseline(baseline)
             }
         }
     }
