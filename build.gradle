@@ -3,10 +3,7 @@ buildscript {
     apply from: "unbundled_check.gradle"
     repositories {
         maven {
-            url "${supportRootFolder}/../../prebuilts/tools/common/m2/repository"
-        }
-        maven {
-            url "${supportRootFolder}/../../prebuilts/gradle-plugin"
+            url "${supportRootFolder}/../../prebuilts/androidx/external"
         }
         if (isUnbundledBuild(supportRootFolder)) {
             jcenter()
