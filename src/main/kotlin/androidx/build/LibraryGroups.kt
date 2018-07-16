@@ -23,6 +23,7 @@ object LibraryGroups {
     const val ANNOTATION = "androidx.annotation"
     const val APPCOMPAT = "androidx.appcompat"
     const val ASYNCLAYOUTINFLATER = "androidx.asynclayoutinflater"
+    const val BIOMETRIC = "androidx.biometric"
     const val BROWSER = "androidx.browser"
     const val BENCHMARK = "androidx.benchmark"
     const val CAR = "androidx.car"
