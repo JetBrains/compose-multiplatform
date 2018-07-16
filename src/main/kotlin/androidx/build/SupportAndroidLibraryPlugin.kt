@@ -35,7 +35,6 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
         val supportLibraryExtension = project.extensions.create("supportLibrary",
                 SupportLibraryExtension::class.java, project)
         apply(project, supportLibraryExtension)
-        val isCoreSupportLibrary = project.rootProject.name == "support"
 
         project.afterEvaluate {
             val library = project.extensions.findByType(LibraryExtension::class.java)
@@ -65,26 +64,6 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
         }
 
         project.apply<LibraryPlugin>()
-
-        project.configurations.all { configuration ->
-            if (isCoreSupportLibrary && project.name != "annotations") {
-                // While this usually happens naturally due to normal project dependencies, force
-                // evaluation on the annotations project in case the below substitution is the only
-                // dependency to this project. See b/70650240 on what happens when this is missing.
-                project.evaluationDependsOn(":annotation")
-
-                // In projects which compile as part of the "core" support libraries (which include
-                // the annotations), replace any transitive pointer to the deployed Maven
-                // coordinate version of annotations with a reference to the local project. These
-                // usually originate from test dependencies and otherwise cause multiple copies on
-                // the classpath. We do not do this for non-"core" projects as they need to
-                // depend on the Maven coordinate variant.
-                configuration.resolutionStrategy.dependencySubstitution.apply {
-                    substitute(module("androidx.annotation:annotation"))
-                            .with(project(":annotation"))
-                }
-            }
-        }
 
         val library = project.extensions.findByType(LibraryExtension::class.java)
                 ?: throw Exception("Failed to find Android extension")

@@ -58,32 +58,12 @@ class AndroidXPlugin : Plugin<Project> {
                 }
                 is LibraryPlugin -> {
                     val extension = project.extensions.getByType<LibraryExtension>()
-
-                    project.configureErrorProneForAndroid(extension.libraryVariants)
                     project.configureSourceJarForAndroid(extension)
                     project.configureAndroidCommonOptions(extension)
-
-                    extension.compileOptions.apply {
-                        setSourceCompatibility(VERSION_1_7)
-                        setTargetCompatibility(VERSION_1_7)
-                    }
-
-                    project.afterEvaluate {
-                        // Java 8 is only fully supported on API 24+ and not all Java 8 features are
-                        // binary compatible with API < 24
-                        val compilesAgainstJava8 =
-                                extension.compileOptions.sourceCompatibility >= VERSION_1_8 ||
-                                        extension.compileOptions.targetCompatibility >= VERSION_1_8
-                        val minSdkLessThan24 = extension.defaultConfig.minSdkVersion.apiLevel < 24
-                        if (compilesAgainstJava8 && minSdkLessThan24) {
-                            throw IllegalArgumentException("Libraries can only support Java 8 if " +
-                                    "minSdkVersion is 24 or higher")
-                        }
-                    }
+                    project.configureAndroidLibraryOptions(extension)
                 }
                 is AppPlugin -> {
                     val extension = project.extensions.getByType<AppExtension>()
-                    project.configureErrorProneForAndroid(extension.applicationVariants)
                     project.configureAndroidCommonOptions(extension)
                     project.configureAndroidApplicationOptions(extension)
                 }
@@ -125,6 +105,48 @@ class AndroidXPlugin : Plugin<Project> {
         // Disable generating BuildConfig.java
         extension.variants.all {
             it.generateBuildConfig.enabled = false
+        }
+
+        configureErrorProneForAndroid(extension.variants)
+    }
+
+    private fun Project.configureAndroidLibraryOptions(extension: LibraryExtension) {
+        extension.compileOptions.apply {
+            setSourceCompatibility(VERSION_1_7)
+            setTargetCompatibility(VERSION_1_7)
+        }
+
+        afterEvaluate {
+            // Java 8 is only fully supported on API 24+ and not all Java 8 features are
+            // binary compatible with API < 24
+            val compilesAgainstJava8 = extension.compileOptions.sourceCompatibility > VERSION_1_7 ||
+                    extension.compileOptions.targetCompatibility > VERSION_1_7
+            val minSdkLessThan24 = extension.defaultConfig.minSdkVersion.apiLevel < 24
+            if (compilesAgainstJava8 && minSdkLessThan24) {
+                throw IllegalArgumentException(
+                        "Libraries can only support Java 8 if minSdkVersion is 24 or higher")
+            }
+        }
+
+        val isCoreSupportLibrary = rootProject.name == "support"
+        configurations.all { configuration ->
+            if (isCoreSupportLibrary && name != "annotations") {
+                // While this usually happens naturally due to normal project dependencies, force
+                // evaluation on the annotations project in case the below substitution is the only
+                // dependency to this project. See b/70650240 on what happens when this is missing.
+                evaluationDependsOn(":annotation")
+
+                // In projects which compile as part of the "core" support libraries (which include
+                // the annotations), replace any transitive pointer to the deployed Maven
+                // coordinate version of annotations with a reference to the local project. These
+                // usually originate from test dependencies and otherwise cause multiple copies on
+                // the classpath. We do not do this for non-"core" projects as they need to
+                // depend on the Maven coordinate variant.
+                configuration.resolutionStrategy.dependencySubstitution.apply {
+                    substitute(module("androidx.annotation:annotation"))
+                            .with(project(":annotation"))
+                }
+            }
         }
     }
 
