@@ -82,8 +82,8 @@ val RELEASE_RULE = docsRules("public") {
     prebuilts(LibraryGroups.LIFECYCLE, flatfootVersion)
     prebuilts(LibraryGroups.ARCH_CORE, flatfootVersion)
     prebuilts(LibraryGroups.PAGING, flatfootVersion)
-    prebuilts(LibraryGroups.NAVIGATION, "1.0.0-alpha01")
-    prebuilts(LibraryGroups.WORKMANAGER, "1.0.0-alpha02")
+    prebuilts(LibraryGroups.NAVIGATION, "1.0.0-alpha03")
+    prebuilts(LibraryGroups.WORKMANAGER, "1.0.0-alpha04")
     default(Ignore)
 }
 
