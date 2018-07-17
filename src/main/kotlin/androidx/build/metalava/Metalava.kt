@@ -22,10 +22,18 @@ import androidx.build.hasApiFolder
 import androidx.build.hasApiTasks
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.kotlin.dsl.getPlugin
 
 object Metalava {
+    private fun Project.createMetalavaConfiguration(): Configuration {
+        return configurations.create("metalava") {
+            val dependency = dependencies.create("com.android:metalava:1.0.0-SNAPSHOT:shadow@jar")
+            it.dependencies.add(dependency)
+        }
+    }
+
     fun registerAndroidProject(
         project: Project,
         library: LibraryExtension,
@@ -35,6 +43,8 @@ object Metalava {
             return
         }
 
+        val metalavaConfiguration = project.createMetalavaConfiguration()
+
         library.libraryVariants.all { variant ->
             if (variant.name == "release") {
                 if (!project.hasApiFolder()) {
@@ -43,7 +53,6 @@ object Metalava {
                     return@all
                 }
 
-                val metalavaConfiguration = project.rootProject.configurations.getByName("metalava")
                 val apiTxt = project.file("api/current.txt")
 
                 val checkApi = project.tasks.create("checkApi", CheckApiTask::class.java) { task ->
@@ -81,7 +90,7 @@ object Metalava {
             return
         }
 
-        val metalavaConfiguration = project.rootProject.configurations.getByName("metalava")
+        val metalavaConfiguration = project.createMetalavaConfiguration()
         val apiTxt = project.file("api/current.txt")
 
         val javaPluginConvention = project.convention.getPlugin<JavaPluginConvention>()
