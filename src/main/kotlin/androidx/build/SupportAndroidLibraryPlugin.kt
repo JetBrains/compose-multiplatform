@@ -34,7 +34,7 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
 
         val supportLibraryExtension = project.extensions.create("supportLibrary",
                 SupportLibraryExtension::class.java, project)
-        apply(project, supportLibraryExtension)
+        project.configureMavenArtifactUpload(supportLibraryExtension)
 
         project.afterEvaluate {
             val library = project.extensions.findByType(LibraryExtension::class.java)

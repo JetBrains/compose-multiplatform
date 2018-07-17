@@ -32,7 +32,7 @@ class SupportJavaLibraryPlugin : Plugin<Project> {
 
         val supportLibraryExtension = project.extensions.create("supportLibrary",
                 SupportLibraryExtension::class.java, project)
-        apply(project, supportLibraryExtension)
+        project.configureMavenArtifactUpload(supportLibraryExtension)
 
         project.apply(mapOf("plugin" to "java"))
         project.afterEvaluate {

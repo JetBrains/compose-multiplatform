@@ -24,26 +24,26 @@ import org.gradle.api.tasks.Upload
 import org.gradle.kotlin.dsl.withGroovyBuilder
 import java.io.File
 
-fun apply(project: Project, extension: SupportLibraryExtension) {
-    project.afterEvaluate {
+fun Project.configureMavenArtifactUpload(extension: SupportLibraryExtension) {
+    afterEvaluate {
         if (extension.publish) {
             if (extension.mavenGroup == null) {
-                throw Exception("You must specify mavenGroup for ${project.name}  project")
+                throw Exception("You must specify mavenGroup for $name project")
             }
             if (extension.mavenVersion == null) {
-                throw Exception("You must specify mavenVersion for ${project.name}  project")
+                throw Exception("You must specify mavenVersion for $name project")
             }
-            project.group = extension.mavenGroup!!
-            project.version = extension.mavenVersion.toString()
+            group = extension.mavenGroup!!
+            version = extension.mavenVersion.toString()
         }
     }
 
-    project.apply(mapOf("plugin" to "maven"))
+    apply(mapOf("plugin" to "maven"))
 
     // Set uploadArchives options.
-    val uploadTask = project.tasks.getByName("uploadArchives") as Upload
+    val uploadTask = tasks.getByName("uploadArchives") as Upload
 
-    val repo = project.uri(project.rootProject.property("supportRepoOut") as File)
+    val repo = uri(rootProject.property("supportRepoOut") as File)
             ?: throw Exception("supportRepoOut not set")
 
     uploadTask.repositories {
@@ -54,7 +54,7 @@ fun apply(project: Project, extension: SupportLibraryExtension) {
         }
     }
 
-    project.afterEvaluate {
+    afterEvaluate {
         if (extension.publish) {
             uploadTask.repositories.withType(MavenDeployer::class.java) { mavenDeployer ->
                 mavenDeployer.isUniqueVersion = true
@@ -98,9 +98,9 @@ fun apply(project: Project, extension: SupportLibraryExtension) {
                 // https://github.com/gradle/gradle/issues/3170
                 uploadTask.doFirst {
                     val allDeps = HashSet<ProjectDependency>()
-                    collectDependenciesForConfiguration(allDeps, project, "api")
-                    collectDependenciesForConfiguration(allDeps, project, "implementation")
-                    collectDependenciesForConfiguration(allDeps, project, "compile")
+                    collectDependenciesForConfiguration(allDeps, this, "api")
+                    collectDependenciesForConfiguration(allDeps, this, "implementation")
+                    collectDependenciesForConfiguration(allDeps, this, "compile")
 
                     mavenDeployer.getPom().whenConfigured {
                         it.dependencies.forEach { dep ->
@@ -126,7 +126,7 @@ fun apply(project: Project, extension: SupportLibraryExtension) {
             }
 
             // Register it as part of release so that we create a Zip file for it
-            Release.register(project, extension)
+            Release.register(this, extension)
         } else {
             uploadTask.enabled = false
         }
