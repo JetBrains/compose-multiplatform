@@ -347,14 +347,8 @@ def configureSubProjects() {
     }
 }
 
-def setupRelease() {
-    // needed for jetify since it accesses the task name directly
-    Release.createGlobalArchiveTask(rootProject)
-}
-
 ext.init.enableDoclavaAndJDiff = this.&enableDoclavaAndJDiff
 ext.init.setSdkInLocalPropertiesFile = this.&setSdkInLocalPropertiesFile
 ext.init.setupRepoOutAndBuildNumber = this.&setupRepoOutAndBuildNumber
-ext.init.setupRelease = this.&setupRelease
 ext.init.configureSubProjects = this.&configureSubProjects
 ext.init.configureBuildOnServer = this.&configureBuildOnServer

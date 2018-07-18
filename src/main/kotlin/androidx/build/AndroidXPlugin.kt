@@ -21,6 +21,7 @@ import androidx.build.SupportConfig.CURRENT_SDK_VERSION
 import androidx.build.SupportConfig.DEFAULT_MIN_SDK_VERSION
 import androidx.build.SupportConfig.INSTRUMENTATION_RUNNER
 import androidx.build.gradle.getByType
+import androidx.build.gradle.isRoot
 import androidx.build.license.configureExternalDependencyLicenseCheck
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
@@ -44,6 +45,10 @@ import org.gradle.kotlin.dsl.withType
  */
 class AndroidXPlugin : Plugin<Project> {
     override fun apply(project: Project) {
+        if (project.isRoot) {
+            project.configureRootProject()
+        }
+
         project.plugins.all {
             when (it) {
                 is JavaPlugin,
@@ -78,6 +83,10 @@ class AndroidXPlugin : Plugin<Project> {
             isReproducibleFileOrder = true
             isPreserveFileTimestamps = false
         }
+    }
+
+    private fun Project.configureRootProject() {
+        Release.createGlobalArchiveTask(this)
     }
 
     private fun Project.configureAndroidCommonOptions(extension: BaseExtension) {
