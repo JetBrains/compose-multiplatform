@@ -108,6 +108,11 @@ class AndroidXPlugin : Plugin<Project> {
         }
 
         configureErrorProneForAndroid(extension.variants)
+
+        // Enable code coverage for debug builds only if we are not running inside the IDE, since
+        // enabling coverage reports breaks the method parameter resolution in the IDE debugger.
+        extension.buildTypes.getByName("debug").isTestCoverageEnabled =
+                !hasProperty("android.injected.invoked.from.ide")
     }
 
     private fun Project.configureAndroidLibraryOptions(extension: LibraryExtension) {

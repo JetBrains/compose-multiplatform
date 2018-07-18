@@ -234,12 +234,6 @@ def configureSubProjects() {
             def isAndroidApp = "com.android.build.gradle.AppPlugin".equals(plugin.class.name)
 
             if (isAndroidLibrary || isAndroidApp) {
-                // Enable code coverage for debug builds only if we are not running inside the IDE,
-                // since enabling coverage reports breaks the method parameter resolution in the IDE
-                // debugger.
-                project.android.buildTypes.debug.testCoverageEnabled =
-                        !project.hasProperty('android.injected.invoked.from.ide')
-
                 // Copy the class files in a jar to be later used to generate code coverage report
                 project.android.testVariants.all { v ->
                     // check if the variant has any source files
