@@ -16,7 +16,7 @@
 
 package androidx.build.dependencies
 
-const val AUTO_COMMON = "com.google.auto:auto-common:0.6"
+const val AUTO_COMMON = "com.google.auto:auto-common:0.10"
 const val ANTLR = "org.antlr:antlr4:4.5.3"
 const val APACHE_COMMONS_CODEC = "commons-codec:commons-codec:1.10"
 const val CONSTRAINT_LAYOUT = "androidx.constraintlayout:constraintlayout:1.1.0@aar"
