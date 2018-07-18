@@ -9,9 +9,10 @@ import org.jetbrains.kotlin.psi.KtxElement
 import org.jetbrains.kotlin.psi.psiUtil.endOffset
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
 
-class IrKtxTag(val element: KtxElement, val body: Collection<IrStatement>?, val attributes: Collection<IrKtxAttribute>, val openTagExpr: IrExpression?) : IrKtxStatement {
+class IrKtxTag(val element: KtxElement, var body: Collection<IrStatement>?, var attributes: Collection<IrKtxAttribute>, val openTagExpr: IrExpression?) : IrKtxStatement {
     override val startOffset = element.startOffset
     override val endOffset = element.endOffset
+    val bodyLambdaPsi by lazy { element.bodyLambda }
     override fun <R, D> accept(visitor: IrElementVisitor<R, D>, data: D): R {
         return visitor.visitKtxStatement(this, data);
     }
@@ -20,9 +21,11 @@ class IrKtxTag(val element: KtxElement, val body: Collection<IrStatement>?, val 
             openTagExpr.accept(visitor, data)
         }
         for(attribute in attributes) attribute.accept(visitor, data)
-        if(body != null) for(statement in body) statement.accept(visitor, data)
+        body?.let { body -> for(statement in body) statement.accept(visitor, data) }
     }
+
     override fun <D> transformChildren(transformer: IrElementTransformer<D>, data: D) {
-        throw UnsupportedOperationException("This temporary placeholder node must be manually transformed, not visited")
+        this.body = body?.map { it.transform(transformer, data) }
+        this.attributes = attributes.map { IrKtxAttribute(it.element, it.value?.transform(transformer, data)) }
     }
 }

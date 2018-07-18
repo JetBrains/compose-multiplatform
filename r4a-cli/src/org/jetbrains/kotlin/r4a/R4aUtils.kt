@@ -3,6 +3,7 @@ package org.jetbrains.kotlin.r4a
 import com.intellij.util.SmartList
 import com.intellij.util.containers.SLRUCache
 import com.intellij.util.containers.hash.EqualityPolicy
+import org.jetbrains.kotlin.builtins.extractParameterNameFromFunctionTypeArgument
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.builtins.getReturnTypeFromFunctionType
 import org.jetbrains.kotlin.builtins.getValueParameterTypesFromFunctionType
@@ -178,7 +179,7 @@ object R4aUtils {
                 if (type != null && type.getReturnTypeFromFunctionType().isUnit()) {
                     return type.getValueParameterTypesFromFunctionType().mapIndexed { index, param ->
                         AttributeInfo(
-                            name = "arg$index",
+                            name = param.type.extractParameterNameFromFunctionTypeArgument()?.identifier ?: "arg$index",
                             required = true,
                             type = param.type,
                             descriptor = descriptor
