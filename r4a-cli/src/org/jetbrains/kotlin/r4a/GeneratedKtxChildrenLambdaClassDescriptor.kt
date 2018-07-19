@@ -1,5 +1,7 @@
 package org.jetbrains.kotlin.r4a
 
+import org.jetbrains.annotations.NotNull
+import org.jetbrains.annotations.Nullable
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptorImpl
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
@@ -20,7 +22,7 @@ import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.utils.Printer
 
-open class GeneratedKtxChildrenLambdaClassDescriptor(private val module: ModuleDescriptor, private val containingDeclaration: ClassDescriptor): ClassDescriptor {
+open class GeneratedKtxChildrenLambdaClassDescriptor(private val module: ModuleDescriptor, private val containingDeclaration: ClassDescriptor, private val variablesToCapture: List<KotlinType>, private val parameters: List<KotlinType>): ClassDescriptor {
 
     companion object {
         var index = 1
@@ -43,12 +45,28 @@ open class GeneratedKtxChildrenLambdaClassDescriptor(private val module: ModuleD
     private var unsubstitutedPrimaryConstructor: ClassConstructorDescriptor? = null
 
     init {
-        val functionNInterface = module.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("kotlin.jvm.functions.Function0")))!!.defaultType
+        val functionNInterface = module.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("kotlin.jvm.functions.Function"+parameters.size)))!!.defaultType
         initialize(emptyList(), listOf(functionNInterface))
     }
 
+    val capturedAccessesAsProperties by lazy {
+        variablesToCapture.mapIndexed { index, type ->
+            PropertyDescriptorImpl.create(this, Annotations.EMPTY, Modality.FINAL, Visibilities.PRIVATE, false, Name.identifier("p"+index), CallableMemberDescriptor.Kind.SYNTHESIZED, SourceElement.NO_SOURCE, false, false, true, true, false, false).apply {
+                setType(type, emptyList<TypeParameterDescriptor>(), thisAsReceiverParameter, null as ReceiverParameterDescriptor?)
+                initialize(
+                    PropertyGetterDescriptorImpl(this, Annotations.EMPTY, Modality.FINAL, Visibilities.PRIVATE, false, false, false, CallableMemberDescriptor.Kind.SYNTHESIZED, null, SourceElement.NO_SOURCE).apply {
+                        initialize(type)
+                    },
+                    PropertySetterDescriptorImpl(this, Annotations.EMPTY, Modality.FINAL, Visibilities.PRIVATE, false, false, false, CallableMemberDescriptor.Kind.SYNTHESIZED, null, SourceElement.NO_SOURCE).apply {
+                        initializeDefault()
+                    }
+                )
+            }
+        }
+    }
+
     val invokeDescriptor by lazy {
-        val functionNInterface = module.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("kotlin.jvm.functions.Function0")))!!
+        val functionNInterface = module.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("kotlin.jvm.functions.Function"+parameters.size)))!!
         val overridenMethod = functionNInterface.unsubstitutedMemberScope.getContributedFunctions(Name.identifier("invoke"), NoLookupLocation.FROM_BACKEND).single()
         val newMethod = SimpleFunctionDescriptorImpl.create(
             this,
@@ -59,11 +77,23 @@ open class GeneratedKtxChildrenLambdaClassDescriptor(private val module: ModuleD
         )
         newMethod.setSingleOverridden(overridenMethod)
 
+
+        val parameters = parameters.mapIndexed({ index, parameterType ->
+                                                           ValueParameterDescriptorImpl(
+                                                               newMethod,
+                                                               null, index, Annotations.EMPTY,
+                                                               Name.identifier("p"+index),
+                                                               parameterType,
+                                                               false,
+                                                               false,
+                                                               false, null, SourceElement.NO_SOURCE)
+                                                       })
+
         newMethod.initialize(
             null,
             this.thisAsReceiverParameter,
             emptyList(),
-            emptyList(),
+            parameters,
             builtIns.unitType,
             Modality.OPEN,
             Visibilities.PUBLIC
@@ -111,7 +141,7 @@ open class GeneratedKtxChildrenLambdaClassDescriptor(private val module: ModuleD
             }
 
             override fun getContributedVariables(name: Name, location: LookupLocation): Collection<PropertyDescriptor> {
-                return emptyList()
+                return capturedAccessesAsProperties
             }
 
             override fun getContributedFunctions(name: Name, location: LookupLocation): Collection<SimpleFunctionDescriptor> {
@@ -134,6 +164,9 @@ open class GeneratedKtxChildrenLambdaClassDescriptor(private val module: ModuleD
     override fun getUnsubstitutedMemberScope(): MemberScope = genScope()
 
     override fun getUnsubstitutedPrimaryConstructor(): ClassConstructorDescriptor {
+
+
+
         unsubstitutedPrimaryConstructor?.let { return it }
         val constructor = ClassConstructorDescriptorImpl.create(
             this,
@@ -141,23 +174,20 @@ open class GeneratedKtxChildrenLambdaClassDescriptor(private val module: ModuleD
             false,
             SourceElement.NO_SOURCE
         )
-        /*
-        val contextParameter = ValueParameterDescriptorImpl(
-            constructor,
-            null, 0, Annotations.EMPTY,
-            Name.identifier("context"),
-            containingDeclaration.module.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("android.content.Context")))!!.defaultType,
-            false,
-            false,
-            false, null, SourceElement.NO_SOURCE)
-        constructor.initialize(
-            listOf(contextParameter),
-            Visibilities.PUBLIC
-        )
-*/
+
+        val parameters = variablesToCapture.mapIndexed { index, parameterType ->
+            ValueParameterDescriptorImpl(
+                constructor,
+                null, index, Annotations.EMPTY,
+                Name.identifier("p"+index),
+                parameterType,
+                false,
+                false,
+                false, null, SourceElement.NO_SOURCE)
+        }
 
         constructor.initialize(
-            emptyList(),
+            parameters,
             Visibilities.PUBLIC
         )
 
@@ -194,7 +224,7 @@ open class GeneratedKtxChildrenLambdaClassDescriptor(private val module: ModuleD
         visitor.visitClassDescriptor(this, null)
     }
 
-    override fun toString(): String = "GeneratedViewClassDescriptor($fqNameUnsafe)"
+    override fun toString(): String = "GeneratedChildrenLambdaClassDescriptor($fqNameUnsafe)"
 
     var instanceCreatorFunction: SimpleFunctionDescriptor? = null;
     fun getInstanceCreatorFunction(componentClassDescriptor: ClassDescriptor) : SimpleFunctionDescriptor {

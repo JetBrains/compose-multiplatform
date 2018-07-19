@@ -12,8 +12,11 @@ import org.jetbrains.kotlin.ir.declarations.impl.IrFunctionImpl
 import org.jetbrains.kotlin.ir.descriptors.IrTemporaryVariableDescriptorImpl
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.*
+import org.jetbrains.kotlin.ir.symbols.IrValueSymbol
+import org.jetbrains.kotlin.ir.symbols.IrVariableSymbol
 import org.jetbrains.kotlin.ir.util.withScope
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
+import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
@@ -30,6 +33,7 @@ import org.jetbrains.kotlin.types.typeUtil.makeNullable
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 import java.security.MessageDigest
+import java.util.*
 
 /**
  * Creates synthetics and applies KTX lowering on a class-component.
@@ -344,14 +348,43 @@ private fun transform(
             ComposableType.COMPONENT -> {
                 val childrenAttributeInfo = context.bindingContext.get(R4AWritableSlices.KTX_TAG_CHILDRENLAMBDA, tag.element)
 
-                val childrenLambdaIrClass = generateChildrenLambda(context, containingClass.descriptor, tag.body)
+
+
+                val symbolsDefined = mutableSetOf<IrVariableSymbol>()
+                val symbolAccesses = mutableSetOf<IrValueAccessExpression>()
+                for(statement in tag.body!!)
+                    statement.accept(object : IrElementVisitorVoid {
+                        override fun visitElement(element: IrElement) {
+                            element.acceptChildren(this, null)
+                        }
+                        override fun visitVariable(declaration: IrVariable) {
+                            symbolsDefined.add(declaration.symbol)
+                        }
+                        override fun visitVariableAccess(expression: IrValueAccessExpression) {
+                            symbolAccesses.add(expression)
+                        }
+                        override fun visitKtxStatement(expression: IrKtxStatement, data: Nothing?) {
+                            expression.acceptChildren(this, data)
+                        }
+                    }, null)
+
+                    val accessesToCapture = symbolAccesses.filter { !symbolsDefined.contains(it.symbol) }.toList()
+
+
+
+
+
+
+                val childrenLambdaIrClass = generateChildrenLambda(context, containingClass.descriptor, accessesToCapture, tag.bodyLambdaPsi!!, tag.body!!)
                 lowerComposeFunction(context, childrenLambdaIrClass, childrenLambdaIrClass.declarations.single { it is IrFunctionImpl && it.name.identifier == "invoke" } as IrFunction)
                 containingClass.declarations.add(childrenLambdaIrClass)
 
                 val lambdaConstructorCall = IrCallImpl(
                     element.startOffset, element.endOffset,
                     (childrenLambdaIrClass.declarations.single { it is IrConstructor } as IrConstructorImpl).symbol
-                )
+                ).apply {
+                    accessesToCapture.forEachIndexed({ index, value -> putValueArgument(index, value) })
+                }
 
                 val attributeSetterCall = IrCallImpl(
                     element.startOffset, element.endOffset,
@@ -367,7 +400,7 @@ private fun transform(
                 output.add(attributeSetterCall)
             }
             ComposableType.VIEW -> {
-                for (statement in tag.body) {
+                for (statement in tag.body!!) {
                     if (statement is IrKtxTag) output.addAll(transform(context, containingClass, statement, helper))
                     else output.add(statement)
                 }

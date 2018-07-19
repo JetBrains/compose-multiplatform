@@ -3,7 +3,6 @@ package org.jetbrains.kotlin.r4a
 import org.jetbrains.kotlin.extensions.KtxTypeResolutionExtension
 import org.jetbrains.kotlin.psi2ir.extensions.SyntheticIrExtension
 import org.jetbrains.kotlin.resolve.extensions.SyntheticResolveExtension
-import java.io.File
 
 class KtxTransformationTest: AbstractCodeGenTest() {
 
@@ -382,15 +381,15 @@ class KtxTransformationTest: AbstractCodeGenTest() {
 
         class HelperComponent : Component() {
             @Children lateinit var children: ()->Unit
-            public override fun compose() {
+            override fun compose() {
                 val children = this.children
                 <children />
             }
         }
 
         class MainComponent : Component() {
-            public var name = "World"
-            public override fun compose() {
+            var name = "World"
+            override fun compose() {
                 <HelperComponent>
                     <TextView text="some child content2!" />
                     <TextView text="some child content!3" />
@@ -400,17 +399,121 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
     )
 
-    fun testChildrenOfNaiveView() = testCompile(
+    fun testChildrenWithParameters() = testCompile(
+        """
+        import android.widget.*
+        import com.google.r4a.*
+
+        class HelperComponent : Component() {
+            @Children lateinit var children: (title: String, rating: Int)->Unit
+            override fun compose() {
+                val children = this.children
+                <children title="Hello World!" rating={5} />
+                <children title="Kompose is awesome!" rating={5} />
+                <children title="Bitcoin!" rating={4} />
+            }
+        }
+
+        class MainComponent : Component() {
+            var name = "World"
+            override fun compose() {
+                <HelperComponent> title, rating ->
+        //TODO:            <TextView text={title+" ("+rating+" stars)"} />
+                </HelperComponent>
+            }
+        }
+        """
+    )
+
+    fun testChildrenCaptureVariables() = testCompile(
+        """
+        import android.widget.*
+        import com.google.r4a.*
+
+        class HelperComponent : Component() {
+            @Children lateinit var children: ()->Unit
+            override fun compose() {
+                val children = this.children
+            }
+        }
+
+        class MainComponent : Component() {
+            var name = "World"
+            override fun compose() {
+                val childText = "Hello World!"
+                <HelperComponent>
+                    <TextView text={childText} />
+                </HelperComponent>
+            }
+        }
+        """
+    )
+
+    fun testChildrenDeepCaptureVariables() = testCompile(
+        """
+        import android.widget.*
+        import com.google.r4a.*
+
+        class HelperComponent : Component() {
+            @Children lateinit var children: ()->Unit
+            override fun compose() {
+                val children = this.children
+            }
+        }
+
+        class MainComponent : Component() {
+            var name = "World"
+            override fun compose() {
+                val childText = "Hello World!"
+                <HelperComponent>
+                    <HelperComponent>
+                        for(i in 1..10) {
+                            <TextView text={childText} />
+                        }
+                    </HelperComponent>
+                </HelperComponent>
+            }
+        }
+        """
+    )
+
+    fun testChildrenOfNativeView() = testCompile(
         """
         import android.widget.*
         import com.google.r4a.*
 
         class MainComponent : Component() {
-            public override fun compose() {
+            override fun compose() {
                 <LinearLayout>
                     <TextView text="some child content2!" />
                     <TextView text="some child content!3" />
                 </LinearLayout>
+            }
+        }
+        """
+    )
+
+    fun testIr() = testCompile(
+        """
+        import android.widget.*
+        import com.google.r4a.*
+
+        class HelperComponent : Component() {
+            @Children lateinit var children: ()->Unit
+            override fun compose() {
+                val children = this.children
+            }
+        }
+
+        class MainComponent : Component() {
+            override fun compose() {
+                val x = "Hello"
+                val y = "World"
+                <HelperComponent>
+                    for(i in 1..100) {
+                        <TextView text={x+y+i} />
+                    }
+                </HelperComponent>
             }
         }
         """
