@@ -16,6 +16,7 @@ import org.jetbrains.kotlin.diagnostics.DiagnosticWithParameters1
 import org.jetbrains.kotlin.diagnostics.RenderedDiagnostic
 import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
 import org.jetbrains.kotlin.r4a.ComponentsClosedDeclarationChecker
+import org.jetbrains.kotlin.r4a.R4AComponentRegistrar
 import org.jetbrains.kotlin.test.ConfigurationKind
 import org.jetbrains.kotlin.test.KotlinTestUtils
 import org.jetbrains.kotlin.test.TestJdkKind
@@ -91,7 +92,8 @@ abstract class AbstractR4aDiagnosticsTest: KtUsefulTestCase() {
 
     protected fun createEnvironment(): KotlinCoreEnvironment {
         val classPath = listOf(KotlinTestUtils.getAnnotationsJar(),
-                               assertExists(File("dist/kotlinc/lib/r4a-runtime.jar")))
+                               assertExists(File("dist/kotlinc/lib/r4a-runtime.jar")),
+                               assertExists(File("custom-dependencies/android-sdk/build/libs/android.jar")))
         val configuration = KotlinTestUtils.newConfiguration(
                 ConfigurationKind.JDK_ONLY,
                 TestJdkKind.MOCK_JDK,
@@ -103,8 +105,7 @@ abstract class AbstractR4aDiagnosticsTest: KtUsefulTestCase() {
     }
 
     fun setupEnvironment(environment: KotlinCoreEnvironment) {
-        // Add checkers here
-        StorageComponentContainerContributor.registerExtension(environment.project, ComponentsClosedDeclarationChecker())
+        R4AComponentRegistrar().registerProjectComponents(environment.project, environment.configuration)
     }
 }
 

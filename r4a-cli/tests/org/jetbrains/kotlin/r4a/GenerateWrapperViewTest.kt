@@ -7,14 +7,6 @@ import org.jetbrains.kotlin.resolve.extensions.SyntheticResolveExtension
 import java.io.File
 
 class GenerateWrapperViewTest : AbstractCodeGenTest() {
-    override fun setUp() {
-        super.setUp()
-
-        KtxTypeResolutionExtension.registerExtension(myEnvironment.project, R4aKtxTypeResolutionExtension())
-        SyntheticIrExtension.registerExtension(myEnvironment.project, R4ASyntheticIrExtension())
-        SyntheticResolveExtension.registerExtension(myEnvironment.project, StaticWrapperCreatorFunctionResolveExtension())
-        SyntheticResolveExtension.registerExtension(myEnvironment.project, WrapperViewSettersGettersResolveExtension())
-    }
 
     fun testWrapperViewGeneration() {
 

@@ -1,6 +1,7 @@
 package org.jetbrains.kotlin.r4a
 
 import com.intellij.mock.MockProject
+import com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.codegen.extensions.ClassBuilderInterceptorExtension
 import org.jetbrains.kotlin.compiler.plugin.CliOption
 import org.jetbrains.kotlin.compiler.plugin.CliOptionProcessingException
@@ -29,6 +30,10 @@ class R4ACommandLineProcessor : CommandLineProcessor {
 
 class R4AComponentRegistrar : ComponentRegistrar {
     override fun registerProjectComponents(project: MockProject, configuration: CompilerConfiguration) {
+        registerProjectComponents(project as Project, configuration)
+    }
+
+    fun registerProjectComponents(project: Project, configuration: CompilerConfiguration) {
         StorageComponentContainerContributor.registerExtension(project, ComponentsClosedDeclarationChecker())
         StorageComponentContainerContributor.registerExtension(project, ComposableAnnotationChecker())
         KtxTypeResolutionExtension.registerExtension(project, R4aKtxTypeResolutionExtension())
