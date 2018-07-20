@@ -16,6 +16,7 @@
 
 package androidx.build.metalava
 
+import androidx.build.AndroidXPlugin.Companion.BUILD_ON_SERVER_TASK
 import androidx.build.SupportLibraryExtension
 import androidx.build.androidJarFile
 import androidx.build.hasApiFolder
@@ -64,6 +65,7 @@ object Metalava {
                     task.dependsOn(metalavaConfiguration)
                 }
                 project.tasks.getByName("check").dependsOn(checkApi)
+                project.rootProject.tasks.getByName(BUILD_ON_SERVER_TASK).dependsOn(checkApi)
 
                 project.tasks.create("updateApi", UpdateApiTask::class.java) { task ->
                     task.configuration = metalavaConfiguration
@@ -106,6 +108,7 @@ object Metalava {
             task.dependsOn(metalavaConfiguration)
         }
         project.tasks.getByName("check").dependsOn(checkApi)
+        project.rootProject.tasks.getByName(BUILD_ON_SERVER_TASK).dependsOn(checkApi)
 
         project.tasks.create("updateApi", UpdateApiTask::class.java) { task ->
             task.configuration = metalavaConfiguration

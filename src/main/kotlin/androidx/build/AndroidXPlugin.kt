@@ -101,7 +101,7 @@ class AndroidXPlugin : Plugin<Project> {
                 DacOptions("androidx", "ANDROIDX_DATA"),
                 listOf(RELEASE_RULE))
 
-        tasks.getByName("buildOnServer").dependsOn(allDocsTask)
+        tasks.getByName(BUILD_ON_SERVER_TASK).dependsOn(allDocsTask)
     }
 
     private fun Project.configureAndroidCommonOptions(extension: BaseExtension) {
@@ -200,5 +200,9 @@ class AndroidXPlugin : Plugin<Project> {
                 baseline(baseline)
             }
         }
+    }
+
+    companion object {
+        const val BUILD_ON_SERVER_TASK = "buildOnServer"
     }
 }

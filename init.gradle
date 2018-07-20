@@ -15,6 +15,7 @@
  */
 
 
+import androidx.build.AndroidXPlugin
 import androidx.build.Release
 import androidx.build.gmaven.GMavenVersionChecker
 import androidx.build.license.CheckExternalDependencyLicensesTask
@@ -138,7 +139,7 @@ def setupRepoOutAndBuildNumber() {
 }
 
 def configureBuildOnServer() {
-    def buildOnServerTask = rootProject.tasks.create("buildOnServer")
+    def buildOnServerTask = rootProject.tasks.create(AndroidXPlugin.BUILD_ON_SERVER_TASK)
     rootProject.tasks.whenTaskAdded { task ->
         if (Release.FULL_ARCHIVE_TASK_NAME.equals(task.name)
                 || task.name.startsWith(Release.DIFF_TASK_PREFIX)
