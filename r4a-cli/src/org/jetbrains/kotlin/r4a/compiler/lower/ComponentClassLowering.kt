@@ -375,7 +375,7 @@ private fun transform(
 
 
 
-                val childrenLambdaIrClass = generateChildrenLambda(context, containingClass.descriptor, accessesToCapture, tag.bodyLambdaPsi!!, tag.body!!)
+                val childrenLambdaIrClass = generateChildrenLambda(context, containingClass.descriptor, accessesToCapture, tag.bodyLambdaPsi!!.functionLiteral, tag.body!!)
                 lowerComposeFunction(context, childrenLambdaIrClass, childrenLambdaIrClass.declarations.single { it is IrFunctionImpl && it.name.identifier == "invoke" } as IrFunction)
                 containingClass.declarations.add(childrenLambdaIrClass)
 

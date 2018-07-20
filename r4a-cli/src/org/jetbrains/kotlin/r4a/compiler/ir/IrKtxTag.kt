@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.psi.psiUtil.startOffset
 class IrKtxTag(val element: KtxElement, var body: Collection<IrStatement>?, var attributes: Collection<IrKtxAttribute>, val openTagExpr: IrExpression?) : IrKtxStatement {
     override val startOffset = element.startOffset
     override val endOffset = element.endOffset
-    val bodyLambdaPsi by lazy { element.bodyLambda }
+    val bodyLambdaPsi by lazy { element.bodyLambdaExpression }
     override fun <R, D> accept(visitor: IrElementVisitor<R, D>, data: D): R {
         return visitor.visitKtxStatement(this, data);
     }
