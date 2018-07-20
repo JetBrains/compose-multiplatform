@@ -62,6 +62,14 @@ import kotlin.collections.mutableMapOf
 import kotlin.collections.plus
 import kotlin.collections.set
 import kotlin.collections.toSet
+import java.net.URLClassLoader
+import javax.tools.ToolProvider
+
+private const val DOCLAVA_DEPENDENCY = "com.android:doclava:1.0.6"
+
+private const val JDIFF_DEPENDENCY = "com.android:jdiff:1.1.0"
+private const val XML_PARSER_APIS_DEPENDENCY = "xerces:xmlParserAPIs:2.6.2"
+private const val XERCES_IMPL_DEPENDENCY = "xerces:xercesImpl:2.6.2"
 
 data class DacOptions(val libraryroot: String, val dataname: String)
 
@@ -85,10 +93,17 @@ object DiffAndDocs {
         dacOptions: DacOptions,
         additionalRules: List<PublishDocsRules> = emptyList()
     ): Task {
+        val doclavaConfiguration = root.configurations.create("doclava")
+        doclavaConfiguration.dependencies.add(root.dependencies.create(DOCLAVA_DEPENDENCY))
+
+        // tools.jar required for com.sun.javadoc
+        // TODO this breaks the ability to use JDK 9+ for compilation.
+        doclavaConfiguration.dependencies.add(root.dependencies.create(root.files(
+                (ToolProvider.getSystemToolClassLoader() as URLClassLoader).urLs)))
+
         rules = additionalRules + TIP_OF_TREE
         docsProject = root.findProject(":docs-fake")
         anchorTask = root.tasks.create("anchorDocsTask")
-        val doclavaConfiguration = root.configurations.getByName("doclava")
         val generateSdkApiTask = createGenerateSdkApiTask(root, doclavaConfiguration)
         val now = LocalDateTime.now()
         // The diff output assumes that each library is of the same version,
@@ -139,7 +154,11 @@ object DiffAndDocs {
             outputApiXmlFile = File(root.docsDir(), "$newVersion.xml")
         }
 
-        val jdiffConfiguration = root.configurations.getByName("jdiff")
+        val jdiffConfiguration = root.configurations.create("jdiff")
+        jdiffConfiguration.dependencies.add(root.dependencies.create(JDIFF_DEPENDENCY))
+        jdiffConfiguration.dependencies.add(root.dependencies.create(XML_PARSER_APIS_DEPENDENCY))
+        jdiffConfiguration.dependencies.add(root.dependencies.create(XERCES_IMPL_DEPENDENCY))
+
         generateDiffsTask = createGenerateDiffsTask(root,
                 oldApisTask,
                 newApisTask,

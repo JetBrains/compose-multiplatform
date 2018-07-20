@@ -15,16 +15,12 @@
  */
 
 
-import androidx.build.DiffAndDocs
 import androidx.build.Release
-import androidx.build.PublishDocsRulesKt
 import androidx.build.gmaven.GMavenVersionChecker
 import androidx.build.license.CheckExternalDependencyLicensesTask
 import com.android.build.gradle.internal.coverage.JacocoReportTask
 import com.android.build.gradle.internal.tasks.DeviceProviderInstrumentTestTask
 import org.gradle.api.logging.configuration.ShowStacktrace
-
-import javax.tools.ToolProvider
 
 def supportRoot = ext.supportRootFolder
 if (supportRoot == null) {
@@ -40,26 +36,6 @@ apply from: "${supportRoot}/buildSrc/dependencies.gradle"
 apply from: "${supportRoot}/buildSrc/build_dependencies.gradle"
 apply from: "${supportRoot}/buildSrc/unbundled_check.gradle"
 
-
-def enableDoclavaAndJDiff(p, dacOptions, rules = []) {
-    p.configurations {
-        doclava
-        jdiff
-    }
-
-    p.dependencies {
-        doclava build_libs.doclava
-        // tools.jar required for com.sun.javadoc
-        doclava files(((URLClassLoader) ToolProvider.getSystemToolClassLoader()).getURLs())
-
-        jdiff build_libs.jdiff
-        jdiff build_libs.xml_parser_apis
-        jdiff build_libs.xerces_impl
-    }
-
-    return DiffAndDocs.configureDiffAndDocs(rootProject, supportRootFolder,
-            dacOptions, rules)
-}
 
 def getFullSdkPath() {
     if (isUnbundledBuild(ext.supportRootFolder)) {
@@ -347,7 +323,6 @@ def configureSubProjects() {
     }
 }
 
-ext.init.enableDoclavaAndJDiff = this.&enableDoclavaAndJDiff
 ext.init.setSdkInLocalPropertiesFile = this.&setSdkInLocalPropertiesFile
 ext.init.setupRepoOutAndBuildNumber = this.&setupRepoOutAndBuildNumber
 ext.init.configureSubProjects = this.&configureSubProjects

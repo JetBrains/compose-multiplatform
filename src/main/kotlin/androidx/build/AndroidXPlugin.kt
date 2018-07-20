@@ -45,6 +45,15 @@ import org.gradle.kotlin.dsl.withType
  */
 class AndroidXPlugin : Plugin<Project> {
     override fun apply(project: Project) {
+        // This has to be first due to bad behavior by DiffAndDocs which is triggered on the root
+        // project. It calls evaluationDependsOn on each subproject. This eagerly causes evaluation
+        // *during* the root build.gradle evaluation. The subproject then applies this plugin (while
+        // we're still halfway through applying it on the root). The check licenses code runs on the
+        // subproject which then looks for the root project task to add itself as a dependency of.
+        // Without the root project having created the task prior to DiffAndDocs running this fails.
+        // TODO do not use evaluationDependsOn in DiffAndDocs to break this cycle!
+        project.configureExternalDependencyLicenseCheck()
+
         if (project.isRoot) {
             project.configureRootProject()
         }
@@ -75,8 +84,6 @@ class AndroidXPlugin : Plugin<Project> {
             }
         }
 
-        project.configureExternalDependencyLicenseCheck()
-
         // Disable timestamps and ensure filesystem-independent archive ordering to maximize
         // cross-machine byte-for-byte reproducibility of artifacts.
         project.tasks.withType<Jar> {
@@ -87,6 +94,14 @@ class AndroidXPlugin : Plugin<Project> {
 
     private fun Project.configureRootProject() {
         Release.createGlobalArchiveTask(this)
+
+        val supportRootFolder = if (name == "app-toolkit") projectDir.parentFile else projectDir
+
+        val allDocsTask = DiffAndDocs.configureDiffAndDocs(this, supportRootFolder,
+                DacOptions("androidx", "ANDROIDX_DATA"),
+                listOf(RELEASE_RULE))
+
+        tasks.getByName("buildOnServer").dependsOn(allDocsTask)
     }
 
     private fun Project.configureAndroidCommonOptions(extension: BaseExtension) {
