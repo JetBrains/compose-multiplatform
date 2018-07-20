@@ -18,12 +18,12 @@ package androidx.build.metalava
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Classpath
 
 /** Base class for invoking Metalava. */
 abstract class MetalavaTask : DefaultTask() {
     /** Configuration containing Metalava and its dependencies. */
-    @get:Input
+    @get:Classpath
     var configuration: Configuration? = null
 
     protected fun runWithArgs(vararg args: String) {
