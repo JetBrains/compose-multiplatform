@@ -23,7 +23,7 @@ object LibraryVersions {
     /**
      * Version code of the support library components.
      */
-    val SUPPORT_LIBRARY = Version("1.0.0-beta01")
+    val SUPPORT_LIBRARY = Version("1.0.0-rc01")
 
     /**
      * Version code for Room
@@ -33,7 +33,7 @@ object LibraryVersions {
     /**
      * Version code for Lifecycle extensions (ProcessLifecycleOwner, Fragment support)
      */
-    val LIFECYCLES_EXT = Version("2.0.0-beta01")
+    val LIFECYCLES_EXT = Version("2.0.0-rc01")
 
     /**
      * Version code for Lifecycle LiveData
@@ -48,9 +48,9 @@ object LibraryVersions {
     /**
      * Version code for Paging
      */
-    val PAGING = Version("2.0.0-beta01")
+    val PAGING = Version("2.0.0-rc01")
 
-    private val LIFECYCLES = Version("2.0.0-beta01")
+    private val LIFECYCLES = Version("2.0.0-rc01")
 
     /**
      * Version code for Lifecycle libs that are required by the support library
@@ -65,7 +65,7 @@ object LibraryVersions {
     /**
      * Version code for shared code of flatfoot
      */
-    val ARCH_CORE = Version("2.0.0-beta01")
+    val ARCH_CORE = Version("2.0.0-rc01")
 
     /**
      * Version code for shared code of flatfoot runtime
@@ -100,17 +100,17 @@ object LibraryVersions {
     /**
      * Version code for Car
      */
-    val CAR = Version("1.0.0-alpha4")
+    val CAR = Version("1.0.0-alpha5")
 
     /*
      * Version code for mediarouter (depends on media2)
      */
-    val MEDIAROUTER = Version("1.0.0-alpha4")
+    val MEDIAROUTER = Version("1.0.0-alpha5")
 
     /**
      * Version code for media-widget (depends on media2)
      */
-    val MEDIA_WIDGET = Version("1.0.0-alpha4")
+    val MEDIA_WIDGET = Version("1.0.0-alpha5")
 
     /**
      * Version code for Core
@@ -120,7 +120,7 @@ object LibraryVersions {
     /**
      * Version code for media2
      */
-    val MEDIA2 = Version("1.0.0-alpha01")
+    val MEDIA2 = Version("1.0.0-alpha02")
 
     /*
      * Version code for Benchmark
@@ -140,12 +140,12 @@ object LibraryVersions {
     /**
      * Version code for slice-builders-ktx
      */
-    val SLICE_BUILDERS_KTX = Version("1.0.0-alpha4")
+    val SLICE_BUILDERS_KTX = Version("1.0.0-alpha5")
 
     /**
      * Version code for slice-builder-ktx
      */
-    val SLICE_BUILDER_KTX = Version("1.0.0-alpha4")
+    val SLICE_BUILDER_KTX = Version("1.0.0-alpha5")
 
     /**
      * Version code for Biometric
