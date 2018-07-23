@@ -45,6 +45,8 @@ object LibraryVersions {
      */
     val LIFECYCLES_VIEWMODEL = LIFECYCLES_EXT
 
+    val LIFECYCLES_SAVEDSTATE = Version("1.0.0-alpha01")
+
     /**
      * Version code for Paging
      */
