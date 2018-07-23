@@ -60,7 +60,7 @@ const val NAV_SUPPORT_CORE_UTILS = "com.android.support:support-core-utils:$NAV_
 const val NAV_SUPPORT_DESIGN = "com.android.support:design:$NAV_SUPPORT_VERSION"
 const val NAV_SUPPORT_FRAGMENTS = "com.android.support:support-fragment:$NAV_SUPPORT_VERSION"
 
-private const val SUPPORT_VERSION = "1.0.0-beta01"
+private const val SUPPORT_VERSION = "1.0.0-rc01"
 const val SUPPORT_ANNOTATIONS = "androidx.annotation:annotation:$SUPPORT_VERSION"
 const val SUPPORT_APPCOMPAT = "androidx.appcompat:appcompat:$SUPPORT_VERSION"
 const val SUPPORT_CORE_UTILS = "androidx.legacy:legacy-support-core-utils:$SUPPORT_VERSION"
@@ -69,8 +69,8 @@ const val SUPPORT_FRAGMENTS = "androidx.fragment:fragment:$SUPPORT_VERSION"
 const val SUPPORT_RECYCLERVIEW = "androidx.recyclerview:recyclerview:$SUPPORT_VERSION"
 
 // Arch libraries
-const val ARCH_LIFECYCLE_RUNTIME = "androidx.lifecycle:lifecycle-runtime:2.0.0-beta01@aar"
+const val ARCH_LIFECYCLE_RUNTIME = "androidx.lifecycle:lifecycle-runtime:2.0.0-rc01@aar"
 const val ARCH_LIFECYCLE_LIVEDATA_CORE =
-        "androidx.lifecycle:lifecycle-livedata-core:2.0.0-beta01@aar"
-const val ARCH_LIFECYCLE_VIEWMODEL = "androidx.lifecycle:lifecycle-viewmodel:2.0.0-beta01@aar"
-const val ARCH_LIFECYCLE_EXTENSIONS = "androidx.lifecycle:lifecycle-extensions:2.0.0-beta01@aar"
+        "androidx.lifecycle:lifecycle-livedata-core:2.0.0-rc01@aar"
+const val ARCH_LIFECYCLE_VIEWMODEL = "androidx.lifecycle:lifecycle-viewmodel:2.0.0-rc01@aar"
+const val ARCH_LIFECYCLE_EXTENSIONS = "androidx.lifecycle:lifecycle-extensions:2.0.0-rc01@aar"
