@@ -53,6 +53,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.LOCALBROADCASTMANAGER, defaultVersion)
     prebuilts(LibraryGroups.MEDIA, "media", defaultVersion)
     prebuilts(LibraryGroups.MEDIA, "media-widget", "1.0.0-alpha4")
+    ignore(LibraryGroups.MEDIA2, "media2-exoplayer")
     prebuilts(LibraryGroups.MEDIA2, "1.0.0-alpha01")
     prebuilts(LibraryGroups.MEDIAROUTER, "1.0.0-alpha4")
     prebuilts(LibraryGroups.PALETTE, defaultVersion)
