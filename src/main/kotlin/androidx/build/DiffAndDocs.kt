@@ -185,7 +185,7 @@ object DiffAndDocs {
             throw GradleException("Failed to find prebuilts for $mavenId. " +
                     "A matching rule $originRule in docsRules(\"$originName\") " +
                     "in PublishDocsRules.kt requires it. You should either add a prebuilt, " +
-                    "or add overriding \"ignore\" or \"tipOfTree\" rules", e)
+                    "or add overriding \"ignore\" or \"tipOfTree\" rules")
         }
 
         val artifact = artifacts.find { it.moduleVersion.id.toString() == mavenId }
@@ -236,7 +236,7 @@ object DiffAndDocs {
         val root = docs.rootProject
         rules.forEach { rule ->
             val resolvedRule = rule.resolve(extension)
-            val strategy = resolvedRule.strategy
+            val strategy = resolvedRule?.strategy
             if (strategy is Prebuilts) {
                 val dependency = strategy.dependency(extension)
                 depHandler.add("${rule.name}Implementation", dependency)
@@ -250,7 +250,7 @@ object DiffAndDocs {
     }
 
     private fun tipOfTreeTasks(extension: SupportLibraryExtension, setup: (DoclavaTask) -> Unit) {
-        rules.filter { rule -> rule.resolve(extension).strategy == TipOfTree }
+        rules.filter { rule -> rule.resolve(extension)?.strategy == TipOfTree }
                 .mapNotNull { rule -> docsTasks[rule.name] }
                 .forEach(setup)
     }
@@ -260,9 +260,6 @@ object DiffAndDocs {
      * local API diff generation tasks.
      */
     fun registerJavaProject(project: Project, extension: SupportLibraryExtension) {
-        if (!hasApiTasks(project, extension)) {
-            return
-        }
         val compileJava = project.properties["compileJava"] as JavaCompile
 
         registerPrebuilts(extension)
@@ -270,10 +267,15 @@ object DiffAndDocs {
         tipOfTreeTasks(extension) { task ->
             registerJavaProjectForDocsTask(task, compileJava)
         }
+
+        registerJavaProjectForDocsTask(generateDiffsTask, compileJava)
+        if (!hasApiTasks(project, extension)) {
+            return
+        }
+
         val tasks = initializeApiChecksForProject(project,
                 aggregateOldApiTxtsTask, aggregateNewApiTxtsTask)
         registerJavaProjectForDocsTask(tasks.generateApi, compileJava)
-        registerJavaProjectForDocsTask(generateDiffsTask, compileJava)
         setupDocsTasks(project, tasks)
         anchorTask.dependsOn(tasks.checkApiTask)
     }
@@ -287,16 +289,13 @@ object DiffAndDocs {
         library: LibraryExtension,
         extension: SupportLibraryExtension
     ) {
-        if (!hasApiTasks(project, extension)) {
-            return
-        }
 
         registerPrebuilts(extension)
 
         library.libraryVariants.all { variant ->
             if (variant.name == "release") {
                 // include R.file generated for prebuilts
-                rules.filter { it.resolve(extension).strategy is Prebuilts }.forEach { rule ->
+                rules.filter { it.resolve(extension)?.strategy is Prebuilts }.forEach { rule ->
                     docsTasks[rule.name]?.include { fileTreeElement ->
                         fileTreeElement.path.endsWith(variant.rFile())
                     }
@@ -306,10 +305,12 @@ object DiffAndDocs {
                     registerAndroidProjectForDocsTask(task, variant)
                 }
 
+                if (!hasApiTasks(project, extension)) {
+                    return@all
+                }
                 val tasks = initializeApiChecksForProject(project, aggregateOldApiTxtsTask,
                         aggregateNewApiTxtsTask)
                 registerAndroidProjectForDocsTask(tasks.generateApi, variant)
-                registerAndroidProjectForDocsTask(generateDiffsTask, variant)
                 setupDocsTasks(project, tasks)
                 anchorTask.dependsOn(tasks.checkApiTask)
             }
@@ -795,8 +796,10 @@ fun androidJarFile(project: Project): FileCollection =
 private fun androidSrcJarFile(project: Project): File = File(project.fullSdkPath(),
         "platforms/android-${SupportConfig.CURRENT_SDK_VERSION}/android-stubs-src.jar")
 
-private fun PublishDocsRules.resolve(extension: SupportLibraryExtension) =
-        resolve(extension.mavenGroup!!, extension.project.name)
+private fun PublishDocsRules.resolve(extension: SupportLibraryExtension): DocsRule? {
+    val mavenGroup = extension.mavenGroup
+    return if (mavenGroup == null) null else resolve(mavenGroup, extension.project.name)
+}
 
 private fun Prebuilts.dependency(extension: SupportLibraryExtension) =
         "${extension.mavenGroup}:${extension.project.name}:$version"

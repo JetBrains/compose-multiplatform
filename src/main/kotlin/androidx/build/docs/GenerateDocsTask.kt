@@ -38,7 +38,10 @@ open class GenerateDocsTask : DoclavaTask() {
                 }
 
                 if (artifacts.isNotEmpty()) {
-                    addMultilineMultiValueOption("artifact").value = artifacts.map { artifact ->
+                    // Ugly hack: generateApi can be skipped because a module has empty inputs,
+                    // so we don't generate current.txt
+                    val existising = artifacts.filter { File(it.path).exists() }
+                    addMultilineMultiValueOption("artifact").value = existising.map { artifact ->
                         listOf(artifact.path, artifact.artifact)
                     }
                 }
