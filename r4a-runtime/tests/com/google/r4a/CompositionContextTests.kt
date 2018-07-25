@@ -23,24 +23,13 @@ import org.robolectric.annotation.Config
 class CompositionContextTests : ComposeTestCase() {
 
     @Test
-    fun testNativeViewWithAttributes() = compose { cc ->
+    fun testNativeViewWithAttributes() = compose {
 
         // <TextView id={456} text="some text" />
-        var el = cc.start(123) as? TextView
-        if (el == null) {
-            el = TextView(cc.context)
-            cc.setInstance(el)
+        emitView(123, ::TextView) {
+            set(456) { id = it }
+            set("some text") { text = it }
         }
-        val attr_0 = 456
-        if (cc.updateAttribute(attr_0)) {
-            el.id = attr_0
-        }
-
-        val attr_1 = "some text"
-        if (cc.updateAttribute(attr_1)) {
-            el.text = attr_1
-        }
-        cc.end()
     }.then { _, _, root, activity ->
         assertEquals(1, root.childCount)
 
@@ -54,26 +43,15 @@ class CompositionContextTests : ComposeTestCase() {
     fun testSlotKeyChangeCausesRecreate() {
         var i = 1
 
-        compose { cc ->
+        compose {
             // this should cause the textview to get recreated on every compose
             i++
 
             // <TextView id={456} text="some text" />
-            var el = cc.start(i) as? TextView
-            if (el == null) {
-                el = TextView(cc.context)
-                cc.setInstance(el)
+            emitView(i, ::TextView) {
+                set(456) { id = it }
+                set("some text") { text = it }
             }
-            val attr_0 = 456
-            if (cc.updateAttribute(attr_0)) {
-                el.id = attr_0
-            }
-
-            val attr_1 = "some text"
-            if (cc.updateAttribute(attr_1)) {
-                el.text = attr_1
-            }
-            cc.end()
         }.then { cc, component, root, activity ->
             val tv1 = activity.findViewById(456) as TextView
 
@@ -91,56 +69,24 @@ class CompositionContextTests : ComposeTestCase() {
 
     @Test
     fun testViewWithViewChildren() {
-        compose { cc ->
+        compose {
             // this should cause the textview to get recreated on every compose
 
             // <LinearLayout id={345}>
-            var el1 = cc.start(100) as? LinearLayout
-            if (el1 == null) {
-                el1 = LinearLayout(cc.context)
-                cc.setInstance(el1)
+            emitView(100, ::LinearLayout, {
+                set(345) { id = it }
+            }) {
+                // <TextView id={456} text="some text" />
+                emitView(101, ::TextView) {
+                    set(456) { id = it }
+                    set("some text") { text = it }
+                }
+                // <TextView id={567} text="some text" />
+                emitView(102, ::TextView) {
+                    set(567) { id = it }
+                    set("some text") { text = it }
+                }
             }
-            val el1_attr_0 = 345
-            if (cc.updateAttribute(el1_attr_0)) {
-                el1.id = el1_attr_0
-            }
-
-            // <TextView id={456} text="some text" />
-            var el2 = cc.start(101) as? TextView
-            if (el2 == null) {
-                el2 = TextView(cc.context)
-                cc.setInstance(el2)
-            }
-            val el2_attr_0 = 456
-            if (cc.updateAttribute(el2_attr_0)) {
-                el2.id = el2_attr_0
-            }
-
-            val el2_attr_1 = "some text"
-            if (cc.updateAttribute(el2_attr_1)) {
-                el2.text = el2_attr_1
-            }
-            cc.end()
-
-            // <TextView id={567} text="some text" />
-            var el3 = cc.start(102) as? TextView
-            if (el3 == null) {
-                el3 = TextView(cc.context)
-                cc.setInstance(el3)
-            }
-            val el3_attr_0 = 567
-            if (cc.updateAttribute(el3_attr_0)) {
-                el3.id = el3_attr_0
-            }
-
-            val el3_attr_1 = "some text"
-            if (cc.updateAttribute(el3_attr_1)) {
-                el3.text = el3_attr_1
-            }
-            cc.end()
-
-            // </LinearLayout>
-            cc.end()
         }.then { _, _, root, activity ->
             val ll = activity.findViewById(345) as LinearLayout
             val tv1 = activity.findViewById(456) as TextView
@@ -157,37 +103,20 @@ class CompositionContextTests : ComposeTestCase() {
     @Test
     fun testForLoop() {
         val items = listOf(1, 2, 3, 4, 5, 6)
-        compose { cc ->
+        compose {
             // this should cause the textview to get recreated on every compose
 
-            // <LinearLayout id={345}>
-            var el1 = cc.start(100) as? LinearLayout
-            if (el1 == null) {
-                el1 = LinearLayout(cc.context)
-                cc.setInstance(el1)
-            }
-            val el1_attr_0 = 345
-            if (cc.updateAttribute(el1_attr_0)) {
-                el1.id = el1_attr_0
-            }
-
-            for (i in items) {
-                // <TextView id={456} text="some text" />
-                var el2 = cc.start(101, i) as? TextView
-                if (el2 == null) {
-                    el2 = TextView(cc.context)
-                    cc.setInstance(el2)
+            emitView(100, ::LinearLayout, {
+                set(345) { id = it }
+            }) {
+                for (i in items) {
+                    // <TextView id={456} text="some text" />
+                    emitView(101, ::TextView) {
+                        set(456) { id = it }
+                        set("some text $i") { text = it }
+                    }
                 }
-
-                val el2_attr_0 = "some text $i"
-                if (cc.updateAttribute(el2_attr_0)) {
-                    el2.text = el2_attr_0
-                }
-                cc.end()
             }
-
-            // </LinearLayout>
-            cc.end()
         }.then { _, _, root, activity ->
             val ll = activity.findViewById(345) as LinearLayout
 
@@ -209,22 +138,13 @@ class CompositionContextTests : ComposeTestCase() {
             override fun compose() {
                 counter.inc("$id")
 
-                // <TextView id={id} onClickListener={{ recomposeSync() }} />
-                val cc = CompositionContext.current
-                var el = cc.start(24) as? TextView
-                if (el == null) {
-                    el = TextView(cc.context)
-                    cc.setInstance(el)
+                with(CompositionContext.current) {
+                    // <TextView id={id} onClickListener={{ recomposeSync() }} />
+                    emitView(24, ::TextView) {
+                        set(id) { id = it }
+                        set(View.OnClickListener { recompose() }) { setOnClickListener(it) }
+                    }
                 }
-                val attr0 = id
-                if (cc.updateAttribute(attr0)) {
-                    el.id = attr0
-                }
-                val attr1 = View.OnClickListener { recompose() }
-                if (cc.updateAttribute(attr1)) {
-                    el.setOnClickListener(attr1)
-                }
-                cc.end()
             }
         }
 
@@ -237,52 +157,29 @@ class CompositionContextTests : ComposeTestCase() {
                 //     <B id={102} />
                 // </LinearLayout>
 
+                with(CompositionContext.current) {
 
-                val cc = CompositionContext.current
-                // <LinearLayout>
-                var el0 = cc.start(897) as? LinearLayout
-                if (el0 == null) {
-                    el0 = LinearLayout(cc.context)
-                    cc.setInstance(el0)
-                }
-                val el0attr1 = View.OnClickListener { recompose() }
-                if (cc.updateAttribute(el0attr1)) {
-                    el0.setOnClickListener(el0attr1)
-                }
-                val el0attr2 = 99
-                if (cc.updateAttribute(el0attr2)) {
-                    el0.id = el0attr2
-                }
-
-                for (id in 100..102) {
-                    // <B key={id} id={id} />
-                    var el1 = cc.start(878983, id) as? B
-                    if (el1 == null) {
-                        el1 = B()
-                        cc.setInstance(el1)
+                    // <LinearLayout onClickListener={{ recompose() }} id={99}>
+                    emitView(897, ::LinearLayout, {
+                        set(99) { id = it }
+                        set(View.OnClickListener { recompose() }) { setOnClickListener(it) }
+                    }) {
+                        for (id in 100..102) {
+                            // <B key={id} id={id} />
+                            emitComponent(878983, id, ::B) {
+                                set(id) { this.id = it }
+                            }
+                        }
                     }
-                    val el1attr1 = id
-                    if (cc.updateAttribute(el1attr1)) {
-                        el1.id = el1attr1
-                    }
-                    cc.compose()
-                    cc.end()
                 }
-                // </LinearLayout>
-                cc.end()
             }
         }
 
 
-        compose { cc ->
+        compose {
             // <A />
-            var el1 = cc.start(123) as? A
-            if (el1 == null) {
-                el1 = A()
-                cc.setInstance(el1!!)
-            }
-            cc.compose()
-            cc.end()
+            emitComponent(123, ::A)
+
         }.then { _, _, _, activity ->
             // everything got rendered once
             assertEquals(1, counter["A"])
@@ -335,22 +232,13 @@ class CompositionContextTests : ComposeTestCase() {
             override fun compose() {
                 counter.inc("$id")
 
-                // <TextView id={id} onClickListener={{ recomposeSync() }} />
-                val cc = CompositionContext.current
-                var el = cc.start(24) as? TextView
-                if (el == null) {
-                    el = TextView(cc.context)
-                    cc.setInstance(el)
+                with(CompositionContext.current) {
+                    // <TextView id={id} onClickListener={{ recomposeSync() }} />
+                    emitView(24, ::TextView) {
+                        set(id) { id = it }
+                        set(View.OnClickListener { recomposeSync() }) { setOnClickListener(it) }
+                    }
                 }
-                val attr0 = id
-                if (cc.updateAttribute(attr0)) {
-                    el.id = attr0
-                }
-                val attr1 = View.OnClickListener { recomposeSync() }
-                if (cc.updateAttribute(attr1)) {
-                    el.setOnClickListener(attr1)
-                }
-                cc.end()
             }
         }
 
@@ -363,44 +251,24 @@ class CompositionContextTests : ComposeTestCase() {
                 //     <B id={102} />
                 // </LinearLayout>
 
-
-                val cc = CompositionContext.current
-                // <LinearLayout>
-                var el0 = cc.start(897) as? LinearLayout
-                if (el0 == null) {
-                    el0 = LinearLayout(cc.context)
-                    cc.setInstance(el0)
-                }
-
-                for (id in 100..102) {
-                    // <B key={id} id={id} />
-                    var el1 = cc.start(878983, id) as? B
-                    if (el1 == null) {
-                        el1 = B()
-                        cc.setInstance(el1)
+                with(CompositionContext.current) {
+                    // <LinearLayout>
+                    emitView(897, ::LinearLayout, {}) {
+                        for (id in 100..102) {
+                            // <B key={id} id={id} />
+                            emitComponent(878983, id, ::B) {
+                                set(id) { this.id = it }
+                            }
+                        }
                     }
-                    val attr1 = id
-                    if (cc.updateAttribute(attr1)) {
-                        el1.id = attr1
-                    }
-                    cc.compose()
-                    cc.end()
                 }
-                // </LinearLayout>
-                cc.end()
             }
         }
 
 
-        compose { cc ->
+        compose {
             // <A />
-            var el1 = cc.start(123) as? A
-            if (el1 == null) {
-                el1 = A()
-                cc.setInstance(el1!!)
-            }
-            cc.compose()
-            cc.end()
+            emitComponent(123, ::A)
         }.then { _, _, _, activity ->
             // everything got rendered once
             assertEquals(1, counter["A"])
@@ -419,17 +287,10 @@ class CompositionContextTests : ComposeTestCase() {
     }
 
     @Test
-    fun testPreservesTree() = compose { cc ->
-        var el = cc.start(123) as? TextView
-        if (el == null) {
-            el = TextView(cc.context)
-            cc.setInstance(el)
+    fun testPreservesTree() = compose {
+        emitView(123, ::TextView) {
+            set("some text") { text = it }
         }
-        val attr_0 = "some text"
-        if (cc.updateAttribute(attr_0)) {
-            el.text = attr_0
-        }
-        cc.end()
     }.then { cc, component, _, _ ->
         val before = cc.treeAsString()
         cc.recompose(component)
@@ -439,41 +300,18 @@ class CompositionContextTests : ComposeTestCase() {
 
 
     @Test
-    fun testCorrectViewTree() = compose { cc ->
+    fun testCorrectViewTree() = compose {
         // <LinearLayout>
         //   <LinearLayout />
         //   <LinearLayout />
         // </LinearLayout>
         // <LinearLayout />
 
-        var el0 = cc.start(123) as? LinearLayout
-        if (el0 == null) {
-            el0 = LinearLayout(cc.context)
-            cc.setInstance(el0)
+        emitView(123, ::LinearLayout, {}) {
+            emitView(123, ::LinearLayout)
+            emitView(123, ::LinearLayout)
         }
-
-        var el0x0 = cc.start(123) as? LinearLayout
-        if (el0x0 == null) {
-            el0x0 = LinearLayout(cc.context)
-            cc.setInstance(el0x0)
-        }
-        cc.end()
-
-        var el0x1 = cc.start(123) as? LinearLayout
-        if (el0x1 == null) {
-            el0x1 = LinearLayout(cc.context)
-            cc.setInstance(el0x1)
-        }
-        cc.end()
-
-        cc.end()
-
-        var el1 = cc.start(123) as? LinearLayout
-        if (el1 == null) {
-            el1 = LinearLayout(cc.context)
-            cc.setInstance(el1)
-        }
-        cc.end()
+        emitView(123, ::LinearLayout)
 
     }.then { cc, component, root, activity ->
         assertChildHierarchy(root) {
@@ -492,18 +330,14 @@ class CompositionContextTests : ComposeTestCase() {
 
         class B : Component() {
             override fun compose() {
-                val cc = CompositionContext.current
-                // <TextView />
-                var elb = cc.start(123) as? TextView
-                if (elb == null) {
-                    elb = TextView(cc.context)
-                    cc.setInstance(elb)
+                with(CompositionContext.current) {
+                    // <TextView />
+                    emitView(123, ::TextView)
                 }
-                cc.end()
             }
         }
 
-        compose { cc ->
+        compose {
             // <LinearLayout>
             //   <LinearLayout>
             //     <B />
@@ -513,46 +347,14 @@ class CompositionContextTests : ComposeTestCase() {
             //   </LinearLayout>
             // </LinearLayout>
 
-            var el0 = cc.start(123) as? LinearLayout
-            if (el0 == null) {
-                el0 = LinearLayout(cc.context)
-                cc.setInstance(el0)
+            emitView(123, ::LinearLayout, {}) {
+                emitView(123, ::LinearLayout, {}) {
+                    emitComponent(123, ::B)
+                }
+                emitView(123, ::LinearLayout, {}) {
+                    emitComponent(123, ::B)
+                }
             }
-
-            var el0x0 = cc.start(123) as? LinearLayout
-            if (el0x0 == null) {
-                el0x0 = LinearLayout(cc.context)
-                cc.setInstance(el0x0)
-            }
-
-            var el0x0x0 = cc.start(123) as? B
-            if (el0x0x0 == null) {
-                el0x0x0 = B()
-                cc.setInstance(el0x0x0)
-            }
-
-            cc.compose()
-            cc.end()
-            cc.end()
-
-            var el0x1 = cc.start(123) as? LinearLayout
-            if (el0x1 == null) {
-                el0x1 = LinearLayout(cc.context)
-                cc.setInstance(el0x1)
-            }
-
-            var el0x1x0 = cc.start(123) as? B
-            if (el0x1x0 == null) {
-                el0x1x0 = B()
-                cc.setInstance(el0x1x0)
-            }
-
-            cc.compose()
-            cc.end()
-            cc.end()
-
-            cc.end()
-
         }.then { cc, component, root, activity ->
 
             assertChildHierarchy(root) {

@@ -4,6 +4,8 @@ import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtxAttribute
 import org.jetbrains.kotlin.psi.KtxElement
+import org.jetbrains.kotlin.r4a.KtxAttributeInfo
+import org.jetbrains.kotlin.r4a.KtxTagInfo
 import org.jetbrains.kotlin.r4a.R4aUtils
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.util.slicedMap.BasicWritableSlice
@@ -16,6 +18,10 @@ object R4AWritableSlices {
     val KTX_TAG_COMPOSABLE_TYPE: WritableSlice<KtxElement, ComposableType> = BasicWritableSlice(RewritePolicy.DO_NOTHING)
     val KTX_TAG_CHILDRENLAMBDA: WritableSlice<KtxElement, R4aUtils.AttributeInfo> = BasicWritableSlice(RewritePolicy.DO_NOTHING)
 
+    val KTX_TAG_INFO: WritableSlice<KtxElement, KtxTagInfo> = BasicWritableSlice(RewritePolicy.DO_NOTHING)
+
     val KTX_ATTR_DESCRIPTOR: WritableSlice<KtxAttribute, DeclarationDescriptor> = BasicWritableSlice(RewritePolicy.DO_NOTHING)
     val KTX_ATTR_TYPE: WritableSlice<KtxAttribute, KotlinType> = BasicWritableSlice(RewritePolicy.DO_NOTHING)
+
+    val KTX_ATTR_INFO: WritableSlice<KtxAttribute, KtxAttributeInfo> = BasicWritableSlice(RewritePolicy.DO_NOTHING)
 }

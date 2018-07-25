@@ -29,6 +29,7 @@ public interface R4AErrors {
     DiagnosticFactory0<KtElement> SUSPEND_FUNCTION_USED_AS_SFC = DiagnosticFactory0.create(ERROR);
     DiagnosticFactory0<PsiElement> KTX_IN_NON_COMPOSABLE = DiagnosticFactory0.create(WARNING);
     DiagnosticFactory0<KtElement> INVALID_TYPE_SIGNATURE_SFC = DiagnosticFactory0.create(ERROR);
+    DiagnosticFactory0<KtxElement> UNRESOLVED_TAG = DiagnosticFactory0.create(ERROR);
 
 
     @SuppressWarnings("UnusedDeclaration")

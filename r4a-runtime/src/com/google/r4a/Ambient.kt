@@ -26,8 +26,7 @@ class Ambient<T>(private val key: String, private val defaultFactory: (() -> T)?
             val cc = CompositionContext.current
 
             cc.start(0, this@Ambient)
-            cc.setInstance(children)
-            cc.compose()
+            children()
             cc.end()
         }
     }
@@ -39,9 +38,7 @@ class Ambient<T>(private val key: String, private val defaultFactory: (() -> T)?
             val cc = CompositionContext.current
             val value = cc.getAmbient(this@Ambient)
             cc.start(0)
-            cc.setInstance(children)
-            cc.updateAttribute(value)
-            cc.compose()
+            children(value)
             cc.end()
         }
     }

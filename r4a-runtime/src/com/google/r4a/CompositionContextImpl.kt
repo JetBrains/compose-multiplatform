@@ -67,7 +67,7 @@ internal class Container {
 }
 
 
-internal class CompositionContextImpl: CompositionContext() {
+internal class CompositionContextImpl : CompositionContext() {
 
     companion object {
         private val COMPONENTS_TO_SLOTS = WeakHashMap<Component, Slot>()
@@ -330,14 +330,13 @@ internal class CompositionContextImpl: CompositionContext() {
     // TODO(lmr): we could add an int that specifies the number of attributes on the element so we can
     // initialize an array of that length to store the attributes since that information is known at compile time
     // and is constant
-    override fun start(sourceHash: Int): Any? = start(sourceHash, null)
-    override fun start(sourceHash: Int, key: Any?): Any? {
+    override fun start(sourceHash: Int) = start(sourceHash, null)
+    override fun start(sourceHash: Int, key: Any?) {
         val current = currentSlot
         val start = if (current.open) current.child else current.nextSibling
         val depth = if (current.open) current.depth + 1 else current.depth
         val next = findOrCreate(start, sourceHash, key, depth)
         currentSlot = next
-        return next.instance
     }
 
     override fun end() {
@@ -388,21 +387,53 @@ internal class CompositionContextImpl: CompositionContext() {
         slot.index = index
     }
 
-    override fun updateAttribute(value: Any?): Boolean {
+    override fun useInstance(): Any? {
+        return currentSlot.instance
+    }
+
+    override fun isInserting(): Boolean {
+        return currentSlot.instance == null
+    }
+
+    /**
+     * Return true if the attribute is different than the last compose. If it is in inserting mode, store the value and return false.
+     */
+    override fun attributeChanged(value: Any?): Boolean {
         val slot = currentSlot
         val i = slot.argIndex
         slot.argIndex++
-        if (slot.attributes.size == i) {
-            currentSlot.attributes.add(value)
-            return true
+        return if (slot.attributes.size == i) {
+            slot.attributes.add(value)
+            false
         } else {
             val current = slot.attributes[i]
             slot.attributes[i] = value
-            return current != value
+            current != value
         }
     }
 
-    override fun compose() {
+    /**
+     * Return true if attribute is different than the last compose. If it is in inserting mode, store the value and return true.
+     */
+    override fun attributeChangedOrInserting(value: Any?): Boolean {
+        val slot = currentSlot
+        val i = slot.argIndex
+        slot.argIndex++
+        return if (slot.attributes.size == i) {
+            slot.attributes.add(value)
+            true
+        } else {
+            val current = slot.attributes[i]
+            slot.attributes[i] = value
+            current != value
+        }
+    }
+
+    override fun willCompose() {
+        composeQueue.remove(currentSlot)
+    }
+
+    fun compose() {
         val slot = currentSlot
         val instance = slot.instance
         when (instance) {

@@ -99,13 +99,8 @@ class ArrayAdapter<T> : BaseAdapter(), Filterable {
             @Suppress("PLUGIN_WARNING")
             override fun invoke() {
                 val cc = CompositionContext.current
-                val fn = composable
-
-                // <fn arg0={item} />
                 cc.start(0)
-                cc.setInstance(fn)
-                cc.updateAttribute(item)
-                cc.compose()
+                composable(item)
                 cc.end()
             }
         })

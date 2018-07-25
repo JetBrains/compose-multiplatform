@@ -9,8 +9,7 @@ object R4a {
         override fun compose() {
             val cc = CompositionContext.current
             cc.start(0)
-            cc.setInstance(composable)
-            cc.compose()
+            composable()
             cc.end()
         }
     }

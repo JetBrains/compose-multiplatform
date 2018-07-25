@@ -22,16 +22,24 @@ import org.jetbrains.kotlin.storage.LockBasedStorageManager
 import org.jetbrains.kotlin.types.*
 import org.jetbrains.kotlin.utils.Printer
 
-open class GeneratedKtxChildrenLambdaClassDescriptor(private val module: ModuleDescriptor, private val containingDeclaration: ClassDescriptor, private val variablesToCapture: List<KotlinType>, private val parameters: List<KotlinType>): ClassDescriptor {
+open class GeneratedKtxChildrenLambdaClassDescriptor(
+    private val module: ModuleDescriptor,
+    private val containingDeclaration: DeclarationDescriptor,
+    private val variablesToCapture: List<KotlinType>,
+    private val functionType: KotlinType,
+    private val parameters: List<ValueParameterDescriptor>
+) : ClassDescriptor {
 
     companion object {
-        var index = 1
+        private var index = 1
     }
 
-    private val name = Name.identifier("KTX_CHILD_"+(index++))
-    override fun isInline(): Boolean = false
-    override fun getName() = name
+    private val internalName by lazy {
+        Name.identifier("KTX_CHILD_${index++}")
+    }
 
+    override fun isInline(): Boolean = false
+    override fun getName() = internalName
     override fun isExpect(): Boolean = false
     override fun isActual(): Boolean = false
     private val modality = Modality.FINAL
@@ -45,19 +53,55 @@ open class GeneratedKtxChildrenLambdaClassDescriptor(private val module: ModuleD
     private var unsubstitutedPrimaryConstructor: ClassConstructorDescriptor? = null
 
     init {
-        val functionNInterface = module.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("kotlin.jvm.functions.Function"+parameters.size)))!!.defaultType
-        initialize(emptyList(), listOf(functionNInterface))
+        initialize(emptyList(), listOf(functionType))
     }
 
     val capturedAccessesAsProperties by lazy {
         variablesToCapture.mapIndexed { index, type ->
-            PropertyDescriptorImpl.create(this, Annotations.EMPTY, Modality.FINAL, Visibilities.PRIVATE, false, Name.identifier("p"+index), CallableMemberDescriptor.Kind.SYNTHESIZED, SourceElement.NO_SOURCE, false, false, true, true, false, false).apply {
+            PropertyDescriptorImpl.create(
+                this,
+                Annotations.EMPTY,
+                Modality.FINAL,
+                Visibilities.PRIVATE,
+                false,
+                Name.identifier("p$index"),
+                CallableMemberDescriptor.Kind.SYNTHESIZED,
+                SourceElement.NO_SOURCE,
+                false,
+                false,
+                true,
+                true,
+                false,
+                false
+            ).apply {
                 setType(type, emptyList<TypeParameterDescriptor>(), thisAsReceiverParameter, null as ReceiverParameterDescriptor?)
                 initialize(
-                    PropertyGetterDescriptorImpl(this, Annotations.EMPTY, Modality.FINAL, Visibilities.PRIVATE, false, false, false, CallableMemberDescriptor.Kind.SYNTHESIZED, null, SourceElement.NO_SOURCE).apply {
+                    PropertyGetterDescriptorImpl(
+                        this,
+                        Annotations.EMPTY,
+                        Modality.FINAL,
+                        Visibilities.PRIVATE,
+                        false,
+                        false,
+                        false,
+                        CallableMemberDescriptor.Kind.SYNTHESIZED,
+                        null,
+                        SourceElement.NO_SOURCE
+                    ).apply {
                         initialize(type)
                     },
-                    PropertySetterDescriptorImpl(this, Annotations.EMPTY, Modality.FINAL, Visibilities.PRIVATE, false, false, false, CallableMemberDescriptor.Kind.SYNTHESIZED, null, SourceElement.NO_SOURCE).apply {
+                    PropertySetterDescriptorImpl(
+                        this,
+                        Annotations.EMPTY,
+                        Modality.FINAL,
+                        Visibilities.PRIVATE,
+                        false,
+                        false,
+                        false,
+                        CallableMemberDescriptor.Kind.SYNTHESIZED,
+                        null,
+                        SourceElement.NO_SOURCE
+                    ).apply {
                         initializeDefault()
                     }
                 )
@@ -66,8 +110,11 @@ open class GeneratedKtxChildrenLambdaClassDescriptor(private val module: ModuleD
     }
 
     val invokeDescriptor by lazy {
-        val functionNInterface = module.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("kotlin.jvm.functions.Function"+parameters.size)))!!
-        val overridenMethod = functionNInterface.unsubstitutedMemberScope.getContributedFunctions(Name.identifier("invoke"), NoLookupLocation.FROM_BACKEND).single()
+        val functionNInterface =
+            module.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("kotlin.jvm.functions.Function" + parameters.size)))!!
+        val overridenMethod =
+            functionNInterface.unsubstitutedMemberScope.getContributedFunctions(Name.identifier("invoke"), NoLookupLocation.FROM_BACKEND)
+                .single()
         val newMethod = SimpleFunctionDescriptorImpl.create(
             this,
             Annotations.EMPTY,
@@ -77,17 +124,21 @@ open class GeneratedKtxChildrenLambdaClassDescriptor(private val module: ModuleD
         )
         newMethod.setSingleOverridden(overridenMethod)
 
-
-        val parameters = parameters.mapIndexed({ index, parameterType ->
-                                                           ValueParameterDescriptorImpl(
-                                                               newMethod,
-                                                               null, index, Annotations.EMPTY,
-                                                               Name.identifier("p"+index),
-                                                               parameterType,
-                                                               false,
-                                                               false,
-                                                               false, null, SourceElement.NO_SOURCE)
-                                                       })
+        val parameters = parameters.map {
+            ValueParameterDescriptorImpl(
+                newMethod,
+                it,
+                it.index,
+                it.annotations,
+                it.name,
+                it.type,
+                false,
+                false,
+                false,
+                null,
+                it.source
+            )
+        }
 
         newMethod.initialize(
             null,
@@ -100,7 +151,6 @@ open class GeneratedKtxChildrenLambdaClassDescriptor(private val module: ModuleD
         )
         newMethod
     }
-
 
     private val thisAsReceiverParameter = LazyClassReceiverParameterDescriptor(this)
 
@@ -122,21 +172,18 @@ open class GeneratedKtxChildrenLambdaClassDescriptor(private val module: ModuleD
 
         return object : MemberScope {
 
-            override fun getFunctionNames() : Set<Name> {
-                return setOf(Name.identifier("invoke"))
-            }
+            override fun getFunctionNames(): Set<Name> = setOf(Name.identifier("invoke"))
 
-            override fun getVariableNames(): Set<Name> {
-                return emptySet()
-            }
+            override fun getVariableNames(): Set<Name> = emptySet()
 
             override fun getClassifierNames(): Set<Name>? = null
 
-            override fun getContributedClassifier(name: Name, location: LookupLocation): ClassifierDescriptor? {
-                return null;
-            }
+            override fun getContributedClassifier(name: Name, location: LookupLocation): ClassifierDescriptor? = null
 
-            override fun getContributedDescriptors(kindFilter: DescriptorKindFilter, nameFilter: (Name) -> Boolean): Collection<DeclarationDescriptor> {
+            override fun getContributedDescriptors(
+                kindFilter: DescriptorKindFilter,
+                nameFilter: (Name) -> Boolean
+            ): Collection<DeclarationDescriptor> {
                 return emptyList()
             }
 
@@ -164,9 +211,6 @@ open class GeneratedKtxChildrenLambdaClassDescriptor(private val module: ModuleD
     override fun getUnsubstitutedMemberScope(): MemberScope = genScope()
 
     override fun getUnsubstitutedPrimaryConstructor(): ClassConstructorDescriptor {
-
-
-
         unsubstitutedPrimaryConstructor?.let { return it }
         val constructor = ClassConstructorDescriptorImpl.create(
             this,
@@ -179,11 +223,12 @@ open class GeneratedKtxChildrenLambdaClassDescriptor(private val module: ModuleD
             ValueParameterDescriptorImpl(
                 constructor,
                 null, index, Annotations.EMPTY,
-                Name.identifier("p"+index),
+                Name.identifier("p$index"),
                 parameterType,
                 false,
                 false,
-                false, null, SourceElement.NO_SOURCE)
+                false, null, SourceElement.NO_SOURCE
+            )
         }
 
         constructor.initialize(
@@ -201,16 +246,13 @@ open class GeneratedKtxChildrenLambdaClassDescriptor(private val module: ModuleD
     }
 
     override fun substitute(substitutor: TypeSubstitutor): ClassDescriptor = error("Class $this can't be substituted")
-
     override fun getThisAsReceiverParameter(): ReceiverParameterDescriptor = thisAsReceiverParameter
-
     override fun getModality(): Modality = modality
     override fun getOriginal(): ClassDescriptor = this
     override fun getVisibility(): Visibility = Visibilities.PUBLIC
     override fun getSource(): SourceElement = sourceElement
     override fun getTypeConstructor(): TypeConstructor = typeConstructor
     override fun getDefaultType(): SimpleType = defaultType
-
     override fun isCompanionObject(): Boolean = false
     override fun isData(): Boolean = false
     override fun isInner(): Boolean = false
@@ -225,23 +267,4 @@ open class GeneratedKtxChildrenLambdaClassDescriptor(private val module: ModuleD
     }
 
     override fun toString(): String = "GeneratedChildrenLambdaClassDescriptor($fqNameUnsafe)"
-
-    var instanceCreatorFunction: SimpleFunctionDescriptor? = null;
-    fun getInstanceCreatorFunction(componentClassDescriptor: ClassDescriptor) : SimpleFunctionDescriptor {
-        if(instanceCreatorFunction != null) return instanceCreatorFunction!!
-        val returnType : SimpleType = this.defaultType
-        val annotations = AnnotationsImpl(listOf(AnnotationDescriptorImpl(componentClassDescriptor.module.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("kotlin.jvm.JvmStatic")))!!.defaultType, HashMap<Name, ConstantValue<*>>(), SourceElement.NO_SOURCE)))
-        val newMethod = SimpleFunctionDescriptorImpl.create(componentClassDescriptor, annotations, Name.identifier("createInstance"), CallableMemberDescriptor.Kind.SYNTHESIZED, SourceElement.NO_SOURCE)
-        val contextParameter = ValueParameterDescriptorImpl(
-            newMethod,
-            null, 0, Annotations.EMPTY,
-            Name.identifier("context"),
-            componentClassDescriptor.module.findClassAcrossModuleDependencies(ClassId.topLevel(FqName("android.content.Context")))!!.defaultType,
-            false,
-            false,
-            false, null, SourceElement.NO_SOURCE)
-        newMethod.initialize(null, if(componentClassDescriptor.isCompanionObject) componentClassDescriptor.thisAsReceiverParameter else null, emptyList(), listOf(contextParameter), returnType, Modality.OPEN, Visibilities.PUBLIC)
-        instanceCreatorFunction = newMethod
-        return newMethod
-    }
 }

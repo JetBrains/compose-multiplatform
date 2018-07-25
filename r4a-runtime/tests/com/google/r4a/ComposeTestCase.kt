@@ -156,7 +156,7 @@ abstract class ComposeTestCase : TestCase() {
             val prev = CompositionContext.current
             CompositionContext.current = cc
             cc.setInstance(component)
-            cc.compose()
+            component.compose()
             cc.end()
             fn(cc, component, root, activity)
             CompositionContext.current = prev

@@ -37,8 +37,6 @@ class R4AComponentRegistrar : ComponentRegistrar {
         StorageComponentContainerContributor.registerExtension(project, ComponentsClosedDeclarationChecker())
         StorageComponentContainerContributor.registerExtension(project, ComposableAnnotationChecker())
         KtxTypeResolutionExtension.registerExtension(project, R4aKtxTypeResolutionExtension())
-        SyntheticResolveExtension.registerExtension(project, StaticWrapperCreatorFunctionResolveExtension())
-        SyntheticResolveExtension.registerExtension(project, WrapperViewSettersGettersResolveExtension())
         SyntheticIrExtension.registerExtension(project, R4ASyntheticIrExtension())
     }
 }

@@ -69,5 +69,9 @@ object R4ADefaultErrorMessages : DefaultErrorMessages.Extension {
                 R4AErrors.KTX_IN_NON_COMPOSABLE,
                 "Stateless Functional Components (SFCs) containing KTX Tags should be marked with the @Composable annotation"
         )
+        MAP.put(
+            R4AErrors.UNRESOLVED_TAG,
+            "Unresolved tag"
+        )
     }
 }
