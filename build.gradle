@@ -39,7 +39,6 @@ repos.addMavenRepositories(repositories)
 
 dependencies {
     compile build_libs.gradle
-    compile build_libs.jacoco
     compile build_libs.error_prone_gradle
     compile gradleApi()
     testCompile "junit:junit:4.12"
