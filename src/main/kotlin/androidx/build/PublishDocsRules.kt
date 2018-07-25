@@ -23,7 +23,7 @@ import androidx.build.Strategy.TipOfTree
 import androidx.build.Strategy.Prebuilts
 import androidx.build.Strategy.Ignore
 
-val RELEASE_RULE = docsRules("public") {
+val RELEASE_RULE = docsRules("public", false) {
     val defaultVersion = "1.0.0-beta01"
     prebuilts(LibraryGroups.ANNOTATION, defaultVersion)
     prebuilts(LibraryGroups.APPCOMPAT, defaultVersion)
@@ -90,7 +90,7 @@ val RELEASE_RULE = docsRules("public") {
     default(Ignore)
 }
 
-val TIP_OF_TREE = docsRules("tipOfTree") {
+val TIP_OF_TREE = docsRules("tipOfTree", true) {
     default(TipOfTree)
 }
 
@@ -98,13 +98,13 @@ val TIP_OF_TREE = docsRules("tipOfTree") {
  * Rules are resolved in addition order. So if you have two rules that specify how docs should be
  * built for a module, first defined rule wins.
  */
-fun docsRules(name: String, init: PublishDocsRulesBuilder.() -> Unit): PublishDocsRules {
-    val f = PublishDocsRulesBuilder(name)
+fun docsRules(name: String, offline: Boolean, init: PublishDocsRulesBuilder.() -> Unit): PublishDocsRules {
+    val f = PublishDocsRulesBuilder(name, offline)
     f.init()
     return f.build()
 }
 
-class PublishDocsRulesBuilder(private val name: String) {
+class PublishDocsRulesBuilder(private val name: String, private val offline: Boolean) {
 
     private val rules: MutableList<DocsRule> = mutableListOf()
     /**
@@ -164,7 +164,7 @@ class PublishDocsRulesBuilder(private val name: String) {
         rules.add(DocsRule(Exact(groupName, name), Ignore))
     }
 
-    fun build() = PublishDocsRules(name, rules)
+    fun build() = PublishDocsRules(name, offline, rules)
 }
 
 sealed class ArtifactsPredicate {
@@ -211,7 +211,7 @@ sealed class Strategy {
     }
 }
 
-class PublishDocsRules(val name: String, private val rules: List<DocsRule>) {
+class PublishDocsRules(val name: String, val offline: Boolean, private val rules: List<DocsRule>) {
     fun resolve(groupName: String, moduleName: String): DocsRule {
         return rules.find { it.predicate.apply(groupName, moduleName) } ?: throw Error()
     }

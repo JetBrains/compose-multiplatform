@@ -110,13 +110,22 @@ object DiffAndDocs {
         // but our libraries may each be of different versions
         // So, we display the date as the new version
         val newVersion = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        val offlineOverride = root.processProperty("offlineDocs")
+
         rules.forEach {
+            val offline = if (offlineOverride != null) {
+                offlineOverride == "true"
+            } else {
+                it.offline
+            }
+
             val task = createGenerateDocsTask(
                     project = root, generateSdkApiTask = generateSdkApiTask,
                     doclavaConfig = doclavaConfiguration,
                     supportRootFolder = supportRootFolder, dacOptions = dacOptions,
                     destDir = File(root.docsDir(), it.name),
-                    taskName = "${it.name}DocsTask")
+                    taskName = "${it.name}DocsTask",
+                    offline = offline)
             docsTasks[it.name] = task
             anchorTask.dependsOn(createDistDocsTask(root, task, it.name))
         }
@@ -632,7 +641,8 @@ private fun createGenerateDocsTask(
     supportRootFolder: File,
     dacOptions: DacOptions,
     destDir: File,
-    taskName: String = "generateDocs"
+    taskName: String = "generateDocs",
+    offline: Boolean
 ): GenerateDocsTask =
         project.tasks.createWithConfig(taskName, GenerateDocsTask::class.java) {
             dependsOn(generateSdkApiTask, doclavaConfig)
@@ -641,7 +651,6 @@ private fun createGenerateDocsTask(
                     "use \'-PofflineDocs=true\' parameter."
 
             setDocletpath(doclavaConfig.resolve())
-            val offline = project.processProperty("offlineDocs") != null
             destinationDir = File(destDir, if (offline) "offline" else "online")
             classpath = androidJarFile(project)
             checksConfig = GENERATE_DOCS_CONFIG
