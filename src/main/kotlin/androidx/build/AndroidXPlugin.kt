@@ -95,9 +95,7 @@ class AndroidXPlugin : Plugin<Project> {
     private fun Project.configureRootProject() {
         Release.createGlobalArchiveTask(this)
 
-        val supportRootFolder = if (name == "app-toolkit") projectDir.parentFile else projectDir
-
-        val allDocsTask = DiffAndDocs.configureDiffAndDocs(this, supportRootFolder,
+        val allDocsTask = DiffAndDocs.configureDiffAndDocs(this, projectDir,
                 DacOptions("androidx", "ANDROIDX_DATA"),
                 listOf(RELEASE_RULE))
 
