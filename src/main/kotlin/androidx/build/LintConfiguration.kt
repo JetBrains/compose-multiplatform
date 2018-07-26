@@ -49,6 +49,7 @@ fun Project.configureLint(lintOptions: LintOptions, extension: SupportLibraryExt
             fatal("VisibleForTests")
             fatal("NoHardKeywords")
             fatal("SyntheticAccessor")
+            fatal("UnusedResources")
 
             if (extension.mavenVersion?.isFinalApi() == true) {
                 fatal("MissingTranslation")
