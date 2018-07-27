@@ -21,12 +21,12 @@ import androidx.build.Strategy.TipOfTree
 import androidx.build.checkapi.ApiXmlConversionTask
 import androidx.build.checkapi.CheckApiTask
 import androidx.build.checkapi.UpdateApiTask
-import androidx.build.doclava.DoclavaTask
-import androidx.build.doclava.DEFAULT_DOCLAVA_CONFIG
 import androidx.build.doclava.CHECK_API_CONFIG_DEVELOP
-import androidx.build.doclava.CHECK_API_CONFIG_RELEASE
 import androidx.build.doclava.CHECK_API_CONFIG_PATCH
+import androidx.build.doclava.CHECK_API_CONFIG_RELEASE
 import androidx.build.doclava.ChecksConfig
+import androidx.build.doclava.DEFAULT_DOCLAVA_CONFIG
+import androidx.build.doclava.DoclavaTask
 import androidx.build.docs.ConcatenateFilesTask
 import androidx.build.docs.GenerateDocsTask
 import androidx.build.jdiff.JDiffTask
@@ -46,24 +46,11 @@ import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.javadoc.Javadoc
 import java.io.File
+import java.net.URLClassLoader
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import kotlin.collections.Collection
-import kotlin.collections.List
-import kotlin.collections.MutableMap
-import kotlin.collections.emptyList
-import kotlin.collections.filter
-import kotlin.collections.find
-import kotlin.collections.forEach
-import kotlin.collections.listOf
-import kotlin.collections.mapNotNull
-import kotlin.collections.minus
-import kotlin.collections.mutableMapOf
-import kotlin.collections.plus
-import kotlin.collections.set
-import kotlin.collections.toSet
-import java.net.URLClassLoader
 import javax.tools.ToolProvider
+import kotlin.collections.set
 
 private const val DOCLAVA_DEPENDENCY = "com.android:doclava:1.0.6"
 
@@ -799,10 +786,10 @@ private fun <T : Task> TaskContainer.createWithConfig(
         create(name, taskClass) { task -> task.config() }
 
 fun androidJarFile(project: Project): FileCollection =
-        project.files(arrayOf(File(project.fullSdkPath(),
+        project.files(arrayOf(File(project.sdkPath(),
                 "platforms/android-${SupportConfig.CURRENT_SDK_VERSION}/android.jar")))
 
-private fun androidSrcJarFile(project: Project): File = File(project.fullSdkPath(),
+private fun androidSrcJarFile(project: Project): File = File(project.sdkPath(),
         "platforms/android-${SupportConfig.CURRENT_SDK_VERSION}/android-stubs-src.jar")
 
 private fun PublishDocsRules.resolve(extension: SupportLibraryExtension): DocsRule? {
@@ -818,7 +805,7 @@ private fun BaseVariant.rFile() = "${applicationId.replace('.', '/')}/R.java"
 // Nasty part. Get rid of that eventually!
 private fun Project.docsDir(): File = properties["docsDir"] as File
 
-private fun Project.fullSdkPath(): File = rootProject.properties["fullSdkPath"] as File
+private fun Project.sdkPath(): File = getSdkPath(rootProject.projectDir)
 
 private fun Project.version() = Version(project.version as String)
 
