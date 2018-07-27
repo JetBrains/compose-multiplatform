@@ -155,6 +155,11 @@ object LibraryVersions {
     val SLICE = Version("1.1.0-alpha01")
 
     /**
+     * Version code for slice-* modules.
+     */
+    val SWIPE_REFRESH_LAYOUT = Version("1.1.0-alpha01")
+
+    /**
      * Version code for Biometric
      */
     val BIOMETRIC = Version("1.0.0-alpha01")
