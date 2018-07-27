@@ -19,9 +19,9 @@ package androidx.build
 import androidx.build.ArtifactsPredicate.All
 import androidx.build.ArtifactsPredicate.Exact
 import androidx.build.ArtifactsPredicate.Group
-import androidx.build.Strategy.TipOfTree
-import androidx.build.Strategy.Prebuilts
 import androidx.build.Strategy.Ignore
+import androidx.build.Strategy.Prebuilts
+import androidx.build.Strategy.TipOfTree
 
 val RELEASE_RULE = docsRules("public", false) {
     val defaultVersion = "1.0.0-beta01"
@@ -29,8 +29,9 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.APPCOMPAT, defaultVersion)
     prebuilts(LibraryGroups.ASYNCLAYOUTINFLATER, defaultVersion)
     prebuilts(LibraryGroups.BROWSER, defaultVersion)
+    ignore(LibraryGroups.CAR, "car-cluster")
     prebuilts(LibraryGroups.CAR, "1.0.0-alpha4")
-            .addStubs("car/car-stubs/android.car.jar")
+            .addStubs("car/core/car-stubs/android.car.jar")
     prebuilts(LibraryGroups.CARDVIEW, defaultVersion)
     prebuilts(LibraryGroups.COLLECTION, defaultVersion)
     prebuilts(LibraryGroups.CONTENTPAGER, defaultVersion)
