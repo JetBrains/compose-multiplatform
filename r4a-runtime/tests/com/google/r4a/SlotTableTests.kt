@@ -1,12 +1,6 @@
-/*
- * Copyright 2010-2018 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
- * that can be found in the license/LICENSE.txt file.
- */
-
 package com.google.r4a
 
 import junit.framework.TestCase
-import org.junit.Assert
 
 class SlotTableTests : TestCase() {
     fun testCanCreate() {
@@ -17,11 +11,11 @@ class SlotTableTests : TestCase() {
 
     fun testCanInsert() {
         val slots = SlotTable()
-        slots.startGroup()
         slots.beginInsert()
+        slots.startGroup()
         slots.next()
-        slots.endInsert()
         slots.endGroup()
+        slots.endInsert()
     }
 
     fun testValidateSlots() {
@@ -137,7 +131,113 @@ class SlotTableTests : TestCase() {
             assertEquals(i, slots.next())
     }
 
-    // Semantic tests (testing groups and containers)
+    // Anchor tests
+
+    fun testAllocateAnchors() {
+        val slots = testSlotsNumbered()
+        val anchors = (1..7).map { slots.anchor(it * 10) }
+        for (index in 1..7) {
+            val anchor = anchors[index - 1]
+            assertEquals(index * 10 , slots.get(anchor))
+        }
+    }
+
+    fun testAnchorsTrackInserts() {
+        val slots = testSlotsNumbered()
+        val anchors = (1..7).map { slots.anchor(it * 10) }
+        slots.current = 40
+        slots.beginInsert()
+        repeat(50) { slots.next() }
+        slots.endInsert()
+        for (index in 1..7) {
+            val anchor = anchors[index - 1]
+            assertEquals(index * 10 , slots.get(anchor))
+        }
+    }
+
+    fun testAnchorTracksExactRemovesUpwards() {
+        val slots = testSlotsNumbered()
+        val anchors = (1..7).map { slots.anchor(it * 10) }
+        for (index in 1..7) {
+            slots.remove(index * 10, 1)
+            assertEquals(-1, anchors[index - 1].location(slots))
+        }
+    }
+
+    fun testAnchorTracksExactRemovesDownwards() {
+        val slots = testSlotsNumbered()
+        val anchors = (1..7).map { slots.anchor(it * 10) }
+        for (index in 7 downTo 1 ) {
+            slots.remove(index * 10, 1)
+            assertEquals(-1, anchors[index - 1].location(slots))
+        }
+    }
+
+    fun testAnchorTracksExtactRemovesInnerOuter() {
+        val slots = testSlotsNumbered()
+        val anchors = (1..7).map { slots.anchor(it * 10) }
+        for (index in listOf(4, 5, 3, 6, 2, 7, 1) ) {
+            slots.remove(index * 10, 1)
+            assertEquals(-1, anchors[index - 1].location(slots))
+        }
+    }
+
+    fun testAnchorTracksExactRemovesOuterInner() {
+        val slots = testSlotsNumbered()
+        val anchors = (1..7).map { slots.anchor(it * 10) }
+        for (index in listOf(1, 7, 2, 6, 3, 5, 4) ) {
+            slots.remove(index * 10, 1)
+            assertEquals(-1, anchors[index - 1].location(slots))
+        }
+    }
+
+    fun testAnchorTrackRemoves() {
+        val slots = testSlotsNumbered()
+        val anchors = (1..7).map { slots.anchor(it * 10) }
+        slots.remove(40, 20)
+        for (index in 1..7) {
+            val anchor = anchors[index - 1]
+            val expected = (index * 10).let { if (it in 40..60) SlotTable.EMPTY else it }
+            assertEquals(expected , slots.get(anchor))
+        }
+    }
+
+    fun testRemovingDuplicateAnchorsMidRange() {
+        val slots = testSlotsNumbered()
+        val anchors = (0 until 10).map { slots.anchor(30) }
+        slots.remove(20, 20)
+        for (anchor in anchors) {
+            assertEquals(-1, anchor.location(slots))
+        }
+    }
+
+    fun testRemovingDuplicateAnchorsStartRange() {
+        val slots = testSlotsNumbered()
+        val anchors = (0 until 10).map { slots.anchor(30) }
+        slots.remove(30, 20)
+        for (anchor in anchors) {
+            assertEquals(-1, anchor.location(slots))
+        }
+    }
+
+    fun testRemovingDuplicateAnchorsEndRange() {
+        val slots = testSlotsNumbered()
+        val anchors = (0 until 10).map { slots.anchor(30) }
+        slots.remove(20, 11)
+        for (anchor in anchors) {
+            assertEquals(-1, anchor.location(slots))
+        }
+    }
+
+    fun testDuplicateAnchorIdentity() {
+        val slots = testSlotsNumbered()
+        val anchors = (0 until 10).map { slots.anchor( it * 5) }
+        anchors.forEachIndexed { index, anchor ->
+            assertTrue(anchor ===  slots.anchor(index * 5))
+        }
+    }
+
+    // Semantic tests (testing groups and nodes)
 
     fun testExtractKeys() {
         val slots = testItems()
@@ -187,7 +287,7 @@ class SlotTableTests : TestCase() {
         slots.endGroup()
     }
 
-    fun testCountContainers() {
+    fun testCountNodes() {
         val slots = testItems()
         slots.startGroup()
         for (i in 0 until 10) {
@@ -197,22 +297,22 @@ class SlotTableTests : TestCase() {
         slots.endGroup()
     }
 
-    fun testCountNestedContainers() {
+    fun testCountNestedNodes() {
         val slots = SlotTable()
-        slots.startGroup()
         slots.beginInsert()
+        slots.startGroup()
         slots.startItem(null)
         repeat(10) {
             slots.startItem(null)
             repeat(3) {
-                slots.startContainer()
-                slots.endContainer()
+                slots.startNode()
+                slots.endNode()
             }
             assertEquals(3, slots.endItem())
         }
         assertEquals(30, slots.endItem())
-        slots.endInsert()
         slots.endGroup()
+        slots.endInsert()
         slots.reset()
 
         slots.startGroup()
@@ -220,24 +320,24 @@ class SlotTableTests : TestCase() {
         slots.endGroup()
     }
 
-    fun testUpdateNestedContainerCountOnInsert() {
+    fun testUpdateNestedNodeCountOnInsert() {
         val slots = SlotTable()
-        slots.startGroup()
         slots.beginInsert()
+        slots.startGroup()
         slots.startItem(null)
         repeat(10) {
             slots.startItem(null)
             repeat(3) {
                 slots.startItem(null)
-                slots.startContainer()
-                slots.endContainer()
+                slots.startNode()
+                slots.endNode()
                 assertEquals(1, slots.endItem())
             }
             assertEquals(3, slots.endItem())
         }
         assertEquals(30, slots.endItem())
-        slots.endInsert()
         slots.endGroup()
+        slots.endInsert()
         slots.reset()
 
         slots.startGroup()
@@ -251,8 +351,8 @@ class SlotTableTests : TestCase() {
         slots.beginInsert()
         repeat(2) {
             slots.startItem(null)
-            slots.startContainer()
-            slots.endContainer()
+            slots.startNode()
+            slots.endNode()
             assertEquals(1, slots.endItem())
         }
         slots.endInsert()
@@ -267,24 +367,24 @@ class SlotTableTests : TestCase() {
         slots.endGroup()
     }
 
-    fun testUpdateNestedContainerCountOnRemove() {
+    fun testUpdateNestedNodeCountOnRemove() {
         val slots = SlotTable()
-        slots.startGroup()
         slots.beginInsert()
+        slots.startGroup()
         slots.startItem(null)
         repeat(10) {
             slots.startItem(null)
             repeat(3) {
                 slots.startItem(null)
-                slots.startContainer()
-                slots.endContainer()
+                slots.startNode()
+                slots.endNode()
                 assertEquals(1, slots.endItem())
             }
             assertEquals(3, slots.endItem())
         }
         assertEquals(30, slots.endItem())
-        slots.endInsert()
         slots.endGroup()
+        slots.endInsert()
         slots.reset()
 
         slots.startGroup()
@@ -309,68 +409,68 @@ class SlotTableTests : TestCase() {
         slots.endGroup()
     }
 
-    fun testContainersResetContainerCount() {
+    fun testNodesResetNodeCount() {
         val slots = SlotTable()
-        slots.startGroup()
         slots.beginInsert()
+        slots.startGroup()
         slots.startItem(null)
-        slots.startContainer()
+        slots.startNode()
         repeat(10) {
-            slots.startContainer()
+            slots.startNode()
             slots.startItem(null)
             repeat(3) {
-                slots.startContainer()
-                slots.endContainer()
+                slots.startNode()
+                slots.endNode()
             }
             assertEquals(3, slots.endItem())
-            slots.endContainer()
+            slots.endNode()
         }
-        slots.endContainer()
+        slots.endNode()
         assertEquals(1, slots.endItem())
-        slots.endInsert()
         slots.endGroup()
+        slots.endInsert()
     }
 
-    fun testSkipAContainer() {
+    fun testSkipANode() {
         val slots = SlotTable()
-        slots.startGroup()
         slots.beginInsert()
+        slots.startGroup()
         slots.startItem(null)
-        slots.startContainer()
+        slots.startNode()
         repeat(10) {
-            slots.startContainer()
+            slots.startNode()
             slots.startItem(null)
             repeat(3) {
-                slots.startContainer()
-                slots.endContainer()
+                slots.startNode()
+                slots.endNode()
             }
             assertEquals(3, slots.endItem())
-            slots.endContainer()
+            slots.endNode()
         }
-        slots.endContainer()
+        slots.endNode()
         assertEquals(1, slots.endItem())
-        slots.endInsert()
         slots.endGroup()
+        slots.endInsert()
 
         slots.reset()
         slots.startGroup()
         slots.startItem(null)
-        assertEquals(1, slots.skipContainer())
+        assertEquals(1, slots.skipNode())
         slots.endGroup()
         slots.endGroup()
     }
 
     fun testMemo() {
         val slots = SlotTable()
-        slots.startGroup()
         slots.beginInsert()
+        slots.startGroup()
         slots.startItem(null)
         slots.startMemo()
         repeat(10) { slots.update(it) }
         slots.endMemo()
         slots.endItem()
-        slots.endInsert()
         slots.endGroup()
+        slots.endInsert()
         slots.reset()
 
         slots.beginReading()
@@ -390,28 +490,28 @@ class SlotTableTests : TestCase() {
 
     fun testSkipMemos() {
         val slots = SlotTable()
-        slots.startGroup()
         slots.beginInsert()
+        slots.startGroup()
         slots.update(null)
         repeat(10) {
             slots.startMemo()
             slots.update(it)
             slots.endMemo()
         }
-        slots.startContainer()
+        slots.startNode()
         slots.update(42)
-        slots.endContainer()
-        slots.endInsert()
+        slots.endNode()
         slots.endGroup()
+        slots.endInsert()
         slots.reset()
 
         slots.beginReading()
         slots.startGroup()
         assertEquals(null, slots.next())
         slots.skipMemos()
-        slots.startContainer()
+        slots.startNode()
         assertEquals(42, slots.next())
-        slots.endContainer()
+        slots.endNode()
         slots.endGroup()
         slots.endReading()
         slots.reset()
@@ -419,28 +519,28 @@ class SlotTableTests : TestCase() {
 
     fun testStartEmpty() {
         val slots = SlotTable()
-        slots.startGroup()
         slots.beginEmpty()
+        slots.startGroup()
         assertEquals(true, slots.inEmpty)
         assertEquals(SlotTable.EMPTY, slots.next())
-        slots.endEmpty()
         slots.endGroup()
+        slots.endEmpty()
         slots.reset()
     }
 
     fun testReportGroupSize() {
         val slots = SlotTable()
-        slots.startGroup()
         slots.beginInsert()
+        slots.startGroup()
         slots.startItem(null)
         repeat(10) {
-            slots.startContainer()
-            slots.endContainer()
+            slots.startNode()
+            slots.endNode()
         }
         slots.endItem()
         slots.update(42)
-        slots.endInsert()
         slots.endGroup()
+        slots.endInsert()
         slots.reset()
 
         slots.startGroup()
@@ -449,7 +549,7 @@ class SlotTableTests : TestCase() {
         val size = slots.groupSize
         val savedCurrent = slots.current
         slots.skipGroup()
-        assertEquals(size, slots.current - savedCurrent - 2)
+        assertEquals(size, slots.current - savedCurrent - 1)
         assertEquals(42, slots.next())
         assertEquals(true, slots.isGroupEnd)
         slots.endGroup()
@@ -457,14 +557,14 @@ class SlotTableTests : TestCase() {
 
     fun testIsGroups() {
         val slots = SlotTable()
-        slots.startGroup()
         slots.beginInsert()
         slots.startGroup()
+        slots.startGroup()
         slots.endGroup()
-        slots.startContainer()
-        slots.endContainer()
+        slots.startNode()
+        slots.endNode()
+        slots.endGroup()
         slots.endInsert()
-        slots.endGroup()
         slots.reset()
 
         slots.startGroup()
@@ -473,21 +573,19 @@ class SlotTableTests : TestCase() {
         assertEquals(false, slots.isGroup)
         assertEquals(true, slots.isGroupEnd)
         slots.endGroup()
-        assertEquals(true, slots.isContainer)
+        assertEquals(true, slots.isNode)
         assertEquals(false, slots.isGroupEnd)
-        slots.startContainer()
-        assertEquals(false, slots.isContainer)
+        slots.startNode()
+        assertEquals(false, slots.isNode)
         assertEquals(true, slots.isGroupEnd)
-        slots.endContainer()
+        slots.endNode()
         slots.endGroup()
     }
 
-    fun testReportUncertainContainerCount() {
+    fun testReportUncertainNodeCount() {
         val slots = SlotTable()
         slots.beginReading()
-        slots.startGroup()
-        slots.reportUncertainContainerCount()
-        slots.endGroup()
+        slots.reportUncertainNodeCount()
         slots.endReading()
         slots.reset()
     }
@@ -501,11 +599,12 @@ fun testSlotsNumbered(): SlotTable {
     return SlotTable(items)
 }
 
+private val elementKey = object{}
 // Creates 0 until 10 items each with 10 elements numbered 0...n with 0..n slots
 fun testItems(): SlotTable {
     val slots = SlotTable()
-    slots.startGroup()
     slots.beginInsert()
+    slots.startGroup()
 
     fun item(key: Any?, memoGroup: Boolean = false, block: () -> Unit) {
         slots.startItem(key)
@@ -520,16 +619,16 @@ fun testItems(): SlotTable {
 
     fun element(key: Any?, block: () -> Unit) {
         item(key) {
-            slots.startContainer()
+            slots.startNode()
             block()
-            slots.endContainer()
+            slots.endNode()
         }
     }
 
     for (key in 0 until 10) {
         item(key, memoGroup = key % 4 == 0) {
             for (item in 0..key) {
-                element(null) {
+                element(elementKey) {
                     for (element in 0..key)
                         slots.update(element)
                 }
@@ -538,8 +637,8 @@ fun testItems(): SlotTable {
         }
     }
 
-    slots.endInsert()
     slots.endGroup()
+    slots.endInsert()
     slots.reset()
 
     return slots
@@ -547,7 +646,7 @@ fun testItems(): SlotTable {
 
 fun SlotTable.startItem(key: Any?) {
     if (isReading) {
-        Assert.assertEquals(key, next())
+        org.junit.Assert.assertEquals(key, next())
     } else {
         update(key)
     }
@@ -558,7 +657,7 @@ fun SlotTable.startItem(key: Any?) {
 fun SlotTable.endItem(): Int = endGroup()
 
 fun SlotTable.expectItem(key: Any?): Int {
-    Assert.assertEquals(key, next())
+    org.junit.Assert.assertEquals(key, next())
     skipMemo()
     return skipGroup()
 }

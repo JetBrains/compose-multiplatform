@@ -1,36 +1,34 @@
 package com.google.r4a
 
-import java.util.Stack
-
 /**
  * A buffer-gap editor implementation of a composition slot space. A slot space can be thought of as a custom List<Any?>
  * that optimizes around inserts and removes.
  *
- * Slots stores slots, groups, memos, items, and containers.
+ * Slots stores slots, groups, memos, items, and nodes.
  *
- *   Slot      - A slot is the primitive base type of the slot space. It is of type Any? and can hold any value.
- *   Group     - A group is a group of slots. The group counts the number of slots and containers it contains.
- *   Item      - An item is a key slot followed by an optional memo and then a group. The key is intended to identify
- *               the content of a group. Key values are opaque to the slots and are to be interpreted by the code that
- *               uses the slot space.
- *   Container - A container is a special group that is counted by the containing groups.
- *   Memo      - A memo is a special group that follows a key and precedes the group of an item.
+ *   Slot  - A slot is the primitive base type of the slot space. It is of type Any? and can hold any value.
+ *   Group - A group is a group of slots. The group counts the number of slots and nodes it contains.
+ *   Item  - An item is a key slot followed by an optional memo and then a group. The key is intended to identify the
+ *           content of a group. Key values are opaque to the slots and are to be interpreted by the code that uses the
+ *           slot space.
+ *   Node  - A node is a special group that is counted by the containing groups.
+ *   Memo  - A memo is a special group that follows a key and precedes the group of an item.
  *
- * All groups, memos, items, and containers are just grouping of slots and use slots to describe the groups. At the root
- * of a slot space is a group. Groups count the number containers that are in the group. An item is defined by a key and
- * an optional memo followed by a group or container. A container only counts as one container in its group regardless
- * of the number of containers it contains.
+ * All groups, memos, items, and nodes are just grouping of slots and use slots to describe the groups. At the root
+ * of a slot space is a group. Groups count the number nodes that are in the group. An item is defined by a key and
+ * an optional memo followed by a group or node. A node only counts as one node in its group regardless of the number of
+ * nodes it contains.
  *
  * ASIDE:
- *  The intent is for items to represent memoized function calls and containers represent views. For example,
+ *  The intent is for items to represent memoized function calls and nodes represent views. For example,
  *
  *   <LinearLayout>
  *       <Contact contact={jim} />
  *       <Contact contact={bob} />
  *   </LinearLayout>
  *
- *  the <LinearLayout> tag here would be a container (the linear layout view). Its memo would be empty as there is no
- *  parameters. The container contains the items for the child views of the linear layout.
+ *  the <LinearLayout> tag here would be a node (the linear layout view). Its memo would be empty as there is no
+ *  parameters. The node contains the items for the child views of the linear layout.
  *
  *  If contact's composition looks like:
  *
@@ -40,10 +38,10 @@ import java.util.Stack
  *    }
  *
  *  then composing contact into the linear layout would add two views to the linear layout's children. The composition
- *  of contact creates an item which with the contact value as a memo and then contains two containers, one for each
- *  text view. The items for each contact would be able to report that it produces two views (that is the group created
- *  for Contact has two containers). Summing the containers in the items of a container produces the number of views (as
- *  each container corresponds to a view).
+ *  of contact creates an item which with the contact value as a memo and then contains two nodes, one for each text
+ *  view. The items for each contact would be able to report that it produces two views (that is the group created
+ *  for Contact has two nodes). Summing the nodes in the items group produces the number of views (as each node
+ *  corresponds to a view).
  *
  *  If the order that jim and bob change above,
  *
@@ -54,7 +52,7 @@ import java.util.Stack
  *
  *  the previous result can be reused by moving the views generated bob's item before jim's (or vis versa). A
  *  composition algorithm could use the key information for each item to determine if they can be switched. For example,
- *  since the first contact's group has two container the composition algorithm can infer that the beginning of jim's
+ *  since the first contact's group has two nodes the composition algorithm can infer that the beginning of jim's
  *  views starts at 2 and contains 2 view. To move jim in front of bob, move the 2 views from offset 2 to offset 0.
  *  The memo can then be used to determine if the function call's effect will the same as the previous result. If
  *  contact is immutable, for example, Contact would only need to be recomposed if the value of jim or bob change.
@@ -71,27 +69,34 @@ import java.util.Stack
  *  ASIDE: The is intended to allow the same generated code to both to create and update views. Empty mode is used
  *  during composition, insert mode is used during apply.
  */
-class SlotTable(private var slots: Array<Any?> = arrayOf(GroupStart(GROUP, 0, 0), GROUP_END)) {
+class SlotTable(private var slots: Array<Any?> = arrayOf()) {
     var current = 0
+    internal val startStack = IntStack()
     private var gapStart = 0
     private var gapLen = 0
     private var insertCount = 0
     private var emptyCount = 0
     private var readingCount = 0
-    private val startStack = Stack<Int>()
-    private val groupKindStack = Stack<GroupKind>()
-    private val containerCountStack = Stack<Int>()
-    private var containerCount = 0
+    private val groupKindStack = IntStack()
+    private val nodeCountStack = IntStack()
+    private var currentEnd =  slots.size
+    private val endStack = IntStack()
+    private var nodeCount = 0
+    private var pendingClear = false
+    private var uncertainCount = false
+
+    private var anchors = ArrayList<Anchor>()
 
     /**
      * Get the value at the current slot
      */
     fun get() = if (emptyCount > 0) EMPTY else slots[effectiveIndex(current - 1)]
+    fun get(anchor: Anchor) = if (anchor.loc >= 0) slots[anchor.loc] else EMPTY
 
     /**
      * Get the value at the index'th slot.
      */
-    fun get(index: Int) = slots[effectiveIndex(index)]
+    fun get(index: Int) = effectiveIndex(index).let { if (it < slots.size) slots[it] else EMPTY }
 
     /**
      * Set the value of the next slot.
@@ -121,8 +126,11 @@ class SlotTable(private var slots: Array<Any?> = arrayOf(GroupStart(GROUP, 0, 0)
         if (insertCount > 0) {
             insert(1)
         }
-        current++
-        return get(current - 1)
+        if (current >= currentEnd) {
+            return EMPTY
+        }
+        val index = current++
+        return slots[effectiveIndex(index)]
     }
 
     /**
@@ -199,7 +207,8 @@ class SlotTable(private var slots: Array<Any?> = arrayOf(GroupStart(GROUP, 0, 0)
         assert(emptyCount == 0) { "Cannot reset in an empty region" }
         assert(readingCount == 0) { "Cannot reset when in reading mode" }
         current = 0
-        containerCount = 0
+        nodeCount = 0
+        nodeCountStack.clear()
     }
 
     /**
@@ -214,13 +223,18 @@ class SlotTable(private var slots: Array<Any?> = arrayOf(GroupStart(GROUP, 0, 0)
         if (emptyCount <= 0) {
             startStack.push(current)
             groupKindStack.push(kind)
-            containerCountStack.push(containerCount)
-            containerCount = 0
+            nodeCountStack.push(nodeCount)
+            // Record the end location as relative to the end of the slot table so when we pop it back off again
+            // all inserts and removes that happened while a child group was open are already reflected into its value.
+            endStack.push(slots.size - gapLen - currentEnd)
+            nodeCount = 0
             if (insertCount > 0) {
                 next() // Skip a slot for the GroupStart added by endGroup.
+                currentEnd = current
             } else {
                 val groupStart = next().asGroupStart
                 assert(groupStart.kind == kind) { "Group kind changed" }
+                currentEnd = current + groupStart.slots
             }
         }
     }
@@ -233,53 +247,70 @@ class SlotTable(private var slots: Array<Any?> = arrayOf(GroupStart(GROUP, 0, 0)
         assert(emptyCount == 0) { "Cannot skip while in an empty region" }
         val groupStart = next().asGroupStart
         current += groupStart.slots
-        expectGroupEnd()
 
-        val count = if (groupStart.isContainer) 1 else groupStart.containers
-        containerCount += count
+        val count = if (groupStart.isNode) 1 else groupStart.nodes
+        nodeCount += count
+
         return count
     }
 
-    private fun expectGroupEnd() {
-        val groupEnd = next()
-        assert(groupEnd === GROUP_END) { "Expected a group end marker" }
+    /**
+     * Skip the to the end of the group.
+     */
+    fun skipEnclosingGroup(): Int {
+        assert(insertCount == 0) { "Cannot skip the enclosing group while inserting" }
+        assert(emptyCount == 0) { "Cannot skip the enclosing group while in an empty region" }
+        assert(readingCount != 0) { "Can only skip the enclosing group in reading mode as the node counts are uncertain" }
+        assert(startStack.isNotEmpty()) { "No enclosing group to skip" }
+        val startLocation = startStack.peek()
+        val start = get(startLocation).asGroupStart
+        current = currentEnd
+        uncertainCount = true
+        return start.nodes
     }
 
     /**
      * End the current group. Must be called after the corresponding startGroup().
      */
     fun endGroup(): Int {
-        val count = containerCount
         if (emptyCount <= 0) {
-            assert(!startStack.empty()) { "Invalid state. Unbalanced calls to startGroup() and endGroup()" }
-            val marker = next()
-            if (marker === EMPTY) set(GROUP_END)
-            else assert(marker === GROUP_END) { "Expected a group end marker" }
+            var count = nodeCount
+            assert(!startStack.isEmpty()) { "Invalid state. Unbalanced calls to startGroup() and endGroup()" }
+            assert(insertCount > 0 || current == currentEnd) { "Expected to be at the end of a group" }
 
             // Update group length
             val startLocation = startStack.pop()
             val groupKind = groupKindStack.pop()
             val effectiveStartLocation = effectiveIndex(startLocation)
             assert(slots[effectiveStartLocation] === EMPTY || slots[effectiveStartLocation] is GroupStart) { "Invalid state. Start location stack doesn't refer to a start location" }
-            val len = current - startLocation - 2
+            val len = current - startLocation - 1
             if (readingCount > 0) {
                 val start = slots[effectiveStartLocation].asGroupStart
-                // A container count < 0 means that it was reported as uncertain while reading
-                assert(start.slots == len && (start.containers == containerCount || containerCount < 0)) { "Invalid endGroup call, expected ${start.slots} slots and ${start.containers} containers but received, $len slots and $containerCount containers" }
+                // A node count < 0 means that it was reported as uncertain while reading
+                assert(start.slots == len && (nodeCount == start.nodes || uncertainCount)) { "Invalid endGroup call, expected ${start.slots} slots and ${start.nodes} nodes but received, $len slots and $nodeCount nodes" }
+                count = start.nodes
             } else {
-                slots[effectiveStartLocation] = GroupStart(groupKind, len, containerCount)
+                slots[effectiveStartLocation] = GroupStart(groupKind, len, nodeCount)
             }
-            containerCount = containerCountStack.pop() + if (groupKind == CONTAINER) 1 else containerCount
-            if (readingCount <= 0 && containerCountStack.isEmpty()) clearGap()
-        }
-        return count
+            nodeCount = nodeCountStack.pop() + if (groupKind == NODE) 1 else nodeCount
+            currentEnd = (slots.size - gapLen) - endStack.pop()
+            if (readingCount <= 0 && nodeCountStack.isEmpty()) clearGap()
+            return count
+        } else return 0
     }
 
-    val isGroup get() = get(current) is GroupStart
-    val isContainer get() = (get(current) as? GroupStart)?.isContainer ?: false
-    val isMemoGroup get() = (get(current) as? GroupStart)?.isMemo ?: false
+    val isGroup get() = current < currentEnd && get(current) is GroupStart
+    fun isGroup(index: Int) = get(index) is GroupStart
+    val isNode get() = current < currentEnd && (get(current) as? GroupStart)?.isNode ?: false
+    val isMemoGroup get() = current < currentEnd && (get(current) as? GroupStart)?.isMemo ?: false
     val groupSize get() = get(current).asGroupStart.slots
-    val isGroupEnd get() = get(current) === GROUP_END
+    fun groupSize(index: Int): Int = get(index).asGroupStart.slots
+    val isGroupEnd get() = inEmpty || current == currentEnd
+    val nodeIndex get() = nodeCount
+    val parentNodes: Int get() {
+        assert(readingCount > 0) { "Cannot read parenNodes count while updating"}
+        return if (startStack.isEmpty()) 0 else  slots[effectiveIndex(startStack.peek())].asGroupStart.nodes
+    }
 
     /**
      * Move the offset'th group after the current item to the current location. Must be called when a keyed group is
@@ -290,6 +321,7 @@ class SlotTable(private var slots: Array<Any?> = arrayOf(GroupStart(GROUP, 0, 0)
         assert(insertCount == 0) { "Cannot move an item while inserting" }
         assert(emptyCount == 0) { "Cannot move an item in an empty region" }
         val oldCurrent = current
+        val oldNodeCount = nodeCount
 
         // Find the item to move
         var count = offset
@@ -307,6 +339,7 @@ class SlotTable(private var slots: Array<Any?> = arrayOf(GroupStart(GROUP, 0, 0)
         insert(moveLen)
         val newMoveLocation = moveLocation + moveLen // insert inserted moveLen slots which moved moveLocation
         current = oldCurrent
+        nodeCount = oldNodeCount
         System.arraycopy(slots, effectiveIndex(newMoveLocation), slots, effectiveIndex(current), moveLen)
         remove(moveLocation + moveLen, moveLen)
     }
@@ -322,25 +355,25 @@ class SlotTable(private var slots: Array<Any?> = arrayOf(GroupStart(GROUP, 0, 0)
         val count = skipItem()
         remove(oldCurrent, current - oldCurrent)
         current = oldCurrent
-        containerCount -= count
+        nodeCount -= count
     }
 
     /**
-     * Start a container. A container resets the element count stack.
+     * Start a node.
      */
-    fun startContainer() {
-        startGroup(CONTAINER)
+    fun startNode() {
+        startGroup(NODE)
     }
 
     /**
-     * End a container
+     * End a node
      */
-    fun endContainer() = endGroup()
+    fun endNode() = endGroup()
 
     /**
-     * Skip a container
+     * Skip a node
      */
-    fun skipContainer() = skipGroup()
+    fun skipNode() = skipGroup()
 
     /**
      * Skip the current item
@@ -358,9 +391,9 @@ class SlotTable(private var slots: Array<Any?> = arrayOf(GroupStart(GROUP, 0, 0)
         skipMemos()
     }
 
-    fun reportUncertainContainerCount() {
+    fun reportUncertainNodeCount() {
         assert(readingCount > 0) { "Can only report an uncertain count while reading" }
-        containerCount = UNCERTAIN
+        uncertainCount = true
     }
 
     /**
@@ -392,26 +425,24 @@ class SlotTable(private var slots: Array<Any?> = arrayOf(GroupStart(GROUP, 0, 0)
     }
 
     /**
-     * Extract the keys from this point to the end of the container. The current is left unaffected.
-     * Must be called inside a container at the beginning of an item (or element)
+     * Extract the keys from this point to the end of the group. The current is left unaffected.
+     * Must be called inside a group at the beginning of an item
      */
     fun extractItemKeys(): MutableList<KeyInfo> {
         assert(insertCount == 0) { "Cannot extract keys while inserting" }
         val result = mutableListOf<KeyInfo>()
         if (emptyCount > 0) return result
         val oldCurrent = current
-        while (true) {
+        val oldNodeCount = nodeCount
+        var index = 0
+        while (current < currentEnd) {
             val location = current
-            val key = next()
-            if (key !== GROUP_END && key !== EMPTY) {
-                skipMemo()
-                result.add(KeyInfo(key, location, skipGroup()))
-            } else {
-                previous()
-                break
-            }
+            val key = next()!!
+            skipMemo()
+            result.add(KeyInfo(key, location, skipGroup(), index++))
         }
         current = oldCurrent
+        this.nodeCount = oldNodeCount
         return result
     }
 
@@ -420,6 +451,8 @@ class SlotTable(private var slots: Array<Any?> = arrayOf(GroupStart(GROUP, 0, 0)
 
     private fun moveGapTo(index: Int) {
         if (gapLen > 0 && gapStart != index) {
+            pendingClear = false
+            if (anchors.isNotEmpty()) updateAnchors(index)
             if (index < gapStart) {
                 val len = gapStart - index
                 System.arraycopy(slots, index, slots, index + gapLen, len)
@@ -428,6 +461,7 @@ class SlotTable(private var slots: Array<Any?> = arrayOf(GroupStart(GROUP, 0, 0)
                 System.arraycopy(slots, gapStart + gapLen, slots, gapStart, len)
             }
             gapStart = index
+            pendingClear = true
         } else {
             gapStart = index
         }
@@ -435,6 +469,7 @@ class SlotTable(private var slots: Array<Any?> = arrayOf(GroupStart(GROUP, 0, 0)
 
     private fun insert(size: Int) {
         if (size > 0) {
+            pendingClear = false
             moveGapTo(current)
             if (gapLen < size) {
                 // Create a bigger gap
@@ -447,43 +482,123 @@ class SlotTable(private var slots: Array<Any?> = arrayOf(GroupStart(GROUP, 0, 0)
                 // Copy the old array into the new array
                 System.arraycopy(slots, 0, newSlots, 0, gapStart)
                 System.arraycopy(slots, oldGapEnd, newSlots, newGapEnd, oldSize - oldGapEnd)
+
+                // Update the anchors
+                if (anchors.isNotEmpty()) anchorGapResize(newGapLen - gapLen)
+
                 // Update the gap and slots
                 slots = newSlots
                 gapLen = newGapLen
             }
+            if (currentEnd >= gapStart) currentEnd += size
             gapStart += size
             gapLen -= size
 
             repeat(size) {
                 slots[current + it] = EMPTY
             }
+            pendingClear = true
         }
     }
 
     internal fun remove(start: Int, len: Int) {
         if (len > 0) {
+            pendingClear = false
             if (gapLen == 0) {
                 // If there is no current gap, just make the removed items the gap
                 gapStart = start
+                if (anchors.isNotEmpty()) removeAnchors(start + len, len)
                 gapLen = len
             } else {
                 // Move the gap to the startGroup + len location and set the gap startGroup to startGroup and gap len to len + gapLen
                 val removeEnd = start + len
                 moveGapTo(removeEnd)
+                if (anchors.isNotEmpty()) removeAnchors(gapStart, len)
                 gapStart = start
                 gapLen += len
+            }
+            if (currentEnd >= gapStart) currentEnd -= len
+            pendingClear = true
+        }
+    }
+
+    private data class GroupStart(val kind: GroupKind, val slots: Int, val nodes: Int) {
+        val isNode get() = kind == NODE
+        val isMemo get() = kind == MEMO
+    }
+
+    /**
+     * Allocate an anchor for a location. As content is inserted and removed from the slot table the anchor is updated
+     * to reflect those changes. For example, if an anchor is requested for an item, the anchor will report the location
+     * of that item even if the item is moved in the slot table. If the position referenced by the anchor is removed,
+     * the anchor location is set to -1.
+     */
+    fun anchor(index: Int = current): Anchor {
+        // TODO: Consider a buffer gap list of anchors if middle inserts and deletes are common
+        val anchorIndex = effectiveIndex(index)
+        val location = anchors.search(anchorIndex)
+        return if (location < 0) {
+            val anchor = Anchor(anchorIndex)
+            anchors.add(-(location + 1), anchor)
+            anchor
+        } else anchors[location]
+    }
+
+    private fun ArrayList<Anchor>.search(index: Int) = binarySearch { it.loc.compareTo(index) }
+    private fun ArrayList<Anchor>.locationOf(index: Int) = search(index).let { if (it >= 0) it else -(it + 1) }
+
+    private fun updateAnchors(gapMovedTo: Int) {
+        val from = gapStart + gapLen
+        val to = if (gapMovedTo < gapStart) gapMovedTo else gapMovedTo + gapLen
+        if (gapStart < gapMovedTo) {
+            var index = anchors.locationOf(from)
+            while (index < anchors.size) {
+                val anchor = anchors[index]
+                if (anchor.loc < to) {
+                    anchor.loc += gapLen
+                    index++
+                }
+                else break
+            }
+        } else {
+            var index = anchors.locationOf(to)
+            while (index < anchors.size) {
+                val anchor = anchors[index]
+                if (anchor.loc > from) {
+                    anchor.loc -= gapLen
+                    index++
+                } else break
             }
         }
     }
 
-    private data class GroupStart(val kind: GroupKind, val slots: Int, val containers: Int) {
-        val isContainer get() = kind == CONTAINER
-        val isMemo get() = kind == MEMO
+    private fun anchorGapResize(delta: Int) {
+        val start = anchors.locationOf(gapStart + gapLen)
+        for (index in start until anchors.size)
+            anchors[index].loc += delta
     }
 
+    private fun removeAnchors(gapStart: Int, size: Int) {
+        val removeStart = gapStart - size
+        var index = anchors.locationOf(gapStart).let { if (it >= anchors.size) it - 1 else it }
+        while (index >= 0) {
+            val anchor = anchors[index]
+            if (anchor.loc >= removeStart) {
+                anchor.loc = -1
+                anchors.removeAt(index)
+                index--
+            } else break
+        }
+    }
+
+    internal fun anchorLocation(anchor: Anchor) = anchor.loc.let { if (it > gapStart) it - gapLen else it }
+
     override fun toString(): String {
-        clearGap() // Clearing the gap makes debugging easier
-        return "${javaClass.simpleName}(current=${current}, size=${slots.size - gapLen}, gap=${ if (gapLen > 0) "${gapStart}-${gapStart + gapLen - 1}" else "none" }${if (isReading) ", reading" else ""}${if (insertCount >0) ", inserting" else ""}${if (inEmpty) ", in empty" else ""})"
+        if (pendingClear) {
+            pendingClear = false
+            clearGap()
+        }
+        return "${javaClass.simpleName}(current=$current, size=${slots.size - gapLen}, gap=${ if (gapLen > 0) "$gapStart-${gapStart + gapLen - 1}" else "none" }${if (isReading) ", reading" else ""}${if (insertCount >0) ", inserting" else ""}${if (inEmpty) ", in empty" else ""})"
     }
 
     private fun clearGap() {
@@ -492,33 +607,41 @@ class SlotTable(private var slots: Array<Any?> = arrayOf(GroupStart(GROUP, 0, 0)
 
     companion object {
         val EMPTY = object {}
-        private val GROUP_END = object {}
     }
 }
 
 /**
  * Information about items and their keys.
  */
-data class KeyInfo(
+class KeyInfo(
     /**
      * The key used for an item.
      */
-    val key: Any?,
+    val key: Any,
     /**
      * The location of the group start of the item.
      */
     val location: Int,
+
     /**
-     * The number of containers in the group. If the group is a container this is always 1.
+     * The number of nodes in the group. If the group is a node this is always 1.
      */
-    val containers: Int
+    val nodes: Int,
+
+    /**
+     * The index of the key info in the list returned by extractItemKeys
+     */
+    val index: Int
 )
+
+class Anchor(internal var loc: Int) {
+    fun location(slots: SlotTable) = slots.anchorLocation(this)
+}
 
 private typealias GroupKind = Int
 
 private const val GROUP: GroupKind = 0
-private const val CONTAINER: GroupKind = 1
+private const val NODE: GroupKind = 1
 private const val MEMO: GroupKind = 2
 
-private const val UNCERTAIN = -(Int.MAX_VALUE / 2)
 private const val MIN_GROWTH_SIZE = 128
