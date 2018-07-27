@@ -52,7 +52,7 @@ object LibraryVersions {
     /**
      * Version code for Paging
      */
-    val PAGING = Version("2.0.0-rc01")
+    val PAGING = Version("2.1.0-alpha01")
 
     private val LIFECYCLES = Version("2.0.0-rc01")
 
@@ -175,4 +175,9 @@ object LibraryVersions {
      * Version code for TextClassifier
      */
     val TEXTCLASSIFIER = Version("1.0.0-alpha01")
+
+    /**
+     * Version code for RecyclerView
+     */
+    val RECYCLERVIEW = Version("1.1.0-alpha01")
 }
