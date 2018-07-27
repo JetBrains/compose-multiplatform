@@ -164,30 +164,7 @@ def configureBuildOnServer() {
             }
         }
     }
-    buildOnServerTask.dependsOn createJacocoAntUberJarTask()
     return buildOnServerTask
-}
-
-def createJacocoAntUberJarTask() {
-    def myJacoco = project.configurations.create('myJacoco')
-    project.dependencies.add('myJacoco', build_libs.jacoco_ant)
-
-    return project.tasks.create(
-            name: "JacocoAntUberJar",
-            type: Jar) {
-        inputs.files myJacoco
-        from {
-            myJacoco
-                    .resolvedConfiguration
-                    .resolvedArtifacts.collect{ zipTree(it.getFile()) }} {
-            // exclude all the signatures the jar might have
-            exclude "META-INF/*.SF"
-            exclude "META-INF/*.DSA"
-            exclude "META-INF/*.RSA"
-        }
-        destinationDir file(project.distDir)
-        archiveName "jacocoant.jar"
-    }
 }
 
 def configureSubProjects() {

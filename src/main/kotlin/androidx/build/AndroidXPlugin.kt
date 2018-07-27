@@ -22,6 +22,7 @@ import androidx.build.SupportConfig.DEFAULT_MIN_SDK_VERSION
 import androidx.build.SupportConfig.INSTRUMENTATION_RUNNER
 import androidx.build.gradle.getByType
 import androidx.build.gradle.isRoot
+import androidx.build.jacoco.Jacoco
 import androidx.build.license.configureExternalDependencyLicenseCheck
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
@@ -100,6 +101,9 @@ class AndroidXPlugin : Plugin<Project> {
                 listOf(RELEASE_RULE))
 
         tasks.getByName(BUILD_ON_SERVER_TASK).dependsOn(allDocsTask)
+
+        val jacocoUberJar = Jacoco.createUberJarTask(this)
+        tasks.getByName(BUILD_ON_SERVER_TASK).dependsOn(jacocoUberJar)
     }
 
     private fun Project.configureAndroidCommonOptions(extension: BaseExtension) {
