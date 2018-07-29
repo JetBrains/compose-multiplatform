@@ -29,6 +29,10 @@ abstract class AbstractR4aDiagnosticsTest: KtUsefulTestCase() {
         // Setup the environment for the analysis
         val environment = createEnvironment()
         setupEnvironment(environment)
+        doTest(expectedText, environment)
+    }
+
+    fun doTest(expectedText: String, environment: KotlinCoreEnvironment) {
         val diagnosedRanges: List<CheckerTestUtil.DiagnosedRange> = ArrayList()
         val clearText = CheckerTestUtil.parseDiagnosedRanges(expectedText, diagnosedRanges)
         val file = KotlinTestUtils.createFile("test.kt", clearText, environment.project)
@@ -71,7 +75,7 @@ abstract class AbstractR4aDiagnosticsTest: KtUsefulTestCase() {
                     }
                     found.add(reportedDiagnostic)
                 } else {
-                    message.append("  Error ${diagnostic.name} not reported, expected at ${range.start}\n")
+                    message.append("  Diagnostic ${diagnostic.name} not reported, expected at ${range.start}\n")
                     message.append(sourceInfo(clearText, range.start, range.end, "  "))
                 }
             }
@@ -81,7 +85,7 @@ abstract class AbstractR4aDiagnosticsTest: KtUsefulTestCase() {
         for (diagnostic in errors) {
             if (diagnostic !in found) {
                 val range = diagnostic.textRanges.first()
-                message.append("  Unexpected error ${diagnostic.factoryName} reported at ${range.startOffset}\n")
+                message.append("  Unexpected diagnostic ${diagnostic.factoryName} reported at ${range.startOffset}\n")
                 message.append(sourceInfo(clearText, range.startOffset, range.endOffset, "  "))
             }
         }
@@ -90,10 +94,12 @@ abstract class AbstractR4aDiagnosticsTest: KtUsefulTestCase() {
         if (message.length > 0) throw Exception("Mismatched errors:\n" + message.toString())
     }
 
+    protected fun createClasspath() = listOf(KotlinTestUtils.getAnnotationsJar(),
+                                             assertExists(File("dist/kotlinc/lib/r4a-runtime.jar")),
+                                             assertExists(File("custom-dependencies/android-sdk/build/libs/android.jar")))
+
     protected fun createEnvironment(): KotlinCoreEnvironment {
-        val classPath = listOf(KotlinTestUtils.getAnnotationsJar(),
-                               assertExists(File("dist/kotlinc/lib/r4a-runtime.jar")),
-                               assertExists(File("custom-dependencies/android-sdk/build/libs/android.jar")))
+        val classPath = createClasspath()
         val configuration = KotlinTestUtils.newConfiguration(
                 ConfigurationKind.JDK_ONLY,
                 TestJdkKind.MOCK_JDK,
@@ -119,8 +125,13 @@ fun assertExists(file: File): File {
 
 // Normalize the factory's name to find the name supplied by a plugin
 val Diagnostic.factoryName: String
-  inline get() = if (factory.name == "PLUGIN_ERROR")
-        (this as DiagnosticWithParameters1<*,RenderedDiagnostic<*>>).a.diagnostic.factory.name else factory.name
+  inline get() {
+      if (factory.name == "PLUGIN_ERROR")
+          return (this as DiagnosticWithParameters1<*,RenderedDiagnostic<*>>).a.diagnostic.factory.name
+      if (factory.name == "PLUGIN_WARNING")
+          return (this as DiagnosticWithParameters1<*,RenderedDiagnostic<*>>).a.diagnostic.factory.name
+      return factory.name
+  }
 
 fun String.lineStart(offset: Int): Int {
     return this.lastIndexOf('\n', offset) + 1

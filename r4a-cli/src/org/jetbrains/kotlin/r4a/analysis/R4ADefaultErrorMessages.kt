@@ -3,6 +3,7 @@ package org.jetbrains.kotlin.r4a.analysis
 import org.jetbrains.kotlin.diagnostics.rendering.DefaultErrorMessages
 import org.jetbrains.kotlin.diagnostics.rendering.DiagnosticFactoryToRendererMap
 import org.jetbrains.kotlin.diagnostics.rendering.Renderers
+import org.jetbrains.kotlin.r4a.analysis.R4AErrors.CHILDREN_INVOCATION
 
 object R4ADefaultErrorMessages : DefaultErrorMessages.Extension {
     private val MAP = DiagnosticFactoryToRendererMap("R4A")
@@ -61,9 +62,25 @@ object R4ADefaultErrorMessages : DefaultErrorMessages.Extension {
                 Renderers.commaSeparated(Renderers.RENDER_TYPE)
         )
         MAP.put(
-                R4AErrors.SVC_INVOCATION,
-                "Stateless Functional Components (SFCs) should not be invoked, use <{1} /> syntax instead",
-                Renderers.STRING
+            R4AErrors.SVC_INVOCATION,
+            "Stateless Functional Components (SFCs) should not be invoked, use <{1} /> syntax instead",
+            Renderers.STRING
+        )
+        MAP.put(
+            R4AErrors.CHILDREN_INVOCATION,
+            "Suspicious invocation; consider using the <{1} /> syntax instead",
+            Renderers.STRING
+        )
+        MAP.put(
+            R4AErrors.CHILDREN_NOT_COMPOSABLE,
+            "Suspicious definition; consider making {1} composable by adding an @Composable annotation to the type.  Recommended type: `@Composable() ()->Unit`",
+            Renderers.STRING
+        )
+        MAP.put(
+            R4AErrors.NON_COMPOSABLE_INVOCATION,
+            "{1} `{2}` must be marked as @Composable in order to be used as a KTX tag",
+            Renderers.STRING,
+            Renderers.STRING
         )
         MAP.put(
                 R4AErrors.KTX_IN_NON_COMPOSABLE,

@@ -2,6 +2,8 @@ package org.jetbrains.kotlin.r4a
 
 import org.jetbrains.kotlin.extensions.KtxControlFlowExtension
 import org.jetbrains.kotlin.extensions.KtxTypeResolutionExtension
+import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
+import org.jetbrains.kotlin.extensions.TypeResolutionInterceptorExtension
 import org.jetbrains.kotlin.psi2ir.extensions.SyntheticIrExtension
 import org.jetbrains.kotlin.resolve.extensions.SyntheticResolveExtension
 
@@ -11,6 +13,8 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         super.setUp()
         KtxTypeResolutionExtension.registerExtension(myEnvironment.project, R4aKtxTypeResolutionExtension())
         KtxControlFlowExtension.registerExtension(myEnvironment.project, R4aKtxControlFlowExtension())
+        StorageComponentContainerContributor.registerExtension(myEnvironment.project, ComposableAnnotationChecker())
+        TypeResolutionInterceptorExtension.registerExtension(myEnvironment.project, R4aTypeResolutionInterceptorExtension())
         SyntheticIrExtension.registerExtension(myEnvironment.project, R4ASyntheticIrExtension())
 //        SyntheticResolveExtension.registerExtension(myEnvironment.project, StaticWrapperCreatorFunctionResolveExtension())
 //        SyntheticResolveExtension.registerExtension(myEnvironment.project, WrapperViewSettersGettersResolveExtension())
@@ -376,7 +380,33 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
     )
 
-    fun testChildrenWithParameters() = testCompile(
+    fun testChildrenWithTypedParameters() = testCompile(
+        """
+        import android.widget.*
+        import com.google.r4a.*
+
+        class HelperComponent : Component() {
+            @Children lateinit var children: (title: String, rating: Int)->Unit
+            override fun compose() {
+                val children = this.children
+                <children title="Hello World!" rating={5} />
+                <children title="Kompose is awesome!" rating={5} />
+                <children title="Bitcoin!" rating={4} />
+            }
+        }
+
+        class MainComponent : Component() {
+            var name = "World"
+            override fun compose() {
+                <HelperComponent> title: String, rating: Int ->
+                    <TextView text={title+" ("+rating+" stars)"} />
+                </HelperComponent>
+            }
+        }
+        """
+    )
+
+    fun testChildrenWithUntypedParameters() = testCompile(
         """
         import android.widget.*
         import com.google.r4a.*

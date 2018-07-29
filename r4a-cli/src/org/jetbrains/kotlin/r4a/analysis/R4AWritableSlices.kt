@@ -1,6 +1,7 @@
 package org.jetbrains.kotlin.r4a.analysis
 
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtxAttribute
 import org.jetbrains.kotlin.psi.KtxElement
@@ -24,4 +25,5 @@ object R4AWritableSlices {
     val KTX_ATTR_TYPE: WritableSlice<KtxAttribute, KotlinType> = BasicWritableSlice(RewritePolicy.DO_NOTHING)
 
     val KTX_ATTR_INFO: WritableSlice<KtxAttribute, KtxAttributeInfo> = BasicWritableSlice(RewritePolicy.DO_NOTHING)
+    val COMPOSABLE_ANALYSIS: WritableSlice<KtElement, Boolean> = BasicWritableSlice(RewritePolicy.DO_NOTHING)
 }
