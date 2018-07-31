@@ -20,6 +20,7 @@ import androidx.build.SupportConfig.BUILD_TOOLS_VERSION
 import androidx.build.SupportConfig.CURRENT_SDK_VERSION
 import androidx.build.SupportConfig.DEFAULT_MIN_SDK_VERSION
 import androidx.build.SupportConfig.INSTRUMENTATION_RUNNER
+import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.gradle.getByType
 import androidx.build.gradle.isRoot
 import androidx.build.jacoco.Jacoco
@@ -104,6 +105,8 @@ class AndroidXPlugin : Plugin<Project> {
 
         val jacocoUberJar = Jacoco.createUberJarTask(this)
         tasks.getByName(BUILD_ON_SERVER_TASK).dependsOn(jacocoUberJar)
+
+        AffectedModuleDetector.configure(gradle, this)
     }
 
     private fun Project.configureAndroidCommonOptions(extension: BaseExtension) {
