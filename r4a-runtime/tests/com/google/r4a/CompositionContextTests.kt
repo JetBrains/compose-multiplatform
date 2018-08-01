@@ -3,10 +3,8 @@
 package com.google.r4a
 
 import android.view.View
-import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import junit.framework.TestCase
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -25,10 +23,12 @@ class CompositionContextTests : ComposeTestCase() {
     @Test
     fun testNativeViewWithAttributes() = compose {
 
-        // <TextView id={456} text="some text" />
-        emitView(123, ::TextView) {
-            set(456) { id = it }
-            set("some text") { text = it }
+        with (it) {
+            // <TextView id={456} text="some text" />
+            emitView(123, ::TextView) {
+                set(456) { id = it }
+                set("some text") { text = it }
+            }
         }
     }.then { _, _, root, activity ->
         assertEquals(1, root.childCount)
@@ -47,10 +47,12 @@ class CompositionContextTests : ComposeTestCase() {
             // this should cause the textview to get recreated on every compose
             i++
 
-            // <TextView id={456} text="some text" />
-            emitView(i, ::TextView) {
-                set(456) { id = it }
-                set("some text") { text = it }
+            with (it) {
+                // <TextView id={456} text="some text" />
+                emitView(i, ::TextView) {
+                    set(456) { id = it }
+                    set("some text") { text = it }
+                }
             }
         }.then { cc, component, root, activity ->
             val tv1 = activity.findViewById(456) as TextView
@@ -73,18 +75,20 @@ class CompositionContextTests : ComposeTestCase() {
             // this should cause the textview to get recreated on every compose
 
             // <LinearLayout id={345}>
-            emitView(100, ::LinearLayout, {
-                set(345) { id = it }
-            }) {
-                // <TextView id={456} text="some text" />
-                emitView(101, ::TextView) {
-                    set(456) { id = it }
-                    set("some text") { text = it }
-                }
-                // <TextView id={567} text="some text" />
-                emitView(102, ::TextView) {
-                    set(567) { id = it }
-                    set("some text") { text = it }
+            with (it) {
+                emitView(100, ::LinearLayout, {
+                    set(345) { id = it }
+                }) {
+                    // <TextView id={456} text="some text" />
+                    emitView(101, ::TextView) {
+                        set(456) { id = it }
+                        set("some text") { text = it }
+                    }
+                    // <TextView id={567} text="some text" />
+                    emitView(102, ::TextView) {
+                        set(567) { id = it }
+                        set("some text") { text = it }
+                    }
                 }
             }
         }.then { _, _, root, activity ->
@@ -105,15 +109,16 @@ class CompositionContextTests : ComposeTestCase() {
         val items = listOf(1, 2, 3, 4, 5, 6)
         compose {
             // this should cause the textview to get recreated on every compose
-
-            emitView(100, ::LinearLayout, {
-                set(345) { id = it }
-            }) {
-                for (i in items) {
-                    // <TextView id={456} text="some text" />
-                    emitView(101, ::TextView) {
-                        set(456) { id = it }
-                        set("some text $i") { text = it }
+            with(it) {
+                emitView(100, ::LinearLayout, {
+                    set(345) { id = it }
+                }) {
+                    for (i in items) {
+                        // <TextView id={456} text="some text" />
+                        emitView(101, ::TextView) {
+                            set(456) { id = it }
+                            set("some text $i") { text = it }
+                        }
                     }
                 }
             }
@@ -178,7 +183,7 @@ class CompositionContextTests : ComposeTestCase() {
 
         compose {
             // <A />
-            emitComponent(123, ::A)
+            it.emitComponent(123, ::A)
 
         }.then { _, _, _, activity ->
             // everything got rendered once
@@ -268,7 +273,7 @@ class CompositionContextTests : ComposeTestCase() {
 
         compose {
             // <A />
-            emitComponent(123, ::A)
+            it.emitComponent(123, ::A)
         }.then { _, _, _, activity ->
             // everything got rendered once
             assertEquals(1, counter["A"])
@@ -288,8 +293,10 @@ class CompositionContextTests : ComposeTestCase() {
 
     @Test
     fun testPreservesTree() = compose {
-        emitView(123, ::TextView) {
-            set("some text") { text = it }
+        with (it) {
+            emitView(123, ::TextView) {
+                set("some text") { text = it }
+            }
         }
     }.then { cc, component, _, _ ->
         val before = cc.treeAsString()
@@ -307,11 +314,13 @@ class CompositionContextTests : ComposeTestCase() {
         // </LinearLayout>
         // <LinearLayout />
 
-        emitView(123, ::LinearLayout, {}) {
-            emitView(123, ::LinearLayout)
+        with (it) {
+            emitView(123, ::LinearLayout, {}) {
+                emitView(123, ::LinearLayout)
+                emitView(123, ::LinearLayout)
+            }
             emitView(123, ::LinearLayout)
         }
-        emitView(123, ::LinearLayout)
 
     }.then { cc, component, root, activity ->
         assertChildHierarchy(root) {
@@ -347,12 +356,14 @@ class CompositionContextTests : ComposeTestCase() {
             //   </LinearLayout>
             // </LinearLayout>
 
-            emitView(123, ::LinearLayout, {}) {
+            with (it) {
                 emitView(123, ::LinearLayout, {}) {
-                    emitComponent(123, ::B)
-                }
-                emitView(123, ::LinearLayout, {}) {
-                    emitComponent(123, ::B)
+                    emitView(123, ::LinearLayout, {}) {
+                        emitComponent(123, ::B)
+                    }
+                    emitView(123, ::LinearLayout, {}) {
+                        emitComponent(123, ::B)
+                    }
                 }
             }
         }.then { cc, component, root, activity ->
