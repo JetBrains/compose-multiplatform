@@ -138,7 +138,8 @@ class AndroidXPlugin : Plugin<Project> {
         // Enable code coverage for debug builds only if we are not running inside the IDE, since
         // enabling coverage reports breaks the method parameter resolution in the IDE debugger.
         extension.buildTypes.getByName("debug").isTestCoverageEnabled =
-                !hasProperty("android.injected.invoked.from.ide")
+                !hasProperty("android.injected.invoked.from.ide") &&
+                !isBenchmark()
     }
 
     private fun Project.configureAndroidLibraryOptions(extension: LibraryExtension) {
@@ -207,4 +208,9 @@ class AndroidXPlugin : Plugin<Project> {
     companion object {
         const val BUILD_ON_SERVER_TASK = "buildOnServer"
     }
+}
+
+fun Project.isBenchmark(): Boolean {
+    // benchmark convention is to end name with "-benchmark"
+    return name.endsWith("-benchmark")
 }
