@@ -59,6 +59,8 @@ abstract class CompositionContext {
 
     abstract fun start(sourceHash: Int)
     abstract fun start(sourceHash: Int, key: Any?)
+    abstract fun startView(sourceHash: Int)
+    abstract fun startView(sourceHash: Int, key: Any?)
     abstract fun setInstance(instance: Any)
     abstract fun useInstance(): Any?
     abstract fun isInserting(): Boolean
