@@ -1,5 +1,5 @@
 package org.jetbrains.kotlin.r4a.compiler.lower
-
+/*
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.findClassAcrossModuleDependencies
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
@@ -432,3 +432,4 @@ private fun generateProperties(context: GeneratorContext, componentMetadata: Com
             .dirtyField
     )
 )
+        */

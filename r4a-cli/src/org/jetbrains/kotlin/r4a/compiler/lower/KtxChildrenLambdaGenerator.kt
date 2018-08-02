@@ -9,11 +9,15 @@ import org.jetbrains.kotlin.ir.expressions.IrDeclarationReference
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrGetValue
 import org.jetbrains.kotlin.ir.expressions.impl.*
+import org.jetbrains.kotlin.ir.types.toIrType
+import org.jetbrains.kotlin.ir.types.toKotlinType
 import org.jetbrains.kotlin.ir.util.createParameterDeclarations
 import org.jetbrains.kotlin.ir.util.endOffset
 import org.jetbrains.kotlin.ir.util.startOffset
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
+import org.jetbrains.kotlin.psi2ir.endOffsetOrUndefined
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
+import org.jetbrains.kotlin.psi2ir.startOffsetOrUndefined
 import org.jetbrains.kotlin.r4a.GeneratedKtxChildrenLambdaClassDescriptor
 import org.jetbrains.kotlin.r4a.compiler.ir.buildWithScope
 import org.jetbrains.kotlin.resolve.descriptorUtil.getSuperClassOrAny
@@ -31,20 +35,26 @@ fun generateChildrenLambda(
     val syntheticClassDescriptor = GeneratedKtxChildrenLambdaClassDescriptor(
         context.moduleDescriptor,
         container.packageFragmentDescriptor,
-        capturedAccesses.map { it.type },
+        capturedAccesses.map { it.type.toKotlinType() },
         functionType,
         parameters
     )
     val lambdaClass = context.symbolTable.declareClass(-1, -1, IrDeclarationOrigin.DEFINED, syntheticClassDescriptor)
+    lambdaClass.thisReceiver = context.symbolTable.declareValueParameter(
+        -1, -1,
+        IrDeclarationOrigin.INSTANCE_RECEIVER,
+        syntheticClassDescriptor.thisAsReceiverParameter,
+        syntheticClassDescriptor.thisAsReceiverParameter.type.toIrType()!!
+    )
 
-    lambdaClass.createParameterDeclarations()
     syntheticClassDescriptor.capturedAccessesAsProperties.forEach {
         lambdaClass.declarations.add(
             context.symbolTable.declareField(
                 it.startOffset ?: -1,
                 it.endOffset ?: -1,
                 IrDeclarationOrigin.DEFINED,
-                it
+                it,
+                it.type.toIrType()!!
             )
         )
     }
@@ -66,30 +76,32 @@ private fun generateConstructor(
         syntheticClassDescriptor.unsubstitutedPrimaryConstructor
     )
         .buildWithScope(context) { constructor ->
-            constructor.createParameterDeclarations()
-            val lambdaAsThisReceiver = context.symbolTable.declareValueParameter(
-                -1,
-                -1,
-                IrDeclarationOrigin.DEFINED,
+            val lambdaAsThisReceiver = context.symbolTable.referenceValueParameter(
                 syntheticClassDescriptor.thisAsReceiverParameter
-            ).symbol
+            )
+
+            val irValueParameters = syntheticClassDescriptor.unsubstitutedPrimaryConstructor.valueParameters.map { context.symbolTable.declareValueParameter(-1, -1, IrDeclarationOrigin.DEFINED, it, it.type.toIrType()!!) }
+            constructor.valueParameters.addAll(irValueParameters)
+
             val getThisExpr = IrGetValueImpl(-1, -1, lambdaAsThisReceiver)
 
             val statements = mutableListOf<IrStatement>()
             val superConstructor =
                 context.symbolTable.referenceConstructor(syntheticClassDescriptor.getSuperClassOrAny().constructors.single { it.valueParameters.size == 0 })
-            val superCall = IrDelegatingConstructorCallImpl(-1, -1, superConstructor, superConstructor.descriptor, 0)
+            val superCall = IrDelegatingConstructorCallImpl(-1, -1, superConstructor.descriptor.returnType.toIrType()!!, superConstructor.descriptor, 0)
 
             statements.add(superCall)
 
-            statements.add(IrInstanceInitializerCallImpl(-1, -1, context.symbolTable.referenceClass(syntheticClassDescriptor)))
+            statements.add(IrInstanceInitializerCallImpl(-1, -1, context.symbolTable.referenceClass(syntheticClassDescriptor), syntheticClassDescriptor.toIrType()))
 
             constructor.valueParameters.forEachIndexed { index, irValueParameter ->
-                val fieldSymbol = context.symbolTable.referenceField(syntheticClassDescriptor.capturedAccessesAsProperties[index])
-                statements.add(IrSetFieldImpl(-1, -1, fieldSymbol, getThisExpr, IrGetValueImpl(-1, -1, irValueParameter.symbol)))
+                val propertyDescriptor = syntheticClassDescriptor.capturedAccessesAsProperties[index]
+                val fieldSymbol = context.symbolTable.referenceField(propertyDescriptor)
+                statements.add(IrSetFieldImpl(-1, -1, fieldSymbol, getThisExpr, IrGetValueImpl(-1, -1, irValueParameter.symbol), propertyDescriptor.type.toIrType()!!))
             }
 
             constructor.body = IrBlockBodyImpl(-1, -1, statements)
+            constructor.returnType = syntheticClassDescriptor.unsubstitutedPrimaryConstructor.returnType.toIrType()!!
         }
 }
 
@@ -100,23 +112,18 @@ private fun generateInvokeFunction(
     parameters: List<ValueParameterDescriptor>,
     body: Collection<IrStatement>
 ): IrFunction {
+
     val functionDescriptor = syntheticClassDescriptor.invokeDescriptor
+    return context.symbolTable.declareSimpleFunction(-1, -1, IrDeclarationOrigin.DEFINED, functionDescriptor)
+        .buildWithScope(context) { irFunction ->
 
-    val lambdaAsThisReceiver = context.symbolTable.declareValueParameter(
-        -1,
-        -1,
-        IrDeclarationOrigin.DEFINED,
+    val lambdaAsThisReceiver = context.symbolTable.referenceValueParameter(
         syntheticClassDescriptor.thisAsReceiverParameter
-    ).symbol
+    )
 
-    functionDescriptor.valueParameters.forEach {
-        context.symbolTable.declareValueParameter(
-            -1,
-            -1,
-            IrDeclarationOrigin.DEFINED,
-            it
-        )
-    }
+    irFunction.dispatchReceiverParameter = context.symbolTable.declareValueParameter(-1, -1, IrDeclarationOrigin.DEFINED, functionDescriptor.dispatchReceiverParameter!!, functionDescriptor.dispatchReceiverParameter!!.type.toIrType()!!)
+
+    val irValueParameters = functionDescriptor.valueParameters.map { context.symbolTable.declareValueParameter(-1, -1, IrDeclarationOrigin.DEFINED, it, it.type.toIrType()!!) }
 
     val transformedBody = body.map {
         it.transform(object : IrElementTransformer<Nothing?> {
@@ -124,13 +131,15 @@ private fun generateInvokeFunction(
             override fun visitGetValue(expression: IrGetValue, data: Nothing?): IrExpression {
                 return when {
                     expression in capturedAccesses -> {
+                        val descriptor = syntheticClassDescriptor.capturedAccessesAsProperties[capturedAccesses.indexOf(expression)]
                         val newSymbol = context.symbolTable.referenceField(
-                            syntheticClassDescriptor.capturedAccessesAsProperties[capturedAccesses.indexOf(expression)]
+                            descriptor
                         )
                         IrGetFieldImpl(
                             expression.startOffset,
                             expression.endOffset,
                             newSymbol,
+                            descriptor.type.toIrType()!!,
                             IrGetValueImpl(-1, -1, lambdaAsThisReceiver),
                             expression.origin
                         )
@@ -158,10 +167,8 @@ private fun generateInvokeFunction(
         }, null)
     }
 
-    return context.symbolTable.declareSimpleFunction(-1, -1, IrDeclarationOrigin.DEFINED, functionDescriptor)
-        .buildWithScope(context) { irFunction ->
-            irFunction.createParameterDeclarations()
-
+            irFunction.valueParameters.addAll(irValueParameters)
+            irFunction.returnType = functionDescriptor.returnType!!.toIrType()!!
             irFunction.body = IrBlockBodyImpl(-1, -1, transformedBody.toList())
         }
 }

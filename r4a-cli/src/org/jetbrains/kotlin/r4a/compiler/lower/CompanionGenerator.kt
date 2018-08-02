@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.impl.*
+import org.jetbrains.kotlin.ir.types.toIrType
 import org.jetbrains.kotlin.ir.util.createParameterDeclarations
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
@@ -20,7 +21,6 @@ import org.jetbrains.kotlin.r4a.compiler.ir.buildWithScope
 // TODO: Create lower function for user when companion already exists.
 fun generateComponentCompanionObject(context: GeneratorContext, componentMetadata: ComponentMetadata): IrClass {
     val companion = context.symbolTable.declareClass(-1, -1, IrDeclarationOrigin.DEFINED, (componentMetadata.descriptor as ClassDescriptor).companionObjectDescriptor!!)
-    companion.createParameterDeclarations()
     companion.declarations.add(generateCreateInstanceFunction(context, componentMetadata, companion))
     return companion
 }
@@ -32,8 +32,9 @@ fun generateCreateInstanceFunction(context: GeneratorContext, componentMetadata:
 
             irFunction.createParameterDeclarations()
 
-            val wrapperViewInstance = IrCallImpl(-1, -1, context.symbolTable.referenceConstructor(componentMetadata.wrapperViewDescriptor.unsubstitutedPrimaryConstructor))
+            val constructorDescriptor = componentMetadata.wrapperViewDescriptor.unsubstitutedPrimaryConstructor
+            val wrapperViewInstance = IrCallImpl(-1, -1, constructorDescriptor.returnType.toIrType()!!, context.symbolTable.referenceConstructor(constructorDescriptor))
             wrapperViewInstance.putValueArgument(0, IrGetValueImpl(-1, -1, irFunction.valueParameters[0].symbol))
-            irFunction.body = IrBlockBodyImpl(-1, -1, listOf(IrReturnImpl(-1, -1, irFunction.symbol, wrapperViewInstance)))
+            irFunction.body = IrBlockBodyImpl(-1, -1, listOf(IrReturnImpl(-1, -1, irFunction.symbol.descriptor.returnType!!.toIrType()!!, irFunction.symbol, wrapperViewInstance)))
         }
 }

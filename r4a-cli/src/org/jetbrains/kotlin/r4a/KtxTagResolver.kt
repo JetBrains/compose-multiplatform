@@ -257,7 +257,7 @@ class KtxTagResolver(
                 moduleDescriptor.getPackage(FqName.topLevel(firstPart.name)).let { if (it.isEmpty()) null else it }
 
         if (currentDescriptor == null) return
-        else storeSimpleNameExpression(firstPart.expression, currentDescriptor, trace)
+        else storeSimpleNameExpression(firstPart.expression!!, currentDescriptor, trace)
 
         // TODO(lmr): we need to add visibility checks into this function...
         for (qualifierPartIndex in 1 until path.size) {
@@ -299,7 +299,7 @@ class KtxTagResolver(
                 }
 
             if (nextPackageOrClassDescriptor == null) return
-            else storeSimpleNameExpression(qualifierPart.expression, nextPackageOrClassDescriptor, trace)
+            else storeSimpleNameExpression(qualifierPart.expression!!, nextPackageOrClassDescriptor, trace)
 
             currentDescriptor = nextPackageOrClassDescriptor
         }
@@ -608,7 +608,7 @@ private fun KtExpression.asQualifierPartList(): List<QualifiedExpressionResolver
 
     fun addQualifierPart(expression: KtExpression?): Boolean {
         if (expression is KtSimpleNameExpression) {
-            result.add(QualifiedExpressionResolver.QualifierPart(expression))
+            result.add(QualifiedExpressionResolver.ExpressionQualifierPart(expression.getReferencedNameAsName(), expression))
             return true
         }
         return false
