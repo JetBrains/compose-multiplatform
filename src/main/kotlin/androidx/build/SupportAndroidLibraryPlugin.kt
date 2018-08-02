@@ -95,7 +95,7 @@ private fun Project.injectCompilationForBenchmarks(
     extension: LibraryExtension,
     supportLibraryExtension: SupportLibraryExtension
 ) {
-    if (name.endsWith("-benchmark")) {
+    if (isBenchmark()) {
         logger.log(LogLevel.WARN,
                 "Will use ADB command injection to force AOT-compile suspected benchmark")
         val group = supportLibraryExtension.mavenGroup
