@@ -173,4 +173,9 @@ object LibraryVersions {
      * Version code for TextClassifier
      */
     val TEXTCLASSIFIER = Version("1.0.0-alpha01")
+
+    /**
+     * Version code for Crane
+     */
+    val UI = Version("1.0.0-alpha01")
 }
