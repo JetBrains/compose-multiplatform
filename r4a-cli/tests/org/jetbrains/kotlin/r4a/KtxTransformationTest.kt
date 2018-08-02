@@ -386,7 +386,9 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         import com.google.r4a.*
 
         class HelperComponent : Component() {
-            @Children lateinit var children: (title: String, rating: Int)->Unit
+            private lateinit var children: (title: String, rating: Int) -> Unit
+            @Children fun setChildren2(x: (title: String, rating: Int) -> Unit) { children = x }
+
             override fun compose() {
                 val children = this.children
                 <children title="Hello World!" rating={5} />
