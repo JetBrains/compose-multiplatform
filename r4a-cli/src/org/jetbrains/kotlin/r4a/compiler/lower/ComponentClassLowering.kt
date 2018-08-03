@@ -220,9 +220,85 @@ private fun transform(
         }
     }
 
-    // TODO(lmr): loop through pivotal properties and create a composite key as a union of src location, "key", and all pivotal properties
     val keyAttribute = attributesByName["key"]
-    val ccStartMethod = if (keyAttribute != null) helper.ccStartMethodWithKey else helper.ccStartMethodWithoutKey
+    when (info.composableType) {
+        ComposableType.COMPONENT -> transformComponentElement(
+            context,
+            container,
+            owner,
+            tag,
+            helper,
+            output,
+            info,
+            keyAttribute,
+            attributes,
+            irChildrenInfo,
+            tagIndex
+        )
+        ComposableType.VIEW -> transformViewElement(
+            context,
+            container,
+            owner,
+            tag,
+            helper,
+            output,
+            info,
+            keyAttribute,
+            attributes,
+            tagIndex
+        )
+        ComposableType.FUNCTION_VAR -> transformFunctionVar(
+            context,
+            container,
+            owner,
+            tag,
+            helper,
+            output,
+            info,
+            keyAttribute,
+            attributes,
+            irChildrenInfo,
+            tagIndex
+        )
+        ComposableType.FUNCTION -> transformFunctionComponent(
+            context,
+            container,
+            owner,
+            tag,
+            helper,
+            output,
+            info,
+            keyAttribute,
+            attributes,
+            irChildrenInfo,
+            tagIndex
+        )
+        ComposableType.UNKNOWN -> error("Unknown composable type encountered")
+    }
+
+    return output
+}
+
+private enum class GroupKind {
+    Component,
+    View,
+    Function,
+}
+
+private fun callStart(
+    kind: GroupKind,
+    keyAttribute: IrAttributeInfo?,
+    helper: ComposeFunctionHelper,
+    tag: IrKtxTag,
+    context: GeneratorContext,
+    tagIndex: Int,
+    output: MutableList<IrStatement>
+) {
+    // TODO(lmr): loop through pivotal properties and create a composite key as a union of src location, "key", and all pivotal properties
+    val ccStartMethod = when (kind) {
+        GroupKind.View -> if (keyAttribute != null) helper.ccStartMethodWithKey else helper.ccStartMethodWithoutKey
+        else -> if (keyAttribute != null) helper.ccStartViewWithKey else helper.ccStartViewWithoutKey
+    }
 
     val ccStartMethodCall = IrCallImpl(
         tag.startOffset, tag.endOffset,
@@ -245,64 +321,16 @@ private fun transform(
 
     // OUTPUT: cc.start(...)
     output.add(ccStartMethodCall)
-
-    when (info.composableType) {
-        ComposableType.COMPONENT -> transformComponentElement(
-            context,
-            container,
-            owner,
-            tag,
-            helper,
-            output,
-            info,
-            attributes,
-            irChildrenInfo,
-            tagIndex
-        )
-        ComposableType.VIEW -> transformViewElement(
-            context,
-            container,
-            owner,
-            tag,
-            helper,
-            output,
-            info,
-            attributes,
-            tagIndex
-        )
-        ComposableType.FUNCTION_VAR -> transformFunctionVar(
-            context,
-            container,
-            owner,
-            tag,
-            helper,
-            output,
-            info,
-            attributes,
-            irChildrenInfo,
-            tagIndex
-        )
-        ComposableType.FUNCTION -> transformFunctionComponent(
-            context,
-            container,
-            owner,
-            tag,
-            helper,
-            output,
-            info,
-            attributes,
-            irChildrenInfo,
-            tagIndex
-        )
-        ComposableType.UNKNOWN -> error("Unknown composable type encountered")
-    }
-
-
-    // OUTPUT: cc.end()
-    output.add(helper.ccEndMethodCall)
-
-    return output
 }
+
+// OUTPUT: cc.end()
+private fun callEnd(
+    output: MutableList<IrStatement>,
+    helper: ComposeFunctionHelper
+) {
+    output.add(helper.ccEndMethodCall)
+}
+
 
 
 /**
@@ -316,6 +344,7 @@ private fun transformFunctionVar(
     helper: ComposeFunctionHelper,
     output: MutableList<IrStatement>,
     info: KtxTagInfo,
+    keyAttribute: IrAttributeInfo?,
     attributes: Collection<IrAttributeInfo>,
     childrenInfo: IrAttributeInfo?,
     tagIndex: Int
@@ -334,10 +363,12 @@ private fun transformFunctionComponent(
     helper: ComposeFunctionHelper,
     output: MutableList<IrStatement>,
     info: KtxTagInfo,
+    keyAttribute: IrAttributeInfo?,
     attributes: Collection<IrAttributeInfo>,
     childrenInfo: IrAttributeInfo?,
     tagIndex: Int
 ) {
+    callStart(GroupKind.Function, keyAttribute, helper, tag, context, tagIndex, output)
     val startOffset = -1
     val endOffset = -1
 
@@ -391,6 +422,8 @@ private fun transformFunctionComponent(
     )
 
     output.add(ifRunThenComposeExpr)
+
+    callEnd(output, helper)
 }
 
 private fun transformComponentElement(
@@ -401,10 +434,12 @@ private fun transformComponentElement(
     helper: ComposeFunctionHelper,
     output: MutableList<IrStatement>,
     info: KtxTagInfo,
+    keyAttribute: IrAttributeInfo?,
     attributes: Collection<IrAttributeInfo>,
     childrenInfo: IrAttributeInfo?,
     tagIndex: Int
 ) {
+    callStart(GroupKind.Component, keyAttribute, helper, tag, context, tagIndex, output)
     val instanceType = info.instanceType ?: error("expected instance type")
 
     val startOffset = -1
@@ -551,6 +586,8 @@ private fun transformComponentElement(
         //    tmpEl.setBam(attrBam)
         // }
         output.add(updateIfNeededExpr)
+
+        callEnd(output, helper)
     }
 
     childrenInfo?.let { attribute ->
@@ -656,9 +693,11 @@ private fun transformViewElement(
     helper: ComposeFunctionHelper,
     output: MutableList<IrStatement>,
     info: KtxTagInfo,
+    keyAttribute: IrAttributeInfo?,
     attributes: Collection<IrAttributeInfo>,
     tagIndex: Int
 ) {
+    callStart(GroupKind.View, keyAttribute, helper, tag, context, tagIndex, output)
     val instanceType = info.instanceType ?: error("expected instance type")
 
     val startOffset = -1
@@ -796,6 +835,8 @@ private fun transformViewElement(
             else output.add(statement)
         }
     }
+
+    callEnd(output, helper)
 }
 
 fun lowerComposeFunction(context: GeneratorContext, container: IrPackageFragment, compose: IrFunction) {
@@ -914,6 +955,20 @@ private class ComposeFunctionHelper(val context: GeneratorContext, val compose: 
             ),
             KTX_TAG_ORIGIN
         )
+    }
+
+    val ccStartViewWithKey by lazy {
+        ccClass.unsubstitutedMemberScope.getContributedFunctions(
+            Name.identifier("startView"),
+            NoLookupLocation.FROM_BACKEND
+        ).find { it.valueParameters.size == 2 }!!
+    }
+
+    val ccStartViewWithoutKey by lazy {
+        ccClass.unsubstitutedMemberScope.getContributedFunctions(
+            Name.identifier("startView"),
+            NoLookupLocation.FROM_BACKEND
+        ).find { it.valueParameters.size == 1 }!!
     }
 
     val ccStartMethodWithKey by lazy {

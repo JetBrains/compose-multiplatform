@@ -339,6 +339,9 @@ internal class CompositionContextImpl : CompositionContext() {
         currentSlot = next
     }
 
+    override fun startView(sourceHash: Int) = start(sourceHash, null)
+    override fun startView(sourceHash: Int, key: Any?) = start(sourceHash, key)
+
     override fun end() {
         val current = currentSlot
         val container = currentContainer
