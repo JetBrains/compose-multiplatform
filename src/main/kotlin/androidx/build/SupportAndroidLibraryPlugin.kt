@@ -22,6 +22,7 @@ import com.android.build.gradle.LibraryPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
+import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.kotlin.dsl.apply
 
 /**
@@ -96,8 +97,13 @@ private fun Project.injectCompilationForBenchmarks(
     supportLibraryExtension: SupportLibraryExtension
 ) {
     if (isBenchmark()) {
-        logger.log(LogLevel.WARN,
-                "Will use ADB command injection to force AOT-compile suspected benchmark")
+        tasks.filter { it.group == JavaBasePlugin.VERIFICATION_GROUP }.forEach {
+            it.doFirst {
+                logger.log(LogLevel.WARN,
+                        "Warning: ADB command injection used to force AOT-compile benchmark")
+            }
+        }
+
         val group = supportLibraryExtension.mavenGroup
 
         // NOTE: we assume here that all benchmarks have package name $groupname.benchmark.test
