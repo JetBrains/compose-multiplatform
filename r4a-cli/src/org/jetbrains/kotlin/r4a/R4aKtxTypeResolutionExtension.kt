@@ -33,7 +33,7 @@ import org.jetbrains.kotlin.types.expressions.ExpressionTypingFacade
 import org.jetbrains.kotlin.types.isNullable
 
 
-private fun Annotated.hasChildrenAnnotation(): Boolean = annotations.findAnnotation(FqName("com.google.r4a.Children")) != null
+private fun Annotated.hasChildrenAnnotation(): Boolean = annotations.findAnnotation(R4aUtils.r4aFqName("Children")) != null
 
 class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
 
