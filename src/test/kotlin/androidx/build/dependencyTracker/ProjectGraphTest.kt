@@ -18,13 +18,10 @@ package androidx.build.dependencyTracker
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
 import org.gradle.testfixtures.ProjectBuilder
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import java.io.File
-@RunWith(JUnit4::class)
+// @RunWith(JUnit4::class) see: b/112205561
 class ProjectGraphTest {
-    @Test
+    // @Test see: b/112205561
     fun testSimple() {
         val tmpDir = File("/tmp")
         val root = ProjectBuilder.builder()
