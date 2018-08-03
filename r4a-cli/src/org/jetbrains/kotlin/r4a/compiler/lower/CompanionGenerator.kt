@@ -10,10 +10,8 @@ import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
-import org.jetbrains.kotlin.ir.expressions.impl.IrBlockBodyImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrReturnImpl
+import org.jetbrains.kotlin.ir.expressions.impl.*
+import org.jetbrains.kotlin.ir.types.toIrType
 import org.jetbrains.kotlin.ir.util.createParameterDeclarations
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
@@ -34,8 +32,9 @@ fun generateCreateInstanceFunction(context: GeneratorContext, componentMetadata:
 
             irFunction.createParameterDeclarations()
 
-            val wrapperViewInstance = IrCallImpl(-1, -1, context.symbolTable.referenceConstructor(componentMetadata.wrapperViewDescriptor.unsubstitutedPrimaryConstructor))
+            val constructorDescriptor = componentMetadata.wrapperViewDescriptor.unsubstitutedPrimaryConstructor
+            val wrapperViewInstance = IrCallImpl(-1, -1, constructorDescriptor.returnType.toIrType()!!, context.symbolTable.referenceConstructor(constructorDescriptor))
             wrapperViewInstance.putValueArgument(0, IrGetValueImpl(-1, -1, irFunction.valueParameters[0].symbol))
-            irFunction.body = IrBlockBodyImpl(-1, -1, listOf(IrReturnImpl(-1, -1, irFunction.symbol, wrapperViewInstance)))
+            irFunction.body = IrBlockBodyImpl(-1, -1, listOf(IrReturnImpl(-1, -1, irFunction.symbol.descriptor.returnType!!.toIrType()!!, irFunction.symbol, wrapperViewInstance)))
         }
 }

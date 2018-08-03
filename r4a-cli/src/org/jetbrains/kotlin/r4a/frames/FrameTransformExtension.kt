@@ -17,6 +17,8 @@ import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrTypeOperator
 import org.jetbrains.kotlin.ir.expressions.impl.*
 import org.jetbrains.kotlin.ir.symbols.*
+import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.kotlin.ir.types.toIrType
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.name.ClassId
@@ -73,70 +75,80 @@ class RecordClassInfo(val irClass: IrClass, val fields: List<IrField>, val const
 fun addFramedStateRecord(context: GeneratorContext, file: IrFile, recordClassDescriptor: FrameRecordClassDescriptor): RecordClassInfo {
     val recordTypeDescriptor = context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(recordClassName)) ?: error("Cannot find the Record class")
 
+
+    val fields = mutableListOf<IrField>()
+    var constructor : IrConstructor? = null
+
     // Declare the state record
-    val recordClass = context.symbolTable.declareSyntheticClass(recordClassDescriptor)
-    recordClass.createParameterDeclarations()
+    val recordClass = context.symbolTable.declareSyntheticClass(recordClassDescriptor).buildWithScope(context) { recordClass ->
 
-    // Create the state record constructor
-    val recordConstructorDescriptor = recordClassDescriptor.unsubstitutedPrimaryConstructor ?: error("Record class constructor not found")
-    val constructor = context.symbolTable.declareSyntheticConstructor(recordConstructorDescriptor).buildWithScope(context) { constructor ->
-        constructor.createParameterDeclarations()
+        recordClass.thisReceiver = context.symbolTable.declareValueParameter(
+            -1, -1,
+            IrDeclarationOrigin.INSTANCE_RECEIVER,
+            recordClassDescriptor.thisAsReceiverParameter,
+            recordClassDescriptor.thisAsReceiverParameter.type.toIrType()!!
+        )
 
-        // Call the ancestor constructor
-        val superConstructor = context.symbolTable.referenceConstructor(recordClassDescriptor.getSuperClassNotAny()!!.constructors.single())
-        val superCall = syntheticConstructorDelegatingCall(superConstructor, superConstructor.descriptor)
+        // Create the state record constructor
+        val recordConstructorDescriptor = recordClassDescriptor.unsubstitutedPrimaryConstructor ?: error("Record class constructor not found")
+        constructor = context.symbolTable.declareSyntheticConstructor(recordConstructorDescriptor).buildWithScope(context) { constructor ->
+            constructor.createParameterDeclarations()
 
-        // Fields are left uninitialized as they will be set either by the framed object's constructor or by a call to assign()
+            // Call the ancestor constructor
+            val superConstructor = context.symbolTable.referenceConstructor(recordClassDescriptor.getSuperClassNotAny()!!.constructors.single())
+            val superCall = syntheticConstructorDelegatingCall(superConstructor, superConstructor.descriptor)
 
-        constructor.body = syntheticBlockBody(listOf(superCall))
-    }
-    recordClass.declarations.add(constructor)
+            // Fields are left uninitialized as they will be set either by the framed object's constructor or by a call to assign()
 
-    fun toRecord(expr: IrExpression) = syntheticImplicitCast(
+            constructor.body = syntheticBlockBody(listOf(superCall))
+        }
+        recordClass.declarations.add(constructor!!)
+
+        fun toRecord(expr: IrExpression) = syntheticImplicitCast(
             recordTypeDescriptor.defaultType,
-            recordClassDescriptor.defaultType,
+            recordClassDescriptor.defaultType.toIrType()!!,
             context.symbolTable.referenceClassifier(recordClassDescriptor), expr)
 
-    // Create fields corresponding to the attributes
-    val attributes = recordClassDescriptor.unsubstitutedMemberScope.getVariableNames()
-    val fields = mutableListOf<IrField>()
-    for (attribute in attributes) {
-        val member = recordClassDescriptor.unsubstitutedMemberScope.getContributedVariables(attribute,
-                NoLookupLocation.FROM_BACKEND).single()
-        val field = context.symbolTable.declareSyntheticField(member)
-        recordClass.declarations.add(field)
-        fields.add(field)
-    }
+        // Create fields corresponding to the attributes
+        val attributes = recordClassDescriptor.unsubstitutedMemberScope.getVariableNames()
+        for (attribute in attributes) {
+            val member = recordClassDescriptor.unsubstitutedMemberScope.getContributedVariables(attribute,
+                                                                                                NoLookupLocation.FROM_BACKEND).single()
+            val field = context.symbolTable.declareSyntheticField(member)
+            recordClass.declarations.add(field)
+            fields.add(field)
+        }
 
-    // Create the create method
-    createMethod(Name.identifier("create"), context, recordClassDescriptor, recordClass) {
-        val recordConstructorSymbol = constructor.symbol
-        val callConstructor = syntheticCall(
-                recordClassDescriptor.defaultType,
+        // Create the create method
+        createMethod(Name.identifier("create"), context, recordClassDescriptor, recordClass) {
+            val recordConstructorSymbol = constructor!!.symbol
+            val callConstructor = syntheticCall(
+                recordClassDescriptor.defaultType.toIrType()!!,
                 recordConstructorSymbol,
                 recordConstructorDescriptor)
-        syntheticExpressionBody(callConstructor)
-    }
-
-
-    // Create the apply method
-    createMethod(Name.identifier("assign"), context, recordClassDescriptor, recordClass) { irFunction ->
-        val statements = mutableListOf<IrStatement>()
-        val thisParameterSymbol = irFunction.dispatchReceiverParameter!!.symbol
-        val valueParameterSymbol = irFunction.valueParameters[0].symbol
-        for (i in 0 until attributes.count()) {
-            val field = fields[i]
-            val fieldSymbol = field.symbol
-            val thisParameter = syntheticGetValue(thisParameterSymbol)
-            val valueParameter = toRecord(syntheticGetValue(valueParameterSymbol))
-            val otherField = syntheticGetField(fieldSymbol, valueParameter)
-            statements.add(syntheticSetField(fieldSymbol, thisParameter, otherField))
+            syntheticExpressionBody(callConstructor)
         }
-        syntheticBlockBody(statements)
-    }
-    file.declarations.add(recordClass)
 
-    return RecordClassInfo(recordClass, fields, constructor.symbol)
+
+        // Create the apply method
+        createMethod(Name.identifier("assign"), context, recordClassDescriptor, recordClass) { irFunction ->
+            val statements = mutableListOf<IrStatement>()
+            val thisParameterSymbol = irFunction.dispatchReceiverParameter!!.symbol
+            val valueParameterSymbol = irFunction.valueParameters[0].symbol
+            for (i in 0 until attributes.count()) {
+                val field = fields[i]
+                val fieldSymbol = field.symbol
+                val thisParameter = syntheticGetValue(thisParameterSymbol)
+                val valueParameter = toRecord(syntheticGetValue(valueParameterSymbol))
+                val otherField = syntheticGetField(fieldSymbol, valueParameter)
+                statements.add(syntheticSetField(fieldSymbol, thisParameter, otherField))
+            }
+            syntheticBlockBody(statements)
+        }
+        file.declarations.add(recordClass)
+
+    }
+    return RecordClassInfo(recordClass, fields, constructor!!.symbol)
 }
 
 fun augmentFramedClass(
@@ -162,7 +174,7 @@ fun augmentFramedClass(
 
     fun toRecord(expr: IrExpression) = syntheticImplicitCast(
             recordTypeDescriptor.defaultType,
-            recordDescriptor.defaultType,
+            recordDescriptor.defaultType.toIrType()!!,
             context.symbolTable.referenceClassifier(recordDescriptor), expr)
 
     fun getRecord() = toRecord(syntheticGetterCall(nextGetter, nextGetterDescriptor, syntheticGetValue(thisSymbol)))
@@ -175,7 +187,7 @@ fun augmentFramedClass(
             // Create the initial state record
             statements.add(syntheticSetterCall(nextSetter, nextSetterDescriptor, syntheticGetValue(thisSymbol),
                     syntheticCall(
-                            recordDescriptor.defaultType,
+                            recordDescriptor.defaultType.toIrType()!!,
                             recordClassInfo.constructorSymbol,
                             // Non-null was already validated when the record class was constructed
                             recordDescriptor.unsubstitutedPrimaryConstructor!!
@@ -329,19 +341,19 @@ fun SymbolTable.declareSyntheticConstructor(descriptor: ClassConstructorDescript
     declareConstructor(UNDEFINED_OFFSET, UNDEFINED_OFFSET, IrDeclarationOrigin.DEFINED, descriptor)
 
 fun SymbolTable.declareSyntheticField(descriptor: PropertyDescriptor) =
-    declareField(UNDEFINED_OFFSET, UNDEFINED_OFFSET, IrDeclarationOrigin.DEFINED, descriptor)
+    declareField(UNDEFINED_OFFSET, UNDEFINED_OFFSET, IrDeclarationOrigin.DEFINED, descriptor, descriptor.type.toIrType()!!)
 
 fun syntheticConstructorDelegatingCall(symbol: IrConstructorSymbol, descriptor: ClassConstructorDescriptor) =
-    IrDelegatingConstructorCallImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, symbol, descriptor, typeArgumentsCount = 0)
+    IrDelegatingConstructorCallImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, descriptor.returnType.toIrType()!!, symbol, descriptor, typeArgumentsCount = 0)
 
 fun syntheticBlockBody(statements: List<IrStatement>) =
     IrBlockBodyImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, statements)
 
-fun syntheticCall(kotlinType: KotlinType, symbol: IrFunctionSymbol, descriptor: FunctionDescriptor) =
+fun syntheticCall(kotlinType: IrType, symbol: IrFunctionSymbol, descriptor: FunctionDescriptor) =
     IrCallImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, kotlinType, symbol, descriptor, typeArgumentsCount = 0)
 
 fun syntheticGetterCall(symbol: IrFunctionSymbol, descriptor: FunctionDescriptor, dispatchReceiver: IrExpression?) =
-    IrGetterCallImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, symbol, descriptor,
+    IrGetterCallImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, descriptor.returnType!!.toIrType()!!, symbol, descriptor,
             typeArgumentsCount = 0,
             dispatchReceiver = dispatchReceiver,
             extensionReceiver = null)
@@ -352,7 +364,7 @@ fun syntheticSetterCall(
     dispatchReceiver: IrExpression?,
     argument: IrExpression
 ) =
-    IrSetterCallImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, symbol, descriptor,
+    IrSetterCallImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, descriptor.returnType!!.toIrType()!!, symbol, descriptor,
             typeArgumentsCount = 0,
             dispatchReceiver = dispatchReceiver,
             extensionReceiver = null,
@@ -365,14 +377,14 @@ fun syntheticGetValue(symbol: IrValueSymbol) =
     IrGetValueImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, symbol)
 
 fun syntheticGetField(symbol: IrFieldSymbol, receiver: IrExpression) =
-    IrGetFieldImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, symbol, receiver)
+    IrGetFieldImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, symbol, symbol.descriptor.type.toIrType()!!, receiver)
 
 fun syntheticSetField(symbol: IrFieldSymbol, receiver: IrExpression, expression: IrExpression) =
-    IrSetFieldImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, symbol, receiver, expression)
+    IrSetFieldImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, symbol, receiver, expression, symbol.descriptor.type.toIrType()!!)
 
-fun syntheticImplicitCast(fromType: KotlinType, toType: KotlinType, classifier: IrClassifierSymbol, argument: IrExpression) =
-    IrTypeOperatorCallImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, fromType, IrTypeOperator.IMPLICIT_CAST,
-            toType, argument, classifier)
+fun syntheticImplicitCast(fromType: KotlinType, toType: IrType, classifier: IrClassifierSymbol, argument: IrExpression) =
+    IrTypeOperatorCallImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, fromType.toIrType()!!, IrTypeOperator.IMPLICIT_CAST,
+            toType, classifier, argument)
 
 // TODO(chuckj): Move to a shared location
 inline fun <T : IrDeclaration> T.buildWithScope(context: GeneratorContext, crossinline builder: (T) -> Unit): T =

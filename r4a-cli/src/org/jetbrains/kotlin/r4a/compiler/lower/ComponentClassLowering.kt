@@ -8,12 +8,18 @@ import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrKtxStatement
 import org.jetbrains.kotlin.ir.IrStatement
+import org.jetbrains.kotlin.ir.builders.constTrue
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.impl.IrConstructorImpl
 import org.jetbrains.kotlin.ir.declarations.impl.IrFunctionImpl
 import org.jetbrains.kotlin.ir.descriptors.IrTemporaryVariableDescriptorImpl
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.*
+import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl.Companion.constTrue
+import org.jetbrains.kotlin.ir.types.toIrType
+import org.jetbrains.kotlin.ir.util.defaultType
+import org.jetbrains.kotlin.ir.util.referenceClassifier
+import org.jetbrains.kotlin.ir.util.referenceFunction
 import org.jetbrains.kotlin.ir.util.withScope
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 import org.jetbrains.kotlin.name.ClassId
@@ -35,7 +41,7 @@ import org.jetbrains.kotlin.types.KotlinType
  */
 fun lowerComponentClass(context: GeneratorContext, metadata: ComponentMetadata, component: IrClass) {
     // TODO: if (component.annotations.includes(GenerateWrapperViewAnnotation) { ...
-    component.declarations.add(generateWrapperView(context, metadata))
+  //  component.declarations.add(generateWrapperView(context, metadata))
     // }
 
     component.declarations.add(generateComponentCompanionObject(context, metadata))
@@ -109,7 +115,7 @@ private fun transform(
 
         val attrVariable = IrTemporaryVariableDescriptorImpl(
             helper.compose.descriptor,
-            Name.identifier("__el${tagIndex}_$name"),
+            Name.identifier("__el_attr_${tagIndex}_$name"),
             attrInfo.type,
             false
         )
@@ -118,6 +124,7 @@ private fun transform(
             irAttr.startOffset, irAttr.endOffset,
             IrDeclarationOrigin.IR_TEMPORARY_VARIABLE,
             attrVariable,
+            attrInfo.type.toIrType()!!,
             irAttr.value
         )
 
@@ -161,9 +168,11 @@ private fun transform(
 
         container.declarations.add(childrenLambdaIrClass)
 
+        val lambdaConstructor = (childrenLambdaIrClass.declarations.single { it is IrConstructor } as IrConstructorImpl)
         val lambdaConstructorCall = IrCallImpl(
             -1, -1,
-            (childrenLambdaIrClass.declarations.single { it is IrConstructor } as IrConstructorImpl).symbol
+            childrenLambdaIrClass.defaultType,
+            lambdaConstructor.symbol
         ).apply {
             tag.capturedExpressions.forEachIndexed { index, value ->
                 putValueArgument(index, value)
@@ -174,7 +183,7 @@ private fun transform(
 
         val attrVariable = IrTemporaryVariableDescriptorImpl(
             helper.compose.descriptor,
-            Name.identifier("__el${tagIndex}_$name"),
+            Name.identifier("__el_chld_${tagIndex}_$name"),
             childrenInfo.type,
             false
         )
@@ -183,6 +192,7 @@ private fun transform(
             -1, -1,
             IrDeclarationOrigin.IR_TEMPORARY_VARIABLE,
             attrVariable,
+            lambdaConstructorCall.type,
             lambdaConstructorCall
         )
 
@@ -302,6 +312,7 @@ private fun callStart(
 
     val ccStartMethodCall = IrCallImpl(
         tag.startOffset, tag.endOffset,
+        ccStartMethod.returnType!!.toIrType()!!,
         context.symbolTable.referenceFunction(ccStartMethod)
     ).apply {
         dispatchReceiver = helper.getCc
@@ -310,7 +321,7 @@ private fun callStart(
             IrConstImpl.int(
                 tag.startOffset,
                 tag.endOffset,
-                context.builtIns.intType,
+                context.irBuiltIns.intType,
                 "${helper.functionDescription}::$tagIndex".hashCode()
             )
         )
@@ -376,6 +387,7 @@ private fun transformFunctionComponent(
 
         val conditionExpr = IrCallImpl(
             startOffset, endOffset,
+            helper.ccAttributeChangedOrInsertingFunctionDescriptor.returnType!!.toIrType()!!,
             context.symbolTable.referenceFunction(helper.ccAttributeChangedOrInsertingFunctionDescriptor)
         ).apply {
             dispatchReceiver = helper.getCc
@@ -384,10 +396,10 @@ private fun transformFunctionComponent(
 
         val ifExpr = IrIfThenElseImpl(
             startOffset, endOffset,
-            context.builtIns.unitType,
-            conditionExpr,
-            helper.setRun(true)
-        )
+            context.irBuiltIns.unitType
+        ).apply {
+            branches.add(IrBranchImpl(startOffset, endOffset, conditionExpr, helper.setRun(true)))
+        }
 
         // OUTPUT: if (cc.attributeChangedOrInserting(attr)) run = true
         output.add(ifExpr)
@@ -397,6 +409,7 @@ private fun transformFunctionComponent(
         // NOTE(lmr): right now children lambdas will always pierce memoization, but we could codegen an equals function that didn't.
         val conditionExpr = IrCallImpl(
             startOffset, endOffset,
+            helper.ccAttributeChangedOrInsertingFunctionDescriptor.returnType!!.toIrType()!!,
             context.symbolTable.referenceFunction(helper.ccAttributeChangedOrInsertingFunctionDescriptor)
         ).apply {
             dispatchReceiver = helper.getCc
@@ -405,10 +418,10 @@ private fun transformFunctionComponent(
 
         val ifExpr = IrIfThenElseImpl(
             startOffset, endOffset,
-            context.builtIns.unitType,
-            conditionExpr,
-            helper.setRun(true)
-        )
+            context.irBuiltIns.unitType
+        ).apply {
+            branches.add(IrBranchImpl(startOffset, endOffset, conditionExpr, helper.setRun(true)))
+        }
 
         // OUTPUT: if (cc.attributeChangedOrInserting(attr)) run = true
         output.add(ifExpr)
@@ -416,10 +429,10 @@ private fun transformFunctionComponent(
 
     val ifRunThenComposeExpr = IrIfThenElseImpl(
         startOffset, endOffset,
-        context.builtIns.unitType,
-        helper.getRun,
-        tag.callExpr
-    )
+        context.irBuiltIns.unitType
+    ).apply {
+        branches.add(IrBranchImpl(startOffset, endOffset, helper.getRun, tag.callExpr))
+    }
 
     output.add(ifRunThenComposeExpr)
 
@@ -447,7 +460,7 @@ private fun transformComponentElement(
 
     val elVariable = IrTemporaryVariableDescriptorImpl(
         helper.compose.descriptor,
-        Name.identifier("__el$tagIndex"),
+        Name.identifier("__elc$tagIndex"),
         instanceType,
         false
     )
@@ -455,7 +468,8 @@ private fun transformComponentElement(
     val elVariableDeclaration = context.symbolTable.declareVariable(
         startOffset, endOffset,
         IrDeclarationOrigin.IR_TEMPORARY_VARIABLE,
-        elVariable
+        elVariable,
+        elVariable.type.toIrType()!!
     )
 
     val elSymbol = context.symbolTable.referenceVariable(elVariable)
@@ -471,6 +485,7 @@ private fun transformComponentElement(
 
     val assignElExpr = IrSetVariableImpl(
         startOffset, endOffset,
+        elSymbol.descriptor.type.toIrType()!!,
         elSymbol,
         tag.callExpr,
         KTX_TAG_ORIGIN
@@ -478,6 +493,7 @@ private fun transformComponentElement(
 
     val callSetInstanceExpr = IrCallImpl(
         startOffset, endOffset,
+        helper.ccSetInstanceFunctionDescriptor.returnType!!.toIrType()!!,
         context.symbolTable.referenceFunction(helper.ccSetInstanceFunctionDescriptor)
     ).apply {
         dispatchReceiver = helper.getCc
@@ -486,7 +502,7 @@ private fun transformComponentElement(
 
     val thenBranchExpr = IrBlockImpl(
         startOffset, endOffset,
-        context.builtIns.unitType,
+        context.irBuiltIns.unitType,
         KTX_TAG_ORIGIN,
         listOf(
             assignElExpr,
@@ -496,6 +512,7 @@ private fun transformComponentElement(
 
     val elseBranchExpr = IrSetVariableImpl(
         startOffset, endOffset,
+        elSymbol.descriptor.type.toIrType()!!,
         elSymbol,
         helper.getUseInstanceCall(instanceType),
         KTX_TAG_ORIGIN
@@ -503,11 +520,11 @@ private fun transformComponentElement(
 
     val ifElseExpr = IrIfThenElseImpl(
         startOffset, endOffset,
-        context.builtIns.unitType,
-        helper.isInsertingCall,
-        thenBranchExpr,
-        elseBranchExpr
-    )
+        context.irBuiltIns.unitType
+    ).apply {
+        branches.add(IrBranchImpl(startOffset, endOffset, helper.isInsertingCall, thenBranchExpr))
+        branches.add(IrElseBranchImpl(startOffset, endOffset, constTrue(startOffset, endOffset, context.irBuiltIns.booleanType), elseBranchExpr))
+    }
 
     // OUTPUT:
     // if (cc.inserting())
@@ -534,6 +551,7 @@ private fun transformComponentElement(
 
         val callUpdateAttributeExpr = IrCallImpl(
             startOffset, endOffset,
+            checkFunction.returnType!!.toIrType()!!,
             context.symbolTable.referenceFunction(checkFunction)
         ).apply {
             dispatchReceiver = helper.getCc
@@ -542,10 +560,10 @@ private fun transformComponentElement(
 
         val attributeSetterCall = IrCallImpl(
             startOffset, endOffset,
-            context.builtIns.unitType,
+            context.irBuiltIns.unitType,
             context.symbolTable.referenceFunction(resolvedCall.resultingDescriptor.original),
             resolvedCall.resultingDescriptor as FunctionDescriptor,
-            resolvedCall.typeArguments,
+            resolvedCall.typeArguments.size,
             IrStatementOrigin.INVOKE,
             null
         ).apply {
@@ -565,7 +583,7 @@ private fun transformComponentElement(
 
         val thenUpdBranchExpr = IrBlockImpl(
             startOffset, endOffset,
-            context.builtIns.unitType,
+            context.irBuiltIns.unitType,
             KTX_TAG_ORIGIN,
             listOf(
                 helper.setRun(true),
@@ -575,10 +593,10 @@ private fun transformComponentElement(
 
         val updateIfNeededExpr = IrIfThenElseImpl(
             startOffset, endOffset,
-            context.builtIns.unitType,
-            callUpdateAttributeExpr, // condition
-            thenUpdBranchExpr
-        )
+            context.irBuiltIns.unitType
+        ).apply {
+            branches.add(IrBranchImpl(startOffset, endOffset, callUpdateAttributeExpr, thenUpdBranchExpr))
+        }
 
         // OUTPUT:
         // if (cc.attributeChangedOrEmpty(attrBam)) {
@@ -598,6 +616,7 @@ private fun transformComponentElement(
 
         val callUpdateAttributeExpr = IrCallImpl(
             startOffset, endOffset,
+            checkFunction.returnType!!.toIrType()!!,
             context.symbolTable.referenceFunction(checkFunction)
         ).apply {
             dispatchReceiver = helper.getCc
@@ -606,10 +625,10 @@ private fun transformComponentElement(
 
         val attributeSetterCall = IrCallImpl(
             startOffset, endOffset,
-            context.builtIns.unitType,
+            context.irBuiltIns.unitType,
             context.symbolTable.referenceFunction(resolvedCall.resultingDescriptor.original),
             resolvedCall.resultingDescriptor as FunctionDescriptor,
-            resolvedCall.typeArguments,
+            resolvedCall.typeArguments.size,
             IrStatementOrigin.INVOKE,
             null
         ).apply {
@@ -629,7 +648,7 @@ private fun transformComponentElement(
 
         val thenUpdBranchExpr = IrBlockImpl(
             startOffset, endOffset,
-            context.builtIns.unitType,
+            context.irBuiltIns.unitType,
             KTX_TAG_ORIGIN,
             listOf(
                 helper.setRun(true),
@@ -639,10 +658,11 @@ private fun transformComponentElement(
 
         val updateIfNeededExpr = IrIfThenElseImpl(
             startOffset, endOffset,
-            context.builtIns.unitType,
-            callUpdateAttributeExpr, // condition
-            thenUpdBranchExpr
-        )
+            context.irBuiltIns.unitType
+        ).apply {
+            branches.add(IrBranchImpl(startOffset, endOffset, callUpdateAttributeExpr, thenUpdBranchExpr))
+            branches.add(IrElseBranchImpl(startOffset, endOffset, constTrue(startOffset, endOffset, context.irBuiltIns.booleanType), elseBranchExpr))
+        }
 
         // OUTPUT:
         // if (cc.attributeChangedOrEmpty(attrBam)) {
@@ -662,6 +682,7 @@ private fun transformComponentElement(
 
     val composeExpr = IrCallImpl(
         startOffset, endOffset,
+        helper.componentComposeMethod.returnType!!.toIrType()!!,
         context.symbolTable.referenceFunction(helper.componentComposeMethod)
     ).apply {
         dispatchReceiver = getEl
@@ -669,18 +690,18 @@ private fun transformComponentElement(
 
     val ifRunThenComposeExpr = IrIfThenElseImpl(
         startOffset, endOffset,
-        context.builtIns.unitType,
-        helper.getRun,
-        IrBlockImpl(
+        context.irBuiltIns.unitType
+    ).apply {
+        branches.add(IrBranchImpl(startOffset, endOffset, helper.getRun, IrBlockImpl(
             startOffset, endOffset,
-            context.builtIns.unitType,
+            context.irBuiltIns.unitType,
             KTX_TAG_ORIGIN,
             listOf(
                 helper.ccWillComposeMethodCall,
                 composeExpr
             )
-        )
-    )
+        )))
+    }
 
     output.add(ifRunThenComposeExpr)
 }
@@ -705,7 +726,7 @@ private fun transformViewElement(
 
     val elVariable = IrTemporaryVariableDescriptorImpl(
         helper.compose.descriptor,
-        Name.identifier("__el$tagIndex"),
+        Name.identifier("__elv$tagIndex"),
         instanceType,
         false
     )
@@ -713,7 +734,8 @@ private fun transformViewElement(
     val elVariableDeclaration = context.symbolTable.declareVariable(
         startOffset, endOffset,
         IrDeclarationOrigin.IR_TEMPORARY_VARIABLE,
-        elVariable
+        elVariable,
+        elVariable.type.toIrType()!!
     )
 
     val elSymbol = context.symbolTable.referenceVariable(elVariable)
@@ -729,6 +751,7 @@ private fun transformViewElement(
 
     val assignElExpr = IrSetVariableImpl(
         startOffset, endOffset,
+        elSymbol.descriptor.type.toIrType()!!,
         elSymbol,
         tag.callExpr,
         KTX_TAG_ORIGIN
@@ -736,6 +759,7 @@ private fun transformViewElement(
 
     val callSetInstanceExpr = IrCallImpl(
         startOffset, endOffset,
+        helper.ccSetInstanceFunctionDescriptor.returnType!!.toIrType()!!,
         context.symbolTable.referenceFunction(helper.ccSetInstanceFunctionDescriptor)
     ).apply {
         dispatchReceiver = helper.getCc
@@ -744,7 +768,7 @@ private fun transformViewElement(
 
     val thenBranchExpr = IrBlockImpl(
         startOffset, endOffset,
-        context.builtIns.unitType,
+        context.irBuiltIns.unitType,
         KTX_TAG_ORIGIN,
         listOf(
             assignElExpr,
@@ -754,6 +778,7 @@ private fun transformViewElement(
 
     val elseBranchExpr = IrSetVariableImpl(
         startOffset, endOffset,
+        elSymbol.descriptor.type.toIrType()!!,
         elSymbol,
         helper.getUseInstanceCall(instanceType),
         KTX_TAG_ORIGIN
@@ -761,11 +786,12 @@ private fun transformViewElement(
 
     val ifElseExpr = IrIfThenElseImpl(
         startOffset, endOffset,
-        context.builtIns.unitType,
-        helper.isInsertingCall,
-        thenBranchExpr,
-        elseBranchExpr
-    )
+        context.irBuiltIns.unitType
+
+    ).apply {
+        branches.add(IrBranchImpl(startOffset, endOffset, helper.isInsertingCall, thenBranchExpr))
+        branches.add(IrElseBranchImpl(startOffset, endOffset, constTrue(startOffset, endOffset, context.irBuiltIns.booleanType), elseBranchExpr))
+    }
 
     // OUTPUT:
     // if (cc.inserting())
@@ -791,6 +817,7 @@ private fun transformViewElement(
 
         val callUpdateAttributeExpr = IrCallImpl(
             startOffset, endOffset,
+            checkFunction.returnType!!.toIrType()!!,
             context.symbolTable.referenceFunction(checkFunction)
         ).apply {
             dispatchReceiver = helper.getCc
@@ -799,6 +826,7 @@ private fun transformViewElement(
 
         val attributeSetterCall = IrCallImpl(
             startOffset, endOffset,
+            resolvedCall.resultingDescriptor.returnType!!.toIrType()!!,
             context.symbolTable.referenceFunction(resolvedCall.resultingDescriptor)
         ).apply {
             resolvedCall.extensionReceiver?.let {
@@ -817,10 +845,10 @@ private fun transformViewElement(
 
         val updateIfNeededExpr = IrIfThenElseImpl(
             startOffset, endOffset,
-            context.builtIns.unitType,
-            callUpdateAttributeExpr, // condition
-            attributeSetterCall
-        )
+            context.irBuiltIns.unitType
+        ).apply {
+            branches.add(IrBranchImpl(startOffset, endOffset, callUpdateAttributeExpr, attributeSetterCall))
+        }
 
         // OUTPUT:
         // if (cc.attributeChangedOrEmpty(attrBam)) {
@@ -851,6 +879,7 @@ fun lowerComposeFunction(context: GeneratorContext, container: IrPackageFragment
             -1, -1,
             IrDeclarationOrigin.IR_TEMPORARY_VARIABLE,
             helper.ccVariable,
+            helper.getCurrentCcCall.type,
             helper.getCurrentCcCall
         )
 
@@ -861,7 +890,8 @@ fun lowerComposeFunction(context: GeneratorContext, container: IrPackageFragment
             -1, -1,
             IrDeclarationOrigin.IR_TEMPORARY_VARIABLE,
             helper.runVariable,
-            IrConstImpl.boolean(-1, -1, context.builtIns.booleanType, false)
+            context.builtIns.booleanType.toIrType()!!,
+            IrConstImpl.boolean(-1, -1, context.irBuiltIns.booleanType, false)
         )
 
         // OUTPUT: var __run = false
@@ -873,7 +903,7 @@ fun lowerComposeFunction(context: GeneratorContext, container: IrPackageFragment
                 val block = IrBlockImpl(
                     expression.startOffset,
                     expression.endOffset,
-                    context.moduleDescriptor.builtIns.unitType,
+                    context.irBuiltIns.unitType,
                     KTX_TAG_ORIGIN,
                     transform(context, container, compose.descriptor, expression as IrKtxTag, helper)
                 )
@@ -913,13 +943,14 @@ private class ComposeFunctionHelper(val context: GeneratorContext, val compose: 
     val getCurrentCcCall by lazy {
         IrGetterCallImpl(
             -1, -1,
+            getCurrentCcFunction.returnType!!.toIrType()!!,
             context.symbolTable.referenceSimpleFunction(getCurrentCcFunction),
             getCurrentCcFunction,
             0
         ).apply {
             dispatchReceiver = IrGetObjectValueImpl(
                 -1, -1,
-                ccClass.companionObjectDescriptor!!.defaultType,
+                ccClass.companionObjectDescriptor!!.defaultType.toIrType()!!,
                 context.symbolTable.referenceClass(ccClass.companionObjectDescriptor!!)
             )
         }
@@ -945,11 +976,12 @@ private class ComposeFunctionHelper(val context: GeneratorContext, val compose: 
         return IrSetVariableImpl(
             -1,
             -1,
+            runVariable.type.toIrType()!!,
             context.symbolTable.referenceVariable(runVariable),
             IrConstImpl(
                 -1,
                 -1,
-                context.builtIns.booleanType,
+                context.irBuiltIns.booleanType,
                 IrConstKind.Boolean,
                 value
             ),
@@ -996,6 +1028,7 @@ private class ComposeFunctionHelper(val context: GeneratorContext, val compose: 
         IrCallImpl(
             -1,
             -1,
+            androidContextGetter.returnType!!.toIrType()!!,
             context.symbolTable.referenceFunction(androidContextGetter)
         ).apply {
             dispatchReceiver = getCc
@@ -1005,6 +1038,7 @@ private class ComposeFunctionHelper(val context: GeneratorContext, val compose: 
     val isInsertingCall by lazy {
         IrCallImpl(
             -1, -1,
+            ccIsInsertingMethod.returnType!!.toIrType()!!,
             context.symbolTable.referenceFunction(ccIsInsertingMethod)
         ).apply {
             dispatchReceiver = getCc
@@ -1014,16 +1048,17 @@ private class ComposeFunctionHelper(val context: GeneratorContext, val compose: 
     fun getUseInstanceCall(type: KotlinType): IrExpression {
         return IrTypeOperatorCallImpl(
             -1, -1,
-            context.builtIns.nullableAnyType,
+            context.builtIns.nullableAnyType.toIrType()!!,
             IrTypeOperator.SAFE_CAST,
-            type,
+            type.toIrType()!!,
+            context.symbolTable.referenceClassifier(type.constructor.declarationDescriptor!!),
             IrCallImpl(
                 -1, -1,
+                ccUseInstanceMethod.returnType!!.toIrType()!!,
                 context.symbolTable.referenceFunction(ccUseInstanceMethod)
             ).apply {
                 dispatchReceiver = getCc
-            },
-            context.symbolTable.referenceClassifier(type.constructor.declarationDescriptor!!)
+            }
         )
     }
 
@@ -1091,7 +1126,7 @@ private class ComposeFunctionHelper(val context: GeneratorContext, val compose: 
     }
 
     val ccWillComposeMethodCall by lazy {
-        IrCallImpl(-1, -1, context.symbolTable.referenceFunction(ccWillComposeMethod)).apply {
+        IrCallImpl(-1, -1, ccWillComposeMethod.returnType!!.toIrType()!!, context.symbolTable.referenceFunction(ccWillComposeMethod)).apply {
             dispatchReceiver = getCc
         }
     }
@@ -1102,7 +1137,7 @@ private class ComposeFunctionHelper(val context: GeneratorContext, val compose: 
     ).single()
 
     val ccEndMethodCall by lazy {
-        IrCallImpl(-1, -1, context.symbolTable.referenceFunction(ccEndMethod)).apply {
+        IrCallImpl(-1, -1, ccEndMethod.returnType!!.toIrType()!!, context.symbolTable.referenceFunction(ccEndMethod)).apply {
             dispatchReceiver = getCc
         }
     }

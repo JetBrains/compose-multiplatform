@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.resolve.lazy.declarations.ClassMemberDeclarationProv
 class StaticWrapperCreatorFunctionResolveExtension() : SyntheticResolveExtension {
 
     override fun getSyntheticCompanionObjectNameIfNeeded(thisDescriptor: ClassDescriptor): Name? {
-        return if(ComponentMetadata.isR4AComponent(thisDescriptor)) Name.identifier("R4H-StaticRenderCompanion") else null
+        return if(ComponentMetadata.isR4AComponent(thisDescriptor)) Name.identifier("R4HStaticRenderCompanion") else null
     }
 
     override fun generateSyntheticClasses(

@@ -14,6 +14,8 @@ import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.symbols.IrVariableSymbol
+import org.jetbrains.kotlin.ir.types.toIrType
+import org.jetbrains.kotlin.ir.util.referenceFunction
 import org.jetbrains.kotlin.ir.util.withScope
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.name.ClassId
@@ -55,10 +57,10 @@ class R4ASyntheticIrExtension : SyntheticIrExtension {
             val functionSymbol = statementGenerator.context.symbolTable.referenceFunction(functionDescriptor.original)
             IrCallImpl(
                 openTagName.startOffset, openTagName.endOffset,
-                returnType,
+                returnType.toIrType()!!,
                 functionSymbol,
                 functionDescriptor as FunctionDescriptor,
-                tagCall.typeArguments,
+                tagCall.typeArguments?.count() ?: 0,
                 IrStatementOrigin.INVOKE,
                 null
             ).apply {
@@ -101,7 +103,8 @@ class R4ASyntheticIrExtension : SyntheticIrExtension {
                             parameter.startOffset,
                             parameter.endOffset,
                             IrDeclarationOrigin.LOCAL_FUNCTION_FOR_LAMBDA,
-                            parameterDescriptor
+                            parameterDescriptor,
+                            parameterDescriptor.type.toIrType()!!
                         ).apply {
                             symbolsDefined.add(symbol)
                         }

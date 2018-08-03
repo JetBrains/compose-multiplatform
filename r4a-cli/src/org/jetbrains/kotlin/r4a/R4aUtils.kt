@@ -322,7 +322,7 @@ object R4aUtils {
 
         fun addQualifierPart(expression: KtExpression?): Boolean {
             if (expression is KtSimpleNameExpression) {
-                result.add(QualifiedExpressionResolver.QualifierPart(expression))
+                result.add(QualifiedExpressionResolver.QualifierPart(expression.getReferencedNameAsName()))
                 return true
             }
             return false
@@ -357,10 +357,10 @@ object R4aUtils {
                 moduleDescriptor.getPackage(FqName.topLevel(firstPart.name)).let { if (it.isEmpty()) null else it }
 
         if (currentDescriptor == null) {
-            trace?.report(Errors.UNRESOLVED_REFERENCE.on(firstPart.expression, firstPart.expression))
+            trace?.report(Errors.UNRESOLVED_REFERENCE.on(firstPart.expression!!, firstPart.expression!!))
             return null
         } else if (trace != null) {
-            storeSimpleNameExpression(firstPart.expression, currentDescriptor, trace)
+            storeSimpleNameExpression(firstPart.expression!!, currentDescriptor, trace)
         }
 
         // TODO(lmr): we need to add visibility checks into this function...
@@ -428,10 +428,10 @@ object R4aUtils {
                 }
 
             if (nextPackageOrClassDescriptor == null) {
-                trace?.report(Errors.UNRESOLVED_REFERENCE.on(qualifierPart.expression, qualifierPart.expression))
+                trace?.report(Errors.UNRESOLVED_REFERENCE.on(qualifierPart.expression!!, qualifierPart.expression!!))
                 return null
             } else if (trace != null) {
-                storeSimpleNameExpression(qualifierPart.expression, nextPackageOrClassDescriptor, trace)
+                storeSimpleNameExpression(qualifierPart.expression!!, nextPackageOrClassDescriptor, trace)
             }
 
             currentDescriptor = nextPackageOrClassDescriptor
