@@ -47,6 +47,8 @@ object LibraryVersions {
 
     val LIFECYCLES_SAVEDSTATE = Version("1.0.0-alpha01")
 
+    val LIFECYCLES_KTX = Version("1.0.0-alpha01")
+
     /**
      * Version code for Paging
      */
