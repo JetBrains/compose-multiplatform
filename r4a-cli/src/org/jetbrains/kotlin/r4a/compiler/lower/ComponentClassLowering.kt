@@ -604,8 +604,6 @@ private fun transformComponentElement(
         //    tmpEl.setBam(attrBam)
         // }
         output.add(updateIfNeededExpr)
-
-        callEnd(output, helper)
     }
 
     childrenInfo?.let { attribute ->
@@ -704,6 +702,8 @@ private fun transformComponentElement(
     }
 
     output.add(ifRunThenComposeExpr)
+
+    callEnd(output, helper)
 }
 
 private fun transformViewElement(
