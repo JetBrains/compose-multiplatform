@@ -49,3 +49,5 @@ tasks.withType<Test> {
         showStackTraces = true
     }
 }
+
+configureInstrumentation()
