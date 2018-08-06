@@ -48,4 +48,21 @@ object Jacoco {
         }
         return task
     }
+
+    fun createCoverageJarTask(project: Project): Task {
+        // Package the individual *-allclasses.jar files together to generate code coverage reports
+        val packageAllClassFiles = project.tasks.create("packageAllClassFilesForCoverageReport",
+                Jar::class.java) {
+            it.destinationDir = project.file(project.extra["distDir"]!!)
+            it.archiveName = "jacoco-report-classes-all.jar"
+        }
+        project.subprojects { subproject ->
+            subproject.tasks.whenTaskAdded { task ->
+                if (task.name.endsWith("ClassFilesForCoverageReport")) {
+                    packageAllClassFiles.from(task)
+                }
+            }
+        }
+        return packageAllClassFiles
+    }
 }

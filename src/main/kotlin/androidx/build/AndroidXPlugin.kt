@@ -24,6 +24,7 @@ import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.gradle.getByType
 import androidx.build.gradle.isRoot
 import androidx.build.jacoco.Jacoco
+import androidx.build.license.CheckExternalDependencyLicensesTask
 import androidx.build.license.configureExternalDependencyLicenseCheck
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
@@ -95,16 +96,41 @@ class AndroidXPlugin : Plugin<Project> {
     }
 
     private fun Project.configureRootProject() {
+        val buildOnServerTask = tasks.create(BUILD_ON_SERVER_TASK)
+        tasks.all { task ->
+            if (task.name.startsWith(Release.DIFF_TASK_PREFIX) ||
+                    "distDocs" == task.name ||
+                    "dejetifyArchive" == task.name ||
+                    CheckExternalDependencyLicensesTask.TASK_NAME == task.name) {
+                buildOnServerTask.dependsOn(task)
+            }
+        }
+        subprojects { project ->
+            if (project.path == ":docs-fake") {
+                return@subprojects
+            }
+            project.tasks.all { task ->
+                if ("assembleAndroidTest" == task.name ||
+                        "assembleDebug" == task.name ||
+                        "runErrorProne" == task.name ||
+                        "lintDebug" == task.name) {
+                    buildOnServerTask.dependsOn(task)
+                }
+            }
+        }
+
+        val createCoverageJarTask = Jacoco.createCoverageJarTask(this)
+        buildOnServerTask.dependsOn(createCoverageJarTask)
+
         Release.createGlobalArchiveTask(this)
 
         val allDocsTask = DiffAndDocs.configureDiffAndDocs(this, projectDir,
                 DacOptions("androidx", "ANDROIDX_DATA"),
                 listOf(RELEASE_RULE))
-
-        tasks.getByName(BUILD_ON_SERVER_TASK).dependsOn(allDocsTask)
+        buildOnServerTask.dependsOn(allDocsTask)
 
         val jacocoUberJar = Jacoco.createUberJarTask(this)
-        tasks.getByName(BUILD_ON_SERVER_TASK).dependsOn(jacocoUberJar)
+        buildOnServerTask.dependsOn(jacocoUberJar)
 
         project.createClockLockTasks()
 
