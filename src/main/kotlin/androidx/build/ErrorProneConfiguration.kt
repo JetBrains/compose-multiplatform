@@ -120,6 +120,7 @@ private fun makeErrorProneTask(project: Project, compileTask: JavaCompile, toolC
     errorProneTask.sourceCompatibility = compileTask.sourceCompatibility
     errorProneTask.targetCompatibility = compileTask.targetCompatibility
     errorProneTask.configureWithErrorProne(toolChain)
+    errorProneTask.dependsOn(compileTask.dependsOn)
 
     project.tasks.getByName("check").dependsOn(errorProneTask)
 }
