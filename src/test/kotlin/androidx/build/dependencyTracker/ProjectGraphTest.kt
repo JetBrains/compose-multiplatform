@@ -18,12 +18,22 @@ package androidx.build.dependencyTracker
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
 import org.gradle.testfixtures.ProjectBuilder
+import org.junit.Rule
+import org.junit.Test
+import org.junit.rules.TemporaryFolder
+import org.junit.runner.RunWith
+import org.junit.runners.JUnit4
 import java.io.File
-// @RunWith(JUnit4::class) see: b/112205561
+
+@RunWith(JUnit4::class)
 class ProjectGraphTest {
-    // @Test see: b/112205561
+    @Rule
+    @JvmField
+    val tmpFolder = TemporaryFolder()
+
+    @Test
     fun testSimple() {
-        val tmpDir = File("/tmp")
+        val tmpDir = tmpFolder.root
         val root = ProjectBuilder.builder()
                 .withProjectDir(tmpDir)
                 .withName("root")
@@ -63,6 +73,5 @@ class ProjectGraphTest {
                 graph.findContainingProject("p2/a/b/c/d/e/f/a.java".toLocalPath())
         )
     }
-    private fun String.toLocalPath() =
-            this.split("/").joinToString(File.separator)
+    private fun String.toLocalPath() = this.split("/").joinToString(File.separator)
 }
