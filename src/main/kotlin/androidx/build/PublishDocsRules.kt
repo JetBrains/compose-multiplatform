@@ -24,7 +24,7 @@ import androidx.build.Strategy.Prebuilts
 import androidx.build.Strategy.TipOfTree
 
 val RELEASE_RULE = docsRules("public", false) {
-    val defaultVersion = "1.0.0-beta01"
+    val defaultVersion = "1.0.0-rc01"
     prebuilts(LibraryGroups.ANNOTATION, defaultVersion)
     prebuilts(LibraryGroups.APPCOMPAT, defaultVersion)
     prebuilts(LibraryGroups.ASYNCLAYOUTINFLATER, defaultVersion)
@@ -53,10 +53,10 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.LOADER, defaultVersion)
     prebuilts(LibraryGroups.LOCALBROADCASTMANAGER, defaultVersion)
     prebuilts(LibraryGroups.MEDIA, "media", defaultVersion)
-    prebuilts(LibraryGroups.MEDIA, "media-widget", "1.0.0-alpha4")
+    prebuilts(LibraryGroups.MEDIA, "media-widget", "1.0.0-alpha5")
     ignore(LibraryGroups.MEDIA2, "media2-exoplayer")
-    prebuilts(LibraryGroups.MEDIA2, "1.0.0-alpha01")
-    prebuilts(LibraryGroups.MEDIAROUTER, "1.0.0-alpha4")
+    prebuilts(LibraryGroups.MEDIA2, "1.0.0-alpha02")
+    prebuilts(LibraryGroups.MEDIAROUTER, "1.0.0-alpha5")
     prebuilts(LibraryGroups.PALETTE, defaultVersion)
     prebuilts(LibraryGroups.PERCENTLAYOUT, defaultVersion)
     prebuilts(LibraryGroups.PREFERENCE, defaultVersion)
@@ -65,7 +65,7 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.RECYCLERVIEW, "recyclerview-benchmark")
     prebuilts(LibraryGroups.RECYCLERVIEW, defaultVersion)
     prebuilts(LibraryGroups.SLICE, "slice-builders", defaultVersion)
-    prebuilts(LibraryGroups.SLICE, "slice-builders-ktx", "1.0.0-alpha4")
+    prebuilts(LibraryGroups.SLICE, "slice-builders-ktx", "1.0.0-alpha5")
     prebuilts(LibraryGroups.SLICE, "slice-core", defaultVersion)
     // TODO: land prebuilts
 //    prebuilts(LibraryGroups.SLICE, "slice-test", defaultVersion)
@@ -106,7 +106,11 @@ val TIP_OF_TREE = docsRules("tipOfTree", true) {
  * Rules are resolved in addition order. So if you have two rules that specify how docs should be
  * built for a module, first defined rule wins.
  */
-fun docsRules(name: String, offline: Boolean, init: PublishDocsRulesBuilder.() -> Unit): PublishDocsRules {
+fun docsRules(
+    name: String,
+    offline: Boolean,
+    init: PublishDocsRulesBuilder.() -> Unit
+): PublishDocsRules {
     val f = PublishDocsRulesBuilder(name, offline)
     f.init()
     return f.build()
