@@ -26,9 +26,11 @@ class ProjectGraph(rootProject: Project) {
     private val rootNode: Node
 
     init {
+        // always use cannonical file: b/112205561
         rootNode = Node()
+        val rootProjectDir = rootProject.projectDir.canonicalFile
         rootProject.subprojects.forEach {
-            val relativePath = it.projectDir.toRelativeString(rootProject.projectDir)
+            val relativePath = it.projectDir.canonicalFile.toRelativeString(rootProjectDir)
             val sections = relativePath.split(File.separatorChar)
             val leaf = sections.fold(rootNode) { left, right ->
                 left.getOrCreateNode(right)
