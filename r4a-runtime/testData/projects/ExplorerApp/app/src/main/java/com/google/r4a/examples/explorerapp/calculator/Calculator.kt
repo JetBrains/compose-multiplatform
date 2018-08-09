@@ -24,6 +24,15 @@ class Calculator : Component() {
             recompose()
         }
     }
+
+    private fun fontSize(display: String): Int {
+        return when {
+            display.length <= 8 -> 32
+            display.length <= 11 -> 24
+            else -> 12
+        }
+    }
+
     override fun compose() {
 
         <LinearLayout orientation="vertical" layoutParams={FILL}>
@@ -49,13 +58,15 @@ class Calculator : Component() {
                     ellipsize={TextUtils.TruncateAt.END}
                     maxLines={1}
                     textColor={Color.BLACK}
-                    textSize={7.dip}
-                    typeface={Typeface.create("sans-serif-medium", Typeface.NORMAL)}
+                    textSize={fontSize(formula.formulaString).dip}
+                    height={90.dip}
+                    typeface={Typeface.create("sans-serif-light", Typeface.NORMAL)}
                     text={formula.formulaString}
                     bufferType={TextView.BufferType.EDITABLE}
                     cursorVisible={true}
                     gravity={Gravity.BOTTOM or Gravity.RIGHT}
                     focusableInTouchMode={true}
+                    paddingHorizontal={3.dip}
                 />
                 <TextView
                     layoutParams={FILL}
@@ -64,7 +75,7 @@ class Calculator : Component() {
                     bufferType={TextView.BufferType.SPANNABLE}
                     typeface={Typeface.create("sans-serif-light", Typeface.NORMAL)}
                     textSize={7.dip}
-                    paddingHorizontal={3.dip}
+                    paddingHorizontal={10.dip}
                     paddingVertical={6.dip}
                     gravity={Gravity.BOTTOM or Gravity.RIGHT}
                     cursorVisible={true}
@@ -78,7 +89,7 @@ class Calculator : Component() {
                     backgroundColor="#434343"
                 >
                     listOf("7", "8", "9", "4", "5", "6", "1", "2", "3", ".", "0", "=").forEachIndexed { index, value ->
-                        <CalculatorButton value={value} onClick={onClick} layoutParams={grid(index / 3, index % 3)} />
+                        <CalculatorButton value onClick layoutParams={grid(index / 3, index % 3)} />
                     }
                 </GridLayout>
                 <GridLayout
@@ -89,7 +100,7 @@ class Calculator : Component() {
                 >
                     listOf(CalculatorFormula.DELETE, CalculatorFormula.DIVIDE, CalculatorFormula.MULTIPLY,
                             CalculatorFormula.SUBTRACT, CalculatorFormula.ADD).forEachIndexed { index, value ->
-                        <CalculatorButton value={value} onClick={onClick} layoutParams={grid(index, 0)} />
+                        <CalculatorButton value onClick layoutParams={grid(index, 0)} />
                     }
                 </GridLayout>
             </LinearLayout>
