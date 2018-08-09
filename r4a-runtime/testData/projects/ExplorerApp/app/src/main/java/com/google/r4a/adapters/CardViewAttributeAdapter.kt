@@ -7,77 +7,74 @@ import com.google.r4a.adapters.LocalUtils.displayMetrics
 import com.google.r4a.adapters.LocalUtils.stringToFloatPx
 import com.google.r4a.adapters.LocalUtils.stringToIntPx
 
-object CardViewAttributeAdapter: AttributeAdapter() {
+fun CardView.setCardBackgroundColor(color: String) {
+    setCardBackgroundColor(Color.parseColor(color))
+}
 
-    fun setCardBackgroundColor(view: CardView, color: String) {
-        view.setCardBackgroundColor(Color.parseColor(color))
-    }
+fun CardView.setRadius(radius: Dimension) {
+    setRadius(radius.toFloatPixels(displayMetrics(this)))
+}
 
-    fun setRadius(view: CardView, radius: Dimension) {
-        view.setRadius(radius.toFloatPixels(displayMetrics(view)))
-    }
+fun CardView.setCardElevation(elevation: Dimension) {
+    setCardElevation(elevation.toFloatPixels(displayMetrics(this)))
+}
 
-    fun setCardElevation(view: CardView, elevation: Dimension) {
-        view.setCardElevation(elevation.toFloatPixels(displayMetrics(view)))
-    }
+fun CardView.setMaxCardElevation(elevation: Dimension) {
+    setMaxCardElevation(elevation.toFloatPixels(displayMetrics(this)))
+}
 
-    fun setMaxCardElevation(view: CardView, elevation: Dimension) {
-        view.setMaxCardElevation(elevation.toFloatPixels(displayMetrics(view)))
-    }
+fun CardView.setContentPadding(padding: Int) {
+    setContentPadding(padding, padding, padding, padding)
+}
 
-    fun setContentPadding(view: CardView, padding: Int) {
-        view.setContentPadding(padding, padding, padding, padding)
-    }
+fun CardView.setContentPadding(padding: Dimension) {
+    setContentPadding(padding.toIntPixels(displayMetrics(this)))
+}
 
-    fun setContentPadding(view: CardView, padding: Dimension) {
-        setContentPadding(view, padding.toIntPixels(displayMetrics(view)))
-    }
+fun CardView.setContentPaddingHorizontal(padding: Int) {
+    setContentPadding(padding, getContentPaddingTop(), padding, getContentPaddingBottom())
+}
 
-    fun setContentPaddingHorizontal(view: CardView, padding: Int) {
-        view.setContentPadding(padding, view.getContentPaddingTop(), padding, view.getContentPaddingBottom())
-    }
+fun CardView.setContentPaddingHorizontal(padding: Dimension) {
+    setContentPaddingHorizontal(padding.toIntPixels(displayMetrics(this)))
+}
 
-    fun setContentPaddingHorizontal(view: CardView, padding: Dimension) {
-        setContentPaddingHorizontal(view, padding.toIntPixels(displayMetrics(view)))
-    }
+fun CardView.setContentPaddingVertical(padding: Int) {
+    setContentPadding(getContentPaddingLeft(), padding, getContentPaddingRight(), padding)
+}
 
-    fun setContentPaddingVertical(view: CardView, padding: Int) {
-        view.setContentPadding(view.getContentPaddingLeft(), padding, view.getContentPaddingRight(), padding)
-    }
+fun CardView.setContentPaddingVertical(padding: Dimension) {
+    setContentPaddingVertical(padding.toIntPixels(displayMetrics(this)))
+}
 
-    fun setContentPaddingVertical(view: CardView, padding: Dimension) {
-        setContentPaddingVertical(view, padding.toIntPixels(displayMetrics(view)))
-    }
+fun CardView.setContentPaddingLeft(padding: Int) {
+    setContentPadding(padding, getContentPaddingTop(), getContentPaddingRight(), getContentPaddingBottom())
+}
 
-    fun setContentPaddingLeft(view: CardView, padding: Int) {
-        view.setContentPadding(padding, view.getContentPaddingTop(), view.getContentPaddingRight(), view.getContentPaddingBottom())
-    }
+fun CardView.setContentPaddingLeft(padding: Dimension) {
+    setContentPaddingLeft(padding.toIntPixels(displayMetrics(this)))
+}
 
-    fun setContentPaddingLeft(view: CardView, padding: Dimension) {
-        setContentPaddingLeft(view, padding.toIntPixels(displayMetrics(view)))
-    }
+fun CardView.setContentPaddingTop(padding: Int) {
+    setContentPadding(getContentPaddingLeft(), padding, getContentPaddingRight(), getContentPaddingBottom())
+}
 
-    fun setContentPaddingTop(view: CardView, padding: Int) {
-        view.setContentPadding(view.getContentPaddingLeft(), padding, view.getContentPaddingRight(), view.getContentPaddingBottom())
-    }
+fun CardView.setContentPaddingTop(padding: Dimension) {
+    setContentPaddingTop(padding.toIntPixels(displayMetrics(this)))
+}
 
-    fun setContentPaddingTop(view: CardView, padding: Dimension) {
-        setContentPaddingTop(view, padding.toIntPixels(displayMetrics(view)))
-    }
+fun CardView.setContentPaddingRight(padding: Int) {
+    setContentPadding(getContentPaddingLeft(), getContentPaddingTop(), padding, getContentPaddingBottom())
+}
 
-    fun setContentPaddingRight(view: CardView, padding: Int) {
-        view.setContentPadding(view.getContentPaddingLeft(), view.getContentPaddingTop(), padding, view.getContentPaddingBottom())
-    }
+fun CardView.setContentPaddingRight(padding: Dimension) {
+    setContentPaddingRight(padding.toIntPixels(displayMetrics(this)))
+}
 
-    fun setContentPaddingRight(view: CardView, padding: Dimension) {
-        setContentPaddingRight(view, padding.toIntPixels(displayMetrics(view)))
-    }
+fun CardView.setContentPaddingBottom(padding: Int) {
+    setContentPadding(getContentPaddingLeft(), getContentPaddingTop(), getContentPaddingRight(), padding)
+}
 
-    fun setContentPaddingBottom(view: CardView, padding: Int) {
-        view.setContentPadding(view.getContentPaddingLeft(), view.getContentPaddingTop(), view.getContentPaddingRight(), padding)
-    }
-
-    fun setContentPaddingBottom(view: CardView, padding: Dimension) {
-        setContentPaddingBottom(view, padding.toIntPixels(displayMetrics(view)))
-    }
+fun CardView.setContentPaddingBottom(padding: Dimension) {
+    setContentPaddingBottom(padding.toIntPixels(displayMetrics(this)))
 }

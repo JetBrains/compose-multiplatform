@@ -505,6 +505,7 @@ private fun transformComponentElement(
         context.irBuiltIns.unitType,
         KTX_TAG_ORIGIN,
         listOf(
+            helper.setRun(true),
             assignElExpr,
             callSetInstanceExpr
         )
@@ -528,6 +529,7 @@ private fun transformComponentElement(
 
     // OUTPUT:
     // if (cc.inserting())
+    //     run = true
     //     el = Foo(...)
     //     cc.setInstance(el)
     // else

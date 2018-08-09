@@ -17,31 +17,21 @@ import com.google.r4a.adapters.LocalUtils.stringToIntPx
 import com.google.r4a.annotations.ConflictsWith
 import java.util.regex.Pattern
 
+fun View.setElevation(elevation: Dimension) = this.setElevation(elevation.toFloatPixels(displayMetrics(this)))
 
-object AttributeAdapterLocal: AttributeAdapter() {
+fun ImageView.setUri(uri: String) {
+    Glide
+        .with(getContext())
+        .load(uri)
+        .centerCrop()
+        .into(this)
+}
 
-    // does this requires a support lib?
-    fun setElevation(view: View, elevation: Dimension) {
-        view.setElevation(elevation.toFloatPixels(displayMetrics(view)))
+fun ImageView.setSrc(src: String) = setUri(src)
+
+fun LinearLayout.setOrientation(orientation: String) {
+    when(orientation) {
+        "vertical" -> setOrientation(LinearLayout.VERTICAL)
+        "horizontal" -> setOrientation(LinearLayout.HORIZONTAL)
     }
-
-    fun setUri(view: ImageView, uri: String) {
-        Glide
-                .with(view.getContext())
-                .load(uri)
-                .centerCrop()
-                .into(view)
-    }
-
-    fun setSrc(view: ImageView, src: String) {
-        setUri(view, src)
-    }
-
-    fun setOrientation(view: LinearLayout, orientation: String) {
-        when (orientation) {
-            "vertical" -> view.setOrientation(LinearLayout.VERTICAL)
-            "horizontal" -> view.setOrientation(LinearLayout.HORIZONTAL)
-        }
-    }
-
 }

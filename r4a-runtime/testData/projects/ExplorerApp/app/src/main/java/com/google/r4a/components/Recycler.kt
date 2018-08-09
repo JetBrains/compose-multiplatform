@@ -34,12 +34,12 @@ class Recycler(context: Context): RecyclerView(context) {
                 override fun invoke() {
                     val composeItemWithType = composeItemWithType
                     if (composeItemWithType != null) {
-                        <composeItemWithType arg0={position} arg1={viewType} />
+                        <composeItemWithType position type={viewType} />
                         return
                     }
                     val composeItem = composeItem
                     if (composeItem != null) {
-                        <composeItem arg0={position} />
+                        <composeItem position />
                         return
                     }
                 }
