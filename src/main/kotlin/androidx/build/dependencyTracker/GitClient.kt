@@ -21,28 +21,46 @@ import org.gradle.api.logging.Logger
 import java.io.File
 import java.util.concurrent.TimeUnit
 
+internal interface GitClient {
+    fun findChangedFilesSince(
+        sha: String,
+        top: String = "HEAD",
+        includeUncommitted: Boolean = false
+    ): List<String>
+    fun findPreviousMergeCL(): String?
+
+    /**
+     * Abstraction for running execution commands for testability
+     */
+    interface CommandRunner {
+        /**
+         * Executes the given shell command and returns the stdout by lines.
+         */
+        fun execute(command: String): List<String>
+    }
+}
 /**
  * A simple git client that uses system process commands to communicate with the git setup in the
  * given working directory.
  */
-internal class GitClient(
+internal class GitClientImpl(
     /**
      * The root location for git
      */
     private val workingDir: File,
     private val logger: Logger? = null,
-    private val commandRunner: CommandRunner = RealCommandRunner(
+    private val commandRunner: GitClient.CommandRunner = RealCommandRunner(
             workingDir = workingDir,
             logger = logger
     )
-) {
+) : GitClient {
     /**
      * Finds changed file paths since the given sha
      */
-    fun findChangedFilesSince(
+    override fun findChangedFilesSince(
         sha: String,
-        top: String = "HEAD",
-        includeUncommitted: Boolean = false
+        top: String,
+        includeUncommitted: Boolean
     ): List<String> {
         // use this if we don't want local changes
         return if (includeUncommitted) {
@@ -55,7 +73,7 @@ internal class GitClient(
     /**
      * checks the history to find the first merge CL.
      */
-    fun findPreviousMergeCL(): String? {
+    override fun findPreviousMergeCL(): String? {
         return PREV_MERGE_CMD
                 .runCommand()
                 .firstOrNull()
@@ -65,20 +83,10 @@ internal class GitClient(
 
     private fun String.runCommand() = commandRunner.execute(this)
 
-    /**
-     * Abstraction for running execution commands for testability
-     */
-    interface CommandRunner {
-        /**
-         * Executes the given shell command and returns the stdout by lines.
-         */
-        fun execute(command: String): List<String>
-    }
-
     private class RealCommandRunner(
         private val workingDir: File,
         private val logger: Logger?
-    ) : CommandRunner {
+    ) : GitClient.CommandRunner {
         override fun execute(command: String): List<String> {
             val parts = command.split("\\s".toRegex())
             logger?.info("running command $command")
