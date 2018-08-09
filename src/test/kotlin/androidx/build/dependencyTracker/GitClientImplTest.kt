@@ -16,47 +16,27 @@
 
 package androidx.build.dependencyTracker
 
-import androidx.build.dependencyTracker.GitClient.Companion.CHANGED_FILES_CMD_PREFIX
-import androidx.build.dependencyTracker.GitClient.Companion.PREV_MERGE_CMD
+import androidx.build.dependencyTracker.GitClientImpl.Companion.CHANGED_FILES_CMD_PREFIX
+import androidx.build.dependencyTracker.GitClientImpl.Companion.PREV_MERGE_CMD
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
 import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TestRule
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import org.junit.runners.model.Statement
 import java.io.File
 
 @RunWith(JUnit4::class)
-class GitClientTest {
-    private val logger = ToStringLogger()
+class GitClientImplTest {
+    @Rule
+    @JvmField
+    val attachLogsRule = AttachLogsTestRule()
+    private val logger = attachLogsRule.logger
     private val commandRunner = MockCommandRunner(logger)
-    private val client = GitClient(
+    private val client = GitClientImpl(
             workingDir = File("."),
             logger = logger,
             commandRunner = commandRunner)
-
-    @Rule
-    @JvmField
-    val attachLogRule = TestRule { base, _ ->
-        object : Statement() {
-            override fun evaluate() {
-                try {
-                    base.evaluate()
-                } catch (t: Throwable) {
-                    throw Exception(
-                            """
-                                test failed with msg: ${t.message}
-                                logs:
-                                ${logger.buildString()}
-                            """.trimIndent(),
-                            t
-                    )
-                }
-            }
-        }
-    }
 
     @Test
     fun findMerge() {
