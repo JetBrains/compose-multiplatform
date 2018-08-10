@@ -4,8 +4,9 @@ import com.google.r4a.frames.Framed
 import com.google.r4a.frames.Record
 
 @Composable
-abstract class Component : Framed {
-    abstract fun compose()
+abstract class Component : Framed, Recomposable {
+    internal var recomposeCallback: (() -> Unit)? = null
+
     protected fun recompose() {
         CompositionContext.recompose(this)
     }
@@ -19,5 +20,9 @@ abstract class Component : Framed {
     override fun prepend(value: Record) {
         value.next = next
         next = value
+    }
+
+    override fun setRecompose(recompose: () -> Unit) {
+        this.recomposeCallback = recompose
     }
 }

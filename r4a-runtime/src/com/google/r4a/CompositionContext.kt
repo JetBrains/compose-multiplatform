@@ -57,7 +57,7 @@ abstract class CompositionContext {
         fun <T : Any?> getAmbient(key: Ambient<T>, component: Component): T = find(component)!!.getAmbient(key, component)
     }
 
-    abstract fun joinKey(left: Any?, right: Any?): Any
+    abstract fun startRoot()
     abstract fun start(sourceHash: Int)
     abstract fun start(sourceHash: Int, key: Any?)
     abstract fun startView(sourceHash: Int)
@@ -65,11 +65,15 @@ abstract class CompositionContext {
     abstract fun setInstance(instance: Any)
     abstract fun useInstance(): Any?
     abstract fun isInserting(): Boolean
-    abstract fun willCompose()
+    abstract fun startCompose(willCompose: Boolean)
+    abstract fun endCompose(didCompose: Boolean)
     abstract fun attributeChanged(value: Any?): Boolean
     abstract fun attributeChangedOrInserting(value: Any?): Boolean
     abstract fun end()
-
+    abstract fun endView()
+    abstract fun endRoot()
+    abstract fun applyChanges()
+    abstract fun joinKey(left: Any?, right: Any?): Any
 
     abstract var context: Context
     abstract fun recompose(component: Component)
@@ -95,6 +99,12 @@ inline fun CompositionContext.group(key: Int, key2: Any? = null, block: () -> Un
     start(key, key2)
     block()
     end()
+}
+
+inline fun CompositionContext.viewGroup(key: Int, key2: Any? = null, block: () -> Unit = {}) {
+    startView(key, key2)
+    block()
+    endView()
 }
 
 inline fun <reified T : Component> CompositionContext.emitComponent(
@@ -129,8 +139,9 @@ inline fun <reified T : Component> CompositionContext.emitComponent(
     }
     Updater(this, el).block()
     // TODO(lmr): do pruning
-    willCompose()
+    startCompose(true)
     el.compose()
+    endCompose(true)
 }
 
 
@@ -171,7 +182,7 @@ inline fun <reified T : View> CompositionContext.emitView(
     ctor: (context: Context) -> T,
     updater: Updater<T>.() -> Unit,
     block: () -> Unit
-) = group(loc, key) {
+) = viewGroup(loc, key) {
     val el: T
     if (isInserting()) {
         el = ctor(context)

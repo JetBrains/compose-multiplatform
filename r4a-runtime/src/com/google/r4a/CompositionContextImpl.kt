@@ -29,6 +29,8 @@ internal data class Slot(
     var open = true
     var argIndex = 0
     var index = 0
+    var viewSlot = false
+
     // TODO: store inc of children?
     // TODO: store map of children? lazily?
     fun print(indent: Int) {
@@ -355,6 +357,8 @@ internal class CompositionContextImpl : CompositionContext() {
         return instance.value as T
     }
 
+    override fun startRoot() {}
+
     // TODO(lmr): we could add an int that specifies the number of attributes on the element so we can
     // initialize an array of that length to store the attributes since that information is known at compile time
     // and is constant
@@ -367,8 +371,11 @@ internal class CompositionContextImpl : CompositionContext() {
         currentSlot = next
     }
 
-    override fun startView(sourceHash: Int) = start(sourceHash, null)
-    override fun startView(sourceHash: Int, key: Any?) = start(sourceHash, key)
+    override fun startView(sourceHash: Int) = startView(sourceHash, null)
+    override fun startView(sourceHash: Int, key: Any?) {
+        start(sourceHash, key)
+        currentSlot.viewSlot = true
+    }
 
     override fun end() {
         val current = currentSlot
@@ -392,6 +399,11 @@ internal class CompositionContextImpl : CompositionContext() {
         }
         addViewIfNeeded()
     }
+
+    override fun applyChanges() { }
+
+    override fun endView() = end()
+    override fun endRoot() = end()
 
     override fun setInstance(instance: Any) {
         val slot = currentSlot
@@ -482,9 +494,11 @@ internal class CompositionContextImpl : CompositionContext() {
         }
     }
 
-    override fun willCompose() {
-        composeQueue.remove(currentSlot)
+    override fun startCompose(willCompose: Boolean) {
+        if (willCompose) composeQueue.remove(currentSlot)
     }
+
+    override fun endCompose(didCompose: Boolean) { }
 
     fun compose() {
         val slot = currentSlot

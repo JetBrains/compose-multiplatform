@@ -1,4 +1,7 @@
-@file:Suppress("unused", "LocalVariableName", "UnnecessaryVariable")
+/*
+ * Copyright 2010-2018 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
+ * that can be found in the license/LICENSE.txt file.
+ */
 
 package com.google.r4a
 
@@ -13,25 +16,25 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 
-
 @RunWith(RobolectricTestRunner::class)
 @Config(
     manifest = Config.NONE,
     minSdk = 23,
     maxSdk = 23
 )
-class CompositionContextTests : ComposeTestCase() {
+class ComposerCompositionContextTests: ComposerComposeTestCase() {
 
     @Test
     fun testNativeViewWithAttributes() = compose {
 
-        with(it) {
+        with (it) {
             // <TextView id={456} text="some text" />
             emitView(123, ::TextView) {
                 set(456) { id = it }
                 set("some text") { text = it }
             }
         }
+
     }.then { _, _, root, activity ->
         assertEquals(1, root.childCount)
 
@@ -49,7 +52,7 @@ class CompositionContextTests : ComposeTestCase() {
             // this should cause the textview to get recreated on every compose
             i++
 
-            with(it) {
+            with (it) {
                 // <TextView id={456} text="some text" />
                 emitView(i, ::TextView) {
                     set(456) { id = it }
@@ -74,10 +77,8 @@ class CompositionContextTests : ComposeTestCase() {
     @Test
     fun testViewWithViewChildren() {
         compose {
-            // this should cause the textview to get recreated on every compose
-
             // <LinearLayout id={345}>
-            with(it) {
+            with (it) {
                 emitView(100, ::LinearLayout, {
                     set(345) { id = it }
                 }) {
@@ -104,7 +105,6 @@ class CompositionContextTests : ComposeTestCase() {
             assertTrue("Should be the expected TextView (2)", ll.getChildAt(1) === tv2)
         }
     }
-
 
     @Test
     fun testForLoop() {
@@ -134,7 +134,6 @@ class CompositionContextTests : ComposeTestCase() {
             }
         }
     }
-
 
     @Test
     fun testRecompose() {
@@ -294,21 +293,6 @@ class CompositionContextTests : ComposeTestCase() {
     }
 
     @Test
-    fun testPreservesTree() = compose {
-        with(it) {
-            emitView(123, ::TextView) {
-                set("some text") { text = it }
-            }
-        }
-    }.then { cc, component, _, _ ->
-        val before = cc.treeAsString()
-        cc.recompose(component)
-        val after = cc.treeAsString()
-        assertEquals(before, after)
-    }
-
-
-    @Test
     fun testCorrectViewTree() = compose {
         // <LinearLayout>
         //   <LinearLayout />
@@ -316,7 +300,7 @@ class CompositionContextTests : ComposeTestCase() {
         // </LinearLayout>
         // <LinearLayout />
 
-        with(it) {
+        with (it) {
             emitView(123, ::LinearLayout, {}) {
                 emitView(123, ::LinearLayout)
                 emitView(123, ::LinearLayout)
@@ -324,7 +308,7 @@ class CompositionContextTests : ComposeTestCase() {
             emitView(123, ::LinearLayout)
         }
 
-    }.then { _, _, root, _ ->
+    }.then { cc, component, root, activity ->
         assertChildHierarchy(root) {
             """
                 <LinearLayout>
@@ -386,258 +370,113 @@ class CompositionContextTests : ComposeTestCase() {
     }
 
     @Test
-    fun testReorderingComponents() {
-        var current = listOf(101, 102, 103, 104)
-        class Item : Component() {
-            var thing: Int = 0
+    fun testCorrectViewTreeWithComponentWithMultipleRoots() {
+
+        class B : Component() {
             override fun compose() {
                 with(CompositionContext.current) {
-                    emitView(2, ::TextView) {
-                        set(thing) { id = it }
-                        set("$thing") { text = it }
-                    }
+                    // <TextView />
+                    emitView(123, ::TextView)
+                    emitView(124, ::TextView)
                 }
             }
         }
-        class Reordering : Component() {
-            var things: List<Int> = listOf()
-            override fun compose() {
-//                <LinearLayout>
-//                    for (thing in things) {
-//                        <Item key=thing thing />
-//                    }
-//                </LinearLayout>
-                with(CompositionContext.current) {
-                    emitView(0, ::LinearLayout, {}) {
-                        for (thing in things) {
-                            emitComponent(1, thing, ::Item) {
-                                set(thing) { this.thing = it }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+
         compose {
-            it.emitComponent(0, ::Reordering) {
-                set(current) { things = it }
-            }
-        }.then { cc, component, root, activity ->
+            // <LinearLayout>
+            //   <LinearLayout>
+            //     <B />
+            //   </LinearLayout>
+            //   <LinearLayout>
+            //     <B />
+            //   </LinearLayout>
+            // </LinearLayout>
 
-            assertChildHierarchy(root) {
-                """
-                <LinearLayout>
-                    <TextView id=101 text='101' />
-                    <TextView id=102 text='102' />
-                    <TextView id=103 text='103' />
-                    <TextView id=104 text='104' />
-                </LinearLayout>
-                """
-            }
-
-            assertSlotTable(cc) {
-                """
-                <ROOT><0-0> (open: false, index: 0)
-                  testReorderingComponents${"$"}Reordering<0-null> (open: false, index: 0)
-                    LinearLayout<0-null> (open: false, index: 0)
-                      testReorderingComponents${"$"}Item<1-101> (open: false, index: 0)
-                        TextView<2-null> (open: false, index: 0)
-                      testReorderingComponents${"$"}Item<1-102> (open: false, index: 1)
-                        TextView<2-null> (open: false, index: 1)
-                      testReorderingComponents${"$"}Item<1-103> (open: false, index: 2)
-                        TextView<2-null> (open: false, index: 2)
-                      testReorderingComponents${"$"}Item<1-104> (open: false, index: 3)
-                        TextView<2-null> (open: false, index: 3)
-                """
-            }
-
-            val el101 = activity.findViewById(101)
-            val el102 = activity.findViewById(102)
-            val el103 = activity.findViewById(103)
-            val el104 = activity.findViewById(104)
-
-            current = listOf(101, 103, 102, 104)
-
-            cc.recompose(component)
-
-            assertChildHierarchy(root) {
-                """
-                <LinearLayout>
-                    <TextView id=101 text='101' />
-                    <TextView id=103 text='103' />
-                    <TextView id=102 text='102' />
-                    <TextView id=104 text='104' />
-                </LinearLayout>
-                """
-            }
-
-            assertSlotTable(cc) {
-                """
-                <ROOT><0-0> (open: false, index: 0)
-                  testReorderingComponents${"$"}Reordering<0-null> (open: false, index: 0)
-                    LinearLayout<0-null> (open: false, index: 0)
-                      testReorderingComponents${"$"}Item<1-101> (open: false, index: 0)
-                        TextView<2-null> (open: false, index: 0)
-                      testReorderingComponents${"$"}Item<1-103> (open: false, index: 1)
-                        TextView<2-null> (open: false, index: 1)
-                      testReorderingComponents${"$"}Item<1-102> (open: false, index: 2)
-                        TextView<2-null> (open: false, index: 2)
-                      testReorderingComponents${"$"}Item<1-104> (open: false, index: 3)
-                        TextView<2-null> (open: false, index: 3)
-                """
-            }
-
-            val el2101 = activity.findViewById(101)
-            val el2102 = activity.findViewById(102)
-            val el2103 = activity.findViewById(103)
-            val el2104 = activity.findViewById(104)
-
-            assert(el101 === el2101)
-            assert(el102 === el2102)
-            assert(el103 === el2103)
-            assert(el104 === el2104)
-        }
-    }
-
-    @Test
-    fun testReorderingViews() {
-        var current = listOf(101, 102, 103, 104)
-        class Reordering : Component() {
-            var things: List<Int> = listOf()
-            override fun compose() {
-//                <LinearLayout>
-//                    for (thing in things) {
-//                        <TextView key=thing id=thing text="$thing" />
-//                    }
-//                </LinearLayout>
-                with(CompositionContext.current) {
-                    emitView(0, ::LinearLayout, {}) {
-                        for (thing in things) {
-                            emitView(1, thing, ::TextView) {
-                                set(thing) { id = it }
-                                set("$thing") { text = it }
-                            }
-                        }
+            with(it) {
+                emitView(123, ::LinearLayout, {}) {
+                    emitView(123, ::LinearLayout, {}) {
+                        emitComponent(123, ::B)
+                    }
+                    emitView(123, ::LinearLayout, {}) {
+                        emitComponent(123, ::B)
                     }
                 }
             }
-        }
-        compose {
-            it.emitComponent(0, ::Reordering) {
-                set(current) { things = it }
-            }
-        }.then { cc, component, root, activity ->
+        }.then { _, _, root, _ ->
 
             assertChildHierarchy(root) {
                 """
                 <LinearLayout>
-                    <TextView id=101 text='101' />
-                    <TextView id=102 text='102' />
-                    <TextView id=103 text='103' />
-                    <TextView id=104 text='104' />
+                    <LinearLayout>
+                        <TextView />
+                        <TextView />
+                    </LinearLayout>
+                    <LinearLayout>
+                        <TextView />
+                        <TextView />
+                    </LinearLayout>
                 </LinearLayout>
                 """
             }
-
-            assertSlotTable(cc) {
-                """
-                 <ROOT><0-0> (open: false, index: 0)
-                   testReorderingViews${"$"}Reordering<0-null> (open: false, index: 0)
-                     LinearLayout<0-null> (open: false, index: 0)
-                       TextView<1-101> (open: false, index: 0)
-                       TextView<1-102> (open: false, index: 1)
-                       TextView<1-103> (open: false, index: 2)
-                       TextView<1-104> (open: false, index: 3)
-                """
-            }
-
-            val el101 = activity.findViewById(101)
-            val el102 = activity.findViewById(102)
-            val el103 = activity.findViewById(103)
-            val el104 = activity.findViewById(104)
-
-            current = listOf(101, 103, 102, 104)
-
-            cc.recompose(component)
-
-
-            assertSlotTable(cc) {
-                """
-                 <ROOT><0-0> (open: false, index: 0)
-                   testReorderingViews${"$"}Reordering<0-null> (open: false, index: 0)
-                     LinearLayout<0-null> (open: false, index: 0)
-                       TextView<1-101> (open: false, index: 0)
-                       TextView<1-103> (open: false, index: 1)
-                       TextView<1-102> (open: false, index: 2)
-                       TextView<1-104> (open: false, index: 3)
-                """
-            }
-
-            assertChildHierarchy(root) {
-                """
-                <LinearLayout>
-                    <TextView id=101 text='101' />
-                    <TextView id=103 text='103' />
-                    <TextView id=102 text='102' />
-                    <TextView id=104 text='104' />
-                </LinearLayout>
-                """
-            }
-
-            val el2101 = activity.findViewById(101)
-            val el2102 = activity.findViewById(102)
-            val el2103 = activity.findViewById(103)
-            val el2104 = activity.findViewById(104)
-
-            assert(el101 === el2101)
-            assert(el102 === el2102)
-            assert(el103 === el2103)
-            assert(el104 === el2104)
-
-
-            current = listOf(102, 103)
-
-            cc.recompose(component)
-
-            assertSlotTable(cc) {
-                """
-                 <ROOT><0-0> (open: false, index: 0)
-                   testReorderingViews${"$"}Reordering<0-null> (open: false, index: 0)
-                     LinearLayout<0-null> (open: false, index: 0)
-                       TextView<1-102> (open: false, index: 0)
-                       TextView<1-103> (open: false, index: 1)
-                """
-            }
-
-            assertChildHierarchy(root) {
-                """
-                <LinearLayout>
-                    <TextView id=102 text='102' />
-                    <TextView id=103 text='103' />
-                </LinearLayout>
-                """
-            }
-
-            val el3101 = activity.findViewById(101)
-            val el3102 = activity.findViewById(102)
-            val el3103 = activity.findViewById(103)
-            val el3104 = activity.findViewById(104)
-
-            assert(el3101 === null)
-            assert(el3102 === el102)
-            assert(el3103 === el103)
-            assert(el3104 === null)
         }
     }
 }
 
-class Counter {
-    private var counts = mutableMapOf<String, Int>()
-    fun inc(key: String) = counts.getOrPut(key, { 0 }).let { counts[key] = it + 1 }
-    fun reset() {
-        counts = mutableMapOf()
-    }
+fun assertChildHierarchy(root: ViewGroup, getHierarchy: () -> String) {
+    val realHierarchy = printChildHierarchy(root)
 
-    operator fun get(key: String) = counts.getOrDefault(key, 0)
+    TestCase.assertEquals(
+        normalizeString(getHierarchy()),
+        realHierarchy.trim()
+    )
 }
 
+fun normalizeString(str: String): String {
+    val lines = str.split('\n').dropWhile { it.isBlank() }.dropLastWhile { it.isBlank() }
+    if (lines.isEmpty()) return ""
+    val toRemove = lines.first().takeWhile { it == ' ' }.length
+    return lines.joinToString("\n") { it.substring(Math.min(toRemove, it.length)) }
+}
+
+fun printChildHierarchy(root: ViewGroup): String {
+    val sb = StringBuilder()
+    for (i in 0 until root.childCount) {
+        printView(root.getChildAt(i), 0, sb)
+    }
+    return sb.toString()
+}
+
+fun printView(view: View, indent: Int, sb: StringBuilder) {
+    val whitespace = " ".repeat(indent)
+    val name = view.javaClass.simpleName
+    val attributes = printAttributes(view)
+    if (view is ViewGroup && view.childCount > 0) {
+        sb.appendln("$whitespace<$name$attributes>")
+        for (i in 0 until view.childCount) {
+            printView(view.getChildAt(i), indent + 4, sb)
+        }
+        sb.appendln("$whitespace</$name>")
+    } else {
+        sb.appendln("$whitespace<$name$attributes />")
+    }
+}
+
+fun printAttributes(view: View): String {
+    val attrs = mutableListOf<String>()
+
+    // NOTE: right now we only look for id and text as attributes to print out... but we are
+    // free to add more if it makes sense
+    if (view.id != -1) {
+        attrs.add("id=${view.id}")
+    }
+
+    if (view is TextView && view.text.length > 0) {
+        attrs.add("text='${view.text}'")
+    }
+
+    val result = attrs.joinToString(" ", prefix = " ")
+    if (result.length == 1) {
+        return ""
+    }
+    return result
+}

@@ -65,12 +65,18 @@ abstract class AbstractCodeGenTest : CodegenTestCase() {
         testMethod.invoke(instance)
     }
 
-    protected fun testCompile(source: String) {
+    protected fun testCompile(source: String, dumpClasses: Boolean = false) {
         val files = mutableListOf<KtFile>()
         files.addAll(helperFiles())
         files.add(sourceFile("Test.kt", source))
         myFiles = CodegenTestFiles.create(files)
         val loader = createClassLoader()
+        if (dumpClasses) {
+            for (file in loader.allGeneratedFiles.filter { it.relativePath.endsWith(".class") }) {
+                println("------\nFILE: ${file.relativePath}\n------")
+                println(file.asText())
+            }
+        }
     }
 
     protected fun sourceFile(name: String, source: String): KtFile {

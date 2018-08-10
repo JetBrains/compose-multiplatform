@@ -1,5 +1,6 @@
 package org.jetbrains.kotlin.r4a.compiler.lower
 
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
@@ -8,6 +9,8 @@ import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrKtxStatement
 import org.jetbrains.kotlin.ir.IrStatement
+import org.jetbrains.kotlin.ir.builders.constTrue
+import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.impl.IrConstructorImpl
 import org.jetbrains.kotlin.ir.declarations.impl.IrFunctionImpl
@@ -38,9 +41,10 @@ import org.jetbrains.kotlin.types.KotlinType
 /**
  * Creates synthetics and applies KTX lowering on a class-component.
  */
+@Suppress("unused")
 fun lowerComponentClass(context: GeneratorContext, metadata: ComponentMetadata, component: IrClass) {
     // TODO: if (component.annotations.includes(GenerateWrapperViewAnnotation) { ...
-  //  component.declarations.add(generateWrapperView(context, metadata))
+    //  component.declarations.add(generateWrapperView(context, metadata))
     // }
 
     component.declarations.add(generateComponentCompanionObject(context, metadata))
@@ -346,17 +350,21 @@ private fun constructKey(context: GeneratorContext, helper: ComposeFunctionHelpe
 
 // OUTPUT: cc.end()
 private fun callEnd(
+    kind: GroupKind,
     output: MutableList<IrStatement>,
     helper: ComposeFunctionHelper
 ) {
-    output.add(helper.ccEndMethodCall)
+    when (kind) {
+        GroupKind.View -> output.add(helper.ccEndViewMethodCall)
+        GroupKind.Component, GroupKind.Function -> output.add(helper.ccEndMethodCall)
+    }
 }
-
 
 
 /**
  * Function vars never memoize, so we don't bother with `run` here. We just invoke
  */
+@Suppress("UNUSED_PARAMETER")
 private fun transformFunctionVar(
     context: GeneratorContext,
     container: IrPackageFragment,
@@ -375,6 +383,7 @@ private fun transformFunctionVar(
 /**
  * Functions can memoize, so we check each attribute and skip if we can
  */
+@Suppress("UNUSED_PARAMETER")
 private fun transformFunctionComponent(
     context: GeneratorContext,
     container: IrPackageFragment,
@@ -444,9 +453,10 @@ private fun transformFunctionComponent(
 
     output.add(ifRunThenComposeExpr)
 
-    callEnd(output, helper)
+    callEnd(GroupKind.Function, output, helper)
 }
 
+@Suppress("UNUSED_PARAMETER")
 private fun transformComponentElement(
     context: GeneratorContext,
     container: IrPackageFragment,
@@ -531,7 +541,14 @@ private fun transformComponentElement(
         context.irBuiltIns.unitType
     ).apply {
         branches.add(IrBranchImpl(startOffset, endOffset, helper.isInsertingCall, thenBranchExpr))
-        branches.add(IrElseBranchImpl(startOffset, endOffset, constTrue(startOffset, endOffset, context.irBuiltIns.booleanType), elseBranchExpr))
+        branches.add(
+            IrElseBranchImpl(
+                startOffset,
+                endOffset,
+                constTrue(startOffset, endOffset, context.irBuiltIns.booleanType),
+                elseBranchExpr
+            )
+        )
     }
 
     // OUTPUT:
@@ -668,7 +685,14 @@ private fun transformComponentElement(
             context.irBuiltIns.unitType
         ).apply {
             branches.add(IrBranchImpl(startOffset, endOffset, callUpdateAttributeExpr, thenUpdBranchExpr))
-            branches.add(IrElseBranchImpl(startOffset, endOffset, constTrue(startOffset, endOffset, context.irBuiltIns.booleanType), elseBranchExpr))
+            branches.add(
+                IrElseBranchImpl(
+                    startOffset,
+                    endOffset,
+                    constTrue(startOffset, endOffset, context.irBuiltIns.booleanType),
+                    elseBranchExpr
+                )
+            )
         }
 
         // OUTPUT:
@@ -681,10 +705,11 @@ private fun transformComponentElement(
 
     /**
      *     // if the element is a component, we recurse down:
+     *     cc.startCompose(run)
      *     if (run) {
-     *         cc.willCompose()
      *         tmpEl.compose()
      *     }
+     *     cc.endCompose(run)
      */
 
     val composeExpr = IrCallImpl(
@@ -699,20 +724,25 @@ private fun transformComponentElement(
         startOffset, endOffset,
         context.irBuiltIns.unitType
     ).apply {
-        branches.add(IrBranchImpl(startOffset, endOffset, helper.getRun, IrBlockImpl(
-            startOffset, endOffset,
-            context.irBuiltIns.unitType,
-            KTX_TAG_ORIGIN,
-            listOf(
-                helper.ccWillComposeMethodCall,
-                composeExpr
+        branches.add(
+            IrBranchImpl(
+                startOffset, endOffset, helper.getRun, IrBlockImpl(
+                    startOffset, endOffset,
+                    context.irBuiltIns.unitType,
+                    KTX_TAG_ORIGIN,
+                    listOf(
+                        composeExpr
+                    )
+                )
             )
-        )))
+        )
     }
 
+    output.add(helper.ccStartComposeCall)
     output.add(ifRunThenComposeExpr)
+    output.add(helper.ccEndComposeCall)
 
-    callEnd(output, helper)
+    callEnd(GroupKind.Component, output, helper)
 }
 
 private fun transformViewElement(
@@ -799,7 +829,14 @@ private fun transformViewElement(
 
     ).apply {
         branches.add(IrBranchImpl(startOffset, endOffset, helper.isInsertingCall, thenBranchExpr))
-        branches.add(IrElseBranchImpl(startOffset, endOffset, constTrue(startOffset, endOffset, context.irBuiltIns.booleanType), elseBranchExpr))
+        branches.add(
+            IrElseBranchImpl(
+                startOffset,
+                endOffset,
+                constTrue(startOffset, endOffset, context.irBuiltIns.booleanType),
+                elseBranchExpr
+            )
+        )
     }
 
     // OUTPUT:
@@ -855,7 +892,7 @@ private fun transformViewElement(
         }
     }
 
-    callEnd(output, helper)
+    callEnd(GroupKind.View, output, helper)
 }
 
 private fun genAttributeUpdate(
@@ -995,14 +1032,16 @@ private class ComposeFunctionHelper(val context: GeneratorContext, val compose: 
 
     val getCurrentCcCall by lazy {
         IrGetterCallImpl(
-            -1, -1,
+            UNDEFINED_OFFSET,
+            UNDEFINED_OFFSET,
             getCurrentCcFunction.returnType!!.toIrType()!!,
             context.symbolTable.referenceSimpleFunction(getCurrentCcFunction),
             getCurrentCcFunction,
             0
         ).apply {
             dispatchReceiver = IrGetObjectValueImpl(
-                -1, -1,
+                UNDEFINED_OFFSET,
+                UNDEFINED_OFFSET,
                 ccClass.companionObjectDescriptor!!.defaultType.toIrType()!!,
                 context.symbolTable.referenceClass(ccClass.companionObjectDescriptor!!)
             )
@@ -1014,7 +1053,7 @@ private class ComposeFunctionHelper(val context: GeneratorContext, val compose: 
     }
 
     val getCc by lazy {
-        IrGetValueImpl(-1, -1, context.symbolTable.referenceVariable(ccVariable))
+        IrGetValueImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, context.symbolTable.referenceVariable(ccVariable))
     }
 
     val runVariable by lazy {
@@ -1022,18 +1061,18 @@ private class ComposeFunctionHelper(val context: GeneratorContext, val compose: 
     }
 
     val getRun by lazy {
-        IrGetValueImpl(-1, -1, context.symbolTable.referenceVariable(runVariable))
+        IrGetValueImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, context.symbolTable.referenceVariable(runVariable))
     }
 
     fun setRun(value: Boolean): IrSetVariable {
         return IrSetVariableImpl(
-            -1,
-            -1,
+            UNDEFINED_OFFSET,
+            UNDEFINED_OFFSET,
             runVariable.type.toIrType()!!,
             context.symbolTable.referenceVariable(runVariable),
             IrConstImpl(
-                -1,
-                -1,
+                UNDEFINED_OFFSET,
+                UNDEFINED_OFFSET,
                 context.irBuiltIns.booleanType,
                 IrConstKind.Boolean,
                 value
@@ -1042,26 +1081,20 @@ private class ComposeFunctionHelper(val context: GeneratorContext, val compose: 
         )
     }
 
-    val ccStartViewWithKey by lazy {
-        ccClass.unsubstitutedMemberScope.getContributedFunctions(
-            Name.identifier("startView"),
-            NoLookupLocation.FROM_BACKEND
-        ).find { it.valueParameters.size == 2 }!!
-    }
+    fun lookupFunction(name: String, cls: ClassDescriptor = ccClass) = cls.unsubstitutedMemberScope.getContributedFunctions(
+        Name.identifier(name),
+        NoLookupLocation.FROM_BACKEND
+    ).single()
 
-    val ccStartViewWithoutKey by lazy {
-        ccClass.unsubstitutedMemberScope.getContributedFunctions(
-            Name.identifier("startView"),
-            NoLookupLocation.FROM_BACKEND
-        ).find { it.valueParameters.size == 1 }!!
-    }
+    fun lookupFunction(name: String, arity: Int, cls: ClassDescriptor = ccClass) = cls.unsubstitutedMemberScope.getContributedFunctions(
+        Name.identifier(name),
+        NoLookupLocation.FROM_BACKEND
+    ).find { it.valueParameters.size == arity }!!
 
-    val ccStartMethodWithKey by lazy {
-        ccClass.unsubstitutedMemberScope.getContributedFunctions(
-            Name.identifier("start"),
-            NoLookupLocation.FROM_BACKEND
-        ).find { it.valueParameters.size == 2 }!!
-    }
+    fun lookupGetter(name: String, cls: ClassDescriptor = ccClass) = cls.unsubstitutedMemberScope.getContributedVariables(
+        Name.identifier(name),
+        NoLookupLocation.FROM_BACKEND
+    ).single().getter!!
 
     val ccJoinKeyMethod by lazy {
         ccClass.unsubstitutedMemberScope.getContributedFunctions(
@@ -1070,24 +1103,16 @@ private class ComposeFunctionHelper(val context: GeneratorContext, val compose: 
         ).single()
     }
 
-    val ccStartMethodWithoutKey by lazy {
-        ccClass.unsubstitutedMemberScope.getContributedFunctions(
-            Name.identifier("start"),
-            NoLookupLocation.FROM_BACKEND
-        ).find { it.valueParameters.size == 1 }!!
-    }
-
-    val androidContextGetter by lazy {
-        ccClass.unsubstitutedMemberScope.getContributedVariables(
-            Name.identifier("context"),
-            NoLookupLocation.FROM_BACKEND
-        ).single().getter!!
-    }
+    val ccStartViewWithKey by lazy { lookupFunction("startView", arity = 2) }
+    val ccStartViewWithoutKey by lazy { lookupFunction("startView", arity = 1) }
+    val ccStartMethodWithKey by lazy { lookupFunction("start", arity = 2) }
+    val ccStartMethodWithoutKey by lazy { lookupFunction("start", arity = 1) }
+    val androidContextGetter by lazy { lookupGetter("context") }
 
     val getAndroidContextCall by lazy {
         IrCallImpl(
-            -1,
-            -1,
+            UNDEFINED_OFFSET,
+            UNDEFINED_OFFSET,
             androidContextGetter.returnType!!.toIrType()!!,
             context.symbolTable.referenceFunction(androidContextGetter)
         ).apply {
@@ -1097,7 +1122,7 @@ private class ComposeFunctionHelper(val context: GeneratorContext, val compose: 
 
     val isInsertingCall by lazy {
         IrCallImpl(
-            -1, -1,
+            UNDEFINED_OFFSET, UNDEFINED_OFFSET,
             ccIsInsertingMethod.returnType!!.toIrType()!!,
             context.symbolTable.referenceFunction(ccIsInsertingMethod)
         ).apply {
@@ -1107,13 +1132,13 @@ private class ComposeFunctionHelper(val context: GeneratorContext, val compose: 
 
     fun getUseInstanceCall(type: KotlinType): IrExpression {
         return IrTypeOperatorCallImpl(
-            -1, -1,
+            UNDEFINED_OFFSET, UNDEFINED_OFFSET,
             context.builtIns.nullableAnyType.toIrType()!!,
             IrTypeOperator.SAFE_CAST,
             type.toIrType()!!,
             context.symbolTable.referenceClassifier(type.constructor.declarationDescriptor!!),
             IrCallImpl(
-                -1, -1,
+                UNDEFINED_OFFSET, UNDEFINED_OFFSET,
                 ccUseInstanceMethod.returnType!!.toIrType()!!,
                 context.symbolTable.referenceFunction(ccUseInstanceMethod)
             ).apply {
@@ -1122,82 +1147,55 @@ private class ComposeFunctionHelper(val context: GeneratorContext, val compose: 
         )
     }
 
-    val ccSetInstanceFunctionDescriptor by lazy {
-        ccClass.unsubstitutedMemberScope.getContributedFunctions(
-            Name.identifier("setInstance"),
-            NoLookupLocation.FROM_BACKEND
-        ).single() // only one of these for now
+    val ccSetInstanceFunctionDescriptor by lazy { lookupFunction("setInstance") }
+    val ccAttributeChangedFunctionDescriptor by lazy { lookupFunction("attributeChanged") }
+    val ccAttributeChangedOrInsertingFunctionDescriptor by lazy { lookupFunction("attributeChangedOrInserting") }
+    val componentComposeMethod by lazy { lookupFunction("compose", componentClass) }
+    val ccIsInsertingMethod by lazy { lookupFunction("isInserting") }
+    val ccUseInstanceMethod by lazy { lookupFunction("useInstance") }
+
+    val ccStartComposeMethod by lazy { lookupFunction("startCompose") }
+    val ccStartComposeCall by lazy {
+        IrCallImpl(
+            UNDEFINED_OFFSET,
+            UNDEFINED_OFFSET,
+            ccStartComposeMethod.returnType!!.toIrType()!!,
+            context.symbolTable.referenceFunction(ccStartComposeMethod)
+        ).apply {
+            dispatchReceiver = getCc
+            putValueArgument(0, getRun)
+        }
     }
 
-    val ccUpdateAttributeFunctionDescriptor by lazy {
-        ccClass.unsubstitutedMemberScope.getContributedFunctions(
-            Name.identifier("updateAttribute"),
-            NoLookupLocation.FROM_BACKEND
-        ).single()
+    val ccEndComposeMethod by lazy { lookupFunction("endCompose") }
+    val ccEndComposeCall by lazy {
+        IrCallImpl(
+            UNDEFINED_OFFSET,
+            UNDEFINED_OFFSET,
+            ccEndComposeMethod.returnType!!.toIrType()!!,
+            context.symbolTable.referenceFunction(ccEndComposeMethod)
+        ).apply {
+            dispatchReceiver = getCc
+            putValueArgument(0, getRun)
+        }
     }
 
-    val ccAttributeChangedFunctionDescriptor by lazy {
-        ccClass.unsubstitutedMemberScope.getContributedFunctions(
-            Name.identifier("attributeChanged"),
-            NoLookupLocation.FROM_BACKEND
-        ).single()
-    }
-
-    val ccAttributeChangedOrInsertingFunctionDescriptor by lazy {
-        ccClass.unsubstitutedMemberScope.getContributedFunctions(
-            Name.identifier("attributeChangedOrInserting"),
-            NoLookupLocation.FROM_BACKEND
-        ).single()
-    }
-
-    val ccComposeMethod by lazy {
-        ccClass.unsubstitutedMemberScope.getContributedFunctions(
-            Name.identifier("compose"),
-            NoLookupLocation.FROM_BACKEND
-        ).single() // only one of these for now
-    }
-
-    val componentComposeMethod by lazy {
-        componentClass.unsubstitutedMemberScope.getContributedFunctions(
-            Name.identifier("compose"),
-            NoLookupLocation.FROM_BACKEND
-        ).single() // only one of these for now
-    }
-
-    val ccIsInsertingMethod by lazy {
-        ccClass.unsubstitutedMemberScope.getContributedFunctions(
-            Name.identifier("isInserting"),
-            NoLookupLocation.FROM_BACKEND
-        ).single() // only one of these for now
-    }
-
-    val ccUseInstanceMethod by lazy {
-        ccClass.unsubstitutedMemberScope.getContributedFunctions(
-            Name.identifier("useInstance"),
-            NoLookupLocation.FROM_BACKEND
-        ).single() // only one of these for now
-    }
-
-    val ccWillComposeMethod by lazy {
-        ccClass.unsubstitutedMemberScope.getContributedFunctions(
-            Name.identifier("willCompose"),
-            NoLookupLocation.FROM_BACKEND
-        ).single() // only one of these for now
-    }
-
-    val ccWillComposeMethodCall by lazy {
-        IrCallImpl(-1, -1, ccWillComposeMethod.returnType!!.toIrType()!!, context.symbolTable.referenceFunction(ccWillComposeMethod)).apply {
+    val ccEndMethod by lazy { lookupFunction("end") }
+    val ccEndMethodCall by lazy {
+        IrCallImpl(
+            UNDEFINED_OFFSET, UNDEFINED_OFFSET, ccEndMethod.returnType!!.toIrType()!!,
+            context.symbolTable.referenceFunction(ccEndMethod)
+        ).apply {
             dispatchReceiver = getCc
         }
     }
 
-    val ccEndMethod = ccClass.unsubstitutedMemberScope.getContributedFunctions(
-        Name.identifier("end"),
-        NoLookupLocation.FROM_BACKEND
-    ).single()
-
-    val ccEndMethodCall by lazy {
-        IrCallImpl(-1, -1, ccEndMethod.returnType!!.toIrType()!!, context.symbolTable.referenceFunction(ccEndMethod)).apply {
+    val ccEndViewMethod by lazy { lookupFunction("endView") }
+    val ccEndViewMethodCall by lazy {
+        IrCallImpl(
+            UNDEFINED_OFFSET, UNDEFINED_OFFSET, ccEndViewMethod.returnType!!.toIrType()!!,
+            context.symbolTable.referenceFunction(ccEndViewMethod)
+        ).apply {
             dispatchReceiver = getCc
         }
     }
