@@ -1,7 +1,6 @@
 package org.jetbrains.kotlin.r4a
 
 import com.intellij.psi.PsiElement
-import com.sun.jndi.ldap.LdapPoolManager.trace
 import org.jetbrains.kotlin.types.TypeUtils
 import org.jetbrains.kotlin.container.StorageComponentContainer
 import org.jetbrains.kotlin.container.useInstance
@@ -149,6 +148,7 @@ class ComposableAnnotationChecker(val mode: Mode = DEFAULT_MODE) : CallChecker, 
         }
 
         var localKtx = false
+        var isInlineLambda = false
         element.accept(object : KtTreeVisitorVoid() {
             override fun visitKtxElement(element: KtxElement) {
                 localKtx = true
@@ -161,9 +161,6 @@ class ComposableAnnotationChecker(val mode: Mode = DEFAULT_MODE) : CallChecker, 
             }
 
             override fun visitLambdaExpression(lambdaExpression: KtLambdaExpression) {
-                if (lambdaExpression == element) {
-                    super.visitLambdaExpression(lambdaExpression)
-                }
 
                 // Parent declaration can be null in code fragments or in some bad error expressions
                 val functionLiteral = lambdaExpression.functionLiteral
@@ -172,10 +169,11 @@ class ComposableAnnotationChecker(val mode: Mode = DEFAULT_MODE) : CallChecker, 
                 val containingFunctionDescriptor = containingFunInfo.getFirst()
 
                 val isInlineable = InlineUtil.checkNonLocalReturnUsage(containingFunctionDescriptor, trace.get(BindingContext.DECLARATION_TO_DESCRIPTOR, functionLiteral), functionLiteral, trace.bindingContext)
-                if(isInlineable) super.visitLambdaExpression(lambdaExpression)
+                if(isInlineable && lambdaExpression == element) isInlineLambda = true
+                if(isInlineable || lambdaExpression == element) super.visitLambdaExpression(lambdaExpression)
             }
         }, null)
-        if (localKtx && (mode == Mode.STRICT || mode == Mode.PEDANTIC)) {
+        if (localKtx && !isInlineLambda && (mode == Mode.STRICT || mode == Mode.PEDANTIC)) {
             val reportElement = when (element) {
                 is KtNamedFunction -> element.nameIdentifier ?: element
                 else -> element
@@ -205,6 +203,11 @@ class ComposableAnnotationChecker(val mode: Mode = DEFAULT_MODE) : CallChecker, 
         if(reportOn.parent is KtxElement) {
             if (!hasComposableAnnotation && resolvedCall is ResolvedCallImpl) {
                 val callee = resolvedCall.candidateDescriptor
+                if(callee is SimpleFunctionDescriptor && callee.annotations.hasAnnotation(R4aUtils.r4aFqName("Children"))) {
+                    // Class components can have a setter function for setting children, which is resolved on the tag.
+                    // This children setter function is not a SFC, so it shouldn't be reported.
+                    return
+                }
                 if(mode == Mode.PEDANTIC && (callee is LocalVariableDescriptor || callee is PropertyDescriptor)) {
                     context.trace.reportFromPlugin(
                         R4AErrors.NON_COMPOSABLE_INVOCATION.on(

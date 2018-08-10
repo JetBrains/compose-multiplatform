@@ -411,6 +411,10 @@ internal class CompositionContextImpl : CompositionContext() {
         } else {
             val current = slot.attributes[i]
             slot.attributes[i] = value
+
+            // TODO: Temporary hack because IR lambdas don't compare properly (yet)
+            if(value is kotlin.jvm.internal.FunctionReference) return true
+
             current != value
         }
     }

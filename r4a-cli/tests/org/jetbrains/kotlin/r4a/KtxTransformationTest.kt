@@ -218,6 +218,7 @@ class KtxTransformationTest: AbstractCodeGenTest() {
             var visible: Boolean = false
             override fun compose() {
                 if (!visible) return
+                else "" // TODO: Remove this line when fixed upstream
                 <Bar />
             }
         }
@@ -1094,6 +1095,49 @@ class KtxTransformationTest: AbstractCodeGenTest() {
             <Example foo={123}> x ->
                 println("hello ${"$"}{x + 1}")
             </Example>
+        }
+        """
+    )
+
+    fun testKtxLambdaInForLoop() = testCompile(
+        """
+        import com.google.r4a.*
+        import android.widget.TextView
+
+        fun bar(): Unit {}
+
+        fun foo() {
+            val lambda =  {  }
+            for(x in 1..5) {
+                lambda()
+                lambda()
+                lambda()
+                lambda()
+                lambda()
+                bar() // TODO: Remove when fixed upstream
+            }
+        }
+        """
+    )
+
+    fun testKtxLambdaInIfElse() = testCompile(
+        """
+        import com.google.r4a.*
+        import android.widget.TextView
+
+        fun bar(): Any {
+            return "Hello"
+        }
+
+        fun foo(x: Boolean) {
+            val lambda = @Composable { <TextView text="Hello World" /> }
+            if(true) {
+                <lambda />
+                <lambda />
+                <lambda />
+            } else {
+                <lambda />
+            }
         }
         """
     )

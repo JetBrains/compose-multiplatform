@@ -501,5 +501,29 @@ class ComposableCheckerTests: AbstractR4aDiagnosticsTest() {
                }
            """)
     }
+
+    fun testComposableReporting024() {
+        doTest(MODE_ALL, """
+            import com.google.r4a.*;
+            import android.widget.TextView;
+            import android.widget.LinearLayout;
+
+            fun foo(ll: LinearLayout) {
+                ll.composeInto({ <TextView text="Hello World!" /> })
+            }
+        """)
+    }
+
+    fun testComposableReporting025() {
+        doTest(MODE_ALL, """
+            import com.google.r4a.*;
+            import android.widget.TextView;
+
+            @Composable
+            fun foo() {
+                listOf(1,2,3,4,5).forEach { <TextView text="Hello World!" /> }
+            }
+        """)
+    }
 }
 

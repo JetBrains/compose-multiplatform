@@ -5,7 +5,7 @@ import android.view.ViewGroup
 object R4a {
 
     private class Root: Component() {
-        lateinit var composable: () -> Unit
+        lateinit var composable: @Composable() () -> Unit
         override fun compose() {
             val cc = CompositionContext.current
             cc.start(0)
@@ -14,7 +14,8 @@ object R4a {
         }
     }
 
-    fun composeInto(container: ViewGroup, composable: () -> Unit) {
+
+    fun composeInto(container: ViewGroup, composable: @Composable() () -> Unit) {
         var root = CompositionContext.getRootComponent(container) as? Root
         if (root == null) {
             root = Root()
@@ -28,4 +29,4 @@ object R4a {
     }
 }
 
-inline fun ViewGroup.composeInto(noinline composable: () -> Unit) = R4a.composeInto(this, composable)
+inline fun ViewGroup.composeInto(noinline composable: @Composable() () -> Unit) = R4a.composeInto(this, composable)

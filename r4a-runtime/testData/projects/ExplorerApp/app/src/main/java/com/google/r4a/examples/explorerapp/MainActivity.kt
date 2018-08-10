@@ -9,11 +9,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val root = LinearLayout(this)
-        root.composeInto(object: Function0<Unit> {
-            override fun invoke() {
-                <MainComponent />
-            }
-        })
+        root.composeInto({<MainComponent />})
         setContentView(root)
     }
 }

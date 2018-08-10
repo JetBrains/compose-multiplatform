@@ -3,6 +3,7 @@ package org.jetbrains.kotlin.r4a
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.r4a.analysis.ComponentMetadata
+import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.extensions.SyntheticResolveExtension
 import org.jetbrains.kotlin.resolve.lazy.LazyClassContext
 import org.jetbrains.kotlin.resolve.lazy.declarations.ClassMemberDeclarationProvider
@@ -28,7 +29,7 @@ class StaticWrapperCreatorFunctionResolveExtension() : SyntheticResolveExtension
         }
     }
 
-    override fun generateSyntheticMethods(thisDescriptor: ClassDescriptor, name: Name, ctx: LazyClassContext, fromSupertypes: List<SimpleFunctionDescriptor>, result: MutableCollection<SimpleFunctionDescriptor>) {
+    override fun generateSyntheticMethods(thisDescriptor: ClassDescriptor, name: Name, ctx: BindingContext, fromSupertypes: List<SimpleFunctionDescriptor>, result: MutableCollection<SimpleFunctionDescriptor>) {
 
         if (!ComponentMetadata.isComponentCompanion(thisDescriptor)) return
         if (name != Name.identifier("createInstance")) return

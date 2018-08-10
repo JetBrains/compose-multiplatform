@@ -30,19 +30,15 @@ class Recycler(context: Context): RecyclerView(context) {
             val view = holder.itemView as LinearLayout
             val viewType = holder.viewType
 
-            view.composeInto(object : Function0<Unit> {
-                override fun invoke() {
-                    val composeItemWithType = composeItemWithType
-                    if (composeItemWithType != null) {
-                        <composeItemWithType position type={viewType} />
-                        return
-                    }
-                    val composeItem = composeItem
-                    if (composeItem != null) {
-                        <composeItem position />
-                        return
-                    }
+            view.composeInto({
+                val composeItemWithType = composeItemWithType
+                val composeItem = composeItem
+                if (composeItemWithType != null) {
+                    <composeItemWithType position type={viewType} />
                 }
+                else if (composeItem != null) {
+                    <composeItem position />
+                } else "Foo" // TODO: Remove this, needed to prevent compile errors due to IR bug.
             })
         }
 
