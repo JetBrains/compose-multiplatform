@@ -97,6 +97,7 @@ class AndroidXPlugin : Plugin<Project> {
 
     private fun Project.configureRootProject() {
         val buildOnServerTask = tasks.create(BUILD_ON_SERVER_TASK)
+        val buildTestApksTask = tasks.create(BUILD_TEST_APKS)
         tasks.all { task ->
             if (task.name.startsWith(Release.DIFF_TASK_PREFIX) ||
                     "distDocs" == task.name ||
@@ -110,11 +111,17 @@ class AndroidXPlugin : Plugin<Project> {
                 return@subprojects
             }
             project.tasks.all { task ->
+                // TODO remove androidTest from buildOnServer once test runners do not
+                // expect them anymore.
                 if ("assembleAndroidTest" == task.name ||
                         "assembleDebug" == task.name ||
                         "runErrorProne" == task.name ||
                         "lintDebug" == task.name) {
                     buildOnServerTask.dependsOn(task)
+                }
+                if ("assembleAndroidTest" == task.name ||
+                        "assembleDebug" == task.name) {
+                    buildTestApksTask.dependsOn(task)
                 }
             }
         }
@@ -238,6 +245,7 @@ class AndroidXPlugin : Plugin<Project> {
 
     companion object {
         const val BUILD_ON_SERVER_TASK = "buildOnServer"
+        const val BUILD_TEST_APKS = "buildTestApks"
     }
 }
 
