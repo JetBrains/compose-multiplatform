@@ -15,11 +15,8 @@
  */
 
 
-import androidx.build.AndroidXPlugin
-import androidx.build.Release
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.gmaven.GMavenVersionChecker
-import androidx.build.license.CheckExternalDependencyLicensesTask
 import com.android.build.gradle.internal.coverage.JacocoReportTask
 import com.android.build.gradle.internal.tasks.DeviceProviderInstrumentTestTask
 
@@ -71,54 +68,6 @@ def setupRepoOutAndBuildNumber() {
     ext.testApkDistOut = ext.distDir
     ext.testResultsDistDir = new File(distDir, "host-test-reports")
     ext.docsDir = new File(buildDir, 'javadoc')
-}
-
-def configureBuildOnServer() {
-    def buildOnServerTask = rootProject.tasks.create(AndroidXPlugin.BUILD_ON_SERVER_TASK)
-    rootProject.tasks.whenTaskAdded { task ->
-        if (Release.FULL_ARCHIVE_TASK_NAME.equals(task.name)
-                || task.name.startsWith(Release.DIFF_TASK_PREFIX)
-                || "distDocs".equals(task.name)
-                || "dejetifyArchive".equals(task.name)
-                || "runErrorProne".equals(task.name)
-                || CheckExternalDependencyLicensesTask.TASK_NAME.equals(task.name)) {
-            buildOnServerTask.dependsOn task
-        }
-    }
-    def docsProject = rootProject.findProject(":docs-fake")
-    subprojects { project ->
-        if (docsProject == project) {
-            return
-        }
-        project.tasks.whenTaskAdded { task ->
-            if ("assembleErrorProne".equals(task.name)
-                    || "assembleAndroidTest".equals(task.name)
-                    || "assembleDebug".equals(task.name)
-                    || "lintDebug".equals(task.name)) {
-                buildOnServerTask.dependsOn task
-            }
-        }
-    }
-    buildOnServerTask.dependsOn createCoverageJarTask()
-    return buildOnServerTask
-}
-
-def createCoverageJarTask() {
-    // Package the individual *-allclasses.jar files together to generate code coverage reports
-    def packageAllClassFiles = project.tasks.create(
-        name: "packageAllClassFilesForCoverageReport",
-        type: Jar) {
-        destinationDir file(project.distDir)
-        archiveName "jacoco-report-classes-all.jar"
-    }
-    subprojects {
-        project.tasks.whenTaskAdded { task ->
-            if (task.name.endsWith("ClassFilesForCoverageReport")) {
-                packageAllClassFiles.from task
-            }
-        }
-    }
-    return packageAllClassFiles
 }
 
 def configureSubProjects() {
@@ -261,4 +210,3 @@ def configureSubProjects() {
 
 ext.init.setupRepoOutAndBuildNumber = this.&setupRepoOutAndBuildNumber
 ext.init.configureSubProjects = this.&configureSubProjects
-ext.init.configureBuildOnServer = this.&configureBuildOnServer
