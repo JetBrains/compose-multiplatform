@@ -19,18 +19,18 @@ class NewsFeed: Component() {
 
     override fun compose() {
         <Recycler
-            layoutParams={layoutParams}
-            layoutManager={layoutManager}
-            getItemCount={object: Function0<Int> {
+            layoutParams
+            layoutManager
+            getItemCount=(object: Function0<Int> {
                 override fun invoke(): Int {
                     return 9999
                 }
-            }}
-            composeItem={object: Function1<Int, Unit> {
+            })
+            composeItem=(object: Function1<Int, Unit> {
                 override fun invoke(position: Int) {
-                    <ItemComponent position={position} />
+                    <ItemComponent position />
                 }
-            }}
+            })
 
         />
     }
@@ -60,33 +60,33 @@ class ItemComponent: Component() {
         }
 
         <CardView
-            cardBackgroundColor={Color.WHITE}
-            radius={0.dp}
-            maxCardElevation={1.dp}
-            cardElevation={0.7.dp}
-            contentPaddingHorizontal={10.dp}
-            contentPaddingTop={10.dp}
-            contentPaddingBottom={0.dp}
-            preventCornerOverlap={true}
-            useCompatPadding={true}
+            cardBackgroundColor=Color.WHITE
+            radius=0.dp
+            maxCardElevation=1.dp
+            cardElevation=0.7.dp
+            contentPaddingHorizontal=10.dp
+            contentPaddingTop=10.dp
+            contentPaddingBottom=0.dp
+            preventCornerOverlap=true
+            useCompatPadding=true
         >
-            <RelativeLayout layoutParams={relLayout}>
+            <RelativeLayout layoutParams=relLayout>
                 <ImageView
-                    id={R.id.img}
-                    layoutParams={imgLayout}
+                    id=R.id.img
+                    layoutParams=imgLayout
                     scaleType="center_crop"
                     uri="https://picsum.photos/200/300?image=$position"
                     contentDescription="CardImageViewDesc"
                 />
                 <TextView
-                    layoutParams={tvLayout}
+                    layoutParams=tvLayout
                     fontFamily="sans-serif"
-                    gravity={Gravity.CENTER_VERTICAL}
+                    gravity=Gravity.CENTER_VERTICAL
                     text="Joshua Sortino - Via Unsplash"
-                    textSize={18.sp}
+                    textSize=18.sp
                 />
                 <ImageButton
-                    layoutParams={imgButtonLayout}
+                    layoutParams=imgButtonLayout
 //                    backgroundResource={android.support.v7.appcompat.R.attr.selectableItemBackgroundBorderless}
 //                    imageResource={android.support.v7.appcompat.R.drawable.abc_ic_voice_search_api_material}
                     contentDescription="FavButtonDesc"

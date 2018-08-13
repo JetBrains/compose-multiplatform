@@ -108,7 +108,7 @@ class R4aCompletionExtension : KotlinCompletionExtension() {
                 LookupElementBuilder
                     .create(attr.descriptor, attr.name)
                     .withPresentableText(attr.name)
-                    .withTailText("={${typeString}}", true)
+                    .withTailText("=${typeString}", true)
                     .withInsertHandler(ATTRIBUTE_INSERTION_HANDLER)
             }
 
@@ -234,12 +234,12 @@ class R4aCompletionExtension : KotlinCompletionExtension() {
 
             val tailOffset = context.tailOffset
             val moveCaret = context.editor.caretModel.offset == tailOffset
-            val textToInsert = "={}"
+            val textToInsert = "="
             document.insertString(tailOffset, textToInsert)
 
             if (moveCaret) {
-                // move caret between the braces
-                context.editor.caretModel.moveToOffset(tailOffset + 2)
+                // move after the '='
+                context.editor.caretModel.moveToOffset(tailOffset + 1)
 
                 // since they just created a new attribute and need to fill out the expression, we might as well open up the autocomplete!
                 AutoPopupController.getInstance(context.project)?.scheduleAutoPopup(context.editor)

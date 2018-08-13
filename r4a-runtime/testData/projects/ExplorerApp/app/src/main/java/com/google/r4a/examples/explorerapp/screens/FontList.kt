@@ -14,16 +14,16 @@ class FontList : Component() {
     private var color = Color.GRAY
 
     override fun compose() {
-        <LinearLayout orientation={LinearLayout.VERTICAL} layoutParams={FILL}>
-            <Button text="Increase Font Size" onClickListener={SetFontSizeHandler(textSize+1, this)} enabled={textSize < 100} />
-            <Button text="Decrease Font Size" onClickListener={SetFontSizeHandler(textSize-1, this)} enabled={textSize > 10} />
-            <LinearLayout orientation={LinearLayout.HORIZONTAL}>
-                <Button text="Red" layoutParams={BUTTON} onClickListener={SetColorHandler(Color.RED, this)} />
-                <Button text="Green" layoutParams={BUTTON} onClickListener={SetColorHandler(Color.GREEN, this)} />
-                <Button text="Blue" layoutParams={BUTTON} onClickListener={SetColorHandler(Color.BLUE, this)} />
-                <Button text="Gray" layoutParams={BUTTON} onClickListener={SetColorHandler(Color.GRAY, this)} />
+        <LinearLayout orientation=LinearLayout.VERTICAL layoutParams=FILL>
+            <Button text="Increase Font Size" onClickListener=SetFontSizeHandler(textSize+1, this) enabled=(textSize < 100) />
+            <Button text="Decrease Font Size" onClickListener=SetFontSizeHandler(textSize-1, this) enabled=(textSize > 10) />
+            <LinearLayout orientation=LinearLayout.HORIZONTAL>
+                <Button text="Red" layoutParams=BUTTON onClickListener={SetColorHandler(Color.RED, this)} />
+                <Button text="Green" layoutParams=BUTTON onClickListener={SetColorHandler(Color.GREEN, this)} />
+                <Button text="Blue" layoutParams=BUTTON onClickListener={SetColorHandler(Color.BLUE, this)} />
+                <Button text="Gray" layoutParams=BUTTON onClickListener={SetColorHandler(Color.GRAY, this)} />
             </LinearLayout>
-            <ChildComponent textSize={textSize} color={color} />
+            <ChildComponent textSize color />
         </LinearLayout>
     }
 
@@ -51,9 +51,9 @@ class FontList : Component() {
 
         override fun compose() {
             <ScrollView>
-                <LinearLayout orientation={LinearLayout.VERTICAL}>
+                <LinearLayout orientation=LinearLayout.VERTICAL>
                     for (x in 1..21) {
-                        <TextView text="Hello Someone $x!" textSize={textSize} textColor={color} />
+                        <TextView text="Hello Someone $x!" textSize textColor=color />
                     }
                 </LinearLayout>
             </ScrollView>

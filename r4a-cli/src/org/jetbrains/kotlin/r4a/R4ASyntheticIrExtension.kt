@@ -21,10 +21,7 @@ import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.psi.KtFile
-import org.jetbrains.kotlin.psi.KtParameter
-import org.jetbrains.kotlin.psi.KtVisitorVoid
-import org.jetbrains.kotlin.psi.KtxElement
+import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.endOffset
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
 import org.jetbrains.kotlin.psi2ir.extensions.SyntheticIrExtension
@@ -71,7 +68,7 @@ class R4ASyntheticIrExtension : SyntheticIrExtension {
 
         val attributes = element.attributes.map { attr ->
             val valueExpr = attr.value ?: attr.key ?: error("malformed element")
-            val irValueExpr = valueExpr.accept(statementGenerator, null) as? IrExpression ?: error("attributes need to be expressions")
+            val irValueExpr = KtPsiUtil.safeDeparenthesize(valueExpr).accept(statementGenerator, null) as? IrExpression ?: error("attributes need to be expressions")
             IrKtxAttribute(attr, irValueExpr)
         }
 

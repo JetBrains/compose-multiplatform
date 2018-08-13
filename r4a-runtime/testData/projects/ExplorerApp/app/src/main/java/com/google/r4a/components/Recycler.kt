@@ -34,7 +34,7 @@ class Recycler(context: Context): RecyclerView(context) {
                 val composeItemWithType = composeItemWithType
                 val composeItem = composeItem
                 if (composeItemWithType != null) {
-                    <composeItemWithType position type={viewType} />
+                    <composeItemWithType position type=viewType />
                 }
                 else if (composeItem != null) {
                     <composeItem position />

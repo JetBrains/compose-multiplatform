@@ -12,19 +12,19 @@ class SpinnerForm : Component() {
     private var selectedIndex = 0
 
     override fun compose() {
-        <LinearLayout orientation={LinearLayout.VERTICAL}>
+        <LinearLayout orientation=LinearLayout.VERTICAL>
             <Spinner
-                layoutParams={WRAP}
-                data={AllRegions}
-                controlledSelectedIndex={selectedIndex}
-                onSelectedIndexChange={object : Function1<Int, Unit> {
+                layoutParams=WRAP
+                data=AllRegions
+                controlledSelectedIndex=selectedIndex
+                onSelectedIndexChange=(object : Function1<Int, Unit> {
                     override fun invoke(p1: Int) {
                         selectedIndex = p1
                         recomposeSync()
                     }
-                }}
+                })
             />
         </LinearLayout>
-        <TextView text={AllRegions[selectedIndex]} />
+        <TextView text=AllRegions[selectedIndex] />
     }
 }

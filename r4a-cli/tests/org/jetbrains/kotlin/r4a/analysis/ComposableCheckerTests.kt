@@ -459,7 +459,7 @@ class ComposableCheckerTests: AbstractR4aDiagnosticsTest() {
             @Composable
             fun foo() {
                 val myList = listOf(1,2,3,4,5)
-                myList.forEach @Composable { value: Int -> <TextView text={value.toString()} />; System.out.println(value); }
+                myList.forEach @Composable { value: Int -> <TextView text=value.toString() />; System.out.println(value); }
             }
         """)
     }
@@ -472,7 +472,7 @@ class ComposableCheckerTests: AbstractR4aDiagnosticsTest() {
 
             fun foo() {
                 val myList = listOf(1,2,3,4,5)
-                myList.forEach { value: Int -> <TextView text={value.toString()} />; System.out.println(value); }
+                myList.forEach { value: Int -> <TextView text=value.toString() />; System.out.println(value); }
             }
         """)
         doTest(
@@ -482,7 +482,7 @@ class ComposableCheckerTests: AbstractR4aDiagnosticsTest() {
 
             fun <!KTX_IN_NON_COMPOSABLE!>foo<!>() {
                 val myList = listOf(1,2,3,4,5)
-                myList.forEach @Composable { value: Int -> <TextView text={value.toString()} />; System.out.println(value); }
+                myList.forEach @Composable { value: Int -> <TextView text=value.toString() />; System.out.println(value); }
             }
         """)
     }

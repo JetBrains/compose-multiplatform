@@ -26,98 +26,98 @@ class EditForm : Component() {
     private var minute: Int = 22
 
     override fun compose() {
-        <ScrollView layoutParams={FILL}>
+        <ScrollView layoutParams=FILL>
         <LinearLayout orientation="vertical">
 
             <Spinner
-                layoutParams={WRAP}
-                data={AllRegions}
+                layoutParams=WRAP
+                data=AllRegions
             />
 
             // TODO(lmr): we should create a version of this where the items are rendered as children
             <AutoCompleteTextView
-                layoutParams={WRAP}
-                controlledText={region}
-                onTextChange={object : Function1<String, Unit> {
+                layoutParams=WRAP
+                controlledText=region
+                onTextChange=(object : Function1<String, Unit> {
                     override fun invoke(value: String) {
                         region = value
                         recomposeSync()
                     }
-                }}
-                data={AllRegions}
-                composeItem={object: Function1<Any, Unit> {
+                })
+                data=AllRegions
+                composeItem=(object: Function1<Any, Unit> {
                     override fun invoke(p1: Any) {
-                        <TextView text={p1 as String} />
+                        <TextView text=(p1 as String) />
                     }
-                }}
+                })
             />
 
             <TimePicker
-                layoutParams={WRAP}
-                hour={hour}
-                minute={minute}
-                onTimeChangedListener={object: TimePicker.OnTimeChangedListener {
+                layoutParams=WRAP
+                hour=hour
+                minute=minute
+                onTimeChangedListener=(object: TimePicker.OnTimeChangedListener {
                     override fun onTimeChanged(view: TimePicker?, hourOfDay: Int, minuteOfHour: Int) {
                         hour = hourOfDay
                         minute = minuteOfHour
                         recompose()
                     }
-                }}
+                })
             />
 
 
             <EditText
-                layoutParams={WRAP}
-                controlledText={name}
-                onTextChange={object : Function1<String, Unit> {
+                layoutParams=WRAP
+                controlledText=name
+                onTextChange=(object : Function1<String, Unit> {
                     override fun invoke(value: String) {
                         name = value.substring(0, Math.min(value.length, 10))
                         recomposeSync()
                     }
-                }}
+                })
             />
-            <TextView layoutParams={WRAP} text={name} />
+            <TextView layoutParams=WRAP text=name />
 
             <ToggleButton
-                layoutParams={WRAP}
-                controlledChecked={checked}
-                onCheckedChange={object : Function1<Boolean, Unit> {
+                layoutParams=WRAP
+                controlledChecked=checked
+                onCheckedChange=(object : Function1<Boolean, Unit> {
                     override fun invoke(p0: Boolean) {
                         checked = p0
                         recomposeSync()
                     }
-                }}
+                })
             />
-            <TextView layoutParams={WRAP} text="is checked: $checked" />
+            <TextView layoutParams=WRAP text="is checked: $checked" />
 
 
             <SeekBar
-                layoutParams={WRAP}
-                controlledProgress={progress}
-                onProgressChange={object: Function1<Int, Unit> {
+                layoutParams=WRAP
+                controlledProgress=progress
+                onProgressChange=(object: Function1<Int, Unit> {
                     override fun invoke(next: Int) {
                         progress = Math.min(next, 70)
                         recomposeSync()
                     }
-                }}
+                })
             />
-            <TextView layoutParams={WRAP} text="value: $progress" />
+            <TextView layoutParams=WRAP text="value: $progress" />
 
 
             // TODO(lmr): we could build a better RadioGroup component
             <RadioGroup
-                controlledCheckedId={checkedId}
-                onCheckedIdChange={object: Function1<Int, Unit> {
+                controlledCheckedId=checkedId
+                onCheckedIdChange=(object: Function1<Int, Unit> {
                     override fun invoke(p1: Int) {
                         if (p1 == R.id.rb_three) return
                         checkedId = p1
                         recomposeSync()
                     }
-                }}
+                })
             >
-                <RadioButton id={R.id.rb_one} text="Choice one"/>
-                <RadioButton id={R.id.rb_two} text="Choice two"/>
-                <RadioButton id={R.id.rb_three} text="Choice three can't be selected"/>
+                <RadioButton id=R.id.rb_one text="Choice one"/>
+                <RadioButton id=R.id.rb_two text="Choice two"/>
+                <RadioButton id=R.id.rb_three text="Choice three can't be selected"/>
             </RadioGroup>
         </LinearLayout>
         </ScrollView>

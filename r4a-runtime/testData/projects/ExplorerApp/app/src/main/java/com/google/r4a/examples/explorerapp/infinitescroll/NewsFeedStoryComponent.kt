@@ -19,31 +19,31 @@ class NewsFeedStoryComponent : Component() {
         val story = story
         <LinearLayout
             orientation="vertical"
-            layoutParams={layoutParams}
-            minimumHeight={1000}
+            layoutParams=layoutParams
+            minimumHeight=1000
         >
             if (story == null) {
                 // If we don't have a newsfeed story yet, show a loading spinner instead
                 <ProgressBar />
             } else {
                 <TextView
-                    text={story.name}
-                    textSize={30f}
-                    paddingLeft={25}
-                    paddingBottom={10}
+                    text=story.name
+                    textSize=30f
+                    paddingLeft=25
+                    paddingBottom=10
                 />
                 if (story.description != null && story.description.isNotEmpty()) {
                     <TextView
-                        text={story.description}
-                        textSize={20f}
-                        paddingLeft={25}
-                        paddingBottom={10}
+                        text=story.description
+                        textSize=20f
+                        paddingLeft=25
+                        paddingBottom=10
                     />
                 }
                 <ImageView
-                    imageBitmap={story.image}
-                    layoutParams={LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)}
-                    scaleType={ImageView.ScaleType.CENTER_CROP}
+                    imageBitmap=story.image
+                    layoutParams=LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+                    scaleType=ImageView.ScaleType.CENTER_CROP
                 />
             }
         </LinearLayout>

@@ -146,8 +146,8 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         class Foo : Component() {
             override fun compose() {
                 val s = "foo" + "bar"
-                <LinearLayout orientation={LinearLayout.VERTICAL}>
-                    <Bar num={123} a={s} b="const" />
+                <LinearLayout orientation=LinearLayout.VERTICAL>
+                    <Bar num=123 a=s b="const" />
                 </LinearLayout>
             }
         }
@@ -164,7 +164,7 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         class Foo : Component() {
             var key: Int = 0
             override fun compose() {
-                <Foo key={123} />
+                <Foo key=123 />
             }
         }
         """
@@ -285,7 +285,7 @@ class KtxTransformationTest: AbstractCodeGenTest() {
                         <Bar />
                     }
                 }
-                <foo x="foo" y={123} />
+                <foo x="foo" y=123 />
             }
         }
         """
@@ -319,7 +319,7 @@ class KtxTransformationTest: AbstractCodeGenTest() {
             lateinit var children: (x: Int) -> Unit
             override fun compose() {
                 val children = children
-                <children x={123} />
+                <children x=123 />
             }
         }
         """
@@ -332,7 +332,7 @@ class KtxTransformationTest: AbstractCodeGenTest() {
             lateinit var composeItem: Function1<@kotlin.ParameterName("arg0") Int, Unit>
             fun fn() {
                 val composeItem = composeItem
-                <composeItem arg0={123} />
+                <composeItem arg0=123 />
             }
         }
         """
@@ -348,7 +348,7 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         }
         class X : Component() {
             override fun compose() {
-                <LinearLayout someExtension={123} />
+                <LinearLayout someExtension=123 />
             }
         }
         """
@@ -392,9 +392,9 @@ class KtxTransformationTest: AbstractCodeGenTest() {
 
             override fun compose() {
                 val children = this.children
-                <children title="Hello World!" rating={5} />
-                <children title="Kompose is awesome!" rating={5} />
-                <children title="Bitcoin!" rating={4} />
+                <children title="Hello World!" rating=5 />
+                <children title="Kompose is awesome!" rating=5 />
+                <children title="Bitcoin!" rating=4 />
             }
         }
 
@@ -402,7 +402,7 @@ class KtxTransformationTest: AbstractCodeGenTest() {
             var name = "World"
             override fun compose() {
                 <HelperComponent> title: String, rating: Int ->
-                    <TextView text={title+" ("+rating+" stars)"} />
+                    <TextView text=(title+" ("+rating+" stars)") />
                 </HelperComponent>
             }
         }
@@ -420,9 +420,9 @@ class KtxTransformationTest: AbstractCodeGenTest() {
             @Children
             fun setChildren2(x: (title: String, rating: Int) -> Unit) { children = x }
             override fun compose() {
-                <children title="Hello World!" rating={5} />
-                <children title="Kompose is awesome!" rating={5} />
-                <children title="Bitcoin!" rating={4} />
+                <children title="Hello World!" rating=5 />
+                <children title="Kompose is awesome!" rating=5 />
+                <children title="Bitcoin!" rating=4 />
             }
         }
 
@@ -430,7 +430,7 @@ class KtxTransformationTest: AbstractCodeGenTest() {
             var name = "World"
             override fun compose() {
                 <HelperComponent> title, rating ->
-                    <TextView text={title+" ("+rating+" stars)"} />
+                    <TextView text=(title+" ("+rating+" stars)") />
                 </HelperComponent>
             }
         }
@@ -456,7 +456,7 @@ class KtxTransformationTest: AbstractCodeGenTest() {
             override fun compose() {
                 val childText = "Hello World!"
                 <HelperComponent>
-                    <TextView text={childText} />
+                    <TextView text=childText />
                 </HelperComponent>
             }
         }
@@ -573,7 +573,7 @@ class KtxTransformationTest: AbstractCodeGenTest() {
                 val y = "World"
                 <HelperComponent>
                     for(i in 1..100) {
-                        <TextView text={x+y+i} />
+                        <TextView text=(x+y+i) />
                     }
                 </HelperComponent>
             }
@@ -597,7 +597,7 @@ class KtxTransformationTest: AbstractCodeGenTest() {
             val a = A(123)
 
             // a.Getter() here has a bound type argument through A
-            <a.Getter x={456} />
+            <a.Getter x=456 />
         }
         """
     )
@@ -637,13 +637,13 @@ class KtxTransformationTest: AbstractCodeGenTest() {
             val x = 123
 
             // we can create element with just value, no list
-            <A value={x} />
+            <A value=x />
 
             // if we add a list, it can infer the type
             <A
-                value={x}
-                list={listOf(234, x)}
-                list2={listOf(234, x)}
+                value=x
+                list=listOf(234, x)
+                list2=listOf(234, x)
             />
         }
         """
@@ -702,7 +702,7 @@ class KtxTransformationTest: AbstractCodeGenTest() {
 
         fun run() {
             <GenericCtorArg foo="string" />
-            <GenericCtorArg foo={123} />
+            <GenericCtorArg foo=123 />
         }
         """
     )
@@ -730,9 +730,9 @@ class KtxTransformationTest: AbstractCodeGenTest() {
             val num = 123
             <OneArg
                 bar
-                baz={bar}
-                bam={bar}
-                jazz={num}
+                baz=bar
+                bam=bar
+                jazz=num
             />
         }
         """
@@ -756,7 +756,7 @@ class KtxTransformationTest: AbstractCodeGenTest() {
 
         fun run() {
             val ref = Ref<Simple>()
-            <Simple ref={ref} />
+            <Simple ref=ref />
         }
         """
     )
@@ -781,8 +781,8 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         fun OneArg(foo: Int) {}
 
         fun run() {
-            <OneArg foo={"string"} />
-            <OneArg foo={123} />
+            <OneArg foo=("string") />
+            <OneArg foo=123 />
         }
         """
     )
@@ -796,7 +796,7 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         }
 
         fun run() {
-            <Foo x={123} />
+            <Foo x=123 />
         }
         """
     )
@@ -810,7 +810,7 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         }
 
         fun run() {
-            <Foo x={123} />
+            <Foo x=123 />
         }
         """
     )
@@ -888,7 +888,7 @@ class KtxTransformationTest: AbstractCodeGenTest() {
             val X = A("string")
             val Y = A(123)
             <X.B bar="string" />
-            <Y.B bar={123} />
+            <Y.B bar=123 />
         }
         """
     )
@@ -926,7 +926,7 @@ class KtxTransformationTest: AbstractCodeGenTest() {
 
         class Test(var children: (x: Int) -> Unit) : Component() {
             override fun compose() {
-                <children x={123} />
+                <children x=123 />
             }
         }
         """
@@ -1047,7 +1047,7 @@ class KtxTransformationTest: AbstractCodeGenTest() {
             <Example value="string"> x ->
                 println("hello ${"$"}x")
             </Example>
-            <Example value={123}> x ->
+            <Example value=123> x ->
                 println("hello ${"$"}{x + 1}")
             </Example>
         }
@@ -1092,7 +1092,7 @@ class KtxTransformationTest: AbstractCodeGenTest() {
             <Example foo="string"> x ->
                 println("hello ${"$"}x")
             </Example>
-            <Example foo={123}> x ->
+            <Example foo=123> x ->
                 println("hello ${"$"}{x + 1}")
             </Example>
         }
@@ -1142,4 +1142,22 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
     )
 
+    fun testLateUsingObjectLiteral() = testCompile(
+        """
+        import com.google.r4a.*
+
+         class Example: Component() {
+             lateinit var callback: (Int) -> Unit
+             var index = 0
+             override fun compose() {
+               <Example callback=(object : Function1<Int, Unit> {
+                    override fun invoke(p1: Int) {
+                        index = p1
+                        recompose()
+                    }
+                }) />
+             }
+         }
+        """
+    )
 }

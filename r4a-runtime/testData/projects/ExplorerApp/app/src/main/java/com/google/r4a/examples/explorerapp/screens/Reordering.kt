@@ -33,13 +33,13 @@ class Reordering : Component() {
     }
 
     override fun compose() {
-        <LinearLayout orientation={LinearLayout.VERTICAL}>
+        <LinearLayout orientation=LinearLayout.VERTICAL>
             <Button
                 text="PRINT TREE"
-                onClickListener={printTreeHandler}
+                onClickListener=printTreeHandler
             />
             items.forEachIndexed { index, id ->
-                <Item key={id} id={id} onMove={onMove(index)} />
+                <Item key=id id onMove=onMove(index) />
             }
         </LinearLayout>
     }
@@ -68,11 +68,11 @@ class Reordering : Component() {
         }
 
         override fun compose() {
-            <LinearLayout orientation={LinearLayout.HORIZONTAL}>
-                <TextView text="id: $id amt: $count" textSize={20f} />
-                <Button text="+" onClickListener={onIncrement} />
-                <Button text="Up" onClickListener={onMoveMake(1)} />
-                <Button text="Down" onClickListener={onMoveMake(-1)} />
+            <LinearLayout orientation=LinearLayout.HORIZONTAL>
+                <TextView text="id: $id amt: $count" textSize=20f />
+                <Button text="+" onClickListener=onIncrement />
+                <Button text="Up" onClickListener=onMoveMake(1) />
+                <Button text="Down" onClickListener=onMoveMake(-1) />
             </LinearLayout>
         }
     }
