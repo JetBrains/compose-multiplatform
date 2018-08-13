@@ -17,6 +17,7 @@
 package androidx.build
 
 import com.android.build.gradle.api.BaseVariant
+import com.android.builder.core.BuilderConstants
 import net.ltgt.gradle.errorprone.ErrorProneBasePlugin
 import net.ltgt.gradle.errorprone.ErrorProneToolChain
 import org.gradle.api.DomainObjectSet
@@ -25,7 +26,6 @@ import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.withType
-import java.io.File
 
 const val ERROR_PRONE_TASK = "runErrorProne"
 
@@ -33,24 +33,22 @@ private const val ERROR_PRONE_VERSION = "com.google.errorprone:error_prone_core:
 private val log = Logging.getLogger("ErrorProneConfiguration")
 
 fun Project.configureErrorProneForJava() {
-    val project = this
     val toolChain = createErrorProneToolChain()
     tasks.withType<JavaCompile>().all { task ->
         log.info("Configuring error-prone for ${task.path}")
-        makeErrorProneTask(project, task, toolChain)
+        makeErrorProneTask(task, toolChain)
     }
 }
 
 fun Project.configureErrorProneForAndroid(variants: DomainObjectSet<out BaseVariant>) {
-    val project = this
     val toolChain = createErrorProneToolChain()
     variants.all { variant ->
-        if (variant.buildType.name == "debug") {
+        if (variant.buildType.name == BuilderConstants.DEBUG) {
             @Suppress("DEPRECATION")
             val task = variant.javaCompile
 
             log.info("Configuring error-prone for ${task.path}")
-            makeErrorProneTask(project, task, toolChain)
+            makeErrorProneTask(task, toolChain)
         }
     }
 }
@@ -104,18 +102,21 @@ private fun JavaCompile.configureWithErrorProne(toolChain: ErrorProneToolChain) 
     )
 }
 
-// Given a JavaCompile task, creates a task that runs the ErrorProne compiler with the same settings
-private fun makeErrorProneTask(project: Project, compileTask: JavaCompile, toolChain: ErrorProneToolChain) {
-    if (project.tasks.findByName(ERROR_PRONE_TASK) != null) {
+/**
+ * Given a [JavaCompile] task, creates a task that runs the ErrorProne compiler with the same
+ * settings.
+ */
+private fun Project.makeErrorProneTask(compileTask: JavaCompile, toolChain: ErrorProneToolChain) {
+    if (tasks.findByName(ERROR_PRONE_TASK) != null) {
         return
     }
 
-    val errorProneTask = project.tasks.create(ERROR_PRONE_TASK, JavaCompile::class.java)
+    val errorProneTask = tasks.create(ERROR_PRONE_TASK, JavaCompile::class.java)
     errorProneTask.classpath = compileTask.classpath
 
     errorProneTask.source = compileTask.source
-    errorProneTask.destinationDir = project.file(File(project.buildDir, "errorProne"))
-    errorProneTask.options.compilerArgs = ArrayList<String>(compileTask.options.compilerArgs)
+    errorProneTask.destinationDir = file(buildDir.resolve("errorProne"))
+    errorProneTask.options.compilerArgs = compileTask.options.compilerArgs.toMutableList()
     errorProneTask.options.annotationProcessorPath = compileTask.options.annotationProcessorPath
     errorProneTask.options.bootstrapClasspath = compileTask.options.bootstrapClasspath
     errorProneTask.sourceCompatibility = compileTask.sourceCompatibility
@@ -123,5 +124,5 @@ private fun makeErrorProneTask(project: Project, compileTask: JavaCompile, toolC
     errorProneTask.configureWithErrorProne(toolChain)
     errorProneTask.dependsOn(compileTask.dependsOn)
 
-    project.tasks.getByName("check").dependsOn(errorProneTask)
+    tasks.getByName("check").dependsOn(errorProneTask)
 }
