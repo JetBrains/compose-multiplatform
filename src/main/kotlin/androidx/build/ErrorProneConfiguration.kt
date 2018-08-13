@@ -71,7 +71,7 @@ private fun JavaCompile.configureWithErrorProne(toolChain: ErrorProneToolChain) 
     val compilerArgs = this.options.compilerArgs
     compilerArgs += listOf(
             "-XDcompilePolicy=simple", // Workaround for b/36098770
-            "-XepExcludedPaths:.*/(build/generated|external)/.*",
+            "-XepExcludedPaths:.*/(build/generated|build/errorProne|external)/.*",
 
             // Disable the following checks.
             "-Xep:RestrictTo:OFF",
@@ -116,6 +116,7 @@ private fun makeErrorProneTask(project: Project, compileTask: JavaCompile, toolC
     errorProneTask.source = compileTask.source
     errorProneTask.destinationDir = project.file(File(project.buildDir, "errorProne"))
     errorProneTask.options.compilerArgs = ArrayList<String>(compileTask.options.compilerArgs)
+    errorProneTask.options.annotationProcessorPath = compileTask.options.annotationProcessorPath
     errorProneTask.options.bootstrapClasspath = compileTask.options.bootstrapClasspath
     errorProneTask.sourceCompatibility = compileTask.sourceCompatibility
     errorProneTask.targetCompatibility = compileTask.targetCompatibility
