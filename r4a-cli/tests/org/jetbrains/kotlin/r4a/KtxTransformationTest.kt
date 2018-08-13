@@ -1099,7 +1099,7 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
     )
 
-    fun testKtxLambdaInForLoop() = testCompile(
+    fun xtestKtxLambdaInForLoop() = testCompile(
         """
         import com.google.r4a.*
         import android.widget.TextView
@@ -1120,7 +1120,7 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
     )
 
-    fun testKtxLambdaInIfElse() = testCompile(
+    fun xtestKtxLambdaInIfElse() = testCompile(
         """
         import com.google.r4a.*
         import android.widget.TextView
