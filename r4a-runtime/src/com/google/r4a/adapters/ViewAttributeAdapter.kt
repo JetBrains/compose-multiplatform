@@ -108,6 +108,8 @@ fun View.setScrollX(scrollX: Dimension) = setScrollX(scrollX.toIntPixels(metrics
 fun View.setScrollY(scrollY: Dimension) = setScrollY(scrollY.toIntPixels(metrics))
 fun View.setTop(top: Dimension) = setTop(top.toIntPixels(metrics))
 
+// TODO: Necessary because the IR doesn't support SAM conversion yet
+fun View.setOnClick(lambda: ()->Unit) { this.setOnClickListener { lambda() } }
 
 // TODO(lmr): introduced in newer SDK
 //fun View.setElevation(elevation: Dimension) = setElevation(elevation.toFloatPixels(metrics))

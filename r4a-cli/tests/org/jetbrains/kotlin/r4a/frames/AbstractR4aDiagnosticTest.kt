@@ -101,7 +101,7 @@ abstract class AbstractR4aDiagnosticsTest: KtUsefulTestCase() {
     protected fun createEnvironment(): KotlinCoreEnvironment {
         val classPath = createClasspath()
         val configuration = KotlinTestUtils.newConfiguration(
-                ConfigurationKind.JDK_ONLY,
+                ConfigurationKind.ALL,
                 TestJdkKind.MOCK_JDK,
                 classPath,
                 emptyList<File>()
