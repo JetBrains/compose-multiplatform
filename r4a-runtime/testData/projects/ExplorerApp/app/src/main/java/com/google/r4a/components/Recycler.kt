@@ -30,7 +30,7 @@ class Recycler(context: Context): RecyclerView(context) {
             val view = holder.itemView as LinearLayout
             val viewType = holder.viewType
 
-            view.composeInto({
+            view.composeInto {
                 val composeItemWithType = composeItemWithType
                 val composeItem = composeItem
                 if (composeItemWithType != null) {
@@ -39,7 +39,7 @@ class Recycler(context: Context): RecyclerView(context) {
                 else if (composeItem != null) {
                     <composeItem position />
                 } else "Foo" // TODO: Remove this, needed to prevent compile errors due to IR bug.
-            })
+            }
         }
 
         override fun getItemViewType(position: Int): Int {

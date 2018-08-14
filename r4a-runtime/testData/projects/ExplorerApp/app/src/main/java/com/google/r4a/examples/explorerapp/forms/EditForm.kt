@@ -38,55 +38,35 @@ class EditForm : Component() {
             <AutoCompleteTextView
                 layoutParams=WRAP
                 controlledText=region
-                onTextChange=(object : Function1<String, Unit> {
-                    override fun invoke(value: String) {
-                        region = value
-                        recomposeSync()
-                    }
-                })
+                onTextChange={ region = it; recomposeSync() }
                 data=AllRegions
-                composeItem=(object: Function1<Any, Unit> {
-                    override fun invoke(p1: Any) {
-                        <TextView text=(p1 as String) />
-                    }
-                })
+                composeItem={ <TextView text=(it as String) /> }
             />
 
             <TimePicker
                 layoutParams=WRAP
                 hour=hour
                 minute=minute
-                onTimeChangedListener=(object: TimePicker.OnTimeChangedListener {
-                    override fun onTimeChanged(view: TimePicker?, hourOfDay: Int, minuteOfHour: Int) {
-                        hour = hourOfDay
-                        minute = minuteOfHour
-                        recompose()
-                    }
-                })
+                onTimeChanged={_, hourOfDay, minuteOfHour ->
+                    hour = hourOfDay
+                    minute = minuteOfHour
+                    recompose()
+                }
             />
 
 
             <EditText
                 layoutParams=WRAP
                 controlledText=name
-                onTextChange=(object : Function1<String, Unit> {
-                    override fun invoke(value: String) {
-                        name = value.substring(0, Math.min(value.length, 10))
-                        recomposeSync()
-                    }
-                })
+                onTextChange={ name = it.substring(0, Math.min(it.length, 10)); recomposeSync(); }
             />
             <TextView layoutParams=WRAP text=name />
 
             <ToggleButton
                 layoutParams=WRAP
                 controlledChecked=checked
-                onCheckedChange=(object : Function1<Boolean, Unit> {
-                    override fun invoke(p0: Boolean) {
-                        checked = p0
-                        recomposeSync()
-                    }
-                })
+                onCheckedChange={ checked = it; recomposeSync() }
+
             />
             <TextView layoutParams=WRAP text="is checked: $checked" />
 
@@ -94,12 +74,7 @@ class EditForm : Component() {
             <SeekBar
                 layoutParams=WRAP
                 controlledProgress=progress
-                onProgressChange=(object: Function1<Int, Unit> {
-                    override fun invoke(next: Int) {
-                        progress = Math.min(next, 70)
-                        recomposeSync()
-                    }
-                })
+                onProgressChange={ progress = Math.min(it, 70); recomposeSync() }
             />
             <TextView layoutParams=WRAP text="value: $progress" />
 
@@ -107,14 +82,7 @@ class EditForm : Component() {
             // TODO(lmr): we could build a better RadioGroup component
             <RadioGroup
                 controlledCheckedId=checkedId
-                onCheckedIdChange=(object: Function1<Int, Unit> {
-                    override fun invoke(p1: Int) {
-                        if (p1 == R.id.rb_three) return
-                        checkedId = p1
-                        recomposeSync()
-                    }
-                })
-            >
+                onCheckedIdChange={ checkedId = it; recomposeSync() }>
                 <RadioButton id=R.id.rb_one text="Choice one"/>
                 <RadioButton id=R.id.rb_two text="Choice two"/>
                 <RadioButton id=R.id.rb_three text="Choice three can't be selected"/>

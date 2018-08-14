@@ -21,17 +21,8 @@ class NewsFeed: Component() {
         <Recycler
             layoutParams
             layoutManager
-            getItemCount=(object: Function0<Int> {
-                override fun invoke(): Int {
-                    return 9999
-                }
-            })
-            composeItem=(object: Function1<Int, Unit> {
-                override fun invoke(position: Int) {
-                    <ItemComponent position />
-                }
-            })
-
+            getItemCount={ 9999 }
+            composeItem={ position ->  <ItemComponent position /> }
         />
     }
 }

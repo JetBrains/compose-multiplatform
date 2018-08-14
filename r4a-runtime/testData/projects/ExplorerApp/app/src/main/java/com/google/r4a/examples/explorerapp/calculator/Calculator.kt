@@ -18,12 +18,8 @@ class Calculator : Component() {
     private val FILL = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
     private val WRAP_HORIZ = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
     private val WRAP = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-    private val onClick = object : Function1<String, Unit>  {
-        override fun invoke(p1: String) {
-            formula.append(p1)
-            recompose()
-        }
-    }
+    private val onClick: (String) -> Unit = { formula.append(it);  recompose() }
+
 
     private fun fontSize(display: String): Int {
         return when {

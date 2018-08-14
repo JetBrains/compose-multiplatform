@@ -1,12 +1,12 @@
 package com.google.r4a.examples.explorerapp.screens
 
 import android.graphics.Color
-import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
-import com.google.r4a.Component
+import com.google.r4a.*
+import com.google.r4a.adapters.*
 
 class FontList : Component() {
 
@@ -15,29 +15,16 @@ class FontList : Component() {
 
     override fun compose() {
         <LinearLayout orientation=LinearLayout.VERTICAL layoutParams=FILL>
-            <Button text="Increase Font Size" onClickListener=SetFontSizeHandler(textSize+1, this) enabled=(textSize < 100) />
-            <Button text="Decrease Font Size" onClickListener=SetFontSizeHandler(textSize-1, this) enabled=(textSize > 10) />
+            <Button text="Increase Font Size" onClick={ textSize += 1; recompose() } enabled=(textSize < 100) />
+            <Button text="Decrease Font Size" onClick={ textSize -= 1; recompose() } enabled=(textSize > 10) />
             <LinearLayout orientation=LinearLayout.HORIZONTAL>
-                <Button text="Red" layoutParams=BUTTON onClickListener={SetColorHandler(Color.RED, this)} />
-                <Button text="Green" layoutParams=BUTTON onClickListener={SetColorHandler(Color.GREEN, this)} />
-                <Button text="Blue" layoutParams=BUTTON onClickListener={SetColorHandler(Color.BLUE, this)} />
-                <Button text="Gray" layoutParams=BUTTON onClickListener={SetColorHandler(Color.GRAY, this)} />
+                <Button text="Red" layoutParams=BUTTON onClick={ color = Color.RED; recompose() } />
+                <Button text="Green" layoutParams=BUTTON onClick={ color = Color.GREEN; recompose() } />
+                <Button text="Blue" layoutParams=BUTTON onClick={ color = Color.BLUE; recompose() } />
+                <Button text="Gray" layoutParams=BUTTON onClick={ color = Color.GRAY; recompose() } />
             </LinearLayout>
             <ChildComponent textSize color />
         </LinearLayout>
-    }
-
-    class SetFontSizeHandler(val fontSize: Float, val component: FontList) : View.OnClickListener {
-        override fun onClick(v: View?){
-            component.textSize = fontSize
-            component.recompose()
-        }
-    }
-    class SetColorHandler(val color: Int, val component: FontList) : View.OnClickListener {
-        override fun onClick(v: View?) {
-            component.color = color
-            component.recompose()
-        }
     }
 
 //    companion object {

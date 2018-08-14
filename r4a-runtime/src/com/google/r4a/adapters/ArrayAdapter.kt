@@ -165,7 +165,7 @@ class ArrayAdapter<T> : BaseAdapter(), Filterable {
             return results
         }
 
-        override fun publishResults(constraint: CharSequence, results: Filter.FilterResults) {
+        override fun publishResults(constraint: CharSequence?, results: Filter.FilterResults) {
             @Suppress("UNCHECKED_CAST")
             items = results.values as MutableList<T>
             if (results.count > 0) {

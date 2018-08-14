@@ -11,10 +11,9 @@ class Reordering : Component() {
     private var items = mutableListOf(1, 2, 3, 4, 5)
 
     private fun onMove(index: Int): Function1<Int, Unit> {
-        return object: Function1<Int, Unit> {
-            override fun invoke(amount: Int) {
-                val next = index + amount
-                if (next < 0 || next >= items.size) return
+        return { amount ->
+            val next = index + amount
+            if (next >= 0 && next < items.size) {
                 val item = items.removeAt(index)
                 // TODO: immutable list ops would be better
                 items.add(next, item)
@@ -52,27 +51,12 @@ class Reordering : Component() {
         // state
         private var count: Int = 0
 
-        private val onIncrement = object: View.OnClickListener {
-            override fun onClick(v: View?) {
-                count += 1
-                recompose()
-            }
-        }
-
-        private fun onMoveMake(amount: Int): View.OnClickListener {
-            return object: View.OnClickListener {
-                override fun onClick(v: View?) {
-                    onMove(amount)
-                }
-            }
-        }
-
         override fun compose() {
             <LinearLayout orientation=LinearLayout.HORIZONTAL>
                 <TextView text="id: $id amt: $count" textSize=20f />
-                <Button text="+" onClickListener=onIncrement />
-                <Button text="Up" onClickListener=onMoveMake(1) />
-                <Button text="Down" onClickListener=onMoveMake(-1) />
+                <Button text="+" onClick={ count++; recompose() } />
+                <Button text="Up" onClick={ onMove(1) } />
+                <Button text="Down" onClick={ onMove(-1) } />
             </LinearLayout>
         }
     }
