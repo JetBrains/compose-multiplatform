@@ -48,6 +48,10 @@ open class GMavenZipTask : Zip() {
      */
     var includeReleased = false
     /**
+     * Set to true to include maven-metadata.xml
+     */
+    var includeMetadata: Boolean = false
+    /**
      * List of artifacts that might be included in the generated zip.
      */
     val candidates = arrayListOf<Artifact>()
@@ -61,6 +65,10 @@ open class GMavenZipTask : Zip() {
              * Maven group for the task. "" if for all projects
              */
             val mavenGroup: String,
+            /**
+             * Set to true to include maven-metadata.xml
+             */
+            var includeMetadata: Boolean,
             /**
              * The out folder for uploadArchives.
              */
@@ -101,6 +109,7 @@ open class GMavenZipTask : Zip() {
                 task.from(supportRepoOut)
                 task.destinationDir = distDir
                 task.includeReleased = params.includeReleased
+                task.includeMetadata = params.includeMetadata
                 task.into("m2repository")
                 val fileSuffix = if (mavenGroup == "") {
                     "all"
@@ -127,19 +136,27 @@ open class GMavenZipTask : Zip() {
      */
     private fun setupIncludes(): Boolean {
         // have 1 default include so that by default, nothing is included
-        val includes = candidates.mapNotNull {
+        val includes = candidates.flatMap {
             val mavenGroupPath = it.mavenGroup.replace('.', '/')
             when {
-                includeReleased -> "$mavenGroupPath/${it.projectName}/${it.version}" + "/**"
+                includeReleased -> listOfNotNull(
+                        "$mavenGroupPath/${it.projectName}/${it.version}" + "/**",
+                        if (includeMetadata)
+                            "$mavenGroupPath/${it.projectName}" + "/maven-metadata.*"
+                        else null)
                 versionChecker.isReleased(it.mavenGroup, it.projectName, it.version) -> {
                     // query maven.google to check if it is released.
                     logger.info("looks like $it is released, skipping")
-                    null
+                    emptyList()
                 }
                 else -> {
                     logger.info("adding $it to partial maven zip because it cannot be found " +
                             "on maven.google.com")
-                    "$mavenGroupPath/${it.projectName}/${it.version}" + "/**"
+                    listOfNotNull(
+                            "$mavenGroupPath/${it.projectName}/${it.version}" + "/**",
+                            if (includeMetadata)
+                                "$mavenGroupPath/${it.projectName}" + "/maven-metadata.*"
+                            else null)
                 }
             }
         }
@@ -211,6 +228,7 @@ object Release {
         val projectDist = project.rootProject.property("distDir") as File
         val params = configActionParams ?: GMavenZipTask.ConfigAction.Params(
                 mavenGroup = "",
+                includeMetadata = false,
                 supportRepoOut = project.property("supportRepoOut") as File,
                 gMavenVersionChecker =
                 project.property("versionChecker") as GMavenVersionChecker,
@@ -254,7 +272,8 @@ object Release {
                 ?: project.rootProject.tasks.create(
                         taskName, GMavenZipTask::class.java,
                         GMavenZipTask.ConfigAction(getParams(project).copy(
-                                includeReleased = true
+                                includeReleased = true,
+                                includeMetadata = true
                         ))
                 )
     }
