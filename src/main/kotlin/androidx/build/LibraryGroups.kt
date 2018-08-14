@@ -20,6 +20,7 @@ package androidx.build
  * The list of maven group names of all the libraries in this project.
  */
 object LibraryGroups {
+    const val ANIMATION = "androidx.animation"
     const val ANNOTATION = "androidx.annotation"
     const val APPCOMPAT = "androidx.appcompat"
     const val ASYNCLAYOUTINFLATER = "androidx.asynclayoutinflater"
