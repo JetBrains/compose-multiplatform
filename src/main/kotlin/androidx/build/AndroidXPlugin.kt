@@ -112,7 +112,7 @@ class AndroidXPlugin : Plugin<Project> {
             }
             project.tasks.all { task ->
                 // TODO remove androidTest from buildOnServer once test runners do not
-                // expect them anymore.
+                // expect them anymore. (wait for master)
                 if ("assembleAndroidTest" == task.name ||
                         "assembleDebug" == task.name ||
                         ERROR_PRONE_TASK == task.name ||
