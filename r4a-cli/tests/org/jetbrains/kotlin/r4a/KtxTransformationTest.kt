@@ -1099,35 +1099,25 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
     )
 
-    fun xtestKtxLambdaInForLoop() = testCompile(
+    fun testKtxLambdaInForLoop() = testCompile(
         """
         import com.google.r4a.*
         import android.widget.TextView
 
-        fun bar(): Unit {}
-
         fun foo() {
-            val lambda =  {  }
+            val lambda = @Composable {  }
             for(x in 1..5) {
-                lambda()
-                lambda()
-                lambda()
-                lambda()
-                lambda()
-                bar() // TODO: Remove when fixed upstream
+                <lambda />
+                <lambda />
             }
         }
         """
     )
 
-    fun xtestKtxLambdaInIfElse() = testCompile(
+    fun testKtxLambdaInIfElse() = testCompile(
         """
         import com.google.r4a.*
         import android.widget.TextView
-
-        fun bar(): Any {
-            return "Hello"
-        }
 
         fun foo(x: Boolean) {
             val lambda = @Composable { <TextView text="Hello World" /> }
