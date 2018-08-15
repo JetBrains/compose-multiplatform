@@ -169,7 +169,7 @@ internal class AffectedModuleDetectorImpl constructor(
     }
 
     private val projectGraph by lazy {
-        ProjectGraph(rootProject)
+        ProjectGraph(rootProject, logger)
     }
 
     val affectedProjects by lazy {
@@ -216,12 +216,13 @@ internal class AffectedModuleDetectorImpl constructor(
             )
             return allProjects
         }
-        // wear pre submit always expects the APK so always include wear for now.
-        val wearProjects = rootProject.subprojects.filter {
-            it.name.contains("wear")
+        val alwaysBuild = rootProject.subprojects.filter { project ->
+            ALWAYS_BUILD.any {
+                project.name.contains(it)
+            }
         }
         // expand the list to all of their dependants
-        return expandToDependants(containingProjects + wearProjects)
+        return expandToDependants(containingProjects + alwaysBuild)
     }
 
     private fun expandToDependants(containingProjects: List<Project?>): Set<Project> {
@@ -234,5 +235,10 @@ internal class AffectedModuleDetectorImpl constructor(
         return projectGraph.findContainingProject(filePath).also {
             logger?.info("search result for $filePath resulted in ${it?.path}")
         }
+    }
+
+    companion object {
+        // list of projects that should always be built
+        private val ALWAYS_BUILD = arrayOf("wear", "media-compat-test")
     }
 }
