@@ -97,11 +97,6 @@ object LibraryVersions {
      */
     val CAR = Version("1.0.0-alpha5")
 
-    /*
-     * Version code for mediarouter (depends on media2)
-     */
-    val MEDIAROUTER = Version("1.0.0-alpha5")
-
     /**
      * Version code for media-widget (depends on media2)
      */
