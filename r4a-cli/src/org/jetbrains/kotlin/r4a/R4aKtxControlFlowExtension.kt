@@ -228,7 +228,10 @@ class R4aKtxControlFlowExtension : KtxControlFlowExtension {
 
             createNonSyntheticValue(element, inputExpressions, MagicKind.VALUE_CONSUMER)
 
-            element.bodyLambdaExpression?.let { generateInstructions(it) }
+            element.bodyLambdaExpression?.let {
+                generateInstructions(it)
+                createNonSyntheticValue(element, listOf(it), MagicKind.VALUE_CONSUMER)
+            }
         }
     }
 
