@@ -78,6 +78,7 @@ class AndroidXPlugin : Plugin<Project> {
                     project.configureSourceJarForAndroid(extension)
                     project.configureAndroidCommonOptions(extension)
                     project.configureAndroidLibraryOptions(extension)
+                    project.configureVersionFileWriter(extension)
                 }
                 is AppPlugin -> {
                     val extension = project.extensions.getByType<AppExtension>()
