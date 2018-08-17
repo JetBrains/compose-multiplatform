@@ -109,7 +109,7 @@ object LibraryVersions {
     /*
      * Version code for mediarouter (depends on media2)
      */
-    val MEDIAROUTER = Version("1.0.0-alpha5")
+    val MEDIAROUTER = Version("1.1.0-alpha01")
 
     /**
      * Version code for media-widget (depends on media2)
