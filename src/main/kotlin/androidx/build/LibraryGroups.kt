@@ -58,6 +58,7 @@ object LibraryGroups {
     const val RECOMMENDATION = "androidx.recommendation"
     const val RECYCLERVIEW = "androidx.recyclerview"
     const val SLICE = "androidx.slice"
+    const val REMOTECALLBACK = "androidx.remotecallback"
     const val SLIDINGPANELAYOUT = "androidx.slidingpanelayout"
     const val SWIPEREFRESHLAYOUT = "androidx.swiperefreshlayout"
     const val TEXTCLASSIFIER = "androidx.textclassifier"

@@ -152,6 +152,11 @@ object LibraryVersions {
     val WEBKIT = Version("1.1.0-alpha01")
 
     /**
+     * Version code for remote-callbacks
+     */
+    val REMOTECALLBACK = Version("1.0.0-alpha01")
+
+    /**
      * Version code for slice-builders-ktx
      */
     val SLICE_BUILDERS_KTX = Version("1.0.0-alpha5")
