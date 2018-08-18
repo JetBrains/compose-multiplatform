@@ -15,6 +15,7 @@
  */
 
 
+import androidx.build.BuildServerConfigurationKt
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.gmaven.GMavenVersionChecker
 import com.android.build.gradle.internal.coverage.JacocoReportTask
@@ -28,36 +29,20 @@ if (supportRoot == null) {
 def init = new Properties()
 ext.init = init
 rootProject.ext.versionChecker = new GMavenVersionChecker(rootProject.logger)
-ext.runningInBuildServer = System.env.DIST_DIR != null && System.env.OUT_DIR != null
 
 apply from: "${supportRoot}/buildSrc/dependencies.gradle"
-apply from: "${supportRoot}/buildSrc/build_dependencies.gradle"
 
 def setupRepoOutAndBuildNumber() {
-    // common support repo folder which works well for prebuilts.
-    ext.supportRepoOut = ''
-    ext.buildNumber = "0"
     /*
-     * With the build server you are given two env variables.
      * The OUT_DIR is a temporary directory you can use to put things during the build.
-     * The DIST_DIR is where you want to save things from the build.
-     *
-     * The build server will copy the contents of DIST_DIR to somewhere and make it available.
      */
-    if (ext.runningInBuildServer) {
+    if (BuildServerConfigurationKt.isRunningOnBuildServer()) {
         buildDir = new File(System.env.OUT_DIR + '/gradle/frameworks/support/build')
                 .getCanonicalFile()
-        project.ext.distDir = new File(System.env.DIST_DIR).getCanonicalFile()
-
-        // the build server does not pass the build number so we infer it from the last folder of
-        // the dist path.
-        ext.buildNumber = project.ext.distDir.getName()
-
         // the build server should always print out full stack traces for any failures.
         gradle.startParameter.showStacktrace = ShowStacktrace.ALWAYS
     } else {
         buildDir = file("${ext.supportRootFolder}/../../out/host/gradle/frameworks/support/build")
-        project.ext.distDir = new File("${ext.supportRootFolder}/../../out/dist")
     }
     subprojects {
         // Change buildDir first so that all plugins pick up the new value.
@@ -65,8 +50,6 @@ def setupRepoOutAndBuildNumber() {
     }
     ext.supportRepoOut = new File(buildDir, 'support_repo')
     ext.supportRepoOut.mkdirs()
-    ext.testApkDistOut = ext.distDir
-    ext.testResultsDistDir = new File(distDir, "host-test-reports")
     ext.docsDir = new File(buildDir, 'javadoc')
 }
 
@@ -104,7 +87,7 @@ def configureSubProjects() {
                             exclude "**/R.class"
                             exclude "**/R\$*.class"
                             exclude "**/BuildConfig.class"
-                            destinationDir file(project.distDir)
+                            destinationDir BuildServerConfigurationKt.getDistributionDirectory(rootProject)
                             archiveName "${project.name}-${v.baseName}-allclasses.jar"
                         }
 
@@ -145,7 +128,7 @@ def configureSubProjects() {
                         copy {
                             from(task.outputDirectory)
                             include '*.apk'
-                            into(rootProject.ext.testApkDistOut)
+                            into(BuildServerConfigurationKt.getDistributionDirectory(rootProject))
                             rename { String fileName ->
                                 // Exclude media-compat-test-* modules from existing support library
                                 // presubmit tests.
@@ -171,11 +154,11 @@ def configureSubProjects() {
                 def junitReport = task.reports.junitXml
                 if (junitReport.enabled) {
                     def zipTask = project.tasks.create(name : "zipResultsOf${task.name.capitalize()}", type : Zip) {
-                        destinationDir(testResultsDistDir)
+                        destinationDir(BuildServerConfigurationKt.getHostTestResultDirectory(project))
                         // first one is always :, drop it.
                         archiveName("${project.getPath().split(":").join("_").substring(1)}.zip")
                     }
-                    if (project.rootProject.ext.runningInBuildServer) {
+                    if (BuildServerConfigurationKt.isRunningOnBuildServer()) {
                         task.ignoreFailures = true
                     }
                     task.finalizedBy zipTask
