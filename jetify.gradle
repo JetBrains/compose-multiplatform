@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import androidx.build.BuildServerConfigurationKt
 import androidx.build.Release
 def standaloneProject = project(":jetifier-standalone")
 def jetifierBin = file("${standaloneProject.buildDir}/install/jetifier-standalone/bin/jetifier-standalone")
@@ -80,7 +82,7 @@ task dejetifyArchive(type: Exec) {
     dependsOn project.tasks['stripArchive']
     inputs.file project.tasks['stripArchive'].archivePath
 
-    outputs.file "${rootProject.ext.distDir}/top-of-tree-m2repository-dejetified-${project.ext.buildNumber}.zip"
+    outputs.file "${BuildServerConfigurationKt.getDistributionDirectory(rootProject).absolutePath}/top-of-tree-m2repository-dejetified-${BuildServerConfigurationKt.getBuildId()}.zip"
 
     commandLine (
         "${jetifierBin}",
