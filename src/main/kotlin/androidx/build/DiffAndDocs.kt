@@ -415,7 +415,7 @@ private fun createGenerateDiffsTask(
             docletpath = jdiffConfig.resolve()
             title = "Support&nbsp;Library&nbsp;API&nbsp;Differences&nbsp;Report"
 
-            exclude("**/BuildConfig.java", "**/R.java")
+            exclude("**/R.java")
             dependsOn(oldApiTask, newApiTask, jdiffConfig)
             doLast {
                 project.logger.lifecycle("generated diffs into $destinationDir")
@@ -513,8 +513,6 @@ private fun createGenerateDocsTask(
                     addStringOption("dac_libraryroot", dacOptions.libraryroot)
                     addStringOption("dac_dataname", dacOptions.dataname)
                 }
-
-                exclude("**/BuildConfig.java")
             }
 
             addArtifactsAndSince()

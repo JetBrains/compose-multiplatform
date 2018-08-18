@@ -152,7 +152,6 @@ private fun createGenerateApiTask(project: Project, docletpathParam: Collection<
                 addBooleanOption("stubsourceonly", true)
             }
 
-            exclude("**/BuildConfig.java")
             exclude("**/R.java")
         }
 
