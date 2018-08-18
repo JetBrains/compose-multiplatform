@@ -17,7 +17,9 @@
 package androidx.build.dependencyTracker
 
 import androidx.build.dependencyTracker.AffectedModuleDetector.Companion.ENABLE_ARG
+import androidx.build.getDistributionDirectory
 import androidx.build.gradle.isRoot
+import androidx.build.isRunningOnBuildServer
 import com.android.annotations.VisibleForTesting
 import org.gradle.BuildAdapter
 import org.gradle.api.GradleException
@@ -25,7 +27,6 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.invocation.Gradle
 import org.gradle.api.logging.Logger
-import java.io.File
 
 /**
  * A utility class that can discover which files are changed based on git history.
@@ -53,16 +54,14 @@ abstract class AffectedModuleDetector {
         @JvmStatic
         fun configure(gradle: Gradle, rootProject: Project) {
             val enabled = rootProject.hasProperty(ENABLE_ARG)
-            val inBuildServer = rootProject.extensions.extraProperties.let {
-                it["runningInBuildServer"] as? Boolean ?: false
-            }
+            val inBuildServer = isRunningOnBuildServer()
             if (!enabled && !inBuildServer) {
                 setInstance(rootProject, AcceptAll())
                 return
             }
             val logger = ToStringLogger.createWithLifecycle(gradle) { log ->
-                val distDir = rootProject.properties["distDir"] as File?
-                distDir?.let {
+                val distDir = rootProject.getDistributionDirectory()
+                distDir.let {
                     val outputFile = it.resolve(LOG_FILE_NAME)
                     outputFile.writeText(log)
                     println("wrote dependency log to ${outputFile.absolutePath}")

@@ -225,7 +225,7 @@ object Release {
         project: Project,
         group: String? = null
     ): GMavenZipTask.ConfigAction.Params {
-        val projectDist = project.rootProject.property("distDir") as File
+        val projectDist = project.getDistributionDirectory()
         val params = configActionParams ?: GMavenZipTask.ConfigAction.Params(
                 mavenGroup = "",
                 includeMetadata = false,
@@ -234,7 +234,7 @@ object Release {
                 project.property("versionChecker") as GMavenVersionChecker,
                 distDir = projectDist,
                 includeReleased = false,
-                buildNumber = project.property("buildNumber").toString()
+                buildNumber = getBuildId()
         ).also {
             configActionParams = it
         }

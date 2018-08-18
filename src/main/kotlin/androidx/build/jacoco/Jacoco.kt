@@ -16,12 +16,11 @@
 
 package androidx.build.jacoco
 
+import androidx.build.getDistributionDirectory
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.create
-import org.gradle.kotlin.dsl.extra
-import java.io.File
 
 object Jacoco {
     private const val VERSION = "0.7.8"
@@ -43,7 +42,7 @@ object Jacoco {
                 it.exclude("META-INF/*.DSA")
                 it.exclude("META-INF/*.RSA")
             }
-            destinationDir = project.extra["distDir"] as File
+            destinationDir = project.getDistributionDirectory()
             archiveName = "jacocoant.jar"
         }
         return task
@@ -53,7 +52,7 @@ object Jacoco {
         // Package the individual *-allclasses.jar files together to generate code coverage reports
         val packageAllClassFiles = project.tasks.create("packageAllClassFilesForCoverageReport",
                 Jar::class.java) {
-            it.destinationDir = project.file(project.extra["distDir"]!!)
+            it.destinationDir = project.getDistributionDirectory()
             it.archiveName = "jacoco-report-classes-all.jar"
         }
         project.subprojects { subproject ->
