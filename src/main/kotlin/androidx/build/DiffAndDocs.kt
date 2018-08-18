@@ -19,11 +19,9 @@ package androidx.build
 import androidx.build.Strategy.Prebuilts
 import androidx.build.Strategy.TipOfTree
 import androidx.build.checkapi.ApiXmlConversionTask
-import androidx.build.checkapi.CheckApiTask
-import androidx.build.checkapi.UpdateApiTask
-import androidx.build.doclava.CHECK_API_CONFIG_DEVELOP
-import androidx.build.doclava.CHECK_API_CONFIG_PATCH
-import androidx.build.doclava.CHECK_API_CONFIG_RELEASE
+import androidx.build.checkapi.CheckApiTasks
+import androidx.build.checkapi.hasApiTasks
+import androidx.build.checkapi.initializeApiChecksForProject
 import androidx.build.doclava.ChecksConfig
 import androidx.build.doclava.DEFAULT_DOCLAVA_CONFIG
 import androidx.build.doclava.DoclavaTask
@@ -273,7 +271,7 @@ object DiffAndDocs {
                 aggregateOldApiTxtsTask, aggregateNewApiTxtsTask)
         registerJavaProjectForDocsTask(tasks.generateApi, compileJava)
         setupDocsTasks(project, tasks)
-        anchorTask.dependsOn(tasks.checkApiTask)
+        anchorTask.dependsOn(tasks.checkApi)
     }
 
     /**
@@ -308,114 +306,23 @@ object DiffAndDocs {
                         aggregateNewApiTxtsTask)
                 registerAndroidProjectForDocsTask(tasks.generateApi, variant)
                 setupDocsTasks(project, tasks)
-                anchorTask.dependsOn(tasks.checkApiTask)
+                anchorTask.dependsOn(tasks.checkApi)
             }
         }
     }
 
-    private fun setupDocsTasks(project: Project, tasks: Tasks) {
+    private fun setupDocsTasks(project: Project, checkApiTasks: CheckApiTasks) {
         docsTasks.values.forEach { docs ->
             generateDiffsTask.dependsOn(docs)
             // Track API change history.
             docs.addSinceFilesFrom(project.projectDir)
             // Associate current API surface with the Maven artifact.
             val artifact = "${project.group}:${project.name}:${project.version}"
-            docs.addArtifact(tasks.generateApi.apiFile!!.absolutePath, artifact)
-            docs.dependsOn(tasks.generateApi)
+            docs.addArtifact(checkApiTasks.generateApi.apiFile!!.absolutePath, artifact)
+            docs.dependsOn(checkApiTasks.generateApi)
         }
     }
 }
-
-fun Project.hasApiFolder() = File(projectDir, "api").exists()
-
-private fun stripExtension(fileName: String) = fileName.substringBeforeLast('.')
-
-private fun getLastReleasedApiFile(rootFolder: File, refVersion: Version?): File? {
-    val apiDir = File(rootFolder, "api")
-    return getLastReleasedApiFileFromDir(apiDir, refVersion)
-}
-
-/**
- * Returns the api file with highest version among those having version less than refVersion
- */
-private fun getLastReleasedApiFileFromDir(apiDir: File, refVersion: Version?): File? {
-    var lastFile: File? = null
-    var lastVersion: Version? = null
-    apiDir.listFiles().forEach { file ->
-        val parsed = Version.parseOrNull(file)
-        parsed?.let { version ->
-            if ((lastFile == null || lastVersion!! < version) &&
-                    (refVersion == null || version < refVersion)) {
-                lastFile = file
-                lastVersion = version
-            }
-        }
-    }
-
-    return lastFile
-}
-
-private fun getApiFile(rootDir: File, refVersion: Version): File {
-    return getApiFile(rootDir, refVersion, false)
-}
-
-/**
- * Returns the API file for the specified reference version.
- *
- * @param refVersion the reference API version, ex. 25.0.0-SNAPSHOT
- * @return the most recently released API file
- */
-private fun getApiFile(rootDir: File, refVersion: Version, forceRelease: Boolean = false): File {
-    val apiDir = File(rootDir, "api")
-
-    if (refVersion.isFinalApi() || forceRelease) {
-        // Release API file is always X.Y.0.txt.
-        return File(apiDir, "${refVersion.major}.${refVersion.minor}.0.txt")
-    }
-
-    // Non-release API file is always current.txt.
-    return File(apiDir, "current.txt")
-}
-
-// Creates a new task on the project for generating API files
-private fun createGenerateApiTask(project: Project, docletpathParam: Collection<File>) =
-        project.tasks.createWithConfig("generateApi", DoclavaTask::class.java) {
-            setDocletpath(docletpathParam)
-            destinationDir = project.docsDir()
-            // Base classpath is Android SDK, sub-projects add their own.
-            classpath = androidJarFile(project)
-            apiFile = File(project.docsDir(), "release/${project.name}/current.txt")
-            generateDocs = false
-
-            coreJavadocOptions {
-                addBooleanOption("stubsourceonly", true)
-            }
-
-            exclude("**/BuildConfig.java")
-            exclude("**/R.java")
-        }
-
-// Creates a new task on the project for verifying the API
-private fun createCheckApiTask(
-    project: Project,
-    taskName: String,
-    docletpath: Collection<File>,
-    config: ChecksConfig,
-    oldApi: File?,
-    newApi: File,
-    whitelist: File? = null
-) =
-        project.tasks.createWithConfig(taskName, CheckApiTask::class.java) {
-            doclavaClasspath = docletpath
-            checksConfig = config
-            newApiFile = newApi
-            oldApiFile = oldApi
-            whitelistErrorsFile = whitelist
-            doFirst {
-                logger.lifecycle("Verifying ${newApi.name} " +
-                        "against ${oldApi?.name ?: "nothing"}...")
-            }
-        }
 
 /**
  * Registers a Java project on the given Javadocs task.
@@ -454,68 +361,6 @@ private fun registerAndroidProjectForDocsTask(task: Javadoc, releaseVariant: Bas
     @Suppress("DEPRECATION")
     task.classpath += releaseVariant.getCompileClasspath(null) +
             task.project.files(releaseVariant.javaCompile.destinationDir)
-}
-
-/**
- * Constructs a new task to copy a generated API file to an appropriately-named "official" API file
- * suitable for source control. This task should be called prior to source control check-in whenever
- * the public API has been modified.
- * <p>
- * The output API file varies according to version:
- * <ul>
- * <li>Snapshot and pre-release versions (e.g. X.Y.Z-SNAPSHOT, X.Y.Z-alphaN) output to current.txt
- * <li>Release versions (e.g. X.Y.Z) output to X.Y.0.txt, throwing an exception if the API has been
- *     finalized and the file already exists
- * </ul>
- */
-private fun createUpdateApiTask(project: Project, checkApiRelease: CheckApiTask) =
-        project.tasks.createWithConfig("updateApi", UpdateApiTask::class.java) {
-            group = JavaBasePlugin.VERIFICATION_GROUP
-            description = "Updates the candidate API file to incorporate valid changes."
-            newApiFile = checkApiRelease.newApiFile
-            oldApiFile = getApiFile(project.projectDir, project.version())
-            whitelistErrors = checkApiRelease.whitelistErrors
-            whitelistErrorsFile = checkApiRelease.whitelistErrorsFile
-            doFirst {
-                val version = project.version()
-                if (!version.isFinalApi() &&
-                        getApiFile(project.projectDir, version, true).exists()) {
-                    throw GradleException("Inconsistent version. Public API file already exists.")
-                }
-                // Replace the expected whitelist with the detected whitelist.
-                whitelistErrors = checkApiRelease.detectedWhitelistErrors
-            }
-        }
-
-/**
- * Returns the filepath of the previous API txt file (for computing diffs against)
- */
-private fun getOldApiTxt(project: Project): File? {
-    val toApi = project.processProperty("toApi")?.let {
-        Version.parseOrNull(it)
-    }
-    val fromApi = project.processProperty("fromApi")
-    val rootFolder = project.projectDir
-    if (fromApi != null) {
-        // Use an explicit API file.
-        return File(rootFolder, "api/$fromApi.txt")
-    } else {
-        // Use the most recently released API file bounded by toApi.
-        return getLastReleasedApiFile(rootFolder, toApi)
-    }
-}
-
-data class FileProvider(val file: File, val task: Task?)
-
-private fun getNewApiTxt(project: Project, generateApi: DoclavaTask): FileProvider {
-    val toApi = project.processProperty("toApi")
-    if (toApi != null) {
-        // Use an explicit API file.
-        return FileProvider(File(project.projectDir, "api/$toApi.txt"), null)
-    } else {
-        // Use the current API file (e.g. current.txt).
-        return FileProvider(generateApi.apiFile!!, generateApi)
-    }
 }
 
 /**
@@ -675,110 +520,9 @@ private fun createGenerateDocsTask(
             addArtifactsAndSince()
         }
 
-private data class Tasks(
-    val generateApi: DoclavaTask,
-    val checkApiTask: CheckApiTask
-)
-
-/**
- * Sets up api tasks for the given project
- */
-private fun initializeApiChecksForProject(
-    project: Project,
-    aggregateOldApiTxtsTask: ConcatenateFilesTask,
-    aggregateNewApiTxtsTask: ConcatenateFilesTask
-): Tasks {
-    if (!project.hasProperty("docsDir")) {
-        project.extensions.add("docsDir", File(project.rootProject.docsDir(), project.name))
-    }
-    val version = project.version()
-    val workingDir = project.projectDir
-
-    val doclavaConfiguration = project.rootProject.configurations.getByName("doclava")
-    val docletClasspath = doclavaConfiguration.resolve()
-    val generateApi = createGenerateApiTask(project, docletClasspath)
-    generateApi.dependsOn(doclavaConfiguration)
-
-    // for verifying that the API surface has not broken since the last release
-    val lastReleasedApiFile = getLastReleasedApiFile(workingDir, version)
-
-    val whitelistFile = lastReleasedApiFile?.let { apiFile ->
-        File(lastReleasedApiFile.parentFile, stripExtension(apiFile.name) + ".ignore")
-    }
-    val checkApiRelease = createCheckApiTask(project,
-            "checkApiRelease",
-            docletClasspath,
-            CHECK_API_CONFIG_RELEASE,
-            lastReleasedApiFile,
-            generateApi.apiFile!!,
-            whitelistFile)
-    checkApiRelease.dependsOn(generateApi)
-
-    // Allow a comma-delimited list of whitelisted errors.
-    if (project.hasProperty("ignore")) {
-        checkApiRelease.whitelistErrors = (project.properties["ignore"] as String)
-                .split(',').toSet()
-    }
-
-    // Check whether the development API surface has changed.
-    val verifyConfig = if (version.isPatch()) CHECK_API_CONFIG_PATCH else CHECK_API_CONFIG_DEVELOP
-    val currentApiFile = getApiFile(workingDir, version)
-    val checkApi = createCheckApiTask(project,
-            "checkApi",
-            docletClasspath,
-            verifyConfig,
-            currentApiFile,
-            generateApi.apiFile!!,
-            null)
-    checkApi.dependsOn(generateApi, checkApiRelease)
-
-    checkApi.group = JavaBasePlugin.VERIFICATION_GROUP
-    checkApi.description = "Verify the API surface."
-
-    val updateApiTask = createUpdateApiTask(project, checkApiRelease)
-    updateApiTask.dependsOn(checkApiRelease)
-
-    val oldApiTxt = getOldApiTxt(project)
-    if (oldApiTxt != null) {
-        aggregateOldApiTxtsTask.addInput(project.name, oldApiTxt)
-    }
-    val newApiTxtProvider = getNewApiTxt(project, generateApi)
-    aggregateNewApiTxtsTask.inputs.file(newApiTxtProvider.file)
-    aggregateNewApiTxtsTask.addInput(project.name, newApiTxtProvider.file)
-    if (newApiTxtProvider.task != null) {
-        aggregateNewApiTxtsTask.dependsOn(newApiTxtProvider.task)
-    }
-
-    return Tasks(generateApi, checkApi)
-}
-
-fun hasApiTasks(project: Project, extension: SupportLibraryExtension): Boolean {
-    if (extension.toolingProject) {
-        project.logger.info("Project ${project.name} is tooling project ignoring API tasks.")
-        return false
-    }
-
-    if (project.hasApiFolder()) {
-        return true
-    }
-
-    if (!extension.publish) {
-        project.logger.info("Project ${project.name} is not published, ignoring API tasks." +
-                "If you still want to trackApi, simply create \"api\" folder in your project path")
-        return false
-    }
-
-    if (extension.publish && project.version().isFinalApi()) {
-        throw GradleException("Project ${project.name} must track API before stabilizing API\n." +
-                "To do that create \"api\" in your project directory and " +
-                "run \"./gradlew updateApi\" command")
-    }
-    return false
-}
-
 private fun sdkApiFile(project: Project) = File(project.docsDir(), "release/sdk_current.txt")
 
-private fun <T : Task> TaskContainer.createWithConfig(
+fun <T : Task> TaskContainer.createWithConfig(
     name: String,
     taskClass: Class<T>,
     config: T.() -> Unit
@@ -803,17 +547,15 @@ private fun Prebuilts.dependency(extension: SupportLibraryExtension) =
 private fun BaseVariant.rFile() = "${applicationId.replace('.', '/')}/R.java"
 
 // Nasty part. Get rid of that eventually!
-private fun Project.docsDir(): File = properties["docsDir"] as File
+fun Project.docsDir(): File = properties["docsDir"] as File
 
 private fun Project.sdkPath(): File = getSdkPath(rootProject.projectDir)
-
-private fun Project.version() = Version(project.version as String)
 
 private fun Project.buildNumber() = properties["buildNumber"] as String
 
 private fun Project.distDir(): File = rootProject.properties["distDir"] as File
 
-private fun Project.processProperty(name: String) =
+fun Project.processProperty(name: String) =
         if (hasProperty(name)) {
             properties[name] as String
         } else {
