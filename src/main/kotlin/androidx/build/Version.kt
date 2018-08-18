@@ -16,6 +16,7 @@
 
 package androidx.build
 
+import org.gradle.api.Project
 import java.io.File
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -24,10 +25,10 @@ import java.util.regex.Pattern
  * Utility class which represents a version
  */
 data class Version(
-        val major: Int,
-        val minor: Int,
-        val patch: Int,
-        val extra: String? = null
+    val major: Int,
+    val minor: Int,
+    val patch: Int,
+    val extra: String? = null
 ) : Comparable<Version> {
 
     constructor(versionString: String) : this(
@@ -87,3 +88,5 @@ data class Version(
         }
     }
 }
+
+fun Project.version() = Version(project.version as String)
