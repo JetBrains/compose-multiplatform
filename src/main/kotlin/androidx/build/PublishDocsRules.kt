@@ -93,6 +93,7 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.PAGING, "paging-runtime-ktx")
     ignore(LibraryGroups.PAGING, "paging-rxjava2-ktx")
     prebuilts(LibraryGroups.PAGING, flatfootVersion)
+    ignore(LibraryGroups.NAVIGATION, "navigation-benchmark")
     prebuilts(LibraryGroups.NAVIGATION, "1.0.0-alpha04")
     prebuilts(LibraryGroups.WORKMANAGER, "1.0.0-alpha07")
     default(Ignore)
