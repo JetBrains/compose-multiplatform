@@ -119,7 +119,7 @@ class ComposableAnnotationChecker(val mode: Mode = DEFAULT_MODE) : CallChecker, 
             return ComponentMetadata.isR4AComponent(descriptor)
         }
         if(element is KtProperty) {
-            val descriptor = trace.bindingContext.get(BindingContext.DECLARATION_TO_DESCRIPTOR, element)
+            val descriptor = trace.bindingContext.get(BindingContext.DECLARATION_TO_DESCRIPTOR, element) ?: return false
             val type = when(descriptor) {
                 is LocalVariableDescriptor -> descriptor.type
                 is PropertyDescriptor -> descriptor.type
