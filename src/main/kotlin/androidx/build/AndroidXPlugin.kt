@@ -129,6 +129,7 @@ class AndroidXPlugin : Plugin<Project> {
 
         val createCoverageJarTask = Jacoco.createCoverageJarTask(this)
         buildOnServerTask.dependsOn(createCoverageJarTask)
+        buildTestApksTask.dependsOn(createCoverageJarTask)
 
         Release.createGlobalArchiveTask(this)
 
