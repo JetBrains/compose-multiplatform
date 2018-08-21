@@ -214,13 +214,8 @@ private fun transform(
 
     tag.callExpr.apply {
         info.parameterInfos.forEachIndexed { index, attrInfo ->
-            if (attrInfo.isChildren) {
-                if (info.isConstructed) {
-                    // TODO(lmr): if children is part of the constructor, pass it in here. Need to wait for property support for this
-                    error("constructor children properties not yet supported")
-                } else {
-                    putValueArgument(index, irChildrenInfo?.getValue)
-                }
+            if (attrInfo.isChildren && irChildrenInfo != null) {
+                putValueArgument(index, irChildrenInfo.getValue)
             } else if (attrInfo.isContext) {
                 putValueArgument(index, helper.getAndroidContextCall)
             } else {

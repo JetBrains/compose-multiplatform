@@ -19,10 +19,14 @@ object R4ADefaultErrorMessages : DefaultErrorMessages.Extension {
         )
         MAP.put(
             R4AErrors.MISMATCHED_ATTRIBUTE_TYPE,
-            "Attribute {0} expects type ''{1}'', found ''{2}''",
-            Renderers.STRING,
+            "<html>Type Mismatch.<br/>Required: {1}<br/>Found: {0}</html>",
             Renderers.RENDER_TYPE,
-            Renderers.RENDER_TYPE
+            Renderers.commaSeparated(Renderers.RENDER_TYPE)
+        )
+        MAP.put(
+            R4AErrors.UNRESOLVED_CHILDREN,
+            "<html>Mismatched children body type.<br/>Expected: {0}</html>",
+            Renderers.commaSeparated(Renderers.RENDER_TYPE)
         )
         MAP.put(
             R4AErrors.UNRESOLVED_ATTRIBUTE_KEY,
@@ -88,6 +92,19 @@ object R4ADefaultErrorMessages : DefaultErrorMessages.Extension {
         MAP.put(
             R4AErrors.UNRESOLVED_TAG,
             "Unresolved tag"
+        )
+        MAP.put(
+            R4AErrors.CHILDREN_ATTR_USED_AS_BODY_AND_KEYED_ATTRIBUTE,
+            "Attribute {0} is provided as the body of the element and therefore can't simultaneously be provided as a keyed attribute.",
+            Renderers.STRING
+        )
+        MAP.put(
+            R4AErrors.CHILDREN_PROVIDED_BUT_NO_CHILDREN_DECLARED,
+            "Element has a children body provided, but no @Children declarations were found"
+        )
+        MAP.put(
+            R4AErrors.MISSING_REQUIRED_CHILDREN,
+            "A children body is required"
         )
     }
 }

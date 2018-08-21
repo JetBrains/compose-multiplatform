@@ -1002,6 +1002,46 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
     )
 
+    fun testSimpleLambdaChildrenProperty() = testCompile(
+        """
+        import com.google.r4a.*
+        import android.widget.*
+        import android.content.*
+
+        class Example: Component() {
+            @Children
+            var children: (() -> Unit)? = null
+            override fun compose() {}
+        }
+
+        fun run(text: String) {
+            <Example>
+                println("hello ${"$"}text")
+            </Example>
+        }
+        """
+    )
+
+    fun testSimpleLambdaChildrenPropertyInCtor() = testCompile(
+        """
+        import com.google.r4a.*
+        import android.widget.*
+        import android.content.*
+
+        class Example(
+            @Children var children: () -> Unit
+        ): Component() {
+            override fun compose() {}
+        }
+
+        fun run(text: String) {
+            <Example>
+                println("hello ${"$"}text")
+            </Example>
+        }
+        """
+    )
+
     fun testBlockChildrenForViews() = testCompile(
         """
         import com.google.r4a.*
@@ -1015,7 +1055,7 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
     )
 
-    fun testChildrenLambdaWithSingleParam() = testCompile(
+    fun testChildrenLambdaSetterWithSingleParam() = testCompile(
         """
         import com.google.r4a.*
 
@@ -1033,13 +1073,89 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
     )
 
-    fun testGenericChildrenArg() = testCompile(
+    fun testChildrenLambdaPropertyWithSingleParam() = testCompile(
+        """
+        import com.google.r4a.*
+
+        class Example: Component() {
+            @Children
+            var children: ((x: Int) -> Unit)? = null
+            override fun compose() {}
+        }
+
+        fun run(text: String) {
+            <Example> x ->
+                println("hello ${"$"}x")
+            </Example>
+        }
+        """
+    )
+
+
+    fun testChildrenLambdaSetterWithMultipleParams() = testCompile(
+        """
+        import com.google.r4a.*
+
+        class Example: Component() {
+            @Children
+            fun setChildren(fn: (x: Int, y: String) -> Unit) {}
+            override fun compose() {}
+        }
+
+        fun run(text: String) {
+            <Example> x, y ->
+                println("hello ${"$"}x ${"$"}y")
+            </Example>
+        }
+        """
+    )
+
+    fun testChildrenLambdaPropertyWithMultipleParams() = testCompile(
+        """
+        import com.google.r4a.*
+
+        class Example: Component() {
+            @Children
+            var children: ((x: Int, y: String) -> Unit)? = null
+            override fun compose() {}
+        }
+
+        fun run(text: String) {
+            <Example> x, y ->
+                println("hello ${"$"}x ${"$"}y")
+            </Example>
+        }
+        """
+    )
+
+    fun testGenericChildrenArgSetter() = testCompile(
         """
         import com.google.r4a.*
 
         class Example<T>(var value: T): Component() {
             @Children
             fun setChildren(fn: (x: T) -> Unit) {}
+            override fun compose() {}
+        }
+
+        fun run(text: String) {
+            <Example value="string"> x ->
+                println("hello ${"$"}x")
+            </Example>
+            <Example value=123> x ->
+                println("hello ${"$"}{x + 1}")
+            </Example>
+        }
+        """
+    )
+
+    fun testGenericChildrenArgProperty() = testCompile(
+        """
+        import com.google.r4a.*
+
+        class Example<T>(var value: T): Component() {
+            @Children
+            var children: ((x: T) -> Unit)? = null
             override fun compose() {}
         }
 
@@ -1268,6 +1384,78 @@ class KtxTransformationTest: AbstractCodeGenTest() {
                     b=2
                     key=3
                 />
+            }
+        }
+        """
+    )
+
+    fun testNamedChildrenAttributeProperty() = testCompile(
+        """
+        import com.google.r4a.*
+        import com.google.r4a.adapters.*
+
+        class Foo: Component() {
+            @Children var children: (() -> Unit)? = null
+            override fun compose() {}
+        }
+
+        class Bar: Component() {
+            override fun compose() {
+                <Foo
+                    children={ }
+                />
+            }
+        }
+        """
+    )
+
+    fun testNamedChildrenAttributeSetter() = testCompile(
+        """
+        import com.google.r4a.*
+        import com.google.r4a.adapters.*
+
+        class Foo: Component() {
+            @Children fun setChildren(children: () -> Unit) {}
+            override fun compose() {}
+        }
+
+        class Bar: Component() {
+            override fun compose() {
+                <Foo
+                    children={ }
+                />
+            }
+        }
+        """
+    )
+
+
+    fun testOverloadedChildren() = testCompile(
+        """
+        import com.google.r4a.*
+        import com.google.r4a.adapters.*
+
+        class Foo: Component() {
+            @Children var children: ((x: Int, y: Int) -> Unit)? = null
+            @Children fun setChildren(children: (x: Int) -> Unit) {}
+            @Children fun setChildren(children: () -> Unit) {}
+            override fun compose() {}
+        }
+
+        class Bar: Component() {
+            override fun compose() {
+                <Foo children={ -> } />
+                <Foo children={ x -> println(x) } />
+                <Foo children={ x, y -> println(x + y) } />
+                <Foo>
+                    println("")
+                </Foo>
+                <Foo> x ->
+                    println(x)
+                </Foo>
+                <Foo> x, y ->
+                    println(x + y)
+                </Foo>
             }
         }
         """

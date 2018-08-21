@@ -4,6 +4,7 @@ import com.intellij.lang.ASTNode
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.util.SmartList
 import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.diagnostics.Severity
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.*
@@ -158,7 +159,7 @@ class KtxTagResolver(
             val expr = attributeExpressions[it.name]
             when {
                 it.isChildren -> {
-                    bodyLambdaExpression?.let { CallMaker.makeExternalValueArgument(it) }
+                    (bodyLambdaExpression ?: expr)?.let { CallMaker.makeExternalValueArgument(it) }
                 }
                 expr != null -> CallMaker.makeExternalValueArgument(expr)
                 it.isContext -> CONTEXT_ARGUMENT
@@ -204,12 +205,13 @@ class KtxTagResolver(
 
         storeSimpleNameExpression(expression, referencedDescriptor, context.trace)
 
-        val typeDescriptor = when (resolvedCall) {
-            is ConstructorDescriptor -> resolvedCall.constructedClass
+        val resultingDescriptor = resolvedCall.resultingDescriptor
+
+        val typeDescriptor = when (resultingDescriptor) {
+            is ConstructorDescriptor -> resultingDescriptor.containingDeclaration as? ClassDescriptor
+            is ClassDescriptor -> resultingDescriptor
             else -> null
         }
-
-        val resultingDescriptor = resolvedCall.resultingDescriptor
 
         // TODO(lmr): theoretically we could allow for "factory functions" to be used which had return types.
         // Pushing this decision off for now.
@@ -375,6 +377,7 @@ class KtxTagResolver(
         keyExpr: KtReferenceExpression,
         valueExpr: KtExpression,
         tag: KtxTagResolveInfo,
+        expectedTypes: MutableCollection<KotlinType>,
         context: ExpressionTypingContext
     ): KtxAttributeInfo? {
         val instanceType = tag.instanceType ?: return null
@@ -442,6 +445,13 @@ class KtxTagResolver(
             return null
         }
 
+        if (results.isAmbiguity || temporaryForFunction.trace.hasTypeMismatchErrorsOn(valueExpr)) {
+            expectedTypes.addAll(
+                results.resultingCalls.mapNotNull { it.resultingDescriptor.valueParameters.firstOrNull() }.map { it.type }
+            )
+            return null
+        }
+
         val resolvedCall = OverloadResolutionResultsUtil.getResultingCall(results, context) ?: return null
 
         if (valueExpr === keyExpr) {
@@ -478,6 +488,7 @@ class KtxTagResolver(
         keyExpr: KtSimpleNameExpression,
         valueExpr: KtExpression,
         tag: KtxTagResolveInfo,
+        expectedTypes: MutableCollection<KotlinType>,
         context: ExpressionTypingContext
     ): KtxAttributeInfo? {
         val instanceType = tag.instanceType ?: return null
@@ -538,13 +549,20 @@ class KtxTagResolver(
 
         val resolvedCall = OverloadResolutionResultsUtil.getResultingCall(results, context) ?: return null
 
+        val expectedType = (resolvedCall.resultingDescriptor as PropertyDescriptor).type
+
         facade.getTypeInfo(
             valueExpr,
             context
                 .replaceTraceAndCache(temporaryForVariable)
-                .replaceExpectedType((resolvedCall.resultingDescriptor as PropertyDescriptor).type)
+                .replaceExpectedType(expectedType)
                 .replaceCallPosition(CallPosition.PropertyAssignment(keyExpr))
         )
+
+        if (temporaryForVariable.trace.hasTypeMismatchErrorsOn(valueExpr)) {
+            expectedTypes.add(expectedType)
+            return null
+        }
 
         val descriptor = resolvedCall.resultingDescriptor as? PropertyDescriptor ?: return null
         val setter = descriptor.setter ?: return null
@@ -564,7 +582,7 @@ class KtxTagResolver(
             resolutionCandidate,
             TemporaryBindingTrace.create(context.trace, "Trace for fake property setter resolved call"),
             TracingStrategy.EMPTY,
-            DataFlowInfoForArgumentsImpl(resolvedCall.dataFlowInfoForArguments.resultInfo, setterCall)
+            DataFlowInfoForArgumentsImpl(context.dataFlowInfo, setterCall)
         )
 
         setterCall.valueArguments.forEachIndexed { index, arg ->
@@ -601,7 +619,203 @@ class KtxTagResolver(
             isPivotal = !descriptor.isVar // NOTE(lmr): i don't think this can happen... it wouldn't resolve here in this case
         )
     }
+
+    fun resolveChildrenAsSetter(
+        childrenDescriptor: SimpleFunctionDescriptor,
+        childrenExpr: KtExpression,
+        tag: KtxTagResolveInfo,
+        element: KtxElement,
+        context: ExpressionTypingContext
+    ): KtxAttributeInfo? {
+        val instanceType = tag.instanceType ?: return null
+
+        val refExpr = element.bodyLambdaExpression as KtxLambdaExpression
+
+
+        if (instanceType.isUnit()) {
+            // NOTE(lmr): this should only really happen on function components and function instances
+            // in which case we have already handled all of the attributes in the resolving of the tag
+            return null
+        }
+
+        val setterName = childrenDescriptor.name
+        val name = R4aUtils.propertyNameFromSetterMethod(setterName.asString())
+
+        val valueArguments = listOf(CallMaker.makeValueArgument(childrenExpr))
+        val receiver = ExpressionReceiver.create(
+            childrenExpr,
+            instanceType,
+            context.trace.bindingContext
+        )
+        val call = object : Call {
+            override fun getDispatchReceiver(): ReceiverValue? = null
+            override fun getValueArgumentList(): KtValueArgumentList? = null
+            override fun getTypeArgumentList(): KtTypeArgumentList? = null
+            override fun getCallOperationNode(): ASTNode? = null
+            override fun getTypeArguments(): List<KtTypeProjection> = listOf()
+            override fun getFunctionLiteralArguments(): List<LambdaArgument> = listOf()
+            override fun getCallType(): Call.CallType = Call.CallType.DEFAULT
+
+            override fun getExplicitReceiver(): Receiver? = receiver
+            override fun getValueArguments(): List<ValueArgument> = valueArguments
+            override fun getCallElement(): KtElement = element
+            override fun getCalleeExpression(): KtExpression? = refExpr
+        }
+
+        val temporaryForFunction = TemporaryTraceAndCache.create(
+            context, "trace to resolve as function call", childrenExpr
+        )
+
+        val results = callResolver.computeTasksAndResolveCall<FunctionDescriptor>(
+            BasicCallResolutionContext.create(
+                context.replaceTraceAndCache(temporaryForFunction),
+                call,
+                CheckArgumentTypesMode.CHECK_VALUE_ARGUMENTS,
+                DataFlowInfoForArgumentsImpl(context.dataFlowInfo, call)
+            ),
+            setterName,
+            refExpr,
+            NewResolutionOldInference.ResolutionKind.Function
+        )
+
+        if (results.isNothing) {
+            return null
+        }
+
+        if (temporaryForFunction.trace.hasTypeMismatchErrorsOn(childrenExpr)) {
+            return null
+        }
+
+        val resolvedCall = OverloadResolutionResultsUtil.getResultingCall(results, context) ?: return null
+
+        temporaryForFunction.commit()
+
+        return KtxAttributeInfo(
+            name = name,
+            type = resolvedCall.resultingDescriptor.valueParameters[0].type,
+            descriptor = resolvedCall.resultingDescriptor,
+            setterResolvedCall = resolvedCall,
+            isIncludedInConstruction = attributesInConstruction.contains(name),
+            isPivotal = false
+        )
+    }
+
+    fun resolveChildrenAsProperty(
+        propertyDescriptor: PropertyDescriptor,
+        valueExpr: KtLambdaExpression,
+        tag: KtxTagResolveInfo,
+        element: KtxElement,
+        context: ExpressionTypingContext
+    ): KtxAttributeInfo? {
+        val instanceType = tag.instanceType ?: return null
+        val refExpr = element.bodyLambdaExpression as KtxLambdaExpression
+
+        if (instanceType.isUnit()) {
+            // NOTE(lmr): this should only really happen on function components and function instances
+            // in which case we have already handled all of the
+            return null
+        }
+
+        val temporaryForVariable = TemporaryTraceAndCache.create(
+            context, "trace to resolve as local variable or property", element
+        )
+
+        val receiver = ExpressionReceiver.create(
+            valueExpr,
+            instanceType,
+            context.trace.bindingContext
+        )
+        val call = object : Call {
+            override fun getCallOperationNode(): ASTNode? = null
+            override fun getValueArgumentList(): KtValueArgumentList? = null
+            override fun getFunctionLiteralArguments(): List<LambdaArgument> = emptyList()
+            override fun getTypeArguments(): List<KtTypeProjection> = emptyList()
+            override fun getTypeArgumentList(): KtTypeArgumentList? = null
+            override fun getDispatchReceiver(): ReceiverValue? = null
+            override fun getCallType(): Call.CallType = Call.CallType.DEFAULT
+
+            override fun getExplicitReceiver(): Receiver? = receiver
+            override fun getValueArguments(): List<ValueArgument> = emptyList()
+            override fun getCallElement(): KtElement = element
+            override fun getCalleeExpression(): KtExpression? = refExpr
+        }
+
+        val contextForVariable = BasicCallResolutionContext.create(
+            context.replaceTraceAndCache(temporaryForVariable),
+            call,
+            CheckArgumentTypesMode.CHECK_VALUE_ARGUMENTS
+        )
+
+        val results = callResolver.computeTasksAndResolveCall<PropertyDescriptor>(
+            contextForVariable,
+            propertyDescriptor.name,
+            TracingStrategy.EMPTY,
+            NewResolutionOldInference.ResolutionKind.Variable
+        )
+
+        if (results.isNothing) {
+            return null
+        }
+
+        val resolvedCall = OverloadResolutionResultsUtil.getResultingCall(results, context) ?: return null
+
+        facade.getTypeInfo(
+            valueExpr,
+            context
+                .replaceTraceAndCache(temporaryForVariable)
+                .replaceExpectedType((resolvedCall.resultingDescriptor).type)
+                .replaceCallPosition(CallPosition.PropertyAssignment(null))
+        )
+        if (temporaryForVariable.trace.hasTypeMismatchErrorsOn(valueExpr)) {
+            return null
+        }
+        val descriptor = resolvedCall.resultingDescriptor as? PropertyDescriptor ?: return null
+        val setter = descriptor.setter ?: return null
+
+        // NOTE(lmr): Without this, the value arguments don't seem to end up in the resolved call. I'm not
+        // sure if there is a better way to do this or not but this seems to work okay.
+        val setterCall = makeCallWithValueArguments(
+            resolvedCall.call,
+            listOf(CallMaker.makeValueArgument(valueExpr))
+        )
+
+        val resolutionCandidate = ResolutionCandidate.create(
+            setterCall, setter, resolvedCall.dispatchReceiver, resolvedCall.explicitReceiverKind, null
+        )
+
+        val resolvedSetterCall = ResolvedCallImpl.create(
+            resolutionCandidate,
+            TemporaryBindingTrace.create(context.trace, "Trace for fake property setter resolved call"),
+            TracingStrategy.EMPTY,
+            DataFlowInfoForArgumentsImpl(context.dataFlowInfo, setterCall)
+        )
+
+        setterCall.valueArguments.forEachIndexed { index, arg ->
+            resolvedSetterCall.recordValueArgument(
+                setter.valueParameters[index],
+                ExpressionValueArgument(arg)
+            )
+        }
+
+        resolvedSetterCall.markCallAsCompleted()
+
+        temporaryForVariable.commit()
+
+        return KtxAttributeInfo(
+            name = descriptor.name.asString(),
+            type = descriptor.type,
+            descriptor = descriptor,
+            setterResolvedCall = resolvedSetterCall,
+            isIncludedInConstruction = false, // attributesInConstruction.contains(nameAsString),
+            isPivotal = !descriptor.isVar // NOTE(lmr): i don't think this can happen... it wouldn't resolve here in this case
+        )
+    }
 }
+
+// We want to return null in cases where types mismatch, so we use this heuristic to find out. I think there might be a more robust
+// way to find this out, but I'm not sure what it would be
+private fun BindingTrace.hasTypeMismatchErrorsOn(element: KtElement): Boolean =
+    bindingContext.diagnostics.forElement(element).filter { it.severity == Severity.ERROR }.isNotEmpty()
 
 private fun KtExpression.asQualifierPartList(): List<QualifiedExpressionResolver.QualifierPart> {
     val result = SmartList<QualifiedExpressionResolver.QualifierPart>()

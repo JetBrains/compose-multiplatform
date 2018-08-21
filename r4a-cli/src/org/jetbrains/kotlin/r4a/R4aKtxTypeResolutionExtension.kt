@@ -7,12 +7,8 @@ import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.diagnostics.reportFromPlugin
 import org.jetbrains.kotlin.extensions.KtxTypeResolutionExtension
-import org.jetbrains.kotlin.idea.caches.resolve.findModuleDescriptor
-import org.jetbrains.kotlin.idea.util.module
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.psi.KtReferenceExpression
-import org.jetbrains.kotlin.psi.KtSimpleNameExpression
 import org.jetbrains.kotlin.psi.KtxAttribute
 import org.jetbrains.kotlin.psi.KtxElement
 import org.jetbrains.kotlin.r4a.analysis.ComposableType
@@ -24,7 +20,7 @@ import org.jetbrains.kotlin.r4a.analysis.R4AWritableSlices.KTX_ATTR_INFO
 import org.jetbrains.kotlin.r4a.analysis.R4AWritableSlices.KTX_TAG_INFO
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.calls.CallResolver
-import org.jetbrains.kotlin.resolve.calls.context.CallPosition
+import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.isSubclassOf
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.types.KotlinType
@@ -56,7 +52,6 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
 
         val tagExpr = element.simpleTagName ?: element.qualifiedTagName ?: return
 
-        // TODO(lmr): we will need to provide the children lambda separately here most likely
         val attributeExpressions = element.attributes.map { it.key!!.getReferencedName() to (it.value ?: it.key!!) }.toMap()
 
         val tagResolver = KtxTagResolver(callResolver, facade, attributeExpressions, element.bodyLambdaExpression)
@@ -124,6 +119,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
             val nameAsString = keyExpr.getReferencedName()
 
             var attributeInfo: KtxAttributeInfo? = null
+            val expectedTypes = mutableListOf<KotlinType>()
 
             // we first look for "setFoo" methods to resolve the attribute to. This will include extension setter methods in scope.
             if (attributeInfo == null && tag.instanceType != null) {
@@ -132,6 +128,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
                     keyExpr,
                     valueExpr,
                     tag,
+                    expectedTypes,
                     context
                 )
             }
@@ -144,6 +141,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
                     keyExpr,
                     valueExpr,
                     tag,
+                    expectedTypes,
                     context
                 )
             }
@@ -177,25 +175,38 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
 
             if (attributeInfo == null) {
                 // error. We couldn't find this attribute, and it wasn't used in the main tag call, so it doesn't exist.
-                context.trace.report(
-                    Errors.UNRESOLVED_REFERENCE.on(
-                        keyExpr,
-                        keyExpr
+                val valueType = facade.getTypeInfo(valueExpr, context).type
+
+                if (valueType == null) {
+                    context.trace.report(
+                        Errors.UNRESOLVED_REFERENCE.on(
+                            keyExpr,
+                            keyExpr
+                        )
                     )
-                )
-                val valueType = facade.getTypeInfo(valueExpr, context).type ?: continue
-                context.trace.reportFromPlugin(
-                    UNRESOLVED_ATTRIBUTE_KEY.on(
-                        attribute,
-                        tag.referrableDescriptor,
-                        nameAsString,
-                        valueType
-                    ),
-                    R4ADefaultErrorMessages
-                )
-            } else if (attributeInfo.descriptor.hasChildrenAnnotation()) {
-                // we do not allow children attributes to be passed in as normal attributes
-                // TODO(lmr): report error saying that they should use ktx body for this attribute
+                } else if (expectedTypes.isEmpty()) {
+                    context.trace.reportFromPlugin(
+                        UNRESOLVED_ATTRIBUTE_KEY.on(
+                            attribute,
+                            tag.referrableDescriptor,
+                            nameAsString,
+                            valueType
+                        ),
+                        R4ADefaultErrorMessages
+                    )
+                } else {
+                    // TODO(lmr): It turns out that expectedTypes won't be populated with extension setters/properties that are in scope
+                    // unless there are no other properties/setters with the same name. Ideally we would have these show up in the error
+                    // message as well. Normal kotlin has the same issue, so I'm not going to spend too much time on this right now.
+                    context.trace.reportFromPlugin(
+                        R4AErrors.MISMATCHED_ATTRIBUTE_TYPE.on(
+                            valueExpr,
+                            valueType,
+                            expectedTypes
+                        ),
+                        R4ADefaultErrorMessages
+                    )
+                }
             } else {
                 // success!
                 context.trace.record(KTX_ATTR_INFO, attribute, attributeInfo)
@@ -212,32 +223,18 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
         // process the children lambda
         if (childrenInfo == null) {
             // children wasn't used in the constructor. check to see if we have a children descriptor, and if we have children provided
-            // TODO(lmr): for now we are just grabbing the first one, but I think in order to handle overloading properly we will need
-            // to grab the list of all children annotated descriptors
-            val childrenDescriptor = when (tag.referrableDescriptor) {
+            val childrenDescriptors = when (tag.referrableDescriptor) {
                 is ClassDescriptor -> tag.referrableDescriptor
                     .unsubstitutedMemberScope
                     .getContributedDescriptors()
-                    .firstOrNull { it.hasChildrenAnnotation() }
+                    .filter { it.hasChildrenAnnotation() }
                 is SimpleFunctionDescriptor -> tag.referrableDescriptor
                     .valueParameters
-                    .firstOrNull { it.hasChildrenAnnotation() }
-                is VariableDescriptor -> tag.referrableDescriptor // TODO(lmr): not sure if this one is right....
-                    .typeParameters
-                    .firstOrNull { it.hasChildrenAnnotation() }
-                else -> null
+                    .filter { it.hasChildrenAnnotation() }
+                else -> emptyList()
             }
 
-            val isRequiredChildrenDescriptor = when (childrenDescriptor) {
-                is PropertyDescriptor -> !childrenDescriptor.type.isNullable()
-                is SimpleFunctionDescriptor -> false // setter function. never required
-                is ValueParameterDescriptor -> !childrenDescriptor.declaresDefaultValue()
-                is ParameterDescriptor -> true
-                is TypeParameterDescriptor -> true
-                else -> false
-            }
-
-            if (childrenExpr != null && childrenDescriptor == null) {
+            if (childrenExpr != null && childrenDescriptors.isEmpty()) {
                 // user provided children, but none are declared.
                 // check to see if it's an android view. if so, we allow children, but don't provide a childrenAttrInfo object.
                 // we do need to make sure that the type system traverses the children though, so we handle that here:
@@ -257,35 +254,74 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
                         )
                     )
                 } else {
-                    // TODO(lmr): mark tag with an error
+                    context.trace.reportFromPlugin(
+                        R4AErrors.CHILDREN_PROVIDED_BUT_NO_CHILDREN_DECLARED.on(element),
+                        R4ADefaultErrorMessages
+                    )
                 }
-            } else if (childrenExpr == null && childrenDescriptor != null && isRequiredChildrenDescriptor) {
-                // there is a required children descriptor, but user didn't provide anything
-                // TODO(lmr): mark tag with an error
-            } else if (childrenExpr != null && childrenDescriptor != null) {
-                when (childrenDescriptor) {
-                    is SimpleFunctionDescriptor -> {
-                        // TODO(lmr): although we can resolve children as a setter function, it still doesn't show up as "used"
-                        childrenAttrInfo = tagResolver.resolveAttributeAsSetter(
-                            R4aUtils.propertyNameFromSetterMethod(childrenDescriptor.name.asString()),
-                            tagExpr as KtReferenceExpression, // TODO(lmr): this won't always work
-                            childrenExpr,
-                            tag,
-                            context
+            }
+
+            for (childrenDescriptor in childrenDescriptors) {
+                if (childrenAttrInfo != null) {
+                    // the first one to resolve correctly wins
+                    continue
+                }
+                val isRequiredChildrenDescriptor = when (childrenDescriptor) {
+                    is PropertyDescriptor -> !childrenDescriptor.type.isNullable()
+                    is SimpleFunctionDescriptor -> false // setter function. never required
+                    is ValueParameterDescriptor -> !childrenDescriptor.declaresDefaultValue()
+                    is ParameterDescriptor -> true
+                    is TypeParameterDescriptor -> true
+                    else -> false
+                }
+
+
+                if (childrenExpr == null && isRequiredChildrenDescriptor) {
+                    val name = childrenDescriptor.name.asString()
+                    val namedAttribute = element.attributes.find { it.name == name }
+                    if (namedAttribute == null) {
+                        // there is a required children descriptor, but user didn't provide anything
+                        context.trace.reportFromPlugin(
+                            R4AErrors.MISSING_REQUIRED_CHILDREN.on(element),
+                            R4ADefaultErrorMessages
                         )
                     }
-                    is PropertyDescriptor -> {
-                        // TODO(lmr): we don't yet resolve children attributes as properties. working on it.
-//                        tagResolver.resolveChildrenAsProperty(
-//                            element,
-//                            childrenDescriptor,
-//                            childrenExpr,
-//                            tag,
-//                            context
-//                        )
+                } else if (childrenExpr != null) {
+                    when (childrenDescriptor) {
+                        is SimpleFunctionDescriptor -> {
+                            childrenAttrInfo = tagResolver.resolveChildrenAsSetter(
+                                childrenDescriptor,
+                                childrenExpr,
+                                tag,
+                                element,
+                                context
+                            )
+                        }
+                        is PropertyDescriptor -> {
+                            childrenAttrInfo = tagResolver.resolveChildrenAsProperty(
+                                childrenDescriptor,
+                                childrenExpr,
+                                tag,
+                                element,
+                                context
+                            )
+                        }
+                        else -> error("unexpected descriptor annotated with @Children")
                     }
-                    else -> error("unexpected descriptor annotated with @Children")
                 }
+            }
+
+            if (childrenExpr != null && childrenAttrInfo == null && childrenDescriptors.isNotEmpty()) {
+                // a children body is provided, but we couldn't resolve it to a @Children declaration on the component
+                val potentialTypes = childrenDescriptors.mapNotNull { when (it) {
+                    is SimpleFunctionDescriptor -> it.valueParameters.firstOrNull()?.type
+                    is PropertyDescriptor -> it.type
+                    else -> null
+                }}
+                context.trace.reportFromPlugin(
+                    R4AErrors.UNRESOLVED_CHILDREN.on(element, potentialTypes),
+                    R4ADefaultErrorMessages
+                )
             }
         } else if (childrenExpr != null) {
             // children *was* used in the constructor, but the type system hasn't traversed down into it yet
@@ -297,8 +333,8 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
                 name = childrenInfo.name,
                 descriptor = childrenInfo.descriptor,
                 type = childrenInfo.descriptor.type,
-                isPivotal = false,
-                isIncludedInConstruction = false, // this only needs to be true for attributes that have a descriptor
+                isPivotal = !childrenInfo.descriptor.isVar,
+                isIncludedInConstruction = true,
                 setterResolvedCall = null
             )
         }
@@ -311,12 +347,16 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
             val missingAttributes = mutableListOf<DeclarationDescriptor>()
             val descriptors = tag.typeDescriptor.unsubstitutedMemberScope.getContributedDescriptors()
             for (descriptor in descriptors) {
-                // TODO(lmr): do we need to check visibility here?
                 val isRequired = when (descriptor) {
-                    is PropertyDescriptor -> descriptor.isLateInit && !descriptor.hasChildrenAnnotation()
+                    is PropertyDescriptor -> descriptor.isLateInit &&
+                            Visibilities.isVisibleIgnoringReceiver(descriptor, context.scope.ownerDescriptor) &&
+                            // Component unfortunately has some publicly exposed properties that will look like they are "required"
+                            // attributes, but we don't want people to use them as properties. We should figure out a better solution for
+                            // this, but for now I am just going to ignore them explicitly.
+                            descriptor.overriddenDescriptors.firstOrNull()?.containingDeclaration?.fqNameSafe != R4aUtils.r4aFqName("Component")
                     else -> false
                 }
-                if (isRequired && !attributeExpressions.containsKey(descriptor.name.asString())) {
+                if (isRequired && !attributeExpressions.containsKey(descriptor.name.asString()) && descriptor !== childrenAttrInfo?.descriptor) {
                     missingAttributes.add(descriptor)
                 }
             }
@@ -343,6 +383,18 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
                 duplicates.add(attr)
             } else {
                 set.add(key)
+            }
+        }
+
+        if (childrenAttrInfo != null && set.contains(childrenAttrInfo.name)) {
+            // the duplicate attribute test won't catch situations where a children attribute is used as a ktx body lambda and also
+            // referenced explicitly as an attribute, so we check for it here
+            val attr = element.attributes.find { it.key!!.getReferencedName() == childrenAttrInfo.name }
+            if (attr != null) {
+                context.trace.reportFromPlugin(
+                    R4AErrors.CHILDREN_ATTR_USED_AS_BODY_AND_KEYED_ATTRIBUTE.on(attr.key!!, childrenAttrInfo.name),
+                    R4ADefaultErrorMessages
+                )
             }
         }
 
