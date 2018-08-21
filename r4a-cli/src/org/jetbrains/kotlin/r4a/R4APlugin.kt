@@ -8,6 +8,7 @@ import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
 import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
+import org.jetbrains.kotlin.extensions.KtxControlFlowExtension
 import org.jetbrains.kotlin.extensions.KtxTypeResolutionExtension
 import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
 import org.jetbrains.kotlin.extensions.TypeResolutionInterceptorExtension
@@ -43,6 +44,7 @@ class R4AComponentRegistrar : ComponentRegistrar {
         StorageComponentContainerContributor.registerExtension(project, ComponentsClosedDeclarationChecker())
         StorageComponentContainerContributor.registerExtension(project, ComposableAnnotationChecker(configuration.get(COMPOSABLE_CHECKER_MODE_KEY, ComposableAnnotationChecker.DEFAULT_MODE)))
         KtxTypeResolutionExtension.registerExtension(project, R4aKtxTypeResolutionExtension())
+        KtxControlFlowExtension.registerExtension(project, R4aKtxControlFlowExtension())
         TypeResolutionInterceptorExtension.registerExtension(project, R4aTypeResolutionInterceptorExtension())
         SyntheticIrExtension.registerExtension(project, R4ASyntheticIrExtension())
     }
