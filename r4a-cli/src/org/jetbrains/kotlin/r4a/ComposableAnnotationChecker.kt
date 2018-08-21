@@ -213,7 +213,7 @@ class ComposableAnnotationChecker(val mode: Mode = DEFAULT_MODE) : CallChecker, 
                         R4AErrors.NON_COMPOSABLE_INVOCATION.on(
                             reportOn as KtElement,
                             "Lambda variable",
-                            resolvedCall.candidateDescriptor.name.identifier
+                            resolvedCall.candidateDescriptor.name.asString()
                         ), R4ADefaultErrorMessages
                     )
                 }
@@ -222,7 +222,7 @@ class ComposableAnnotationChecker(val mode: Mode = DEFAULT_MODE) : CallChecker, 
                         R4AErrors.NON_COMPOSABLE_INVOCATION.on(
                             reportOn as KtElement,
                             "function",
-                            resolvedCall.candidateDescriptor.name.identifier
+                            resolvedCall.candidateDescriptor.name.asString()
                         ), R4ADefaultErrorMessages
                     )
                 }
@@ -233,7 +233,7 @@ class ComposableAnnotationChecker(val mode: Mode = DEFAULT_MODE) : CallChecker, 
                 context.trace.reportFromPlugin(
                     R4AErrors.CHILDREN_INVOCATION.on(
                         reportOn as KtElement,
-                        resolvedCall.candidateDescriptor.name.identifier
+                        resolvedCall.candidateDescriptor.name.asString()
                     ), R4ADefaultErrorMessages
                 )
                 return
@@ -242,7 +242,7 @@ class ComposableAnnotationChecker(val mode: Mode = DEFAULT_MODE) : CallChecker, 
                 context.trace.reportFromPlugin(
                     R4AErrors.SVC_INVOCATION.on(
                         reportOn as KtElement,
-                        resolvedCall.candidateDescriptor.name.identifier
+                        resolvedCall.candidateDescriptor.name.asString()
                     ), R4ADefaultErrorMessages
                 )
             }
