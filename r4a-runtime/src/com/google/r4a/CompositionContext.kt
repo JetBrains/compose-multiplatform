@@ -57,6 +57,7 @@ abstract class CompositionContext {
         fun <T : Any?> getAmbient(key: Ambient<T>, component: Component): T = find(component)!!.getAmbient(key)
     }
 
+    abstract fun joinKey(left: Any?, right: Any?): Any
     abstract fun start(sourceHash: Int)
     abstract fun start(sourceHash: Int, key: Any?)
     abstract fun startView(sourceHash: Int)

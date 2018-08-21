@@ -509,4 +509,16 @@ internal class CompositionContextImpl : CompositionContext() {
             slot.nextSibling = null
         }
     }
+
+    override fun joinKey(left: Any?, right: Any?): Any {
+        // NOTE(lmr): For now, I am just allocating a key every time we have 2+ pivotal attributes. When we move to the new runtime, we will
+        // be able to optimize allocations during updates by leveraging memoization of these keys on the slot table, which is why this
+        // method is on the composition context instead of static.
+        return JoinedKey(left, right)
+    }
 }
+
+internal data class JoinedKey(
+    @JvmField val left: Any?,
+    @JvmField val right: Any?
+)

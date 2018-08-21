@@ -1150,4 +1150,126 @@ class KtxTransformationTest: AbstractCodeGenTest() {
          }
         """
     )
+
+    fun testMultiplePivotalAttributesOdd() = testCompile(
+        """
+        import com.google.r4a.*
+
+        class Foo(
+            val a: Int,
+            val b: Int,
+            val c: Int,
+            val d: Int,
+            val e: Int
+        ): Component() {
+            override fun compose() {}
+        }
+
+        class Bar: Component() {
+            override fun compose() {
+                <Foo
+                    a=1
+                    b=2
+                    c=3
+                    d=4
+                    e=5
+                />
+            }
+        }
+        """
+    )
+
+    fun testMultiplePivotalAttributesEven() = testCompile(
+        """
+        import com.google.r4a.*
+
+        class Foo(
+            val a: Int,
+            val b: Int,
+            val c: Int,
+            val d: Int
+        ): Component() {
+            override fun compose() {}
+        }
+
+        class Bar: Component() {
+            override fun compose() {
+                <Foo
+                    a=1
+                    b=2
+                    c=3
+                    d=4
+                />
+            }
+        }
+        """
+    )
+
+    fun testSinglePivotalAttribute() = testCompile(
+        """
+        import com.google.r4a.*
+
+        class Foo(
+            val a: Int
+        ): Component() {
+            override fun compose() {}
+        }
+
+        class Bar: Component() {
+            override fun compose() {
+                <Foo
+                    a=1
+                />
+            }
+        }
+        """
+    )
+
+    fun testKeyAttributeWithPivotal() = testCompile(
+        """
+        import com.google.r4a.*
+        import com.google.r4a.adapters.*
+
+        class Foo(
+            val a: Int,
+            var b: Int
+        ): Component() {
+            override fun compose() {}
+        }
+
+        class Bar: Component() {
+            override fun compose() {
+                <Foo
+                    a=1
+                    b=2
+                    key=3
+                />
+            }
+        }
+        """
+    )
+
+    fun testKeyAttributeWithoutPivotal() = testCompile(
+        """
+        import com.google.r4a.*
+        import com.google.r4a.adapters.*
+
+        class Foo(
+            var a: Int,
+            var b: Int
+        ): Component() {
+            override fun compose() {}
+        }
+
+        class Bar: Component() {
+            override fun compose() {
+                <Foo
+                    a=1
+                    b=2
+                    key=3
+                />
+            }
+        }
+        """
+    )
 }

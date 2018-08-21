@@ -8,7 +8,6 @@ import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrKtxStatement
 import org.jetbrains.kotlin.ir.IrStatement
-import org.jetbrains.kotlin.ir.builders.constTrue
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.declarations.impl.IrConstructorImpl
 import org.jetbrains.kotlin.ir.declarations.impl.IrFunctionImpl
@@ -230,7 +229,6 @@ private fun transform(
         }
     }
 
-    val keyAttribute = attributesByName["key"]
     when (info.composableType) {
         ComposableType.COMPONENT -> transformComponentElement(
             context,
@@ -240,7 +238,6 @@ private fun transform(
             helper,
             output,
             info,
-            keyAttribute,
             attributes,
             irChildrenInfo,
             tagIndex
@@ -253,7 +250,6 @@ private fun transform(
             helper,
             output,
             info,
-            keyAttribute,
             attributes,
             tagIndex
         )
@@ -265,7 +261,6 @@ private fun transform(
             helper,
             output,
             info,
-            keyAttribute,
             attributes,
             irChildrenInfo,
             tagIndex
@@ -278,7 +273,6 @@ private fun transform(
             helper,
             output,
             info,
-            keyAttribute,
             attributes,
             irChildrenInfo,
             tagIndex
@@ -297,17 +291,18 @@ private enum class GroupKind {
 
 private fun callStart(
     kind: GroupKind,
-    keyAttribute: IrAttributeInfo?,
+    attributes: Collection<IrAttributeInfo>,
     helper: ComposeFunctionHelper,
     tag: IrKtxTag,
     context: GeneratorContext,
     tagIndex: Int,
     output: MutableList<IrStatement>
 ) {
-    // TODO(lmr): loop through pivotal properties and create a composite key as a union of src location, "key", and all pivotal properties
+    val pivotalAttributes = attributes.filter { it.info.isPivotal || it.name == "key" }
+
     val ccStartMethod = when (kind) {
-        GroupKind.View -> if (keyAttribute != null) helper.ccStartMethodWithKey else helper.ccStartMethodWithoutKey
-        else -> if (keyAttribute != null) helper.ccStartViewWithKey else helper.ccStartViewWithoutKey
+        GroupKind.View -> if (pivotalAttributes.isNotEmpty()) helper.ccStartViewWithKey else helper.ccStartViewWithoutKey
+        else -> if (pivotalAttributes.isNotEmpty()) helper.ccStartMethodWithKey else helper.ccStartMethodWithoutKey
     }
 
     val ccStartMethodCall = IrCallImpl(
@@ -325,13 +320,32 @@ private fun callStart(
                 "${helper.functionDescription}::$tagIndex".hashCode()
             )
         )
-        if (keyAttribute != null) {
-            putValueArgument(1, keyAttribute.getValue)
+        if (pivotalAttributes.isNotEmpty()) {
+            putValueArgument(1, constructKey(context, helper, pivotalAttributes))
         }
     }
 
     // OUTPUT: cc.start(...)
     output.add(ccStartMethodCall)
+}
+
+private fun constructKey(context: GeneratorContext, helper: ComposeFunctionHelper, attributes: List<IrAttributeInfo>): IrExpression {
+    // if we just have
+    return if (attributes.size == 1) attributes.single().getValue
+    else IrCallImpl(
+        -1, -1,
+        context.irBuiltIns.anyNType,
+        context.symbolTable.referenceFunction(helper.ccJoinKeyMethod)
+    ).apply {
+        dispatchReceiver = helper.getCc
+        // the composite key should be a balanced binary tree of "JoinedKeys" to minimize comparisons, so we recursively split the list
+        // of pivotal attributes in half
+        val midpoint = attributes.size / 2
+        val left = attributes.subList(0, midpoint)
+        val right = attributes.subList(midpoint, attributes.size)
+        putValueArgument(0, constructKey(context, helper, left))
+        putValueArgument(1, constructKey(context, helper, right))
+    }
 }
 
 // OUTPUT: cc.end()
@@ -355,7 +369,6 @@ private fun transformFunctionVar(
     helper: ComposeFunctionHelper,
     output: MutableList<IrStatement>,
     info: KtxTagInfo,
-    keyAttribute: IrAttributeInfo?,
     attributes: Collection<IrAttributeInfo>,
     childrenInfo: IrAttributeInfo?,
     tagIndex: Int
@@ -374,12 +387,11 @@ private fun transformFunctionComponent(
     helper: ComposeFunctionHelper,
     output: MutableList<IrStatement>,
     info: KtxTagInfo,
-    keyAttribute: IrAttributeInfo?,
     attributes: Collection<IrAttributeInfo>,
     childrenInfo: IrAttributeInfo?,
     tagIndex: Int
 ) {
-    callStart(GroupKind.Function, keyAttribute, helper, tag, context, tagIndex, output)
+    callStart(GroupKind.Function, attributes, helper, tag, context, tagIndex, output)
     val startOffset = -1
     val endOffset = -1
 
@@ -447,12 +459,11 @@ private fun transformComponentElement(
     helper: ComposeFunctionHelper,
     output: MutableList<IrStatement>,
     info: KtxTagInfo,
-    keyAttribute: IrAttributeInfo?,
     attributes: Collection<IrAttributeInfo>,
     childrenInfo: IrAttributeInfo?,
     tagIndex: Int
 ) {
-    callStart(GroupKind.Component, keyAttribute, helper, tag, context, tagIndex, output)
+    callStart(GroupKind.Component, attributes, helper, tag, context, tagIndex, output)
     val instanceType = info.instanceType ?: error("expected instance type")
 
     val startOffset = -1
@@ -716,11 +727,10 @@ private fun transformViewElement(
     helper: ComposeFunctionHelper,
     output: MutableList<IrStatement>,
     info: KtxTagInfo,
-    keyAttribute: IrAttributeInfo?,
     attributes: Collection<IrAttributeInfo>,
     tagIndex: Int
 ) {
-    callStart(GroupKind.View, keyAttribute, helper, tag, context, tagIndex, output)
+    callStart(GroupKind.View, attributes, helper, tag, context, tagIndex, output)
     val instanceType = info.instanceType ?: error("expected instance type")
 
     val startOffset = -1
@@ -1010,6 +1020,13 @@ private class ComposeFunctionHelper(val context: GeneratorContext, val compose: 
             Name.identifier("start"),
             NoLookupLocation.FROM_BACKEND
         ).find { it.valueParameters.size == 2 }!!
+    }
+
+    val ccJoinKeyMethod by lazy {
+        ccClass.unsubstitutedMemberScope.getContributedFunctions(
+            Name.identifier("joinKey"),
+            NoLookupLocation.FROM_BACKEND
+        ).single()
     }
 
     val ccStartMethodWithoutKey by lazy {
