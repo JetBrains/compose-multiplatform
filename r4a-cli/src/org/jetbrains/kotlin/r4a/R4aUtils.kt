@@ -175,7 +175,6 @@ object R4aUtils {
     ): Collection<AttributeInfo> {
         val module = scope.ownerDescriptor.module
         val componentClass = module.findClassAcrossModuleDependencies(ClassId.topLevel(r4aFqName("Component"))) ?: error("Could not find component")
-        val adapterDescriptor = module.findClassAcrossModuleDependencies(ClassId.topLevel(r4aFqName("adapters.AttributeAdapter"))) ?: return listOf()
         return when (descriptor) {
             is VariableDescriptor -> {
                 val type = getFunctionTypeFromType(descriptor.type)
@@ -210,16 +209,6 @@ object R4aUtils {
 
                 for (d in allDescriptorsInScope) {
                     when (d) {
-                        is ClassDescriptor -> {
-                            if (d.defaultType.isSubtypeOf(adapterDescriptor.defaultType)) {
-                                val validAttributes = adapterSetterCache[d].filter {
-                                    val fn = it.descriptor as? FunctionDescriptor ?: return@filter false
-                                    Visibilities.isVisibleIgnoringReceiver(fn, scope.ownerDescriptor) &&
-                                            descriptor.defaultType.isSubtypeOf(fn.valueParameters[0].type)
-                                }
-                                result.addAll(validAttributes)
-                            }
-                        }
                     // extension properties
                         is PropertyDescriptor -> {
                             val receiverParam = d.extensionReceiverParameter
