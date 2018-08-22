@@ -17,6 +17,7 @@
 package androidx.build
 
 import androidx.build.ArtifactsPredicate.All
+import androidx.build.ArtifactsPredicate.Benchmark
 import androidx.build.ArtifactsPredicate.Exact
 import androidx.build.ArtifactsPredicate.Group
 import androidx.build.Strategy.Ignore
@@ -62,7 +63,6 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.PREFERENCE, defaultVersion)
     prebuilts(LibraryGroups.PRINT, defaultVersion)
     prebuilts(LibraryGroups.RECOMMENDATION, defaultVersion)
-    ignore(LibraryGroups.RECYCLERVIEW, "recyclerview-benchmark")
     prebuilts(LibraryGroups.RECYCLERVIEW, defaultVersion)
     prebuilts(LibraryGroups.SLICE, "slice-builders", defaultVersion)
     prebuilts(LibraryGroups.SLICE, "slice-builders-ktx", "1.0.0-alpha5")
@@ -93,7 +93,6 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.PAGING, "paging-runtime-ktx")
     ignore(LibraryGroups.PAGING, "paging-rxjava2-ktx")
     prebuilts(LibraryGroups.PAGING, flatfootVersion)
-    ignore(LibraryGroups.NAVIGATION, "navigation-benchmark")
     prebuilts(LibraryGroups.NAVIGATION, "1.0.0-alpha04")
     prebuilts(LibraryGroups.WORKMANAGER, "1.0.0-alpha07")
     default(Ignore)
@@ -119,7 +118,7 @@ fun docsRules(
 
 class PublishDocsRulesBuilder(private val name: String, private val offline: Boolean) {
 
-    private val rules: MutableList<DocsRule> = mutableListOf()
+    private val rules: MutableList<DocsRule> = mutableListOf(DocsRule(Benchmark, Ignore))
     /**
      * docs for projects within [groupName] will be built from sources.
      */
@@ -192,6 +191,10 @@ sealed class ArtifactsPredicate {
     class Exact(val group: String, val name: String) : ArtifactsPredicate() {
         override fun apply(inGroup: String, inName: String) = group == inGroup && name == inName
         override fun toString() = "\"$group\", \"$name\""
+    }
+
+    object Benchmark : ArtifactsPredicate() {
+        override fun apply(inGroup: String, inName: String) = inName.endsWith("-benchmark")
     }
 }
 
