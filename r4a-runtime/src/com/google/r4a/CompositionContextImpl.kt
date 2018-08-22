@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.Choreographer
 import android.view.View
 import android.view.ViewGroup
+import com.google.r4a.adapters.getViewAdapterIfExists
 import java.util.*
 
 
@@ -178,6 +179,11 @@ internal class CompositionContextImpl : CompositionContext() {
     private fun swapChildren(parent: ViewGroup, i: Int, j: Int) {
         val a = parent.getChildAt(i)
         val b = parent.getChildAt(j)
+        if (a == null || b == null) {
+            // NOTE(lmr): The fact that this happens is indicative of a bug. I'd like to fix it but things
+            // also appear to work just fine. The new runtime should not have this issue anyway...
+            return
+        }
         parent.removeView(a)
         parent.removeView(b)
         if (i < j) {
@@ -362,17 +368,13 @@ internal class CompositionContextImpl : CompositionContext() {
         if (currentSlot.instance is ViewGroup) {
             currentContainer = container.parent
         }
+        addViewIfNeeded()
     }
 
     override fun setInstance(instance: Any) {
         val slot = currentSlot
         val container = currentContainer
         val index = container.index
-        if (instance is View) {
-            // add to current container
-            container.view.addView(instance, index)
-            container.index++
-        }
         if (instance is ViewGroup) {
             // push this as container to the stack
             val next = Container()
@@ -388,6 +390,28 @@ internal class CompositionContextImpl : CompositionContext() {
         }
         slot.instance = instance
         slot.index = index
+    }
+
+    private fun addViewIfNeeded() {
+        val slot = currentSlot
+        val container = currentContainer
+        val index = container.index
+        val view = slot.instance
+        val parent = container.view
+        if (view is View) {
+            // add to current container
+            val adapter = view.getViewAdapterIfExists()
+
+            if (view.parent == null) {
+                adapter?.willInsert(view, parent)
+                parent.addView(view, index)
+                adapter?.didInsert(view, parent)
+            } else {
+                adapter?.didUpdate(view, parent)
+            }
+
+            container.index++
+        }
     }
 
     override fun useInstance(): Any? {
