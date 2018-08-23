@@ -15,12 +15,17 @@ object R4a {
     }
 
 
-    fun composeInto(container: ViewGroup, composable: @Composable() () -> Unit) {
+    fun composeInto(
+        container: ViewGroup,
+        parent: Ambient.Reference? = null,
+        composable: () -> Unit
+    ) {
         var root = CompositionContext.getRootComponent(container) as? Root
         if (root == null) {
+            container.removeAllViews()
             root = Root()
             root.composable = composable
-            val cc = CompositionContext.create(container.getContext(), container, root)
+            val cc = CompositionContext.create(container.context, container, root, parent)
             cc.recomposeSync(root)
         } else {
             root.composable = composable
@@ -29,4 +34,4 @@ object R4a {
     }
 }
 
-inline fun ViewGroup.composeInto(noinline composable: @Composable() () -> Unit) = R4a.composeInto(this, composable)
+inline fun ViewGroup.composeInto(noinline composable: @Composable() () -> Unit) = R4a.composeInto(this, null, composable)
