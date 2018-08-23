@@ -4,15 +4,13 @@ import com.intellij.codeInsight.AutoPopupController
 import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.completion.InsertHandler
-import com.intellij.codeInsight.lookup.LookupElement
-import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.codeInsight.lookup.*
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiErrorElement
 import com.intellij.psi.PsiNamedElement
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
-import org.jetbrains.kotlin.descriptors.FunctionDescriptor
-import org.jetbrains.kotlin.descriptors.findClassAcrossModuleDependencies
+import com.intellij.ui.JBColor
+import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.idea.caches.resolve.getResolutionFacade
 import org.jetbrains.kotlin.idea.completion.KotlinCompletionExtension
 import org.jetbrains.kotlin.idea.util.getResolutionScope
@@ -21,17 +19,16 @@ import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.lexer.KtTokens.*
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.psi.KtFile
-import org.jetbrains.kotlin.psi.KtReferenceExpression
-import org.jetbrains.kotlin.psi.KtSimpleNameExpression
-import org.jetbrains.kotlin.psi.KtxAttribute
+import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.getChildOfType
 import org.jetbrains.kotlin.psi.psiUtil.getChildrenOfType
 import org.jetbrains.kotlin.renderer.DescriptorRenderer
 import org.jetbrains.kotlin.renderer.render
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
+import org.jetbrains.kotlin.resolve.descriptorUtil.isExtension
 import org.jetbrains.kotlin.resolve.descriptorUtil.isSubclassOf
 import org.jetbrains.kotlin.resolve.scopes.utils.collectAllFromMeAndParent
+import org.jetbrains.kotlin.types.asSimpleType
 import org.jetbrains.kotlin.types.typeUtil.isUnit
 
 class R4aCompletionExtension : KotlinCompletionExtension() {
@@ -46,7 +43,7 @@ class R4aCompletionExtension : KotlinCompletionExtension() {
                 }
             }
             is KtxAttribute -> {
-                if (expr.parent?.prevSibling?.node?.elementType == LBRACE) {
+                if (expr.parent?.prevSibling?.node?.elementType == EQ) {
                     // we are inside of a ktx expression value... use normal autocomplete
                     return false
                 }
@@ -88,27 +85,74 @@ class R4aCompletionExtension : KotlinCompletionExtension() {
         val possibleAttributes = R4aUtils.getPossibleAttributesForDescriptor(declarationDescriptor, scope, resolutionFacade)
 
         val usedAttributes = elementExpr.getChildrenOfType<KtxAttribute>()
+        val hasChildrenLambda = elementExpr.getChildrenOfType<KtxLambdaExpression>().isNotEmpty()
         val usedAttributesNameSet = usedAttributes.mapNotNull { attr -> attr.key?.getIdentifier()?.text }.toSet()
 
         val elements = possibleAttributes
             .filter { !usedAttributesNameSet.contains(it.name) }
-            .map { attr ->
-                val d = attr.descriptor
-                val typeString = when (d) {
-                    is FunctionDescriptor -> {
-                        when (d.valueParameters.size) {
-                            2 -> SHORT_NAMES_RENDERER.renderType(attr.type)
-                            else -> SHORT_NAMES_RENDERER.renderValueParameters(d.valueParameters, false).let { it.substring(1, it.length - 1) }
+            .mapNotNull { attr ->
+                val descriptor = attr.descriptor
+                val isChildrenAttribute = descriptor.annotations.findAnnotation(R4aUtils.r4aFqName("Children")) != null
+
+                // if the user has defined a chilren lambda already, there is no need to add a children attribute to the
+                // autocomplete list
+                if (hasChildrenLambda && isChildrenAttribute) return@mapNotNull null
+
+                val containingDeclaration = descriptor.containingDeclaration
+                // NOTE(lmr): if the attribute is a setter function, the parameter name can often be useful. we should consider using its
+                // name somewhere in here: (attr.descriptor as SimpleFunctionDescriptor).valueParameters.single().name
+
+                var isImmediate = containingDeclaration == declarationDescriptor
+                var tailText = "=..."
+                val isExtension = descriptor.isExtension
+                val isRequired = attr.required
+
+                if (isExtension && descriptor is SimpleFunctionDescriptor && descriptor.isExtension) {
+                    val type = descriptor.extensionReceiverParameter?.type ?: error("expected receiver")
+                    if (type.asSimpleType() == (declarationDescriptor as? ClassDescriptor)?.defaultType) {
+                        isImmediate = true
+                    }
+                    val klass = SHORT_NAMES_RENDERER.renderType(type)
+                    tailText += " (extension on $klass)"
+                }
+
+                if (!isImmediate && !isExtension) {
+                    if (containingDeclaration is ClassifierDescriptor) {
+                        val klass = SHORT_NAMES_RENDERER.renderClassifierName(containingDeclaration)
+                        tailText += " (from $klass)"
+                    }
+                }
+
+                if (isChildrenAttribute) {
+                    tailText += " (@Children)"
+                }
+                if (isRequired) {
+                    tailText += " (required)"
+                }
+
+                val renderer = object : LookupElementRenderer<LookupElement>() {
+                    override fun renderElement(element: LookupElement?, presentation: LookupElementPresentation?) {
+                        if (presentation == null) return
+                        with(presentation) {
+                            itemText = attr.name
+                            isItemTextBold = isImmediate || isRequired
+                            if (isRequired) {
+                                itemTextForeground = JBColor.RED
+                            }
+                            typeText = SHORT_NAMES_RENDERER.renderType(attr.type)
+                            if (isExtension) {
+                                appendTailTextItalic(tailText, true)
+                            } else {
+                                appendTailText(tailText, true)
+                            }
                         }
                     }
-                    else -> SHORT_NAMES_RENDERER.renderType(attr.type)
                 }
 
                 // TODO(lmr): make the elements look pretty!
                 LookupElementBuilder
                     .create(attr.descriptor, attr.name)
-                    .withPresentableText(attr.name)
-                    .withTailText("=${typeString}", true)
+                    .withRenderer(renderer)
                     .withInsertHandler(ATTRIBUTE_INSERTION_HANDLER)
             }
 
@@ -165,6 +209,10 @@ class R4aCompletionExtension : KotlinCompletionExtension() {
                     else -> false // TODO(lmr): handle @Content annotations on components and SFCs
                 }
 
+                val packageText = cd.fqNameSafe.parent().render()
+
+                val tailText = if (packageText.isNotBlank()) " ($packageText)" else ""
+
                 if (psi != null) {
                     // TODO(lmr): make the elements look pretty!
                     LookupElementBuilder
@@ -172,7 +220,7 @@ class R4aCompletionExtension : KotlinCompletionExtension() {
                         .withBoldness(true)
                         .withPresentableText("<${cd.name.asString()} />")
                         .withBoldness(false)
-                        .appendTailText(" (${cd.fqNameSafe.parent().render()})", true)
+                        .appendTailText(tailText, true)
                         .withInsertHandler(CLOSE_TAG_INSERTION_HANDLER)
                         .apply { putUserData(ALLOWS_CHILDREN, allowsChildren) }
                 } else null
