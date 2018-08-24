@@ -5,7 +5,9 @@ import org.jetbrains.kotlin.ir.IrKtxStatement
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.IrValueParameter
 import org.jetbrains.kotlin.ir.declarations.IrVariable
+import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrDeclarationReference
+import org.jetbrains.kotlin.ir.expressions.IrGetValue
 import org.jetbrains.kotlin.ir.expressions.IrValueAccessExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
@@ -22,7 +24,7 @@ class IrKtxTag(
     var capturedExpressions: List<IrDeclarationReference>,
     var parameters: List<IrValueParameter>,
     var attributes: Collection<IrKtxAttribute>,
-    val callExpr: IrCallImpl
+    var callExpr: IrCall
 ) : IrKtxStatement {
     override val startOffset = element.startOffset
     override val endOffset = element.endOffset
@@ -35,9 +37,11 @@ class IrKtxTag(
         for (attribute in attributes) attribute.accept(visitor, data)
         for (parameter in parameters) parameter.accept(visitor, data)
         body?.let { body -> for (statement in body) statement.accept(visitor, data) }
+        callExpr.accept(visitor, data)
     }
 
     override fun <D> transformChildren(transformer: IrElementTransformer<D>, data: D) {
+        callExpr = callExpr.transform(transformer, data) as IrCall
         attributes = attributes.map {
             IrKtxAttribute(it.element, it.value.transform(transformer, data))
         }
@@ -65,13 +69,14 @@ fun getCapturedAccesses(bodyStatements: List<IrStatement>?, parameters: List<IrV
 
         override fun visitVariable(declaration: IrVariable) {
             symbolsDefined.add(declaration.symbol)
+            declaration.acceptChildren(this, null)
         }
 
         override fun visitValueParameter(declaration: IrValueParameter) {
             symbolsDefined.add(declaration.symbol)
         }
 
-        override fun visitVariableAccess(expression: IrValueAccessExpression) {
+        override fun visitGetValue(expression: IrGetValue) {
             symbolAccesses.add(expression)
         }
 

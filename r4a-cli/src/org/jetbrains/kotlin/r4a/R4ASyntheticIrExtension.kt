@@ -117,13 +117,14 @@ class R4ASyntheticIrExtension : SyntheticIrExtension {
 
                             override fun visitVariable(declaration: IrVariable) {
                                 symbolsDefined.add(declaration.symbol)
+                                declaration.acceptChildren(this, null)
                             }
 
                             override fun visitValueParameter(declaration: IrValueParameter) {
                                 symbolsDefined.add(declaration.symbol)
                             }
 
-                            override fun visitVariableAccess(expression: IrValueAccessExpression) {
+                            override fun visitGetValue(expression: IrGetValue) {
                                 symbolAccesses.add(expression)
                             }
 
