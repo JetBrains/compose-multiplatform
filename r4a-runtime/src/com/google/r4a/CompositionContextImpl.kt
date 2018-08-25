@@ -31,18 +31,24 @@ internal data class Slot(
     // TODO: store inc of children?
     // TODO: store map of children? lazily?
     fun print(indent: Int) {
+        val b = StringBuilder()
+        debugString(indent, b)
+        println(b.toString())
+    }
+
+    fun debugString(indent: Int, b: StringBuilder) {
         val whiteSpace = " ".repeat(indent)
 
-        println("$whiteSpace $this")
+        b.appendln("$whiteSpace $this")
 
         val child = child
         if (child != null) {
-            child.print(indent + 2)
+            child.debugString(indent + 2, b)
         }
 
         val nextSibling = nextSibling
         if (nextSibling != null) {
-            nextSibling.print(indent)
+            nextSibling.debugString(indent, b)
         }
     }
 
@@ -212,28 +218,40 @@ internal class CompositionContextImpl : CompositionContext() {
         // we didn't find the slot to reuse immediately, so we have to search all siblings to
         // preserve the instance if possible
         val startPrevSibling = start.prevSibling
+        val startNextSibling = start.nextSibling
         var next: Slot? = start.nextSibling
         while (next != null) {
             if (next.sourceHash == sourceHash && next.key == key) {
 
                 // cut next out of the chain
                 val nextNextSibling = next.nextSibling
-                nextNextSibling?.prevSibling = next.prevSibling
-                next.prevSibling?.nextSibling = nextNextSibling
+                val nextPrevSibling = next.prevSibling
 
-                // insert it in front of start
                 if (startPrevSibling == null) {
                     // it was first in chain, so we have to replace the parent's child reference
                     // with this one
                     start.parent.child = next
-                } else {
-                    startPrevSibling.nextSibling = next
                 }
-                start.prevSibling = next
-                next.prevSibling = startPrevSibling
-                next.nextSibling = start
 
-                // slot moved. we need to
+                if (startNextSibling === next) {
+                    // the slots are adjacent, so the swapping logic is slightly different since siblings are moving
+                    next.nextSibling = start
+                    next.prevSibling = startPrevSibling
+                    nextNextSibling?.prevSibling = start
+                    start.prevSibling = next
+                    start.nextSibling = nextNextSibling
+                    startPrevSibling?.nextSibling = next
+                } else {
+                    nextPrevSibling?.nextSibling = start
+                    startNextSibling?.prevSibling = next
+                    nextNextSibling?.prevSibling = start
+                    startPrevSibling?.nextSibling = next
+                    start.prevSibling = nextPrevSibling
+                    next.nextSibling = startNextSibling
+                    start.nextSibling = nextNextSibling
+                    next.prevSibling = startPrevSibling
+                }
+                // slot moved. move the corresponding views
                 moveSlot(start, next)
                 reuseSlot(next)
 
@@ -253,9 +271,6 @@ internal class CompositionContextImpl : CompositionContext() {
         it.argIndex = 0
         // push container stack if its a
         val index = container.index
-        if (it.instance is View) {
-            container.index++
-        }
         if (it.instance is ViewGroup) {
             val nextContainer = container.children[it]!!
             nextContainer.index = 0

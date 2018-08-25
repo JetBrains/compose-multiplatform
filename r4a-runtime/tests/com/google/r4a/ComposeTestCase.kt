@@ -90,6 +90,16 @@ abstract class ComposeTestCase : TestCase() {
         )
     }
 
+    fun assertSlotTable(cc: CompositionContext, getHierarchy: () -> String) {
+        val slot = (cc as CompositionContextImpl).ROOT_SLOT
+        val b = StringBuilder()
+        slot.debugString(0, b)
+        TestCase.assertEquals(
+            normalizeString(getHierarchy()),
+            normalizeString(b.toString())
+        )
+    }
+
     fun normalizeString(str: String): String {
         val lines = str.split('\n').dropWhile { it.isBlank() }.dropLastWhile { it.isBlank() }
         if (lines.isEmpty()) return ""
