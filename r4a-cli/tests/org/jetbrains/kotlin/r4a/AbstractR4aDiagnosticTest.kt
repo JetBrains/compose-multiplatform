@@ -1,4 +1,4 @@
-package org.jetbrains.kotlin.r4a.frames
+package org.jetbrains.kotlin.r4a
 
 import org.jetbrains.kotlin.checkers.BaseDiagnosticsTest
 import org.jetbrains.kotlin.checkers.CheckerTestUtil
@@ -14,9 +14,6 @@ import org.jetbrains.kotlin.config.languageVersionSettings
 import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.diagnostics.DiagnosticWithParameters1
 import org.jetbrains.kotlin.diagnostics.RenderedDiagnostic
-import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
-import org.jetbrains.kotlin.r4a.ComponentsClosedDeclarationChecker
-import org.jetbrains.kotlin.r4a.R4AComponentRegistrar
 import org.jetbrains.kotlin.test.ConfigurationKind
 import org.jetbrains.kotlin.test.KotlinTestUtils
 import org.jetbrains.kotlin.test.TestJdkKind
@@ -57,7 +54,7 @@ abstract class AbstractR4aDiagnosticsTest: KtUsefulTestCase() {
         )
 
         // Collect the errors
-        val errors = result.bindingContext.diagnostics.all()
+        val errors = result.bindingContext.diagnostics.all().toMutableList()
 
         val message = StringBuilder()
 
@@ -73,6 +70,7 @@ abstract class AbstractR4aDiagnosticsTest: KtUsefulTestCase() {
                         message.append("  Error ${diagnostic.name} reported at ${firstRange.startOffset} but expected at ${range.start}\n")
                         message.append(sourceInfo(clearText, firstRange.startOffset, firstRange.endOffset, "  "))
                     }
+                    errors.remove(reportedDiagnostic)
                     found.add(reportedDiagnostic)
                 } else {
                     message.append("  Diagnostic ${diagnostic.name} not reported, expected at ${range.start}\n")
@@ -96,7 +94,8 @@ abstract class AbstractR4aDiagnosticsTest: KtUsefulTestCase() {
 
     protected fun createClasspath() = listOf(KotlinTestUtils.getAnnotationsJar(),
                                              assertExists(File("dist/kotlinc/lib/r4a-runtime.jar")),
-                                             assertExists(File("custom-dependencies/android-sdk/build/libs/android.jar")))
+                                             assertExists(File("custom-dependencies/android-sdk/build/libs/android.jar"))
+    )
 
     protected fun createEnvironment(): KotlinCoreEnvironment {
         val classPath = createClasspath()

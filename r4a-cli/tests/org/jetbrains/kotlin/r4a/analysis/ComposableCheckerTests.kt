@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.r4a.ComposableAnnotationChecker.Mode
 import org.jetbrains.kotlin.r4a.R4AComponentRegistrar
-import org.jetbrains.kotlin.r4a.frames.AbstractR4aDiagnosticsTest
+import org.jetbrains.kotlin.r4a.AbstractR4aDiagnosticsTest
 import org.jetbrains.kotlin.test.ConfigurationKind
 import org.jetbrains.kotlin.test.KotlinTestUtils
 import org.jetbrains.kotlin.test.TestJdkKind

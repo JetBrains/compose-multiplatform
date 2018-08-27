@@ -54,7 +54,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
 
         val moduleDescriptor = context.scope.ownerDescriptor.module
 
-        val tagExpr = element.simpleTagName ?: element.qualifiedTagName ?: return
+        val tagExpr = element.simpleTagName ?: element.qualifiedTagName ?: return fallback(element, context, facade)
 
         val attributeExpressions = element.attributes.map { it.key!!.getReferencedName() to (it.value ?: it.key!!) }.toMap()
 
@@ -75,12 +75,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
             element.qualifiedClosingTagName?.let {
                 tagResolver.resolveReference(it, context)
             }
-            // report an error on the entire element for good measure
-            context.trace.reportFromPlugin(
-                R4AErrors.UNRESOLVED_TAG.on(element),
-                R4ADefaultErrorMessages
-            )
-            return
+            return fallback(element, context, facade)
         }
 
         // If we've made it here, it resolved to something and our opening tag is marked but our closing tag is not, so we copy it over
@@ -95,10 +90,9 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
             tagResolver.resolveReference(it, context)
         }
 
-        if (!tag.valid) {
-            // we don't need to record any errors here since there will already be some on the trace from the failed resolve
-            return
-        }
+        // NOTE(lmr): tag may not be valid at this point, but if it isn't a diagnostic will be reported on the tag. Regardless of whether
+        // or not it's valid, we continue to validate the entire tag since we want to give the user as much information as possible. If one
+        // tag constructor isn't valid, we still wan't to type check all of its children for instance.
 
         val ctorAttributes = when {
             tag.isConstructed -> tag.parameters.map { it.name }.toSet()
@@ -276,15 +270,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
                     // the first one to resolve correctly wins
                     continue
                 }
-                val isRequiredChildrenDescriptor = when (childrenDescriptor) {
-                    is PropertyDescriptor -> !childrenDescriptor.type.isNullable()
-                    is SimpleFunctionDescriptor -> false // setter function. never required
-                    is ValueParameterDescriptor -> !childrenDescriptor.declaresDefaultValue()
-                    is ParameterDescriptor -> true
-                    is TypeParameterDescriptor -> true
-                    else -> false
-                }
-
+                val isRequiredChildrenDescriptor = childrenDescriptor.isRequiredR4aAttribute(context.scope.ownerDescriptor)
 
                 if (childrenExpr == null && isRequiredChildrenDescriptor) {
                     val name = childrenDescriptor.name.asString()
@@ -357,15 +343,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
             val missingAttributes = mutableListOf<DeclarationDescriptor>()
             val descriptors = tag.typeDescriptor.unsubstitutedMemberScope.getContributedDescriptors()
             for (descriptor in descriptors) {
-                val isRequired = when (descriptor) {
-                    is PropertyDescriptor -> descriptor.isLateInit &&
-                            Visibilities.isVisibleIgnoringReceiver(descriptor, context.scope.ownerDescriptor) &&
-                            // Component unfortunately has some publicly exposed properties that will look like they are "required"
-                            // attributes, but we don't want people to use them as properties. We should figure out a better solution for
-                            // this, but for now I am just going to ignore them explicitly.
-                            descriptor.overriddenDescriptors.firstOrNull()?.containingDeclaration?.fqNameSafe != R4aUtils.r4aFqName("Component")
-                    else -> false
-                }
+                val isRequired = descriptor.isRequiredR4aAttribute(context.scope.ownerDescriptor)
                 if (isRequired && !attributeExpressions.containsKey(descriptor.name.asString()) && descriptor !== childrenAttrInfo?.descriptor) {
                     missingAttributes.add(descriptor)
                 }
@@ -428,6 +406,31 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
         )
 
         context.trace.record(KTX_TAG_INFO, element, tagInfo)
+    }
+
+    private fun DeclarationDescriptor.isRequiredR4aAttribute(ownerDescriptor: DeclarationDescriptor) = when (this) {
+        is PropertyDescriptor -> isLateInit &&
+                Visibilities.isVisibleIgnoringReceiver(this, ownerDescriptor) &&
+                // Component unfortunately has some publicly exposed properties that will look like they are "required"
+                // attributes, but we don't want people to use them as properties. We should figure out a better solution for
+                // this, but for now I am just going to ignore them explicitly.
+                overriddenDescriptors.firstOrNull()?.containingDeclaration?.fqNameSafe != R4aUtils.r4aFqName("Component")
+        is ValueParameterDescriptor -> !declaresDefaultValue()
+        is SimpleFunctionDescriptor -> false // setter function. never required
+        else -> false
+    }
+
+    private fun fallback(
+        element: KtxElement,
+        context: ExpressionTypingContext,
+        facade: ExpressionTypingFacade
+    ) {
+        // If we can't resolve the tag name, we can't accurately report errors on the element, but we still want the type system to traverse
+        // through all of the children nodes so that specific errors on those can get recorded
+        with(element) {
+            attributes.forEach { facade.getTypeInfo(it, context) }
+            body?.forEach { facade.getTypeInfo(it, context) }
+        }
     }
 
     private fun getComposableType(tagDescriptor: DeclarationDescriptor, module: ModuleDescriptor): ComposableType {

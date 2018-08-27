@@ -6,7 +6,6 @@ import org.jetbrains.kotlin.codegen.CodegenTestCase
 import org.jetbrains.kotlin.codegen.CodegenTestFiles
 import org.jetbrains.kotlin.config.*
 import org.jetbrains.kotlin.psi.KtFile
-import org.jetbrains.kotlin.r4a.frames.assertExists
 
 import org.jetbrains.kotlin.resolve.AnalyzingUtils
 import org.jetbrains.kotlin.test.ConfigurationKind
@@ -19,9 +18,9 @@ abstract class AbstractCodeGenTest : CodegenTestCase() {
     override fun setUp() {
         super.setUp()
         val classPath = listOf(
-                KotlinTestUtils.getAnnotationsJar(),
-                assertExists(File("dist/kotlinc/lib/r4a-runtime.jar")),
-                assertExists(File("custom-dependencies/android-sdk/build/libs/android.jar"))
+            KotlinTestUtils.getAnnotationsJar(),
+            assertExists(File("dist/kotlinc/lib/r4a-runtime.jar")),
+            assertExists(File("custom-dependencies/android-sdk/build/libs/android.jar"))
         )
         val configuration = createConfiguration(
                 ConfigurationKind.ALL,
