@@ -11,11 +11,11 @@ abstract class CompositionContext {
         private val TAG_ROOT_COMPONENT = "r4aRootComponent".hashCode()
         private val COMPONENTS_TO_CONTEXT = WeakHashMap<Component, CompositionContext>()
 
-        var factory: Function3<Context, ViewGroup, Component, CompositionContext> = CompositionContextImpl.factory
+        var factory: Function4<Context, ViewGroup, Component, Ambient.Reference?, CompositionContext> = CompositionContextImpl.factory
         var current: CompositionContext = CompositionContextImpl()
 
-        fun create(context: Context, view: ViewGroup, component: Component): CompositionContext {
-            val cc = factory(context, view, component)
+        fun create(context: Context, view: ViewGroup, component: Component, reference: Ambient.Reference?): CompositionContext {
+            val cc = factory(context, view, component, reference)
             setRoot(view, component)
             return cc
         }
@@ -54,7 +54,7 @@ abstract class CompositionContext {
             view.setTag(TAG_ROOT_COMPONENT, component)
         }
 
-        fun <T : Any?> getAmbient(key: Ambient<T>, component: Component): T = find(component)!!.getAmbient(key)
+        fun <T : Any?> getAmbient(key: Ambient<T>, component: Component): T = find(component)!!.getAmbient(key, component)
     }
 
     abstract fun joinKey(left: Any?, right: Any?): Any

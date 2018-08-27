@@ -78,10 +78,11 @@ internal class CompositionContextImpl : CompositionContext() {
 
     companion object {
         private val COMPONENTS_TO_SLOTS = WeakHashMap<Component, Slot>()
-        val factory = object: Function3<Context, ViewGroup, Component, CompositionContext> {
-            override fun invoke(context: Context, root: ViewGroup, component: Component): CompositionContext {
+        val factory = object : Function4<Context, ViewGroup, Component, Ambient.Reference?, CompositionContextImpl> {
+            override fun invoke(context: Context, root: ViewGroup, component: Component, reference: Ambient.Reference?): CompositionContextImpl {
                 val result = CompositionContextImpl()
                 result.ROOT_CONTAINER.view = root
+                result.AMBIENT_REFERENCE = reference
                 result.context = context
                 result.setInstance(component)
                 return result
@@ -91,6 +92,8 @@ internal class CompositionContextImpl : CompositionContext() {
     }
 
     override lateinit var context: Context
+
+    internal var AMBIENT_REFERENCE: Ambient.Reference? = null
 
     internal val ROOT_CONTAINER = Container()
     internal var currentContainer: Container = ROOT_CONTAINER
@@ -340,6 +343,10 @@ internal class CompositionContextImpl : CompositionContext() {
             slot = slot.parent
         }
         if (slot.parent === slot) {
+            val ref = AMBIENT_REFERENCE
+            if (ref != null) {
+                return ref.getAmbient(key)
+            }
             // we made it to the root of the tree... return the default value
             return key.defaultValue
         }

@@ -1,5 +1,6 @@
 package com.google.r4a
 
+import android.view.ViewGroup
 import kotlin.reflect.KProperty
 
 class Ambient<T>(private val key: String, private val defaultFactory: (() -> T)? = null) {
@@ -46,5 +47,25 @@ class Ambient<T>(private val key: String, private val defaultFactory: (() -> T)?
     operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
         if (thisRef !is Component) error("Cannot use Ambient property delegates on non-component instances")
         return CompositionContext.getAmbient(this, thisRef)
+    }
+
+
+    interface Reference {
+        fun <T> getAmbient(key: Ambient<T>): T
+        fun composeInto(container: ViewGroup, composable: () -> Unit)
+    }
+
+    class Portal(
+        @Children
+        var children: (ref: Reference) -> Unit
+    ) : Component() {
+
+        private val reference = object : Reference {
+            override fun <T> getAmbient(key: Ambient<T>) = CompositionContext.getAmbient(key, this@Portal)
+            override fun composeInto(container: ViewGroup, composable: () -> Unit) = R4a.composeInto(container, this, composable)
+        }
+        override fun compose() {
+            children(reference)
+        }
     }
 }
