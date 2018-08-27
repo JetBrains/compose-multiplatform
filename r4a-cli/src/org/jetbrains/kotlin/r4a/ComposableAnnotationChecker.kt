@@ -41,6 +41,7 @@ import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
 import org.jetbrains.kotlin.resolve.descriptorUtil.builtIns
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.inline.InlineUtil
+import org.jetbrains.kotlin.resolve.inline.InlineUtil.isInlinedArgument
 import org.jetbrains.kotlin.resolve.jvm.platform.JvmPlatform
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.expressions.ClassLiteralChecker
@@ -161,14 +162,7 @@ class ComposableAnnotationChecker(val mode: Mode = DEFAULT_MODE) : CallChecker, 
             }
 
             override fun visitLambdaExpression(lambdaExpression: KtLambdaExpression) {
-
-                // Parent declaration can be null in code fragments or in some bad error expressions
-                val functionLiteral = lambdaExpression.functionLiteral
-                val declarationDescriptor = trace.get(DECLARATION_TO_DESCRIPTOR, functionLiteral)
-                val containingFunInfo = BindingContextUtils.getContainingFunctionSkipFunctionLiterals(declarationDescriptor, false)
-                val containingFunctionDescriptor = containingFunInfo.getFirst()
-
-                val isInlineable = InlineUtil.checkNonLocalReturnUsage(containingFunctionDescriptor, trace.get(BindingContext.DECLARATION_TO_DESCRIPTOR, functionLiteral), functionLiteral, trace.bindingContext)
+                val isInlineable = isInlinedArgument(lambdaExpression.functionLiteral, trace.bindingContext, true)
                 if(isInlineable && lambdaExpression == element) isInlineLambda = true
                 if(isInlineable || lambdaExpression == element) super.visitLambdaExpression(lambdaExpression)
             }
@@ -275,14 +269,7 @@ class ComposableAnnotationChecker(val mode: Mode = DEFAULT_MODE) : CallChecker, 
         val expectedComposable = expectedType.annotations.hasAnnotation(COMPOSABLE_ANNOTATION_NAME)
         val isComposable = analyze(c.trace, expression, c.expectedType)
         if(expectedComposable != isComposable) {
-
-            // Parent declaration can be null in code fragments or in some bad error expressions
-            val functionLiteral = expression.functionLiteral
-            val declarationDescriptor = c.trace.get(DECLARATION_TO_DESCRIPTOR, functionLiteral)
-            val containingFunInfo = BindingContextUtils.getContainingFunctionSkipFunctionLiterals(declarationDescriptor, false)
-            val containingFunctionDescriptor = containingFunInfo.getFirst()
-
-            val isInlineable = InlineUtil.checkNonLocalReturnUsage(containingFunctionDescriptor, c.trace.get(BindingContext.DECLARATION_TO_DESCRIPTOR, functionLiteral), functionLiteral, c.trace.bindingContext)
+            val isInlineable = isInlinedArgument(expression.functionLiteral, c.trace.bindingContext, true)
             if(isInlineable) return;
 
             val reportOn = if(expression.parent is KtAnnotatedExpression) expression.parent as KtExpression else expression

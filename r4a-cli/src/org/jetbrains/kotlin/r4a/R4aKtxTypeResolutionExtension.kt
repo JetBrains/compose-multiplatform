@@ -3,7 +3,11 @@ package org.jetbrains.kotlin.r4a
 import org.jetbrains.kotlin.builtins.createFunctionType
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotated
+import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
+import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.resolve.constants.ConstantValue
+import org.jetbrains.kotlin.descriptors.annotations.AnnotationsImpl
 import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.diagnostics.reportFromPlugin
 import org.jetbrains.kotlin.extensions.KtxTypeResolutionExtension
@@ -239,12 +243,18 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
                 // check to see if it's an android view. if so, we allow children, but don't provide a childrenAttrInfo object.
                 // we do need to make sure that the type system traverses the children though, so we handle that here:
                 if (composableType == ComposableType.VIEW) {
+                    val composableAnnotation = object : AnnotationDescriptor {
+                        override val type: KotlinType get() = context.scope.ownerDescriptor.module.findClassAcrossModuleDependencies(ClassId.topLevel(R4aUtils.r4aFqName("Composable")))!!.defaultType
+                        override val allValueArguments: Map<Name, ConstantValue<*>> get() = emptyMap()
+                        override val source: SourceElement get() = SourceElement.NO_SOURCE
+                        override fun toString() = "[@Composable]"
+                    }
                     facade.getTypeInfo(
                         childrenExpr,
                         context.replaceExpectedType(
                             createFunctionType(
                                 moduleDescriptor.builtIns,
-                                Annotations.EMPTY,
+                                AnnotationsImpl(listOf(composableAnnotation)),
                                 null,
                                 emptyList(),
                                 emptyList(),
