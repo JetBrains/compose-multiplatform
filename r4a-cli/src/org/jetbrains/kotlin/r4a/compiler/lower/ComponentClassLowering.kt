@@ -142,7 +142,7 @@ private fun transform(
         )
     }
     val childrenInfo = info.childrenInfo
-    val irChildrenInfo = if (childrenInfo != null && info.composableType != ComposableType.VIEW) {
+    val irChildrenInfo = if (childrenInfo != null) {
         val tagBody = tag.body ?: error("expected tag body")
         val lambda = tag.element.bodyLambdaExpression ?: error("expected lambda")
         val parameters = lambda.valueParameters
@@ -246,6 +246,7 @@ private fun transform(
             output,
             info,
             attributes,
+            irChildrenInfo,
             tagIndex
         )
         ComposableType.FUNCTION_VAR -> transformFunctionVar(
@@ -723,6 +724,7 @@ private fun transformViewElement(
     output: MutableList<IrStatement>,
     info: KtxTagInfo,
     attributes: Collection<IrAttributeInfo>,
+    childrenInfo: IrAttributeInfo?,
     tagIndex: Int
 ) {
     callStart(GroupKind.View, attributes, helper, tag, context, tagIndex, output)
@@ -810,68 +812,112 @@ private fun transformViewElement(
 
     for (attribute in attributes) {
 
-        /**
-         *     // we then iterate over each non-pivotal attribute, setting only the ones that have changed
-         *     if (cc.attributeChangedOrEmpty(attrBam)) {
-         *         tmpEl.setBam(attrBam)
-         *     }
-         */
+        val attributeUpdate = genAttributeUpdate(
+            attribute,
+            info,
+            getEl,
+            context,
+            helper
+        )
+        if (attributeUpdate != null) {
+            // OUTPUT:
+            // if (cc.attributeChangedOrEmpty(attrBam)) {
+            //    tmpEl.setBam(attrBam)
+            // }
+            output.add(attributeUpdate)
 
-        val resolvedCall = attribute.info.setterResolvedCall ?: continue
-
-        val checkFunction = if (attribute.info.isIncludedInConstruction) helper.ccAttributeChangedFunctionDescriptor
-        else helper.ccAttributeChangedOrInsertingFunctionDescriptor
-
-        val callUpdateAttributeExpr = IrCallImpl(
-            startOffset, endOffset,
-            checkFunction.returnType!!.toIrType()!!,
-            context.symbolTable.referenceFunction(checkFunction)
-        ).apply {
-            dispatchReceiver = helper.getCc
-            putValueArgument(0, attribute.getValue)
         }
-
-        val attributeSetterCall = IrCallImpl(
-            startOffset, endOffset,
-            resolvedCall.resultingDescriptor.returnType!!.toIrType()!!,
-            context.symbolTable.referenceFunction(resolvedCall.resultingDescriptor)
-        ).apply {
-            resolvedCall.extensionReceiver?.let {
-                extensionReceiver = getEl
-            }
-            resolvedCall.dispatchReceiver?.let {
-                if (it.type == instanceType) {
-                    dispatchReceiver = getEl
-                } else {
-                    // this could be a local extension function... we might want to support this?
-                    error("unknown dispatch receiver")
-                }
-            }
-            putValueArgument(0, attribute.getValue)
-        }
-
-        val updateIfNeededExpr = IrIfThenElseImpl(
-            startOffset, endOffset,
-            context.irBuiltIns.unitType
-        ).apply {
-            branches.add(IrBranchImpl(startOffset, endOffset, callUpdateAttributeExpr, attributeSetterCall))
-        }
-
-        // OUTPUT:
-        // if (cc.attributeChangedOrEmpty(attrBam)) {
-        //    tmpEl.setBam(attrBam)
-        // }
-        output.add(updateIfNeededExpr)
     }
 
-    tag.body?.let { body ->
-        for (statement in body) {
-            if (statement is IrKtxTag) output.addAll(transform(context, container, owner, statement, helper))
-            else output.add(statement)
+    if (childrenInfo != null) {
+
+        val update = genAttributeUpdate(
+            childrenInfo,
+            info,
+            getEl,
+            context,
+            helper
+        )
+
+        if (update != null) {
+            // OUTPUT:
+            // if (cc.attributeChangedOrEmpty(attrBam)) {
+            //    tmpEl.setBam(attrBam)
+            // }
+            output.add(update)
+        }
+    } else {
+        tag.body?.let { body ->
+            for (statement in body) {
+                if (statement is IrKtxTag) output.addAll(transform(context, container, owner, statement, helper))
+                else output.add(statement)
+            }
         }
     }
 
     callEnd(output, helper)
+}
+
+private fun genAttributeUpdate(
+    attribute: IrAttributeInfo,
+    info: KtxTagInfo,
+    getEl: IrExpression,
+    context: GeneratorContext,
+    helper: ComposeFunctionHelper
+): IrStatement? {
+    val instanceType = info.instanceType
+
+    val startOffset = -1
+    val endOffset = -1
+
+    /**
+     *     // we then iterate over each non-pivotal attribute, setting only the ones that have changed
+     *     if (cc.attributeChangedOrEmpty(attrBam)) {
+     *         tmpEl.setBam(attrBam)
+     *     }
+     */
+
+    val resolvedCall = attribute.info.setterResolvedCall ?: return null
+
+    val checkFunction = if (attribute.info.isIncludedInConstruction) helper.ccAttributeChangedFunctionDescriptor
+    else helper.ccAttributeChangedOrInsertingFunctionDescriptor
+
+    val callUpdateAttributeExpr = IrCallImpl(
+        startOffset, endOffset,
+        checkFunction.returnType!!.toIrType()!!,
+        context.symbolTable.referenceFunction(checkFunction)
+    ).apply {
+        dispatchReceiver = helper.getCc
+        putValueArgument(0, attribute.getValue)
+    }
+
+    val attributeSetterCall = IrCallImpl(
+        startOffset, endOffset,
+        resolvedCall.resultingDescriptor.returnType!!.toIrType()!!,
+        context.symbolTable.referenceFunction(resolvedCall.resultingDescriptor)
+    ).apply {
+        resolvedCall.extensionReceiver?.let {
+            extensionReceiver = getEl
+        }
+        resolvedCall.dispatchReceiver?.let {
+            if (it.type == instanceType) {
+                dispatchReceiver = getEl
+            } else {
+                // this could be a local extension function... we might want to support this?
+                error("unknown dispatch receiver")
+            }
+        }
+        putValueArgument(0, attribute.getValue)
+    }
+
+    val updateIfNeededExpr = IrIfThenElseImpl(
+        startOffset, endOffset,
+        context.irBuiltIns.unitType
+    ).apply {
+        branches.add(IrBranchImpl(startOffset, endOffset, callUpdateAttributeExpr, attributeSetterCall))
+    }
+
+    return updateIfNeededExpr
 }
 
 fun lowerComposeFunction(context: GeneratorContext, container: IrPackageFragment, compose: IrFunction) {
