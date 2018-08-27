@@ -1460,4 +1460,106 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         }
         """
     )
+
+    fun testKtxVariableTagsProperlyCapturedAcrossKtxLambdas() = testCompile(
+        """
+        import com.google.r4a.*
+        import com.google.r4a.adapters.*
+
+        class Foo(@Children var children: (sub: () -> Unit) -> Unit): Component() {
+            override fun compose() {}
+        }
+
+        class Boo(@Children var children: () -> Unit): Component() {
+            override fun compose() {}
+        }
+
+        class Bar: Component() {
+            override fun compose() {
+                <Foo> sub ->
+                    <Boo>
+                        <sub />
+                    </Boo>
+                </Foo>
+            }
+        }
+        """
+    )
+
+    fun testPassChildrenLambdaVarWithCorrectType() = testCompile(
+        """
+        import com.google.r4a.*
+        import com.google.r4a.adapters.*
+
+        class Boo(@Children var children: () -> Unit): Component() {
+            override fun compose() {}
+        }
+
+        class Bar(var data: List<Int>): Component() {
+            override fun compose() {
+                val children = { Unit; }
+                <Boo children />
+            }
+        }
+        """
+    )
+
+    fun testPassChildrenLambdaLiteralWithCorrectType() = testCompile(
+        """
+        import com.google.r4a.*
+        import com.google.r4a.adapters.*
+
+        class Boo: Component() {
+            @Children lateinit var children: () -> Unit
+            override fun compose() {}
+        }
+
+        class Bar(var data: List<Int>): Component() {
+            override fun compose() {
+                <Boo
+                    children={ Unit; }
+                />
+            }
+        }
+        """
+    )
+
+    fun testChildrenLiteral() = testCompile(
+        """
+        import com.google.r4a.*
+        import com.google.r4a.adapters.*
+
+        class Boo(@Children var children: () -> Unit): Component() {
+            override fun compose() {}
+        }
+
+        class Bar(var data: List<Int>): Component() {
+            override fun compose() {
+                <Boo
+                    children={ Unit; }
+                />
+            }
+        }
+        """
+    )
+
+    fun testKtxLambdaCapturedVariableInAssignment() = testCompile(
+        """
+        import com.google.r4a.*
+
+        class Tabs(@Children var children: () -> Unit) : Component() {
+            override fun compose() {}
+        }
+
+        class Bar: Component() {
+            override fun compose() {
+                val bam = "x"
+                <Tabs>
+                    val qoo = bam
+                </Tabs>
+            }
+        }
+        """
+    )
+
 }
