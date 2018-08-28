@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="nav_graph" type="id"/>
+    <item name="nav_list_to_detail" type="id"/>
+    <item name="ambient_reference_tag_key" type="id"/>
+    <item name="key_compose_pager_adapter" type="id"/>
+    <item name="view_pager_id" type="id"/>
+</resources>
