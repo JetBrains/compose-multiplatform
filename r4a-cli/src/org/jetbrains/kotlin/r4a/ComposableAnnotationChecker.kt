@@ -110,7 +110,7 @@ class ComposableAnnotationChecker(val mode: Mode = DEFAULT_MODE) : CallChecker, 
     fun analyze(trace: BindingTrace, element: KtElement, type: KotlinType?): Boolean {
         trace.bindingContext.get(COMPOSABLE_ANALYSIS, element)?.let { return it }
         if (element is KtClass) {
-            val descriptor = trace.bindingContext.get(BindingContext.CLASS, element) ?: return false
+            val descriptor = trace.bindingContext.get(BindingContext.CLASS, element)!!
             val annotationEntry = element.annotationEntries.singleOrNull {
                 trace.bindingContext.get(BindingContext.ANNOTATION, it)?.fqName == COMPOSABLE_ANNOTATION_NAME
             }
@@ -120,7 +120,7 @@ class ComposableAnnotationChecker(val mode: Mode = DEFAULT_MODE) : CallChecker, 
             return ComponentMetadata.isR4AComponent(descriptor)
         }
         if(element is KtProperty) {
-            val descriptor = trace.bindingContext.get(BindingContext.CLASS, element)!!
+            val descriptor = trace.bindingContext.get(BindingContext.DECLARATION_TO_DESCRIPTOR, element) ?: return false
             val type = when(descriptor) {
                 is LocalVariableDescriptor -> descriptor.type
                 is PropertyDescriptor -> descriptor.type
