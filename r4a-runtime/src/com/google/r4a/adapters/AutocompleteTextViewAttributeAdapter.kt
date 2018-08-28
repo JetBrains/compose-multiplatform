@@ -3,6 +3,7 @@
 package com.google.r4a.adapters
 
 import android.widget.AutoCompleteTextView
+import com.google.r4a.Composable
 
 private fun AutoCompleteTextView.getR4aAdapter(): ArrayAdapter<Any> {
     var adapter = adapter as? ArrayAdapter<Any>
@@ -19,6 +20,6 @@ fun AutoCompleteTextView.setData(data: Collection<Any>) {
     getR4aAdapter().items = data.toMutableList()
 }
 
-fun AutoCompleteTextView.setComposeItem(composeItem: Function1<Any, Unit>) {
+fun AutoCompleteTextView.setComposeItem(composeItem: @Composable() (Any)->Unit) {
     getR4aAdapter().composable = composeItem
 }

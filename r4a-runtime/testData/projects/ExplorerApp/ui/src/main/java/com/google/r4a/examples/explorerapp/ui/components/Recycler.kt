@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.google.r4a.Children
+import com.google.r4a.Composable
 import com.google.r4a.composeInto
 
 open class Recycler(context: Context): RecyclerView(context) {
@@ -12,11 +13,11 @@ open class Recycler(context: Context): RecyclerView(context) {
     lateinit var getItemCount: () -> Int
 
     @Children
-    var composeItemWithType: ((position: Int, type: Int) -> Unit) = { _, _ ->  }
+    var composeItemWithType: @Composable() ((position: Int, type: Int) -> Unit) = { _, _ ->  }
 
     @Children
-    fun setComposeItem(composeItem: ((position: Int) -> Unit)) {
-        composeItemWithType = { position, _ -> composeItem(position) }
+    fun setComposeItem(composeItem: @Composable() ((position: Int) -> Unit)) {
+        composeItemWithType = { position, _ -> <composeItem position /> }
     }
     var getItemViewType: ((Int) -> Int)? = null
 

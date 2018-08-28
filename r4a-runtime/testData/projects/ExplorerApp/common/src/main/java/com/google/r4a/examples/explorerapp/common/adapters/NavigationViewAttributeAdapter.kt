@@ -3,6 +3,7 @@ package com.google.r4a.examples.explorerapp.common.adapters
 import android.support.design.widget.NavigationView
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import com.google.r4a.Composable
 import com.google.r4a.R4a
 
 
@@ -10,7 +11,7 @@ fun NavigationView.setMenu(resId: Int) = inflateMenu(resId)
 
 fun NavigationView.setHeader(resId: Int) = inflateHeaderView(resId)
 
-fun NavigationView.setHeader(composable: () -> Unit) {
+fun NavigationView.setHeader(composable: @Composable() () -> Unit) {
     if (headerCount == 0) {
         addHeaderView(LinearLayout(context))
     }

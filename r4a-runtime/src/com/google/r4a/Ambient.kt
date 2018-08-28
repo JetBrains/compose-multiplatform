@@ -52,7 +52,7 @@ class Ambient<T>(private val key: String, private val defaultFactory: (() -> T)?
 
     interface Reference {
         fun <T> getAmbient(key: Ambient<T>): T
-        fun composeInto(container: ViewGroup, composable: () -> Unit)
+        fun composeInto(container: ViewGroup, composable: @Composable() () -> Unit)
     }
 
     class Portal(

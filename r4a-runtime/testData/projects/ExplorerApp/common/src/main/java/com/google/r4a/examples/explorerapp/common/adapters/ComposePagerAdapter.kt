@@ -144,9 +144,9 @@ class Tabs : Component() {
     ) -> Unit = { _, _ -> }
 
     @Children
-    fun setChildren(children:(
+    fun setChildren(children:@Composable() (
         tabs: () -> Unit,
-        content: (children: (Int) -> Unit) -> Unit
+        content: @Composable() (children: @Composable() (Int) -> Unit) -> Unit
     ) -> Unit) {
         _children = children
     }

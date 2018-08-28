@@ -4,30 +4,22 @@ import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.types.TypeUtils
 import org.jetbrains.kotlin.container.StorageComponentContainer
 import org.jetbrains.kotlin.container.useInstance
-import org.jetbrains.kotlin.contracts.model.structure.UNKNOWN_COMPUTATION.type
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.KotlinTarget
 import org.jetbrains.kotlin.descriptors.impl.LocalVariableDescriptor
 import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.diagnostics.reportFromPlugin
 import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
-import org.jetbrains.kotlin.idea.search.usagesSearch.ExpressionsOfTypeProcessor
-import org.jetbrains.kotlin.idea.search.usagesSearch.ExpressionsOfTypeProcessor.Companion.mode
+import org.jetbrains.kotlin.idea.caches.resolve.getResolutionFacade
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
-import org.jetbrains.kotlin.js.translate.utils.AnnotationsUtils.hasAnnotation
-import org.jetbrains.kotlin.load.java.descriptors.JavaClassConstructorDescriptor
 import org.jetbrains.kotlin.load.java.descriptors.JavaMethodDescriptor
-import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.*
-import org.jetbrains.kotlin.r4a.ComposableAnnotationChecker.Companion.COMPOSABLE_ANNOTATION_NAME
 import org.jetbrains.kotlin.r4a.analysis.ComponentMetadata
 import org.jetbrains.kotlin.r4a.analysis.R4ADefaultErrorMessages
 import org.jetbrains.kotlin.r4a.analysis.R4AErrors
 import org.jetbrains.kotlin.r4a.analysis.R4AWritableSlices.COMPOSABLE_ANALYSIS
 import org.jetbrains.kotlin.resolve.*
-import org.jetbrains.kotlin.resolve.BindingContext.DECLARATION_TO_DESCRIPTOR
-import org.jetbrains.kotlin.resolve.calls.callUtil.getType
 import org.jetbrains.kotlin.resolve.calls.checkers.AdditionalTypeChecker
 import org.jetbrains.kotlin.resolve.calls.checkers.CallChecker
 import org.jetbrains.kotlin.resolve.calls.checkers.CallCheckerContext
@@ -39,12 +31,10 @@ import org.jetbrains.kotlin.resolve.calls.model.VariableAsFunctionResolvedCall
 import org.jetbrains.kotlin.resolve.checkers.DeclarationChecker
 import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
 import org.jetbrains.kotlin.resolve.descriptorUtil.builtIns
-import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
-import org.jetbrains.kotlin.resolve.inline.InlineUtil
 import org.jetbrains.kotlin.resolve.inline.InlineUtil.isInlinedArgument
 import org.jetbrains.kotlin.resolve.jvm.platform.JvmPlatform
+import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode
 import org.jetbrains.kotlin.types.KotlinType
-import org.jetbrains.kotlin.types.expressions.ClassLiteralChecker
 import org.jetbrains.kotlin.types.typeUtil.isUnit
 
 class ComposableAnnotationChecker(val mode: Mode = DEFAULT_MODE) : CallChecker, DeclarationChecker,
@@ -110,7 +100,7 @@ class ComposableAnnotationChecker(val mode: Mode = DEFAULT_MODE) : CallChecker, 
     fun analyze(trace: BindingTrace, element: KtElement, type: KotlinType?): Boolean {
         trace.bindingContext.get(COMPOSABLE_ANALYSIS, element)?.let { return it }
         if (element is KtClass) {
-            val descriptor = trace.bindingContext.get(BindingContext.CLASS, element)!!
+            var descriptor = trace.bindingContext.get(BindingContext.CLASS, element) ?: element.getResolutionFacade().resolveToDescriptor(element, BodyResolveMode.FULL) as ClassDescriptor
             val annotationEntry = element.annotationEntries.singleOrNull {
                 trace.bindingContext.get(BindingContext.ANNOTATION, it)?.fqName == COMPOSABLE_ANNOTATION_NAME
             }
@@ -120,7 +110,7 @@ class ComposableAnnotationChecker(val mode: Mode = DEFAULT_MODE) : CallChecker, 
             return ComponentMetadata.isR4AComponent(descriptor)
         }
         if(element is KtProperty) {
-            val descriptor = trace.bindingContext.get(BindingContext.DECLARATION_TO_DESCRIPTOR, element) ?: return false
+            var descriptor = trace.bindingContext.get(BindingContext.DECLARATION_TO_DESCRIPTOR, element) ?: element.getResolutionFacade().resolveToDescriptor(element, BodyResolveMode.FULL)
             val type = when(descriptor) {
                 is LocalVariableDescriptor -> descriptor.type
                 is PropertyDescriptor -> descriptor.type

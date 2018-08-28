@@ -24,23 +24,24 @@ class HomogeneousList<T>(comparator: DiffUtil.ItemCallback<T>) : Component() {
         adapter.submitList(data)
     }
     @Children
-    fun setChildren(children: (T, Int) -> Unit) {
+    fun setChildren(children: @Composable() (T, Int) -> Unit) {
         adapter.children = children
     }
     @Children
-    fun setChildren(children: (T) -> Unit) {
-        adapter.children = { data, _ -> children(data) }
+    fun setChildren(children: @Composable() (T) -> Unit) {
+        val children2: (T) -> Unit = children
+        adapter.children = { data, _ -> children2(data) }
     }
 
-    fun setComposeHeader(composeHeader: (Int) -> Unit) {
+    fun setComposeHeader(composeHeader: @Composable() (Int) -> Unit) {
         adapter.composeHeader = composeHeader
     }
 
-    fun setComposeFooter(composeFooter: (Int) -> Unit) {
+    fun setComposeFooter(composeFooter: @Composable() (Int) -> Unit) {
         adapter.composeFooter = composeFooter
     }
 
-    fun setComposeLoadingRow(composeLoadingRow: (Int) -> Unit) {
+    fun setComposeLoadingRow(composeLoadingRow: @Composable() (Int) -> Unit) {
         adapter.composeLoadingRow = composeLoadingRow
     }
 
