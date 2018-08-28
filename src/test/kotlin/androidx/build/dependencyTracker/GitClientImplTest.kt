@@ -56,15 +56,15 @@ class GitClientImplTest {
 
     @Test
     fun findChangesSince() {
+        var changes = listOf(
+                convertToFilePath("a", "b", "c.java"),
+                convertToFilePath("d", "e", "f.java"))
         commandRunner.addReply(
                 "$CHANGED_FILES_CMD_PREFIX mySha",
-                """
-                    a/b/c.java
-                    d/e/f.java
-                """.trimIndent()
+                changes.joinToString(System.lineSeparator())
         )
         assertEquals(
-                listOf("a/b/c.java", "d/e/f.java"),
+                changes,
                 client.findChangedFilesSince(sha = "mySha", includeUncommitted = true))
     }
 
@@ -77,19 +77,24 @@ class GitClientImplTest {
 
     @Test
     fun findChangesSince_twoCls() {
+        var changes = listOf(
+                convertToFilePath("a", "b", "c.java"),
+                convertToFilePath("d", "e", "f.java"))
         commandRunner.addReply(
                 "$CHANGED_FILES_CMD_PREFIX otherSha mySha",
-                """
-                    a/b/c.java
-                    d/e/f.java
-                """.trimIndent()
+                changes.joinToString(System.lineSeparator())
         )
         assertEquals(
-                listOf("a/b/c.java", "d/e/f.java"),
+                changes,
                 client.findChangedFilesSince(
                         sha = "mySha",
                         top = "otherSha",
                         includeUncommitted = false))
+    }
+
+    // For both Linux/Windows
+    fun convertToFilePath(vararg list: String): String {
+        return list.toList().joinToString(File.separator)
     }
 
     private class MockCommandRunner(val logger: ToStringLogger) : GitClient.CommandRunner {

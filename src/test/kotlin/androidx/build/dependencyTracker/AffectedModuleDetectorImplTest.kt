@@ -26,6 +26,7 @@ import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import java.io.File
 
 @RunWith(JUnit4::class)
 class AffectedModuleDetectorImplTest {
@@ -84,7 +85,7 @@ class AffectedModuleDetectorImplTest {
                 ignoreUnknownProjects = false,
                 injectedGitClient = MockGitClient(
                         lastMergeSha = "foo",
-                        changedFiles = listOf("p1/foo.java"))
+                        changedFiles = listOf(convertToFilePath("p1", "foo.java")))
         )
         MatcherAssert.assertThat(detector.affectedProjects, CoreMatchers.`is`(
                 setOf(p1)
@@ -99,7 +100,9 @@ class AffectedModuleDetectorImplTest {
                 ignoreUnknownProjects = false,
                 injectedGitClient = MockGitClient(
                         lastMergeSha = "foo",
-                        changedFiles = listOf("p1/foo.java", "p2/bar.java"))
+                        changedFiles = listOf(
+                                convertToFilePath("p1", "foo.java"),
+                                convertToFilePath("p2", "bar.java")))
         )
         MatcherAssert.assertThat(detector.affectedProjects, CoreMatchers.`is`(
                 setOf(p1, p2)
@@ -119,6 +122,11 @@ class AffectedModuleDetectorImplTest {
         MatcherAssert.assertThat(detector.affectedProjects, CoreMatchers.`is`(
                 setOf(p1, p2)
         ))
+    }
+
+    // For both Linux/Windows
+    fun convertToFilePath(vararg list: String): String {
+        return list.toList().joinToString(File.separator)
     }
 
     private class MockGitClient(
