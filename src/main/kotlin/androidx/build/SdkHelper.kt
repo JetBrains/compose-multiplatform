@@ -26,8 +26,11 @@ fun setSdkInLocalPropertiesFile(supportRoot: File) {
     val sdkPath = getSdkPath(supportRoot)
     if (sdkPath.exists()) {
         val props = File(supportRoot, "local.properties")
+        // gradle always deliminate directories with '/' regardless of the OS.
+        // So convert deliminator here.
+        val gradlePath = sdkPath.getAbsolutePath().replace(File.separator, "/")
         props.printWriter().use { out ->
-            out.println("sdk.dir=${sdkPath.getAbsolutePath()}")
+            out.println("sdk.dir=${gradlePath}")
         }
     } else {
         throw Exception("You are using non androidx-master-dev checkout. You need to check out " +
