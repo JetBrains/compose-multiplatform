@@ -34,7 +34,6 @@ fun Project.configureMavenArtifactUpload(extension: SupportLibraryExtension) {
                 throw Exception("You must specify mavenVersion for $name project")
             }
             group = extension.mavenGroup!!
-            version = extension.mavenVersion.toString()
         }
     }
 
