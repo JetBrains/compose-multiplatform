@@ -25,6 +25,8 @@ object LibraryVersions {
      */
     val SUPPORT_LIBRARY = Version("1.0.0-rc01")
 
+    val ANIMATION = Version("1.0.0-alpha01")
+
     /**
      * Version code for Room
      */
