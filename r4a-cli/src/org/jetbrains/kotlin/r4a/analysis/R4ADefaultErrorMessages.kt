@@ -3,6 +3,7 @@ package org.jetbrains.kotlin.r4a.analysis
 import org.jetbrains.kotlin.diagnostics.rendering.DefaultErrorMessages
 import org.jetbrains.kotlin.diagnostics.rendering.DiagnosticFactoryToRendererMap
 import org.jetbrains.kotlin.diagnostics.rendering.Renderers
+import org.jetbrains.kotlin.diagnostics.rendering.Renderers.RENDER_COLLECTION_OF_TYPES
 
 object R4ADefaultErrorMessages : DefaultErrorMessages.Extension {
     private val MAP = DiagnosticFactoryToRendererMap("R4A")
@@ -105,6 +106,12 @@ object R4ADefaultErrorMessages : DefaultErrorMessages.Extension {
         MAP.put(
             R4AErrors.MISSING_REQUIRED_CHILDREN,
             "A children body is required"
+        )
+        MAP.put(
+            R4AErrors.ILLEGAL_ASSIGN_TO_UNIONTYPE,
+            "Value of type {0} can't be assigned to union type {1}.",
+            RENDER_COLLECTION_OF_TYPES,
+            RENDER_COLLECTION_OF_TYPES
         )
     }
 }
