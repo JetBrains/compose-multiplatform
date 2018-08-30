@@ -30,6 +30,7 @@ object LibraryGroups {
     const val CAR = "androidx.car"
     const val CARDVIEW = "androidx.cardview"
     const val COLLECTION = "androidx.collection"
+    const val CONCURRENT = "androidx.concurrent"
     const val CONTENTPAGER = "androidx.contentpager"
     const val COORDINATORLAYOUT = "androidx.coordinatorlayout"
     const val CORE = "androidx.core"
