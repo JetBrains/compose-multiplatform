@@ -4,10 +4,7 @@ import com.intellij.psi.PsiElement;
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor;
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor;
 import org.jetbrains.kotlin.diagnostics.*;
-import org.jetbrains.kotlin.psi.KtElement;
-import org.jetbrains.kotlin.psi.KtSimpleNameExpression;
-import org.jetbrains.kotlin.psi.KtxAttribute;
-import org.jetbrains.kotlin.psi.KtxElement;
+import org.jetbrains.kotlin.psi.*;
 import org.jetbrains.kotlin.types.KotlinType;
 
 import java.util.Collection;
@@ -38,6 +35,7 @@ public interface R4AErrors {
     DiagnosticFactory1<KtElement, String> CHILDREN_ATTR_USED_AS_BODY_AND_KEYED_ATTRIBUTE = DiagnosticFactory1.create(ERROR);
     DiagnosticFactory0<KtxElement> CHILDREN_PROVIDED_BUT_NO_CHILDREN_DECLARED = DiagnosticFactory0.create(ERROR);
     DiagnosticFactory0<KtxElement> MISSING_REQUIRED_CHILDREN = DiagnosticFactory0.create(ERROR);
+    DiagnosticFactory2<KtExpression, Collection<KotlinType>, Collection<KotlinType>> ILLEGAL_ASSIGN_TO_UNIONTYPE = DiagnosticFactory2.create(ERROR);
 
 
     @SuppressWarnings("UnusedDeclaration")
