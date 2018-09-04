@@ -6,7 +6,7 @@
 package org.jetbrains.kotlin.r4a.analysis
 
 
-import org.jetbrains.kotlin.r4a.frames.AbstractR4aDiagnosticsTest
+import org.jetbrains.kotlin.r4a.AbstractR4aDiagnosticsTest
 
 class UnionCheckerTests: AbstractR4aDiagnosticsTest() {
 
