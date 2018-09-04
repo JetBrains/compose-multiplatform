@@ -82,7 +82,7 @@ fun initializeApiChecksForProject(
 
     // Check whether the development API surface has changed.
     val verifyConfig = if (version.isPatch()) CHECK_API_CONFIG_PATCH else CHECK_API_CONFIG_DEVELOP
-    val currentApiFile = getApiFile(workingDir, version)
+    val currentApiFile = project.getCurrentApiFile()
     val checkApi = createCheckApiTask(project,
             "checkApi",
             docletClasspath,
@@ -172,7 +172,7 @@ private fun createUpdateApiTask(project: Project, checkApiRelease: CheckApiTask)
             group = JavaBasePlugin.VERIFICATION_GROUP
             description = "Updates the candidate API file to incorporate valid changes."
             newApiFile = checkApiRelease.newApiFile
-            oldApiFile = getApiFile(project.projectDir, project.version())
+            oldApiFile = project.getCurrentApiFile()
             whitelistErrors = checkApiRelease.whitelistErrors
             whitelistErrorsFile = checkApiRelease.whitelistErrorsFile
             doFirst {
@@ -186,25 +186,36 @@ private fun createUpdateApiTask(project: Project, checkApiRelease: CheckApiTask)
             }
         }
 
+/**
+ * Returns the API file whose contents match the project's source code.
+ * This is the API file that the updateApi task will write to.
+ * Note that in many cases the filename will be current.txt but not always (such as for release versions).
+ *
+ * @param project the project to query
+ * @return the current api file for that project
+ */
+fun Project.getCurrentApiFile() = getApiFile(project.projectDir, project.version())
+
 private fun getApiFile(rootDir: File, refVersion: Version): File {
     return getApiFile(rootDir, refVersion, false)
 }
 
 /**
- * Returns the API file for the specified reference version.
+ * Returns the API file for the API of the specified version.
  *
- * @param refVersion the reference API version, ex. 25.0.0-SNAPSHOT
- * @return the most recently released API file
+ * @param version the API version, ex. 25.0.0-SNAPSHOT
+ * @return the API file of this version
  */
-private fun getApiFile(rootDir: File, refVersion: Version, forceRelease: Boolean = false): File {
+private fun getApiFile(rootDir: File, version: Version, forceRelease: Boolean = false): File {
     val apiDir = File(rootDir, "api")
 
-    if (refVersion.isFinalApi() || forceRelease) {
-        // Release API file is always X.Y.0.txt.
-        return File(apiDir, "${refVersion.major}.${refVersion.minor}.0.txt")
+    if (version.isFinalApi() || forceRelease) {
+        // The API may not change in a patch release.
+        // So, the release API file is always the one from the most recent the latest minor release, and is of the form X.Y.0.txt.
+        return File(apiDir, "${version.major}.${version.minor}.0.txt")
     }
 
-    // Non-release API file is always current.txt.
+    // If the API's version is not a release version (that is, it's an alpha or a beta), then its contents are stored in current.txt
     return File(apiDir, "current.txt")
 }
 

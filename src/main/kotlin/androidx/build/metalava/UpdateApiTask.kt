@@ -57,7 +57,7 @@ open class UpdateApiTask : MetalavaTask() {
     fun exec() {
         val dependencyClasspath = checkNotNull(
                 dependencyClasspath) { "Dependency classpath not set." }
-        val currentTxtFile = checkNotNull(currentTxtFile) { "current.txt not set." }
+        val currentTxtFile = checkNotNull(currentTxtFile) { "Current API file not set." }
         check(bootClasspath.isNotEmpty()) { "Android boot classpath not set." }
         check(sourcePaths.isNotEmpty()) { "Source paths not set." }
 
