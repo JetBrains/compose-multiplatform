@@ -19,6 +19,7 @@ package androidx.build.metalava
 import androidx.build.AndroidXPlugin.Companion.BUILD_ON_SERVER_TASK
 import androidx.build.SupportLibraryExtension
 import androidx.build.androidJarFile
+import androidx.build.checkapi.getCurrentApiFile
 import androidx.build.checkapi.hasApiFolder
 import androidx.build.checkapi.hasApiTasks
 import com.android.build.gradle.LibraryExtension
@@ -54,7 +55,7 @@ object Metalava {
                     return@all
                 }
 
-                val apiTxt = project.file("api/current.txt")
+                val apiTxt = project.getCurrentApiFile()
 
                 val checkApi = project.tasks.create("checkApi", CheckApiTask::class.java) { task ->
                     task.configuration = metalavaConfiguration
@@ -93,7 +94,7 @@ object Metalava {
         }
 
         val metalavaConfiguration = project.createMetalavaConfiguration()
-        val apiTxt = project.file("api/current.txt")
+        val apiTxt = project.getCurrentApiFile()
 
         val javaPluginConvention = project.convention.getPlugin<JavaPluginConvention>()
         val mainSourceSet = javaPluginConvention.sourceSets.getByName("main")
