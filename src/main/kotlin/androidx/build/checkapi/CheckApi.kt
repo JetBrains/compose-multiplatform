@@ -59,8 +59,8 @@ fun initializeApiChecksForProject(
     val generateApi = createGenerateApiTask(project, docletClasspath)
     generateApi.dependsOn(doclavaConfiguration)
 
-    // for verifying that the API surface has not broken since the last release
-    val lastReleasedApiFile = getLastReleasedApiFile(workingDir, version)
+    // for verifying that the API surface has not broken since the last minor release
+    val lastReleasedApiFile = getLastReleasedApiFile(workingDir, version, true, true)
 
     val whitelistFile = lastReleasedApiFile?.let { apiFile ->
         File(lastReleasedApiFile.parentFile, stripExtension(apiFile.name) + ".ignore")
@@ -98,7 +98,7 @@ fun initializeApiChecksForProject(
     val updateApiTask = createUpdateApiTask(project, checkApiRelease)
     updateApiTask.dependsOn(checkApiRelease)
 
-    val oldApiTxt = getOldApiTxt(project)
+    val oldApiTxt = getOldApiTxtForDocDiffs(project)
     if (oldApiTxt != null) {
         aggregateOldApiTxtsTask.addInput(project.name, oldApiTxt)
     }
@@ -209,9 +209,9 @@ private fun getApiFile(rootDir: File, refVersion: Version, forceRelease: Boolean
 }
 
 /**
- * Returns the filepath of the previous API txt file (for computing diffs against)
+ * Returns the filepath of the previous API txt file
  */
-private fun getOldApiTxt(project: Project): File? {
+private fun getOldApiTxtForDocDiffs(project: Project): File? {
     val toApi = project.processProperty("toApi")?.let {
         Version.parseOrNull(it)
     }
@@ -222,32 +222,52 @@ private fun getOldApiTxt(project: Project): File? {
         File(rootFolder, "api/$fromApi.txt")
     } else {
         // Use the most recently released API file bounded by toApi.
-        getLastReleasedApiFile(rootFolder, toApi)
+        getLastReleasedApiFile(rootFolder, toApi, false, false)
     }
 }
 
-private fun getLastReleasedApiFile(rootFolder: File, refVersion: Version?): File? {
+private fun getLastReleasedApiFile(
+    rootFolder: File,
+    refVersion: Version?,
+    requireFinalApi: Boolean,
+    requireSameMajorRevision: Boolean
+): File? {
     val apiDir = File(rootFolder, "api")
-    return getLastReleasedApiFileFromDir(apiDir, refVersion)
+    return getLastReleasedApiFileFromDir(apiDir, refVersion, requireFinalApi,
+        requireSameMajorRevision)
 }
 
 /**
- * Returns the api file with highest version among those having version less than refVersion
+ * Returns the api file with highest version among those having version less than
+ * maxVersionExclusive or null.
+ * Ignores alpha versions if requireFinalApi is true.
+ * If requireSameMajorRevision is true then only considers releases having the same major revision.
  */
-private fun getLastReleasedApiFileFromDir(apiDir: File, refVersion: Version?): File? {
+private fun getLastReleasedApiFileFromDir(
+    apiDir: File,
+    maxVersionExclusive: Version?,
+    requireFinalApi: Boolean,
+    requireSameMajorRevision: Boolean
+): File? {
+    if (requireSameMajorRevision && maxVersionExclusive == null) {
+        throw GradleException("Version is not specified for the current project, " +
+                "please specify a mavenVersion in your gradle build file")
+    }
     var lastFile: File? = null
     var lastVersion: Version? = null
     apiDir.listFiles().forEach { file ->
         val parsed = Version.parseOrNull(file)
         parsed?.let { version ->
             if ((lastFile == null || lastVersion!! < version) &&
-                    (refVersion == null || version < refVersion)) {
+                (maxVersionExclusive == null || version < maxVersionExclusive) &&
+                if (requireFinalApi) version.isFinalApi() else true &&
+                if (requireSameMajorRevision) version.major == maxVersionExclusive?.major
+                else true) {
                 lastFile = file
                 lastVersion = version
             }
         }
     }
-
     return lastFile
 }
 
