@@ -101,6 +101,11 @@ object LibraryVersions {
     /**
      * Version code for Appcompat
      */
+    val ACTIVITY = Version("1.0.0-alpha01")
+
+    /**
+     * Version code for Appcompat
+     */
     val APPCOMPAT = Version("1.1.0-alpha01")
 
     /**
