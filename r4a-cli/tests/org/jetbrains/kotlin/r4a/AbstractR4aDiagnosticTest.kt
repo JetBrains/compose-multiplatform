@@ -67,7 +67,7 @@ abstract class AbstractR4aDiagnosticsTest: KtUsefulTestCase() {
                     val reportedRange = reportedDiagnostic.textRanges.find { it.startOffset == range.start && it.endOffset == range.end }
                     if (reportedRange == null) {
                         val firstRange = reportedDiagnostic.textRanges.first()
-                        message.append("  Error ${diagnostic.name} reported at ${firstRange.startOffset} but expected at ${range.start}\n")
+                        message.append("  Error ${diagnostic.name} reported at ${firstRange.startOffset}-${firstRange.endOffset} but expected at ${range.start}-${range.end}\n")
                         message.append(sourceInfo(clearText, firstRange.startOffset, firstRange.endOffset, "  "))
                     }
                     errors.remove(reportedDiagnostic)
