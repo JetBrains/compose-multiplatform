@@ -70,9 +70,14 @@ class KtxTypedHandler : TypedHandlerDelegate() {
             '/' -> {
                 // if `</` is typed, we can complete the closing tag...
                 if (justTypedTheDivOfAClosingTag(editor)) {
-                    val errorKtxElement = file.findElementAt(editor.caretModel.offset - 1)?.parent ?: error("expected to find error ktx element")
+                    PsiDocumentManager.getInstance(project).commitDocument(editor.document)
+                    val div = file.findElementAt(editor.caretModel.offset - 1) ?: return Result.CONTINUE
+                    assert(div.node.elementType == KtTokens.DIV)
+                    val errorKtxElement = div.parent as? PsiErrorElement ?: return Result.CONTINUE
+                    // when the closing tag isn't fully formed, we actually parse it as an error tag in the body of the unclosed
+                    // parent tag. Thus, to find the tag we want to close, we find the first parent ktx element
                     val el = errorKtxElement.parentOfType<KtxElement>() ?: return Result.CONTINUE
-                    val openTag = el.qualifiedTagName ?: el.simpleTagName ?: error("no tag name found")
+                    val openTag = el.qualifiedTagName ?: el.simpleTagName ?: return Result.CONTINUE
                     val tagText = editor.document.charsSequence.subSequence(openTag.startOffset, openTag.endOffset)
                     EditorModificationUtil.insertStringAtCaret(editor, "$tagText>", false, true)
                     return Result.STOP
@@ -94,8 +99,11 @@ class KtxTypedHandler : TypedHandlerDelegate() {
                 if (justTypedTheClosingBracketOfOpenTag(editor)) {
                     PsiDocumentManager.getInstance(project).commitDocument(editor.document)
 
-                    val el = file.findElementAt(editor.caretModel.offset - 1)?.parent as? KtxElement ?: return Result.CONTINUE
-                    val openTag = el.qualifiedTagName ?: el.simpleTagName ?: error("no tag name found")
+                    val gt = file.findElementAt(editor.caretModel.offset - 1) ?: return Result.CONTINUE
+                    assert(gt.node.elementType == KtTokens.GT)
+
+                    val el = gt.parent as? KtxElement ?: return Result.CONTINUE
+                    val openTag = el.qualifiedTagName ?: el.simpleTagName ?: return Result.CONTINUE
                     val closeTag = el.qualifiedClosingTagName ?: el.simpleClosingTagName
                     if (closeTag != null) {
                         // this element already has a closing tag, so we don't want to add another one...
@@ -116,8 +124,7 @@ class KtxTypedHandler : TypedHandlerDelegate() {
         val iterator = editor.highlighter.createIterator(editor.caretModel.offset)
         with(iterator) {
             retreat()
-            // if it turns out there are valid reasons for this to not be a div, we can change from assert to early return
-            assert(tokenType == KtTokens.GT) { "expected a GT token type but instead was $tokenType" }
+            if (tokenType != KtTokens.GT) return false
 
             retreat()
             // if it's a DIV then the tag was self-closing and there's nothing we need to do
@@ -130,8 +137,7 @@ class KtxTypedHandler : TypedHandlerDelegate() {
         val iterator = editor.highlighter.createIterator(editor.caretModel.offset)
         with(iterator) {
             retreat()
-            // if it turns out there are valid reasons for this to not be a div, we can change from assert to early return
-            assert(tokenType == KtTokens.DIV) { "expected a div token type but instead was $tokenType"}
+            if (tokenType != KtTokens.DIV) return false
             retreat()
 
             if (tokenType != KtTokens.LT) return false // we aren't in a ktx closing tag
@@ -143,8 +149,7 @@ class KtxTypedHandler : TypedHandlerDelegate() {
         val iterator = editor.highlighter.createIterator(editor.caretModel.offset)
         with(iterator) {
             retreat()
-            // if it turns out there are valid reasons for this to not be a div, we can change from assert to early return
-            assert(tokenType == KtTokens.DIV) { "expected a div token type but instead was $tokenType"}
+            if (tokenType != KtTokens.DIV) return false
             retreat()
 
             if (tokenType == KtTokens.LT) return false // we aren't in a ktx closing tag
