@@ -31,6 +31,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.ASYNCLAYOUTINFLATER, defaultVersion)
     prebuilts(LibraryGroups.BROWSER, defaultVersion)
     ignore(LibraryGroups.CAR, "car-cluster")
+    ignore(LibraryGroups.CAR, "car-moderator")
     prebuilts(LibraryGroups.CAR, "1.0.0-alpha4")
             .addStubs("car/stubs/android.car.jar")
     prebuilts(LibraryGroups.CARDVIEW, defaultVersion)
