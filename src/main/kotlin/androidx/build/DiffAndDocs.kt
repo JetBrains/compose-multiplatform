@@ -291,9 +291,8 @@ object DiffAndDocs {
     ) {
 
         registerPrebuilts(extension)
-
         library.libraryVariants.all { variant ->
-            if (variant.name == "release") {
+            if (variant.name == Release.DEFAULT_PUBLISH_CONFIG) {
                 // include R.file generated for prebuilts
                 rules.filter { it.resolve(extension)?.strategy is Prebuilts }.forEach { rule ->
                     docsTasks[rule.name]?.include { fileTreeElement ->
