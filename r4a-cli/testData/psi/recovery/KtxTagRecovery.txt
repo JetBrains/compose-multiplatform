@@ -1,0 +1,388 @@
+KtFile: KtxTagRecovery.kt
+  PACKAGE_DIRECTIVE
+    <empty list>
+  IMPORT_LIST
+    <empty list>
+  FUN
+    PsiElement(fun)('fun')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('a0')
+    VALUE_PARAMETER_LIST
+      PsiElement(LPAR)('(')
+      PsiElement(RPAR)(')')
+    PsiWhiteSpace(' ')
+    BLOCK
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      PsiErrorElement:Invalid KTX tag
+        PsiElement(LT)('<')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n\n')
+  FUN
+    PsiElement(fun)('fun')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('a1')
+    VALUE_PARAMETER_LIST
+      PsiElement(LPAR)('(')
+      PsiElement(RPAR)(')')
+    PsiWhiteSpace(' ')
+    BLOCK
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      PsiErrorElement:Invalid KTX tag
+        PsiElement(LT)('<')
+        REFERENCE_EXPRESSION
+          PsiElement(IDENTIFIER)('Bar')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n\n')
+  FUN
+    PsiElement(fun)('fun')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('a2')
+    VALUE_PARAMETER_LIST
+      PsiElement(LPAR)('(')
+      PsiElement(RPAR)(')')
+    PsiWhiteSpace(' ')
+    BLOCK
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      PsiErrorElement:Invalid KTX tag
+        PsiElement(LT)('<')
+        DOT_QUALIFIED_EXPRESSION
+          DOT_QUALIFIED_EXPRESSION
+            REFERENCE_EXPRESSION
+              PsiElement(IDENTIFIER)('com')
+            PsiElement(DOT)('.')
+            REFERENCE_EXPRESSION
+              PsiElement(IDENTIFIER)('foo')
+          PsiElement(DOT)('.')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n\n')
+  FUN
+    PsiElement(fun)('fun')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('a3')
+    VALUE_PARAMETER_LIST
+      PsiElement(LPAR)('(')
+      PsiElement(RPAR)(')')
+    PsiWhiteSpace(' ')
+    BLOCK
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      PsiErrorElement:Invalid KTX tag
+        PsiElement(LT)('<')
+        REFERENCE_EXPRESSION
+          PsiElement(IDENTIFIER)('Bar')
+        PsiWhiteSpace(' ')
+        KTX_ATTRIBUTE
+          REFERENCE_EXPRESSION
+            PsiElement(IDENTIFIER)('attribute')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n\n')
+  FUN
+    PsiElement(fun)('fun')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('a4')
+    VALUE_PARAMETER_LIST
+      PsiElement(LPAR)('(')
+      PsiElement(RPAR)(')')
+    PsiWhiteSpace(' ')
+    BLOCK
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      PsiErrorElement:Invalid KTX tag
+        PsiElement(LT)('<')
+        REFERENCE_EXPRESSION
+          PsiElement(IDENTIFIER)('Bar')
+        PsiWhiteSpace(' ')
+        KTX_ATTRIBUTE
+          REFERENCE_EXPRESSION
+            PsiElement(IDENTIFIER)('attribute')
+          PsiElement(EQ)('=')
+          PsiErrorElement:Expecting an element
+            <empty list>
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n\n')
+  FUN
+    PsiElement(fun)('fun')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('a5')
+    VALUE_PARAMETER_LIST
+      PsiElement(LPAR)('(')
+      PsiElement(RPAR)(')')
+    PsiWhiteSpace(' ')
+    BLOCK
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      PsiErrorElement:Invalid KTX tag
+        PsiElement(LT)('<')
+        REFERENCE_EXPRESSION
+          PsiElement(IDENTIFIER)('Bar')
+        PsiWhiteSpace(' ')
+        KTX_ATTRIBUTE
+          REFERENCE_EXPRESSION
+            PsiElement(IDENTIFIER)('attribute')
+          PsiElement(EQ)('=')
+          PsiWhiteSpace('\n    ')
+          CALL_EXPRESSION
+            REFERENCE_EXPRESSION
+              PsiElement(IDENTIFIER)('println')
+            VALUE_ARGUMENT_LIST
+              PsiElement(LPAR)('(')
+              VALUE_ARGUMENT
+                STRING_TEMPLATE
+                  PsiElement(OPEN_QUOTE)('"')
+                  LITERAL_STRING_TEMPLATE_ENTRY
+                    PsiElement(REGULAR_STRING_PART)('Some other statement, to break attribute expression')
+                  PsiElement(CLOSING_QUOTE)('"')
+              PsiElement(RPAR)(')')
+      PsiErrorElement:Expecting an element
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n\n')
+  FUN
+    PsiElement(fun)('fun')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('a6')
+    VALUE_PARAMETER_LIST
+      PsiElement(LPAR)('(')
+      PsiElement(RPAR)(')')
+    PsiWhiteSpace(' ')
+    BLOCK
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      PsiErrorElement:Invalid KTX tag
+        PsiElement(LT)('<')
+        REFERENCE_EXPRESSION
+          PsiElement(IDENTIFIER)('Bar')
+        PsiWhiteSpace(' ')
+        KTX_ATTRIBUTE
+          REFERENCE_EXPRESSION
+            PsiElement(IDENTIFIER)('attribute')
+          PsiElement(EQ)('=')
+          PARENTHESIZED
+            PsiElement(LPAR)('(')
+            PsiErrorElement:Expecting an expression
+              <empty list>
+            PsiElement(RPAR)(')')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n\n')
+  FUN
+    PsiElement(fun)('fun')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('a7')
+    VALUE_PARAMETER_LIST
+      PsiElement(LPAR)('(')
+      PsiElement(RPAR)(')')
+    PsiWhiteSpace(' ')
+    BLOCK
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      PsiErrorElement:Invalid KTX tag
+        PsiElement(LT)('<')
+        REFERENCE_EXPRESSION
+          PsiElement(IDENTIFIER)('Bar')
+        PsiWhiteSpace(' ')
+        KTX_ATTRIBUTE
+          REFERENCE_EXPRESSION
+            PsiElement(IDENTIFIER)('attribute')
+          PsiElement(EQ)('=')
+          STRING_TEMPLATE
+            PsiElement(OPEN_QUOTE)('"')
+            PsiErrorElement:Expecting '"'
+              <empty list>
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n\n')
+  FUN
+    PsiElement(fun)('fun')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('a8')
+    VALUE_PARAMETER_LIST
+      PsiElement(LPAR)('(')
+      PsiElement(RPAR)(')')
+    PsiWhiteSpace(' ')
+    BLOCK
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      KTX_ELEMENT
+        PsiElement(LT)('<')
+        REFERENCE_EXPRESSION
+          PsiElement(IDENTIFIER)('Bar')
+        PsiElement(GT)('>')
+        PsiWhiteSpace('\n')
+        KTX_BODY_LAMBDA
+          FUNCTION_LITERAL
+            BLOCK
+              <empty list>
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n\n')
+  FUN
+    PsiElement(fun)('fun')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('a9')
+    VALUE_PARAMETER_LIST
+      PsiElement(LPAR)('(')
+      PsiElement(RPAR)(')')
+    PsiWhiteSpace(' ')
+    BLOCK
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      KTX_ELEMENT
+        PsiElement(LT)('<')
+        REFERENCE_EXPRESSION
+          PsiElement(IDENTIFIER)('Bar')
+        PsiElement(GT)('>')
+        KTX_BODY_LAMBDA
+          FUNCTION_LITERAL
+            BLOCK
+              PsiErrorElement:Invalid KTX tag
+                PsiElement(LT)('<')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n\n')
+  FUN
+    PsiElement(fun)('fun')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('a10')
+    VALUE_PARAMETER_LIST
+      PsiElement(LPAR)('(')
+      PsiElement(RPAR)(')')
+    PsiWhiteSpace(' ')
+    BLOCK
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      KTX_ELEMENT
+        PsiElement(LT)('<')
+        REFERENCE_EXPRESSION
+          PsiElement(IDENTIFIER)('Bar')
+        PsiElement(GT)('>')
+        KTX_BODY_LAMBDA
+          FUNCTION_LITERAL
+            BLOCK
+              PsiErrorElement:Expected `>` (end of KTX close tag)
+                PsiElement(LT)('<')
+                PsiElement(DIV)('/')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n\n')
+  FUN
+    PsiElement(fun)('fun')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('a11')
+    VALUE_PARAMETER_LIST
+      PsiElement(LPAR)('(')
+      PsiElement(RPAR)(')')
+    PsiWhiteSpace(' ')
+    BLOCK
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      KTX_ELEMENT
+        PsiElement(LT)('<')
+        REFERENCE_EXPRESSION
+          PsiElement(IDENTIFIER)('Bar')
+        PsiElement(GT)('>')
+        KTX_BODY_LAMBDA
+          FUNCTION_LITERAL
+            BLOCK
+              <empty list>
+        PsiErrorElement:Expected `>` (end of KTX close tag)
+          PsiElement(LT)('<')
+          PsiElement(DIV)('/')
+          REFERENCE_EXPRESSION
+            PsiElement(IDENTIFIER)('Bar')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n\n')
+  FUN
+    PsiElement(fun)('fun')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('a12')
+    VALUE_PARAMETER_LIST
+      PsiElement(LPAR)('(')
+      PsiElement(RPAR)(')')
+    PsiWhiteSpace(' ')
+    BLOCK
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      KTX_ELEMENT
+        PsiElement(LT)('<')
+        DOT_QUALIFIED_EXPRESSION
+          DOT_QUALIFIED_EXPRESSION
+            REFERENCE_EXPRESSION
+              PsiElement(IDENTIFIER)('com')
+            PsiElement(DOT)('.')
+            REFERENCE_EXPRESSION
+              PsiElement(IDENTIFIER)('foo')
+          PsiElement(DOT)('.')
+          REFERENCE_EXPRESSION
+            PsiElement(IDENTIFIER)('Noise')
+        PsiElement(GT)('>')
+        KTX_BODY_LAMBDA
+          FUNCTION_LITERAL
+            BLOCK
+              PsiErrorElement:Expected `>` (end of KTX close tag)
+                PsiElement(LT)('<')
+                PsiElement(DIV)('/')
+                DOT_QUALIFIED_EXPRESSION
+                  DOT_QUALIFIED_EXPRESSION
+                    REFERENCE_EXPRESSION
+                      PsiElement(IDENTIFIER)('com')
+                    PsiElement(DOT)('.')
+                    REFERENCE_EXPRESSION
+                      PsiElement(IDENTIFIER)('foo')
+                  PsiElement(DOT)('.')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n\n')
+  FUN
+    PsiElement(fun)('fun')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('a13')
+    VALUE_PARAMETER_LIST
+      PsiElement(LPAR)('(')
+      PsiElement(RPAR)(')')
+    PsiWhiteSpace(' ')
+    BLOCK
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      CALL_EXPRESSION
+        REFERENCE_EXPRESSION
+          PsiElement(IDENTIFIER)('lambda')
+        PsiWhiteSpace(' ')
+        LAMBDA_ARGUMENT
+          LAMBDA_EXPRESSION
+            FUNCTION_LITERAL
+              PsiElement(LBRACE)('{')
+              PsiWhiteSpace('\n        ')
+              BLOCK
+                KTX_ELEMENT
+                  PsiElement(LT)('<')
+                  REFERENCE_EXPRESSION
+                    PsiElement(IDENTIFIER)('Bar')
+                  PsiWhiteSpace(' ')
+                  KTX_ATTRIBUTE
+                    REFERENCE_EXPRESSION
+                      PsiElement(IDENTIFIER)('attribute')
+                    PsiElement(EQ)('=')
+                    PROPERTY
+                      PsiElement(val)('val')
+                      PsiWhiteSpace(' ')
+                      PsiErrorElement:Expecting property name or receiver type
+                        PsiElement(DIV)('/')
+                  PsiElement(GT)('>')
+                  PsiWhiteSpace('\n    ')
+                  KTX_BODY_LAMBDA
+                    FUNCTION_LITERAL
+                      BLOCK
+                        <empty list>
+              PsiElement(RBRACE)('}')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')

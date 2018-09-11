@@ -1,0 +1,773 @@
+KtFile: Ktx.kt
+  PACKAGE_DIRECTIVE
+    <empty list>
+  IMPORT_LIST
+    IMPORT_DIRECTIVE
+      PsiElement(import)('import')
+      PsiWhiteSpace(' ')
+      DOT_QUALIFIED_EXPRESSION
+        DOT_QUALIFIED_EXPRESSION
+          REFERENCE_EXPRESSION
+            PsiElement(IDENTIFIER)('android')
+          PsiElement(DOT)('.')
+          REFERENCE_EXPRESSION
+            PsiElement(IDENTIFIER)('graphics')
+        PsiElement(DOT)('.')
+        REFERENCE_EXPRESSION
+          PsiElement(IDENTIFIER)('Color')
+    PsiWhiteSpace('\n')
+    IMPORT_DIRECTIVE
+      PsiElement(import)('import')
+      PsiWhiteSpace(' ')
+      DOT_QUALIFIED_EXPRESSION
+        REFERENCE_EXPRESSION
+          PsiElement(IDENTIFIER)('android')
+        PsiElement(DOT)('.')
+        REFERENCE_EXPRESSION
+          PsiElement(IDENTIFIER)('widget')
+      PsiElement(DOT)('.')
+      PsiElement(MUL)('*')
+    PsiWhiteSpace('\n')
+    IMPORT_DIRECTIVE
+      PsiElement(import)('import')
+      PsiWhiteSpace(' ')
+      DOT_QUALIFIED_EXPRESSION
+        DOT_QUALIFIED_EXPRESSION
+          REFERENCE_EXPRESSION
+            PsiElement(IDENTIFIER)('com')
+          PsiElement(DOT)('.')
+          REFERENCE_EXPRESSION
+            PsiElement(IDENTIFIER)('google')
+        PsiElement(DOT)('.')
+        REFERENCE_EXPRESSION
+          PsiElement(IDENTIFIER)('r4a')
+      PsiElement(DOT)('.')
+      PsiElement(MUL)('*')
+  PsiWhiteSpace('\n\n')
+  CLASS
+    PsiElement(class)('class')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('MainComponent')
+    PsiWhiteSpace(' ')
+    PsiElement(COLON)(':')
+    PsiWhiteSpace(' ')
+    SUPER_TYPE_LIST
+      SUPER_TYPE_CALL_ENTRY
+        CONSTRUCTOR_CALLEE
+          TYPE_REFERENCE
+            USER_TYPE
+              REFERENCE_EXPRESSION
+                PsiElement(IDENTIFIER)('Component')
+        VALUE_ARGUMENT_LIST
+          PsiElement(LPAR)('(')
+          PsiElement(RPAR)(')')
+    PsiWhiteSpace(' ')
+    CLASS_BODY
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n\n    ')
+      FUN
+        MODIFIER_LIST
+          PsiElement(public)('public')
+          PsiWhiteSpace(' ')
+          PsiElement(override)('override')
+        PsiWhiteSpace(' ')
+        PsiElement(fun)('fun')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('render')
+        VALUE_PARAMETER_LIST
+          PsiElement(LPAR)('(')
+          PsiElement(RPAR)(')')
+        PsiWhiteSpace(' ')
+        BLOCK
+          PsiElement(LBRACE)('{')
+          PsiWhiteSpace('\n        ')
+          PROPERTY
+            PsiElement(val)('val')
+            PsiWhiteSpace(' ')
+            PsiElement(IDENTIFIER)('fontSize')
+            PsiWhiteSpace(' ')
+            PsiElement(EQ)('=')
+            PsiWhiteSpace(' ')
+            DOT_QUALIFIED_EXPRESSION
+              REFERENCE_EXPRESSION
+                PsiElement(IDENTIFIER)('MyApplicationData')
+              PsiElement(DOT)('.')
+              REFERENCE_EXPRESSION
+                PsiElement(IDENTIFIER)('currentFontSize')
+          PsiElement(SEMICOLON)(';')
+          PsiWhiteSpace('\n        ')
+          KTX_ELEMENT
+            PsiElement(LT)('<')
+            REFERENCE_EXPRESSION
+              PsiElement(IDENTIFIER)('LinearLayout')
+            PsiWhiteSpace(' ')
+            KTX_ATTRIBUTE
+              REFERENCE_EXPRESSION
+                PsiElement(IDENTIFIER)('orientation')
+              PsiElement(EQ)('=')
+              STRING_TEMPLATE
+                PsiElement(OPEN_QUOTE)('"')
+                LITERAL_STRING_TEMPLATE_ENTRY
+                  PsiElement(REGULAR_STRING_PART)('vertical')
+                PsiElement(CLOSING_QUOTE)('"')
+            PsiWhiteSpace(' ')
+            KTX_ATTRIBUTE
+              REFERENCE_EXPRESSION
+                PsiElement(IDENTIFIER)('layoutParams')
+              PsiElement(EQ)('=')
+              DOT_QUALIFIED_EXPRESSION
+                REFERENCE_EXPRESSION
+                  PsiElement(IDENTIFIER)('LinearLayout')
+                PsiElement(DOT)('.')
+                CALL_EXPRESSION
+                  REFERENCE_EXPRESSION
+                    PsiElement(IDENTIFIER)('LayoutParams')
+                  VALUE_ARGUMENT_LIST
+                    PsiElement(LPAR)('(')
+                    VALUE_ARGUMENT
+                      DOT_QUALIFIED_EXPRESSION
+                        DOT_QUALIFIED_EXPRESSION
+                          REFERENCE_EXPRESSION
+                            PsiElement(IDENTIFIER)('LinearLayout')
+                          PsiElement(DOT)('.')
+                          REFERENCE_EXPRESSION
+                            PsiElement(IDENTIFIER)('LayoutParams')
+                        PsiElement(DOT)('.')
+                        REFERENCE_EXPRESSION
+                          PsiElement(IDENTIFIER)('MATCH_PARENT')
+                    PsiElement(COMMA)(',')
+                    PsiWhiteSpace(' ')
+                    VALUE_ARGUMENT
+                      DOT_QUALIFIED_EXPRESSION
+                        DOT_QUALIFIED_EXPRESSION
+                          REFERENCE_EXPRESSION
+                            PsiElement(IDENTIFIER)('LinearLayout')
+                          PsiElement(DOT)('.')
+                          REFERENCE_EXPRESSION
+                            PsiElement(IDENTIFIER)('LayoutParams')
+                        PsiElement(DOT)('.')
+                        REFERENCE_EXPRESSION
+                          PsiElement(IDENTIFIER)('MATCH_PARENT')
+                    PsiElement(COMMA)(',')
+                    PsiWhiteSpace(' ')
+                    VALUE_ARGUMENT
+                      FLOAT_CONSTANT
+                        PsiElement(FLOAT_CONSTANT)('1.0f')
+                    PsiElement(RPAR)(')')
+            PsiElement(GT)('>')
+            PsiWhiteSpace('\n            ')
+            KTX_BODY_LAMBDA
+              FUNCTION_LITERAL
+                BLOCK
+                  KTX_ELEMENT
+                    PsiElement(LT)('<')
+                    DOT_QUALIFIED_EXPRESSION
+                      DOT_QUALIFIED_EXPRESSION
+                        REFERENCE_EXPRESSION
+                          PsiElement(IDENTIFIER)('android')
+                        PsiElement(DOT)('.')
+                        REFERENCE_EXPRESSION
+                          PsiElement(IDENTIFIER)('widget')
+                      PsiElement(DOT)('.')
+                      REFERENCE_EXPRESSION
+                        PsiElement(IDENTIFIER)('Button')
+                    PsiWhiteSpace(' ')
+                    KTX_ATTRIBUTE
+                      REFERENCE_EXPRESSION
+                        PsiElement(IDENTIFIER)('text')
+                      PsiElement(EQ)('=')
+                      STRING_TEMPLATE
+                        PsiElement(OPEN_QUOTE)('"')
+                        LITERAL_STRING_TEMPLATE_ENTRY
+                          PsiElement(REGULAR_STRING_PART)('Increase Font Size')
+                        PsiElement(CLOSING_QUOTE)('"')
+                    PsiWhiteSpace(' ')
+                    KTX_ATTRIBUTE
+                      REFERENCE_EXPRESSION
+                        PsiElement(IDENTIFIER)('onClick')
+                      PsiElement(EQ)('=')
+                      LAMBDA_EXPRESSION
+                        FUNCTION_LITERAL
+                          PsiElement(LBRACE)('{')
+                          BLOCK
+                            BINARY_EXPRESSION
+                              DOT_QUALIFIED_EXPRESSION
+                                REFERENCE_EXPRESSION
+                                  PsiElement(IDENTIFIER)('MyApplicationData')
+                                PsiElement(DOT)('.')
+                                REFERENCE_EXPRESSION
+                                  PsiElement(IDENTIFIER)('currentFontSize')
+                              PsiWhiteSpace(' ')
+                              OPERATION_REFERENCE
+                                PsiElement(EQ)('=')
+                              PsiWhiteSpace(' ')
+                              BINARY_EXPRESSION
+                                REFERENCE_EXPRESSION
+                                  PsiElement(IDENTIFIER)('fontSize')
+                                OPERATION_REFERENCE
+                                  PsiElement(PLUS)('+')
+                                INTEGER_CONSTANT
+                                  PsiElement(INTEGER_LITERAL)('5')
+                            PsiElement(SEMICOLON)(';')
+                            PsiWhiteSpace(' ')
+                            CALL_EXPRESSION
+                              REFERENCE_EXPRESSION
+                                PsiElement(IDENTIFIER)('rerender')
+                              VALUE_ARGUMENT_LIST
+                                PsiElement(LPAR)('(')
+                                PsiElement(RPAR)(')')
+                          PsiElement(RBRACE)('}')
+                    PsiWhiteSpace(' ')
+                    KTX_ATTRIBUTE
+                      REFERENCE_EXPRESSION
+                        PsiElement(IDENTIFIER)('enabled')
+                      PsiElement(EQ)('=')
+                      PARENTHESIZED
+                        PsiElement(LPAR)('(')
+                        BINARY_EXPRESSION
+                          REFERENCE_EXPRESSION
+                            PsiElement(IDENTIFIER)('fontSize')
+                          PsiWhiteSpace(' ')
+                          OPERATION_REFERENCE
+                            PsiElement(LT)('<')
+                          PsiWhiteSpace(' ')
+                          INTEGER_CONSTANT
+                            PsiElement(INTEGER_LITERAL)('100')
+                        PsiElement(RPAR)(')')
+                    PsiWhiteSpace(' ')
+                    PsiElement(DIV)('/')
+                    PsiElement(GT)('>')
+                  PsiWhiteSpace('\n            ')
+                  KTX_ELEMENT
+                    PsiElement(LT)('<')
+                    DOT_QUALIFIED_EXPRESSION
+                      DOT_QUALIFIED_EXPRESSION
+                        REFERENCE_EXPRESSION
+                          PsiElement(IDENTIFIER)('android')
+                        PsiElement(DOT)('.')
+                        REFERENCE_EXPRESSION
+                          PsiElement(IDENTIFIER)('widget')
+                      PsiElement(DOT)('.')
+                      REFERENCE_EXPRESSION
+                        PsiElement(IDENTIFIER)('Button')
+                    PsiWhiteSpace(' ')
+                    KTX_ATTRIBUTE
+                      REFERENCE_EXPRESSION
+                        PsiElement(IDENTIFIER)('text')
+                      PsiElement(EQ)('=')
+                      STRING_TEMPLATE
+                        PsiElement(OPEN_QUOTE)('"')
+                        LITERAL_STRING_TEMPLATE_ENTRY
+                          PsiElement(REGULAR_STRING_PART)('Decrease Font Size')
+                        PsiElement(CLOSING_QUOTE)('"')
+                    PsiWhiteSpace(' ')
+                    KTX_ATTRIBUTE
+                      REFERENCE_EXPRESSION
+                        PsiElement(IDENTIFIER)('onClick')
+                      PsiElement(EQ)('=')
+                      LAMBDA_EXPRESSION
+                        FUNCTION_LITERAL
+                          PsiElement(LBRACE)('{')
+                          BLOCK
+                            BINARY_EXPRESSION
+                              DOT_QUALIFIED_EXPRESSION
+                                REFERENCE_EXPRESSION
+                                  PsiElement(IDENTIFIER)('MyApplicationData')
+                                PsiElement(DOT)('.')
+                                REFERENCE_EXPRESSION
+                                  PsiElement(IDENTIFIER)('currentFontSize')
+                              PsiWhiteSpace(' ')
+                              OPERATION_REFERENCE
+                                PsiElement(EQ)('=')
+                              PsiWhiteSpace(' ')
+                              BINARY_EXPRESSION
+                                REFERENCE_EXPRESSION
+                                  PsiElement(IDENTIFIER)('fontSize')
+                                OPERATION_REFERENCE
+                                  PsiElement(MINUS)('-')
+                                INTEGER_CONSTANT
+                                  PsiElement(INTEGER_LITERAL)('5')
+                            PsiElement(SEMICOLON)(';')
+                            PsiWhiteSpace(' ')
+                            CALL_EXPRESSION
+                              REFERENCE_EXPRESSION
+                                PsiElement(IDENTIFIER)('rerender')
+                              VALUE_ARGUMENT_LIST
+                                PsiElement(LPAR)('(')
+                                PsiElement(RPAR)(')')
+                          PsiElement(RBRACE)('}')
+                    PsiWhiteSpace(' ')
+                    KTX_ATTRIBUTE
+                      REFERENCE_EXPRESSION
+                        PsiElement(IDENTIFIER)('enabled')
+                      PsiElement(EQ)('=')
+                      PARENTHESIZED
+                        PsiElement(LPAR)('(')
+                        BINARY_EXPRESSION
+                          REFERENCE_EXPRESSION
+                            PsiElement(IDENTIFIER)('fontSize')
+                          PsiWhiteSpace(' ')
+                          OPERATION_REFERENCE
+                            PsiElement(GT)('>')
+                          PsiWhiteSpace(' ')
+                          INTEGER_CONSTANT
+                            PsiElement(INTEGER_LITERAL)('10')
+                        PsiElement(RPAR)(')')
+                    PsiWhiteSpace(' ')
+                    PsiElement(DIV)('/')
+                    PsiElement(GT)('>')
+                  PsiWhiteSpace('\n            ')
+                  KTX_ELEMENT
+                    PsiElement(LT)('<')
+                    REFERENCE_EXPRESSION
+                      PsiElement(IDENTIFIER)('LinearLayout')
+                    PsiElement(GT)('>')
+                    PsiWhiteSpace('\n                ')
+                    KTX_BODY_LAMBDA
+                      FUNCTION_LITERAL
+                        BLOCK
+                          PROPERTY
+                            PsiElement(var)('var')
+                            PsiWhiteSpace(' ')
+                            PsiElement(IDENTIFIER)('colorButtonLayout')
+                            PsiWhiteSpace(' ')
+                            PsiElement(EQ)('=')
+                            PsiWhiteSpace(' ')
+                            DOT_QUALIFIED_EXPRESSION
+                              REFERENCE_EXPRESSION
+                                PsiElement(IDENTIFIER)('LinearLayout')
+                              PsiElement(DOT)('.')
+                              CALL_EXPRESSION
+                                REFERENCE_EXPRESSION
+                                  PsiElement(IDENTIFIER)('LayoutParams')
+                                VALUE_ARGUMENT_LIST
+                                  PsiElement(LPAR)('(')
+                                  VALUE_ARGUMENT
+                                    DOT_QUALIFIED_EXPRESSION
+                                      DOT_QUALIFIED_EXPRESSION
+                                        REFERENCE_EXPRESSION
+                                          PsiElement(IDENTIFIER)('LinearLayout')
+                                        PsiElement(DOT)('.')
+                                        REFERENCE_EXPRESSION
+                                          PsiElement(IDENTIFIER)('LayoutParams')
+                                      PsiElement(DOT)('.')
+                                      REFERENCE_EXPRESSION
+                                        PsiElement(IDENTIFIER)('MATCH_PARENT')
+                                  PsiElement(COMMA)(',')
+                                  PsiWhiteSpace(' ')
+                                  VALUE_ARGUMENT
+                                    DOT_QUALIFIED_EXPRESSION
+                                      DOT_QUALIFIED_EXPRESSION
+                                        REFERENCE_EXPRESSION
+                                          PsiElement(IDENTIFIER)('LinearLayout')
+                                        PsiElement(DOT)('.')
+                                        REFERENCE_EXPRESSION
+                                          PsiElement(IDENTIFIER)('LayoutParams')
+                                      PsiElement(DOT)('.')
+                                      REFERENCE_EXPRESSION
+                                        PsiElement(IDENTIFIER)('WRAP_CONTENT')
+                                  PsiElement(COMMA)(',')
+                                  PsiWhiteSpace(' ')
+                                  VALUE_ARGUMENT
+                                    FLOAT_CONSTANT
+                                      PsiElement(FLOAT_CONSTANT)('1.0f')
+                                  PsiElement(RPAR)(')')
+                          PsiElement(SEMICOLON)(';')
+                          PsiWhiteSpace('\n                ')
+                          PROPERTY
+                            PsiElement(val)('val')
+                            PsiWhiteSpace(' ')
+                            PsiElement(IDENTIFIER)('enabled')
+                            PsiWhiteSpace(' ')
+                            PsiElement(EQ)('=')
+                            PsiWhiteSpace(' ')
+                            BOOLEAN_CONSTANT
+                              PsiElement(true)('true')
+                          PsiWhiteSpace('\n                ')
+                          KTX_ELEMENT
+                            PsiElement(LT)('<')
+                            REFERENCE_EXPRESSION
+                              PsiElement(IDENTIFIER)('Button')
+                            PsiWhiteSpace(' ')
+                            KTX_ATTRIBUTE
+                              REFERENCE_EXPRESSION
+                                PsiElement(IDENTIFIER)('text')
+                              PsiElement(EQ)('=')
+                              STRING_TEMPLATE
+                                PsiElement(OPEN_QUOTE)('"')
+                                LITERAL_STRING_TEMPLATE_ENTRY
+                                  PsiElement(REGULAR_STRING_PART)('Red')
+                                PsiElement(CLOSING_QUOTE)('"')
+                            PsiWhiteSpace(' ')
+                            KTX_ATTRIBUTE
+                              REFERENCE_EXPRESSION
+                                PsiElement(IDENTIFIER)('layoutParams')
+                              PsiElement(EQ)('=')
+                              REFERENCE_EXPRESSION
+                                PsiElement(IDENTIFIER)('colorButtonLayout')
+                            PsiWhiteSpace(' ')
+                            KTX_ATTRIBUTE
+                              REFERENCE_EXPRESSION
+                                PsiElement(IDENTIFIER)('onClick')
+                              PsiElement(EQ)('=')
+                              LAMBDA_EXPRESSION
+                                FUNCTION_LITERAL
+                                  PsiElement(LBRACE)('{')
+                                  BLOCK
+                                    BINARY_EXPRESSION
+                                      DOT_QUALIFIED_EXPRESSION
+                                        REFERENCE_EXPRESSION
+                                          PsiElement(IDENTIFIER)('MyApplicationData')
+                                        PsiElement(DOT)('.')
+                                        REFERENCE_EXPRESSION
+                                          PsiElement(IDENTIFIER)('currentColor')
+                                      PsiWhiteSpace(' ')
+                                      OPERATION_REFERENCE
+                                        PsiElement(EQ)('=')
+                                      PsiWhiteSpace(' ')
+                                      DOT_QUALIFIED_EXPRESSION
+                                        REFERENCE_EXPRESSION
+                                          PsiElement(IDENTIFIER)('Color')
+                                        PsiElement(DOT)('.')
+                                        REFERENCE_EXPRESSION
+                                          PsiElement(IDENTIFIER)('RED')
+                                    PsiElement(SEMICOLON)(';')
+                                    PsiWhiteSpace(' ')
+                                    CALL_EXPRESSION
+                                      REFERENCE_EXPRESSION
+                                        PsiElement(IDENTIFIER)('rerender')
+                                      VALUE_ARGUMENT_LIST
+                                        PsiElement(LPAR)('(')
+                                        PsiElement(RPAR)(')')
+                                  PsiElement(RBRACE)('}')
+                            PsiWhiteSpace(' ')
+                            PsiElement(DIV)('/')
+                            PsiElement(GT)('>')
+                          PsiWhiteSpace('\n                ')
+                          KTX_ELEMENT
+                            PsiElement(LT)('<')
+                            REFERENCE_EXPRESSION
+                              PsiElement(IDENTIFIER)('Button')
+                            PsiWhiteSpace(' ')
+                            KTX_ATTRIBUTE
+                              REFERENCE_EXPRESSION
+                                PsiElement(IDENTIFIER)('text')
+                              PsiElement(EQ)('=')
+                              STRING_TEMPLATE
+                                PsiElement(OPEN_QUOTE)('"')
+                                LITERAL_STRING_TEMPLATE_ENTRY
+                                  PsiElement(REGULAR_STRING_PART)('Green')
+                                PsiElement(CLOSING_QUOTE)('"')
+                            PsiWhiteSpace(' ')
+                            KTX_ATTRIBUTE
+                              REFERENCE_EXPRESSION
+                                PsiElement(IDENTIFIER)('layoutParams')
+                              PsiElement(EQ)('=')
+                              REFERENCE_EXPRESSION
+                                PsiElement(IDENTIFIER)('colorButtonLayout')
+                            PsiWhiteSpace(' ')
+                            KTX_ATTRIBUTE
+                              REFERENCE_EXPRESSION
+                                PsiElement(IDENTIFIER)('onClick')
+                              PsiElement(EQ)('=')
+                              LAMBDA_EXPRESSION
+                                FUNCTION_LITERAL
+                                  PsiElement(LBRACE)('{')
+                                  BLOCK
+                                    BINARY_EXPRESSION
+                                      DOT_QUALIFIED_EXPRESSION
+                                        REFERENCE_EXPRESSION
+                                          PsiElement(IDENTIFIER)('MyApplicationData')
+                                        PsiElement(DOT)('.')
+                                        REFERENCE_EXPRESSION
+                                          PsiElement(IDENTIFIER)('currentColor')
+                                      PsiWhiteSpace(' ')
+                                      OPERATION_REFERENCE
+                                        PsiElement(EQ)('=')
+                                      PsiWhiteSpace(' ')
+                                      DOT_QUALIFIED_EXPRESSION
+                                        REFERENCE_EXPRESSION
+                                          PsiElement(IDENTIFIER)('Color')
+                                        PsiElement(DOT)('.')
+                                        REFERENCE_EXPRESSION
+                                          PsiElement(IDENTIFIER)('GREEN')
+                                    PsiElement(SEMICOLON)(';')
+                                    PsiWhiteSpace(' ')
+                                    CALL_EXPRESSION
+                                      REFERENCE_EXPRESSION
+                                        PsiElement(IDENTIFIER)('rerender')
+                                      VALUE_ARGUMENT_LIST
+                                        PsiElement(LPAR)('(')
+                                        PsiElement(RPAR)(')')
+                                  PsiElement(RBRACE)('}')
+                            PsiWhiteSpace(' ')
+                            PsiElement(DIV)('/')
+                            PsiElement(GT)('>')
+                          PsiWhiteSpace('\n                ')
+                          KTX_ELEMENT
+                            PsiElement(LT)('<')
+                            REFERENCE_EXPRESSION
+                              PsiElement(IDENTIFIER)('Button')
+                            PsiWhiteSpace(' ')
+                            KTX_ATTRIBUTE
+                              REFERENCE_EXPRESSION
+                                PsiElement(IDENTIFIER)('text')
+                              PsiElement(EQ)('=')
+                              STRING_TEMPLATE
+                                PsiElement(OPEN_QUOTE)('"')
+                                LITERAL_STRING_TEMPLATE_ENTRY
+                                  PsiElement(REGULAR_STRING_PART)('Blue')
+                                PsiElement(CLOSING_QUOTE)('"')
+                            PsiWhiteSpace(' ')
+                            KTX_ATTRIBUTE
+                              REFERENCE_EXPRESSION
+                                PsiElement(IDENTIFIER)('layoutParams')
+                              PsiElement(EQ)('=')
+                              REFERENCE_EXPRESSION
+                                PsiElement(IDENTIFIER)('colorButtonLayout')
+                            PsiWhiteSpace(' ')
+                            KTX_ATTRIBUTE
+                              REFERENCE_EXPRESSION
+                                PsiElement(IDENTIFIER)('onClick')
+                              PsiElement(EQ)('=')
+                              LAMBDA_EXPRESSION
+                                FUNCTION_LITERAL
+                                  PsiElement(LBRACE)('{')
+                                  BLOCK
+                                    BINARY_EXPRESSION
+                                      DOT_QUALIFIED_EXPRESSION
+                                        REFERENCE_EXPRESSION
+                                          PsiElement(IDENTIFIER)('MyApplicationData')
+                                        PsiElement(DOT)('.')
+                                        REFERENCE_EXPRESSION
+                                          PsiElement(IDENTIFIER)('currentColor')
+                                      PsiWhiteSpace(' ')
+                                      OPERATION_REFERENCE
+                                        PsiElement(EQ)('=')
+                                      PsiWhiteSpace(' ')
+                                      DOT_QUALIFIED_EXPRESSION
+                                        REFERENCE_EXPRESSION
+                                          PsiElement(IDENTIFIER)('Color')
+                                        PsiElement(DOT)('.')
+                                        REFERENCE_EXPRESSION
+                                          PsiElement(IDENTIFIER)('BLUE')
+                                    PsiElement(SEMICOLON)(';')
+                                    PsiWhiteSpace(' ')
+                                    CALL_EXPRESSION
+                                      REFERENCE_EXPRESSION
+                                        PsiElement(IDENTIFIER)('rerender')
+                                      VALUE_ARGUMENT_LIST
+                                        PsiElement(LPAR)('(')
+                                        PsiElement(RPAR)(')')
+                                  PsiElement(RBRACE)('}')
+                            PsiWhiteSpace(' ')
+                            PsiElement(DIV)('/')
+                            PsiElement(GT)('>')
+                          PsiWhiteSpace('\n                ')
+                          KTX_ELEMENT
+                            PsiElement(LT)('<')
+                            REFERENCE_EXPRESSION
+                              PsiElement(IDENTIFIER)('Button')
+                            PsiWhiteSpace(' ')
+                            KTX_ATTRIBUTE
+                              REFERENCE_EXPRESSION
+                                PsiElement(IDENTIFIER)('text')
+                              PsiElement(EQ)('=')
+                              STRING_TEMPLATE
+                                PsiElement(OPEN_QUOTE)('"')
+                                LITERAL_STRING_TEMPLATE_ENTRY
+                                  PsiElement(REGULAR_STRING_PART)('Gray')
+                                PsiElement(CLOSING_QUOTE)('"')
+                            PsiWhiteSpace(' ')
+                            KTX_ATTRIBUTE
+                              REFERENCE_EXPRESSION
+                                PsiElement(IDENTIFIER)('layoutParams')
+                              PsiElement(EQ)('=')
+                              REFERENCE_EXPRESSION
+                                PsiElement(IDENTIFIER)('colorButtonLayout')
+                            PsiWhiteSpace(' ')
+                            KTX_ATTRIBUTE
+                              REFERENCE_EXPRESSION
+                                PsiElement(IDENTIFIER)('onClick')
+                              PsiElement(EQ)('=')
+                              LAMBDA_EXPRESSION
+                                FUNCTION_LITERAL
+                                  PsiElement(LBRACE)('{')
+                                  BLOCK
+                                    BINARY_EXPRESSION
+                                      DOT_QUALIFIED_EXPRESSION
+                                        REFERENCE_EXPRESSION
+                                          PsiElement(IDENTIFIER)('MyApplicationData')
+                                        PsiElement(DOT)('.')
+                                        REFERENCE_EXPRESSION
+                                          PsiElement(IDENTIFIER)('currentColor')
+                                      PsiWhiteSpace(' ')
+                                      OPERATION_REFERENCE
+                                        PsiElement(EQ)('=')
+                                      PsiWhiteSpace(' ')
+                                      DOT_QUALIFIED_EXPRESSION
+                                        REFERENCE_EXPRESSION
+                                          PsiElement(IDENTIFIER)('Color')
+                                        PsiElement(DOT)('.')
+                                        REFERENCE_EXPRESSION
+                                          PsiElement(IDENTIFIER)('GRAY')
+                                    PsiElement(SEMICOLON)(';')
+                                    PsiWhiteSpace(' ')
+                                    CALL_EXPRESSION
+                                      REFERENCE_EXPRESSION
+                                        PsiElement(IDENTIFIER)('rerender')
+                                      VALUE_ARGUMENT_LIST
+                                        PsiElement(LPAR)('(')
+                                        PsiElement(RPAR)(')')
+                                  PsiElement(RBRACE)('}')
+                            PsiWhiteSpace(' ')
+                            PsiElement(DIV)('/')
+                            PsiElement(GT)('>')
+                          PsiWhiteSpace('\n                ')
+                          KTX_ELEMENT
+                            PsiElement(LT)('<')
+                            REFERENCE_EXPRESSION
+                              PsiElement(IDENTIFIER)('Button')
+                            PsiWhiteSpace(' ')
+                            KTX_ATTRIBUTE
+                              REFERENCE_EXPRESSION
+                                PsiElement(IDENTIFIER)('enabled')
+                            PsiWhiteSpace(' ')
+                            PsiElement(DIV)('/')
+                            PsiElement(GT)('>')
+                    PsiWhiteSpace('\n            ')
+                    PsiElement(LT)('<')
+                    PsiElement(DIV)('/')
+                    REFERENCE_EXPRESSION
+                      PsiElement(IDENTIFIER)('LinearLayout')
+                    PsiElement(GT)('>')
+                  PsiWhiteSpace('\n            ')
+                  KTX_ELEMENT
+                    PsiElement(LT)('<')
+                    REFERENCE_EXPRESSION
+                      PsiElement(IDENTIFIER)('ScrollView')
+                    PsiElement(GT)('>')
+                    PsiWhiteSpace('\n                ')
+                    KTX_BODY_LAMBDA
+                      FUNCTION_LITERAL
+                        BLOCK
+                          KTX_ELEMENT
+                            PsiElement(LT)('<')
+                            REFERENCE_EXPRESSION
+                              PsiElement(IDENTIFIER)('LinearLayout')
+                            PsiWhiteSpace(' ')
+                            KTX_ATTRIBUTE
+                              REFERENCE_EXPRESSION
+                                PsiElement(IDENTIFIER)('orientation')
+                              PsiElement(EQ)('=')
+                              STRING_TEMPLATE
+                                PsiElement(OPEN_QUOTE)('"')
+                                LITERAL_STRING_TEMPLATE_ENTRY
+                                  PsiElement(REGULAR_STRING_PART)('vertical')
+                                PsiElement(CLOSING_QUOTE)('"')
+                            PsiElement(GT)('>')
+                            PsiWhiteSpace('\n                    ')
+                            KTX_BODY_LAMBDA
+                              FUNCTION_LITERAL
+                                BLOCK
+                                  FOR
+                                    PsiElement(for)('for')
+                                    PsiElement(LPAR)('(')
+                                    VALUE_PARAMETER
+                                      PsiElement(IDENTIFIER)('x')
+                                    PsiWhiteSpace(' ')
+                                    PsiElement(in)('in')
+                                    PsiWhiteSpace(' ')
+                                    LOOP_RANGE
+                                      BINARY_EXPRESSION
+                                        INTEGER_CONSTANT
+                                          PsiElement(INTEGER_LITERAL)('1')
+                                        OPERATION_REFERENCE
+                                          PsiElement(RANGE)('..')
+                                        INTEGER_CONSTANT
+                                          PsiElement(INTEGER_LITERAL)('25')
+                                    PsiElement(RPAR)(')')
+                                    PsiWhiteSpace(' ')
+                                    BODY
+                                      BLOCK
+                                        PsiElement(LBRACE)('{')
+                                        PsiWhiteSpace('\n                        ')
+                                        KTX_ELEMENT
+                                          PsiElement(LT)('<')
+                                          REFERENCE_EXPRESSION
+                                            PsiElement(IDENTIFIER)('TextView')
+                                          PsiWhiteSpace(' ')
+                                          KTX_ATTRIBUTE
+                                            REFERENCE_EXPRESSION
+                                              PsiElement(IDENTIFIER)('text')
+                                            PsiWhiteSpace(' ')
+                                            PsiElement(EQ)('=')
+                                            PsiWhiteSpace(' ')
+                                            PARENTHESIZED
+                                              PsiElement(LPAR)('(')
+                                              BINARY_EXPRESSION
+                                                BINARY_EXPRESSION
+                                                  STRING_TEMPLATE
+                                                    PsiElement(OPEN_QUOTE)('"')
+                                                    LITERAL_STRING_TEMPLATE_ENTRY
+                                                      PsiElement(REGULAR_STRING_PART)('Hello Stephanie ')
+                                                    PsiElement(CLOSING_QUOTE)('"')
+                                                  OPERATION_REFERENCE
+                                                    PsiElement(PLUS)('+')
+                                                  REFERENCE_EXPRESSION
+                                                    PsiElement(IDENTIFIER)('x')
+                                                OPERATION_REFERENCE
+                                                  PsiElement(PLUS)('+')
+                                                STRING_TEMPLATE
+                                                  PsiElement(OPEN_QUOTE)('"')
+                                                  LITERAL_STRING_TEMPLATE_ENTRY
+                                                    PsiElement(REGULAR_STRING_PART)('!')
+                                                  PsiElement(CLOSING_QUOTE)('"')
+                                              PsiElement(RPAR)(')')
+                                          PsiWhiteSpace(' ')
+                                          KTX_ATTRIBUTE
+                                            REFERENCE_EXPRESSION
+                                              PsiElement(IDENTIFIER)('textSize')
+                                            PsiWhiteSpace(' ')
+                                            PsiElement(EQ)('=')
+                                            PsiWhiteSpace(' ')
+                                            REFERENCE_EXPRESSION
+                                              PsiElement(IDENTIFIER)('fontSize')
+                                          PsiWhiteSpace(' ')
+                                          KTX_ATTRIBUTE
+                                            REFERENCE_EXPRESSION
+                                              PsiElement(IDENTIFIER)('textColor')
+                                            PsiElement(EQ)('=')
+                                            DOT_QUALIFIED_EXPRESSION
+                                              REFERENCE_EXPRESSION
+                                                PsiElement(IDENTIFIER)('MyApplicationData')
+                                              PsiElement(DOT)('.')
+                                              REFERENCE_EXPRESSION
+                                                PsiElement(IDENTIFIER)('currentColor')
+                                          PsiWhiteSpace(' ')
+                                          PsiElement(DIV)('/')
+                                          PsiElement(GT)('>')
+                                        PsiWhiteSpace('\n                    ')
+                                        PsiElement(RBRACE)('}')
+                            PsiWhiteSpace('\n                ')
+                            PsiElement(LT)('<')
+                            PsiElement(DIV)('/')
+                            REFERENCE_EXPRESSION
+                              PsiElement(IDENTIFIER)('LinearLayout')
+                            PsiElement(GT)('>')
+                    PsiWhiteSpace('\n            ')
+                    PsiElement(LT)('<')
+                    PsiElement(DIV)('/')
+                    REFERENCE_EXPRESSION
+                      PsiElement(IDENTIFIER)('ScrollView')
+                    PsiElement(GT)('>')
+            PsiWhiteSpace('\n        ')
+            PsiElement(LT)('<')
+            PsiElement(DIV)('/')
+            REFERENCE_EXPRESSION
+              PsiElement(IDENTIFIER)('LinearLayout')
+            PsiElement(GT)('>')
+          PsiWhiteSpace('\n    ')
+          PsiElement(RBRACE)('}')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')

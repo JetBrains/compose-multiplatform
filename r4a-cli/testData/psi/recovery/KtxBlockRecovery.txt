@@ -1,0 +1,223 @@
+KtFile: KtxBlockRecovery.kt
+  PACKAGE_DIRECTIVE
+    <empty list>
+  IMPORT_LIST
+    <empty list>
+  FUN
+    PsiElement(fun)('fun')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('TestKtxBlockRecovery')
+    VALUE_PARAMETER_LIST
+      PsiElement(LPAR)('(')
+      PsiElement(RPAR)(')')
+    PsiWhiteSpace(' ')
+    BLOCK
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      PsiComment(EOL_COMMENT)('// If statement has a KTX block with no LBRACKET between `if` and KTX')
+      PsiWhiteSpace('\n    ')
+      IF
+        PsiElement(if)('if')
+        PsiElement(LPAR)('(')
+        CONDITION
+          BOOLEAN_CONSTANT
+            PsiElement(true)('true')
+        PsiElement(RPAR)(')')
+        PsiWhiteSpace('\n        ')
+        THEN
+          KTX_ELEMENT
+            PsiElement(LT)('<')
+            REFERENCE_EXPRESSION
+              PsiElement(IDENTIFIER)('LinearLayout')
+            PsiElement(GT)('>')
+            PsiWhiteSpace('\n            ')
+            KTX_BODY_LAMBDA
+              FUNCTION_LITERAL
+                BLOCK
+                  KTX_ELEMENT
+                    PsiElement(LT)('<')
+                    REFERENCE_EXPRESSION
+                      PsiElement(IDENTIFIER)('Closed1')
+                    PsiElement(GT)('>')
+                    PsiWhiteSpace('\n                ')
+                    KTX_BODY_LAMBDA
+                      FUNCTION_LITERAL
+                        BLOCK
+                          KTX_ELEMENT
+                            PsiElement(LT)('<')
+                            REFERENCE_EXPRESSION
+                              PsiElement(IDENTIFIER)('Unclosed1')
+                            PsiElement(GT)('>')
+                            PsiWhiteSpace('\n                    ')
+                            KTX_BODY_LAMBDA
+                              FUNCTION_LITERAL
+                                BLOCK
+                                  KTX_ELEMENT
+                                    PsiElement(LT)('<')
+                                    REFERENCE_EXPRESSION
+                                      PsiElement(IDENTIFIER)('Unclosed2')
+                                    PsiElement(GT)('>')
+                                    PsiWhiteSpace('\n                    ')
+                                    KTX_BODY_LAMBDA
+                                      FUNCTION_LITERAL
+                                        BLOCK
+                                          FOR
+                                            PsiElement(for)('for')
+                                            PsiElement(LPAR)('(')
+                                            VALUE_PARAMETER
+                                              PsiElement(IDENTIFIER)('x')
+                                            PsiWhiteSpace(' ')
+                                            PsiElement(in)('in')
+                                            PsiWhiteSpace(' ')
+                                            LOOP_RANGE
+                                              BINARY_EXPRESSION
+                                                INTEGER_CONSTANT
+                                                  PsiElement(INTEGER_LITERAL)('1')
+                                                OPERATION_REFERENCE
+                                                  PsiElement(RANGE)('..')
+                                                INTEGER_CONSTANT
+                                                  PsiElement(INTEGER_LITERAL)('5')
+                                            PsiElement(RPAR)(')')
+                                            PsiWhiteSpace(' ')
+                                            BODY
+                                              BLOCK
+                                                PsiElement(LBRACE)('{')
+                                                PsiWhiteSpace('  ')
+                                                PsiComment(EOL_COMMENT)('// Valid for loop causes no problems')
+                                                PsiWhiteSpace('\n                        ')
+                                                CALL_EXPRESSION
+                                                  REFERENCE_EXPRESSION
+                                                    PsiElement(IDENTIFIER)('println')
+                                                  VALUE_ARGUMENT_LIST
+                                                    PsiElement(LPAR)('(')
+                                                    VALUE_ARGUMENT
+                                                      STRING_TEMPLATE
+                                                        PsiElement(OPEN_QUOTE)('"')
+                                                        LITERAL_STRING_TEMPLATE_ENTRY
+                                                          PsiElement(REGULAR_STRING_PART)('foo')
+                                                        PsiElement(CLOSING_QUOTE)('"')
+                                                    PsiElement(RPAR)(')')
+                                                PsiWhiteSpace('\n                    ')
+                                                PsiElement(RBRACE)('}')
+                    PsiWhiteSpace('\n            ')
+                    PsiElement(LT)('<')
+                    PsiElement(DIV)('/')
+                    REFERENCE_EXPRESSION
+                      PsiElement(IDENTIFIER)('Closed1')
+                    PsiElement(GT)('>')
+                  PsiWhiteSpace('\n            ')
+                  KTX_ELEMENT
+                    PsiElement(LT)('<')
+                    REFERENCE_EXPRESSION
+                      PsiElement(IDENTIFIER)('NextElementToVerifyDepth')
+                    PsiWhiteSpace(' ')
+                    PsiElement(DIV)('/')
+                    PsiElement(GT)('>')
+            PsiWhiteSpace('\n        ')
+            PsiElement(LT)('<')
+            PsiElement(DIV)('/')
+            REFERENCE_EXPRESSION
+              PsiElement(IDENTIFIER)('LinearLayout')
+            PsiElement(GT)('>')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n\n\n')
+  FUN
+    PsiElement(fun)('fun')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('TestKtxBlockRecovery')
+    VALUE_PARAMETER_LIST
+      PsiElement(LPAR)('(')
+      PsiElement(RPAR)(')')
+    PsiWhiteSpace(' ')
+    BLOCK
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      IF
+        PsiElement(if)('if')
+        PsiElement(LPAR)('(')
+        CONDITION
+          BOOLEAN_CONSTANT
+            PsiElement(true)('true')
+        PsiElement(RPAR)(')')
+        PsiWhiteSpace('\n        ')
+        THEN
+          KTX_ELEMENT
+            PsiElement(LT)('<')
+            REFERENCE_EXPRESSION
+              PsiElement(IDENTIFIER)('LinearLayout')
+            PsiElement(GT)('>')
+            PsiWhiteSpace('\n            ')
+            KTX_BODY_LAMBDA
+              FUNCTION_LITERAL
+                BLOCK
+                  PsiElement(LT)('<')
+                  PsiElement(DIV)('/')
+                  REFERENCE_EXPRESSION
+                    PsiElement(IDENTIFIER)('Unopened1')
+                  PsiElement(GT)('>')
+                  PsiWhiteSpace('\n            ')
+                  PsiElement(LT)('<')
+                  PsiElement(DIV)('/')
+                  REFERENCE_EXPRESSION
+                    PsiElement(IDENTIFIER)('Unopened2')
+                  PsiElement(GT)('>')
+            PsiWhiteSpace('\n        ')
+            PsiElement(LT)('<')
+            PsiElement(DIV)('/')
+            REFERENCE_EXPRESSION
+              PsiElement(IDENTIFIER)('LinearLayout')
+            PsiElement(GT)('>')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n\n')
+  FUN
+    PsiElement(fun)('fun')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('TestKtxBlockWithLeadingComment')
+    VALUE_PARAMETER_LIST
+      PsiElement(LPAR)('(')
+      PsiElement(RPAR)(')')
+    PsiWhiteSpace(' ')
+    BLOCK
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      IF
+        PsiElement(if)('if')
+        PsiElement(LPAR)('(')
+        CONDITION
+          BOOLEAN_CONSTANT
+            PsiElement(true)('true')
+        PsiElement(RPAR)(')')
+        PsiWhiteSpace('  ')
+        PsiComment(EOL_COMMENT)('// EOL Comment between `if` and KTX block')
+        PsiWhiteSpace('\n        ')
+        THEN
+          KTX_ELEMENT
+            PsiElement(LT)('<')
+            REFERENCE_EXPRESSION
+              PsiElement(IDENTIFIER)('LinearLayout')
+            PsiWhiteSpace(' ')
+            PsiElement(DIV)('/')
+            PsiElement(GT)('>')
+      PsiWhiteSpace('\n\n    ')
+      IF
+        PsiElement(if)('if')
+        PsiElement(LPAR)('(')
+        CONDITION
+          BOOLEAN_CONSTANT
+            PsiElement(true)('true')
+        PsiElement(RPAR)(')')
+        PsiWhiteSpace('  ')
+        PsiComment(BLOCK_COMMENT)('/* Block Comment between `if` and KTX block */')
+        PsiWhiteSpace('\n        ')
+        THEN
+          KTX_ELEMENT
+            PsiElement(LT)('<')
+            REFERENCE_EXPRESSION
+              PsiElement(IDENTIFIER)('LinearLayout')
+            PsiWhiteSpace(' ')
+            PsiElement(DIV)('/')
+            PsiElement(GT)('>')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')

@@ -1,0 +1,448 @@
+KtFile: KtxChildrenWithParameters.kt
+  PACKAGE_DIRECTIVE
+    <empty list>
+  IMPORT_LIST
+    IMPORT_DIRECTIVE
+      PsiElement(import)('import')
+      PsiWhiteSpace(' ')
+      DOT_QUALIFIED_EXPRESSION
+        DOT_QUALIFIED_EXPRESSION
+          REFERENCE_EXPRESSION
+            PsiElement(IDENTIFIER)('android')
+          PsiElement(DOT)('.')
+          REFERENCE_EXPRESSION
+            PsiElement(IDENTIFIER)('graphics')
+        PsiElement(DOT)('.')
+        REFERENCE_EXPRESSION
+          PsiElement(IDENTIFIER)('Color')
+    PsiWhiteSpace('\n')
+    IMPORT_DIRECTIVE
+      PsiElement(import)('import')
+      PsiWhiteSpace(' ')
+      DOT_QUALIFIED_EXPRESSION
+        REFERENCE_EXPRESSION
+          PsiElement(IDENTIFIER)('android')
+        PsiElement(DOT)('.')
+        REFERENCE_EXPRESSION
+          PsiElement(IDENTIFIER)('widget')
+      PsiElement(DOT)('.')
+      PsiElement(MUL)('*')
+    PsiWhiteSpace('\n')
+    IMPORT_DIRECTIVE
+      PsiElement(import)('import')
+      PsiWhiteSpace(' ')
+      DOT_QUALIFIED_EXPRESSION
+        DOT_QUALIFIED_EXPRESSION
+          REFERENCE_EXPRESSION
+            PsiElement(IDENTIFIER)('com')
+          PsiElement(DOT)('.')
+          REFERENCE_EXPRESSION
+            PsiElement(IDENTIFIER)('google')
+        PsiElement(DOT)('.')
+        REFERENCE_EXPRESSION
+          PsiElement(IDENTIFIER)('r4a')
+      PsiElement(DOT)('.')
+      PsiElement(MUL)('*')
+  PsiWhiteSpace('\n\n')
+  CLASS
+    PsiElement(class)('class')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('MainComponent')
+    PsiWhiteSpace(' ')
+    PsiElement(COLON)(':')
+    PsiWhiteSpace(' ')
+    SUPER_TYPE_LIST
+      SUPER_TYPE_CALL_ENTRY
+        CONSTRUCTOR_CALLEE
+          TYPE_REFERENCE
+            USER_TYPE
+              REFERENCE_EXPRESSION
+                PsiElement(IDENTIFIER)('Component')
+        VALUE_ARGUMENT_LIST
+          PsiElement(LPAR)('(')
+          PsiElement(RPAR)(')')
+    PsiWhiteSpace(' ')
+    CLASS_BODY
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n\n    ')
+      FUN
+        MODIFIER_LIST
+          PsiElement(public)('public')
+          PsiWhiteSpace(' ')
+          PsiElement(override)('override')
+        PsiWhiteSpace(' ')
+        PsiElement(fun)('fun')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('render')
+        VALUE_PARAMETER_LIST
+          PsiElement(LPAR)('(')
+          PsiElement(RPAR)(')')
+        PsiWhiteSpace(' ')
+        BLOCK
+          PsiElement(LBRACE)('{')
+          PsiWhiteSpace('\n        ')
+          KTX_ELEMENT
+            PsiElement(LT)('<')
+            REFERENCE_EXPRESSION
+              PsiElement(IDENTIFIER)('LinearLayout')
+            PsiElement(GT)('>')
+            PsiWhiteSpace('\n            ')
+            KTX_BODY_LAMBDA
+              FUNCTION_LITERAL
+                BLOCK
+                  KTX_ELEMENT
+                    PsiElement(LT)('<')
+                    REFERENCE_EXPRESSION
+                      PsiElement(IDENTIFIER)('FancyComponent1')
+                    PsiElement(GT)('>')
+                    PsiWhiteSpace(' ')
+                    KTX_BODY_LAMBDA
+                      FUNCTION_LITERAL
+                        VALUE_PARAMETER_LIST
+                          VALUE_PARAMETER
+                            PsiElement(IDENTIFIER)('value')
+                        PsiWhiteSpace(' ')
+                        PsiElement(ARROW)('->')
+                        PsiWhiteSpace('\n                ')
+                        BLOCK
+                          KTX_ELEMENT
+                            PsiElement(LT)('<')
+                            REFERENCE_EXPRESSION
+                              PsiElement(IDENTIFIER)('TextView')
+                            PsiWhiteSpace(' ')
+                            KTX_ATTRIBUTE
+                              REFERENCE_EXPRESSION
+                                PsiElement(IDENTIFIER)('text')
+                              PsiElement(EQ)('=')
+                              REFERENCE_EXPRESSION
+                                PsiElement(IDENTIFIER)('value')
+                            PsiWhiteSpace(' ')
+                            PsiElement(DIV)('/')
+                            PsiElement(GT)('>')
+                    PsiWhiteSpace('\n            ')
+                    PsiElement(LT)('<')
+                    PsiElement(DIV)('/')
+                    REFERENCE_EXPRESSION
+                      PsiElement(IDENTIFIER)('FancyComponent1')
+                    PsiElement(GT)('>')
+                  PsiWhiteSpace('\n            ')
+                  KTX_ELEMENT
+                    PsiElement(LT)('<')
+                    REFERENCE_EXPRESSION
+                      PsiElement(IDENTIFIER)('FancyComponent2')
+                    PsiElement(GT)('>')
+                    PsiWhiteSpace(' ')
+                    KTX_BODY_LAMBDA
+                      FUNCTION_LITERAL
+                        VALUE_PARAMETER_LIST
+                          VALUE_PARAMETER
+                            PsiElement(IDENTIFIER)('p1')
+                          PsiElement(COMMA)(',')
+                          PsiWhiteSpace(' ')
+                          VALUE_PARAMETER
+                            PsiElement(IDENTIFIER)('p2')
+                        PsiWhiteSpace(' ')
+                        PsiElement(ARROW)('->')
+                        PsiWhiteSpace('\n                ')
+                        BLOCK
+                          KTX_ELEMENT
+                            PsiElement(LT)('<')
+                            REFERENCE_EXPRESSION
+                              PsiElement(IDENTIFIER)('TextView')
+                            PsiWhiteSpace(' ')
+                            KTX_ATTRIBUTE
+                              REFERENCE_EXPRESSION
+                                PsiElement(IDENTIFIER)('text')
+                              PsiElement(EQ)('=')
+                              PARENTHESIZED
+                                PsiElement(LPAR)('(')
+                                BINARY_EXPRESSION
+                                  REFERENCE_EXPRESSION
+                                    PsiElement(IDENTIFIER)('p1')
+                                  OPERATION_REFERENCE
+                                    PsiElement(PLUS)('+')
+                                  REFERENCE_EXPRESSION
+                                    PsiElement(IDENTIFIER)('p2')
+                                PsiElement(RPAR)(')')
+                            PsiWhiteSpace(' ')
+                            PsiElement(DIV)('/')
+                            PsiElement(GT)('>')
+                    PsiWhiteSpace('\n            ')
+                    PsiElement(LT)('<')
+                    PsiElement(DIV)('/')
+                    REFERENCE_EXPRESSION
+                      PsiElement(IDENTIFIER)('FancyComponent2')
+                    PsiElement(GT)('>')
+                  PsiWhiteSpace('\n            ')
+                  KTX_ELEMENT
+                    PsiElement(LT)('<')
+                    REFERENCE_EXPRESSION
+                      PsiElement(IDENTIFIER)('FancyComponent2')
+                    PsiElement(GT)('>')
+                    PsiWhiteSpace(' ')
+                    KTX_BODY_LAMBDA
+                      FUNCTION_LITERAL
+                        VALUE_PARAMETER_LIST
+                          VALUE_PARAMETER
+                            DESTRUCTURING_DECLARATION
+                              PsiElement(LPAR)('(')
+                              DESTRUCTURING_DECLARATION_ENTRY
+                                PsiElement(IDENTIFIER)('p1')
+                              PsiElement(COMMA)(',')
+                              PsiWhiteSpace(' ')
+                              DESTRUCTURING_DECLARATION_ENTRY
+                                PsiElement(IDENTIFIER)('p2')
+                              PsiElement(RPAR)(')')
+                        PsiWhiteSpace(' ')
+                        PsiElement(ARROW)('->')
+                        PsiWhiteSpace('\n                ')
+                        BLOCK
+                          KTX_ELEMENT
+                            PsiElement(LT)('<')
+                            REFERENCE_EXPRESSION
+                              PsiElement(IDENTIFIER)('TextView')
+                            PsiWhiteSpace(' ')
+                            KTX_ATTRIBUTE
+                              REFERENCE_EXPRESSION
+                                PsiElement(IDENTIFIER)('text')
+                              PsiElement(EQ)('=')
+                              PARENTHESIZED
+                                PsiElement(LPAR)('(')
+                                BINARY_EXPRESSION
+                                  REFERENCE_EXPRESSION
+                                    PsiElement(IDENTIFIER)('p1')
+                                  OPERATION_REFERENCE
+                                    PsiElement(PLUS)('+')
+                                  REFERENCE_EXPRESSION
+                                    PsiElement(IDENTIFIER)('p2')
+                                PsiElement(RPAR)(')')
+                            PsiWhiteSpace(' ')
+                            PsiElement(DIV)('/')
+                            PsiElement(GT)('>')
+                    PsiWhiteSpace('\n            ')
+                    PsiElement(LT)('<')
+                    PsiElement(DIV)('/')
+                    REFERENCE_EXPRESSION
+                      PsiElement(IDENTIFIER)('FancyComponent2')
+                    PsiElement(GT)('>')
+                  PsiWhiteSpace('\n            ')
+                  KTX_ELEMENT
+                    PsiElement(LT)('<')
+                    REFERENCE_EXPRESSION
+                      PsiElement(IDENTIFIER)('FancyComponent3')
+                    PsiElement(GT)('>')
+                    PsiWhiteSpace(' ')
+                    KTX_BODY_LAMBDA
+                      FUNCTION_LITERAL
+                        VALUE_PARAMETER_LIST
+                          VALUE_PARAMETER
+                            PsiElement(IDENTIFIER)('p1')
+                            PsiElement(COLON)(':')
+                            PsiWhiteSpace(' ')
+                            TYPE_REFERENCE
+                              USER_TYPE
+                                REFERENCE_EXPRESSION
+                                  PsiElement(IDENTIFIER)('String')
+                          PsiElement(COMMA)(',')
+                          PsiWhiteSpace(' ')
+                          VALUE_PARAMETER
+                            PsiElement(IDENTIFIER)('p2')
+                            PsiElement(COLON)(':')
+                            PsiWhiteSpace(' ')
+                            TYPE_REFERENCE
+                              USER_TYPE
+                                REFERENCE_EXPRESSION
+                                  PsiElement(IDENTIFIER)('Int')
+                          PsiElement(COMMA)(',')
+                          PsiWhiteSpace(' ')
+                          VALUE_PARAMETER
+                            PsiElement(IDENTIFIER)('p3')
+                            PsiElement(COLON)(':')
+                            PsiWhiteSpace(' ')
+                            TYPE_REFERENCE
+                              USER_TYPE
+                                REFERENCE_EXPRESSION
+                                  PsiElement(IDENTIFIER)('ArrayList')
+                                TYPE_ARGUMENT_LIST
+                                  PsiElement(LT)('<')
+                                  TYPE_PROJECTION
+                                    TYPE_REFERENCE
+                                      USER_TYPE
+                                        REFERENCE_EXPRESSION
+                                          PsiElement(IDENTIFIER)('String')
+                                  PsiElement(GT)('>')
+                        PsiWhiteSpace(' ')
+                        PsiElement(ARROW)('->')
+                        PsiWhiteSpace('\n                ')
+                        BLOCK
+                          KTX_ELEMENT
+                            PsiElement(LT)('<')
+                            REFERENCE_EXPRESSION
+                              PsiElement(IDENTIFIER)('TextView')
+                            PsiWhiteSpace(' ')
+                            KTX_ATTRIBUTE
+                              REFERENCE_EXPRESSION
+                                PsiElement(IDENTIFIER)('text')
+                              PsiElement(EQ)('=')
+                              PARENTHESIZED
+                                PsiElement(LPAR)('(')
+                                BINARY_EXPRESSION
+                                  BINARY_EXPRESSION
+                                    REFERENCE_EXPRESSION
+                                      PsiElement(IDENTIFIER)('p1')
+                                    OPERATION_REFERENCE
+                                      PsiElement(PLUS)('+')
+                                    REFERENCE_EXPRESSION
+                                      PsiElement(IDENTIFIER)('p2')
+                                  OPERATION_REFERENCE
+                                    PsiElement(PLUS)('+')
+                                  REFERENCE_EXPRESSION
+                                    PsiElement(IDENTIFIER)('p3')
+                                PsiElement(RPAR)(')')
+                            PsiWhiteSpace(' ')
+                            PsiElement(DIV)('/')
+                            PsiElement(GT)('>')
+                    PsiWhiteSpace('\n            ')
+                    PsiElement(LT)('<')
+                    PsiElement(DIV)('/')
+                    REFERENCE_EXPRESSION
+                      PsiElement(IDENTIFIER)('FancyComponent3')
+                    PsiElement(GT)('>')
+                  PsiWhiteSpace('\n            ')
+                  KTX_ELEMENT
+                    PsiElement(LT)('<')
+                    REFERENCE_EXPRESSION
+                      PsiElement(IDENTIFIER)('FancyComponent3')
+                    PsiElement(GT)('>')
+                    PsiWhiteSpace(' ')
+                    KTX_BODY_LAMBDA
+                      FUNCTION_LITERAL
+                        VALUE_PARAMETER_LIST
+                          VALUE_PARAMETER
+                            DESTRUCTURING_DECLARATION
+                              PsiElement(LPAR)('(')
+                              DESTRUCTURING_DECLARATION_ENTRY
+                                PsiElement(IDENTIFIER)('p1')
+                                PsiElement(COLON)(':')
+                                PsiWhiteSpace(' ')
+                                TYPE_REFERENCE
+                                  USER_TYPE
+                                    REFERENCE_EXPRESSION
+                                      PsiElement(IDENTIFIER)('String')
+                              PsiElement(COMMA)(',')
+                              PsiWhiteSpace(' ')
+                              DESTRUCTURING_DECLARATION_ENTRY
+                                PsiElement(IDENTIFIER)('p2')
+                                PsiElement(COLON)(':')
+                                PsiWhiteSpace(' ')
+                                TYPE_REFERENCE
+                                  USER_TYPE
+                                    REFERENCE_EXPRESSION
+                                      PsiElement(IDENTIFIER)('Int')
+                              PsiElement(COMMA)(',')
+                              PsiWhiteSpace(' ')
+                              DESTRUCTURING_DECLARATION_ENTRY
+                                PsiElement(IDENTIFIER)('p3')
+                                PsiElement(COLON)(':')
+                                PsiWhiteSpace(' ')
+                                TYPE_REFERENCE
+                                  USER_TYPE
+                                    REFERENCE_EXPRESSION
+                                      PsiElement(IDENTIFIER)('ArrayList')
+                                    TYPE_ARGUMENT_LIST
+                                      PsiElement(LT)('<')
+                                      TYPE_PROJECTION
+                                        TYPE_REFERENCE
+                                          USER_TYPE
+                                            REFERENCE_EXPRESSION
+                                              PsiElement(IDENTIFIER)('String')
+                                      PsiElement(GT)('>')
+                              PsiElement(RPAR)(')')
+                        PsiWhiteSpace(' ')
+                        PsiElement(ARROW)('->')
+                        PsiWhiteSpace('\n                ')
+                        BLOCK
+                          KTX_ELEMENT
+                            PsiElement(LT)('<')
+                            REFERENCE_EXPRESSION
+                              PsiElement(IDENTIFIER)('TextView')
+                            PsiWhiteSpace(' ')
+                            KTX_ATTRIBUTE
+                              REFERENCE_EXPRESSION
+                                PsiElement(IDENTIFIER)('text')
+                              PsiElement(EQ)('=')
+                              PARENTHESIZED
+                                PsiElement(LPAR)('(')
+                                BINARY_EXPRESSION
+                                  BINARY_EXPRESSION
+                                    REFERENCE_EXPRESSION
+                                      PsiElement(IDENTIFIER)('p1')
+                                    OPERATION_REFERENCE
+                                      PsiElement(PLUS)('+')
+                                    REFERENCE_EXPRESSION
+                                      PsiElement(IDENTIFIER)('p2')
+                                  OPERATION_REFERENCE
+                                    PsiElement(PLUS)('+')
+                                  REFERENCE_EXPRESSION
+                                    PsiElement(IDENTIFIER)('p3')
+                                PsiElement(RPAR)(')')
+                            PsiWhiteSpace(' ')
+                            PsiElement(DIV)('/')
+                            PsiElement(GT)('>')
+                    PsiWhiteSpace('\n            ')
+                    PsiElement(LT)('<')
+                    PsiElement(DIV)('/')
+                    REFERENCE_EXPRESSION
+                      PsiElement(IDENTIFIER)('FancyComponent3')
+                    PsiElement(GT)('>')
+                  PsiWhiteSpace('\n\n            ')
+                  IF
+                    PsiElement(if)('if')
+                    PsiElement(LPAR)('(')
+                    CONDITION
+                      BOOLEAN_CONSTANT
+                        PsiElement(true)('true')
+                    PsiElement(RPAR)(')')
+                    PsiWhiteSpace(' ')
+                    PsiComment(EOL_COMMENT)('// Use `if` to assert that it also works with the "block" style parsing')
+                    PsiWhiteSpace('\n                ')
+                    THEN
+                      KTX_ELEMENT
+                        PsiElement(LT)('<')
+                        REFERENCE_EXPRESSION
+                          PsiElement(IDENTIFIER)('FancyComponent1')
+                        PsiElement(GT)('>')
+                        PsiWhiteSpace(' ')
+                        KTX_BODY_LAMBDA
+                          FUNCTION_LITERAL
+                            VALUE_PARAMETER_LIST
+                              VALUE_PARAMETER
+                                PsiElement(IDENTIFIER)('value')
+                            PsiWhiteSpace(' ')
+                            PsiElement(ARROW)('->')
+                            PsiWhiteSpace('\n                    ')
+                            BLOCK
+                              KTX_ELEMENT
+                                PsiElement(LT)('<')
+                                REFERENCE_EXPRESSION
+                                  PsiElement(IDENTIFIER)('TextView')
+                                PsiWhiteSpace(' ')
+                                KTX_ATTRIBUTE
+                                  REFERENCE_EXPRESSION
+                                    PsiElement(IDENTIFIER)('text')
+                                  PsiElement(EQ)('=')
+                                  REFERENCE_EXPRESSION
+                                    PsiElement(IDENTIFIER)('value')
+                                PsiWhiteSpace(' ')
+                                PsiElement(DIV)('/')
+                                PsiElement(GT)('>')
+                        PsiWhiteSpace('\n                ')
+                        PsiElement(LT)('<')
+                        PsiElement(DIV)('/')
+                        REFERENCE_EXPRESSION
+                          PsiElement(IDENTIFIER)('FancyComponent1')
+                        PsiElement(GT)('>')
+          PsiWhiteSpace('\n    ')
+          PsiElement(RBRACE)('}')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')

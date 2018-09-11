@@ -6,8 +6,24 @@ import com.intellij.testFramework.LightProjectDescriptor
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
 import org.jetbrains.kotlin.idea.KotlinFileType
 import org.jetbrains.kotlin.idea.test.KotlinLightCodeInsightFixtureTestCase
+import org.jetbrains.kotlin.parsing.KtxParsingExtension
+import org.jetbrains.kotlin.r4a.R4aKtxParsingExtension
 
 class KtxEnterHandlerTest : KotlinLightCodeInsightFixtureTestCase() {
+
+    var parsingExtension: KtxParsingExtension? = null
+
+    override fun setUp() {
+        super.setUp()
+        parsingExtension = R4aKtxParsingExtension()
+        KtxParsingExtension.registerExtension(project, parsingExtension!!)
+    }
+
+    override fun tearDown() {
+        KtxParsingExtension.unregisterExtension(project, parsingExtension!!)
+        super.tearDown()
+    }
+
     // context added to every test
     private val context = """
         fun Foo() {}

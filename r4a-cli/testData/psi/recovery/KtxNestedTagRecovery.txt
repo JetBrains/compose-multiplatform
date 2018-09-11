@@ -1,0 +1,128 @@
+KtFile: KtxNestedTagRecovery.kt
+  PACKAGE_DIRECTIVE
+    <empty list>
+  IMPORT_LIST
+    <empty list>
+  FUN
+    PsiElement(fun)('fun')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('unclosedTags')
+    VALUE_PARAMETER_LIST
+      PsiElement(LPAR)('(')
+      PsiElement(RPAR)(')')
+    PsiWhiteSpace(' ')
+    BLOCK
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      KTX_ELEMENT
+        PsiElement(LT)('<')
+        REFERENCE_EXPRESSION
+          PsiElement(IDENTIFIER)('LinearLayout')
+        PsiElement(GT)('>')
+        PsiWhiteSpace('\n        ')
+        KTX_BODY_LAMBDA
+          FUNCTION_LITERAL
+            BLOCK
+              KTX_ELEMENT
+                PsiElement(LT)('<')
+                REFERENCE_EXPRESSION
+                  PsiElement(IDENTIFIER)('Closed1')
+                PsiElement(GT)('>')
+                PsiWhiteSpace('\n            ')
+                KTX_BODY_LAMBDA
+                  FUNCTION_LITERAL
+                    BLOCK
+                      KTX_ELEMENT
+                        PsiElement(LT)('<')
+                        REFERENCE_EXPRESSION
+                          PsiElement(IDENTIFIER)('Unclosed1')
+                        PsiElement(GT)('>')
+                        PsiWhiteSpace('\n                ')
+                        KTX_BODY_LAMBDA
+                          FUNCTION_LITERAL
+                            BLOCK
+                              KTX_ELEMENT
+                                PsiElement(LT)('<')
+                                REFERENCE_EXPRESSION
+                                  PsiElement(IDENTIFIER)('Unclosed2')
+                                PsiElement(GT)('>')
+                                PsiWhiteSpace('\n        ')
+                                KTX_BODY_LAMBDA
+                                  FUNCTION_LITERAL
+                                    BLOCK
+                                      <empty list>
+                PsiElement(LT)('<')
+                PsiElement(DIV)('/')
+                REFERENCE_EXPRESSION
+                  PsiElement(IDENTIFIER)('Closed1')
+                PsiElement(GT)('>')
+              PsiWhiteSpace('\n        ')
+              KTX_ELEMENT
+                PsiElement(LT)('<')
+                REFERENCE_EXPRESSION
+                  PsiElement(IDENTIFIER)('NextElementToVerifyDepth')
+                PsiWhiteSpace(' ')
+                PsiElement(DIV)('/')
+                PsiElement(GT)('>')
+        PsiWhiteSpace('\n    ')
+        PsiElement(LT)('<')
+        PsiElement(DIV)('/')
+        REFERENCE_EXPRESSION
+          PsiElement(IDENTIFIER)('LinearLayout')
+        PsiElement(GT)('>')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n\n')
+  FUN
+    PsiElement(fun)('fun')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('unopenedCloses')
+    VALUE_PARAMETER_LIST
+      PsiElement(LPAR)('(')
+      PsiElement(RPAR)(')')
+    PsiWhiteSpace(' ')
+    BLOCK
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      KTX_ELEMENT
+        PsiElement(LT)('<')
+        REFERENCE_EXPRESSION
+          PsiElement(IDENTIFIER)('LinearLayout')
+        PsiElement(GT)('>')
+        PsiWhiteSpace('\n        ')
+        KTX_BODY_LAMBDA
+          FUNCTION_LITERAL
+            BLOCK
+              PsiElement(LT)('<')
+              PsiElement(DIV)('/')
+              REFERENCE_EXPRESSION
+                PsiElement(IDENTIFIER)('UnopenedClosed')
+              PsiElement(GT)('>')
+              PsiWhiteSpace('\n        ')
+              PsiElement(LT)('<')
+              PsiElement(DIV)('/')
+              REFERENCE_EXPRESSION
+                PsiElement(IDENTIFIER)('UnopenedClosed')
+              PsiElement(GT)('>')
+              PsiWhiteSpace('\n        ')
+              PsiElement(LT)('<')
+              PsiElement(DIV)('/')
+              REFERENCE_EXPRESSION
+                PsiElement(IDENTIFIER)('UnopenedClosed')
+              PsiElement(GT)('>')
+              PsiWhiteSpace('\n        ')
+              KTX_ELEMENT
+                PsiElement(LT)('<')
+                REFERENCE_EXPRESSION
+                  PsiElement(IDENTIFIER)('NextElementToVerifyDepth')
+                PsiWhiteSpace(' ')
+                PsiElement(DIV)('/')
+                PsiElement(GT)('>')
+        PsiWhiteSpace('\n    ')
+        PsiElement(LT)('<')
+        PsiElement(DIV)('/')
+        REFERENCE_EXPRESSION
+          PsiElement(IDENTIFIER)('LinearLayout')
+        PsiElement(GT)('>')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')

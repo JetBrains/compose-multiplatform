@@ -1,0 +1,287 @@
+KtFile: KtxBlock.kt
+  PACKAGE_DIRECTIVE
+    <empty list>
+  IMPORT_LIST
+    IMPORT_DIRECTIVE
+      PsiElement(import)('import')
+      PsiWhiteSpace(' ')
+      DOT_QUALIFIED_EXPRESSION
+        DOT_QUALIFIED_EXPRESSION
+          REFERENCE_EXPRESSION
+            PsiElement(IDENTIFIER)('android')
+          PsiElement(DOT)('.')
+          REFERENCE_EXPRESSION
+            PsiElement(IDENTIFIER)('graphics')
+        PsiElement(DOT)('.')
+        REFERENCE_EXPRESSION
+          PsiElement(IDENTIFIER)('Color')
+    PsiWhiteSpace('\n')
+    IMPORT_DIRECTIVE
+      PsiElement(import)('import')
+      PsiWhiteSpace(' ')
+      DOT_QUALIFIED_EXPRESSION
+        REFERENCE_EXPRESSION
+          PsiElement(IDENTIFIER)('android')
+        PsiElement(DOT)('.')
+        REFERENCE_EXPRESSION
+          PsiElement(IDENTIFIER)('widget')
+      PsiElement(DOT)('.')
+      PsiElement(MUL)('*')
+    PsiWhiteSpace('\n')
+    IMPORT_DIRECTIVE
+      PsiElement(import)('import')
+      PsiWhiteSpace(' ')
+      DOT_QUALIFIED_EXPRESSION
+        DOT_QUALIFIED_EXPRESSION
+          REFERENCE_EXPRESSION
+            PsiElement(IDENTIFIER)('com')
+          PsiElement(DOT)('.')
+          REFERENCE_EXPRESSION
+            PsiElement(IDENTIFIER)('google')
+        PsiElement(DOT)('.')
+        REFERENCE_EXPRESSION
+          PsiElement(IDENTIFIER)('r4a')
+      PsiElement(DOT)('.')
+      PsiElement(MUL)('*')
+  PsiWhiteSpace('\n\n')
+  CLASS
+    PsiElement(class)('class')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('MainComponent')
+    PsiWhiteSpace(' ')
+    PsiElement(COLON)(':')
+    PsiWhiteSpace(' ')
+    SUPER_TYPE_LIST
+      SUPER_TYPE_CALL_ENTRY
+        CONSTRUCTOR_CALLEE
+          TYPE_REFERENCE
+            USER_TYPE
+              REFERENCE_EXPRESSION
+                PsiElement(IDENTIFIER)('Component')
+        VALUE_ARGUMENT_LIST
+          PsiElement(LPAR)('(')
+          PsiElement(RPAR)(')')
+    PsiWhiteSpace(' ')
+    CLASS_BODY
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n\n    ')
+      FUN
+        MODIFIER_LIST
+          PsiElement(public)('public')
+          PsiWhiteSpace(' ')
+          PsiElement(override)('override')
+        PsiWhiteSpace(' ')
+        PsiElement(fun)('fun')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('render')
+        VALUE_PARAMETER_LIST
+          PsiElement(LPAR)('(')
+          PsiElement(RPAR)(')')
+        PsiWhiteSpace(' ')
+        BLOCK
+          PsiElement(LBRACE)('{')
+          PsiWhiteSpace('\n        ')
+          IF
+            PsiElement(if)('if')
+            PsiElement(LPAR)('(')
+            CONDITION
+              BOOLEAN_CONSTANT
+                PsiElement(false)('false')
+            PsiElement(RPAR)(')')
+            PsiWhiteSpace('\n            ')
+            THEN
+              KTX_ELEMENT
+                PsiElement(LT)('<')
+                REFERENCE_EXPRESSION
+                  PsiElement(IDENTIFIER)('MyTag')
+                PsiElement(GT)('>')
+                PsiWhiteSpace('\n                    ')
+                KTX_BODY_LAMBDA
+                  FUNCTION_LITERAL
+                    VALUE_PARAMETER_LIST
+                      <empty list>
+                    BLOCK
+                      CALL_EXPRESSION
+                        REFERENCE_EXPRESSION
+                          PsiElement(IDENTIFIER)('println')
+                        VALUE_ARGUMENT_LIST
+                          PsiElement(LPAR)('(')
+                          VALUE_ARGUMENT
+                            STRING_TEMPLATE
+                              PsiElement(OPEN_QUOTE)('"')
+                              LITERAL_STRING_TEMPLATE_ENTRY
+                                PsiElement(REGULAR_STRING_PART)('do something')
+                              PsiElement(CLOSING_QUOTE)('"')
+                          PsiElement(RPAR)(')')
+                      PsiElement(SEMICOLON)(';')
+                PsiWhiteSpace('\n            ')
+                PsiElement(LT)('<')
+                PsiElement(DIV)('/')
+                REFERENCE_EXPRESSION
+                  PsiElement(IDENTIFIER)('MyTag')
+                PsiElement(GT)('>')
+            PsiWhiteSpace('\n        ')
+            PsiElement(else)('else')
+            PsiWhiteSpace('\n            ')
+            ELSE
+              KTX_ELEMENT
+                PsiElement(LT)('<')
+                REFERENCE_EXPRESSION
+                  PsiElement(IDENTIFIER)('MyTag')
+                PsiElement(GT)('>')
+                PsiWhiteSpace('\n                    ')
+                KTX_BODY_LAMBDA
+                  FUNCTION_LITERAL
+                    VALUE_PARAMETER_LIST
+                      <empty list>
+                    BLOCK
+                      CALL_EXPRESSION
+                        REFERENCE_EXPRESSION
+                          PsiElement(IDENTIFIER)('println')
+                        VALUE_ARGUMENT_LIST
+                          PsiElement(LPAR)('(')
+                          VALUE_ARGUMENT
+                            STRING_TEMPLATE
+                              PsiElement(OPEN_QUOTE)('"')
+                              LITERAL_STRING_TEMPLATE_ENTRY
+                                PsiElement(REGULAR_STRING_PART)('do something')
+                              PsiElement(CLOSING_QUOTE)('"')
+                          PsiElement(RPAR)(')')
+                      PsiElement(SEMICOLON)(';')
+                PsiWhiteSpace('\n            ')
+                PsiElement(LT)('<')
+                PsiElement(DIV)('/')
+                REFERENCE_EXPRESSION
+                  PsiElement(IDENTIFIER)('MyTag')
+                PsiElement(GT)('>')
+          PsiWhiteSpace('\n    ')
+          PsiElement(RBRACE)('}')
+      PsiWhiteSpace('\n\n    ')
+      FUN
+        MODIFIER_LIST
+          PsiElement(public)('public')
+          PsiWhiteSpace(' ')
+          PsiElement(override)('override')
+        PsiWhiteSpace(' ')
+        PsiElement(fun)('fun')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('render')
+        VALUE_PARAMETER_LIST
+          PsiElement(LPAR)('(')
+          PsiElement(RPAR)(')')
+        PsiWhiteSpace(' ')
+        BLOCK
+          PsiElement(LBRACE)('{')
+          PsiWhiteSpace('\n        ')
+          WHILE
+            PsiElement(while)('while')
+            PsiElement(LPAR)('(')
+            CONDITION
+              BOOLEAN_CONSTANT
+                PsiElement(false)('false')
+            PsiElement(RPAR)(')')
+            PsiWhiteSpace('\n            ')
+            BODY
+              KTX_ELEMENT
+                PsiElement(LT)('<')
+                REFERENCE_EXPRESSION
+                  PsiElement(IDENTIFIER)('MyTag')
+                PsiElement(GT)('>')
+                PsiWhiteSpace('\n                    ')
+                KTX_BODY_LAMBDA
+                  FUNCTION_LITERAL
+                    VALUE_PARAMETER_LIST
+                      <empty list>
+                    BLOCK
+                      CALL_EXPRESSION
+                        REFERENCE_EXPRESSION
+                          PsiElement(IDENTIFIER)('println')
+                        VALUE_ARGUMENT_LIST
+                          PsiElement(LPAR)('(')
+                          VALUE_ARGUMENT
+                            STRING_TEMPLATE
+                              PsiElement(OPEN_QUOTE)('"')
+                              LITERAL_STRING_TEMPLATE_ENTRY
+                                PsiElement(REGULAR_STRING_PART)('do something')
+                              PsiElement(CLOSING_QUOTE)('"')
+                          PsiElement(RPAR)(')')
+                      PsiElement(SEMICOLON)(';')
+                PsiWhiteSpace('\n            ')
+                PsiElement(LT)('<')
+                PsiElement(DIV)('/')
+                REFERENCE_EXPRESSION
+                  PsiElement(IDENTIFIER)('MyTag')
+                PsiElement(GT)('>')
+          PsiWhiteSpace('\n    ')
+          PsiElement(RBRACE)('}')
+      PsiWhiteSpace('\n\n    ')
+      FUN
+        MODIFIER_LIST
+          PsiElement(public)('public')
+          PsiWhiteSpace(' ')
+          PsiElement(override)('override')
+        PsiWhiteSpace(' ')
+        PsiElement(fun)('fun')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('render')
+        VALUE_PARAMETER_LIST
+          PsiElement(LPAR)('(')
+          PsiElement(RPAR)(')')
+        PsiWhiteSpace(' ')
+        BLOCK
+          PsiElement(LBRACE)('{')
+          PsiWhiteSpace('\n        ')
+          FOR
+            PsiElement(for)('for')
+            PsiElement(LPAR)('(')
+            VALUE_PARAMETER
+              PsiElement(IDENTIFIER)('x')
+            PsiWhiteSpace(' ')
+            PsiElement(in)('in')
+            PsiWhiteSpace(' ')
+            LOOP_RANGE
+              INTEGER_CONSTANT
+                PsiElement(INTEGER_LITERAL)('1')
+            PsiErrorElement:Expecting ')'
+              <empty list>
+            BODY
+              <empty list>
+          PsiErrorElement:Unexpected tokens (use ';' to separate expressions on the same line)
+            PsiElement(RESERVED)('...')
+            PsiElement(INTEGER_LITERAL)('5')
+            PsiElement(RPAR)(')')
+          PsiWhiteSpace('\n            ')
+          KTX_ELEMENT
+            PsiElement(LT)('<')
+            REFERENCE_EXPRESSION
+              PsiElement(IDENTIFIER)('MyTag')
+            PsiElement(GT)('>')
+            PsiWhiteSpace('\n                ')
+            KTX_BODY_LAMBDA
+              FUNCTION_LITERAL
+                VALUE_PARAMETER_LIST
+                  <empty list>
+                BLOCK
+                  CALL_EXPRESSION
+                    REFERENCE_EXPRESSION
+                      PsiElement(IDENTIFIER)('println')
+                    VALUE_ARGUMENT_LIST
+                      PsiElement(LPAR)('(')
+                      VALUE_ARGUMENT
+                        STRING_TEMPLATE
+                          PsiElement(OPEN_QUOTE)('"')
+                          LITERAL_STRING_TEMPLATE_ENTRY
+                            PsiElement(REGULAR_STRING_PART)('do something')
+                          PsiElement(CLOSING_QUOTE)('"')
+                      PsiElement(RPAR)(')')
+                  PsiElement(SEMICOLON)(';')
+            PsiWhiteSpace('\n            ')
+            PsiElement(LT)('<')
+            PsiElement(DIV)('/')
+            REFERENCE_EXPRESSION
+              PsiElement(IDENTIFIER)('MyTag')
+            PsiElement(GT)('>')
+          PsiWhiteSpace('\n    ')
+          PsiElement(RBRACE)('}')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')

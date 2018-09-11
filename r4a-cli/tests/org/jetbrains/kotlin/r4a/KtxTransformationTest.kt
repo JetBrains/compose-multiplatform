@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.extensions.KtxControlFlowExtension
 import org.jetbrains.kotlin.extensions.KtxTypeResolutionExtension
 import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
 import org.jetbrains.kotlin.extensions.TypeResolutionInterceptorExtension
+import org.jetbrains.kotlin.parsing.KtxParsingExtension
 import org.jetbrains.kotlin.psi2ir.extensions.SyntheticIrExtension
 import org.jetbrains.kotlin.resolve.extensions.SyntheticResolveExtension
 
@@ -16,6 +17,7 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         StorageComponentContainerContributor.registerExtension(myEnvironment.project, ComposableAnnotationChecker())
         TypeResolutionInterceptorExtension.registerExtension(myEnvironment.project, R4aTypeResolutionInterceptorExtension())
         SyntheticIrExtension.registerExtension(myEnvironment.project, R4ASyntheticIrExtension())
+        KtxParsingExtension.registerExtension(myEnvironment.project, R4aKtxParsingExtension())
 //        SyntheticResolveExtension.registerExtension(myEnvironment.project, StaticWrapperCreatorFunctionResolveExtension())
 //        SyntheticResolveExtension.registerExtension(myEnvironment.project, WrapperViewSettersGettersResolveExtension())
     }
