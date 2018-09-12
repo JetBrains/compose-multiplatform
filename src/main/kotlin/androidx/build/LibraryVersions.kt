@@ -131,7 +131,7 @@ object LibraryVersions {
     /**
      * Version code for media2
      */
-    val MEDIA2 = Version("1.0.0-alpha02")
+    val MEDIA2 = Version("1.0.0-alpha03")
 
     /**
      * Version code for media2-exoplayer
