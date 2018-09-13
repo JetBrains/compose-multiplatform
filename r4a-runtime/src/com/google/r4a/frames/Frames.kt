@@ -167,9 +167,9 @@ fun commit(frame: Frame) {
             // A record is guaranteed not collide if no other write was performed to the record by a committed
             // frame since this frame was opened. No writes to a framed object occurred if, ignoring this frame, the
             // readable records for the framed object are the same. If they are different, and the records could be
-            // =merged, (such as considering writes to different fields as not colliding) could be allowed here but,
+            // merged, (such as considering writes to different fields as not colliding) could be allowed here but,
             // for now, the all writes to a record are considered atomic. Additionally, if the field values can be
-            // merged this could also be allowed here.
+            // merged (e.g. using a conflict-free data type) this could also be allowed here.
 
             val current = currentInvalid()
             val nextFrame = maxFrameId + 1
