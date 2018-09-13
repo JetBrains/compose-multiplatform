@@ -31,6 +31,8 @@ class SupportKotlinLibraryPlugin : Plugin<Project> {
         project.apply(mapOf("plugin" to "kotlin"))
         project.apply(mapOf("plugin" to "kotlin-kapt"))
 
+        project.configureNonAndroidProjectForLint(supportLibraryExtension)
+
         project.afterEvaluate {
             Metalava.registerJavaProject(project, supportLibraryExtension)
         }
