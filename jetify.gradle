@@ -24,7 +24,8 @@ task stripArchive(type: Zip) {
     from zipTree(project.tasks['createArchive'].archivePath)
     destinationDir rootProject.buildDir
     archiveName "stripped_archive.zip"
-    include "m2repository/androidx/annotation/**",
+    include "m2repository/androidx/activity/**",
+            "m2repository/androidx/annotation/**",
             "m2repository/androidx/appcompat/**",
             "m2repository/androidx/asynclayoutinflater/**",
             "m2repository/androidx/browser/**",
