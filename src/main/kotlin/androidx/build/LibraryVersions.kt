@@ -213,7 +213,7 @@ object LibraryVersions {
      */
     val FRAGMENT = Version("1.1.0-alpha01")
 
-    val LISTENABLE_FUTURE = Version("0.1.0-alpha01")
+    val FUTURES = Version("1.0.0-alpha01")
 
     /**
      * Version code for CoordinatorLayout
