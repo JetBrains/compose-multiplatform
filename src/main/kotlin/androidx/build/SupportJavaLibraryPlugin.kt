@@ -43,5 +43,7 @@ class SupportJavaLibraryPlugin : Plugin<Project> {
                 DiffAndDocs.registerJavaProject(project, supportLibraryExtension)
             }
         }
+
+        project.configureNonAndroidProjectForLint(supportLibraryExtension)
     }
 }

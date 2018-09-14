@@ -35,6 +35,8 @@ open class SupportLibraryExtension(val project: Project) {
     var failOnUncheckedWarnings = true
     var failOnDeprecationWarnings = true
 
+    var compilationTarget: CompilationTarget = CompilationTarget.DEVICE
+
     var useMetalava = false
 
     /**
@@ -61,6 +63,13 @@ open class SupportLibraryExtension(val project: Project) {
         @JvmField
         val SUPPORT_URL = "http://developer.android.com/tools/extras/support-library.html"
     }
+}
+
+enum class CompilationTarget {
+    /** This library is meant to run on the host machine (like an annotation processor). */
+    HOST,
+    /** This library is meant to run on an Android device. */
+    DEVICE
 }
 
 class License {
