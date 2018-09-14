@@ -10,8 +10,10 @@ import com.intellij.psi.*
 import com.intellij.psi.tree.IElementType
 import org.jetbrains.kotlin.KtNodeTypes
 import org.jetbrains.kotlin.lexer.KtTokens
+import org.jetbrains.kotlin.psi.KtxAttribute
 import org.jetbrains.kotlin.psi.KtxElement
 import org.jetbrains.kotlin.psi.psiUtil.endOffset
+import org.jetbrains.kotlin.psi.psiUtil.getPrevSiblingIgnoringWhitespace
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
 import org.jetbrains.kotlin.r4a.idea.parentOfType
 
@@ -37,8 +39,37 @@ class KtxTypedHandler : TypedHandlerDelegate() {
                     return Result.STOP
                 }
             }
+            '{' -> {
+                // if '{' is typed at the start of an attribute value expression and right before a '>' or a '/', the '}' won't get
+                // inserted by kotlin, so we do it for you...
+                if (betweenEqOfAttributeAndCloseTag(editor, file)) {
+                    EditorModificationUtil.insertStringAtCaret(editor, "{}", true, false)
+                    EditorModificationUtil.moveCaretRelatively(editor, 1)
+                    return Result.STOP
+                }
+            }
         }
         return Result.CONTINUE
+    }
+
+    private fun betweenEqOfAttributeAndCloseTag(editor: Editor, file: PsiFile): Boolean {
+        val el = file.findElementAt(editor.caretModel.offset) ?: return false
+        if (el.node.elementType == KtTokens.DOUBLE_ARROW) {
+            // this is a special case where <Foo x=> will end in a double arrow, but is really just a user in the middle of typing
+            // an attribute value. If they type `{` after the `=` we want to do the right thing here
+            if (editor.caretModel.offset != el.startOffset + 1) return false
+            if (el.parent?.parent !is KtxElement) return false
+            if (el.parent?.getPrevSiblingIgnoringWhitespace(withItself = false) !is KtxAttribute) return false
+            return true
+        }
+        val next = el.nextSibling
+        if (next == null) {
+            return false
+        }
+        if (next.node.elementType != KtTokens.DIV && next.node.elementType != KtTokens.GT) return false
+        if (el.getPrevSiblingIgnoringWhitespace(withItself = false) !is KtxAttribute) return false
+
+        return true
     }
 
     private fun shouldOverwrite(token: IElementType, editor: Editor, file: PsiFile): Boolean {
