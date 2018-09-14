@@ -51,6 +51,11 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
                 DiffAndDocs.registerAndroidProject(project, library, supportLibraryExtension)
             }
 
+            if (supportLibraryExtension.compilationTarget != CompilationTarget.DEVICE) {
+                throw IllegalStateException(
+                        "Android libraries must use a compilation target of DEVICE")
+            }
+
             library.libraryVariants.all { libraryVariant ->
                 if (libraryVariant.getBuildType().getName().equals("debug")) {
                     @Suppress("DEPRECATION")
