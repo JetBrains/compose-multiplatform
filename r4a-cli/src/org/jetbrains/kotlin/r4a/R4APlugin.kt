@@ -46,6 +46,7 @@ class R4AComponentRegistrar : ComponentRegistrar {
         KtxParsingExtension.registerExtension(project, R4aKtxParsingExtension())
         KtxTypeResolutionExtension.registerExtension(project, R4aKtxTypeResolutionExtension())
         KtxControlFlowExtension.registerExtension(project, R4aKtxControlFlowExtension())
+        R4aDiagnosticSuppressor.registerExtension(project, R4aDiagnosticSuppressor())
         TypeResolutionInterceptorExtension.registerExtension(project, R4aTypeResolutionInterceptorExtension())
         SyntheticIrExtension.registerExtension(project, R4ASyntheticIrExtension())
     }
