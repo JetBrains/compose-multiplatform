@@ -126,7 +126,7 @@ private fun syntheticProperty(
             null,
             SourceElement.NO_SOURCE
         ).apply {
-            initialize(PropertySetterDescriptorImpl.createSetterParameter(this, type))
+            initialize(PropertySetterDescriptorImpl.createSetterParameter(this, type, Annotations.EMPTY))
         }
         initialize(getter, setter)
         setType(type, emptyList<TypeParameterDescriptor>(), container.thisAsReceiverParameter, null as ReceiverParameterDescriptor?)

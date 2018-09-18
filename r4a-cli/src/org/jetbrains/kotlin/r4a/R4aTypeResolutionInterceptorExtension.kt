@@ -7,7 +7,7 @@ package org.jetbrains.kotlin.r4a
 
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptor
-import org.jetbrains.kotlin.descriptors.annotations.AnnotationsImpl
+import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
 import org.jetbrains.kotlin.extensions.TypeResolutionInterceptorExtension
 import org.jetbrains.kotlin.name.ClassId
@@ -38,7 +38,7 @@ class R4aTypeResolutionInterceptorExtension : TypeResolutionInterceptorExtension
                 override val source: SourceElement get() = SourceElement.NO_SOURCE
                 override fun toString() = "[@Composable]"
             }
-            return type.replaceAnnotations(AnnotationsImpl(type.annotations + annotation))
+            return type.replaceAnnotations(Annotations.create(type.annotations + annotation))
         }
         return type
     }

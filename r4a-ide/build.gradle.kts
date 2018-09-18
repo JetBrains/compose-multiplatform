@@ -54,6 +54,9 @@ dependencies {
     (rootProject.extra["compilerModules"] as Array<String>).forEach {
         testRuntime(project(it))
     }
+    
+    testCompile(project(":idea:idea-native")) { isTransitive = false }
+    testCompile(project(":idea:idea-gradle-native")) { isTransitive = false }
 
     testCompile(intellijPluginDep("IntelliLang"))
     testCompile(intellijPluginDep("copyright"))

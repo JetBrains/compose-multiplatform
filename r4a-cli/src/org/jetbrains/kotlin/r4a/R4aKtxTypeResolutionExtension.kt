@@ -7,7 +7,6 @@ import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.constants.ConstantValue
-import org.jetbrains.kotlin.descriptors.annotations.AnnotationsImpl
 import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.diagnostics.reportFromPlugin
 import org.jetbrains.kotlin.extensions.KtxTypeResolutionExtension
@@ -248,7 +247,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
                         context.replaceExpectedType(
                             createFunctionType(
                                 moduleDescriptor.builtIns,
-                                AnnotationsImpl(listOf(composableAnnotation)),
+                                Annotations.create(listOf(composableAnnotation)),
                                 null,
                                 emptyList(),
                                 emptyList(),
