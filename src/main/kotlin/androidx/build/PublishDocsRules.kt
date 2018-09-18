@@ -25,7 +25,7 @@ import androidx.build.Strategy.Prebuilts
 import androidx.build.Strategy.TipOfTree
 
 val RELEASE_RULE = docsRules("public", false) {
-    val defaultVersion = "1.0.0-rc01"
+    val defaultVersion = "1.0.0"
     prebuilts(LibraryGroups.ANNOTATION, defaultVersion)
     prebuilts(LibraryGroups.APPCOMPAT, defaultVersion)
     prebuilts(LibraryGroups.ASYNCLAYOUTINFLATER, defaultVersion)
@@ -58,8 +58,8 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.MEDIA, "media", defaultVersion)
     prebuilts(LibraryGroups.MEDIA, "media-widget", "1.0.0-alpha5")
     ignore(LibraryGroups.MEDIA2, "media2-exoplayer")
-    prebuilts(LibraryGroups.MEDIA2, "1.0.0-alpha02")
-    prebuilts(LibraryGroups.MEDIAROUTER, "1.0.0-alpha5")
+    prebuilts(LibraryGroups.MEDIA2, "1.0.0-alpha03")
+    prebuilts(LibraryGroups.MEDIAROUTER, defaultVersion)
     prebuilts(LibraryGroups.PALETTE, defaultVersion)
     prebuilts(LibraryGroups.PERCENTLAYOUT, defaultVersion)
     prebuilts(LibraryGroups.PREFERENCE, defaultVersion)
@@ -67,7 +67,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.RECOMMENDATION, defaultVersion)
     prebuilts(LibraryGroups.RECYCLERVIEW, defaultVersion)
     prebuilts(LibraryGroups.SLICE, "slice-builders", defaultVersion)
-    prebuilts(LibraryGroups.SLICE, "slice-builders-ktx", "1.0.0-alpha5")
+    prebuilts(LibraryGroups.SLICE, "slice-builders-ktx", "1.0.0-alpha6")
     prebuilts(LibraryGroups.SLICE, "slice-core", defaultVersion)
     // TODO: land prebuilts
 //    prebuilts(LibraryGroups.SLICE, "slice-test", defaultVersion)
