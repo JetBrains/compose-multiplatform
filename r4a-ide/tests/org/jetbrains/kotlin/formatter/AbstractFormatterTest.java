@@ -23,8 +23,6 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.kotlin.idea.KotlinLanguage;
 import org.jetbrains.kotlin.idea.test.PluginTestCaseBase;
-import org.jetbrains.kotlin.parsing.KtxParsingExtension;
-import org.jetbrains.kotlin.r4a.R4aKtxParsingExtension;
 import org.jetbrains.kotlin.test.InTextDirectivesUtils;
 import org.jetbrains.kotlin.test.KotlinTestUtils;
 import org.jetbrains.kotlin.test.SettingsConfigurator;
@@ -65,20 +63,10 @@ public abstract class AbstractFormatterTest extends LightIdeaTestCase {
     public TextRange myTextRange;
     public TextRange myLineRange;
 
-    KtxParsingExtension parsingExtension = null;
-
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         LanguageLevelProjectExtension.getInstance(getProject()).setLanguageLevel(LanguageLevel.HIGHEST);
-        parsingExtension = new R4aKtxParsingExtension();
-        KtxParsingExtension.Companion.registerExtension(getProject(), parsingExtension);
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        KtxParsingExtension.Companion.unregisterExtension(getProject(), parsingExtension);
-        super.tearDown();
     }
 
     public void doTextTest(@NonNls String text, File fileAfter, String extension) throws IncorrectOperationException {
