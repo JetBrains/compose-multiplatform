@@ -4,24 +4,9 @@ import com.intellij.testFramework.LightProjectDescriptor
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase
 import org.jetbrains.kotlin.idea.KotlinFileType
 import org.jetbrains.kotlin.idea.test.KotlinLightCodeInsightFixtureTestCase
-import org.jetbrains.kotlin.parsing.KtxParsingExtension
-import org.jetbrains.kotlin.r4a.R4aKtxParsingExtension
 
 
 class KtxSyncTagTest : KotlinLightCodeInsightFixtureTestCase() {
-
-    var parsingExtension: KtxParsingExtension? = null
-
-    override fun setUp() {
-        super.setUp()
-        parsingExtension = R4aKtxParsingExtension()
-        KtxParsingExtension.registerExtension(project, parsingExtension!!)
-    }
-
-    override fun tearDown() {
-        KtxParsingExtension.unregisterExtension(project, parsingExtension!!)
-        super.tearDown()
-    }
 
     fun testSelfClosingAtEnd() = doTest("<Foo<caret> />", "ab", "<Fooab />")
     fun testSelfClosingAtBeginning() = doTest("<<caret>Foo />", "ab", "<abFoo />")
