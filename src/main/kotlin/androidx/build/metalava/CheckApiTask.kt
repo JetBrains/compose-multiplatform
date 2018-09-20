@@ -20,6 +20,7 @@ import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.api.BaseVariant
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.file.FileCollection
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
@@ -35,7 +36,11 @@ open class CheckApiTask : MetalavaTask() {
      */
     @get:InputFile
     @get:OutputFile
-    var currentTxtFile: File? = null
+    var apiTxtFile: File? = null
+
+    /** Whether to permit API additions **/
+    @get:Input
+    var allowApiAdditions: Boolean = false
 
     /** Android's boot classpath. Obtained from [BaseExtension.getBootClasspath]. */
     @get:InputFiles
@@ -63,7 +68,7 @@ open class CheckApiTask : MetalavaTask() {
     fun exec() {
         val dependencyClasspath = checkNotNull(
                 dependencyClasspath) { "Dependency classpath not set." }
-        val currentTxtFile = checkNotNull(currentTxtFile) { "Current API file not set." }
+        val apiTxtFile = checkNotNull(apiTxtFile) { "Current API file not set." }
         check(bootClasspath.isNotEmpty()) { "Android boot classpath not set." }
         check(sourcePaths.isNotEmpty()) { "Source paths not set." }
 
@@ -74,9 +79,8 @@ open class CheckApiTask : MetalavaTask() {
             "--source-path",
             sourcePaths.filter { it.exists() }.joinToString(File.pathSeparator),
 
-            "--check-compatibility",
-            "--previous-api",
-            currentTxtFile.toString(),
+            "--check-compatibility:api:" + if (allowApiAdditions) { "released" } else { "current" },
+            apiTxtFile.toString(),
 
             "--no-banner",
             "--compatible-output=no",
