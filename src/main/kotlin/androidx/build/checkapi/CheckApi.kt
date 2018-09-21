@@ -60,7 +60,7 @@ fun initializeApiChecksForProject(
     generateApi.dependsOn(doclavaConfiguration)
 
     // for verifying that the API surface has not broken since the last minor release
-    val lastReleasedApiFile = getLastReleasedApiFile(workingDir, version, true, true)
+    val lastReleasedApiFile = project.getRequiredCompatibilityApiFile()
 
     val whitelistFile = lastReleasedApiFile?.let { apiFile ->
         File(lastReleasedApiFile.parentFile, stripExtension(apiFile.name) + ".ignore")
@@ -195,6 +195,13 @@ private fun createUpdateApiTask(project: Project, checkApiRelease: CheckApiTask)
  * @return the current api file for that project
  */
 fun Project.getCurrentApiFile() = getApiFile(project.projectDir, project.version())
+
+/**
+ * Returns the API file containing the public API that this library promises to support
+ * This is API file that checkApiRelease validates against
+ * @return the API file
+ */
+fun Project.getRequiredCompatibilityApiFile() = getLastReleasedApiFile(project.projectDir, project.version(), true, true)
 
 private fun getApiFile(rootDir: File, refVersion: Version): File {
     return getApiFile(rootDir, refVersion, false)
