@@ -56,3 +56,7 @@ fun a13() {
         <Bar attribute=val />
     }
 }
+
+fun a14() {
+    <Hello world$ foo=123 />
+}

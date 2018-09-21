@@ -14,8 +14,10 @@ KtFile: KtxTagRecovery.kt
     BLOCK
       PsiElement(LBRACE)('{')
       PsiWhiteSpace('\n    ')
-      PsiErrorElement:Invalid KTX tag
+      KTX_ELEMENT
         PsiElement(LT)('<')
+        PsiErrorElement:Invalid KTX tag
+          <empty list>
       PsiWhiteSpace('\n')
       PsiElement(RBRACE)('}')
   PsiWhiteSpace('\n\n')
@@ -30,10 +32,12 @@ KtFile: KtxTagRecovery.kt
     BLOCK
       PsiElement(LBRACE)('{')
       PsiWhiteSpace('\n    ')
-      PsiErrorElement:Invalid KTX tag
+      KTX_ELEMENT
         PsiElement(LT)('<')
         REFERENCE_EXPRESSION
           PsiElement(IDENTIFIER)('Bar')
+        PsiErrorElement:Invalid KTX tag
+          <empty list>
       PsiWhiteSpace('\n')
       PsiElement(RBRACE)('}')
   PsiWhiteSpace('\n\n')
@@ -48,7 +52,7 @@ KtFile: KtxTagRecovery.kt
     BLOCK
       PsiElement(LBRACE)('{')
       PsiWhiteSpace('\n    ')
-      PsiErrorElement:Invalid KTX tag
+      KTX_ELEMENT
         PsiElement(LT)('<')
         DOT_QUALIFIED_EXPRESSION
           DOT_QUALIFIED_EXPRESSION
@@ -58,6 +62,8 @@ KtFile: KtxTagRecovery.kt
             REFERENCE_EXPRESSION
               PsiElement(IDENTIFIER)('foo')
           PsiElement(DOT)('.')
+        PsiErrorElement:Invalid KTX tag
+          <empty list>
       PsiWhiteSpace('\n')
       PsiElement(RBRACE)('}')
   PsiWhiteSpace('\n\n')
@@ -72,7 +78,7 @@ KtFile: KtxTagRecovery.kt
     BLOCK
       PsiElement(LBRACE)('{')
       PsiWhiteSpace('\n    ')
-      PsiErrorElement:Invalid KTX tag
+      KTX_ELEMENT
         PsiElement(LT)('<')
         REFERENCE_EXPRESSION
           PsiElement(IDENTIFIER)('Bar')
@@ -80,6 +86,8 @@ KtFile: KtxTagRecovery.kt
         KTX_ATTRIBUTE
           REFERENCE_EXPRESSION
             PsiElement(IDENTIFIER)('attribute')
+        PsiErrorElement:Invalid KTX tag
+          <empty list>
       PsiWhiteSpace('\n')
       PsiElement(RBRACE)('}')
   PsiWhiteSpace('\n\n')
@@ -94,7 +102,7 @@ KtFile: KtxTagRecovery.kt
     BLOCK
       PsiElement(LBRACE)('{')
       PsiWhiteSpace('\n    ')
-      PsiErrorElement:Invalid KTX tag
+      KTX_ELEMENT
         PsiElement(LT)('<')
         REFERENCE_EXPRESSION
           PsiElement(IDENTIFIER)('Bar')
@@ -119,7 +127,7 @@ KtFile: KtxTagRecovery.kt
     BLOCK
       PsiElement(LBRACE)('{')
       PsiWhiteSpace('\n    ')
-      PsiErrorElement:Invalid KTX tag
+      KTX_ELEMENT
         PsiElement(LT)('<')
         REFERENCE_EXPRESSION
           PsiElement(IDENTIFIER)('Bar')
@@ -141,6 +149,8 @@ KtFile: KtxTagRecovery.kt
                     PsiElement(REGULAR_STRING_PART)('Some other statement, to break attribute expression')
                   PsiElement(CLOSING_QUOTE)('"')
               PsiElement(RPAR)(')')
+        PsiErrorElement:Invalid KTX tag
+          <empty list>
       PsiErrorElement:Expecting an element
         PsiElement(SEMICOLON)(';')
       PsiWhiteSpace('\n')
@@ -157,7 +167,7 @@ KtFile: KtxTagRecovery.kt
     BLOCK
       PsiElement(LBRACE)('{')
       PsiWhiteSpace('\n    ')
-      PsiErrorElement:Invalid KTX tag
+      KTX_ELEMENT
         PsiElement(LT)('<')
         REFERENCE_EXPRESSION
           PsiElement(IDENTIFIER)('Bar')
@@ -171,6 +181,8 @@ KtFile: KtxTagRecovery.kt
             PsiErrorElement:Expecting an expression
               <empty list>
             PsiElement(RPAR)(')')
+        PsiErrorElement:Invalid KTX tag
+          <empty list>
       PsiWhiteSpace('\n')
       PsiElement(RBRACE)('}')
   PsiWhiteSpace('\n\n')
@@ -185,7 +197,7 @@ KtFile: KtxTagRecovery.kt
     BLOCK
       PsiElement(LBRACE)('{')
       PsiWhiteSpace('\n    ')
-      PsiErrorElement:Invalid KTX tag
+      KTX_ELEMENT
         PsiElement(LT)('<')
         REFERENCE_EXPRESSION
           PsiElement(IDENTIFIER)('Bar')
@@ -198,6 +210,8 @@ KtFile: KtxTagRecovery.kt
             PsiElement(OPEN_QUOTE)('"')
             PsiErrorElement:Expecting '"'
               <empty list>
+        PsiErrorElement:Invalid KTX tag
+          <empty list>
       PsiWhiteSpace('\n')
       PsiElement(RBRACE)('}')
   PsiWhiteSpace('\n\n')
@@ -243,8 +257,10 @@ KtFile: KtxTagRecovery.kt
         KTX_BODY_LAMBDA
           FUNCTION_LITERAL
             BLOCK
-              PsiErrorElement:Invalid KTX tag
+              KTX_ELEMENT
                 PsiElement(LT)('<')
+                PsiErrorElement:Invalid KTX tag
+                  <empty list>
       PsiWhiteSpace('\n')
       PsiElement(RBRACE)('}')
   PsiWhiteSpace('\n\n')
@@ -384,5 +400,39 @@ KtFile: KtxTagRecovery.kt
                       BLOCK
                         <empty list>
               PsiElement(RBRACE)('}')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n\n')
+  FUN
+    PsiElement(fun)('fun')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('a14')
+    VALUE_PARAMETER_LIST
+      PsiElement(LPAR)('(')
+      PsiElement(RPAR)(')')
+    PsiWhiteSpace(' ')
+    BLOCK
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      KTX_ELEMENT
+        PsiElement(LT)('<')
+        REFERENCE_EXPRESSION
+          PsiElement(IDENTIFIER)('Hello')
+        PsiWhiteSpace(' ')
+        KTX_ATTRIBUTE
+          REFERENCE_EXPRESSION
+            PsiElement(IDENTIFIER)('world')
+        PsiErrorElement:Expecting an attribute
+          PsiElement(BAD_CHARACTER)('$')
+        PsiWhiteSpace(' ')
+        KTX_ATTRIBUTE
+          REFERENCE_EXPRESSION
+            PsiElement(IDENTIFIER)('foo')
+          PsiElement(EQ)('=')
+          INTEGER_CONSTANT
+            PsiElement(INTEGER_LITERAL)('123')
+        PsiWhiteSpace(' ')
+        PsiElement(DIV)('/')
+        PsiElement(GT)('>')
       PsiWhiteSpace('\n')
       PsiElement(RBRACE)('}')
