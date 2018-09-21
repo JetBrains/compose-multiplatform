@@ -176,10 +176,11 @@ object DiffAndDocs {
         val artifacts = try {
             configuration.resolvedConfiguration.resolvedArtifacts
         } catch (e: ResolveException) {
-            throw GradleException("Failed to find prebuilts for $mavenId. " +
+            root.logger.error("Failed to find prebuilts for $mavenId. " +
                     "A matching rule $originRule in docsRules(\"$originName\") " +
                     "in PublishDocsRules.kt requires it. You should either add a prebuilt, " +
                     "or add overriding \"ignore\" or \"tipOfTree\" rules")
+            throw e
         }
 
         val artifact = artifacts.find { it.moduleVersion.id.toString() == mavenId }
