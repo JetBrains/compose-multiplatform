@@ -29,7 +29,7 @@ import java.io.File
 open class UpdateApiTask : MetalavaTask() {
     /** Text file to which API signatures will be written. */
     @get:OutputFile
-    var currentTxtFile: File? = null
+    var apiTxtFile: File? = null
 
     /** Android's boot classpath. Obtained from [BaseExtension.getBootClasspath]. */
     @get:InputFiles
@@ -57,7 +57,7 @@ open class UpdateApiTask : MetalavaTask() {
     fun exec() {
         val dependencyClasspath = checkNotNull(
                 dependencyClasspath) { "Dependency classpath not set." }
-        val currentTxtFile = checkNotNull(currentTxtFile) { "Current API file not set." }
+        val apiTxtFile = checkNotNull(apiTxtFile) { "Current API file not set." }
         check(bootClasspath.isNotEmpty()) { "Android boot classpath not set." }
         check(sourcePaths.isNotEmpty()) { "Source paths not set." }
 
@@ -69,7 +69,7 @@ open class UpdateApiTask : MetalavaTask() {
             sourcePaths.filter { it.exists() }.joinToString(File.pathSeparator),
 
             "--api",
-            currentTxtFile.toString(),
+            apiTxtFile.toString(),
 
             "--no-banner",
             "--compatible-output=no",
