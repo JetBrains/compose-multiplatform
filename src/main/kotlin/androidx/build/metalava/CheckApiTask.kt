@@ -74,8 +74,7 @@ open class CheckApiTask : MetalavaTask() {
             "--source-path",
             sourcePaths.filter { it.exists() }.joinToString(File.pathSeparator),
 
-            "--check-compatibility",
-            "--previous-api",
+            "--check-compatibility:api:current",
             currentTxtFile.toString(),
 
             "--no-banner",
