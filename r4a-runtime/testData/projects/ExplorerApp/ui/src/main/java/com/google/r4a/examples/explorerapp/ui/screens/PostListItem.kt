@@ -9,19 +9,18 @@ import com.google.r4a.examples.explorerapp.common.data.Link
 import com.google.r4a.examples.explorerapp.ui.R
 
 class PostListItem(var link: Link) : Component() {
-    private val navigator get() = CompositionContext.getAmbient(Ambients.NavController, this)
-
     override fun compose() {
-        <LinkCard
-            link=link
-            onClick={
-                val bundle = Bundle()
+        CompositionContext.current.consumeAmbient(Ambients.NavController) { navigator ->
+            <LinkCard
+                link=link
+                onClick={
+                    val bundle = Bundle()
 
-                bundle.putString("id", link.id)
-                bundle.putParcelable("initialLink", link)
+                    bundle.putString("id", link.id)
+                    bundle.putParcelable("initialLink", link)
 
-                navigator.navigate(R.id.nav_list_to_detail, bundle)
-            }
-        />
+                    navigator.navigate(R.id.nav_list_to_detail, bundle)
+                } />
+        }
     }
 }

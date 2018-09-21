@@ -20,7 +20,10 @@ class Ambient<T>(private val key: String, private val defaultFactory: (() -> T)?
     override fun hashCode() = key.hashCode()
     override fun equals(other: Any?) = this === other
 
-    inner class Provider(var value: T, var children: () -> Unit) : Component() {
+    inner class Provider(
+        var value: T,
+        @Children
+        var children: () -> Unit) : Component() {
         internal val subscribers = HashSet<Slot>()
 
         override fun compose() {
@@ -30,10 +33,13 @@ class Ambient<T>(private val key: String, private val defaultFactory: (() -> T)?
             children()
             cc.end()
         }
+
+        val ambient get() = this@Ambient
     }
 
-    inner class Consumer : Component() {
-        lateinit var children: (T) -> Unit
+    inner class Consumer(
+        @Children
+        var children: (T) -> Unit) : Component() {
 
         override fun compose() {
             val cc = CompositionContext.current
@@ -44,12 +50,6 @@ class Ambient<T>(private val key: String, private val defaultFactory: (() -> T)?
         }
     }
 
-    operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
-        if (thisRef !is Component) error("Cannot use Ambient property delegates on non-component instances")
-        return CompositionContext.getAmbient(this, thisRef)
-    }
-
-
     interface Reference {
         fun <T> getAmbient(key: Ambient<T>): T
         fun composeInto(container: ViewGroup, composable: @Composable() () -> Unit)
@@ -57,14 +57,15 @@ class Ambient<T>(private val key: String, private val defaultFactory: (() -> T)?
 
     class Portal(
         @Children
-        var children: (ref: Reference) -> Unit
-    ) : Component() {
+        var children: (ref: Reference) -> Unit) : Component() {
 
         private val reference = object : Reference {
             override fun <T> getAmbient(key: Ambient<T>) = CompositionContext.getAmbient(key, this@Portal)
             override fun composeInto(container: ViewGroup, composable: () -> Unit) = R4a.composeInto(container, this, composable)
         }
+
         override fun compose() {
+            CompositionContext.current.preserveAmbientScope(this)
             children(reference)
         }
     }

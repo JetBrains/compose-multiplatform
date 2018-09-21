@@ -17,13 +17,11 @@ import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.view.inputmethod.EditorInfo
 import android.text.method.PasswordTransformationMethod
 import com.google.r4a.CompositionContext
+import com.google.r4a.consumeAmbient
 import com.google.r4a.examples.explorerapp.common.data.RedditRepository
 
 
 class LoginScreen : Component() {
-    private val repository get() = CompositionContext.getAmbient(RedditRepository.Ambient, this)
-    private val navigator get() = CompositionContext.getAmbient(Ambients.NavController, this)
-
     private var username: String = ""
     private var password: String = ""
 
@@ -110,33 +108,33 @@ class LoginScreen : Component() {
                         onSubmit()
                     }
                 />
-                <TextView
-                    layoutWidth=MATCH_PARENT
-                    layoutHeight=WRAP_CONTENT
-                    layoutGravity=Gravity.CENTER_HORIZONTAL
-                    padding=10.dp
-                    textAlignment=TextView.TEXT_ALIGNMENT_CENTER
-                    text="No account yet? Create one."
-                    onClick={ _ ->
-                        navigator.navigate(R.id.nav_to_signup)
-                    }
-                    textSize=6.sp
-                    textColor=Colors.TEXT_MUTED
-                />
-//                text="No account yet? Create one."
-                <TextView
-                    layoutWidth=MATCH_PARENT
-                    layoutHeight=WRAP_CONTENT
-                    layoutGravity=Gravity.CENTER_HORIZONTAL
-                    padding=10.dp
-                    textAlignment=TextView.TEXT_ALIGNMENT_CENTER
-                    text="Use app without logging in."
-                    onClick={ _ ->
-                        navigator.navigate(R.id.screen_link_list)
-                    }
-                    textSize=6.sp
-                    textColor=Colors.TEXT_MUTED
-                />
+                CompositionContext.current.consumeAmbient(Ambients.NavController) { navigator ->
+                    <TextView
+                        layoutWidth=MATCH_PARENT
+                        layoutHeight=WRAP_CONTENT
+                        layoutGravity=Gravity.CENTER_HORIZONTAL
+                        padding=10.dp
+                        textAlignment=TextView.TEXT_ALIGNMENT_CENTER
+                        text="No account yet? Create one."
+                        onClick={ _ ->
+                            navigator.navigate(R.id.nav_to_signup)
+                        }
+                        textSize=6.sp
+                        textColor=Colors.TEXT_MUTED />
+//                      text="No account yet? Create one."
+                    <TextView
+                        layoutWidth=MATCH_PARENT
+                        layoutHeight=WRAP_CONTENT
+                        layoutGravity=Gravity.CENTER_HORIZONTAL
+                        padding=10.dp
+                        textAlignment=TextView.TEXT_ALIGNMENT_CENTER
+                        text="Use app without logging in."
+                        onClick={ _ ->
+                            navigator.navigate(R.id.screen_link_list)
+                        }
+                        textSize=6.sp
+                        textColor=Colors.TEXT_MUTED />
+                }
             </LinearLayout>
         </ScrollView>
     }

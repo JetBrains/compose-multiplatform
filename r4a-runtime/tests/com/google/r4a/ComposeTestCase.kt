@@ -167,8 +167,11 @@ abstract class ComposeTestCase : TestCase() {
             CompositionContext.current = cc
             cc.startRoot()
             cc.setInstance(component)
+            cc.startCompose(true)
             component.compose()
+            cc.endCompose(true)
             cc.endRoot()
+            cc.applyChanges()
             fn(cc, component, root, activity)
             CompositionContext.current = prev
         }

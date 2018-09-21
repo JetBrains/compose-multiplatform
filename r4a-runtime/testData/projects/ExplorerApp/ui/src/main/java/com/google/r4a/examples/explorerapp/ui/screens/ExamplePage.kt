@@ -20,8 +20,8 @@ const val REORDERING = "Reordering"
 val EXAMPLES = arrayOf(CALCULATOR, EDIT_FORM, NEWS_FEED, FONT_LIST, SPINNER_FORM, REORDERING)
 
 class ExamplePage : Component() {
-    private val fragment get() = CompositionContext.getAmbient(Ambients.Fragment, this)
     override fun compose() {
+        val fragment = CompositionContext.current.getAmbient(Ambients.Fragment)
         val name = fragment.arguments?.getString(EXAMPLE_NAME)
         when (name) {
             CALCULATOR -> { <Calculator /> }

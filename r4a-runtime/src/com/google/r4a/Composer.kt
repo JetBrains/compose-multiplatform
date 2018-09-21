@@ -146,11 +146,7 @@ open class Composer<N>(
         block()
         endGroup()
         slots.endReading()
-        finalRealizeSlots()
-        assert(pendingStack.empty()) { "Start end imbalance"}
-        pending = null
-        nodeIndex = 0
-        groupNodeCount = 0
+        finalizeCompose()
     }
 
     override val inserting: Boolean get() = slots.inEmpty
@@ -250,7 +246,7 @@ open class Composer<N>(
             }
         }
 
-        // Enumerate the parents that were alos in the previous render
+        // Enumerate the parents that were also in the previous composition
         var current = slots.startStack.size - 1
         while (current > 0) {
             val index = slots.startStack.peek(current)
@@ -632,14 +628,16 @@ open class Composer<N>(
     }
 
     fun recompose() {
-        slots.reset()
-        slots.beginReading()
-        nodeIndex = 0
+        if (invalidations.isNotEmpty()) {
+            slots.reset()
+            slots.beginReading()
+            nodeIndex = 0
 
-        recomposeComponentRange(0, Int.MAX_VALUE)
+            recomposeComponentRange(0, Int.MAX_VALUE)
 
-        slots.endReading()
-        finalRealizeSlots()
+            slots.endReading()
+            finalizeCompose()
+        }
     }
 
     private fun record(change: Change<N>) {
@@ -702,13 +700,22 @@ open class Composer<N>(
         }
     }
 
-    internal fun finalRealizeSlots() {
+    private fun finalRealizeSlots() {
         when (slotActions.size) {
             0 -> Unit
             1 -> if (slotActions.first() == SKIP_GROUP) slotActions.clear() else realizeSlots()
             2 -> if (slotActions.first() >= SKIP_NODE && slotActions.last() == SKIP_GROUP) slotActions.clear() else realizeSlots()
             else -> realizeSlots()
         }
+    }
+
+    internal fun finalizeCompose() {
+        finalRealizeSlots()
+        assert(pendingStack.empty()) { "Start end imbalance"}
+        pending = null
+        nodeIndex = 0
+        groupNodeCount = 0
+
     }
 
     private fun recordSlotNext(count: Int = 1) {

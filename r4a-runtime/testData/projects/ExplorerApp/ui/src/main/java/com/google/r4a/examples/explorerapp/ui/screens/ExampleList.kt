@@ -9,7 +9,6 @@ import com.google.r4a.examples.explorerapp.common.adapters.Ambients
 import com.google.r4a.examples.explorerapp.ui.R
 
 class ExampleList : Component() {
-    private val navigator get() = CompositionContext.getAmbient(Ambients.NavController, this)
     override fun compose() {
         <LinearLayout orientation=VERTICAL>
             <TextView
@@ -18,6 +17,7 @@ class ExampleList : Component() {
                 paddingBottom=6.pt
             />
 
+            val navigator = CompositionContext.current.getAmbient(Ambients.NavController)
             for (example in EXAMPLES) {
                 <Button
                     text=example
@@ -25,8 +25,7 @@ class ExampleList : Component() {
                         val bundle = Bundle()
                         bundle.putString(EXAMPLE_NAME, example)
                         navigator.navigate(R.id.nav_to_example, bundle)
-                    }
-                />
+                    } />
             }
         </LinearLayout>
     }

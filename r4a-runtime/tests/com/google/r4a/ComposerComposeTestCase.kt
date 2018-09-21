@@ -29,7 +29,7 @@ abstract class ComposerComposeTestCase : TestCase() {
             val controller = Robolectric.buildActivity(TestActivity::class.java)
             val activity = controller.create().get()
             val root = activity.findViewById(ROOT_ID) as ViewGroup
-            val cc = ComposerCompositionContext.factory(root.context, root, component)
+            val cc = ComposerCompositionContext.factory(root.context, root, component, null)
             val prev = CompositionContext.current
             CompositionContext.current = cc
             cc.recomposeSync(component)

@@ -21,7 +21,6 @@ import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 
 class RedditDrawer : Component() {
-    private val navigator get() = CompositionContext.getAmbient(Ambients.NavController, this)
     private var children: (() -> Unit)? = null
     fun setChildrenBlock(fn: () -> Unit) {
         children = fn
@@ -38,6 +37,8 @@ class RedditDrawer : Component() {
             fitsSystemWindows=true
         >
             <children />
+
+            val navigator = CompositionContext.current.getAmbient(Ambients.NavController)
             <NavigationView
                 layoutWidth=WRAP_CONTENT
                 layoutHeight=MATCH_PARENT
@@ -57,24 +58,21 @@ class RedditDrawer : Component() {
                             uri="https://avatars1.githubusercontent.com/u/1885623?s=460&v=4"
                             cornerRadius=32.dp
                             borderColor=Colors.WHITE
-                            borderWidth=2.dp
-                        />
+                            borderWidth=2.dp />
                         <TextView
                             layoutWidth=MATCH_PARENT
                             layoutHeight=WRAP_CONTENT
                             paddingTop=8.dp
                             textColor=Colors.WHITE
                             textSize=8.sp
-                            text="lrichardson"
-                        />
+                            text="lrichardson" />
                         <TextView
                             layoutWidth=MATCH_PARENT
                             layoutHeight=WRAP_CONTENT
                             textColor=Colors.WHITE
                             textSize=6.sp
                             fontStyle=Typeface.ITALIC
-                            text="Logged In"
-                        />
+                            text="Logged In" />
                     </LinearLayout>
                 }
                 menu=R.menu.drawer_view
@@ -103,8 +101,7 @@ class RedditDrawer : Component() {
                         }
                         else -> false
                     }
-                }
-            />
+                } />
         </DrawerLayout>
     }
 }
