@@ -23,7 +23,7 @@ object LibraryVersions {
     /**
      * Version code of the support library components.
      */
-    val SUPPORT_LIBRARY = Version("1.0.0-rc01")
+    val SUPPORT_LIBRARY = Version("1.0.0")
 
     val ANIMATION = Version("1.0.0-alpha01")
 
@@ -35,7 +35,7 @@ object LibraryVersions {
     /**
      * Version code for Lifecycle extensions (ProcessLifecycleOwner, Fragment support)
      */
-    val LIFECYCLES_EXT = Version("2.0.0-rc01")
+    val LIFECYCLES_EXT = Version("2.0.0")
 
     /**
      * Version code for Lifecycle LiveData
@@ -45,7 +45,7 @@ object LibraryVersions {
     /**
      * Version code for Lifecycle ViewModel
      */
-    val LIFECYCLES_VIEWMODEL = Version("2.0.0-rc02")
+    val LIFECYCLES_VIEWMODEL = Version("2.0.0")
 
     val LIFECYCLES_SAVEDSTATE = Version("1.0.0-alpha01")
 
@@ -56,7 +56,7 @@ object LibraryVersions {
      */
     val PAGING = Version("2.1.0-alpha01")
 
-    private val LIFECYCLES = Version("2.0.0-rc01")
+    private val LIFECYCLES = Version("2.0.0")
 
     /**
      * Version code for Lifecycle libs that are required by the support library
@@ -71,7 +71,7 @@ object LibraryVersions {
     /**
      * Version code for shared code of flatfoot
      */
-    val ARCH_CORE = Version("2.0.0-rc01")
+    val ARCH_CORE = Version("2.0.0")
 
     /**
      * Version code for shared code of flatfoot runtime
@@ -171,7 +171,7 @@ object LibraryVersions {
     /**
      * Version code for slice-builders-ktx
      */
-    val SLICE_BUILDERS_KTX = Version("1.0.0-alpha5")
+    val SLICE_BUILDERS_KTX = Version("1.0.0-alpha6")
 
     /**
      * Version code for slice-* modules.
