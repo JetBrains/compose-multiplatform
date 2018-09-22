@@ -61,11 +61,11 @@ class FrameTest: TestCase() {
 
     fun testRecordReuse() {
         val address = frame { Address(OLD_STREET, OLD_CITY) }
-        Assert.assertEquals(1, address.first.length)
+        Assert.assertEquals(1, address.firstFrameRecord.length)
         frame { address.street = NEW_STREET }
-        Assert.assertEquals(2, address.first.length)
+        Assert.assertEquals(2, address.firstFrameRecord.length)
         frame { address.street = "other street" }
-        Assert.assertEquals(2, address.first.length)
+        Assert.assertEquals(2, address.firstFrameRecord.length)
     }
 
     fun testAborted() {
@@ -81,11 +81,11 @@ class FrameTest: TestCase() {
 
     fun testReuseAborted() {
         val address = frame { Address(OLD_STREET, OLD_CITY) }
-        Assert.assertEquals(1, address.first.length)
+        Assert.assertEquals(1, address.firstFrameRecord.length)
         aborted { address.street = NEW_STREET }
-        Assert.assertEquals(2, address.first.length)
+        Assert.assertEquals(2, address.firstFrameRecord.length)
         frame { address.street = "other street" }
-        Assert.assertEquals(2, address.first.length)
+        Assert.assertEquals(2, address.firstFrameRecord.length)
     }
 
     fun testSpeculation() {
@@ -117,11 +117,11 @@ class FrameTest: TestCase() {
 
     fun testReuseSpeculation() {
         val address = frame { Address(OLD_STREET, OLD_CITY) }
-        Assert.assertEquals(1, address.first.length)
+        Assert.assertEquals(1, address.firstFrameRecord.length)
         speculation { address.street = NEW_STREET }
-        Assert.assertEquals(2, address.first.length)
+        Assert.assertEquals(2, address.firstFrameRecord.length)
         frame { address.street = "other street" }
-        Assert.assertEquals(2, address.first.length)
+        Assert.assertEquals(2, address.firstFrameRecord.length)
     }
 
     fun testCommitAbortInteraction() {

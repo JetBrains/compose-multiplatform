@@ -33,7 +33,7 @@ interface Record {
 /**
  * Base implementation of a frame record
  */
-abstract class AbstractRecord: Record {
+abstract class AbstractRecord : Record {
     override var frameId: Int = currentFrame().id
     override var next: Record? = null
 }
@@ -58,7 +58,8 @@ class Frame(
     /**
      * True if the frame is read only
      */
-    readOnly: Boolean) {
+    readOnly: Boolean
+) {
     internal val modified = if (readOnly) null else HashSet<Framed>()
 
     /**
@@ -113,6 +114,7 @@ private fun open(readOnly: Boolean, speculative: Boolean): Frame {
         return frame
     }
 }
+
 /**
  * Open a frame
  *
@@ -176,7 +178,7 @@ fun commit(frame: Frame) {
             val start = frame.invalid.copy().apply { set(frame.id) }
             val id = frame.id
             for (framed in frame.modified) {
-                val first = framed.first
+                val first = framed.firstFrameRecord
                 if (readable(first, nextFrame, current) != readable(first, id, start)) {
                     abort(frame)
                 }
@@ -269,7 +271,9 @@ private fun valid(currentFrame: Int, candidateFrame: Int, invalid: BitSet): Bool
     //
     // All frames born after the current frame are considered invalid since they occur after the
     // current frame was open.
-    return candidateFrame != 0 && candidateFrame <= currentFrame && !speculationFrame(candidateFrame, currentFrame) && !invalid.get(candidateFrame)
+    return candidateFrame != 0 && candidateFrame <= currentFrame && !speculationFrame(candidateFrame, currentFrame) && !invalid.get(
+        candidateFrame
+    )
 }
 
 // Determine if the given data is valid for the frame.
@@ -277,11 +281,11 @@ private fun valid(data: Record, frame: Int, invalid: BitSet): Boolean {
     return valid(frame, data.frameId, invalid)
 }
 
-private fun <T: Record> readable(r: T, id: Int, invalid: BitSet): T {
+private fun <T : Record> readable(r: T, id: Int, invalid: BitSet): T {
     // The readable record valid record with the highest frameId
     var current: Record? = r
     var candidate: Record? = null
-    while(current != null) {
+    while (current != null) {
         if (valid(current, id, invalid)) {
             candidate = if (candidate == null) current else if (candidate.frameId < current.frameId) current else candidate
         }
@@ -294,11 +298,11 @@ private fun <T: Record> readable(r: T, id: Int, invalid: BitSet): T {
     throw IllegalStateException("Could not find a current")
 }
 
-fun <T: Record> T.readable(): T {
+fun <T : Record> T.readable(): T {
     return this.readable(currentFrame())
 }
 
-fun <T: Record> T.readable(frame: Frame): T {
+fun <T : Record> T.readable(frame: Frame): T {
     return readable(this, frame.id, frame.invalid)
 }
 
@@ -306,11 +310,11 @@ fun _readable(r: Record): Record = r.readable()
 fun _writable(r: Record, framed: Framed): Record = r.writable(framed)
 
 interface Framed {
-    val first: Record
-    fun prepend(value: Record)
+    val firstFrameRecord: Record
+    fun prependFrameRecord(value: Record)
 }
 
-fun <T: Record> T.writable(framed: Framed): T {
+fun <T : Record> T.writable(framed: Framed): T {
     return this.writable(framed, currentFrame())
 }
 
@@ -319,13 +323,13 @@ fun <T: Record> T.writable(framed: Framed): T {
  * true if the record is valid in the previous frame and is obscured by another record also valid in the previous frame record.
  */
 private fun used(framed: Framed, id: Int, invalid: BitSet): Record? {
-    var current: Record? = framed.first
+    var current: Record? = framed.firstFrameRecord
     var validRecord: Record? = null
     while (current != null) {
         val currentId = current.frameId
         if (speculationFrame(currentId, id) || abortedFrames[currentId])
             return current
-        if (valid(current, id-1, invalid)) {
+        if (valid(current, id - 1, invalid)) {
             if (validRecord == null) {
                 validRecord = current
             } else {
@@ -347,7 +351,7 @@ private fun used(framed: Framed, id: Int, invalid: BitSet): Record? {
  * and the readable record is applied to it. If a record cannot be reused, a new record is created and the readable record is applied to it.
  * Once the values are correct the record is made live by giving it the current frame id.
  */
-fun <T: Record> T.writable(framed: Framed, frame: Frame): T {
+fun <T : Record> T.writable(framed: Framed, frame: Frame): T {
     if (frame.readonly) throw IllegalStateException("In a readonly frame")
     val id = frame.id
     val readData = readable<T>(this, id, frame.invalid)
@@ -366,8 +370,9 @@ fun <T: Record> T.writable(framed: Framed, frame: Frame): T {
         // thread but using Int.MAX_VALUE allows multiple readers, single writer, of a frame. Note that threads reading a mutating
         // frame should not cache the result of readable() as the mutating thread calls to writable() can change the result of readable().
         @Suppress("UNCHECKED_CAST")
-        (used(framed, id, frame.invalid) as T?)?.apply { frameId = Int.MAX_VALUE } ?:
-            readData.create().apply { frameId = Int.MAX_VALUE; framed.prepend(this as T) } as T
+        (used(framed, id, frame.invalid) as T?)?.apply { frameId = Int.MAX_VALUE } ?: readData.create().apply {
+            frameId = Int.MAX_VALUE; framed.prependFrameRecord(this as T)
+        } as T
     }
     newData.assign(readData)
     newData.frameId = id

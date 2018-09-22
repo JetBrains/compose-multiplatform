@@ -162,13 +162,13 @@ fun augmentFramedClass(
     val metadata = FrameMetadata(framedDescriptor)
     val recordTypeDescriptor = context.moduleDescriptor.findClassAcrossModuleDependencies(ClassId.topLevel(recordClassName)) ?: error("Cannot find the Record class")
 
-    // Find the next field
-    val nextPropertyDescriptor = framedDescriptor.unsubstitutedMemberScope.getContributedVariables(Name.identifier("next"),
-            NoLookupLocation.FROM_BACKEND).single()
-    val nextGetterDescriptor = nextPropertyDescriptor.getter ?: error("Expected next property to have a getter")
-    val nextGetter = context.symbolTable.referenceFunction(nextGetterDescriptor)
-    val nextSetterDescriptor = nextPropertyDescriptor.setter ?: error("Expected next property to have a setter")
-    val nextSetter = context.symbolTable.referenceFunction(nextSetterDescriptor)
+    // Find the firstFrameRecord field
+    val recordPropertyDescriptor = framedDescriptor.unsubstitutedMemberScope.getContributedVariables(Name.identifier("_firstFrameRecord"),
+                                                                                                     NoLookupLocation.FROM_BACKEND).single()
+    val recordGetterDescriptor = recordPropertyDescriptor.getter ?: error("Expected next property to have a getter")
+    val recordGetter = context.symbolTable.referenceFunction(recordGetterDescriptor)
+    val recordSetterDescriptor = recordPropertyDescriptor.setter ?: error("Expected next property to have a setter")
+    val recordSetter = context.symbolTable.referenceFunction(recordSetterDescriptor)
 
     val thisSymbol = framedClass.thisReceiver?.symbol ?: error("No this receiver found for class ${framedClass.name}")
 
@@ -177,7 +177,7 @@ fun augmentFramedClass(
             recordDescriptor.defaultType.toIrType()!!,
             context.symbolTable.referenceClassifier(recordDescriptor), expr)
 
-    fun getRecord() = toRecord(syntheticGetterCall(nextGetter, nextGetterDescriptor, syntheticGetValue(thisSymbol)))
+    fun getRecord() = toRecord(syntheticGetterCall(recordGetter, recordGetterDescriptor, syntheticGetValue(thisSymbol)))
 
     // Move property initializer to an anonymous initializer as the backing field is moved to the record
     context.symbolTable.declareAnonymousInitializer(UNDEFINED_OFFSET, UNDEFINED_OFFSET, IrDeclarationOrigin.DEFINED, framedDescriptor)
@@ -185,8 +185,8 @@ fun augmentFramedClass(
             val statements = mutableListOf<IrStatement>()
 
             // Create the initial state record
-            statements.add(syntheticSetterCall(nextSetter, nextSetterDescriptor, syntheticGetValue(thisSymbol),
-                    syntheticCall(
+            statements.add(syntheticSetterCall(recordSetter, recordSetterDescriptor, syntheticGetValue(thisSymbol),
+                                               syntheticCall(
                             recordDescriptor.defaultType.toIrType()!!,
                             recordClassInfo.constructorSymbol,
                             // Non-null was already validated when the record class was constructed
@@ -239,9 +239,9 @@ fun augmentFramedClass(
                                             readableDescriptor).also {
                                         it.putValueArgument(0,
                                                 syntheticGetterCall(
-                                                        nextGetter,
-                                                        nextGetterDescriptor,
-                                                        syntheticGetValue(thisSymbol)
+                                                    recordGetter,
+                                                    recordGetterDescriptor,
+                                                    syntheticGetValue(thisSymbol)
                                                 ))
                                     }
                                     ))
@@ -258,9 +258,9 @@ fun augmentFramedClass(
                                     writableSymbol,
                                     writableDescriptor).also {
                                 it.putValueArgument(0, syntheticGetterCall(
-                                        nextGetter,
-                                        nextGetterDescriptor,
-                                        syntheticGetValue(thisSymbol)
+                                    recordGetter,
+                                    recordGetterDescriptor,
+                                    syntheticGetValue(thisSymbol)
                                 ))
                                 it.putValueArgument(1, syntheticGetValue(thisSymbol))
                             }),

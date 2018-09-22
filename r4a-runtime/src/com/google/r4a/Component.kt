@@ -15,11 +15,12 @@ abstract class Component : Framed, Recomposable {
         CompositionContext.recomposeSync(this)
     }
 
-    protected lateinit var next: Record
-    override val first: Record get() = next
-    override fun prepend(value: Record) {
-        value.next = next
-        next = value
+    protected lateinit var _firstFrameRecord: Record
+    override val firstFrameRecord: Record get() = _firstFrameRecord
+
+    override fun prependFrameRecord(value: Record) {
+        value.next = _firstFrameRecord
+        _firstFrameRecord = value
     }
 
     override fun setRecompose(recompose: () -> Unit) {

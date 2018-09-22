@@ -22,12 +22,12 @@ class Address(street: String, city: String): Framed {
         next.city = city
     }
 
-    override fun prepend(value: Record) {
+    override fun prependFrameRecord(value: Record) {
         value.next = next
         next = value as AddressRecord
     }
 
-    override val first: AddressRecord get() = next
+    override val firstFrameRecord: AddressRecord get() = next
 }
 
 class AddressRecord : AbstractRecord() {
