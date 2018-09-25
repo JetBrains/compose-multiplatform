@@ -13,20 +13,9 @@ import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtxElement
 import org.jetbrains.kotlin.psi.psiUtil.endOffset
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
+import org.jetbrains.kotlin.r4a.idea.parentOfType
 
 class KtxTypedHandler : TypedHandlerDelegate() {
-
-    companion object {
-        private inline fun <reified T : PsiElement> PsiElement.parentOfType(): T? {
-            var node: PsiElement? = this
-            while (node != null) {
-                if (node is T) return node
-                node = node.parent
-            }
-            return null
-        }
-    }
-
 
     override fun beforeCharTyped(
         c: Char,
