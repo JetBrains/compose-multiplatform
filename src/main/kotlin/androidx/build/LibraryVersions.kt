@@ -96,7 +96,7 @@ object LibraryVersions {
     /**
      * Version code for Jetifier
      */
-    val JETIFIER = Version("1.0.0-alpha10")
+    val JETIFIER = Version("1.0.0-beta01")
 
     /**
      * Version code for Appcompat
