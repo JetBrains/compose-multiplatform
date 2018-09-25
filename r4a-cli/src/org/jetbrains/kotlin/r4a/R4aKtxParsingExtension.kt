@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.r4a
 
 import com.intellij.lang.PsiBuilder
+import com.intellij.psi.tree.TokenSet
 import org.jetbrains.kotlin.KtNodeTypes.*
 import org.jetbrains.kotlin.lexer.KtTokens.*
 import org.jetbrains.kotlin.parsing.KotlinExpressionParsing
@@ -13,15 +14,16 @@ import org.jetbrains.kotlin.parsing.KtxParsingExtension
 import org.jetbrains.kotlin.parsing.KtxStatementsParser
 import java.util.ArrayList
 
+private val EXPRESSION_FOLLOW_KTX = TokenSet.orSet(KotlinExpressionParsing.EXPRESSION_FOLLOW, TokenSet.create(DIV, GT))
+private val ATTRIBUTE_FOLLOW = TokenSet.create(DIV, GT, IDENTIFIER, EQ, LBRACE, RBRACE, SEMICOLON)
+
 class R4aKtxParsingExtension : KtxParsingExtension {
 
-    override fun atKtxStart(parser: KotlinExpressionParsing): Boolean {
-        return parser.at(LT)
-    }
+    override fun atKtxStart(parser: KotlinExpressionParsing) = parser.at(LT)
 
-    override fun parseKtxTag(parser: KotlinExpressionParsing) {
-        parser.parseKtxTag()
-    }
+    override fun parseKtxTag(parser: KotlinExpressionParsing) = parser.parseKtxTag()
+
+    override fun parseKtxExpressionFollow() = EXPRESSION_FOLLOW_KTX
 
     override fun createStatementsParser(parser: KotlinExpressionParsing, closeTagToken: String?): KtxStatementsParser {
         return object : KtxStatementsParser {
@@ -40,8 +42,8 @@ class R4aKtxParsingExtension : KtxParsingExtension {
                 }
             }
 
-            override fun shouldBreak() = shouldBreak;
-            override fun shouldContinue() = shouldContinue;
+            override fun shouldBreak() = shouldBreak
+            override fun shouldContinue() = shouldContinue
 
             override fun finish() {
                 // Close all open KTX tags
@@ -140,9 +142,9 @@ private fun KotlinExpressionParsing.handleKtx(markers: MutableList<KtxMarkerStar
 }
 
 /*
-     * KtxElement
-     *  ;
-     */
+ * KtxElement
+ *  ;
+ */
 private fun KotlinExpressionParsing.parseKtxTag() {
     val startTag = parseKtxOpenTag()
     if (startTag == null || startTag.isClosed) return
@@ -234,16 +236,14 @@ private fun KotlinExpressionParsing.parseKtxTagName(): String {
         expression = expression.precede()
     }
 
-
-
     expression.drop()
     return tagName
 }
 
 /*
-     * KtxAttribute
-     *  ;
-     */
+ * KtxAttribute
+ *  ;
+ */
 private fun KotlinExpressionParsing.parseKtxAttribute() {
     val marker = mark()
     if (at(IDENTIFIER)) {
@@ -251,7 +251,7 @@ private fun KotlinExpressionParsing.parseKtxAttribute() {
         advance()
         attrKeyMark.done(REFERENCE_EXPRESSION)
     } else {
-        error("Expected attribute name")
+        errorWithRecovery("Expected attribute name", ATTRIBUTE_FOLLOW)
     }
 
     if (at(EQ)) {
@@ -262,9 +262,9 @@ private fun KotlinExpressionParsing.parseKtxAttribute() {
 }
 
 /*
-     * KtxElement
-     *  ;
-     */
+ * KtxElement
+ *  ;
+ */
 private fun KotlinExpressionParsing.parseKtxOpenTag(): KtxMarkerStart? {
 
     val marker = mark()
@@ -282,6 +282,9 @@ private fun KotlinExpressionParsing.parseKtxOpenTag(): KtxMarkerStart? {
 
     while (at(IDENTIFIER)) {
         parseKtxAttribute()
+        if (!atSet(ATTRIBUTE_FOLLOW)) {
+            errorAndAdvance("Expecting an attribute")
+        }
     }
 
     if (at(DIV)) {
@@ -299,15 +302,20 @@ private fun KotlinExpressionParsing.parseKtxOpenTag(): KtxMarkerStart? {
         advance()
         return result
     } else {
-        marker.error("Invalid KTX tag")
-        return null
+        errorWithRecovery("Invalid KTX tag", EXPRESSION_FOLLOW_KTX)
+
+        if (at(DIV)) advance()
+        if (at(GT)) advance()
+        result.close()
+
+        return result
     }
 }
 
 /*
-     * KtxElement
-     *  ;
-     */
+ * KtxElement
+ *  ;
+ */
 private fun KotlinExpressionParsing.parseKtxCloseTag(): String? {
     val marker = mark()
 

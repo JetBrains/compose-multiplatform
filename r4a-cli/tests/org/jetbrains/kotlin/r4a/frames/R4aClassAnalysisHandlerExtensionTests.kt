@@ -34,20 +34,5 @@ class R4aClassAnalysisHandlerExtensionTests: AbstractR4aDiagnosticsTest() {
         """)
     }
 
-    fun testReportInvalidTag() {
-        doTest("""
-            import com.google.r4a.Component
-
-            var b = true
-            class MyComponent: Component() {
-              override fun compose() {
-                <!EXPRESSION_EXPECTED!>while (b)
-                    <MyComponent<!> * />
-              }
-            }
-        """)
-    }
-
-
 }
 
