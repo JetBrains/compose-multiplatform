@@ -77,6 +77,8 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
             return fallback(element, context, facade)
         }
 
+        tag.commit()
+
         // If we've made it here, it resolved to something and our opening tag is marked but our closing tag is not, so we copy it over
         element.simpleClosingTagName?.let {
             val ref = context.trace[BindingContext.REFERENCE_TARGET, element.simpleTagName]
@@ -184,7 +186,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
                 } else if (expectedTypes.isEmpty()) {
                     context.trace.reportFromPlugin(
                         UNRESOLVED_ATTRIBUTE_KEY.on(
-                            attribute,
+                            keyExpr,
                             tag.referrableDescriptor,
                             nameAsString,
                             valueType
@@ -192,12 +194,16 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
                         R4ADefaultErrorMessages
                     )
                 } else {
+                    expectedTypes.firstOrNull()?.let {
+                        context.trace.record(BindingContext.EXPECTED_EXPRESSION_TYPE, valueExpr, it)
+                    }
+
                     // TODO(lmr): It turns out that expectedTypes won't be populated with extension setters/properties that are in scope
                     // unless there are no other properties/setters with the same name. Ideally we would have these show up in the error
                     // message as well. Normal kotlin has the same issue, so I'm not going to spend too much time on this right now.
                     context.trace.reportFromPlugin(
                         R4AErrors.MISMATCHED_ATTRIBUTE_TYPE.on(
-                            valueExpr,
+                            keyExpr,
                             valueType,
                             expectedTypes
                         ),
@@ -258,7 +264,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
                     )
                 } else {
                     context.trace.reportFromPlugin(
-                        R4AErrors.CHILDREN_PROVIDED_BUT_NO_CHILDREN_DECLARED.on(element),
+                        R4AErrors.CHILDREN_PROVIDED_BUT_NO_CHILDREN_DECLARED.on(tagExpr),
                         R4ADefaultErrorMessages
                     )
                 }
@@ -277,7 +283,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
                     if (namedAttribute == null) {
                         // there is a required children descriptor, but user didn't provide anything
                         context.trace.reportFromPlugin(
-                            R4AErrors.MISSING_REQUIRED_CHILDREN.on(element),
+                            R4AErrors.MISSING_REQUIRED_CHILDREN.on(tagExpr),
                             R4ADefaultErrorMessages
                         )
                     }
@@ -301,6 +307,16 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
                                 context
                             )
                         }
+                        is ValueParameterDescriptor -> {
+                            childrenAttrInfo = KtxAttributeInfo(
+                                name = childrenDescriptor.name.asString(),
+                                isPivotal = tag.isConstructed,
+                                descriptor = childrenDescriptor,
+                                type = childrenDescriptor.type,
+                                setterResolvedCall = null,
+                                isIncludedInConstruction = true
+                            )
+                        }
                         else -> error("unexpected descriptor annotated with @Children")
                     }
                 }
@@ -314,7 +330,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
                     else -> null
                 }}
                 context.trace.reportFromPlugin(
-                    R4AErrors.UNRESOLVED_CHILDREN.on(element, potentialTypes),
+                    R4AErrors.UNRESOLVED_CHILDREN.on(tagExpr, potentialTypes),
                     R4ADefaultErrorMessages
                 )
             }
@@ -350,7 +366,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
 
             if (missingAttributes.size > 0) {
                 context.trace.reportFromPlugin(
-                    MISSING_REQUIRED_ATTRIBUTES.on(element, missingAttributes),
+                    MISSING_REQUIRED_ATTRIBUTES.on(tagExpr, missingAttributes),
                     R4ADefaultErrorMessages
                 )
             }
@@ -401,7 +417,8 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
             resolvedCall = tag.resolvedCall,
             attributeInfos = attributeInfos,
             childrenInfo = childrenAttrInfo,
-            parameterInfos = tag.parameters
+            parameterInfos = tag.parameters,
+            referrableDescriptor = tag.referrableDescriptor
         )
 
         context.trace.record(KTX_TAG_INFO, element, tagInfo)

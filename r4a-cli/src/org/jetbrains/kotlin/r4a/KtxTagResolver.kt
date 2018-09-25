@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.QualifiedExpressionResolver
 import org.jetbrains.kotlin.resolve.TemporaryBindingTrace
 import org.jetbrains.kotlin.resolve.calls.CallResolver
+import org.jetbrains.kotlin.resolve.calls.callUtil.noErrorsInValueArguments
 import org.jetbrains.kotlin.resolve.calls.checkers.UnderscoreUsageChecker
 import org.jetbrains.kotlin.resolve.calls.context.*
 import org.jetbrains.kotlin.resolve.calls.model.*
@@ -47,7 +48,8 @@ class KtxTagInfo(
     val instanceType: KotlinType?,
     val attributeInfos: List<KtxAttributeInfo>,
     val childrenInfo: KtxAttributeInfo?,
-    val parameterInfos: List<KtxTagParameterInfo>
+    val parameterInfos: List<KtxTagParameterInfo>,
+    val referrableDescriptor: DeclarationDescriptor
 )
 
 class KtxTagResolveInfo(
@@ -58,8 +60,11 @@ class KtxTagResolveInfo(
     val referrableDescriptor: DeclarationDescriptor,
     val instanceType: KotlinType?,
     val parameters: List<KtxTagParameterInfo>,
-    val receiverExpression: KtExpression?
-)
+    val receiverExpression: KtExpression?,
+    private val trace: TemporaryTraceAndCache
+) {
+    fun commit() { trace.commit() }
+}
 
 class KtxTagParameterInfo(
     val name: String,
@@ -100,8 +105,10 @@ class KtxTagResolver(
             return it.type.constructor.declarationDescriptor?.fqNameSafe == FqName("android.content.Context")
         }
 
+        private val childrenFqName = R4aUtils.r4aFqName("Children")
+
         fun isChildrenParameter(it: ValueParameterDescriptor): Boolean {
-            return it.annotations.findAnnotation(FqName("com.google.r4a.Children")) != null
+            return it.annotations.findAnnotation(childrenFqName) != null
         }
     }
 
@@ -180,6 +187,7 @@ class KtxTagResolver(
         if (result.isNothing) return null
 
         if (!result.isSuccess && parameterInfos == null && result.resultingCalls.isNotEmpty()) {
+            val allResults = mutableListOf<KtxTagResolveInfo>()
             for (candidate in result.resultingCalls) {
                 val nextParameters = candidate.resultingDescriptor.valueParameters
                     .map {
@@ -190,12 +198,23 @@ class KtxTagResolver(
                             isContext = isContextParameter(it)
                         )
                     }
-                val nextResult = resolveFunction(receiver, receiverExpression, expression, context, nextParameters) ?: continue
-                if (nextResult.valid) return nextResult
-            }
-        }
+                val nextResult = resolveFunction(
+                    receiver,
+                    receiverExpression,
+                    expression,
+                    context,
+                    nextParameters
+                ) ?: continue
 
-        temporaryForVariable.commit()
+                if (nextResult.valid) {
+                    return nextResult
+                }
+
+                allResults.add(nextResult)
+            }
+
+            return allResults.maxBy { it.parameters.size }
+        }
 
         val resolvedCall = result.resultingCall
         val referencedDescriptor = when (resolvedCall) {
@@ -236,6 +255,7 @@ class KtxTagResolver(
             referrableDescriptor = referrableDescriptor,
             typeDescriptor = typeDescriptor,
             instanceType = instanceType,
+            trace = temporaryForVariable,
             parameters = resolvedCall.valueArguments.map {
                 KtxTagParameterInfo(
                     name = it.key.name.asString(),
