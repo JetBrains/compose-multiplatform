@@ -87,6 +87,36 @@ class KtxTypedHandlerTest : KotlinLightCodeInsightFixtureTestCase() {
         "<Foo><<caret></Foo>"
     )
 
+    fun testFnLiteralOpenCloseOnSelfClosingTag() = doCharTypeTest(
+        "<Foo a=b c=d f=<caret> />",
+        '{',
+        "<Foo a=b c=d f={<caret>} />"
+    )
+
+    fun testFnLiteralOpenCloseOnUnclosedOpenTag() = doCharTypeTest(
+        "<Foo f=<caret>>",
+        '{',
+        "<Foo f={<caret>}>"
+    )
+
+    fun testFnLiteralOpenCloseOnOpenTag() = doCharTypeTest(
+        "<Foo f=<caret>></Foo>",
+        '{',
+        "<Foo f={<caret>}></Foo>"
+    )
+
+    fun testFnLiteralOpenCloseOnOpenTagBeforeOtherAttributes() = doCharTypeTest(
+        "<Foo f=<caret> b=bar></Foo>",
+        '{',
+        "<Foo f={<caret>} b=bar></Foo>"
+    )
+
+    fun testFnLiteralOpenCloseWithWhitespaceBetweenEq() = doCharTypeTest(
+        "<Foo f = <caret> b = bar></Foo>",
+        '{',
+        "<Foo f = {<caret>} b = bar></Foo>"
+    )
+
     fun doCharTypeTest(before: String, c: Char, after: String) {
         fun String.withFunContext(): String {
             val bodyText = "//---- [test]\n${this.trimIndent()}\n//---- [/test]"
