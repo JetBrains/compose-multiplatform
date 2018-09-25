@@ -14,16 +14,7 @@ import org.jetbrains.kotlin.util.slicedMap.RewritePolicy
 import org.jetbrains.kotlin.util.slicedMap.WritableSlice
 
 object R4AWritableSlices {
-    val KTX_TAG_TYPE_DESCRIPTOR: WritableSlice<KtExpression, DeclarationDescriptor> = BasicWritableSlice(RewritePolicy.DO_NOTHING)
-    val KTX_TAG_INSTANCE_TYPE: WritableSlice<KtExpression, KotlinType> = BasicWritableSlice(RewritePolicy.DO_NOTHING)
-    val KTX_TAG_COMPOSABLE_TYPE: WritableSlice<KtxElement, ComposableType> = BasicWritableSlice(RewritePolicy.DO_NOTHING)
-    val KTX_TAG_CHILDRENLAMBDA: WritableSlice<KtxElement, R4aUtils.AttributeInfo> = BasicWritableSlice(RewritePolicy.DO_NOTHING)
-
     val KTX_TAG_INFO: WritableSlice<KtxElement, KtxTagInfo> = BasicWritableSlice(RewritePolicy.DO_NOTHING)
-
-    val KTX_ATTR_DESCRIPTOR: WritableSlice<KtxAttribute, DeclarationDescriptor> = BasicWritableSlice(RewritePolicy.DO_NOTHING)
-    val KTX_ATTR_TYPE: WritableSlice<KtxAttribute, KotlinType> = BasicWritableSlice(RewritePolicy.DO_NOTHING)
-
     val KTX_ATTR_INFO: WritableSlice<KtxAttribute, KtxAttributeInfo> = BasicWritableSlice(RewritePolicy.DO_NOTHING)
     val COMPOSABLE_ANALYSIS: WritableSlice<KtElement, Boolean> = BasicWritableSlice(RewritePolicy.DO_NOTHING)
 }

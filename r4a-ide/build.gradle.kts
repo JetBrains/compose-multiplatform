@@ -19,8 +19,10 @@ dependencies {
     compile(project(":idea"))
     compile(project(":idea:idea-jps-common"))
     compile(project(":plugins:annotation-based-compiler-plugins-ide-support"))
-    compileOnly(intellijDep()) { includeJars("openapi", "idea", "util", "extensions", "platform-api", "extensions") }
-    //compile(ideaPluginDeps("maven", plugin = "maven"))
+    compileOnly(intellijDep()) { includeJars("extensions", "openapi", "util", "idea", "platform-api", "platform-impl", "android-base-common", rootProject = rootProject) }
+    compileOnly(project(":idea:idea-core"))
+    compile(project(":idea:ide-common"))
+    compileOnly(intellijCoreDep()) { includeJars("intellij-core") }
     compileOnly(intellijPluginDep("gradle"))
 
     testCompile(project(":kotlin-test:kotlin-test-junit"))
@@ -50,6 +52,8 @@ dependencies {
     testRuntime(project(":idea:idea-android")) { isTransitive = false }
     testRuntime(project(":plugins:lint")) { isTransitive = false }
     testRuntime(project(":plugins:uast-kotlin"))
+    testCompile(project(":kotlinx-serialization-ide-plugin"))
+    testCompile(projectTests(":idea"))
 
     (rootProject.extra["compilerModules"] as Array<String>).forEach {
         testRuntime(project(it))
