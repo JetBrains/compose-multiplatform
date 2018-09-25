@@ -30,6 +30,7 @@ import org.jetbrains.kotlin.idea.KotlinLanguage
 import org.jetbrains.kotlin.psi.KtxElement
 import org.jetbrains.kotlin.psi.psiUtil.endOffset
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
+import org.jetbrains.kotlin.r4a.idea.parentOfType
 
 private val LOG = Logger.getInstance(XmlTagNameSynchronizer::class.java)
 private val SYNCHRONIZER_KEY = Key.create<TagNameSynchronizer>("ktx.tag_name_synchronizer")
@@ -76,15 +77,6 @@ class KtxTagNameSynchronizer(editorFactory: EditorFactory, private val manager: 
 private class TagNameSynchronizer(val editor: Editor, val project: Project) : DocumentListener {
 
     companion object {
-        private inline fun <reified T : PsiElement> PsiElement.parentOfType(): T? {
-            var node: PsiElement? = this
-            while (node != null) {
-                if (node is T) return node
-                node = node.parent
-            }
-            return null
-        }
-
         private fun Char.isValidTagNameChar() = isLetter() || isDigit() || this == '.' || this == '_'
     }
 
