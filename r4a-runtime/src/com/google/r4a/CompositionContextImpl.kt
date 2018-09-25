@@ -332,6 +332,10 @@ internal class CompositionContextImpl : CompositionContext() {
         }
     }
 
+    override fun preserveAmbientScope(component: Component) {
+        // Nothing to do
+    }
+
     override fun <T> getAmbient(key: Ambient<T>): T = getAmbient(key, currentSlot)
 
     override fun <T> getAmbient(key: Ambient<T>, component: Component): T {

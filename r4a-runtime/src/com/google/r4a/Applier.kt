@@ -6,9 +6,11 @@ import java.util.*
  * An adapter that performs tree based operations on some tree startNode N without requiring a specific base type for N
  */
 interface ApplyAdapter<N> {
+    fun N.start(instance: N)
     fun N.insertAt(index: Int, instance: N)
     fun N.removeAt(index: Int, count: Int)
     fun N.move(from: Int, to: Int, count: Int)
+    fun N.end(instance: N, parent: N)
 }
 
 /**
@@ -23,10 +25,17 @@ class Applier<N>(root: N, private val adapter: ApplyAdapter<N>) {
     fun down(node: N) {
         stack.push(current)
         _current = node
+        with(adapter) {
+            current.start(node)
+        }
     }
 
     fun up() {
+        val node = _current
         _current = stack.pop()
+        with(adapter) {
+            current.end(node, current)
+        }
     }
 
     fun insert(index: Int, instance: N) {

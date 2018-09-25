@@ -9,10 +9,18 @@ import android.content.Context
 import android.view.Choreographer
 import android.view.View
 import android.view.ViewGroup
+import com.google.r4a.adapters.getViewAdapterIfExists
+import java.util.Stack
+import java.util.WeakHashMap
 
 private class ViewApplyAdapter : ApplyAdapter<View> {
+    private data class PendingInsert(val index: Int, val instance: View)
+
+    private val pendingInserts = Stack<PendingInsert>()
+
+    override fun View.start(instance: View) {}
     override fun View.insertAt(index: Int, instance: View) {
-        (this as ViewGroup).addView(instance, index)
+        pendingInserts.push(PendingInsert(index, instance))
     }
 
     override fun View.removeAt(index: Int, count: Int) {
@@ -38,26 +46,53 @@ private class ViewApplyAdapter : ApplyAdapter<View> {
             }
         }
     }
+
+    override fun View.end(instance: View, parent: View) {
+        val adapter = instance.getViewAdapterIfExists()
+        val parentGroup = parent as ViewGroup
+        if (!pendingInserts.isEmpty()) {
+            val pendingInsert = pendingInserts.peek()
+            if (pendingInsert.instance === instance) {
+                pendingInserts.pop()
+                adapter?.willInsert(instance, parentGroup)
+                parentGroup.addView(instance, pendingInsert.index)
+                adapter?.didInsert(instance, parentGroup)
+                return
+            }
+        }
+        adapter?.didUpdate(instance, parentGroup)
+    }
 }
 
 private class ViewComposer(val root: ViewGroup) : Composer<View>(SlotTable(), Applier(root, ViewApplyAdapter()))
 
 internal class ComposerCompositionContext(val root: ViewGroup, private val rootComponent: Component) : CompositionContext() {
     companion object {
-        val factory = object: Function3<Context, ViewGroup, Component, CompositionContext> {
-            override fun invoke(context: Context, root: ViewGroup, component: Component): CompositionContext {
-                val result = ComposerCompositionContext(root, component)
-                result.context = context
-                return result
+        val factory: Function4<Context, ViewGroup, Component, Ambient.Reference?, CompositionContext> by lazy {
+            object : Function4<Context, ViewGroup, Component, Ambient.Reference?, CompositionContext> {
+                override fun invoke(
+                    context: Context,
+                    root: ViewGroup,
+                    component: Component,
+                    ambientReference: Ambient.Reference?
+                ): CompositionContext {
+                    val result = ComposerCompositionContext(root, component)
+                    result.context = context
+                    result.ambientReference = ambientReference
+                    return result
+                }
             }
         }
     }
 
     private val composer = ViewComposer(root)
     private var currentComponent: Component? = null
+    private var ambientReference: Ambient.Reference? = null
 
     private var hasPendingFrame = false
     private var isComposing = false
+
+    private val preservedAmbientScopes by lazy { WeakHashMap<Component, List<Ambient<*>.Provider>>() }
 
     private val frameCallback = Choreographer.FrameCallback {
         hasPendingFrame = false
@@ -98,7 +133,7 @@ internal class ComposerCompositionContext(val root: ViewGroup, private val rootC
     override fun endRoot() {
         composer.endGroup()
         composer.slots.endReading()
-        composer.finalRealizeSlots()
+        composer.finalizeCompose()
     }
 
     override fun joinKey(left: Any?, right: Any?): Any = composer.joinKey(left, right)
@@ -128,7 +163,7 @@ internal class ComposerCompositionContext(val root: ViewGroup, private val rootC
                 currentComponent = instance
                 instance
             }
-            else -> error("Unknown instance type ${instance}")
+            else -> error("Unknown instance type $instance")
         }
     }
 
@@ -173,7 +208,10 @@ internal class ComposerCompositionContext(val root: ViewGroup, private val rootC
                 isComposing = true
                 CompositionContext.current = this
                 startRoot()
-                setInstance(component)
+                if (isInserting())
+                    setInstance(component)
+                else
+                    useInstance()
                 startCompose(true)
                 component.compose()
                 endCompose(true)
@@ -192,13 +230,41 @@ internal class ComposerCompositionContext(val root: ViewGroup, private val rootC
         }
     }
 
-    override fun <T> getAmbient(key: Ambient<T>): T {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun preserveAmbientScope(component: Component) {
+        val providers = mutableListOf<Ambient<*>.Provider>()
+        composer.enumParents { parent ->
+            if (parent is Ambient<*>.Provider) providers.add(parent)
+            true
+        }
+        if (providers.size > 0)
+            preservedAmbientScopes[component] = providers
     }
 
-    override fun <T> getAmbient(key: Ambient<T>, component: Component): T {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun <T> getAmbient(key: Ambient<T>): T {
+        var result: Any? = null
+        composer.enumParents { parent ->
+            if (parent is Ambient<*>.Provider && parent.ambient == key) {
+                result = parent.value
+                false
+            } else true
+        }
+
+        if (result == null) {
+            val ref = ambientReference
+            if (ref != null) {
+                return ref.getAmbient(key)
+            }
+            return key.defaultValue
+        }
+
+        @Suppress("UNCHECKED_CAST")
+        return result as T
     }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T> getAmbient(key: Ambient<T>, component: Component): T =
+        preservedAmbientScopes[component]?.firstOrNull { it.ambient == key }?.value as T? ?: ambientReference?.getAmbient(key)
+        ?: key.defaultValue
 
     override fun debug() {}
 }

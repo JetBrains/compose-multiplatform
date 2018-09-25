@@ -28,9 +28,11 @@ typealias Compose = ViewComposition.() -> Unit
 
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 object ViewApplierAdapter : ApplyAdapter<View> {
+    override fun View.start(instance: View) { }
     override fun View.insertAt(index: Int, instance: View) = addAt(index, instance)
     override fun View.removeAt(index: Int, count: Int) = removeAt(index, count)
     override fun View.move(from: Int, to: Int, count: Int) = moveAt(from, to, count)
+    override fun View.end(instance: View, parent: View) { }
 }
 
 class ViewComposer(val root: View) : Composer<View>(SlotTable(), Applier(root, ViewApplierAdapter)) {

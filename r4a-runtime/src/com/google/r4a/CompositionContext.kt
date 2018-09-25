@@ -5,13 +5,17 @@ import android.view.View
 import android.view.ViewGroup
 import java.util.*
 
+private var useComposer = true
+
 abstract class CompositionContext {
     companion object {
 
         private val TAG_ROOT_COMPONENT = "r4aRootComponent".hashCode()
         private val COMPONENTS_TO_CONTEXT = WeakHashMap<Component, CompositionContext>()
 
-        var factory: Function4<Context, ViewGroup, Component, Ambient.Reference?, CompositionContext> = CompositionContextImpl.factory
+        val factory: Function4<Context, ViewGroup, Component, Ambient.Reference?, CompositionContext> get() =
+            if(useComposer) ComposerCompositionContext.factory else CompositionContextImpl.factory
+
         var current: CompositionContext = CompositionContextImpl()
 
         fun create(context: Context, view: ViewGroup, component: Component, reference: Ambient.Reference?): CompositionContext {
@@ -55,6 +59,11 @@ abstract class CompositionContext {
         }
 
         fun <T : Any?> getAmbient(key: Ambient<T>, component: Component): T = find(component)!!.getAmbient(key, component)
+
+        fun useNew() { useComposer = true }
+        fun useOld() { useComposer = false }
+
+        val usingNew get() = useComposer
     }
 
     abstract fun startRoot()
@@ -78,6 +87,7 @@ abstract class CompositionContext {
     abstract var context: Context
     abstract fun recompose(component: Component)
     abstract fun recomposeSync(component: Component)
+    abstract fun preserveAmbientScope(component: Component)
     abstract fun <T : Any?> getAmbient(key: Ambient<T>): T
     abstract fun <T : Any?> getAmbient(key: Ambient<T>, component: Component): T
     abstract fun debug()
@@ -204,6 +214,7 @@ inline fun <reified T> CompositionContext.provideAmbient(
         el = key.Provider(value, children)
         setInstance(el)
     } else {
+        @Suppress("UNCHECKED_CAST")
         el = useInstance() as Ambient<T>.Provider
     }
     if (attributeChanged(value)) {
@@ -212,7 +223,9 @@ inline fun <reified T> CompositionContext.provideAmbient(
     if (attributeChanged(children)) {
         el.children = children
     }
+    startCompose(true)
     el.compose()
+    endCompose(true)
 }
 
 inline fun <reified T> CompositionContext.consumeAmbient(
@@ -221,17 +234,21 @@ inline fun <reified T> CompositionContext.consumeAmbient(
 ) = group(0) {
     val el: Ambient<T>.Consumer
     if (isInserting()) {
-        el = key.Consumer()
+        el = key.Consumer(children)
         setInstance(el)
     } else {
+        @Suppress("UNCHECKED_CAST")
         el = useInstance() as Ambient<T>.Consumer
     }
     if (attributeChangedOrInserting(children)) {
         el.children = children
     }
+    startCompose(true)
     el.compose()
+    endCompose(true)
 }
 
+@Suppress("NOTHING_TO_INLINE")
 inline fun CompositionContext.portal(location: Int, noinline children: (Ambient.Reference) -> Unit) {
     emitComponent(location, { Ambient.Portal(children) }) {
         set(children) { this.children = it }

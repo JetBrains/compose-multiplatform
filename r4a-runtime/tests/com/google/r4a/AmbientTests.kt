@@ -128,46 +128,4 @@ class AmbientTests : ComposeTestCase() {
             assertEquals("If defaultFactory is provided, it should be called", "ambient: 345", tv1.text)
         }
     }
-
-
-    @Test
-    fun testDelegate() {
-        val X = Ambient.of<Int>(defaultFactory = { 345 })
-        val idTv1 = 999
-
-        class Foo : Component() {
-            val x by X
-            override fun compose() {
-                with(CompositionContext.current) {
-                    // <TextView text="ambient: $ambient" id={id} />
-                    emitView(9734, ::TextView) {
-                        set("ambient: $x") { text = it }
-                        set(idTv1) { id = it }
-                    }
-                }
-            }
-        }
-
-        compose { cc ->
-            with(cc) {
-                provideAmbient(X, 234) {
-                    emitComponent(9734, ::Foo)
-                }
-            }
-        }.then { _, _, _, activity ->
-            val tv1 = activity.findViewById(idTv1) as TextView
-            assertEquals("If used under a provider, the provided value should be used", "ambient: 234", tv1.text)
-        }
-
-
-        compose { cc ->
-            with(cc) {
-                // <Foo />
-                emitComponent(9734, ::Foo)
-            }
-        }.then { _, _, _, activity ->
-            val tv1 = activity.findViewById(idTv1) as TextView
-            assertEquals("If no provider, the defaultFactory should be called", "ambient: 345", tv1.text)
-        }
-    }
 }

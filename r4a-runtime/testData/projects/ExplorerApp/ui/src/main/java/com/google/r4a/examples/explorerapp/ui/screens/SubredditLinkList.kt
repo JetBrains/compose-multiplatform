@@ -17,7 +17,7 @@ import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import com.google.r4a.examples.explorerapp.common.components.HomogeneousPagedList
 
 class SubredditLinkList : Component() {
-    private val repository get() = CompositionContext.getAmbient(RedditRepository.Ambient, this)
+    private val repository get() = CompositionContext.current.getAmbient(RedditRepository.Ambient)
 
     private val pageSize = 10
 
@@ -42,6 +42,8 @@ class SubredditLinkList : Component() {
         get() {
             var result = _model
             if (result == null) {
+
+                val repository = repository
                 result = repository.linksOfSubreddit(subreddit, sortOptions[selectedSortIndex], pageSize)
                 _model = result
                 subscribe(result.links)
@@ -58,7 +60,7 @@ class SubredditLinkList : Component() {
 
     override fun compose() {
         val model = model
-        val isLoading = model.networkState.getValue() == AsyncState.LOADING
+        val isLoading = (model.networkState.value ?: AsyncState.LOADING) == AsyncState.LOADING
 
         <HomogeneousPagedList
             comparator=Link.COMPARATOR
