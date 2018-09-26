@@ -454,6 +454,7 @@ private fun createGenerateSdkApiTask(project: Project, doclavaConfig: Configurat
             destinationDir = project.docsDir()
             classpath = androidJarFile(project)
             source(project.zipTree(androidSrcJarFile(project)))
+            exclude("**/overview.html") // TODO https://issuetracker.google.com/issues/116699307
             apiFile = sdkApiFile(project)
             generateDocs = false
             coreJavadocOptions {
