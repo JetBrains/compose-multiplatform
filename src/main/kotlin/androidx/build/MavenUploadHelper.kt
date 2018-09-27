@@ -27,13 +27,18 @@ import java.io.File
 fun Project.configureMavenArtifactUpload(extension: SupportLibraryExtension) {
     afterEvaluate {
         if (extension.publish) {
-            if (extension.mavenGroup == null) {
+            val mavenGroup = extension.mavenGroup
+            if (mavenGroup == null) {
                 throw Exception("You must specify mavenGroup for $name project")
             }
             if (extension.mavenVersion == null) {
                 throw Exception("You must specify mavenVersion for $name project")
             }
-            group = extension.mavenGroup!!
+            val strippedGroupId = mavenGroup.substringAfterLast(".")
+            if (mavenGroup.startsWith("androidx") && !name.startsWith(strippedGroupId)) {
+                throw Exception("Your artifactId must start with $strippedGroupId")
+            }
+            group = mavenGroup
         }
     }
 
