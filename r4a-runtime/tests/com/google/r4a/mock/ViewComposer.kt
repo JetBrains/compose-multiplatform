@@ -2,11 +2,11 @@ package com.google.r4a.mock
 
 import com.google.r4a.*
 
-interface ViewComposition {
+interface MockViewComposition {
     val cc: Composition<View>
 }
 
-abstract class ViewComponent : Recomposable, ViewComposition {
+abstract class ViewComponent : Recomposable, MockViewComposition {
     private var recomposer: (() -> Unit)? = null
     private lateinit var _composition: Composition<View>
     @PublishedApi
@@ -24,7 +24,7 @@ abstract class ViewComponent : Recomposable, ViewComposition {
     }
 }
 
-typealias Compose = ViewComposition.() -> Unit
+typealias Compose = MockViewComposition.() -> Unit
 
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 object ViewApplierAdapter : ApplyAdapter<View> {
@@ -35,14 +35,14 @@ object ViewApplierAdapter : ApplyAdapter<View> {
     override fun View.end(instance: View, parent: View) { }
 }
 
-class ViewComposer(val root: View) : Composer<View>(SlotTable(), Applier(root, ViewApplierAdapter)) {
-    private val rootComposer: ViewComposition by lazy {
-        object : ViewComposition {
-            override val cc: Composition<View> get() = this@ViewComposer
+class MockViewComposer(val root: View) : Composer<View>(SlotTable(), Applier(root, ViewApplierAdapter)) {
+    private val rootComposer: MockViewComposition by lazy {
+        object : MockViewComposition {
+            override val cc: Composition<View> get() = this@MockViewComposer
         }
     }
 
-    fun compose(composition: ViewComposition.() -> Unit) {
+    fun compose(composition: MockViewComposition.() -> Unit) {
 
         composeRoot {
             rootComposer.composition()
@@ -50,29 +50,37 @@ class ViewComposer(val root: View) : Composer<View>(SlotTable(), Applier(root, V
     }
 }
 
-inline fun <V> ViewComposition.remember(block: () -> V): V = cc.remember(block)
-inline fun <V, reified P1> ViewComposition.remember(p1: P1, block: () -> V) = cc.remember(p1, block)
-inline fun <V, reified P1, reified P2> ViewComposition.remember(p1: P1, p2: P2, block: () -> V) = cc.remember(p1, p2, block)
-inline fun <V, reified P1, reified P2, reified P3> ViewComposition.remember(p1: P1, p2: P2, p3: P3, block: () -> V) = cc.remember(p1, p2, p3, block)
-inline fun <V, reified P1, reified P2, reified P3, reified P4> ViewComposition.remember(p1: P1, p2: P2, p3: P3, p4: P4, block: () -> V) = cc.remember(p1, p2, p3, p4, block)
-inline fun <V> ViewComposition.remember(vararg args: Any, block: () -> V): V = cc.remember(*args, block = block)
+inline fun <V> MockViewComposition.remember(crossinline block: () -> V): V = cc.remember(block)
+inline fun <V, reified P1> MockViewComposition.remember(p1: P1, crossinline block: () -> V) = cc.remember(p1, block)
+inline fun <V, reified P1, reified P2> MockViewComposition.remember(p1: P1, p2: P2, crossinline block: () -> V) = cc.remember(p1, p2, block)
+inline fun <V, reified P1, reified P2, reified P3> MockViewComposition.remember(p1: P1, p2: P2, p3: P3, crossinline block: () -> V) = cc.remember(p1, p2, p3, block)
+inline fun <V, reified P1, reified P2, reified P3, reified P4> MockViewComposition.remember(p1: P1, p2: P2, p3: P3, p4: P4, crossinline block: () -> V) = cc.remember(p1, p2, p3, p4, block)
+inline fun <V> MockViewComposition.remember(vararg args: Any, crossinline block: () -> V): V = cc.remember(*args, block = block)
 
-inline fun <reified P1> ViewComposition.memoize(key: Any, p1: P1, block: ViewComposition.(p1: P1) -> Unit) {
+inline fun <reified P1> MockViewComposition.memoize(key: Any, p1: P1, block: MockViewComposition.(p1: P1) -> Unit) {
     cc.startGroup(key)
-    if (!cc.changed(p1)) cc.skipGroup()
-    else block(p1)
+    if (!cc.changed(p1)) {
+        cc.nextSlot()
+        cc.skipValue()
+        cc.skipGroup()
+    }
+    else {
+        cc.startGroup(key)
+        block(p1)
+        cc.endGroup()
+    }
     cc.endGroup()
 }
 
 
-inline fun <V : View> ViewComposition.emit(key: Any, noinline factory: () -> V, block: ViewComposition.() -> Unit) {
+inline fun <V : View> MockViewComposition.emit(key: Any, noinline factory: () -> V, block: MockViewComposition.() -> Unit) {
     cc.startNode(key)
     cc.emitNode(factory)
     block()
     cc.endNode()
 }
 
-inline fun <V : View, reified A1> ViewComposition.emit(key: Any, noinline factory: () -> V, a1: A1, noinline set1: V.(A1) -> Unit) {
+inline fun <V : View, reified A1> MockViewComposition.emit(key: Any, noinline factory: () -> V, a1: A1, noinline set1: V.(A1) -> Unit) {
     cc.startNode(key)
     cc.emitNode(factory)
     if (cc.changed(a1)) {
@@ -82,7 +90,7 @@ inline fun <V : View, reified A1> ViewComposition.emit(key: Any, noinline factor
 }
 
 
-inline fun <reified C : ViewComponent, reified A1> ViewComposition.composeComponent(
+inline fun <reified C : ViewComponent, reified A1> MockViewComposition.composeComponent(
     key: Any,
     crossinline factory: () -> C,
     a1: A1, set1: C.(A1) -> Unit
@@ -101,7 +109,7 @@ inline fun <reified C : ViewComponent, reified A1> ViewComposition.composeCompon
     myCC.endGroup()
 }
 
-inline fun <reified C : ViewComponent, reified A1, reified A2> ViewComposition.composeComponent(
+inline fun <reified C : ViewComponent, reified A1, reified A2> MockViewComposition.composeComponent(
     key: Any,
     crossinline factory: () -> C,
     a1: A1, set1: C.(A1) -> Unit,
@@ -126,7 +134,7 @@ inline fun <reified C : ViewComponent, reified A1, reified A2> ViewComposition.c
     myCC.endGroup()
 }
 
-inline fun <reified C : ViewComponent, reified A1, reified A2, reified A3> ViewComposition.composeComponent(
+inline fun <reified C : ViewComponent, reified A1, reified A2, reified A3> MockViewComposition.composeComponent(
     key: Any,
     crossinline factory: () -> C,
     a1: A1, set1: C.(A1) -> Unit,
@@ -155,7 +163,7 @@ inline fun <reified C : ViewComponent, reified A1, reified A2, reified A3> ViewC
     myCC.endGroup()
 }
 
-interface ComponentUpdater<C>: ViewComposition {
+interface ComponentUpdater<C>: MockViewComposition {
     val component: C
     var changed: Boolean
 }
@@ -181,7 +189,7 @@ inline fun <C, V> ComponentUpdater<C>.change(value: V, block: C.(V) -> Unit) {
     changed = true
 }
 
-inline fun <reified C:ViewComponent> ViewComposition.composeComponent(key: Any, crossinline factory: () -> C, crossinline block: ComponentUpdater<C>.() -> Unit) {
+inline fun <reified C:ViewComponent> MockViewComposition.composeComponent(key: Any, crossinline factory: () -> C, crossinline block: ComponentUpdater<C>.() -> Unit) {
     val myCC = cc
     myCC.startGroup(key)
     val component = myCC.remember { factory().apply { setComposition(myCC)} }

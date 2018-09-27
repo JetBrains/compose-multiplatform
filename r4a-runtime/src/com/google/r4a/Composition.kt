@@ -1,5 +1,7 @@
 package com.google.r4a
 
+/* Old code generation model */
+
 interface Recomposable {
     fun setRecompose(recompose: () -> Unit)
     fun compose()
@@ -18,9 +20,10 @@ abstract class Composition<N> : RecomposableContext() {
     abstract fun skipGroup()
 
     abstract fun startNode(key: Any)
-    abstract fun <T : N> emitNode(factory: () -> T)
+    abstract fun <T : N> emitNode(factory: () -> T) // Deprecated
+    abstract fun <T : N> createNode(factory: () -> T)
     abstract fun emitNode(node: N) // Deprecated - single threaded
-    abstract fun useNode(): N // Deprecated - single threaded
+    abstract fun useNode(): N
     abstract fun endNode()
 
     abstract fun startCompose(valid: Boolean, recomposable: Recomposable)
@@ -36,7 +39,7 @@ abstract class Composition<N> : RecomposableContext() {
     abstract fun <V, T> apply(value: V, block: T.(V) -> Unit)
 }
 
-inline fun <N, T> Composition<N>.cache(valid: Boolean = true, block: () -> T): T {
+inline fun <N, T> Composition<N>.cache(valid: Boolean = true, crossinline block: () -> T): T {
     var result = nextSlot()
     if (result === SlotTable.EMPTY || !valid) {
         val value = block()
@@ -60,17 +63,17 @@ inline fun <N, reified V> Composition<N>.changed(value: V): Boolean {
 
 inline fun <N, reified V> Composition<N>.applyNeeded(value: V): Boolean = changed(value) && !inserting
 
-inline fun <N, V> Composition<N>.remember(block: () -> V): V = cache(true, block)
+inline fun <N, V> Composition<N>.remember(crossinline block: () -> V): V = cache(true, block)
 
-inline fun <N, V, reified P1> Composition<N>.remember(p1: P1, block: () -> V) = cache(!changed(p1), block)
+inline fun <N, V, reified P1> Composition<N>.remember(p1: P1, crossinline block: () -> V) = cache(!changed(p1), block)
 
-inline fun <N, V, reified P1, reified P2> Composition<N>.remember(p1: P1, p2: P2, block: () -> V): V {
+inline fun <N, V, reified P1, reified P2> Composition<N>.remember(p1: P1, p2: P2, crossinline block: () -> V): V {
     var valid = !changed(p1)
     valid = !changed(p2) && valid
     return cache(valid, block)
 }
 
-inline fun <N, V, reified P1, reified P2, reified P3> Composition<N>.remember(p1: P1, p2: P2, p3: P3, block: () -> V): V {
+inline fun <N, V, reified P1, reified P2, reified P3> Composition<N>.remember(p1: P1, p2: P2, p3: P3, crossinline block: () -> V): V {
     var valid = !changed(p1)
     valid = !changed(p2) && valid
     valid = !changed(p3) && valid
@@ -82,7 +85,7 @@ inline fun <N, V, reified P1, reified P2, reified P3, reified P4> Composition<N>
     p2: P2,
     p3: P3,
     p4: P4,
-    block: () -> V
+    crossinline block: () -> V
 ): V {
     var valid = !changed(p1)
     valid = !changed(p2) && valid
@@ -91,7 +94,7 @@ inline fun <N, V, reified P1, reified P2, reified P3, reified P4> Composition<N>
     return cache(valid, block)
 }
 
-inline fun <N, V> Composition<N>.remember(vararg args: Any, block: () -> V): V {
+inline fun <N, V> Composition<N>.remember(vararg args: Any, crossinline block: () -> V): V {
     var valid = true
     for (arg in args) valid = !changed(arg) && valid
     return cache(valid, block)

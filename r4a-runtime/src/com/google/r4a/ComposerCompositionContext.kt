@@ -13,58 +13,7 @@ import com.google.r4a.adapters.getViewAdapterIfExists
 import java.util.Stack
 import java.util.WeakHashMap
 
-private class ViewApplyAdapter : ApplyAdapter<View> {
-    private data class PendingInsert(val index: Int, val instance: View)
 
-    private val pendingInserts = Stack<PendingInsert>()
-
-    override fun View.start(instance: View) {}
-    override fun View.insertAt(index: Int, instance: View) {
-        pendingInserts.push(PendingInsert(index, instance))
-    }
-
-    override fun View.removeAt(index: Int, count: Int) {
-        (this as ViewGroup).removeViews(index, count)
-    }
-
-    override fun View.move(from: Int, to: Int, count: Int) {
-        with(this as ViewGroup) {
-            if (from > to) {
-                var current = to
-                repeat(count) {
-                    val view = getChildAt(from)
-                    removeViewAt(from)
-                    addView(view, current)
-                    current++
-                }
-            } else {
-                repeat(count) {
-                    val view = getChildAt(from)
-                    removeViewAt(from)
-                    addView(view, to - 1)
-                }
-            }
-        }
-    }
-
-    override fun View.end(instance: View, parent: View) {
-        val adapter = instance.getViewAdapterIfExists()
-        val parentGroup = parent as ViewGroup
-        if (!pendingInserts.isEmpty()) {
-            val pendingInsert = pendingInserts.peek()
-            if (pendingInsert.instance === instance) {
-                pendingInserts.pop()
-                adapter?.willInsert(instance, parentGroup)
-                parentGroup.addView(instance, pendingInsert.index)
-                adapter?.didInsert(instance, parentGroup)
-                return
-            }
-        }
-        adapter?.didUpdate(instance, parentGroup)
-    }
-}
-
-private class ViewComposer(val root: ViewGroup) : Composer<View>(SlotTable(), Applier(root, ViewApplyAdapter()))
 
 internal class ComposerCompositionContext(val root: ViewGroup, private val rootComponent: Component) : CompositionContext() {
     companion object {
@@ -85,7 +34,7 @@ internal class ComposerCompositionContext(val root: ViewGroup, private val rootC
         }
     }
 
-    private val composer = ViewComposer(root)
+    internal val composer by lazy { ViewComposer(root, context) }
     private var currentComponent: Component? = null
     private var ambientReference: Ambient.Reference? = null
 

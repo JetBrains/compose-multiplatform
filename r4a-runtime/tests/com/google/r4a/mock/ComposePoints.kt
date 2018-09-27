@@ -1,22 +1,22 @@
 package com.google.r4a.mock
 
-fun ViewComposition.point(point: Point) {
+fun MockViewComposition.point(point: Point) {
     text("X: ${point.x} Y: ${point.y}")
 }
 
-fun ViewValidator.point(point: Point) {
+fun MockViewValidator.point(point: Point) {
     text("X: ${point.x} Y: ${point.y}")
 }
 
 object SLPoints
 
-fun ViewComposition.points(points: Iterable<Point>) {
+fun MockViewComposition.points(points: Iterable<Point>) {
     repeat(of = points) {
         memoize(SLPoints, it) { point(it) }
     }
 }
 
-fun ViewValidator.points(points: Iterable<Point>) {
+fun MockViewValidator.points(points: Iterable<Point>) {
     repeat(of = points) {
         point(it)
     }

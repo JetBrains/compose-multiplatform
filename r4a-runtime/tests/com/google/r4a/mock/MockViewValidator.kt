@@ -2,12 +2,12 @@ package com.google.r4a.mock
 
 import org.junit.Assert
 
-interface ViewValidator {
+interface MockViewValidator {
     val view: View
     fun next(): Boolean
 }
 
-class ViewListValidator(private val views: List<View>) : ViewValidator {
+class MockViewListValidator(private val views: List<View>) : MockViewValidator {
     override lateinit var view: View
 
     override fun next(): Boolean {
@@ -20,7 +20,7 @@ class ViewListValidator(private val views: List<View>) : ViewValidator {
 
     private val iterator by lazy { views.iterator() }
 
-    fun validate(block: (ViewValidator.() -> Unit)?) {
+    fun validate(block: (MockViewValidator.() -> Unit)?) {
         if (block != null) {
             Assert.assertNotEquals(0, views.size)
             this.block()
@@ -33,32 +33,32 @@ class ViewListValidator(private val views: List<View>) : ViewValidator {
     }
 }
 
-fun ViewValidator.view(name: String, block: (ViewValidator.() -> Unit)? = null) {
+fun MockViewValidator.view(name: String, block: (MockViewValidator.() -> Unit)? = null) {
     val hasNext = next()
     Assert.assertEquals(true, hasNext)
     Assert.assertEquals(name, view.name)
-    ViewListValidator(view.children).validate(block)
+    MockViewListValidator(view.children).validate(block)
 }
 
-fun <T> ViewValidator.repeat(of: Iterable<T>, block: ViewValidator.(value: T) -> Unit) {
+fun <T> MockViewValidator.repeat(of: Iterable<T>, block: MockViewValidator.(value: T) -> Unit) {
     for (value in of) {
         block(value)
     }
 }
 
-fun ViewValidator.linear() = view("linear", null)
-fun ViewValidator.linear(block: ViewValidator.() -> Unit) = view("linear", block)
-fun ViewValidator.box(block: ViewValidator.() -> Unit) = view("box", block)
-fun ViewValidator.text(value: String) {
+fun MockViewValidator.linear() = view("linear", null)
+fun MockViewValidator.linear(block: MockViewValidator.() -> Unit) = view("linear", block)
+fun MockViewValidator.box(block: MockViewValidator.() -> Unit) = view("box", block)
+fun MockViewValidator.text(value: String) {
     view("text")
     Assert.assertEquals(value, view.attributes["text"])
 }
-fun ViewValidator.edit(value: String) {
+fun MockViewValidator.edit(value: String) {
     view("edit")
     Assert.assertEquals(value, view.attributes["value"])
 }
 
-fun ViewValidator.selectBox(selected: Boolean, block: ViewValidator.() -> Unit) {
+fun MockViewValidator.selectBox(selected: Boolean, block: MockViewValidator.() -> Unit) {
     if (selected) {
         box {
             block()
@@ -68,13 +68,13 @@ fun ViewValidator.selectBox(selected: Boolean, block: ViewValidator.() -> Unit) 
     }
 }
 
-fun ViewValidator.skip(times: Int = 1) {
+fun MockViewValidator.skip(times: Int = 1) {
     repeat(times) {
         val hasNext = next()
         Assert.assertEquals(true, hasNext)
     }
 }
 
-fun validate(root: View, block: ViewValidator.() -> Unit) {
-    ViewListValidator(root.children).validate(block)
+fun validate(root: View, block: MockViewValidator.() -> Unit) {
+    MockViewListValidator(root.children).validate(block)
 }
