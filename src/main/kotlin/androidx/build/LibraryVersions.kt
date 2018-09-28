@@ -76,7 +76,7 @@ object LibraryVersions {
     /**
      * Version code for shared code of flatfoot runtime
      */
-    val ARCH_RUNTIME = ARCH_CORE
+    val ARCH_RUNTIME = Version("2.0.1-alpha01")
 
     /**
      * Version code for shared testing code of flatfoot
