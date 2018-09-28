@@ -199,27 +199,6 @@ class AndroidXPlugin : Plugin<Project> {
                         "Libraries can only support Java 8 if minSdkVersion is 24 or higher")
             }
         }
-
-        val isCoreSupportLibrary = rootProject.name == "support"
-        configurations.all { configuration ->
-            if (isCoreSupportLibrary && name != "annotations") {
-                // While this usually happens naturally due to normal project dependencies, force
-                // evaluation on the annotations project in case the below substitution is the only
-                // dependency to this project. See b/70650240 on what happens when this is missing.
-                evaluationDependsOn(":annotation")
-
-                // In projects which compile as part of the "core" support libraries (which include
-                // the annotations), replace any transitive pointer to the deployed Maven
-                // coordinate version of annotations with a reference to the local project. These
-                // usually originate from test dependencies and otherwise cause multiple copies on
-                // the classpath. We do not do this for non-"core" projects as they need to
-                // depend on the Maven coordinate variant.
-                configuration.resolutionStrategy.dependencySubstitution.apply {
-                    substitute(module("androidx.annotation:annotation"))
-                            .with(project(":annotation"))
-                }
-            }
-        }
     }
 
     private fun Project.configureAndroidApplicationOptions(extension: AppExtension) {
