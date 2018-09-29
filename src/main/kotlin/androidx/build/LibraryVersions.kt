@@ -220,6 +220,8 @@ object LibraryVersions {
 
     val FUTURES = Version("1.0.0-alpha01")
 
+    val COLLECTION = Version("1.1.0-alpha01")
+
     /**
      * Version code for CoordinatorLayout
      */
