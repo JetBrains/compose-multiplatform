@@ -68,6 +68,10 @@ open class UpdateApiTask : DefaultTask() {
 
         Files.copy(newApiFile, oldApiFile)
 
+        if (oldApiFile.name != "current.txt") {
+            Files.copy(newApiFile, File(project.projectDir, "api/current.txt"))
+        }
+
         if (oldRemovedApiFile != null) {
             if (newRemovedApiFile != null) {
                 Files.copy(newRemovedApiFile!!, oldRemovedApiFile!!)
