@@ -33,6 +33,11 @@ object LibraryVersions {
     val ROOM = Version("2.1.0-alpha01")
 
     /**
+     * Version code for Persistence (SupportSQLite)
+     */
+    val PERSISTENCE = Version("2.0.0")
+
+    /**
      * Version code for Lifecycle extensions (ProcessLifecycleOwner, Fragment support)
      */
     val LIFECYCLES_EXT = Version("2.0.0")
