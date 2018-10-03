@@ -91,7 +91,7 @@ object LibraryVersions {
     /**
      * Version code for Navigation
      */
-    val NAVIGATION = Version("1.0.0-alpha06")
+    val NAVIGATION = Version("1.0.0-alpha07")
 
     /**
      * Version code for WorkManager
