@@ -236,4 +236,9 @@ object LibraryVersions {
      * Version code for CoordinatorLayout
      */
     val COORDINATORLAYOUT = Version("1.1.0-alpha01")
+
+    /**
+     * Version code for Transition
+     */
+    val TRANSITION = Version("1.1.0-alpha01")
 }
