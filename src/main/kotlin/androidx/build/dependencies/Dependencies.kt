@@ -79,3 +79,5 @@ const val ARCH_LIFECYCLE_LIVEDATA_CORE =
 const val ARCH_LIFECYCLE_VIEWMODEL = "androidx.lifecycle:lifecycle-viewmodel:2.0.0-rc01@aar"
 const val ARCH_LIFECYCLE_EXTENSIONS = "androidx.lifecycle:lifecycle-extensions:2.0.0-rc01@aar"
 const val ARCH_CORE_COMMON = "androidx.arch.core:core-common:2.0.0-rc01@jar"
+
+const val ROOM_PAGING_COMMON = "androidx.paging:paging-common:2.0.0"
