@@ -107,6 +107,15 @@ fun Project.configureMavenArtifactUpload(extension: SupportLibraryExtension) {
                     collectDependenciesForConfiguration(allDeps, this, "compile")
 
                     mavenDeployer.getPom().whenConfigured {
+                        it.dependencies.removeAll { dep ->
+                            if (dep == null) {
+                                return@removeAll false
+                            }
+
+                            val getScopeMethod =
+                                    dep::class.java.getDeclaredMethod("getScope")
+                            getScopeMethod.invoke(dep) as String == "test"
+                        }
                         it.dependencies.forEach { dep ->
                             if (dep == null) {
                                 return@forEach
