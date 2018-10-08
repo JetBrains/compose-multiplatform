@@ -158,6 +158,7 @@ object DiffAndDocs {
                 newApisTask,
                 jdiffConfiguration)
 
+        docsTasks.values.forEach { docs -> generateDiffsTask.dependsOn(docs) }
         setupDocsProject()
 
         return anchorTask
@@ -271,8 +272,8 @@ object DiffAndDocs {
         val tasks = initializeApiChecksForProject(project,
                 aggregateOldApiTxtsTask, aggregateNewApiTxtsTask)
         registerJavaProjectForDocsTask(tasks.generateApi, compileJava)
-        setupDocsTasks(project, tasks)
-        anchorTask.dependsOn(tasks.checkApi)
+        setupApiVersioningInDocsTasks(extension, tasks)
+        addCheckApiTasksToGraph(tasks)
     }
 
     /**
@@ -306,22 +307,37 @@ object DiffAndDocs {
                 val tasks = initializeApiChecksForProject(project, aggregateOldApiTxtsTask,
                         aggregateNewApiTxtsTask)
                 registerAndroidProjectForDocsTask(tasks.generateApi, variant)
-                setupDocsTasks(project, tasks)
-                anchorTask.dependsOn(tasks.checkApi)
+                setupApiVersioningInDocsTasks(extension, tasks)
+                addCheckApiTasksToGraph(tasks)
             }
         }
     }
 
-    private fun setupDocsTasks(project: Project, checkApiTasks: CheckApiTasks) {
-        docsTasks.values.forEach { docs ->
-            generateDiffsTask.dependsOn(docs)
+    private fun setupApiVersioningInDocsTasks(
+        extension: SupportLibraryExtension,
+        checkApiTasks: CheckApiTasks
+    ) {
+        rules.forEach { rules ->
+            val project = extension.project
+            val strategy = rules.resolve(extension)?.strategy
+            val version = if (strategy is Prebuilts) {
+                strategy.version
+            } else {
+                extension.project.version()
+            }
+            val docs = docsTasks[rules.name]!!
             // Track API change history.
             docs.addSinceFilesFrom(project.projectDir)
             // Associate current API surface with the Maven artifact.
-            val artifact = "${project.group}:${project.name}:${project.version}"
+            val artifact = "${project.group}:${project.name}:$version"
             docs.addArtifact(checkApiTasks.generateApi.apiFile!!.absolutePath, artifact)
             docs.dependsOn(checkApiTasks.generateApi)
         }
+    }
+
+    private fun addCheckApiTasksToGraph(tasks: CheckApiTasks) {
+        docsTasks.values.forEach { docs -> docs.dependsOn(tasks.generateApi) }
+        anchorTask.dependsOn(tasks.checkApi)
     }
 }
 
