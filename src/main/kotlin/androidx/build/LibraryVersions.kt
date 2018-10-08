@@ -40,38 +40,13 @@ object LibraryVersions {
     /**
      * Version code for Lifecycle extensions (ProcessLifecycleOwner, Fragment support)
      */
-    val LIFECYCLES_EXT = Version("2.0.0")
-
-    /**
-     * Version code for Lifecycle LiveData
-     */
-    val LIFECYCLES_LIVEDATA = Version("2.1.0-alpha01")
-
-    /**
-     * Version code for Lifecycle ViewModel
-     */
-    val LIFECYCLES_VIEWMODEL = Version("2.0.0")
+    val LIFECYCLE = Version("2.1.0-alpha01")
 
     val LIFECYCLES_SAVEDSTATE = Version("1.0.0-alpha01")
-
-    val LIFECYCLES_KTX = Version("1.0.0-alpha01")
-
     /**
      * Version code for Paging
      */
     val PAGING = Version("2.1.0-alpha01")
-
-    private val LIFECYCLES = Version("2.0.0")
-
-    /**
-     * Version code for Lifecycle libs that are required by the support library
-     */
-    val LIFECYCLES_CORE = LIFECYCLES
-
-    /**
-     * Version code for Lifecycle runtime libs that are required by the support library
-     */
-    val LIFECYCLES_RUNTIME = LIFECYCLES
 
     /**
      * Version code for shared code of flatfoot
