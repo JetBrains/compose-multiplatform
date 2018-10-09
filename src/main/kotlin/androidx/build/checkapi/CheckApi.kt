@@ -52,7 +52,6 @@ fun initializeApiChecksForProject(
         project.extensions.add("docsDir", File(project.rootProject.docsDir(), project.name))
     }
     val version = project.version()
-    val workingDir = project.projectDir
 
     val doclavaConfiguration = project.rootProject.configurations.getByName("doclava")
     val docletClasspath = doclavaConfiguration.resolve()
@@ -201,7 +200,8 @@ fun Project.getCurrentApiFile() = getApiFile(project.projectDir, project.version
  * This is API file that checkApiRelease validates against
  * @return the API file
  */
-fun Project.getRequiredCompatibilityApiFile() = getLastReleasedApiFile(project.projectDir, project.version(), true, true)
+fun Project.getRequiredCompatibilityApiFile() =
+    getLastReleasedApiFile(project.projectDir, project.version(), true, true)
 
 private fun getApiFile(rootDir: File, refVersion: Version): File {
     return getApiFile(rootDir, refVersion, false)
