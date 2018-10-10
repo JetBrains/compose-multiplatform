@@ -27,6 +27,8 @@ object LibraryVersions {
 
     val ANIMATION = Version("1.0.0-alpha01")
 
+    val PALETTE = Version("1.1.0-alpha01")
+
     /**
      * Version code for Room
      */
