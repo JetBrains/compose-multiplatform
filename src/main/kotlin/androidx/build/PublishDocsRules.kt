@@ -36,6 +36,7 @@ val RELEASE_RULE = docsRules("public", false) {
             .addStubs("car/stubs/android.car.jar")
     prebuilts(LibraryGroups.CARDVIEW, "1.0.0")
     prebuilts(LibraryGroups.COLLECTION, "1.0.0")
+    prebuilts(LibraryGroups.CONCURRENT, "1.0.0-alpha02")
     prebuilts(LibraryGroups.CONTENTPAGER, "1.0.0")
     prebuilts(LibraryGroups.COORDINATORLAYOUT, "1.0.0")
     prebuilts(LibraryGroups.CORE, "1.0.0")
@@ -94,7 +95,7 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.PAGING, "paging-rxjava2-ktx")
     prebuilts(LibraryGroups.PAGING, "2.0.0")
     prebuilts(LibraryGroups.NAVIGATION, "1.0.0-alpha06")
-    prebuilts(LibraryGroups.WORKMANAGER, "1.0.0-alpha09")
+    prebuilts(LibraryGroups.WORKMANAGER, "1.0.0-alpha10")
     default(Ignore)
 }
 
