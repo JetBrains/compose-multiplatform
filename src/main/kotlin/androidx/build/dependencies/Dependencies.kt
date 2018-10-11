@@ -73,6 +73,8 @@ const val SUPPORT_DESIGN = "com.google.android.material:material:1.0.0@aar"
 const val SUPPORT_FRAGMENTS = "androidx.fragment:fragment:$SUPPORT_VERSION"
 const val SUPPORT_RECYCLERVIEW = "androidx.recyclerview:recyclerview:$SUPPORT_VERSION"
 
+const val ANDROIDX_COLLECTION = "androidx.collection:collection:$SUPPORT_VERSION"
+
 // Arch libraries
 const val ARCH_LIFECYCLE_RUNTIME = "androidx.lifecycle:lifecycle-runtime:2.0.0@aar"
 const val ARCH_LIFECYCLE_LIVEDATA_CORE =
