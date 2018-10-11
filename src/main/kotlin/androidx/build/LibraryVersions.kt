@@ -32,7 +32,7 @@ object LibraryVersions {
     /**
      * Version code for Room
      */
-    val ROOM = Version("2.1.0-alpha01")
+    val ROOM = Version("2.1.0-alpha02")
 
     /**
      * Version code for Persistence (SupportSQLite)
