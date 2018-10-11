@@ -271,11 +271,6 @@ private fun createUpdateApiTask(project: Project, checkApiRelease: CheckApiTask)
             whitelistErrors = checkApiRelease.whitelistErrors
             whitelistErrorsFile = checkApiRelease.whitelistErrorsFile
             doFirst {
-                val version = project.version()
-                if (!version.isFinalApi() &&
-                        getApiFile(project.projectDir, version, true).exists()) {
-                    throw GradleException("Inconsistent version. Public API file already exists.")
-                }
                 // Replace the expected whitelist with the detected whitelist.
                 whitelistErrors = checkApiRelease.detectedWhitelistErrors
             }
@@ -296,12 +291,8 @@ fun Project.getCurrentApiFile() = getApiFile(project.projectDir, project.version
  * This is API file that checkApiRelease validates against
  * @return the API file
  */
-fun Project.getRequiredCompatibilityApiFile() = getLastReleasedApiFile(project.projectDir,
-        project.version(), true, true)
-
-private fun getApiFile(rootDir: File, refVersion: Version): File {
-    return getApiFile(rootDir, refVersion, false)
-}
+fun Project.getRequiredCompatibilityApiFile() =
+        getLastReleasedApiFile(project.projectDir, project.version(), true, true)
 
 /**
  * Returns the API file for the API of the specified version.
@@ -309,17 +300,9 @@ private fun getApiFile(rootDir: File, refVersion: Version): File {
  * @param version the API version, ex. 25.0.0-SNAPSHOT
  * @return the API file of this version
  */
-private fun getApiFile(rootDir: File, version: Version, forceRelease: Boolean = false): File {
+private fun getApiFile(rootDir: File, version: Version): File {
     val apiDir = File(rootDir, "api")
-
-    if (version.isFinalApi() || forceRelease) {
-        // The API may not change in a patch release.
-        // So, the release API file is always the one from the most recent the latest minor release, and is of the form X.Y.0.txt.
-        return File(apiDir, "${version.major}.${version.minor}.0.txt")
-    }
-
-    // If the API's version is not a release version (that is, it's an alpha or a beta), then its contents are stored in current.txt
-    return File(apiDir, "current.txt")
+    return File(apiDir, "${version.major}.${version.minor}.0${version.extra ?: ""}.txt")
 }
 
 /**
@@ -373,10 +356,9 @@ private fun getLastReleasedApiFileFromDir(
         val parsed = Version.parseOrNull(file)
         parsed?.let { version ->
             if ((lastFile == null || lastVersion!! < version) &&
-                (maxVersionExclusive == null || version < maxVersionExclusive) &&
-                if (requireFinalApi) version.isFinalApi() else true &&
-                if (requireSameMajorRevision) version.major == maxVersionExclusive?.major
-                else true) {
+                    (maxVersionExclusive == null || version < maxVersionExclusive) &&
+                    (!requireFinalApi || version.isFinalApi()) &&
+                    (!requireSameMajorRevision || version.major == maxVersionExclusive?.major)) {
                 lastFile = file
                 lastVersion = version
             }
