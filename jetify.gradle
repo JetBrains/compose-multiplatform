@@ -28,6 +28,7 @@ task stripArchive(type: Zip) {
             "m2repository/androidx/annotation/**",
             "m2repository/androidx/appcompat/**",
             "m2repository/androidx/asynclayoutinflater/**",
+            "m2repository/androidx/biometric/**",
             "m2repository/androidx/browser/**",
             "m2repository/androidx/car/**",
             "m2repository/androidx/cardview/**",
