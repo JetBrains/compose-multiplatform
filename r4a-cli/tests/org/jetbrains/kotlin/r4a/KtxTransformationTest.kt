@@ -1564,4 +1564,22 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
     )
 
+    fun testKtxParameterlessFunction() = testCompile(
+        """
+        import com.google.r4a.*
+        import android.widget.*
+
+        @Composable
+        fun Paramless() {
+          <TextView text="Hello!" />
+        }
+
+        class Bar: Component() {
+          override fun compose() {
+            <Paramless />
+          }
+        }
+        """
+    )
+
 }

@@ -108,8 +108,8 @@ private fun transform(
 
     val info = context.bindingContext.get(R4AWritableSlices.KTX_TAG_INFO, tag.element) ?: error("No tagInfo found on element")
 
-    // OUTPUT: run = false
-    output.add(helper.setRun(false))
+    // OUTPUT: run = cc.isInserting
+    output.add(helper.setRun(helper.isInsertingCall))
 
     val attributes = tag.attributes.map { irAttr ->
         val attrInfo = context.bindingContext.get(R4AWritableSlices.KTX_ATTR_INFO, irAttr.element)
@@ -1064,22 +1064,26 @@ private class ComposeFunctionHelper(val context: GeneratorContext, val compose: 
         IrGetValueImpl(UNDEFINED_OFFSET, UNDEFINED_OFFSET, context.symbolTable.referenceVariable(runVariable))
     }
 
-    fun setRun(value: Boolean): IrSetVariable {
+    fun setRun(expression: IrExpression): IrSetVariable {
         return IrSetVariableImpl(
             UNDEFINED_OFFSET,
             UNDEFINED_OFFSET,
             runVariable.type.toIrType()!!,
             context.symbolTable.referenceVariable(runVariable),
-            IrConstImpl(
-                UNDEFINED_OFFSET,
-                UNDEFINED_OFFSET,
-                context.irBuiltIns.booleanType,
-                IrConstKind.Boolean,
-                value
-            ),
+            expression,
             KTX_TAG_ORIGIN
         )
     }
+
+    fun setRun(value: Boolean): IrSetVariable = setRun(
+        IrConstImpl(
+            UNDEFINED_OFFSET,
+            UNDEFINED_OFFSET,
+            context.irBuiltIns.booleanType,
+            IrConstKind.Boolean,
+            value
+        )
+    )
 
     fun lookupFunction(name: String, cls: ClassDescriptor = ccClass) = cls.unsubstitutedMemberScope.getContributedFunctions(
         Name.identifier(name),
