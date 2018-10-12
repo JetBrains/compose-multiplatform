@@ -100,6 +100,11 @@ object LibraryVersions {
      */
     val CAR_MODERATOR = Version("1.0.0-alpha1")
 
+    /**
+     * Version code for media
+     */
+    val MEDIA = Version("1.1.0-alpha01")
+
     /*
      * Version code for mediarouter (depends on media2)
      */
