@@ -93,10 +93,15 @@ object LibraryVersions {
     /**
      * Version code for Car
      */
-    val CAR = Version("1.0.0-alpha5")
+    val CAR = Version("1.0.0-alpha6")
 
     /**
-     * Version code for Car
+     * Version code for Car cluster
+     */
+    val CAR_CLUSTER = Version("1.0.0-alpha5")
+
+    /**
+     * Version code for Car moderator
      */
     val CAR_MODERATOR = Version("1.0.0-alpha1")
 
