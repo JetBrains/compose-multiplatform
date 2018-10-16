@@ -30,9 +30,9 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.ASYNCLAYOUTINFLATER, "1.0.0")
     prebuilts(LibraryGroups.BIOMETRIC, "biometric", "1.0.0-alpha01")
     prebuilts(LibraryGroups.BROWSER, "1.0.0")
-    ignore(LibraryGroups.CAR, "car-cluster")
     ignore(LibraryGroups.CAR, "car-moderator")
-    prebuilts(LibraryGroups.CAR, "1.0.0-alpha5")
+    prebuilts(LibraryGroups.CAR, "car-cluster", "1.0.0-alpha5")
+    prebuilts(LibraryGroups.CAR, "car", "1.0.0-alpha5")
             .addStubs("car/stubs/android.car.jar")
     prebuilts(LibraryGroups.CARDVIEW, "1.0.0")
     prebuilts(LibraryGroups.COLLECTION, "1.0.0")
@@ -137,8 +137,10 @@ class PublishDocsRulesBuilder(private val name: String, private val offline: Boo
      * docs for a project with the given [groupName] and [name] will be built from a prebuilt with
      * the given [version].
      */
-    fun prebuilts(groupName: String, moduleName: String, version: String) {
-        rules.add(DocsRule(Exact(groupName, moduleName), Prebuilts(Version(version))))
+    fun prebuilts(groupName: String, moduleName: String, version: String): Prebuilts {
+        val strategy = Prebuilts(Version(version))
+        rules.add(DocsRule(Exact(groupName, moduleName), strategy))
+        return strategy
     }
 
     /**
