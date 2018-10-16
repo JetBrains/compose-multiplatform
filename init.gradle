@@ -168,26 +168,6 @@ def configureSubProjects() {
                 }
             }
         }
-
-        project.afterEvaluate { p ->
-            // remove dependency on the test so that we still get coverage even if some tests fail
-            p.tasks.findAll { it instanceof JacocoReportTask }.each { task ->
-                def toBeRemoved = new ArrayList()
-                def dependencyList = task.taskDependencies.values
-                dependencyList.each { dep ->
-                    if (dep instanceof String) {
-                        def t = tasks.findByName(dep)
-                        if (t instanceof DeviceProviderInstrumentTestTask) {
-                            toBeRemoved.add(dep)
-                            task.mustRunAfter(t)
-                        }
-                    }
-                }
-                toBeRemoved.each { dep ->
-                    dependencyList.remove(dep)
-                }
-            }
-        }
     }
 }
 
