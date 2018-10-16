@@ -27,17 +27,20 @@ import androidx.build.doclava.ChecksConfig
 import androidx.build.doclava.DoclavaTask
 import androidx.build.docs.ConcatenateFilesTask
 import androidx.build.docsDir
+import androidx.build.jdiff.JDiffTask
 import androidx.build.processProperty
 import androidx.build.version
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.JavaBasePlugin
 import java.io.File
 
 data class CheckApiTasks(
     val generateApi: DoclavaTask,
-    val checkApi: CheckApiTask
+    val checkApi: CheckApiTask,
+    val generateLocalDiffs: JDiffTask
 )
 
 /**
@@ -108,8 +111,101 @@ fun initializeApiChecksForProject(
         aggregateNewApiTxtsTask.dependsOn(newApiTxtProvider.task)
     }
 
-    return CheckApiTasks(generateApi, checkApi)
+    val newApiTask = createNewApiXmlTask(project, generateApi, doclavaConfiguration)
+    val oldApiTask = createOldApiXml(project, doclavaConfiguration)
+
+    val jdiffConfiguration = project.rootProject.configurations.getByName("jdiff")
+
+    val generatelocalDiffsTask = createGenerateLocalDiffsTask(project,
+            oldApiTask,
+            newApiTask,
+            jdiffConfiguration)
+
+    return CheckApiTasks(generateApi, checkApi, generatelocalDiffsTask)
 }
+
+private fun createGenerateLocalDiffsTask(
+    project: Project,
+    oldApiTask: ApiXmlConversionTask,
+    newApiTask: ApiXmlConversionTask,
+    jdiffConfig: Configuration
+): JDiffTask =
+        project.tasks.createWithConfig("generateLocalDiffs", JDiffTask::class.java) {
+            // Base classpath is Android SDK, sub-projects add their own.
+            classpath = androidJarFile(project)
+
+            // JDiff properties.
+            oldApiXmlFile = oldApiTask.outputApiXmlFile
+            newApiXmlFile = newApiTask.outputApiXmlFile
+
+            val newApi = project.processProperty("toApi") ?: project.version
+            val docsDir = project.rootProject.docsDir()
+
+            newJavadocPrefix = "../../../../../reference/"
+            destinationDir = File(docsDir, "online/sdk/support_api_diff/${project.name}/$newApi")
+            // Javadoc properties.
+            docletpath = jdiffConfig.resolve()
+            title = "AndroidX&nbsp;Library&nbsp;API&nbsp;Differences&nbsp;Report"
+
+            exclude("**/BuildConfig.java", "**/R.java")
+            dependsOn(oldApiTask, newApiTask, jdiffConfig)
+            doFirst {
+                println("Generating diffs from api version " +
+                        "${stripExtension(oldApiTask.outputApiXmlFile.name)} " +
+                        "to api version $newApi")
+            }
+        }
+
+/**
+ * Converts the <code>fromApi</code>.txt file (or the most recently released
+ * X.Y.Z.txt if not explicitly defined using -PfromAPi=<file>) to XML format
+ * for use by JDiff.
+ */
+private fun createOldApiXml(project: Project, doclavaConfig: Configuration) =
+        project.tasks.createWithConfig("oldApiXml", ApiXmlConversionTask::class.java) {
+            val fromApi = project.processProperty("fromApi")
+            classpath = project.files(doclavaConfig.resolve())
+            val rootFolder = project.projectDir
+            inputApiFile = if (fromApi != null) {
+                // Use an explicit API file.
+                File(rootFolder, "api/$fromApi.txt")
+            } else {
+                // Use the most recently released API file.
+                getLastReleasedApiFile(rootFolder, Version(project.processProperty("toApi")
+                        ?: project.version.toString()), false, false)
+            }
+
+            outputApiXmlFile = File(project.docsDir(),
+                    "release/${stripExtension(inputApiFile?.name ?: "creation")}.xml")
+
+            dependsOn(doclavaConfig)
+        }
+
+/**
+ * Converts the <code>toApi</code>.txt file (or current.txt if not explicitly
+ * defined using -PtoApi=<file>) to XML format for use by JDiff.
+ */
+private fun createNewApiXmlTask(
+    project: Project,
+    generateApi: DoclavaTask,
+    doclavaConfig: Configuration
+) =
+        project.tasks.createWithConfig("newApiXml", ApiXmlConversionTask::class.java) {
+            classpath = project.files(doclavaConfig.resolve())
+            val toApi = project.processProperty("toApi")
+
+            if (toApi != null && toApi != project.version) {
+                // Use an explicit API file.
+                inputApiFile = File(project.projectDir, "api/$toApi.txt")
+            } else {
+                // Use the current API file (e.g. current.txt).
+                inputApiFile = generateApi.apiFile!!
+                dependsOn(generateApi, doclavaConfig)
+            }
+            // Use either the toApi version, otherwise the most recent version.
+            outputApiXmlFile = File(project.docsDir(),
+                    "release/${toApi ?: project.version}.xml")
+        }
 
 fun Project.hasApiFolder() = File(projectDir, "api").exists()
 
@@ -200,8 +296,8 @@ fun Project.getCurrentApiFile() = getApiFile(project.projectDir, project.version
  * This is API file that checkApiRelease validates against
  * @return the API file
  */
-fun Project.getRequiredCompatibilityApiFile() =
-    getLastReleasedApiFile(project.projectDir, project.version(), true, true)
+fun Project.getRequiredCompatibilityApiFile() = getLastReleasedApiFile(project.projectDir,
+        project.version(), true, true)
 
 private fun getApiFile(rootDir: File, refVersion: Version): File {
     return getApiFile(rootDir, refVersion, false)
@@ -252,7 +348,7 @@ private fun getLastReleasedApiFile(
 ): File? {
     val apiDir = File(rootFolder, "api")
     return getLastReleasedApiFileFromDir(apiDir, refVersion, requireFinalApi,
-        requireSameMajorRevision)
+            requireSameMajorRevision)
 }
 
 /**
