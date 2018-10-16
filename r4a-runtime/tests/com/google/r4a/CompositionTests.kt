@@ -147,19 +147,19 @@ class CompositionTests : TestCase() {
     fun testInsertWithMultipleRoots() {
         val chars = listOf('a', 'b', 'c')
 
-        fun ViewComposition.textOf(c: Char) {
+        fun MockViewComposition.textOf(c: Char) {
             text(c.toString())
         }
 
-        fun ViewValidator.textOf(c: Char) {
+        fun MockViewValidator.textOf(c: Char) {
             text(c.toString())
         }
 
-        fun ViewComposition.chars(chars: Iterable<Char>) {
+        fun MockViewComposition.chars(chars: Iterable<Char>) {
             repeat(of = chars) { c -> textOf(c) }
         }
 
-        fun ViewValidator.chars(chars: Iterable<Char>) {
+        fun MockViewValidator.chars(chars: Iterable<Char>) {
             repeat(of = chars) { c -> textOf(c) }
         }
 
@@ -238,7 +238,7 @@ class CompositionTests : TestCase() {
             }
         }
 
-        fun ViewComposition.reportsReport(reports: Iterable<Report>) {
+        fun MockViewComposition.reportsReport(reports: Iterable<Report>) {
             linear {
                 repeat(of = reports) { report ->
                     composeComponent(
@@ -279,7 +279,7 @@ class CompositionTests : TestCase() {
             }
         }
 
-        fun ViewValidator.two(first: Int, second: Int) {
+        fun MockViewValidator.two(first: Int, second: Int) {
             linear {
                 text("$first $second")
             }
@@ -312,7 +312,7 @@ class CompositionTests : TestCase() {
             }
         }
 
-        fun ViewValidator.three(first: Int, second: Int, third: Int) {
+        fun MockViewValidator.three(first: Int, second: Int, third: Int) {
             linear {
                 text("$first $second $third")
             }
@@ -345,7 +345,7 @@ class CompositionTests : TestCase() {
             }
         }
 
-        fun ViewValidator.four(first: Int, second: Int, third: Int, fourth: Int) {
+        fun MockViewValidator.four(first: Int, second: Int, third: Int, fourth: Int) {
             linear {
                 text("$first $second $third $fourth")
             }
@@ -373,12 +373,12 @@ class CompositionTests : TestCase() {
             }
         }
 
-        fun ViewValidator.one(first: Int) {
+        fun MockViewValidator.one(first: Int) {
             text("$first")
         }
 
         val key = object {}
-        fun ViewComposition.callOne(value: Int) {
+        fun MockViewComposition.callOne(value: Int) {
             composeComponent(key, { One(first = value) }) {
                 update(value) { first = it }
             }
@@ -411,12 +411,12 @@ class CompositionTests : TestCase() {
             }
         }
 
-        fun ViewValidator.one(first: Int) {
+        fun MockViewValidator.one(first: Int) {
             text("$first")
         }
 
         val key = object {}
-        fun ViewComposition.callOne(value: Int) {
+        fun MockViewComposition.callOne(value: Int) {
             composeComponent(cc.joinKey(key, value), { One(first = value) }) { }
         }
 
@@ -464,7 +464,7 @@ class CompositionTests : TestCase() {
             }
         }
 
-        fun ViewComposition.reportsReport(reports: Iterable<Report>) {
+        fun MockViewComposition.reportsReport(reports: Iterable<Report>) {
             linear {
                 repeat(of = reports) { report ->
                     composeComponent(
@@ -537,7 +537,7 @@ class CompositionTests : TestCase() {
             }
         }
 
-        fun ViewComposition.reportsReport(reports: Iterable<Report>) {
+        fun MockViewComposition.reportsReport(reports: Iterable<Report>) {
             linear {
                 repeat(of = reports) { report ->
                     composeComponent(
@@ -601,12 +601,12 @@ class CompositionTests : TestCase() {
             }
         }
 
-        fun ViewComposition.test(value: Int) {
+        fun MockViewComposition.test(value: Int) {
             val w = remember { Wrapper(value) }
             text("value = ${w.value}")
         }
 
-        fun ViewValidator.test(value: Int) {
+        fun MockViewValidator.test(value: Int) {
             text("value = $value")
         }
 
@@ -635,12 +635,12 @@ class CompositionTests : TestCase() {
             }
         }
 
-        fun ViewComposition.test(value: Int) {
+        fun MockViewComposition.test(value: Int) {
             val w = remember(value) { Wrapper(value) }
             text("value = ${w.value}")
         }
 
-        fun ViewValidator.test(value: Int) {
+        fun MockViewValidator.test(value: Int) {
             text("value = $value")
         }
 
@@ -675,12 +675,12 @@ class CompositionTests : TestCase() {
             }
         }
 
-        fun ViewComposition.test(a: Int, b: Int) {
+        fun MockViewComposition.test(a: Int, b: Int) {
             val w = remember(a, b) { Wrapper(a, b) }
             text("a = ${w.a} b = ${w.b}")
         }
 
-        fun ViewValidator.test(a: Int, b: Int) {
+        fun MockViewValidator.test(a: Int, b: Int) {
             text("a = $a b = $b")
         }
 
@@ -714,12 +714,12 @@ class CompositionTests : TestCase() {
             }
         }
 
-        fun ViewComposition.test(a: Int, b: Int, c: Int) {
+        fun MockViewComposition.test(a: Int, b: Int, c: Int) {
             val w = remember(a, b, c) { Wrapper(a, b, c) }
             text("a = ${w.a} b = ${w.b} c = ${w.c}")
         }
 
-        fun ViewValidator.test(a: Int, b: Int, c: Int) {
+        fun MockViewValidator.test(a: Int, b: Int, c: Int) {
             text("a = $a b = $b c = $c")
         }
 
@@ -753,12 +753,12 @@ class CompositionTests : TestCase() {
             }
         }
 
-        fun ViewComposition.test(a: Int, b: Int, c: Int, d: Int) {
+        fun MockViewComposition.test(a: Int, b: Int, c: Int, d: Int) {
             val w = remember(a, b, c, d) { Wrapper(a, b, c, d) }
             text("a = ${w.a} b = ${w.b} c = ${w.c} d = ${w.d}")
         }
 
-        fun ViewValidator.test(a: Int, b: Int, c: Int, d: Int) {
+        fun MockViewValidator.test(a: Int, b: Int, c: Int, d: Int) {
             text("a = $a b = $b c = $c d = $d")
         }
 
@@ -792,12 +792,12 @@ class CompositionTests : TestCase() {
             }
         }
 
-        fun ViewComposition.test(a: Int, b: Int, c: Int, d: Int, e: Int) {
+        fun MockViewComposition.test(a: Int, b: Int, c: Int, d: Int, e: Int) {
             val w = remember(a, b, c, d, e) { Wrapper(a, b, c, d, e) }
             text("a = ${w.a} b = ${w.b} c = ${w.c} d = ${w.d} e = ${w.e}")
         }
 
-        fun ViewValidator.test(a: Int, b: Int, c: Int, d: Int, e: Int) {
+        fun MockViewValidator.test(a: Int, b: Int, c: Int, d: Int, e: Int) {
             text("a = $a b = $b c = $c d = $d e = $e")
         }
 
@@ -824,10 +824,10 @@ class CompositionTests : TestCase() {
 }
 
 
-private fun compose(composer: ViewComposer? = null, expectChanges: Boolean = true, block: Compose): ViewComposer {
+private fun compose(composer: MockViewComposer? = null, expectChanges: Boolean = true, block: Compose): MockViewComposer {
     val myComposer = composer ?: run {
         val root = View().apply { name = "root" }
-        ViewComposer(root)
+        MockViewComposer(root)
     }
 
     myComposer.compose {
@@ -843,7 +843,7 @@ private fun compose(composer: ViewComposer? = null, expectChanges: Boolean = tru
     return myComposer
 }
 
-private fun compose(model: ContactModel, composer: ViewComposer? = null, expectChanges: Boolean = true): ViewComposer =
+private fun compose(model: ContactModel, composer: MockViewComposer? = null, expectChanges: Boolean = true): MockViewComposer =
     compose(composer = composer, expectChanges = expectChanges) {
         selectContact(model)
     }

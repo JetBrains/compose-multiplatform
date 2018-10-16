@@ -4,14 +4,14 @@ package com.google.r4a.mock
 //  <text text="Name: ${contact.name}" />
 //  <text text="email: ${contact.email" />
 // </linear>
-fun ViewComposition.contact(contact: Contact) {
+fun MockViewComposition.contact(contact: Contact) {
     linear {
         text(value = "Name: ${contact.name}")
         text(value = "email: ${contact.email}")
     }
 }
 
-fun ViewValidator.contact(contact: Contact) {
+fun MockViewValidator.contact(contact: Contact) {
     linear {
         text(value = "Name: ${contact.name}")
         text(value = "email: ${contact.email}")
@@ -25,7 +25,7 @@ fun ViewValidator.contact(contact: Contact) {
 //    <selectBox>
 //   </repeat>
 // </linear>
-fun ViewComposition.contacts(contacts: Collection<Contact>, selected: Contact?) {
+fun MockViewComposition.contacts(contacts: Collection<Contact>, selected: Contact?) {
     linear {
         repeat(of = contacts) {
             selectBox(it == selected) {
@@ -35,7 +35,7 @@ fun ViewComposition.contacts(contacts: Collection<Contact>, selected: Contact?) 
     }
 }
 
-fun ViewValidator.contacts(contacts: Collection<Contact>, selected: Contact?) {
+fun MockViewValidator.contacts(contacts: Collection<Contact>, selected: Contact?) {
     linear {
         repeat(of = contacts) {
             selectBox(it == selected) {
@@ -55,7 +55,7 @@ fun ViewValidator.contacts(contacts: Collection<Contact>, selected: Contact?) {
 //     <contacts contacts=model.filtered selected=model.selected />
 //   </linear>
 // </linear>
-fun ViewComposition.selectContact(model: ContactModel) {
+fun MockViewComposition.selectContact(model: ContactModel) {
     linear {
         linear {
             text(value = "Filter:")
@@ -69,7 +69,7 @@ fun ViewComposition.selectContact(model: ContactModel) {
     }
 }
 
-fun ViewValidator.selectContact(model: ContactModel) {
+fun MockViewValidator.selectContact(model: ContactModel) {
     linear {
         linear {
             text(value = "Filter:")

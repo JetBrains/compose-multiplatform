@@ -162,8 +162,8 @@ open class Composer<N>(
     override fun endGroup() = end(END_GROUP)
 
     override fun skipGroup() {
-        assert(slotsStartStack.isNotEmpty())
-        groupNodeCount = slots.skipEnclosingGroup()
+        recordSkip(START_GROUP)
+        groupNodeCount += slots.skipGroup()
     }
 
     override fun startNode(key: Any) {
@@ -171,6 +171,7 @@ open class Composer<N>(
         childrenAllowed = false
     }
 
+    // Deprecated
     override fun <T : N> emitNode(factory: () -> T) {
         if (inserting) {
             // The previous pending is the pending information for where the node is being inserted. They must exist
@@ -187,6 +188,21 @@ open class Composer<N>(
         } else {
             recordDown()
             slots.next() // Skip node slot
+        }
+        childrenAllowed = true
+    }
+
+    override fun <T : N> createNode(factory: () -> T) {
+        // The previous pending is the pending information for where the node is being inserted. They must exist
+        // as we are in insert mode and entering inserting mode created them.
+        val insertIndex = nodeIndexStack.peek()
+        pending!!.nodeCount++
+        groupNodeCount++
+        recordOperation { applier, slots ->
+            val node = factory()
+            slots.update(node)
+            applier.insert(insertIndex, node)
+            applier.down(node)
         }
         childrenAllowed = true
     }
@@ -285,7 +301,7 @@ open class Composer<N>(
     val changeCount get() = changes.size
 
     private fun start(key: Any, action: SlotAction) {
-        assert(childrenAllowed) { "A call to emitNode() or useNode() expected" }
+        assert(childrenAllowed) { "A call to creadNode(), emitNode() or useNode() expected" }
         if (pending == null) {
             val slotKey = slots.next()
             if (slotKey == key) {
