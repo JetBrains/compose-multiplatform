@@ -31,6 +31,7 @@ import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
+import org.gradle.api.DefaultTask
 import org.gradle.api.JavaVersion.VERSION_1_7
 import org.gradle.api.JavaVersion.VERSION_1_8
 import org.gradle.api.Plugin
@@ -39,6 +40,7 @@ import org.gradle.api.plugins.JavaLibraryPlugin
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.kotlin.dsl.getPlugin
 import org.gradle.kotlin.dsl.withType
 
@@ -67,11 +69,13 @@ class AndroidXPlugin : Plugin<Project> {
                 is JavaLibraryPlugin -> {
                     project.configureErrorProneForJava()
                     project.configureSourceJarForJava()
-
                     project.convention.getPlugin<JavaPluginConvention>().apply {
                         sourceCompatibility = VERSION_1_7
                         targetCompatibility = VERSION_1_7
                     }
+                    val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
+                    val compileJavaTask = project.properties["compileJava"] as JavaCompile
+                    verifyDependencyVersionsTask.dependsOn(compileJavaTask)
                 }
                 is LibraryPlugin -> {
                     val extension = project.extensions.getByType<LibraryExtension>()
@@ -79,6 +83,10 @@ class AndroidXPlugin : Plugin<Project> {
                     project.configureAndroidCommonOptions(extension)
                     project.configureAndroidLibraryOptions(extension)
                     project.configureVersionFileWriter(extension)
+                    val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
+                    extension.libraryVariants.all {
+                        variant -> verifyDependencyVersionsTask.dependsOn(variant.javaCompiler)
+                    }
                 }
                 is AppPlugin -> {
                     val extension = project.extensions.getByType<AppExtension>()
@@ -222,6 +230,11 @@ class AndroidXPlugin : Plugin<Project> {
                 baseline(baseline)
             }
         }
+    }
+
+    private fun Project.createVerifyDependencyVersionsTask(): DefaultTask {
+        return project.tasks.create("verifyDependencyVersions",
+                VerifyDependencyVersionsTask::class.java)
     }
 
     companion object {
