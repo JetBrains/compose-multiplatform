@@ -30,7 +30,7 @@ abstract class MetalavaTask : DefaultTask() {
         project.javaexec {
             it.classpath = checkNotNull(configuration) { "Configuration not set." }
             it.main = "com.android.tools.metalava.Driver"
-            it.args = args.toList()
+            it.args = listOf("--no-banner") + args
         }
     }
 }

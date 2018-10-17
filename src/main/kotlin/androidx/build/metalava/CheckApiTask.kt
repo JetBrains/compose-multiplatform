@@ -82,7 +82,6 @@ open class CheckApiTask : MetalavaTask() {
             "--check-compatibility:api:" + if (allowApiAdditions) { "released" } else { "current" },
             apiTxtFile.toString(),
 
-            "--no-banner",
             "--compatible-output=no",
             "--omit-common-packages=yes",
             "--input-kotlin-nulls=yes"

@@ -71,7 +71,6 @@ open class UpdateApiTask : MetalavaTask() {
             "--api",
             apiTxtFile.toString(),
 
-            "--no-banner",
             "--compatible-output=no",
             "--omit-common-packages=yes",
             "--output-kotlin-nulls=yes"
