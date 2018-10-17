@@ -9,11 +9,7 @@ import android.content.Context
 import android.view.Choreographer
 import android.view.View
 import android.view.ViewGroup
-import com.google.r4a.adapters.getViewAdapterIfExists
-import java.util.Stack
 import java.util.WeakHashMap
-
-
 
 internal class ComposerCompositionContext(val root: ViewGroup, private val rootComponent: Component) : CompositionContext() {
     companion object {
@@ -93,6 +89,7 @@ internal class ComposerCompositionContext(val root: ViewGroup, private val rootC
         assert(currentComponent == null) { "Unhandled recursion" }
         when (instance) {
             is View -> composer.emitNode(instance)
+            is Emittable -> composer.emitNode(instance)
             is Component -> {
                 currentComponent = instance
                 composer.updateValue(instance)

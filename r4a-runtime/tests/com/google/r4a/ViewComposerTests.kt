@@ -3,6 +3,7 @@ package com.google.r4a
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
+import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -35,10 +36,10 @@ class NewCodeGenTests : TestCase() {
         val tv2Id = 200
 
         compose {
-            emit(168, { TextView(it).apply { text = "Hello world!"; id = tv1Id } }) { }
+            emit(168, { context -> TextView(context).apply { text = "Hello world!"; id = tv1Id } }) { }
 
-            emit(170, { LinearLayout(it).apply { orientation = LinearLayout.HORIZONTAL } }, { }) {
-                emit(171, { TextView(it).apply { text = "Yellow world"; id = tv2Id } }) { }
+            emit(170, { context -> LinearLayout(context).apply { orientation = LinearLayout.HORIZONTAL } }, { }) {
+                emit(171, { context -> TextView(context).apply { text = "Yellow world"; id = tv2Id } }) { }
             }
         }.then { activity ->
             val helloText = activity.findViewById(tv1Id) as TextView
@@ -57,11 +58,11 @@ class NewCodeGenTests : TestCase() {
         var text2 = "Yellow world"
 
         compose {
-            emit(168, { TextView(it).apply { id = tv1Id } }) {
+            emit(168, { context -> TextView(context).apply { id = tv1Id } }) {
                 set(text1) { text = it }
             }
-            emit(170, { LinearLayout(it).apply { orientation = LinearLayout.HORIZONTAL } }, { }) {
-                emit(171, { TextView(it).apply { id = tv2Id } }) {
+            emit(170, { context -> LinearLayout(context).apply { orientation = LinearLayout.HORIZONTAL } }, { }) {
+                emit(171, { context -> TextView(context).apply { id = tv2Id } }) {
                     set(text2) { text = it }
                 }
             }
@@ -89,7 +90,7 @@ class NewCodeGenTests : TestCase() {
 
         compose {
             // <TextView text id=tvId />
-            emit(242, { TextView(it).apply { id = tvId } }) {
+            emit(242, { context -> TextView(context).apply { id = tvId } }) {
                 set(text) { this.text = it }
             }
         }.then { activity ->
@@ -114,10 +115,10 @@ class NewCodeGenTests : TestCase() {
             // <LinearLayout>
             //  <TextView text />
             // </LinearLayout
-            emit(264, { LinearLayout(it).apply { id = llId } }, {
+            emit(264, { context: Context -> LinearLayout(context).apply { id = llId } }, {
                 set(orientation) { this.orientation = it }
             }) {
-                emit(265, { TextView(it).apply { id = tvId } }) {
+                emit(265, { context -> TextView(context).apply { id = tvId } }) {
                     set(text) { this.text = it }
                 }
             }
@@ -152,7 +153,7 @@ class NewCodeGenTests : TestCase() {
             //  }
             fun PhoneView(phone: Phone) {
                 phoneCalled++
-                emit(225, ::TextView) {
+                emit(225, { context -> TextView(context) }) {
                     set("${if (phone.area.isBlank()) "" else "(${phone.area}) "}${phone.prefix}-${phone.number}") { text = it }
                 }
             }
@@ -188,7 +189,7 @@ class NewCodeGenTests : TestCase() {
             //  }
             fun AddView(left: Int, right: Int) {
                 addCalled++
-                emit(292, { TextView(it).apply { id = tvId } }) {
+                emit(292, { context -> TextView(context).apply { id = tvId } }) {
                     set("$left + $right = ${left + right}") { text = it }
                 }
             }
@@ -243,7 +244,7 @@ class NewCodeGenTests : TestCase() {
                 operator fun invoke() {
                     with(composition) {
                         // <TextView "$left + $right = ${left + right}" />
-                        emit(350, { TextView(it).apply { id = tvId } }) {
+                        emit(350, { context -> TextView(context).apply { id = tvId } }) {
                             addCalled++
                             set("${this@AddView.left} + ${this@AddView.right} = ${this@AddView.left + this@AddView.right}") { text = it }
                         }
@@ -303,7 +304,7 @@ class NewCodeGenTests : TestCase() {
                 operator fun invoke(left: Int, right: Int) {
                     with(composition) {
                         // <TextView "$left + $right = ${left + right}" />
-                        emit(350, { TextView(it).apply { id = tvId } }) {
+                        emit(350, { context -> TextView(context).apply { id = tvId } }) {
                             addCalled++
                             set("$left + $right = ${left + right}") { text = it }
                         }
@@ -370,11 +371,11 @@ class NewCodeGenTests : TestCase() {
                         addCalled++
 
                         // <TextView "$left + $right = ${left + right}" />
-                        emit(491, { TextView(it).apply { id = tvId } }) {
+                        emit(491, { context -> TextView(context).apply { id = tvId } }) {
                             set("${this@AddView.left} + ${this@AddView.right} = ${this@AddView.left + this@AddView.right}") { text = it }
                         }
 
-                        emit(496, { TextView(it).apply { id = tvPrivateValue } }) {
+                        emit(496, { context -> TextView(context).apply { id = tvPrivateValue } }) {
                             set(privateValue) { text = it }
                         }
 
@@ -448,14 +449,14 @@ class NewCodeGenTests : TestCase() {
                     with(composition) {
 
                         // <TextView "$left + $right = ${left + right}" />
-                        emit(619, { TextView(it).apply { id = tvId } }) {
+                        emit(619, { context-> TextView(context).apply { id = tvId } }) {
                             set("${this@OffsetAddView.left} + ${this@OffsetAddView.right} = ${this@OffsetAddView.left + this@OffsetAddView.right}") {
                                 text = it
                             }
                         }
 
                         // <TextView text="$offset" />
-                        emit(623, { TextView(it).apply { id = tvOffsetId } }) {
+                        emit(623, { context -> TextView(context).apply { id = tvOffsetId } }) {
                             set("$offset") { this.text = it }
                         }
                     }
@@ -511,14 +512,14 @@ class NewCodeGenTests : TestCase() {
                     with(composition) {
 
                         // <TextView "$left + $right = ${left + right}" />
-                        emit(709, { TextView(it).apply { id = tvId } }) {
+                        emit(709, { context -> TextView(context).apply { id = tvId } }) {
                             set("${this@OffsetAddView.left} + ${this@OffsetAddView.right} = ${this@OffsetAddView.left + this@OffsetAddView.right}") {
                                 text = it
                             }
                         }
 
                         // <TextView text="$offset" />
-                        emit(714, { TextView(it).apply { id = tvOffsetId } }) {
+                        emit(714, { context -> TextView(context).apply { id = tvOffsetId } }) {
                             set("${this@OffsetAddView.offset}") { this.text = it }
                         }
                     }
@@ -564,7 +565,7 @@ class NewCodeGenTests : TestCase() {
         var hello = "Hello world!"
         compose {
             // <MyTextView someText=hello />
-            emit(joinKey(760, hello), { MyTextView(it, hello).apply { id = tvId } }) { }
+            emit(joinKey(760, hello), { context -> MyTextView(context, hello).apply { id = tvId } }) { }
         }.then { activity ->
             val tv = activity.findViewById(tvId) as TextView
             assertEquals("Hello world!", tv.text)
@@ -586,7 +587,7 @@ class NewCodeGenTests : TestCase() {
         var value = "Unmodified"
         compose {
             // <MyTextView someText=hello />
-            emit(760, { MyTextView(it, value).apply { id = tvId } }) {
+            emit(760, { context -> MyTextView(context, value).apply { id = tvId } }) {
                 update(value) { someValue = it }
                 set(hello) { this.text = it }
             }
@@ -602,6 +603,80 @@ class NewCodeGenTests : TestCase() {
             assertEquals("Salutations!", tv.text)
             assertEquals("Modified", tv.someValue)
         }
+    }
+
+    @Test
+    fun testEmittingAnEmittable() {
+
+        class MyEmittable: MockEmittable() {
+            var message: String = ""
+        }
+
+        compose {
+            adaptable {
+                emit(615, { context -> LinearLayout(context) }, {}) {
+                    emit(616, { -> MyEmittable() }, { set("Message") { message = it }}) {
+                        emit(617, { context -> TextView(context)}, {
+                            set("SomeValue") { text = it }
+                        })
+                        emit(620, { -> MyEmittable() }, { set("Message2") { message = it }})
+                    }
+                }
+            }
+        }.then { activity ->
+            val root = activity.root.getChildAt(0) as LinearLayout
+            val firstChild = root.getChildAt(0) as ViewEmitWrapper
+            val emitted = firstChild.emittable as MockEmittable
+            val firstEmitChild = emitted.children[0] as EmitViewWrapper
+            firstEmitChild.view as TextView
+            val secondEmit = emitted.children[1] as MyEmittable
+            assertEquals(0, secondEmit.children.size)
+        }
+    }
+
+    open class MockEmittable: Emittable {
+        val children = mutableListOf<Emittable>()
+        override fun emitInsertAt(index: Int, instance: Emittable) {
+            children.add(index, instance)
+        }
+
+        override fun emitRemoveAt(index: Int, count: Int) {
+            children.subList(index, count).clear()
+        }
+
+        override fun emitMove(from: Int, to: Int, count: Int) {
+            val range = children.subList(from, count)
+            val moved = range.map { it }
+            range.clear()
+            children.addAll(if (to > from) to - count else to, moved)
+        }
+    }
+
+    class ViewEmitWrapper(context: Context) : View(context) {
+        var emittable: Emittable? = null
+    }
+
+    class EmitViewWrapper: MockEmittable() {
+        var view: View? = null
+    }
+
+    fun ViewComposition.adaptable(block: ViewComposition.() -> Unit) {
+        composer.adapters?.register { parent, child ->
+            when (parent) {
+                is ViewGroup -> when (child) {
+                    is View -> child
+                    is Emittable -> ViewEmitWrapper(composer.context).apply { emittable = child }
+                    else -> null
+                }
+                is Emittable -> when (child) {
+                    is View -> EmitViewWrapper().apply { view = child }
+                    is Emittable -> child
+                    else -> null
+                }
+                else -> null
+            }
+        }
+        block()
     }
 
     fun compose(block: ViewComposition.() -> Unit) = CompositionTest(block)

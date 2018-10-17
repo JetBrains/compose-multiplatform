@@ -4,6 +4,7 @@ enum class ComposableType {
     UNKNOWN,
     COMPONENT,
     VIEW,
+    EMITTABLE,
     FUNCTION_VAR,
     FUNCTION
 }

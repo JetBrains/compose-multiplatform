@@ -253,6 +253,18 @@ private fun transform(
             irChildrenInfo,
             tagIndex
         )
+        ComposableType.EMITTABLE -> transformEmittableElement(
+            context,
+            container,
+            owner,
+            tag,
+            helper,
+            output,
+            info,
+            attributes,
+            irChildrenInfo,
+            tagIndex
+        )
         ComposableType.FUNCTION_VAR -> transformFunctionVar(
             context,
             container,
@@ -744,6 +756,19 @@ private fun transformComponentElement(
 
     callEnd(GroupKind.Component, output, helper)
 }
+
+private fun transformEmittableElement(
+    context: GeneratorContext,
+    container: IrPackageFragment,
+    owner: DeclarationDescriptor,
+    tag: IrKtxTag,
+    helper: ComposeFunctionHelper,
+    output: MutableList<IrStatement>,
+    info: KtxTagInfo,
+    attributes: Collection<IrAttributeInfo>,
+    childrenInfo: IrAttributeInfo?,
+    tagIndex: Int
+) = transformViewElement(context, container, owner, tag, helper, output, info, attributes, childrenInfo, tagIndex)
 
 private fun transformViewElement(
     context: GeneratorContext,
