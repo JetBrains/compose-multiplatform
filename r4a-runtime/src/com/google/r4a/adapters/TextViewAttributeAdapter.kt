@@ -4,6 +4,7 @@ package com.google.r4a.adapters
 
 import android.graphics.Color
 import android.graphics.Typeface
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import android.widget.TextView
@@ -13,11 +14,9 @@ import com.google.r4a.annotations.ColorString
 import com.google.r4a.annotations.DimensionString
 
 @DimensionString
-fun TextView.setTextSize(size: String) {
-    textSize = stringToFloatPx(size, metrics)
-}
+fun TextView.setTextSize(size: String) = setTextSize(TypedValue.COMPLEX_UNIT_PX, stringToFloatPx(size, metrics))
 
-fun TextView.setTextSize(size: Dimension) = setTextSize(size.toFloatPixels(metrics))
+fun TextView.setTextSize(size: Dimension) = setTextSize(TypedValue.COMPLEX_UNIT_PX, size.toFloatPixels(metrics))
 
 fun TextView.setFontFamily(fontFamily: String) {
     typeface = Typeface.create(fontFamily, typeface.style)

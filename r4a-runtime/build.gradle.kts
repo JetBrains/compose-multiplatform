@@ -14,8 +14,13 @@ plugins {
 
 jvmTarget = "1.6"
 
+repositories {
+    google()
+}
+
 dependencies {
     compile(project(":kotlin-stdlib"))
+    compileOnly("com.android.support:support-annotations:27.1.1")
     compileOnly("com.google.android:android:4.1.1.4")
     testCompile("com.google.android:android:4.1.1.4")
     testCompile("org.robolectric:robolectric:3.8")

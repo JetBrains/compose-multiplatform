@@ -21,9 +21,9 @@ class NewsFeedStoryComponent : Component() {
             orientation=LinearLayout.VERTICAL
             layoutWidth=MATCH_PARENT
             layoutHeight=MATCH_PARENT
-            marginTop=125.px
-            marginBottom=250.px
-            minimumHeight=1000
+            marginTop=125.dp
+            marginBottom=250.dp
+            minimumHeight=1000.dp
         >
             if (story == null) {
                 // If we don't have a newsfeed story yet, show a loading spinner instead
@@ -31,16 +31,16 @@ class NewsFeedStoryComponent : Component() {
             } else {
                 <TextView
                     text=story.name
-                    textSize=30f
-                    paddingLeft=25
-                    paddingBottom=10
+                    textSize=30.sp
+                    paddingLeft=25.dp
+                    paddingBottom=10.dp
                 />
                 if (story.description != null && story.description.isNotEmpty()) {
                     <TextView
                         text=story.description
-                        textSize=20f
-                        paddingLeft=25
-                        paddingBottom=10
+                        textSize=20.sp
+                        paddingLeft=25.dp
+                        paddingBottom=10.dp
                     />
                 }
                 <ImageView

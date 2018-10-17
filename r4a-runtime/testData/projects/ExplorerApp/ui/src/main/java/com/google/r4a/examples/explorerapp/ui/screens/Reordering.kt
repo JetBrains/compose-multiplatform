@@ -45,7 +45,7 @@ class Reordering : Component() {
 
         override fun compose() {
             <LinearLayout orientation=LinearLayout.HORIZONTAL>
-                <TextView text="id: $id amt: $count" textSize=20f />
+                <TextView text="id: $id amt: $count" textSize=20.sp />
                 <Button text="+" onClick={ count++; recompose() } />
                 <Button text="Up" onClick={ onMove(1) } />
                 <Button text="Down" onClick={ onMove(-1) } />

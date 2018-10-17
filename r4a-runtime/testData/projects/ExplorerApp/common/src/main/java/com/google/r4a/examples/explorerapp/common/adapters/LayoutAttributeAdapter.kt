@@ -1,5 +1,6 @@
 package com.google.r4a.examples.explorerapp.common.adapters
 
+import android.support.annotation.DimenRes
 import android.support.design.widget.AppBarLayout
 import android.support.v4.widget.DrawerLayout
 import android.view.View
@@ -235,44 +236,69 @@ private fun View.getLayoutBuilder(): LayoutBuilder {
     return getOrAddAdapter(LayoutBuilder.id) { LayoutBuilder() }
 }
 
-fun View.setLayoutWidth(width: Int) = getLayoutBuilder().set(android.R.attr.layout_width, width)
-fun View.setLayoutWidth(dim: Dimension) = setLayoutWidth(dim.toIntPixels(metrics))
+// TODO(jdemeulenaere): Remove this and use extension method from ViewAttributeAdapter.kt once this file is moved in
+// same project.
+internal fun @receiver:DimenRes Int.assertDimensionRes(): Int {
+    assert((this ushr 28) == 0x7f)
+    return this
+}
 
-fun View.setLayoutHeight(height: Int) = getLayoutBuilder().set(android.R.attr.layout_height, height)
-fun View.setLayoutHeight(dim: Dimension) = setLayoutHeight(dim.toIntPixels(metrics))
+private fun View.setPixelLayoutWidth(width: Int) = getLayoutBuilder().set(android.R.attr.layout_width, width)
+fun View.setLayoutWidth(width: Int) {
+    if (width == -1 || width == -2) {
+        // It is either MATCH_PARENT, FILL_PARENT or WRAP_CONTENT
+        setPixelLayoutWidth(width)
+    } else {
+        // It is a dimension resource ID.
+        setPixelLayoutWidth(resources.getDimensionPixelSize(width.assertDimensionRes()))
+    }
+}
+fun View.setLayoutWidth(dim: Dimension) = setPixelLayoutWidth(dim.toIntPixels(metrics))
+
+private fun View.setPixelLayoutHeight(height: Int) = getLayoutBuilder().set(android.R.attr.layout_height, height)
+fun View.setLayoutHeight(height: Int) {
+    if (height == -1 || height == -2) {
+        setPixelLayoutHeight(height)
+    } else {
+        setPixelLayoutHeight(resources.getDimensionPixelSize(height.assertDimensionRes()))
+    }
+}
+fun View.setLayoutHeight(dim: Dimension) = setPixelLayoutHeight(dim.toIntPixels(metrics))
 
 fun View.setLayoutGravity(gravity: Int) = getLayoutBuilder().set(android.R.attr.layout_gravity, gravity)
 
-fun View.setMarginTop(pixels: Int) = getLayoutBuilder().set(android.R.attr.layout_marginTop, pixels)
-fun View.setMarginLeft(pixels: Int) = getLayoutBuilder().set(android.R.attr.layout_marginLeft, pixels)
-fun View.setMarginBottom(pixels: Int) = getLayoutBuilder().set(android.R.attr.layout_marginBottom, pixels)
-fun View.setMarginRight(pixels: Int) = getLayoutBuilder().set(android.R.attr.layout_marginRight, pixels)
+private fun View.setPixelMarginTop(pixels: Int) = getLayoutBuilder().set(android.R.attr.layout_marginTop, pixels)
+private fun View.setPixelMarginLeft(pixels: Int) = getLayoutBuilder().set(android.R.attr.layout_marginLeft, pixels)
+private fun View.setPixelMarginBottom(pixels: Int) = getLayoutBuilder().set(android.R.attr.layout_marginBottom, pixels)
+private fun View.setPixelMarginRight(pixels: Int) = getLayoutBuilder().set(android.R.attr.layout_marginRight, pixels)
 
-fun View.setMarginTop(dim: Dimension) = setMarginTop(dim.toIntPixels(metrics))
-fun View.setMarginLeft(dim: Dimension) = setMarginLeft(dim.toIntPixels(metrics))
-fun View.setMarginBottom(dim: Dimension) = setMarginBottom(dim.toIntPixels(metrics))
-fun View.setMarginRight(dim: Dimension) = setMarginRight(dim.toIntPixels(metrics))
+fun View.setMarginTop(@DimenRes resId: Int) = setPixelMarginTop(resources.getDimensionPixelSize(resId.assertDimensionRes()))
+fun View.setMarginLeft(@DimenRes resId: Int) = setPixelMarginLeft(resources.getDimensionPixelSize(resId.assertDimensionRes()))
+fun View.setMarginBottom(@DimenRes resId: Int) = setPixelMarginBottom(resources.getDimensionPixelSize(resId.assertDimensionRes()))
+fun View.setMarginRight(@DimenRes resId: Int) = setPixelMarginRight(resources.getDimensionPixelSize(resId.assertDimensionRes()))
 
-fun View.setMarginHorizontal(pixels: Int) {
+fun View.setMarginTop(dim: Dimension) = setPixelMarginTop(dim.toIntPixels(metrics))
+fun View.setMarginLeft(dim: Dimension) = setPixelMarginLeft(dim.toIntPixels(metrics))
+fun View.setMarginBottom(dim: Dimension) = setPixelMarginBottom(dim.toIntPixels(metrics))
+fun View.setMarginRight(dim: Dimension) = setPixelMarginRight(dim.toIntPixels(metrics))
+
+private fun View.setPixelMarginHorizontal(pixels: Int) {
     setMarginLeft(pixels)
     setMarginRight(pixels)
 }
 
-fun View.setMarginVertical(pixels: Int) {
+private fun View.setPixelMarginVertical(pixels: Int) {
     setMarginTop(pixels)
     setMarginBottom(pixels)
 }
 
-fun View.setMarginHorizontal(dim: Dimension) = setMarginHorizontal(dim.toIntPixels(metrics))
-fun View.setMarginVertical(dim: Dimension) = setMarginVertical(dim.toIntPixels(metrics))
+fun View.setMarginHorizontal(@DimenRes resId: Int) = setPixelMarginHorizontal(resources.getDimensionPixelSize(resId.assertDimensionRes()))
+fun View.setMarginVertical(@DimenRes resId: Int) = setPixelMarginVertical(resources.getDimensionPixelSize(resId.assertDimensionRes()))
+fun View.setMarginHorizontal(dim: Dimension) = setPixelMarginHorizontal(dim.toIntPixels(metrics))
+fun View.setMarginVertical(dim: Dimension) = setPixelMarginVertical(dim.toIntPixels(metrics))
 
 fun View.setLayoutAppBarScrollFlags(flags: Int) = getLayoutBuilder().set(android.support.design.R.styleable.AppBarLayout_Layout_layout_scrollFlags, flags)
 fun View.setLayoutAlignParentBottom(value: Boolean) = getLayoutBuilder().set(android.R.attr.layout_alignParentBottom, if (value) 1 else 0)
 fun View.setLayoutAlignParentRight(value: Boolean) = getLayoutBuilder().set(android.R.attr.layout_alignParentRight, if (value) 1 else 0)
 fun View.setLayoutBelow(resId: Int) = getLayoutBuilder().set(android.R.attr.layout_alignParentBottom, resId)
 fun View.setLayoutWeight(weight: Float) = getLayoutBuilder().set(android.R.attr.layout_weight, weight)
-
-
-
-
-
