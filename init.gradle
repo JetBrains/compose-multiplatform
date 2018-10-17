@@ -57,17 +57,6 @@ def configureSubProjects() {
     subprojects {
         repos.addMavenRepositories(repositories)
 
-        // Only modify Android projects.
-        if (project.name.equals('noto-emoji-compat')) {
-            // disable tests and return
-            project.tasks.whenTaskAdded { task ->
-                if (task instanceof org.gradle.api.tasks.testing.Test) {
-                    task.enabled = false
-                }
-            }
-            return
-        }
-
         project.plugins.whenPluginAdded { plugin ->
             def isAndroidLibrary = "com.android.build.gradle.LibraryPlugin"
                     .equals(plugin.class.name)
