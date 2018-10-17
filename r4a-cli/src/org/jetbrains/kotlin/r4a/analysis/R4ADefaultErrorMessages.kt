@@ -92,7 +92,8 @@ object R4ADefaultErrorMessages : DefaultErrorMessages.Extension {
         )
         MAP.put(
             R4AErrors.UNRESOLVED_TAG,
-            "Unresolved tag"
+            "Unresolved reference: {0}",
+            Renderers.ELEMENT_TEXT
         )
         MAP.put(
             R4AErrors.CHILDREN_ATTR_USED_AS_BODY_AND_KEYED_ATTRIBUTE,

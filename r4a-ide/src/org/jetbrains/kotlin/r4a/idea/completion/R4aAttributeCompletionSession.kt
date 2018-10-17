@@ -30,6 +30,7 @@ import org.jetbrains.kotlin.psi.KtxAttribute
 import org.jetbrains.kotlin.psi.KtxElement
 import org.jetbrains.kotlin.psi.KtxLambdaExpression
 import org.jetbrains.kotlin.psi.psiUtil.getChildrenOfType
+import org.jetbrains.kotlin.r4a.R4aUtils
 import org.jetbrains.kotlin.r4a.analysis.R4AWritableSlices
 import org.jetbrains.kotlin.r4a.idea.parentOfType
 import org.jetbrains.kotlin.renderer.DescriptorRenderer
@@ -62,13 +63,6 @@ class R4aAttributeCompletionSession(
 
     private val tagInfo get() = nullableTagInfo ?: error("no tag info found on element. Call isValid() before using this class")
 
-    private fun propertyNameFromSetterMethod(name: String): String {
-        return if (name.startsWith("set")) "${name[3].toLowerCase()}${name.slice(4 until name.length)}" else name
-    }
-
-    private fun isSetterMethodName(name: String): Boolean {
-        return name.startsWith("set") && name.length > 3 && !name[3].isLowerCase() // use !lower to capture non-alpha chars
-    }
 
     private fun DeclarationDescriptor.isValidAttribute(): Boolean {
         return when (this) {
@@ -77,7 +71,7 @@ class R4aAttributeCompletionSession(
                     valueParameters.size != 1 -> false
                     returnType?.isUnit() != true -> false
                     // only void setters are allowed
-                    else -> isSetterMethodName(name.identifier)
+                    else -> R4aUtils.isSetterMethodName(name.identifier)
                 }
             }
             is PropertyDescriptor -> isVar
@@ -211,7 +205,7 @@ class R4aAttributeCompletionSession(
 
         return AttributeInfo(
             name = when (this) {
-                is FunctionDescriptor -> propertyNameFromSetterMethod(name.asString())
+                is FunctionDescriptor -> R4aUtils.propertyNameFromSetterMethod(name.asString())
                 else -> name.asString()
             },
             type = when (this) {

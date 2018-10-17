@@ -31,7 +31,7 @@ public interface R4AErrors {
     DiagnosticFactory0<KtElement> SUSPEND_FUNCTION_USED_AS_SFC = DiagnosticFactory0.create(ERROR);
     DiagnosticFactory0<PsiElement> KTX_IN_NON_COMPOSABLE = DiagnosticFactory0.create(WARNING);
     DiagnosticFactory0<KtElement> INVALID_TYPE_SIGNATURE_SFC = DiagnosticFactory0.create(ERROR);
-    DiagnosticFactory0<KtElement> UNRESOLVED_TAG = DiagnosticFactory0.create(ERROR);
+    DiagnosticFactory1<KtElement, KtReferenceExpression> UNRESOLVED_TAG = DiagnosticFactory1.create(ERROR);
     DiagnosticFactory1<KtElement, String> CHILDREN_ATTR_USED_AS_BODY_AND_KEYED_ATTRIBUTE = DiagnosticFactory1.create(ERROR);
     DiagnosticFactory0<KtElement> CHILDREN_PROVIDED_BUT_NO_CHILDREN_DECLARED = DiagnosticFactory0.create(ERROR);
     DiagnosticFactory0<KtElement> MISSING_REQUIRED_CHILDREN = DiagnosticFactory0.create(ERROR);

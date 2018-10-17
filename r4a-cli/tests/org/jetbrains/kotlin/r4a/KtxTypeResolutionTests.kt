@@ -5,9 +5,9 @@ class KtxTypeResolutionTests: AbstractR4aDiagnosticsTest() {
 
     fun testThatUnresolvedTagDiagnosticIsOnlyOnTagName() = doTestWithContext(
         """
-            <<!UNRESOLVED_REFERENCE!>SomeNameThatWillNotResolve<!> foo=123>
+            <<!UNRESOLVED_TAG!>SomeNameThatWillNotResolve<!> foo=123>
                 <Foo />
-            </<!UNRESOLVED_REFERENCE!>SomeNameThatWillNotResolve<!>>
+            </<!UNRESOLVED_TAG!>SomeNameThatWillNotResolve<!>>
         """
     )
 

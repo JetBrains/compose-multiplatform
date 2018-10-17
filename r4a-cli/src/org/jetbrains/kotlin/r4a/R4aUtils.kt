@@ -16,4 +16,8 @@ object R4aUtils {
         return if (name.startsWith("set")) "${name[3].toLowerCase()}${name.slice(4 until name.length)}" else name
     }
 
+    fun isSetterMethodName(name: String): Boolean {
+        return name.startsWith("set") && name.length > 3 && !name[3].isLowerCase() // use !lower to capture non-alpha chars
+    }
+
 }

@@ -29,7 +29,6 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.expressions.ExpressionTypingContext
 import org.jetbrains.kotlin.types.expressions.ExpressionTypingFacade
-import org.jetbrains.kotlin.types.isNullable
 
 
 private fun Annotated.hasChildrenAnnotation(): Boolean = annotations.findAnnotation(R4aUtils.r4aFqName("Children")) != null
@@ -64,10 +63,22 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
         if (tag == null) {
             // We couldn't find anything, so we mark things as unresolved
             element.simpleTagName?.let {
-                context.trace.report(Errors.UNRESOLVED_REFERENCE.on(it, it))
+                // NOTE(lmr): we are explicitly using our own UNRESOLVED_TAG diagnostic here instead
+                // of UNRESOLVED_REFERENCE because we want to do our own quick fix handling for tags,
+                // and using UNRESOLVED_REFERENCE produces a conflict.
+                context.trace.reportFromPlugin(
+                    R4AErrors.UNRESOLVED_TAG.on(it, it),
+                    R4ADefaultErrorMessages
+                )
             }
             element.simpleClosingTagName?.let {
-                context.trace.report(Errors.UNRESOLVED_REFERENCE.on(it, it))
+                // NOTE(lmr): we are explicitly using our own UNRESOLVED_TAG diagnostic here instead
+                // of UNRESOLVED_REFERENCE because we want to do our own quick fix handling for tags,
+                // and using UNRESOLVED_REFERENCE produces a conflict.
+                context.trace.reportFromPlugin(
+                    R4AErrors.UNRESOLVED_TAG.on(it, it),
+                    R4ADefaultErrorMessages
+                )
             }
             // if the tag is dot-qualified, we can't directly mark as unresolved, but the tagResolver handles each part of it, so we just
             // call it again on the closing tag, even though it's doing duplicate work from above and we know it won't resolve.
