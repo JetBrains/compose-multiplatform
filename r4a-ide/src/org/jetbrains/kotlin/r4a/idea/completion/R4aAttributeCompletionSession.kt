@@ -161,6 +161,7 @@ class R4aAttributeCompletionSession(
         val name = d.name.asString()
 
         when (name) {
+            "_firstFrameRecord",
             "setRecompose" -> {
                 if (d is CallableMemberDescriptor) {
                     val realDescriptor = getContributingDescriptor(d)
