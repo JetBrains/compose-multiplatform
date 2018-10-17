@@ -23,7 +23,7 @@ class Ambient<T>(private val key: String, private val defaultFactory: (() -> T)?
     inner class Provider(
         var value: T,
         @Children
-        var children: () -> Unit) : Component() {
+        var children: @Composable() () -> Unit) : Component() {
         internal val subscribers = HashSet<Slot>()
 
         override fun compose() {
@@ -39,7 +39,7 @@ class Ambient<T>(private val key: String, private val defaultFactory: (() -> T)?
 
     inner class Consumer(
         @Children
-        var children: (T) -> Unit) : Component() {
+        var children: @Composable() (T) -> Unit) : Component() {
 
         override fun compose() {
             val cc = CompositionContext.current
