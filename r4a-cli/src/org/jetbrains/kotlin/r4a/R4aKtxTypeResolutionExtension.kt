@@ -252,7 +252,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
                 // user provided children, but none are declared.
                 // check to see if it's an android view. if so, we allow children, but don't provide a childrenAttrInfo object.
                 // we do need to make sure that the type system traverses the children though, so we handle that here:
-                if (composableType == ComposableType.VIEW) {
+                if (composableType == ComposableType.VIEW || composableType == ComposableType.EMITTABLE) {
                     val composableAnnotation = object : AnnotationDescriptor {
                         override val type: KotlinType get() = context.scope.ownerDescriptor.module.findClassAcrossModuleDependencies(ClassId.topLevel(R4aUtils.r4aFqName("Composable")))!!.defaultType
                         override val allValueArguments: Map<Name, ConstantValue<*>> get() = emptyMap()
@@ -464,6 +464,8 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
         // TODO(lmr): cache this
         val r4aComponentId = ClassId.topLevel(R4aUtils.r4aFqName("Component"))
         val r4aComponentDescriptor = module.findClassAcrossModuleDependencies(r4aComponentId) ?: return ComposableType.UNKNOWN
+        val r4aEmittableId = ClassId.topLevel(R4aUtils.r4aFqName("Emittable"))
+        val r4aEmittableDescriptor = module.findClassAcrossModuleDependencies(r4aEmittableId) ?: return ComposableType.UNKNOWN
 
         // TODO(lmr): cache this
         // TODO(lmr): we should think about a non-android specific way to determine when we have hit a "node"
@@ -477,6 +479,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
             is ClassDescriptor -> {
                 if (tagDescriptor.isSubclassOf(r4aComponentDescriptor)) ComposableType.COMPONENT
                 else if (tagDescriptor.isSubclassOf(androidViewDescriptor)) ComposableType.VIEW
+                else if (tagDescriptor.isSubclassOf(r4aEmittableDescriptor)) ComposableType.EMITTABLE
                 else ComposableType.UNKNOWN
             }
             else -> ComposableType.UNKNOWN

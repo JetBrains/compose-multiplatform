@@ -1582,4 +1582,53 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
     )
 
+    fun testKtxEmittable() = testCompile(
+        """
+        import com.google.r4a.*
+
+        open class MockEmittable: Emittable {
+          override fun emitInsertAt(index: Int, instance: Emittable) {}
+          override fun emitRemoveAt(index: Int, count: Int) {}
+          override fun emitMove(from: Int, to: Int, count: Int) {}
+        }
+
+        class MyEmittable: MockEmittable() {
+          var a: Int = 1
+        }
+
+        class Comp: Component() {
+          override fun compose() {
+            <MyEmittable a=2 />
+          }
+        }
+        """
+    )
+
+    fun testKtxCompoundEmittable() = testCompile(
+        """
+        import com.google.r4a.*
+
+        open class MockEmittable: Emittable {
+          override fun emitInsertAt(index: Int, instance: Emittable) {}
+          override fun emitRemoveAt(index: Int, count: Int) {}
+          override fun emitMove(from: Int, to: Int, count: Int) {}
+        }
+
+        class MyEmittable: MockEmittable() {
+          var a: Int = 1
+        }
+
+        class Comp: Component() {
+          override fun compose() {
+            <MyEmittable a=1>
+              <MyEmittable a=2 />
+              <MyEmittable a=3 />
+              <MyEmittable a=4 />
+              <MyEmittable a=5 />
+            </MyEmittable>
+          }
+        }
+        """
+    )
+
 }
