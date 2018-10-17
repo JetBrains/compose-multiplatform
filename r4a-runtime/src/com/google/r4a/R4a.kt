@@ -1,6 +1,8 @@
 package com.google.r4a
 
+import android.app.Activity
 import android.view.ViewGroup
+import android.widget.LinearLayout
 
 object R4a {
 
@@ -35,3 +37,13 @@ object R4a {
 }
 
 inline fun ViewGroup.composeInto(noinline composable: @Composable() () -> Unit) = R4a.composeInto(this, null, composable)
+
+
+inline fun Activity.composeInto(noinline composable: @Composable() () -> Unit) {
+    val root = LinearLayout(this)
+    root.composeInto(composable)
+    this.setContentView(root)
+}
+
+inline fun Activity.setContent(noinline composable: @Composable() () -> Unit) { this.composeInto(composable) }
+inline fun Activity.setContentView(noinline composable: @Composable() () -> Unit) { this.composeInto(composable) }
