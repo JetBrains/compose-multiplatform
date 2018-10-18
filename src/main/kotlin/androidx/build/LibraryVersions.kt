@@ -37,7 +37,7 @@ object LibraryVersions {
     val FRAGMENT = Version("1.1.0-alpha01")
     val FUTURES = Version("1.0.0-alpha02")
     val GRIDLAYOUT = Version("1.1.0-alpha01")
-    val JETIFIER = Version("1.0.0-beta01")
+    val JETIFIER = Version("1.0.0-beta02")
     val LEANBACK = Version("1.1.0-alpha01")
     val LEANBACK_PREFERENCE = Version("1.1.0-alpha01")
     val LIFECYCLE = Version("2.1.0-alpha01")
