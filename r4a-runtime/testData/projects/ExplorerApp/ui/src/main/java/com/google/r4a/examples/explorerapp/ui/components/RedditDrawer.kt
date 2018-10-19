@@ -64,13 +64,13 @@ class RedditDrawer : Component() {
                             layoutHeight=WRAP_CONTENT
                             paddingTop=8.dp
                             textColor=Colors.WHITE
-                            textSize=8.sp
+                            textSize=21.sp
                             text="lrichardson" />
                         <TextView
                             layoutWidth=MATCH_PARENT
                             layoutHeight=WRAP_CONTENT
                             textColor=Colors.WHITE
-                            textSize=6.sp
+                            textSize=15.sp
                             fontStyle=Typeface.ITALIC
                             text="Logged In" />
                     </LinearLayout>

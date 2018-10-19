@@ -12,7 +12,7 @@ class ExampleList : Component() {
     override fun compose() {
         <LinearLayout orientation=VERTICAL>
             <TextView
-                textSize=10.sp
+                textSize=26.sp
                 text="Select Example"
                 paddingBottom=6.pt
             />

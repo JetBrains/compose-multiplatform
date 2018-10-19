@@ -80,7 +80,7 @@ class SubredditLinkList : Component() {
                         layoutHeight=WRAP_CONTENT
                         layoutGravity=(Gravity.START or Gravity.CENTER_VERTICAL)
                         text="Filter:"
-                        textSize=6.sp
+                        textSize=15.sp
                         textColor=Colors.TEXT_MUTED
                     />
                     <Spinner

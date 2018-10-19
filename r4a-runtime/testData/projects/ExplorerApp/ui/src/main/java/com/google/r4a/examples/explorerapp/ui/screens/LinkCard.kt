@@ -66,7 +66,7 @@ class LinkCard(var link: Link) : Component() {
                     <TextView
                         text=link.title
                         textColor=Colors.TEXT_DARK
-                        textSize=8.sp
+                        textSize=21.sp
                     />
 
                     // TODO: number of comments, subreddit, domain

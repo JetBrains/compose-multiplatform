@@ -3,6 +3,7 @@
 package com.google.r4a.adapters
 
 import android.graphics.Color
+import android.support.annotation.DimenRes
 import android.view.View
 import com.google.r4a.adapters.Utils.stringToIntPx
 import com.google.r4a.annotations.Aesthetic
@@ -17,74 +18,110 @@ import com.google.r4a.annotations.DimensionString
 // is a simple stop-gap solution.
 fun View.setKey(key: Any) {}
 
+internal fun @receiver:DimenRes Int.assertDimensionRes(): Int {
+    // TODO(jdemeulenaere): This only checks that `this` is a resource ID. Check if there is a reliable way to assert it is a dimension resource.
+    assert((this ushr 28) == 0x7f)
+    return this
+}
+
+private fun View.setPixelPadding(padding: Int) = setPadding(padding, padding, padding, padding)
+
+private fun View.setPixelPaddingHorizontal(padding: Int) = setPadding(padding, paddingTop, padding, paddingBottom)
+
+private fun View.setPixelPaddingVertical(padding: Int) = setPadding(paddingLeft, padding, paddingRight, padding)
+
+private fun View.setPixelPaddingLeft(padding: Int) = setPadding(padding, paddingTop, paddingRight, paddingBottom)
+
+private fun View.setPixelPaddingTop(padding: Int) = setPadding(paddingLeft, padding, paddingRight, paddingBottom)
+
+private fun View.setPixelPaddingRight(padding: Int) = setPadding(paddingLeft, paddingTop, padding, paddingBottom)
+
+private fun View.setPixelPaddingBottom(padding: Int) = setPadding(paddingLeft, paddingTop, paddingRight, padding)
+
+// Int resource setters
+
 @ConflictsWith("paddingLeft", "paddingRight", "paddingTop", "paddingBottom", "paddingHorizontal", "paddingHorizontal")
-fun View.setPadding(padding: Int) = setPadding(padding, padding, padding, padding)
+fun View.setPadding(@DimenRes paddingResId: Int) {
+    setPixelPadding(resources.getDimensionPixelSize(paddingResId.assertDimensionRes()))
+}
 
 @ConflictsWith("paddingLeft", "paddingRight")
-fun View.setPaddingHorizontal(padding: Int) = setPadding(padding, paddingTop, padding, paddingBottom)
+fun View.setPaddingHorizontal(@DimenRes paddingResId: Int) {
+    setPixelPaddingHorizontal(resources.getDimensionPixelSize(paddingResId.assertDimensionRes()))
+}
 
 @ConflictsWith("paddingTop", "paddingBottom")
-fun View.setPaddingVertical(padding: Int) = setPadding(paddingLeft, padding, paddingRight, padding)
+fun View.setPaddingVertical(@DimenRes paddingResId: Int) {
+    setPixelPaddingVertical(resources.getDimensionPixelSize(paddingResId.assertDimensionRes()))
+}
 
-fun View.setPaddingLeft(padding: Int) = setPadding(padding, paddingTop, paddingRight, paddingBottom)
+fun View.setPaddingLeft(@DimenRes paddingResId: Int) {
+    setPixelPaddingLeft(resources.getDimensionPixelSize(paddingResId.assertDimensionRes()))
+}
 
-fun View.setPaddingTop(padding: Int) = setPadding(paddingLeft, padding, paddingRight, paddingBottom)
+fun View.setPaddingTop(@DimenRes paddingResId: Int) {
+    setPixelPaddingTop(resources.getDimensionPixelSize(paddingResId.assertDimensionRes()))
+}
 
-fun View.setPaddingRight(padding: Int) = setPadding(paddingLeft, paddingTop, padding, paddingBottom)
+fun View.setPaddingRight(@DimenRes paddingResId: Int) {
+    setPixelPaddingRight(resources.getDimensionPixelSize(paddingResId.assertDimensionRes()))
+}
 
-fun View.setPaddingBottom(padding: Int) = setPadding(paddingLeft, paddingTop, paddingRight, padding)
+fun View.setPaddingBottom(@DimenRes paddingResId: Int) {
+    setPixelPaddingBottom(resources.getDimensionPixelSize(paddingResId.assertDimensionRes()))
+}
 
 // Dimension Setters
 
 @ConflictsWith("paddingLeft", "paddingRight", "paddingTop", "paddingBottom", "paddingHorizontal", "paddingHorizontal")
-fun View.setPadding(padding: Dimension) = setPadding(padding.toIntPixels(metrics))
+fun View.setPadding(padding: Dimension) = setPixelPadding(padding.toIntPixels(metrics))
 
 @ConflictsWith("paddingLeft", "paddingRight")
-fun View.setPaddingHorizontal(padding: Dimension) = setPaddingHorizontal(padding.toIntPixels(metrics))
+fun View.setPaddingHorizontal(padding: Dimension) = setPixelPaddingHorizontal(padding.toIntPixels(metrics))
 
 @ConflictsWith("paddingTop", "paddingBottom")
-fun View.setPaddingVertical(padding: Dimension) = setPaddingVertical(padding.toIntPixels(metrics))
+fun View.setPaddingVertical(padding: Dimension) = setPixelPaddingVertical(padding.toIntPixels(metrics))
 
-fun View.setPaddingLeft(padding: Dimension) = setPaddingLeft(padding.toIntPixels(metrics))
+fun View.setPaddingLeft(padding: Dimension) = setPixelPaddingLeft(padding.toIntPixels(metrics))
 
-fun View.setPaddingTop(padding: Dimension) = setPaddingTop(padding.toIntPixels(metrics))
+fun View.setPaddingTop(padding: Dimension) = setPixelPaddingTop(padding.toIntPixels(metrics))
 
-fun View.setPaddingRight(padding: Dimension) = setPaddingRight(padding.toIntPixels(metrics))
+fun View.setPaddingRight(padding: Dimension) = setPixelPaddingRight(padding.toIntPixels(metrics))
 
-fun View.setPaddingBottom(padding: Dimension) = setPaddingBottom(padding.toIntPixels(metrics))
+fun View.setPaddingBottom(padding: Dimension) = setPixelPaddingBottom(padding.toIntPixels(metrics))
 
 // String-based compatibility setters
 
 @Aesthetic
 @DimensionString
 @ConflictsWith("paddingLeft", "paddingRight", "paddingTop", "paddingBottom", "paddingHorizontal", "paddingHorizontal")
-fun View.setPadding(padding: String) = setPadding(stringToIntPx(padding, metrics))
+fun View.setPadding(padding: String) = setPixelPadding(stringToIntPx(padding, metrics))
 
 @Aesthetic
 @DimensionString
 @ConflictsWith("paddingLeft", "paddingRight")
-fun View.setPaddingHorizontal(padding: String) = setPaddingHorizontal(stringToIntPx(padding, metrics))
+fun View.setPaddingHorizontal(padding: String) = setPixelPaddingHorizontal(stringToIntPx(padding, metrics))
 
 @Aesthetic
 @DimensionString
 @ConflictsWith("paddingTop", "paddingBottom")
-fun View.setPaddingVertical(padding: String) = setPaddingVertical(stringToIntPx(padding, metrics))
+fun View.setPaddingVertical(padding: String) = setPixelPaddingVertical(stringToIntPx(padding, metrics))
 
 @Aesthetic
 @DimensionString
-fun View.setPaddingLeft(padding: String) = setPaddingLeft(stringToIntPx(padding, metrics))
+fun View.setPaddingLeft(padding: String) = setPixelPaddingLeft(stringToIntPx(padding, metrics))
 
 @Aesthetic
 @DimensionString
-fun View.setPaddingTop(padding: String) = setPaddingTop(stringToIntPx(padding, metrics))
+fun View.setPaddingTop(padding: String) = setPixelPaddingTop(stringToIntPx(padding, metrics))
 
 @Aesthetic
 @DimensionString
-fun View.setPaddingRight(padding: String) = setPaddingRight(stringToIntPx(padding, metrics))
+fun View.setPaddingRight(padding: String) = setPixelPaddingRight(stringToIntPx(padding, metrics))
 
 @Aesthetic
 @DimensionString
-fun View.setPaddingBottom(padding: String) = setPaddingBottom(stringToIntPx(padding, metrics))
+fun View.setPaddingBottom(padding: String) = setPixelPaddingBottom(stringToIntPx(padding, metrics))
 
 @ColorString
 fun View.setBackgroundColor(color: String) = setBackgroundColor(Color.parseColor(color))

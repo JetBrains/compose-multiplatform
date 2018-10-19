@@ -10,7 +10,7 @@ import com.google.r4a.adapters.*
 
 class FontList : Component() {
 
-    private var textSize = 20f
+    private var textSize = 20
     private var color = Color.GRAY
 
     override fun compose() {
@@ -23,7 +23,7 @@ class FontList : Component() {
                 <Button text="Blue" layoutParams=BUTTON onClick={ color = Color.BLUE; recompose() } />
                 <Button text="Gray" layoutParams=BUTTON onClick={ color = Color.GRAY; recompose() } />
             </LinearLayout>
-            <ChildComponent textSize color />
+            <ChildComponent textSize=textSize.sp color />
         </LinearLayout>
     }
 
@@ -33,8 +33,8 @@ class FontList : Component() {
 //    }
 
     private class ChildComponent : Component() {
-        var textSize: Float = 20f
-        var color: Int = Color.RED
+        var textSize = 20.sp
+        var color = Color.RED
 
         override fun compose() {
             <ScrollView>

@@ -58,7 +58,7 @@ class SignupScreen : Component() {
                     <EditText
                         paddingHorizontal=16.dp
                         paddingVertical=16.dp
-                        textSize=6.sp
+                        textSize=15.sp
                         hint="Username"
                         controlledText=username
                         onTextChange={
@@ -80,7 +80,7 @@ class SignupScreen : Component() {
                         <TextInputEditText
                             paddingHorizontal=16.dp
                             paddingVertical=16.dp
-                            textSize=6.sp
+                            textSize=15.sp
                             hint="Password"
                             controlledText=password
                             onTextChange={
@@ -100,7 +100,7 @@ class SignupScreen : Component() {
                     </TextInputLayout>
                     <Button
                         text="Sign Up"
-                        textSize=6.sp
+                        textSize=15.sp
                         marginBottom=10.dp
                         backgroundColor=Colors.PRIMARY
                         textColor=Colors.TEXT_LIGHT
@@ -118,7 +118,7 @@ class SignupScreen : Component() {
                         onClick={ _ ->
                             navigator.navigate(R.id.nav_to_login)
                         }
-                        textSize=6.sp
+                        textSize=15.sp
                         textColor=Colors.TEXT_MUTED />
                     <TextView
                         layoutWidth=MATCH_PARENT
@@ -130,7 +130,7 @@ class SignupScreen : Component() {
                         onClick={ _ ->
                             navigator.navigate(R.id.screen_link_list)
                         }
-                        textSize=6.sp
+                        textSize=15.sp
                         textColor=Colors.TEXT_MUTED />
                 }
             </LinearLayout>

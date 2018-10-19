@@ -125,7 +125,7 @@ class CommentAuthorLine(var author: String) : Component() {
                     padding=10.dp
                     textColor=Colors.WHITE
                     backgroundColor=Colors.SECONDARY
-                    textSize=5.sp
+                    textSize=13.sp
                     text="$collapseCount"
                 />
             }

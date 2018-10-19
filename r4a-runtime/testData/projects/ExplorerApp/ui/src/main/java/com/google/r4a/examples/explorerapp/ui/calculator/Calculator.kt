@@ -46,7 +46,7 @@ class Calculator : Component() {
                         layoutWidth=WRAP_CONTENT
                         layoutHeight=WRAP_CONTENT
                         allCaps=true
-                        textSize=6.sp
+                        textSize=15.sp
                         typeface=Typeface.create("sans-serif-medium", Typeface.NORMAL)
                         text="RAD"
                         contentDescription="radian mode"
@@ -58,7 +58,7 @@ class Calculator : Component() {
                     ellipsize=TextUtils.TruncateAt.END
                     maxLines=1
                     textColor=Color.BLACK
-                    textSize=7.dip
+                    textSize=18.sp
                     typeface=Typeface.create("sans-serif-medium", Typeface.NORMAL)
                     text=formula.formulaString
                     bufferType=TextView.BufferType.EDITABLE
@@ -72,7 +72,7 @@ class Calculator : Component() {
                     text=formula.previewString
                     bufferType=TextView.BufferType.SPANNABLE
                     typeface=Typeface.create("sans-serif-light", Typeface.NORMAL)
-                    textSize=7.dip
+                    textSize=18.sp
                     paddingHorizontal=3.dip
                     paddingVertical=6.dip
                     gravity=(Gravity.BOTTOM or Gravity.RIGHT)
@@ -82,7 +82,7 @@ class Calculator : Component() {
             <LinearLayout layoutWidth=MATCH_PARENT layoutHeight=MATCH_PARENT>
                 <GridLayout
                     layoutParams=LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 7f)
-                    layoutWidth=0
+                    layoutWidth=0.dp
                     layoutHeight=MATCH_PARENT
                     layoutWeight=7f
                     rowCount=4
@@ -133,7 +133,7 @@ private class CalculatorButton(
             gravity=Gravity.CENTER
             includeFontPadding=false
             typeface=Typeface.create("sans-serif-light", Typeface.NORMAL)
-            textSize=8.sp
+            textSize=21.sp
             textColor=Color.WHITE
             backgroundResource=R.drawable.pad_button_background
             onClick={ v -> onClick(value) }
