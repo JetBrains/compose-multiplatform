@@ -36,11 +36,13 @@ import org.gradle.api.JavaVersion.VERSION_1_7
 import org.gradle.api.JavaVersion.VERSION_1_8
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.plugins.JavaLibraryPlugin
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getPlugin
 import org.gradle.kotlin.dsl.withType
 
@@ -157,7 +159,6 @@ class AndroidXPlugin : Plugin<Project> {
     private fun Project.configureAndroidCommonOptions(extension: BaseExtension) {
         extension.compileSdkVersion(CURRENT_SDK_VERSION)
         extension.buildToolsVersion = BUILD_TOOLS_VERSION
-
         // Expose the compilation SDK for use as the target SDK in test manifests.
         extension.defaultConfig.addManifestPlaceholders(
                 mapOf("target-sdk-version" to CURRENT_SDK_VERSION))
@@ -170,6 +171,35 @@ class AndroidXPlugin : Plugin<Project> {
             val minSdkVersion = extension.defaultConfig.minSdkVersion.apiLevel
             check(minSdkVersion >= DEFAULT_MIN_SDK_VERSION) {
                 "minSdkVersion $minSdkVersion lower than the default of $DEFAULT_MIN_SDK_VERSION"
+            }
+            project.configurations.all { configuration ->
+                configuration.resolutionStrategy.eachDependency { dep ->
+                    val target = dep.target
+                    // Enforce the ban on declaring dependencies with version ranges.
+                    if (isDependencyRange(target.version)) {
+                        throw IllegalArgumentException(
+                                "Dependency ${dep.target} declares its version as " +
+                                        "version range ${dep.target.version} however the use of " +
+                                        "version ranges is not allowed, please update the " +
+                                        "dependency to list a fixed version.")
+                    }
+                }
+            }
+        }
+        if (project.name != "docs-fake") {
+            // Add another "version" flavor dimension which would have two flavors minDepVersions
+            // and maxDepVersions. Flavor minDepVersions builds the libraries against the specified
+            // versions of their dependencies while maxDepVersions builds the libraries against
+            // the local versions of their dependencies (so for example if library A specifies
+            // androidx.collection:collection:1.2.0 as its dependency then minDepVersions would
+            // build using exactly that version while maxDepVersions would build against
+            // project(":collection") instead.)
+            extension.flavorDimensions("version")
+            extension.productFlavors {
+                it.create("minDepVersions")
+                it.get("minDepVersions").dimension = "version"
+                it.create("maxDepVersions")
+                it.get("maxDepVersions").dimension = "version"
             }
         }
 
@@ -188,6 +218,16 @@ class AndroidXPlugin : Plugin<Project> {
         extension.buildTypes.getByName("debug").isTestCoverageEnabled =
                 !hasProperty("android.injected.invoked.from.ide") &&
                 !isBenchmark()
+
+        extension.variants.all { variant ->
+            if (variant.flavorName.toLowerCase().contains(
+                            "maxdepversions")) {
+                useMaxiumumDependencyVersions(project.configurations)
+            }
+        }
+        // Set the officially published version to be the release version with minimum dependency
+        // versions.
+        extension.defaultPublishConfig(Release.DEFAULT_PUBLISH_CONFIG)
     }
 
     private fun Project.configureAndroidLibraryOptions(extension: LibraryExtension) {
@@ -246,4 +286,51 @@ class AndroidXPlugin : Plugin<Project> {
 fun Project.isBenchmark(): Boolean {
     // benchmark convention is to end name with "-benchmark"
     return name.endsWith("-benchmark")
+}
+
+/**
+ * Goes through all the dependencies in the passed in configurations and finds each dependency
+ * depending on an androidx library, then each of these dependencies is substituted with its
+ * equivalent in the current development project (e.g module("androidx.collection:collection:x.y.z")
+ * becomes project(":collection".) Throws an error if there is a major release conflict between
+ * the two dependency versions.
+ */
+private fun Project.useMaxiumumDependencyVersions(configurations: ConfigurationContainer) {
+    configurations.all { configuration ->
+        configuration.resolutionStrategy.eachDependency { dep ->
+            if (artifactSupportsSemVer(dep.target.group)) {
+                // TODO: support projects having two ':' chars in the name
+                val localDependencyProject = findProject(":${dep.target.name}")
+                if (localDependencyProject != null &&
+                        localDependencyProject.version.toString() != "unspecified") {
+                    if (localDependencyProject.version().major ==
+                            Version(dep.target.version!!).major) {
+                        configuration.resolutionStrategy.dependencySubstitution.apply {
+                            substitute(module("${dep.target}"))
+                                    .with(project(":${localDependencyProject.name}"))
+                        }
+                    } else {
+                        throw IllegalArgumentException("The local version for dependency" +
+                                " ${localDependencyProject.name} is in major release" +
+                                " ${localDependencyProject.version().major}, but the " +
+                                "specified dependency's major release is " +
+                                "${Version(dep.target.version!!).major}" +
+                                ", please update the dependency's version to match " +
+                                "that major release as it is required that all libraries at HEAD " +
+                                "are compatible with each other at all times")
+                    }
+                }
+            }
+        }
+    }
+}
+
+private fun isDependencyRange(version: String?): Boolean {
+    return ((version!!.startsWith("[") || version.startsWith("(")) &&
+            (version.endsWith("]") || version.endsWith(")")) ||
+            version.endsWith("+"))
+}
+
+private fun artifactSupportsSemVer(artifactGroup: String): Boolean {
+    return artifactGroup.startsWith("androidx.")
 }
