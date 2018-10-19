@@ -1631,4 +1631,22 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
     )
 
+    fun testInvocableObject() = testCompile(
+        """
+        import com.google.r4a.*
+
+        class Foo { }
+        @Composable
+        operator fun Foo.invoke() {  }
+
+        @Composable
+        fun test() {
+            val foo = Foo()
+            <foo />
+        }
+        """
+    )
+
+
+
 }

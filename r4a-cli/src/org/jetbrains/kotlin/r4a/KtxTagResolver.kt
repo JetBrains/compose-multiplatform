@@ -216,7 +216,7 @@ class KtxTagResolver(
             return allResults.maxBy { it.parameters.size }
         }
 
-        val resolvedCall = result.resultingCall
+        val resolvedCall = result.resultingCalls.first()
         val referencedDescriptor = when (resolvedCall) {
             is VariableAsFunctionResolvedCall -> resolvedCall.variableCall.resultingDescriptor
             else -> resolvedCall.resultingDescriptor

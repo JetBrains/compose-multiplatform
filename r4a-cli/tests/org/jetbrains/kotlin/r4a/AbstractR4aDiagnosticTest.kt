@@ -62,16 +62,18 @@ abstract class AbstractR4aDiagnosticsTest: KtUsefulTestCase() {
         val found = mutableSetOf<Diagnostic>()
         for (range in diagnosedRanges) {
             for (diagnostic in range.diagnostics) {
-                val reportedDiagnostic = errors.find { it.factoryName == diagnostic.name }
-                if (reportedDiagnostic != null) {
-                    val reportedRange = reportedDiagnostic.textRanges.find { it.startOffset == range.start && it.endOffset == range.end }
-                    if (reportedRange == null) {
-                        val firstRange = reportedDiagnostic.textRanges.first()
+                val reportedDiagnostics = errors.filter { it.factoryName == diagnostic.name }
+                if (reportedDiagnostics.isNotEmpty()) {
+                    var reportedDiagnostic = reportedDiagnostics.find { it.textRanges.find { it.startOffset == range.start && it.endOffset == range.end } != null }
+                    if (reportedDiagnostic == null) {
+                        val firstRange = reportedDiagnostics.first().textRanges.first()
                         message.append("  Error ${diagnostic.name} reported at ${firstRange.startOffset}-${firstRange.endOffset} but expected at ${range.start}-${range.end}\n")
                         message.append(sourceInfo(clearText, firstRange.startOffset, firstRange.endOffset, "  "))
                     }
-                    errors.remove(reportedDiagnostic)
-                    found.add(reportedDiagnostic)
+                    else {
+                        errors.remove(reportedDiagnostic)
+                        found.add(reportedDiagnostic)
+                    }
                 } else {
                     message.append("  Diagnostic ${diagnostic.name} not reported, expected at ${range.start}\n")
                     message.append(sourceInfo(clearText, range.start, range.end, "  "))
