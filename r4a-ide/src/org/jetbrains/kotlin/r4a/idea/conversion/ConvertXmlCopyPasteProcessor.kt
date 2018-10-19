@@ -73,9 +73,12 @@ class ConvertXmlCopyPasteProcessor : CopyPastePostProcessor<TextBlockTransferabl
         val copiedCode = values.single() as CopiedXmlCode
         val xmlFile = PsiFileFactory.getInstance(project).createFileFromText(XMLLanguage.INSTANCE, copiedCode.fileText) as XmlFile
         // TODO(jdemeulenaere): Check if there are syntax errors in XML file, in which case either abort or warn that result might be incorrect.
-        val namespacePrefixes = XmlToKtxConverter.namespacePrefixes(xmlFile)
         // TODO(jdemeulenaere): Improve this. Maybe we don't want to restrict only to android XML files.
-        if (!namespacePrefixes.contains(XmlNamespace.ANDROID)) {
+        val hasAndroidNameSpace = xmlFile.rootTag
+            ?.attributes
+            ?.any { it.namespacePrefix == XmlToKtxConverter.NAMESPACE_PREFIX && it.value == XmlNamespace.ANDROID.uri }
+            ?: false
+        if (!hasAndroidNameSpace) {
             return
         }
 
@@ -93,7 +96,7 @@ class ConvertXmlCopyPasteProcessor : CopyPastePostProcessor<TextBlockTransferabl
             override fun processElement(element: PsiElement) {
                 // TODO(jdemeulenaere): Better comment converter.
                 val codeBuilder = CodeBuilder(null, EmptyDocCommentConverter)
-                codeBuilder.append(XmlToKtxConverter.convertElement(element, namespacePrefixes))
+                codeBuilder.append(XmlToKtxConverter.convertElement(element))
                 imports.addAll(codeBuilder.importsToAdd)
                 conversionResult.append(codeBuilder.resultText)
             }

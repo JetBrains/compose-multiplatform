@@ -55,11 +55,12 @@ dependencies {
     testRuntime(project(":plugins:uast-kotlin"))
     testCompile(project(":kotlinx-serialization-ide-plugin"))
     testCompile(projectTests(":idea"))
+    testRuntime(project(":r4a-runtime"))
 
     (rootProject.extra["compilerModules"] as Array<String>).forEach {
         testRuntime(project(it))
     }
-    
+
     testCompile(project(":idea:idea-native")) { isTransitive = false }
     testCompile(project(":idea:idea-gradle-native")) { isTransitive = false }
 
