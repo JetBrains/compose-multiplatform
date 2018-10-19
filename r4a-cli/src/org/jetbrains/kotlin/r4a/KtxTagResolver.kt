@@ -4,11 +4,16 @@ import com.intellij.lang.ASTNode
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.util.SmartList
 import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.diagnostics.Severity
+import org.jetbrains.kotlin.diagnostics.reportFromPlugin
+import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.r4a.analysis.ComposableType
+import org.jetbrains.kotlin.r4a.analysis.R4ADefaultErrorMessages
+import org.jetbrains.kotlin.r4a.analysis.R4AErrors
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.QualifiedExpressionResolver
@@ -38,6 +43,7 @@ import org.jetbrains.kotlin.types.TypeUtils
 import org.jetbrains.kotlin.types.expressions.ExpressionTypingContext
 import org.jetbrains.kotlin.types.expressions.ExpressionTypingFacade
 import org.jetbrains.kotlin.types.expressions.KotlinTypeInfo
+import org.jetbrains.kotlin.types.typeUtil.isSubtypeOf
 import org.jetbrains.kotlin.types.typeUtil.isUnit
 
 
@@ -247,8 +253,21 @@ class KtxTagResolver(
             else -> null
         }
 
+        val validTagType = isValidTagType(instanceType, context)
+
+        if (instanceType != null && !validTagType) {
+            temporaryForVariable.trace.reportFromPlugin(
+                R4AErrors.INVALID_TAG_TYPE.on(
+                    expression,
+                    instanceType,
+                    possibleTagTypes(context)
+                ),
+                R4ADefaultErrorMessages
+            )
+        }
+
         return KtxTagResolveInfo(
-            valid = result.isSuccess,
+            valid = result.isSuccess && validTagType,
             isConstructed = isConstructed,
             resolvedCall = resolvedCall,
             receiverExpression = receiverExpression,
@@ -369,6 +388,60 @@ class KtxTagResolver(
         }
     }
 
+    fun markUnresolved(
+        expression: KtQualifiedExpression,
+        context: ExpressionTypingContext
+    ) {
+        var last: KtExpression? = null
+        for (part in expression.asQualifierPartList()) {
+            val expr = part.expression ?: continue
+            last = expr
+            val reference = context.trace.get(BindingContext.REFERENCE_TARGET, expr)
+            if (reference == null) {
+                context.trace.report(Errors.UNRESOLVED_REFERENCE.on(expr, expr))
+                return
+            }
+        }
+        // This function should only get called if the tag was invalid, so if we've made it all the way
+        // here it means that the last identifier is not of a valid type
+        if (last != null) {
+            markInvalidTagType(last, context)
+        } else {
+            // NOTE(lmr): I'm not sure under which conditions this is possible...
+            error("no valid selector expression found")
+        }
+    }
+
+
+    private fun markInvalidTagType(expression: KtExpression, context: ExpressionTypingContext) {
+        val refExpr = expression as? KtReferenceExpression
+        val reference = refExpr?.let { context.trace.get(BindingContext.REFERENCE_TARGET, it) }
+        val tagType = when (reference) {
+            is ClassDescriptor -> reference.defaultType
+            is VariableDescriptor -> reference.type
+            is CallableDescriptor -> reference.returnType
+            else -> null
+        }
+        if (tagType != null && reference != null) {
+            context.trace.reportFromPlugin(
+                R4AErrors.INVALID_TAG_TYPE.on(
+                    expression,
+                    tagType,
+                    possibleTagTypes(context)
+                ),
+                R4ADefaultErrorMessages
+            )
+        } else {
+            context.trace.reportFromPlugin(
+                R4AErrors.INVALID_TAG_DESCRIPTOR.on(
+                    expression,
+                    possibleTagTypes(context)
+                ),
+                R4ADefaultErrorMessages
+            )
+        }
+    }
+
     private fun storeSimpleNameExpression(
         expression: KtSimpleNameExpression,
         descriptor: DeclarationDescriptor,
@@ -390,6 +463,35 @@ class KtxTagResolver(
         if (qualifier != null) {
             trace.record(BindingContext.QUALIFIER, qualifier.expression, qualifier)
         }
+    }
+
+    private fun possibleTagTypes(context: ExpressionTypingContext) : Collection<KotlinType> {
+        val module = context.scope.ownerDescriptor.module
+
+        val r4aComponentId = ClassId.topLevel(R4aUtils.r4aFqName("Component"))
+        val r4aComponentDescriptor = module.findClassAcrossModuleDependencies(r4aComponentId) ?: return emptyList()
+        val r4aEmittableId = ClassId.topLevel(R4aUtils.r4aFqName("Emittable"))
+        val r4aEmittableDescriptor = module.findClassAcrossModuleDependencies(r4aEmittableId) ?: return emptyList()
+        val androidViewId = ClassId.topLevel(FqName("android.view.View"))
+        val androidViewDescriptor = module.findClassAcrossModuleDependencies(androidViewId) ?: return emptyList()
+
+        return listOf(
+            androidViewDescriptor.defaultType,
+            r4aComponentDescriptor.defaultType,
+            r4aEmittableDescriptor.defaultType
+        )
+    }
+
+    private fun isValidTagType(type: KotlinType?, context: ExpressionTypingContext) : Boolean {
+        if (type == null || type.isUnit()) return true
+
+        val types = possibleTagTypes(context)
+
+        for (ancestor in types) {
+            if (type.isSubtypeOf(ancestor)) return true
+        }
+
+        return false
     }
 
     fun resolveAttributeAsSetter(

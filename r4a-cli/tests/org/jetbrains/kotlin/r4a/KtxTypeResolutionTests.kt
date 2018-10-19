@@ -323,9 +323,10 @@ class KtxTypeResolutionTests : AbstractR4aDiagnosticsTest() {
 
             object MyNamespace {
                 class Foo() : Component() {
-                    override fun compose() {}
+                    @Children var children: @Composable() () -> Unit = {}
+                    override fun compose() { <children /> }
                 }
-                @Composable fun Bar() {}
+                @Composable fun Bar(@Children children: @Composable() () -> Unit = {}) { <children /> }
 
                 var Baz = @Composable { }
 
@@ -335,10 +336,12 @@ class KtxTypeResolutionTests : AbstractR4aDiagnosticsTest() {
 
             class Boo {
                 class Wat : Component() {
-                    override fun compose() {}
+                    @Children var children: @Composable() () -> Unit = {}
+                    override fun compose() { <children /> }
                 }
                 inner class Qoo : Component() {
-                    override fun compose() {}
+                    @Children var children: @Composable() () -> Unit = {}
+                    override fun compose() { <children /> }
                 }
             }
 
@@ -346,23 +349,31 @@ class KtxTypeResolutionTests : AbstractR4aDiagnosticsTest() {
                 <MyNamespace.Foo />
                 <MyNamespace.Bar />
                 <MyNamespace.Baz />
-                <MyNamespace.Qoo />
+                <MyNamespace.<!UNRESOLVED_REFERENCE!>Qoo<!> />
+                <MyNamespace.<!INVALID_TAG_TYPE!>someString<!> />
+                <MyNamespace.<!INVALID_TAG_TYPE!>NonComponent<!> />
 
-                // TODO(lmr): this should be an error! Will fix in a followup CL
-                <MyNamespace.someString />
-                // TODO(lmr): this should be an error! Will fix in a followup CL
-                <MyNamespace.NonComponent />
+                <MyNamespace.Foo></MyNamespace.Foo>
+                <MyNamespace.Bar></MyNamespace.Bar>
+                <<!CHILDREN_PROVIDED_BUT_NO_CHILDREN_DECLARED!>MyNamespace.Baz<!>></MyNamespace.Baz>
+                <MyNamespace.<!UNRESOLVED_REFERENCE!>Qoo<!>></MyNamespace.<!UNRESOLVED_REFERENCE!>Qoo<!>>
+                <MyNamespace.<!INVALID_TAG_TYPE!>someString<!>></MyNamespace.<!INVALID_TAG_TYPE!>someString<!>>
 
                 val obj = Boo()
                 <obj.Qoo />
                 <Boo.Wat />
+                <obj.Qoo></obj.Qoo>
+                <Boo.Wat></Boo.Wat>
 
-                // TODO(lmr): this should be unresolved! Will fix in a followup CL
-                <obj.Wat />
+                <obj.<!INVALID_TAG_TYPE!>Wat<!> />
+                <obj.<!INVALID_TAG_TYPE!>Wat<!>></obj.<!INVALID_TAG_TYPE!>Wat<!>>
 
+                <<!UNRESOLVED_REFERENCE!>SomethingThatDoesntExist<!>.Foo />
+                <<!CHILDREN_PROVIDED_BUT_NO_CHILDREN_DECLARED!><!UNRESOLVED_REFERENCE!>SomethingThatDoesntExist<!>.Foo<!>></<!UNRESOLVED_REFERENCE!>SomethingThatDoesntExist<!>.Foo>
+                <<!CHILDREN_PROVIDED_BUT_NO_CHILDREN_DECLARED!>MyNamespace.<!INVALID_TAG_TYPE!>NonComponent<!><!>></MyNamespace.<!INVALID_TAG_TYPE!>NonComponent<!>>
 
-                // TODO(lmr): this should be unresolved! Will fix in a followup CL
-                <MyNamespace.Bam />
+                <MyNamespace.<!UNRESOLVED_REFERENCE!>Bam<!> />
+                <MyNamespace.<!UNRESOLVED_REFERENCE!>Bam<!>></MyNamespace.<!UNRESOLVED_REFERENCE!>Bam<!>>
             }
 
         """.trimIndent()

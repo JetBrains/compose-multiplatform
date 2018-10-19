@@ -80,10 +80,14 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
                     R4ADefaultErrorMessages
                 )
             }
+            element.qualifiedTagName?.let {
+                tagResolver.markUnresolved(it, context)
+            }
             // if the tag is dot-qualified, we can't directly mark as unresolved, but the tagResolver handles each part of it, so we just
             // call it again on the closing tag, even though it's doing duplicate work from above and we know it won't resolve.
             element.qualifiedClosingTagName?.let {
                 tagResolver.resolveReference(it, context)
+                tagResolver.markUnresolved(it, context)
             }
             return fallback(element, context, facade)
         }
@@ -99,7 +103,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
         // again, if it's dot-qualified we have to do the more expensive thing of calling resolveReference(...) again so it marks
         // the closing tag properly.
         element.qualifiedClosingTagName?.let {
-            tagResolver.resolveReference(it, context)
+            tagResolver.resolveReference(it, context)?.commit()
         }
 
         // NOTE(lmr): tag may not be valid at this point, but if it isn't a diagnostic will be reported on the tag. Regardless of whether
