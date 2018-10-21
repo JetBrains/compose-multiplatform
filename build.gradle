@@ -2,6 +2,7 @@ buildscript {
     def supportRootFolder = project.projectDir.getParentFile()
     apply from: "unbundled_check.gradle"
     repositories {
+        maven { url("../../../tools/vendor/google_prebuilts/studio/r4a/m2") }
         maven {
             url "${supportRootFolder}/../../prebuilts/androidx/external"
         }
