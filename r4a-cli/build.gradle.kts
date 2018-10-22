@@ -33,6 +33,10 @@ dependencies {
     testCompile(project(":compiler:tests-common"))
     testCompile(projectTests(":compiler:tests-common"))
     testCompile(commonDep("junit:junit"))
+
+    testCompile("com.google.android:android:4.1.1.4")
+    testCompile("org.robolectric:robolectric:3.8")
+    testCompile("org.robolectric:android-all:6.0.0_r1-robolectric-0")
 }
 
 sourceSets {
@@ -76,4 +80,7 @@ tasks.withType<Test> {
         showExceptions = true
         showStackTraces = true
     }
+
+    // The version of maven in the kotlin dependencies is incompatible with robolectric and causes all robolectric tests to fail
+    classpath = classpath.filter { !it.name.endsWith("maven-model-3.3.9.jar") }
 }

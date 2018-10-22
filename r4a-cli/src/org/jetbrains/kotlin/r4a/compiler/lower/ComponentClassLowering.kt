@@ -456,6 +456,9 @@ private fun transformFunctionComponent(
         output.add(ifExpr)
     }
 
+    // OUTPUT: cc.startCall(run)
+    output.add(helper.ccStartCallCall)
+
     val ifRunThenComposeExpr = IrIfThenElseImpl(
         startOffset, endOffset,
         context.irBuiltIns.unitType
@@ -463,7 +466,11 @@ private fun transformFunctionComponent(
         branches.add(IrBranchImpl(startOffset, endOffset, helper.getRun, tag.callExpr))
     }
 
+    // OUTPUT: if (run) f(...)
     output.add(ifRunThenComposeExpr)
+
+    // OUTPUT: cc.endCall(run)
+    output.add(helper.ccEndCallCall)
 
     callEnd(GroupKind.Function, output, helper)
 }
@@ -1203,6 +1210,32 @@ private class ComposeFunctionHelper(val context: GeneratorContext, val compose: 
             UNDEFINED_OFFSET,
             ccEndComposeMethod.returnType!!.toIrType()!!,
             context.symbolTable.referenceFunction(ccEndComposeMethod)
+        ).apply {
+            dispatchReceiver = getCc
+            putValueArgument(0, getRun)
+        }
+    }
+
+    val ccStartCallMethod by lazy { lookupFunction("startCall") }
+    val ccStartCallCall by lazy {
+        IrCallImpl(
+            UNDEFINED_OFFSET,
+            UNDEFINED_OFFSET,
+            ccStartCallMethod.returnType!!.toIrType()!!,
+            context.symbolTable.referenceFunction(ccStartCallMethod)
+        ).apply {
+            dispatchReceiver = getCc
+            putValueArgument(0, getRun)
+        }
+    }
+
+    val ccEndCallMethod by lazy { lookupFunction("endCall") }
+    val ccEndCallCall by lazy {
+        IrCallImpl(
+            UNDEFINED_OFFSET,
+            UNDEFINED_OFFSET,
+            ccEndCallMethod.returnType!!.toIrType()!!,
+            context.symbolTable.referenceFunction(ccEndCallMethod)
         ).apply {
             dispatchReceiver = getCc
             putValueArgument(0, getRun)

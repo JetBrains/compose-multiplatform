@@ -26,7 +26,7 @@ class CompositionContextTests : ComposeTestCase() {
     fun testNativeViewWithAttributes() = compose {
 
         with(it) {
-            // <TextView id={456} text="some text" />
+            // <TextView id=456 text="some text" />
             emitView(123, ::TextView) {
                 set(456) { id = it }
                 set("some text") { text = it }

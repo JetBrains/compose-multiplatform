@@ -76,6 +76,8 @@ abstract class CompositionContext {
     abstract fun isInserting(): Boolean
     abstract fun startCompose(willCompose: Boolean)
     abstract fun endCompose(didCompose: Boolean)
+    abstract fun startCall(willCall: Boolean)
+    abstract fun endCall(didCall: Boolean)
     abstract fun attributeChanged(value: Any?): Boolean
     abstract fun attributeChangedOrInserting(value: Any?): Boolean
     abstract fun end()

@@ -125,6 +125,18 @@ internal class ComposerCompositionContext(val root: ViewGroup, private val rootC
 
     override fun endCompose(didCompose: Boolean) = composer.doneCompose(!didCompose)
 
+    override fun startCall(willCall: Boolean) {
+        if (willCall) {
+            composer.startGroup(0)
+        } else {
+            composer.skipGroup(0)
+        }
+    }
+
+    override fun endCall(didCall: Boolean) {
+        if (didCall) composer.endGroup()
+    }
+
     override fun attributeChanged(value: Any?) =
         if (composer.nextSlot() == value) {
             composer.skipValue()

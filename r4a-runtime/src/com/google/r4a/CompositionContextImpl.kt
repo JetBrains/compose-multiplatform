@@ -503,6 +503,8 @@ internal class CompositionContextImpl : CompositionContext() {
     }
 
     override fun endCompose(didCompose: Boolean) { }
+    override fun startCall(willCall: Boolean) { }
+    override fun endCall(didCall: Boolean) { }
 
     fun compose() {
         val slot = currentSlot

@@ -114,7 +114,7 @@ class ViewComposer(val root: ViewGroup, val context: Context, val adapters: View
     }
 }
 
-/* inline */ class ViewComposition(@PublishedApi internal val composer: ViewComposer) {
+/* inline */ class ViewComposition(val composer: ViewComposer) {
     inline fun <T : View> emit(key: Any, crossinline ctor: (context: Context) -> T, update: ViewUpdater<T>.() -> Unit) {
         composer.startNode(key)
         if (composer.inserting)
