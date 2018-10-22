@@ -88,7 +88,8 @@ private fun generateConstructor(
             val statements = mutableListOf<IrStatement>()
             val superConstructor =
                 context.symbolTable.referenceConstructor(syntheticClassDescriptor.getSuperClassOrAny().constructors.single { it.valueParameters.size == 0 })
-            val superCall = IrDelegatingConstructorCallImpl(-1, -1, superConstructor.descriptor.returnType.toIrType()!!, superConstructor.descriptor, 0)
+            val constructorSymbol = context.symbolTable.referenceConstructor(superConstructor.descriptor.original)
+            val superCall = IrDelegatingConstructorCallImpl(-1, -1, superConstructor.descriptor.returnType.toIrType()!!, constructorSymbol, superConstructor.descriptor)
 
             statements.add(superCall)
 
