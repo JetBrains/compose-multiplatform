@@ -83,3 +83,5 @@ const val ARCH_LIFECYCLE_LIVEDATA_CORE =
 const val ARCH_LIFECYCLE_VIEWMODEL = "androidx.lifecycle:lifecycle-viewmodel:2.0.0@aar"
 const val ARCH_LIFECYCLE_EXTENSIONS = "androidx.lifecycle:lifecycle-extensions:2.0.0@aar"
 const val ARCH_CORE_COMMON = "androidx.arch.core:core-common:2.0.0@jar"
+
+const val SAFE_ARGS_ANDROID_GRADLE_PLUGIN = "com.android.tools.build:gradle:3.2.1"
