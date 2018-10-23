@@ -61,6 +61,7 @@ object LibraryVersions {
     val SWIPE_REFRESH_LAYOUT = Version("1.1.0-alpha01")
     val TEXTCLASSIFIER = Version("1.0.0-alpha01")
     val TRANSITION = Version("1.1.0-alpha01")
+    val VECTORDRAWABLE_ANIMATED = Version("1.1.0-alpha01")
     val VERSIONED_PARCELABLE = Version("1.1.0-alpha01")
     val WEBKIT = Version("1.1.0-alpha01")
     val WORKMANAGER = Version("1.0.0-alpha10")
