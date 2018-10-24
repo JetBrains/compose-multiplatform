@@ -49,7 +49,7 @@ object Metalava {
         val metalavaConfiguration = project.createMetalavaConfiguration()
 
         library.libraryVariants.all { variant ->
-            if (variant.name == "release") {
+            if (variant.name == "minDepVersionsRelease") {
                 if (!project.hasApiFolder()) {
                     project.logger.info(
                         "Project ${project.name} doesn't have an api folder, ignoring API tasks.")
