@@ -40,6 +40,24 @@ class KtxCodegenTests : AbstractCodeGenTest() {
     }
 
     @Test
+    fun testCGNSimpleTextView(): Unit = newCodeGen {
+        compose(
+            """
+                // composer.emit(-555642258,
+                //    { context -> TextView(context) },
+                //    {
+                //      set("Hello, world!") { text = it }
+                //      set(42) { id = it }
+                //    })
+
+                <TextView text="Hello, world!" id=42 />
+            """).then { activity ->
+            val textView = activity.findViewById(42) as TextView
+            assertEquals("Hello, world!", textView.text)
+        }
+    }
+
+    @Test
     fun testCGUpdatedComposition(): Unit = ensureSetup {
         var value = "Hello, world!"
 
@@ -175,7 +193,7 @@ class KtxCodegenTests : AbstractCodeGenTest() {
             }
         """, { mapOf("text" to text) }, """
             <TestClass text />
-        """, true).then { activity ->
+        """).then { activity ->
             val tv = activity.findViewById(tvId) as TextView
             assertEquals(text, tv.text)
 
@@ -205,9 +223,21 @@ class KtxCodegenTests : AbstractCodeGenTest() {
         return block()
     }
 
-    fun compose(text: String): CompositionTest = compose({mapOf<String, Any>()}, text)
+    private inline fun <T> newCodeGen(block: () -> T): T {
+        ensureSetup {
+            val oldFlag = R4AFlags.USE_NEW_TYPE_RESOLUTION
+            R4AFlags.USE_NEW_TYPE_RESOLUTION = true
+            try {
+                return block()
+            } finally {
+                R4AFlags.USE_NEW_TYPE_RESOLUTION = oldFlag
+            }
+        }
+    }
 
-    fun <T: Any> compose(valuesFactory: () -> Map<String, T>, text: String) = compose("", valuesFactory, text)
+    fun compose(text: String, dumpClasses: Boolean = false): CompositionTest = compose({mapOf<String, Any>()}, text, dumpClasses)
+
+    fun <T: Any> compose(valuesFactory: () -> Map<String, T>, text: String, dumpClasses: Boolean = false) = compose("", valuesFactory, text, dumpClasses)
     fun <T: Any> compose(prefix: String, valuesFactory: () -> Map<String, T>, text: String, dumpClasses: Boolean = false): CompositionTest {
         val className = "Test_${uniqueNumber++}"
         val fileName = "$className.kt"
@@ -219,6 +249,7 @@ class KtxCodegenTests : AbstractCodeGenTest() {
         val parameterTypes = candidateValues.map { it.value::class.javaPrimitiveType ?: it.value::class.javaObjectType }.toTypedArray()
 
         val compiledClasses = classLoader("""
+           import android.content.Context
            import android.widget.*
            import com.google.r4a.*
 

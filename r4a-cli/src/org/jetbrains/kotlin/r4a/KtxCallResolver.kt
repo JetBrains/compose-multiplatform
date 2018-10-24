@@ -757,10 +757,12 @@ class KtxCallResolver(
                             attrType = receiver.type,
                             expressionToReportErrorsOn = receiver.expression,
                             receiverScope = receiverScope,
+                            assignmentReceiverScope = null,
                             valueExpr = receiver.expression,
                             context = context
-                        ),
+                        ).first,
                         assignment = null,
+                        assignmentLambda = null,
                         attribute = AttributeNode(
                             name = TAG_KEY,
                             isStatic = false,
@@ -792,7 +794,7 @@ class KtxCallResolver(
         children.forEach {
             // TODO(lmr): how do we know we want the one that's already in there?
             if (result.containsKey(it.name)) return@forEach
-            val attr = attributes[it.name] ?: error("didnt find attribute")
+            val attr = attributes[it.name] ?: error("did not find attribute")
             result[it.name] = it.asChangedValidatedAssignment(
                 expressionToReportErrorsOn = attr.key ?: expression,
                 receiverScope = invalidReceiverScope,
@@ -1392,15 +1394,17 @@ class KtxCallResolver(
             attrType = type,
             expressionToReportErrorsOn = expressionToReportErrorsOn,
             receiverScope = receiverScope,
+            assignmentReceiverScope = null,
             valueExpr = valueExpr,
             context = context
-        )
+        ).first
 
         return ValidatedAssignment(
             validationType = ValidationType.CHANGED,
             validationCall = validationCall,
             attribute = this,
-            assignment = null
+            assignment = null,
+            assignmentLambda = null
         )
     }
 
@@ -1463,19 +1467,21 @@ class KtxCallResolver(
                     else -> ValidationType.SET
                 }
 
-                val validationCall = resolveValidationCall(
-                    expressionToReportErrorsOn,
-                    receiverScope,
-                    validationType,
-                    resolvedCall.resultingDescriptor.valueParameters.first().type,
-                    attribute.value,
-                    context
+                val (validationCall, lambdaDescriptor) = resolveValidationCall(
+                    expressionToReportErrorsOn = expressionToReportErrorsOn,
+                    receiverScope = receiverScope,
+                    assignmentReceiverScope = type,
+                    validationType = validationType,
+                    attrType = resolvedCall.resultingDescriptor.valueParameters.first().type,
+                    valueExpr = attribute.value,
+                    context = context
                 )
 
                 results.add(
                     ValidatedAssignment(
                         validationType = validationType,
                         assignment = resolvedCall,
+                        assignmentLambda = lambdaDescriptor,
                         attribute = AttributeNode(
                             name = name,
                             expression = attribute.value,
@@ -1548,13 +1554,14 @@ class KtxCallResolver(
 
                 val attrType = descriptor.valueParameters.first().type
 
-                val validationCall = resolveValidationCall(
-                    expressionToReportErrorsOn,
-                    receiverScope,
-                    validationType,
-                    attrType,
-                    children.value,
-                    context
+                val (validationCall, lambdaDescriptor) = resolveValidationCall(
+                    expressionToReportErrorsOn = expressionToReportErrorsOn,
+                    receiverScope = receiverScope,
+                    assignmentReceiverScope = type,
+                    validationType = validationType,
+                    attrType = attrType,
+                    valueExpr = children.value,
+                    context = context
                 )
 
                 results.add(
@@ -1564,6 +1571,7 @@ class KtxCallResolver(
                             else -> ValidationType.SET
                         },
                         assignment = resolvedCall,
+                        assignmentLambda = lambdaDescriptor,
                         attribute = AttributeNode(
                             name = CHILDREN_KEY,
                             expression = children.value,
@@ -2250,7 +2258,7 @@ class KtxCallResolver(
                         original = null,
                         index = i,
                         annotations = Annotations.EMPTY,
-                        name = Name.identifier("p$i"),
+                        name = t.type.extractParameterNameFromFunctionTypeArgument() ?: Name.identifier("p$i"),
                         outType = t.type,
                         declaresDefaultValue = false,
                         isCrossinline = false,
@@ -2261,13 +2269,13 @@ class KtxCallResolver(
                 },
                 type.getReturnTypeFromFunctionType(),
                 Modality.FINAL,
-                Visibilities.DEFAULT_VISIBILITY,
+                Visibilities.LOCAL,
                 null
             )
             isOperator = false
             isInfix = false
             isExternal = false
-            isInline = true
+            isInline = false
             isTailrec = false
             isSuspend = false
             isExpect = false
@@ -2318,13 +2326,14 @@ class KtxCallResolver(
     private fun resolveValidationCall(
         expressionToReportErrorsOn: KtExpression,
         receiverScope: KotlinType?,
+        assignmentReceiverScope: KotlinType?,
         validationType: ValidationType,
         attrType: KotlinType,
         valueExpr: KtExpression,
         context: ExpressionTypingContext
-    ): ResolvedCall<*>? {
+    ): Pair<ResolvedCall<*>?, FunctionDescriptor?> {
 
-        if (receiverScope == null) return null
+        if (receiverScope == null) return null to null
 
         val temporaryForVariable = TemporaryTraceAndCache.create(
             context, "trace to resolve variable", expressionToReportErrorsOn
@@ -2336,13 +2345,16 @@ class KtxCallResolver(
 
         val calleeExpression = psiFactory.createSimpleName(name)
 
+        val lambdaType = if (includeLambda) functionType(parameterTypes = listOf(attrType), receiverType = assignmentReceiverScope) else null
+        val lambdaArg = lambdaType?.let { makeValueArgument(it, contextToUse) }
+        val lambdaDescriptor = lambdaType?.let { createFunctionDescriptor(it, contextToUse) }
+
         val call = makeCall(
             callElement = expressionToReportErrorsOn,
             calleeExpression = calleeExpression,
             valueArguments = listOfNotNull(
                 CallMaker.makeValueArgument(valueExpr),
-                if (includeLambda) makeValueArgument(functionType(parameterTypes = listOf(attrType)), contextToUse)
-                else null
+                lambdaArg
             ),
             receiver = TransientReceiver(receiverScope)
         )
@@ -2363,9 +2375,9 @@ class KtxCallResolver(
             Name.identifier(name)
         )
 
-        if (results.isSuccess) return results.resultingCall
+        if (results.isSuccess) return results.resultingCall to lambdaDescriptor
 
-        return null
+        return null to null
     }
 
     private fun resolveSubstitutableComposerMethod(

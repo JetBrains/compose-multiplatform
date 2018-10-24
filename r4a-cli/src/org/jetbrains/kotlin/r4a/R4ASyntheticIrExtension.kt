@@ -43,7 +43,10 @@ import java.util.*
 
 class R4ASyntheticIrExtension : SyntheticIrExtension {
 
+    private val composerExtesion = ComposerSyntheticExtension()
+
     override fun visitKtxElement(statementGenerator: StatementGenerator, element: KtxElement): IrStatement {
+        if (R4AFlags.USE_NEW_TYPE_RESOLUTION) return composerExtesion.visitKtxElement(statementGenerator, element)
         val tagInfo = statementGenerator.context.bindingContext.get(R4AWritableSlices.KTX_TAG_INFO, element) ?: error("no tag info")
         val openTagName = element.simpleTagName ?: element.qualifiedTagName ?: error("malformed element")
 
@@ -154,6 +157,8 @@ class R4ASyntheticIrExtension : SyntheticIrExtension {
     }
 
     override fun interceptModuleFragment(context: GeneratorContext, ktFiles: Collection<KtFile>, irModuleFragment: IrModuleFragment) {
+        if (R4AFlags.USE_NEW_TYPE_RESOLUTION) return composerExtesion.interceptModuleFragment(context, ktFiles, irModuleFragment)
+
         class TaggedFunction(val fn: IrFunction) {
             var hasKtx = false
         }

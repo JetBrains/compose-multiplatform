@@ -44,7 +44,7 @@ import org.jetbrains.kotlin.types.expressions.ExpressionTypingFacade
 import org.jetbrains.kotlin.types.expressions.KotlinTypeInfo
 import org.jetbrains.kotlin.types.typeUtil.isSubtypeOf
 import org.jetbrains.kotlin.types.typeUtil.isUnit
-
+import org.jetbrains.kotlin.r4a.ast.ResolvedKtxElementCall
 
 class KtxTagInfo(
     val composableType: ComposableType,
@@ -54,7 +54,8 @@ class KtxTagInfo(
     val attributeInfos: List<KtxAttributeInfo>,
     val childrenInfo: KtxAttributeInfo?,
     val parameterInfos: List<KtxTagParameterInfo>,
-    val referrableDescriptor: DeclarationDescriptor
+    val referrableDescriptor: DeclarationDescriptor,
+    val resolvedCalls: ResolvedKtxElementCall? = null
 )
 
 class KtxTagResolveInfo(
