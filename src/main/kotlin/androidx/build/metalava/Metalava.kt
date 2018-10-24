@@ -23,6 +23,7 @@ import androidx.build.checkapi.getCurrentApiFile
 import androidx.build.checkapi.getRequiredCompatibilityApiFile
 import androidx.build.checkapi.hasApiFolder
 import androidx.build.checkapi.hasApiTasks
+import androidx.build.java.JavaCompileInputs
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -58,25 +59,24 @@ object Metalava {
 
                 val apiTxt = project.getCurrentApiFile()
 
+                val javaInputs = JavaCompileInputs.fromLibraryVariant(library, variant)
+
                 val checkApi = project.tasks.create("checkApi", CheckApiTask::class.java) { task ->
                     task.configuration = metalavaConfiguration
-                    task.bootClasspath = library.bootClasspath
-                    task.setVariant(variant)
                     task.apiTxtFile = apiTxt
-
                     task.dependsOn(metalavaConfiguration)
                 }
+                applyInputs(javaInputs, checkApi)
+
                 project.tasks.getByName("check").dependsOn(checkApi)
                 project.rootProject.tasks.getByName(BUILD_ON_SERVER_TASK).dependsOn(checkApi)
 
-                project.tasks.create("updateApi", UpdateApiTask::class.java) { task ->
+                val updateApi = project.tasks.create("updateApi", UpdateApiTask::class.java) { task ->
                     task.configuration = metalavaConfiguration
-                    task.bootClasspath = library.bootClasspath
-                    task.setVariant(variant)
                     task.apiTxtFile = apiTxt
-
                     task.dependsOn(metalavaConfiguration)
                 }
+                applyInputs(javaInputs, updateApi)
             }
         }
     }
@@ -101,42 +101,41 @@ object Metalava {
 
         val currentApiFile = project.getCurrentApiFile()
 
+        val javaInputs = JavaCompileInputs.fromSourceSet(mainSourceSet, project)
+
         val checkApi = project.tasks.create("checkApi", CheckApiTask::class.java) { task ->
             task.configuration = metalavaConfiguration
-            task.bootClasspath = androidJarFile(project).files
-            task.sourcePaths = mainSourceSet.allSource.srcDirs
-            task.dependencyClasspath = mainSourceSet.compileClasspath
             task.apiTxtFile = currentApiFile
-
             task.dependsOn(metalavaConfiguration)
         }
+        applyInputs(javaInputs, checkApi)
 
-       val lastReleasedApiFile = project.getRequiredCompatibilityApiFile()
-       if (lastReleasedApiFile != null) {
-           val checkApiRelease = project.tasks.create("checkApiRelease", CheckApiTask::class.java) { task ->
-                task.configuration = metalavaConfiguration
-                task.bootClasspath = androidJarFile(project).files
-                task.sourcePaths = mainSourceSet.allSource.srcDirs
-                task.dependencyClasspath = mainSourceSet.compileClasspath
-                task.apiTxtFile = lastReleasedApiFile
-                task.allowApiAdditions = true
-    
-                task.dependsOn(metalavaConfiguration)
-            }
-            checkApi.dependsOn(checkApiRelease)
+        val lastReleasedApiFile = project.getRequiredCompatibilityApiFile()
+        if (lastReleasedApiFile != null) {
+            val checkApiRelease = project.tasks.create("checkApiRelease", CheckApiTask::class.java) { task ->
+                 task.configuration = metalavaConfiguration
+                 task.apiTxtFile = lastReleasedApiFile
+                 task.allowApiAdditions = true
+                 task.dependsOn(metalavaConfiguration)
+             }
+             applyInputs(javaInputs, checkApiRelease)
+             checkApi.dependsOn(checkApiRelease)
         }
 
-        project.tasks.create("updateApi", UpdateApiTask::class.java) { task ->
+        val updateApi = project.tasks.create("updateApi", UpdateApiTask::class.java) { task ->
             task.configuration = metalavaConfiguration
-            task.bootClasspath = androidJarFile(project).files
-            task.sourcePaths = mainSourceSet.allSource.srcDirs
-            task.dependencyClasspath = mainSourceSet.compileClasspath
             task.apiTxtFile = currentApiFile
-
             task.dependsOn(metalavaConfiguration)
         }
+        applyInputs(javaInputs, updateApi)
 
         project.tasks.getByName("check").dependsOn(checkApi)
         project.rootProject.tasks.getByName(BUILD_ON_SERVER_TASK).dependsOn(checkApi)
+    }
+
+    fun applyInputs(inputs: JavaCompileInputs, task: MetalavaTask) {
+        task.sourcePaths = inputs.sourcePaths
+        task.dependencyClasspath = inputs.dependencyClasspath
+        task.bootClasspath = inputs.bootClasspath
     }
 }
