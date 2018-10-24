@@ -16,15 +16,30 @@
 
 package androidx.build.metalava
 
+import java.io.File
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.Classpath
+import org.gradle.api.tasks.InputFiles
 
 /** Base class for invoking Metalava. */
 abstract class MetalavaTask : DefaultTask() {
     /** Configuration containing Metalava and its dependencies. */
     @get:Classpath
     var configuration: Configuration? = null
+
+    /** Android's boot classpath. Obtained from [BaseExtension.getBootClasspath]. */
+    @get:InputFiles
+    var bootClasspath: Collection<File> = emptyList()
+
+    /** Dependencies of [sourcePaths]. */
+    @get:InputFiles
+    var dependencyClasspath: FileCollection? = null
+
+    /** Source files against which API signatures will be validated. */
+    @get:InputFiles
+    var sourcePaths: Collection<File> = emptyList()
 
     protected fun runWithArgs(vararg args: String) {
         project.javaexec {
