@@ -31,28 +31,6 @@ open class UpdateApiTask : MetalavaTask() {
     @get:OutputFile
     var apiTxtFile: File? = null
 
-    /** Android's boot classpath. Obtained from [BaseExtension.getBootClasspath]. */
-    @get:InputFiles
-    var bootClasspath: Collection<File> = emptyList()
-
-    /** Dependencies of [sourcePaths]. */
-    @get:InputFiles
-    var dependencyClasspath: FileCollection? = null
-
-    /** Source files for which API signatures will be generated. */
-    @get:InputFiles
-    var sourcePaths: Collection<File> = emptyList()
-
-    /** Convenience method for setting [dependencyClasspath] and [sourcePaths] from a variant. */
-    fun setVariant(variant: BaseVariant) {
-        sourcePaths = variant.sourceSets.flatMap { it.javaDirectories }
-        dependencyClasspath = variant.compileConfiguration.incoming.artifactView { config ->
-            config.attributes { container ->
-                container.attribute(Attribute.of("artifactType", String::class.java), "jar")
-            }
-        }.artifacts.artifactFiles
-    }
-
     @TaskAction
     fun exec() {
         val dependencyClasspath = checkNotNull(

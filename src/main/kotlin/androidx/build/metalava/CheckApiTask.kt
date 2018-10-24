@@ -22,7 +22,6 @@ import org.gradle.api.attributes.Attribute
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import java.io.File
@@ -41,28 +40,6 @@ open class CheckApiTask : MetalavaTask() {
     /** Whether to permit API additions **/
     @get:Input
     var allowApiAdditions: Boolean = false
-
-    /** Android's boot classpath. Obtained from [BaseExtension.getBootClasspath]. */
-    @get:InputFiles
-    var bootClasspath: Collection<File> = emptyList()
-
-    /** Dependencies of [sourcePaths]. */
-    @get:InputFiles
-    var dependencyClasspath: FileCollection? = null
-
-    /** Source files against which API signatures will be validated. */
-    @get:InputFiles
-    var sourcePaths: Collection<File> = emptyList()
-
-    /** Convenience method for setting [dependencyClasspath] and [sourcePaths] from a variant. */
-    fun setVariant(variant: BaseVariant) {
-        sourcePaths = variant.sourceSets.flatMap { it.javaDirectories }
-        dependencyClasspath = variant.compileConfiguration.incoming.artifactView { config ->
-            config.attributes { container ->
-                container.attribute(Attribute.of("artifactType", String::class.java), "jar")
-            }
-        }.artifacts.artifactFiles
-    }
 
     @TaskAction
     fun exec() {
