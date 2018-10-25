@@ -19,10 +19,12 @@ import org.jetbrains.kotlin.r4a.analysis.R4ADefaultErrorMessages
 import org.jetbrains.kotlin.r4a.analysis.R4AErrors
 import org.jetbrains.kotlin.r4a.analysis.R4AErrors.MISSING_REQUIRED_ATTRIBUTES
 import org.jetbrains.kotlin.r4a.analysis.R4AErrors.UNRESOLVED_ATTRIBUTE_KEY
+import org.jetbrains.kotlin.r4a.analysis.R4AWritableSlices
 import org.jetbrains.kotlin.r4a.analysis.R4AWritableSlices.KTX_ATTR_INFO
 import org.jetbrains.kotlin.r4a.analysis.R4AWritableSlices.KTX_TAG_INFO
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.calls.CallResolver
+import org.jetbrains.kotlin.resolve.calls.context.TemporaryTraceAndCache
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.isSubclassOf
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
@@ -41,6 +43,54 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
         facade: ExpressionTypingFacade,
         callResolver: CallResolver
     ) {
+        if (R4AFlags.USE_NEW_TYPE_RESOLUTION) visitKtxElementNew(element, context, facade, callResolver)
+        else visitKtxElementOld(element, context, facade, callResolver)
+    }
+
+    fun visitKtxElementNew(
+        element: KtxElement,
+        context: ExpressionTypingContext,
+        facade: ExpressionTypingFacade,
+        callResolver: CallResolver
+    ) {
+        val ktxCallResolver = KtxCallResolver(callResolver, facade, element.project)
+
+        val foundComposer = ktxCallResolver.findComposer(element, context)
+
+        if (!foundComposer) {
+            // TODO(lmr): proper diagnostics for missing composer
+            return fallback(element, context, facade)
+        }
+
+        val temporaryForKtxCall = TemporaryTraceAndCache.create(context, "trace to resolve ktx call", element)
+
+        val resolvedKtxElementCall = ktxCallResolver.resolveTag(
+            listOfNotNull(
+                element.simpleTagName,
+                element.simpleClosingTagName,
+                element.qualifiedTagName,
+                element.qualifiedClosingTagName
+            ),
+            element.attributes,
+            element.bodyLambdaExpression,
+            context.replaceTraceAndCache(temporaryForKtxCall)
+        )
+
+        temporaryForKtxCall.commit()
+
+        if (resolvedKtxElementCall == null) {
+
+        } else {
+            context.trace.record(R4AWritableSlices.RESOLVED_KTX_CALL, element, resolvedKtxElementCall)
+        }
+    }
+
+    fun visitKtxElementOld(
+        element: KtxElement,
+        context: ExpressionTypingContext,
+        facade: ExpressionTypingFacade,
+        callResolver: CallResolver
+    ) {
         // First we resolve the tag name to something we can "call". It can be one of the following:
         //
         //   1. A constructor (either component or view)
@@ -54,7 +104,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
 
         val tagExpr = element.simpleTagName ?: element.qualifiedTagName ?: return fallback(element, context, facade)
 
-        val attributeExpressions = element.attributes.map { it.key!!.getReferencedName() to (it.value ?: it.key!!) }.toMap()
+        val attributeExpressions = element.attributes.map { it.key.getReferencedName() to (it.value ?: it.key!!) }.toMap()
 
         val tagResolver = KtxTagResolver(callResolver, facade, attributeExpressions, element.bodyLambdaExpression)
 

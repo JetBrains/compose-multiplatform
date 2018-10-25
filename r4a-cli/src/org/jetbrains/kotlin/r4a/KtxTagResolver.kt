@@ -19,7 +19,6 @@ import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.QualifiedExpressionResolver
 import org.jetbrains.kotlin.resolve.TemporaryBindingTrace
 import org.jetbrains.kotlin.resolve.calls.CallResolver
-import org.jetbrains.kotlin.resolve.calls.callUtil.noErrorsInValueArguments
 import org.jetbrains.kotlin.resolve.calls.checkers.UnderscoreUsageChecker
 import org.jetbrains.kotlin.resolve.calls.context.*
 import org.jetbrains.kotlin.resolve.calls.model.*
@@ -69,7 +68,9 @@ class KtxTagResolveInfo(
     val receiverExpression: KtExpression?,
     private val trace: TemporaryTraceAndCache
 ) {
-    fun commit() { trace.commit() }
+    fun commit() {
+        trace.commit()
+    }
 }
 
 class KtxTagParameterInfo(
@@ -306,7 +307,7 @@ class KtxTagResolver(
 
             val nextPackageOrClassDescriptor =
                 when (currentDescriptor) {
-                // TODO(lmr): i wonder if we could allow this for Ktx. Seems like a nice to have
+                    // TODO(lmr): i wonder if we could allow this for Ktx. Seems like a nice to have
                     is TypeAliasDescriptor -> // TODO type aliases as qualifiers? (would break some assumptions in TypeResolver)
                         null
                     is ClassDescriptor -> {
@@ -366,10 +367,10 @@ class KtxTagResolver(
 
         // TODO(lmr): inspect jumps and nullability. We cant allow tags that can be null or return early
         val receiverType = receiverTypeInfo.type
-                ?: ErrorUtils.createErrorType("Type for " + receiverExpr.text)
+            ?: ErrorUtils.createErrorType("Type for " + receiverExpr.text)
 
         val receiver = context.trace.get(BindingContext.QUALIFIER, receiverExpr)
-                ?: ExpressionReceiver.create(receiverExpr, receiverType, context.trace.bindingContext)
+            ?: ExpressionReceiver.create(receiverExpr, receiverType, context.trace.bindingContext)
 
         return when (selector) {
             is KtSimpleNameExpression -> resolveFunction(receiver, receiverExpr, selector, context, null)
@@ -465,7 +466,7 @@ class KtxTagResolver(
         }
     }
 
-    private fun possibleTagTypes(context: ExpressionTypingContext) : Collection<KotlinType> {
+    private fun possibleTagTypes(context: ExpressionTypingContext): Collection<KotlinType> {
         val module = context.scope.ownerDescriptor.module
 
         val r4aComponentId = ClassId.topLevel(R4aUtils.r4aFqName("Component"))
@@ -482,7 +483,7 @@ class KtxTagResolver(
         )
     }
 
-    private fun isValidTagType(type: KotlinType?, context: ExpressionTypingContext) : Boolean {
+    private fun isValidTagType(type: KotlinType?, context: ExpressionTypingContext): Boolean {
         if (type == null || type.isUnit()) return true
 
         val types = possibleTagTypes(context)
@@ -966,13 +967,13 @@ private fun KtExpression.asQualifierPartList(): List<QualifiedExpressionResolver
 private fun HierarchicalScope.findDescriptor(part: QualifiedExpressionResolver.QualifierPart): DeclarationDescriptor? {
     return findFirstFromMeAndParent {
         it.findVariable(part.name, part.location)
-                ?: it.findFunction(part.name, part.location)
-                ?: it.findClassifier(part.name, part.location)
+            ?: it.findFunction(part.name, part.location)
+            ?: it.findClassifier(part.name, part.location)
     }
 }
 
 private fun MemberScope.findDescriptor(part: QualifiedExpressionResolver.QualifierPart): DeclarationDescriptor? {
     return this.getContributedClassifier(part.name, part.location)
-            ?: getContributedFunctions(part.name, part.location).singleOrNull()
-            ?: getContributedVariables(part.name, part.location).singleOrNull()
+        ?: getContributedFunctions(part.name, part.location).singleOrNull()
+        ?: getContributedVariables(part.name, part.location).singleOrNull()
 }
