@@ -821,6 +821,37 @@ class CompositionTests : TestCase() {
 
         assertEquals(2, count)
     }
+
+    fun testInsertGroupInContainer() {
+        val values = mutableListOf(0)
+
+        fun MockViewComposition.composition() {
+            linear {
+                for (value in values) {
+                    memoize(value, value) {
+                        text("$value")
+                    }
+                }
+            }
+        }
+
+        fun MockViewValidator.composition() {
+            linear {
+                for (value in values)
+                    text("$value")
+            }
+        }
+
+        val composer = compose { composition() }
+
+        validate(composer.root) { composition() }
+
+        for (i in 1..10) {
+            values.add(i)
+            compose(composer) { composition() }
+            validate(composer.root) { composition() }
+        }
+    }
 }
 
 

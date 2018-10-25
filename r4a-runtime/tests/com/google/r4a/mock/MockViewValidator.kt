@@ -22,7 +22,6 @@ class MockViewListValidator(private val views: List<View>) : MockViewValidator {
 
     fun validate(block: (MockViewValidator.() -> Unit)?) {
         if (block != null) {
-            Assert.assertNotEquals(0, views.size)
             this.block()
             val hasNext = next()
             Assert.assertEquals(false, hasNext)

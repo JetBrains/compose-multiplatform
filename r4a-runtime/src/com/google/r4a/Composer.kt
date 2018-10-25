@@ -635,8 +635,7 @@ open class Composer<N>(
             end(END_GROUP)
         } else {
             if (invalidations.isEmpty()) {
-                slots.skipGroup()
-                recordSkip(START_GROUP)
+                skipGroup()
             } else {
                 recomposeComponentRange(slots.current, slots.current + slots.groupSize)
             }
