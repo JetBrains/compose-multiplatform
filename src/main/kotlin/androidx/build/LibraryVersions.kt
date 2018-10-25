@@ -34,6 +34,7 @@ object LibraryVersions {
     val COLLECTION = Version("1.1.0-alpha01")
     val COORDINATORLAYOUT = Version("1.1.0-alpha01")
     val CORE = Version("1.1.0-alpha01")
+    val DYNAMICANIMATION_KTX = Version("1.0.0-alpha01")
     val FRAGMENT = Version("1.1.0-alpha01")
     val FUTURES = Version("1.0.0-alpha02")
     val GRIDLAYOUT = Version("1.1.0-alpha01")
