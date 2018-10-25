@@ -18,6 +18,7 @@ package androidx.build.metalava
 
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.api.BaseVariant
+import com.google.common.io.Files
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.InputFiles
@@ -53,5 +54,8 @@ open class UpdateApiTask : MetalavaTask() {
             "--omit-common-packages=yes",
             "--output-kotlin-nulls=yes"
         )
+        if (apiTxtFile.name != "current.txt") {
+            Files.copy(apiTxtFile, File(apiTxtFile.parentFile, "current.txt"))
+        }
     }
 }
