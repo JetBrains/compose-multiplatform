@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.renderer.ClassifierNamePolicy
 import org.jetbrains.kotlin.renderer.DescriptorRenderer
+import org.jetbrains.kotlin.renderer.ParameterNameRenderingPolicy
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.types.KotlinType
 
@@ -75,41 +76,47 @@ class ValidatedAssignment(
     attribute: AttributeNode
 ) : Assignment(assignment, attribute)
 
-class StaticAssignment(
-    assignment: ResolvedCall<*>,
-    attribute: AttributeNode
-) : Assignment(assignment, attribute)
-
 class ComposerCallInfo(
+    val composerCall: ResolvedCall<*>?,
     val pivotals: List<AttributeNode>,
     val joinKeyCall: ResolvedCall<*>?,
     val ctorCall: ResolvedCall<*>?,
     val ctorParams: List<ValueNode>,
-    val staticAssignments: List<StaticAssignment>,
     val validations: List<ValidatedAssignment>
-)
+) {
+    fun allAttributes(): List<ValueNode> = ctorParams.filter { it !is ImplicitCtorValueNode } + validations.map { it.attribute }
+}
 
-sealed class EmitOrCallNode
+sealed class EmitOrCallNode {
+    abstract fun allAttributes(): List<ValueNode>
+}
 sealed class CallNode : EmitOrCallNode()
 
 class NonMemoizedCallNode(
     val resolvedCall: ResolvedCall<*>,
     val params: List<AttributeNode>
-) : CallNode()
+) : CallNode() {
+    override fun allAttributes(): List<ValueNode> = params
+}
 
 class MemoizedCallNode(
     val memoize: ComposerCallInfo?,
     val call: EmitOrCallNode
-) : CallNode()
+) : CallNode() {
+    override fun allAttributes(): List<ValueNode> = call.allAttributes() + (memoize?.allAttributes() ?: emptyList())
+}
 
 class EmitCallNode(
     val memoize: ComposerCallInfo
-) : EmitOrCallNode()
+) : EmitOrCallNode() {
+    override fun allAttributes(): List<ValueNode> = memoize.allAttributes()
+}
 
 class ResolvedKtxElementCall(
     val usedAttributes: List<AttributeNode>,
-    val unusedAttributes: List<AttributeNode>,
-    val emitOrCall: EmitOrCallNode
+    val unusedAttributes: List<String>,
+    val emitOrCall: EmitOrCallNode,
+    val getComposerCall: ResolvedCall<*>
 )
 
 
@@ -117,7 +124,6 @@ fun ComposerCallInfo?.consumedAttributes(): List<AttributeNode> {
     if (this == null) return emptyList()
     return pivotals +
             ctorParams.mapNotNull { it as? AttributeNode } +
-            staticAssignments.map { it.attribute } +
             validations.map { it.attribute }
 }
 
@@ -144,7 +150,7 @@ fun List<ValueNode>.print(): String {
 
 fun ValueNode.print(): String = when (this) {
     is AttributeNode -> name
-    is ImplicitCtorValueNode -> "(implicit-$name)"
+    is ImplicitCtorValueNode -> "(implicit)$name"
 }
 
 fun MemoizedCallNode.print(): String = buildString {
@@ -174,16 +180,18 @@ fun ResolvedKtxElementCall.print() = buildString {
         }
     }
     attr("usedAttributes", usedAttributes) { it.print() }
-    attr("unusedAttributes", unusedAttributes) { it.print() }
+    attr("unusedAttributes", unusedAttributes) {
+        it.joinToString(separator = ", ").let { s -> if (s.isBlank()) "<empty>" else s }
+    }
 }
 
 fun ComposerCallInfo.print() = buildString {
     self("ComposerCallInfo")
+    attr("composerCall", composerCall) { it.print() }
     attr("pivotals", pivotals) { it.print() }
     attr("joinKeyCall", joinKeyCall) { it.print() }
     attr("ctorCall", ctorCall) { it.print() }
     attr("ctorParams", ctorParams) { it.print() }
-    list("staticAssignments", staticAssignments) { it.print() }
     list("validations", validations) { it.print() }
 }
 
@@ -196,17 +204,19 @@ fun ValidatedAssignment.print() = buildString {
     attr("attribute", attribute) { it.print() }
 }
 
-fun StaticAssignment.print() = buildString {
-    self("StaticAssignment")
-    attr("assignment", assignment) { it.print() }
-    attr("attribute", attribute) { it.print() }
-}
-
 val DESC_RENDERER = DescriptorRenderer.COMPACT_WITHOUT_SUPERTYPES.withOptions {
     parameterNamesInFunctionalTypes = false
     renderConstructorKeyword = false
     classifierNamePolicy = ClassifierNamePolicy.SHORT
+    includeAdditionalModifiers = false
+    unitReturnType = false
+    withoutTypeParameters = true
+    parameterNameRenderingPolicy = ParameterNameRenderingPolicy.NONE
+    defaultParameterValueRenderer = null
+    renderUnabbreviatedType = false
 }
+
+
 
 fun StringBuilder.self(name: String) {
     append(name)
