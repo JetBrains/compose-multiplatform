@@ -26,7 +26,7 @@ import androidx.build.Strategy.TipOfTree
 
 val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.ANNOTATION, "1.0.0")
-    prebuilts(LibraryGroups.APPCOMPAT, "1.0.0")
+    prebuilts(LibraryGroups.APPCOMPAT, "1.0.1")
     prebuilts(LibraryGroups.ASYNCLAYOUTINFLATER, "1.0.0")
     prebuilts(LibraryGroups.BIOMETRIC, "biometric", "1.0.0-alpha01")
     prebuilts(LibraryGroups.BROWSER, "1.0.0")
@@ -40,6 +40,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.CONTENTPAGER, "1.0.0")
     prebuilts(LibraryGroups.COORDINATORLAYOUT, "1.0.0")
     prebuilts(LibraryGroups.CORE, "1.0.0")
+    prebuilts(LibraryGroups.CORE, "core-ktx", "1.0.1")
     prebuilts(LibraryGroups.CURSORADAPTER, "1.0.0")
     prebuilts(LibraryGroups.CUSTOMVIEW, "1.0.0")
     prebuilts(LibraryGroups.DOCUMENTFILE, "1.0.0")
@@ -75,9 +76,10 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.SLICE, "slice-view", "1.0.0")
     prebuilts(LibraryGroups.SLIDINGPANELAYOUT, "1.0.0")
     prebuilts(LibraryGroups.SWIPEREFRESHLAYOUT, "1.0.0")
-    prebuilts(LibraryGroups.TRANSITION, "1.0.0")
+    prebuilts(LibraryGroups.TRANSITION, "1.0.1")
     prebuilts(LibraryGroups.TVPROVIDER, "1.0.0")
     prebuilts(LibraryGroups.VECTORDRAWABLE, "1.0.0")
+    prebuilts(LibraryGroups.VECTORDRAWABLE, "vectordrawable-animated", "1.0.1")
     prebuilts(LibraryGroups.VIEWPAGER, "1.0.0")
     prebuilts(LibraryGroups.WEAR, "1.0.0")
             .addStubs("wear/wear_stubs/com.google.android.wearable-stubs.jar")
