@@ -15,10 +15,7 @@ import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Ref
 import com.intellij.openapi.util.TextRange
-import com.intellij.psi.PsiDocumentManager
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiFile
-import com.intellij.psi.PsiFileFactory
+import com.intellij.psi.*
 import com.intellij.psi.xml.XmlFile
 import org.jetbrains.kotlin.idea.caches.resolve.resolveImportReference
 import org.jetbrains.kotlin.idea.conversion.copy.*
@@ -28,13 +25,40 @@ import org.jetbrains.kotlin.j2k.CodeBuilder
 import org.jetbrains.kotlin.j2k.EmptyDocCommentConverter
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.psi.psiUtil.anyDescendantOfType
 import org.jetbrains.kotlin.psi.psiUtil.elementsInRange
 import org.jetbrains.kotlin.r4a.idea.conversion.XmlToKtxConverter.XmlNamespace
 import org.jetbrains.kotlin.r4a.idea.editor.KtxEditorOptions
+import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
+import java.lang.IllegalStateException
 
 class ConvertXmlCopyPasteProcessor : CopyPastePostProcessor<TextBlockTransferableData>() {
     private val LOG = Logger.getInstance(ConvertXmlCopyPasteProcessor::class.java)
+
+    private class CopiedXmlCode(val fileText: String, val startOffsets: IntArray, val endOffsets: IntArray) : TextBlockTransferableData {
+        override fun getFlavor() = DATA_FLAVOR
+        override fun getOffsetCount() = 0
+
+        override fun getOffsets(offsets: IntArray?, index: Int) = index
+        override fun setOffsets(offsets: IntArray?, index: Int) = index
+
+        companion object {
+            val DATA_FLAVOR: DataFlavor = DataFlavor(CopiedXmlCode::class.java, "class: ConvertXmlCopyPasteProcessor.CopiedXmlCode")
+        }
+    }
+
+    private class CopiedText(val text: String) : TextBlockTransferableData {
+        override fun getFlavor() = DATA_FLAVOR
+        override fun getOffsetCount() = 0
+
+        override fun getOffsets(offsets: IntArray?, index: Int) = index
+        override fun setOffsets(offsets: IntArray?, index: Int) = index
+
+        companion object {
+            val DATA_FLAVOR: DataFlavor = DataFlavor(CopiedText::class.java, "class: ConvertXmlCopyPasteProcessor.CopiedText")
+        }
+    }
 
     override fun collectTransferableData(
         file: PsiFile,
@@ -50,6 +74,9 @@ class ConvertXmlCopyPasteProcessor : CopyPastePostProcessor<TextBlockTransferabl
         try {
             if (content.isDataFlavorSupported(CopiedXmlCode.DATA_FLAVOR)) {
                 return listOf(content.getTransferData(CopiedXmlCode.DATA_FLAVOR) as TextBlockTransferableData)
+            } else if (content.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                val text = content.getTransferData(DataFlavor.stringFlavor) as String
+                return listOf(CopiedText(text))
             }
         } catch (e: Throwable) {
             LOG.error(e)
@@ -68,25 +95,25 @@ class ConvertXmlCopyPasteProcessor : CopyPastePostProcessor<TextBlockTransferabl
         if (DumbService.getInstance(project).isDumb) return
         if (!KtxEditorOptions.getInstance().enableXmlToKtxConversion) return
 
-        // TODO(jdemeulenaere): Handle pasting from anywhere (not only from XML files in the editor).
         val targetFile = PsiDocumentManager.getInstance(project).getPsiFile(editor.document) as? KtFile ?: return
-        val copiedCode = values.single() as CopiedXmlCode
-        val xmlFile = PsiFileFactory.getInstance(project).createFileFromText(XMLLanguage.INSTANCE, copiedCode.fileText) as XmlFile
-        // TODO(jdemeulenaere): Check if there are syntax errors in XML file, in which case either abort or warn that result might be incorrect.
-        // TODO(jdemeulenaere): Improve this. Maybe we don't want to restrict only to android XML files.
-        val hasAndroidNameSpace = xmlFile.rootTag
-            ?.attributes
-            ?.any { it.namespacePrefix == XmlToKtxConverter.NAMESPACE_PREFIX && it.value == XmlNamespace.ANDROID.uri }
-            ?: false
-        if (!hasAndroidNameSpace) {
-            return
+        val transferableData = values.single()
+        val (fileText, startOffsets, endOffsets) = when (transferableData) {
+            is CopiedXmlCode -> Triple(transferableData.fileText, transferableData.startOffsets, transferableData.endOffsets)
+            is CopiedText -> Triple(transferableData.text, intArrayOf(0), intArrayOf(transferableData.text.length))
+            else -> throw IllegalStateException("Unsupported transferable data: $transferableData")
+        }
+        val xmlFile = PsiFileFactory.getInstance(project).createFileFromText(XMLLanguage.INSTANCE, fileText) as XmlFile
+        val hasErrors = xmlFile.anyDescendantOfType<PsiErrorElement>()
+        if (hasErrors) {
+            if (transferableData is CopiedText) return
+            // TODO(jdemeulenaere): Warn that result might be incorrect.
         }
 
         if (!confirmConversion(project)) {
             return
         }
 
-        val ranges = copiedCode.startOffsets.mapIndexed { i, startOffset -> TextRange(startOffset, copiedCode.endOffsets[i]) }
+        val ranges = startOffsets.mapIndexed { i, startOffset -> TextRange(startOffset, endOffsets[i]) }
         val elementAndTextList = ElementAndTextList().apply { ranges.forEach { this.collectElementsToConvert(xmlFile, it) } }
 
         // Convert PsiElement's to AST Element's.

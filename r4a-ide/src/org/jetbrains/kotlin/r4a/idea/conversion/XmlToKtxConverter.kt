@@ -21,10 +21,10 @@ import java.util.regex.Pattern
 object XmlToKtxConverter {
     const val NAMESPACE_PREFIX = "xmlns"
 
-    enum class XmlNamespace(val uri: String) {
-        ANDROID("http://schemas.android.com/apk/res/android"),
-        ANDROID_TOOLS("http://schemas.android.com/tools"),
-        ANDROID_APP("http://schemas.android.com/apk/res-auto");
+    enum class XmlNamespace(val uri: String, val defaultPrefix: String) {
+        ANDROID("http://schemas.android.com/apk/res/android", "android"),
+        ANDROID_TOOLS("http://schemas.android.com/tools", "tools"),
+        ANDROID_APP("http://schemas.android.com/apk/res-auto", "app");
     }
 
     fun convertElement(
@@ -73,8 +73,16 @@ object XmlToKtxConverter {
         return FqName("android.widget.$fullName") to fullName
     }
 
+    private fun XmlAttribute.isInNamespace(ns: XmlNamespace): Boolean {
+        return if (namespace.isNotEmpty()) {
+            namespace == ns.uri
+        } else {
+            namespacePrefix == ns.defaultPrefix
+        }
+    }
+
     private fun shouldConvertAttribute(attribute: XmlAttribute): Boolean {
-        return attribute.namespacePrefix != NAMESPACE_PREFIX && attribute.namespace != XmlNamespace.ANDROID_TOOLS.uri
+        return attribute.namespacePrefix != NAMESPACE_PREFIX && !attribute.isInNamespace(XmlNamespace.ANDROID_TOOLS)
         && !(attribute.value ?: "").startsWith("@+id/")
     }
 
@@ -84,7 +92,7 @@ object XmlToKtxConverter {
         val ktxName = xmlName.replace(Regex("_([a-zA-Z\\d])")) { it.groupValues[1].toUpperCase() }
         // TODO(jdemeulenaere): Better handling of missing value.
         val xmlValue = attribute.value ?: ""
-        val ktxValue = convertAttributeValue(xmlName, xmlValue, attribute.namespace == XmlNamespace.ANDROID.uri)
+        val ktxValue = convertAttributeValue(xmlName, xmlValue, attribute.isInNamespace(XmlNamespace.ANDROID))
         return KtxAttribute(ktxName, ktxValue)
     }
 
