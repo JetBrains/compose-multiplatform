@@ -4,10 +4,10 @@ import com.intellij.lang.ASTNode
 import com.intellij.openapi.project.Project
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.util.SmartList
-import org.jetbrains.kotlin.builtins.getReturnTypeFromFunctionType
-import org.jetbrains.kotlin.builtins.isFunctionTypeOrSubtype
+import org.jetbrains.kotlin.builtins.*
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotated
+import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.diagnostics.Severity
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
@@ -24,11 +24,14 @@ import org.jetbrains.kotlin.resolve.calls.context.*
 import org.jetbrains.kotlin.resolve.calls.model.*
 import org.jetbrains.kotlin.resolve.calls.results.OverloadResolutionResults
 import org.jetbrains.kotlin.resolve.calls.results.OverloadResolutionResultsUtil
+import org.jetbrains.kotlin.resolve.calls.smartcasts.DataFlowInfo
 import org.jetbrains.kotlin.resolve.calls.tasks.ResolutionCandidate
 import org.jetbrains.kotlin.resolve.calls.tasks.TracingStrategy
 import org.jetbrains.kotlin.resolve.calls.tasks.TracingStrategyForInvoke
+import org.jetbrains.kotlin.resolve.calls.tasks.TracingStrategyImpl
 import org.jetbrains.kotlin.resolve.calls.tower.NewResolutionOldInference
 import org.jetbrains.kotlin.resolve.calls.util.CallMaker
+import org.jetbrains.kotlin.resolve.constants.evaluate.ConstantExpressionEvaluator
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.scopes.HierarchicalScope
@@ -38,13 +41,9 @@ import org.jetbrains.kotlin.resolve.scopes.utils.findClassifier
 import org.jetbrains.kotlin.resolve.scopes.utils.findFirstFromMeAndParent
 import org.jetbrains.kotlin.resolve.scopes.utils.findFunction
 import org.jetbrains.kotlin.resolve.scopes.utils.findVariable
-import org.jetbrains.kotlin.types.ErrorUtils
-import org.jetbrains.kotlin.types.KotlinType
-import org.jetbrains.kotlin.types.TypeUtils
-import org.jetbrains.kotlin.types.expressions.ExpressionTypingContext
-import org.jetbrains.kotlin.types.expressions.ExpressionTypingFacade
-import org.jetbrains.kotlin.types.expressions.FakeCallResolver
-import org.jetbrains.kotlin.types.expressions.KotlinTypeInfo
+import org.jetbrains.kotlin.types.*
+import org.jetbrains.kotlin.types.expressions.*
+import org.jetbrains.kotlin.types.typeUtil.asTypeProjection
 import org.jetbrains.kotlin.types.typeUtil.isSubtypeOf
 import org.jetbrains.kotlin.types.typeUtil.isTypeParameter
 import org.jetbrains.kotlin.types.typeUtil.isUnit
@@ -55,23 +54,25 @@ class KtxCallResolver(
     private val facade: ExpressionTypingFacade,
     private val project: Project
 ) {
-    private val fakeCallResolver = FakeCallResolver(project, callResolver)
-    lateinit private var composerType: KotlinType
-    lateinit private var composerResolvedCall: ResolvedCall<*>
-    lateinit private var tagExpressions: List<KtExpression>
+    private val psiFactory = KtPsiFactory(project, markGenerated = false)
+
+    private lateinit var composerType: KotlinType
+    private lateinit var composerResolvedCall: ResolvedCall<*>
+    private lateinit var tagExpressions: List<KtExpression>
+    private lateinit var joinKeyCall: ResolvedCall<*>
 
     private val emitSimpleUpperBoundTypes = mutableSetOf<KotlinType>()
     private val emitCompoundUpperBoundTypes = mutableSetOf<KotlinType>()
+    private val emittableTypeToImplicitCtorTypes = mutableListOf<Pair<List<KotlinType>, Set<KotlinType>>>()
 
-//    lateinit val simpleEmitMap: Map<KotlinType, ResolvedCall<*>>
-//    lateinit val compoundEmitMap: Map<KotlinType, ResolvedCall<*>>
-//    lateinit val statelessMemoize: ResolvedCall<*>?
-//    lateinit val statefullMemoize: ResolvedCall<*>?
-//    lateinit val joinKey: ResolvedCall<*>?
-
-    private fun isStatic(expression: KtExpression, context: ExpressionTypingContext): Boolean {
-        // TODO(lmr): make this smarter?  expression.isConstant() doesn't seem to work in testing?
-        return false
+    private fun isStatic(
+        expression: KtExpression,
+        context: ExpressionTypingContext,
+        expectedType: KotlinType?,
+        constantChecker: ConstantExpressionEvaluator
+    ): Boolean {
+        val constValue = constantChecker.evaluateExpression(expression, context.trace, expectedType)
+        return constValue != null
     }
 
     /**
@@ -102,11 +103,36 @@ class KtxCallResolver(
             else -> return false
         }
 
-        val composerTypeDescriptor = composerType.constructor.declarationDescriptor as? ClassDescriptor ?: return false
+        val calleeExpression = psiFactory.createSimpleName(EMIT_NAME.asString())
 
-        for (memDescriptor in composerTypeDescriptor.unsubstitutedMemberScope.getContributedDescriptors { it == EMIT_NAME }) {
-            recordComposerEmitBounds(memDescriptor)
+        val emitCall = makeCall(
+            callElement = element,
+            calleeExpression = calleeExpression,
+            receiver = TransientReceiver(composerType)
+        )
+
+        val contextForVariable = BasicCallResolutionContext.create(
+            context,
+            emitCall,
+            CheckArgumentTypesMode.CHECK_VALUE_ARGUMENTS,
+            DataFlowInfoForArgumentsImpl(context.dataFlowInfo, emitCall)
+        ).replaceCollectAllCandidates(true)
+
+        val results = callResolver.resolveCallWithGivenName(
+            contextForVariable,
+            emitCall,
+            calleeExpression,
+            EMIT_NAME
+        )
+
+        for (candidate in results.allCandidates ?: emptyList()) {
+            recordComposerEmitBounds(candidate.candidateDescriptor)
         }
+
+        joinKeyCall = resolveJoinKey(
+            expressionToReportErrorsOn = tagExpressions.first(),
+            context = context
+        ) ?: return false
 
         return true
     }
@@ -128,26 +154,40 @@ class KtxCallResolver(
         return emitCompoundUpperBoundTypes.any { isSubtypeOf(it) }
     }
 
-
     private fun recordComposerEmitBounds(descriptor: DeclarationDescriptor) {
         if (descriptor.name != EMIT_NAME) return
         if (descriptor !is SimpleFunctionDescriptor) return
-        with (descriptor) {
+        with(descriptor) {
             // TODO(lmr): we could report diagnostics on some of these? seems strange to though...
             if (valueParameters.size < 3) return
             if (valueParameters.size > 4) return
             val ctorParam = valueParameters.find { it.name == CTOR_PARAMETER_NAME } ?: return
             if (!ctorParam.type.isFunctionTypeOrSubtype) return
-            val upperBounds = ctorParam.type.getReturnTypeFromFunctionType().upperBounds()
 
-            // TODO(lmr): grab any parameters in the type definition here that we will use as implicit attributes (ie, "context")
+            val upperBounds = ctorParam.type.getReturnTypeFromFunctionType().upperBounds()
+            val implicitParamTypes = ctorParam.type.getValueParameterTypesFromFunctionType().map { it.type }
+
+            for (implicitType in implicitParamTypes) {
+                emittableTypeToImplicitCtorTypes.add(
+                    upperBounds to implicitParamTypes.toSet()
+                )
+            }
 
             emitSimpleUpperBoundTypes.addAll(upperBounds)
 
-            if(valueParameters.any { it.name == CHILDREN_PARAMETER_NAME }) {
+            if (valueParameters.any { it.name == CHILDREN_PARAMETER_NAME }) {
                 emitCompoundUpperBoundTypes.addAll(upperBounds)
             }
         }
+    }
+
+    private class ImplicitCtorValueArgument(val type: KotlinType) : ValueArgument {
+        override fun getArgumentExpression(): KtExpression? = null
+        override fun getArgumentName(): ValueArgumentName? = null
+        override fun isNamed(): Boolean = false
+        override fun asElement(): KtElement = error("tried to get element")
+        override fun getSpreadElement(): LeafPsiElement? = null
+        override fun isExternal(): Boolean = true
     }
 
     private sealed class ResolveKind {
@@ -224,36 +264,44 @@ class KtxCallResolver(
         // TODO(lmr): validate that if it bottoms out at an emit(...) that it doesn't have any call(...)s
 
         if (emitOrCall != null) {
+
+            val constantChecker = ConstantExpressionEvaluator(
+                project = project,
+                module = context.scope.ownerDescriptor.module,
+                languageVersionSettings = context.languageVersionSettings
+            )
+
+            val usedAttributeNodes = emitOrCall
+                .allAttributes()
+                .map { it.name to it }
+                .toMap()
+                .values
+                .map {
+                    val attr = attrInfos[it.name] ?: error("couldnt find attribute ${it.name}")
+                    AttributeNode(
+                        name = it.name,
+                        descriptor = it.descriptor,
+                        expression = attr.value,
+                        type = it.type,
+                        isStatic = isStatic(attr.value, context, it.type, constantChecker)
+                    )
+                }
+
             return ResolvedKtxElementCall(
-                usedAttributes = emptyList(),
-                unusedAttributes = emptyList(),
-                emitOrCall = emitOrCall
+                usedAttributes = usedAttributeNodes,
+                unusedAttributes = (attrInfos.keys - usedAttributes).toList(),
+                emitOrCall = emitOrCall,
+                getComposerCall = composerResolvedCall
             )
         }
 
         return null
-
-
-        // TODO(lmr): do we need to check the type that it bottoms out at?
-//        val validTagType = isValidTagType(instanceType, context)
-
-//        if (instanceType != null && !validTagType) {
-//            temporaryForVariable.trace.reportFromPlugin(
-//                R4AErrors.INVALID_TAG_TYPE.on(
-//                    expression,
-//                    instanceType,
-//                    possibleTagTypes(context)
-//                ),
-//                R4ADefaultErrorMessages
-//            )
-//        }
-
     }
 
     private fun forceResolveCallForInvoke(
         calleeType: KotlinType,
         context: BasicCallResolutionContext
-    ) : OverloadResolutionResults<FunctionDescriptor> {
+    ): OverloadResolutionResults<FunctionDescriptor> {
         val calleeExpression = context.call.calleeExpression ?: error("callee expression required on call")
         val expressionReceiver = ExpressionReceiver.create(calleeExpression, calleeType, context.trace.bindingContext)
         val call = CallTransformer.CallForImplicitInvoke(
@@ -305,12 +353,15 @@ class KtxCallResolver(
 
             val attrsUsedInCall = mutableSetOf<String>()
 
+            val usedAttributeInfos = mutableListOf<TempParameterInfo>()
+
             val resolvedCall = resolveCandidate(
                 kind,
                 result,
                 call,
                 attributes,
                 attrsUsedInCall,
+                usedAttributeInfos,
                 candidateContext
             )
 
@@ -321,6 +372,9 @@ class KtxCallResolver(
 
             if (returnType == null || returnType.isUnit()) {
                 // bottomed out
+
+                // TODO(lmr): check that the function was @Composable
+
                 // TODO(lmr): there are cases where this should be a memoized call though!
                 return@mapNotNull TempResolveInfo(
                     true, // TODO(lmr): valid
@@ -337,24 +391,38 @@ class KtxCallResolver(
 
             val attrsUsedInSets = mutableSetOf<String>()
 
-            val setterValidations = resolveAllSetAttributes(
-                returnType,
-                attributes,
-                attrsUsedInCall,
-                attrsUsedInSets,
-                candidateContext
-            )
-
-            val pivotals = resolvePivotalAttributes(
-                resolvedCall,
-                attributes,
-                attrsUsedInCall,
-                attrsUsedInSets,
-                returnType
-            )
-
-
             if (returnType.isEmittable()) {
+
+                val composerCall = resolveComposerEmit(
+                    constructedType = returnType,
+                    hasBody = attributes.contains(CHILDREN_KEY),
+                    implicitCtorTypes = resolvedCall.call.valueArguments.mapNotNull { (it as? ImplicitCtorValueArgument)?.type },
+                    expressionToReportErrorsOn = expression,
+                    context = context
+                )
+
+                val updateReceiverScope = composerCall?.let {
+                    it.resultingDescriptor.valueParameters.getOrNull(2)?.type?.getReceiverTypeFromFunctionType()
+                }
+
+                val setterValidations = resolveAllSetAttributes(
+                    expression,
+                    updateReceiverScope,
+                    returnType,
+                    attributes,
+                    attrsUsedInCall,
+                    attrsUsedInSets,
+                    candidateContext
+                )
+
+                val pivotals = resolvePivotalAttributes(
+                    attributes,
+                    attrsUsedInCall,
+                    usedAttributeInfos,
+                    setterValidations,
+                    returnType
+                )
+
 
                 return@mapNotNull TempResolveInfo(
                     true,
@@ -363,20 +431,49 @@ class KtxCallResolver(
                 ) {
                     EmitCallNode(
                         memoize = ComposerCallInfo(
-                            pivotals = emptyList(), // TODO(lmr):
-                            joinKeyCall = null, // TODO(lmr):
+                            composerCall = composerCall,
+                            pivotals = pivotals,
+                            joinKeyCall = joinKeyCall,
                             ctorCall = resolvedCall,
                             ctorParams = constructCtorValueNodes(resolvedCall, attributes),
-                            staticAssignments = emptyList(), // TODO(lmr):
                             validations = setterValidations
                         )
                     )
                 }
             }
 
+            val composerCall = resolveComposerCall(
+                constructedType = returnType,
+                expressionToReportErrorsOn = expression,
+                context = context
+            )
+
+            // the "invalid" lambda is at a different argument index depending on whether or not there is a "ctor" param.
+            val invalidArgIndex = if (returnType != null) 2 else 1
+
+            val invalidReceiverScope = composerCall?.let {
+                it.resultingDescriptor.valueParameters.getOrNull(invalidArgIndex)?.type?.getReceiverTypeFromFunctionType()
+            }
+
+            val setterValidations = resolveAllSetAttributes(
+                expression,
+                invalidReceiverScope,
+                returnType,
+                attributes,
+                attrsUsedInCall,
+                attrsUsedInSets,
+                candidateContext
+            )
+
+            val pivotals = resolvePivotalAttributes(
+                attributes,
+                attrsUsedInCall,
+                usedAttributeInfos,
+                setterValidations,
+                returnType
+            )
+
             val attrsUsedInFollowingCalls = mutableSetOf<String>()
-            // TODO(lmr): the validations from the child need to be added / copied to the setter validations
-            // and marked as CHANGED
 
             // TODO(lmr): prevent recursion if we have not consumed 1 or more attributes....
             val childCall = resolveThing(
@@ -408,12 +505,20 @@ class KtxCallResolver(
             ) {
                 MemoizedCallNode(
                     memoize = ComposerCallInfo(
-                        pivotals = emptyList(), // TODO(lmr):
-                        joinKeyCall = null, // TODO(lmr):
+                        composerCall = composerCall,
+                        pivotals = pivotals,
+                        joinKeyCall = joinKeyCall,
                         ctorCall = resolvedCall,
                         ctorParams = constructAttributeNodes(resolvedCall, attributes),
-                        staticAssignments = emptyList(), // TODO(lmr):
-                        validations = setterValidations + childCall.consumedAttributes().toSet().map { it.asChangedValidatedAssignment() }
+                        validations = setterValidations + childCall.consumedAttributes().toSet().map {
+                            val attr = attributes[it.name] ?: error("didnt find attribute")
+                            it.asChangedValidatedAssignment(
+                                expressionToReportErrorsOn = attr.key ?: expression,
+                                receiverScope = invalidReceiverScope,
+                                valueExpr = attr.value,
+                                context = context
+                            )
+                        }
                     ),
                     call = childCall
                 )
@@ -442,37 +547,78 @@ class KtxCallResolver(
     }
 
     private fun resolvePivotalAttributes(
-        resolvedCall: ResolvedCall<*>,
         attributes: Map<String, AttributeInfo>,
         attrsUsedInCall: Set<String>,
-        attrsUsedInSets: Set<String>,
+        callParamInfos: List<TempParameterInfo>,
+        validations: List<ValidatedAssignment>,
         returnType: KotlinType?
-    ): Set<String> {
-        val fnDescriptor = resolvedCall.resultingDescriptor
+    ): List<AttributeNode> {
+        val result = mutableListOf<AttributeNode>()
 
-        // TODO(lmr): this isn't quite right... what if a children param is annotated with @Pivotal?
         if (returnType == null || returnType.isUnit()) {
-            return fnDescriptor
-                .valueParameters
-                .filter { isAnnotatedAsPivotal(it) }
-                .map { it.name.asString() }
-                .toSet()
+            return callParamInfos
+                .filter { isAnnotatedAsPivotal(it.descriptor) }
+                .map {
+                    AttributeNode(
+                        name = it.attribute.name,
+                        descriptor = it.descriptor,
+                        type = it.type,
+                        expression = it.attribute.value,
+                        isStatic = false
+                    )
+                }
         }
 
-        val clsDescriptor = returnType.constructor.declarationDescriptor as? ClassDescriptor ?: return emptySet()
-        val members = clsDescriptor
-            .unsubstitutedMemberScope
-            .getContributedDescriptors()
-            .mapNotNull {
-                when (it) {
-                    is SimpleFunctionDescriptor -> if (R4aUtils.isSetterMethodName(it.name.asString())) it
-                        else null
-                    is PropertyDescriptor -> it
-                    else -> null
-                }
+        // if you were in the ctor call but not in the sets, you *have* to be pivotal
+        for (info in callParamInfos) {
+            if (attrsUsedInCall.contains(info.attribute.name)) continue
+            val attribute = attributes[info.attribute.name] ?: continue
+            result.add(
+                AttributeNode(
+                    name = info.attribute.name,
+                    descriptor = info.descriptor,
+                    type = info.type,
+                    expression = attribute.value,
+                    isStatic = false
+                )
+            )
+        }
+
+        // There are additional cases where attributes can be pivotal:
+        //   1. It is annotated as @Pivotal
+        //   2. It is a `val` ctor parameter
+        for (assignment in validations) {
+            val attribute = assignment.attribute
+            val name = attribute.name
+            val descriptor = attribute.descriptor
+
+            if (isAnnotatedAsPivotal(descriptor)) {
+                result.add(
+                    AttributeNode(
+                        name = name,
+                        descriptor = descriptor,
+                        type = attribute.type,
+                        expression = attribute.expression,
+                        isStatic = false
+                    )
+                )
+                continue
             }
-        // TODO(lmr):
-        return emptySet()
+            if (descriptor is PropertyDescriptor && attrsUsedInCall.contains(name) && !descriptor.isVar) {
+                result.add(
+                    AttributeNode(
+                        name = name,
+                        descriptor = descriptor,
+                        type = attribute.type,
+                        expression = attribute.expression,
+                        isStatic = false
+                    )
+                )
+                continue
+            }
+        }
+
+        return result
     }
 
     private fun constructAttributeNodes(resolvedCall: ResolvedCall<*>, attributes: Map<String, AttributeInfo>): List<AttributeNode> {
@@ -480,7 +626,7 @@ class KtxCallResolver(
             val name = param.name.asString()
             var attr = attributes[name]
 
-            if (isChildrenParameter(param)) {
+            if (isAnnotatedAsChildren(param)) {
                 val childrenAttr = attributes[CHILDREN_KEY]
                 if (childrenAttr != null) {
                     attr = childrenAttr
@@ -508,16 +654,16 @@ class KtxCallResolver(
             val name = param.name.asString()
             var attr = attributes[name]
 
-            if (isChildrenParameter(param)) {
+            if (isAnnotatedAsChildren(param)) {
                 val childrenAttr = attributes[CHILDREN_KEY]
                 if (childrenAttr != null) {
                     attr = childrenAttr
                 }
             }
 
-            if (attr == null && isContextParameter(param)) {
+            if (attr == null && isImplicitConstructorParam(param, resolvedCall.resultingDescriptor)) {
                 return@mapNotNull ImplicitCtorValueNode(
-                    name = CONTEXT_KEY,
+                    name = param.name.asString(),
                     descriptor = param,
                     type = param.type
                 )
@@ -539,16 +685,32 @@ class KtxCallResolver(
         }
     }
 
-    private fun AttributeNode.asChangedValidatedAssignment(): ValidatedAssignment {
+    private fun AttributeNode.asChangedValidatedAssignment(
+        expressionToReportErrorsOn: KtExpression,
+        receiverScope: KotlinType?,
+        valueExpr: KtExpression,
+        context: ExpressionTypingContext
+    ): ValidatedAssignment {
+        val validationCall = resolveValidationCall(
+            validationType = ValidationType.CHANGED,
+            attrType = type,
+            expressionToReportErrorsOn = expressionToReportErrorsOn,
+            receiverScope = receiverScope,
+            valueExpr = valueExpr,
+            context = context
+        )
+
         return ValidatedAssignment(
             validationType = ValidationType.CHANGED,
-            validationCall = null, // TODO(lmr):
+            validationCall = validationCall,
             attribute = this,
             assignment = null
         )
     }
 
     private fun resolveAllSetAttributes(
+        expressionToReportErrorsOn: KtExpression,
+        receiverScope: KotlinType?,
         type: KotlinType,
         attributes: Map<String, AttributeInfo>,
         attributesUsedInCall: Set<String>,
@@ -567,6 +729,9 @@ class KtxCallResolver(
             val expectedTypes = mutableListOf<KotlinType>()
 
             var resolvedCall: ResolvedCall<*>? = null
+
+            // TODO(lmr): it might be possible to construct a case where private var properties are resolved here
+            // even though they shouldn't be props at that point... perhaps we should look into that corner case
 
             if (resolvedCall == null) {
                 resolvedCall = resolveAttributeAsSetter(
@@ -592,21 +757,34 @@ class KtxCallResolver(
 
             if (resolvedCall != null) {
 
-                results.add(ValidatedAssignment(
-                    validationType = when {
-                        attributesUsedInCall.contains(name) -> ValidationType.UPDATE
-                        else -> ValidationType.SET
-                    },
-                    assignment = resolvedCall,
-                    attribute = AttributeNode(
-                        name = name,
-                        expression = attribute.value,
-                        type = resolvedCall.resultingDescriptor.valueParameters.first().type,
-                        descriptor = resolvedCall.resultingDescriptor,
-                        isStatic = false /* attribute.value.isConstant() */
-                    ),
-                    validationCall = null // TODO(lmr)
-                ))
+                val validationType = when {
+                    attributesUsedInCall.contains(name) -> ValidationType.UPDATE
+                    else -> ValidationType.SET
+                }
+
+                val validationCall = resolveValidationCall(
+                    expressionToReportErrorsOn,
+                    receiverScope,
+                    validationType,
+                    resolvedCall.resultingDescriptor.valueParameters.first().type,
+                    attribute.value,
+                    context
+                )
+
+                results.add(
+                    ValidatedAssignment(
+                        validationType = validationType,
+                        assignment = resolvedCall,
+                        attribute = AttributeNode(
+                            name = name,
+                            expression = attribute.value,
+                            type = resolvedCall.resultingDescriptor.valueParameters.first().type,
+                            descriptor = resolvedCall.resultingDescriptor,
+                            isStatic = false
+                        ),
+                        validationCall = validationCall
+                    )
+                )
                 consumedAttributes.add(name)
             }
         }
@@ -643,21 +821,40 @@ class KtxCallResolver(
                 }
             }
             if (resolvedCall != null) {
-                results.add(ValidatedAssignment(
-                    validationType = when {
-                        attributesUsedInCall.contains(CHILDREN_KEY) -> ValidationType.UPDATE
-                        else -> ValidationType.SET
-                    },
-                    assignment = resolvedCall,
-                    attribute = AttributeNode(
-                        name = CHILDREN_KEY,
-                        expression = children.value,
-                        type = resolvedCall.resultingDescriptor.valueParameters.first().type,
-                        descriptor = resolvedCall.resultingDescriptor,
-                        isStatic = false /* children.value.isConstant() */
-                    ),
-                    validationCall = null // TODO(lmr)
-                ))
+
+                val validationType = when {
+                    attributesUsedInCall.contains(CHILDREN_KEY) -> ValidationType.UPDATE
+                    else -> ValidationType.SET
+                }
+
+                val attrType = resolvedCall.resultingDescriptor.valueParameters.first().type
+
+                val validationCall = resolveValidationCall(
+                    expressionToReportErrorsOn,
+                    receiverScope,
+                    validationType,
+                    attrType,
+                    children.value,
+                    context
+                )
+
+                results.add(
+                    ValidatedAssignment(
+                        validationType = when {
+                            attributesUsedInCall.contains(CHILDREN_KEY) -> ValidationType.UPDATE
+                            else -> ValidationType.SET
+                        },
+                        assignment = resolvedCall,
+                        attribute = AttributeNode(
+                            name = CHILDREN_KEY,
+                            expression = children.value,
+                            type = resolvedCall.resultingDescriptor.valueParameters.first().type,
+                            descriptor = resolvedCall.resultingDescriptor,
+                            isStatic = false /* children.value.isConstant() */
+                        ),
+                        validationCall = validationCall
+                    )
+                )
                 consumedAttributes.add(CHILDREN_KEY)
             }
         }
@@ -682,7 +879,7 @@ class KtxCallResolver(
         valueExpr: KtExpression,
         expectedTypes: MutableCollection<KotlinType>,
         context: ExpressionTypingContext
-    ) : ResolvedCall<*>? {
+    ): ResolvedCall<*>? {
         val setterName = Name.identifier(R4aUtils.setterMethodFromPropertyName(name))
         val ambiguousReferences = mutableSetOf<DeclarationDescriptor>()
 
@@ -774,7 +971,7 @@ class KtxCallResolver(
         valueExpr: KtExpression,
         expectedTypes: MutableCollection<KotlinType>,
         context: ExpressionTypingContext
-    ) : ResolvedCall<*>? {
+    ): ResolvedCall<*>? {
         val ambiguousReferences = mutableSetOf<DeclarationDescriptor>()
 
         if (valueExpr === keyExpr) {
@@ -894,8 +1091,6 @@ class KtxCallResolver(
         expectedTypes: MutableCollection<KotlinType>,
         context: ExpressionTypingContext
     ): ResolvedCall<*>? {
-        // TODO(lmr): should we use FakeCallResolver here???
-
         val setterName = childrenDescriptor.name
 
         val valueArguments = listOf(CallMaker.makeValueArgument(childrenExpr))
@@ -937,15 +1132,6 @@ class KtxCallResolver(
         temporaryForFunction.commit()
 
         return resolvedCall
-
-//        return KtxAttributeInfo(
-//            name = name,
-//            type = resolvedCall.resultingDescriptor.valueParameters[0].type,
-//            descriptor = resolvedCall.resultingDescriptor,
-//            setterResolvedCall = resolvedCall,
-//            isIncludedInConstruction = attributesInConstruction.contains(name),
-//            isPivotal = false
-//        )
     }
 
     private fun resolveChildrenAsProperty(
@@ -1042,12 +1228,19 @@ class KtxCallResolver(
 //        )
     }
 
+    private class TempParameterInfo(
+        val attribute: AttributeInfo,
+        val descriptor: DeclarationDescriptor,
+        val type: KotlinType
+    )
+
     private fun resolveCandidate(
         kind: ResolveKind,
         candidate: ResolvedCall<*>,
         original: Call,
         attributes: Map<String, AttributeInfo>,
         usedAttributes: MutableSet<String>,
+        usedAttributeInfos: MutableList<TempParameterInfo>,
         context: ExpressionTypingContext
     ): ResolvedCall<*>? {
         val valueArguments = mutableListOf<ValueArgument>()
@@ -1059,7 +1252,7 @@ class KtxCallResolver(
             val attr = attributes[name]
             var arg: ValueArgument? = null
 
-            if (arg == null && isChildrenParameter(param)) {
+            if (arg == null && isAnnotatedAsChildren(param)) {
                 val childrenAttr = attributes[CHILDREN_KEY]
                 if (childrenAttr != null) {
                     usedAttributes.add(CHILDREN_KEY)
@@ -1069,12 +1262,19 @@ class KtxCallResolver(
 
             if (arg == null && attr != null) {
                 usedAttributes.add(name)
+                usedAttributeInfos.add(
+                    TempParameterInfo(
+                        attribute = attr,
+                        descriptor = param,
+                        type = param.type
+                    )
+                )
                 context.trace.record(BindingContext.REFERENCE_TARGET, attr.key, param)
                 arg = attr.makeArgumentValue()
             }
 
-            if (arg == null && isContextParameter(param)) {
-                arg = CONTEXT_ARGUMENT
+            if (arg == null && isImplicitConstructorParam(param, referencedDescriptor)) {
+                arg = ImplicitCtorValueArgument(param.type)
             }
 
             if (arg != null) {
@@ -1148,21 +1348,7 @@ class KtxCallResolver(
     }
 
     companion object {
-        private val CONTEXT_ARGUMENT = object : ValueArgument {
-            override fun getArgumentExpression(): KtExpression? = null
-            override fun getArgumentName(): ValueArgumentName? = null
-            override fun isNamed(): Boolean = false
-            override fun asElement(): KtElement = error("tried to get element")
-            override fun getSpreadElement(): LeafPsiElement? = null
-            override fun isExternal(): Boolean = true
-        }
-
-        private fun isContextParameter(it: ValueParameterDescriptor): Boolean {
-            // TODO(lmr): need better approach for this
-            return it.type.constructor.declarationDescriptor?.fqNameSafe == CONTEXT_FQNAME
-        }
-
-        private fun isChildrenParameter(it: ValueParameterDescriptor): Boolean {
+        private fun isAnnotatedAsChildren(it: Annotated): Boolean {
             return it.annotations.findAnnotation(CHILDREN_FQNAME) != null
         }
 
@@ -1173,32 +1359,294 @@ class KtxCallResolver(
         private fun Annotated.hasChildrenAnnotation(): Boolean = annotations.findAnnotation(CHILDREN_FQNAME) != null
 
         private val CHILDREN_KEY = "<children>"
-        private val CONTEXT_KEY = "<context>"
 
         private val COMPOSABLE_FQNAME = R4aUtils.r4aFqName("Composable")
         private val PIVOTAL_FQNAME = R4aUtils.r4aFqName("Pivotal")
         private val CHILDREN_FQNAME = R4aUtils.r4aFqName("Children")
         private val EMITTABLE_FQNAME = R4aUtils.r4aFqName("Emittable")
-        private val CONTEXT_FQNAME = FqName("android.content.Context")
 
         private val COMPOSER_NAME = Name.identifier("composer")
         private val EMIT_NAME = Name.identifier("emit")
-        private val MEMOIZE_NAME = Name.identifier("memoize")
+        private val CALL_NAME = Name.identifier("call")
         private val JOINKEY_NAME = Name.identifier("joinKey")
         private val CTOR_PARAMETER_NAME = Name.identifier("ctor")
         private val CHILDREN_PARAMETER_NAME = Name.identifier("children")
     }
-/*
-    private fun makeComposerCall(
-        callExpression: KtExpression,
-        callElement: KtElement,
+
+    private fun isImplicitConstructorParam(
+        param: ValueParameterDescriptor,
+        fnDescriptor: CallableDescriptor
+    ): Boolean {
+        val returnType = fnDescriptor.returnType ?: return false
+        val paramType = param.type
+        for ((upperBounds, implicitTypes) in emittableTypeToImplicitCtorTypes) {
+            if (!implicitTypes.any { it.isSubtypeOf(paramType) }) continue
+            if (!returnType.satisfiesConstraintsOf(upperBounds)) continue
+            return true
+        }
+        return false
+    }
+
+    private var uniqueName: () -> String = ({
+        var i = 100000
+        { "tmpVar${i++}" }
+    }())
+
+    private fun makeValueArgument(type: KotlinType, context: ExpressionTypingContext): ValueArgument {
+        val fakeExpr = psiFactory.createSimpleName(uniqueName())
+
+        context.trace.record(
+            BindingContext.EXPRESSION_TYPE_INFO, fakeExpr, KotlinTypeInfo(
+                type = type,
+                dataFlowInfo = DataFlowInfo.EMPTY,
+                jumpOutPossible = false,
+                jumpFlowInfo = DataFlowInfo.EMPTY
+            )
+        )
+
+        return CallMaker.makeValueArgument(fakeExpr)
+    }
+
+    private fun resolveJoinKey(
+        expressionToReportErrorsOn: KtExpression,
         context: ExpressionTypingContext
-    ) = makeCall(
-        callElement = callElement,
-        calleeExpression = callExpression,
-        receiver = ExpressionReceiver.create(callExpression, composerType, context.trace.bindingContext)
+    ): ResolvedCall<*>? {
+
+        return resolveSubstitutableComposerMethod(
+            JOINKEY_NAME,
+            listOf(
+                builtIns.anyType,
+                builtIns.anyType
+            ),
+            null,
+            expressionToReportErrorsOn,
+            context
+        )
+    }
+
+    private fun resolveComposerEmit(
+        implicitCtorTypes: List<KotlinType>,
+        constructedType: KotlinType,
+        hasBody: Boolean,
+        expressionToReportErrorsOn: KtExpression,
+        context: ExpressionTypingContext
+    ): ResolvedCall<*>? {
+        return resolveSubstitutableComposerMethod(
+            EMIT_NAME,
+            listOfNotNull(
+                builtIns.anyType,
+                functionType(
+                    parameterTypes = implicitCtorTypes,
+                    returnType = constructedType
+                ),
+                functionType(),
+                if (hasBody) functionType() else null
+            ),
+            constructedType,
+            expressionToReportErrorsOn,
+            context
+        )
+    }
+
+    private val builtIns = DefaultBuiltIns.Instance
+
+    private fun functionType(
+        parameterTypes: List<KotlinType> = emptyList(),
+        returnType: KotlinType = builtIns.unitType,
+        receiverType: KotlinType? = null
+    ): KotlinType = createFunctionType(
+        builtIns = builtIns,
+        annotations = Annotations.EMPTY,
+        parameterNames = null,
+        parameterTypes = parameterTypes,
+        receiverType = receiverType,
+        returnType = returnType
     )
-*/
+
+    private fun resolveComposerCall(
+        constructedType: KotlinType?,
+        expressionToReportErrorsOn: KtExpression,
+        context: ExpressionTypingContext
+    ): ResolvedCall<*>? {
+
+        // call signature is:
+        // ==================
+        // key: Any, invalid: V.() -> Boolean, block: () -> Unit
+        // key: Any, ctor: () -> T, invalid: V.(T) -> Boolean, block: (T) -> Unit
+
+        return resolveSubstitutableComposerMethod(
+            CALL_NAME,
+            listOfNotNull(
+                builtIns.anyType,
+                constructedType?.let {
+                    functionType(returnType = constructedType)
+                },
+                functionType(
+                    parameterTypes = listOfNotNull(constructedType),
+                    returnType = builtIns.booleanType
+                ),
+                functionType(parameterTypes = listOfNotNull(constructedType))
+            ),
+            constructedType,
+            expressionToReportErrorsOn,
+            context
+        )
+    }
+
+    private fun resolveValidationCall(
+        expressionToReportErrorsOn: KtExpression,
+        receiverScope: KotlinType?,
+        validationType: ValidationType,
+        attrType: KotlinType,
+        valueExpr: KtExpression,
+        context: ExpressionTypingContext
+    ): ResolvedCall<*>? {
+
+        if (receiverScope == null) return null
+
+        val temporaryForVariable = TemporaryTraceAndCache.create(
+            context, "trace to resolve variable", expressionToReportErrorsOn
+        )
+        val contextToUse = context.replaceTraceAndCache(temporaryForVariable)
+
+        val name = validationType.name.toLowerCase()
+        val includeLambda = validationType != ValidationType.CHANGED
+
+        val calleeExpression = psiFactory.createSimpleName(name)
+
+        val call = makeCall(
+            callElement = expressionToReportErrorsOn,
+            calleeExpression = calleeExpression,
+            valueArguments = listOfNotNull(
+                CallMaker.makeValueArgument(valueExpr),
+                if (includeLambda) makeValueArgument(functionType(parameterTypes = listOf(attrType)), contextToUse)
+                else null
+            ),
+            receiver = TransientReceiver(receiverScope)
+        )
+
+        // ValidatorType.set(AttrType, (AttrType) -> Unit): Boolean
+        // ValidatorType.update(AttrType, (AttrType) -> Unit): Boolean
+        // ValidatorType.changed(AttrType): Boolean
+
+        val results = callResolver.resolveCallWithGivenName(
+            BasicCallResolutionContext.create(
+                contextToUse,
+                call,
+                CheckArgumentTypesMode.CHECK_VALUE_ARGUMENTS,
+                DataFlowInfoForArgumentsImpl(contextToUse.dataFlowInfo, call)
+            ),
+            call,
+            calleeExpression,
+            Name.identifier(name)
+        )
+
+        if (results.isSuccess) return results.resultingCall
+
+        return null
+    }
+
+    private fun resolveSubstitutableComposerMethod(
+        methodName: Name,
+        argumentTypes: List<KotlinType>,
+        typeToSubstitute: KotlinType?,
+        expressionToReportErrorsOn: KtExpression,
+        context: ExpressionTypingContext
+    ): ResolvedCall<*>? {
+        val temporaryForVariable = TemporaryTraceAndCache.create(
+            context, "trace to resolve variable", expressionToReportErrorsOn
+        )
+        val contextToUse = context.replaceTraceAndCache(temporaryForVariable)
+
+        val composerExpr = psiFactory.createSimpleName(methodName.asString())
+
+        val call = makeCall(
+            callElement = expressionToReportErrorsOn,
+            calleeExpression = composerExpr,
+            receiver = TransientReceiver(composerType),
+            valueArguments = argumentTypes.map { makeValueArgument(it, contextToUse) }
+        )
+
+        val results = callResolver.resolveCallWithGivenName(
+            BasicCallResolutionContext.create(
+                contextToUse,
+                call,
+                CheckArgumentTypesMode.CHECK_VALUE_ARGUMENTS,
+                DataFlowInfoForArgumentsImpl(contextToUse.dataFlowInfo, call)
+            ),
+            call,
+            composerExpr,
+            methodName
+        )
+
+        if (results.isSuccess) return results.resultingCall
+
+        if (typeToSubstitute == null) return null
+
+        val candidates = if (context.collectAllCandidates) results.allCandidates ?: emptyList() else results.resultingCalls
+
+        for (candidate in candidates) {
+
+            val T = candidate.typeArguments.keys.singleOrNull() ?: continue
+
+            if (!typeToSubstitute.satisfiesConstraintsOf(T)) continue
+
+            val nextTempTrace = TemporaryTraceAndCache.create(
+                context, "trace to resolve variable", expressionToReportErrorsOn
+            )
+
+            val nextContext = context
+                .replaceTraceAndCache(nextTempTrace)
+                .replaceCollectAllCandidates(false)
+
+            val substitutor = TypeSubstitutor.create(
+                mapOf(
+                    T.typeConstructor to typeToSubstitute.asTypeProjection()
+                )
+            )
+
+            val nextCall = makeCall(
+                callElement = expressionToReportErrorsOn,
+                calleeExpression = composerExpr,
+                receiver = TransientReceiver(composerType),
+                valueArguments = candidate.candidateDescriptor.valueParameters.map { makeValueArgument(it.type, nextContext) }
+            )
+
+            val nextResults = callResolver.resolveCallWithKnownCandidate(
+                nextCall,
+                TracingStrategyImpl.create(composerExpr, nextCall),
+                BasicCallResolutionContext.create(
+                    nextContext,
+                    nextCall,
+                    CheckArgumentTypesMode.CHECK_VALUE_ARGUMENTS,
+                    DataFlowInfoForArgumentsImpl(nextContext.dataFlowInfo, nextCall)
+                ),
+                ResolutionCandidate.create(
+                    nextCall,
+                    candidate.candidateDescriptor,
+                    candidate.dispatchReceiver,
+                    candidate.explicitReceiverKind,
+                    substitutor
+                ),
+                DataFlowInfoForArgumentsImpl(nextContext.dataFlowInfo, nextCall)
+            )
+
+            if (nextResults.isSuccess) {
+                nextTempTrace.commit()
+                return nextResults.resultingCall
+            }
+        }
+
+        return if (context.collectAllCandidates) null
+        else resolveSubstitutableComposerMethod(
+            methodName,
+            argumentTypes,
+            typeToSubstitute,
+            expressionToReportErrorsOn,
+            context.replaceCollectAllCandidates(true)
+        )
+    }
+
     private fun makeCall(
         callElement: KtElement,
         calleeExpression: KtExpression? = null,
@@ -1243,33 +1691,6 @@ class KtxCallResolver(
             NewResolutionOldInference.ResolutionKind.Variable
         )
     }
-/*
-    private fun resolveMethod(
-        type: KotlinType,
-        name: Name,
-        tagExpr: KtExpression,
-        element: KtxElement,
-        context: ExpressionTypingContext
-    ): OverloadResolutionResults<FunctionDescriptor> {
-        val temporaryForFunction = TemporaryTraceAndCache.create(
-            context, "trace to resolve composer", tagExpr
-        )
-        val call = makeComposerCall(tagExpr, element, context)
-        return callResolver.computeTasksAndResolveCall<FunctionDescriptor>(
-            BasicCallResolutionContext.create(
-                context.replaceTraceAndCache(temporaryForFunction),
-                call,
-                CheckArgumentTypesMode.CHECK_CALLABLE_TYPE,
-                DataFlowInfoForArgumentsImpl(context.dataFlowInfo, call)
-            ),
-            name,
-            TracingStrategy.EMPTY,
-            NewResolutionOldInference.ResolutionKind.Function
-        )
-    }
-*/
-
-
 
     private fun KtQualifiedExpression.elementChain(context: ExpressionTypingContext) {
         val moduleDescriptor = context.scope.ownerDescriptor.module
@@ -1353,137 +1774,20 @@ class KtxCallResolver(
             trace.record(BindingContext.QUALIFIER, qualifier.expression, qualifier)
         }
     }
-/*
-    private fun resolveQualifiedName(
-        expression: KtQualifiedExpression,
-        context: ExpressionTypingContext
-    ): KtxTagResolveInfo? {
-        val currentContext = context
-            .replaceExpectedType(TypeUtils.NO_EXPECTED_TYPE)
-            .replaceContextDependency(ContextDependency.INDEPENDENT)
+}
 
-        expression.elementChain(currentContext)
+private fun KotlinType.satisfiesConstraintsOf(T: TypeParameterDescriptor): Boolean {
+    return T.upperBounds.all { isSubtypeOf(it) }
+}
 
-        val selector = expression.selectorExpression
-        val receiverExpr = expression.receiverExpression
-
-        val receiverTypeInfo = when (context.trace.get(BindingContext.QUALIFIER, receiverExpr)) {
-            null -> facade.getTypeInfo(receiverExpr, currentContext)
-            else -> KotlinTypeInfo(null, currentContext.dataFlowInfo)
-        }
-
-        // TODO(lmr): inspect jumps and nullability. We cant allow tags that can be null or return early
-        val receiverType = receiverTypeInfo.type
-            ?: ErrorUtils.createErrorType("Type for " + receiverExpr.text)
-
-        val receiver = context.trace.get(BindingContext.QUALIFIER, receiverExpr)
-            ?: ExpressionReceiver.create(receiverExpr, receiverType, context.trace.bindingContext)
-
-//        return when (selector) {
-//            is KtSimpleNameExpression -> resolveFunction(receiver, receiverExpr, selector, context, null)
-//            else -> null
-//        }
-        return null
-    }
-*/
-    /*private fun resolveComposer(
-        tagExpr: KtExpression,
-        element: KtxElement,
-        context: ExpressionTypingContext
-    ): KtxComposerInfo? {
-        val resolvedContextProperty = resolveVar(COMPOSER_NAME, tagExpr, context)
-        if (!resolvedContextProperty.isSuccess) return null
-
-        val descriptor = resolvedContextProperty.resultingCall.resultingDescriptor
-
-        val type = when (descriptor) {
-            is PropertyDescriptor -> descriptor.type
-            is VariableDescriptor -> descriptor.type
-            else -> return null
-        }
-
-
-//        val getter = (resolvedContextProperty.resultingCall.resultingDescriptor as? PropertyDescriptor)?.getter
-//        if (getter == null) return null
-//
-//        val type = getter.returnType
-//        if (type != null) {
-
-        // TODO(b/???): This parameter types of the emits are not validated and will generate a runtime error if not correct.
-        val emitResult = resolveMethod(type, EMIT_NAME, tagExpr, element, context)
-
-        // Calculate emit descriptors
-        val simpleEmitMap = mutableMapOf<KotlinType, ResolvedCall<*>>()
-        val compoundEmitMap = mutableMapOf<KotlinType, ResolvedCall<*>>()
-        if (emitResult.isSuccess || emitResult.isIncomplete || emitResult.isAmbiguity) {
-            val emitCalls = emitResult.resultingCalls.filter {
-                it.resultingDescriptor.valueParameters.let {
-                    it.size >= 3 && it.size <= 4
-                }
-            }
-
-            for (emitCall in emitCalls) {
-                val ctor = emitCall.candidateDescriptor.valueParameters.find { it.name == CTOR_PARAMETER_NAME }
-                if (ctor != null) {
-                    val children = emitCall.candidateDescriptor.valueParameters.find { it.name == CHILDREN_PARAMETER_NAME }
-                    if (ctor.type.isFunctionTypeOrSubtype) {
-                        val ctorResult = ctor.type.getReturnTypeFromFunctionType()
-                        val constraint: Collection<KotlinType> = if (ctorResult.isTypeParameter()) {
-                            TypeUtils.getTypeParameterDescriptorOrNull(ctorResult)?.upperBounds ?: emptyList()
-                        } else {
-                            listOf(ctorResult)
-                        }
-                        val map = if (children != null) compoundEmitMap else simpleEmitMap
-                        for (constraintType in constraint)
-                            map[constraintType] = emitCall
-                    }
-                }
-            }
-        }
-
-        // Calculate memoization calls
-        var statelessMemoize: ResolvedCall<*>? = null
-        var statefullMemoize: ResolvedCall<*>? = null
-        val memoizeResult = resolveMethod(type, MEMOIZE_NAME, tagExpr, element, context)
-        if (memoizeResult.isSuccess || memoizeResult.isIncomplete || memoizeResult.isAmbiguity) {
-            val memoizeCalls = memoizeResult.resultingCalls.filter {
-                it.resultingDescriptor.valueParameters.let {
-                    it.size >= 3 && it.size <= 4
-                }
-            }
-
-            for (memoizeCall in memoizeCalls) {
-                if (memoizeCall.candidateDescriptor.valueParameters.find { it.name == CTOR_PARAMETER_NAME } != null) {
-                    statefullMemoize = memoizeCall
-                } else {
-                    statelessMemoize = memoizeCall
-                }
-
-            }
-        }
-
-
-        // Calculate joinKey
-        val joinKey: ResolvedCall<*>? = resolveMethod(type, JOINKEY_NAME, tagExpr, element, context).let {
-            if (it.isSuccess || it.isIncomplete) it.resultingCall else null
-        }
-
-        return KtxComposerInfo(
-            type = type,
-            descriptor = descriptor,
-            simpleEmitMap = simpleEmitMap,
-            compoundEmitMap = compoundEmitMap,
-            statelessMemoize = statelessMemoize ?: statefullMemoize,
-            statefullMemoize = statefullMemoize,
-            joinKey = joinKey
-        )
-    }*/
+private fun KotlinType.satisfiesConstraintsOf(bounds: List<KotlinType>): Boolean {
+    return bounds.all { isSubtypeOf(it) }
 }
 
 // We want to return null in cases where types mismatch, so we use this heuristic to find out. I think there might be a more robust
 // way to find this out, but I'm not sure what it would be
 private fun BindingTrace.hasTypeMismatchErrorsOn(element: KtElement): Boolean =
-    bindingContext.diagnostics.forElement(element).filter { it.severity == Severity.ERROR }.isNotEmpty()
+    bindingContext.diagnostics.forElement(element).any { it.severity == Severity.ERROR }
 
 private fun KtExpression.asQualifierPartList(): List<QualifiedExpressionResolver.QualifierPart> {
     val result = SmartList<QualifiedExpressionResolver.QualifierPart>()
