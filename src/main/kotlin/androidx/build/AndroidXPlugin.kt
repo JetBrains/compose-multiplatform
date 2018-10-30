@@ -16,6 +16,7 @@
 
 package androidx.build
 
+import androidx.build.dokka.Dokka
 import androidx.build.SupportConfig.BUILD_TOOLS_VERSION
 import androidx.build.SupportConfig.CURRENT_SDK_VERSION
 import androidx.build.SupportConfig.DEFAULT_MIN_SDK_VERSION
@@ -112,6 +113,7 @@ class AndroidXPlugin : Plugin<Project> {
         tasks.all { task ->
             if (task.name.startsWith(Release.DIFF_TASK_PREFIX) ||
                     "distDocs" == task.name ||
+                    Dokka.ARCHIVE_TASK_NAME == task.name ||
                     "dejetifyArchive" == task.name ||
                     CheckExternalDependencyLicensesTask.TASK_NAME == task.name) {
                 buildOnServerTask.dependsOn(task)
@@ -154,6 +156,7 @@ class AndroidXPlugin : Plugin<Project> {
         project.createClockLockTasks()
 
         AffectedModuleDetector.configure(gradle, this)
+
     }
 
     private fun Project.configureAndroidCommonOptions(extension: BaseExtension) {
