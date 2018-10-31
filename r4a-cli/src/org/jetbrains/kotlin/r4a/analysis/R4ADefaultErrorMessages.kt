@@ -71,16 +71,6 @@ object R4ADefaultErrorMessages : DefaultErrorMessages.Extension {
             Renderers.STRING
         )
         MAP.put(
-            R4AErrors.CHILDREN_INVOCATION,
-            "Suspicious invocation; consider using the <{0} /> syntax instead",
-            Renderers.STRING
-        )
-        MAP.put(
-            R4AErrors.CHILDREN_NOT_COMPOSABLE,
-            "Suspicious definition; consider making {0} composable by adding an @Composable annotation to the type.  Recommended type: `@Composable() ()->Unit`",
-            Renderers.STRING
-        )
-        MAP.put(
             R4AErrors.NON_COMPOSABLE_INVOCATION,
             "{0} `{1}` must be marked as @Composable in order to be used as a KTX tag",
             Renderers.STRING,

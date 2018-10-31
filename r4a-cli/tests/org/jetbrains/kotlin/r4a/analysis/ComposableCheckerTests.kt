@@ -248,26 +248,14 @@ class ComposableCheckerTests: AbstractR4aDiagnosticsTest() {
 
     fun testComposableReporting012() {
         doTest(
-            MODE_CHECKED, """
+            MODE_ALL, """
             import com.google.r4a.*;
             import android.widget.TextView;
 
             class MyComponent : Component() {
                 @Children lateinit var children: ()->Unit
                 override fun compose() {
-                    <!CHILDREN_INVOCATION!>children<!>()
-                }
-            }
-        """)
-        doTest(
-            MODE_STRICT or MODE_PEDANTIC, """
-            import com.google.r4a.*;
-            import android.widget.TextView;
-
-            class MyComponent : Component() {
-                @Children lateinit var children: <!CHILDREN_NOT_COMPOSABLE!>()->Unit<!>
-                override fun compose() {
-                    <!CHILDREN_INVOCATION!>children<!>()
+                    <!SVC_INVOCATION!>children<!>()
                 }
             }
         """)
@@ -279,7 +267,7 @@ class ComposableCheckerTests: AbstractR4aDiagnosticsTest() {
             import android.widget.TextView;
 
             class MyComponent : Component() {
-                @Children lateinit var children: (value: Int)->Unit
+                @Children(composable=false) lateinit var children: (value: Int)->Unit
                 override fun compose() {
                     children(5)
                 }
@@ -295,7 +283,7 @@ class ComposableCheckerTests: AbstractR4aDiagnosticsTest() {
             class MyReceiver {}
 
             class MyComponent : Component() {
-                @Children lateinit var children: MyReceiver.()->Unit
+                @Children(composable=false) lateinit var children: MyReceiver.()->Unit
                 override fun compose() {
                     MyReceiver().children()
                 }
@@ -377,13 +365,35 @@ class ComposableCheckerTests: AbstractR4aDiagnosticsTest() {
     }
 
     fun testComposableReporting017() {
-        doTest(MODE_STRICT or MODE_PEDANTIC, """
+        doTest(
+            MODE_CHECKED, """
             import com.google.r4a.*;
+            import android.widget.LinearLayout;
             import android.widget.TextView;
 
-            class MyComponent : Component() {
-                @Children lateinit var children: <!CHILDREN_NOT_COMPOSABLE!>()->Unit<!>
-                override fun compose() {}
+            @Composable
+            fun Foo(@Children(composable=false) children: ()->Unit) {
+                children()
+            }
+
+            @Composable
+            fun main() {
+                <Foo><TextView text="Hello" /></Foo>
+            }
+        """)
+        doTest(MODE_STRICT or MODE_PEDANTIC, """
+            import com.google.r4a.*;
+            import android.widget.LinearLayout;
+            import android.widget.TextView;
+
+            @Composable
+            fun Foo(@Children(composable=false) children: ()->Unit) {
+                children()
+            }
+
+            @Composable
+            fun main() {
+                <Foo><!KTX_IN_NON_COMPOSABLE!><TextView text="Hello" /><!></Foo>
             }
         """)
     }
@@ -554,6 +564,144 @@ class ComposableCheckerTests: AbstractR4aDiagnosticsTest() {
                         <TextView text="Hello Jim!" />
                     }
                 </LinearLayout>
+            }
+        """)
+    }
+
+    fun testComposableReporting028() {
+        doTest(
+            MODE_CHECKED or MODE_STRICT, """
+            import com.google.r4a.Composable;
+            import android.widget.TextView;
+
+            fun foo(v: @Composable() ()->Unit) {
+                val myVariable: ()->Unit = v
+                myVariable()
+            }
+        """)
+        doTest(MODE_PEDANTIC, """
+            import com.google.r4a.Composable;
+            import android.widget.TextView;
+
+            fun foo(v: @Composable() ()->Unit) {
+                val myVariable: ()->Unit = <!TYPE_INFERENCE_EXPECTED_TYPE_MISMATCH!>v<!>
+                myVariable()
+            }
+        """)
+    }
+
+    fun testComposableReporting029() {
+        doTest(
+            MODE_CHECKED or MODE_STRICT, """
+            import com.google.r4a.Composable;
+            import android.widget.TextView;
+
+            @Composable
+            fun foo(v: ()->Unit) {
+                val myVariable: @Composable() ()->Unit = v;
+                <myVariable />
+            }
+        """)
+        doTest(MODE_PEDANTIC, """
+            import com.google.r4a.Composable;
+            import android.widget.TextView;
+
+            @Composable
+            fun foo(v: ()->Unit) {
+                val myVariable: @Composable() ()->Unit = <!TYPE_INFERENCE_EXPECTED_TYPE_MISMATCH!>v<!>;
+                <myVariable />
+            }
+        """)
+    }
+
+    fun testComposableReporting030() {
+        doTest(
+            MODE_ALL, """
+            import com.google.r4a.Composable;
+            import android.widget.TextView;
+
+            @Composable
+            fun foo() {
+                val myVariable: @Composable() ()->Unit = {};
+                <myVariable />
+            }
+        """)
+    }
+
+    fun testComposableReporting031() {
+        doTest(
+            MODE_STRICT or MODE_PEDANTIC, """
+            import com.google.r4a.Composable;
+            import android.widget.TextView;
+
+            fun foo() {
+                val myVariable: ()->Unit = <!KTX_IN_NON_COMPOSABLE!>{ <TextView text="Hello" /> }<!>;
+                myVariable();
+            }
+        """)
+    }
+
+    fun testComposableReporting032() {
+        doTest(
+            MODE_ALL, """
+            import com.google.r4a.Composable;
+            import com.google.r4a.Children;
+            import android.widget.TextView;
+
+            @Composable
+            fun MyComposable(@Children children: ()->Unit) { <children /> }
+
+            @Composable
+            fun foo() {
+                <MyComposable><TextView text="Hello" /></MyComposable>
+            }
+        """)
+    }
+
+    fun testComposableReporting033() {
+        doTest(
+            MODE_ALL, """
+            import com.google.r4a.Composable;
+            import com.google.r4a.Children;
+            import android.widget.TextView;
+
+            @Composable
+            fun MyComposable(@Children children: ()->Unit) { <children /> }
+
+            @Composable
+            fun foo() {
+                <MyComposable children={<TextView text="Hello" />} />
+            }
+        """)
+    }
+
+    fun testComposableReporting034() {
+        doTest(
+            MODE_CHECKED or MODE_STRICT, """
+            import com.google.r4a.Composable;
+            import com.google.r4a.Children;
+            import android.widget.TextView;
+
+            fun identity(f: ()->Unit): ()->Unit { return f; }
+
+            @Composable
+            fun test(f: @Composable() ()->Unit) {
+                val f2: @Composable() ()->Unit = identity(f);
+                <f2 />
+            }
+        """)
+        doTest(
+            MODE_PEDANTIC, """
+            import com.google.r4a.Composable;
+            import com.google.r4a.Children;
+            import android.widget.TextView;
+
+            fun identity(f: ()->Unit): ()->Unit { return f; }
+
+            @Composable
+            fun test(f: @Composable() ()->Unit) {
+                val f2: @Composable() ()->Unit = <!TYPE_INFERENCE_EXPECTED_TYPE_MISMATCH!>identity(<!TYPE_INFERENCE_EXPECTED_TYPE_MISMATCH!>f<!>)<!>;
+                <f2 />
             }
         """)
     }
