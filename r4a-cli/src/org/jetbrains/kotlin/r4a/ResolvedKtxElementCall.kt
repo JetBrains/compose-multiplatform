@@ -1,6 +1,7 @@
 package org.jetbrains.kotlin.r4a.ast
 
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.descriptors.FunctionDescriptor
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.renderer.ClassifierNamePolicy
 import org.jetbrains.kotlin.renderer.DescriptorRenderer
@@ -78,6 +79,7 @@ class ValidatedAssignment(
 
 class ComposerCallInfo(
     val composerCall: ResolvedCall<*>?,
+    val functionDescriptors: List<FunctionDescriptor?>,
     val pivotals: List<AttributeNode>,
     val joinKeyCall: ResolvedCall<*>?,
     val ctorCall: ResolvedCall<*>?,
@@ -94,7 +96,8 @@ sealed class CallNode : EmitOrCallNode()
 
 class NonMemoizedCallNode(
     val resolvedCall: ResolvedCall<*>,
-    val params: List<AttributeNode>
+    val params: List<ValueNode>,
+    val nextCall: NonMemoizedCallNode?
 ) : CallNode() {
     override fun allAttributes(): List<ValueNode> = params
 }
@@ -130,17 +133,18 @@ fun ComposerCallInfo?.consumedAttributes(): List<AttributeNode> {
 fun EmitOrCallNode?.consumedAttributes(): List<AttributeNode> {
     return when (this) {
         is MemoizedCallNode -> memoize.consumedAttributes() + call.consumedAttributes()
-        is NonMemoizedCallNode -> params
+        is NonMemoizedCallNode -> params.mapNotNull { it as? AttributeNode } + (nextCall?.consumedAttributes() ?: emptyList())
         is EmitCallNode -> memoize.consumedAttributes()
         null -> emptyList()
     }
 }
 
 
-fun NonMemoizedCallNode.print() = buildString {
+fun NonMemoizedCallNode.print(): String = buildString {
     self("NonMemoizedCallNode")
     attr("resolvedCall", resolvedCall) { it.print() }
     attr("params", params) { it.print() }
+    attr("nextCall", nextCall) { it.print() }
 }
 
 fun List<ValueNode>.print(): String {
@@ -188,6 +192,7 @@ fun ResolvedKtxElementCall.print() = buildString {
 fun ComposerCallInfo.print() = buildString {
     self("ComposerCallInfo")
     attr("composerCall", composerCall) { it.print() }
+//    list("composerCall", functionDescriptors) { if (it != null) DESC_RENDERER.render(it) else "<null>" }
     attr("pivotals", pivotals) { it.print() }
     attr("joinKeyCall", joinKeyCall) { it.print() }
     attr("ctorCall", ctorCall) { it.print() }
