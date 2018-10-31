@@ -26,12 +26,8 @@ import org.jetbrains.kotlin.types.typeUtil.replaceAnnotations
  */
 class R4aTypeResolutionInterceptorExtension : TypeResolutionInterceptorExtension {
 
-    override fun interceptType(element: KtElement, context: ExpressionTypingContext, type: KotlinType): KotlinType {
-        if(type == null || type === TypeUtils.NO_EXPECTED_TYPE) return type
-        if(element !is KtLambdaExpression) return type
-        val module = context.scope.ownerDescriptor.module
-        val checker = StorageComponentContainerContributor.getInstances(element.project).single { it is ComposableAnnotationChecker } as ComposableAnnotationChecker
-        if(element is KtLambdaExpression && (checker.hasComposableAnnotation(context.expectedType) || checker.analyze(context.trace, element, type))) {
+    companion object {
+        fun makeComposable(module: ModuleDescriptor, type: KotlinType): KotlinType {
             val annotation = object : AnnotationDescriptor {
                 override val type: KotlinType get() = module.findClassAcrossModuleDependencies(ClassId.topLevel(R4aUtils.r4aFqName("Composable")))!!.defaultType
                 override val allValueArguments: Map<Name, ConstantValue<*>> get() = emptyMap()
@@ -39,6 +35,16 @@ class R4aTypeResolutionInterceptorExtension : TypeResolutionInterceptorExtension
                 override fun toString() = "[@Composable]"
             }
             return type.replaceAnnotations(Annotations.create(type.annotations + annotation))
+        }
+    }
+
+    override fun interceptType(element: KtElement, context: ExpressionTypingContext, type: KotlinType): KotlinType {
+        if(type == null || type === TypeUtils.NO_EXPECTED_TYPE) return type
+        if(element !is KtLambdaExpression) return type
+        val module = context.scope.ownerDescriptor.module
+        val checker = StorageComponentContainerContributor.getInstances(element.project).single { it is ComposableAnnotationChecker } as ComposableAnnotationChecker
+        if(element is KtLambdaExpression && (checker.hasComposableAnnotation(context.expectedType) || checker.analyze(context.trace, element, type) != ComposableAnnotationChecker.Composability.NOT_COMPOSABLE)) {
+            return makeComposable(module, type)
         }
         return type
     }

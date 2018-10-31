@@ -25,8 +25,6 @@ public interface R4AErrors {
     DiagnosticFactory2<KtElement, KotlinType, Collection<KotlinType>> INVALID_TAG_TYPE = DiagnosticFactory2.create(ERROR);
     DiagnosticFactory1<KtElement, Collection<KotlinType>> INVALID_TAG_DESCRIPTOR = DiagnosticFactory1.create(ERROR);
     DiagnosticFactory1<KtElement, String> SVC_INVOCATION = DiagnosticFactory1.create(ERROR);
-    DiagnosticFactory1<KtElement, String> CHILDREN_INVOCATION = DiagnosticFactory1.create(WARNING);
-    DiagnosticFactory1<KtElement, String> CHILDREN_NOT_COMPOSABLE = DiagnosticFactory1.create(WARNING);
     DiagnosticFactory2<KtElement, String, String> NON_COMPOSABLE_INVOCATION = DiagnosticFactory2.create(WARNING);
     DiagnosticFactory0<KtElement> SUSPEND_FUNCTION_USED_AS_SFC = DiagnosticFactory0.create(ERROR);
     DiagnosticFactory0<PsiElement> KTX_IN_NON_COMPOSABLE = DiagnosticFactory0.create(WARNING);

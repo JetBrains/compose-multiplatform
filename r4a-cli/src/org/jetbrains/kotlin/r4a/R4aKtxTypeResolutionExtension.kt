@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.r4a.analysis.R4AWritableSlices
 import org.jetbrains.kotlin.r4a.analysis.R4AWritableSlices.KTX_ATTR_INFO
 import org.jetbrains.kotlin.r4a.analysis.R4AWritableSlices.KTX_TAG_INFO
 import org.jetbrains.kotlin.resolve.BindingContext
+import org.jetbrains.kotlin.resolve.annotations.argumentValue
 import org.jetbrains.kotlin.resolve.calls.CallResolver
 import org.jetbrains.kotlin.resolve.calls.context.TemporaryTraceAndCache
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
@@ -217,22 +218,27 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
                 val argDescriptor = attributeNameToDescriptor[nameAsString]
 
                 if (argDescriptor != null) {
+                    val argType = argDescriptor.type.let {
+                        if(descriptorHasComposableChildrenAnnotation(argDescriptor))
+                            R4aTypeResolutionInterceptorExtension.makeComposable(argDescriptor.module, it)
+                        else it
+                    }
                     attributeInfo = KtxAttributeInfo(
                         name = nameAsString,
                         isIncludedInConstruction = ctorAttributes.contains(nameAsString),
                         isPivotal = tag.isConstructed,
                         setterResolvedCall = null,
                         descriptor = argDescriptor,
-                        type = argDescriptor.type
+                        type = argType
                     )
                     context.trace.record(
                         BindingContext.REFERENCE_TARGET,
                         keyExpr,
                         argDescriptor
                     )
-                    facade.getTypeInfo(
+                    facade.checkType(
                         valueExpr,
-                        context.replaceExpectedType(argDescriptor.type)
+                        context.replaceExpectedType(argType)
                     )
                 }
             }
@@ -313,7 +319,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
                         override val source: SourceElement get() = SourceElement.NO_SOURCE
                         override fun toString() = "[@Composable]"
                     }
-                    facade.getTypeInfo(
+                    facade.checkType(
                         childrenExpr,
                         context.replaceExpectedType(
                             createFunctionType(
@@ -400,15 +406,21 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
                 )
             }
         } else if (childrenExpr != null) {
+            val childrenType = childrenInfo.descriptor.type.let {
+                if(descriptorHasComposableChildrenAnnotation(childrenInfo.descriptor))
+                    R4aTypeResolutionInterceptorExtension.makeComposable(childrenInfo.descriptor.module, it)
+                else it
+            }
+
             // children *was* used in the constructor, but the type system hasn't traversed down into it yet
-            facade.getTypeInfo(
+            facade.checkType(
                 childrenExpr,
-                context.replaceExpectedType(childrenInfo.descriptor.type)
+                context.replaceExpectedType(childrenType)
             )
             childrenAttrInfo = KtxAttributeInfo(
                 name = childrenInfo.name,
                 descriptor = childrenInfo.descriptor,
-                type = childrenInfo.descriptor.type,
+                type = childrenType,
                 isPivotal = !childrenInfo.descriptor.isVar,
                 isIncludedInConstruction = true,
                 setterResolvedCall = null
@@ -509,8 +521,8 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
         // If we can't resolve the tag name, we can't accurately report errors on the element, but we still want the type system to traverse
         // through all of the children nodes so that specific errors on those can get recorded
         with(element) {
-            attributes.forEach { facade.getTypeInfo(it, context) }
-            body?.forEach { facade.getTypeInfo(it, context) }
+            attributes.forEach { facade.checkType(it, context) }
+            body?.forEach { facade.checkType(it, context) }
         }
     }
 
@@ -538,5 +550,11 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
             }
             else -> ComposableType.UNKNOWN
         }
+    }
+
+    fun descriptorHasComposableChildrenAnnotation(descriptor: DeclarationDescriptor): Boolean {
+        val annotation = descriptor.annotations.findAnnotation(ComposableAnnotationChecker.CHILDREN_ANNOTATION_NAME) ?: return false
+        val composableValueArgument = annotation.argumentValue("composable")?.value
+        return composableValueArgument == null || composableValueArgument == true
     }
 }

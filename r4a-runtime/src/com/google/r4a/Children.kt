@@ -5,4 +5,4 @@ package com.google.r4a
     AnnotationTarget.PROPERTY,
     AnnotationTarget.FUNCTION
 )
-annotation class Children
+annotation class Children(val composable: Boolean = true)

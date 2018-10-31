@@ -882,7 +882,7 @@ class KtxTagResolver(
 
         val resolvedCall = OverloadResolutionResultsUtil.getResultingCall(results, context) ?: return null
 
-        facade.getTypeInfo(
+        facade.checkType(
             valueExpr,
             context
                 .replaceTraceAndCache(temporaryForVariable)
