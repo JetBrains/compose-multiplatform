@@ -24,6 +24,7 @@ import androidx.build.checkapi.getRequiredCompatibilityApiFile
 import androidx.build.checkapi.hasApiFolder
 import androidx.build.checkapi.hasApiTasks
 import androidx.build.java.JavaCompileInputs
+import androidx.build.Release
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -50,7 +51,7 @@ object Metalava {
         val metalavaConfiguration = project.createMetalavaConfiguration()
 
         library.libraryVariants.all { variant ->
-            if (variant.name == "minDepVersionsRelease") {
+            if (variant.name == Release.DEFAULT_PUBLISH_CONFIG) {
                 if (!project.hasApiFolder()) {
                     project.logger.info(
                         "Project ${project.name} doesn't have an api folder, ignoring API tasks.")

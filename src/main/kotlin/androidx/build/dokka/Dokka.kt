@@ -22,6 +22,7 @@ import androidx.build.getBuildId
 import androidx.build.getDistributionDirectory
 import androidx.build.java.JavaCompileInputs
 import androidx.build.SupportLibraryExtension
+import androidx.build.Release
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginConvention
@@ -91,7 +92,7 @@ object Dokka {
             return
         }
         library.libraryVariants.all { variant ->
-            if (variant.name == "release") {
+            if (variant.name == Release.DEFAULT_PUBLISH_CONFIG) {
                 project.afterEvaluate({
                     val inputs = JavaCompileInputs.fromLibraryVariant(library, variant)
                     registerInputs(inputs, project)
