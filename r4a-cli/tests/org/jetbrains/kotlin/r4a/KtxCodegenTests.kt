@@ -148,6 +148,44 @@ class KtxCodegenTests : AbstractCodeGenTest() {
         }
     }
 
+    // b/118610495
+    @Test
+    fun testCGChildCompose(): Unit = ensureSetup {
+        val tvId = 153
+
+        var text = "Test 1"
+
+        compose("""
+            var called = 0
+
+            class TestContainer(@Children var children: @Composable() ()->Unit): Component() {
+              override fun compose() {
+                <LinearLayout>
+                  <children />
+                </LinearLayout>
+              }
+            }
+
+            class TestClass(var text: String): Component() {
+              override fun compose() {
+                <TestContainer>
+                  <TextView text id=$tvId />
+                </TestContainer>
+              }
+            }
+        """, { mapOf("text" to text) }, """
+            <TestClass text />
+        """, true).then { activity ->
+            val tv = activity.findViewById(tvId) as TextView
+            assertEquals(text, tv.text)
+
+            text = "Test 2"
+        }.then { activity ->
+            val tv = activity.findViewById(tvId) as TextView
+            assertEquals(text, tv.text)
+        }
+    }
+
     override fun setUp() {
         isSetup = true
         super.setUp()

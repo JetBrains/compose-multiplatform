@@ -1,10 +1,12 @@
 package org.jetbrains.kotlin.r4a
 
+import org.jetbrains.kotlin.backend.common.descriptors.propertyIfAccessor
 import org.jetbrains.kotlin.builtins.createFunctionType
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotated
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
+import org.jetbrains.kotlin.descriptors.impl.referencedProperty
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.constants.ConstantValue
 import org.jetbrains.kotlin.diagnostics.Errors
@@ -219,7 +221,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
 
                 if (argDescriptor != null) {
                     val argType = argDescriptor.type.let {
-                        if(descriptorHasComposableChildrenAnnotation(argDescriptor))
+                        if (descriptorHasComposableChildrenAnnotation(argDescriptor))
                             R4aTypeResolutionInterceptorExtension.makeComposable(argDescriptor.module, it)
                         else it
                     }
@@ -294,125 +296,158 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
         val childrenExpr = element.bodyLambdaExpression
         var childrenAttrInfo: KtxAttributeInfo? = null
 
-        // process the children lambda
-        if (childrenInfo == null) {
-            // children wasn't used in the constructor. check to see if we have a children descriptor, and if we have children provided
-            val childrenDescriptors = when (tag.referrableDescriptor) {
-                is ClassDescriptor -> tag.referrableDescriptor
-                    .unsubstitutedMemberScope
-                    .getContributedDescriptors()
-                    .filter { it.hasChildrenAnnotation() }
-                is SimpleFunctionDescriptor -> tag.referrableDescriptor
-                    .valueParameters
-                    .filter { it.hasChildrenAnnotation() }
-                else -> emptyList()
+        // The property descriptor created from an `@Children var children: () -> Unit` value parameter in a constructor
+        // will *not* have an `@Children` annotation on it, so we must check to see if the name matches the children value
+        // parameter instead.
+        val isPropertyFromChildrenParam = { d: DeclarationDescriptor ->
+            when {
+                childrenInfo == null -> false
+                d !is PropertyDescriptor -> false
+                else -> d.name.asString() == childrenInfo.name
             }
+        }
 
-            if (childrenExpr != null && childrenDescriptors.isEmpty()) {
-                // user provided children, but none are declared.
-                // check to see if it's an android view. if so, we allow children, but don't provide a childrenAttrInfo object.
-                // we do need to make sure that the type system traverses the children though, so we handle that here:
-                if (composableType == ComposableType.VIEW || composableType == ComposableType.EMITTABLE) {
-                    val composableAnnotation = object : AnnotationDescriptor {
-                        override val type: KotlinType get() = context.scope.ownerDescriptor.module.findClassAcrossModuleDependencies(ClassId.topLevel(R4aUtils.r4aFqName("Composable")))!!.defaultType
-                        override val allValueArguments: Map<Name, ConstantValue<*>> get() = emptyMap()
-                        override val source: SourceElement get() = SourceElement.NO_SOURCE
-                        override fun toString() = "[@Composable]"
-                    }
-                    facade.checkType(
-                        childrenExpr,
-                        context.replaceExpectedType(
-                            createFunctionType(
-                                moduleDescriptor.builtIns,
-                                Annotations.create(listOf(composableAnnotation)),
-                                null,
-                                emptyList(),
-                                emptyList(),
-                                moduleDescriptor.builtIns.unitType,
-                                false
+
+        // check to see if we have a children descriptor, and if we have children provided
+        val childrenDescriptors = when (tag.referrableDescriptor) {
+            is ClassDescriptor -> tag.referrableDescriptor
+                .unsubstitutedMemberScope
+                .getContributedDescriptors()
+                .filter { it.hasChildrenAnnotation() || isPropertyFromChildrenParam(it) }
+            is SimpleFunctionDescriptor -> tag.referrableDescriptor
+                .valueParameters
+                .filter { it.hasChildrenAnnotation() }
+            else -> emptyList()
+        }
+
+        if (childrenInfo == null && childrenExpr != null && childrenDescriptors.isEmpty()) {
+            // user provided children, but none are declared.
+            // check to see if it's an android view. if so, we allow children, but don't provide a childrenAttrInfo object.
+            // we do need to make sure that the type system traverses the children though, so we handle that here:
+            if (composableType == ComposableType.VIEW || composableType == ComposableType.EMITTABLE) {
+                val composableAnnotation = object : AnnotationDescriptor {
+                    override val type: KotlinType
+                        get() = context.scope.ownerDescriptor.module.findClassAcrossModuleDependencies(
+                            ClassId.topLevel(
+                                R4aUtils.r4aFqName("Composable")
                             )
+                        )!!.defaultType
+                    override val allValueArguments: Map<Name, ConstantValue<*>> get() = emptyMap()
+                    override val source: SourceElement get() = SourceElement.NO_SOURCE
+                    override fun toString() = "[@Composable]"
+                }
+                facade.checkType(
+                    childrenExpr,
+                    context.replaceExpectedType(
+                        createFunctionType(
+                            moduleDescriptor.builtIns,
+                            Annotations.create(listOf(composableAnnotation)),
+                            null,
+                            emptyList(),
+                            emptyList(),
+                            moduleDescriptor.builtIns.unitType,
+                            false
                         )
                     )
-                } else {
-                    context.trace.reportFromPlugin(
-                        R4AErrors.CHILDREN_PROVIDED_BUT_NO_CHILDREN_DECLARED.on(tagExpr),
-                        R4ADefaultErrorMessages
-                    )
-                }
-            }
-
-            for (childrenDescriptor in childrenDescriptors) {
-                if (childrenAttrInfo != null) {
-                    // the first one to resolve correctly wins
-                    continue
-                }
-                val isRequiredChildrenDescriptor = childrenDescriptor.isRequiredR4aAttribute(context.scope.ownerDescriptor)
-
-                if (childrenExpr == null && isRequiredChildrenDescriptor) {
-                    val name = childrenDescriptor.name.asString()
-                    val namedAttribute = element.attributes.find { it.name == name }
-                    if (namedAttribute == null) {
-                        // there is a required children descriptor, but user didn't provide anything
-                        context.trace.reportFromPlugin(
-                            R4AErrors.MISSING_REQUIRED_CHILDREN.on(tagExpr),
-                            R4ADefaultErrorMessages
-                        )
-                    }
-                } else if (childrenExpr != null) {
-                    when (childrenDescriptor) {
-                        is SimpleFunctionDescriptor -> {
-                            childrenAttrInfo = tagResolver.resolveChildrenAsSetter(
-                                childrenDescriptor,
-                                childrenExpr,
-                                tag,
-                                element,
-                                context
-                            )
-                        }
-                        is PropertyDescriptor -> {
-                            childrenAttrInfo = tagResolver.resolveChildrenAsProperty(
-                                childrenDescriptor,
-                                childrenExpr,
-                                tag,
-                                element,
-                                context
-                            )
-                        }
-                        is ValueParameterDescriptor -> {
-                            childrenAttrInfo = KtxAttributeInfo(
-                                name = childrenDescriptor.name.asString(),
-                                isPivotal = tag.isConstructed,
-                                descriptor = childrenDescriptor,
-                                type = childrenDescriptor.type,
-                                setterResolvedCall = null,
-                                isIncludedInConstruction = true
-                            )
-                        }
-                        else -> error("unexpected descriptor annotated with @Children")
-                    }
-                }
-            }
-
-            if (childrenExpr != null && childrenAttrInfo == null && childrenDescriptors.isNotEmpty()) {
-                // a children body is provided, but we couldn't resolve it to a @Children declaration on the component
-                val potentialTypes = childrenDescriptors.mapNotNull { when (it) {
-                    is SimpleFunctionDescriptor -> it.valueParameters.firstOrNull()?.type
-                    is PropertyDescriptor -> it.type
-                    else -> null
-                }}
+                )
+            } else {
                 context.trace.reportFromPlugin(
-                    R4AErrors.UNRESOLVED_CHILDREN.on(tagExpr, potentialTypes),
+                    R4AErrors.CHILDREN_PROVIDED_BUT_NO_CHILDREN_DECLARED.on(tagExpr),
                     R4ADefaultErrorMessages
                 )
             }
-        } else if (childrenExpr != null) {
+        }
+
+        for (childrenDescriptor in childrenDescriptors) {
+            if (childrenAttrInfo != null) {
+                // the first one to resolve correctly wins
+                continue
+            }
+            val isRequiredChildrenDescriptor = childrenDescriptor.isRequiredR4aAttribute(context.scope.ownerDescriptor)
+
+            if (childrenExpr == null && isRequiredChildrenDescriptor) {
+                val name = childrenDescriptor.name.asString()
+                val namedAttribute = element.attributes.find { it.name == name }
+                if (namedAttribute == null) {
+                    // there is a required children descriptor, but user didn't provide anything
+                    context.trace.reportFromPlugin(
+                        R4AErrors.MISSING_REQUIRED_CHILDREN.on(tagExpr),
+                        R4ADefaultErrorMessages
+                    )
+                }
+            } else if (childrenExpr != null) {
+                when (childrenDescriptor) {
+                    is SimpleFunctionDescriptor -> {
+                        childrenAttrInfo = tagResolver.resolveChildrenAsSetter(
+                            childrenDescriptor,
+                            childrenExpr,
+                            tag,
+                            element,
+                            context
+                        )?.copy(
+                            isIncludedInConstruction = childrenInfo != null
+                        )
+                    }
+                    is PropertyDescriptor -> {
+                        childrenAttrInfo = tagResolver.resolveChildrenAsProperty(
+                            childrenDescriptor,
+                            childrenExpr,
+                            tag,
+                            element,
+                            context
+                        )?.copy(
+                            isIncludedInConstruction = childrenInfo != null
+                        )
+                    }
+                    is ValueParameterDescriptor -> {
+                        // the callResolver hasn't traversed down into children yet, so we will do that as well here.
+                        val childrenType =
+                            if (descriptorHasComposableChildrenAnnotation(childrenDescriptor))
+                                R4aTypeResolutionInterceptorExtension.makeComposable(childrenDescriptor.module, childrenDescriptor.type)
+                            else childrenDescriptor.type
+
+                        facade.checkType(
+                            childrenExpr,
+                            context.replaceExpectedType(childrenType)
+                        )
+                        childrenAttrInfo = KtxAttributeInfo(
+                            name = childrenDescriptor.name.asString(),
+                            isPivotal = tag.isConstructed,
+                            descriptor = childrenDescriptor,
+                            type = childrenType,
+                            setterResolvedCall = null,
+                            isIncludedInConstruction = true
+                        )
+                    }
+                    else -> error("unexpected descriptor annotated with @Children")
+                }
+            }
+        }
+
+
+        if (childrenInfo == null && childrenExpr != null && childrenAttrInfo == null && childrenDescriptors.isNotEmpty()) {
+            // a children body is provided, but we couldn't resolve it to a @Children declaration on the component
+            val potentialTypes = childrenDescriptors.mapNotNull {
+                when (it) {
+                    is SimpleFunctionDescriptor -> it.valueParameters.firstOrNull()?.type
+                    is PropertyDescriptor -> it.type
+                    else -> null
+                }
+            }
+            context.trace.reportFromPlugin(
+                R4AErrors.UNRESOLVED_CHILDREN.on(tagExpr, potentialTypes),
+                R4ADefaultErrorMessages
+            )
+        } else if (childrenInfo != null && childrenExpr != null && childrenAttrInfo == null) {
+            // children *was* used in the constructor.
+            // 1. we need to see if it was a var or val parameter, and specify such in the attrInfo
+            // 2. the callResolver hasn't traversed down into children yet, so we will do that as well here.
             val childrenType = childrenInfo.descriptor.type.let {
-                if(descriptorHasComposableChildrenAnnotation(childrenInfo.descriptor))
+                if (descriptorHasComposableChildrenAnnotation(childrenInfo.descriptor))
                     R4aTypeResolutionInterceptorExtension.makeComposable(childrenInfo.descriptor.module, it)
                 else it
             }
 
-            // children *was* used in the constructor, but the type system hasn't traversed down into it yet
             facade.checkType(
                 childrenExpr,
                 context.replaceExpectedType(childrenType)

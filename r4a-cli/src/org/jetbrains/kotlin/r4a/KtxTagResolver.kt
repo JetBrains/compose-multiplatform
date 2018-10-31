@@ -80,7 +80,7 @@ class KtxTagParameterInfo(
     val descriptor: ValueParameterDescriptor
 )
 
-class KtxAttributeInfo(
+data class KtxAttributeInfo(
     val name: String,
     val type: KotlinType,
     val isPivotal: Boolean,
