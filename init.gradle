@@ -29,7 +29,6 @@ if (supportRoot == null) {
 def init = new Properties()
 ext.init = init
 rootProject.ext.versionChecker = new GMavenVersionChecker(rootProject.logger)
-
 apply from: "${supportRoot}/buildSrc/dependencies.gradle"
 
 def setupRepoOutAndBuildNumber() {
@@ -56,7 +55,15 @@ def setupRepoOutAndBuildNumber() {
 def configureSubProjects() {
     subprojects {
         repos.addMavenRepositories(repositories)
-
+    }
+    if (!rootProject.hasProperty("android.injected.invoked.from.ide")) {
+        // configure build server tasks only if we are not running in the IDE to speed up
+        // configuration times
+        setupSubprojectsForBuildServer()
+    }
+}
+def setupSubprojectsForBuildServer() {
+    subprojects {
         project.plugins.whenPluginAdded { plugin ->
             def isAndroidLibrary = "com.android.build.gradle.LibraryPlugin"
                     .equals(plugin.class.name)
