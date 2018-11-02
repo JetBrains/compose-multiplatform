@@ -20,7 +20,7 @@ package androidx.build
  * The list of versions codes of all the libraries in this project.
  */
 object LibraryVersions {
-    val ACTIVITY = Version("1.0.0-alpha01")
+    val ACTIVITY = Version("1.0.0-alpha02")
     val ANIMATION = Version("1.0.0-alpha01")
     val ANIMATION_TESTING = Version("1.0.0")
     val ANNOTATION = Version("1.0.0")
