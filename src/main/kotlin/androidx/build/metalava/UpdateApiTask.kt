@@ -20,42 +20,35 @@ import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.api.BaseVariant
 import com.google.common.io.Files
 import org.gradle.api.attributes.Attribute
+import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
+import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
 /** Generate an API signature text file from a set of source files. */
-open class UpdateApiTask : MetalavaTask() {
+open class UpdateApiTask : DefaultTask() {
     /** Text file to which API signatures will be written. */
     @get:OutputFile
-    var apiTxtFile: File? = null
+    var outputApiFile: File? = null
+
+    /** Text file from which API signatures will be read. */
+    var inputApiFile: File? = null
 
     @TaskAction
     fun exec() {
-        val dependencyClasspath = checkNotNull(
-                dependencyClasspath) { "Dependency classpath not set." }
-        val apiTxtFile = checkNotNull(apiTxtFile) { "Current API file not set." }
-        check(bootClasspath.isNotEmpty()) { "Android boot classpath not set." }
-        check(sourcePaths.isNotEmpty()) { "Source paths not set." }
-
-        runWithArgs(
-            "--classpath",
-            (bootClasspath + dependencyClasspath.files).joinToString(File.pathSeparator),
-
-            "--source-path",
-            sourcePaths.filter { it.exists() }.joinToString(File.pathSeparator),
-
-            "--api",
-            apiTxtFile.toString(),
-
-            "--compatible-output=no",
-            "--omit-common-packages=yes",
-            "--output-kotlin-nulls=yes"
-        )
-        if (apiTxtFile.name != "current.txt") {
-            Files.copy(apiTxtFile, File(apiTxtFile.parentFile, "current.txt"))
+        val inputApiFile = checkNotNull(inputApiFile) { "inputApiFile not set" }
+        val outputApiFile = checkNotNull(outputApiFile) { "outputApiFile not set" }
+        copy(inputApiFile, outputApiFile, project.logger)
+        if (outputApiFile.name != "current.txt") {
+            copy(outputApiFile, File(outputApiFile.parentFile, "current.txt"), project.logger)
         }
+    }
+
+    fun copy(source: File, dest: File, logger: Logger) {
+        Files.copy(source, dest)
+        logger.lifecycle("Copied ${source} to ${dest}")
     }
 }
