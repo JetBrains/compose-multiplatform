@@ -34,6 +34,8 @@ const val GSON = "com.google.code.gson:gson:2.8.0"
 const val GUAVA = "com.google.guava:guava:23.5-jre"
 const val GUAVA_ANDROID = "com.google.guava:guava:23.6-android"
 const val GUAVA_LISTENABLE_FUTURE = "com.google.guava:listenablefuture:1.0"
+const val GUAVA_LISTENABLE_FUTURE_AVOID_CONFLICT =
+        "com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava"
 const val INTELLIJ_ANNOTATIONS = "com.intellij:annotations:12.0"
 const val JAVAPOET = "com.squareup:javapoet:1.8.0"
 const val JSR250 = "javax.annotation:javax.annotation-api:1.2"
