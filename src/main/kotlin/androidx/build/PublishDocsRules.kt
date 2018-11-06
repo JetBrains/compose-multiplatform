@@ -95,7 +95,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.ARCH_CORE, "2.0.0")
     prebuilts(LibraryGroups.PAGING, "2.1.0-beta01")
     prebuilts(LibraryGroups.NAVIGATION, "1.0.0-alpha07")
-    ignore(LibraryGroups.WORKMANAGER, "work-runtime-sync")
+    ignore(LibraryGroups.WORKMANAGER, "work-coroutines")
     prebuilts(LibraryGroups.WORKMANAGER, "1.0.0-alpha10")
     default(Ignore)
 }
