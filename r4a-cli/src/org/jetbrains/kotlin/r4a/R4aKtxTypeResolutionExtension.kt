@@ -36,9 +36,10 @@ import org.jetbrains.kotlin.types.expressions.ExpressionTypingContext
 import org.jetbrains.kotlin.types.expressions.ExpressionTypingFacade
 
 
-private fun Annotated.hasChildrenAnnotation(): Boolean = annotations.findAnnotation(R4aUtils.r4aFqName("Children")) != null
 
 class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
+
+    private fun Annotated.hasChildrenAnnotation(): Boolean = annotations.findAnnotation(R4aUtils.r4aFqName("Children")) != null
 
     override fun visitKtxElement(
         element: KtxElement,
@@ -68,6 +69,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
         val temporaryForKtxCall = TemporaryTraceAndCache.create(context, "trace to resolve ktx call", element)
 
         val resolvedKtxElementCall = ktxCallResolver.resolveTag(
+            element,
             listOfNotNull(
                 element.simpleTagName,
                 element.simpleClosingTagName,
@@ -260,7 +262,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
                     context.trace.reportFromPlugin(
                         UNRESOLVED_ATTRIBUTE_KEY.on(
                             keyExpr,
-                            tag.referrableDescriptor,
+                            listOf(tag.referrableDescriptor),
                             nameAsString,
                             valueType
                         ),

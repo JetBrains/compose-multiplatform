@@ -635,6 +635,111 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
         """
     )
 
+    fun testDeepNestedCalls() = doTest(
+        """
+            import com.google.r4a.*
+
+
+            class A { operator fun invoke(a: Int): B { return B() } }
+            class B { operator fun invoke(b: Int): C { return C() } }
+            class C { operator fun invoke(c: Int): D { return D() } }
+            class D { operator fun invoke(d: Int): E { return E() } }
+            class E { operator fun invoke(e: Int) {} }
+
+            @Composable
+            fun test() {
+                <caret><A a=1 b=2 c=3 d=4 e=5 />
+            }
+        """,
+        """
+            ResolvedKtxElementCall:
+              emitOrCall = MemoizedCallNode:
+                memoize = ComposerCallInfo:
+                  composerCall = fun call(Any, crossinline () -> A, crossinline ViewValidator.(A) -> Boolean, crossinline (A) -> Unit)
+                  pivotals = <empty>
+                  joinKeyCall = fun joinKey(Any, Any?): Any
+                  ctorCall = <null>
+                  ctorParams = <empty>
+                  validations =
+                    - ValidatedAssignment(CHANGED):
+                        validationCall = fun changed(Int): Boolean
+                        assignment = <null>
+                        attribute = a
+                    - ValidatedAssignment(CHANGED):
+                        validationCall = fun changed(Int): Boolean
+                        assignment = <null>
+                        attribute = b
+                    - ValidatedAssignment(CHANGED):
+                        validationCall = fun changed(Int): Boolean
+                        assignment = <null>
+                        attribute = c
+                    - ValidatedAssignment(CHANGED):
+                        validationCall = fun changed(Int): Boolean
+                        assignment = <null>
+                        attribute = d
+                    - ValidatedAssignment(CHANGED):
+                        validationCall = fun changed(Int): Boolean
+                        assignment = <null>
+                        attribute = e
+                call = NonMemoizedCallNode:
+                  resolvedCall = A()
+                  params = <empty>
+                  nextCall = NonMemoizedCallNode:
+                    resolvedCall = fun invoke(Int): B
+                    params = a
+                    nextCall = NonMemoizedCallNode:
+                      resolvedCall = fun invoke(Int): C
+                      params = b
+                      nextCall = NonMemoizedCallNode:
+                        resolvedCall = fun invoke(Int): D
+                        params = c
+                        nextCall = NonMemoizedCallNode:
+                          resolvedCall = fun invoke(Int): E
+                          params = d
+                          nextCall = NonMemoizedCallNode:
+                            resolvedCall = fun invoke(Int)
+                            params = e
+                            nextCall = <null>
+              usedAttributes = a, b, c, d, e
+              unusedAttributes = <empty>
+        """
+    )
+
+    fun testRecursionLimitNoParams() = doTest(
+        """
+            import com.google.r4a.*
+
+
+            class A { operator fun invoke(): B { return B() } }
+            class B { operator fun invoke(): C { return C() } }
+            class C { operator fun invoke(): D { return D() } }
+            class D { operator fun invoke(): E { return E() } }
+            class E { operator fun invoke() {} }
+
+            @Composable
+            fun test() {
+                <caret><A />
+            }
+        """,
+        """
+            ResolvedKtxElementCall:
+              emitOrCall = MemoizedCallNode:
+                memoize = ComposerCallInfo:
+                  composerCall = fun call(Any, crossinline () -> A, crossinline ViewValidator.(A) -> Boolean, crossinline (A) -> Unit)
+                  pivotals = <empty>
+                  joinKeyCall = fun joinKey(Any, Any?): Any
+                  ctorCall = <null>
+                  ctorParams = <empty>
+                  validations = <empty>
+                call = NonMemoizedCallNode:
+                  resolvedCall = A()
+                  params = <empty>
+                  nextCall = <ERROR:RecursionLimitError>
+              usedAttributes = <empty>
+              unusedAttributes = <empty>
+        """
+    )
+
     fun testIsStaticNature() = doTest(
         """
             import com.google.r4a.*

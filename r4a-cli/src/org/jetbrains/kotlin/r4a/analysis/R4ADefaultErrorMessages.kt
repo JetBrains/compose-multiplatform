@@ -25,6 +25,16 @@ object R4ADefaultErrorMessages : DefaultErrorMessages.Extension {
             Renderers.commaSeparated(Renderers.RENDER_TYPE)
         )
         MAP.put(
+            R4AErrors.MISMATCHED_INFERRED_ATTRIBUTE_TYPE,
+            "<html>Type Mismatch.<br/>Required: {1}<br/>Found: {0}</html>",
+            Renderers.RENDER_TYPE,
+            Renderers.commaSeparated(Renderers.RENDER_TYPE)
+        )
+        MAP.put(
+            R4AErrors.CALLABLE_RECURSION_DETECTED,
+            "Recursion detected"
+        )
+        MAP.put(
             R4AErrors.UNRESOLVED_CHILDREN,
             "<html>Mismatched children body type.<br/>Expected: {0}</html>",
             Renderers.commaSeparated(Renderers.RENDER_TYPE)
@@ -32,9 +42,15 @@ object R4ADefaultErrorMessages : DefaultErrorMessages.Extension {
         MAP.put(
             R4AErrors.UNRESOLVED_ATTRIBUTE_KEY,
             "No valid attribute on ''{0}'' found with key ''{1}'' and type ''{2}''",
-            Renderers.COMPACT,
+            Renderers.commaSeparated(Renderers.COMPACT),
             Renderers.STRING,
             Renderers.RENDER_TYPE
+        )
+        MAP.put(
+            R4AErrors.UNRESOLVED_ATTRIBUTE_KEY_UNKNOWN_TYPE,
+            "No valid attribute on ''{0}'' found with key ''{1}''",
+            Renderers.commaSeparated(Renderers.COMPACT),
+            Renderers.STRING
         )
         MAP.put(
             R4AErrors.MISMATCHED_ATTRIBUTE_TYPE_NO_SINGLE_PARAM_SETTER_FNS,

@@ -12,8 +12,10 @@ import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.descriptors.VariableDescriptor
 import org.jetbrains.kotlin.extensions.KtxControlFlowExtension
 import org.jetbrains.kotlin.psi.*
+import org.jetbrains.kotlin.r4a.analysis.R4AWritableSlices
 import org.jetbrains.kotlin.r4a.analysis.R4AWritableSlices.KTX_ATTR_INFO
 import org.jetbrains.kotlin.r4a.analysis.R4AWritableSlices.KTX_TAG_INFO
+import org.jetbrains.kotlin.r4a.ast.*
 import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.calls.model.ArgumentMatch
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
@@ -202,7 +204,7 @@ class R4aKtxControlFlowExtension : KtxControlFlowExtension {
             getBoundOrUnreachableValue(from)?.let { builder.bindValue(it, to) }
         }
 
-        fun visitKtxElement(element: KtxElement) {
+        fun visitKtxElementOld(element: KtxElement) {
             val tagInfo = trace.get(KTX_TAG_INFO, element) ?: return
             val tagExpr = element.simpleTagName ?: element.qualifiedTagName ?: return
 
@@ -233,6 +235,62 @@ class R4aKtxControlFlowExtension : KtxControlFlowExtension {
                 createNonSyntheticValue(element, listOf(it), MagicKind.VALUE_CONSUMER)
             }
         }
+
+        fun visitComposerCallInfo(memoize: ComposerCallInfo) {
+            memoize.ctorCall?.let { generateCall(it) }
+            memoize.composerCall?.let { generateCall(it) }
+            memoize.validations.forEach {
+                it.validationCall?.let { generateCall(it) }
+                it.assignment?.let { generateCall(it) }
+            }
+        }
+
+        fun visitKtxElementNew(element: KtxElement) {
+            val inputExpressions = ArrayList<KtExpression>()
+            val tagExpr = element.simpleTagName ?: element.qualifiedTagName ?: return
+
+            mark(tagExpr)
+            generateInstructions(tagExpr)
+            inputExpressions.add(tagExpr)
+
+            for (attribute in element.attributes) {
+                val valueExpr = attribute.value ?: attribute.key ?: break
+                mark(valueExpr)
+                generateInstructions(valueExpr)
+                inputExpressions.add(valueExpr)
+            }
+
+            element.bodyLambdaExpression?.let {
+                generateInstructions(it)
+                inputExpressions.add(it)
+            }
+
+            val elementCall = trace.get(R4AWritableSlices.RESOLVED_KTX_CALL, element) ?: return
+            var node: EmitOrCallNode? = elementCall.emitOrCall
+
+            generateCall(elementCall.getComposerCall)
+
+            while (node != null) {
+                when (node) {
+                    is MemoizedCallNode -> {
+                        node.memoize?.let { visitComposerCallInfo(it) }
+                        node = node.call
+                    }
+                    is NonMemoizedCallNode -> {
+                        generateCall(node.resolvedCall)
+                        node = node.nextCall
+                    }
+                    is EmitCallNode -> {
+                        visitComposerCallInfo(node.memoize)
+                        node = null
+                    }
+                    is ErrorNode -> {
+                        node = null
+                    }
+                }
+            }
+            createNonSyntheticValue(element, inputExpressions, MagicKind.VALUE_CONSUMER)
+        }
     }
 
     override fun visitKtxElement(
@@ -241,6 +299,10 @@ class R4aKtxControlFlowExtension : KtxControlFlowExtension {
         visitor: KtVisitorVoid,
         trace: BindingTrace
     ) {
-        ControlFlowVisitor(builder, visitor, trace).visitKtxElement(element)
+        if (R4AFlags.USE_NEW_TYPE_RESOLUTION) {
+            ControlFlowVisitor(builder, visitor, trace).visitKtxElementNew(element)
+        } else {
+            ControlFlowVisitor(builder, visitor, trace).visitKtxElementOld(element)
+        }
     }
 }

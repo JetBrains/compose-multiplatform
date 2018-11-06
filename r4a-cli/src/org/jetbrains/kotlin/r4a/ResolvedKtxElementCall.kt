@@ -1,8 +1,11 @@
 package org.jetbrains.kotlin.r4a.ast
 
-import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
-import org.jetbrains.kotlin.descriptors.FunctionDescriptor
+import org.jetbrains.kotlin.backend.common.push
+import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.psi.KtExpression
+import org.jetbrains.kotlin.r4a.CHILDREN_KEY
+import org.jetbrains.kotlin.r4a.R4aUtils
+import org.jetbrains.kotlin.r4a.hasChildrenAnnotation
 import org.jetbrains.kotlin.renderer.ClassifierNamePolicy
 import org.jetbrains.kotlin.renderer.DescriptorRenderer
 import org.jetbrains.kotlin.renderer.ParameterNameRenderingPolicy
@@ -14,6 +17,12 @@ sealed class ValueNode(
     val type: KotlinType,
     val descriptor: DeclarationDescriptor
 )
+
+class DefaultValueNode(
+    name: String,
+    type: KotlinType,
+    descriptor: DeclarationDescriptor
+) : ValueNode(name, type, descriptor)
 
 class ImplicitCtorValueNode(
     name: String,
@@ -38,7 +47,7 @@ class ImplicitCtorValueNode(
 
 class AttributeNode(
     name: String,
-    val isStatic: Boolean,
+    var isStatic: Boolean,
     val expression: KtExpression,
     type: KotlinType,
     descriptor: DeclarationDescriptor
@@ -72,7 +81,7 @@ sealed class Assignment(
 
 class ValidatedAssignment(
     val validationType: ValidationType,
-    val validationCall: ResolvedCall<*>?, // TODO(lmr):
+    val validationCall: ResolvedCall<*>?,
     assignment: ResolvedCall<*>?,
     attribute: AttributeNode
 ) : Assignment(assignment, attribute)
@@ -89,17 +98,136 @@ class ComposerCallInfo(
     fun allAttributes(): List<ValueNode> = ctorParams.filter { it !is ImplicitCtorValueNode } + validations.map { it.attribute }
 }
 
+class AttributeMeta(
+    val name: String,
+    val type: KotlinType,
+    val isChildren: Boolean,
+    val descriptor: DeclarationDescriptor
+)
+
 sealed class EmitOrCallNode {
     abstract fun allAttributes(): List<ValueNode>
+    abstract fun print(): String
+    fun resolvedCalls(): List<ResolvedCall<*>> {
+        return when (this) {
+            is ErrorNode -> emptyList()
+            is MemoizedCallNode -> listOfNotNull(memoize?.ctorCall) + call.resolvedCalls()
+            is NonMemoizedCallNode -> listOf(resolvedCall) + (nextCall?.resolvedCalls() ?: emptyList())
+            is EmitCallNode -> listOfNotNull(memoize.ctorCall)
+        }
+    }
+
+    fun allPossibleAttributes(): Map<String, List<AttributeMeta>> {
+        val collector = mutableMapOf<String, MutableList<AttributeMeta>>()
+        collectPossibleAttributes(collector)
+        return collector
+    }
+
+    private fun collectPossibleAttributes(collector: MutableMap<String, MutableList<AttributeMeta>>) {
+        when (this) {
+            is ErrorNode -> {}
+            is MemoizedCallNode -> {
+                val callDescriptor = memoize?.ctorCall?.resultingDescriptor as? FunctionDescriptor
+                callDescriptor?.let { collectAttributesFromFunction(it, collector) }
+                val returnType = callDescriptor?.returnType
+                returnType?.let { collectAttributesFromType(it, collector) }
+
+                call.collectPossibleAttributes(collector)
+            }
+            is NonMemoizedCallNode -> {
+                val callDescriptor = resolvedCall.resultingDescriptor as? FunctionDescriptor
+                callDescriptor?.let { collectAttributesFromFunction(it, collector) }
+                val returnType = callDescriptor?.returnType
+                returnType?.let { collectAttributesFromType(it, collector) }
+
+                nextCall?.collectPossibleAttributes(collector)
+            }
+            is EmitCallNode -> {
+                val callDescriptor = memoize.ctorCall?.resultingDescriptor as? FunctionDescriptor
+                callDescriptor?.let { collectAttributesFromFunction(it, collector) }
+                val returnType = callDescriptor?.returnType
+                returnType?.let { collectAttributesFromType(it, collector) }
+            }
+        }
+    }
+
+    private fun collectAttributesFromFunction(fn: FunctionDescriptor, collector: MutableMap<String, MutableList<AttributeMeta>>) {
+        fn.valueParameters.forEach {
+            collector.multiPut(
+                AttributeMeta(
+                    name = it.name.asString(),
+                    type = it.type,
+                    descriptor = it,
+                    isChildren = it.hasChildrenAnnotation()
+                )
+            )
+        }
+    }
+
+    private fun collectAttributesFromType(type: KotlinType, collector: MutableMap<String, MutableList<AttributeMeta>>) {
+        val cls = type.constructor.declarationDescriptor as? ClassDescriptor ?: return
+        cls.unsubstitutedMemberScope.getContributedDescriptors().forEach {
+            when (it) {
+                is SimpleFunctionDescriptor -> {
+                    if (R4aUtils.isSetterMethodName(it.name.asString()) && it.valueParameters.size == 1) {
+                        val name = R4aUtils.propertyNameFromSetterMethod(it.name.asString())
+                        collector.multiPut(
+                            AttributeMeta(
+                                name = name,
+                                type = it.valueParameters.first().type,
+                                descriptor = it,
+                                isChildren = it.hasChildrenAnnotation()
+                            )
+                        )
+                    }
+                }
+                is PropertyDescriptor -> {
+                    collector.multiPut(
+                        AttributeMeta(
+                            name = it.name.asString(),
+                            type = it.type,
+                            descriptor = it,
+                            isChildren = it.hasChildrenAnnotation()
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    fun errorNode(): ErrorNode? {
+        return when (this) {
+            is ErrorNode -> this
+            is MemoizedCallNode -> call.errorNode()
+            is NonMemoizedCallNode -> nextCall?.errorNode()
+            is EmitCallNode -> null
+        }
+    }
 }
+
 sealed class CallNode : EmitOrCallNode()
+
+sealed class ErrorNode : EmitOrCallNode() {
+    override fun allAttributes(): List<ValueNode> = emptyList()
+    override fun print(): String = "<ERROR:${javaClass.simpleName}>"
+
+    class NonEmittableNonCallable(val type: KotlinType) : ErrorNode()
+    class RecursionLimitError() : ErrorNode()
+    class NonCallableRoot : ErrorNode()
+}
 
 class NonMemoizedCallNode(
     val resolvedCall: ResolvedCall<*>,
     val params: List<ValueNode>,
-    val nextCall: NonMemoizedCallNode?
+    var nextCall: EmitOrCallNode?
 ) : CallNode() {
     override fun allAttributes(): List<ValueNode> = params
+    override fun print(): String = buildString {
+        self("NonMemoizedCallNode")
+        attr("resolvedCall", resolvedCall) { it.print() }
+        attr("params", params) { it.print() }
+        attr("nextCall", nextCall) { it.print() }
+    }
 }
 
 class MemoizedCallNode(
@@ -107,12 +235,21 @@ class MemoizedCallNode(
     val call: EmitOrCallNode
 ) : CallNode() {
     override fun allAttributes(): List<ValueNode> = call.allAttributes() + (memoize?.allAttributes() ?: emptyList())
+    override fun print(): String = buildString {
+        self("MemoizedCallNode")
+        attr("memoize", memoize) { it.print() }
+        attr("call", call) { it.print() }
+    }
 }
 
 class EmitCallNode(
     val memoize: ComposerCallInfo
 ) : EmitOrCallNode() {
     override fun allAttributes(): List<ValueNode> = memoize.allAttributes()
+    override fun print() = buildString {
+        self("EmitCallNode")
+        attr("memoize", memoize) { it.print() }
+    }
 }
 
 class ResolvedKtxElementCall(
@@ -135,16 +272,9 @@ fun EmitOrCallNode?.consumedAttributes(): List<AttributeNode> {
         is MemoizedCallNode -> memoize.consumedAttributes() + call.consumedAttributes()
         is NonMemoizedCallNode -> params.mapNotNull { it as? AttributeNode } + (nextCall?.consumedAttributes() ?: emptyList())
         is EmitCallNode -> memoize.consumedAttributes()
+        is ErrorNode -> emptyList()
         null -> emptyList()
     }
-}
-
-
-fun NonMemoizedCallNode.print(): String = buildString {
-    self("NonMemoizedCallNode")
-    attr("resolvedCall", resolvedCall) { it.print() }
-    attr("params", params) { it.print() }
-    attr("nextCall", nextCall) { it.print() }
 }
 
 fun List<ValueNode>.print(): String {
@@ -155,34 +285,12 @@ fun List<ValueNode>.print(): String {
 fun ValueNode.print(): String = when (this) {
     is AttributeNode -> name
     is ImplicitCtorValueNode -> "(implicit)$name"
-}
-
-fun MemoizedCallNode.print(): String = buildString {
-    self("MemoizedCallNode")
-    attr("memoize", memoize) { it.print() }
-    attr("call", call) {
-        when (it) {
-            is NonMemoizedCallNode -> it.print()
-            is EmitCallNode -> it.print()
-            is MemoizedCallNode -> it.print()
-        }
-    }
-}
-
-fun EmitCallNode.print() = buildString {
-    self("EmitCallNode")
-    attr("memoize", memoize) { it.print() }
+    is DefaultValueNode -> "(default)$name"
 }
 
 fun ResolvedKtxElementCall.print() = buildString {
     self("ResolvedKtxElementCall")
-    attr("emitOrCall", emitOrCall) {
-        when (it) {
-            is EmitCallNode -> it.print()
-            is NonMemoizedCallNode -> it.print()
-            is MemoizedCallNode -> it.print()
-        }
-    }
+    attr("emitOrCall", emitOrCall) { it.print() }
     attr("usedAttributes", usedAttributes) { it.print() }
     attr("unusedAttributes", unusedAttributes) {
         it.joinToString(separator = ", ").let { s -> if (s.isBlank()) "<empty>" else s }
@@ -220,8 +328,6 @@ val DESC_RENDERER = DescriptorRenderer.COMPACT_WITHOUT_SUPERTYPES.withOptions {
     defaultParameterValueRenderer = null
     renderUnabbreviatedType = false
 }
-
-
 
 fun StringBuilder.self(name: String) {
     append(name)
@@ -266,6 +372,22 @@ fun <T> StringBuilder.list(name: String, obj: Collection<T>, printer: (T) -> Str
             append("    - ")
             appendln(printer(it).indentExceptFirstLine("      ").trim())
         }
+    }
+}
+
+private fun <T, V> MutableMap<T, MutableList<V>>.multiPut(key: T, value: V) {
+    val current = get(key)
+    if (current != null) {
+        current.push(value)
+    } else {
+        put(key, mutableListOf(value))
+    }
+}
+
+private fun MutableMap<String, MutableList<AttributeMeta>>.multiPut(value: AttributeMeta) {
+    multiPut(value.name, value)
+    if (value.isChildren) {
+        multiPut(CHILDREN_KEY, value)
     }
 }
 

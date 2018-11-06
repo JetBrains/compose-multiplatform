@@ -16,13 +16,16 @@ public interface R4AErrors {
     DiagnosticFactory0<PsiElement> DUPLICATE_ATTRIBUTE = DiagnosticFactory0.create(ERROR);
     DiagnosticFactory0<PsiElement> OPEN_COMPONENT = DiagnosticFactory0.create(ERROR);
 
-    DiagnosticFactory3<KtElement, DeclarationDescriptor, String, KotlinType> UNRESOLVED_ATTRIBUTE_KEY = DiagnosticFactory3.create(ERROR);
+    DiagnosticFactory3<KtElement, Collection<DeclarationDescriptor>, String, KotlinType> UNRESOLVED_ATTRIBUTE_KEY = DiagnosticFactory3.create(ERROR);
+    DiagnosticFactory2<KtElement, Collection<DeclarationDescriptor>, String> UNRESOLVED_ATTRIBUTE_KEY_UNKNOWN_TYPE = DiagnosticFactory2.create(ERROR);
     DiagnosticFactory2<KtElement, KotlinType, Collection<KotlinType>> MISMATCHED_ATTRIBUTE_TYPE = DiagnosticFactory2.create(ERROR);
+    DiagnosticFactory2<KtElement, KotlinType, Collection<KotlinType>> MISMATCHED_INFERRED_ATTRIBUTE_TYPE = DiagnosticFactory2.create(ERROR);
     DiagnosticFactory1<KtElement, Collection<KotlinType>> UNRESOLVED_CHILDREN = DiagnosticFactory1.create(ERROR);
     DiagnosticFactory1<KtElement, SimpleFunctionDescriptor>
             MISMATCHED_ATTRIBUTE_TYPE_NO_SINGLE_PARAM_SETTER_FNS = DiagnosticFactory1.create(ERROR);
     DiagnosticFactory1<KtElement, Collection<DeclarationDescriptor>> MISSING_REQUIRED_ATTRIBUTES = DiagnosticFactory1.create(ERROR);
     DiagnosticFactory2<KtElement, KotlinType, Collection<KotlinType>> INVALID_TAG_TYPE = DiagnosticFactory2.create(ERROR);
+    DiagnosticFactory0<KtElement> CALLABLE_RECURSION_DETECTED = DiagnosticFactory0.create(ERROR);
     DiagnosticFactory1<KtElement, Collection<KotlinType>> INVALID_TAG_DESCRIPTOR = DiagnosticFactory1.create(ERROR);
     DiagnosticFactory1<KtElement, String> SVC_INVOCATION = DiagnosticFactory1.create(ERROR);
     DiagnosticFactory2<KtElement, String, String> NON_COMPOSABLE_INVOCATION = DiagnosticFactory2.create(WARNING);
