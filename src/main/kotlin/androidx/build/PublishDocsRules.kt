@@ -91,6 +91,8 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.LIFECYCLE, "lifecycle-savedstate-fragment")
     ignore(LibraryGroups.LIFECYCLE, "lifecycle-viewmodel-savedstate")
     ignore(LibraryGroups.LIFECYCLE, "lifecycle-viewmodel-fragment")
+    ignore(LibraryGroups.LIFECYCLE, "lifecycle-livedata-ktx")
+    ignore(LibraryGroups.LIFECYCLE, "lifecycle-livedata-core-ktx")
     prebuilts(LibraryGroups.LIFECYCLE, "2.0.0")
     prebuilts(LibraryGroups.ARCH_CORE, "2.0.0")
     prebuilts(LibraryGroups.PAGING, "2.1.0-beta01")
