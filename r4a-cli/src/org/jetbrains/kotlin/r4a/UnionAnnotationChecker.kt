@@ -1,5 +1,6 @@
 package org.jetbrains.kotlin.r4a
 
+import com.intellij.openapi.module.Module
 import org.jetbrains.kotlin.types.TypeUtils
 import org.jetbrains.kotlin.container.StorageComponentContainer
 import org.jetbrains.kotlin.container.useInstance
@@ -7,6 +8,8 @@ import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.diagnostics.Errors.TYPE_INFERENCE_EXPECTED_TYPE_MISMATCH
 import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
+import org.jetbrains.kotlin.idea.caches.resolve.findModuleDescriptor
+import org.jetbrains.kotlin.idea.util.module
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.r4a.analysis.R4AErrors
@@ -14,27 +17,29 @@ import org.jetbrains.kotlin.resolve.*
 import org.jetbrains.kotlin.resolve.calls.checkers.AdditionalTypeChecker
 import org.jetbrains.kotlin.resolve.calls.context.ResolutionContext
 import org.jetbrains.kotlin.resolve.constants.ArrayValue
+import org.jetbrains.kotlin.resolve.constants.ClassLiteralValue
+import org.jetbrains.kotlin.resolve.constants.KClassValue
+import org.jetbrains.kotlin.resolve.descriptorUtil.classId
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.jvm.platform.JvmPlatform
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.checker.KotlinTypeChecker
 
-class UnionAnnotationChecker() : AdditionalTypeChecker, StorageComponentContainerContributor {
-
-
-    companion object {
-        val UNIONTYPE_ANNOTATION_NAME = R4aUtils.r4aFqName("UnionType")
-    }
-
+class UnionAnnotationCheckerProvider() : StorageComponentContainerContributor {
     override fun registerModuleComponents(
         container: StorageComponentContainer,
         platform: TargetPlatform,
         moduleDescriptor: ModuleDescriptor
     ) {
         if (platform != JvmPlatform) return
-        container.useInstance(this)
+        container.useInstance(UnionAnnotationChecker(moduleDescriptor))
     }
+}
 
+class UnionAnnotationChecker(val moduleDescriptor: ModuleDescriptor) : AdditionalTypeChecker {
+    companion object {
+        val UNIONTYPE_ANNOTATION_NAME = R4aUtils.r4aFqName("UnionType")
+    }
 
     override fun checkType(
         expression: KtExpression,
@@ -65,6 +70,6 @@ class UnionAnnotationChecker() : AdditionalTypeChecker, StorageComponentContaine
     private fun getUnionTypes(type: KotlinType): List<KotlinType> {
         val annotation = type.annotations.findAnnotation(UNIONTYPE_ANNOTATION_NAME) ?: return listOf(type)
         val types = annotation.allValueArguments.get(Name.identifier("types")) as ArrayValue
-        return types.value.map { it.value as KotlinType }
+        return types.value.map { KClassValue(it.value as ClassLiteralValue).getType(moduleDescriptor).arguments.single().type }
     }
 }

@@ -42,7 +42,7 @@ class R4AComponentRegistrar : ComponentRegistrar {
     fun registerProjectComponents(project: Project, configuration: CompilerConfiguration) {
         StorageComponentContainerContributor.registerExtension(project, ComponentsClosedDeclarationChecker())
         StorageComponentContainerContributor.registerExtension(project, ComposableAnnotationChecker(configuration.get(COMPOSABLE_CHECKER_MODE_KEY, ComposableAnnotationChecker.DEFAULT_MODE)))
-        StorageComponentContainerContributor.registerExtension(project, UnionAnnotationChecker())
+        StorageComponentContainerContributor.registerExtension(project, UnionAnnotationCheckerProvider())
         KtxParsingExtension.registerExtension(project, R4aKtxParsingExtension())
         KtxTypeResolutionExtension.registerExtension(project, R4aKtxTypeResolutionExtension())
         KtxControlFlowExtension.registerExtension(project, R4aKtxControlFlowExtension())

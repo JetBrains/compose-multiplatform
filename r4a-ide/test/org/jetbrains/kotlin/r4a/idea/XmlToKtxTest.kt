@@ -16,7 +16,7 @@ class XmlToKtxTest : KotlinLightCodeInsightFixtureTestCase() {
     override fun getProjectDescriptor(): LightProjectDescriptor {
         return KotlinJdkAndLibraryProjectDescriptor(
             listOf(
-                File("plugins/r4a/r4a-runtime/build/libs/r4a-runtime-1.2-SNAPSHOT.jar"),
+                File("plugins/r4a/r4a-runtime/build/libs/r4a-runtime-1.3-SNAPSHOT.jar"),
                 File("custom-dependencies/android-sdk/build/libs/android.jar")
             )
         )
