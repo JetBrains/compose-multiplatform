@@ -46,6 +46,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.CUSTOMVIEW, "1.0.0")
     prebuilts(LibraryGroups.DOCUMENTFILE, "1.0.0")
     prebuilts(LibraryGroups.DRAWERLAYOUT, "1.0.0")
+    ignore(LibraryGroups.DYNAMICANIMATION, "dynamicanimation-ktx")
     prebuilts(LibraryGroups.DYNAMICANIMATION, "1.0.0")
     prebuilts(LibraryGroups.EMOJI, "1.0.0")
     prebuilts(LibraryGroups.EXIFINTERFACE, "1.0.0")
