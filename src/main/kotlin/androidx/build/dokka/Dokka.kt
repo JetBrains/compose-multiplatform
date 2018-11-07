@@ -32,6 +32,7 @@ import org.gradle.kotlin.dsl.getPlugin
 import org.jetbrains.dokka.gradle.DokkaPlugin
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.dokka.gradle.PackageOptions
+import androidx.build.DiffAndDocs
 
 object Dokka {
     private val RUNNER_TASK_NAME = "dokka"
@@ -99,6 +100,7 @@ object Dokka {
                 })
             }
         }
+        DiffAndDocs.registerPrebuilts(extension)
     }
 
     fun registerJavaProject(
@@ -115,6 +117,7 @@ object Dokka {
             val inputs = JavaCompileInputs.fromSourceSet(mainSourceSet, project)
             registerInputs(inputs, project)
         })
+        DiffAndDocs.registerPrebuilts(extension)
     }
 
     fun registerInputs(inputs: JavaCompileInputs, project: Project) {
