@@ -226,7 +226,7 @@ object DiffAndDocs {
                 ?.forEach { docsProject?.evaluationDependsOn(it.path) }
     }
 
-    private fun registerPrebuilts(extension: SupportLibraryExtension) =
+    fun registerPrebuilts(extension: SupportLibraryExtension) =
             docsProject?.afterEvaluate { docs ->
         val depHandler = docs.dependencies
         val root = docs.rootProject
