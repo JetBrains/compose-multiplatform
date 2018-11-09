@@ -17,6 +17,7 @@ import com.intellij.openapi.util.Ref
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
 import com.intellij.psi.xml.XmlFile
+import com.intellij.psi.xml.XmlTag
 import org.jetbrains.kotlin.idea.caches.resolve.resolveImportReference
 import org.jetbrains.kotlin.idea.conversion.copy.*
 import org.jetbrains.kotlin.idea.util.ImportInsertHelper
@@ -27,11 +28,9 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.psiUtil.anyDescendantOfType
 import org.jetbrains.kotlin.psi.psiUtil.elementsInRange
-import org.jetbrains.kotlin.r4a.idea.conversion.XmlToKtxConverter.XmlNamespace
 import org.jetbrains.kotlin.r4a.idea.editor.KtxEditorOptions
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
-import java.lang.IllegalStateException
 
 class ConvertXmlCopyPasteProcessor : CopyPastePostProcessor<TextBlockTransferableData>() {
     private val LOG = Logger.getInstance(ConvertXmlCopyPasteProcessor::class.java)
@@ -72,11 +71,16 @@ class ConvertXmlCopyPasteProcessor : CopyPastePostProcessor<TextBlockTransferabl
 
     override fun extractTransferableData(content: Transferable): List<TextBlockTransferableData> {
         try {
-            if (content.isDataFlavorSupported(CopiedXmlCode.DATA_FLAVOR)) {
-                return listOf(content.getTransferData(CopiedXmlCode.DATA_FLAVOR) as TextBlockTransferableData)
-            } else if (content.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-                val text = content.getTransferData(DataFlavor.stringFlavor) as String
-                return listOf(CopiedText(text))
+            when {
+                // Do not try to convert text copied from Kotlin file.
+                content.isDataFlavorSupported(CopiedKotlinCode.DATA_FLAVOR) -> return emptyList()
+                content.isDataFlavorSupported(CopiedXmlCode.DATA_FLAVOR) -> {
+                    return listOf(content.getTransferData(CopiedXmlCode.DATA_FLAVOR) as TextBlockTransferableData)
+                }
+                content.isDataFlavorSupported(DataFlavor.stringFlavor) -> {
+                    val text = content.getTransferData(DataFlavor.stringFlavor) as String
+                    return listOf(CopiedText(text))
+                }
             }
         } catch (e: Throwable) {
             LOG.error(e)
@@ -99,14 +103,16 @@ class ConvertXmlCopyPasteProcessor : CopyPastePostProcessor<TextBlockTransferabl
         val transferableData = values.single()
         val (fileText, startOffsets, endOffsets) = when (transferableData) {
             is CopiedXmlCode -> Triple(transferableData.fileText, transferableData.startOffsets, transferableData.endOffsets)
+            // TODO(jdemeulenaere): Allow to convert copy pasted attribute/value pairs from anywhere (not only full tags).
             is CopiedText -> Triple(transferableData.text, intArrayOf(0), intArrayOf(transferableData.text.length))
             else -> throw IllegalStateException("Unsupported transferable data: $transferableData")
         }
         val xmlFile = PsiFileFactory.getInstance(project).createFileFromText(XMLLanguage.INSTANCE, fileText) as XmlFile
         val hasErrors = xmlFile.anyDescendantOfType<PsiErrorElement>()
-        if (hasErrors) {
-            if (transferableData is CopiedText) return
-            // TODO(jdemeulenaere): Warn that result might be incorrect.
+
+        // Avoid converting copied text that is not XML.
+        if (transferableData is CopiedText && (hasErrors || !hasAttributeWithNamespace(xmlFile))) {
+            return
         }
 
         if (!confirmConversion(project)) {
@@ -154,6 +160,27 @@ class ConvertXmlCopyPasteProcessor : CopyPastePostProcessor<TextBlockTransferabl
         // Format code.
         XmlToKtxConverter.formatCode(targetFile, rangeAfterReplace)
         return
+    }
+
+    private fun hasAttributeWithNamespace(file: XmlFile): Boolean {
+        val rootTag = file.rootTag ?: return false
+        return hasAttributeWithNamespace(rootTag)
+    }
+
+    private fun hasAttributeWithNamespace(tag: XmlTag): Boolean {
+        for (attribute in tag.attributes) {
+            if (attribute.namespacePrefix.isNotEmpty()) {
+                return true
+            }
+        }
+
+        for (subTag in tag.subTags) {
+            if (hasAttributeWithNamespace(subTag)) {
+                return true
+            }
+        }
+
+        return false
     }
 
     private fun replaceText(
