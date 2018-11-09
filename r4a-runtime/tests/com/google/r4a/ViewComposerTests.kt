@@ -634,6 +634,45 @@ class NewCodeGenTests : TestCase() {
         }
     }
 
+    @Test
+    fun testCGEmittingAnEmittable() {
+
+        class MyEmittable: MockEmittable() {
+            var message: String = ""
+        }
+
+        composeCG{
+            adaptable {
+                val cc = CompositionContext.current
+                cc.emitView(615, { context -> LinearLayout(context) }, {}) {
+                    cc.emitEmittable(616, { -> MyEmittable() }, { set("Message") { message = it }}) {
+                        cc.emitView(617, { context -> TextView(context)}, {
+                            set("SomeValue") { text = it }
+                        })
+                        cc.emitEmittable(620, { -> MyEmittable() }, { set("Message2") { message = it }})
+                    }
+                }
+            }
+        }.then { activity ->
+            val root = activity.root.getChildAt(0) as LinearLayout
+            val firstChild = root.getChildAt(0) as ViewEmitWrapper
+            val emitted = firstChild.emittable as MockEmittable
+            val firstEmitChild = emitted.children[0] as EmitViewWrapper
+            firstEmitChild.view as TextView
+            val secondEmit = emitted.children[1] as MyEmittable
+            assertEquals(0, secondEmit.children.size)
+        }.then { activity ->
+            val root = activity.root.getChildAt(0) as LinearLayout
+            val firstChild = root.getChildAt(0) as ViewEmitWrapper
+            val emitted = firstChild.emittable as MockEmittable
+            val firstEmitChild = emitted.children[0] as EmitViewWrapper
+            firstEmitChild.view as TextView
+            val secondEmit = emitted.children[1] as MyEmittable
+            assertEquals(0, secondEmit.children.size)
+        }
+    }
+
+
     open class MockEmittable: Emittable {
         val children = mutableListOf<Emittable>()
         override fun emitInsertAt(index: Int, instance: Emittable) {
@@ -707,6 +746,65 @@ class NewCodeGenTests : TestCase() {
             val activity = controller.create().get()
             val composition = ViewComposition(ViewComposer(activity.root, activity))
             return ActiveTest(composition, activity).then(block)
+        }
+    }
+
+    class TestContext(val cc: CompositionContext) {
+        fun adaptable(block: TestContext.() -> Unit) {
+            composer.registerAdapter { parent, child ->
+                when (parent) {
+                    is ViewGroup -> when (child) {
+                        is View -> child
+                        is Emittable -> ViewEmitWrapper(cc.context).apply { emittable = child }
+                        else -> null
+                    }
+                    is Emittable -> when (child) {
+                        is View -> EmitViewWrapper().apply { view = child }
+                        is Emittable -> child
+                        else -> null
+                    }
+                    else -> null
+                }
+            }
+            block()
+        }
+
+    }
+
+    fun composeCG(block: TestContext.(activity: Activity) -> Unit) = CompositionCodeGenTest(block)
+
+    private class Root : Component() {
+        override fun compose() {}
+    }
+
+    class CompositionCodeGenTest(val composable: TestContext.(activity: Activity) -> Unit) {
+        inner class ActiveTest(val activity: Activity, val context: TestContext, val component: Component) {
+
+            fun then(block: TestContext.(activity: Activity) -> Unit): ActiveTest {
+                val previous = CompositionContext.current
+                val cc = context.cc
+                CompositionContext.current = cc
+                try {
+                    cc.startRoot()
+                    context.composable(activity)
+                    cc.endRoot()
+                    cc.applyChanges()
+                } finally {
+                    CompositionContext.current = previous
+                }
+                context.block(activity)
+                return this
+            }
+        }
+
+        fun then(block: TestContext.(activity: Activity) -> Unit): ActiveTest {
+            val controller = Robolectric.buildActivity(TestActivity::class.java)
+            val activity = controller.create().get()
+            val root = activity.root
+            val component = Root()
+            val cc = CompositionContext.create(root.context, root, component, null)
+            cc.context = activity
+            return ActiveTest(activity, TestContext(cc), component).then(block)
         }
     }
 }

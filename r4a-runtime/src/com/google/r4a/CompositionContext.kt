@@ -206,6 +206,29 @@ inline fun <reified T : View> CompositionContext.emitView(
     block()
 }
 
+inline fun <reified T: Emittable> CompositionContext.emitEmittable(
+    loc: Int,
+    key: Int?,
+    ctor: () -> T,
+    updater: Updater<T>.() -> Unit,
+    block: () -> Unit
+) = viewGroup(loc, key) {
+    val el: T = if (isInserting()) ctor().also { setInstance(it) } else  useInstance() as T
+    Updater(this, el).updater()
+    block()
+}
+
+inline fun <reified T: Emittable> CompositionContext.emitEmittable(
+    loc: Int,
+    ctor: () -> T,
+    updater: Updater<T>.() -> Unit,
+    block: () -> Unit
+) = emitEmittable(loc, null, ctor, updater, block)
+
+inline fun <reified T: Emittable> CompositionContext.emitEmittable(
+    loc: Int, ctor: () -> T, updater: Updater<T>.() -> Unit
+) = emitEmittable(loc, null, ctor, updater, {})
+
 inline fun <reified T> CompositionContext.provideAmbient(
     key: Ambient<T>,
     value: T,

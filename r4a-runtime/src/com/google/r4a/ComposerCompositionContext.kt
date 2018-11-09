@@ -102,7 +102,7 @@ internal class ComposerCompositionContext(val root: ViewGroup, private val rootC
     override fun useInstance(): Any? {
         val instance = composer.peekSlot()
         return when (instance) {
-            is View -> composer.useNode()
+            is View, is Emittable -> composer.useNode()
             is Component -> {
                 composer.skipValue()
                 composer.nextSlot()
