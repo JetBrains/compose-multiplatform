@@ -75,6 +75,23 @@ class KtxCodegenTests : AbstractCodeGenTest() {
     }
 
     @Test
+    fun testCGNUpdatedComposition(): Unit = newCodeGen {
+        var value = "Hello, world!"
+
+        compose({ mapOf("value" to value) }, """
+           <TextView text=value id=42 />
+        """).then { activity ->
+            val textView = activity.findViewById(42) as TextView
+            assertEquals("Hello, world!", textView.text)
+
+            value = "Other value"
+        }.then { activity ->
+            val textView = activity.findViewById(42) as TextView
+            assertEquals("Other value", textView.text)
+        }
+    }
+
+    @Test
     fun testCGViewGroup(): Unit = ensureSetup {
         val tvId = 258
         val llId = 260
@@ -85,6 +102,50 @@ class KtxCodegenTests : AbstractCodeGenTest() {
             <LinearLayout orientation id=$llId>
               <TextView text id=$tvId />
             </LinearLayout>
+        """).then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+            val linearLayout = activity.findViewById(llId) as LinearLayout
+
+            assertEquals(text, textView.text)
+            assertEquals(orientation, linearLayout.orientation)
+
+            text = "Other value"
+            orientation = LinearLayout.VERTICAL
+        }.then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+            val linearLayout = activity.findViewById(llId) as LinearLayout
+
+            assertEquals(text, textView.text)
+            assertEquals(orientation, linearLayout.orientation)
+        }
+    }
+
+    @Test
+    fun testCGNViewGroup(): Unit = newCodeGen {
+        val tvId = 258
+        val llId = 260
+        var text = "Hello, world!"
+        var orientation = LinearLayout.HORIZONTAL
+
+        compose({ mapOf("text" to text, "orientation" to orientation) }, """
+
+            composer.emit<LinearLayout>(13,
+                    { context -> LinearLayout(context)},
+                    {
+                        set<Int>(orientation) { this.orientation = it }
+                        set<Int>($llId) { this.id = it }
+                    }) {
+                composer.emit<TextView>(12,
+                        { context -> TextView(context) } ,
+                        {
+                            set<String>(text) { this.text = it }
+                            set<Int>($tvId) { this.id = it }
+                        })
+            }
+
+            // <LinearLayout orientation id=$llId>
+            //   <TextView text id=$tvId />
+            // </LinearLayout>
         """).then { activity ->
             val textView = activity.findViewById(tvId) as TextView
             val linearLayout = activity.findViewById(llId) as LinearLayout
