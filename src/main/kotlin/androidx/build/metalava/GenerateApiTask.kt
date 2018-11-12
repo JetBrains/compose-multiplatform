@@ -18,34 +18,25 @@ package androidx.build.metalava
 
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.api.BaseVariant
+import com.google.common.io.Files
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.file.FileCollection
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
-/** Validate an API signature text file against a set of source files. */
-open class CheckApiTask : MetalavaTask() {
-    /**
-     * Text file from which the API signatures will be obtained.
-     *
-     * Note: Marked as an output so that this task will be properly incremental.
-     */
-    @get:InputFile
+/** Generate an API signature text file from a set of source files. */
+open class GenerateApiTask : MetalavaTask() {
+    /** Text file to which API signatures will be written. */
     @get:OutputFile
-    var apiTxtFile: File? = null
-
-    /** Whether to permit API additions **/
-    @get:Input
-    var allowApiAdditions: Boolean = false
+    var apiFile: File? = null
 
     @TaskAction
     fun exec() {
         val dependencyClasspath = checkNotNull(
                 dependencyClasspath) { "Dependency classpath not set." }
-        val apiTxtFile = checkNotNull(apiTxtFile) { "Current API file not set." }
+        val apiFile = checkNotNull(apiFile) { "Current API file not set." }
         check(bootClasspath.isNotEmpty()) { "Android boot classpath not set." }
         check(sourcePaths.isNotEmpty()) { "Source paths not set." }
 
@@ -56,12 +47,12 @@ open class CheckApiTask : MetalavaTask() {
             "--source-path",
             sourcePaths.filter { it.exists() }.joinToString(File.pathSeparator),
 
-            "--check-compatibility:api:" + if (allowApiAdditions) { "released" } else { "current" },
-            apiTxtFile.toString(),
+            "--api",
+            apiFile.toString(),
 
             "--compatible-output=no",
             "--omit-common-packages=yes",
-            "--input-kotlin-nulls=yes"
+            "--output-kotlin-nulls=yes"
         )
     }
 }
