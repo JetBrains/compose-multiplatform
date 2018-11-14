@@ -16,12 +16,12 @@
 
 package androidx.build
 
-import androidx.build.dokka.Dokka
 import androidx.build.SupportConfig.BUILD_TOOLS_VERSION
 import androidx.build.SupportConfig.CURRENT_SDK_VERSION
 import androidx.build.SupportConfig.DEFAULT_MIN_SDK_VERSION
 import androidx.build.SupportConfig.INSTRUMENTATION_RUNNER
 import androidx.build.dependencyTracker.AffectedModuleDetector
+import androidx.build.dokka.Dokka
 import androidx.build.gradle.getByType
 import androidx.build.gradle.isRoot
 import androidx.build.jacoco.Jacoco
@@ -38,6 +38,7 @@ import org.gradle.api.JavaVersion.VERSION_1_8
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ConfigurationContainer
+import org.gradle.api.artifacts.ExternalDependency
 import org.gradle.api.plugins.JavaLibraryPlugin
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPluginConvention
@@ -156,7 +157,6 @@ class AndroidXPlugin : Plugin<Project> {
         project.createClockLockTasks()
 
         AffectedModuleDetector.configure(gradle, this)
-
     }
 
     private fun Project.configureAndroidCommonOptions(extension: BaseExtension) {
@@ -306,6 +306,17 @@ fun Project.isBenchmark(): Boolean {
  */
 private fun Project.useMaxiumumDependencyVersions(configurations: ConfigurationContainer) {
     configurations.all { configuration ->
+        configuration.dependencies.forEach { dependency ->
+            // we need to use @aar in internal dependencies to allow maven projects to work
+            // properly but that also makes them non-transitive by default.
+            //
+            // we fix them here to avoid declaring every single transitive dependency in build files
+            // when depending on prebuilts.
+            if (dependency is ExternalDependency &&
+                dependency.module.group.startsWith("androidx")) {
+                dependency.isTransitive = true
+            }
+        }
         configuration.resolutionStrategy.eachDependency { dep ->
             if (artifactSupportsSemVer(dep.target.group)) {
                 // TODO: support projects having two ':' chars in the name
