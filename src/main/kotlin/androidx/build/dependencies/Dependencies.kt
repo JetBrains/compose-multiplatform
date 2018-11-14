@@ -52,6 +52,7 @@ const val RX_JAVA = "io.reactivex.rxjava2:rxjava:2.0.6"
 const val TEST_CORE = "androidx.test:core:1.0.0"
 const val TEST_RUNNER = "androidx.test:runner:1.1.0"
 const val TEST_RULES = "androidx.test:rules:1.1.0"
+const val TEST_EXT_JUNIT = "androidx.test.ext:junit:1.0.0"
 const val TRUTH = "com.google.truth:truth:0.34"
 /**
  * this Xerial version is newer than we want but we need it to fix
