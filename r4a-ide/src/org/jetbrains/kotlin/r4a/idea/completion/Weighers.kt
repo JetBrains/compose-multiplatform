@@ -4,6 +4,7 @@ import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementWeigher
 import com.intellij.codeInsight.lookup.WeighingContext
 import com.intellij.openapi.util.Key
+import org.jetbrains.kotlin.r4a.idea.AttributeInfo
 
 object Weighers {
     val IS_IMPORTED_KEY = Key<Boolean>("r4a.is_imported")

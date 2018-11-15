@@ -27,11 +27,9 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.psiUtil.anyDescendantOfType
 import org.jetbrains.kotlin.psi.psiUtil.elementsInRange
-import org.jetbrains.kotlin.r4a.idea.conversion.XmlToKtxConverter.XmlNamespace
 import org.jetbrains.kotlin.r4a.idea.editor.KtxEditorOptions
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
-import java.lang.IllegalStateException
 
 class ConvertXmlCopyPasteProcessor : CopyPastePostProcessor<TextBlockTransferableData>() {
     private val LOG = Logger.getInstance(ConvertXmlCopyPasteProcessor::class.java)
@@ -119,11 +117,12 @@ class ConvertXmlCopyPasteProcessor : CopyPastePostProcessor<TextBlockTransferabl
         // Convert PsiElement's to AST Element's.
         val conversionResult = StringBuilder()
         val imports = hashSetOf<FqName>()
+        val converter = XmlToKtxConverter(targetFile)
         elementAndTextList.process(object : ElementsAndTextsProcessor {
             override fun processElement(element: PsiElement) {
                 // TODO(jdemeulenaere): Better comment converter.
                 val codeBuilder = CodeBuilder(null, EmptyDocCommentConverter)
-                codeBuilder.append(XmlToKtxConverter.convertElement(element))
+                codeBuilder.append(converter.convertElement(element))
                 imports.addAll(codeBuilder.importsToAdd)
                 conversionResult.append(codeBuilder.resultText)
             }
