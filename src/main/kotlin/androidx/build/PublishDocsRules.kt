@@ -29,7 +29,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.ANNOTATION, "1.0.0")
     prebuilts(LibraryGroups.APPCOMPAT, "1.0.2")
     prebuilts(LibraryGroups.ASYNCLAYOUTINFLATER, "1.0.0")
-    prebuilts(LibraryGroups.BIOMETRIC, "biometric", "1.0.0-alpha01")
+    prebuilts(LibraryGroups.BIOMETRIC, "biometric", "1.0.0-alpha02")
     prebuilts(LibraryGroups.BROWSER, "1.0.0")
     ignore(LibraryGroups.CAR, "car-moderator")
     prebuilts(LibraryGroups.CAR, "car-cluster", "1.0.0-alpha5")
