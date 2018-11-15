@@ -3,10 +3,8 @@ package org.jetbrains.kotlin.r4a.frames
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi2ir.extensions.SyntheticIrExtension
 import org.jetbrains.kotlin.r4a.AbstractCodeGenTest
-import org.jetbrains.kotlin.r4a.R4ASyntheticIrExtension
 import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisHandlerExtension
 import org.jetbrains.kotlin.r4a.frames.analysis.PackageAnalysisHandlerExtension
-import org.jetbrains.kotlin.r4a.frames.FrameTransformExtension
 
 class FrameTransformExtensionTests : AbstractCodeGenTest() {
 

@@ -23,7 +23,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
             ResolvedKtxElementCall:
               emitOrCall = MemoizedCallNode:
                 memoize = ComposerCallInfo:
-                  composerCall = fun call(Any, crossinline () -> Foo.Bar, crossinline ViewValidator.(Foo.Bar) -> Boolean, crossinline (Foo.Bar) -> Unit)
+                  composerCall = fun call(Any, () -> Foo.Bar, ViewValidator.(Foo.Bar) -> Boolean, (Foo.Bar) -> Unit)
                   pivotals = <empty>
                   joinKeyCall = fun joinKey(Any, Any?): Any
                   ctorCall = <null>
@@ -57,7 +57,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
             ResolvedKtxElementCall:
               emitOrCall = MemoizedCallNode:
                 memoize = ComposerCallInfo:
-                  composerCall = fun call(Any, crossinline ViewValidator.() -> Boolean, crossinline () -> Unit)
+                  composerCall = fun call(Any, ViewValidator.() -> Boolean, () -> Unit)
                   pivotals = <empty>
                   joinKeyCall = fun joinKey(Any, Any?): Any
                   ctorCall = <null>
@@ -93,7 +93,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
             ResolvedKtxElementCall:
               emitOrCall = MemoizedCallNode:
                 memoize = ComposerCallInfo:
-                  composerCall = fun call(Any, crossinline () -> Bar, crossinline ViewValidator.(Bar) -> Boolean, crossinline (Bar) -> Unit)
+                  composerCall = fun call(Any, () -> Bar, ViewValidator.(Bar) -> Boolean, (Bar) -> Unit)
                   pivotals = <empty>
                   joinKeyCall = fun joinKey(Any, Any?): Any
                   ctorCall = <null>
@@ -144,7 +144,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
             ResolvedKtxElementCall:
               emitOrCall = MemoizedCallNode:
                 memoize = ComposerCallInfo:
-                  composerCall = fun call(Any, crossinline () -> (Int) -> Bar, crossinline ViewValidator.((Int) -> Bar) -> Boolean, crossinline ((Int) -> Bar) -> Unit)
+                  composerCall = fun call(Any, () -> (Int) -> Bar, ViewValidator.((Int) -> Bar) -> Boolean, ((Int) -> Bar) -> Unit)
                   pivotals = <empty>
                   joinKeyCall = fun joinKey(Any, Any?): Any
                   ctorCall = fun Foo(Int): (Int) -> Bar
@@ -160,14 +160,14 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
                         attribute = z
                 call = MemoizedCallNode:
                   memoize = ComposerCallInfo:
-                    composerCall = fun call(Any, crossinline () -> Bar, crossinline ViewValidator.(Bar) -> Boolean, crossinline (Bar) -> Unit)
+                    composerCall = fun call(Any, () -> Bar, ViewValidator.(Bar) -> Boolean, (Bar) -> Unit)
                     pivotals = <empty>
                     joinKeyCall = fun joinKey(Any, Any?): Any
                     ctorCall = fun invoke(Int): Bar
                     ctorParams = y
                     validations =
                       - ValidatedAssignment(UPDATE):
-                          validationCall = fun update(Int, crossinline (Int) -> Unit): Boolean
+                          validationCall = fun update(Int, (Int) -> Unit): Boolean
                           assignment = fun <set-y>(Int)
                           attribute = y
                       - ValidatedAssignment(CHANGED):
@@ -201,7 +201,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
             ResolvedKtxElementCall:
               emitOrCall = MemoizedCallNode:
                 memoize = ComposerCallInfo:
-                  composerCall = fun call(Any, crossinline ViewValidator.() -> Boolean, crossinline () -> Unit)
+                  composerCall = fun call(Any, ViewValidator.() -> Boolean, () -> Unit)
                   pivotals = <empty>
                   joinKeyCall = fun joinKey(Any, Any?): Any
                   ctorCall = <null>
@@ -245,7 +245,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
             ResolvedKtxElementCall:
               emitOrCall = MemoizedCallNode:
                 memoize = ComposerCallInfo:
-                  composerCall = fun call(Any, crossinline ViewValidator.() -> Boolean, crossinline () -> Unit)
+                  composerCall = fun call(Any, ViewValidator.() -> Boolean, () -> Unit)
                   pivotals = <empty>
                   joinKeyCall = fun joinKey(Any, Any?): Any
                   ctorCall = <null>
@@ -282,7 +282,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
             ResolvedKtxElementCall:
               emitOrCall = MemoizedCallNode:
                 memoize = ComposerCallInfo:
-                  composerCall = fun call(Any, crossinline ViewValidator.() -> Boolean, crossinline () -> Unit)
+                  composerCall = fun call(Any, ViewValidator.() -> Boolean, () -> Unit)
                   pivotals = <empty>
                   joinKeyCall = fun joinKey(Any, Any?): Any
                   ctorCall = <null>
@@ -327,7 +327,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
             ResolvedKtxElementCall:
               emitOrCall = MemoizedCallNode:
                 memoize = ComposerCallInfo:
-                  composerCall = fun call(Any, crossinline () -> Bar, crossinline ViewValidator.(Bar) -> Boolean, crossinline (Bar) -> Unit)
+                  composerCall = fun call(Any, () -> Bar, ViewValidator.(Bar) -> Boolean, (Bar) -> Unit)
                   pivotals = <empty>
                   joinKeyCall = fun joinKey(Any, Any?): Any
                   ctorCall = <null>
@@ -338,7 +338,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
                         assignment = fun <set-y>(Int)
                         attribute = y
                     - ValidatedAssignment(SET):
-                        validationCall = fun set(() -> Unit, crossinline (() -> Unit) -> Unit): Boolean
+                        validationCall = fun set(() -> Unit, (() -> Unit) -> Unit): Boolean
                         assignment = fun <set-children>(() -> Unit)
                         attribute = <children>
                     - ValidatedAssignment(CHANGED):
@@ -371,18 +371,18 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
             ResolvedKtxElementCall:
               emitOrCall = EmitCallNode:
                 memoize = ComposerCallInfo:
-                  composerCall = fun emit(Any, crossinline (Context) -> Button, ViewUpdater<Button>.() -> Unit)
+                  composerCall = fun emit(Any, (Context) -> Button, ViewUpdater<Button>.() -> Unit)
                   pivotals = <empty>
                   joinKeyCall = fun joinKey(Any, Any?): Any
                   ctorCall = Button(Context!)
                   ctorParams = (implicit)context
                   validations =
                     - ValidatedAssignment(SET):
-                        validationCall = fun set(String, crossinline Button.(String) -> Unit)
+                        validationCall = fun set(String, Button.(String) -> Unit)
                         assignment = fun setText(CharSequence!)
                         attribute = text
                     - ValidatedAssignment(SET):
-                        validationCall = fun set(Boolean, crossinline Button.(Boolean) -> Unit)
+                        validationCall = fun set(Boolean, Button.(Boolean) -> Unit)
                         assignment = fun setEnabled(Boolean)
                         attribute = enabled
               usedAttributes = text, enabled
@@ -407,13 +407,13 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
 
             inline fun <T : Foo> C.emit(
                 key: Any,
-                crossinline ctor: (Context) -> T,
+                ctor: (Context) -> T,
                 update: Updater.() -> Unit
             ) {}
 
             inline fun <T : Foo> C.emit(
                 key: Any,
-                crossinline ctor: (Context) -> T,
+                ctor: (Context) -> T,
                 update: Updater.() -> Unit,
                 children: () -> Unit
             ) {}
@@ -463,7 +463,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
             ResolvedKtxElementCall:
               emitOrCall = MemoizedCallNode:
                 memoize = ComposerCallInfo:
-                  composerCall = fun call(Any, crossinline () -> Bar, crossinline ViewValidator.(Bar) -> Boolean, crossinline (Bar) -> Unit)
+                  composerCall = fun call(Any, () -> Bar, ViewValidator.(Bar) -> Boolean, (Bar) -> Unit)
                   pivotals = <empty>
                   joinKeyCall = fun joinKey(Any, Any?): Any
                   ctorCall = <null>
@@ -513,14 +513,14 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
             ResolvedKtxElementCall:
               emitOrCall = MemoizedCallNode:
                 memoize = ComposerCallInfo:
-                  composerCall = fun call(Any, crossinline () -> Bar, crossinline ViewValidator.(Bar) -> Boolean, crossinline (Bar) -> Unit)
+                  composerCall = fun call(Any, () -> Bar, ViewValidator.(Bar) -> Boolean, (Bar) -> Unit)
                   pivotals = <empty>
                   joinKeyCall = fun joinKey(Any, Any?): Any
                   ctorCall = Bar(Int)
                   ctorParams = a
                   validations =
                     - ValidatedAssignment(UPDATE):
-                        validationCall = fun update(Int, crossinline (Int) -> Unit): Boolean
+                        validationCall = fun update(Int, (Int) -> Unit): Boolean
                         assignment = fun <set-a>(Int)
                         attribute = a
                     - ValidatedAssignment(CHANGED):
@@ -561,7 +561,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
             ResolvedKtxElementCall:
               emitOrCall = MemoizedCallNode:
                 memoize = ComposerCallInfo:
-                  composerCall = fun call(Any, crossinline ViewValidator.() -> Boolean, crossinline () -> Unit)
+                  composerCall = fun call(Any, ViewValidator.() -> Boolean, () -> Unit)
                   pivotals = <empty>
                   joinKeyCall = fun joinKey(Any, Any?): Any
                   ctorCall = <null>
@@ -612,7 +612,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
             ResolvedKtxElementCall:
               emitOrCall = MemoizedCallNode:
                 memoize = ComposerCallInfo:
-                  composerCall = fun call(Any, crossinline () -> Bar.Foo, crossinline ViewValidator.(Bar.Foo) -> Boolean, crossinline (Bar.Foo) -> Unit)
+                  composerCall = fun call(Any, () -> Bar.Foo, ViewValidator.(Bar.Foo) -> Boolean, (Bar.Foo) -> Unit)
                   pivotals = <empty>
                   joinKeyCall = fun joinKey(Any, Any?): Any
                   ctorCall = Foo()
@@ -655,7 +655,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
             ResolvedKtxElementCall:
               emitOrCall = MemoizedCallNode:
                 memoize = ComposerCallInfo:
-                  composerCall = fun call(Any, crossinline () -> A, crossinline ViewValidator.(A) -> Boolean, crossinline (A) -> Unit)
+                  composerCall = fun call(Any, () -> A, ViewValidator.(A) -> Boolean, (A) -> Unit)
                   pivotals = <empty>
                   joinKeyCall = fun joinKey(Any, Any?): Any
                   ctorCall = <null>
@@ -725,7 +725,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
             ResolvedKtxElementCall:
               emitOrCall = MemoizedCallNode:
                 memoize = ComposerCallInfo:
-                  composerCall = fun call(Any, crossinline () -> A, crossinline ViewValidator.(A) -> Boolean, crossinline (A) -> Unit)
+                  composerCall = fun call(Any, () -> A, ViewValidator.(A) -> Boolean, (A) -> Unit)
                   pivotals = <empty>
                   joinKeyCall = fun joinKey(Any, Any?): Any
                   ctorCall = <null>
@@ -817,7 +817,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
             ResolvedKtxElementCall:
               emitOrCall = MemoizedCallNode:
                 memoize = ComposerCallInfo:
-                  composerCall = fun call(Any, crossinline ViewValidator.() -> Boolean, crossinline () -> Unit)
+                  composerCall = fun call(Any, ViewValidator.() -> Boolean, () -> Unit)
                   pivotals = <empty>
                   joinKeyCall = fun joinKey(Any, Any?): Any
                   ctorCall = <null>

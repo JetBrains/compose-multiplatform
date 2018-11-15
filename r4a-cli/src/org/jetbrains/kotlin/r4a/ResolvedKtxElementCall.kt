@@ -74,17 +74,13 @@ enum class ValidationType {
     UPDATE
 }
 
-sealed class Assignment(
-    val assignment: ResolvedCall<*>?,
-    val attribute: AttributeNode
-)
-
 class ValidatedAssignment(
     val validationType: ValidationType,
     val validationCall: ResolvedCall<*>?,
-    assignment: ResolvedCall<*>?,
-    attribute: AttributeNode
-) : Assignment(assignment, attribute)
+    val assignment: ResolvedCall<*>?,
+    val assignmentLambda: FunctionDescriptor?,
+    val attribute: AttributeNode
+)
 
 class ComposerCallInfo(
     val composerCall: ResolvedCall<*>?,

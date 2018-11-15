@@ -115,7 +115,7 @@ class ViewComposer(val root: ViewGroup, val context: Context, val adapters: View
 }
 
 /* inline */ class ViewComposition(val composer: ViewComposer) {
-    inline fun <T : View> emit(key: Any, crossinline ctor: (context: Context) -> T, update: ViewUpdater<T>.() -> Unit) {
+    /*inline*/ fun <T : View> emit(key: Any, /*crossinline*/ ctor: (context: Context) -> T, update: ViewUpdater<T>.() -> Unit) {
         composer.startNode(key)
         if (composer.inserting)
             composer.createNode { ctor(composer.context) }
@@ -124,9 +124,9 @@ class ViewComposer(val root: ViewGroup, val context: Context, val adapters: View
         composer.endNode()
     }
 
-    inline fun <T : ViewGroup> emit(
+    /*inline*/ fun <T : ViewGroup> emit(
         key: Any,
-        crossinline ctor: (context: Context) -> T,
+        /*crossinline*/ ctor: (context: Context) -> T,
         update: ViewUpdater<T>.() -> Unit,
         children: () -> Unit
     ) {
@@ -139,7 +139,7 @@ class ViewComposer(val root: ViewGroup, val context: Context, val adapters: View
         composer.endNode()
     }
 
-    inline fun <T : Emittable> emit(key: Any, crossinline ctor: () -> T, update: ViewUpdater<T>.() -> Unit) {
+    /*inline*/ fun <T : Emittable> emit(key: Any, /*crossinline*/ ctor: () -> T, update: ViewUpdater<T>.() -> Unit) {
         composer.startNode(key)
         if (composer.inserting)
             composer.createNode { ctor() }
@@ -148,9 +148,9 @@ class ViewComposer(val root: ViewGroup, val context: Context, val adapters: View
         composer.endNode()
     }
 
-    inline fun <T : Emittable> emit(
+    /*inline*/ fun <T : Emittable> emit(
         key: Any,
-        crossinline ctor: () -> T,
+        /*crossinline*/ ctor: () -> T,
         update: ViewUpdater<T>.() -> Unit,
         children: () -> Unit
     ) {
@@ -163,9 +163,9 @@ class ViewComposer(val root: ViewGroup, val context: Context, val adapters: View
         composer.endNode()
     }
 
-    inline fun joinKey(left: Any, right: Any?): Any = composer.joinKey(left, right)
+    /*inline*/ fun joinKey(left: Any, right: Any?): Any = composer.joinKey(left, right)
 
-    inline fun call(key: Any, crossinline invalid: ViewValidator.() -> Boolean, crossinline block: () -> Unit) {
+    /*inline*/ fun call(key: Any, /*crossinline*/ invalid: ViewValidator.() -> Boolean, /*crossinline*/ block: () -> Unit) {
         composer.startGroup(key)
         if (ViewValidator(composer).invalid() || composer.inserting) {
             composer.startGroup(invocation)
@@ -177,11 +177,11 @@ class ViewComposer(val root: ViewGroup, val context: Context, val adapters: View
         composer.endGroup()
     }
 
-    inline fun <T> call(
+    /*inline*/ fun <T> call(
         key: Any,
-        crossinline ctor: () -> T,
-        crossinline invalid: ViewValidator.(f: T) -> Boolean,
-        crossinline block: (f: T) -> Unit
+        /*crossinline*/ ctor: () -> T,
+        /*crossinline*/ invalid: ViewValidator.(f: T) -> Boolean,
+        /*crossinline*/ block: (f: T) -> Unit
     ) {
         composer.startGroup(key)
         val f = composer.remember { ctor() }
@@ -197,7 +197,7 @@ class ViewComposer(val root: ViewGroup, val context: Context, val adapters: View
 }
 
 /* inline */ class ViewValidator(val composer: ViewComposer) {
-    inline fun changed(value: Int) = if (composer.nextSlot() != value || composer.inserting) {
+    /*inline*/ fun changed(value: Int) = if (composer.nextSlot() != value || composer.inserting) {
         composer.updateValue(value)
         true
     } else {
@@ -205,7 +205,7 @@ class ViewComposer(val root: ViewGroup, val context: Context, val adapters: View
         false
     }
 
-    inline fun <reified T> changed(value: T) = if (composer.nextSlot() != value || composer.inserting) {
+    /*inline*/ fun </*reified*/ T> changed(value: T) = if (composer.nextSlot() != value || composer.inserting) {
         composer.updateValue(value)
         true
     } else {
@@ -213,7 +213,7 @@ class ViewComposer(val root: ViewGroup, val context: Context, val adapters: View
         false
     }
 
-    inline fun updated(value: Int) = composer.inserting.let { inserting ->
+    /*inline*/ fun updated(value: Int) = composer.inserting.let { inserting ->
         if (composer.nextSlot() != value || inserting) {
             composer.updateValue(value)
             !inserting
@@ -223,7 +223,7 @@ class ViewComposer(val root: ViewGroup, val context: Context, val adapters: View
         }
     }
 
-    inline fun <reified T> updated(value: T) = composer.inserting.let { inserting ->
+    /*inline*/ fun </*reified*/ T> updated(value: T) = composer.inserting.let { inserting ->
         if (composer.nextSlot() != value || inserting) {
             composer.updateValue(value)
             !inserting
@@ -233,16 +233,16 @@ class ViewComposer(val root: ViewGroup, val context: Context, val adapters: View
         }
     }
 
-    inline fun set(value: Int, crossinline block: (value: Int) -> Unit): Boolean = changed(value).also { if (it) block(value) }
-    inline fun <reified T> set(value: T, crossinline block: (value: T) -> Unit): Boolean = changed(value).also { if (it) block(value) }
-    inline fun update(value: Int, crossinline block: (value: Int) -> Unit): Boolean = updated(value).also { if (it) block(value) }
-    inline fun <reified T> update(value: T, crossinline block: (value: T) -> Unit): Boolean = updated(value).also { if (it) block(value) }
+    /*inline*/ fun set(value: Int, /*crossinline*/ block: (value: Int) -> Unit): Boolean = changed(value).also { if (it) block(value) }
+    /*inline*/ fun </*reified*/ T> set(value: T, /*crossinline*/ block: (value: T) -> Unit): Boolean = changed(value).also { if (it) block(value) }
+    /*inline*/ fun update(value: Int, /*crossinline*/ block: (value: Int) -> Unit): Boolean = updated(value).also { if (it) block(value) }
+    /*inline*/ fun </*reified*/ T> update(value: T, /*crossinline*/ block: (value: T) -> Unit): Boolean = updated(value).also { if (it) block(value) }
 
-    inline operator fun Boolean.plus(other: Boolean) = this || other
+    /*inline*/ operator fun Boolean.plus(other: Boolean) = this || other
 }
 
 /* inline */ class ComposerUpdater<N, T:N>(val composer: Composer<N>) {
-    inline fun set(value: Int, crossinline block: T.(value: Int) -> Unit) {
+    /*inline*/ fun set(value: Int, /*crossinline*/ block: T.(value: Int) -> Unit) {
         if (composer.inserting || composer.nextSlot() != value) {
             composer.updateValue(value)
             val appliedBlock: T.(value: Int) -> Unit = { block(it) }
@@ -250,7 +250,7 @@ class ViewComposer(val root: ViewGroup, val context: Context, val adapters: View
         } else composer.skipValue()
     }
 
-    inline fun <reified V> set(value: V, crossinline block: T.(value: V) -> Unit) {
+    /*inline*/ fun </*reified*/ V> set(value: V, /*crossinline*/ block: T.(value: V) -> Unit) {
         if (composer.inserting || composer.nextSlot() != value) {
             composer.updateValue(value)
             val appliedBlock: T.(value: V) -> Unit = { block(it) }
@@ -258,7 +258,7 @@ class ViewComposer(val root: ViewGroup, val context: Context, val adapters: View
         } else composer.skipValue()
     }
 
-    inline fun update(value: Int, crossinline block: T.(value: Int) -> Unit) {
+    /*inline*/ fun update(value: Int, /*crossinline*/ block: T.(value: Int) -> Unit) {
         if (composer.inserting || composer.nextSlot() != value) {
             composer.updateValue(value)
             val appliedBlock: T.(value: Int) -> Unit = { block(it) }
@@ -266,7 +266,7 @@ class ViewComposer(val root: ViewGroup, val context: Context, val adapters: View
         } else composer.skipValue()
     }
 
-    inline fun <reified V> update(value: V, crossinline block: T.(value: V) -> Unit) {
+    /*inline*/ fun </*reified*/ V> update(value: V, /*crossinline*/ block: T.(value: V) -> Unit) {
         if (composer.inserting || composer.nextSlot() != value) {
             composer.updateValue(value)
             val appliedBlock: T.(value: V) -> Unit = { block(it) }

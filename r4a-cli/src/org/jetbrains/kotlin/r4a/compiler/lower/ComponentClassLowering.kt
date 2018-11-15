@@ -1037,7 +1037,7 @@ fun lowerComposeFunction(context: GeneratorContext, container: IrPackageFragment
     }
 }
 
-private val KTX_TAG_ORIGIN = object : IrStatementOriginImpl("KTX Tag") {}
+internal val KTX_TAG_ORIGIN = object : IrStatementOriginImpl("KTX Tag") {}
 
 private class ComposeFunctionHelper(val context: GeneratorContext, val compose: IrFunction) {
     // make a local unique index generator for tmp var creation and slotting
