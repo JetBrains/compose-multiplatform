@@ -41,7 +41,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.CONCURRENT, "1.0.0-alpha02")
     prebuilts(LibraryGroups.CONTENTPAGER, "1.0.0")
     prebuilts(LibraryGroups.COORDINATORLAYOUT, "1.0.0")
-    prebuilts(LibraryGroups.CORE, "1.0.1")
+    prebuilts(LibraryGroups.CORE, "core", "1.1.0-alpha01")
     prebuilts(LibraryGroups.CORE, "core-ktx", "1.0.1")
     prebuilts(LibraryGroups.CURSORADAPTER, "1.0.0")
     prebuilts(LibraryGroups.CUSTOMVIEW, "1.0.0")
