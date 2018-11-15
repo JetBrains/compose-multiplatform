@@ -8,16 +8,15 @@ package com.google.r4a
 import android.content.Context
 import android.view.Choreographer
 import android.view.View
-import android.view.ViewGroup
 import java.util.WeakHashMap
 
-internal class ComposerCompositionContext(val root: ViewGroup, private val rootComponent: Component) : CompositionContext() {
+internal class ComposerCompositionContext(val root: Any, private val rootComponent: Component) : CompositionContext() {
     companion object {
-        val factory: Function4<Context, ViewGroup, Component, Ambient.Reference?, CompositionContext> by lazy {
-            object : Function4<Context, ViewGroup, Component, Ambient.Reference?, CompositionContext> {
+        val factory: Function4<Context, Any, Component, Ambient.Reference?, CompositionContext> by lazy {
+            object : Function4<Context, Any, Component, Ambient.Reference?, CompositionContext> {
                 override fun invoke(
                     context: Context,
-                    root: ViewGroup,
+                    root: Any,
                     component: Component,
                     ambientReference: Ambient.Reference?
                 ): CompositionContext {
@@ -58,7 +57,7 @@ internal class ComposerCompositionContext(val root: ViewGroup, private val rootC
         }
     }
 
-    override var context: Context = root.context
+    override lateinit var context: Context
 
     override fun startRoot() {
         composer.slots.reset()

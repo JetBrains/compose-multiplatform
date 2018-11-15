@@ -641,7 +641,7 @@ class NewCodeGenTests : TestCase() {
             var message: String = ""
         }
 
-        composeCG{
+        composeCG {
             adaptable {
                 val cc = CompositionContext.current
                 cc.emitView(615, { context -> LinearLayout(context) }, {}) {
@@ -672,6 +672,36 @@ class NewCodeGenTests : TestCase() {
         }
     }
 
+    @Test
+    fun testCGEmittableAsRoot() {
+        class MyEmittable: MockEmittable() {
+            var message: String = ""
+        }
+
+        val root = MyEmittable()
+
+        var first = "Hi"
+        var second = "there"
+        composeCG { activity ->
+            adaptable {
+                R4a.composeInto(root, activity) {
+                    val cc = CompositionContext.current
+                    cc.emitEmittable(686, { MyEmittable() }, { set(first) { message = it }}) {
+                        cc.emitEmittable(687, { MyEmittable() }, { set(second) { message = it }})
+                    }
+                }
+            }
+        }.then {
+            assertEquals(first, (root.children.first() as MyEmittable).message)
+            assertEquals(second, ((root.children.first() as MyEmittable).children.first() as MyEmittable).message)
+
+            first = "hello"
+            second = "dolly"
+        }.then {
+            assertEquals(first, (root.children.first() as MyEmittable).message)
+            assertEquals(second, ((root.children.first() as MyEmittable).children.first() as MyEmittable).message)
+        }
+    }
 
     open class MockEmittable: Emittable {
         val children = mutableListOf<Emittable>()

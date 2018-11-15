@@ -1,6 +1,7 @@
 package com.google.r4a
 
 import android.app.Activity
+import android.content.Context
 import android.view.ViewGroup
 import android.widget.LinearLayout
 
@@ -28,6 +29,25 @@ object R4a {
             root = Root()
             root.composable = composable
             val cc = CompositionContext.create(container.context, container, root, parent)
+            cc.recomposeSync(root)
+        } else {
+            root.composable = composable
+            CompositionContext.recomposeSync(root)
+        }
+    }
+
+    fun composeInto(
+        container: Emittable,
+        context: Context,
+        parent: Ambient.Reference? = null,
+        composable: () -> Unit
+    ) {
+        var root = CompositionContext.getRootComponent(container) as? Root
+        if (root == null) {
+            root = Root()
+            root.composable = composable
+            CompositionContext.setRoot(container, root)
+            val cc = CompositionContext.create(context, container, root, parent)
             cc.recomposeSync(root)
         } else {
             root.composable = composable

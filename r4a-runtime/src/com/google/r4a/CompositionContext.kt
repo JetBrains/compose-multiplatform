@@ -11,16 +11,20 @@ abstract class CompositionContext {
     companion object {
 
         private val TAG_ROOT_COMPONENT = "r4aRootComponent".hashCode()
+        private val EMITTABLE_ROOT_COMPONENT = WeakHashMap<Emittable, Component>()
         private val COMPONENTS_TO_CONTEXT = WeakHashMap<Component, CompositionContext>()
 
-        val factory: Function4<Context, ViewGroup, Component, Ambient.Reference?, CompositionContext> get() =
+        val factory: Function4<Context, Any, Component, Ambient.Reference?, CompositionContext> get() =
             if(useComposer) ComposerCompositionContext.factory else CompositionContextImpl.factory
 
         var current: CompositionContext = CompositionContextImpl()
 
-        fun create(context: Context, view: ViewGroup, component: Component, reference: Ambient.Reference?): CompositionContext {
-            val cc = factory(context, view, component, reference)
-            setRoot(view, component)
+        fun create(context: Context, group: Any, component: Component, reference: Ambient.Reference?): CompositionContext {
+            val cc = factory(context, group, component, reference)
+            when (group) {
+                is View -> setRoot(group, component)
+                is Emittable -> setRoot(group, component)
+            }
             return cc
         }
 
@@ -54,8 +58,16 @@ abstract class CompositionContext {
             return view.getTag(TAG_ROOT_COMPONENT) as? Component
         }
 
+        fun getRootComponent(emittable: Emittable): Component? {
+            return EMITTABLE_ROOT_COMPONENT[emittable]
+        }
+
         fun setRoot(view: View, component: Component) {
             view.setTag(TAG_ROOT_COMPONENT, component)
+        }
+
+        fun setRoot(emittable: Emittable, component: Component) {
+            EMITTABLE_ROOT_COMPONENT[emittable] = component
         }
 
         fun <T : Any?> getAmbient(key: Ambient<T>, component: Component): T = find(component)!!.getAmbient(key, component)
