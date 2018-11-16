@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.Choreographer
 import android.view.View
 import android.view.ViewGroup
+import com.google.r4a.adapters.Dimension
 import com.google.r4a.adapters.getViewAdapterIfExists
 import java.util.*
 
@@ -461,6 +462,19 @@ internal class CompositionContextImpl : CompositionContext() {
     }
 
     /**
+     * Just a dummy implementation to prove the behavior for a couple simple cases.
+     * TODO: Should return true for deeply immutable objects, frozen objects, primitives, value types, inline classes of immutables, @Model
+     * TODO: When we know at compile time, we shouldn't be doing a runtime check for this
+     */
+    private fun isEffectivelyImmutable(value: Any?): Boolean {
+        return when(value) {
+            is String, is Int, is Double, is Float, is Short, is Byte, is Char, is Boolean, is UByte, is UShort, is UInt, is ULong -> true
+            is Dimension -> true
+            else -> false
+        }
+    }
+
+    /**
      * Return true if the attribute is different than the last compose. If it is in inserting mode, store the value and return false.
      */
     override fun attributeChanged(value: Any?): Boolean {
@@ -477,7 +491,7 @@ internal class CompositionContextImpl : CompositionContext() {
             // TODO: Temporary hack because IR lambdas don't compare properly (yet)
             if(value is kotlin.jvm.internal.FunctionReference) return true
 
-            current != value
+            !isEffectivelyImmutable(value) || current != value
         }
     }
 
@@ -494,7 +508,7 @@ internal class CompositionContextImpl : CompositionContext() {
         } else {
             val current = slot.attributes[i]
             slot.attributes[i] = value
-            current != value
+            !isEffectivelyImmutable(value) || current != value
         }
     }
 
