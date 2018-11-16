@@ -128,9 +128,10 @@ def setupSubprojectsForBuildServer() {
                             include '*.apk'
                             into(BuildServerConfigurationKt.getDistributionDirectory(rootProject))
                             rename { String fileName ->
-                                // Exclude media-compat-test-* modules from existing support library
-                                // presubmit tests.
-                                if (fileName.contains("media-compat-test")) {
+                                // Exclude media-compat-test-* and media2-test-* modules from
+                                // existing support library presubmit tests.
+                                if (fileName.contains("media-compat-test")
+                                        || fileName.contains("media2-test")) {
                                     fileName
                                             .replace(fileName,
                                             "minDepVersions-${fileName}")
