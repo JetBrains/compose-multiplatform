@@ -106,7 +106,7 @@ internal class ViewApplyAdapter(private val adapters: ViewAdapters? = null) : Ap
     }
 }
 
-class ViewComposer(val root: ViewGroup, val context: Context, val adapters: ViewAdapters? = ViewAdapters()) : Composer<Any>(SlotTable(), Applier(root, ViewApplyAdapter(adapters))) {
+class ViewComposer(val root: Any, val context: Context, val adapters: ViewAdapters? = ViewAdapters()) : Composer<Any>(SlotTable(), Applier(root, ViewApplyAdapter(adapters))) {
     fun skipGroup(key: Any) {
         nextSlot()
         skipValue()

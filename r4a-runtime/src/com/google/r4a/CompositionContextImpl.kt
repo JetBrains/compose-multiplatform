@@ -80,10 +80,10 @@ internal class CompositionContextImpl : CompositionContext() {
 
     companion object {
         private val COMPONENTS_TO_SLOTS = WeakHashMap<Component, Slot>()
-        val factory = object : Function4<Context, ViewGroup, Component, Ambient.Reference?, CompositionContextImpl> {
-            override fun invoke(context: Context, root: ViewGroup, component: Component, reference: Ambient.Reference?): CompositionContextImpl {
+        val factory = object : Function4<Context, Any, Component, Ambient.Reference?, CompositionContextImpl> {
+            override fun invoke(context: Context, root: Any, component: Component, reference: Ambient.Reference?): CompositionContextImpl {
                 val result = CompositionContextImpl()
-                result.ROOT_CONTAINER.view = root
+                result.ROOT_CONTAINER.view = root as ViewGroup
                 result.AMBIENT_REFERENCE = reference
                 result.context = context
                 result.setInstance(component)
