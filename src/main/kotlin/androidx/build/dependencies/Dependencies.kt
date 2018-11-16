@@ -77,13 +77,26 @@ const val SUPPORT_FRAGMENTS = "androidx.fragment:fragment:$SUPPORT_VERSION"
 const val SUPPORT_RECYCLERVIEW = "androidx.recyclerview:recyclerview:$SUPPORT_VERSION"
 
 const val ANDROIDX_COLLECTION = "androidx.collection:collection:$SUPPORT_VERSION"
+const val ANDROIDX_CORE = "androidx.core:core:1.0.0@aar"
+const val ANDROIDX_RECYCLERVIEW = "androidx.recyclerview:recyclerview:1.0.0@aar"
 
 // Arch libraries
 const val ARCH_LIFECYCLE_RUNTIME = "androidx.lifecycle:lifecycle-runtime:2.0.0@aar"
+const val ARCH_LIFECYCLE_COMMON = "androidx.lifecycle:lifecycle-common:2.0.0@jar"
 const val ARCH_LIFECYCLE_LIVEDATA_CORE =
         "androidx.lifecycle:lifecycle-livedata-core:2.0.0@aar"
+const val ARCH_LIFECYCLE_LIVEDATA =
+        "androidx.lifecycle:lifecycle-livedata:2.0.0@aar"
 const val ARCH_LIFECYCLE_VIEWMODEL = "androidx.lifecycle:lifecycle-viewmodel:2.0.0@aar"
 const val ARCH_LIFECYCLE_EXTENSIONS = "androidx.lifecycle:lifecycle-extensions:2.0.0@aar"
 const val ARCH_CORE_COMMON = "androidx.arch.core:core-common:2.0.0@jar"
+const val ARCH_CORE_RUNTIME = "androidx.arch.core:core-runtime:2.0.0@aar"
+const val ARCH_CORE_TESTING = "androidx.arch.core:core-testing:2.0.0@aar"
 
 const val SAFE_ARGS_ANDROID_GRADLE_PLUGIN = "com.android.tools.build:gradle:3.2.1"
+
+const val ARCH_PAGING_COMMON = "androidx.paging:paging-common:2.0.0"
+const val ARCH_PAGING_RUNTIME = "androidx.paging:paging-runtime:2.0.0"
+const val ARCH_ROOM_RUNTIME = "androidx.room:room-runtime:2.0.0"
+const val ARCH_ROOM_COMPILER = "androidx.room:room-compiler:2.0.0"
+const val ARCH_ROOM_RXJAVA = "androidx.room:room-rxjava2:2.0.0"
