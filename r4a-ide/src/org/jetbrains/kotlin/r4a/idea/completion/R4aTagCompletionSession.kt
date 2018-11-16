@@ -8,9 +8,7 @@ import com.intellij.codeInsight.lookup.LookupElementPresentation
 import com.intellij.codeInsight.lookup.LookupElementRenderer
 import com.intellij.openapi.util.Iconable
 import com.intellij.openapi.util.Key
-import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiDocumentManager
-import com.intellij.psi.PsiLiteral
+import com.intellij.psi.*
 import com.intellij.ui.JBColor
 import com.intellij.util.PlatformIcons
 import org.jetbrains.kotlin.asJava.classes.KtLightClass
@@ -32,6 +30,7 @@ import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtxElement
 import org.jetbrains.kotlin.psi.psiUtil.endOffset
 import org.jetbrains.kotlin.psi.psiUtil.isIdentifier
+import org.jetbrains.kotlin.psi.psiUtil.nextLeaf
 import org.jetbrains.kotlin.r4a.idea.parentOfType
 import org.jetbrains.kotlin.renderer.render
 import org.jetbrains.kotlin.resolve.DescriptorUtils
@@ -39,6 +38,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.isSubclassOf
 import org.jetbrains.kotlin.resolve.scopes.utils.collectAllFromMeAndParent
 import org.jetbrains.kotlin.types.typeUtil.isUnit
+import java.awt.SystemColor.text
 
 class R4aTagCompletionSession(
     configuration: CompletionSessionConfiguration,
@@ -396,6 +396,7 @@ class R4aTagCompletionSession(
 
         val token = context.file.findElementAt(context.startOffset) ?: return
         val ktxElement = token.parentOfType<KtxElement>() ?: return
+        val mightWrapBody = ktxElement.nextLeaf({it !is PsiWhiteSpace && it.textLength > 0})?.text != "}"
         val gt = ktxElement.node.findChildByType(KtTokens.GT)
         // if the tag has a GT token, then we don't need to close it
         if (gt != null) return
@@ -404,21 +405,25 @@ class R4aTagCompletionSession(
 
         val tailOffset = context.tailOffset
         val moveCaret = context.editor.caretModel.offset == tailOffset
-        val textToInsert = if (allowsChildren && parameterNames.isNotEmpty()) {
-            " > ${parameterNames.joinToString()} -> </$tagName>"
-        } else if (allowsChildren) {
-            " ></$tagName>"
-        } else {
-            " />"
+        val textToInsert = buildString {
+            if (allowsChildren) {
+                append(">")
+                if (parameterNames.isNotEmpty()) {
+                    append(" ${parameterNames.joinToString()} ->")
+                    if (!mightWrapBody) append(" ")
+                }
+                if (!mightWrapBody) append("</$tagName>")
+            } else append(">")
         }
 
         document.insertString(tailOffset, textToInsert)
 
         if (moveCaret) {
-            context.editor.caretModel.moveToOffset(tailOffset + 1)
+            context.editor.caretModel.moveToOffset(tailOffset)
 
-            // since they just created a new tag, they might want to add some attributes. open up the autocomplete right away!
-            AutoPopupController.getInstance(context.project)?.scheduleAutoPopup(context.editor)
+            // TODO: Check if any attributes are valid, and if so, open autocomplete in `attributes` mode
+            // since they just created a new tag, they might want to add some attributes.
+            // AutoPopupController.getInstance(context.project)?.scheduleAutoPopup(context.editor)
         }
     }
 
