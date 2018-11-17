@@ -8,6 +8,7 @@ package com.google.r4a
 import android.content.Context
 import android.view.Choreographer
 import android.view.View
+import com.google.r4a.adapters.Dimension
 import java.util.WeakHashMap
 
 internal class ComposerCompositionContext(val root: Any, private val rootComponent: Component) : CompositionContext() {
@@ -137,13 +138,26 @@ internal class ComposerCompositionContext(val root: Any, private val rootCompone
     }
 
     override fun attributeChanged(value: Any?) =
-        if (composer.nextSlot() == value) {
+        if (composer.nextSlot() == value && isEffectivelyImmutable(value)) {
             composer.skipValue()
             false
         } else {
             composer.updateValue(value)
             true
         }
+
+    /**
+     * Just a dummy implementation to prove the behavior for a couple simple cases.
+     * TODO: Should return true for deeply immutable objects, frozen objects, primitives, value types, inline classes of immutables, @Model
+     * TODO: When we know at compile time, we shouldn't be doing a runtime check for this
+     */
+    private fun isEffectivelyImmutable(value: Any?): Boolean {
+        return when(value) {
+            is String, is Int, is Double, is Float, is Short, is Byte, is Char, is Boolean, is UByte, is UShort, is UInt, is ULong -> true
+            is Dimension -> true
+            else -> false
+        }
+    }
 
     override fun attributeChangedOrInserting(value: Any?): Boolean = attributeChanged(value) || composer.inserting
 
