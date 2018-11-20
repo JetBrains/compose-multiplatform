@@ -51,6 +51,9 @@ class R4aKtxControlFlowExtension : KtxControlFlowExtension {
         private fun elementsToValues(from: List<KtElement?>): List<PseudoValue> =
             from.mapNotNull { element -> getBoundOrUnreachableValue(element) }
 
+        private fun instructionsToValues(from: List<InstructionWithValue>): List<PseudoValue> =
+            from.mapNotNull { instruction -> instruction.outputValue }
+
         private fun generateInstructions(element: KtElement?) {
             if (element == null) return
             element.accept(visitor)
@@ -63,7 +66,8 @@ class R4aKtxControlFlowExtension : KtxControlFlowExtension {
             val expression = KtPsiUtil.deparenthesize(element) ?: return
 
             if (expression is KtStatementExpression || expression is KtTryExpression
-                || expression is KtIfExpression || expression is KtWhenExpression) {
+                || expression is KtIfExpression || expression is KtWhenExpression
+            ) {
                 return
             }
 
@@ -106,8 +110,7 @@ class R4aKtxControlFlowExtension : KtxControlFlowExtension {
             }
 
             mark(resolvedCall.call.callElement)
-            val callInstruction = builder.call(callElement, resolvedCall, receivers, parameterValues)
-            return callInstruction
+            return builder.call(callElement, resolvedCall, receivers, parameterValues)
         }
 
         private fun getReceiverValues(resolvedCall: ResolvedCall<*>): Map<PseudoValue, ReceiverValue> {
@@ -173,7 +176,7 @@ class R4aKtxControlFlowExtension : KtxControlFlowExtension {
                     // Do nothing
                 }
                 else -> {
-                    throw IllegalArgumentException("Unknown receiver kind: " + receiver)
+                    throw IllegalArgumentException("Unknown receiver kind: $receiver")
                 }
             }
 
@@ -236,27 +239,26 @@ class R4aKtxControlFlowExtension : KtxControlFlowExtension {
             }
         }
 
-        fun visitComposerCallInfo(memoize: ComposerCallInfo) {
-            memoize.ctorCall?.let { generateCall(it) }
-            memoize.composerCall?.let { generateCall(it) }
-            memoize.validations.forEach {
-                it.validationCall?.let { generateCall(it) }
-                it.assignment?.let { generateCall(it) }
+        fun visitComposerCallInfo(memoize: ComposerCallInfo, inputInstructions: MutableList<InstructionWithValue>) {
+            memoize.ctorCall?.let { inputInstructions.add(generateCall(it)) }
+            inputInstructions.add(generateCall(memoize.composerCall))
+            memoize.validations.forEach { validation ->
+                validation.validationCall?.let { inputInstructions.add(generateCall(it)) }
+                validation.assignment?.let { inputInstructions.add(generateCall(it)) }
             }
         }
 
         fun visitKtxElementNew(element: KtxElement) {
-            val inputExpressions = ArrayList<KtExpression>()
+            val inputExpressions = ArrayList<KtElement>()
+            val inputInstructions = ArrayList<InstructionWithValue>()
             val tagExpr = element.simpleTagName ?: element.qualifiedTagName ?: return
 
-            mark(tagExpr)
-            generateInstructions(tagExpr)
             inputExpressions.add(tagExpr)
 
             for (attribute in element.attributes) {
                 val valueExpr = attribute.value ?: attribute.key ?: break
-                mark(valueExpr)
                 generateInstructions(valueExpr)
+                mark(valueExpr)
                 inputExpressions.add(valueExpr)
             }
 
@@ -268,20 +270,20 @@ class R4aKtxControlFlowExtension : KtxControlFlowExtension {
             val elementCall = trace.get(R4AWritableSlices.RESOLVED_KTX_CALL, element) ?: return
             var node: EmitOrCallNode? = elementCall.emitOrCall
 
-            generateCall(elementCall.getComposerCall)
+            inputInstructions.add(generateCall(elementCall.getComposerCall))
 
             while (node != null) {
                 when (node) {
                     is MemoizedCallNode -> {
-                        node.memoize?.let { visitComposerCallInfo(it) }
+                        visitComposerCallInfo(node.memoize, inputInstructions)
                         node = node.call
                     }
                     is NonMemoizedCallNode -> {
-                        generateCall(node.resolvedCall)
+                        inputInstructions.add(generateCall(node.resolvedCall))
                         node = node.nextCall
                     }
                     is EmitCallNode -> {
-                        visitComposerCallInfo(node.memoize)
+                        visitComposerCallInfo(node.memoize, inputInstructions)
                         node = null
                     }
                     is ErrorNode -> {
@@ -289,7 +291,13 @@ class R4aKtxControlFlowExtension : KtxControlFlowExtension {
                     }
                 }
             }
-            createNonSyntheticValue(element, inputExpressions, MagicKind.VALUE_CONSUMER)
+
+            builder.magic(
+                instructionElement = element,
+                valueElement = null,
+                inputValues = elementsToValues(inputExpressions) + instructionsToValues(inputInstructions),
+                kind = MagicKind.VALUE_CONSUMER
+            )
         }
     }
 

@@ -82,5 +82,5 @@ tasks.withType<Test> {
     }
 
     // The version of maven in the kotlin dependencies is incompatible with robolectric and causes all robolectric tests to fail
-    classpath = classpath.filter { !it.name.endsWith("maven-model-3.3.9.jar") }
+    classpath = classpath.filter { !(it.name.contains("3.3.9") && it.name.contains("maven")) }
 }

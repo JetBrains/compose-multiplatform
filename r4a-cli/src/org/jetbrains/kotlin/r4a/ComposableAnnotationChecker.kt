@@ -211,7 +211,7 @@ class ComposableAnnotationChecker(val mode: Mode = DEFAULT_MODE) : CallChecker, 
                         R4AErrors.NON_COMPOSABLE_INVOCATION.on(
                             reportOn as KtElement,
                             "Lambda variable",
-                            resolvedCall.candidateDescriptor.name.asString()
+                            resolvedCall.candidateDescriptor
                         ), R4ADefaultErrorMessages
                     )
                 } else if (callee is SimpleFunctionDescriptor) {
@@ -219,7 +219,7 @@ class ComposableAnnotationChecker(val mode: Mode = DEFAULT_MODE) : CallChecker, 
                         R4AErrors.NON_COMPOSABLE_INVOCATION.on(
                             reportOn as KtElement,
                             "function",
-                            resolvedCall.candidateDescriptor.name.asString()
+                            resolvedCall.candidateDescriptor
                         ), R4ADefaultErrorMessages
                     )
                 }

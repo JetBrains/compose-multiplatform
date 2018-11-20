@@ -2,15 +2,15 @@ package org.jetbrains.kotlin.r4a.ast
 
 import org.jetbrains.kotlin.backend.common.push
 import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtExpression
-import org.jetbrains.kotlin.r4a.CHILDREN_KEY
-import org.jetbrains.kotlin.r4a.R4aUtils
-import org.jetbrains.kotlin.r4a.hasChildrenAnnotation
+import org.jetbrains.kotlin.r4a.*
 import org.jetbrains.kotlin.renderer.ClassifierNamePolicy
 import org.jetbrains.kotlin.renderer.DescriptorRenderer
 import org.jetbrains.kotlin.renderer.ParameterNameRenderingPolicy
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.expressions.ExpressionTypingContext
 
 sealed class ValueNode(
     val name: String,
@@ -76,21 +76,35 @@ enum class ValidationType {
 
 class ValidatedAssignment(
     val validationType: ValidationType,
+    // NOTE(lmr): we should be able to make this non-nullable
     val validationCall: ResolvedCall<*>?,
     val assignment: ResolvedCall<*>?,
     val assignmentLambda: FunctionDescriptor?,
     val attribute: AttributeNode
 )
 
+private fun getParamFnDescriptorFromCall(name: Name, call: ResolvedCall<*>, context: ExpressionTypingContext): FunctionDescriptor? {
+    val param = call.resultingDescriptor?.valueParameters?.firstOrNull { it.name == name } ?: return null
+    return createFunctionDescriptor(param.type, context)
+}
+
 class ComposerCallInfo(
-    val composerCall: ResolvedCall<*>?,
-    val functionDescriptors: List<FunctionDescriptor?>,
+    context: ExpressionTypingContext,
+    val composerCall: ResolvedCall<*>,
     val pivotals: List<AttributeNode>,
-    val joinKeyCall: ResolvedCall<*>?,
+    val joinKeyCall: ResolvedCall<*>,
     val ctorCall: ResolvedCall<*>?,
     val ctorParams: List<ValueNode>,
     val validations: List<ValidatedAssignment>
 ) {
+    val emitCtorFnDescriptor = getParamFnDescriptorFromCall(KtxNameConventions.EMIT_CTOR_PARAMETER, composerCall, context)
+    val emitUpdaterFnDescriptor = getParamFnDescriptorFromCall(KtxNameConventions.EMIT_UPDATER_PARAMETER, composerCall, context)
+    val emitBodyFnDescriptor = getParamFnDescriptorFromCall(KtxNameConventions.EMIT_CHILDREN_PARAMETER, composerCall, context)
+
+    val callCtorFnDescriptor = getParamFnDescriptorFromCall(KtxNameConventions.CALL_CTOR_PARAMETER, composerCall, context)
+    val callInvalidFnDescriptor = getParamFnDescriptorFromCall(KtxNameConventions.CALL_INVALID_PARAMETER, composerCall, context)
+    val callBlockFnDescriptor = getParamFnDescriptorFromCall(KtxNameConventions.CALL_BLOCK_PARAMETER, composerCall, context)
+
     fun allAttributes(): List<ValueNode> = ctorParams.filter { it !is ImplicitCtorValueNode } + validations.map { it.attribute }
 }
 
@@ -104,10 +118,27 @@ class AttributeMeta(
 sealed class EmitOrCallNode {
     abstract fun allAttributes(): List<ValueNode>
     abstract fun print(): String
+
+    inline fun <T> collect(visitor: (EmitOrCallNode) -> T?): List<T> {
+        val results = mutableListOf<T>()
+        var node: EmitOrCallNode? = this
+        while (node != null) {
+            visitor(node)?.let { results.add(it) }
+            node = when (node) {
+                is MemoizedCallNode -> node.call
+                is NonMemoizedCallNode -> node.nextCall
+                is EmitCallNode -> null
+                is ErrorNode -> null
+            }
+        }
+        return results
+    }
+
+    // TODO(lmr): use collect
     fun resolvedCalls(): List<ResolvedCall<*>> {
         return when (this) {
             is ErrorNode -> emptyList()
-            is MemoizedCallNode -> listOfNotNull(memoize?.ctorCall) + call.resolvedCalls()
+            is MemoizedCallNode -> listOfNotNull(memoize.ctorCall) + call.resolvedCalls()
             is NonMemoizedCallNode -> listOf(resolvedCall) + (nextCall?.resolvedCalls() ?: emptyList())
             is EmitCallNode -> listOfNotNull(memoize.ctorCall)
         }
@@ -121,9 +152,9 @@ sealed class EmitOrCallNode {
 
     private fun collectPossibleAttributes(collector: MutableMap<String, MutableList<AttributeMeta>>) {
         when (this) {
-            is ErrorNode -> {}
+            is ErrorNode -> Unit
             is MemoizedCallNode -> {
-                val callDescriptor = memoize?.ctorCall?.resultingDescriptor as? FunctionDescriptor
+                val callDescriptor = memoize.ctorCall?.resultingDescriptor as? FunctionDescriptor
                 callDescriptor?.let { collectAttributesFromFunction(it, collector) }
                 val returnType = callDescriptor?.returnType
                 returnType?.let { collectAttributesFromType(it, collector) }
@@ -208,8 +239,10 @@ sealed class ErrorNode : EmitOrCallNode() {
     override fun print(): String = "<ERROR:${javaClass.simpleName}>"
 
     class NonEmittableNonCallable(val type: KotlinType) : ErrorNode()
-    class RecursionLimitError() : ErrorNode()
+    class RecursionLimitAmbiguousAttributesError(val attributes: Set<String>) : ErrorNode()
+    class RecursionLimitError : ErrorNode()
     class NonCallableRoot : ErrorNode()
+    class ResolveError : ErrorNode()
 }
 
 class NonMemoizedCallNode(
@@ -227,10 +260,10 @@ class NonMemoizedCallNode(
 }
 
 class MemoizedCallNode(
-    val memoize: ComposerCallInfo?,
+    val memoize: ComposerCallInfo,
     val call: EmitOrCallNode
 ) : CallNode() {
-    override fun allAttributes(): List<ValueNode> = call.allAttributes() + (memoize?.allAttributes() ?: emptyList())
+    override fun allAttributes(): List<ValueNode> = call.allAttributes() + memoize.allAttributes()
     override fun print(): String = buildString {
         self("MemoizedCallNode")
         attr("memoize", memoize) { it.print() }
@@ -252,7 +285,10 @@ class ResolvedKtxElementCall(
     val usedAttributes: List<AttributeNode>,
     val unusedAttributes: List<String>,
     val emitOrCall: EmitOrCallNode,
-    val getComposerCall: ResolvedCall<*>
+    val getComposerCall: ResolvedCall<*>,
+    val emitSimpleUpperBoundTypes: Set<KotlinType>,
+    val emitCompoundUpperBoundTypes: Set<KotlinType>,
+    val infixOrCall: ResolvedCall<*>
 )
 
 
