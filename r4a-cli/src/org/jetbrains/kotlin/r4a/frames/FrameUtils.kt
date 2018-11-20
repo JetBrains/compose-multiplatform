@@ -15,5 +15,7 @@ internal val framesPackageName = r4aPackageName.child(Name.identifier("frames"))
 internal val abstractRecordClassName = framesPackageName.child(Name.identifier("AbstractRecord"))
 internal val recordClassName = framesPackageName.child(Name.identifier("Record"))
 internal val componentClassName = r4aPackageName.child(Name.identifier("Component"))
+internal val modelClassName = r4aPackageName.child(Name.identifier("Model"))
+internal val framedTypeName = framesPackageName.child(Name.identifier("Framed"))
 internal fun ClassDescriptor.isFramed(): Boolean = getSuperClassNotAny()?.fqNameSafe == componentClassName
 internal fun ModuleDescriptor.findTopLevel(name: FqName) = findClassAcrossModuleDependencies(ClassId.topLevel(name)) ?: error("Could not find $name")

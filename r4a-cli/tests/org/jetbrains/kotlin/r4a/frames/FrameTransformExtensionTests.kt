@@ -1,10 +1,13 @@
 package org.jetbrains.kotlin.r4a.frames
 
+import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi2ir.extensions.SyntheticIrExtension
 import org.jetbrains.kotlin.r4a.AbstractCodeGenTest
 import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisHandlerExtension
 import org.jetbrains.kotlin.r4a.frames.analysis.PackageAnalysisHandlerExtension
+import org.jetbrains.kotlin.r4a.frames.FrameTransformExtension
+import org.jetbrains.kotlin.r4a.frames.analysis.FrameModelChecker
 
 class FrameTransformExtensionTests : AbstractCodeGenTest() {
 
@@ -12,6 +15,7 @@ class FrameTransformExtensionTests : AbstractCodeGenTest() {
         super.setUp()
         AnalysisHandlerExtension.registerExtension(myEnvironment.project, PackageAnalysisHandlerExtension())
         SyntheticIrExtension.registerExtension(myEnvironment.project, FrameTransformExtension())
+        StorageComponentContainerContributor.registerExtension(myEnvironment.project, FrameModelChecker())
     }
 
     fun testTestUtilities() = testFile("""
@@ -26,34 +30,31 @@ class FrameTransformExtensionTests : AbstractCodeGenTest() {
         }
     """)
 
+    fun testModel_Simple() = testFile("""
+        import com.google.r4a.Model
 
-    fun testSimpleComponent() = testFile("""
-       import com.google.r4a.Component
+        @Model
+        class MyModel { }
 
-       class MyComponent: Component() {
-         override fun compose() {}
-       }
-
-       class Test {
-         fun test() {
-           frame { MyComponent() }
-         }
-       }
+        class Test {
+          fun test() {
+            frame { MyModel() }
+          }
+        }
     """)
 
 
-    fun testOneField() = testFile("""
-        import com.google.r4a.Component
+    fun testModel_OneField() = testFile("""
+        import com.google.r4a.Model
 
-        class MyComponent: Component() {
+        @Model
+        class MyModel {
           var value: String = "default"
-
-          override fun compose() {}
         }
 
         class Test {
           fun test() {
-            val instance = frame { MyComponent() }
+            val instance = frame { MyModel() }
             frame {
               instance.value.expectEqual("default")
               instance.value = "new value"
@@ -66,18 +67,17 @@ class FrameTransformExtensionTests : AbstractCodeGenTest() {
         }
     """)
 
-    fun testIsolation() = testFile("""
-        import com.google.r4a.Component
+    fun testModel_OneField_Isolation() = testFile("""
+        import com.google.r4a.Model
 
-        class MyComponent: Component() {
+        @Model
+        class MyModel {
           var value: String = "default"
-
-          override fun compose() {}
         }
 
         class Test {
           fun test() {
-            val instance = frame { MyComponent() }
+            val instance = frame { MyModel() }
             val frame1 = suspended {
               instance.value = "new value"
             }
@@ -92,23 +92,21 @@ class FrameTransformExtensionTests : AbstractCodeGenTest() {
             }
           }
         }
-
     """)
 
-    fun testThreeFields() = testFile("""
-        import com.google.r4a.Component
+    fun testModel_ThreeFields() = testFile("""
+        import com.google.r4a.Model
 
-        class MyComponent: Component() {
+        @Model
+        class MyModel {
           var strVal = "default"
           var intVal = 1
           var doubleVal = 27.2
-
-          override fun compose() {}
         }
 
         class Test {
           fun test() {
-            val instance = frame { MyComponent() }
+            val instance = frame { MyModel() }
             frame {
               instance.strVal.expectEqual("default")
               instance.intVal.expectEqual(1)
@@ -129,6 +127,140 @@ class FrameTransformExtensionTests : AbstractCodeGenTest() {
               instance.strVal.expectEqual("new value")
               instance.intVal.expectEqual(2)
               instance.doubleVal.expectEqual(27.2)
+            }
+          }
+        }
+    """)
+
+
+    fun testModel_ThreeFields_Isolation() = testFile("""
+        import com.google.r4a.Model
+
+        @Model
+        class MyModel {
+          var strVal = "default"
+          var intVal = 1
+          var doubleVal = 27.2
+        }
+
+        class Test {
+          fun test() {
+            val instance = frame { MyModel() }
+            frame {
+              instance.strVal.expectEqual("default")
+              instance.intVal.expectEqual(1)
+              instance.doubleVal.expectEqual(27.2)
+            }
+            val frame1 = suspended {
+              instance.strVal = "new value"
+            }
+            frame {
+              instance.strVal.expectEqual("default")
+              instance.intVal.expectEqual(1)
+              instance.doubleVal.expectEqual(27.2)
+            }
+            restored(frame1) {
+              instance.intVal = 2
+            }
+            frame {
+              instance.strVal.expectEqual("new value")
+              instance.intVal.expectEqual(2)
+              instance.doubleVal.expectEqual(27.2)
+            }
+          }
+        }
+    """)
+
+    fun testModel_CustomSetter_Isolation() = testFile("""
+        import com.google.r4a.Model
+
+        @Model
+        class MyModel {
+          var intVal = 0; set(value) { field = value; intVal2 = value + 10 }
+          var intVal2 = 10
+          var intVal3 = 0; get() = field + 7; set(value) { field = value - 7 }
+        }
+
+        class Test {
+          fun test() {
+            val instance = frame { MyModel() }
+            frame {
+              instance.intVal.expectEqual(0)
+              instance.intVal2.expectEqual(10)
+              instance.intVal3.expectEqual(7)
+
+              instance.intVal = 22
+              instance.intVal3 = 14
+
+              instance.intVal.expectEqual(22)
+              instance.intVal2.expectEqual(32)
+              instance.intVal3.expectEqual(14)
+            }
+            val frame1 = suspended {
+              instance.intVal = 32
+              instance.intVal3 = 21
+
+              instance.intVal.expectEqual(32)
+              instance.intVal2.expectEqual(42)
+              instance.intVal3.expectEqual(21)
+            }
+            frame {
+              instance.intVal.expectEqual(22)
+              instance.intVal2.expectEqual(32)
+              instance.intVal3.expectEqual(14)
+            }
+            restored(frame1) {
+              instance.intVal.expectEqual(32)
+              instance.intVal2.expectEqual(42)
+              instance.intVal3.expectEqual(21)
+            }
+            frame {
+              instance.intVal.expectEqual(32)
+              instance.intVal2.expectEqual(42)
+              instance.intVal3.expectEqual(21)
+            }
+          }
+        }
+    """)
+
+
+    fun testModel_PrivateFields_Isolation() = testFile("""
+        import com.google.r4a.Model
+
+        @Model
+        class MyModel {
+          private var myIntVal = 1
+          private var myStrVal = "default"
+
+          var intVal get() = myIntVal; set(value) { myIntVal = value }
+          var strVal get() = myStrVal; set(value) { myStrVal = value }
+        }
+
+
+        class Test {
+          fun test() {
+            val instance = frame { MyModel() }
+            frame {
+              instance.strVal.expectEqual("default")
+              instance.intVal.expectEqual(1)
+            }
+            val frame1 = suspended {
+              instance.strVal = "new value"
+              instance.intVal = 2
+              instance.strVal.expectEqual("new value")
+              instance.intVal.expectEqual(2)
+            }
+            frame {
+              instance.strVal.expectEqual("default")
+              instance.intVal.expectEqual(1)
+            }
+            restored(frame1) {
+              instance.strVal.expectEqual("new value")
+              instance.intVal.expectEqual(2)
+            }
+            frame {
+              instance.strVal.expectEqual("new value")
+              instance.intVal.expectEqual(2)
             }
           }
         }

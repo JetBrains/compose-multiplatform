@@ -14,6 +14,10 @@ import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
 import org.jetbrains.kotlin.extensions.TypeResolutionInterceptorExtension
 import org.jetbrains.kotlin.parsing.KtxParsingExtension
 import org.jetbrains.kotlin.psi2ir.extensions.SyntheticIrExtension
+import org.jetbrains.kotlin.r4a.frames.FrameTransformExtension
+import org.jetbrains.kotlin.r4a.frames.analysis.FrameModelChecker
+import org.jetbrains.kotlin.r4a.frames.analysis.PackageAnalysisHandlerExtension
+import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisHandlerExtension
 
 class R4ACommandLineProcessor : CommandLineProcessor {
 
@@ -49,6 +53,10 @@ class R4AComponentRegistrar : ComponentRegistrar {
         R4aDiagnosticSuppressor.registerExtension(project, R4aDiagnosticSuppressor())
         TypeResolutionInterceptorExtension.registerExtension(project, R4aTypeResolutionInterceptorExtension())
         SyntheticIrExtension.registerExtension(project, R4ASyntheticIrExtension())
+
+        StorageComponentContainerContributor.registerExtension(project, FrameModelChecker())
+        AnalysisHandlerExtension.registerExtension(project, PackageAnalysisHandlerExtension())
+        SyntheticIrExtension.registerExtension(project, FrameTransformExtension())
     }
 }
 

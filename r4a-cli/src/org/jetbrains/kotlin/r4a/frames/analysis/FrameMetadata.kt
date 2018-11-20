@@ -1,10 +1,13 @@
 package org.jetbrains.kotlin.r4a.frames.analysis
 
+import org.jetbrains.kotlin.builtins.DefaultBuiltIns
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.*
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.descriptorUtil.builtIns
+import org.jetbrains.kotlin.resolve.hasBackingField
 import org.jetbrains.kotlin.types.KotlinType
 
 /**
@@ -20,52 +23,68 @@ import org.jetbrains.kotlin.types.KotlinType
  *
  *   For example, given the declaration:
  *
- *   class MyComponent: Component {
+ *   @Model
+ *   class MyModel {
  *     var some: String = "Default some"
  *     var data: String = "Default data"
  *
- *     override compose() { ... }
  *   }
  *
  *   The class is transformed into something like:
  *
- *   class MyComponent: Component {
+ *   class MyModel: Framed {
  *     var some: String
- *       get() = (_readable(next) as MyComponent_Record).some
- *       set(value) { (_writable(next) as MyComponent_Record).some = value }
+ *       get() = (_readable(next) as MyModel_Record).some
+ *       set(value) { (_writable(next) as MyModel_Record).some = value }
  *     var data: String
- *       get() = ((_readable(next) as MyComponent_Record).data
- *       set(value) { (_writable(next, this) as MyComponent_Record).data = value }
+ *       get() = ((_readable(next) as MyModel_Record).data
+ *       set(value) { (_writable(next, this) as MyModel_Record).data = value }
+ *
+ *     private var _firstFrameRecord: MyModelRecord? = null
+ *
+ *     override var firstFrameRecord: Record get() = _firstFrameRecord
+ *     override fun prependFrameRecord(value: Record) {
+ *       value.next = _firstFrameRecord
+ *       _firstFrameRecord = value
+ *     }
  *
  *     init {
- *       next = MyComponent_Record()
- *       (next as MyComponent_Record).some = "Default some"
- *       (next as MyComponent_Record).data = "Default data"
+ *       next = MyModel_Record()
+ *       (next as MyModel_Record).some = "Default some"
+ *       (next as MyModel_Record).data = "Default data"
  *     }
  *   }
  *
- *   class MyComponent_Record : AbstractRecord {
+ *   class MyModel_Record : AbstractRecord {
  *     @JvmField var some: String
  *     @JvmField var data: String
  *
- *     override fun create(): Record = MyComponent_Record()
+ *     override fun create(): Record = MyModel_Record()
  *     override fun assign(value: Record) {
- *       some = (value as MyComponent_Record).some
- *       data = (value as MyCompoennt_Record).data
+ *       some = (value as MyModel_Record).some
+ *       data = (value as MyModel_Record).data
  *     }
  *   }
  */
 class FrameMetadata(private val framedClassDescriptor: ClassDescriptor) {
+    private val builtIns = DefaultBuiltIns.Instance
+
     /**
      * Get the list of properties on the framed class that should be framed
      */
-    fun getFramedProperties() = myFramedProperties
+    fun getFramedProperties(bindingContext: BindingContext) =
+        framedClassDescriptor.unsubstitutedMemberScope.getContributedDescriptors().mapNotNull {
+            if (it is PropertyDescriptor &&
+                it.kind == CallableMemberDescriptor.Kind.DECLARATION &&
+                it.isVar && it.hasBackingField(bindingContext)
+            ) it else null
+        }
 
     /**
      * Get the list of the record's properties (on for each public property of the framed object)
      */
-    fun getRecordPropertyDescriptors(recordClassDescriptor: ClassDescriptor): List<PropertyDescriptor> {
-        return myFramedProperties.map { syntheticProperty(recordClassDescriptor, it.name, it.returnType!!) }
+    fun getRecordPropertyDescriptors(recordClassDescriptor: ClassDescriptor, bindingContext: BindingContext): List<PropertyDescriptor> {
+        return getFramedProperties(bindingContext).map { syntheticProperty(recordClassDescriptor, it.name, it.returnType!!) }
     }
 
     /**
@@ -76,19 +95,21 @@ class FrameMetadata(private val framedClassDescriptor: ClassDescriptor) {
             // fun create(): <record>
             syntheticMethod(container, "create", recordDescriptor.defaultType),
             // fun assign(value: <record>)
-            syntheticMethod(container, "assign", container.builtIns.unitType,
-                Parameter("value", recordDescriptor.defaultType)))
+            syntheticMethod(
+                container, "assign", container.builtIns.unitType,
+                Parameter("value", recordDescriptor.defaultType)
+            )
+        )
     }
 
-    private val myFramedProperties: List<PropertyDescriptor> by lazy {
-        framedClassDescriptor.unsubstitutedMemberScope.getContributedDescriptors().mapNotNull {
-            if (it is PropertyDescriptor &&
-                it.kind == CallableMemberDescriptor.Kind.DECLARATION &&
-                it.isVar &&
-                (!Visibilities.isPrivate(it.visibility))
-            ) it else null
-        }
-    }
+    fun firstFrameDescriptor(recordTypeDescriptor: ClassDescriptor): SimpleFunctionDescriptor =
+        syntheticMethod(framedClassDescriptor, "getFirstFrameRecord", recordTypeDescriptor.defaultType)
+
+    fun prependFrameRecordDescriptor(recordTypeDescriptor: ClassDescriptor): SimpleFunctionDescriptor =
+        syntheticMethod(
+            framedClassDescriptor, "prependFrameRecord", builtIns.unitType,
+            Parameter("value", recordTypeDescriptor.defaultType)
+        )
 }
 
 private fun syntheticProperty(
@@ -101,7 +122,8 @@ private fun syntheticProperty(
         container, Annotations.EMPTY, Modality.OPEN, Visibilities.PUBLIC, true,
         name, CallableMemberDescriptor.Kind.SYNTHESIZED, SourceElement.NO_SOURCE,
         false, false, true, true, false,
-        false).apply {
+        false
+    ).apply {
         val getter = PropertyGetterDescriptorImpl(
             this,
             Annotations.EMPTY,

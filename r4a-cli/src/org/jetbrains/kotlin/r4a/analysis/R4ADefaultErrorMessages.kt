@@ -19,6 +19,14 @@ object R4ADefaultErrorMessages : DefaultErrorMessages.Extension {
             "Component is open. Components cannot be an open or abstract class."
         )
         MAP.put(
+            R4AErrors.OPEN_MODEL,
+            "Model objects cannot be open or abstract"
+        )
+        MAP.put(
+            R4AErrors.UNSUPPORTED_MODEL_INHERITENCE,
+            "Model objects do not support inheritance"
+        )
+        MAP.put(
             R4AErrors.MISMATCHED_ATTRIBUTE_TYPE,
             "<html>Type Mismatch.<br/>Required: {1}<br/>Found: {0}</html>",
             Renderers.RENDER_TYPE,

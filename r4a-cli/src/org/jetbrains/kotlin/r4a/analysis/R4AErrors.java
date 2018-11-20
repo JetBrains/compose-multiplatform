@@ -15,6 +15,8 @@ import static org.jetbrains.kotlin.diagnostics.Severity.WARNING;
 public interface R4AErrors {
     DiagnosticFactory0<PsiElement> DUPLICATE_ATTRIBUTE = DiagnosticFactory0.create(ERROR);
     DiagnosticFactory0<PsiElement> OPEN_COMPONENT = DiagnosticFactory0.create(ERROR);
+    DiagnosticFactory0<PsiElement> OPEN_MODEL = DiagnosticFactory0.create(ERROR);
+    DiagnosticFactory0<PsiElement> UNSUPPORTED_MODEL_INHERITENCE = DiagnosticFactory0.create(ERROR);
 
     DiagnosticFactory3<KtElement, Collection<DeclarationDescriptor>, String, KotlinType> UNRESOLVED_ATTRIBUTE_KEY = DiagnosticFactory3.create(ERROR);
     DiagnosticFactory2<KtElement, Collection<DeclarationDescriptor>, String> UNRESOLVED_ATTRIBUTE_KEY_UNKNOWN_TYPE = DiagnosticFactory2.create(ERROR);
