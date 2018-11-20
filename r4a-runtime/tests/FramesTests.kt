@@ -1,13 +1,4 @@
-import com.google.r4a.frames.FrameAborted
-import com.google.r4a.frames.Frame
-import com.google.r4a.frames.Record
-import com.google.r4a.frames.abortHandler
-import com.google.r4a.frames.commit
-import com.google.r4a.frames.commitHandler
-import com.google.r4a.frames.open
-import com.google.r4a.frames.restore
-import com.google.r4a.frames.speculate
-import com.google.r4a.frames.suspend
+import com.google.r4a.frames.*
 import junit.framework.TestCase
 import org.junit.Assert
 import java.util.ArrayDeque
@@ -252,7 +243,70 @@ class FrameTest: TestCase() {
         for (i in 0..count) {
             Assert.assertEquals("From index $i", addresses[i].street)
         }
+    }
 
+    fun testFrameObserver_ObserveRead_Single() {
+        val address = frame { Address(OLD_STREET, OLD_CITY) }
+        var read: Address? = null
+        observeFrame({ obj -> read = obj as Address }) {
+            Assert.assertEquals(OLD_STREET, address.street)
+        }
+        Assert.assertEquals(address, read)
+    }
+
+    fun testFrameObserver_ObserveCommit_Single() {
+        val address = frame { Address(OLD_STREET, OLD_CITY) }
+        var committed: Set<Any>? = null
+        observeCommit({ framed: Set<Any> -> committed = framed }) {
+            frame {
+                address.street = NEW_STREET
+            }
+        }
+        Assert.assertTrue(committed?.contains(address) ?: false)
+    }
+
+    fun testFrameObserver_OberveRead_Multiple() {
+        val addressToRead = frame {
+            List(100) { Address(OLD_STREET, OLD_CITY) }
+        }
+        val addressToIgnore = frame {
+            List(100) { Address(OLD_STREET, OLD_CITY) }
+        }
+        val readAddresses = HashSet<Address>()
+        observeFrame({ obj -> readAddresses.add(obj as Address)} ) {
+            for (address in addressToRead) {
+                Assert.assertEquals(OLD_STREET, address.street)
+            }
+        }
+        for (address in addressToRead) {
+            Assert.assertTrue("Ensure a read callback was called for the address", readAddresses.contains(address))
+        }
+        for (address in addressToIgnore) {
+            Assert.assertFalse("Ensure a read callback was not called for the address", readAddresses.contains(address))
+        }
+    }
+
+    fun testFrameObserver_ObserveCommit_Multiple() {
+        val addressToWrite = frame {
+            List(100) { Address(OLD_STREET, OLD_CITY) }
+        }
+        val addressToIgnore = frame {
+            List(100) { Address(OLD_STREET, OLD_CITY) }
+        }
+        var committedAddresses = null as Set<Any>?
+        observeCommit({ framed -> committedAddresses = framed }) {
+            frame {
+                for (address in addressToWrite) {
+                    address.street = NEW_STREET
+                }
+            }
+        }
+        for (address in addressToWrite) {
+            Assert.assertTrue("Ensure written address is in the set of committed objects", committedAddresses?.contains(address) ?: false)
+        }
+        for (address in addressToIgnore) {
+            Assert.assertFalse("Ensure ignored addresses are not in the set of committed objects", committedAddresses?.contains(address) ?: false)
+        }
     }
 }
 
@@ -267,6 +321,27 @@ inline fun <T> frame(crossinline block: ()->T): T {
         throw e
     } finally {
         commitHandler()
+    }
+}
+
+inline fun <T> observeFrame(noinline observer: FrameReadObserver, crossinline block: () -> T): T {
+    open(observer)
+    try {
+        return block()
+    } catch (e: Exception) {
+        abortHandler()
+        throw e
+    } finally {
+        commitHandler()
+    }
+}
+
+inline fun <T> observeCommit(noinline observer: FrameCommitObserver, crossinline block: () -> T): T {
+    val unregister = registerCommitObserver(observer)
+    try {
+        return block()
+    } finally {
+        unregister()
     }
 }
 

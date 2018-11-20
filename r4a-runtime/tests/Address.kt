@@ -6,11 +6,11 @@ import com.google.r4a.frames.Record
 
 class Address(street: String, city: String): Framed {
     var street: String
-        get() = next.readable().street
+        get() = next.readable(this).street
         set(value) { next.writable(this).street = value }
 
     var city: String
-        get() = next.readable().city
+        get() = next.readable(this).city
         set(value) { next.writable(this).city = value }
 
 

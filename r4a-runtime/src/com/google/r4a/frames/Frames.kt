@@ -40,6 +40,9 @@ abstract class AbstractRecord : Record {
 
 internal val threadFrame = ThreadLocal<Frame>()
 
+typealias FrameReadObserver = (read: Any) -> Unit
+typealias FrameCommitObserver = (committed: Set<Any>) -> Unit
+
 /**
  * Information about a frame including the frame id and whether or not it is read only.
  */
@@ -58,7 +61,12 @@ class Frame(
     /**
      * True if the frame is read only
      */
-    readOnly: Boolean
+    readOnly: Boolean,
+
+    /**
+     * Observe a frame
+     */
+    internal val readObserver: FrameReadObserver?
 ) {
     internal val modified = if (readOnly) null else HashSet<Framed>()
 
@@ -102,13 +110,18 @@ private fun BitSet.copy(): BitSet {
     return BitSet().apply { or(this@copy) }
 }
 
-private fun open(readOnly: Boolean, speculative: Boolean): Frame {
+private fun open(readOnly: Boolean, speculative: Boolean, observer: FrameReadObserver?): Frame {
     validateNotInFrame()
     synchronized(sync) {
         maxFrameId += 2
         val id = if (speculative) maxFrameId or 1 else maxFrameId
         val invalid = currentInvalid()
-        val frame = Frame(id, invalid, readOnly)
+        val frame = Frame(
+            id = id,
+            invalid = invalid,
+            readOnly = readOnly,
+            readObserver = observer
+        )
         openFrames.set(id)
         threadFrame.set(frame)
         return frame
@@ -121,7 +134,12 @@ private fun open(readOnly: Boolean, speculative: Boolean): Frame {
  * @param readOnly true if the frame can only be read from
  * @return the newly created frame's data
  */
-fun open(readOnly: Boolean = false) = open(readOnly, false)
+fun open(readOnly: Boolean = false) = open(readOnly, false, null)
+
+/**
+ * Open a frame with observers
+ */
+fun open(observer: FrameReadObserver) = open(false, false, observer)
 
 /**
  * Open a speculative frame. A speculative frame can only be aborted and can be used to
@@ -129,7 +147,7 @@ fun open(readOnly: Boolean = false) = open(readOnly, false)
  * expensive calculations to be pre-calculated on a separate thread and later replayed on
  * the primary thread without affecting the primary thread.
  */
-fun speculate() = open(false, true)
+fun speculate() = open(false, true, null)
 
 /*
  * Commits the pending frame if there one is open. Intended to be used in a `finally` clause
@@ -142,6 +160,19 @@ fun commitHandler() = threadFrame.get()?.let { commit(it) }
  * if one is open).
  */
 fun commit() = commit(currentFrame())
+
+private var commitListeners = mutableListOf<FrameCommitObserver>()
+
+fun registerCommitObserver(observer: FrameCommitObserver): () -> Unit {
+    synchronized(sync) {
+        commitListeners.add(observer)
+    }
+    return {
+        synchronized(sync) {
+            commitListeners.remove(observer)
+        }
+    }
+}
 
 /**
  * Commit the given frame. Throws FrameAborted if changes in the frame collides with the current
@@ -158,11 +189,12 @@ fun commit(frame: Frame) {
     // frame was last opened. There are two trivial cases that can be dismissed immediately, first, if the frame
     // is read-only, no writes occurred. Second, if no other frame was opened while the current frame was open.
     val modified = frame.modified
-    synchronized(sync) {
+    val listeners = synchronized(sync) {
         if (!openFrames[frame.id]) throw IllegalStateException("Frame not open")
         if (frame.id and 1 != 0) throw IllegalStateException("Speculative frames cannot be committed")
         if (modified == null || modified.size == 0) {
             closeFrame(frame)
+            emptyList()
         } else {
             // If there are modifications we need to ensure none of the modifications have collisions.
 
@@ -184,9 +216,13 @@ fun commit(frame: Frame) {
                 }
             }
             closeFrame(frame)
+            commitListeners.toList()
         }
-
     }
+    if (modified != null)
+        for (commitListener in listeners) {
+            commitListener(modified)
+        }
 }
 
 /**
@@ -298,15 +334,16 @@ private fun <T : Record> readable(r: T, id: Int, invalid: BitSet): T {
     throw IllegalStateException("Could not find a current")
 }
 
-fun <T : Record> T.readable(): T {
-    return this.readable(currentFrame())
+fun <T : Record> T.readable(framed: Framed): T {
+    return this.readable(currentFrame(), framed)
 }
 
-fun <T : Record> T.readable(frame: Frame): T {
+fun <T : Record> T.readable(frame: Frame, framed: Framed): T {
+    frame.readObserver?.let { it(framed) }
     return readable(this, frame.id, frame.invalid)
 }
 
-fun _readable(r: Record): Record = r.readable()
+fun _readable(r: Record, framed: Framed): Record = r.readable(framed)
 fun _writable(r: Record, framed: Framed): Record = r.writable(framed)
 
 interface Framed {

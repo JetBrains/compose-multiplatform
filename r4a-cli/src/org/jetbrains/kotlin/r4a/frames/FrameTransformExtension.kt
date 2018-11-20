@@ -399,6 +399,7 @@ fun augmentFramedClass(
                                                   0,
                                                   recordGetter
                                               )
+                                              it.putValueArgument(1, syntheticGetValue(thisSymbol))
                                           }
                                           ))
 
