@@ -11,6 +11,10 @@ object R4ADefaultErrorMessages : DefaultErrorMessages.Extension {
 
     init {
         MAP.put(
+            R4AErrors.NO_COMPOSER_FOUND,
+            "Couldn't find a valid composer."
+        )
+        MAP.put(
             R4AErrors.DUPLICATE_ATTRIBUTE,
             "Duplicate attribute; Attributes must appear at most once per tag."
         )
@@ -33,6 +37,17 @@ object R4ADefaultErrorMessages : DefaultErrorMessages.Extension {
         MAP.put(
             R4AErrors.CALLABLE_RECURSION_DETECTED,
             "Recursion detected"
+        )
+        MAP.put(
+            R4AErrors.AMBIGUOUS_ATTRIBUTES_DETECTED,
+            "KTX call targets resulted in ambiguous attributes: {0}",
+            Renderers.commaSeparated(Renderers.STRING)
+        )
+        MAP.put(
+            R4AErrors.INVALID_COMPOSER_IMPLEMENTATION,
+            "Composer of type ''{0}'' was found to be an invalid Composer implementation. Reason: {1}",
+            Renderers.RENDER_TYPE,
+            Renderers.STRING
         )
         MAP.put(
             R4AErrors.UNRESOLVED_CHILDREN,
@@ -77,9 +92,9 @@ object R4ADefaultErrorMessages : DefaultErrorMessages.Extension {
             "Only Unit-returning functions are allowed to be used as R4A Components"
         )
         MAP.put(
-                R4AErrors.INVALID_TAG_DESCRIPTOR,
-                "Invalid KTX tag type. Expected ''{0}''",
-                Renderers.commaSeparated(Renderers.RENDER_TYPE)
+            R4AErrors.INVALID_TAG_DESCRIPTOR,
+            "Invalid KTX tag type. Expected ''{0}''",
+            Renderers.commaSeparated(Renderers.RENDER_TYPE)
         )
         MAP.put(
             R4AErrors.SVC_INVOCATION,
@@ -90,11 +105,11 @@ object R4ADefaultErrorMessages : DefaultErrorMessages.Extension {
             R4AErrors.NON_COMPOSABLE_INVOCATION,
             "{0} `{1}` must be marked as @Composable in order to be used as a KTX tag",
             Renderers.STRING,
-            Renderers.STRING
+            Renderers.COMPACT
         )
         MAP.put(
-                R4AErrors.KTX_IN_NON_COMPOSABLE,
-                "Stateless Functional Components (SFCs) containing KTX Tags should be marked with the @Composable annotation"
+            R4AErrors.KTX_IN_NON_COMPOSABLE,
+            "Functions containing KTX Tags should be marked with the @Composable annotation"
         )
         MAP.put(
             R4AErrors.UNRESOLVED_TAG,
@@ -112,7 +127,8 @@ object R4ADefaultErrorMessages : DefaultErrorMessages.Extension {
         )
         MAP.put(
             R4AErrors.MISSING_REQUIRED_CHILDREN,
-            "A children body is required"
+            "A children body of type '{0}' is required",
+            Renderers.RENDER_TYPE
         )
         MAP.put(
             R4AErrors.ILLEGAL_ASSIGN_TO_UNIONTYPE,

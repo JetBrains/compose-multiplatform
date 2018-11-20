@@ -1,12 +1,10 @@
 package org.jetbrains.kotlin.r4a
 
-import org.jetbrains.kotlin.backend.common.descriptors.propertyIfAccessor
 import org.jetbrains.kotlin.builtins.createFunctionType
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotated
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptor
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
-import org.jetbrains.kotlin.descriptors.impl.referencedProperty
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.constants.ConstantValue
 import org.jetbrains.kotlin.diagnostics.Errors
@@ -59,35 +57,22 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
     ) {
         val ktxCallResolver = KtxCallResolver(callResolver, facade, element.project)
 
-        val foundComposer = ktxCallResolver.findComposer(element, context)
+        val success = ktxCallResolver.resolveComposer(element, context)
 
-        if (!foundComposer) {
-            // TODO(lmr): proper diagnostics for missing composer
+        if (!success) {
             return fallback(element, context, facade)
         }
 
         val temporaryForKtxCall = TemporaryTraceAndCache.create(context, "trace to resolve ktx call", element)
 
-        val resolvedKtxElementCall = ktxCallResolver.resolveTag(
+        val resolvedKtxElementCall = ktxCallResolver.resolve(
             element,
-            listOfNotNull(
-                element.simpleTagName,
-                element.simpleClosingTagName,
-                element.qualifiedTagName,
-                element.qualifiedClosingTagName
-            ),
-            element.attributes,
-            element.bodyLambdaExpression,
             context.replaceTraceAndCache(temporaryForKtxCall)
         )
 
         temporaryForKtxCall.commit()
 
-        if (resolvedKtxElementCall == null) {
-
-        } else {
-            context.trace.record(R4AWritableSlices.RESOLVED_KTX_CALL, element, resolvedKtxElementCall)
-        }
+        context.trace.record(R4AWritableSlices.RESOLVED_KTX_CALL, element, resolvedKtxElementCall)
     }
 
     fun visitKtxElementOld(
@@ -372,8 +357,14 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
                 val namedAttribute = element.attributes.find { it.name == name }
                 if (namedAttribute == null) {
                     // there is a required children descriptor, but user didn't provide anything
+                    val type = when (childrenDescriptor) {
+                        is PropertyDescriptor -> childrenDescriptor.type
+                        is ParameterDescriptor -> childrenDescriptor.type
+                        is SimpleFunctionDescriptor -> childrenDescriptor.valueParameters.first().type
+                        else -> error("unknown descriptor type")
+                    }
                     context.trace.reportFromPlugin(
-                        R4AErrors.MISSING_REQUIRED_CHILDREN.on(tagExpr),
+                        R4AErrors.MISSING_REQUIRED_CHILDREN.on(tagExpr, type),
                         R4ADefaultErrorMessages
                     )
                 }

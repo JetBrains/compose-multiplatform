@@ -23,7 +23,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
             ResolvedKtxElementCall:
               emitOrCall = MemoizedCallNode:
                 memoize = ComposerCallInfo:
-                  composerCall = fun call(Any, () -> Foo.Bar, ViewValidator.(Foo.Bar) -> Boolean, (Foo.Bar) -> Unit)
+                  composerCall = fun call(Any, ViewValidator.() -> Boolean, () -> Unit)
                   pivotals = <empty>
                   joinKeyCall = fun joinKey(Any, Any?): Any
                   ctorCall = <null>
@@ -93,7 +93,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
             ResolvedKtxElementCall:
               emitOrCall = MemoizedCallNode:
                 memoize = ComposerCallInfo:
-                  composerCall = fun call(Any, () -> Bar, ViewValidator.(Bar) -> Boolean, (Bar) -> Unit)
+                  composerCall = fun call(Any, ViewValidator.() -> Boolean, () -> Unit)
                   pivotals = <empty>
                   joinKeyCall = fun joinKey(Any, Any?): Any
                   ctorCall = <null>
@@ -327,7 +327,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
             ResolvedKtxElementCall:
               emitOrCall = MemoizedCallNode:
                 memoize = ComposerCallInfo:
-                  composerCall = fun call(Any, () -> Bar, ViewValidator.(Bar) -> Boolean, (Bar) -> Unit)
+                  composerCall = fun call(Any, ViewValidator.() -> Boolean, () -> Unit)
                   pivotals = <empty>
                   joinKeyCall = fun joinKey(Any, Any?): Any
                   ctorCall = <null>
@@ -390,56 +390,6 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
         """
     )
 
-    fun testComposerExtensionMethods() = doTest(
-        """
-            import com.google.r4a.*
-            import android.content.Context
-
-            class C {
-                fun joinKey(left: Any, right: Any?): Any = left
-            }
-
-            val composer = C()
-
-            open class Foo {}
-
-            class Updater {}
-
-            inline fun <T : Foo> C.emit(
-                key: Any,
-                ctor: (Context) -> T,
-                update: Updater.() -> Unit
-            ) {}
-
-            inline fun <T : Foo> C.emit(
-                key: Any,
-                ctor: (Context) -> T,
-                update: Updater.() -> Unit,
-                children: () -> Unit
-            ) {}
-
-            class Bar(context: Context) : Foo
-
-            @Composable
-            fun test() {
-                <caret><Bar />
-            }
-        """,
-        """
-            ResolvedKtxElementCall:
-              emitOrCall = EmitCallNode:
-                memoize = ComposerCallInfo:
-                  composerCall = <null>
-                  pivotals = <empty>
-                  joinKeyCall = fun joinKey(Any, Any?): Any
-                  ctorCall = Bar(Context)
-                  ctorParams = (implicit)context
-                  validations = <empty>
-              usedAttributes = <empty>
-              unusedAttributes = <empty>
-        """
-    )
-
     fun testNonMemoizableClassComponent() = doTest(
         """
             import com.google.r4a.*
@@ -463,7 +413,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
             ResolvedKtxElementCall:
               emitOrCall = MemoizedCallNode:
                 memoize = ComposerCallInfo:
-                  composerCall = fun call(Any, () -> Bar, ViewValidator.(Bar) -> Boolean, (Bar) -> Unit)
+                  composerCall = fun call(Any, ViewValidator.() -> Boolean, () -> Unit)
                   pivotals = <empty>
                   joinKeyCall = fun joinKey(Any, Any?): Any
                   ctorCall = <null>
@@ -655,7 +605,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
             ResolvedKtxElementCall:
               emitOrCall = MemoizedCallNode:
                 memoize = ComposerCallInfo:
-                  composerCall = fun call(Any, () -> A, ViewValidator.(A) -> Boolean, (A) -> Unit)
+                  composerCall = fun call(Any, ViewValidator.() -> Boolean, () -> Unit)
                   pivotals = <empty>
                   joinKeyCall = fun joinKey(Any, Any?): Any
                   ctorCall = <null>
@@ -725,7 +675,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
             ResolvedKtxElementCall:
               emitOrCall = MemoizedCallNode:
                 memoize = ComposerCallInfo:
-                  composerCall = fun call(Any, () -> A, ViewValidator.(A) -> Boolean, (A) -> Unit)
+                  composerCall = fun call(Any, ViewValidator.() -> Boolean, () -> Unit)
                   pivotals = <empty>
                   joinKeyCall = fun joinKey(Any, Any?): Any
                   ctorCall = <null>
@@ -739,6 +689,50 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
               unusedAttributes = <empty>
         """
     )
+
+    fun testPivotalsAreNotValidated() = doTest(
+        """
+            import com.google.r4a.*
+
+            @Composable
+            fun A(@Pivotal x: Int, y: Int) {
+                println(x)
+                println(y)
+            }
+
+            @Composable
+            fun test(x: Int, y: Int) {
+                <caret><A x y />
+            }
+        """,
+        """
+            ResolvedKtxElementCall:
+              emitOrCall = MemoizedCallNode:
+                memoize = ComposerCallInfo:
+                  composerCall = fun call(Any, ViewValidator.() -> Boolean, () -> Unit)
+                  pivotals = x
+                  joinKeyCall = fun joinKey(Any, Any?): Any
+                  ctorCall = <null>
+                  ctorParams = <empty>
+                  validations =
+                    - ValidatedAssignment(CHANGED):
+                        validationCall = fun changed(Int): Boolean
+                        assignment = <null>
+                        attribute = x
+                    - ValidatedAssignment(CHANGED):
+                        validationCall = fun changed(Int): Boolean
+                        assignment = <null>
+                        attribute = y
+                call = NonMemoizedCallNode:
+                  resolvedCall = fun A(Int, Int)
+                  params = x, y
+                  nextCall = <null>
+              usedAttributes = x, y
+              unusedAttributes = <empty>
+        """
+    )
+
+
 
     fun testIsStaticNature() = doTest(
         """

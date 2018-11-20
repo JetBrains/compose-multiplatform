@@ -128,24 +128,9 @@ class KtxCodegenTests : AbstractCodeGenTest() {
         var orientation = LinearLayout.HORIZONTAL
 
         compose({ mapOf("text" to text, "orientation" to orientation) }, """
-
-            composer.emit<LinearLayout>(13,
-                    { context -> LinearLayout(context)},
-                    {
-                        set<Int>(orientation) { this.orientation = it }
-                        set<Int>($llId) { this.id = it }
-                    }) {
-                composer.emit<TextView>(12,
-                        { context -> TextView(context) } ,
-                        {
-                            set<String>(text) { this.text = it }
-                            set<Int>($tvId) { this.id = it }
-                        })
-            }
-
-            // <LinearLayout orientation id=$llId>
-            //   <TextView text id=$tvId />
-            // </LinearLayout>
+             <LinearLayout orientation id=$llId>
+               <TextView text id=$tvId />
+             </LinearLayout>
         """).then { activity ->
             val textView = activity.findViewById(tvId) as TextView
             val linearLayout = activity.findViewById(llId) as LinearLayout
@@ -161,6 +146,134 @@ class KtxCodegenTests : AbstractCodeGenTest() {
 
             assertEquals(text, textView.text)
             assertEquals(orientation, linearLayout.orientation)
+        }
+    }
+
+    @Test
+    fun testCGNSimpleCall(): Unit = newCodeGen {
+        val tvId = 258
+        var text = "Hello, world!"
+
+        compose(
+            """
+                @Composable fun SomeFun(x: String) {
+                    <TextView text=x id=$tvId />
+                }
+            """,
+            { mapOf("text" to text) },
+            """
+                <SomeFun x=text />
+            """
+        ).then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+
+            assertEquals(text, textView.text)
+
+            text = "Other value"
+        }.then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+
+            assertEquals(text, textView.text)
+        }
+    }
+
+    @Test
+    fun testCGNSimpleCall2(): Unit = newCodeGen {
+            val tvId = 258
+            var text = "Hello, world!"
+            var someInt = 456
+
+            compose(
+                """
+                class SomeClass(var x: String) {
+                    @Composable
+                    operator fun invoke(y: Int) {
+                        <TextView text="${"$"}x ${"$"}y" id=$tvId />
+                    }
+                }
+            """,
+                { mapOf("text" to text, "someInt" to someInt) },
+                """
+                <SomeClass x=text y=someInt />
+            """
+            ).then { activity ->
+                val textView = activity.findViewById(tvId) as TextView
+
+                assertEquals("Hello, world! 456", textView.text)
+
+                text = "Other value"
+                someInt = 123
+            }.then { activity ->
+                val textView = activity.findViewById(tvId) as TextView
+
+                assertEquals("Other value 123", textView.text)
+            }
+        }
+
+    @Test
+    fun testCGNSimpleCall3(): Unit = newCodeGen {
+        val tvId = 258
+        var text = "Hello, world!"
+        var someInt = 456
+
+        compose(
+            """
+                @Memoized
+                class SomeClassoawid(var x: String) {
+                    @Composable
+                    operator fun invoke(y: Int) {
+                        <TextView text="${"$"}x ${"$"}y" id=$tvId />
+                    }
+                }
+            """,
+            { mapOf("text" to text, "someInt" to someInt) },
+            """
+                <SomeClassoawid x=text y=someInt />
+            """
+        ).then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+
+            assertEquals("Hello, world! 456", textView.text)
+
+            text = "Other value"
+            someInt = 123
+        }.then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+
+            assertEquals("Other value 123", textView.text)
+        }
+    }
+
+    @Test
+    fun testCGNCallWithChildren(): Unit = newCodeGen {
+        val tvId = 258
+        var text = "Hello, world!"
+
+        compose(
+            """
+                @Composable
+                fun Block(@Children children: () -> Unit) {
+                    <children />
+                }
+            """,
+            { mapOf("text" to text) },
+            """
+                <Block>
+                    <Block>
+                        <TextView text id=$tvId />
+                    </Block>
+                </Block>
+            """
+        ).then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+
+            assertEquals(text, textView.text)
+
+            text = "Other value"
+        }.then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+
+            assertEquals(text, textView.text)
         }
     }
 
