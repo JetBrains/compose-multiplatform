@@ -88,7 +88,7 @@ object LibraryVersions {
     val TEXTCLASSIFIER = Version("1.0.0-alpha01")
     val TRANSITION = Version("1.1.0-alpha01")
     val TVPROVIDER = Version("1.0.0")
-    val VECTORDRAWABLE = Version("1.0.1")
+    val VECTORDRAWABLE = Version("1.1.0-alpha01")
     val VECTORDRAWABLE_ANIMATED = Version("1.1.0-alpha01")
     val VERSIONED_PARCELABLE = Version("1.1.0-alpha01")
     val VIEWPAGER = Version("1.1.0-alpha01")
