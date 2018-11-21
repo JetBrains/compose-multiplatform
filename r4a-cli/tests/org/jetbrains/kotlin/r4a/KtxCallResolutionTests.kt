@@ -32,9 +32,11 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
                 call = NonMemoizedCallNode:
                   resolvedCall = Bar()
                   params = <empty>
+                  postAssignments = <empty>
                   nextCall = NonMemoizedCallNode:
                     resolvedCall = fun invoke()
                     params = <empty>
+                    postAssignments = <empty>
                     nextCall = <null>
               usedAttributes = <empty>
               unusedAttributes = <empty>
@@ -66,6 +68,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
                 call = NonMemoizedCallNode:
                   resolvedCall = fun Foo.invoke()
                   params = <empty>
+                  postAssignments = <empty>
                   nextCall = <null>
               usedAttributes = <empty>
               unusedAttributes = <empty>
@@ -110,9 +113,11 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
                 call = NonMemoizedCallNode:
                   resolvedCall = Bar(Int)
                   params = y
+                  postAssignments = <empty>
                   nextCall = NonMemoizedCallNode:
                     resolvedCall = fun invoke(Int)
                     params = z
+                    postAssignments = <empty>
                     nextCall = <null>
               usedAttributes = y, z
               unusedAttributes = <children>
@@ -177,6 +182,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
                   call = NonMemoizedCallNode:
                     resolvedCall = fun invoke(Int)
                     params = z
+                    postAssignments = <empty>
                     nextCall = <null>
               usedAttributes = z, y, a
               unusedAttributes = <empty>
@@ -218,6 +224,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
                 call = NonMemoizedCallNode:
                   resolvedCall = fun Foo(Int, Int)
                   params = a, z
+                  postAssignments = <empty>
                   nextCall = <null>
               usedAttributes = a, z
               unusedAttributes = <empty>
@@ -262,6 +269,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
                 call = NonMemoizedCallNode:
                   resolvedCall = fun invoke(Int)
                   params = z
+                  postAssignments = <empty>
                   nextCall = <null>
               usedAttributes = z, <tag>
               unusedAttributes = <empty>
@@ -299,6 +307,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
                 call = NonMemoizedCallNode:
                   resolvedCall = fun invoke(Int)
                   params = z
+                  postAssignments = <empty>
                   nextCall = <null>
               usedAttributes = z, <tag>
               unusedAttributes = <empty>
@@ -337,9 +346,9 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
                         validationCall = fun changed(Int): Boolean
                         assignment = fun <set-y>(Int)
                         attribute = y
-                    - ValidatedAssignment(SET):
-                        validationCall = fun set(() -> Unit, (() -> Unit) -> Unit): Boolean
-                        assignment = fun <set-children>(() -> Unit)
+                    - ValidatedAssignment(CHANGED):
+                        validationCall = fun changed(() -> Unit): Boolean
+                        assignment = <null>
                         attribute = <children>
                     - ValidatedAssignment(CHANGED):
                         validationCall = fun changed(Int): Boolean
@@ -348,9 +357,15 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
                 call = NonMemoizedCallNode:
                   resolvedCall = Bar(Int)
                   params = y
+                  postAssignments =
+                    - ValidatedAssignment(SET):
+                        validationCall = fun set(() -> Unit, (() -> Unit) -> Unit): Boolean
+                        assignment = fun <set-children>(() -> Unit)
+                        attribute = <children>
                   nextCall = NonMemoizedCallNode:
                     resolvedCall = fun invoke(Int)
                     params = z
+                    postAssignments = <empty>
                     nextCall = <null>
               usedAttributes = y, <children>, z
               unusedAttributes = <empty>
@@ -430,9 +445,11 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
                 call = NonMemoizedCallNode:
                   resolvedCall = Bar(Int)
                   params = a
+                  postAssignments = <empty>
                   nextCall = NonMemoizedCallNode:
                     resolvedCall = fun invoke(Int)
                     params = b
+                    postAssignments = <empty>
                     nextCall = <null>
               usedAttributes = a, b
               unusedAttributes = <empty>
@@ -480,6 +497,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
                 call = NonMemoizedCallNode:
                   resolvedCall = fun invoke(Int)
                   params = b
+                  postAssignments = <empty>
                   nextCall = <null>
               usedAttributes = b, a
               unusedAttributes = <empty>
@@ -528,6 +546,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
                 call = NonMemoizedCallNode:
                   resolvedCall = fun invoke(Int)
                   params = b
+                  postAssignments = <empty>
                   nextCall = <null>
               usedAttributes = b, <tag>
               unusedAttributes = <empty>
@@ -579,6 +598,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
                 call = NonMemoizedCallNode:
                   resolvedCall = fun invoke(Int)
                   params = b
+                  postAssignments = <empty>
                   nextCall = <null>
               usedAttributes = b, <tag>
               unusedAttributes = <empty>
@@ -634,21 +654,27 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
                 call = NonMemoizedCallNode:
                   resolvedCall = A()
                   params = <empty>
+                  postAssignments = <empty>
                   nextCall = NonMemoizedCallNode:
                     resolvedCall = fun invoke(Int): B
                     params = a
+                    postAssignments = <empty>
                     nextCall = NonMemoizedCallNode:
                       resolvedCall = fun invoke(Int): C
                       params = b
+                      postAssignments = <empty>
                       nextCall = NonMemoizedCallNode:
                         resolvedCall = fun invoke(Int): D
                         params = c
+                        postAssignments = <empty>
                         nextCall = NonMemoizedCallNode:
                           resolvedCall = fun invoke(Int): E
                           params = d
+                          postAssignments = <empty>
                           nextCall = NonMemoizedCallNode:
                             resolvedCall = fun invoke(Int)
                             params = e
+                            postAssignments = <empty>
                             nextCall = <null>
               usedAttributes = a, b, c, d, e
               unusedAttributes = <empty>
@@ -684,6 +710,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
                 call = NonMemoizedCallNode:
                   resolvedCall = A()
                   params = <empty>
+                  postAssignments = <empty>
                   nextCall = <ERROR:RecursionLimitError>
               usedAttributes = <empty>
               unusedAttributes = <empty>
@@ -726,6 +753,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
                 call = NonMemoizedCallNode:
                   resolvedCall = fun A(Int, Int)
                   params = x, y
+                  postAssignments = <empty>
                   nextCall = <null>
               usedAttributes = x, y
               unusedAttributes = <empty>
@@ -820,6 +848,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
                 call = NonMemoizedCallNode:
                   resolvedCall = fun Foo()
                   params = <empty>
+                  postAssignments = <empty>
                   nextCall = <null>
               usedAttributes = <empty>
               unusedAttributes = <empty>

@@ -248,6 +248,10 @@ sealed class ErrorNode : EmitOrCallNode() {
 class NonMemoizedCallNode(
     val resolvedCall: ResolvedCall<*>,
     val params: List<ValueNode>,
+    val postAssignments: List<ValidatedAssignment>,
+    val applyCall: ResolvedCall<*>?,
+    val applyLambdaDescriptor: FunctionDescriptor?,
+    val applyLambdaType: KotlinType?,
     var nextCall: EmitOrCallNode?
 ) : CallNode() {
     override fun allAttributes(): List<ValueNode> = params
@@ -255,6 +259,7 @@ class NonMemoizedCallNode(
         self("NonMemoizedCallNode")
         attr("resolvedCall", resolvedCall) { it.print() }
         attr("params", params) { it.print() }
+        list("postAssignments", postAssignments) { it.print() }
         attr("nextCall", nextCall) { it.print() }
     }
 }
@@ -302,7 +307,7 @@ fun ComposerCallInfo?.consumedAttributes(): List<AttributeNode> {
 fun EmitOrCallNode?.consumedAttributes(): List<AttributeNode> {
     return when (this) {
         is MemoizedCallNode -> memoize.consumedAttributes() + call.consumedAttributes()
-        is NonMemoizedCallNode -> params.mapNotNull { it as? AttributeNode } + (nextCall?.consumedAttributes() ?: emptyList())
+        is NonMemoizedCallNode -> params.mapNotNull { it as? AttributeNode } + nextCall.consumedAttributes()
         is EmitCallNode -> memoize.consumedAttributes()
         is ErrorNode -> emptyList()
         null -> emptyList()

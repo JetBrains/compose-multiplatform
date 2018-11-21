@@ -870,7 +870,6 @@ class KtxCallResolver(
                                     }
                                 }
                                 is ArgumentUnmapped -> {
-//                                    error("ArgumentUnmapped")
                                     return@mapNotNull TempResolveInfo(
                                         false,
                                         tmpForCandidate,
@@ -908,12 +907,6 @@ class KtxCallResolver(
             val isStaticCall = isStaticTag(resolveStep, resolvedCall, candidateContext)
 
             val shouldMemoizeCtor = shouldMemoizeResult(resolvedCall)
-
-            val nonMemoizedCall = NonMemoizedCallNode(
-                resolvedCall = resolvedCall,
-                params = resolvedCall.buildParamsFromAttributes(attributes),
-                nextCall = null
-            )
 
             if (returnType.isUnit()) {
                 // bottomed out
@@ -967,6 +960,16 @@ class KtxCallResolver(
                         usedAttributeInfos,
                         emptyList(),
                         returnType
+                    )
+
+                    val nonMemoizedCall = NonMemoizedCallNode(
+                        resolvedCall = resolvedCall,
+                        params = resolvedCall.buildParamsFromAttributes(attributes),
+                        applyCall = null,
+                        applyLambdaDescriptor = null,
+                        applyLambdaType = null,
+                        postAssignments = emptyList(),
+                        nextCall = null
                     )
 
                     if (resolveStep is ResolveStep.Root) {
@@ -1122,6 +1125,57 @@ class KtxCallResolver(
 
             val attrsUsedInFollowingCalls = mutableSetOf<String>()
 
+
+            // TODO(lmr): clean this up a little bit
+            val postAssignments = if (!shouldMemoizeCtor) {
+                (tagValidations + setterValidations)
+                    .filter { it.validationType != ValidationType.CHANGED }
+            } else emptyList()
+
+            val allValidations = if (!shouldMemoizeCtor) {
+                (tagValidations + setterValidations).map {
+                    when (it.validationType) {
+                        ValidationType.CHANGED -> it
+                        ValidationType.UPDATE,
+                        ValidationType.SET -> ValidatedAssignment(
+                            validationType = ValidationType.CHANGED,
+                            validationCall = resolveValidationCall(
+                                kind = ComposerCallKind.CALL,
+                                validationType = ValidationType.CHANGED,
+                                attrType = it.attribute.type,
+                                expressionToReportErrorsOn = expression,
+                                receiverScope = invalidReceiverScope,
+                                assignmentReceiverScope = null,
+                                valueExpr = it.attribute.expression,
+                                context = context
+                            ).first,
+                            assignment = null,
+                            attribute = it.attribute,
+                            assignmentLambda = null
+                        )
+                    }
+                }
+            } else tagValidations + setterValidations
+
+            val applyCall = if (!shouldMemoizeCtor) {
+                resolveApplyCallForType(returnType, candidateContext)
+            } else null
+
+            val applyLambdaType = if (!shouldMemoizeCtor) functionType(receiverType = returnType) else null
+            val applyLambdaDescriptor = if (!shouldMemoizeCtor) {
+                createFunctionDescriptor(applyLambdaType!!, candidateContext)
+            } else null
+
+            val nonMemoizedCall = NonMemoizedCallNode(
+                resolvedCall = resolvedCall,
+                params = resolvedCall.buildParamsFromAttributes(attributes),
+                applyCall = applyCall,
+                applyLambdaDescriptor = applyLambdaDescriptor,
+                postAssignments = postAssignments,
+                applyLambdaType = applyLambdaType,
+                nextCall = null
+            )
+
             val childCall = resolveChild(
                 expression,
                 resolveStep.recurse(
@@ -1163,7 +1217,7 @@ class KtxCallResolver(
                             ctorParams = if (shouldMemoizeCtor) nonMemoizedCall.params else emptyList(),
                             validations = collectValidations(
                                 kind = ComposerCallKind.CALL,
-                                current = tagValidations + setterValidations,
+                                current = allValidations,
                                 children = childCall.consumedAttributes(),
                                 expression = expression,
                                 attributes = attributes,
@@ -2112,6 +2166,25 @@ class KtxCallResolver(
         ).resultingCall
     }
 
+    private fun resolveApplyCallForType(type: KotlinType, context: ExpressionTypingContext): ResolvedCall<*> {
+        val apply = psiFactory.createSimpleName("apply")
+
+        val results = callResolver.resolveCallWithGivenName(
+            context,
+            makeCall(
+                callElement = apply,
+                calleeExpression = apply,
+                receiver = TransientReceiver(type),
+                valueArguments = listOf(
+                    makeValueArgument(functionType(receiverType = type), context)
+                )
+            ),
+            apply,
+            Name.identifier("apply")
+        )
+        return results.resultingCall
+    }
+
     private fun resolveComposerEmit(
         implicitCtorTypes: List<KotlinType>,
         constructedType: KotlinType,
@@ -2264,6 +2337,67 @@ class KtxCallResolver(
         )
 
         if (results.isSuccess) return results.resultingCall to lambdaDescriptor
+
+        if (results.resultCode == OverloadResolutionResults.Code.INCOMPLETE_TYPE_INFERENCE) {
+
+            // NOTE(lmr): We know the type of the attribute at this point, but it's possible for the validation call to require
+            // some help in order to do the type inference for the call. We are just guessing here that the type is going to be
+            // the attribute type, and not something more complicated. It is kind of a bummer that we need this and I wonder if
+            // there isn't a cleaner way to do this.
+            val typeToSubstitute = attrType
+
+            for (candidate in results.resultingCalls) {
+
+                val typeParam = candidate.typeArguments.keys.singleOrNull() ?: continue
+
+                if (!typeToSubstitute.satisfiesConstraintsOf(typeParam)) continue
+
+                val nextTempTrace = TemporaryTraceAndCache.create(
+                    context, "trace to resolve variable", expressionToReportErrorsOn
+                )
+
+                val nextContext = context
+                    .replaceTraceAndCache(nextTempTrace)
+                    .replaceCollectAllCandidates(false)
+
+                val substitutor = TypeSubstitutor.create(
+                    mapOf(
+                        typeParam.typeConstructor to typeToSubstitute.asTypeProjection()
+                    )
+                )
+
+                val nextCall = makeCall(
+                    callElement = expressionToReportErrorsOn,
+                    calleeExpression = calleeExpression,
+                    receiver = TransientReceiver(composerType),
+                    valueArguments = candidate.candidateDescriptor.valueParameters.map { makeValueArgument(it.type, nextContext) }
+                )
+
+                val nextResults = callResolver.resolveCallWithKnownCandidate(
+                    nextCall,
+                    TracingStrategyImpl.create(calleeExpression, nextCall),
+                    BasicCallResolutionContext.create(
+                        nextContext,
+                        nextCall,
+                        CheckArgumentTypesMode.CHECK_VALUE_ARGUMENTS,
+                        DataFlowInfoForArgumentsImpl(nextContext.dataFlowInfo, nextCall)
+                    ),
+                    ResolutionCandidate.create(
+                        nextCall,
+                        candidate.candidateDescriptor,
+                        candidate.dispatchReceiver,
+                        candidate.explicitReceiverKind,
+                        substitutor
+                    ),
+                    DataFlowInfoForArgumentsImpl(nextContext.dataFlowInfo, nextCall)
+                )
+
+                if (nextResults.isSuccess) {
+                    nextTempTrace.commit()
+                    return nextResults.resultingCall to lambdaDescriptor
+                }
+            }
+        }
 
         return null to null
     }
@@ -2831,6 +2965,10 @@ private sealed class ResolveStep(
             call = NonMemoizedCallNode(
                 resolvedCall = prevCall.resolvedCall,
                 params = prevCall.params,
+                applyCall = prevCall.applyCall,
+                applyLambdaDescriptor = prevCall.applyLambdaDescriptor,
+                postAssignments = prevCall.postAssignments,
+                applyLambdaType = prevCall.applyLambdaType,
                 nextCall = call
             )
         }

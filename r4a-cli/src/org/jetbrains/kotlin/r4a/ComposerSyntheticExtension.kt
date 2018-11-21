@@ -24,6 +24,7 @@ import org.jetbrains.kotlin.r4a.analysis.R4AWritableSlices
 import org.jetbrains.kotlin.r4a.ast.*
 import org.jetbrains.kotlin.r4a.frames.buildWithScope
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
+import org.jetbrains.kotlin.resolve.calls.tasks.ExplicitReceiverKind
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.typeUtil.isSubtypeOf
@@ -124,7 +125,7 @@ class ComposerSyntheticExtension : SyntheticIrExtension {
         )
 
 
-        fun generateEmitOrCallNode(callNode: EmitOrCallNode, receiver: IrExpression? = null): IrStatement {
+        fun generateEmitOrCallNode(callNode: EmitOrCallNode, container: DeclarationDescriptor, receiver: IrExpression? = null): IrExpression {
             when (callNode) {
                 is EmitCallNode -> {
                     val memoize = callNode.memoize
@@ -204,31 +205,113 @@ class ComposerSyntheticExtension : SyntheticIrExtension {
                     }
                 }
                 is NonMemoizedCallNode -> {
-                    val call = if (receiver != null) {
-                        statementGenerator.callMethod(
-                            element.startOffset,
-                            element.endOffset,
-                            callNode.resolvedCall,
-                            receiver
-                        )
-                    } else {
-                        statementGenerator.callFunction(
-                            element.startOffset,
-                            element.endOffset,
-                            callNode.resolvedCall
-                        )
-                    }
-                    call.apply {
+                    var result: IrExpression = statementGenerator.buildCall(
+                        element.startOffset,
+                        element.endOffset,
+                        resolvedCall = callNode.resolvedCall,
+                        descriptor = callNode.resolvedCall.resultingDescriptor as FunctionDescriptor,
+                        dispatchReceiver = receiver
+                    ).apply {
                         putValueParameters(callNode.params, statementGenerator) { getAttribute(it) }
                     }
 
-                    val nextCall = callNode.nextCall
-                    return if (nextCall != null) {
-                        generateEmitOrCallNode(nextCall, call)
-                    } else {
-                        call
+                    if (callNode.postAssignments.isNotEmpty()) {
+                        //     Foo()
+                        // turns into
+                        //     val x = Foo()
+                        //     x.prop = value
+                        //     x
+                        val elType = callNode.resolvedCall.resultingDescriptor.returnType!!
+
+                        val elVarDescriptor = IrTemporaryVariableDescriptorImpl(
+                            container,
+                            Name.identifier("__el"),
+                            elType,
+                            false
+                        )
+
+                        val statements = mutableListOf<IrStatement>()
+
+                        val elVarDecl = statementGenerator.context.symbolTable.declareVariable(
+                            UNDEFINED_OFFSET, UNDEFINED_OFFSET,
+                            IrDeclarationOrigin.IR_TEMPORARY_VARIABLE,
+                            elVarDescriptor,
+                            elType.toIrType()!!,
+                            result
+                        )
+
+                        statements.add(elVarDecl)
+
+                        val getEl = IrGetValueImpl(
+                            UNDEFINED_OFFSET, UNDEFINED_OFFSET,
+                            statementGenerator.context.symbolTable.referenceVariable(elVarDescriptor)
+                        )
+
+                        for (assignment in callNode.postAssignments) {
+                            if (assignment.assignment == null) error("expected assignment")
+
+                            val statement = statementGenerator.callMethod(
+                                UNDEFINED_OFFSET, UNDEFINED_OFFSET,
+                                assignment.assignment,
+                                getEl
+                            ).apply {
+                                putValueArgument(0, getAttribute(assignment.attribute.name))
+                            }
+                            statements.add(statement)
+                        }
+                        statements.add(getEl)
+
+                        result = IrBlockImpl(
+                            UNDEFINED_OFFSET, UNDEFINED_OFFSET,
+                            type = elType.toIrType()!!,
+                            origin = IrStatementOrigin.LAMBDA,
+                            statements = statements
+                        )
                     }
 
+                    // TODO(lmr): this doesn't work for what appears to be a broader compiler bug, but it is the more ideal
+                    // way to write this code. The above code does the same thing but we should switch it whenever the bug in
+                    // the compiler is fixed.
+//                    if (callNode.postAssignments.isNotEmpty()) {
+//                        if (callNode.applyCall == null) error("applyCall expected to be non-null")
+//                        if (callNode.applyLambdaDescriptor == null) error("applyLambdaDescriptor expected to be non-null")
+//                        if (callNode.applyLambdaType == null) error("applyLambdaType expected to be non-null")
+//
+//                        result = statementGenerator.buildCall(
+//                            element.startOffset,
+//                            element.endOffset,
+//                            resolvedCall = callNode.applyCall,
+//                            descriptor = callNode.applyCall.resultingDescriptor as FunctionDescriptor,
+//                            receiver = result
+//                        ).apply {
+//                            val applyLambda = lambdaExpression(callNode.applyLambdaDescriptor, callNode.applyLambdaType) { statements ->
+//                                val validator = statementGenerator.extensionReceiverOf(callNode.applyLambdaDescriptor)
+//                                    ?: error("Expected extension receiver")
+//
+//                                for (assignment in callNode.postAssignments) {
+//                                    if (assignment.assignment == null) error("expected assignmnet")
+//
+//                                    val statement = statementGenerator.callMethod(
+//                                        UNDEFINED_OFFSET, UNDEFINED_OFFSET,
+//                                        assignment.assignment,
+//                                        validator
+//                                    ).apply {
+//                                        putValueArgument(0, getAttribute(assignment.attribute.name))
+//                                    }
+//                                    statements.add(statement)
+//                                }
+//                                statementGenerator.addReturn(statements, callNode.applyLambdaDescriptor)
+//                            }
+//                            putValueArgument(0, applyLambda)
+//                        }
+//                    }
+
+                    val nextCall = callNode.nextCall
+                    if (nextCall != null) {
+                        result = generateEmitOrCallNode(nextCall, container, result)
+                    }
+
+                    return result
                 }
                 is MemoizedCallNode -> {
                     val memoize = callNode.memoize
@@ -277,28 +360,35 @@ class ComposerSyntheticExtension : SyntheticIrExtension {
                         val validateParameterType = composerCallParametersType[KtxNameConventions.CALL_INVALID_PARAMETER]!!
                         val validateLambda = lambdaExpression(validateLambdaDescriptor, validateParameterType) { statements ->
                             // all as one expression: a or b or c ... or z
-                            statements.add(
-                                memoize.validations
-                                    .map { validation ->
-                                        statementGenerator.validationCall(
-                                            UNDEFINED_OFFSET, UNDEFINED_OFFSET,
-                                            validation,
-                                            validateLambdaDescriptor,
-                                            validateLambdaDescriptor.valueParameters.firstOrNull()
-                                        ) { name ->
-                                            getAttribute(name)
-                                        }
+
+                            val validationCalls = memoize.validations
+                                .map { validation ->
+                                    statementGenerator.validationCall(
+                                        UNDEFINED_OFFSET, UNDEFINED_OFFSET,
+                                        validation,
+                                        validateLambdaDescriptor,
+                                        validateLambdaDescriptor.valueParameters.firstOrNull()
+                                    ) { name ->
+                                        getAttribute(name)
                                     }
-                                    .reduce { left, right ->
-                                        statementGenerator.callMethod(
-                                            UNDEFINED_OFFSET, UNDEFINED_OFFSET,
-                                            resolvedKtxCall.infixOrCall,
-                                            left
-                                        ).apply {
-                                            putValueArgument(0, right)
+                                }
+                            when (validationCalls.size) {
+                                0 -> Unit // TODO(lmr): return constant true here?
+                                1 -> statements.add(validationCalls.single())
+                                else -> {
+                                    statements.add(
+                                        validationCalls.reduce { left, right ->
+                                            statementGenerator.callMethod(
+                                                UNDEFINED_OFFSET, UNDEFINED_OFFSET,
+                                                resolvedKtxCall.infixOrCall,
+                                                left
+                                            ).apply {
+                                                putValueArgument(0, right)
+                                            }
                                         }
-                                    }
-                            )
+                                    )
+                                }
+                            }
 
                             statementGenerator.addReturn(statements, validateLambdaDescriptor)
                         }
@@ -317,7 +407,7 @@ class ComposerSyntheticExtension : SyntheticIrExtension {
                                     receiverValue
                                 )
                             }
-                            statements.add(generateEmitOrCallNode(callNode.call, nextReceiver))
+                            statements.add(generateEmitOrCallNode(callNode.call, bodyLambdaDescriptor, nextReceiver))
                         }
                         putValueArgument(composerCallParameters[KtxNameConventions.CALL_BLOCK_PARAMETER]!!, bodyLambda)
                     }
@@ -326,7 +416,7 @@ class ComposerSyntheticExtension : SyntheticIrExtension {
             }
         }
 
-        statements.add(generateEmitOrCallNode(resolvedKtxCall.emitOrCall))
+        statements.add(generateEmitOrCallNode(resolvedKtxCall.emitOrCall, statementGenerator.scopeOwner))
 
         if (statements.size == 1) return statements.first()
 
@@ -522,6 +612,7 @@ private fun StatementGenerator.buildCall(
     endOffset: Int,
     resolvedCall: ResolvedCall<*>,
     descriptor: FunctionDescriptor,
+    receiver: IrExpression? = null,
     dispatchReceiver: IrExpression? = null,
     extensionReceiver: IrExpression? = null,
     irStatementOrigin: IrStatementOrigin? = null
@@ -539,9 +630,23 @@ private fun StatementGenerator.buildCall(
             irStatementOrigin,
             null
         ).apply {
-            this.dispatchReceiver = dispatchReceiver ?: dispatchReceiverValue?.load()
-            this.extensionReceiver = extensionReceiver ?: extensionReceiverValue?.load()
-
+            when (resolvedCall.explicitReceiverKind) {
+                ExplicitReceiverKind.DISPATCH_RECEIVER -> {
+                    this.dispatchReceiver = dispatchReceiver ?: receiver ?: dispatchReceiverValue?.load()
+                    this.extensionReceiver = extensionReceiver ?: extensionReceiverValue?.load()
+                }
+                ExplicitReceiverKind.EXTENSION_RECEIVER -> {
+                    this.dispatchReceiver = dispatchReceiver ?: dispatchReceiverValue?.load()
+                    this.extensionReceiver = extensionReceiver ?: receiver ?: extensionReceiverValue?.load()
+                }
+                ExplicitReceiverKind.NO_EXPLICIT_RECEIVER -> {
+                    this.dispatchReceiver = dispatchReceiver ?: dispatchReceiverValue?.load()
+                    this.extensionReceiver = extensionReceiver ?: extensionReceiverValue?.load()
+                }
+                ExplicitReceiverKind.BOTH_RECEIVERS -> {
+                    TODO("Figure out how to handle both receivers")
+                }
+            }
             putTypeArguments(resolvedCall.typeArguments) { it.toIrType() }
         }
     } as IrCall
