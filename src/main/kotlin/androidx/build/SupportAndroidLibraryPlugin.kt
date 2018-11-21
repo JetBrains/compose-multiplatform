@@ -25,6 +25,7 @@ import org.gradle.api.Project
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.extra
 
 /**
  * Support library specific com.android.library plugin that sets common configurations needed for
@@ -41,6 +42,10 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
         project.configureMavenArtifactUpload(supportLibraryExtension)
 
         project.afterEvaluate {
+            if (supportLibraryExtension.publish) {
+                project.extra.set("publish", true)
+                project.addToProjectMap(supportLibraryExtension.mavenGroup)
+            }
             val library = project.extensions.findByType(LibraryExtension::class.java)
                     ?: return@afterEvaluate
 
@@ -68,7 +73,12 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
                     if (supportLibraryExtension.failOnDeprecationWarnings) {
                         javaCompile.options.compilerArgs.add("-Xlint:deprecation")
                     }
-                    javaCompile.options.compilerArgs.add("-Werror")
+                    // We don't want maxDepVersions to fail when it finds a warning because
+                    // if we introduce warnings to new libraries that were okay to use before,
+                    // we'd like to only display a warning and fix later.
+                    if (libraryVariant.flavorName != "maxDepVersions") {
+                        javaCompile.options.compilerArgs.add("-Werror")
+                    }
                 }
             }
         }

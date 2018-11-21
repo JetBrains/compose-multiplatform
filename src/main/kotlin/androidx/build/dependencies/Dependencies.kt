@@ -23,7 +23,7 @@ const val AUTO_VALUE_PARCEL = "com.ryanharter.auto.value:auto-value-parcel:0.2.6
 const val ANTLR = "org.antlr:antlr4:4.7.1"
 const val APACHE_COMMONS_CODEC = "commons-codec:commons-codec:1.10"
 const val CHECKER_FRAMEWORK = "org.checkerframework:checker-qual:2.5.0"
-const val CONSTRAINT_LAYOUT = "androidx.constraintlayout:constraintlayout:1.1.0@aar"
+const val CONSTRAINT_LAYOUT = "androidx.constraintlayout:constraintlayout:1.1.0"
 const val DEXMAKER_MOCKITO = "com.linkedin.dexmaker:dexmaker-mockito:2.19.0"
 const val ESPRESSO_CONTRIB = "androidx.test.espresso:espresso-contrib:3.1.0-alpha3"
 const val ESPRESSO_CORE = "androidx.test.espresso:espresso-core:3.1.0-alpha3"
@@ -76,21 +76,21 @@ const val SUPPORT_FRAGMENTS = "androidx.fragment:fragment:$SUPPORT_VERSION"
 const val SUPPORT_RECYCLERVIEW = "androidx.recyclerview:recyclerview:$SUPPORT_VERSION"
 
 const val ANDROIDX_COLLECTION = "androidx.collection:collection:$SUPPORT_VERSION"
-const val ANDROIDX_CORE = "androidx.core:core:1.0.0@aar"
-const val ANDROIDX_RECYCLERVIEW = "androidx.recyclerview:recyclerview:1.0.0@aar"
+const val ANDROIDX_CORE = "androidx.core:core:1.0.0"
+const val ANDROIDX_RECYCLERVIEW = "androidx.recyclerview:recyclerview:1.0.0"
 
 // Arch libraries
-const val ARCH_LIFECYCLE_RUNTIME = "androidx.lifecycle:lifecycle-runtime:2.0.0@aar"
+const val ARCH_LIFECYCLE_RUNTIME = "androidx.lifecycle:lifecycle-runtime:2.0.0"
 const val ARCH_LIFECYCLE_COMMON = "androidx.lifecycle:lifecycle-common:2.0.0@jar"
 const val ARCH_LIFECYCLE_LIVEDATA_CORE =
-        "androidx.lifecycle:lifecycle-livedata-core:2.0.0@aar"
+        "androidx.lifecycle:lifecycle-livedata-core:2.0.0"
 const val ARCH_LIFECYCLE_LIVEDATA =
-        "androidx.lifecycle:lifecycle-livedata:2.0.0@aar"
-const val ARCH_LIFECYCLE_VIEWMODEL = "androidx.lifecycle:lifecycle-viewmodel:2.0.0@aar"
-const val ARCH_LIFECYCLE_EXTENSIONS = "androidx.lifecycle:lifecycle-extensions:2.0.0@aar"
+        "androidx.lifecycle:lifecycle-livedata:2.0.0"
+const val ARCH_LIFECYCLE_VIEWMODEL = "androidx.lifecycle:lifecycle-viewmodel:2.0.0"
+const val ARCH_LIFECYCLE_EXTENSIONS = "androidx.lifecycle:lifecycle-extensions:2.0.0"
 const val ARCH_CORE_COMMON = "androidx.arch.core:core-common:2.0.0@jar"
-const val ARCH_CORE_RUNTIME = "androidx.arch.core:core-runtime:2.0.0@aar"
-const val ARCH_CORE_TESTING = "androidx.arch.core:core-testing:2.0.0@aar"
+const val ARCH_CORE_RUNTIME = "androidx.arch.core:core-runtime:2.0.0"
+const val ARCH_CORE_TESTING = "androidx.arch.core:core-testing:2.0.0"
 
 const val SAFE_ARGS_ANDROID_GRADLE_PLUGIN = "com.android.tools.build:gradle:3.2.1"
 

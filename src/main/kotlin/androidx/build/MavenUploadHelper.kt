@@ -19,10 +19,13 @@ package androidx.build
 import com.android.build.gradle.LibraryPlugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ProjectDependency
+import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.maven.MavenDeployer
 import org.gradle.api.tasks.Upload
+import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.withGroovyBuilder
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 
 fun Project.configureMavenArtifactUpload(extension: SupportLibraryExtension) {
     afterEvaluate {
@@ -101,7 +104,7 @@ fun Project.configureMavenArtifactUpload(extension: SupportLibraryExtension) {
                 // TODO(aurimas): remove this when Gradle bug is fixed.
                 // https://github.com/gradle/gradle/issues/3170
                 uploadTask.doFirst {
-                    val allDeps = HashSet<ProjectDependency>()
+                    val allDeps = HashSet<Dependency>()
                     collectDependenciesForConfiguration(allDeps, this, "api")
                     collectDependenciesForConfiguration(allDeps, this, "implementation")
                     collectDependenciesForConfiguration(allDeps, this, "compile")
@@ -147,26 +150,40 @@ fun Project.configureMavenArtifactUpload(extension: SupportLibraryExtension) {
 }
 
 private fun collectDependenciesForConfiguration(
-    projectDependencies: MutableSet<ProjectDependency>,
+    androidxDependencies: MutableSet<Dependency>,
     project: Project,
     name: String
 ) {
     val config = project.configurations.findByName(name)
     if (config != null) {
-        config.dependencies.withType(ProjectDependency::class.java).forEach {
-            dep -> projectDependencies.add(dep)
+        config.dependencies.forEach { dep ->
+            if (dep.group?.startsWith("androidx.") ?: false) {
+                androidxDependencies.add(dep)
+            }
         }
     }
 }
 
-private fun isAndroidProject(
+private fun Project.isAndroidProject(
     groupId: String,
     artifactId: String,
-    deps: Set<ProjectDependency>
+    deps: Set<Dependency>
 ): Boolean {
     for (dep in deps) {
-        if (dep.group == groupId && dep.name == artifactId) {
-            return dep.getDependencyProject().plugins.hasPlugin(LibraryPlugin::class.java)
+        if (dep is ProjectDependency) {
+            if (dep.group == groupId && dep.name == artifactId) {
+                return dep.getDependencyProject().plugins.hasPlugin(LibraryPlugin::class.java)
+            }
+        } else {
+            var projectModules = project.rootProject.extra.get("projects")
+                    as ConcurrentHashMap<String, String>
+            if (projectModules.contains("${dep.group}:${dep.name}")) {
+                val localProjectVersion = project.findProject(
+                        projectModules.get("${dep.group}:${dep.name}"))
+                if (localProjectVersion != null) {
+                    return localProjectVersion.plugins.hasPlugin(LibraryPlugin::class.java)
+                }
+            }
         }
     }
     return false
