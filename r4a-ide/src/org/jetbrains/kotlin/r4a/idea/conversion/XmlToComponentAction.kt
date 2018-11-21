@@ -37,99 +37,85 @@ class XmlToComponentAction : AnAction() {
             }
 
             // TODO(jdemeulenaere): Check if there are syntax errors in any file, in which case either abort or warn that result might be incorrect.
-            val newContentsAndImports = xmlFiles.mapNotNull { xmlFile ->
-                val (content, imports) = convertFile(xmlFile)
-                Triple(xmlFile, content, imports)
-            }
 
-            val project = xmlFiles[0].project
+            val project = xmlFiles.first().project
             project.executeWriteCommand("Convert XML Files to Component") {
-                // Replace and rename files.
-                val virtualFilesAndImports = newContentsAndImports.mapNotNull { (xmlFile, content, imports) ->
-                    replaceAndRename(xmlFile, content)?.let { Pair(it, imports) }
-                }
+                val convertedFiles = xmlFiles.map { convertFile(it) }
                 PsiDocumentManager.getInstance(project).commitAllDocuments()
 
-                virtualFilesAndImports.forEach { (file, imports) ->
-                    val ktFile = file.toPsiFile(project) as? KtFile ?: return@forEach
-
-                    // Add imports.
-                    addImports(project, ktFile, imports)
-
-                    // Format code.
-                    XmlToKtxConverter.formatCode(ktFile)
-                }
-
                 // Open first converted file.
-                virtualFilesAndImports.singleOrNull()?.let { (file, _) ->
-                    FileEditorManager.getInstance(project).openFile(file, true)
-                }
+                FileEditorManager.getInstance(project).openFile(convertedFiles.first().virtualFile, true)
             }
         }
 
-        private fun convertFile(file: XmlFile): Pair<String, Collection<FqName>> {
-            // Generate class code.
+        private fun convertFile(sourceFile: XmlFile): KtFile {
+            val copy = sourceFile.copy() as XmlFile
+            val targetFile = renameFile(sourceFile)
+
+            val convertedXml = XmlToKtxConverter(targetFile).convertElement(copy)
             // TODO(jdemeulenaere): Better comment converter.
             val codeBuilder = CodeBuilder(null, EmptyDocCommentConverter)
-            val convertedXml = XmlToKtxConverter.convertFile(
-                file
-            )
             codeBuilder.append(convertedXml)
-            val className = className(file)
-            val fileContent = createComponentClass(className, codeBuilder.resultText)
-            // TODO(jdemeulenaere): For some reason, adding imports here on a dummy file to directly return the final content didn't work...
-            // Hence I add them later once the file actually exists.
-            return fileContent to codeBuilder.importsToAdd
+            val functionName = functionName(copy)
+            val content = createFunctionalComponent(functionName, codeBuilder.resultText)
+
+            replaceContent(targetFile, content)
+            addImports(targetFile, codeBuilder.importsToAdd)
+            XmlToKtxConverter.formatCode(targetFile)
+            return targetFile
         }
 
-        private fun className(file: XmlFile): String {
-            // TODO(jdemeulenaere): Ask the user which class name to use (and pre-fill name with this algorithm) if converting only one file.
-            var className = file.name
+        private fun functionName(file: XmlFile): String {
+            // TODO(jdemeulenaere): Ask the user which file/function name to use (and pre-fill name with this algorithm) if converting only one file.
+            var functionName = file.name
 
             // Remove extension.
-            val dotIndex = className.lastIndexOf('.')
+            val dotIndex = functionName.lastIndexOf('.')
             if (dotIndex != -1) {
-                className = className.substring(0, dotIndex)
+                functionName = functionName.substring(0, dotIndex)
             }
 
             // Remove special characters.
-            className = className.replace(Regex("[^A-Za-z0-9_]"), "")
+            functionName = functionName.replace(Regex("[^A-Za-z0-9_]"), "")
 
-            // Convert files named activity_* to *Component.
-            if (className.startsWith("activity_")) {
-                className = className.substring("activity_".length) + "_component"
+            // Strip activity_* prefix away.
+            if (functionName.startsWith("activity_")) {
+                functionName = functionName.substring("activity_".length)
             }
 
             // Convert case.
-            return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, className)
+            return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, functionName)
         }
 
-        private fun createComponentClass(name: String, composeBody: String): String {
+        private fun createFunctionalComponent(name: String, composeBody: String): String {
             // TODO(jdemeulenaere): Infer package from file location/siblings/parents.
-            // We don't use org.jetbrains.kotlin.j2k.ast.Class here because adding a function with a body inside a Class requires using a j2k
-            // Converter class.
+            // We don't use org.jetbrains.kotlin.j2k.ast.Function because it requires a j2k.Converter instance to create a DeferredElement
+            // (the type of the Function body).
+
             return """
-            |import com.google.r4a.Component
+            |import com.google.r4a.*
             |
-            |class $name : Component() {
-            |    override fun compose() {
-            |        $composeBody
-            |    }
+            |@Composable
+            |fun $name() {
+            |    $composeBody
             |}""".trimMargin()
         }
 
-        private fun replaceAndRename(file: XmlFile, content: String): VirtualFile? {
+        private fun replaceContent(file: KtFile, content: String) {
             // Replace content.
-            val document = PsiDocumentManager.getInstance(file.project).getDocument(file) ?: return null
+            val documentManager = PsiDocumentManager.getInstance(file.project)
+            val document = documentManager.getDocument(file)!!
             document.replaceString(0, document.textLength, content)
             FileDocumentManager.getInstance().saveDocument(document)
+            documentManager.commitDocument(document)
+        }
 
-            // Rename file.
-            // TODO(jdemeulenaere): If we are converting only one file, ask the user in which folder he wants to move that file.
+        private fun renameFile(sourceFile: XmlFile): KtFile {
+            // TODO(jdemeulenaere): If we are converting only one file, ask the user in which folder we should move that file.
             // TODO(jdemeulenaere): Handle scratch files (change language mapping).
-            val virtualFile = file.virtualFile
+            val virtualFile = sourceFile.virtualFile
             val ioFile = File(virtualFile.path.replace('/', File.separatorChar))
-            val className = className(file)
+            val className = functionName(sourceFile)
             var kotlinFileName = "$className.kt"
             var i = 1
             while (true) {
@@ -137,14 +123,14 @@ class XmlToComponentAction : AnAction() {
                 kotlinFileName = "$className${i++}.kt"
             }
             virtualFile.rename(this, kotlinFileName)
-            return virtualFile
+            return virtualFile.toPsiFile(sourceFile.project)!! as KtFile
         }
 
-        private fun addImports(project: Project, ktFile: KtFile, imports: Collection<FqName>) {
+        private fun addImports(ktFile: KtFile, imports: Collection<FqName>) {
             runWriteAction {
                 imports.forEach { fqName ->
                     ktFile.resolveImportReference(fqName).firstOrNull()?.let {
-                        ImportInsertHelper.getInstance(project).importDescriptor(ktFile, it)
+                        ImportInsertHelper.getInstance(ktFile.project).importDescriptor(ktFile, it)
                     }
                 }
             }

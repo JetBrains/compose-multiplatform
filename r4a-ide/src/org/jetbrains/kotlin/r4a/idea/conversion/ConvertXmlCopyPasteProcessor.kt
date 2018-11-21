@@ -125,11 +125,12 @@ class ConvertXmlCopyPasteProcessor : CopyPastePostProcessor<TextBlockTransferabl
         // Convert PsiElement's to AST Element's.
         val conversionResult = StringBuilder()
         val imports = hashSetOf<FqName>()
+        val converter = XmlToKtxConverter(targetFile)
         elementAndTextList.process(object : ElementsAndTextsProcessor {
             override fun processElement(element: PsiElement) {
                 // TODO(jdemeulenaere): Better comment converter.
                 val codeBuilder = CodeBuilder(null, EmptyDocCommentConverter)
-                codeBuilder.append(XmlToKtxConverter.convertElement(element))
+                codeBuilder.append(converter.convertElement(element))
                 imports.addAll(codeBuilder.importsToAdd)
                 conversionResult.append(codeBuilder.resultText)
             }
