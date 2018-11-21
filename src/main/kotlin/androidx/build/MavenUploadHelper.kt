@@ -61,8 +61,6 @@ fun Project.configureMavenArtifactUpload(extension: SupportLibraryExtension) {
     afterEvaluate {
         if (extension.publish) {
             uploadTask.repositories.withType(MavenDeployer::class.java) { mavenDeployer ->
-                mavenDeployer.isUniqueVersion = true
-
                 mavenDeployer.getPom().project {
                     it.withGroovyBuilder {
                         "name"(extension.name)
