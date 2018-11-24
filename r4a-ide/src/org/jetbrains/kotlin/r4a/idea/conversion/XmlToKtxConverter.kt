@@ -33,16 +33,32 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.getAllSuperClassifiers
 import java.util.*
 
 class XmlToKtxConverter(private val targetFile: KtFile) {
-    enum class XmlNamespace(val uri: String, val defaultPrefix: String) {
-        ANDROID("http://schemas.android.com/apk/res/android", "android"),
-        ANDROID_TOOLS("http://schemas.android.com/tools", "tools"),
-        ANDROID_APP("http://schemas.android.com/apk/res-auto", "app");
-    }
-
     companion object {
         private const val NAMESPACE_PREFIX = "xmlns"
         private val MAGIC_CONSTANT_ANNOTATIONS = listOf("IntDef", "LongDef", "StringDef").flatMap {
             listOf("android.annotation.$it", "android.support.annotation.$it")
+        }
+
+        private val CLASS_PREFIX_LIST = listOf(
+            "android.widget.",
+            "android.webkit.",
+            "android.app.",
+            "android.view."
+        )
+
+        private enum class SpecialTags(val tagName: String) {
+            VIEW("view"),
+            BLINK("blink"),
+            MERGE("merge"),
+            INCLUDE("include"),
+            REQUEST_FOCUS("requestFocus"),
+            TAG("tag")
+        }
+
+        enum class XmlNamespace(val uri: String, val defaultPrefix: String) {
+            ANDROID("http://schemas.android.com/apk/res/android", "android"),
+            ANDROID_TOOLS("http://schemas.android.com/tools", "tools"),
+            ANDROID_APP("http://schemas.android.com/apk/res-auto", "app");
         }
 
         fun formatCode(file: PsiFile, range: RangeMarker? = null) {
@@ -57,17 +73,17 @@ class XmlToKtxConverter(private val targetFile: KtFile) {
         }
     }
 
+    private val project = targetFile.project
     // TODO(jdemeulenaere): Compare with `isVisibleDescriptor` in (BaseR4a)CompletionSession to add more checks here.
     private val visibilityFilter: (DeclarationDescriptor) -> Boolean = lambda@{ descriptor ->
         if (descriptor is DeclarationDescriptorWithVisibility) {
             return@lambda descriptor.isVisible(targetFile.findModuleDescriptor())
         }
 
-        return@lambda descriptor.isExcludedFromAutoImport(targetFile.project, targetFile)
+        return@lambda descriptor.isExcludedFromAutoImport(project, targetFile)
     }
     private val attributeInfoExtractor = AttributeInfoExtractor(targetFile, visibilityFilter)
     private val classToAttributeConversions = hashMapOf<String, List<AttributeConversion>>()
-
 
     fun convertElement(element: PsiElement): Element = when (element) {
         is XmlFile -> convertFile(element)
@@ -77,8 +93,8 @@ class XmlToKtxConverter(private val targetFile: KtFile) {
         else -> DummyStringExpression(element.text)
     }
 
-    fun convertFile(element: XmlFile): Element {
-        return element.rootTag?.let { convertTag(it) } ?: DummyStringExpression("")
+    private fun convertFile(element: XmlFile): Element {
+        return element.rootTag?.let { convertTag(it) } ?: Element.Empty
     }
 
     private fun getAttributeConversions(tag: XmlTag): List<AttributeConversion> {
@@ -103,7 +119,6 @@ class XmlToKtxConverter(private val targetFile: KtFile) {
     }
 
     private fun findClass(qualifiedName: String): PsiClass? {
-        val project = targetFile.project
         return JavaPsiFacade.getInstance(project).findClass(qualifiedName, project.allScope())
     }
 
@@ -201,10 +216,20 @@ class XmlToKtxConverter(private val targetFile: KtFile) {
             .mapNotNull { it.getKotlinFqName() }
     }
 
-    private fun convertTag(tag: XmlTag): KtxElement {
+    private fun convertTag(tag: XmlTag): Element {
+        when (tag.name) {
+            SpecialTags.MERGE.tagName -> return DeclarationStatement(tag.subTags.map { convertTag(it) })
+            // TODO(jdemeulenaere): Instead of ignoring the <include> tag, we might want to suggest the user to convert the included layout
+            // file into a component, or inline and convert its content.
+            SpecialTags.INCLUDE.tagName,
+            // TODO(jdemeulenaere): Make sure we want to ignore <tag> and <requestFocus/> tags.
+            SpecialTags.TAG.tagName,
+            SpecialTags.REQUEST_FOCUS.tagName -> return Element.Empty
+        }
+
         val attributeConversions = getAttributeConversions(tag)
         val attributes = tag.attributes
-            .filter(::shouldConvertAttribute)
+            .filter { shouldConvertAttribute(tag, it) }
             .map { convertAttribute(it, attributeConversions) }
 
         val body = tag.subTags.map { convertTag(it) }
@@ -213,15 +238,25 @@ class XmlToKtxConverter(private val targetFile: KtFile) {
     }
 
     private fun getTagSimpleAndQualifiedName(tag: XmlTag): Pair<String, String> {
-        val fullName = tag.name
+        val fullName = when(tag.name) {
+            SpecialTags.VIEW.tagName -> tag.getAttributeValue("class") ?: "android.view.View"
+            // The <blink></blink> tag will be inflated as a android.view.LayoutInflater.BlinkLayout, which is a private class that extends
+            // FrameLayout. User will lose the blinking but this is the closest we can get.
+            SpecialTags.BLINK.tagName -> "android.widget.FrameLayout"
+            else -> tag.name
+        }
+
         val dotIndex = fullName.lastIndexOf('.')
         if (dotIndex != -1) {
             // TODO(jdemeulenaere): Check that import doesn't conflict with another (existing or future) import (in which case use the fully qualified name).
             return fullName.substring(dotIndex + 1) to fullName
         }
 
-        // TODO(jdemeulenaere): Not sure this default package is always correct.
-        return fullName to "android.widget.$fullName"
+        val qualifiedName = CLASS_PREFIX_LIST
+            .map { "$it$fullName" }
+            .firstOrNull { JavaPsiFacade.getInstance(project).findClass(it, project.allScope()) != null }
+            ?: "android.widget.$fullName"
+        return fullName to qualifiedName
     }
 
     private fun XmlAttribute.isInNamespace(ns: XmlNamespace): Boolean {
@@ -232,9 +267,9 @@ class XmlToKtxConverter(private val targetFile: KtFile) {
         }
     }
 
-    private fun shouldConvertAttribute(attribute: XmlAttribute): Boolean {
+    private fun shouldConvertAttribute(tag: XmlTag, attribute: XmlAttribute): Boolean {
         return attribute.namespacePrefix != NAMESPACE_PREFIX && !attribute.isInNamespace(XmlNamespace.ANDROID_TOOLS)
-                && !(attribute.value ?: "").startsWith("@+id/")
+                && !(attribute.value ?: "").startsWith("@+id/") && (tag.name != SpecialTags.VIEW.tagName || attribute.name != "class")
     }
 
     private fun convertAttribute(attribute: XmlAttribute, attributeConversions: List<AttributeConversion>): KtxAttribute {
