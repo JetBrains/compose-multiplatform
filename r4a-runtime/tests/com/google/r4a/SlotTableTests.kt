@@ -460,63 +460,6 @@ class SlotTableTests : TestCase() {
         slots.endGroup()
     }
 
-    fun testMemo() {
-        val slots = SlotTable()
-        slots.beginInsert()
-        slots.startGroup()
-        slots.startItem(null)
-        slots.startMemo()
-        repeat(10) { slots.update(it) }
-        slots.endMemo()
-        slots.endItem()
-        slots.endGroup()
-        slots.endInsert()
-        slots.reset()
-
-        slots.beginReading()
-        slots.startGroup()
-        slots.startItem(null)
-        assertEquals(true, slots.isMemoGroup)
-        slots.startMemo()
-        repeat(10) {
-            assertEquals(it, slots.next())
-        }
-        slots.endMemo()
-        slots.endItem()
-        slots.endGroup()
-        slots.endReading()
-        slots.reset()
-    }
-
-    fun testSkipMemos() {
-        val slots = SlotTable()
-        slots.beginInsert()
-        slots.startGroup()
-        slots.update(null)
-        repeat(10) {
-            slots.startMemo()
-            slots.update(it)
-            slots.endMemo()
-        }
-        slots.startNode()
-        slots.update(42)
-        slots.endNode()
-        slots.endGroup()
-        slots.endInsert()
-        slots.reset()
-
-        slots.beginReading()
-        slots.startGroup()
-        assertEquals(null, slots.next())
-        slots.skipMemos()
-        slots.startNode()
-        assertEquals(42, slots.next())
-        slots.endNode()
-        slots.endGroup()
-        slots.endReading()
-        slots.reset()
-    }
-
     fun testStartEmpty() {
         val slots = SlotTable()
         slots.beginEmpty()
@@ -606,13 +549,8 @@ fun testItems(): SlotTable {
     slots.beginInsert()
     slots.startGroup()
 
-    fun item(key: Any?, memoGroup: Boolean = false, block: () -> Unit) {
+    fun item(key: Any?, block: () -> Unit) {
         slots.startItem(key)
-        if (memoGroup) {
-            slots.startMemo()
-            slots.update(key)
-            slots.endMemo()
-        }
         block()
         slots.endItem()
     }
@@ -626,7 +564,7 @@ fun testItems(): SlotTable {
     }
 
     for (key in 0 until 10) {
-        item(key, memoGroup = key % 4 == 0) {
+        item(key) {
             for (item in 0..key) {
                 element(elementKey) {
                     for (element in 0..key)
@@ -658,6 +596,5 @@ fun SlotTable.endItem(): Int = endGroup()
 
 fun SlotTable.expectItem(key: Any?): Int {
     org.junit.Assert.assertEquals(key, next())
-    skipMemo()
     return skipGroup()
 }
