@@ -71,10 +71,7 @@ class ComposableAnnotationChecker(val mode: Mode = DEFAULT_MODE) : CallChecker, 
         if (resolvedCall is VariableAsFunctionResolvedCall) {
             return analyze(trace, resolvedCall.variableCall.candidateDescriptor)
         }
-        if (resolvedCall is ResolvedCallImpl) {
-            return analyze(trace, resolvedCall.candidateDescriptor)
-        }
-        throw Error("unexpected")
+        return analyze(trace, resolvedCall.candidateDescriptor)
     }
 
     fun analyze(trace: BindingTrace, descriptor: DeclarationDescriptor): Composability {
