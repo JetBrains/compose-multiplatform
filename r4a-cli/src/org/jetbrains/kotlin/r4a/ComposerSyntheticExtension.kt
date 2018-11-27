@@ -99,7 +99,11 @@ class ComposerSyntheticExtension : SyntheticIrExtension {
                 .append(callInfo.pivotals.map { getAttribute(it.name) })
                 .reduce { left, right ->
                     statementGenerator
-                        .callFunction(UNDEFINED_OFFSET, UNDEFINED_OFFSET, callInfo.joinKeyCall)
+                        .callMethod(
+                            UNDEFINED_OFFSET, UNDEFINED_OFFSET,
+                            callInfo.joinKeyCall,
+                            getComposer
+                        )
                         .apply {
                             putValueArgument(0, left)
                             putValueArgument(1, right)
