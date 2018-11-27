@@ -21,6 +21,7 @@ import androidx.build.metalava.Metalava
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.extra
 
 /**
  * Support java library specific plugin that sets common configurations needed for
@@ -38,6 +39,10 @@ class SupportJavaLibraryPlugin : Plugin<Project> {
 
         project.apply(mapOf("plugin" to "java"))
         project.afterEvaluate {
+            if (supportLibraryExtension.publish) {
+                project.extra.set("publish", true)
+                project.addToProjectMap(supportLibraryExtension.mavenGroup)
+            }
             Dokka.registerJavaProject(project, supportLibraryExtension)
             if (supportLibraryExtension.useMetalava) {
                 Metalava.registerJavaProject(project, supportLibraryExtension)
