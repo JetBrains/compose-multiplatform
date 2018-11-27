@@ -852,6 +852,37 @@ class CompositionTests : TestCase() {
             validate(composer.root) { composition() }
         }
     }
+
+    fun testStartJoin() {
+        var text = "Starting"
+        var invalidate: (() -> Unit)? = null
+        fun MockViewComposition.composition() {
+            linear {
+                join(860) { myInvalidate ->
+                    invalidate = myInvalidate
+                    text(text)
+                }
+            }
+        }
+
+        fun MockViewValidator.composition() {
+            linear {
+                text(text)
+            }
+        }
+
+        val composer = compose { composition() }
+
+        validate(composer.root) { composition() }
+
+        text = "Ending"
+        invalidate?.let { it() }
+
+        composer.recompose()
+        composer.applyChanges()
+
+        validate(composer.root) { composition() }
+    }
 }
 
 

@@ -327,6 +327,13 @@ fun augmentFramedClass(
     )
 
     fun getRecord() = toRecord(recordGetter)
+    val framesPackageDescriptor = context.moduleDescriptor.getPackage(framesPackageName)
+    val createdDescriptor =
+        framesPackageDescriptor.memberScope.getContributedFunctions(
+            Name.identifier("_created"),
+            NoLookupLocation.FROM_BACKEND
+        ).single()
+    val createdSymbol = context.symbolTable.referenceSimpleFunction(createdDescriptor)
 
     // Move property initializer to an anonymous initializer as the backing field is moved to the record
     context.symbolTable.declareAnonymousInitializer(UNDEFINED_OFFSET, UNDEFINED_OFFSET, IrDeclarationOrigin.DEFINED, framedDescriptor)
@@ -358,6 +365,18 @@ fun augmentFramedClass(
                     statements.add(syntheticSetField(irRecordField.symbol, getRecord(), initializer.expression))
                 }
             }
+
+            // Notify the runtime a new framed object was created
+            statements.add(
+                syntheticCall(
+                    context.irBuiltIns.unitType,
+                    createdSymbol,
+                    createdDescriptor
+                ).apply {
+                    putValueArgument(0, thisValue)
+                }
+            )
+
             irInitializer.body = syntheticBlockBody(statements)
 
             // TODO(http://b/79588393): Determine if the order is important here. Should this be added before, all other initializers, after, be before the property
@@ -365,7 +384,6 @@ fun augmentFramedClass(
         }
 
     // Replace property getter/setters with _readable/_writable calls (this, indirectly, removes the backing field)
-    val framesPackageDescriptor = context.moduleDescriptor.getPackage(framesPackageName)
     val readableDescriptor =
         framesPackageDescriptor.memberScope.getContributedFunctions(
             Name.identifier("_readable"),

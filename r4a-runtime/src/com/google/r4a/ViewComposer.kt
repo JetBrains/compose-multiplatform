@@ -107,6 +107,9 @@ internal class ViewApplyAdapter(private val adapters: ViewAdapters? = null) : Ap
 }
 
 class ViewComposer(val root: Any, val context: Context, val adapters: ViewAdapters? = ViewAdapters()) : Composer<Any>(SlotTable(), Applier(root, ViewApplyAdapter(adapters))) {
+    init {
+        FrameManager.ensureStarted()
+    }
     fun skipGroup(key: Any) {
         nextSlot()
         skipValue()
@@ -193,6 +196,16 @@ class ViewComposer(val root: Any, val context: Context, val adapters: ViewAdapte
             composer.skipGroup(invocation)
         }
         composer.endGroup()
+    }
+
+    /*inline*/ fun observe(
+        key: Any,
+        block: (invalidate: () -> Unit) -> Unit
+    ) {
+        composer.startGroup(key)
+        val invalidate = composer.startJoin(false, block)
+        block(invalidate)
+        composer.doneJoin(false)
     }
 }
 

@@ -25,6 +25,7 @@ private class Pending(val parentKeyInfo: KeyInfo, val keyInfos: MutableList<KeyI
     init {
         assert(startIndex >= 0) { "Invalid start index" }
     }
+
     var nodeCount = parentKeyInfo.nodes
 
     private val usedKeys = mutableListOf<KeyInfo>()
@@ -117,7 +118,17 @@ private class Pending(val parentKeyInfo: KeyInfo, val keyInfos: MutableList<KeyI
 
 private object RootKey
 
-private class Invalidation(val recomposable: Recomposable, val location: Int)
+private sealed class Invalidation(val location: Int)
+private class RecomposableInvalidation(val recomposable: Recomposable, location: Int) : Invalidation(location)
+private class ScopeInvalidation(val scope: RecomposeScope, location: Int) : Invalidation(location)
+
+internal class RecomposeScope(val compose: (invalidate: () -> Unit) -> Unit) {
+    var anchor: Anchor? = null
+    var invalidate: (() -> Unit)? = null
+    val valid: Boolean get() = anchor?.valid ?: false
+}
+
+private val IGNORE_INVALIDATE: () -> Unit = {}
 
 open class Composer<N>(
     internal val slots: SlotTable,
@@ -138,6 +149,7 @@ open class Composer<N>(
     private var invalidations: MutableList<Invalidation> = mutableListOf()
     private val entersStack = IntStack()
     private val insertedParents = Stack<Recomposable>()
+    private val invalidateStack = Stack<RecomposeScope>()
 
     protected fun composeRoot(block: () -> Unit) {
         slots.reset()
@@ -152,6 +164,7 @@ open class Composer<N>(
     override val inserting: Boolean get() = slots.inEmpty
 
     fun applyChanges() {
+        invalidateStack.clear()
         slots.reset()
         changes.forEach { change -> change(applier, slots) }
         changes.clear()
@@ -221,7 +234,7 @@ open class Composer<N>(
     }
 
     override fun useNode(): N {
-        assert(!inserting) { "useNode() called while inserting"}
+        assert(!inserting) { "useNode() called while inserting" }
         recordDown()
         val result = slots.next()
         childrenAllowed = true
@@ -299,6 +312,8 @@ open class Composer<N>(
     }
 
     val changeCount get() = changes.size
+
+    internal val currentInvalidate: RecomposeScope? get() = invalidateStack.let { if (it.isNotEmpty()) it.peek() else null }
 
     private fun start(key: Any, action: SlotAction) {
         assert(childrenAllowed) { "A call to creadNode(), emitNode() or useNode() expected" }
@@ -423,7 +438,11 @@ open class Composer<N>(
                     val deleteOffset = pending.nodePositionOf(previousInfo)
                     recordRemoveNode(deleteOffset + pending.startIndex, previousInfo.nodes)
                     pending.updateNodeCount(previousInfo, 0)
-                    recordOperation { _, slots -> slots.removeItem() }
+                    recordOperation { _, slots ->
+                        if (slots.removeItem()) {
+                            FrameManager.scheduleCleanup()
+                        }
+                    }
                     previousIndex++
                     continue
                 }
@@ -475,7 +494,11 @@ open class Composer<N>(
             slots.next() // Skip key
             val nodesToRemove = slots.skipGroup()
             recordRemoveNode(removeIndex, nodesToRemove)
-            recordOperation { _, slots -> slots.removeItem() }
+            recordOperation { _, slots ->
+                if (slots.removeItem()) {
+                    FrameManager.scheduleCleanup()
+                }
+            }
             slots.reportUncertainNodeCount()
         }
 
@@ -512,7 +535,7 @@ open class Composer<N>(
      * skipped.
      */
     private fun skipToGroupContaining(location: Int) {
-        while(slots.current < location) {
+        while (slots.current < location) {
             if (slots.isGroupEnd) return
             if (slots.isGroup) {
                 if (location < slots.groupSize + slots.current) return
@@ -572,14 +595,16 @@ open class Composer<N>(
         var firstInRange = invalidations.firstInRange(start, end)
         while (firstInRange != null) {
             val location = firstInRange.location
-            val recomposable = firstInRange.recomposable
 
             invalidations.removeLocation(location)
 
             recordExits(location)
             recordEnters(location)
 
-            composeInstance(recomposable)
+            when (firstInRange) {
+                is RecomposableInvalidation -> composeInstance(firstInRange.recomposable)
+                is ScopeInvalidation -> composeScope(firstInRange.scope)
+            }
 
             recomposed = true
 
@@ -599,15 +624,22 @@ open class Composer<N>(
         }
     }
 
+    internal fun invalidate(scope: RecomposeScope) {
+        val location = scope.anchor!!.location(slots)
+        assert(location >= 0) { "Invalid anchor" }
+        invalidations.insertIfMissing(location, scope)
+    }
+
     private fun invalidate(instance: Recomposable, anchor: Anchor) {
         val location = anchor.location(slots)
-        assert(location >= 0) { "Invalid anchor" }
-        invalidations.insertIfMissing(location, instance)
+        if (location >= 0) {
+            invalidations.insertIfMissing(location, instance)
+        }
     }
 
     private fun composeInstance(instance: Recomposable) {
         startCompose(false, instance)
-        with (instance) { compose() }
+        with(instance) { compose() }
         doneCompose(false)
     }
 
@@ -633,6 +665,53 @@ open class Composer<N>(
         if (!valid) {
             if (inserting) insertedParents.pop()
             end(END_GROUP)
+        } else {
+            if (invalidations.isEmpty()) {
+                skipGroup()
+            } else {
+                recomposeComponentRange(slots.current, slots.current + slots.groupSize)
+            }
+        }
+    }
+
+    private fun composeScope(scope: RecomposeScope) {
+        val invalidate = startJoin(false, scope.compose)
+        scope.compose(invalidate)
+        doneJoin(false)
+    }
+
+    fun startJoin(valid: Boolean, compose: (invalidate: () -> Unit) -> Unit): () -> Unit {
+        return if (!valid) {
+            val invalidate = if (inserting) {
+                val scope = RecomposeScope(compose)
+                invalidateStack.push(scope)
+                scope.invalidate = { invalidate(scope) }
+                recordStart(START_GROUP)
+                recordOperation { _, slots -> scope.anchor = slots.anchor(slots.current - 1) }
+                updateValue(scope)
+                slots.beginEmpty()
+                scope.invalidate
+
+            } else {
+                slots.startGroup()
+                @Suppress("UNCHECKED_CAST")
+                val scope = slots.next() as RecomposeScope
+                invalidateStack.push(scope)
+                recordStart(START_GROUP)
+                skipValue()
+                invalidations.removeLocation(slots.current - 1)
+                scope.invalidate
+
+            }
+            enterGroup(START_GROUP, null, null)
+            invalidate ?: IGNORE_INVALIDATE
+        } else IGNORE_INVALIDATE
+    }
+
+    fun doneJoin(valid: Boolean) {
+        if (!valid) {
+            end(END_GROUP)
+            invalidateStack.pop()
         } else {
             if (invalidations.isEmpty()) {
                 skipGroup()
@@ -700,8 +779,8 @@ open class Composer<N>(
                             END_GROUP -> slots.endGroup()
                             SKIP_GROUP -> slots.skipGroup()
                             START_NODE -> slots.startNode()
-                            END_NODE ->  slots.endNode()
-                            SKIP_NODE-> slots.skipNode()
+                            END_NODE -> slots.endNode()
+                            SKIP_NODE -> slots.skipNode()
                             DOWN -> {
                                 @Suppress("UNCHECKED_CAST")
                                 applier.down(slots.next() as N)
@@ -726,7 +805,7 @@ open class Composer<N>(
 
     internal fun finalizeCompose() {
         finalRealizeSlots()
-        assert(pendingStack.empty()) { "Start end imbalance"}
+        assert(pendingStack.empty()) { "Start end imbalance" }
         pending = null
         nodeIndex = 0
         groupNodeCount = 0
@@ -772,8 +851,13 @@ open class Composer<N>(
         }
     }
 
-    private fun recordDown() { slotActions.add(DOWN) }
-    private fun recordUp() { slotActions.add(UP) }
+    private fun recordDown() {
+        slotActions.add(DOWN)
+    }
+
+    private fun recordUp() {
+        slotActions.add(UP)
+    }
 
     private var previousRemove = -1
     private var previousMoveFrom = -1
@@ -826,6 +910,7 @@ open class Composer<N>(
 }
 
 internal typealias SlotAction = Int
+
 internal const val START_GROUP: SlotAction = 1
 internal const val END_GROUP: SlotAction = START_GROUP + 1
 internal const val SKIP_GROUP: SlotAction = END_GROUP + 1
@@ -853,7 +938,9 @@ private class SlotActions(var actions: IntArray = IntArray(DEFAULT_SLOT_ACTIONS_
         size -= count
     }
 
-    fun clear() { size = 0 }
+    fun clear() {
+        size = 0
+    }
 
     fun clone(): SlotActions = SlotActions(actions.copyOf(this.size)).also { it.size = size }
 
@@ -882,12 +969,14 @@ private inline fun SlotActions.forEach(block: (SlotAction) -> Unit) {
 
 // Mutable list
 private fun <K, V> multiMap() = HashMap<K, LinkedHashSet<V>>()
+
 private fun <K, V> HashMap<K, LinkedHashSet<V>>.put(key: K, value: V) = getOrPut(key) { LinkedHashSet() }.add(value)
 private fun <K, V> HashMap<K, LinkedHashSet<V>>.remove(key: K, value: V) =
     get(key)?.let {
         it.remove(value)
         if (it.isEmpty()) remove(key)
     }
+
 private fun <K, V> HashMap<K, LinkedHashSet<V>>.pop(key: K) = get(key)?.firstOrNull()?.also { remove(key, it) }
 
 // Slot table helper
@@ -913,7 +1002,15 @@ private fun MutableList<Invalidation>.findLocation(location: Int): Int =
 private fun MutableList<Invalidation>.insertIfMissing(location: Int, recomposable: Recomposable) {
     val index = findLocation(location)
     if (index < 0) {
-        add(-(index + 1), Invalidation(recomposable, location))
+        add(-(index + 1), RecomposableInvalidation(recomposable, location))
+    }
+}
+
+private fun MutableList<Invalidation>.insertIfMissing(location: Int, scope: RecomposeScope) {
+    val index = findLocation(location)
+    if (index < 0) {
+        // TODO: Remove Recomposable
+        add(-(index + 1), ScopeInvalidation(scope, location))
     }
 }
 

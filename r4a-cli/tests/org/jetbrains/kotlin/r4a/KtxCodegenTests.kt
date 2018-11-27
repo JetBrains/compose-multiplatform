@@ -7,6 +7,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.r4a.Component
 import com.google.r4a.CompositionContext
+import com.google.r4a.isolated
 
 import org.jetbrains.kotlin.extensions.KtxControlFlowExtension
 import org.jetbrains.kotlin.extensions.KtxTypeResolutionExtension

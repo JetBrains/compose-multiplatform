@@ -92,6 +92,7 @@ abstract class CompositionContext {
 
     abstract var context: Context
     abstract fun recompose(component: Component)
+    abstract fun recomposeAll()
     abstract fun recomposeSync(component: Component)
     abstract fun preserveAmbientScope(component: Component)
     abstract fun <T : Any?> getAmbient(key: Ambient<T>): T

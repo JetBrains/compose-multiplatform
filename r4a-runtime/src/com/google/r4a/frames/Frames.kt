@@ -41,7 +41,9 @@ abstract class AbstractRecord : Record {
 internal val threadFrame = ThreadLocal<Frame>()
 
 typealias FrameReadObserver = (read: Any) -> Unit
+typealias FrameWriteObserver = (write: Any) -> Unit
 typealias FrameCommitObserver = (committed: Set<Any>) -> Unit
+
 
 /**
  * Information about a frame including the frame id and whether or not it is read only.
@@ -64,9 +66,14 @@ class Frame(
     readOnly: Boolean,
 
     /**
-     * Observe a frame
+     * Observe a frame read
      */
-    internal val readObserver: FrameReadObserver?
+    internal val readObserver: FrameReadObserver?,
+
+    /**
+     * Observe a frame write
+     */
+    internal val writeObserver: FrameWriteObserver?
 ) {
     internal val modified = if (readOnly) null else HashSet<Framed>()
 
@@ -87,6 +94,8 @@ private fun validateNotInFrame() {
 fun currentFrame(): Frame {
     return threadFrame.get() ?: throw IllegalStateException("Not in a frame")
 }
+
+val inFrame: Boolean get() = threadFrame.get() != null
 
 // A global synchronization object
 private val sync = Object()
@@ -110,7 +119,7 @@ private fun BitSet.copy(): BitSet {
     return BitSet().apply { or(this@copy) }
 }
 
-private fun open(readOnly: Boolean, speculative: Boolean, observer: FrameReadObserver?): Frame {
+private fun open(readOnly: Boolean, speculative: Boolean, readObserver: FrameReadObserver?, writeObserver: FrameWriteObserver?): Frame {
     validateNotInFrame()
     synchronized(sync) {
         maxFrameId += 2
@@ -120,7 +129,8 @@ private fun open(readOnly: Boolean, speculative: Boolean, observer: FrameReadObs
             id = id,
             invalid = invalid,
             readOnly = readOnly,
-            readObserver = observer
+            readObserver = readObserver,
+            writeObserver = writeObserver
         )
         openFrames.set(id)
         threadFrame.set(frame)
@@ -134,12 +144,12 @@ private fun open(readOnly: Boolean, speculative: Boolean, observer: FrameReadObs
  * @param readOnly true if the frame can only be read from
  * @return the newly created frame's data
  */
-fun open(readOnly: Boolean = false) = open(readOnly, false, null)
+fun open(readOnly: Boolean = false) = open(readOnly, false, null, null)
 
 /**
  * Open a frame with observers
  */
-fun open(observer: FrameReadObserver) = open(false, false, observer)
+fun open(readObserver: FrameReadObserver? = null, writeObserver: FrameWriteObserver? = null) = open(false, false, readObserver, writeObserver)
 
 /**
  * Open a speculative frame. A speculative frame can only be aborted and can be used to
@@ -147,7 +157,7 @@ fun open(observer: FrameReadObserver) = open(false, false, observer)
  * expensive calculations to be pre-calculated on a separate thread and later replayed on
  * the primary thread without affecting the primary thread.
  */
-fun speculate() = open(false, true, null)
+fun speculate() = open(false, true, null, null)
 
 /*
  * Commits the pending frame if there one is open. Intended to be used in a `finally` clause
@@ -160,6 +170,11 @@ fun commitHandler() = threadFrame.get()?.let { commit(it) }
  * if one is open).
  */
 fun commit() = commit(currentFrame())
+
+/**
+ * Returns true if the given object framed object mutated in the the frame
+ */
+fun wasModified(value: Any) = currentFrame().modified?.contains(value) ?: false
 
 private var commitListeners = mutableListOf<FrameCommitObserver>()
 
@@ -345,6 +360,7 @@ fun <T : Record> T.readable(frame: Frame, framed: Framed): T {
 
 fun _readable(r: Record, framed: Framed): Record = r.readable(framed)
 fun _writable(r: Record, framed: Framed): Record = r.writable(framed)
+fun _created(framed: Framed) = currentFrame().writeObserver?.let { it(framed) }
 
 interface Framed {
     val firstFrameRecord: Record
@@ -395,6 +411,9 @@ fun <T : Record> T.writable(framed: Framed, frame: Frame): T {
 
     // If the readable data was born in this frame, it is writable.
     if (readData.frameId == frame.id) return readData
+
+    // The first write to an framed in frame
+    frame.writeObserver?.let { it(framed) }
 
     // Otherwise, make a copy of the readable data and mark it as born in this frame, making it writable.
     val newData = synchronized(framed) {

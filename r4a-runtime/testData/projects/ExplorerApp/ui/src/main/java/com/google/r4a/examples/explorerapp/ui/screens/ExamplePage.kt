@@ -16,8 +16,9 @@ const val NEWS_FEED = "News Feed"
 const val FONT_LIST = "Font List"
 const val SPINNER_FORM = "Spinner Form"
 const val REORDERING = "Reordering"
+const val MODEL = "Model"
 
-val EXAMPLES = arrayOf(CALCULATOR, EDIT_FORM, NEWS_FEED, FONT_LIST, SPINNER_FORM, REORDERING)
+val EXAMPLES = arrayOf(CALCULATOR, EDIT_FORM, NEWS_FEED, FONT_LIST, SPINNER_FORM, REORDERING, MODEL)
 
 class ExamplePage : Component() {
     override fun compose() {
@@ -30,6 +31,7 @@ class ExamplePage : Component() {
             FONT_LIST -> { <FontList /> }
             SPINNER_FORM -> { <SpinnerForm /> }
             REORDERING -> { <Reordering /> }
+            MODEL -> { <ModelExample /> }
             else -> {
                 <TextView text="ERROR: Unknown example '$name'" />
             }

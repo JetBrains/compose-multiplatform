@@ -32,6 +32,7 @@ class EmptyCompositionContext: CompositionContext() {
         set(value) = emptyComposition()
     override fun recompose(component: Component) = emptyComposition()
     override fun recomposeSync(component: Component) = emptyComposition()
+    override fun recomposeAll() = emptyComposition()
     override fun preserveAmbientScope(component: Component) = emptyComposition()
     override fun <T> getAmbient(key: Ambient<T>): T = emptyComposition()
     override fun <T> getAmbient(key: Ambient<T>, component: Component): T = emptyComposition()

@@ -24,6 +24,7 @@ internal class ComposerCompositionContext(val root: Any, private val rootCompone
                     val result = ComposerCompositionContext(root, component)
                     result.context = context
                     result.ambientReference = ambientReference
+                    FrameManager.registerComposition(result)
                     return result
                 }
             }
@@ -161,14 +162,17 @@ internal class ComposerCompositionContext(val root: Any, private val rootCompone
 
     override fun attributeChangedOrInserting(value: Any?): Boolean = attributeChanged(value) || composer.inserting
 
-    override fun recompose(component: Component) {
-        component.recomposeCallback?.let { it() }
-
+    override fun recomposeAll() {
         // if we're not currently composing and a frame hasn't been scheduled, we want to schedule it
         if (!isComposing && !hasPendingFrame) {
             hasPendingFrame = true
             Choreographer.getInstance().postFrameCallback(frameCallback)
         }
+    }
+
+    override fun recompose(component: Component) {
+        component.recomposeCallback?.let { it() }
+        recomposeAll()
     }
 
     override fun recomposeSync(component: Component) {

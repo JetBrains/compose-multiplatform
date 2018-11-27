@@ -343,15 +343,16 @@ class SlotTable(private var slots: Array<Any?> = arrayOf()) {
     /**
      * Remove an item. Must be called at the startGroup of an item.
      */
-    fun removeItem() {
+    fun removeItem(): Boolean {
         assert(readingCount == 0) { "Cannot remove while reading" }
         assert(insertCount == 0) { "Cannot remove and item while inserting" }
         assert(emptyCount == 0) { "Cannot remove an item in an empty region" }
         val oldCurrent = current
         val count = skipItem()
-        remove(oldCurrent, current - oldCurrent)
+        val anchorsRemoved = remove(oldCurrent, current - oldCurrent)
         current = oldCurrent
         nodeCount -= count
+        return anchorsRemoved
     }
 
     /**
@@ -467,25 +468,27 @@ class SlotTable(private var slots: Array<Any?> = arrayOf()) {
         }
     }
 
-    internal fun remove(start: Int, len: Int) {
-        if (len > 0) {
+    internal fun remove(start: Int, len: Int): Boolean {
+        return if (len > 0) {
             pendingClear = false
+            var anchorsRemoved = false
             if (gapLen == 0) {
                 // If there is no current gap, just make the removed items the gap
                 gapStart = start
-                if (anchors.isNotEmpty()) removeAnchors(start + len, len)
+                if (anchors.isNotEmpty()) anchorsRemoved = removeAnchors(start + len, len)
                 gapLen = len
             } else {
                 // Move the gap to the startGroup + len location and set the gap startGroup to startGroup and gap len to len + gapLen
                 val removeEnd = start + len
                 moveGapTo(removeEnd)
-                if (anchors.isNotEmpty()) removeAnchors(gapStart, len)
+                if (anchors.isNotEmpty()) anchorsRemoved = removeAnchors(gapStart, len)
                 gapStart = start
                 gapLen += len
             }
             if (currentEnd >= gapStart) currentEnd -= len
             pendingClear = true
-        }
+            anchorsRemoved
+        } else false
     }
 
     private data class GroupStart(val kind: GroupKind, val slots: Int, val nodes: Int) {
@@ -542,17 +545,20 @@ class SlotTable(private var slots: Array<Any?> = arrayOf()) {
             anchors[index].loc += delta
     }
 
-    private fun removeAnchors(gapStart: Int, size: Int) {
+    private fun removeAnchors(gapStart: Int, size: Int): Boolean {
         val removeStart = gapStart - size
         var index = anchors.locationOf(gapStart).let { if (it >= anchors.size) it - 1 else it }
+        var anchorsRemoved = false
         while (index >= 0) {
             val anchor = anchors[index]
             if (anchor.loc >= removeStart) {
                 anchor.loc = -1
                 anchors.removeAt(index)
+                anchorsRemoved = true
                 index--
             } else break
         }
+        return anchorsRemoved
     }
 
     internal fun anchorLocation(anchor: Anchor) = anchor.loc.let { if (it > gapStart) it - gapLen else it }
@@ -599,6 +605,7 @@ class KeyInfo(
 )
 
 class Anchor(internal var loc: Int) {
+    val valid get() = loc >= 0
     fun location(slots: SlotTable) = slots.anchorLocation(this)
 }
 

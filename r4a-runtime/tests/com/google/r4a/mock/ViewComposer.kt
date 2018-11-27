@@ -109,6 +109,18 @@ inline fun <reified C : ViewComponent, reified A1> MockViewComposition.composeCo
     myCC.endGroup()
 }
 
+fun MockViewComposition.join(
+    key: Any,
+    block: (invalidate: () -> Unit) -> Unit
+) {
+    val myCC = cc as MockViewComposer
+    myCC.startGroup(key)
+    val invalidate = myCC.startJoin(false, block)
+    block(invalidate)
+    myCC.doneJoin(false)
+    myCC.endGroup()
+}
+
 inline fun <reified C : ViewComponent, reified A1, reified A2> MockViewComposition.composeComponent(
     key: Any,
     crossinline factory: () -> C,
