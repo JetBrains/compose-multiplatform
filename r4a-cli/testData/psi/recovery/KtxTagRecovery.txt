@@ -236,6 +236,8 @@ KtFile: KtxTagRecovery.kt
           FUNCTION_LITERAL
             BLOCK
               <empty list>
+      PsiErrorElement:Close tag expected
+        <empty list>
       PsiElement(RBRACE)('}')
   PsiWhiteSpace('\n\n')
   FUN
@@ -286,6 +288,8 @@ KtFile: KtxTagRecovery.kt
               PsiErrorElement:Expected `>` (end of KTX close tag)
                 PsiElement(LT)('<')
                 PsiElement(DIV)('/')
+      PsiErrorElement:Close tag expected
+        <empty list>
       PsiWhiteSpace('\n')
       PsiElement(RBRACE)('}')
   PsiWhiteSpace('\n\n')
@@ -355,6 +359,8 @@ KtFile: KtxTagRecovery.kt
                     REFERENCE_EXPRESSION
                       PsiElement(IDENTIFIER)('foo')
                   PsiElement(DOT)('.')
+      PsiErrorElement:Close tag expected
+        <empty list>
       PsiWhiteSpace('\n')
       PsiElement(RBRACE)('}')
   PsiWhiteSpace('\n\n')
@@ -399,6 +405,8 @@ KtFile: KtxTagRecovery.kt
                     FUNCTION_LITERAL
                       BLOCK
                         <empty list>
+                PsiErrorElement:Close tag expected
+                  <empty list>
               PsiElement(RBRACE)('}')
       PsiWhiteSpace('\n')
       PsiElement(RBRACE)('}')

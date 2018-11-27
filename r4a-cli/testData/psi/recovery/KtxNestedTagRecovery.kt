@@ -17,3 +17,8 @@ fun unopenedCloses() {
         <NextElementToVerifyDepth />
     </LinearLayout>
 }
+
+fun unclosedTags2() {
+    <Unclosed1>
+      <Unclosed2>
+}

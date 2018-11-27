@@ -53,6 +53,7 @@ class R4aKtxParsingExtension : KtxParsingExtension {
                     marker.functionLiteralMarker!!.done(FUNCTION_LITERAL)
                     marker.lambdaExpressionMarker!!.done(KTX_BODY_LAMBDA)
                     marker.close()
+                    parser.errorWithRecovery("Close tag expected", EXPRESSION_FOLLOW_KTX)
                 }
             }
         }
