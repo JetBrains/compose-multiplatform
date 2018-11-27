@@ -8,6 +8,10 @@ import org.jetbrains.kotlin.r4a.analysis.R4AErrors
 class R4aQuickFixRegistry : QuickFixContributor {
     override fun registerQuickFixes(quickFixes: QuickFixes) {
 
+        // Provide fixes to annotate things that need to be @Composable when they aren't
+        quickFixes.register(R4AErrors.KTX_IN_NON_COMPOSABLE, AnnotateWithComposableQuickFix)
+        quickFixes.register(R4AErrors.NON_COMPOSABLE_INVOCATION, AnnotateTargetWithComposableQuickFix)
+
         // "Add Import" quick fixes for unresolved attributes that have valid extension attributes
         quickFixes.register(R4AErrors.MISMATCHED_ATTRIBUTE_TYPE, ImportAttributeFix)
         quickFixes.register(Errors.UNRESOLVED_REFERENCE, ImportAttributeFix)
