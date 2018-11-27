@@ -16,13 +16,13 @@
 
 package androidx.build.metalava
 
+import androidx.build.checkapi.ApiLocation
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.api.BaseVariant
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.file.FileCollection
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
@@ -30,34 +30,51 @@ import java.io.File
 open class CheckApiCompatibilityTask : MetalavaTask() {
     /**
      * Text file from which the API signatures will be obtained.
-     *
-     * Note: Marked as an output so that this task will be properly incremental.
      */
-    @get:InputFile
-    @get:OutputFile
-    var apiTxtFile: File? = null
+    var apiLocation: ApiLocation? = null
+
+    @InputFiles
+    fun getTaskInputs(): List<File>? {
+        return apiLocation?.files()
+    }
+
+    /**
+     * Declaring outputs prevents Gradle from rerunning this task if the inputs haven't changed
+     */
+    @OutputFiles
+    fun getTaskOutputs(): List<File>? {
+        return getTaskInputs()
+    }
 
     @TaskAction
     fun exec() {
-        val dependencyClasspath = checkNotNull(
-                dependencyClasspath) { "Dependency classpath not set." }
-        val apiTxtFile = checkNotNull(apiTxtFile) { "Current API file not set." }
+        val publicApiFile = checkNotNull(apiLocation?.publicApiFile) { "publicApiFile not set." }
+        val restrictedApiFile = checkNotNull(apiLocation?.restrictedApiFile) { "restrictedApiFile not set." }
+
         check(bootClasspath.isNotEmpty()) { "Android boot classpath not set." }
-        check(sourcePaths.isNotEmpty()) { "Source paths not set." }
 
-        runWithArgs(
-            "--classpath",
-            (bootClasspath + dependencyClasspath.files).joinToString(File.pathSeparator),
+        checkApiFile(publicApiFile, false)
+        // checkApiFile(restrictedApiFile, true) // TODO(jeffrygaston) enable this once validation is fully ready (b/87457009)
+    }
 
-            "--source-path",
-            sourcePaths.filter { it.exists() }.joinToString(File.pathSeparator),
 
-            "--check-compatibility:api:released",
-            apiTxtFile.toString(),
+    fun checkApiFile(apiFile: File, checkRestrictedApis: Boolean) {
+        var args = listOf("--classpath",
+                (bootClasspath + dependencyClasspath!!.files).joinToString(File.pathSeparator),
 
-            "--compatible-output=no",
-            "--omit-common-packages=yes",
-            "--input-kotlin-nulls=yes"
+                "--source-path",
+                sourcePaths.filter { it.exists() }.joinToString(File.pathSeparator),
+
+                "--check-compatibility:api:released",
+                apiFile.toString(),
+
+                "--compatible-output=no",
+                "--omit-common-packages=yes",
+                "--input-kotlin-nulls=yes"
         )
+        if (checkRestrictedApis) {
+            args = args + listOf("--show-annotation", "androidx.annotation.RestrictTo")
+        }
+        runWithArgs(args)
     }
 }

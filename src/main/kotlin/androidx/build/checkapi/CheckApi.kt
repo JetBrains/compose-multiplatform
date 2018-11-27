@@ -287,12 +287,28 @@ private fun createUpdateApiTask(project: Project, checkApiRelease: CheckApiTask)
 fun Project.getCurrentApiFile() = getApiFile(project.projectDir, project.version())
 
 /**
+ * Same as getCurrentApiFile but also contains a restricted API file too
+ */
+fun Project.getCurrentApiLocation() = ApiLocation.fromPublicApiFile(project.getCurrentApiFile())
+
+/**
  * Returns the API file containing the public API that this library promises to support
  * This is API file that checkApiRelease validates against
  * @return the API file
  */
 fun Project.getRequiredCompatibilityApiFile() =
         getLastReleasedApiFile(project.projectDir, project.version(), true, true)
+
+/*
+ * Same as getRequiredCompatibilityApiFile but also contains a restricted API file
+ */
+fun Project.getRequiredCompatibilityApiLocation(): ApiLocation? {
+    val publicFile = project.getRequiredCompatibilityApiFile()
+    if (publicFile == null) {
+        return null
+    }
+    return ApiLocation.fromPublicApiFile(publicFile)
+}
 
 /**
  * Returns the API file for the API of the specified version.

@@ -16,6 +16,7 @@
 
 package androidx.build.metalava
 
+import androidx.build.checkapi.ApiLocation
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.api.BaseVariant
 import com.google.common.io.Files
@@ -24,26 +25,40 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
 import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
-/** Generate an API signature text file from a set of source files. */
+/**
+ * Updates API signature text files.
+ * In practice, the values they will be updated to will match the APIs defined by the source code.
+ */
 open class UpdateApiTask : DefaultTask() {
-    /** Text file to which API signatures will be written. */
-    @get:OutputFile
-    var outputApiFile: File? = null
-
     /** Text file from which API signatures will be read. */
-    var inputApiFile: File? = null
+    var inputApiLocation: ApiLocation? = null
+
+    /** Text files to which API signatures will be written. */
+    var outputApiLocations: List<ApiLocation> = listOf()
+
+    @InputFiles
+    fun getTaskInputs(): List<File>? {
+        return inputApiLocation?.files()
+    }
+
+    @OutputFiles
+    fun getTaskOutputs(): List<File> {
+        return outputApiLocations.flatMap { it.files() }
+    }
 
     @TaskAction
     fun exec() {
-        val inputApiFile = checkNotNull(inputApiFile) { "inputApiFile not set" }
-        val outputApiFile = checkNotNull(outputApiFile) { "outputApiFile not set" }
-        copy(inputApiFile, outputApiFile, project.logger)
-        if (outputApiFile.name != "current.txt") {
-            copy(outputApiFile, File(outputApiFile.parentFile, "current.txt"), project.logger)
+        val inputPublicApi = checkNotNull(inputApiLocation?.publicApiFile) { "inputPublicApi not set" }
+        val inputRestrictedApi = checkNotNull(inputApiLocation?.restrictedApiFile) { "inputRestrictedApi not set" }
+        for (outputApi in outputApiLocations) {
+            copy(inputPublicApi, outputApi.publicApiFile, project.logger)
+
+            // TODO(jeffrygaston) enable this once validation is fully ready (b/87457009)
+            // copy(inputRestrictedApi, outputApi.restrictedApiFile, project.logger)
         }
     }
 

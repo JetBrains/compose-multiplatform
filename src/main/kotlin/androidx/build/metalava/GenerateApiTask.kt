@@ -16,27 +16,33 @@
 
 package androidx.build.metalava
 
+import androidx.build.checkapi.ApiLocation
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.api.BaseVariant
 import com.google.common.io.Files
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
 /** Generate an API signature text file from a set of source files. */
 open class GenerateApiTask : MetalavaTask() {
     /** Text file to which API signatures will be written. */
-    @get:OutputFile
-    var apiFile: File? = null
+    var apiLocation: ApiLocation? = null
+
+    @OutputFiles
+    fun getTaskOutputs(): List<File>? {
+        return apiLocation?.files()
+    }
 
     @TaskAction
     fun exec() {
         val dependencyClasspath = checkNotNull(
                 dependencyClasspath) { "Dependency classpath not set." }
-        val apiFile = checkNotNull(apiFile) { "Current API file not set." }
+        val publicApiFile = checkNotNull(apiLocation?.publicApiFile) { "Current public API file not set." }
+        val restrictedApiFile = checkNotNull(apiLocation?.restrictedApiFile) { "Current restricted API file not set." }
         check(bootClasspath.isNotEmpty()) { "Android boot classpath not set." }
         check(sourcePaths.isNotEmpty()) { "Source paths not set." }
 
@@ -48,7 +54,25 @@ open class GenerateApiTask : MetalavaTask() {
             sourcePaths.filter { it.exists() }.joinToString(File.pathSeparator),
 
             "--api",
-            apiFile.toString(),
+            publicApiFile.toString(),
+
+            "--compatible-output=no",
+            "--omit-common-packages=yes",
+            "--output-kotlin-nulls=yes"
+        )
+
+        runWithArgs(
+            "--classpath",
+            (bootClasspath + dependencyClasspath.files).joinToString(File.pathSeparator),
+
+            "--source-path",
+            sourcePaths.filter { it.exists() }.joinToString(File.pathSeparator),
+
+            "--api",
+            restrictedApiFile.toString(),
+
+            "--show-annotation",
+            "androidx.annotation.RestrictTo",
 
             "--compatible-output=no",
             "--omit-common-packages=yes",
