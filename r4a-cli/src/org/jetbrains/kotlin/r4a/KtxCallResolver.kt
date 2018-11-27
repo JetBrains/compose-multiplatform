@@ -304,11 +304,7 @@ class KtxCallResolver(
             )
         }
 
-        attrInfos[TAG_KEY] = AttributeInfo(
-            value = openTagExpr,
-            key = null,
-            name = TAG_KEY
-        )
+
 
         val usedAttributes = mutableSetOf<String>()
 
@@ -323,6 +319,15 @@ class KtxCallResolver(
             traceForOpenClose = referenceCopyingTrace(openTagExpr, closeTagExpr, tmpTraceAndCache.trace)
         }
         val receiver = resolveReceiver(openTagExpr, contextToUse.replaceBindingTrace(traceForOpenClose))
+
+        attrInfos[TAG_KEY] = AttributeInfo(
+            value = when (receiver) {
+                is ExpressionReceiver -> receiver.expression
+                else -> openTagExpr
+            },
+            key = null,
+            name = TAG_KEY
+        )
 
         val emitOrCall = resolveChild(
             openTagExpr,
