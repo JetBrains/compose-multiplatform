@@ -396,7 +396,7 @@ class R4aTagCompletionSession(
 
         val token = context.file.findElementAt(context.startOffset) ?: return
         val ktxElement = token.parentOfType<KtxElement>() ?: return
-        val mightWrapBody = ktxElement.nextLeaf({it !is PsiWhiteSpace && it.textLength > 0})?.text != "}"
+        val mightWrapBody = ktxElement.nextLeaf { it !is PsiWhiteSpace && it.textLength > 0 }?.text != "}"
         val gt = ktxElement.node.findChildByType(KtTokens.GT)
         // if the tag has a GT token, then we don't need to close it
         if (gt != null) return
@@ -413,13 +413,16 @@ class R4aTagCompletionSession(
                     if (!mightWrapBody) append(" ")
                 }
                 if (!mightWrapBody) append("</$tagName>")
-            } else append(">")
+            } else append(" />")
         }
+
 
         document.insertString(tailOffset, textToInsert)
 
         if (moveCaret) {
-            context.editor.caretModel.moveToOffset(tailOffset)
+            val addedSpace = if (!allowsChildren) 1 else 0
+
+            context.editor.caretModel.moveToOffset(tailOffset + addedSpace)
 
             // TODO: Check if any attributes are valid, and if so, open autocomplete in `attributes` mode
             // since they just created a new tag, they might want to add some attributes.
