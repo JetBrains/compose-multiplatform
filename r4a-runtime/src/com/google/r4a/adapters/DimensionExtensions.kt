@@ -30,6 +30,7 @@ interface Dimension {
     operator fun times(rhs: Double): Dimension = CombinedDimension(this, rhs.scalar, INT_MULT, FLOAT_MULT)
     operator fun div(rhs: Double): Dimension = CombinedDimension(this, rhs.scalar, INT_DIV, FLOAT_DIV)
     operator fun plus(dim: Dimension): Dimension = CombinedDimension(this, dim, INT_PLUS, FLOAT_PLUS)
+    operator fun minus(dim: Dimension): Dimension = CombinedDimension(this, dim, INT_MINUS, FLOAT_MINUS)
 }
 
 operator fun Int.times(dim: Dimension): Dimension = CombinedDimension(this.scalar, dim, INT_MULT, FLOAT_MULT)
