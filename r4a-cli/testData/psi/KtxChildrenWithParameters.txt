@@ -442,6 +442,8 @@ KtFile: KtxChildrenWithParameters.kt
                         REFERENCE_EXPRESSION
                           PsiElement(IDENTIFIER)('FancyComponent1')
                         PsiElement(GT)('>')
+          PsiErrorElement:Close tag expected
+            <empty list>
           PsiWhiteSpace('\n    ')
           PsiElement(RBRACE)('}')
       PsiWhiteSpace('\n')

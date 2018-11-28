@@ -37,6 +37,7 @@ public interface R4AErrors {
     DiagnosticFactory0<PsiElement> KTX_IN_NON_COMPOSABLE = DiagnosticFactory0.create(WARNING);
     DiagnosticFactory0<KtElement> INVALID_TYPE_SIGNATURE_SFC = DiagnosticFactory0.create(ERROR);
     DiagnosticFactory1<KtElement, KtReferenceExpression> UNRESOLVED_TAG = DiagnosticFactory1.create(ERROR);
+    DiagnosticFactory0<KtElement> UNCLOSED_TAG = DiagnosticFactory0.create(ERROR);
     DiagnosticFactory0<KtElement> NO_COMPOSER_FOUND = DiagnosticFactory0.create(ERROR);
     DiagnosticFactory2<KtElement, KotlinType, String> INVALID_COMPOSER_IMPLEMENTATION = DiagnosticFactory2.create(ERROR);
     DiagnosticFactory2<KtElement, EmitOrCallNode, EmitOrCallNode> AMBIGUOUS_KTX_CALL = DiagnosticFactory2.create(ERROR);
