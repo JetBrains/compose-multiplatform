@@ -11,6 +11,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorModificationUtil
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler
 import com.intellij.openapi.util.Ref
+import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.util.IncorrectOperationException
@@ -137,21 +138,24 @@ class KtxEnterHandler : EnterHandlerDelegateAdapter() {
 
         if (caretOffset !in 0..text.length) return null
 
-        val elementAt = file.findElementAt(caretOffset)
+        val elementAt = file.findElementAt(caretOffset) ?: return null
 
-        val elementBefore = elementAt?.getPrevLeafIgnoringWhitespace(includeSelf = false)
-        val elementAfter = elementAt?.getNextLeafIgnoringWhitespace(includeSelf = true)
+        val elementBefore = elementAt.getPrevLeafIgnoringWhitespace(includeSelf = false) ?: return null
+        val elementAfter = elementAt.getNextLeafIgnoringWhitespace(includeSelf = true) ?: return null
 
-        val beforeParent = elementBefore?.parent
-        val afterParent = elementAfter?.parent
+        val returnsBetweenLeftAndCaret = document.getText(TextRange(elementBefore.endOffset, caretOffset)).contains('\n')
+        val returnsBetweenRightAndCaret = document.getText(TextRange(caretOffset, elementAfter.startOffset)).contains('\n')
 
-        val isAfterGt = elementBefore?.node?.elementType == KtTokens.GT
-        val isAfterArrow = elementBefore?.node?.elementType == KtTokens.ARROW
-        val isBeforeGt = elementAfter?.node?.elementType == KtTokens.GT
+        val beforeParent = elementBefore.parent
+        val afterParent = elementAfter.parent
+
+        val isAfterGt = elementBefore.node?.elementType == KtTokens.GT
+        val isAfterArrow = elementBefore.node?.elementType == KtTokens.ARROW
+        val isBeforeGt = elementAfter.node?.elementType == KtTokens.GT
         val isBeforeDivAndGt =
-            elementAfter?.node?.elementType == KtTokens.DIV && elementAfter?.nextSibling?.node?.elementType == KtTokens.GT
+            elementAfter.node?.elementType == KtTokens.DIV && elementAfter.nextSibling?.node?.elementType == KtTokens.GT
         val isBeforeLtAndDiv =
-            elementAfter?.node?.elementType == KtTokens.LT && elementAfter?.nextSibling?.node?.elementType == KtTokens.DIV
+            elementAfter.node?.elementType == KtTokens.LT && elementAfter.nextSibling?.node?.elementType == KtTokens.DIV
         val afterIsSameKtxTag = afterParent is KtxElement && beforeParent?.parentOfType<KtxElement>() == afterParent
 
         val ktxElement = if (beforeParent is KtxElement)
@@ -160,12 +164,17 @@ class KtxEnterHandler : EnterHandlerDelegateAdapter() {
             beforeParent.parent.parent as? KtxElement
         else null
 
-        val isUnclosed = ktxElement?.let { (it.simpleClosingTagName ?: it.qualifiedClosingTagName) == null } ?: false
+        val isUnclosed = ktxElement?.let { it.node.children().none { child -> child.elementType == KtTokens.DIV } } ?: false
+        val isSelfClosing = !isUnclosed && ktxElement?.let { it.simpleClosingTagName ?: it.qualifiedClosingTagName } == null
+        val isBetweenOpenAndCloseOfKtxElement = ktxElement?.let { it.simpleClosingTagName ?: it.qualifiedClosingTagName }?.let {
+            val closeTagStart = it.startOffset - 2
+            caretOffset <= closeTagStart
+        } ?: false
 
-        val closingTagLt = ktxElement?.let { it.children.lastOrNull { child -> child.node.elementType == KtTokens.LT } }
+        val closingTagLt = ktxElement?.let { it.node.children().lastOrNull { child -> child.elementType == KtTokens.LT } }
         val newLineExistsBeforeClosingTag = closingTagLt?.let { lt ->
             lt
-                .prevLeafs
+                .leaves(forward = false)
                 .takeWhile { leaf ->
                     when (leaf) {
                         is PsiWhiteSpace -> true
@@ -179,21 +188,26 @@ class KtxEnterHandler : EnterHandlerDelegateAdapter() {
 
         return Meta(
             smartIndent = when {
+                returnsBetweenLeftAndCaret || (returnsBetweenRightAndCaret && afterIsSameKtxTag) -> false
                 isBeforeGt && afterIsSameKtxTag -> true // // <Foo{{CURSOR}}></Foo>
                 isBeforeDivAndGt && afterIsSameKtxTag -> true // <Foo{{CURSOR}}/>
                 isAfterGt && isBeforeLtAndDiv && afterIsSameKtxTag -> true // <Foo>{{CURSOR}}</Foo>
                 isAfterArrow && isBeforeLtAndDiv && afterIsSameKtxTag -> true // <Foo> x ->{{CURSOR}}</Foo>
 
-                (isAfterGt || isAfterArrow) && !isUnclosed && !afterIsSameKtxTag -> true
+                // <Foo>{{CURSOR}}<Bar /></Foo>
+                (isAfterGt || isAfterArrow) && !isUnclosed && !afterIsSameKtxTag && !isSelfClosing && isBetweenOpenAndCloseOfKtxElement && !returnsBetweenRightAndCaret -> true
+                // <Foo>{{CURSOR}}<Bar />
                 (isAfterGt || isAfterArrow) && isUnclosed -> true
                 else -> false
             },
             insertClosingTag = when {
+                isSelfClosing -> false
                 (isAfterGt || isAfterArrow) && isUnclosed -> true
                 else -> false
             },
             indentClosingTag = when {
-                !isUnclosed && !newLineExistsBeforeClosingTag && !afterIsSameKtxTag -> true
+                isSelfClosing -> false
+                !isUnclosed && !newLineExistsBeforeClosingTag && !afterIsSameKtxTag && isBetweenOpenAndCloseOfKtxElement -> true
                 else -> false
             },
             element = ktxElement

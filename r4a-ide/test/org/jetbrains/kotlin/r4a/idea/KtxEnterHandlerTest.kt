@@ -100,6 +100,96 @@ class KtxEnterHandlerTest : KotlinLightCodeInsightFixtureTestCase() {
         """
     )
 
+    fun testAfterSelfClosedTagDoesNotInsertAnything() = doFunTest(
+        """
+            <Foo /><caret>
+            <Foo />
+        """
+        ,
+        """
+            <Foo />
+            <caret>
+            <Foo />
+        """
+    )
+
+    fun testAfterClosedTagDoesNotInsertAnything() = doFunTest(
+        """
+            <Foo></Foo><caret>
+        """
+        ,
+        """
+            <Foo></Foo>
+            <caret>
+        """
+    )
+
+    fun testOnlyOneReturnWhenTagBodyAlreadyIndentedProperly() = doFunTest(
+        """
+            <Foo><caret>
+                <Foo />
+            </Foo>
+        """
+        ,
+        """
+            <Foo>
+                <caret>
+                <Foo />
+            </Foo>
+        """
+    )
+
+    // Need to do this one with manual indents otherwise IntelliJ will remove the whitespace on save
+    fun testReturnPrependedToElementDoesNothingExtra() = doTest(
+"""
+fun Foo() {}
+fun method() {
+    <Foo>
+        <caret><Foo />
+    </Foo>
+}""",
+        """
+fun Foo() {}
+fun method() {
+    <Foo>
+${"        "}
+        <caret><Foo />
+    </Foo>
+}"""
+    )
+
+    fun testReturnWhenTagAlreadyOnNextLine() = doFunTest(
+        """
+            <Foo><caret>
+            </Foo>
+        """
+        ,
+        """
+            <Foo>
+                <caret>
+            </Foo>
+        """
+    )
+
+    // Need to do this one with manual indents otherwise IntelliJ will remove the whitespace on save
+    fun testInsertingMultipleReturnsInsideBodyOnlyInsertsOneAtATime() = doTest(
+"""
+fun Foo() {}
+fun method() {
+    <Foo>
+        <caret>
+    </Foo>
+}""",
+"""
+fun Foo() {}
+fun method() {
+    <Foo>
+${"        "}
+        <caret>
+    </Foo>
+}"""
+    )
+
     fun testClosedTagWithContentOnSameLineGetsIndentedAtOpenAndClose() = doFunTest(
         """
             <Foo><caret><Foo /></Foo>
