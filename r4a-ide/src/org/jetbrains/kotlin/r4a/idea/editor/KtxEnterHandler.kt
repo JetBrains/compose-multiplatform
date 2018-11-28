@@ -8,17 +8,20 @@ import com.intellij.codeInsight.editorActions.enter.EnterHandlerDelegateAdapter
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.EditorModificationUtil
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler
 import com.intellij.openapi.util.Ref
-import com.intellij.psi.PsiDocumentManager
-import com.intellij.psi.PsiFile
-import com.intellij.psi.PsiWhiteSpace
+import com.intellij.psi.*
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.util.IncorrectOperationException
-import org.jetbrains.kotlin.idea.codeInsight.CodeInsightUtils
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtxElement
+import org.jetbrains.kotlin.psi.KtxLambdaExpression
+import org.jetbrains.kotlin.psi.psiUtil.*
+import org.jetbrains.kotlin.r4a.idea.getNextLeafIgnoringWhitespace
+import org.jetbrains.kotlin.r4a.idea.getPrevLeafIgnoringWhitespace
+import org.jetbrains.kotlin.r4a.idea.parentOfType
 
 class KtxEnterHandler : EnterHandlerDelegateAdapter() {
     companion object {
@@ -34,7 +37,36 @@ class KtxEnterHandler : EnterHandlerDelegateAdapter() {
         originalHandler: EditorActionHandler?
     ): EnterHandlerDelegate.Result? {
 
-        val smartIndent = shouldSmartIndent(file, editor, caretOffsetRef)
+        val (
+            smartIndent,
+            insertClosingTag,
+            indentClosingTag,
+            element
+        ) = getIndentMeta(file, editor, caretOffsetRef) ?: return EnterHandlerDelegate.Result.Continue
+
+        if (insertClosingTag) {
+            element?.let { ktxTag ->
+                val openTag = ktxTag.simpleTagName ?: ktxTag.qualifiedTagName ?: error("malformed tag")
+                val tagText = editor.document.charsSequence.subSequence(openTag.startOffset, openTag.endOffset)
+                EditorModificationUtil.insertStringAtCaret(editor, "</$tagText>", true, false)
+            }
+        }
+
+        if (indentClosingTag) {
+            element?.let { ktxTag ->
+                val closingTag =
+                    ktxTag.node.children().lastOrNull { child -> child.elementType == KtTokens.LT } ?: error("expected to find")
+                editor.document.insertString(
+                    closingTag.startOffset,
+                    "\n"
+                )
+                PsiDocumentManager.getInstance(file.project).commitDocument(editor.document)
+                try {
+                    CodeStyleManager.getInstance(file.project)!!.adjustLineIndent(file, closingTag.startOffset)
+                } catch (e: IncorrectOperationException) {
+                }
+            }
+        }
 
         if (smartIndent) {
             originalHandler?.execute(editor, editor.caretModel.currentCaret, dataContext)
@@ -54,6 +86,13 @@ class KtxEnterHandler : EnterHandlerDelegateAdapter() {
 
         return if (smartIndent) EnterHandlerDelegate.Result.DefaultForceIndent else EnterHandlerDelegate.Result.Continue
     }
+
+    private data class Meta(
+        var smartIndent: Boolean = false,
+        var insertClosingTag: Boolean = false,
+        var indentClosingTag: Boolean = false,
+        var element: KtxElement? = null
+    )
 
     /**
      * We want to do a few "smart" enter handlers for KTX-specific edits.
@@ -82,27 +121,29 @@ class KtxEnterHandler : EnterHandlerDelegateAdapter() {
      *
      *      Note that in this transformation, we can also have a parameter list to the left side of the cursor.
      */
-    private fun shouldSmartIndent(
+    private fun getIndentMeta(
         file: PsiFile,
         editor: Editor,
         caretOffsetRef: Ref<Int>
-    ): Boolean {
-        if (file !is KtFile) return false
+    ): Meta? {
+        if (file !is KtFile) return null
 
         // honor normal kotlin settings for smart enter
-        if (!CodeInsightSettings.getInstance()!!.SMART_INDENT_ON_ENTER) return false
+        if (!CodeInsightSettings.getInstance()!!.SMART_INDENT_ON_ENTER) return null
 
         val document = editor.document
         val text = document.charsSequence
         val caretOffset = caretOffsetRef.get()!!.toInt()
 
-        if (caretOffset !in 0..text.length) return false
+        if (caretOffset !in 0..text.length) return null
 
         val elementAt = file.findElementAt(caretOffset)
-        if (elementAt is PsiWhiteSpace && ("\n" in elementAt.getText()!!)) return false
 
-        val elementBefore = CodeInsightUtils.getElementAtOffsetIgnoreWhitespaceAfter(file, caretOffset)
-        val elementAfter = CodeInsightUtils.getElementAtOffsetIgnoreWhitespaceBefore(file, caretOffset)
+        val elementBefore = elementAt?.getPrevLeafIgnoringWhitespace(includeSelf = false)
+        val elementAfter = elementAt?.getNextLeafIgnoringWhitespace(includeSelf = true)
+
+        val beforeParent = elementBefore?.parent
+        val afterParent = elementAfter?.parent
 
         val isAfterGt = elementBefore?.node?.elementType == KtTokens.GT
         val isAfterArrow = elementBefore?.node?.elementType == KtTokens.ARROW
@@ -111,13 +152,52 @@ class KtxEnterHandler : EnterHandlerDelegateAdapter() {
             elementAfter?.node?.elementType == KtTokens.DIV && elementAfter?.nextSibling?.node?.elementType == KtTokens.GT
         val isBeforeLtAndDiv =
             elementAfter?.node?.elementType == KtTokens.LT && elementAfter?.nextSibling?.node?.elementType == KtTokens.DIV
-        val afterIsKtxElement = elementAfter?.parent is KtxElement
+        val afterIsSameKtxTag = afterParent is KtxElement && beforeParent?.parentOfType<KtxElement>() == afterParent
 
-        return if (isBeforeGt && afterIsKtxElement) true // // <Foo{{CURSOR}}></Foo>
-        else if (isBeforeDivAndGt && afterIsKtxElement) true // <Foo{{CURSOR}}/>
-        else if (isAfterGt && isBeforeLtAndDiv && afterIsKtxElement) true // <Foo>{{CURSOR}}</Foo>
-        else if (isAfterArrow && isBeforeLtAndDiv && afterIsKtxElement) true // <Foo> x ->{{CURSOR}}</Foo>
-        else false
+        val ktxElement = if (beforeParent is KtxElement)
+            beforeParent
+        else if (isAfterArrow && beforeParent?.parent is KtxLambdaExpression)
+            beforeParent.parent.parent as? KtxElement
+        else null
+
+        val isUnclosed = ktxElement?.let { (it.simpleClosingTagName ?: it.qualifiedClosingTagName) == null } ?: false
+
+        val closingTagLt = ktxElement?.let { it.children.lastOrNull { child -> child.node.elementType == KtTokens.LT } }
+        val newLineExistsBeforeClosingTag = closingTagLt?.let { lt ->
+            lt
+                .prevLeafs
+                .takeWhile { leaf ->
+                    when (leaf) {
+                        is PsiWhiteSpace -> true
+                        is PsiComment -> true
+                        is PsiBlockStatement -> true
+                        else -> false
+                    }
+                }
+                .any { it.textContains('\n') }
+        } ?: false
+
+        return Meta(
+            smartIndent = when {
+                isBeforeGt && afterIsSameKtxTag -> true // // <Foo{{CURSOR}}></Foo>
+                isBeforeDivAndGt && afterIsSameKtxTag -> true // <Foo{{CURSOR}}/>
+                isAfterGt && isBeforeLtAndDiv && afterIsSameKtxTag -> true // <Foo>{{CURSOR}}</Foo>
+                isAfterArrow && isBeforeLtAndDiv && afterIsSameKtxTag -> true // <Foo> x ->{{CURSOR}}</Foo>
+
+                (isAfterGt || isAfterArrow) && !isUnclosed && !afterIsSameKtxTag -> true
+                (isAfterGt || isAfterArrow) && isUnclosed -> true
+                else -> false
+            },
+            insertClosingTag = when {
+                (isAfterGt || isAfterArrow) && isUnclosed -> true
+                else -> false
+            },
+            indentClosingTag = when {
+                !isUnclosed && !newLineExistsBeforeClosingTag && !afterIsSameKtxTag -> true
+                else -> false
+            },
+            element = ktxElement
+        )
     }
 
     private fun shouldPopupAutocomplete(

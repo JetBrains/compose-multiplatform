@@ -62,6 +62,57 @@ class KtxEnterHandlerTest : KotlinLightCodeInsightFixtureTestCase() {
         """
     )
 
+    fun testAfterUnclosedOpenGetsIndentAndClose() = doFunTest(
+        """
+            <Foo><caret>
+        """
+        ,
+        """
+            <Foo>
+                <caret>
+            </Foo>
+        """
+    )
+
+    fun testAfterUnclosedOpenWithParamsGetsIndentAndClose() = doFunTest(
+        """
+            <Foo> x -><caret>
+        """
+        ,
+        """
+            <Foo> x ->
+                <caret>
+            </Foo>
+        """
+    )
+
+    fun testAfterUnclosedBeforeMoreStatementsGetsIndentAndClose() = doFunTest(
+        """
+            <Foo><caret>
+            <Foo />
+        """
+        ,
+        """
+            <Foo>
+                <caret>
+            </Foo>
+            <Foo />
+        """
+    )
+
+    fun testClosedTagWithContentOnSameLineGetsIndentedAtOpenAndClose() = doFunTest(
+        """
+            <Foo><caret><Foo /></Foo>
+        """
+        ,
+        """
+            <Foo>
+                <caret>
+                <Foo />
+            </Foo>
+        """
+    )
+
     fun doFunTest(before: String, after: String) {
         fun String.withFunContext(): String {
             val bodyText = "//---- [test]\n${this.trimIndent()}\n//---- [/test]"

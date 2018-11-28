@@ -45,14 +45,14 @@ class KtxTypedHandlerTest : KotlinLightCodeInsightFixtureTestCase() {
         """
     )
 
-    fun testGtOnBrokenElWithoutClosingTagCreatesClosingTag() = doCharTypeTest(
+    fun testGtOnBrokenElWithoutClosingTagDoesNotCreateClosingTag() = doCharTypeTest(
         """
         <Foo<caret>
             <Bar />
         """,
         '>',
         """
-        <Foo><caret></Foo>
+        <Foo><caret>
             <Bar />
         """
     )
@@ -115,6 +115,60 @@ class KtxTypedHandlerTest : KotlinLightCodeInsightFixtureTestCase() {
         "<Foo f = <caret> b = bar></Foo>",
         '{',
         "<Foo f = {<caret>} b = bar></Foo>"
+    )
+
+    fun testDivOnClosingTagIndentsContentsInsideOfIt() = doCharTypeTest(
+        """
+            <Foo>
+            <Foo />
+            <<caret>
+        """,
+        '/',
+        """
+            <Foo>
+                <Foo />
+            </Foo><caret>
+        """
+    )
+
+    fun testGtOnClosingTagIndentsContentsInsideOfIt() = doCharTypeTest(
+        """
+            <Foo>
+            <Foo />
+            </Foo<caret>
+        """,
+        '>',
+        """
+            <Foo>
+                <Foo />
+            </Foo><caret>
+        """
+    )
+
+    fun testGtOnOpenTagIndentsContentsInsideOfIt() = doCharTypeTest(
+        """
+            <Foo<caret>
+            <Foo />
+            </Foo>
+        """,
+        '>',
+        """
+            <Foo><caret>
+                <Foo />
+            </Foo>
+        """
+    )
+
+    fun testGtOnOpenTagWithElementsToTheRightDoesNotInsertClosingTag() = doCharTypeTest(
+        """
+            <Foo<caret>
+            <Foo />
+        """,
+        '>',
+        """
+            <Foo><caret>
+            <Foo />
+        """
     )
 
     fun doCharTypeTest(before: String, c: Char, after: String) {
