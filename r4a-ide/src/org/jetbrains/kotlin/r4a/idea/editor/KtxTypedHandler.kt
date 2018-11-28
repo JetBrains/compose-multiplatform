@@ -7,14 +7,15 @@ import com.intellij.codeInsight.editorActions.TypedHandlerDelegate
 import com.intellij.openapi.editor.EditorModificationUtil
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.psi.*
+import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.tree.IElementType
+import com.intellij.util.IncorrectOperationException
 import org.jetbrains.kotlin.KtNodeTypes
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtxAttribute
 import org.jetbrains.kotlin.psi.KtxElement
-import org.jetbrains.kotlin.psi.psiUtil.endOffset
-import org.jetbrains.kotlin.psi.psiUtil.getPrevSiblingIgnoringWhitespace
-import org.jetbrains.kotlin.psi.psiUtil.startOffset
+import org.jetbrains.kotlin.psi.psiUtil.*
+import org.jetbrains.kotlin.r4a.idea.getNextLeafIgnoringWhitespace
 import org.jetbrains.kotlin.r4a.idea.parentOfType
 
 class KtxTypedHandler : TypedHandlerDelegate() {
@@ -100,6 +101,11 @@ class KtxTypedHandler : TypedHandlerDelegate() {
                     val openTag = el.qualifiedTagName ?: el.simpleTagName ?: return Result.CONTINUE
                     val tagText = editor.document.charsSequence.subSequence(openTag.startOffset, openTag.endOffset)
                     EditorModificationUtil.insertStringAtCaret(editor, "$tagText>", false, true)
+                    PsiDocumentManager.getInstance(file.project).commitDocument(editor.document)
+                    try {
+                        CodeStyleManager.getInstance(file.project)!!.adjustLineIndent(file, openTag.endOffset + 1)
+                    } catch (e: IncorrectOperationException) {
+                    }
                     return Result.STOP
                 }
                 // if `/` is typed before a tag is closed, we can add `>` to complete the self-closing tag
@@ -126,12 +132,25 @@ class KtxTypedHandler : TypedHandlerDelegate() {
                     val openTag = el.qualifiedTagName ?: el.simpleTagName ?: return Result.CONTINUE
                     val closeTag = el.qualifiedClosingTagName ?: el.simpleClosingTagName
                     if (closeTag != null) {
-                        // this element already has a closing tag, so we don't want to add another one...
+                        // this element already has a closing tag, so we don't want to add another one... but we do want
+                        // to go ahead and ensure that the indent of the body of this tag is correct
+                        try {
+                            CodeStyleManager.getInstance(file.project)!!.adjustLineIndent(file, openTag.endOffset + 1)
+                        } catch (e: IncorrectOperationException) {
+                        }
                         return Result.CONTINUE
                     } else {
-                        val tagText = editor.document.charsSequence.subSequence(openTag.startOffset, openTag.endOffset)
-                        EditorModificationUtil.insertStringAtCaret(editor, "</$tagText>", true, false)
-                        return Result.STOP
+                        val next = gt.getNextLeafIgnoringWhitespace()
+                        if (next == null || next.node.elementType == KtTokens.RBRACE) {
+                            // the next token is a close brace or empty, so we assume that the user's intent is not to wrap
+                            // content below with this tag. as a result, we automatically insert the closing tag
+                            val tagText = editor.document.charsSequence.subSequence(openTag.startOffset, openTag.endOffset)
+                            EditorModificationUtil.insertStringAtCaret(editor, "</$tagText>", true, false)
+                            return Result.STOP
+                        } else {
+                            // since there is content below the tag they are typing, we aren't going to auto-insert the close tag.
+                            return Result.CONTINUE
+                        }
                     }
                 }
             }
