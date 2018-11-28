@@ -17,7 +17,8 @@
 package androidx.build
 
 import androidx.build.SupportConfig.BUILD_TOOLS_VERSION
-import androidx.build.SupportConfig.CURRENT_SDK_VERSION
+import androidx.build.SupportConfig.COMPILE_SDK_VERSION
+import androidx.build.SupportConfig.TARGET_SDK_VERSION
 import androidx.build.SupportConfig.DEFAULT_MIN_SDK_VERSION
 import androidx.build.SupportConfig.INSTRUMENTATION_RUNNER
 import androidx.build.dependencyTracker.AffectedModuleDetector
@@ -177,11 +178,11 @@ class AndroidXPlugin : Plugin<Project> {
     }
 
     private fun Project.configureAndroidCommonOptions(extension: BaseExtension) {
-        extension.compileSdkVersion(CURRENT_SDK_VERSION)
+        extension.compileSdkVersion(COMPILE_SDK_VERSION)
         extension.buildToolsVersion = BUILD_TOOLS_VERSION
         // Expose the compilation SDK for use as the target SDK in test manifests.
         extension.defaultConfig.addManifestPlaceholders(
-                mapOf("target-sdk-version" to CURRENT_SDK_VERSION))
+                mapOf("target-sdk-version" to TARGET_SDK_VERSION))
 
         extension.defaultConfig.testInstrumentationRunner = INSTRUMENTATION_RUNNER
         extension.testOptions.unitTests.isReturnDefaultValues = true
@@ -271,7 +272,7 @@ class AndroidXPlugin : Plugin<Project> {
 
     private fun Project.configureAndroidApplicationOptions(extension: AppExtension) {
         extension.defaultConfig.apply {
-            targetSdkVersion(CURRENT_SDK_VERSION)
+            targetSdkVersion(TARGET_SDK_VERSION)
 
             versionCode = 1
             versionName = "1.0"

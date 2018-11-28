@@ -43,6 +43,7 @@ import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.javadoc.Javadoc
+import org.gradle.api.tasks.util.PatternSet
 import java.io.File
 import java.net.URLClassLoader
 import java.time.LocalDateTime
@@ -477,7 +478,8 @@ private fun createGenerateSdkApiTask(project: Project, doclavaConfig: Configurat
             setDocletpath(doclavaConfig.resolve())
             destinationDir = project.docsDir()
             classpath = androidJarFile(project)
-            source(project.zipTree(androidSrcJarFile(project)))
+            source(project.zipTree(androidSrcJarFile(project))
+                .matching(PatternSet().include("**/*.java")))
             exclude("**/overview.html") // TODO https://issuetracker.google.com/issues/116699307
             apiFile = sdkApiFile(project)
             generateDocs = false
@@ -565,10 +567,10 @@ fun <T : Task> TaskContainer.createWithConfig(
 
 fun androidJarFile(project: Project): FileCollection =
         project.files(arrayOf(File(project.sdkPath(),
-                "platforms/android-${SupportConfig.CURRENT_SDK_VERSION}/android.jar")))
+                "platforms/${SupportConfig.COMPILE_SDK_VERSION}/android.jar")))
 
 private fun androidSrcJarFile(project: Project): File = File(project.sdkPath(),
-        "platforms/android-${SupportConfig.CURRENT_SDK_VERSION}/android-stubs-src.jar")
+        "platforms/${SupportConfig.COMPILE_SDK_VERSION}/android-stubs-src.jar")
 
 private fun PublishDocsRules.resolve(extension: SupportLibraryExtension): DocsRule? {
     val mavenGroup = extension.mavenGroup
