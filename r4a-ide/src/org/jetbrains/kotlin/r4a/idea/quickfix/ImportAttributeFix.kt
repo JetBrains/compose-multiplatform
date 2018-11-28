@@ -16,6 +16,7 @@ import org.jetbrains.kotlin.idea.util.getFileResolutionScope
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.*
+import org.jetbrains.kotlin.r4a.R4AFlags
 import org.jetbrains.kotlin.r4a.R4aUtils
 import org.jetbrains.kotlin.r4a.analysis.R4AWritableSlices
 import org.jetbrains.kotlin.resolve.BindingContext
@@ -25,11 +26,23 @@ import org.jetbrains.kotlin.resolve.scopes.LexicalScope
 import org.jetbrains.kotlin.resolve.scopes.utils.findClassifier
 import org.jetbrains.kotlin.resolve.scopes.utils.findFunction
 import org.jetbrains.kotlin.resolve.scopes.utils.findVariable
+import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.typeUtil.isSubtypeOf
 import org.jetbrains.kotlin.types.typeUtil.isUnit
 
 class ImportAttributeFix(expression: KtSimpleNameExpression) : R4aImportFix(expression) {
     private val ktxAttribute = expression.parent as KtxAttribute
+
+    private fun getReceiverTypes(bindingContext: BindingContext, element: KtxElement): List<KotlinType>? {
+        if (R4AFlags.USE_NEW_TYPE_RESOLUTION) {
+            val ktxCall = bindingContext[R4AWritableSlices.RESOLVED_KTX_CALL, element] ?: return null
+            return ktxCall.emitOrCall.resolvedCalls().mapNotNull { it.resultingDescriptor.returnType }
+        } else {
+            val tagInfo = bindingContext[R4AWritableSlices.KTX_TAG_INFO, element] ?: return null
+            val instanceType = tagInfo.instanceType ?: return null
+            return listOf(instanceType)
+        }
+    }
 
     override fun computeSuggestions(): List<ImportVariant> {
         val ktxElement = ktxAttribute.parent as? KtxElement ?: return emptyList()
@@ -42,10 +55,8 @@ class ImportAttributeFix(expression: KtSimpleNameExpression) : R4aImportFix(expr
 
         val bindingContext = ktxAttribute.analyze(BodyResolveMode.PARTIAL_WITH_DIAGNOSTICS)
 
-        val tagInfo = bindingContext[R4AWritableSlices.KTX_TAG_INFO, ktxElement] ?: return emptyList()
+        val receiverTypes = getReceiverTypes(bindingContext, ktxElement) ?: return emptyList()
         val expectedTypeInfo = bindingContext[BindingContext.EXPRESSION_TYPE_INFO, ktxAttribute.value ?: ktxAttribute.key]
-
-        val instanceType = tagInfo.instanceType ?: return emptyList()
 
         val searchScope = getResolveScope(file)
 
@@ -102,7 +113,7 @@ class ImportAttributeFix(expression: KtSimpleNameExpression) : R4aImportFix(expr
 
         val candidates = indicesHelper.getCallableTopLevelExtensions(
             callTypeAndReceiver = callTypeAndReceiver,
-            receiverTypes = listOf(instanceType),
+            receiverTypes = receiverTypes,
             nameFilter = { true },
             declarationFilter = { true }
         )

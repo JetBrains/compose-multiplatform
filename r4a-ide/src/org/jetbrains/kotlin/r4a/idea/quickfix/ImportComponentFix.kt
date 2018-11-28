@@ -27,12 +27,12 @@ import org.jetbrains.kotlin.resolve.scopes.utils.findVariable
 
 class ImportComponentFix(element: KtSimpleNameExpression, private val ktxElement: KtxElement) : R4aImportFix(element) {
 
+    private val name = element.getReferencedName()
+
     override fun computeSuggestions(): List<ImportVariant> {
         if (!ktxElement.isValid) return emptyList()
 
         if (ktxElement.containingFile !is KtFile) return emptyList()
-
-        val name = expression.getReferencedName()
 
         val file = ktxElement.containingKtFile
 

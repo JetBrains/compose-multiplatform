@@ -7,14 +7,17 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
+import com.intellij.psi.util.PsiModificationTracker
 import org.jetbrains.kotlin.idea.quickfix.KotlinQuickFixAction
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtSimpleNameExpression
 import org.jetbrains.kotlin.r4a.idea.R4aBundle
 
-abstract class R4aImportFix(protected var expression: KtSimpleNameExpression) : KotlinQuickFixAction<KtExpression>(expression), HighPriorityAction, HintAction {
+abstract class R4aImportFix(protected var expression: KtExpression) : KotlinQuickFixAction<KtExpression>(expression), HighPriorityAction, HintAction {
     private val project = expression.project
+
+    private val modificationCountOnCreate = PsiModificationTracker.SERVICE.getInstance(project).modificationCount
 
     private lateinit var suggestions: Collection<ImportVariant>
 
@@ -32,7 +35,7 @@ abstract class R4aImportFix(protected var expression: KtSimpleNameExpression) : 
 
     override fun isAvailable(project: Project, editor: Editor?, file: KtFile) = element != null && suggestions.isNotEmpty()
 
-    private fun isOutdated() = false
+    fun isOutdated() = modificationCountOnCreate != PsiModificationTracker.SERVICE.getInstance(project).modificationCount
 
     override fun showHint(editor: Editor): Boolean {
         if (!expression.isValid || isOutdated()) return false
