@@ -3,6 +3,7 @@ package org.jetbrains.kotlin.r4a
 import org.jetbrains.kotlin.generators.tests.generator.testGroup
 import org.jetbrains.kotlin.idea.completion.test.AbstractR4aCompletionTest
 import org.jetbrains.kotlin.idea.quickfix.AbstractR4AQuickFixMultiFileTest
+import org.jetbrains.kotlin.r4a.idea.conversion.AbstractXmlToKtxCopyPasteConversionTest
 
 
 fun main(args: Array<String>) {
@@ -13,9 +14,12 @@ fun main(args: Array<String>) {
             model(relativeRootPath = "completion", recursive = true)
         }
 
-
         testClass<AbstractR4AQuickFixMultiFileTest> {
             model(relativeRootPath = "quickfix", pattern = """^(\w+)\.((before\.Main\.\w+)|(test))$""", testMethod = "doTestWithExtraFile")
+        }
+
+        testClass<AbstractXmlToKtxCopyPasteConversionTest> {
+            model(relativeRootPath = "conversion", pattern = """^([^\.]+)\.to.kt$""")
         }
     }
 }

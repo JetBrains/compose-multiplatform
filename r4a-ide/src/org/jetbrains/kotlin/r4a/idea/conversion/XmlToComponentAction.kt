@@ -57,10 +57,11 @@ class XmlToComponentAction : AnAction() {
             val codeBuilder = CodeBuilder(null, EmptyDocCommentConverter)
             codeBuilder.append(convertedXml)
             val functionName = functionName(copy)
-            val content = createFunctionalComponent(functionName, codeBuilder.resultText)
+            val imports = codeBuilder.importsToAdd.toMutableSet()
+            val content = createFunctionalComponent(functionName, codeBuilder.resultText, imports)
 
             replaceContent(targetFile, content)
-            addImports(targetFile, codeBuilder.importsToAdd)
+            addImports(targetFile, imports)
             XmlToKtxConverter.formatCode(targetFile)
             return targetFile
         }
@@ -85,20 +86,6 @@ class XmlToComponentAction : AnAction() {
 
             // Convert case.
             return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, functionName)
-        }
-
-        private fun createFunctionalComponent(name: String, composeBody: String): String {
-            // TODO(jdemeulenaere): Infer package from file location/siblings/parents.
-            // We don't use org.jetbrains.kotlin.j2k.ast.Function because it requires a j2k.Converter instance to create a DeferredElement
-            // (the type of the Function body).
-
-            return """
-            |import com.google.r4a.*
-            |
-            |@Composable
-            |fun $name() {
-            |    $composeBody
-            |}""".trimMargin()
         }
 
         private fun replaceContent(file: KtFile, content: String) {

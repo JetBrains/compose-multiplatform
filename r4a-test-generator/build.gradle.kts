@@ -11,6 +11,7 @@ sourceSets {
 
 dependencies {
     testCompile(projectTests(":idea"))
+    testCompile(projectTests(":r4a-ide-plugin"))
     compile(projectTests(":generators:test-generator"))
 }
 

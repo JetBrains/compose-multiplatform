@@ -1,0 +1,1 @@
+val lambda = {<caret>}

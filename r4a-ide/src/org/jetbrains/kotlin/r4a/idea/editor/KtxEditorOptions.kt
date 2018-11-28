@@ -20,7 +20,9 @@ class KtxEditorOptions : PersistentStateComponent<KtxEditorOptions> {
     }
 
     var enableXmlToKtxConversion = true
+    var enableAddComposableAnnotation = true
     var donTShowKtxConversionDialog = false
+    var donTShowAddComposableAnnotationDialog = false
 
     override fun getState(): KtxEditorOptions? {
         return this

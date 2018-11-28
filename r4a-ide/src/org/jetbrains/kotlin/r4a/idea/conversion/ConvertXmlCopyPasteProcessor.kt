@@ -21,13 +21,18 @@ import com.intellij.psi.xml.XmlTag
 import org.jetbrains.kotlin.idea.caches.resolve.resolveImportReference
 import org.jetbrains.kotlin.idea.conversion.copy.*
 import org.jetbrains.kotlin.idea.util.ImportInsertHelper
+import org.jetbrains.kotlin.idea.util.addAnnotation
 import org.jetbrains.kotlin.idea.util.application.runWriteAction
+import org.jetbrains.kotlin.idea.util.findAnnotation
 import org.jetbrains.kotlin.j2k.CodeBuilder
 import org.jetbrains.kotlin.j2k.EmptyDocCommentConverter
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.psi.KtCallableDeclaration
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.psiUtil.anyDescendantOfType
 import org.jetbrains.kotlin.psi.psiUtil.elementsInRange
+import org.jetbrains.kotlin.r4a.R4aUtils
 import org.jetbrains.kotlin.r4a.idea.editor.KtxEditorOptions
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
@@ -97,7 +102,9 @@ class ConvertXmlCopyPasteProcessor : CopyPastePostProcessor<TextBlockTransferabl
         values: List<TextBlockTransferableData>
     ) {
         if (DumbService.getInstance(project).isDumb) return
-        if (!KtxEditorOptions.getInstance().enableXmlToKtxConversion) return
+
+        val editorOptions = KtxEditorOptions.getInstance()
+        if (!editorOptions.enableXmlToKtxConversion) return
 
         val targetFile = PsiDocumentManager.getInstance(project).getPsiFile(editor.document) as? KtFile ?: return
         val transferableData = values.single()
@@ -141,9 +148,44 @@ class ConvertXmlCopyPasteProcessor : CopyPastePostProcessor<TextBlockTransferabl
         })
 
         // Replace text.
-        val conversionResultText = conversionResult.toString()
+        val resultKtx = conversionResult.toString()
+        val enclosingCallable = targetFile.findElementAt(bounds.startOffset)?.let { enclosingCallable(it) }
+        val conversionResultText = if (enclosingCallable != null) {
+            resultKtx
+        } else {
+            // TODO(jdemeulenaere): Find better function name. If we are pasting in a class that has the same name as the file (common
+            // case), we will clash with the constructor. Maybe override invoke operator if it's not already overridden in that class or
+            // its subclasses ?
+            val functionName = targetFile.name.takeWhile { it != '.' }
+            createFunctionalComponent(functionName, resultKtx, imports)
+        }
         val rangeAfterReplace = replaceText(editor, conversionResultText, bounds)
         PsiDocumentManager.getInstance(project).commitAllDocuments()
+
+        // Suggest to add @Composable annotation if necessary.
+        if (enclosingCallable != null && editorOptions.enableAddComposableAnnotation
+            // TODO(jdemeulenaere): For some reason, checking for annotations on lambdas doesn't work. Fix that and remove this check.
+            && enclosingCallable is KtNamedFunction) {
+            val annotationFqName = R4aUtils.r4aFqName("Composable")
+            if (enclosingCallable.findAnnotation(annotationFqName) == null) {
+                val shouldAddAnnotation = if (editorOptions.donTShowAddComposableAnnotationDialog) {
+                    true
+                } else {
+                    val dialog = KtxAddComposableAnnotationDialog(project)
+                    dialog.show()
+                    dialog.isOK
+                }
+
+                if (shouldAddAnnotation) {
+                    runWriteAction {
+                        enclosingCallable.addAnnotation(annotationFqName)
+                    }
+                }
+            }
+        }
+
+        // TODO(jdemeulenaere): If enclosingCallable == null (i.e. if we generated the enclosing function), put the cursor at the function
+        // name position and select it to easily change it right after pasting.
 
         // Import classes.
         if (imports.isNotEmpty()) {
@@ -161,6 +203,17 @@ class ConvertXmlCopyPasteProcessor : CopyPastePostProcessor<TextBlockTransferabl
         // Format code.
         XmlToKtxConverter.formatCode(targetFile, rangeAfterReplace)
         return
+    }
+
+    private fun enclosingCallable(element: PsiElement): KtCallableDeclaration? {
+        var current = element
+        while (current !is KtFile) {
+            if (current is KtCallableDeclaration) {
+                return current
+            }
+            current = current.parent
+        }
+        return null
     }
 
     private fun hasAttributeWithNamespace(file: XmlFile): Boolean {
