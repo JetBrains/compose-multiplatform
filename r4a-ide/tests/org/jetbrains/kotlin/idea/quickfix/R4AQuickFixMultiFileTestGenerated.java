@@ -29,6 +29,21 @@ public class R4AQuickFixMultiFileTestGenerated extends AbstractR4AQuickFixMultiF
         KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("plugins/r4a/r4a-ide/testData/quickfix"), Pattern.compile("^(\\w+)\\.((before\\.Main\\.\\w+)|(test))$"), TargetBackend.ANY, true);
     }
 
+    @TestMetadata("convertCallToTagLambda.before.Main.kt")
+    public void testConvertCallToTagLambda() throws Exception {
+        runTest("plugins/r4a/r4a-ide/testData/quickfix/convertCallToTagLambda.before.Main.kt");
+    }
+
+    @TestMetadata("convertCallToTagNamedParameter.before.Main.kt")
+    public void testConvertCallToTagNamedParameter() throws Exception {
+        runTest("plugins/r4a/r4a-ide/testData/quickfix/convertCallToTagNamedParameter.before.Main.kt");
+    }
+
+    @TestMetadata("convertCallToTagSimple.before.Main.kt")
+    public void testConvertCallToTagSimple() throws Exception {
+        runTest("plugins/r4a/r4a-ide/testData/quickfix/convertCallToTagSimple.before.Main.kt");
+    }
+
     @TestMetadata("importClassComponentCompound.before.Main.kt")
     public void testImportClassComponentCompound() throws Exception {
         runTest("plugins/r4a/r4a-ide/testData/quickfix/importClassComponentCompound.before.Main.kt");

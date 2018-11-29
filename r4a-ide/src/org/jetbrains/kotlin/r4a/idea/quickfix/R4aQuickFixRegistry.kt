@@ -12,6 +12,9 @@ class R4aQuickFixRegistry : QuickFixContributor {
         quickFixes.register(R4AErrors.KTX_IN_NON_COMPOSABLE, AnnotateWithComposableQuickFix)
         quickFixes.register(R4AErrors.NON_COMPOSABLE_INVOCATION, AnnotateTargetWithComposableQuickFix)
 
+        // Provide fixes for calling composable with a normal call
+        quickFixes.register(R4AErrors.SVC_INVOCATION, ConvertCallToKtxQuickFix)
+
         // "Add Import" quick fixes for unresolved attributes that have valid extension attributes
         quickFixes.register(R4AErrors.MISMATCHED_ATTRIBUTE_TYPE, ImportAttributeFix)
         quickFixes.register(Errors.UNRESOLVED_REFERENCE, ImportAttributeFix)
