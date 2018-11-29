@@ -212,15 +212,18 @@ class R4aKtxControlFlowExtension : KtxControlFlowExtension {
             val tagExpr = element.simpleTagName ?: element.qualifiedTagName ?: return
 
             val inputExpressions = ArrayList<KtExpression>()
+            val inputInstructions = ArrayList<InstructionWithValue>()
 
-            generateCall(tagInfo.resolvedCall)
+            inputInstructions.add(generateCall(tagInfo.resolvedCall))
 
 
             for (attribute in element.attributes) {
                 val valueExpr = attribute.value ?: attribute.key ?: break
                 val attrInfo = trace.get(KTX_ATTR_INFO, attribute) ?: break
 
-                checkAndGenerateCall(attrInfo.setterResolvedCall)
+                attrInfo.setterResolvedCall?.let {
+                    inputInstructions.add(generateCall(it))
+                }
 
                 generateInstructions(valueExpr)
                 mark(valueExpr)
@@ -231,12 +234,23 @@ class R4aKtxControlFlowExtension : KtxControlFlowExtension {
             mark(tagExpr)
             inputExpressions.add(tagExpr)
 
-            createNonSyntheticValue(element, inputExpressions, MagicKind.VALUE_CONSUMER)
-
             element.bodyLambdaExpression?.let {
+                // If we don't surround this with block scope and loadUnit(), refactoring tools will improperly think that the lambda
+                // is an "outputValue" of the element. If that happens, the refactorings break.
+                builder.enterBlockScope(it)
                 generateInstructions(it)
-                createNonSyntheticValue(element, listOf(it), MagicKind.VALUE_CONSUMER)
+                builder.loadUnit(it)
+                builder.exitBlockScope(it)
+
+                inputExpressions.add(it)
             }
+            mark(element)
+            builder.magic(
+                instructionElement = element,
+                valueElement = null,
+                inputValues = elementsToValues(inputExpressions) + instructionsToValues(inputInstructions),
+                kind = MagicKind.UNRESOLVED_CALL
+            )
         }
 
         fun visitComposerCallInfo(memoize: ComposerCallInfo, inputInstructions: MutableList<InstructionWithValue>) {
