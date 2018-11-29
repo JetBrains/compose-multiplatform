@@ -172,16 +172,15 @@ private fun Project.isAndroidProject(
             if (dep.group == groupId && dep.name == artifactId) {
                 return dep.getDependencyProject().plugins.hasPlugin(LibraryPlugin::class.java)
             }
-        } else {
-            var projectModules = project.rootProject.extra.get("projects")
-                    as ConcurrentHashMap<String, String>
-            if (projectModules.contains("${dep.group}:${dep.name}")) {
-                val localProjectVersion = project.findProject(
-                        projectModules.get("${dep.group}:${dep.name}"))
-                if (localProjectVersion != null) {
-                    return localProjectVersion.plugins.hasPlugin(LibraryPlugin::class.java)
-                }
-            }
+        }
+    }
+    var projectModules = project.rootProject.extra.get("projects")
+            as ConcurrentHashMap<String, String>
+    if (projectModules.containsKey("$groupId:$artifactId")) {
+        val localProjectVersion = project.findProject(
+                projectModules.get("$groupId:$artifactId"))
+        if (localProjectVersion != null) {
+            return localProjectVersion.plugins.hasPlugin(LibraryPlugin::class.java)
         }
     }
     return false
