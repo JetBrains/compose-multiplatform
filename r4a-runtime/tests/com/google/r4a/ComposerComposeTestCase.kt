@@ -54,3 +54,13 @@ abstract class ComposerComposeTestCase : TestCase() {
     }
 
 }
+
+class Counter {
+    private var counts = mutableMapOf<String, Int>()
+    fun inc(key: String) = counts.getOrPut(key, { 0 }).let { counts[key] = it + 1 }
+    fun reset() {
+        counts = mutableMapOf()
+    }
+
+    operator fun get(key: String) = counts.getOrDefault(key, 0)
+}

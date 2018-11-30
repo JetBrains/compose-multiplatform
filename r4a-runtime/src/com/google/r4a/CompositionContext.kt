@@ -2,10 +2,7 @@ package com.google.r4a
 
 import android.content.Context
 import android.view.View
-import android.view.ViewGroup
 import java.util.*
-
-private var useComposer = true
 
 abstract class CompositionContext {
     companion object {
@@ -15,9 +12,9 @@ abstract class CompositionContext {
         private val COMPONENTS_TO_CONTEXT = WeakHashMap<Component, CompositionContext>()
 
         val factory: Function4<Context, Any, Component, Ambient.Reference?, CompositionContext> get() =
-            if(useComposer) ComposerCompositionContext.factory else CompositionContextImpl.factory
+            ComposerCompositionContext.factory
 
-        var current: CompositionContext = CompositionContextImpl()
+        var current: CompositionContext = EmptyCompositionContext()
 
         fun create(context: Context, group: Any, component: Component, reference: Ambient.Reference?): CompositionContext {
             val cc = factory(context, group, component, reference)
@@ -71,11 +68,6 @@ abstract class CompositionContext {
         }
 
         fun <T : Any?> getAmbient(key: Ambient<T>, component: Component): T = find(component)!!.getAmbient(key, component)
-
-        fun useNew() { useComposer = true }
-        fun useOld() { useComposer = false }
-
-        val usingNew get() = useComposer
     }
 
     abstract fun startRoot()

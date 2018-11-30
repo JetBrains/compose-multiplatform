@@ -18,7 +18,7 @@ import org.robolectric.annotation.Config
 private class TestActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(LinearLayout(this).apply { id = ComposeTestCase.ROOT_ID })
+        setContentView(LinearLayout(this).apply { id = ComposerComposeTestCase.ROOT_ID })
     }
 }
 
@@ -839,4 +839,4 @@ class NewCodeGenTests : TestCase() {
     }
 }
 
-private val Activity.root get() = findViewById(ComposeTestCase.ROOT_ID) as ViewGroup
+private val Activity.root get() = findViewById(ComposerComposeTestCase.ROOT_ID) as ViewGroup

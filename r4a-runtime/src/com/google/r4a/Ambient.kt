@@ -24,7 +24,6 @@ class Ambient<T>(private val key: String, private val defaultFactory: (() -> T)?
         var value: T,
         @Children
         var children: @Composable() () -> Unit) : Component() {
-        internal val subscribers = HashSet<Slot>()
 
         override fun compose() {
             val cc = CompositionContext.current
