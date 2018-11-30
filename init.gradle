@@ -87,7 +87,7 @@ def setupSubprojectsForBuildServer() {
                             archiveName "${project.name}-${v.baseName}-allclasses.jar"
                         }
 
-                        jarifyTask.dependsOn v.getJavaCompiler()
+                        jarifyTask.dependsOn v.getJavaCompileProvider()
                         v.assemble.dependsOn jarifyTask
                     }
                 }

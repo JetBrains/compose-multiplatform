@@ -30,7 +30,7 @@ if (androidPluginVersionOverride != null) {
     logger.warn("USING OVERRIDDEN ANDROID GRADLE PLUGIN DEPENDENCY OF " + build_libs.gradle)
 } else {
     // Keep gradle plugin version in sync with ub_supportlib-master manifest.
-    build_libs.gradle = 'com.android.tools.build:gradle:3.2.1-SNAPSHOT'
+    build_libs.gradle = 'com.android.tools.build:gradle:3.3.0-rc01'
 }
 
 build_libs.error_prone_gradle = 'net.ltgt.gradle:gradle-errorprone-plugin:0.0.13'

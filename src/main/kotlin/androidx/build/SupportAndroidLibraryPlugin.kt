@@ -22,6 +22,7 @@ import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ComponentModuleMetadataDetails
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.kotlin.dsl.apply
@@ -40,6 +41,12 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
                 SupportLibraryExtension::class.java, project)
         project.setupVersion(supportLibraryExtension)
         project.configureMavenArtifactUpload(supportLibraryExtension)
+
+        // Workaround for concurrentfuture
+        project.dependencies.modules.module("com.google.guava:listenablefuture") {
+            (it as ComponentModuleMetadataDetails).replacedBy(
+                "com.google.guava:guava", "guava contains listenablefuture")
+        }
 
         project.afterEvaluate {
             if (supportLibraryExtension.publish) {
