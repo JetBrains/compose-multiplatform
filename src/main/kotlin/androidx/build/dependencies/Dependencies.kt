@@ -59,7 +59,7 @@ const val XERIAL = "org.xerial:sqlite-jdbc:3.20.1"
 const val XPP3 = "xpp3:xpp3:1.1.4c"
 const val XMLPULL = "xmlpull:xmlpull:1.1.3.1"
 
-private const val NAV_SUPPORT_VERSION = "27.1.1"
+private const val NAV_SUPPORT_VERSION = "28.0.0"
 const val NAV_SUPPORT_COMPAT = "com.android.support:support-compat:$NAV_SUPPORT_VERSION"
 const val NAV_SUPPORT_CORE_UTILS = "com.android.support:support-core-utils:$NAV_SUPPORT_VERSION"
 const val NAV_SUPPORT_DESIGN = "com.android.support:design:$NAV_SUPPORT_VERSION"
