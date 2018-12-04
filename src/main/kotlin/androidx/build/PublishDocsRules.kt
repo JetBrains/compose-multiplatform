@@ -88,8 +88,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.WEAR, "1.0.0")
             .addStubs("wear/wear_stubs/com.google.android.wearable-stubs.jar")
     prebuilts(LibraryGroups.WEBKIT, "1.0.0")
-    ignore(LibraryGroups.ROOM, "room-coroutines") // TODO(danysantiago): Land on prebuilts
-    prebuilts(LibraryGroups.ROOM, "2.1.0-alpha01")
+    prebuilts(LibraryGroups.ROOM, "2.1.0-alpha03")
     prebuilts(LibraryGroups.PERSISTENCE, "2.0.0")
     ignore(LibraryGroups.LIFECYCLE, "lifecycle-savedstate-core")
     ignore(LibraryGroups.LIFECYCLE, "lifecycle-savedstate-fragment")
