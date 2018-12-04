@@ -49,6 +49,13 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
         }
 
         project.afterEvaluate {
+            // workaround for b/120487939
+            project.configurations.all {
+                // Gradle seems to crash an androidtest configurations preferring project modules...
+                if (!it.name.toLowerCase().contains("androidtest")) {
+                    it.resolutionStrategy.preferProjectModules()
+                }
+            }
             if (supportLibraryExtension.publish) {
                 project.extra.set("publish", true)
                 project.addToProjectMap(supportLibraryExtension.mavenGroup)
