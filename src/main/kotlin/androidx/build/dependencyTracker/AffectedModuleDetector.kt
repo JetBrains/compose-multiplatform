@@ -238,6 +238,6 @@ internal class AffectedModuleDetectorImpl constructor(
 
     companion object {
         // list of projects that should always be built
-        private val ALWAYS_BUILD = arrayOf("dumb-test", "wear", "media-compat-test")
+        private val ALWAYS_BUILD = arrayOf("dumb-test", "wear", "media-compat-test", "media2-test")
     }
 }
