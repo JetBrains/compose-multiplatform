@@ -39,6 +39,10 @@ class SupportJavaLibraryPlugin : Plugin<Project> {
 
         project.apply(mapOf("plugin" to "java"))
         project.afterEvaluate {
+            // workaround for b/120487939
+            project.configurations.all {
+                it.resolutionStrategy.preferProjectModules()
+            }
             if (supportLibraryExtension.publish) {
                 project.extra.set("publish", true)
                 project.addToProjectMap(supportLibraryExtension.mavenGroup)
