@@ -21,6 +21,9 @@ import androidx.build.SupportConfig.COMPILE_SDK_VERSION
 import androidx.build.SupportConfig.TARGET_SDK_VERSION
 import androidx.build.SupportConfig.DEFAULT_MIN_SDK_VERSION
 import androidx.build.SupportConfig.INSTRUMENTATION_RUNNER
+import androidx.build.checkapi.ApiType
+import androidx.build.checkapi.getLastReleasedApiFileFromDir
+import androidx.build.checkapi.hasApiFolder
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.dokka.Dokka
 import androidx.build.gradle.getByType
@@ -49,6 +52,7 @@ import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getPlugin
 import org.gradle.kotlin.dsl.withType
 import java.util.concurrent.ConcurrentHashMap
+import java.io.File
 
 /**
  * A plugin which enables all of the Gradle customizations for AndroidX.
@@ -89,6 +93,7 @@ class AndroidXPlugin : Plugin<Project> {
                     project.configureAndroidCommonOptions(extension)
                     project.configureAndroidLibraryOptions(extension)
                     project.configureVersionFileWriter(extension)
+                    project.configureResourceApiChecks()
                     val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
                     extension.libraryVariants.all {
                         variant -> verifyDependencyVersionsTask.dependsOn(variant.javaCompiler)
@@ -323,4 +328,47 @@ private fun isDependencyRange(version: String?): Boolean {
     return ((version!!.startsWith("[") || version.startsWith("(")) &&
             (version.endsWith("]") || version.endsWith(")")) ||
             version.endsWith("+"))
+}
+
+private fun Project.createCheckResourceApiTask(): DefaultTask {
+    return project.tasks.createWithConfig("checkResourceApi",
+            CheckResourceApiTask::class.java) {
+        newApiFile = getGenerateResourceApiFile()
+        oldApiFile = File(project.projectDir, "api/res-${project.version}.txt")
+    }
+}
+
+private fun Project.createUpdateResourceApiTask(): DefaultTask {
+    return project.tasks.createWithConfig("updateResourceApi", UpdateResourceApiTask::class.java) {
+        newApiFile = getGenerateResourceApiFile()
+        oldApiFile = getLastReleasedApiFileFromDir(File(project.projectDir, "api/"),
+                project.version(), true, false, ApiType.RESOURCEAPI)
+    }
+}
+
+private fun Project.configureResourceApiChecks() {
+    project.afterEvaluate {
+        if (project.hasApiFolder()) {
+            val checkResourceApiTask = project.createCheckResourceApiTask()
+            val updateResourceApiTask = project.createUpdateResourceApiTask()
+            project.tasks.all { task ->
+                if (task.name == "assembleRelease") {
+                    checkResourceApiTask.dependsOn(task)
+                    updateResourceApiTask.dependsOn(task)
+                } else if (task.name == "updateApi") {
+                    task.dependsOn(updateResourceApiTask)
+                }
+            }
+            project.rootProject.tasks.all { task ->
+                if (task.name == AndroidXPlugin.BUILD_ON_SERVER_TASK) {
+                    task.dependsOn(checkResourceApiTask)
+                }
+            }
+        }
+    }
+}
+
+private fun Project.getGenerateResourceApiFile(): File {
+    return File(project.buildDir, "intermediates/public_res/minDepVersionsRelease" +
+            "/packageMinDepVersionsReleaseResources/public.txt")
 }
