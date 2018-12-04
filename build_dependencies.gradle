@@ -17,6 +17,7 @@
 def build_versions = [:]
 
 build_versions.kotlin = '1.3.0'
+build_versions.lint = '26.3.0-rc01'
 
 rootProject.ext['build_versions'] = build_versions
 
@@ -33,8 +34,15 @@ if (androidPluginVersionOverride != null) {
     build_libs.gradle = 'com.android.tools.build:gradle:3.3.0-rc01'
 }
 
+build_libs.lint = [
+        core: "com.android.tools.lint:lint:${build_versions.lint}",
+        api: "com.android.tools.lint:lint-api:${build_versions.lint}",
+        tests: "com.android.tools.lint:lint-tests:${build_versions.lint}"
+]
+
 build_libs.error_prone_gradle = 'net.ltgt.gradle:gradle-errorprone-plugin:0.0.13'
 build_libs.kotlin = [
+        stdlib: "org.jetbrains.kotlin:kotlin-stdlib:${build_versions.kotlin}",
         gradle_plugin: "org.jetbrains.kotlin:kotlin-gradle-plugin:${build_versions.kotlin}"
 ]
 build_libs.dokka_gradle = 'org.jetbrains.dokka:dokka-android-gradle-plugin:0.9.18-SNAPSHOT'
