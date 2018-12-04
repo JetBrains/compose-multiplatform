@@ -59,7 +59,7 @@ data class Version(
     }
 
     companion object {
-        private val VERSION_FILE_REGEX = Pattern.compile("^(.*).txt$")
+        private val VERSION_FILE_REGEX = Pattern.compile("^(res-)?(.*).txt$")
         private val VERSION_REGEX = Pattern.compile("^(\\d+)\\.(\\d+)\\.(\\d+)(-.+)?$")
 
         private fun checkedMatcher(versionString: String): Matcher {
@@ -76,7 +76,7 @@ data class Version(
         fun parseOrNull(file: File): Version? {
             if (!file.isFile) return null
             val matcher = VERSION_FILE_REGEX.matcher(file.name)
-            return if (matcher.matches()) parseOrNull(matcher.group(1)) else null
+            return if (matcher.matches()) parseOrNull(matcher.group(2)) else null
         }
 
         /**
