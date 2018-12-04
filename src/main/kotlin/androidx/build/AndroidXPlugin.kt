@@ -134,7 +134,7 @@ class AndroidXPlugin : Plugin<Project> {
                 if ("assembleAndroidTest" == task.name ||
                         "assembleDebug" == task.name ||
                         ERROR_PRONE_TASK == task.name ||
-                        "lintDebug" == task.name) {
+                        "lintMinDepVersionsDebug" == task.name) {
                     buildOnServerTask.dependsOn(task)
                 }
                 if ("assembleAndroidTest" == task.name ||
