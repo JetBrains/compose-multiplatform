@@ -64,7 +64,7 @@ object Dokka {
         if (runnerProject.tasks.findByName(Dokka.RUNNER_TASK_NAME) == null) {
             project.apply<DokkaPlugin>()
             val docsTask = project.tasks.getByName(Dokka.RUNNER_TASK_NAME) as DokkaTask
-            docsTask.outputFormat = "dac-as-java"
+            docsTask.outputFormat = "dac"
             for (hiddenPackage in hiddenPackages) {
                 val opts = PackageOptions()
                 opts.prefix = hiddenPackage
