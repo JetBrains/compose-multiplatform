@@ -21,7 +21,6 @@ build_versions.lint = '26.3.0-rc01'
 
 rootProject.ext['build_versions'] = build_versions
 
-
 def build_libs = [:]
 
 def androidPluginVersionOverride = System.getenv("GRADLE_PLUGIN_VERSION")
