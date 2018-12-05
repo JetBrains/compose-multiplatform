@@ -33,6 +33,7 @@ task stripArchive(type: Zip) {
             "m2repository/androidx/car/**",
             "m2repository/androidx/cardview/**",
             "m2repository/androidx/collection/collection/**",
+            "m2repository/androidx/contentpager/**",
             "m2repository/androidx/coordinatorlayout/**",
             "m2repository/androidx/core/core/**",
             "m2repository/androidx/cursoradapter/**",
@@ -88,6 +89,27 @@ task dejetifyArchive(type: Exec) {
         "${jetifierBin}",
         "-i", "${inputs.files.singleFile}",
         "-o", "${outputs.files.singleFile}",
+        "--log", "warning",
+        "--reversed",
+        "--rebuildTopOfTree"
+    )
+}
+
+task partiallyDejetifyArchive(type: Exec) {
+    description "Produces a zip of partially dejetified artifacts by running Dejetifier against refactored" +
+            " artifacts, for temporary migration purposes."
+
+    dependsOn ':jetifier-standalone:installDist'
+    dependsOn project.tasks['stripArchive']
+    inputs.file project.tasks['stripArchive'].archivePath
+
+    outputs.file "${BuildServerConfigurationKt.getDistributionDirectory(rootProject).absolutePath}/top-of-tree-m2repository-partially-dejetified-${BuildServerConfigurationKt.getBuildId()}.zip"
+
+    commandLine (
+        "${jetifierBin}",
+        "-i", "${inputs.files.singleFile}",
+        "-o", "${outputs.files.singleFile}",
+	"-c", "${standaloneProject.projectDir.getParentFile()}/migration.config",
         "--log", "warning",
         "--reversed",
         "--rebuildTopOfTree"
