@@ -42,6 +42,10 @@ abstract class MetalavaTask : DefaultTask() {
     var sourcePaths: Collection<File> = emptyList()
 
     protected fun runWithArgs(vararg args: String) {
+        runWithArgs(args.asList())
+    }
+
+    protected fun runWithArgs(args: List<String>) {
         project.javaexec {
             it.classpath = checkNotNull(configuration) { "Configuration not set." }
             it.main = "com.android.tools.metalava.Driver"
