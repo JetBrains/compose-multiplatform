@@ -59,6 +59,7 @@ task stripArchive(type: Zip) {
             "m2repository/androidx/print/**",
             "m2repository/androidx/recommendation/**",
             "m2repository/androidx/recyclerview/**",
+            "m2repository/androidx/savedstate/**",
             "m2repository/androidx/slice/slice-builders/**",
             "m2repository/androidx/slice/slice-core/**",
             "m2repository/androidx/slice/slice-view/**",
