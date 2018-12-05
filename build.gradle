@@ -35,7 +35,9 @@ apply from: "build_dependencies.gradle"
 apply plugin: "kotlin"
 apply from: "kotlin-dsl-dependency.gradle.kts"
 
-repos.addMavenRepositories(repositories)
+allprojects {
+    repos.addMavenRepositories(repositories)
+}
 
 dependencies {
     compile build_libs.gradle
