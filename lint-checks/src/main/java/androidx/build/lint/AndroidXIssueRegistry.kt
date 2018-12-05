@@ -21,6 +21,7 @@ import com.android.tools.lint.client.api.IssueRegistry
 class AndroidXIssueRegistry : IssueRegistry() {
     override val issues get() = listOf(
             BanParcelableUsage.ISSUE,
-            BanKeepAnnotation.ISSUE
+            BanKeepAnnotation.ISSUE,
+            BanTargetApiAnnotation.ISSUE
     )
 }
