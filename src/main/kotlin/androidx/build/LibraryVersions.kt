@@ -24,7 +24,7 @@ object LibraryVersions {
     val ANIMATION = Version("1.0.0-alpha01")
     val ANIMATION_TESTING = Version("1.0.0")
     val ANNOTATION = Version("1.0.0")
-    val APPCOMPAT = Version("1.1.0-alpha01")
+    val APPCOMPAT = Version("1.1.0-alpha02")
     val ARCH_CORE = Version("2.0.0")
     val ARCH_CORE_TESTING = ARCH_CORE
     val ARCH_RUNTIME = Version("2.0.1-alpha01")
@@ -39,7 +39,7 @@ object LibraryVersions {
     val COLLECTION = Version("1.1.0-alpha01")
     val CONTENTPAGER = Version("1.0.0")
     val COORDINATORLAYOUT = Version("1.1.0-alpha02")
-    val CORE = Version("1.1.0-alpha02")
+    val CORE = Version("1.1.0-alpha03")
     val CURSORADAPTER = Version("1.0.0")
     val CUSTOMVIEW = Version("1.0.0")
     val DOCUMENTFILE = Version("1.0.0")
