@@ -117,6 +117,7 @@ object Metalava {
         val checkApi = project.tasks.create("checkApi", CheckApiEquivalenceTask::class.java) { task ->
             task.builtApi = generateApi.apiLocation
             task.checkedInApis = outputApiLocations
+            task.checkRestrictedAPIs = extension.trackRestrictedAPIs
             task.dependsOn(generateApi)
         }
 
@@ -126,6 +127,7 @@ object Metalava {
                  task.configuration = metalavaConfiguration
                  task.apiLocation = lastReleasedApiFile
                  task.dependsOn(metalavaConfiguration)
+                 task.checkRestrictedAPIs = extension.trackRestrictedAPIs
              }
              applyInputs(javaCompileInputs, checkApiRelease)
              checkApi.dependsOn(checkApiRelease)
@@ -134,6 +136,7 @@ object Metalava {
         project.tasks.create("updateApi", UpdateApiTask::class.java) { task ->
             task.inputApiLocation = generateApi.apiLocation
             task.outputApiLocations = checkApi.checkedInApis
+            task.updateRestrictedAPIs = extension.trackRestrictedAPIs
             task.dependsOn(generateApi)
         }
 

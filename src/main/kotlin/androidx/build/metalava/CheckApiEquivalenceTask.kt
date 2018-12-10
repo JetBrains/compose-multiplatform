@@ -44,8 +44,20 @@ open class CheckApiEquivalenceTask : DefaultTask() {
     /**
      * Api file (in source control) to compare against
      */
-    @get:InputFiles
     var checkedInApis: List<ApiLocation> = listOf()
+
+    @InputFiles
+    fun getTaskInputs(): List<File> {
+        if (checkRestrictedAPIs) {
+            return checkedInApis.flatMap { it.files() }
+        }
+        return checkedInApis.map { it.publicApiFile }
+    }
+
+    /**
+     * Whether to check restricted APIs too
+     */
+    var checkRestrictedAPIs = false
 
     /**
      * Message to show on comparison failure of public API
@@ -65,7 +77,12 @@ open class CheckApiEquivalenceTask : DefaultTask() {
             val publicApi2 = checkNotNull(checkedInApi?.publicApiFile) { "publicApi2 not set" }
             val restrictedApi2 = checkNotNull(checkedInApi?.restrictedApiFile) { "restrictedApi2 not set" }
             if (!FileUtils.contentEquals(publicApi1, publicApi2)) {
-                throw GradleException(publicApiFailureMessage);
+                throw GradleException(publicApiFailureMessage)
+            }
+            if (checkRestrictedAPIs) {
+                if (!FileUtils.contentEquals(restrictedApi1, restrictedApi2)) {
+                    throw GradleException(publicApiFailureMessage)
+                }
             }
         }
     }
