@@ -16,6 +16,7 @@ import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.r4a.R4aFqNames.makeComposableAnnotation
 import org.jetbrains.kotlin.r4a.analysis.R4ADefaultErrorMessages
 import org.jetbrains.kotlin.r4a.analysis.R4AErrors
+import org.jetbrains.kotlin.r4a.analysis.R4AWritableSlices
 import org.jetbrains.kotlin.r4a.ast.*
 import org.jetbrains.kotlin.resolve.*
 import org.jetbrains.kotlin.resolve.calls.CallResolver
@@ -280,16 +281,41 @@ class KtxCallResolver(
         val attrInfos = mutableMapOf<String, AttributeInfo>()
 
         for (attr in attributes) {
-            val name = attr.key.getReferencedName()
+            val key = attr.key
+            val name = key.getReferencedName()
             if (attrInfos.contains(name)) {
                 contextToUse.trace.reportFromPlugin(
-                    R4AErrors.DUPLICATE_ATTRIBUTE.on(attr.key),
+                    R4AErrors.DUPLICATE_ATTRIBUTE.on(key),
                     R4ADefaultErrorMessages
                 )
             }
+            if (attr.value == null && attr.equals == null) {
+                // punning...
+                // punning has a single expression that both acts as reference to the value and to the property/setter. As a result, we
+                // need to save the descriptors that it targets into a different writable slice that we can surface later in a
+                // reference so that users cam Cmd-Click to either target. Additionally, for the purposes of codegen it's more important
+                // that the expression gets resolved to its *value*, and not its *target attribute*. In order to ensure this, we end up
+                // running `getTypeInfo` on any attributes that are punned before doing any other resolution.
+                val temporaryForPunning = TemporaryTraceAndCache.create(
+                    contextToUse, "trace to resolve reference for punning", key
+                )
+
+                facade.getTypeInfo(
+                    key,
+                    contextToUse.replaceTraceAndCache(temporaryForPunning)
+                )
+
+                temporaryForPunning.trace[BindingContext.REFERENCE_TARGET, key]?.let {
+                    // save the reference into a Set that we can use later in a custom reference
+                    temporaryForPunning.trace.recordAttributeKeyRef(key, it)
+                }
+
+                temporaryForPunning.commit()
+            }
+
             attrInfos[name] = AttributeInfo(
-                value = attr.value ?: attr.key,
-                key = attr.key,
+                value = attr.value ?: key,
+                key = key,
                 name = name
             )
         }
@@ -303,8 +329,6 @@ class KtxCallResolver(
                 name = CHILDREN_KEY
             )
         }
-
-
 
         val usedAttributes = mutableSetOf<String>()
 
@@ -936,7 +960,9 @@ class KtxCallResolver(
                         constructedType = null, // or should we pass in Unit here?
                         expressionToReportErrorsOn = expression,
                         context = candidateContext
-                    ) ?: return@TempResolveInfo ErrorNode.ResolveError()
+                    )
+                    // if this doesn't succeed, perhaps we should try and continue???
+                        ?: return@TempResolveInfo ErrorNode.ResolveError()
 
                     val invalidReceiverScope = composerCall
                         .resultingDescriptor
@@ -1468,13 +1494,19 @@ class KtxCallResolver(
                     else -> ValidationType.SET
                 }
 
+                val valueParameters = resolvedCall.resultingDescriptor.valueParameters
+
+                if (valueParameters.isEmpty()) {
+                    continue
+                }
+
                 val (validationCall, lambdaDescriptor) = resolveValidationCall(
                     kind = kind,
                     expressionToReportErrorsOn = expressionToReportErrorsOn,
                     receiverScope = receiverScope,
                     assignmentReceiverScope = type,
                     validationType = validationType,
-                    attrType = resolvedCall.resultingDescriptor.valueParameters.first().type,
+                    attrType = valueParameters.first().type,
                     valueExpr = attribute.value,
                     context = context
                 )
@@ -1633,30 +1665,6 @@ class KtxCallResolver(
         context: ExpressionTypingContext
     ): ResolvedCall<*>? {
         val setterName = Name.identifier(R4aUtils.setterMethodFromPropertyName(name))
-        val ambiguousReferences = mutableSetOf<DeclarationDescriptor>()
-
-        if (valueExpr === keyExpr) {
-            // punning...
-            // punning has a single expression that both acts as reference to the value and to the property/setter. As a result, we do
-            // two separate resolution steps, but we need to use BindingContext.AMBIGUOUS_REFERENCE_TARGET instead of
-            // BindingContext.REFERENCE_TARGET, and since we can't unset the latter, we have to retrieve it from a temporary trace
-            // and manually set the references later. Here we resolve the "reference to the value" and save it:
-            val temporaryForPunning = TemporaryTraceAndCache.create(
-                context, "trace to resolve reference for punning", keyExpr
-            )
-
-            facade.getTypeInfo(
-                keyExpr,
-                context.replaceTraceAndCache(temporaryForPunning)
-            )
-
-            temporaryForPunning.trace[BindingContext.REFERENCE_TARGET, keyExpr]?.let {
-                ambiguousReferences.add(it)
-            }
-
-            temporaryForPunning.commit()
-        }
-
         val receiver = TransientReceiver(instanceType)
 
         val call = makeCall(
@@ -1703,11 +1711,8 @@ class KtxCallResolver(
                     !(value === valueExpr && (slice === BindingContext.REFERENCE_TARGET || slice === BindingContext.CALL))
                 }, false
             )
-            // TODO(lmr): even w/ ambiguous reference target, because we are setting a real reference target (which we really need to do
-            // for codegen), the target of the actual descriptor doesn't show up...
             temporaryForFunction.cache.commit()
-            ambiguousReferences.add(resolvedCall.resultingDescriptor)
-            context.trace.record(BindingContext.AMBIGUOUS_REFERENCE_TARGET, keyExpr, ambiguousReferences)
+            context.trace.recordAttributeKeyRef(keyExpr, resolvedCall.resultingDescriptor)
         } else {
             // if we weren't punning, we can just commit like normal
             temporaryForFunction.commit()
@@ -1724,28 +1729,6 @@ class KtxCallResolver(
         expectedTypes: MutableCollection<KotlinType>,
         context: ExpressionTypingContext
     ): ResolvedCall<*>? {
-        val ambiguousReferences = mutableSetOf<DeclarationDescriptor>()
-
-        if (valueExpr === keyExpr) {
-            // punning...
-            // punning has a single expression that both acts as reference to the value and to the property/setter. As a result, we do
-            // two separate resolution steps, but we need to use BindingContext.AMBIGUOUS_REFERENCE_TARGET instead of
-            // BindingContext.REFERENCE_TARGET, and since we can't unset the latter, we have to retrieve it from a temporary trace
-            // and manually set the references later. Here we resolve the "reference to the value" and save it:
-            val temporaryForPunning = TemporaryTraceAndCache.create(
-                context, "trace to resolve reference for punning", keyExpr
-            )
-
-            facade.getTypeInfo(
-                keyExpr,
-                context.replaceTraceAndCache(temporaryForPunning)
-            )
-
-            temporaryForPunning.trace[BindingContext.REFERENCE_TARGET, keyExpr]?.let {
-                ambiguousReferences.add(it)
-            }
-            temporaryForPunning.commit()
-        }
 
         // NOTE(lmr): I'm not sure what the consequences are of using the tagExpr as the receiver...
         val receiver = TransientReceiver(instanceType)
@@ -1825,10 +1808,7 @@ class KtxCallResolver(
                 }, false
             )
             temporaryForVariable.cache.commit()
-            ambiguousReferences.add(descriptor)
-            // TODO(lmr): even w/ ambiguous reference target, because we are setting a real reference target (which we really need to do
-            // for codegen), the target of the actual descriptor doesn't show up...
-            context.trace.record(BindingContext.AMBIGUOUS_REFERENCE_TARGET, keyExpr, ambiguousReferences)
+            context.trace.recordAttributeKeyRef(keyExpr, descriptor)
         } else {
             temporaryForVariable.commit()
         }
@@ -2019,6 +1999,7 @@ class KtxCallResolver(
                     )
                 )
                 context.trace.record(BindingContext.REFERENCE_TARGET, attr.key, param)
+                context.trace.recordAttributeKeyRef(attr.key, param)
                 arg = attr.toValueArgument(attr.name, stableParamNames)
             }
 
@@ -2443,7 +2424,7 @@ class KtxCallResolver(
 
         for (candidate in candidates) {
 
-            val typeParam = candidate.typeArguments.keys.singleOrNull() ?: continue
+            val typeParam = candidate.candidateDescriptor.typeParameters.singleOrNull() ?: continue
 
             if (!typeToSubstitute.satisfiesConstraintsOf(typeParam)) continue
 
@@ -3058,5 +3039,10 @@ private fun isValidStaticQualifiedPart(target: DeclarationDescriptor): Boolean {
 }
 
 private fun DeclarationDescriptor.isRoot() = containingDeclaration?.containingDeclaration is ModuleDescriptor
+
+private fun BindingTrace.recordAttributeKeyRef(key: KtReferenceExpression?, value: DeclarationDescriptor) {
+    val prev = get(R4AWritableSlices.ATTRIBUTE_KEY_REFERENCE_TARGET, key) ?: emptySet()
+    record(R4AWritableSlices.ATTRIBUTE_KEY_REFERENCE_TARGET, key, prev + value)
+}
 
 enum class ComposerCallKind { CALL, EMIT }
