@@ -67,9 +67,6 @@ open class CheckApiEquivalenceTask : DefaultTask() {
             if (!FileUtils.contentEquals(publicApi1, publicApi2)) {
                 throw GradleException(publicApiFailureMessage);
             }
-            if (!FileUtils.contentEquals(restrictedApi1, restrictedApi2)) {
-                throw GradleException(restrictedApiFailureMessage);
-            }
         }
     }
 }

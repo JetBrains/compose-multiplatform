@@ -115,7 +115,7 @@ object Metalava {
         applyInputs(javaCompileInputs, generateApi)
 
         val checkApi = project.tasks.create("checkApi", CheckApiEquivalenceTask::class.java) { task ->
-            task.builtApi = libraryVersionApi
+            task.builtApi = generateApi.apiLocation
             task.checkedInApis = outputApiLocations
             task.dependsOn(generateApi)
         }
