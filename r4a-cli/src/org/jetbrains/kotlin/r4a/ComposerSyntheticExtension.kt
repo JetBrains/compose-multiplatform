@@ -55,7 +55,7 @@ class ComposerSyntheticExtension : SyntheticIrExtension {
                 val attributeType = attribute.type
                 val attributeVariable = IrTemporaryVariableDescriptorImpl(
                     statementGenerator.scopeOwner,
-                    Name.identifier("__el_attr_${attribute.name}"),
+                    Name.identifier("__el_attr_${attribute.name.jvmSafeChars()}"),
                     attributeType,
                     false
                 )
@@ -717,3 +717,5 @@ private fun StatementGenerator.lambdaExpression(
         )
     )
 }
+
+private fun String.jvmSafeChars() = map { if (!it.isLetterOrDigit()) "${"$"}${it.toInt()}${"$"}" else "$it" }.joinToString(separator = "")
