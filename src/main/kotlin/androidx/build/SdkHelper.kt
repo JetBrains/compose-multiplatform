@@ -30,7 +30,7 @@ fun setSdkInLocalPropertiesFile(supportRoot: File) {
         // So convert deliminator here.
         val gradlePath = sdkPath.getAbsolutePath().replace(File.separator, "/")
         props.printWriter().use { out ->
-            out.println("sdk.dir=${gradlePath}")
+            out.println("sdk.dir=$gradlePath")
         }
     } else {
         throw Exception("You are using non androidx-master-dev checkout. You need to check out " +
@@ -44,9 +44,9 @@ fun setSdkInLocalPropertiesFile(supportRoot: File) {
 fun getSdkPath(supportRoot: File): File {
     if (isUnbundledBuild(supportRoot)) {
         val properties = Properties()
-        val propertiesFile = File("local.properties")
+        val propertiesFile = File(supportRoot, "local.properties")
         if (propertiesFile.exists()) {
-            properties.load(propertiesFile.inputStream())
+            propertiesFile.inputStream().use(properties::load)
         }
         return findSdkLocation(properties, supportRoot)
     } else {
