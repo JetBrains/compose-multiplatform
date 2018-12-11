@@ -142,6 +142,8 @@ class KtxEnterHandler : EnterHandlerDelegateAdapter() {
 
         val elementBefore = elementAt.getPrevLeafIgnoringWhitespace(includeSelf = false) ?: return null
         val elementAfter = elementAt.getNextLeafIgnoringWhitespace(includeSelf = true) ?: return null
+        if (elementBefore.endOffset > caretOffset) return null
+        if (caretOffset > elementAfter.startOffset) return null
 
         val returnsBetweenLeftAndCaret = document.getText(TextRange(elementBefore.endOffset, caretOffset)).contains('\n')
         val returnsBetweenRightAndCaret = document.getText(TextRange(caretOffset, elementAfter.startOffset)).contains('\n')
