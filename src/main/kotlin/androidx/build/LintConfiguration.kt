@@ -63,8 +63,13 @@ fun Project.configureLint(lintOptions: LintOptions, extension: SupportLibraryExt
                 fatal("NewApi")
                 fatal("ObsoleteSdkInt")
                 fatal("NoHardKeywords")
-                fatal("SyntheticAccessor")
                 fatal("UnusedResources")
+
+                // Only override if not set explicitly.
+                // Some Kotlin projects may wish to disable this.
+                if (lintOptions.severityOverrides["SyntheticAccessor"] == null) {
+                    fatal("SyntheticAccessor")
+                }
 
                 if (extension.mavenVersion?.isFinalApi() == true) {
                     fatal("MissingTranslation")
