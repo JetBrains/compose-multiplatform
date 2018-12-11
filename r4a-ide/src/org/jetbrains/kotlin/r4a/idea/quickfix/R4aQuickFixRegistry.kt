@@ -29,5 +29,8 @@ class R4aQuickFixRegistry : QuickFixContributor {
         // wanted.
         quickFixes.register(Errors.UNRESOLVED_REFERENCE, ImportComponentFix)
         quickFixes.register(R4AErrors.UNRESOLVED_TAG, ImportComponentFix)
+
+        // when a composer isn't in scope, this proovides a quickfix to import one
+        quickFixes.register(R4AErrors.NO_COMPOSER_FOUND, ImportComposerFix)
     }
 }
