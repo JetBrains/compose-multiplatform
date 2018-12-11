@@ -28,12 +28,12 @@ import com.android.tools.lint.detector.api.Severity
 import com.intellij.psi.PsiMethod
 import org.jetbrains.uast.UAnnotation
 import org.jetbrains.uast.UElement
+import java.util.Collections
 
-class BanKeepAnnotation : Detector(), Detector.UastScanner {
+class BanTargetApiAnnotation : Detector(), Detector.UastScanner {
 
     override fun applicableAnnotations(): List<String>? {
-        return listOf("android.support.annotation.Keep",
-                "androidx.annotation.Keep")
+        return Collections.singletonList("android.annotation.TargetApi")
     }
 
     override fun visitAnnotationUsage(
@@ -48,16 +48,18 @@ class BanKeepAnnotation : Detector(), Detector.UastScanner {
         allClassAnnotations: List<UAnnotation>,
         allPackageAnnotations: List<UAnnotation>
     ) {
-        context.report(ISSUE, annotation, context.getNameLocation(annotation), "Uses @Keep" +
-                " annotation")
+        if (type == AnnotationUsageType.METHOD_CALL) {
+            context.report(ISSUE, annotation, context.getNameLocation(annotation),
+                    "Uses @TargetApi annotation")
+        }
     }
 
     companion object {
-        val ISSUE = Issue.create("BanKeepAnnotation",
-                "Uses @Keep annotation",
-                "Use of @Keep annotation is not allowed, please use a conditional " +
-                        "keep rule in proguard-rules.pro.",
+        val ISSUE = Issue.create("BanTargetApiAnnotation",
+                "Uses @TargetApi annotation",
+                "Use of @TargetApi annotation is not allowed, please consider " +
+                        "using the @RequiresApi annotation instead.",
                 Category.CORRECTNESS, 5, Severity.ERROR,
-                Implementation(BanKeepAnnotation::class.java, Scope.JAVA_FILE_SCOPE))
+                Implementation(BanTargetApiAnnotation::class.java, Scope.JAVA_FILE_SCOPE))
     }
 }
