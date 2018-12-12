@@ -171,7 +171,7 @@ object DiffAndDocs {
         originName: String,
         originRule: DocsRule
     ): FileTree {
-        val configName = "docs-temp_$mavenId"
+        val configName = "docs-temp_${mavenId.replace(":", "-")}"
         val configuration = root.configurations.create(configName)
         root.dependencies.add(configName, mavenId)
 
