@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.diagnostics.reportFromPlugin
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtClass
+import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.r4a.R4AFlags
 import org.jetbrains.kotlin.r4a.analysis.R4ADefaultErrorMessages
@@ -30,7 +31,7 @@ class PackageAnalysisHandlerExtension : AnalysisHandlerExtension {
             if (!R4AFlags.FRAMED_MODEL_CLASSES) return
             for (file in files) {
                 for (declaration in file.declarations) {
-                    val ktClass = declaration as? KtClass ?: continue
+                    val ktClass = declaration as? KtClassOrObject ?: continue
                     val framedDescriptor = resolveSession.resolveToDescriptor(declaration) as? ClassDescriptor ?: continue
                     if (!framedDescriptor.hasModelAnnotation()) continue
 

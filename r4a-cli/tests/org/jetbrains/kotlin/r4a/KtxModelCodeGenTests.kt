@@ -108,6 +108,51 @@ class KtxModelCodeGenTests : AbstractCodeGenTest() {
         }
     }
 
+    @Test // b/120843442
+    fun testCGModelView_ObjectModel(): Unit = ensureSetup {
+        val tvNameId = 384
+        val tvAgeId = 385
+
+        var name = PRESIDENT_NAME_1
+        var age = PRESIDENT_AGE_1
+        compose(
+            """
+            @Model
+            object president {
+                var name: String = "$PRESIDENT_NAME_1"
+                var age: Int = $PRESIDENT_AGE_1
+            }
+
+            @Composable
+            fun PresidentView() {
+              <Observe>
+                <TextView text=president.name id=$tvNameId />
+                <TextView text=president.age.toString() id=$tvAgeId />
+              </Observe>
+            }
+
+
+            """, { mapOf("name" to name, "age" to age) }, """
+               president.name = name
+               president.age = age
+            """, """
+                <PresidentView />
+            """).then { activity ->
+            val tvName = activity.findViewById(tvNameId) as TextView
+            val tvAge = activity.findViewById(tvAgeId) as TextView
+            assertEquals(PRESIDENT_NAME_1, tvName.text)
+            assertEquals(PRESIDENT_AGE_1.toString(), tvAge.text)
+
+            name = PRESIDENT_NAME_16
+            age = PRESIDENT_AGE_16
+        }.then { activity ->
+            val tvName = activity.findViewById(tvNameId) as TextView
+            val tvAge = activity.findViewById(tvAgeId) as TextView
+            assertEquals(PRESIDENT_NAME_16, tvName.text)
+            assertEquals(PRESIDENT_AGE_16.toString(), tvAge.text)
+        }
+    }
+
     @Test // b/120836313
     fun testCGModelView_DataModel(): Unit = ensureSetup {
         val tvNameId = 384
