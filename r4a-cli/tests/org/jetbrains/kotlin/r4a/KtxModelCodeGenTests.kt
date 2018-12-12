@@ -150,6 +150,92 @@ class KtxModelCodeGenTests : AbstractCodeGenTest() {
         }
     }
 
+    @Test // b/120843442
+    fun testCGModelView_ZeroFrame(): Unit = ensureSetup {
+        val tvNameId = 384
+        val tvAgeId = 385
+
+        var name = PRESIDENT_NAME_1
+        var age = PRESIDENT_AGE_1
+        compose(
+            """
+            @Model
+            class PersonC(var name: String, var age: Int)
+
+            @Composable
+            fun PersonView(person: PersonC) {
+              <Observe>
+                <TextView text=person.name id=$tvNameId />
+                <TextView text=person.age.toString() id=$tvAgeId />
+              </Observe>
+            }
+
+            val president = unframed { PersonC("$PRESIDENT_NAME_1", $PRESIDENT_AGE_1) }
+            """, { mapOf("name" to name, "age" to age) }, """
+               president.name = name
+               president.age = age
+            """, """
+                <PersonView person=president />
+            """).then { activity ->
+            val tvName = activity.findViewById(tvNameId) as TextView
+            val tvAge = activity.findViewById(tvAgeId) as TextView
+            assertEquals(name, tvName.text)
+            assertEquals(age.toString(), tvAge.text)
+
+            name = PRESIDENT_NAME_16
+            age = PRESIDENT_AGE_16
+        }.then { activity ->
+            val tvName = activity.findViewById(tvNameId) as TextView
+            val tvAge = activity.findViewById(tvAgeId) as TextView
+            assertEquals(PRESIDENT_NAME_16, tvName.text)
+            assertEquals(PRESIDENT_AGE_16.toString(), tvAge.text)
+        }
+    }
+
+    @Test // b/120843442
+    fun testCGModelView_ZeroFrame_Modification(): Unit = ensureSetup {
+        val tvNameId = 384
+        val tvAgeId = 385
+
+        var name = PRESIDENT_NAME_1
+        var age = PRESIDENT_AGE_1
+        compose(
+            """
+            @Model
+            class PersonD(var name: String, var age: Int)
+
+            @Composable
+            fun PersonView(person: PersonD) {
+              <Observe>
+                <TextView text=person.name id=$tvNameId />
+                <TextView text=person.age.toString() id=$tvAgeId />
+              </Observe>
+            }
+
+            val president = framed { PersonD("$PRESIDENT_NAME_1", $PRESIDENT_AGE_1).apply { age = $PRESIDENT_AGE_1 } }
+            """, { mapOf("name" to name, "age" to age) }, """
+               president.name = name
+               president.age = age
+            """, """
+                <PersonView person=president />
+            """).then { activity ->
+            val tvName = activity.findViewById(tvNameId) as TextView
+            val tvAge = activity.findViewById(tvAgeId) as TextView
+            assertEquals(PRESIDENT_NAME_1, tvName.text)
+            assertEquals(PRESIDENT_AGE_1.toString(), tvAge.text)
+
+            name = PRESIDENT_NAME_16
+            age = PRESIDENT_AGE_16
+        }.then { activity ->
+            val tvName = activity.findViewById(tvNameId) as TextView
+            val tvAge = activity.findViewById(tvAgeId) as TextView
+            assertEquals(PRESIDENT_NAME_16, tvName.text)
+            assertEquals(PRESIDENT_AGE_16.toString(), tvAge.text)
+        }
+
+    }
+
+
 
     fun compose(prefix: String, valuesFactory: () -> Map<String, Any>, advance: String, composition: String, dumpClasses: Boolean = false): ModelCompositionTest {
         val className = "Test_${uniqueNumber++}"

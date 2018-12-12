@@ -3,6 +3,8 @@ package com.google.r4a
 import android.view.Choreographer
 import com.google.r4a.frames.open
 import com.google.r4a.frames.commit
+import com.google.r4a.frames.suspend
+import com.google.r4a.frames.restore
 import com.google.r4a.frames.registerCommitObserver
 import com.google.r4a.frames.inFrame
 import java.lang.ref.WeakReference
@@ -11,6 +13,8 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 fun <T> isolated(block: () -> T) = FrameManager.isolated(block)
+fun <T> unframed(block: () -> T) = FrameManager.unframed(block)
+fun <T> framed(block: () -> T) = FrameManager.framed(block)
 
 /**
  * Ignore the object's implementation of hashCode and equals as they will change for data classes
@@ -71,6 +75,32 @@ internal object FrameManager {
             return block()
         } finally {
             close()
+        }
+    }
+
+    fun <T> unframed(block: () -> T): T {
+        if (inFrame) {
+            val frame = suspend()
+            try {
+                val result = block()
+                if (inFrame) error("An unframed block left a frame uncommitted or aborted")
+                return result
+            } finally {
+                restore(frame)
+            }
+        } else return block()
+    }
+
+    fun <T> framed(block: () -> T): T {
+        if (inFrame) {
+            return block()
+        } else {
+            open()
+            try {
+                return block()
+            } finally {
+                commit()
+            }
         }
     }
 
