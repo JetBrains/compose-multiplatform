@@ -5,10 +5,11 @@
 
 package org.jetbrains.kotlin.r4a.idea.conversion
 
-import com.google.common.base.CaseFormat
-import com.intellij.codeInsight.AnnotationUtil
 import com.intellij.openapi.editor.RangeMarker
-import com.intellij.psi.*
+import com.intellij.psi.JavaPsiFacade
+import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.xml.XmlAttribute
 import com.intellij.psi.xml.XmlFile
@@ -20,24 +21,18 @@ import org.jetbrains.kotlin.idea.caches.resolve.findModuleDescriptor
 import org.jetbrains.kotlin.idea.caches.resolve.util.getJavaClassDescriptor
 import org.jetbrains.kotlin.idea.core.isExcludedFromAutoImport
 import org.jetbrains.kotlin.idea.core.isVisible
-import org.jetbrains.kotlin.idea.refactoring.fqName.getKotlinFqName
 import org.jetbrains.kotlin.idea.search.allScope
 import org.jetbrains.kotlin.idea.util.application.runWriteAction
 import org.jetbrains.kotlin.j2k.ast.*
-import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.r4a.idea.AttributeInfoExtractor
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameOrNull
 import org.jetbrains.kotlin.resolve.descriptorUtil.getAllSuperClassifiers
-import java.util.*
 
 class XmlToKtxConverter(private val targetFile: KtFile) {
     companion object {
         private const val NAMESPACE_PREFIX = "xmlns"
-        private val MAGIC_CONSTANT_ANNOTATIONS = listOf("IntDef", "LongDef", "StringDef").flatMap {
-            listOf("android.annotation.$it", "android.support.annotation.$it")
-        }
 
         private val CLASS_PREFIX_LIST = listOf(
             "android.widget.",
@@ -124,35 +119,39 @@ class XmlToKtxConverter(private val targetFile: KtFile) {
 
     private fun getEnumAttributeConversions(descriptor: ClassDescriptor): List<AttributeConversion> {
         // TODO(jdemeulenaere): Precompute those for Android views or download android SDK & external annotations jars.
-        // TODO(jdemeulenaere): Handle normal Java/Kotlin enums.
         // TODO(jdemeulenaere): We might want to somehow filter those, as some incorrect attribute conversions will be returned (e.g.
-        // "notFocusable" in XML will be mapped to android.view.View.NOT_FOCUSABLE).
+        // "notFocusable" in XML will be mapped to android.view.View.NOT_FOCUSABLE, which does not exist).
         val enumConversions = arrayListOf<AttributeConversion>()
         attributeInfoExtractor.extract(descriptor) {
             it
                 .forEach { attributeInfo ->
-                    // TODO(jdemeulenaere): Handle annotated properties values.
-                    val psiMethod = attributeInfo.descriptor?.findPsi() as? PsiMethod ?: return@forEach
-
-                    // This should not happen.
-                    if (psiMethod.parameterList.parametersCount != 1) {
-                        return@forEach
-                    }
-
-                    val psiParameter = psiMethod.parameters.first() as PsiParameter
-                    val possibleValues = getPossibleEnumValues(psiParameter)
+                    val possibleValues = attributeInfo.getPossibleValues(project)
                     if (possibleValues.isEmpty()) {
                         return@forEach
                     }
 
+                    // TODO(jdemeulenaere): We certainly want to remove common prefix only for values coming from magic annotations and not
+                    // actual enum classes.
                     val commonPrefixLength = if (possibleValues.size == 1) 0 else getCommonPrefixLength(possibleValues.map { it.shortName().asString() })
-
-                    val attributeConversion = ExactAttributeConversion(attributeInfo.name)
+                    val attributeConversion = ExactKtxAttributeConversion(attributeInfo.name)
                     attributeConversion.valueConversions.addAll(possibleValues.map { fqName ->
                         val shortName = fqName.shortName()
                         val upperUnderscoreValue = shortName.asString().substring(commonPrefixLength)
-                        val xmlValue = CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, upperUnderscoreValue)
-                        ExactValueConversion(xmlValue) { Identifier(shortName.asString(), imports = listOf(fqName)) }
+
+                        object : ValueConversion() {
+                            private val nonAlphaNumericPattern = Regex("[^A-Za-z0-9]")
+
+                            private fun simplify(s: String) = s.replace(nonAlphaNumericPattern, "").toLowerCase()
+
+                            override fun matches(attributeValue: String): Boolean {
+                                // Remove all non alpha numeric characters and lower case when matching values.
+                                return simplify(upperUnderscoreValue) == simplify(attributeValue)
+                            }
+
+                            override fun convert(attributeName: String, attributeValue: String): Expression? {
+                                return Identifier(shortName.asString(), imports = listOf(fqName))
+                            }
+                        }
                     })
                     enumConversions.add(attributeConversion)
                 }
@@ -180,40 +179,6 @@ class XmlToKtxConverter(private val targetFile: KtFile) {
             }
         }
         return lastUnderscoreIndex + 1
-    }
-
-    private fun getPossibleEnumValues(annotated: PsiModifierListOwner): List<FqName> {
-        val enumFqNames = arrayListOf<FqName>()
-        fillPossibleEnumValues(annotated, enumFqNames, hashSetOf())
-        return enumFqNames
-    }
-
-    private fun fillPossibleEnumValues(
-        annotated: PsiModifierListOwner,
-        enumFqNames: ArrayList<FqName>,
-        visited: MutableSet<PsiClass>
-    ) {
-        val annotations = AnnotationUtil.getAllAnnotations(annotated, /* inHierarchy= */ true, /* visited= */ null)
-        for (annotation in annotations) {
-            val qualifiedName = annotation.qualifiedName ?: continue
-            if (qualifiedName in MAGIC_CONSTANT_ANNOTATIONS) {
-                enumFqNames.addAll(getMagicConstantEnumValues(annotation))
-            } else {
-                val annotationClass = findClass(qualifiedName) ?: continue
-                if (!visited.add(annotationClass)) continue
-                fillPossibleEnumValues(annotationClass, enumFqNames, visited)
-            }
-        }
-    }
-
-    private fun getMagicConstantEnumValues(annotation: PsiAnnotation): List<FqName> {
-        val valueAttribute = annotation.findAttributeValue("value")
-        val allowedValues = (valueAttribute as? PsiArrayInitializerMemberValue)?.initializers ?: PsiAnnotationMemberValue.EMPTY_ARRAY
-        return allowedValues
-            .filterIsInstance<PsiReference>()
-            .map(PsiReference::resolve)
-            .filterIsInstance<PsiNamedElement>()
-            .mapNotNull { it.getKotlinFqName() }
     }
 
     private fun convertTag(tag: XmlTag): Element {
@@ -278,11 +243,11 @@ class XmlToKtxConverter(private val targetFile: KtFile) {
         val ktxName = xmlName.replace(Regex("_([a-zA-Z\\d])")) { it.groupValues[1].toUpperCase() }
         // TODO(jdemeulenaere): Better handling of missing value.
         val xmlValue = attribute.value ?: ""
-        val ktxValue = convertAttributeValue(xmlName, xmlValue, attributeConversions)
+        val ktxValue = convertAttributeValue(xmlName, ktxName, xmlValue, attributeConversions)
         return KtxAttribute(ktxName, ktxValue)
     }
 
-    private fun convertAttributeValue(name: String, value: String, attributeConversions: List<AttributeConversion>): Expression {
+    private fun convertAttributeValue(xmlName: String, ktxName: String, value: String, attributeConversions: List<AttributeConversion>): Expression {
         // TODO(jdemeulenaere): Improve attribute value conversion. Current implementation simply apply some pattern matching logic on the
         // value to guess what the attribute value should be converted to.
         // A second better solution should reflect on available setters/properties on the tag class, and apply the current pattern matching
@@ -293,10 +258,10 @@ class XmlToKtxConverter(private val targetFile: KtFile) {
         // Try all matching conversions.
         return attributeConversions
             .asSequence()
-            .filter { it.matches(name) }
+            .filter { it.matches(xmlName, ktxName) }
             .flatMap { it.valueConversions.asSequence() }
             .filter { it.matches(value) }
-            .mapNotNull { it.convert(name, value) }
+            .mapNotNull { it.convert(xmlName, value) }
             .firstOrNull() ?: LiteralExpression(value.quoted())
     }
 

@@ -41,14 +41,14 @@ sealed class ClassConversion {
         attributeConversions.add(AnyAttributeConversion().apply(builder))
     }
 
-    fun anyOf(vararg attributes: String, builder: ExactAttributeConversion.() -> Unit) {
+    fun anyOf(vararg attributes: String, builder: ExactXmlAttributeConversion.() -> Unit) {
         attributes.forEach { attribute ->
-            attributeConversions.add(ExactAttributeConversion(attribute).apply(builder))
+            attributeConversions.add(ExactXmlAttributeConversion(attribute).apply(builder))
         }
     }
 
-    operator fun String.invoke(builder: ExactAttributeConversion.() -> Unit) {
-        attributeConversions.add(ExactAttributeConversion(this).apply(builder))
+    operator fun String.invoke(builder: ExactXmlAttributeConversion.() -> Unit) {
+        attributeConversions.add(ExactXmlAttributeConversion(this).apply(builder))
     }
 }
 class AnyClassConversion : ClassConversion() {
@@ -71,7 +71,7 @@ typealias ConversionWithMatcher = ConversionContext.(Matcher) -> Expression?
 sealed class AttributeConversion {
     val valueConversions = arrayListOf<ValueConversion>()
 
-    abstract fun matches(attributeName: String): Boolean
+    abstract fun matches(xmlName: String, ktxName: String): Boolean
 
     fun anyValue(conversion: Conversion) {
         valueConversions.add(AnyValueConversion(conversion))
@@ -92,13 +92,16 @@ sealed class AttributeConversion {
     }
 }
 class AnyAttributeConversion : AttributeConversion() {
-    override fun matches(attributeName: String): Boolean = true
+    override fun matches(xmlName: String, ktxName: String) = true
 }
-class ExactAttributeConversion(private val attributeName: String) : AttributeConversion() {
-    override fun matches(attributeName: String): Boolean = this.attributeName == attributeName
+class ExactXmlAttributeConversion(private val attributeName: String) : AttributeConversion() {
+    override fun matches(xmlName: String, ktxName: String): Boolean = this.attributeName == xmlName
+}
+class ExactKtxAttributeConversion(private val attributeName: String) : AttributeConversion() {
+    override fun matches(xmlName: String, ktxName: String): Boolean = this.attributeName == ktxName
 }
 
-sealed class ValueConversion {
+abstract class ValueConversion {
     abstract fun matches(attributeValue: String): Boolean
 
     abstract fun convert(attributeName: String, attributeValue: String): Expression?
