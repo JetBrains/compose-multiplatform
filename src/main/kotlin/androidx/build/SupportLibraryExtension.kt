@@ -38,6 +38,7 @@ open class SupportLibraryExtension(val project: Project) {
     var compilationTarget: CompilationTarget = CompilationTarget.DEVICE
 
     var useMetalava = true
+    var trackRestrictedAPIs = false
 
     /**
      * It disables docs generation and api tracking for tooling modules like annotation processors.
