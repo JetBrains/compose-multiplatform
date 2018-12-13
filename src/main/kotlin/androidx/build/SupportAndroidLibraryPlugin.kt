@@ -69,7 +69,8 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
             if (supportLibraryExtension.useMetalava) {
                 Metalava.registerAndroidProject(project, library, supportLibraryExtension)
             } else {
-                DiffAndDocs.registerAndroidProject(project, library, supportLibraryExtension)
+                DiffAndDocs.get(project)
+                    .registerAndroidProject(project, library, supportLibraryExtension)
             }
 
             if (supportLibraryExtension.compilationTarget != CompilationTarget.DEVICE) {
