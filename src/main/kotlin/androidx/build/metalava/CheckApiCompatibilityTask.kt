@@ -33,9 +33,17 @@ open class CheckApiCompatibilityTask : MetalavaTask() {
      */
     var apiLocation: ApiLocation? = null
 
+    /**
+     * Whether to confirm that no restricted APIs were removed since the previous release
+     */
+    var checkRestrictedAPIs = false
+
     @InputFiles
     fun getTaskInputs(): List<File>? {
-        return apiLocation?.files()
+        if (checkRestrictedAPIs) {
+            return apiLocation?.files()
+        }
+        return listOf(apiLocation!!.publicApiFile)
     }
 
     /**
@@ -54,7 +62,9 @@ open class CheckApiCompatibilityTask : MetalavaTask() {
         check(bootClasspath.isNotEmpty()) { "Android boot classpath not set." }
 
         checkApiFile(publicApiFile, false)
-        // checkApiFile(restrictedApiFile, true) // TODO(jeffrygaston) enable this once validation is fully ready (b/87457009)
+        if (checkRestrictedAPIs) {
+            checkApiFile(restrictedApiFile, true)
+        }
     }
 
 
