@@ -51,7 +51,7 @@ class SupportJavaLibraryPlugin : Plugin<Project> {
             if (supportLibraryExtension.useMetalava) {
                 Metalava.registerJavaProject(project, supportLibraryExtension)
             } else {
-                DiffAndDocs.registerJavaProject(project, supportLibraryExtension)
+                DiffAndDocs.get(project).registerJavaProject(project, supportLibraryExtension)
             }
         }
 

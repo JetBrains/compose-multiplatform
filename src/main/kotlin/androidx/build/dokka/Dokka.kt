@@ -18,11 +18,12 @@
 // TODO: after DiffAndDocs and Doclava are fully obsoleted and removed, rename this from Dokka to just Docs
 package androidx.build.dokka
 
+import androidx.build.DiffAndDocs
+import androidx.build.Release
+import androidx.build.SupportLibraryExtension
 import androidx.build.getBuildId
 import androidx.build.getDistributionDirectory
 import androidx.build.java.JavaCompileInputs
-import androidx.build.SupportLibraryExtension
-import androidx.build.Release
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginConvention
@@ -32,7 +33,6 @@ import org.gradle.kotlin.dsl.getPlugin
 import org.jetbrains.dokka.gradle.DokkaPlugin
 import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.dokka.gradle.PackageOptions
-import androidx.build.DiffAndDocs
 
 object Dokka {
     private val RUNNER_TASK_NAME = "dokka"
@@ -53,13 +53,15 @@ object Dokka {
         "androidx.work.impl.model",
         "androidx.work.impl.utils",
         "androidx.work.impl.utils.futures",
-        "androidx.work.impl.utils.taskexecutor")
+        "androidx.work.impl.utils.taskexecutor"
+    )
 
     fun getDocsTask(project: Project): DokkaTask {
         return project.rootProject.getOrCreateDocsTask()
     }
 
-    @Synchronized fun Project.getOrCreateDocsTask(): DokkaTask {
+    @Synchronized
+    fun Project.getOrCreateDocsTask(): DokkaTask {
         val runnerProject = this
         if (runnerProject.tasks.findByName(Dokka.RUNNER_TASK_NAME) == null) {
             project.apply<DokkaPlugin>()
@@ -73,7 +75,8 @@ object Dokka {
             }
             project.tasks.create(ARCHIVE_TASK_NAME, Zip::class.java) { task ->
                 task.dependsOn(docsTask)
-                task.description = "Generates documentation artifact for pushing to developer.android.com"
+                task.description =
+                        "Generates documentation artifact for pushing to developer.android.com"
                 task.from(docsTask.outputDirectory)
                 task.baseName = "android-support-dokka-docs"
                 task.version = getBuildId()
@@ -100,7 +103,7 @@ object Dokka {
                 })
             }
         }
-        DiffAndDocs.registerPrebuilts(extension)
+        DiffAndDocs.get(project).registerPrebuilts(extension)
     }
 
     fun registerJavaProject(
@@ -117,13 +120,14 @@ object Dokka {
             val inputs = JavaCompileInputs.fromSourceSet(mainSourceSet, project)
             registerInputs(inputs, project)
         })
-        DiffAndDocs.registerPrebuilts(extension)
+        DiffAndDocs.get(project).registerPrebuilts(extension)
     }
 
     fun registerInputs(inputs: JavaCompileInputs, project: Project) {
         val docsTask = getDocsTask(project)
         docsTask.sourceDirs += inputs.sourcePaths
-        docsTask.classpath = docsTask.classpath.plus(inputs.dependencyClasspath).plus(inputs.bootClasspath)
+        docsTask.classpath =
+                docsTask.classpath.plus(inputs.dependencyClasspath).plus(inputs.bootClasspath)
         docsTask.dependsOn(inputs.dependencyClasspath)
     }
 }

@@ -27,10 +27,12 @@ import androidx.build.doclava.DEFAULT_DOCLAVA_CONFIG
 import androidx.build.doclava.DoclavaTask
 import androidx.build.docs.ConcatenateFilesTask
 import androidx.build.docs.GenerateDocsTask
+import androidx.build.gradle.isRoot
 import androidx.build.jdiff.JDiffTask
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.BaseVariant
+import com.google.common.base.Preconditions
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -45,6 +47,7 @@ import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.util.PatternSet
 import java.io.File
+import java.lang.IllegalStateException
 import java.net.URLClassLoader
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -59,26 +62,22 @@ private const val XERCES_IMPL_DEPENDENCY = "xerces:xercesImpl:2.6.2"
 
 data class DacOptions(val libraryroot: String, val dataname: String)
 
-object DiffAndDocs {
-    private lateinit var anchorTask: Task
+class DiffAndDocs private constructor(
+    root: Project,
+    supportRootFolder: File,
+    dacOptions: DacOptions,
+    additionalRules: List<PublishDocsRules> = emptyList()
+) {
+    private val anchorTask: Task
     private var docsProject: Project? = null
 
-    private lateinit var rules: List<PublishDocsRules>
+    private val rules: List<PublishDocsRules>
     private val docsTasks: MutableMap<String, GenerateDocsTask> = mutableMapOf()
-    private lateinit var aggregateOldApiTxtsTask: ConcatenateFilesTask
-    private lateinit var aggregateNewApiTxtsTask: ConcatenateFilesTask
-    private lateinit var generateDiffsTask: JDiffTask
+    private val aggregateOldApiTxtsTask: ConcatenateFilesTask
+    private val aggregateNewApiTxtsTask: ConcatenateFilesTask
+    private val generateDiffsTask: JDiffTask
 
-    /**
-     * Initialization that should happen only once (and on the root project)
-     */
-    @JvmStatic
-    fun configureDiffAndDocs(
-        root: Project,
-        supportRootFolder: File,
-        dacOptions: DacOptions,
-        additionalRules: List<PublishDocsRules> = emptyList()
-    ): Task {
+    init {
         val doclavaConfiguration = root.configurations.create("doclava")
         doclavaConfiguration.dependencies.add(root.dependencies.create(DOCLAVA_DEPENDENCY))
 
@@ -106,12 +105,12 @@ object DiffAndDocs {
             }
 
             val task = createGenerateDocsTask(
-                    project = root, generateSdkApiTask = generateSdkApiTask,
-                    doclavaConfig = doclavaConfiguration,
-                    supportRootFolder = supportRootFolder, dacOptions = dacOptions,
-                    destDir = File(root.docsDir(), it.name),
-                    taskName = "${it.name}DocsTask",
-                    offline = offline)
+                project = root, generateSdkApiTask = generateSdkApiTask,
+                doclavaConfig = doclavaConfiguration,
+                supportRootFolder = supportRootFolder, dacOptions = dacOptions,
+                destDir = File(root.docsDir(), it.name),
+                taskName = "${it.name}DocsTask",
+                offline = offline)
             docsTasks[it.name] = task
             anchorTask.dependsOn(createDistDocsTask(root, task, it.name))
         }
@@ -121,11 +120,11 @@ object DiffAndDocs {
         val docletClasspath = doclavaConfiguration.resolve()
 
         aggregateOldApiTxtsTask = root.tasks.create("aggregateOldApiTxts",
-                ConcatenateFilesTask::class.java)
+            ConcatenateFilesTask::class.java)
         aggregateOldApiTxtsTask.Output = File(root.docsDir(), "previous.txt")
 
         val oldApisTask = root.tasks.createWithConfig("oldApisXml",
-                ApiXmlConversionTask::class.java) {
+            ApiXmlConversionTask::class.java) {
             classpath = root.files(docletClasspath)
             dependsOn(doclavaConfiguration)
 
@@ -136,11 +135,11 @@ object DiffAndDocs {
         }
 
         aggregateNewApiTxtsTask = root.tasks.create("aggregateNewApiTxts",
-                ConcatenateFilesTask::class.java)
+            ConcatenateFilesTask::class.java)
         aggregateNewApiTxtsTask.Output = File(root.docsDir(), newVersion)
 
         val newApisTask = root.tasks.createWithConfig("newApisXml",
-                ApiXmlConversionTask::class.java) {
+            ApiXmlConversionTask::class.java) {
             classpath = root.files(docletClasspath)
 
             inputApiFile = aggregateNewApiTxtsTask.Output
@@ -155,14 +154,46 @@ object DiffAndDocs {
         jdiffConfiguration.dependencies.add(root.dependencies.create(XERCES_IMPL_DEPENDENCY))
 
         generateDiffsTask = createGenerateDiffsTask(root,
-                oldApisTask,
-                newApisTask,
-                jdiffConfiguration)
+            oldApisTask,
+            newApisTask,
+            jdiffConfiguration)
 
         docsTasks.values.forEach { docs -> generateDiffsTask.dependsOn(docs) }
-        setupDocsProject()
+    }
 
-        return anchorTask
+    companion object {
+        private const val EXT_NAME = "DIFF_AND_DOCS_EXT"
+        /**
+         * Returns the instance of DiffAndDocs from the Root project
+         */
+        fun get(project: Project): DiffAndDocs {
+            return project.rootProject.extensions.findByName(EXT_NAME) as? DiffAndDocs
+                ?: throw IllegalStateException("must call configureDiffAndDocs first")
+        }
+
+        /**
+         * Initialization that should happen only once (and on the root project).
+         * Returns the anchor task
+         */
+        fun configureDiffAndDocs(
+            root: Project,
+            supportRootFolder: File,
+            dacOptions: DacOptions,
+            additionalRules: List<PublishDocsRules> = emptyList()
+        ): Task {
+            Preconditions.checkArgument(root.isRoot, "Must pass the root project")
+            Preconditions.checkState(root.extensions.findByName(EXT_NAME) == null,
+                "Cannot initialize DiffAndDocs twice")
+            val instance = DiffAndDocs(
+                root = root,
+                supportRootFolder = supportRootFolder,
+                dacOptions = dacOptions,
+                additionalRules = additionalRules
+            )
+            root.extensions.add(EXT_NAME, instance)
+            instance.setupDocsProject()
+            return instance.anchorTask
+        }
     }
 
     private fun prebuiltSources(
@@ -222,7 +253,7 @@ object DiffAndDocs {
             }
         }
 
-        docsProject?.rootProject?.subprojects
+        docsProject?.rootProject?.subprojects?.asSequence()
                 ?.filter { docsProject != it }
                 ?.forEach { docsProject?.evaluationDependsOn(it.path) }
     }
