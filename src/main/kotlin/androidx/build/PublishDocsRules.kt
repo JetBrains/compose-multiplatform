@@ -60,9 +60,10 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.LOADER, "1.1.0-alpha01")
     prebuilts(LibraryGroups.LOCALBROADCASTMANAGER, "1.0.0")
     prebuilts(LibraryGroups.MEDIA, "media", "1.1.0-alpha01")
+    // TODO: Rename media-widget to media2-widget after 1.0.0-alpha06
     prebuilts(LibraryGroups.MEDIA, "media-widget", "1.0.0-alpha5")
     ignore(LibraryGroups.MEDIA2, "media2-exoplayer")
-    prebuilts(LibraryGroups.MEDIA2, "1.0.0-alpha03")
+    prebuilts(LibraryGroups.MEDIA2, "media2", "1.0.0-alpha03")
     prebuilts(LibraryGroups.MEDIAROUTER, "1.1.0-alpha01")
     prebuilts(LibraryGroups.PALETTE, "1.0.0")
     prebuilts(LibraryGroups.PERCENTLAYOUT, "1.0.0")
