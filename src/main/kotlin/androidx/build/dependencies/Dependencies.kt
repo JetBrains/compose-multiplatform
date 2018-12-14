@@ -94,6 +94,7 @@ const val ARCH_CORE_RUNTIME = "androidx.arch.core:core-runtime:2.0.0"
 const val ARCH_CORE_TESTING = "androidx.arch.core:core-testing:2.0.0"
 
 const val SAFE_ARGS_ANDROID_GRADLE_PLUGIN = "com.android.tools.build:gradle:3.2.1"
+const val SAFE_ARGS_NAVIGATION_COMMON = "android.arch.navigation:navigation-common:1.0.0-alpha08"
 
 const val ARCH_PAGING_COMMON = "androidx.paging:paging-common:2.0.0"
 const val ARCH_PAGING_RUNTIME = "androidx.paging:paging-runtime:2.0.0"
