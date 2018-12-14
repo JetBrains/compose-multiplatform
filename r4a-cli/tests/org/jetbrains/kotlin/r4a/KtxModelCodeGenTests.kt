@@ -331,7 +331,7 @@ class KtxModelCodeGenTests : AbstractCodeGenTest() {
 
         return composeModel({ composeMethod.invoke(instanceOfClass) }) {
             val values = valuesFactory()
-            val arguments = values.map { it.value as Any }.toTypedArray()
+            val arguments = values.map { it.value }.toTypedArray()
             advanceMethod.invoke(instanceOfClass, *arguments)
         }
     }

@@ -126,6 +126,7 @@ fun assertExists(file: File): File {
 }
 
 // Normalize the factory's name to find the name supplied by a plugin
+@Suppress("UNCHECKED_CAST")
 val Diagnostic.factoryName: String
   inline get() {
       if (factory.name == "PLUGIN_ERROR")
