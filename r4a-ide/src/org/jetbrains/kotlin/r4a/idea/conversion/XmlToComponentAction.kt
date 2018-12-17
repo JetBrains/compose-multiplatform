@@ -25,6 +25,7 @@ import org.jetbrains.kotlin.idea.util.application.executeWriteCommand
 import org.jetbrains.kotlin.idea.util.application.runWriteAction
 import org.jetbrains.kotlin.j2k.CodeBuilder
 import org.jetbrains.kotlin.j2k.EmptyDocCommentConverter
+import org.jetbrains.kotlin.j2k.append
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
 import java.io.File
@@ -52,13 +53,18 @@ class XmlToComponentAction : AnAction() {
             val copy = sourceFile.copy() as XmlFile
             val targetFile = renameFile(sourceFile)
 
-            val convertedXml = XmlToKtxConverter(targetFile).convertElement(copy)
-            // TODO(jdemeulenaere): Better comment converter.
-            val codeBuilder = CodeBuilder(null, EmptyDocCommentConverter)
-            codeBuilder.append(convertedXml)
-            val functionName = functionName(copy)
-            val imports = codeBuilder.importsToAdd.toMutableSet()
-            val content = createFunctionalComponent(functionName, codeBuilder.resultText, imports)
+            val resultKtx = XmlToKtxConverter(targetFile).convertElement(copy)
+            val (content, imports) = if (resultKtx != null) {
+                // TODO(jdemeulenaere): Better comment converter.
+                val codeBuilder = CodeBuilder(null, EmptyDocCommentConverter)
+                codeBuilder.append(resultKtx)
+                val functionName = functionName(copy)
+                val imports = codeBuilder.importsToAdd.toMutableSet()
+                val content = createFunctionalComponent(functionName, codeBuilder.resultText, imports)
+                Pair(content, imports)
+            } else {
+                Pair(copy.text, emptySet<FqName>())
+            }
 
             replaceContent(targetFile, content)
             addImports(targetFile, imports)
