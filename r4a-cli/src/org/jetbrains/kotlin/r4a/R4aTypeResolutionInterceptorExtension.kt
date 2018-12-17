@@ -5,46 +5,26 @@
 
 package org.jetbrains.kotlin.r4a
 
-import org.jetbrains.kotlin.descriptors.*
-import org.jetbrains.kotlin.descriptors.annotations.AnnotationDescriptor
-import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
 import org.jetbrains.kotlin.extensions.TypeResolutionInterceptorExtension
-import org.jetbrains.kotlin.name.ClassId
-import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtLambdaExpression
-import org.jetbrains.kotlin.resolve.constants.ConstantValue
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeUtils
 import org.jetbrains.kotlin.types.expressions.ExpressionTypingContext
-import org.jetbrains.kotlin.types.typeUtil.replaceAnnotations
 
 /**
  * If a lambda is marked as `@Composable`, then the inferred type should become `@Composable`
  */
 class R4aTypeResolutionInterceptorExtension : TypeResolutionInterceptorExtension {
-
-    companion object {
-        fun makeComposable(module: ModuleDescriptor, type: KotlinType): KotlinType {
-            val annotation = object : AnnotationDescriptor {
-                override val type: KotlinType get() = module.findClassAcrossModuleDependencies(ClassId.topLevel(R4aUtils.r4aFqName("Composable")))!!.defaultType
-                override val allValueArguments: Map<Name, ConstantValue<*>> get() = emptyMap()
-                override val source: SourceElement get() = SourceElement.NO_SOURCE
-                override fun toString() = "[@Composable]"
-            }
-            return type.replaceAnnotations(Annotations.create(type.annotations + annotation))
-        }
-    }
-
     override fun interceptType(element: KtElement, context: ExpressionTypingContext, type: KotlinType): KotlinType {
         if(type == null || type === TypeUtils.NO_EXPECTED_TYPE) return type
         if(element !is KtLambdaExpression) return type
         val module = context.scope.ownerDescriptor.module
         val checker = StorageComponentContainerContributor.getInstances(element.project).single { it is ComposableAnnotationChecker } as ComposableAnnotationChecker
-        if(element is KtLambdaExpression && (checker.hasComposableAnnotation(context.expectedType) || checker.analyze(context.trace, element, type) != ComposableAnnotationChecker.Composability.NOT_COMPOSABLE)) {
-            return makeComposable(module, type)
+        if(element is KtLambdaExpression && (context.expectedType.hasComposableAnnotation() || checker.analyze(context.trace, element, type) != ComposableAnnotationChecker.Composability.NOT_COMPOSABLE)) {
+            return type.makeComposable(module)
         }
         return type
     }

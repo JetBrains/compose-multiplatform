@@ -144,5 +144,14 @@ object R4ADefaultErrorMessages : DefaultErrorMessages.Extension {
             RENDER_COLLECTION_OF_TYPES,
             RENDER_COLLECTION_OF_TYPES
         )
+        MAP.put(
+            R4AErrors.TEMPORARY_NEED_TO_ADD_IMPLICIT_IT,
+            "Implicit 'it' parameters are not currently supported with KTX elements. Please add the parameter explicitly."
+        )
+        MAP.put(
+            R4AErrors.TEMPORARY_RECEIVER_SCOPES_NOT_SUPPORTED,
+            "Receiver scopes are not currently inferred correctly with KTX elements. Please define the lambda as a variable and reference it directly."
+        )
+
     }
 }

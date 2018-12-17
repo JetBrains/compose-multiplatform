@@ -209,7 +209,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
                 if (argDescriptor != null) {
                     val argType = argDescriptor.type.let {
                         if (descriptorHasComposableChildrenAnnotation(argDescriptor))
-                            R4aTypeResolutionInterceptorExtension.makeComposable(argDescriptor.module, it)
+                            it.makeComposable(argDescriptor.module)
                         else it
                     }
                     attributeInfo = KtxAttributeInfo(
@@ -396,7 +396,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
                         // the callResolver hasn't traversed down into children yet, so we will do that as well here.
                         val childrenType =
                             if (descriptorHasComposableChildrenAnnotation(childrenDescriptor))
-                                R4aTypeResolutionInterceptorExtension.makeComposable(childrenDescriptor.module, childrenDescriptor.type)
+                                childrenDescriptor.type.makeComposable(childrenDescriptor.module)
                             else childrenDescriptor.type
 
                         facade.checkType(
@@ -437,7 +437,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
             // 2. the callResolver hasn't traversed down into children yet, so we will do that as well here.
             val childrenType = childrenInfo.descriptor.type.let {
                 if (descriptorHasComposableChildrenAnnotation(childrenInfo.descriptor))
-                    R4aTypeResolutionInterceptorExtension.makeComposable(childrenInfo.descriptor.module, it)
+                    it.makeComposable(childrenInfo.descriptor.module)
                 else it
             }
 
@@ -581,8 +581,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
     }
 
     fun descriptorHasComposableChildrenAnnotation(descriptor: DeclarationDescriptor): Boolean {
-        val annotation = descriptor.annotations.findAnnotation(ComposableAnnotationChecker.CHILDREN_ANNOTATION_NAME) ?: return false
-        val composableValueArgument = annotation.argumentValue("composable")?.value
-        return composableValueArgument == null || composableValueArgument == true
+        val annotation = descriptor.annotations.findAnnotation(R4aFqNames.Children) ?: return false
+        return annotation.isComposableChildrenAnnotation
     }
 }

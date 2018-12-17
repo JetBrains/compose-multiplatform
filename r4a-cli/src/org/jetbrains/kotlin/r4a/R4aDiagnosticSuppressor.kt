@@ -24,8 +24,8 @@ class R4aDiagnosticSuppressor : DiagnosticSuppressor {
         if(diagnostic.factory == Errors.NON_SOURCE_ANNOTATION_ON_INLINED_LAMBDA_EXPRESSION) {
             for(entry in (diagnostic.psiElement.parent as KtAnnotatedExpression).annotationEntries) {
                 if(bindingContext != null) {
-                    val annotationName = bindingContext.get(BindingContext.ANNOTATION, entry)?.fqName
-                    if (annotationName == ComposableAnnotationChecker.COMPOSABLE_ANNOTATION_NAME) return true
+                    val annotation = bindingContext.get(BindingContext.ANNOTATION, entry)
+                    if (annotation != null && annotation.isComposableAnnotation) return true
                 }
                 // Best effort, maybe jetbrains can get rid of nullability.
                 else if(entry.shortName?.identifier == "Composable") return true

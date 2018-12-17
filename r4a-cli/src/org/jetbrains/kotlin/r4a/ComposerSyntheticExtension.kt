@@ -8,6 +8,7 @@ import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.descriptors.IrTemporaryVariableDescriptorImpl
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.*
+import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.toIrType
 import org.jetbrains.kotlin.ir.util.declareSimpleFunctionWithOverrides
 import org.jetbrains.kotlin.ir.util.referenceFunction
@@ -17,13 +18,16 @@ import org.jetbrains.kotlin.psi.KtxElement
 import org.jetbrains.kotlin.psi.psiUtil.endOffset
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
 import org.jetbrains.kotlin.psi2ir.extensions.SyntheticIrExtension
-import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
-import org.jetbrains.kotlin.psi2ir.generators.StatementGenerator
-import org.jetbrains.kotlin.psi2ir.generators.pregenerateCallReceivers
+import org.jetbrains.kotlin.psi2ir.generators.*
+import org.jetbrains.kotlin.psi2ir.intermediate.*
+import org.jetbrains.kotlin.psi2ir.unwrappedGetMethod
+import org.jetbrains.kotlin.psi2ir.unwrappedSetMethod
 import org.jetbrains.kotlin.r4a.analysis.R4AWritableSlices
 import org.jetbrains.kotlin.r4a.ast.*
+import org.jetbrains.kotlin.r4a.compiler.lower.KTX_TAG_ORIGIN
 import org.jetbrains.kotlin.r4a.frames.buildWithScope
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
+import org.jetbrains.kotlin.resolve.calls.model.VariableAsFunctionResolvedCall
 import org.jetbrains.kotlin.resolve.calls.tasks.ExplicitReceiverKind
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.types.KotlinType
@@ -125,7 +129,11 @@ class ComposerSyntheticExtension : SyntheticIrExtension {
         )
 
 
-        fun generateEmitOrCallNode(callNode: EmitOrCallNode, container: DeclarationDescriptor, receiver: IrExpression? = null): IrExpression {
+        fun generateEmitOrCallNode(
+            callNode: EmitOrCallNode,
+            container: DeclarationDescriptor,
+            receiver: IrExpression? = null
+        ): IrExpression {
             when (callNode) {
                 is EmitCallNode -> {
                     val memoize = callNode.memoize
@@ -205,11 +213,14 @@ class ComposerSyntheticExtension : SyntheticIrExtension {
                     }
                 }
                 is NonMemoizedCallNode -> {
+                    val resolvedCall =
+                        if (callNode.resolvedCall is VariableAsFunctionResolvedCall) callNode.resolvedCall.functionCall else callNode.resolvedCall
+
                     var result: IrExpression = statementGenerator.buildCall(
                         element.startOffset,
                         element.endOffset,
-                        resolvedCall = callNode.resolvedCall,
-                        descriptor = callNode.resolvedCall.resultingDescriptor as FunctionDescriptor,
+                        resolvedCall = resolvedCall,
+                        descriptor = resolvedCall.resultingDescriptor as FunctionDescriptor,
                         dispatchReceiver = receiver
                     ).apply {
                         putValueParameters(callNode.params, statementGenerator) { getAttribute(it) }
@@ -250,13 +261,26 @@ class ComposerSyntheticExtension : SyntheticIrExtension {
                         for (assignment in callNode.postAssignments) {
                             if (assignment.assignment == null) error("expected assignment")
 
-                            val statement = statementGenerator.callMethod(
-                                UNDEFINED_OFFSET, UNDEFINED_OFFSET,
-                                assignment.assignment,
-                                getEl
-                            ).apply {
-                                putValueArgument(0, getAttribute(assignment.attribute.name))
+                            val statement = when (assignment.assignment.resultingDescriptor) {
+                                is PropertyDescriptor -> statementGenerator.assignmentReceiver(
+                                    UNDEFINED_OFFSET, UNDEFINED_OFFSET,
+                                    assignment.assignment,
+                                    getEl,
+                                    elType
+                                ).assign(getAttribute(assignment.attribute.name))
+
+                                is FunctionDescriptor -> statementGenerator.callMethod(
+                                    UNDEFINED_OFFSET, UNDEFINED_OFFSET,
+                                    assignment.assignment,
+                                    getEl
+                                ).apply {
+                                    putValueArgument(0, getAttribute(assignment.attribute.name))
+                                }
+
+                                else -> error("")
                             }
+
+
                             statements.add(statement)
                         }
                         statements.add(getEl)
@@ -602,9 +626,105 @@ private fun StatementGenerator.callMethod(
     function: ResolvedCall<*>,
     dispatchReceiver: IrExpression
 ): IrCall {
-    val functionDescriptor = function.resultingDescriptor as FunctionDescriptor
+    val resultingDescriptor = function.resultingDescriptor
+    val functionDescriptor = when (resultingDescriptor) {
+        is PropertyDescriptor -> resultingDescriptor.setter!!
+        is FunctionDescriptor -> resultingDescriptor
+        else -> error("Expected function or property descriptor")
+    }
 
     return buildCall(startOffset, endOffset, function, functionDescriptor, dispatchReceiver)
+}
+
+private fun StatementGenerator.assignmentReceiver(
+    startOffset: Int,
+    endOffset: Int,
+    resolvedCall: ResolvedCall<*>,
+    dispatchReceiver: IrExpression,
+    dispatchReceiverType: KotlinType
+): AssignmentReceiver {
+    val descriptor = resolvedCall.resultingDescriptor as PropertyDescriptor
+
+    var dispatchReceiverValue = resolvedCall.dispatchReceiver?.let { generateReceiver(startOffset, endOffset, it) }
+    var extensionReceiverValue = resolvedCall.extensionReceiver?.let { generateReceiver(startOffset, endOffset, it) }
+
+    if (dispatchReceiverValue is TransientReceiverValue) {
+        dispatchReceiverValue = object : IntermediateValue {
+            override fun load(): IrExpression = dispatchReceiver
+            override val type: IrType
+                get() = dispatchReceiverType.toIrType()
+        }
+    }
+    if (extensionReceiverValue is TransientReceiverValue) {
+        extensionReceiverValue = object : IntermediateValue {
+            override fun load(): IrExpression = dispatchReceiver
+            override val type: IrType
+                get() = dispatchReceiverType.toIrType()
+        }
+    }
+
+    val propertyReceiver = SimpleCallReceiver(dispatchReceiverValue, extensionReceiverValue)
+
+    val superQualifier = getSuperQualifier(resolvedCall)
+
+    // TODO property imported from an object
+    return createPropertyLValue(
+        startOffset,
+        endOffset,
+        descriptor,
+        propertyReceiver,
+        getTypeArguments(resolvedCall),
+        KTX_TAG_ORIGIN,
+        superQualifier
+    )
+}
+
+private fun StatementGenerator.createPropertyLValue(
+    startOffset: Int,
+    endOffset: Int,
+    descriptor: PropertyDescriptor,
+    propertyReceiver: CallReceiver,
+    typeArgumentsMap: Map<TypeParameterDescriptor, KotlinType>?,
+    origin: IrStatementOrigin?,
+    superQualifier: ClassDescriptor?
+): PropertyLValueBase {
+    val superQualifierSymbol = superQualifier?.let { context.symbolTable.referenceClass(it) }
+
+    val getterDescriptor = descriptor.unwrappedGetMethod
+    val setterDescriptor = descriptor.unwrappedSetMethod
+
+    val getterSymbol = getterDescriptor?.let { context.symbolTable.referenceFunction(it.original) }
+    val setterSymbol = setterDescriptor?.let { context.symbolTable.referenceFunction(it.original) }
+
+    val propertyIrType = descriptor.type.toIrType()
+    return if (getterSymbol != null || setterSymbol != null) {
+        val typeArgumentsList =
+            typeArgumentsMap?.let { typeArguments ->
+                descriptor.original.typeParameters.map { typeArguments[it]!!.toIrType() }
+            }
+        AccessorPropertyLValue(
+            context,
+            scope,
+            startOffset, endOffset, origin,
+            propertyIrType,
+            getterSymbol,
+            getterDescriptor,
+            setterSymbol,
+            setterDescriptor,
+            typeArgumentsList,
+            propertyReceiver,
+            superQualifierSymbol
+        )
+    } else
+        FieldPropertyLValue(
+            context,
+            scope,
+            startOffset, endOffset, origin,
+            context.symbolTable.referenceField(descriptor),
+            propertyIrType,
+            propertyReceiver,
+            superQualifierSymbol
+        )
 }
 
 private fun StatementGenerator.buildCall(
@@ -652,7 +772,8 @@ private fun StatementGenerator.buildCall(
     } as IrCall
 }
 
-private fun getKeyValue(descriptor: DeclarationDescriptor, startOffset: Int): Int = descriptor.fqNameSafe.toString().hashCode() xor startOffset
+private fun getKeyValue(descriptor: DeclarationDescriptor, startOffset: Int): Int =
+    descriptor.fqNameSafe.toString().hashCode() xor startOffset
 
 private fun buildLambda(
     context: GeneratorContext,

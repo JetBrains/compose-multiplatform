@@ -104,7 +104,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
                   validations =
                     - ValidatedAssignment(CHANGED):
                         validationCall = fun changed(Int): Boolean
-                        assignment = fun <set-y>(Int)
+                        assignment = var y: Int
                         attribute = y
                     - ValidatedAssignment(CHANGED):
                         validationCall = fun changed(Int): Boolean
@@ -173,7 +173,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
                     validations =
                       - ValidatedAssignment(UPDATE):
                           validationCall = fun update(Int, (Int) -> Unit): Boolean
-                          assignment = fun <set-y>(Int)
+                          assignment = var y: Int
                           attribute = y
                       - ValidatedAssignment(CHANGED):
                           validationCall = fun changed(Int): Boolean
@@ -344,7 +344,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
                   validations =
                     - ValidatedAssignment(CHANGED):
                         validationCall = fun changed(Int): Boolean
-                        assignment = fun <set-y>(Int)
+                        assignment = var y: Int
                         attribute = y
                     - ValidatedAssignment(CHANGED):
                         validationCall = fun changed(() -> Unit): Boolean
@@ -360,7 +360,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
                   postAssignments =
                     - ValidatedAssignment(SET):
                         validationCall = fun set(() -> Unit, (() -> Unit) -> Unit): Boolean
-                        assignment = fun <set-children>(() -> Unit)
+                        assignment = var children: () -> Unit
                         attribute = <children>
                   nextCall = NonMemoizedCallNode:
                     resolvedCall = fun invoke(Int)
@@ -436,7 +436,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
                   validations =
                     - ValidatedAssignment(CHANGED):
                         validationCall = fun changed(Int): Boolean
-                        assignment = fun <set-a>(Int)
+                        assignment = var a: Int
                         attribute = a
                     - ValidatedAssignment(CHANGED):
                         validationCall = fun changed(Int): Boolean
@@ -488,7 +488,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
                   validations =
                     - ValidatedAssignment(UPDATE):
                         validationCall = fun update(Int, (Int) -> Unit): Boolean
-                        assignment = fun <set-a>(Int)
+                        assignment = var a: Int
                         attribute = a
                     - ValidatedAssignment(CHANGED):
                         validationCall = fun changed(Int): Boolean

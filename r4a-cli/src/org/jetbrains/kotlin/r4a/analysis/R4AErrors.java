@@ -46,6 +46,8 @@ public interface R4AErrors {
     DiagnosticFactory1<KtElement, KotlinType> MISSING_REQUIRED_CHILDREN = DiagnosticFactory1.create(ERROR);
     DiagnosticFactory2<KtExpression, Collection<KotlinType>, Collection<KotlinType>> ILLEGAL_ASSIGN_TO_UNIONTYPE = DiagnosticFactory2.create(ERROR);
 
+    DiagnosticFactory0<KtElement> TEMPORARY_NEED_TO_ADD_IMPLICIT_IT = DiagnosticFactory0.create(ERROR);
+    DiagnosticFactory0<KtElement> TEMPORARY_RECEIVER_SCOPES_NOT_SUPPORTED = DiagnosticFactory0.create(ERROR);
 
     @SuppressWarnings("UnusedDeclaration")
     Object _initializer = new Object() {

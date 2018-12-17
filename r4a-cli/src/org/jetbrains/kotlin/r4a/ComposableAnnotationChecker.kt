@@ -1,8 +1,6 @@
 package org.jetbrains.kotlin.r4a
 
 import com.intellij.psi.PsiElement
-import com.sun.jndi.ldap.LdapPoolManager.trace
-import org.jetbrains.kotlin.types.TypeUtils
 import org.jetbrains.kotlin.container.StorageComponentContainer
 import org.jetbrains.kotlin.container.useInstance
 import org.jetbrains.kotlin.descriptors.*
@@ -20,8 +18,10 @@ import org.jetbrains.kotlin.r4a.analysis.ComponentMetadata
 import org.jetbrains.kotlin.r4a.analysis.R4ADefaultErrorMessages
 import org.jetbrains.kotlin.r4a.analysis.R4AErrors
 import org.jetbrains.kotlin.r4a.analysis.R4AWritableSlices.COMPOSABLE_ANALYSIS
-import org.jetbrains.kotlin.resolve.*
-import org.jetbrains.kotlin.resolve.annotations.argumentValue
+import org.jetbrains.kotlin.resolve.AdditionalAnnotationChecker
+import org.jetbrains.kotlin.resolve.BindingContext
+import org.jetbrains.kotlin.resolve.BindingTrace
+import org.jetbrains.kotlin.resolve.TargetPlatform
 import org.jetbrains.kotlin.resolve.calls.checkers.AdditionalTypeChecker
 import org.jetbrains.kotlin.resolve.calls.checkers.CallChecker
 import org.jetbrains.kotlin.resolve.calls.checkers.CallCheckerContext
@@ -32,11 +32,11 @@ import org.jetbrains.kotlin.resolve.calls.model.ResolvedCallImpl
 import org.jetbrains.kotlin.resolve.calls.model.VariableAsFunctionResolvedCall
 import org.jetbrains.kotlin.resolve.checkers.DeclarationChecker
 import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
-import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.inline.InlineUtil.isInlinedArgument
 import org.jetbrains.kotlin.resolve.jvm.platform.JvmPlatform
 import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode
 import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.TypeUtils
 import org.jetbrains.kotlin.types.lowerIfFlexible
 import org.jetbrains.kotlin.types.typeUtil.builtIns
 import org.jetbrains.kotlin.types.upperIfFlexible
@@ -54,20 +54,12 @@ class ComposableAnnotationChecker(val mode: Mode = DEFAULT_MODE) : CallChecker, 
     }
 
     companion object {
-        val COMPOSABLE_ANNOTATION_NAME = R4aUtils.r4aFqName("Composable")
-        val CHILDREN_ANNOTATION_NAME = R4aUtils.r4aFqName("Children")
-
         val DEFAULT_MODE = Mode.STRICT
     }
 
     enum class Composability { NOT_COMPOSABLE, INFERRED, MARKED }
 
-    fun hasComposableAnnotation(type: KotlinType): Boolean {
-        if(type === TypeUtils.NO_EXPECTED_TYPE || type === TypeUtils.UNIT_EXPECTED_TYPE) return false
-        return type.annotations.hasAnnotation(COMPOSABLE_ANNOTATION_NAME)
-    }
-
-    fun hasComposableAnnotation(trace: BindingTrace, resolvedCall: ResolvedCall<*>): Composability {
+    private fun hasComposableAnnotation(trace: BindingTrace, resolvedCall: ResolvedCall<*>): Composability {
         if (resolvedCall is VariableAsFunctionResolvedCall) {
             return analyze(trace, resolvedCall.variableCall.candidateDescriptor)
         }
@@ -87,12 +79,12 @@ class ComposableAnnotationChecker(val mode: Mode = DEFAULT_MODE) : CallChecker, 
         }
         if (psi != null) return analyze(trace, psi, type)
         val hasAnnotation = when (descriptor) {
-            is VariableDescriptor -> descriptor.annotations.hasAnnotation(COMPOSABLE_ANNOTATION_NAME) || descriptor.type.annotations.hasAnnotation(COMPOSABLE_ANNOTATION_NAME)
-            is ConstructorDescriptor -> descriptor.annotations.hasAnnotation(COMPOSABLE_ANNOTATION_NAME)
-            is JavaMethodDescriptor -> descriptor.annotations.hasAnnotation(COMPOSABLE_ANNOTATION_NAME)
-            else -> descriptor.annotations.hasAnnotation(COMPOSABLE_ANNOTATION_NAME)
+            is VariableDescriptor -> descriptor.hasComposableAnnotation() || descriptor.type.hasComposableAnnotation()
+            is ConstructorDescriptor -> descriptor.hasComposableAnnotation()
+            is JavaMethodDescriptor -> descriptor.hasComposableAnnotation()
+            else -> descriptor.hasComposableAnnotation()
         }
-        return if(hasAnnotation) Composability.MARKED else Composability.NOT_COMPOSABLE
+        return if (hasAnnotation) Composability.MARKED else Composability.NOT_COMPOSABLE
     }
 
     /**
@@ -105,45 +97,66 @@ class ComposableAnnotationChecker(val mode: Mode = DEFAULT_MODE) : CallChecker, 
     fun analyze(trace: BindingTrace, element: KtElement, type: KotlinType?): Composability {
         trace.bindingContext.get(COMPOSABLE_ANALYSIS, element)?.let { return it }
 
+        var composability = Composability.NOT_COMPOSABLE
+
         if (element is KtClass) {
-            var descriptor = trace.bindingContext.get(BindingContext.CLASS, element) ?: element.getResolutionFacade().resolveToDescriptor(element, BodyResolveMode.FULL) as ClassDescriptor
+            val descriptor = trace.bindingContext.get(BindingContext.CLASS, element) ?: element.getResolutionFacade().resolveToDescriptor(
+                element,
+                BodyResolveMode.FULL
+            ) as ClassDescriptor
             val annotationEntry = element.annotationEntries.singleOrNull {
-                trace.bindingContext.get(BindingContext.ANNOTATION, it)?.fqName == COMPOSABLE_ANNOTATION_NAME
+                trace.bindingContext.get(BindingContext.ANNOTATION, it)?.isComposableAnnotation ?: false
             }
             if (annotationEntry != null && !ComponentMetadata.isR4AComponent(descriptor)) {
                 trace.report(Errors.WRONG_ANNOTATION_TARGET.on(annotationEntry, "class which does not extend com.google.r4a.Component"))
             }
-            if(ComponentMetadata.isR4AComponent(descriptor)) Composability.MARKED else Composability.NOT_COMPOSABLE
+            if (ComponentMetadata.isR4AComponent(descriptor)) {
+                composability += Composability.MARKED
+            }
         }
-        if(element is KtProperty) {
-            var descriptor = trace.bindingContext.get(BindingContext.DECLARATION_TO_DESCRIPTOR, element) ?: element.getResolutionFacade().resolveToDescriptor(element, BodyResolveMode.FULL)
-            val type = when(descriptor) {
-                is LocalVariableDescriptor -> descriptor.type
-                is PropertyDescriptor -> descriptor.type
-                else -> throw Error("Unknown type: $descriptor")
+        if (element is KtParameter) {
+            val childrenAnnotation = element.annotationEntries
+                .mapNotNull { trace.bindingContext.get(BindingContext.ANNOTATION, it) }
+                .singleOrNull { it.isComposableChildrenAnnotation }
+
+            if (childrenAnnotation != null) {
+                composability += Composability.MARKED
+            }
+
+            val composableAnnotation = element
+                .typeReference
+                ?.annotationEntries
+                ?.mapNotNull { trace.bindingContext.get(BindingContext.ANNOTATION, it) }
+                ?.singleOrNull { it.isComposableAnnotation }
+
+            if (composableAnnotation != null) {
+                composability += Composability.MARKED
             }
         }
         //if (candidateDescriptor.type.arguments.size != 1 || !candidateDescriptor.type.arguments[0].type.isUnit()) return false
-        if (type != null && type !== TypeUtils.NO_EXPECTED_TYPE && type.annotations.findAnnotation(ComposableAnnotationChecker.COMPOSABLE_ANNOTATION_NAME) != null) return Composability.MARKED
+        if (
+            type != null &&
+            type !== TypeUtils.NO_EXPECTED_TYPE &&
+            type.hasComposableAnnotation()
+        ) {
+            composability += Composability.MARKED
+        }
         val parent = element.parent
-        val annotations =
-            if (element is KtNamedFunction) element.annotationEntries
-            else if (parent is KtAnnotatedExpression) parent.annotationEntries
-            else if (element is KtProperty) element.annotationEntries
-            else emptyList()
+        val annotations = when {
+            element is KtNamedFunction -> element.annotationEntries
+            parent is KtAnnotatedExpression -> parent.annotationEntries
+            element is KtProperty -> element.annotationEntries
+            element is KtParameter -> element.typeReference?.annotationEntries ?: emptyList()
+            else -> emptyList()
+        }
 
         for (entry in annotations) {
             val descriptor = trace.bindingContext.get(BindingContext.ANNOTATION, entry) ?: continue
-            if (descriptor.fqName == COMPOSABLE_ANNOTATION_NAME) {
-                trace.record(COMPOSABLE_ANALYSIS, element, Composability.MARKED)
-                return Composability.MARKED
+            if (descriptor.isComposableAnnotation) {
+                composability += Composability.MARKED
             }
-            if (descriptor.fqName == CHILDREN_ANNOTATION_NAME) {
-                val composableValueArgument = descriptor.argumentValue("composable")?.value
-                if(composableValueArgument == null || composableValueArgument == true) {
-                    trace.record(COMPOSABLE_ANALYSIS, element, Composability.MARKED)
-                    return Composability.MARKED
-                }
+            if (descriptor.isComposableChildrenAnnotation) {
+                composability += Composability.MARKED
             }
         }
 
@@ -162,18 +175,21 @@ class ComposableAnnotationChecker(val mode: Mode = DEFAULT_MODE) : CallChecker, 
 
             override fun visitLambdaExpression(lambdaExpression: KtLambdaExpression) {
                 val isInlineable = isInlinedArgument(lambdaExpression.functionLiteral, trace.bindingContext, true)
-                if(isInlineable && lambdaExpression == element) isInlineLambda = true
-                if(isInlineable || lambdaExpression == element) super.visitLambdaExpression(lambdaExpression)
+                if (isInlineable && lambdaExpression == element) isInlineLambda = true
+                if (isInlineable || lambdaExpression == element) super.visitLambdaExpression(lambdaExpression)
             }
         }, null)
-        if (localKtx && !isInlineLambda && (mode == Mode.STRICT || mode == Mode.PEDANTIC)) {
+        if (localKtx && !isInlineLambda && composability == Composability.NOT_COMPOSABLE && (mode == Mode.STRICT || mode == Mode.PEDANTIC)) {
             val reportElement = when (element) {
                 is KtNamedFunction -> element.nameIdentifier ?: element
                 else -> element
             }
             trace.reportFromPlugin(R4AErrors.KTX_IN_NON_COMPOSABLE.on(reportElement), R4ADefaultErrorMessages)
         }
-        val composability = if(localKtx) Composability.INFERRED else Composability.NOT_COMPOSABLE
+        if (localKtx) {
+            composability += Composability.INFERRED
+        }
+
         trace.record(COMPOSABLE_ANALYSIS, element, composability)
         return composability
     }
@@ -198,7 +214,7 @@ class ComposableAnnotationChecker(val mode: Mode = DEFAULT_MODE) : CallChecker, 
             if (R4AFlags.USE_NEW_TYPE_RESOLUTION) return
             if (composability == Composability.NOT_COMPOSABLE && resolvedCall is ResolvedCallImpl) {
                 val callee = resolvedCall.candidateDescriptor
-                if (callee is SimpleFunctionDescriptor && callee.annotations.hasAnnotation(R4aUtils.r4aFqName("Children"))) {
+                if (callee is SimpleFunctionDescriptor && callee.hasChildrenAnnotation()) {
                     // Class components can have a setter function for setting children, which is resolved on the tag.
                     // This children setter function is not a SFC, so it shouldn't be reported.
                     return
@@ -240,43 +256,51 @@ class ComposableAnnotationChecker(val mode: Mode = DEFAULT_MODE) : CallChecker, 
         expressionTypeWithSmartCast: KotlinType,
         c: ResolutionContext<*>
     ) {
-        if(mode != Mode.PEDANTIC) return
-        if(expression is KtLambdaExpression) {
+        if (mode != Mode.PEDANTIC) return
+        if (expression is KtLambdaExpression) {
             val expectedType = c.expectedType
             if (expectedType === TypeUtils.NO_EXPECTED_TYPE) return
-            val expectedComposable = expectedType.annotations.hasAnnotation(COMPOSABLE_ANNOTATION_NAME)
-            val composability= analyze(c.trace, expression, c.expectedType)
+            val expectedComposable = expectedType.hasComposableAnnotation()
+            val composability = analyze(c.trace, expression, c.expectedType)
             if ((expectedComposable && composability == Composability.NOT_COMPOSABLE) || (!expectedComposable && composability == Composability.MARKED)) {
                 val isInlineable = isInlinedArgument(expression.functionLiteral, c.trace.bindingContext, true)
-                if (isInlineable) return;
+                if (isInlineable) return
 
                 val reportOn = if (expression.parent is KtAnnotatedExpression) expression.parent as KtExpression else expression
                 c.trace.report(Errors.TYPE_INFERENCE_EXPECTED_TYPE_MISMATCH.on(reportOn, expectedType, expressionTypeWithSmartCast))
             }
-            return;
+            return
         } else {
             val expectedType = c.expectedType
+
             if (expectedType === TypeUtils.NO_EXPECTED_TYPE) return
             if (expectedType === TypeUtils.UNIT_EXPECTED_TYPE) return
-            if (expectedType.builtIns.anyType.equals(expectedType.lowerIfFlexible()) && expectedType.builtIns.nullableAnyType.equals(expectedType.upperIfFlexible())) return
-            val expectedComposable = expectedType.annotations.hasAnnotation(COMPOSABLE_ANNOTATION_NAME)
-            val anyType = expectedType.builtIns.nullableAnyType
-            val isComposable = expressionType.annotations.hasAnnotation(COMPOSABLE_ANNOTATION_NAME)
+
+            val nullableAnyType = expectedType.builtIns.nullableAnyType
+            val anyType = expectedType.builtIns.anyType
+
+            if (anyType == expectedType.lowerIfFlexible() && nullableAnyType == expectedType.upperIfFlexible()) return
+
+            val expectedComposable = expectedType.hasComposableAnnotation()
+            val isComposable = expressionType.hasComposableAnnotation()
+
             if (expectedComposable != isComposable) {
                 val reportOn = if (expression.parent is KtAnnotatedExpression) expression.parent as KtExpression else expression
                 c.trace.report(Errors.TYPE_INFERENCE_EXPECTED_TYPE_MISMATCH.on(reportOn, expectedType, expressionTypeWithSmartCast))
             }
-            return;
+            return
         }
     }
 
 
     override fun checkEntries(entries: List<KtAnnotationEntry>, actualTargets: List<KotlinTarget>, trace: BindingTrace) {
         val entry = entries.singleOrNull {
-            trace.bindingContext.get(BindingContext.ANNOTATION, it)?.fqName == COMPOSABLE_ANNOTATION_NAME
+            trace.bindingContext.get(BindingContext.ANNOTATION, it)?.isComposableAnnotation ?: false
         }
-        if((entry?.parent as? KtAnnotatedExpression)?.baseExpression is KtObjectLiteralExpression) {
+        if ((entry?.parent as? KtAnnotatedExpression)?.baseExpression is KtObjectLiteralExpression) {
             trace.report(Errors.WRONG_ANNOTATION_TARGET.on(entry, "class which does not extend com.google.r4a.Component"))
         }
     }
+
+    operator fun Composability.plus(rhs: Composability): Composability = if (this > rhs) this else rhs
 }
