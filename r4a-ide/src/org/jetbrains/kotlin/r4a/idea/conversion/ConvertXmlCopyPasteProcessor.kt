@@ -26,6 +26,7 @@ import org.jetbrains.kotlin.idea.util.application.runWriteAction
 import org.jetbrains.kotlin.idea.util.findAnnotation
 import org.jetbrains.kotlin.j2k.CodeBuilder
 import org.jetbrains.kotlin.j2k.EmptyDocCommentConverter
+import org.jetbrains.kotlin.j2k.append
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtCallableDeclaration
 import org.jetbrains.kotlin.psi.KtFile
@@ -122,10 +123,6 @@ class ConvertXmlCopyPasteProcessor : CopyPastePostProcessor<TextBlockTransferabl
             return
         }
 
-        if (!confirmConversion(project)) {
-            return
-        }
-
         val ranges = startOffsets.mapIndexed { i, startOffset -> TextRange(startOffset, endOffsets[i]) }
         val elementAndTextList = ElementAndTextList().apply { ranges.forEach { this.collectElementsToConvert(xmlFile, it) } }
 
@@ -133,19 +130,30 @@ class ConvertXmlCopyPasteProcessor : CopyPastePostProcessor<TextBlockTransferabl
         val conversionResult = StringBuilder()
         val imports = hashSetOf<FqName>()
         val converter = XmlToKtxConverter(targetFile)
+        var skipConversion = true
         elementAndTextList.process(object : ElementsAndTextsProcessor {
             override fun processElement(element: PsiElement) {
                 // TODO(jdemeulenaere): Better comment converter.
                 val codeBuilder = CodeBuilder(null, EmptyDocCommentConverter)
-                codeBuilder.append(converter.convertElement(element))
-                imports.addAll(codeBuilder.importsToAdd)
-                conversionResult.append(codeBuilder.resultText)
+                val resultKtx = converter.convertElement(element)
+                if (resultKtx != null) {
+                    skipConversion = false
+                    codeBuilder.append(resultKtx)
+                    imports.addAll(codeBuilder.importsToAdd)
+                    conversionResult.append(codeBuilder.resultText)
+                } else {
+                    conversionResult.append(element.text)
+                }
             }
 
             override fun processText(string: String) {
                 conversionResult.append(string)
             }
         })
+
+        if (skipConversion || !confirmConversion(project)) {
+            return
+        }
 
         // Replace text.
         val resultKtx = conversionResult.toString()

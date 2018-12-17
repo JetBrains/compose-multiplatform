@@ -85,12 +85,12 @@ class XmlToKtxConverter(private val targetFile: KtFile) {
     private val attributeInfoExtractor = AttributeInfoExtractor(targetFile, visibilityFilter)
     private val classToAttributeConversions = hashMapOf<String, List<AttributeConversion>>()
 
-    fun convertElement(element: PsiElement): Element = when (element) {
+    fun convertElement(element: PsiElement): Element? = when (element) {
         is XmlFile -> convertFile(element)
         is XmlTag -> convertTag(element)
         // TODO(jdemeulenaere): If no parent tag, look if we are pasting in existing KTX tag.
         is XmlAttribute -> convertAttribute(element, element.parent?.let { getAttributeConversions(it) } ?: emptyList())
-        else -> DummyStringExpression(element.text)
+        else -> null
     }
 
     private fun convertFile(element: XmlFile): Element {
