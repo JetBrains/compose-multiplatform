@@ -260,9 +260,13 @@ class DiffAndDocs private constructor(
             }
         }
 
-        docsProject?.rootProject?.subprojects?.asSequence()
-                ?.filter { docsProject != it }
-                ?.forEach { docsProject?.evaluationDependsOn(it.path) }
+        docsProject?.let { docsProject ->
+            docsProject.beforeEvaluate {
+                docsProject.rootProject.subprojects.asSequence()
+                    .filter { docsProject != it }
+                    .forEach { docsProject.evaluationDependsOn(it.path) }
+            }
+        }
     }
 
     fun registerPrebuilts(extension: SupportLibraryExtension) =
