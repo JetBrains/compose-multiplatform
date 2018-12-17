@@ -56,11 +56,7 @@ def configureSubProjects() {
     subprojects {
         repos.addMavenRepositories(repositories)
     }
-    if (!rootProject.hasProperty("android.injected.invoked.from.ide")) {
-        // configure build server tasks only if we are not running in the IDE to speed up
-        // configuration times
-        setupSubprojectsForBuildServer()
-    }
+    setupSubprojectsForBuildServer()
 }
 def setupSubprojectsForBuildServer() {
     subprojects {
