@@ -67,6 +67,7 @@ object LibraryVersions {
     val MEDIA2_WIDGET = Version("1.0.0-alpha06")
     val MEDIAROUTER = Version("1.1.0-alpha01")
     val NAVIGATION = Version("1.0.0-alpha09")
+    val NAVIGATION_TESTING = Version("1.0.0-alpha08") // Unpublished
     val PAGING = Version("2.2.0-alpha01")
     val PALETTE = Version("1.1.0-alpha01")
     val PRINT = Version("1.0.0")
