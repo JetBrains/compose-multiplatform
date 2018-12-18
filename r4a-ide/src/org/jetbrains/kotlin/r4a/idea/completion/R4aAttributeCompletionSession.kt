@@ -12,6 +12,7 @@ import com.intellij.codeInsight.lookup.LookupElementRenderer
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.ui.JBColor
+import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.idea.completion.CompletionSessionConfiguration
 import org.jetbrains.kotlin.idea.completion.ToFromOriginalFileMapper
@@ -23,12 +24,15 @@ import org.jetbrains.kotlin.psi.KtxAttribute
 import org.jetbrains.kotlin.psi.KtxElement
 import org.jetbrains.kotlin.psi.KtxLambdaExpression
 import org.jetbrains.kotlin.psi.psiUtil.getChildrenOfType
+import org.jetbrains.kotlin.r4a.R4AFlags
 import org.jetbrains.kotlin.r4a.analysis.R4AWritableSlices
 import org.jetbrains.kotlin.r4a.idea.AttributeInfo
 import org.jetbrains.kotlin.r4a.idea.AttributeInfoExtractor
 import org.jetbrains.kotlin.r4a.idea.parentOfType
 import org.jetbrains.kotlin.renderer.DescriptorRenderer
 import org.jetbrains.kotlin.resolve.DescriptorUtils
+import org.jetbrains.kotlin.resolve.calls.model.VariableAsFunctionResolvedCall
+import org.jetbrains.kotlin.types.typeUtil.isUnit
 
 class R4aAttributeCompletionSession(
     configuration: CompletionSessionConfiguration,
@@ -42,17 +46,45 @@ class R4aAttributeCompletionSession(
     private val hasChildrenLambda = elementExpr.getChildrenOfType<KtxLambdaExpression>().isNotEmpty()
     private val usedAttributesNameSet = usedAttributes.mapNotNull { attr -> attr.key?.getIdentifier()?.text }.toSet()
 
-    private val nullableTagInfo = bindingContext.get(R4AWritableSlices.KTX_TAG_INFO, elementExpr)
+    fun isValid() = if (R4AFlags.USE_NEW_TYPE_RESOLUTION) nullableKtxCall != null
+    else nullableTagInfo != null
 
-    fun isValid() = nullableTagInfo != null
+    private val nullableTagInfo = bindingContext.get(R4AWritableSlices.KTX_TAG_INFO, elementExpr)
+    private val nullableKtxCall = bindingContext.get(R4AWritableSlices.RESOLVED_KTX_CALL, elementExpr)
 
     private val tagInfo get() = nullableTagInfo ?: error("no tag info found on element. Call isValid() before using this class")
+    private val ktxCall get() = nullableKtxCall ?: error("no tag info found on element. Call isValid() before using this class")
+
+    private val ktxCallResolvedCalls by lazy { ktxCall.emitOrCall.resolvedCalls() }
+    private val referrableDescriptors by lazy {
+        if (R4AFlags.USE_NEW_TYPE_RESOLUTION)
+            ktxCallResolvedCalls
+                .map {
+                    val resultingDescriptor = it.resultingDescriptor
+                    val result: DeclarationDescriptor = when {
+                        it is VariableAsFunctionResolvedCall -> it.variableCall.candidateDescriptor
+                        resultingDescriptor is ConstructorDescriptor -> resultingDescriptor.constructedClass
+                        else -> resultingDescriptor
+                    }
+                    result
+                }
+        else listOf(tagInfo.referrableDescriptor)
+    }
+
+    private val instanceTypes by lazy {
+        if (R4AFlags.USE_NEW_TYPE_RESOLUTION)
+            ktxCallResolvedCalls
+                .mapNotNull { it.resultingDescriptor.returnType }
+                .filter { !it.isUnit() }
+        else listOfNotNull(tagInfo.instanceType)
+    }
 
     private val attributeInfoExtractor = AttributeInfoExtractor(
         file = file,
         visibilityFilter = { it.isVisibleDescriptor() },
         declarationTranslator = { toFromOriginalFileMapper.toSyntheticFile(it) },
-        tagInfo = nullableTagInfo
+        tagInfo = nullableTagInfo,
+        ktxCall = nullableKtxCall
     )
 
     private fun AttributeInfo.constructLookupElement(): LookupElement? {
@@ -73,7 +105,7 @@ class R4aAttributeCompletionSession(
         var myTailText = "=..."
 
         if (isExtension && extensionType != null) {
-            if (extensionType == tagInfo.instanceType) {
+            if (extensionType in instanceTypes) {
                 isImmediate = true
             }
             val klass = SHORT_NAMES_RENDERER.renderType(extensionType)
@@ -131,9 +163,14 @@ class R4aAttributeCompletionSession(
     }
 
     override fun doComplete() {
-        attributeInfoExtractor.extract(tagInfo.referrableDescriptor) { attributeInfo ->
-            collector.addElements(attributeInfo.mapNotNull { it.constructLookupElement() }.asIterable())
-            flushToResultSet()
+        for (descriptor in referrableDescriptors) {
+            attributeInfoExtractor.extract(descriptor) { attributeInfos ->
+                attributeInfos.forEach {
+                    // TODO(lmr): use it.getPossibleValues(project) here to get some of the int enum values as well
+                    it.constructLookupElement()?.let { collector.addElement(it) }
+                }
+                flushToResultSet()
+            }
         }
     }
 
