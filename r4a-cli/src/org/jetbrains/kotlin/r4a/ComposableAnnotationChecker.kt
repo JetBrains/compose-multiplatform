@@ -211,7 +211,6 @@ class ComposableAnnotationChecker(val mode: Mode = DEFAULT_MODE) : CallChecker, 
 
         val composability = hasComposableAnnotation(context.trace, resolvedCall)
         if (reportOn.parent is KtxElement) {
-            if (R4AFlags.USE_NEW_TYPE_RESOLUTION) return
             if (composability == Composability.NOT_COMPOSABLE && resolvedCall is ResolvedCallImpl) {
                 val callee = resolvedCall.candidateDescriptor
                 if (callee is SimpleFunctionDescriptor && callee.hasChildrenAnnotation()) {

@@ -45,34 +45,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
         facade: ExpressionTypingFacade,
         callResolver: CallResolver
     ) {
-        if (R4AFlags.USE_NEW_TYPE_RESOLUTION) visitKtxElementNew(element, context, facade, callResolver)
-        else visitKtxElementOld(element, context, facade, callResolver)
-    }
-
-    fun visitKtxElementNew(
-        element: KtxElement,
-        context: ExpressionTypingContext,
-        facade: ExpressionTypingFacade,
-        callResolver: CallResolver
-    ) {
-        val ktxCallResolver = KtxCallResolver(callResolver, facade, element.project)
-
-        val success = ktxCallResolver.resolveComposer(element, context)
-
-        if (!success) {
-            return fallback(element, context, facade)
-        }
-
-        val temporaryForKtxCall = TemporaryTraceAndCache.create(context, "trace to resolve ktx call", element)
-
-        val resolvedKtxElementCall = ktxCallResolver.resolve(
-            element,
-            context.replaceTraceAndCache(temporaryForKtxCall)
-        )
-
-        temporaryForKtxCall.commit()
-
-        context.trace.record(R4AWritableSlices.RESOLVED_KTX_CALL, element, resolvedKtxElementCall)
+        visitKtxElementOld(element, context, facade, callResolver)
     }
 
     fun visitKtxElementOld(
