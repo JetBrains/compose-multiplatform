@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.resolve.annotations.argumentValue
 import org.jetbrains.kotlin.resolve.constants.ConstantValue
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeUtils.NO_EXPECTED_TYPE
+import org.jetbrains.kotlin.types.TypeUtils.UNIT_EXPECTED_TYPE
 import org.jetbrains.kotlin.types.typeUtil.replaceAnnotations
 
 object R4aFqNames {
@@ -37,7 +38,7 @@ fun KotlinType.makeComposable(module: ModuleDescriptor): KotlinType {
     return replaceAnnotations(Annotations.create(annotations + annotation))
 }
 
-fun KotlinType.hasComposableAnnotation(): Boolean = this !== NO_EXPECTED_TYPE && annotations.findAnnotation(R4aFqNames.Composable) != null
+fun KotlinType.hasComposableAnnotation(): Boolean = !isSpecialType && annotations.findAnnotation(R4aFqNames.Composable) != null
 fun Annotated.hasComposableAnnotation(): Boolean = annotations.findAnnotation(R4aFqNames.Composable) != null
 fun Annotated.hasPivotalAnnotation(): Boolean = annotations.findAnnotation(R4aFqNames.Pivotal) != null
 fun Annotated.hasChildrenAnnotation(): Boolean = annotations.findAnnotation(R4aFqNames.Children) != null
@@ -49,6 +50,8 @@ fun Annotated.isComposableFromChildrenAnnotation(): Boolean {
     val childrenAnnotation = annotations.findAnnotation(R4aFqNames.Children) ?: return false
     return childrenAnnotation.isComposableChildrenAnnotation
 }
+
+private val KotlinType.isSpecialType: Boolean get() = this === NO_EXPECTED_TYPE || this === UNIT_EXPECTED_TYPE
 
 val AnnotationDescriptor.isComposableAnnotation: Boolean get() = fqName == R4aFqNames.Composable
 val AnnotationDescriptor.isChildrenAnnotation: Boolean get() = fqName == R4aFqNames.Children

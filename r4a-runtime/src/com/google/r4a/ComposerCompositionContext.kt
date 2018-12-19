@@ -23,7 +23,7 @@ internal class ComposerCompositionContext(val root: Any, private val rootCompone
                 ): CompositionContext {
                     val result = ComposerCompositionContext(root, component)
                     result.context = context
-                    result.ambientReference = ambientReference
+                    result.composer.ambientReference = ambientReference
                     FrameManager.registerComposition(result)
                     return result
                 }
@@ -33,12 +33,9 @@ internal class ComposerCompositionContext(val root: Any, private val rootCompone
 
     internal val composer by lazy { ViewComposer(root, context) }
     private var currentComponent: Component? = null
-    private var ambientReference: Ambient.Reference? = null
 
     private var hasPendingFrame = false
     private var isComposing = false
-
-    private val preservedAmbientScopes by lazy { WeakHashMap<Component, List<Ambient<*>.Provider>>() }
 
     private val frameCallback = Choreographer.FrameCallback {
         hasPendingFrame = false
@@ -184,7 +181,7 @@ internal class ComposerCompositionContext(val root: Any, private val rootCompone
                 else
                     useInstance()
                 startCompose(true)
-                component.compose()
+                component()
                 endCompose(true)
                 endRoot()
                 applyChanges()
@@ -201,41 +198,7 @@ internal class ComposerCompositionContext(val root: Any, private val rootCompone
         }
     }
 
-    override fun preserveAmbientScope(component: Component) {
-        val providers = mutableListOf<Ambient<*>.Provider>()
-        composer.enumParents { parent ->
-            if (parent is Ambient<*>.Provider) providers.add(parent)
-            true
-        }
-        if (providers.size > 0)
-            preservedAmbientScopes[component] = providers
-    }
-
     override fun <T> getAmbient(key: Ambient<T>): T {
-        var result: Any? = null
-        composer.enumParents { parent ->
-            if (parent is Ambient<*>.Provider && parent.ambient == key) {
-                result = parent.value
-                false
-            } else true
-        }
-
-        if (result == null) {
-            val ref = ambientReference
-            if (ref != null) {
-                return ref.getAmbient(key)
-            }
-            return key.defaultValue
-        }
-
-        @Suppress("UNCHECKED_CAST")
-        return result as T
+        return composer.parentAmbient(key)
     }
-
-    @Suppress("UNCHECKED_CAST")
-    override fun <T> getAmbient(key: Ambient<T>, component: Component): T =
-        preservedAmbientScopes[component]?.firstOrNull { it.ambient == key }?.value as T? ?: ambientReference?.getAmbient(key)
-        ?: key.defaultValue
-
-    override fun debug() {}
 }

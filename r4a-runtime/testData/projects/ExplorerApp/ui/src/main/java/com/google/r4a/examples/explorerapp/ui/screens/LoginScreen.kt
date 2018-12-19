@@ -16,12 +16,14 @@ import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.view.inputmethod.EditorInfo
 import android.text.method.PasswordTransformationMethod
+import com.google.r4a.Composable
+import com.google.r4a.composer
 import com.google.r4a.CompositionContext
 import com.google.r4a.consumeAmbient
 import com.google.r4a.examples.explorerapp.common.data.RedditRepository
 
 
-class LoginScreen : Component() {
+class LoginScreen: Component() { // component because of need for recomposeSync()
     private var username: String = ""
     private var password: String = ""
 
@@ -61,7 +63,7 @@ class LoginScreen : Component() {
                         textSize=15.sp
                         hint="Username"
                         controlledText=username
-                        onTextChange={
+                        onTextChange={ it ->
                             username = it
                             recomposeSync()
                         }
@@ -81,7 +83,7 @@ class LoginScreen : Component() {
                         textSize=15.sp
                         hint="Password"
                         controlledText=password
-                        onTextChange={
+                        onTextChange={ it ->
                             password = it
                             recomposeSync()
                         }
@@ -108,7 +110,7 @@ class LoginScreen : Component() {
                         onSubmit()
                     }
                 />
-                CompositionContext.current.consumeAmbient(Ambients.NavController) { navigator ->
+                <Ambients.NavController.Consumer> navigator ->
                     <TextView
                         layoutWidth=MATCH_PARENT
                         layoutHeight=WRAP_CONTENT
@@ -134,7 +136,7 @@ class LoginScreen : Component() {
                         }
                         textSize=15.sp
                         textColor=Colors.TEXT_MUTED />
-                }
+                </Ambients.NavController.Consumer>
             </LinearLayout>
         </ScrollView>
     }

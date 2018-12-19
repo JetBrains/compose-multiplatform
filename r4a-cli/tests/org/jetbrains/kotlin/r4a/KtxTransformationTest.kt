@@ -25,21 +25,23 @@ class KtxTransformationTest: AbstractCodeGenTest() {
 
     fun testEmptyComposeFunction() = testCompile(
         """
-        import com.google.r4a.Component
+        import com.google.r4a.*
 
-        class Foo : Component() {
-            override fun compose() {}
+        class Foo {
+            @Composable
+            operator fun invoke() {}
         }
         """
     )
 
     fun testSingleViewCompose() = testCompile(
         """
-        import com.google.r4a.Component
+        import com.google.r4a.*
         import android.widget.*
 
-        class Foo : Component() {
-            override fun compose() {
+        class Foo {
+            @Composable
+            operator fun invoke() {
                 <TextView />
             }
         }
@@ -48,11 +50,12 @@ class KtxTransformationTest: AbstractCodeGenTest() {
 
     fun testMultipleRootViewCompose() = testCompile(
         """
-        import com.google.r4a.Component
+        import com.google.r4a.*
         import android.widget.*
 
-        class Foo : Component() {
-            override fun compose() {
+        class Foo {
+            @Composable
+            operator fun invoke() {
                 <TextView />
                 <TextView />
                 <TextView />
@@ -63,11 +66,12 @@ class KtxTransformationTest: AbstractCodeGenTest() {
 
     fun testNestedViewCompose() = testCompile(
         """
-        import com.google.r4a.Component
+        import com.google.r4a.*
         import android.widget.*
 
-        class Foo : Component() {
-            override fun compose() {
+        class Foo {
+            @Composable
+            operator fun invoke() {
                 <LinearLayout>
                     <TextView />
                     <LinearLayout>
@@ -82,14 +86,16 @@ class KtxTransformationTest: AbstractCodeGenTest() {
 
     fun testSingleComposite() = testCompile(
         """
-        import com.google.r4a.Component
+         import com.google.r4a.*
 
-        class Bar : Component() {
-            override fun compose() {}
+        class Bar {
+            @Composable
+            operator fun invoke() {}
         }
 
-        class Foo : Component() {
-            override fun compose() {
+        class Foo {
+            @Composable
+            operator fun invoke() {
                 <Bar />
             }
         }
@@ -98,14 +104,16 @@ class KtxTransformationTest: AbstractCodeGenTest() {
 
     fun testMultipleRootComposite() = testCompile(
         """
-        import com.google.r4a.Component
+         import com.google.r4a.*
 
-        class Bar : Component() {
-            override fun compose() {}
+        class Bar {
+            @Composable
+            operator fun invoke() {}
         }
 
-        class Foo : Component() {
-            override fun compose() {
+        class Foo {
+            @Composable
+            operator fun invoke() {
                 <Bar />
                 <Bar />
                 <Bar />
@@ -116,15 +124,17 @@ class KtxTransformationTest: AbstractCodeGenTest() {
 
     fun testViewAndComposites() = testCompile(
         """
-        import com.google.r4a.Component
+        import com.google.r4a.*
         import android.widget.*
 
-        class Bar : Component() {
-            override fun compose() {}
+        class Bar {
+            @Composable
+            operator fun invoke() {}
         }
 
-        class Foo : Component() {
-            override fun compose() {
+        class Foo {
+            @Composable
+            operator fun invoke() {
                 <LinearLayout>
                     <Bar />
                 </LinearLayout>
@@ -135,18 +145,20 @@ class KtxTransformationTest: AbstractCodeGenTest() {
 
     fun testAttributes() = testCompile(
         """
-        import com.google.r4a.Component
+         import com.google.r4a.*
         import android.widget.*
 
-        class Bar : Component() {
+        class Bar {
             var num: Int = 0
             var a: String = ""
             var b: String = ""
-            override fun compose() {}
+            @Composable
+            operator fun invoke() {}
         }
 
-        class Foo : Component() {
-            override fun compose() {
+        class Foo {
+            @Composable
+            operator fun invoke() {
                 val s = "foo" + "bar"
                 <LinearLayout orientation=LinearLayout.VERTICAL>
                     <Bar num=123 a=s b="const" />
@@ -161,11 +173,12 @@ class KtxTransformationTest: AbstractCodeGenTest() {
     // TODO(lmr): add test in r4a-runtime around behavior of this attribute
     fun testKeyAttributes() = testCompile(
         """
-        import com.google.r4a.Component
+         import com.google.r4a.*
 
-        class Foo : Component() {
+        class Foo {
             var key: Int = 0
-            override fun compose() {
+            @Composable
+            operator fun invoke() {
                 <Foo key=123 />
             }
         }
@@ -174,14 +187,16 @@ class KtxTransformationTest: AbstractCodeGenTest() {
 
     fun testForEach() = testCompile(
         """
-        import com.google.r4a.Component
+         import com.google.r4a.*
 
-        class Bar : Component() {
-            override fun compose() {}
+        class Bar {
+            @Composable
+            operator fun invoke() {}
         }
 
-        class Foo : Component() {
-            override fun compose() {
+        class Foo {
+            @Composable
+            operator fun invoke() {
                 listOf(1, 2, 3).forEach {
                     <Bar />
                 }
@@ -192,14 +207,16 @@ class KtxTransformationTest: AbstractCodeGenTest() {
 
     fun testForLoop() = testCompile(
         """
-        import com.google.r4a.Component
+         import com.google.r4a.*
 
-        class Bar : Component() {
-            override fun compose() {}
+        class Bar {
+            @Composable
+            operator fun invoke() {}
         }
 
-        class Foo : Component() {
-            override fun compose() {
+        class Foo {
+            @Composable
+            operator fun invoke() {
                 for (i in listOf(1, 2, 3)) {
                     <Bar />
                 }
@@ -210,15 +227,17 @@ class KtxTransformationTest: AbstractCodeGenTest() {
 
     fun testEarlyReturns() = testCompile(
         """
-        import com.google.r4a.Component
+         import com.google.r4a.*
 
-        class Bar : Component() {
-            override fun compose() {}
+        class Bar {
+            @Composable
+            operator fun invoke() {}
         }
 
-        class Foo : Component() {
+        class Foo {
             var visible: Boolean = false
-            override fun compose() {
+            @Composable
+            operator fun invoke() {
                 if (!visible) return
                 else "" // TODO: Remove this line when fixed upstream
                 <Bar />
@@ -229,20 +248,23 @@ class KtxTransformationTest: AbstractCodeGenTest() {
 
     fun testConditionalRendering() = testCompile(
         """
-        import com.google.r4a.Component
+         import com.google.r4a.*
         import java.util.Random
 
-        class Bar : Component() {
-            override fun compose() {}
+        class Bar {
+            @Composable
+            operator fun invoke() {}
         }
 
-        class Bam : Component() {
-            override fun compose() {}
+        class Bam {
+            @Composable
+            operator fun invoke() {}
         }
 
-        class Foo : Component() {
+        class Foo {
             var visible: Boolean = false
-            override fun compose() {
+            @Composable
+            operator fun invoke() {
                 if (!visible) {
                     <Bar />
                 } else {
@@ -257,11 +279,13 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
         import com.google.r4a.*
 
-        class Bar : Component() {
-            override fun compose() {}
+        class Bar {
+            @Composable
+            operator fun invoke() {}
         }
-        class Foo: Component() {
-            override fun compose() {
+        class Foo {
+            @Composable
+            operator fun invoke() {
                 val foo = object: Function0<Unit> {
                     override fun invoke() {
                         <Bar />
@@ -277,11 +301,13 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
         import com.google.r4a.*
 
-        class Bar : Component() {
-            override fun compose() {}
+        class Bar {
+            @Composable
+            operator fun invoke() {}
         }
-        class Foo: Component() {
-            override fun compose() {
+        class Foo {
+            @Composable
+            operator fun invoke() {
                 val foo = object: Function2<@kotlin.ParameterName("x") String, @kotlin.ParameterName("y")Int, Unit> {
                     override fun invoke(x: String, y: Int) {
                         <Bar />
@@ -297,12 +323,14 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
         import com.google.r4a.*
 
-        class Bar : Component() {
-            override fun compose() {}
+        class Bar {
+            @Composable
+            operator fun invoke() {}
         }
-        class Foo: Component() {
+        class Foo {
             lateinit var children: () -> Unit
-            override fun compose() {
+            @Composable
+            operator fun invoke() {
                 val children = children
                 <children />
             }
@@ -314,12 +342,14 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
         import com.google.r4a.*
 
-        class Bar : Component() {
-            override fun compose() {}
+        class Bar {
+            @Composable
+            operator fun invoke() {}
         }
-        class Foo: Component() {
+        class Foo {
             lateinit var children: (x: Int) -> Unit
-            override fun compose() {
+            @Composable
+            operator fun invoke() {
                 val children = children
                 <children x=123 />
             }
@@ -330,6 +360,8 @@ class KtxTransformationTest: AbstractCodeGenTest() {
 
     fun testComposeAttributeFunctionType() = testCompile(
         """
+        import com.google.r4a.*
+
         class X {
             lateinit var composeItem: Function1<@kotlin.ParameterName("arg0") Int, Unit>
             fun fn() {
@@ -348,8 +380,9 @@ class KtxTransformationTest: AbstractCodeGenTest() {
 
         fun LinearLayout.setSomeExtension(x: Int) {
         }
-        class X : Component() {
-            override fun compose() {
+        class X {
+            @Composable
+            operator fun invoke() {
                 <LinearLayout someExtension=123 />
             }
         }
@@ -361,19 +394,21 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         import android.widget.*
         import com.google.r4a.*
 
-        class HelperComponent : Component() {
+        class HelperComponent {
             private lateinit var children: () -> Unit
 
             @Children
             fun setChildren2(x: () -> Unit) { children = x }
-            override fun compose() {
+            @Composable
+            operator fun invoke() {
                 <children />
             }
         }
 
-        class MainComponent : Component() {
+        class MainComponent {
             var name = "World"
-            override fun compose() {
+            @Composable
+            operator fun invoke() {
                 <HelperComponent>
                     <TextView text="some child content2!" />
                     <TextView text="some child content!3" />
@@ -388,11 +423,12 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         import android.widget.*
         import com.google.r4a.*
 
-        class HelperComponent : Component() {
+        class HelperComponent {
             private lateinit var children: (title: String, rating: Int) -> Unit
             @Children fun setChildren2(x: (title: String, rating: Int) -> Unit) { children = x }
 
-            override fun compose() {
+            @Composable
+            operator fun invoke() {
                 val children = this.children
                 <children title="Hello World!" rating=5 />
                 <children title="Kompose is awesome!" rating=5 />
@@ -400,9 +436,10 @@ class KtxTransformationTest: AbstractCodeGenTest() {
             }
         }
 
-        class MainComponent : Component() {
+        class MainComponent {
             var name = "World"
-            override fun compose() {
+            @Composable
+            operator fun invoke() {
                 <HelperComponent> title: String, rating: Int ->
                     <TextView text=(title+" ("+rating+" stars)") />
                 </HelperComponent>
@@ -416,21 +453,23 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         import android.widget.*
         import com.google.r4a.*
 
-        class HelperComponent : Component() {
+        class HelperComponent {
             private lateinit var children: (title: String, rating: Int) -> Unit
 
             @Children
             fun setChildren2(x: (title: String, rating: Int) -> Unit) { children = x }
-            override fun compose() {
+            @Composable
+            operator fun invoke() {
                 <children title="Hello World!" rating=5 />
                 <children title="Kompose is awesome!" rating=5 />
                 <children title="Bitcoin!" rating=4 />
             }
         }
 
-        class MainComponent : Component() {
+        class MainComponent {
             var name = "World"
-            override fun compose() {
+            @Composable
+            operator fun invoke() {
                 <HelperComponent> title, rating ->
                     <TextView text=(title+" ("+rating+" stars)") />
                 </HelperComponent>
@@ -444,18 +483,20 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         import android.widget.*
         import com.google.r4a.*
 
-        class HelperComponent : Component() {
+        class HelperComponent {
             lateinit private var children: () -> Unit
             @Children
             fun setChildren2(x: () -> Unit) { children = x }
-            override fun compose() {
+            @Composable
+            operator fun invoke() {
                 val children = this.children
             }
         }
 
-        class MainComponent : Component() {
+        class MainComponent {
             var name = "World"
-            override fun compose() {
+            @Composable
+            operator fun invoke() {
                 val childText = "Hello World!"
                 <HelperComponent>
                     <TextView text=childText />
@@ -470,27 +511,30 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         import android.widget.*
         import com.google.r4a.*
 
-        class A : Component() {
+        class A {
             lateinit private var children: () -> Unit
             @Children
             fun setChildren2(x: () -> Unit) { children = x }
-            override fun compose() {
+            @Composable
+            operator fun invoke() {
                 val children = this.children
             }
         }
 
-        class B : Component() {
+        class B {
             lateinit private var children: () -> Unit
             @Children
             fun setChildren2(x: () -> Unit) { children = x }
-            override fun compose() {
+            @Composable
+            operator fun invoke() {
                 val children = this.children
             }
         }
 
-        class MainComponent : Component() {
+        class MainComponent {
             var name = "World"
-            override fun compose() {
+            @Composable
+            operator fun invoke() {
                 val childText = "Hello World!"
                 <A>
                     <B>
@@ -507,27 +551,30 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         import android.widget.*
         import com.google.r4a.*
 
-        class A : Component() {
+        class A {
             lateinit private var children: (String) -> Unit
             @Children
             fun setChildren2(x: (String) -> Unit) { children = x }
-            override fun compose() {
+            @Composable
+            operator fun invoke() {
                 val children = this.children
             }
         }
 
-        class B : Component() {
+        class B {
             lateinit private var children: (String) -> Unit
             @Children
             fun setChildren2(x: (String) -> Unit) { children = x }
-            override fun compose() {
+            @Composable
+            operator fun invoke() {
                 val children = this.children
             }
         }
 
-        class MainComponent : Component() {
+        class MainComponent {
             var name = "World"
-            override fun compose() {
+            @Composable
+            operator fun invoke() {
                 val childText = "Hello World!"
                 <A> x ->
                     <B> y ->
@@ -544,8 +591,9 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         import android.widget.*
         import com.google.r4a.*
 
-        class MainComponent : Component() {
-            override fun compose() {
+        class MainComponent {
+            @Composable
+            operator fun invoke() {
                 <LinearLayout>
                     <TextView text="some child content2!" />
                     <TextView text="some child content!3" />
@@ -555,30 +603,45 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
     )
 
-    fun testIr() = testCompile(
+    fun testIrSpecial() = testCompile(
         """
         import android.widget.*
         import com.google.r4a.*
 
-        class HelperComponent : Component() {
+        class HelperComponent {
             private lateinit var children: () -> Unit
             @Children
             fun setChildren2(x: () -> Unit) { children = x }
-            override fun compose() {
+            @Composable
+            operator fun invoke() {
                 val children = this.children
             }
         }
 
-        class MainComponent : Component() {
-            override fun compose() {
+        class MainComponent {
+            @Composable
+            operator fun invoke() {
                 val x = "Hello"
                 val y = "World"
                 <HelperComponent>
                     for(i in 1..100) {
                         <TextView text=(x+y+i) />
                     }
+                    Unit // NOTE(lmr): this Unit is needed here but it's a general compiler bug, not our bug. Remove when fixed.
                 </HelperComponent>
             }
+        }
+        """
+    )
+
+
+    fun testForLoopIrBug() = testCompile(
+        """
+        var z = {
+            for (i in 1..100) {
+                print("wat")
+            }
+            Unit // NOTE(lmr): this Unit is needed here but it's a general compiler bug, not our bug. Remove when fixed.
         }
         """
     )
@@ -589,9 +652,10 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         import com.google.r4a.*
 
         class A<T>(val value: T) {
-            inner class Getter : Component() {
+            inner class Getter {
                 var x: T? = null
-                override fun compose() {}
+                @Composable
+                operator fun invoke() {}
             }
         }
 
@@ -609,8 +673,9 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         import com.google.r4a.*
 
         class A<T>(val value: T) {
-            inner class C : Component() {
-                override fun compose() {}
+            inner class C {
+                @Composable
+                operator fun invoke() {}
             }
         }
 
@@ -629,10 +694,11 @@ class KtxTransformationTest: AbstractCodeGenTest() {
 
         class A<T>(
             val value: T
-        ): Component() {
+        ) {
             var list2: List<T>? = null
             fun setList(list: List<T>) {}
-            override fun compose() {}
+            @Composable
+            operator fun invoke() {}
         }
 
         fun doStuff() {
@@ -655,8 +721,9 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
         import com.google.r4a.*
 
-        class Simple : Component() {
-            override fun compose() {}
+        class Simple {
+            @Composable
+            operator fun invoke() {}
         }
 
         fun run() {
@@ -669,8 +736,9 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
         import com.google.r4a.*
 
-        class SimpleConstructorArg(var foo: String) : Component() {
-            override fun compose() {}
+        class SimpleConstructorArg(var foo: String) {
+            @Composable
+            operator fun invoke() {}
         }
 
         fun run() {
@@ -683,9 +751,10 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
         import com.google.r4a.*
 
-        class SimpleLateInitArg : Component() {
+        class SimpleLateInitArg {
             lateinit var foo: String
-            override fun compose() {}
+            @Composable
+            operator fun invoke() {}
         }
 
         fun run() {
@@ -698,8 +767,9 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
         import com.google.r4a.*
 
-        class GenericCtorArg<T>(var foo: T) : Component() {
-            override fun compose() {}
+        class GenericCtorArg<T>(var foo: T) {
+            @Composable
+            operator fun invoke() {}
         }
 
         fun run() {
@@ -713,13 +783,14 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
         import com.google.r4a.*
 
-        class OneArg : Component() {
+        class OneArg {
             var bar: String? = null
             var baz: String? = null
             fun setBam(bam: String) {
                 bar = bam
             }
-            override fun compose() {}
+            @Composable
+            operator fun invoke() {}
         }
 
         fun OneArg.setJazz(x: String) {}
@@ -744,8 +815,9 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
         import com.google.r4a.*
 
-        class Simple : Component() {
-            override fun compose() {}
+        class Simple {
+            @Composable
+            operator fun invoke() {}
         }
 
         class Ref<T> {
@@ -793,8 +865,9 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
         import com.google.r4a.*
 
-        class Foo(val x: Int): Component() {
-            override fun compose() {}
+        class Foo(val x: Int) {
+            @Composable
+            operator fun invoke() {}
         }
 
         fun run() {
@@ -807,8 +880,9 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
         import com.google.r4a.*
 
-        class Foo(x: Int): Component() {
-            override fun compose() {}
+        class Foo(x: Int) {
+            @Composable
+            operator fun invoke() {}
         }
 
         fun run() {
@@ -822,8 +896,9 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         import com.google.r4a.*
 
         object Obj {
-            class B : Component() {
-                override fun compose() {}
+            class B {
+                @Composable
+                operator fun invoke() {}
             }
         }
 
@@ -835,6 +910,8 @@ class KtxTransformationTest: AbstractCodeGenTest() {
 
     fun testPackageQualifiedTags() = testCompile(
         """
+        import com.google.r4a.*
+
         fun run() {
             <android.widget.TextView text="bar" />
         }
@@ -847,8 +924,9 @@ class KtxTransformationTest: AbstractCodeGenTest() {
 
         class Y {
             class Z {
-                class F : Component() {
-                    override fun compose() {}
+                class F {
+                    @Composable
+                    operator fun invoke() {}
                 }
             }
         }
@@ -864,8 +942,9 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         import com.google.r4a.*
 
         class A(var foo: String) {
-            inner class B(var bar: String) : Component() {
-                override fun compose() {}
+            inner class B(var bar: String) {
+                @Composable
+                operator fun invoke() {}
             }
         }
 
@@ -881,8 +960,9 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         import com.google.r4a.*
 
         class A<T>(var foo: T) {
-            inner class B(var bar: T) : Component() {
-                override fun compose() {}
+            inner class B(var bar: T) {
+                @Composable
+                operator fun invoke() {}
             }
         }
 
@@ -899,8 +979,9 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
         import com.google.r4a.*
 
-        class Simple : Component() {
-            override fun compose() {}
+        class Simple {
+            @Composable
+            operator fun invoke() {}
         }
 
         fun run() {
@@ -914,8 +995,9 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
         import com.google.r4a.*
 
-        class Test(var children: () -> Unit) : Component() {
-            override fun compose() {
+        class Test(var children: () -> Unit) {
+            @Composable
+            operator fun invoke() {
                 <children />
             }
         }
@@ -926,8 +1008,9 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
         import com.google.r4a.*
 
-        class Test(var children: (x: Int) -> Unit) : Component() {
-            override fun compose() {
+        class Test(var children: (x: Int) -> Unit) {
+            @Composable
+            operator fun invoke() {
                 <children x=123 />
             }
         }
@@ -938,9 +1021,10 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
         import com.google.r4a.*
 
-        class Test : Component() {
+        class Test {
             fun doStuff() {}
-            override fun compose() {
+            @Composable
+            operator fun invoke() {
                 <doStuff />
             }
         }
@@ -951,13 +1035,15 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
         import com.google.r4a.*
 
-        class Simple(var foo: String) : Component() {
+        class Simple(var foo: String) {
             fun setBar(bar: String) {}
-            override fun compose() {}
+            @Composable
+            operator fun invoke() {}
         }
 
-        class Test(var foo: String, var bar: String) : Component() {
-            override fun compose() {
+        class Test(var foo: String, var bar: String) {
+            @Composable
+            operator fun invoke() {
                 <Simple foo bar />
             }
         }
@@ -968,14 +1054,16 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
         import com.google.r4a.*
 
-        class Simple() : Component() {
+        class Simple() {
             var bar: String? = null
             fun setFoo(foo: String) {}
-            override fun compose() {}
+            @Composable
+            operator fun invoke() {}
         }
 
-        class Test : Component() {
-            override fun compose() {
+        class Test {
+            @Composable
+            operator fun invoke() {
                 val foo = "string"
                 val bar = "other"
                 <Simple foo bar />
@@ -990,10 +1078,11 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         import android.widget.*
         import android.content.*
 
-        class Example: Component() {
+        class Example {
             @Children
             fun setChildren(fn: () -> Unit) {}
-            override fun compose() {}
+            @Composable
+            operator fun invoke() {}
         }
 
         fun run(text: String) {
@@ -1010,10 +1099,11 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         import android.widget.*
         import android.content.*
 
-        class Example: Component() {
+        class Example {
             @Children
             var children: (() -> Unit)? = null
-            override fun compose() {}
+            @Composable
+            operator fun invoke() {}
         }
 
         fun run(text: String) {
@@ -1032,8 +1122,9 @@ class KtxTransformationTest: AbstractCodeGenTest() {
 
         class Example(
             @Children var children: () -> Unit
-        ): Component() {
-            override fun compose() {}
+        ) {
+            @Composable
+            operator fun invoke() {}
         }
 
         fun run(text: String) {
@@ -1061,10 +1152,11 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
         import com.google.r4a.*
 
-        class Example: Component() {
+        class Example {
             @Children
             fun setChildren(fn: (x: Int) -> Unit) {}
-            override fun compose() {}
+            @Composable
+            operator fun invoke() {}
         }
 
         fun run(text: String) {
@@ -1079,10 +1171,11 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
         import com.google.r4a.*
 
-        class Example: Component() {
+        class Example {
             @Children
             var children: ((x: Int) -> Unit)? = null
-            override fun compose() {}
+            @Composable
+            operator fun invoke() {}
         }
 
         fun run(text: String) {
@@ -1098,13 +1191,23 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
         import com.google.r4a.*
 
-        class Example: Component() {
+        class Example {
             @Children
             fun setChildren(fn: (x: Int, y: String) -> Unit) {}
-            override fun compose() {}
+            @Composable
+            operator fun invoke() {}
         }
 
         fun run(text: String) {
+
+//                val lambda = { x, y -> ... }
+//                composer.call(
+//                    123,
+//                    { changed(lambda) },
+//                    { Example().also { setChildren(lambda) }() }
+//                )
+
+
             <Example> x, y ->
                 println("hello ${"$"}x ${"$"}y")
             </Example>
@@ -1116,10 +1219,11 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
         import com.google.r4a.*
 
-        class Example: Component() {
+        class Example {
             @Children
             var children: ((x: Int, y: String) -> Unit)? = null
-            override fun compose() {}
+            @Composable
+            operator fun invoke() {}
         }
 
         fun run(text: String) {
@@ -1134,10 +1238,11 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
         import com.google.r4a.*
 
-        class Example<T>(var value: T): Component() {
+        class Example<T>(var value: T) {
             @Children
             fun setChildren(fn: (x: T) -> Unit) {}
-            override fun compose() {}
+            @Composable
+            operator fun invoke() {}
         }
 
         fun run(text: String) {
@@ -1155,10 +1260,11 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
         import com.google.r4a.*
 
-        class Example<T>(var value: T): Component() {
+        class Example<T>(var value: T) {
             @Children
             var children: ((x: T) -> Unit)? = null
-            override fun compose() {}
+            @Composable
+            operator fun invoke() {}
         }
 
         fun run(text: String) {
@@ -1254,14 +1360,14 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
         import com.google.r4a.*
 
-         class Example: Component() {
+         class Example {
              lateinit var callback: (Int) -> Unit
              var index = 0
-             override fun compose() {
+             @Composable
+            operator fun invoke() {
                <Example callback=(object : Function1<Int, Unit> {
                     override fun invoke(p1: Int) {
                         index = p1
-                        recompose()
                     }
                 }) />
              }
@@ -1279,12 +1385,14 @@ class KtxTransformationTest: AbstractCodeGenTest() {
             val c: Int,
             val d: Int,
             val e: Int
-        ): Component() {
-            override fun compose() {}
+        ) {
+            @Composable
+            operator fun invoke() {}
         }
 
-        class Bar: Component() {
-            override fun compose() {
+        class Bar {
+            @Composable
+            operator fun invoke() {
                 <Foo
                     a=1
                     b=2
@@ -1306,12 +1414,14 @@ class KtxTransformationTest: AbstractCodeGenTest() {
             val b: Int,
             val c: Int,
             val d: Int
-        ): Component() {
-            override fun compose() {}
+        ) {
+            @Composable
+            operator fun invoke() {}
         }
 
-        class Bar: Component() {
-            override fun compose() {
+        class Bar {
+            @Composable
+            operator fun invoke() {
                 <Foo
                     a=1
                     b=2
@@ -1329,12 +1439,14 @@ class KtxTransformationTest: AbstractCodeGenTest() {
 
         class Foo(
             val a: Int
-        ): Component() {
-            override fun compose() {}
+        ) {
+            @Composable
+            operator fun invoke() {}
         }
 
-        class Bar: Component() {
-            override fun compose() {
+        class Bar {
+            @Composable
+            operator fun invoke() {
                 <Foo
                     a=1
                 />
@@ -1351,12 +1463,16 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         class Foo(
             val a: Int,
             var b: Int
-        ): Component() {
-            override fun compose() {}
+        ) {
+            @Composable
+            operator fun invoke() {}
         }
 
-        class Bar: Component() {
-            override fun compose() {
+        fun Foo.setKey(@Pivotal key: Any?) {}
+
+        class Bar {
+            @Composable
+            operator fun invoke() {
                 <Foo
                     a=1
                     b=2
@@ -1372,15 +1488,20 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         import com.google.r4a.*
         import com.google.r4a.adapters.*
 
+        @Pivotal
+        fun Foo.setKey(x: Any?) {}
+
         class Foo(
             var a: Int,
             var b: Int
-        ): Component() {
-            override fun compose() {}
+        ) {
+            @Composable
+            operator fun invoke() {}
         }
 
-        class Bar: Component() {
-            override fun compose() {
+        class Bar {
+            @Composable
+            operator fun invoke() {
                 <Foo
                     a=1
                     b=2
@@ -1396,13 +1517,15 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         import com.google.r4a.*
         import com.google.r4a.adapters.*
 
-        class Foo: Component() {
+        class Foo {
             @Children var children: (() -> Unit)? = null
-            override fun compose() {}
+            @Composable
+            operator fun invoke() {}
         }
 
-        class Bar: Component() {
-            override fun compose() {
+        class Bar {
+            @Composable
+            operator fun invoke() {
                 <Foo
                     children={ }
                 />
@@ -1416,13 +1539,15 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         import com.google.r4a.*
         import com.google.r4a.adapters.*
 
-        class Foo: Component() {
+        class Foo {
             @Children fun setChildren(children: () -> Unit) {}
-            override fun compose() {}
+            @Composable
+            operator fun invoke() {}
         }
 
-        class Bar: Component() {
-            override fun compose() {
+        class Bar {
+            @Composable
+            operator fun invoke() {
                 <Foo
                     children={ }
                 />
@@ -1437,15 +1562,17 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         import com.google.r4a.*
         import com.google.r4a.adapters.*
 
-        class Foo: Component() {
+        class Foo {
             @Children var children: ((x: Int, y: Int) -> Unit)? = null
             @Children fun setChildren(children: (x: Int) -> Unit) {}
             @Children fun setChildren(children: () -> Unit) {}
-            override fun compose() {}
+            @Composable
+            operator fun invoke() {}
         }
 
-        class Bar: Component() {
-            override fun compose() {
+        class Bar {
+            @Composable
+            operator fun invoke() {
                 <Foo children={ -> } />
                 <Foo children={ x -> println(x) } />
                 <Foo children={ x, y -> println(x + y) } />
@@ -1468,16 +1595,19 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         import com.google.r4a.*
         import com.google.r4a.adapters.*
 
-        class Foo(@Children var children: (sub: () -> Unit) -> Unit): Component() {
-            override fun compose() {}
+        class Foo(@Children var children: (sub: () -> Unit) -> Unit) {
+            @Composable
+            operator fun invoke() {}
         }
 
-        class Boo(@Children var children: () -> Unit): Component() {
-            override fun compose() {}
+        class Boo(@Children var children: () -> Unit) {
+            @Composable
+            operator fun invoke() {}
         }
 
-        class Bar: Component() {
-            override fun compose() {
+        class Bar {
+            @Composable
+            operator fun invoke() {
                 <Foo> sub ->
                     <Boo>
                         <sub />
@@ -1493,12 +1623,14 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         import com.google.r4a.*
         import com.google.r4a.adapters.*
 
-        class Boo(@Children var children: () -> Unit): Component() {
-            override fun compose() {}
+        class Boo(@Children var children: () -> Unit) {
+            @Composable
+            operator fun invoke() {}
         }
 
-        class Bar(var data: List<Int>): Component() {
-            override fun compose() {
+        class Bar(var data: List<Int>) {
+            @Composable
+            operator fun invoke() {
                 val children = { Unit; }
                 <Boo children />
             }
@@ -1511,13 +1643,15 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         import com.google.r4a.*
         import com.google.r4a.adapters.*
 
-        class Boo: Component() {
+        class Boo {
             @Children lateinit var children: () -> Unit
-            override fun compose() {}
+            @Composable
+            operator fun invoke() {}
         }
 
-        class Bar(var data: List<Int>): Component() {
-            override fun compose() {
+        class Bar(var data: List<Int>) {
+            @Composable
+            operator fun invoke() {
                 <Boo
                     children={ Unit; }
                 />
@@ -1531,12 +1665,14 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         import com.google.r4a.*
         import com.google.r4a.adapters.*
 
-        class Boo(@Children var children: () -> Unit): Component() {
-            override fun compose() {}
+        class Boo(@Children var children: () -> Unit) {
+            @Composable
+            operator fun invoke() {}
         }
 
-        class Bar(var data: List<Int>): Component() {
-            override fun compose() {
+        class Bar(var data: List<Int>) {
+            @Composable
+            operator fun invoke() {
                 <Boo
                     children={ Unit; }
                 />
@@ -1549,12 +1685,14 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         """
         import com.google.r4a.*
 
-        class Tabs(@Children var children: () -> Unit) : Component() {
-            override fun compose() {}
+        class Tabs(@Children var children: () -> Unit) {
+            @Composable
+            operator fun invoke() {}
         }
 
-        class Bar: Component() {
-            override fun compose() {
+        class Bar {
+            @Composable
+            operator fun invoke() {
                 val bam = "x"
                 <Tabs>
                     val qoo = bam
@@ -1574,8 +1712,9 @@ class KtxTransformationTest: AbstractCodeGenTest() {
           <TextView text="Hello!" />
         }
 
-        class Bar: Component() {
-          override fun compose() {
+        class Bar {
+          @Composable
+            operator fun invoke() {
             <Paramless />
           }
         }
@@ -1596,8 +1735,9 @@ class KtxTransformationTest: AbstractCodeGenTest() {
           var a: Int = 1
         }
 
-        class Comp: Component() {
-          override fun compose() {
+        class Comp {
+          @Composable
+            operator fun invoke() {
             <MyEmittable a=2 />
           }
         }
@@ -1618,8 +1758,9 @@ class KtxTransformationTest: AbstractCodeGenTest() {
           var a: Int = 1
         }
 
-        class Comp: Component() {
-          override fun compose() {
+        class Comp {
+          @Composable
+            operator fun invoke() {
             <MyEmittable a=1>
               <MyEmittable a=2 />
               <MyEmittable a=3 />

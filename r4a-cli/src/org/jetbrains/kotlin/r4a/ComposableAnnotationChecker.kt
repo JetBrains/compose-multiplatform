@@ -210,34 +210,10 @@ class ComposableAnnotationChecker(val mode: Mode = DEFAULT_MODE) : CallChecker, 
     override fun check(resolvedCall: ResolvedCall<*>, reportOn: PsiElement, context: CallCheckerContext) {
 
         val composability = hasComposableAnnotation(context.trace, resolvedCall)
-        if (reportOn.parent is KtxElement) {
-            if (composability == Composability.NOT_COMPOSABLE && resolvedCall is ResolvedCallImpl) {
-                val callee = resolvedCall.candidateDescriptor
-                if (callee is SimpleFunctionDescriptor && callee.hasChildrenAnnotation()) {
-                    // Class components can have a setter function for setting children, which is resolved on the tag.
-                    // This children setter function is not a SFC, so it shouldn't be reported.
-                    return
-                }
-                if (mode == Mode.PEDANTIC && (callee is LocalVariableDescriptor || callee is PropertyDescriptor)) {
-                    context.trace.reportFromPlugin(
-                        R4AErrors.NON_COMPOSABLE_INVOCATION.on(
-                            reportOn as KtElement,
-                            "Lambda variable",
-                            resolvedCall.candidateDescriptor
-                        ), R4ADefaultErrorMessages
-                    )
-                } else if (callee is SimpleFunctionDescriptor) {
-                    context.trace.reportFromPlugin(
-                        R4AErrors.NON_COMPOSABLE_INVOCATION.on(
-                            reportOn as KtElement,
-                            "function",
-                            resolvedCall.candidateDescriptor
-                        ), R4ADefaultErrorMessages
-                    )
-                }
-            }
-            return
-        } else if (context.resolutionContext is CallResolutionContext && resolvedCall is ResolvedCallImpl && (context.resolutionContext as CallResolutionContext).call.callElement is KtCallExpression) {
+        // NOTE: we return early here because the KtxCallResolver does its own composable checking (by delegating to this class) and has
+        // more context to make the right call.
+        if (reportOn.parent is KtxElement) return
+        if (context.resolutionContext is CallResolutionContext && resolvedCall is ResolvedCallImpl && (context.resolutionContext as CallResolutionContext).call.callElement is KtCallExpression) {
             if (composability != Composability.NOT_COMPOSABLE) {
                 context.trace.reportFromPlugin(
                     R4AErrors.SVC_INVOCATION.on(

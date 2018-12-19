@@ -93,7 +93,7 @@ class MyNavHostFragment : Fragment(), NavHost {
             // Navigation controller state overrides arguments
             controller!!.restoreState(navState)
         } else {
-            controller!!.setMetadataGraph()
+//            controller!!.setGraph()
         }
     }
 

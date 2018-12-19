@@ -16,7 +16,7 @@ import com.google.r4a.examples.explorerapp.common.data.Link
 // TODO(lmr): refactor this when we codegen type-parameter calls correctly
 class HomogeneousPagedList<T>(
     comparator: DiffUtil.ItemCallback<T>
-) : Component() {
+) {
     private val adapter = HeaderFooterPagedListAdapter(comparator)
 
     // TODO(lmr): I think the way I am doing get/set with all of these
@@ -78,12 +78,13 @@ class HomogeneousPagedList<T>(
         orientation = LinearLayoutManager.VERTICAL
     }
 
-    override fun compose() {
-        with(CompositionContext.current) {
+    @Composable
+    operator fun invoke() {
+        with(composer) {
             portal(0) { ref ->
                 adapter.reference = ref
                 emitView(0, ::RecyclerView) {
-                    el.isNestedScrollingEnabled = true
+                    set(true) { isNestedScrollingEnabled = it }
                     set(adapter) { adapter = it }
                     set(layoutManager) { layoutManager = it }
                     set(paddingTop) { setPaddingTop(it) }

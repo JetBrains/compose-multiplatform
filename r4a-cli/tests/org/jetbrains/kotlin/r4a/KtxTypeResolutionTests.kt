@@ -7,15 +7,161 @@ class KtxTypeResolutionTests : AbstractR4aDiagnosticsTest() {
         """
             import com.google.r4a.*
 
-            class Foo : Component() {
-                override fun compose() {}
+            class Foo {
+                @Composable operator fun invoke() {}
             }
 
             @Composable fun test() {
-                <<!UNRESOLVED_TAG!>SomeNameThatWillNotResolve<!> foo=123>
+                <<!UNRESOLVED_TAG, INVALID_TAG_DESCRIPTOR!>SomeNameThatWillNotResolve<!> foo=123>
                     <Foo />
-                </<!UNRESOLVED_TAG!>SomeNameThatWillNotResolve<!>>
+                </<!INVALID_TAG_DESCRIPTOR!>SomeNameThatWillNotResolve<!>>
             }
+        """
+    )
+
+    fun testExtensionInvoke() = doTest(
+        """
+            import com.google.r4a.*
+
+            class Foo {}
+            @Composable operator fun Foo.invoke() {}
+
+            @Composable fun test() {
+                <Foo />
+            }
+        """
+    )
+
+    fun testResolutionInsideWhenExpression() = doTest(
+        """
+            import com.google.r4a.*
+            import android.widget.TextView
+
+            @Composable fun doSomething(foo: Boolean) {
+                when (foo) {
+                    true -> <TextView text="Started..." />
+                    false -> <TextView text="Continue..." />
+                }
+            }
+        """
+    )
+
+    fun testComposerExtensions() = doTest(
+        """
+            import com.google.r4a.*
+
+            open class Foo {}
+            class Bar : Foo() {}
+
+            class Bam {}
+
+            fun <T : Foo> ViewComposition.emit(key: Any, ctor: () -> T, update: ViewUpdater<T>.() -> Unit) {
+                print(key)
+                print(ctor)
+                print(update)
+            }
+
+            @Composable fun test() {
+                <Bar />
+                <<!INVALID_TAG_TYPE!>Bam<!> />
+            }
+        """
+    )
+
+    fun testUsedParameters() = doTest(
+        """
+            import com.google.r4a.*
+            import android.widget.LinearLayout
+
+            class Foo {
+                var composeItem: @Composable() () -> Unit = {}
+                @Composable operator fun invoke(x: Int) {
+                    println(x)
+                }
+            }
+
+
+            @Composable fun test(
+                @Children children: @Composable() () -> Unit,
+                value: Int,
+                x: Int,
+                @Children children2: @Composable() () -> Unit,
+                value2: Int
+            ) {
+                <LinearLayout>
+                    // attribute value
+                    <Foo x=value />
+
+                    // punned attribute
+                    <Foo x />
+
+                    // tag
+                    <children />
+                </LinearLayout>
+                <Foo x=123 composeItem={
+                    val abc = 123
+
+                    // attribute value
+                    <Foo x=abc />
+
+                    // attribute value
+                    <Foo x=value2 />
+
+                    // tag
+                    <children2 />
+                } />
+            }
+        """
+    )
+
+    fun testDispatchInvoke() = doTest(
+        """
+            import com.google.r4a.*
+
+            class Bam {
+                @Composable fun Foo() {}
+            }
+
+            @Composable fun test() {
+                with(Bam()) {
+                    <Foo />
+                }
+            }
+        """
+    )
+
+    fun testDispatchAndExtensionReceiver() = doTest(
+        """
+            import com.google.r4a.*
+
+            class Bam {
+                inner class Foo {}
+            }
+
+            @Composable operator fun Bam.Foo.invoke() {}
+
+            @Composable fun test() {
+                with(Bam()) {
+                    <Foo />
+                }
+            }
+        """
+    )
+
+    fun testDispatchAndExtensionReceiverLocal() = doTest(
+        """
+            import com.google.r4a.*
+
+
+            class Foo {}
+
+            class Bam {
+                @Composable operator fun Foo.invoke() {}
+                @Composable operator fun invoke() {
+                    <Foo />
+                }
+            }
+
         """
     )
 
@@ -26,28 +172,28 @@ class KtxTypeResolutionTests : AbstractR4aDiagnosticsTest() {
             data class Foo(val value: Int)
 
             @Composable fun A(x: Foo) { println(x) }
-            class B(var x: Foo) : Component() { override fun compose() { println(x) } }
-            class C(x: Foo) : Component() { init { println(x) } override fun compose() { } }
-            class D(val x: Foo) : Component() { override fun compose() { println(x) } }
-            class E : Component() {
+            class B(var x: Foo) { @Composable operator fun invoke() { println(x) } }
+            class C(x: Foo) { init { println(x) } @Composable operator fun invoke() { } }
+            class D(val x: Foo) { @Composable operator fun invoke() { println(x) } }
+            class E {
                 lateinit var x: Foo
-                override fun compose() { println(x) }
+                @Composable operator fun invoke() { println(x) }
             }
 
             // NOTE: It's important that the diagnostic be only over the tag target, and not the entire element
             // so that a single error doesn't end up making a huge part of an otherwise correct file "red".
             @Composable fun Test(F: @Composable() (x: Foo) -> Unit) {
                 // NOTE: constructor attributes and fn params get a "missing parameter" diagnostic
-                <<!NO_VALUE_FOR_PARAMETER!>A<!> />
-                <<!NO_VALUE_FOR_PARAMETER!>B<!> />
-                <<!NO_VALUE_FOR_PARAMETER!>C<!> />
-                <<!NO_VALUE_FOR_PARAMETER!>D<!> />
+                <<!NO_VALUE_FOR_PARAMETER, MISSING_REQUIRED_ATTRIBUTES!>A<!> />
+                <<!NO_VALUE_FOR_PARAMETER, MISSING_REQUIRED_ATTRIBUTES!>B<!> />
+                <<!NO_VALUE_FOR_PARAMETER, MISSING_REQUIRED_ATTRIBUTES!>C<!> />
+                <<!NO_VALUE_FOR_PARAMETER, MISSING_REQUIRED_ATTRIBUTES!>D<!> />
 
-                // NOTE: lateinit attributes get a custom "missing required attribute" diagnostic
+                // NOTE: lateinit attributes get only the "missing required attribute" diagnostic
                 <<!MISSING_REQUIRED_ATTRIBUTES!>E<!> />
 
                 // local
-                <<!NO_VALUE_FOR_PARAMETER!>F<!> />
+                <<!NO_VALUE_FOR_PARAMETER, MISSING_REQUIRED_ATTRIBUTES!>F<!> />
 
                 val x = Foo(123)
 
@@ -69,12 +215,12 @@ class KtxTypeResolutionTests : AbstractR4aDiagnosticsTest() {
             data class Foo(val value: Int)
 
             @Composable fun A(x: Foo) { println(x) }
-            class B(var x: Foo) : Component() { override fun compose() { println(x) } }
-            class C(x: Foo) : Component() { init { println(x) } override fun compose() { } }
-            class D(val x: Foo) : Component() { override fun compose() { println(x) } }
-            class E : Component() {
+            class B(var x: Foo) { @Composable operator fun invoke() { println(x) } }
+            class C(x: Foo) { init { println(x) } @Composable operator fun invoke() { } }
+            class D(val x: Foo) { @Composable operator fun invoke() { println(x) } }
+            class E {
                 lateinit var x: Foo
-                override fun compose() { println(x) }
+                @Composable operator fun invoke() { println(x) }
             }
 
             @Composable fun Test() {
@@ -97,14 +243,14 @@ class KtxTypeResolutionTests : AbstractR4aDiagnosticsTest() {
             import com.google.r4a.*
 
             @Composable fun A(@Children children: @Composable() () -> Unit) { <children /> }
-            class B(@Children var children: @Composable() () -> Unit) : Component() { override fun compose() { <children /> } }
-            class C: Component() {
+            class B(@Children var children: @Composable() () -> Unit) { @Composable operator fun invoke() { <children /> } }
+            class C {
                 @Children var children: @Composable() () -> Unit = {}
-                override fun compose() { <children /> }
+                @Composable operator fun invoke() { <children /> }
             }
-            class D: Component() {
+            class D {
                 @Children lateinit var children: @Composable() () -> Unit
-                override fun compose() { <children /> }
+                @Composable operator fun invoke() { <children /> }
             }
 
             @Composable fun Test() {
@@ -123,13 +269,41 @@ class KtxTypeResolutionTests : AbstractR4aDiagnosticsTest() {
             import android.content.Context
             import android.widget.LinearLayout
 
-            abstract class <!OPEN_COMPONENT!>Foo<!> : Component() {}
+            abstract class Foo {}
 
             abstract class Bar(context: Context) : LinearLayout(context) {}
 
             @Composable fun Test() {
-                <<!CREATING_AN_INSTANCE_OF_ABSTRACT_CLASS!>Foo<!> />
+                <<!CREATING_AN_INSTANCE_OF_ABSTRACT_CLASS, INVALID_TAG_TYPE!>Foo<!> />
                 <<!CREATING_AN_INSTANCE_OF_ABSTRACT_CLASS!>Bar<!> />
+            }
+
+        """.trimIndent()
+    )
+
+    fun testAmbiguousTags() = doTest(
+        """
+            import com.google.r4a.*
+
+            @Composable fun Foo() {}
+            @Composable fun Foo(x: Int) { println(x) }
+
+
+            class Wat {
+                operator fun invoke(): Xam {
+                    return Xam()
+                }
+            }
+
+            class Xam {
+                @Composable
+                operator fun invoke(x: Int) { println(x) }
+            }
+
+            @Composable fun Test() {
+//                <Foo x=123 />
+//                <Foo />
+                <Wat x=123 />
             }
 
         """.trimIndent()
@@ -142,11 +316,11 @@ class KtxTypeResolutionTests : AbstractR4aDiagnosticsTest() {
 
             data class FooModel(val x: Int, val y: Double)
 
-            class Foo(model: FooModel) : Component() {
+            class Foo(model: FooModel) {
                 init { println(model) }
                 constructor(x: Int, y: Double) : this(FooModel(x, y))
 
-                override fun compose() {}
+                @Composable operator fun invoke() {}
             }
 
 
@@ -177,35 +351,35 @@ class KtxTypeResolutionTests : AbstractR4aDiagnosticsTest() {
             class A { fun a() {} }
             class B { fun b() {} }
 
-            class Foo<T>(var value: T, var f: (T) -> Unit) : Component() {
-                override fun compose() {}
+            class Foo<T>(var value: T, var f: (T) -> Unit) {
+                @Composable operator fun invoke() {}
             }
 
-            @Composable fun <T> Bar(value: T, f: (T) -> Unit) { println(value); println(f) }
+            @Composable fun <T> Bar(x: Int, value: T, f: (T) -> Unit) { println(value); println(f); println(x) }
 
             @Composable fun Test() {
 
                 val fa: (A) -> Unit = { it -> it.a() }
                 val fb: (B) -> Unit = { it -> it.b() }
 
-                <Foo value=A() f={ it.a() } />
-                <Foo value=B() f={ it.b() } />
+                <Foo value=A() f={ it -> it.a() } />
+                <Foo value=B() f={ it -> it.b() } />
                 <Foo value=A() f=fa />
                 <Foo value=B() f=fb />
-                <Foo value=B() f={ it.<!UNRESOLVED_REFERENCE!>a<!>() } />
-                <Foo value=A() f={ it.<!UNRESOLVED_REFERENCE!>b<!>() } />
-                <<!TYPE_INFERENCE_CONFLICTING_SUBSTITUTIONS!>Foo<!> value=A() f=fb />
-                <<!TYPE_INFERENCE_CONFLICTING_SUBSTITUTIONS!>Foo<!> value=B() f=fa />
+                <Foo value=B() f={ it -> it.<!UNRESOLVED_REFERENCE!>a<!>() } />
+                <Foo value=A() f={ it -> it.<!UNRESOLVED_REFERENCE!>b<!>() } />
+                <<!TYPE_INFERENCE_CONFLICTING_SUBSTITUTIONS!>Foo<!> <!MISMATCHED_INFERRED_ATTRIBUTE_TYPE!>value<!>=A() <!MISMATCHED_INFERRED_ATTRIBUTE_TYPE!>f<!>=fb />
+                <<!TYPE_INFERENCE_CONFLICTING_SUBSTITUTIONS!>Foo<!> <!MISMATCHED_INFERRED_ATTRIBUTE_TYPE!>value<!>=B() <!MISMATCHED_INFERRED_ATTRIBUTE_TYPE!>f<!>=fa />
 
 
-                <Bar value=A() f={ it.a() } />
-                <Bar value=B() f={ it.b() } />
-                <Bar value=A() f=fa />
-                <Bar value=B() f=fb />
-                <Bar value=B() f={ it.<!UNRESOLVED_REFERENCE!>a<!>() } />
-                <Bar value=A() f={ it.<!UNRESOLVED_REFERENCE!>b<!>() } />
-                <<!TYPE_INFERENCE_CONFLICTING_SUBSTITUTIONS!>Bar<!> value=A() f=fb />
-                <<!TYPE_INFERENCE_CONFLICTING_SUBSTITUTIONS!>Bar<!> value=B() f=fa />
+                <Bar x=1 value=A() f={ it -> it.a() } />
+                <Bar x=1 value=B() f={ it -> it.b() } />
+                <Bar x=1 value=A() f=fa />
+                <Bar x=1 value=B() f=fb />
+                <Bar x=1 value=B() f={ it -> it.<!UNRESOLVED_REFERENCE!>a<!>() } />
+                <Bar x=1 value=A() f={ it -> it.<!UNRESOLVED_REFERENCE!>b<!>() } />
+                <<!TYPE_INFERENCE_CONFLICTING_SUBSTITUTIONS!>Bar<!> x=1 <!MISMATCHED_INFERRED_ATTRIBUTE_TYPE!>value<!>=A() <!MISMATCHED_INFERRED_ATTRIBUTE_TYPE!>f<!>=fb />
+                <<!TYPE_INFERENCE_CONFLICTING_SUBSTITUTIONS!>Bar<!> x=1 <!MISMATCHED_INFERRED_ATTRIBUTE_TYPE!>value<!>=B() <!MISMATCHED_INFERRED_ATTRIBUTE_TYPE!>f<!>=fa />
             }
 
         """.trimIndent()
@@ -215,7 +389,7 @@ class KtxTypeResolutionTests : AbstractR4aDiagnosticsTest() {
         """
             import com.google.r4a.*
 
-            class Foo(val a: Int, var b: Int, c: Int, d: Int = 1) : Component() {
+            class Foo(val a: Int, var b: Int, c: Int, d: Int = 1) {
                 init { println(c); println(d); }
                 var e = 1
                 var f: Int? = null
@@ -233,7 +407,7 @@ class KtxTypeResolutionTests : AbstractR4aDiagnosticsTest() {
                     get() = 1
                     set(v: Int) { println(v) }
                 private val n = 1
-                override fun compose() {}
+                @Composable operator fun invoke() {}
             }
 
             @Composable fun Test() {
@@ -245,14 +419,14 @@ class KtxTypeResolutionTests : AbstractR4aDiagnosticsTest() {
                     e=1
                     f=null
                     g=1
-                    <!UNRESOLVED_ATTRIBUTE_KEY!>h<!>=1
-                    <!UNRESOLVED_ATTRIBUTE_KEY!>i<!>=1
+                    <!MISMATCHED_ATTRIBUTE_TYPE!>h<!>=1
+                    <!MISMATCHED_ATTRIBUTE_TYPE!>i<!>=1
                     j=1
-                    <!UNRESOLVED_ATTRIBUTE_KEY!>k<!>=1
+                    <!MISMATCHED_ATTRIBUTE_TYPE!>k<!>=1
                     <!UNRESOLVED_ATTRIBUTE_KEY!>z<!>=1
                     <!INVISIBLE_MEMBER!>l<!>=1
                     <!INVISIBLE_MEMBER!>m<!>=1
-                    <!UNRESOLVED_ATTRIBUTE_KEY!>n<!>=1
+                    <!MISMATCHED_ATTRIBUTE_TYPE!>n<!>=1
                 />
             }
 
@@ -267,11 +441,11 @@ class KtxTypeResolutionTests : AbstractR4aDiagnosticsTest() {
             open class A {}
             class B : A() {}
 
-            class Foo() : Component() {
+            class Foo() {
                 var x: A = A()
                 var y: A = B()
                 var z: B = B()
-                override fun compose() {}
+                @Composable operator fun invoke() {}
             }
 
             @Composable fun Test() {
@@ -300,17 +474,15 @@ class KtxTypeResolutionTests : AbstractR4aDiagnosticsTest() {
         """
             import com.google.r4a.*
 
-            class Foo() : Component() {
+            class Foo() {
                 var x: Int = 1
-                override fun compose() {}
+                @Composable operator fun invoke() {}
             }
 
             @Composable fun Test() {
                 <Foo
-                    // TODO(lmr): if the attribute value is unresolved but the attribute name is valid, perhaps we should
-                    // not mark the key as unresolved?
-                    <!UNRESOLVED_REFERENCE!>x<!>=<!UNRESOLVED_REFERENCE!>someUnresolvedValue<!>
-                    <!UNRESOLVED_REFERENCE!>y<!>=<!UNRESOLVED_REFERENCE!>someUnresolvedValue<!>
+                    <!MISMATCHED_ATTRIBUTE_TYPE!>x<!>=<!UNRESOLVED_REFERENCE!>someUnresolvedValue<!>
+                    <!UNRESOLVED_ATTRIBUTE_KEY_UNKNOWN_TYPE!>y<!>=<!UNRESOLVED_REFERENCE!>someUnresolvedValue<!>
                 />
             }
 
@@ -322,9 +494,9 @@ class KtxTypeResolutionTests : AbstractR4aDiagnosticsTest() {
             import com.google.r4a.*
 
             object MyNamespace {
-                class Foo() : Component() {
+                class Foo() {
                     @Children var children: @Composable() () -> Unit = {}
-                    override fun compose() { <children /> }
+                    @Composable operator fun invoke() { <children /> }
                 }
                 @Composable fun Bar(@Children children: @Composable() () -> Unit = {}) { <children /> }
 
@@ -335,45 +507,57 @@ class KtxTypeResolutionTests : AbstractR4aDiagnosticsTest() {
             }
 
             class Boo {
-                class Wat : Component() {
+                class Wat {
                     @Children var children: @Composable() () -> Unit = {}
-                    override fun compose() { <children /> }
+                    @Composable operator fun invoke() { <children /> }
                 }
-                inner class Qoo : Component() {
+                inner class Qoo {
                     @Children var children: @Composable() () -> Unit = {}
-                    override fun compose() { <children /> }
+                    @Composable operator fun invoke() { <children /> }
                 }
             }
 
             @Composable fun Test() {
+
                 <MyNamespace.Foo />
                 <MyNamespace.Bar />
                 <MyNamespace.Baz />
-                <MyNamespace.<!UNRESOLVED_REFERENCE!>Qoo<!> />
-                <MyNamespace.<!INVALID_TAG_TYPE!>someString<!> />
-                <MyNamespace.<!INVALID_TAG_TYPE!>NonComponent<!> />
-
+                <<!INVALID_TAG_DESCRIPTOR!>MyNamespace.<!UNRESOLVED_REFERENCE!>Qoo<!><!> />
+                <<!INVALID_TAG_TYPE!>MyNamespace.<!UNRESOLVED_REFERENCE!>someString<!><!> />
+                <<!INVALID_TAG_TYPE!>MyNamespace.NonComponent<!> />
                 <MyNamespace.Foo></MyNamespace.Foo>
                 <MyNamespace.Bar></MyNamespace.Bar>
                 <<!CHILDREN_PROVIDED_BUT_NO_CHILDREN_DECLARED!>MyNamespace.Baz<!>></MyNamespace.Baz>
-                <MyNamespace.<!UNRESOLVED_REFERENCE!>Qoo<!>></MyNamespace.<!UNRESOLVED_REFERENCE!>Qoo<!>>
-                <MyNamespace.<!INVALID_TAG_TYPE!>someString<!>></MyNamespace.<!INVALID_TAG_TYPE!>someString<!>>
+
 
                 val obj = Boo()
                 <obj.Qoo />
                 <Boo.Wat />
                 <obj.Qoo></obj.Qoo>
                 <Boo.Wat></Boo.Wat>
+                <<!INVALID_TAG_DESCRIPTOR!>obj.<!UNRESOLVED_REFERENCE!>Wat<!><!> />
 
-                <obj.<!INVALID_TAG_TYPE!>Wat<!> />
-                <obj.<!INVALID_TAG_TYPE!>Wat<!>></obj.<!INVALID_TAG_TYPE!>Wat<!>>
-
+                <<!INVALID_TAG_DESCRIPTOR!>MyNamespace.<!UNRESOLVED_REFERENCE!>Bam<!><!> />
                 <<!UNRESOLVED_REFERENCE!>SomethingThatDoesntExist<!>.Foo />
-                <<!CHILDREN_PROVIDED_BUT_NO_CHILDREN_DECLARED!><!UNRESOLVED_REFERENCE!>SomethingThatDoesntExist<!>.Foo<!>></<!UNRESOLVED_REFERENCE!>SomethingThatDoesntExist<!>.Foo>
-                <<!CHILDREN_PROVIDED_BUT_NO_CHILDREN_DECLARED!>MyNamespace.<!INVALID_TAG_TYPE!>NonComponent<!><!>></MyNamespace.<!INVALID_TAG_TYPE!>NonComponent<!>>
 
-                <MyNamespace.<!UNRESOLVED_REFERENCE!>Bam<!> />
-                <MyNamespace.<!UNRESOLVED_REFERENCE!>Bam<!>></MyNamespace.<!UNRESOLVED_REFERENCE!>Bam<!>>
+                <<!INVALID_TAG_DESCRIPTOR!>obj.<!UNRESOLVED_REFERENCE!>Wat<!><!>>
+                </<!INVALID_TAG_DESCRIPTOR!>obj.Wat<!>>
+
+                <<!INVALID_TAG_DESCRIPTOR!>MyNamespace.<!UNRESOLVED_REFERENCE!>Qoo<!><!>>
+                </<!INVALID_TAG_DESCRIPTOR!>MyNamespace.Qoo<!>>
+
+                <<!INVALID_TAG_TYPE!>MyNamespace.<!UNRESOLVED_REFERENCE!>someString<!><!>>
+                </<!INVALID_TAG_TYPE!>MyNamespace.someString<!>>
+
+                <<!UNRESOLVED_REFERENCE!>SomethingThatDoesntExist<!>.Foo>
+                </SomethingThatDoesntExist.Foo>
+
+                <<!INVALID_TAG_TYPE!>MyNamespace.NonComponent<!>>
+                </<!INVALID_TAG_TYPE!>MyNamespace.NonComponent<!>>
+
+                <<!INVALID_TAG_DESCRIPTOR!>MyNamespace.<!UNRESOLVED_REFERENCE!>Bam<!><!>>
+                </<!INVALID_TAG_DESCRIPTOR!>MyNamespace.Bam<!>>
+
             }
 
         """.trimIndent()
@@ -383,9 +567,9 @@ class KtxTypeResolutionTests : AbstractR4aDiagnosticsTest() {
         """
             import com.google.r4a.*
 
-            class Foo() : Component() {
+            class Foo() {
                 var x: Int = 1
-                override fun compose() {}
+                @Composable operator fun invoke() {}
             }
 
             fun Foo.setBar(x: Int) { println(x) }
@@ -420,40 +604,40 @@ class KtxTypeResolutionTests : AbstractR4aDiagnosticsTest() {
             import android.widget.Button
             import android.widget.LinearLayout
 
-            class ChildrenRequired1(@Children var children: @Composable() () -> Unit) : Component() {
-                override fun compose() {}
+            class ChildrenRequired1(@Children var children: @Composable() () -> Unit) {
+                @Composable operator fun invoke() {}
             }
 
             @Composable fun ChildrenRequired2(@Children children: @Composable() () -> Unit) { <children /> }
 
-            class ChildrenOptional1(@Children var children: @Composable() () -> Unit = {}) : Component() {
-                override fun compose() {}
+            class ChildrenOptional1(@Children var children: @Composable() () -> Unit = {}) {
+                @Composable operator fun invoke() {}
             }
-            class ChildrenOptional2() : Component() {
+            class ChildrenOptional2() {
                 @Children var children: @Composable() () -> Unit = {}
-                override fun compose() {}
+                @Composable operator fun invoke() {}
             }
 
             @Composable fun ChildrenOptional3(@Children children: @Composable() () -> Unit = {}) { <children /> }
 
-            class NoChildren1() : Component() {
-                override fun compose() {}
+            class NoChildren1() {
+                @Composable operator fun invoke() {}
             }
             @Composable fun NoChildren2() {}
 
 
-            class MultiChildren() : Component() {
+            class MultiChildren() {
                 @Children var c1: @Composable() () -> Unit = {}
                 @Children var c2: @Composable() (x: Int) -> Unit = {}
                 @Children var c3: @Composable() (x: Int, y: Int) -> Unit = { x, y -> println(x + y) }
 
-                override fun compose() {}
+                @Composable operator fun invoke() {}
             }
 
             @Composable fun Test() {
                 <ChildrenRequired1></ChildrenRequired1>
                 <ChildrenRequired2></ChildrenRequired2>
-                <<!NO_VALUE_FOR_PARAMETER!>ChildrenRequired1<!> />
+                <<!NO_VALUE_FOR_PARAMETER, MISSING_REQUIRED_CHILDREN!>ChildrenRequired1<!> />
                 <<!NO_VALUE_FOR_PARAMETER, MISSING_REQUIRED_CHILDREN!>ChildrenRequired2<!> />
 
                 <ChildrenOptional1></ChildrenOptional1>
@@ -486,8 +670,7 @@ class KtxTypeResolutionTests : AbstractR4aDiagnosticsTest() {
                 <LinearLayout>
                 </LinearLayout>
 
-                // TODO(lmr) should this be an error???
-                <Button></Button>
+                <<!CHILDREN_PROVIDED_BUT_NO_CHILDREN_DECLARED!>Button<!>></Button>
             }
 
         """.trimIndent()

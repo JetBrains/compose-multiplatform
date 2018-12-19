@@ -39,7 +39,7 @@ fun ModelExample(model: ExampleModel = remember { ExampleModel() }) {
         <LinearLayout>
             <TextView text="Recompose count=${recomposeCount++}" />
             <CounterView counter=model.buttonCounter />
-            <Button text="Press me" onClick={ model.buttonCounter.next() } />
+            <Button text="Press me" onClick={ _ -> model.buttonCounter.next() } />
         </LinearLayout>
     </Observe>
 }

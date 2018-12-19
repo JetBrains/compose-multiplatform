@@ -18,8 +18,8 @@ import android.widget.TextView
 import com.google.r4a.examples.explorerapp.common.components.HomogeneousList
 import com.google.r4a.examples.explorerapp.ui.R
 
-class LinkDetailScreen : Component() {
-    private val repository get() = CompositionContext.current.getAmbient(RedditRepository.Ambient, this)
+class LinkDetailScreen: Component() { // component because of need for getAmbient and subscribe
+    private val repository = CompositionContext.current.getAmbient(RedditRepository.Ambient)
 
     private val pageSize = 10
 
@@ -46,10 +46,10 @@ class LinkDetailScreen : Component() {
             if (result == null) {
                 result = repository.linkDetails(linkId!!, pageSize)
                 _model = result
-                subscribe(result.link)
-                subscribe(result.comments)
-                subscribe(result.networkState)
-                subscribe(result.initialLoad)
+                subscribe(result.link, CompositionContext.current)
+                subscribe(result.comments, CompositionContext.current)
+                subscribe(result.networkState, CompositionContext.current)
+                subscribe(result.initialLoad, CompositionContext.current)
             }
             return result
         }
@@ -57,29 +57,30 @@ class LinkDetailScreen : Component() {
     private val listParams = CoordinatorLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
             LinearLayout.LayoutParams.MATCH_PARENT).apply {
-        setBehavior(AppBarLayout.ScrollingViewBehavior())
+        behavior = AppBarLayout.ScrollingViewBehavior()
     }
 
     private val tlParams = AppBarLayout.LayoutParams(
         AppBarLayout.LayoutParams.MATCH_PARENT,
         AppBarLayout.LayoutParams.WRAP_CONTENT
     ).apply {
-        setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP)
+        scrollFlags = SCROLL_FLAG_SNAP
     }
 
     private val pagerParams = CoordinatorLayout.LayoutParams(
         LinearLayout.LayoutParams.MATCH_PARENT,
         LinearLayout.LayoutParams.MATCH_PARENT
     ).apply {
-        setBehavior(AppBarLayout.ScrollingViewBehavior())
+        behavior = AppBarLayout.ScrollingViewBehavior()
     }
 
     private val tabTitles = listOf("Comments", "Link")
 
+    @Suppress("PLUGIN_WARNING") // TODO(lmr): Figure out how to get the compsoableannotationchecker to work better here
     override fun compose() {
         val model = model // TODO(lmr): remove when private access works
         val listParams = listParams // TODO(lmr): remove when private access works
-        val link = model.link.getValue() ?: minitialLink
+        val link = model.link.value ?: minitialLink
         <CoordinatorLayout
             layoutWidth=MATCH_PARENT
             layoutHeight=MATCH_PARENT
@@ -99,7 +100,7 @@ class LinkDetailScreen : Component() {
                     children={ tabIndex ->
                         when (tabIndex) {
                             0 /* List of Comments */-> {
-                                val isLoading = model.networkState.getValue() == AsyncState.LOADING
+                                val isLoading = model.networkState.value == AsyncState.LOADING
                                 <HomogeneousList
                                     comparator=HierarchicalThing.COMPARATOR
                                     layoutParams=listParams
@@ -107,17 +108,17 @@ class LinkDetailScreen : Component() {
                                     backgroundColor=Colors.LIGHT_GRAY
 
                                     headerCount=(if (link != null) 1 else 0)
-                                    composeHeader={
+                                    composeHeader={ _ ->
                                         <LinkHeader link=link!! />
                                     }
 
                                     loadingRowCount=(if (isLoading) 1 else 0)
-                                    composeLoadingRow={
+                                    composeLoadingRow={ _ ->
                                         <LoadingRow />
                                     }
 
                                     onLoadAround={ pos -> model.loadAround(pos) }
-                                    data=model.comments.getValue()
+                                    data=model.comments.value
                                 > node ->
                                     <CommentRow
                                         node

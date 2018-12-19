@@ -33,9 +33,9 @@ abstract class ComposeNavigationActivity: AppCompatActivity() {
     lateinit var controller: NavController
     lateinit var navigator: FragmentNavigator
 
-    @Suppress("PLUGIN_WARNING")
+    @Suppress("PLUGIN_WARNING", "PLUGIN_ERROR")
     private val rootCompose = {
-        with(CompositionContext.current) {
+        with(composer) {
             provideAmbient(Ambients.Activity, this@ComposeNavigationActivity) {
                 provideAmbient(Ambients.Context, this@ComposeNavigationActivity) {
                     provideAmbient(Ambients.FragmentManager, supportFragmentManager) {
@@ -44,11 +44,12 @@ abstract class ComposeNavigationActivity: AppCompatActivity() {
                                 provideAmbient(Ambients.Configuration, this@ComposeNavigationActivity.resources.configuration) {
                                     group(0) {
                                         composeContent { params ->
-                                            emitComponent(0, ::FragmentComponent) {
-                                                set({ MyNavHostFragment().apply { controller = this@ComposeNavigationActivity.controller } }) { construct = it }
-                                                set(params) { layoutParams = it }
-                                                set(R.id.container) { id = it }
-                                            }
+                                            val construct = { MyNavHostFragment().apply { controller = this@ComposeNavigationActivity.controller } }
+                                            call(
+                                                    0,
+                                                    { changed(construct) or changed(params) or changed(R.id.container) },
+                                                    { FragmentComponent(construct, params, R.id.container) }
+                                            )
                                         }
                                     }
                                 }

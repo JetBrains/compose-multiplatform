@@ -79,7 +79,8 @@ internal class ViewApplyAdapter(private val adapters: ViewAdapters? = null) : Ap
                                 adapter?.didInsert(instance, parent)
                             }
                             is Emittable -> {
-                                val adaptedView = adapters?.adapt(parent, instance) as? View ?: error("Could not convert ${instance.javaClass.simpleName} to a View")
+                                val adaptedView = adapters?.adapt(parent, instance) as? View
+                                    ?: error("Could not convert ${instance.javaClass.simpleName} to a View")
                                 adapter?.willInsert(adaptedView, parent)
                                 parent.addView(adaptedView, index)
                                 adapter?.didInsert(adaptedView, parent)
@@ -91,7 +92,8 @@ internal class ViewApplyAdapter(private val adapters: ViewAdapters? = null) : Ap
                         when (instance) {
                             is View -> parent.emitInsertAt(
                                 index,
-                                adapters?.adapt(parent, instance) as? Emittable ?: error("Could not convert ${instance.javaClass.name} to an Emittable")
+                                adapters?.adapt(parent, instance) as? Emittable
+                                    ?: error("Could not convert ${instance.javaClass.name} to an Emittable")
                             )
                             is Emittable -> parent.emitInsertAt(index, instance)
                             else -> invalidNode(instance)
@@ -106,10 +108,12 @@ internal class ViewApplyAdapter(private val adapters: ViewAdapters? = null) : Ap
     }
 }
 
-class ViewComposer(val root: Any, val context: Context, val adapters: ViewAdapters? = ViewAdapters()) : Composer<Any>(SlotTable(), Applier(root, ViewApplyAdapter(adapters))) {
+class ViewComposer(val root: Any, val context: Context, val adapters: ViewAdapters? = ViewAdapters()) :
+    Composer<Any>(SlotTable(), Applier(root, ViewApplyAdapter(adapters))) {
     init {
         FrameManager.ensureStarted()
     }
+
     fun skipGroup(key: Any) {
         nextSlot()
         skipValue()
@@ -117,85 +121,98 @@ class ViewComposer(val root: Any, val context: Context, val adapters: ViewAdapte
     }
 }
 
+@Suppress("UNCHECKED_CAST")
 /* inline */ class ViewComposition(val composer: ViewComposer) {
-    /*inline*/ fun <T : View> emit(key: Any, /*crossinline*/ ctor: (context: Context) -> T, update: ViewUpdater<T>.() -> Unit) {
-        composer.startNode(key)
-        if (composer.inserting)
-            composer.createNode { ctor(composer.context) }
-        else composer.useNode()
-        ViewUpdater<T>(composer).update()
-        composer.endNode()
-    }
-
-    /*inline*/ fun <T : ViewGroup> emit(
+    inline fun <T : View> emit(
         key: Any,
         /*crossinline*/ ctor: (context: Context) -> T,
-        update: ViewUpdater<T>.() -> Unit,
+        noinline update: ViewUpdater<T>.() -> Unit
+    ) = with(composer) {
+        startNode(key)
+        val node = if (inserting)
+            ctor(context).also { emitNode(it) }
+//            composer.createNode { ctor(composer.context) }
+        else useNode() as T
+        ViewUpdater<T>(this, node).update()
+        endNode()
+    }
+
+    inline fun <T : ViewGroup> emit(
+        key: Any,
+        /*crossinline*/ ctor: (context: Context) -> T,
+        noinline update: ViewUpdater<T>.() -> Unit,
         children: () -> Unit
-    ) {
-        composer.startNode(key)
-        if (composer.inserting)
-            composer.createNode { ctor(composer.context) }
-        else composer.useNode()
-        ViewUpdater<T>(composer).update()
+    ) = with(composer) {
+        startNode(key)
+        val node = if (inserting)
+            ctor(context).also { emitNode(it) }
+//            createNode { ctor(composer.context) }
+        else useNode() as T
+        ViewUpdater<T>(this, node).update()
         children()
-        composer.endNode()
+        endNode()
     }
 
-    /*inline*/ fun <T : Emittable> emit(key: Any, /*crossinline*/ ctor: () -> T, update: ViewUpdater<T>.() -> Unit) {
-        composer.startNode(key)
-        if (composer.inserting)
-            composer.createNode { ctor() }
-        else composer.useNode()
-        ViewUpdater<T>(composer).update()
-        composer.endNode()
+    inline fun <T : Emittable> emit(key: Any, /*crossinline*/ ctor: () -> T, update: ViewUpdater<T>.() -> Unit) = with(composer) {
+        startNode(key)
+        val node = if (inserting)
+            ctor().also { emitNode(it) }
+//            createNode { ctor() }
+        else useNode() as T
+        ViewUpdater<T>(this, node).update()
+        endNode()
     }
 
-    /*inline*/ fun <T : Emittable> emit(
+    inline fun <T : Emittable> emit(
         key: Any,
         /*crossinline*/ ctor: () -> T,
         update: ViewUpdater<T>.() -> Unit,
         children: () -> Unit
-    ) {
-        composer.startNode(key)
-        if (composer.inserting)
-            composer.createNode { ctor() }
-        else composer.useNode()
-        ViewUpdater<T>(composer).update()
+    ) = with(composer) {
+        startNode(key)
+        val node = if (inserting)
+            ctor().also { emitNode(it) }
+//            createNode { ctor() }
+        else useNode() as T
+        ViewUpdater<T>(this, node).update()
         children()
-        composer.endNode()
+        endNode()
     }
 
-    /*inline*/ fun joinKey(left: Any, right: Any?): Any = composer.joinKey(left, right)
+    inline fun joinKey(left: Any, right: Any?): Any = composer.joinKey(left, right)
 
-    /*inline*/ fun call(key: Any, /*crossinline*/ invalid: ViewValidator.() -> Boolean, /*crossinline*/ block: () -> Unit) {
-        composer.startGroup(key)
-        if (ViewValidator(composer).invalid() || composer.inserting) {
-            composer.startGroup(invocation)
+    inline fun call(
+        key: Any,
+        /*crossinline*/ noinline invalid: ViewValidator.() -> Boolean,
+        block: () -> Unit
+    ) = with(composer) {
+        startGroup(key)
+        if (ViewValidator(composer).invalid() || inserting) {
+            startGroup(invocation)
             block()
-            composer.endGroup()
+            endGroup()
         } else {
-            composer.skipGroup(invocation)
+            skipGroup(invocation)
         }
-        composer.endGroup()
+        endGroup()
     }
 
-    /*inline*/ fun <T> call(
+    inline fun <T> call(
         key: Any,
         /*crossinline*/ ctor: () -> T,
-        /*crossinline*/ invalid: ViewValidator.(f: T) -> Boolean,
-        /*crossinline*/ block: (f: T) -> Unit
-    ) {
-        composer.startGroup(key)
-        val f = composer.remember { ctor() }
-        if (ViewValidator(composer).invalid(f) || composer.inserting) {
-            composer.startGroup(invocation)
+        /*crossinline*/ noinline invalid: ViewValidator.(f: T) -> Boolean,
+        block: (f: T) -> Unit
+    ) = with(composer) {
+        startGroup(key)
+        val f = remember { ctor() }
+        if (ViewValidator(this).invalid(f) || inserting) {
+            startGroup(invocation)
             block(f)
-            composer.endGroup()
+            endGroup()
         } else {
-            composer.skipGroup(invocation)
+            skipGroup(invocation)
         }
-        composer.endGroup()
+        endGroup()
     }
 
     /*inline*/ fun observe(
@@ -210,81 +227,97 @@ class ViewComposer(val root: Any, val context: Context, val adapters: ViewAdapte
 }
 
 /* inline */ class ViewValidator(val composer: ViewComposer) {
-    /*inline*/ fun changed(value: Int) = if (composer.nextSlot() != value || composer.inserting) {
-        composer.updateValue(value)
-        true
-    } else {
-        composer.skipValue()
-        false
-    }
-
-    /*inline*/ fun </*reified*/ T> changed(value: T) = if (composer.nextSlot() != value || composer.inserting) {
-        composer.updateValue(value)
-        true
-    } else {
-        composer.skipValue()
-        false
-    }
-
-    /*inline*/ fun updated(value: Int) = composer.inserting.let { inserting ->
-        if (composer.nextSlot() != value || inserting) {
-            composer.updateValue(value)
-            !inserting
+    inline fun changed(value: Int) = with(composer) {
+        if (nextSlot() != value || inserting) {
+            updateValue(value)
+            true
         } else {
-            composer.skipValue()
+            skipValue()
             false
         }
     }
 
-    /*inline*/ fun </*reified*/ T> updated(value: T) = composer.inserting.let { inserting ->
-        if (composer.nextSlot() != value || inserting) {
-            composer.updateValue(value)
-            !inserting
+    inline fun </*reified*/ T> changed(value: T) = with(composer) {
+        if (nextSlot() != value || inserting) {
+            updateValue(value)
+            true
         } else {
-            composer.skipValue()
+            skipValue()
             false
         }
     }
 
-    /*inline*/ fun set(value: Int, /*crossinline*/ block: (value: Int) -> Unit): Boolean = changed(value).also { if (it) block(value) }
-    /*inline*/ fun </*reified*/ T> set(value: T, /*crossinline*/ block: (value: T) -> Unit): Boolean = changed(value).also { if (it) block(value) }
-    /*inline*/ fun update(value: Int, /*crossinline*/ block: (value: Int) -> Unit): Boolean = updated(value).also { if (it) block(value) }
-    /*inline*/ fun </*reified*/ T> update(value: T, /*crossinline*/ block: (value: T) -> Unit): Boolean = updated(value).also { if (it) block(value) }
+    inline fun updated(value: Int) = with(composer) {
+        inserting.let { inserting ->
+            if (nextSlot() != value || inserting) {
+                updateValue(value)
+                !inserting
+            } else {
+                skipValue()
+                false
+            }
+        }
+    }
+
+    inline fun </*reified*/ T> updated(value: T) = with(composer) {
+        inserting.let { inserting ->
+            if (nextSlot() != value || inserting) {
+                updateValue(value)
+                !inserting
+            } else {
+                skipValue()
+                false
+            }
+        }
+    }
+
+    inline fun set(value: Int, /*crossinline*/ block: (value: Int) -> Unit): Boolean = changed(value).also { if (it) block(value) }
+    inline fun </*reified*/ T> set(value: T, /*crossinline*/ block: (value: T) -> Unit): Boolean =
+        changed(value).also { if (it) block(value) }
+
+    inline fun update(value: Int, /*crossinline*/ block: (value: Int) -> Unit): Boolean = updated(value).also { if (it) block(value) }
+    inline fun </*reified*/ T> update(value: T, /*crossinline*/ block: (value: T) -> Unit): Boolean =
+        updated(value).also { if (it) block(value) }
 
     /*inline*/ operator fun Boolean.plus(other: Boolean) = this || other
 }
 
-/* inline */ class ComposerUpdater<N, T:N>(val composer: Composer<N>) {
-    /*inline*/ fun set(value: Int, /*crossinline*/ block: T.(value: Int) -> Unit) {
-        if (composer.inserting || composer.nextSlot() != value) {
-            composer.updateValue(value)
-            val appliedBlock: T.(value: Int) -> Unit = { block(it) }
-            composer.apply(value, appliedBlock)
-        } else composer.skipValue()
+@Suppress("UNCHECKED_CAST")
+/*inline */ class ComposerUpdater<N, T : N>(val composer: Composer<N>, val node: T) {
+    inline fun set(value: Int, /*crossinline*/ block: T.(value: Int) -> Unit) = with(composer) {
+        if (inserting || nextSlot() != value) {
+            updateValue(value)
+            node.block(value)
+//            val appliedBlock: T.(value: Int) -> Unit = { block(it) }
+//            composer.apply(value, appliedBlock)
+        } else skipValue()
     }
 
-    /*inline*/ fun </*reified*/ V> set(value: V, /*crossinline*/ block: T.(value: V) -> Unit) {
-        if (composer.inserting || composer.nextSlot() != value) {
-            composer.updateValue(value)
-            val appliedBlock: T.(value: V) -> Unit = { block(it) }
-            composer.apply(value, appliedBlock)
-        } else composer.skipValue()
+    inline fun <V> set(value: V, /*crossinline*/ block: T.(value: V) -> Unit) = with(composer) {
+        if (inserting || nextSlot() != value) {
+            updateValue(value)
+            node.block(value)
+//            val appliedBlock: T.(value: V) -> Unit = { block(it) }
+//            composer.apply(value, appliedBlock)
+        } else skipValue()
     }
 
-    /*inline*/ fun update(value: Int, /*crossinline*/ block: T.(value: Int) -> Unit) {
-        if (composer.inserting || composer.nextSlot() != value) {
-            composer.updateValue(value)
-            val appliedBlock: T.(value: Int) -> Unit = { block(it) }
-            if (!composer.inserting) composer.apply(value, appliedBlock)
-        } else composer.skipValue()
+    inline fun update(value: Int, /*crossinline*/ block: T.(value: Int) -> Unit) = with(composer) {
+        if (inserting || nextSlot() != value) {
+            updateValue(value)
+            node.block(value)
+//            val appliedBlock: T.(value: Int) -> Unit = { block(it) }
+//            if (!inserting) composer.apply(value, appliedBlock)
+        } else skipValue()
     }
 
-    /*inline*/ fun </*reified*/ V> update(value: V, /*crossinline*/ block: T.(value: V) -> Unit) {
-        if (composer.inserting || composer.nextSlot() != value) {
-            composer.updateValue(value)
-            val appliedBlock: T.(value: V) -> Unit = { block(it) }
-            if (!composer.inserting) composer.apply(value, appliedBlock)
-        } else composer.skipValue()
+    inline fun </*reified*/ V> update(value: V, /*crossinline*/ block: T.(value: V) -> Unit) = with(composer) {
+        if (inserting || nextSlot() != value) {
+            updateValue(value)
+            node.block(value)
+//            val appliedBlock: T.(value: V) -> Unit = { block(it) }
+//            if (!inserting) composer.apply(value, appliedBlock)
+        } else skipValue()
     }
 }
 
@@ -295,3 +328,9 @@ typealias ViewUpdater<T> = ComposerUpdater<Any, T>
 
 @PublishedApi
 internal val invocation = Object()
+
+@PublishedApi
+internal val provider = Object()
+
+@PublishedApi
+internal val consumer = Object()

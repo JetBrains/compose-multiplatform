@@ -5,10 +5,13 @@
 
 package com.google.r4a
 
-@Composable
 class Recompose : Component() {
-    @Children lateinit var body: @Composable() (recompose: ()->Unit)->Unit
+    @Children lateinit var body: @Composable() (recompose: () -> Unit) -> Unit
+
+    // TODO(lmr): fix this before merging
+    private val localRecompose: () -> Unit = { recompose() }
+
     override fun compose() {
-        body(::recompose)
+        body(localRecompose)
     }
 }

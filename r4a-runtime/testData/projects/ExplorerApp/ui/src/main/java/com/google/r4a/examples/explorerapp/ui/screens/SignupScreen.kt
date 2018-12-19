@@ -5,7 +5,6 @@ import android.support.design.widget.TextInputLayout
 import android.text.InputType
 import android.view.Gravity
 import android.widget.*
-import com.google.r4a.Component
 import com.google.r4a.adapters.*
 import com.google.r4a.examples.explorerapp.common.adapters.*
 import com.google.r4a.examples.explorerapp.ui.Colors
@@ -13,11 +12,10 @@ import com.google.r4a.examples.explorerapp.ui.R
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.view.inputmethod.EditorInfo
-import com.google.r4a.CompositionContext
-import com.google.r4a.consumeAmbient
+import com.google.r4a.*
 import com.google.r4a.examples.explorerapp.common.data.AuthenticationService
 
-class SignupScreen : Component() {
+class SignupScreen: Component() {
     private var username: String = ""
     private var password: String = ""
     private var isLoading: Boolean = false
@@ -31,7 +29,6 @@ class SignupScreen : Component() {
     }
 
     override fun compose() {
-
         val buttonEnabled = username.isNotEmpty() && password.isNotEmpty()
         <ScrollView
             layoutWidth=MATCH_PARENT
@@ -60,17 +57,16 @@ class SignupScreen : Component() {
                         paddingVertical=16.dp
                         textSize=15.sp
                         hint="Username"
+                        imeOptions=EditorInfo.IME_ACTION_NEXT
                         controlledText=username
-                        onTextChange={
+                        onTextChange={ it ->
                             username = it
                             recomposeSync()
                         }
-                        singleLine=true
-                        imeOptions=EditorInfo.IME_ACTION_NEXT
+//                        singleLine=true
                     />
                 </TextInputLayout>
-                val cc = CompositionContext.current
-                cc.consumeAmbient(AuthenticationService.Ambient) { authentication ->
+                <AuthenticationService.Ambient.Consumer> authentication ->
                     <TextInputLayout
                         layoutWidth=MATCH_PARENT
                         layoutHeight=WRAP_CONTENT
@@ -82,15 +78,15 @@ class SignupScreen : Component() {
                             paddingVertical=16.dp
                             textSize=15.sp
                             hint="Password"
+                            imeOptions=EditorInfo.IME_ACTION_DONE
+                            inputType=InputType.TYPE_TEXT_VARIATION_PASSWORD
                             controlledText=password
-                            onTextChange={
+                            onTextChange={ it ->
                                 password = it
                                 recomposeSync()
                             }
 //                          transformationMethod={PasswordTransformationMethod.getInstance()}
-                            singleLine=true
-                            imeOptions=EditorInfo.IME_ACTION_DONE
-                            inputType=InputType.TYPE_TEXT_VARIATION_PASSWORD
+//                            singleLine=true
                             onEditorAction={ _, actionId, _ ->
                                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                                     onSubmit(authentication)
@@ -106,8 +102,8 @@ class SignupScreen : Component() {
                         textColor=Colors.TEXT_LIGHT
                         enabled=buttonEnabled
                         onClick={ _ -> onSubmit(authentication) } />
-                }
-                cc.consumeAmbient(Ambients.NavController) { navigator ->
+                </AuthenticationService.Ambient.Consumer>
+                <Ambients.NavController.Consumer> navigator ->
                     <TextView
                         layoutWidth=MATCH_PARENT
                         layoutHeight=WRAP_CONTENT
@@ -132,7 +128,7 @@ class SignupScreen : Component() {
                         }
                         textSize=15.sp
                         textColor=Colors.TEXT_MUTED />
-                }
+                </Ambients.NavController.Consumer>
             </LinearLayout>
         </ScrollView>
     }

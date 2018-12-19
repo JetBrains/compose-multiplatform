@@ -8,7 +8,7 @@ import com.google.r4a.examples.explorerapp.ui.forms.EditForm
 import com.google.r4a.examples.explorerapp.ui.forms.SpinnerForm
 import com.google.r4a.examples.explorerapp.ui.infinitescroll.NewsFeed
 
-public const val EXAMPLE_NAME = "com.google.r4a.exampleName"
+const val EXAMPLE_NAME = "com.google.r4a.exampleName"
 
 const val CALCULATOR = "Calculator"
 const val EDIT_FORM = "Edit Form"
@@ -22,19 +22,20 @@ val EXAMPLES = arrayOf(CALCULATOR, EDIT_FORM, NEWS_FEED, FONT_LIST, SPINNER_FORM
 
 class ExamplePage : Component() {
     override fun compose() {
-        val fragment = CompositionContext.current.getAmbient(Ambients.Fragment)
-        val name = fragment.arguments?.getString(EXAMPLE_NAME)
-        when (name) {
-            CALCULATOR -> { <Calculator /> }
-            EDIT_FORM -> { <EditForm /> }
-            NEWS_FEED -> { <NewsFeed /> }
-            FONT_LIST -> { <FontList /> }
-            SPINNER_FORM -> { <SpinnerForm /> }
-            REORDERING -> { <Reordering /> }
-            MODEL -> { <ModelExample /> }
-            else -> {
-                <TextView text="ERROR: Unknown example '$name'" />
+        <Ambients.Fragment.Consumer> fragment ->
+            val name = fragment.arguments?.getString(EXAMPLE_NAME)
+            when (name) {
+                CALCULATOR -> { <Calculator /> }
+                EDIT_FORM -> { <EditForm /> }
+                NEWS_FEED -> { <NewsFeed /> }
+                FONT_LIST -> { <FontList /> }
+                SPINNER_FORM -> { <SpinnerForm /> }
+                REORDERING -> { <Reordering /> }
+                MODEL -> { <ModelExample /> }
+                else -> {
+                    <TextView text="ERROR: Unknown example '$name'" />
+                }
             }
-        }
+        </Ambients.Fragment.Consumer>
     }
 }

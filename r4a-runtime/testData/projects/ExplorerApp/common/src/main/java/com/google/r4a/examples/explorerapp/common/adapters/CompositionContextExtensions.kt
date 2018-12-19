@@ -5,6 +5,9 @@ import android.view.View
 import com.google.r4a.Ambient
 import com.google.r4a.Component
 import com.google.r4a.CompositionContext
+import com.google.r4a.ViewComposition
+
+
 //
 //
 //inline fun <reified T: Component> CompositionContext.emitComponent(ctor: () -> T, block: (T) -> Unit) {

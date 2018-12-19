@@ -7,6 +7,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.r4a.Component
 import com.google.r4a.CompositionContext
+import com.google.r4a.composer
 import com.google.r4a.isolated
 
 import org.jetbrains.kotlin.extensions.KtxControlFlowExtension
@@ -19,6 +20,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
@@ -41,7 +43,35 @@ class KtxCodegenTests : AbstractCodeGenTest() {
     }
 
     @Test
+    fun testCGNSimpleTextView(): Unit = ensureSetup {
+        compose(
+            """
+                <TextView text="Hello, world!" id=42 />
+            """).then { activity ->
+            val textView = activity.findViewById(42) as TextView
+            assertEquals("Hello, world!", textView.text)
+        }
+    }
+
+    @Test
     fun testCGUpdatedComposition(): Unit = ensureSetup {
+        var value = "Hello, world!"
+
+        compose({ mapOf("value" to value) }, """
+           <TextView text=value id=42 />
+        """).then { activity ->
+            val textView = activity.findViewById(42) as TextView
+            assertEquals("Hello, world!", textView.text)
+
+            value = "Other value"
+        }.then { activity ->
+            val textView = activity.findViewById(42) as TextView
+            assertEquals("Other value", textView.text)
+        }
+    }
+
+    @Test
+    fun testCGNUpdatedComposition(): Unit = ensureSetup {
         var value = "Hello, world!"
 
         compose({ mapOf("value" to value) }, """
@@ -83,6 +113,324 @@ class KtxCodegenTests : AbstractCodeGenTest() {
 
             assertEquals(text, textView.text)
             assertEquals(orientation, linearLayout.orientation)
+        }
+    }
+
+    @Test
+    fun testCGNAmbient(): Unit = ensureSetup {
+        val tvId = 258
+        var text = "Hello, world!"
+
+        compose(
+            """
+
+            val StringAmbient = Ambient.of<String> { "default" }
+
+            @Composable fun Foo() {
+                <StringAmbient.Consumer> value ->
+                    <TextView id=$tvId text=value />
+                </StringAmbient.Consumer>
+            }
+
+        """,
+            { mapOf("text" to text) },
+            """
+            <StringAmbient.Provider value=text>
+                <Foo />
+            </StringAmbient.Provider>
+        """).then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+
+            assertEquals(text, textView.text)
+            text = "wat"
+        }.then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+
+            assertEquals(text, textView.text)
+        }
+    }
+
+    @Test
+    fun testCGNClassComponent(): Unit = ensureSetup {
+        var text = "Hello, world!"
+        val tvId = 123
+
+        compose(
+        """
+            class Foo {
+                var text = ""
+                @Composable
+                operator fun invoke(bar: Int) {
+                    <TextView id=$tvId text=text />
+                }
+            }
+
+        """,
+        { mapOf("text" to text) },
+        """
+             <Foo text bar=123 />
+        """
+        ).then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+
+            assertEquals(text, textView.text)
+            text = "wat"
+        }.then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+
+            assertEquals(text, textView.text)
+        }
+    }
+
+    @Test
+    fun testCGNFunctionComponent(): Unit = ensureSetup {
+        var text = "Hello, world!"
+        val tvId = 123
+
+        compose(
+            """
+            @Composable
+            fun Foo(text: String) {
+                <TextView id=$tvId text=text />
+            }
+
+        """,
+            { mapOf("text" to text) },
+            """
+             <Foo text />
+        """,
+            true
+        ).then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+
+            assertEquals(text, textView.text)
+            text = "wat"
+        }.then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+
+            assertEquals(text, textView.text)
+        }
+    }
+
+    @Test
+    fun testCGNViewGroup(): Unit = ensureSetup {
+        val tvId = 258
+        val llId = 260
+        var text = "Hello, world!"
+        var orientation = LinearLayout.HORIZONTAL
+
+        compose({ mapOf("text" to text, "orientation" to orientation) }, """
+             <LinearLayout orientation id=$llId>
+               <TextView text id=$tvId />
+             </LinearLayout>
+        """).then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+            val linearLayout = activity.findViewById(llId) as LinearLayout
+
+            assertEquals(text, textView.text)
+            assertEquals(orientation, linearLayout.orientation)
+
+            text = "Other value"
+            orientation = LinearLayout.VERTICAL
+        }.then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+            val linearLayout = activity.findViewById(llId) as LinearLayout
+
+            assertEquals(text, textView.text)
+            assertEquals(orientation, linearLayout.orientation)
+        }
+    }
+
+    @Test
+    fun testCGNSimpleCall(): Unit = ensureSetup {
+        val tvId = 258
+        var text = "Hello, world!"
+
+        compose(
+            """
+                @Composable fun SomeFun(x: String) {
+                    <TextView text=x id=$tvId />
+                }
+            """,
+            { mapOf("text" to text) },
+            """
+                <SomeFun x=text />
+            """
+        ).then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+
+            assertEquals(text, textView.text)
+
+            text = "Other value"
+        }.then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+
+            assertEquals(text, textView.text)
+        }
+    }
+
+    @Test
+    fun testCGNSimpleCall2(): Unit = ensureSetup {
+            val tvId = 258
+            var text = "Hello, world!"
+            var someInt = 456
+
+            compose(
+                """
+                class SomeClass(var x: String) {
+                    @Composable
+                    operator fun invoke(y: Int) {
+                        <TextView text="${"$"}x ${"$"}y" id=$tvId />
+                    }
+                }
+            """,
+                { mapOf("text" to text, "someInt" to someInt) },
+                """
+                <SomeClass x=text y=someInt />
+            """
+            ).then { activity ->
+                val textView = activity.findViewById(tvId) as TextView
+
+                assertEquals("Hello, world! 456", textView.text)
+
+                text = "Other value"
+                someInt = 123
+            }.then { activity ->
+                val textView = activity.findViewById(tvId) as TextView
+
+                assertEquals("Other value 123", textView.text)
+            }
+        }
+
+    @Test
+    fun testCGNSimpleCall3(): Unit = ensureSetup {
+        val tvId = 258
+        var text = "Hello, world!"
+        var someInt = 456
+
+        compose(
+            """
+                @Memoized
+                class SomeClassoawid(var x: String) {
+                    @Composable
+                    operator fun invoke(y: Int) {
+                        <TextView text="${"$"}x ${"$"}y" id=$tvId />
+                    }
+                }
+            """,
+            { mapOf("text" to text, "someInt" to someInt) },
+            """
+                <SomeClassoawid x=text y=someInt />
+            """
+        ).then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+
+            assertEquals("Hello, world! 456", textView.text)
+
+            text = "Other value"
+            someInt = 123
+        }.then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+
+            assertEquals("Other value 123", textView.text)
+        }
+    }
+
+    @Test
+    fun testCGNCallWithChildren(): Unit = ensureSetup {
+        val tvId = 258
+        var text = "Hello, world!"
+
+        compose(
+            """
+                @Composable
+                fun Block(@Children children: () -> Unit) {
+                    <children />
+                }
+            """,
+            { mapOf("text" to text) },
+            """
+                <Block>
+                    <Block>
+                        <TextView text id=$tvId />
+                    </Block>
+                </Block>
+            """
+        ).then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+
+            assertEquals(text, textView.text)
+
+            text = "Other value"
+        }.then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+
+            assertEquals(text, textView.text)
+        }
+    }
+
+    @Test
+    fun testCGNStuff(): Unit = ensureSetup {
+        val tvId = 258
+        var num = 123
+
+        compose(
+            """
+                class OneArg {
+                    var foo = 0
+                    @Composable
+                    operator fun invoke() {
+                        <TextView text="${"$"}foo" id=$tvId />
+                    }
+                }
+                fun OneArg.setBar(bar: Int) { foo = bar }
+            """,
+            { mapOf("num" to num) },
+            """
+            <OneArg bar=num />
+            """
+        ).then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+            assertEquals("$num", textView.text)
+
+            num = 456
+        }.then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+            assertEquals("$num", textView.text)
+        }
+    }
+
+    @Test
+    fun testTagBasedMemoization(): Unit = ensureSetup {
+        val tvId = 258
+        var text = "Hello World"
+
+        compose(
+            """
+                class A {
+                    var foo = ""
+                    inner class B {
+                        @Composable
+                        operator fun invoke() {
+                            <TextView text=foo id=$tvId />
+                        }
+                    }
+                }
+            """,
+            { mapOf("text" to text) },
+            """
+                val a = A()
+                a.foo = text
+                <a.B />
+            """
+        ).then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+            assertEquals(text, textView.text)
+
+            text = "new value"
+        }.then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+            assertEquals(text, textView.text)
         }
     }
 
@@ -284,7 +632,7 @@ private class TestActivity : Activity() {
 
 private val Activity.root get() = findViewById(ROOT_ID) as ViewGroup
 
-private class Root : Component() {
+private class Root(val composable: () -> Unit) : Component() {
     override fun compose() {}
 }
 
@@ -295,6 +643,8 @@ class CompositionTest(val composable: () -> Unit) {
         fun then(block: (activity: Activity) -> Unit): ActiveTest {
             val previous = CompositionContext.current
             CompositionContext.current = cc
+            val scheduler = RuntimeEnvironment.getMasterScheduler()
+            scheduler.pause()
             try {
                 cc.startRoot()
                 composable()
@@ -303,6 +653,8 @@ class CompositionTest(val composable: () -> Unit) {
             } finally {
                 CompositionContext.current = previous
             }
+            cc.recomposeAll()
+            scheduler.advanceToLastPostedRunnable()
             block(activity)
             return this
         }
@@ -312,7 +664,7 @@ class CompositionTest(val composable: () -> Unit) {
         val controller = Robolectric.buildActivity(TestActivity::class.java)
         val activity = controller.create().get()
         val root = activity.root
-        val component = Root()
+        val component = Root(composable)
         val cc = CompositionContext.create(root.context, root, component, null)
         cc.context = activity
         return ActiveTest(activity, cc, component).then(block)

@@ -13,7 +13,7 @@ abstract class ComposeActivity: AppCompatActivity() {
 
     @Suppress("PLUGIN_WARNING")
     private val rootCompose = {
-        val cc = CompositionContext.current
+        val cc = composer
 
         cc.provideAmbient(Ambients.Activity, this) {
             cc.provideAmbient(Ambients.Context, this) {

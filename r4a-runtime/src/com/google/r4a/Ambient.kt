@@ -1,7 +1,6 @@
 package com.google.r4a
 
 import android.view.ViewGroup
-import kotlin.reflect.KProperty
 
 class Ambient<T>(private val key: String, private val defaultFactory: (() -> T)? = null) {
     internal val defaultValue by lazy {
@@ -27,13 +26,16 @@ class Ambient<T>(private val key: String, private val defaultFactory: (() -> T)?
 
         override fun compose() {
             val cc = CompositionContext.current
+            cc as ComposerCompositionContext
 
-            cc.start(0, this@Ambient)
-            children()
-            cc.end()
+            with(cc.composer) {
+                startProvider(this@Provider, value)
+                children()
+                endProvider()
+            }
         }
 
-        val ambient get() = this@Ambient
+        val ambient = this@Ambient
     }
 
     inner class Consumer(
@@ -42,11 +44,16 @@ class Ambient<T>(private val key: String, private val defaultFactory: (() -> T)?
 
         override fun compose() {
             val cc = CompositionContext.current
-            val value = cc.getAmbient(this@Ambient)
-            cc.start(0)
-            children(value)
-            cc.end()
+            cc as ComposerCompositionContext
+
+            with(cc.composer) {
+                val value = startConsumer(this@Consumer)
+                children(value)
+                endConsumer()
+            }
         }
+
+        val ambient = this@Ambient
     }
 
     interface Reference {
@@ -58,14 +65,10 @@ class Ambient<T>(private val key: String, private val defaultFactory: (() -> T)?
         @Children
         var children: (ref: Reference) -> Unit) : Component() {
 
-        private val reference = object : Reference {
-            override fun <T> getAmbient(key: Ambient<T>) = CompositionContext.getAmbient(key, this@Portal)
-            override fun composeInto(container: ViewGroup, composable: () -> Unit) = R4a.composeInto(container, this, composable)
-        }
-
         override fun compose() {
-            CompositionContext.current.preserveAmbientScope(this)
-            children(reference)
+            val cc = CompositionContext.current as ComposerCompositionContext
+
+            children(cc.composer.buildReference())
         }
     }
 }

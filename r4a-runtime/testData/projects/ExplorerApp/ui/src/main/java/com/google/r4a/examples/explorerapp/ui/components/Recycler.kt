@@ -7,6 +7,7 @@ import android.widget.LinearLayout
 import com.google.r4a.Children
 import com.google.r4a.Composable
 import com.google.r4a.composeInto
+import com.google.r4a.composer
 
 open class Recycler(context: Context): RecyclerView(context) {
 

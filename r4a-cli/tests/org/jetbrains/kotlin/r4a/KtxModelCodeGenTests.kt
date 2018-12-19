@@ -76,22 +76,22 @@ class KtxModelCodeGenTests : AbstractCodeGenTest() {
         compose(
             """
             @Model
-            class Person(var name: String, var age: Int)
+            class Person4(var name: String, var age: Int)
 
             @Composable
-            fun PersonView(person: Person) {
+            fun PersonView4(person: Person4) {
               <Observe>
                 <TextView text=person.name id=$tvNameId />
                 <TextView text=person.age.toString() id=$tvAgeId />
               </Observe>
             }
 
-            val president = Person("$PRESIDENT_NAME_1", $PRESIDENT_AGE_1)
+            val president = Person4("$PRESIDENT_NAME_1", $PRESIDENT_AGE_1)
             """, { mapOf("name" to name, "age" to age) }, """
                president.name = name
                president.age = age
             """, """
-                <PersonView person=president />
+                <PersonView4 person=president />
             """).then { activity ->
             val tvName = activity.findViewById(tvNameId) as TextView
             val tvAge = activity.findViewById(tvAgeId) as TextView
@@ -166,7 +166,7 @@ class KtxModelCodeGenTests : AbstractCodeGenTest() {
             data class PersonB(var name: String, var age: Int)
 
             @Composable
-            fun PersonView(person: PersonB) {
+            fun PersonViewB(person: PersonB) {
               <Observe>
                 <TextView text=person.name id=$tvNameId />
                 <TextView text=person.age.toString() id=$tvAgeId />
@@ -178,7 +178,7 @@ class KtxModelCodeGenTests : AbstractCodeGenTest() {
                president.name = name
                president.age = age
             """, """
-                <PersonView person=president />
+                <PersonViewB person=president />
             """).then { activity ->
             val tvName = activity.findViewById(tvNameId) as TextView
             val tvAge = activity.findViewById(tvAgeId) as TextView
@@ -208,7 +208,7 @@ class KtxModelCodeGenTests : AbstractCodeGenTest() {
             class PersonC(var name: String, var age: Int)
 
             @Composable
-            fun PersonView(person: PersonC) {
+            fun PersonViewC(person: PersonC) {
               <Observe>
                 <TextView text=person.name id=$tvNameId />
                 <TextView text=person.age.toString() id=$tvAgeId />
@@ -220,7 +220,7 @@ class KtxModelCodeGenTests : AbstractCodeGenTest() {
                president.name = name
                president.age = age
             """, """
-                <PersonView person=president />
+                <PersonViewC person=president />
             """).then { activity ->
             val tvName = activity.findViewById(tvNameId) as TextView
             val tvAge = activity.findViewById(tvAgeId) as TextView
@@ -250,7 +250,7 @@ class KtxModelCodeGenTests : AbstractCodeGenTest() {
             class PersonD(var name: String, var age: Int)
 
             @Composable
-            fun PersonView(person: PersonD) {
+            fun PersonViewD(person: PersonD) {
               <Observe>
                 <TextView text=person.name id=$tvNameId />
                 <TextView text=person.age.toString() id=$tvAgeId />
@@ -262,7 +262,7 @@ class KtxModelCodeGenTests : AbstractCodeGenTest() {
                president.name = name
                president.age = age
             """, """
-                <PersonView person=president />
+                <PersonViewD person=president />
             """).then { activity ->
             val tvName = activity.findViewById(tvNameId) as TextView
             val tvAge = activity.findViewById(tvAgeId) as TextView

@@ -14,7 +14,7 @@ import com.google.r4a.examples.explorerapp.common.data.HierarchicalThing
  * TODO(lmr): Once we can properly use generics with KTX, we should make this
  * generic
  */
-class HomogeneousList<T>(comparator: DiffUtil.ItemCallback<T>) : Component() {
+class HomogeneousList<T>(comparator: DiffUtil.ItemCallback<T>) {
     private val adapter = HeaderFooterListAdapter(comparator)
 
     // TODO(lmr): I think the way I am doing get/set with all of these
@@ -80,8 +80,9 @@ class HomogeneousList<T>(comparator: DiffUtil.ItemCallback<T>) : Component() {
         orientation = LinearLayoutManager.VERTICAL
     }
 
-    override fun compose() {
-        with(CompositionContext.current) {
+    @Composable
+    operator fun invoke() {
+        with(composer) {
             portal(0) { ref ->
                 adapter.reference = ref
                 // NOTE(lmr): Realistically, we should call notifyDataSetChanged() on every compose. Otherwise, there

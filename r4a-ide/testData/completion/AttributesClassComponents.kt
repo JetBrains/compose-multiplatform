@@ -9,7 +9,7 @@ class ClassComponent(
     val b: Double,
     var c: SomeData,
     @Children var d: () -> Unit,
-    e: Double = 1.0,
+    e: Double = 1.0
 ): Component() {
     lateinit var f: SomeData
     var g: String = "not required"
@@ -27,11 +27,11 @@ fun f(){
 }
 
 
-// EXIST: { lookupString: "a", tailText: "=... (required) (pivotal)", typeText: "Int" }
-// EXIST: { lookupString: "b", tailText: "=... (required) (pivotal)", typeText: "Double" }
+// EXIST: { lookupString: "a", tailText: "=... (required)", typeText: "Int" }
+// EXIST: { lookupString: "b", tailText: "=... (required)", typeText: "Double" }
 // EXIST: { lookupString: "c", tailText: "=... (required)", typeText: "SomeData" }
 // EXIST: { lookupString: "d", tailText: "=... (@Children) (required)", typeText: "() -> Unit" }
-// EXIST: { lookupString: "e", tailText: "=... (pivotal)", typeText: "Double" }
+// EXIST: { lookupString: "e", tailText: "=...", typeText: "Double" }
 // EXIST: { lookupString: "f", tailText: "=... (required)", typeText: "SomeData" }
 // EXIST: { lookupString: "g", tailText: "=...", typeText: "String" }
 // EXIST: { lookupString: "h", tailText: "=... (extension on ClassComponent)", typeText: "Int" }

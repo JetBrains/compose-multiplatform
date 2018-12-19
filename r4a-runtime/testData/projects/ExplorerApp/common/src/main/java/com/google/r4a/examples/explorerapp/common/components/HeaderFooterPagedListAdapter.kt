@@ -29,7 +29,7 @@ class HeaderFooterPagedListAdapter<T>(callback: DiffUtil.ItemCallback<T>) : Recy
             notifyItemMoved(getHeaderCount() + fromPosition, getHeaderCount() + toPosition)
         }
 
-        override fun onChanged(position: Int, count: Int, payload: Any) {
+        override fun onChanged(position: Int, count: Int, payload: Any?) {
             notifyItemRangeChanged(getHeaderCount() + position, count, payload)
         }
     }
@@ -103,7 +103,7 @@ class HeaderFooterPagedListAdapter<T>(callback: DiffUtil.ItemCallback<T>) : Recy
         if (viewType == TYPE_HEADER) {
             val realPosition = index
             reference.composeInto(view) {
-                with(CompositionContext.current) {
+                with(composer) {
                     group(0) {
                         composeHeader(realPosition)
                     }
@@ -119,7 +119,7 @@ class HeaderFooterPagedListAdapter<T>(callback: DiffUtil.ItemCallback<T>) : Recy
             val realPosition = index
             val item = differ.getItem(realPosition) ?: error("couldn't find item")
             reference.composeInto(view) {
-                with(CompositionContext.current) {
+                with(composer) {
                     group(0) {
                         children(item, realPosition)
                     }
@@ -134,7 +134,7 @@ class HeaderFooterPagedListAdapter<T>(callback: DiffUtil.ItemCallback<T>) : Recy
         if (viewType == TYPE_LOADING) {
             val realPosition = index
             reference.composeInto(view) {
-                with(CompositionContext.current) {
+                with(composer) {
                     group(0) {
                         composeLoadingRow(realPosition)
                     }
@@ -149,7 +149,7 @@ class HeaderFooterPagedListAdapter<T>(callback: DiffUtil.ItemCallback<T>) : Recy
         if (viewType == TYPE_FOOTER) {
             val realPosition = index
             reference.composeInto(view) {
-                with(CompositionContext.current) {
+                with(composer) {
                     group(0) {
                         composeFooter(realPosition)
                     }

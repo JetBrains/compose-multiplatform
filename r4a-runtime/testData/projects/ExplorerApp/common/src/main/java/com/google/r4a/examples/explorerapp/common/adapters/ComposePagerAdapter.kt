@@ -18,6 +18,9 @@ import com.google.r4a.Ambient
 import com.google.r4a.Component
 import com.google.r4a.CompositionContext
 import com.google.r4a.*
+import com.google.r4a.adapters.Ref
+import com.google.r4a.adapters.RefForwarder
+import com.google.r4a.adapters.setRef
 import com.google.r4a.examples.explorerapp.common.R
 
 
@@ -62,7 +65,7 @@ abstract class ComposePagerAdapter : PagerAdapter() {
 
     private fun compose(container: ViewGroup, position: Int) {
         R4a.composeInto(container, reference) {
-            with(CompositionContext.current) {
+            with(composer) {
                 group(0) {
                     composeItem(position)
                 }
@@ -82,7 +85,7 @@ abstract class ComposePagerAdapter : PagerAdapter() {
 
 }
 
-class ComposeViewPager : Component(), RefForwarder<ViewPager> {
+class ComposeViewPager: RefForwarder<ViewPager>, Component() { // keeping a component for now because we are using macros to call it
     override val refToForward: Ref<ViewPager> = Ref()
     var children: (Int) -> Unit = {}
     var getCount: () -> Int = { 0 }
@@ -94,7 +97,7 @@ class ComposeViewPager : Component(), RefForwarder<ViewPager> {
     private val myAdapter = object : ComposePagerAdapter() {
 
         override fun composeItem(position: Int) {
-            with(CompositionContext.current) {
+            with(composer) {
                 group(0) {
                     children(position)
                 }
@@ -108,13 +111,13 @@ class ComposeViewPager : Component(), RefForwarder<ViewPager> {
     override fun compose() {
         // TODO(lmr): I think we realistically should call myAdapter.notifyDatasetChanged() here or in a
         // componentDidUpdate() like lifecycle
-        with(CompositionContext.current) {
+        with(composer) {
             portal(0) { ref ->
                 myAdapter.reference = ref
                 emitView(0, ::ViewPager) {
                     set(R.id.view_pager_id) { id = it }
                     set(myAdapter) { adapter = it }
-                    set(refToForward) { setRef(it) }
+                    set(refToForward) { this.setRef(it) }
                     set(offscreenPageLimit) { setOffscreenPageLimit(it) }
                 }
             }
@@ -126,7 +129,8 @@ class ComposeViewPager : Component(), RefForwarder<ViewPager> {
 /**
  * A Tabs component that abstracts away the common need of having a ViewPager and TabLayout work together.
  */
-class Tabs : Component() {
+class Tabs {
+    var bust: Double = 0.0
     lateinit var titles: List<String>
     var offscreenPageLimit: Int = 1
     lateinit var tabLayoutParams: ViewGroup.LayoutParams
@@ -138,14 +142,14 @@ class Tabs : Component() {
 //            content: (children: (Int) -> Unit) -> Unit
 //    ) -> Unit
 
-    private var _children: (
-        tabs: () -> Unit,
-        content: (children: (Int) -> Unit) -> Unit
+    private var _children: @Composable() (
+        tabs: @Composable() () -> Unit,
+        content: @Composable() (children: @Composable() (Int) -> Unit) -> Unit
     ) -> Unit = { _, _ -> }
 
     @Children
-    fun setChildren(children:@Composable() (
-        tabs: () -> Unit,
+    fun setChildren(children: @Composable() (
+        tabs: @Composable() () -> Unit,
         content: @Composable() (children: @Composable() (Int) -> Unit) -> Unit
     ) -> Unit) {
         _children = children
@@ -166,25 +170,26 @@ class Tabs : Component() {
         }
     }
 
-    override fun compose() {
-        with(CompositionContext.current) {
+    @Suppress("PLUGIN_ERROR")
+    @Composable
+    operator fun invoke() {
+        with(composer) {
             group(0) {
                 _children({
                     emitView(0, ::TabLayout) {
                         set(tabLayoutParams) { layoutParams = it }
-//                    set(it, titles) { setTitles(it) }
                         set(tabBackgroundColor) { setBackgroundColor(it) }
                         set(tabRef) { setRef(it) }
                     }
                 }, { composeTab ->
                     portal(0) { ambients ->
-                        emitComponent(0, ::ComposeViewPager) {
-                            set(pagerLayoutParams) { layoutParams = it }
-                            set(ambients) { reference = it }
-                            set(composeTab) { children = it }
-                            set({ titles.size }) { getCount = it }
-                            set({ position: Int -> titles[position] }) { getPageTitle = it }
-                            set(pagerRef) { ref = it }
+                        emitComponent(0, ::ComposeViewPager) { f ->
+                            set(pagerLayoutParams) { f.layoutParams = it } or
+                            set(ambients) { f.reference = it } or
+                            set(composeTab) { f.children = it } or
+                            set({ titles.size }) { f.getCount = it } or
+                            set({ position: Int -> titles[position] }) { f.getPageTitle = it } or
+                            set(pagerRef) { f.ref = it } or
                             set(offscreenPageLimit) { offscreenPageLimit = it }
                         }
                     }

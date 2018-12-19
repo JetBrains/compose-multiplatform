@@ -12,6 +12,7 @@ import com.intellij.codeInsight.lookup.LookupElementRenderer
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.ui.JBColor
+import org.jetbrains.kotlin.descriptors.ConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.idea.completion.CompletionSessionConfiguration
 import org.jetbrains.kotlin.idea.completion.ToFromOriginalFileMapper
@@ -29,6 +30,8 @@ import org.jetbrains.kotlin.r4a.idea.AttributeInfoExtractor
 import org.jetbrains.kotlin.r4a.idea.parentOfType
 import org.jetbrains.kotlin.renderer.DescriptorRenderer
 import org.jetbrains.kotlin.resolve.DescriptorUtils
+import org.jetbrains.kotlin.resolve.calls.model.VariableAsFunctionResolvedCall
+import org.jetbrains.kotlin.types.typeUtil.isUnit
 
 class R4aAttributeCompletionSession(
     configuration: CompletionSessionConfiguration,
@@ -42,25 +45,37 @@ class R4aAttributeCompletionSession(
     private val hasChildrenLambda = elementExpr.getChildrenOfType<KtxLambdaExpression>().isNotEmpty()
     private val usedAttributesNameSet = usedAttributes.mapNotNull { attr -> attr.key?.getIdentifier()?.text }.toSet()
 
-    fun isValid() = nullableTagInfo != null
+    fun isValid() = nullableKtxCall != null
 
-    private val nullableTagInfo = bindingContext.get(R4AWritableSlices.KTX_TAG_INFO, elementExpr)
+    private val nullableKtxCall = bindingContext.get(R4AWritableSlices.RESOLVED_KTX_CALL, elementExpr)
 
-    private val tagInfo get() = nullableTagInfo ?: error("no tag info found on element. Call isValid() before using this class")
+    private val ktxCall get() = nullableKtxCall ?: error("no tag info found on element. Call isValid() before using this class")
 
+    private val ktxCallResolvedCalls by lazy { ktxCall.emitOrCall.resolvedCalls() }
     private val referrableDescriptors by lazy {
-        listOf(tagInfo.referrableDescriptor)
+        ktxCallResolvedCalls
+            .map {
+                val resultingDescriptor = it.resultingDescriptor
+                val result: DeclarationDescriptor = when {
+                    it is VariableAsFunctionResolvedCall -> it.variableCall.candidateDescriptor
+                    resultingDescriptor is ConstructorDescriptor -> resultingDescriptor.constructedClass
+                    else -> resultingDescriptor
+                }
+                result
+            }
     }
 
     private val instanceTypes by lazy {
-        listOfNotNull(tagInfo.instanceType)
+        ktxCallResolvedCalls
+            .mapNotNull { it.resultingDescriptor.returnType }
+            .filter { !it.isUnit() }
     }
 
     private val attributeInfoExtractor = AttributeInfoExtractor(
         file = file,
         visibilityFilter = { it.isVisibleDescriptor() },
         declarationTranslator = { toFromOriginalFileMapper.toSyntheticFile(it) },
-        tagInfo = nullableTagInfo
+        ktxCall = nullableKtxCall
     )
 
     private fun AttributeInfo.constructLookupElement(): LookupElement? {

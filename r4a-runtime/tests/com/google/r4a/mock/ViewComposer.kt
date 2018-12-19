@@ -22,6 +22,8 @@ abstract class ViewComponent : Recomposable, MockViewComposition {
     fun recompose() {
         recomposer?.let { it() }
     }
+    override operator fun invoke() = compose()
+    abstract fun compose()
 }
 
 typealias Compose = MockViewComposition.() -> Unit
@@ -141,7 +143,7 @@ inline fun <reified C : ViewComponent, reified A1, reified A2> MockViewCompositi
         skip = false
     }
     myCC.startCompose(skip, component)
-    if (!skip) component.compose()
+    if (!skip) component()
     myCC.doneCompose(skip)
     myCC.endGroup()
 }
@@ -170,7 +172,7 @@ inline fun <reified C : ViewComponent, reified A1, reified A2, reified A3> MockV
         skip = false
     }
     myCC.startCompose(skip, component)
-    if (!skip) component.compose()
+    if (!skip) component()
     myCC.doneCompose(skip)
     myCC.endGroup()
 }
@@ -214,7 +216,7 @@ inline fun <reified C:ViewComponent> MockViewComposition.composeComponent(key: A
     updater.block()
     val skip = !updater.changed
     myCC.startCompose(skip, component)
-    if (!skip) component.compose()
+    if (!skip) component()
     myCC.doneCompose(skip)
     myCC.endGroup()
 }

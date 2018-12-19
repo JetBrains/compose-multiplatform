@@ -9,7 +9,7 @@ import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import com.google.r4a.CompositionContext.Companion.recomposeSync
 
-class SpinnerForm : Component() {
+class SpinnerForm: Component() {
     private var selectedIndex = 0
 
     override fun compose() {
@@ -19,7 +19,7 @@ class SpinnerForm : Component() {
                 layoutHeight=WRAP_CONTENT
                 data=AllRegions
                 controlledSelectedIndex=selectedIndex
-                onSelectedIndexChange={
+                onSelectedIndexChange={ it ->
                     selectedIndex = it
                     recomposeSync()
                 }

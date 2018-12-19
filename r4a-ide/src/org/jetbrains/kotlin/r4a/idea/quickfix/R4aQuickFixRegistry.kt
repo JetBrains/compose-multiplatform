@@ -19,6 +19,7 @@ class R4aQuickFixRegistry : QuickFixContributor {
         quickFixes.register(R4AErrors.MISMATCHED_ATTRIBUTE_TYPE, ImportAttributeFix)
         quickFixes.register(Errors.UNRESOLVED_REFERENCE, ImportAttributeFix)
         quickFixes.register(R4AErrors.UNRESOLVED_ATTRIBUTE_KEY, ImportAttributeFix)
+        quickFixes.register(R4AErrors.UNRESOLVED_ATTRIBUTE_KEY_UNKNOWN_TYPE, ImportAttributeFix)
 
         // "Add Import" for unresolved tags on KTX elements. The normal "Unresolved Reference" quick fix
         // doesn't work in this case because if the KTX element has an open and closing tag, only one of

@@ -3,26 +3,28 @@ package com.google.r4a.examples.explorerapp.ui.screens
 import android.graphics.Color
 import android.graphics.Typeface
 import android.support.v7.widget.CardView
-import android.view.View
-import android.view.ViewGroup
-import android.widget.FrameLayout
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.google.r4a.Component
+import com.google.r4a.Composable
 import com.google.r4a.adapters.*
-import com.google.r4a.examples.explorerapp.common.adapters.*
+import com.google.r4a.composer
+import com.google.r4a.examples.explorerapp.common.adapters.setCardElevation
+import com.google.r4a.examples.explorerapp.common.adapters.setForeground
+import com.google.r4a.examples.explorerapp.common.adapters.setMaxCardElevation
+import com.google.r4a.examples.explorerapp.common.adapters.setRadius
 import com.google.r4a.examples.explorerapp.common.components.CardImageView
 import com.google.r4a.examples.explorerapp.common.components.ImageSpec
 import com.google.r4a.examples.explorerapp.common.data.Link
 import com.google.r4a.examples.explorerapp.ui.Colors
 import com.google.r4a.examples.explorerapp.ui.components.TimeAgo
-import android.view.ViewGroup.LayoutParams.MATCH_PARENT
-import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 
-class LinkCard(var link: Link) : Component() {
+class LinkCard(var link: Link) {
     var onClick: () -> Unit = {}
 
-    override fun compose() {
+    @Composable
+    operator fun invoke() {
         <CardView
             layoutWidth=MATCH_PARENT
             layoutHeight=WRAP_CONTENT
@@ -49,7 +51,7 @@ class LinkCard(var link: Link) : Component() {
                     // image will at worst be square
                     <CardImageView
                         spec=ImageSpec(
-                                uri = image.source.url,
+                                uri = image.source.decodedUrl,
                                 aspectRatio = Math.min(1f, image.source.height.toFloat() / image.source.width.toFloat())
                         )
                         layoutWidth=MATCH_PARENT

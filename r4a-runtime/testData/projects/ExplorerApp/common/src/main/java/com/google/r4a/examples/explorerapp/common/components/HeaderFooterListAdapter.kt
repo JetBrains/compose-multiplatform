@@ -127,7 +127,7 @@ class HeaderFooterListAdapter<T>(callback: DiffUtil.ItemCallback<T>) : RecyclerV
         if (viewType == TYPE_HEADER) {
             val realPosition = index
             reference.composeInto(view) {
-                with(CompositionContext.current) {
+                with(composer) {
                     group(0) {
                         composeHeader(realPosition)
                     }
@@ -145,7 +145,7 @@ class HeaderFooterListAdapter<T>(callback: DiffUtil.ItemCallback<T>) : RecyclerV
             onLoadAround(realPosition)
             val item = differ.currentList[realPosition] ?: error("couldn't find item")
             reference.composeInto(view) {
-                with(CompositionContext.current) {
+                with(composer) {
                     group(0) { children(item, realPosition) }
                 }
             }
@@ -158,7 +158,7 @@ class HeaderFooterListAdapter<T>(callback: DiffUtil.ItemCallback<T>) : RecyclerV
         if (viewType == TYPE_LOADING) {
             val realPosition = index
             reference.composeInto(view) {
-                with(CompositionContext.current) {
+                with(composer) {
                     group(0) { composeLoadingRow(realPosition) }
                 }
             }
@@ -171,7 +171,7 @@ class HeaderFooterListAdapter<T>(callback: DiffUtil.ItemCallback<T>) : RecyclerV
         if (viewType == TYPE_FOOTER) {
             val realPosition = index
             reference.composeInto(view) {
-                with(CompositionContext.current) {
+                with(composer) {
                     group(0) { composeFooter(realPosition) }
                 }
             }

@@ -19,10 +19,12 @@ import com.google.r4a.examples.explorerapp.ui.R
 import com.makeramen.roundedimageview.RoundedImageView
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import com.google.r4a.adapters.Ref
 
-class RedditDrawer : Component() {
-    private var children: (() -> Unit)? = null
-    fun setChildrenBlock(fn: () -> Unit) {
+class RedditDrawer: Component() { // component due to being called from a macro
+    private var children: (@Composable() () -> Unit)? = null
+    @Children
+    fun setChildrenBlock(fn: @Composable() () -> Unit) {
         children = fn
     }
 
@@ -52,6 +54,7 @@ class RedditDrawer : Component() {
                         padding=16.dp
                         gravity=Gravity.BOTTOM
                     >
+                        // TOD(typeres): why doesn't this tag have a ref target?
                         <RoundedImageView
                             layoutWidth=64.dp
                             layoutHeight=64.dp
@@ -79,7 +82,7 @@ class RedditDrawer : Component() {
                 onNavigationItemSelected={ item ->
                     val bundle = Bundle()
                     val drawerLayout = drawerRef.value ?: error("expected drawerLayout to be there")
-                    when (item.getItemId()) {
+                    when (item.itemId) {
                         R.id.nav_home -> {
                             drawerLayout.closeDrawer(Gravity.START, true)
                             navigator.navigate(R.id.nav_to_home, bundle)

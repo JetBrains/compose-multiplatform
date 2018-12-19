@@ -12,8 +12,8 @@ import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.descriptors.VariableDescriptor
 import org.jetbrains.kotlin.extensions.KtxControlFlowExtension
 import org.jetbrains.kotlin.psi.*
-import org.jetbrains.kotlin.r4a.analysis.R4AWritableSlices.KTX_ATTR_INFO
-import org.jetbrains.kotlin.r4a.analysis.R4AWritableSlices.KTX_TAG_INFO
+import org.jetbrains.kotlin.r4a.analysis.R4AWritableSlices
+import org.jetbrains.kotlin.r4a.ast.*
 import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.calls.model.ArgumentMatch
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
@@ -205,52 +205,66 @@ class R4aKtxControlFlowExtension : KtxControlFlowExtension {
             getBoundOrUnreachableValue(from)?.let { builder.bindValue(it, to) }
         }
 
-        fun visitKtxElementOld(element: KtxElement) {
-            val tagInfo = trace.get(KTX_TAG_INFO, element) ?: return
+        fun visitComposerCallInfo(memoize: ComposerCallInfo, inputInstructions: MutableList<InstructionWithValue>) {
+            memoize.ctorCall?.let { inputInstructions.add(generateCall(it)) }
+            inputInstructions.add(generateCall(memoize.composerCall))
+            memoize.validations.forEach { validation ->
+                validation.validationCall?.let { inputInstructions.add(generateCall(it)) }
+                validation.assignment?.let { inputInstructions.add(generateCall(it)) }
+            }
+        }
+
+        fun visitKtxElement(element: KtxElement) {
+            val inputExpressions = ArrayList<KtElement>()
+            val inputInstructions = ArrayList<InstructionWithValue>()
             val tagExpr = element.simpleTagName ?: element.qualifiedTagName ?: return
 
-            val inputExpressions = ArrayList<KtExpression>()
-            val inputInstructions = ArrayList<InstructionWithValue>()
-
-            inputInstructions.add(generateCall(tagInfo.resolvedCall))
-
+            inputExpressions.add(tagExpr)
 
             for (attribute in element.attributes) {
                 val valueExpr = attribute.value ?: attribute.key ?: break
-                val attrInfo = trace.get(KTX_ATTR_INFO, attribute) ?: break
-
-                attrInfo.setterResolvedCall?.let {
-                    inputInstructions.add(generateCall(it))
-                }
-
                 generateInstructions(valueExpr)
                 mark(valueExpr)
                 inputExpressions.add(valueExpr)
             }
 
-            generateInstructions(tagExpr)
-            mark(tagExpr)
-            inputExpressions.add(tagExpr)
-
             element.bodyLambdaExpression?.let {
-                // If we don't surround this with block scope and loadUnit(), refactoring tools will improperly think that the lambda
-                // is an "outputValue" of the element. If that happens, the refactorings break.
-                builder.enterBlockScope(it)
                 generateInstructions(it)
-                builder.loadUnit(it)
-                builder.exitBlockScope(it)
-
                 inputExpressions.add(it)
             }
-            mark(element)
+
+            val elementCall = trace.get(R4AWritableSlices.RESOLVED_KTX_CALL, element) ?: return
+            var node: EmitOrCallNode? = elementCall.emitOrCall
+
+            inputInstructions.add(generateCall(elementCall.getComposerCall))
+
+            while (node != null) {
+                when (node) {
+                    is MemoizedCallNode -> {
+                        visitComposerCallInfo(node.memoize, inputInstructions)
+                        node = node.call
+                    }
+                    is NonMemoizedCallNode -> {
+                        inputInstructions.add(generateCall(node.resolvedCall))
+                        node = node.nextCall
+                    }
+                    is EmitCallNode -> {
+                        visitComposerCallInfo(node.memoize, inputInstructions)
+                        node = null
+                    }
+                    is ErrorNode -> {
+                        node = null
+                    }
+                }
+            }
+
             builder.magic(
                 instructionElement = element,
                 valueElement = null,
                 inputValues = elementsToValues(inputExpressions) + instructionsToValues(inputInstructions),
-                kind = MagicKind.UNRESOLVED_CALL
+                kind = MagicKind.VALUE_CONSUMER
             )
         }
-
     }
 
     override fun visitKtxElement(
@@ -259,6 +273,6 @@ class R4aKtxControlFlowExtension : KtxControlFlowExtension {
         visitor: KtVisitorVoid,
         trace: BindingTrace
     ) {
-        ControlFlowVisitor(builder, visitor, trace).visitKtxElementOld(element)
+        ControlFlowVisitor(builder, visitor, trace).visitKtxElement(element)
     }
 }

@@ -1,5 +1,6 @@
 package com.google.r4a
 
+import android.view.ViewGroup
 import java.util.*
 
 internal typealias Change<N> = (applier: Applier<N>, slots: SlotWriter) -> Unit
@@ -149,7 +150,9 @@ open class Composer<N>(
     private var invalidations: MutableList<Invalidation> = mutableListOf()
     private val entersStack = IntStack()
     private val insertedParents = Stack<Recomposable>()
+    private val insertedProviders = Stack<Ambient<*>.Provider>()
     private val invalidateStack = Stack<RecomposeScope>()
+    internal var ambientReference: Ambient.Reference? = null
 
     // Temporary to allow staged changes. This will move into a sub-object that represents an active composition
     // created by startRoot() and recomposeComponentRange()
@@ -323,6 +326,184 @@ open class Composer<N>(
                     }
                 }
             }
+        }
+    }
+
+    fun <T> startProvider(p: Ambient<T>.Provider, value: T) {
+        startGroup(provider)
+        nextSlot()
+        updateValue(p)
+        insertedProviders.push(p)
+        if (value != nextSlot()) {
+            updateValue(value)
+            invalidateConsumers(p.ambient)
+        } else {
+            skipValue()
+        }
+        startGroup(invocation)
+    }
+
+    fun endProvider() {
+        endGroup()
+        endGroup()
+        insertedProviders.pop()
+    }
+
+    fun <T> startConsumer(c: Ambient<T>.Consumer): T {
+        startGroup(consumer)
+        nextSlot()
+        updateValue(c)
+        startGroup(invocation)
+        return parentAmbient(c.ambient)
+    }
+
+    fun endConsumer() {
+        endGroup()
+        endGroup()
+    }
+
+    /**
+     * Create or use a memoized `Ambient.Reference` instance at this position in the slot table.
+     * Used to implement Ambient.Portal.
+     */
+    fun buildReference(): Ambient.Reference {
+        val reference = 0
+        startGroup(reference)
+
+        var ref = nextSlot() as? Ambient.Reference
+        if (ref != null && !inserting) {
+            skipValue()
+            return ref
+        } else {
+            val scope = invalidateStack.peek()
+            ref = object : Ambient.Reference {
+                override fun <T> getAmbient(key: Ambient<T>): T {
+                    val anchor = scope.anchor
+                    return if (anchor != null && anchor.valid) {
+                        parentAmbient(key, anchor.location(slotTable))
+                    } else {
+                        parentAmbient(key)
+                    }
+                }
+
+                override fun composeInto(container: ViewGroup, composable: () -> Unit) {
+                    R4a.composeInto(container, this, composable)
+                }
+            }
+            updateValue(ref)
+        }
+        endGroup()
+
+        return ref
+    }
+
+    internal fun <T> parentAmbient(key: Ambient<T>): T {
+        // Enumerate the parents that have been inserted
+        if (insertedProviders.isNotEmpty()) {
+            var current = insertedProviders.size - 1
+            while (current >= 0) {
+                val element = insertedProviders[current]
+                if (element is Ambient<*>.Provider && element.ambient === key) {
+                    return element.value as? T ?: key.defaultValue
+                }
+                current--
+            }
+        }
+
+        // Enumerate the parents that were also in the previous composition
+        var current = slots.startStack.size - 1
+        while (current > 0) {
+            val index = slots.startStack.peek(current)
+            val sentinel = slots.get(index - 1)
+            if (sentinel === provider) {
+                val element = slots.get(index + 1)
+                if (element is Ambient<*>.Provider && element.ambient === key) {
+                    return element.value as? T ?: key.defaultValue
+                }
+            }
+            current--
+        }
+
+        val ref = ambientReference
+
+        if (ref != null) {
+            return ref.getAmbient(key)
+        }
+
+        return key.defaultValue
+    }
+
+    private fun <T> parentAmbient(key: Ambient<T>, location: Int): T {
+
+        var index = location
+
+        while (index >= 0) {
+            // A recomposable (i.e. a component) will always be in the first slot after the group marker.  This is true because that is
+            // where the recompose routine will look for it. If the slot does not hold a recomposable it is not a recomposable
+            // group so skip it.
+            if (slots.isGroup(index)) {
+                val sentinel = slots.get(index - 1)
+                when {
+                    sentinel === provider -> {
+                        val element = slots.get(index + 1)
+                        if (element is Ambient<*>.Provider && element.ambient == key) {
+                            @Suppress("UNCHECKED_CAST")
+                            return element.value as T
+                        }
+                    }
+                }
+            }
+            index -= 1
+        }
+
+        val ref = ambientReference
+
+        if (ref != null) {
+            return ref.getAmbient(key)
+        }
+
+        return key.defaultValue
+    }
+
+    private fun <T> invalidateConsumers(key: Ambient<T>) {
+        // Inserting components don't have children yet.
+        if (!inserting) {
+            // Get the parent size from the slot table
+            val containingGroupIndex = slots.startStack.peek()
+            val start = containingGroupIndex + 1
+            val end = start + slots.groupSize(containingGroupIndex)
+            var index = start
+
+            // Check the slots in range for recomposabile instances
+            loop@ while (index < end) {
+                // A recomposable (i.e. a component) will always be in the first slot after the group marker.  This is true because that is
+                // where the recompose routine will look for it. If the slot does not hold a recomposable it is not a recomposable
+                // group so skip it.
+                if (slots.isGroup(index)) {
+                    val sentinel = slots.get(index - 1)
+                    when {
+                        sentinel === consumer -> {
+                            val element = slots.get(index + 1)
+                            if (element is Ambient<*>.Consumer && element.ambient == key) {
+                                @Suppress("UNCHECKED_CAST")
+                                element.recomposeCallback?.let { it() }
+                            }
+                        }
+                        sentinel === provider -> {
+                            val element = slots.get(index + 1)
+                            if (element is Ambient<*>.Provider && element.ambient == key) {
+                                index += slots.groupSize(index)
+                                continue@loop
+                            }
+                        }
+                    }
+                }
+                index += 1
+            }
+
+            // NOTE(lmr): realistically, we should be invalidating Ambient.References here as well, but soon we will be storing
+            // subcompositions in the same SlotTable which means this won't be necessary. And it doesn't work prior to this being
+            // added anyway, so it continuing to not work is not a huge deal.
         }
     }
 
@@ -640,7 +821,7 @@ open class Composer<N>(
     }
 
     private fun invalidate(scope: RecomposeScope) {
-        val location = scope.anchor!!.location(slotTable)
+        val location = scope.anchor?.location(slotTable) ?: return
         assert(location >= 0) { "Invalid anchor" }
         invalidations.insertIfMissing(location, scope)
     }
@@ -654,7 +835,7 @@ open class Composer<N>(
 
     private fun composeInstance(instance: Recomposable) {
         startCompose(false, instance)
-        with(instance) { compose() }
+        instance()
         doneCompose(false)
     }
 

@@ -6,7 +6,7 @@ import android.widget.*
 import android.view.*
 import com.google.r4a.CompositionContext
 
-class Reordering : Component() {
+class Reordering: Component() { // Component for cc.find()
     // state
     private var items = mutableListOf(1, 2, 3, 4, 5)
 
@@ -27,10 +27,7 @@ class Reordering : Component() {
             <Button
                 text="PRINT TREE"
                 onClick={
-                    val cc = CompositionContext.find(this@Reordering)
-                    if (cc != null) {
-                        cc.debug()
-                    }
+                    // NOTE(lmr): debug() is no longer supported
                 }
             />
             items.forEachIndexed { index, id ->
@@ -39,7 +36,7 @@ class Reordering : Component() {
         </LinearLayout>
     }
 
-    private class Item(var id: Int, var onMove: (Int) -> Unit): Component() {
+    private class Item(var id: Int, var onMove: (Int) -> Unit): Component() { // component for state
         // state
         private var count: Int = 0
 

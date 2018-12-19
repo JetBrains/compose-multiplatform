@@ -429,7 +429,7 @@ class ComposableCheckerTests: AbstractR4aDiagnosticsTest() {
                @Composable
                fun foo() {
                    val myVariable: ()->Unit = { }
-                   <myVariable />  // TODO: We can (and should) easily catch this (using annotations or ideally dataflow analysis)
+                   <<!NON_COMPOSABLE_INVOCATION!>myVariable<!> />
                    System.out.println(myVariable)
                }
            """)

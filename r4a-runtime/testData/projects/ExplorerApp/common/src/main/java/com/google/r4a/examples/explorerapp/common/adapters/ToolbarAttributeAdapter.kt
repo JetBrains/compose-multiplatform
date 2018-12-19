@@ -57,7 +57,7 @@ fun Toolbar.setIsActionBar(isActionBar: Boolean) {
     // TODO(lmr): Using ambients in a setter like this is not great, since we are don't really have any way of
     // ensuring that it's getting the right ones based on it's scope. If we change ambients to also pass though
     // android Context objects, I think we can do this in a more reliable way that feels better.
-    val activity = CompositionContext.current.getAmbient(Ambients.Activity) ?: return
+    val activity = CompositionContext.current.getAmbient(Ambients.Activity)
     if (isActionBar) {
         activity.setSupportActionBar(this)
     }

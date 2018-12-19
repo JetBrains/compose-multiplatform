@@ -1,8 +1,12 @@
 package com.google.r4a.examples.explorerapp
 
+import android.app.AppComponentFactory
+import android.os.Bundle
 import android.support.v4.widget.DrawerLayout
+import android.support.v7.app.AppCompatActivity
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.FragmentNavigatorDestinationBuilder
@@ -105,16 +109,16 @@ class MainActivity : ComposeNavigationActivity() {
      * TODO(lmr): It might be a better abstraction if we consolidate this and composeDrawer
      */
     override fun composeContent(content: (ViewGroup.LayoutParams) -> Unit) {
-        with(CompositionContext.current) {
+        with(composer) {
             provideAmbient(RedditRepository.Ambient, repository) {
                 provideAmbient(AuthenticationService.Ambient, authService) {
-                    emitComponent(0, ::RedditDrawer) {
+                    emitComponent(0, ::RedditDrawer) {f ->
                         val fn = {
                             group(0) {
                                 content(contentParams)
                             }
                         }
-                        set(fn) { setChildrenBlock(it) }
+                        set(fn) { f.setChildrenBlock(it) }
                     }
                 }
             }

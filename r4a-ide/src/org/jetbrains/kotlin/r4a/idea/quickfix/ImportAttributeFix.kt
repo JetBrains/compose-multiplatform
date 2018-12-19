@@ -34,9 +34,8 @@ class ImportAttributeFix(expression: KtSimpleNameExpression) : R4aImportFix(expr
     private val ktxAttribute = expression.parent as KtxAttribute
 
     private fun getReceiverTypes(bindingContext: BindingContext, element: KtxElement): List<KotlinType>? {
-        val tagInfo = bindingContext[R4AWritableSlices.KTX_TAG_INFO, element] ?: return null
-        val instanceType = tagInfo.instanceType ?: return null
-        return listOf(instanceType)
+        val ktxCall = bindingContext[R4AWritableSlices.RESOLVED_KTX_CALL, element] ?: return null
+        return ktxCall.emitOrCall.resolvedCalls().mapNotNull { it.resultingDescriptor.returnType }
     }
 
     override fun computeSuggestions(): List<ImportVariant> {

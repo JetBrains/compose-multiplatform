@@ -25,7 +25,7 @@ abstract class ComposeFragment : Fragment() {
         // seamlessly with FragmentComponent. It works but feels a little bit wrong. Consider better options.
         val reference = reference ?: container?.findAmbientReference()
         R4a.composeInto(root, reference) {
-            with(CompositionContext.current) {
+            with(composer) {
                 provideAmbient(Ambients.Fragment, this@ComposeFragment) {
                     group(0) {
                         compose()

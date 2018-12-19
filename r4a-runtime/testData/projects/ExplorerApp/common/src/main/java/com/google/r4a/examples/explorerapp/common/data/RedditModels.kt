@@ -1,7 +1,9 @@
 package com.google.r4a.examples.explorerapp.common.data
 
+import android.os.Build
 import android.os.Parcelable
 import android.support.v7.util.DiffUtil
+import android.text.Html
 import com.google.gson.*
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
@@ -127,7 +129,13 @@ data class ImageSource(
         val url: String,
         val width: Int,
         val height: Int
-): Parcelable
+): Parcelable {
+    val decodedUrl: String
+        get() = if (Build.VERSION.SDK_INT >= 24)
+            Html.fromHtml(url , Html.FROM_HTML_MODE_LEGACY).toString()
+        else
+            Html.fromHtml(url).toString()
+}
 
 @Parcelize
 data class Comment(

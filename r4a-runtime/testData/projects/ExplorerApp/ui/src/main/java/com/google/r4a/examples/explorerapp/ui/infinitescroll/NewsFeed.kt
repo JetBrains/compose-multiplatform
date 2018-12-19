@@ -14,27 +14,29 @@ import com.google.r4a.examples.explorerapp.ui.components.Recycler
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 
-class NewsFeed: Component() {
+class NewsFeed {
     // TODO(lmr): do a better job dealing with layoutmanager...
     private val layoutManager = LinearLayoutManager(null).apply { setOrientation(LinearLayoutManager.VERTICAL) }
 
-    override fun compose() {
+    @Composable
+    operator fun invoke() {
         <Recycler
             layoutWidth=MATCH_PARENT
             layoutHeight=MATCH_PARENT
             layoutManager
             getItemCount={ 9999 }
-        > position ->
-            <ItemComponent position />
-        </Recycler>
+            composeItem={ position ->
+                <ItemComponent position />
+            }
+        />
     }
 }
 
 
-class ItemComponent: Component() {
+class ItemComponent {
     var position = 0
-    override fun compose() {
-
+    @Composable
+    operator fun invoke() {
         <CardView
             cardBackgroundColor=Color.WHITE
             radius=0.dp

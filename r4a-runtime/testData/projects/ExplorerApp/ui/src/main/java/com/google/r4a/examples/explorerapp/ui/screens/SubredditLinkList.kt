@@ -16,7 +16,7 @@ import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import com.google.r4a.examples.explorerapp.common.components.HomogeneousPagedList
 
-class SubredditLinkList : Component() {
+class SubredditLinkList: Component() { // component for getAmbient() and subscribe(...)
     private val repository get() = CompositionContext.current.getAmbient(RedditRepository.Ambient)
 
     private val pageSize = 10
@@ -46,9 +46,9 @@ class SubredditLinkList : Component() {
                 val repository = repository
                 result = repository.linksOfSubreddit(subreddit, sortOptions[selectedSortIndex], pageSize)
                 _model = result
-                subscribe(result.links)
-                subscribe(result.networkState)
-                subscribe(result.refreshState)
+                subscribe(result.links, CompositionContext.current)
+                subscribe(result.networkState, CompositionContext.current)
+                subscribe(result.refreshState, CompositionContext.current)
             }
             return result
         }
@@ -67,7 +67,7 @@ class SubredditLinkList : Component() {
             layoutParams=listParams
             paddingTop=(48.dp + 56.dp)
             headerCount=1
-            composeHeader={
+            composeHeader={ it: Int ->
                 <FrameLayout
                     layoutWidth=MATCH_PARENT
                     layoutHeight=WRAP_CONTENT
@@ -91,9 +91,11 @@ class SubredditLinkList : Component() {
                         // TODO(lmr): textColor?
 
                         controlledSelectedIndex=selectedSortIndex
-                        onSelectedIndexChange={
-                            selectedSortIndex = it
-                            recomposeSync()
+                        onSelectedIndexChange={ it ->
+                            if (it != selectedSortIndex) {
+                                selectedSortIndex = it
+                                recomposeSync()
+                            }
                         }
                     />
                 </FrameLayout>
@@ -102,7 +104,7 @@ class SubredditLinkList : Component() {
             loadingRowCount=(if (isLoading) 1 else 0)
             composeLoadingRow={ _ -> <LoadingRow /> }
             backgroundColor=Colors.LIGHT_GRAY
-            data=model.links.getValue()
+            data=model.links.value
         > link ->
             <PostListItem link />
         </HomogeneousPagedList>

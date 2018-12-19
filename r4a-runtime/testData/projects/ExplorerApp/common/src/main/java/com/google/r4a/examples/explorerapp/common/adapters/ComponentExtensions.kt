@@ -12,15 +12,16 @@ import com.google.r4a.CompositionContext
  * TODO(lmr): Once we have start/stop lifecycle support, we will want to use that here. For now I'm using
  * CompositionContext.find(...) as a stop-gap solution.
  */
-fun <T> Component.subscribe(data: LiveData<T>) {
+fun <T> Component.subscribe(data: LiveData<T>, context: CompositionContext) {
     val component = this
     var observer: Observer<T>? = null
     observer = Observer {
-        val context = CompositionContext.find(component)
-        if (context == null) {
-            data.removeObserver(observer!!)
-        } else {
+        try {
             context.recompose(component)
+        } catch (e: Exception) {
+            // TODO(lmr): there is obviously a better way to do this, but this is the best I have until we have
+            // solid support for onInactive
+            data.removeObserver(observer!!)
         }
     }
     data.observeForever(observer)

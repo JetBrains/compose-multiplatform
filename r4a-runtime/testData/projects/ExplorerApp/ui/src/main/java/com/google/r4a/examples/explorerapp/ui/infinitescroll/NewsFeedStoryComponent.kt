@@ -11,11 +11,12 @@ import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 
 
 /** This component represents an individual feed story, including a title, optional description, and photo **/
-class NewsFeedStoryComponent : Component() {
+class NewsFeedStoryComponent {
 
     var story: Story? = null
 
-    override fun compose() {
+    @Composable
+    operator fun invoke() {
         val story = story
         <LinearLayout
             orientation=LinearLayout.VERTICAL

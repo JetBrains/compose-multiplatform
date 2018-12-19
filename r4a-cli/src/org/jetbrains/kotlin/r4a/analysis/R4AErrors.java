@@ -5,6 +5,7 @@ import org.jetbrains.kotlin.descriptors.DeclarationDescriptor;
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor;
 import org.jetbrains.kotlin.diagnostics.*;
 import org.jetbrains.kotlin.psi.*;
+import org.jetbrains.kotlin.r4a.ast.EmitOrCallNode;
 import org.jetbrains.kotlin.types.KotlinType;
 
 import java.util.Collection;
@@ -39,6 +40,7 @@ public interface R4AErrors {
     DiagnosticFactory0<KtElement> UNCLOSED_TAG = DiagnosticFactory0.create(ERROR);
     DiagnosticFactory0<KtElement> NO_COMPOSER_FOUND = DiagnosticFactory0.create(ERROR);
     DiagnosticFactory2<KtElement, KotlinType, String> INVALID_COMPOSER_IMPLEMENTATION = DiagnosticFactory2.create(ERROR);
+    DiagnosticFactory2<KtElement, EmitOrCallNode, EmitOrCallNode> AMBIGUOUS_KTX_CALL = DiagnosticFactory2.create(ERROR);
     DiagnosticFactory1<KtElement, String> CHILDREN_ATTR_USED_AS_BODY_AND_KEYED_ATTRIBUTE = DiagnosticFactory1.create(ERROR);
     DiagnosticFactory0<KtElement> CHILDREN_PROVIDED_BUT_NO_CHILDREN_DECLARED = DiagnosticFactory0.create(ERROR);
     DiagnosticFactory1<KtElement, KotlinType> MISSING_REQUIRED_CHILDREN = DiagnosticFactory1.create(ERROR);

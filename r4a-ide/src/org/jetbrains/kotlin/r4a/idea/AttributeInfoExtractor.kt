@@ -21,9 +21,8 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.isChildOf
 import org.jetbrains.kotlin.psi.KtDeclaration
 import org.jetbrains.kotlin.psi.KtFile
-import org.jetbrains.kotlin.r4a.KtxTagInfo
-import org.jetbrains.kotlin.r4a.R4AFlags
 import org.jetbrains.kotlin.r4a.R4aUtils
+import org.jetbrains.kotlin.r4a.ast.ResolvedKtxElementCall
 import org.jetbrains.kotlin.r4a.hasHiddenAttributeAnnotation
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.resolve.calls.components.hasDefaultValue
@@ -57,7 +56,7 @@ class AttributeInfoExtractor(
     // TODO(jdemeulenaere): Remove those params and try to share more code instead.
     private val visibilityFilter: (DeclarationDescriptor) -> Boolean,
     declarationTranslator: (KtDeclaration) -> KtDeclaration? = { it },
-    private val tagInfo: KtxTagInfo? = null
+    private val ktxCall: ResolvedKtxElementCall? = null
 ) {
     private val module = file.findModuleDescriptor()
     private val r4aComponentDescriptor = module.findClassAcrossModuleDependencies(ClassId.topLevel(R4aUtils.r4aFqName("Component")))
@@ -70,8 +69,28 @@ class AttributeInfoExtractor(
         file = file
     )
 
+    private val ktxCallResolvedCalls by lazy { ktxCall?.emitOrCall?.resolvedCalls() ?: emptyList() }
+    private val referrableDescriptors by lazy {
+        ktxCallResolvedCalls
+            .map {
+                val resultingDescriptor = it.resultingDescriptor
+                val result: DeclarationDescriptor = when {
+                    it is VariableAsFunctionResolvedCall -> it.variableCall.candidateDescriptor
+                    resultingDescriptor is ConstructorDescriptor -> resultingDescriptor.constructedClass
+                    else -> resultingDescriptor
+                }
+                result
+            }
+    }
+
+    private val instanceTypes by lazy {
+        ktxCallResolvedCalls
+            .mapNotNull { it.resultingDescriptor.returnType }
+            .filter { !it.isUnit() }
+    }
+
     private fun isDescriptorReferredTo(descriptor: DeclarationDescriptor?): Boolean {
-        return descriptor == tagInfo?.referrableDescriptor
+        return descriptor in referrableDescriptors
     }
 
     fun extract(tagDescriptor: DeclarationDescriptor, receiver: (Sequence<AttributeInfo>) -> Unit) {
@@ -206,18 +225,8 @@ class AttributeInfoExtractor(
             it.isPivotal = when (this) {
                 is PropertyDescriptor -> !isVar && !isExtension
                 is ValueParameterDescriptor -> {
-                    if (tagInfo?.isConstructed == true && containingDeclaration is ConstructorDescriptor) {
-                        val cd = containingDeclaration.containingDeclaration as ClassDescriptor
-                        val propName = name
-                        val desc = cd.unsubstitutedMemberScope.getContributedDescriptors()
-                            .mapNotNull { it as? PropertyDescriptor }
-                            .firstOrNull { it.name == propName }
-                        if (desc != null) !desc.isVar // if it's a "val", it's pivotal
-                        else true // if desc is null, it's a non-property constructor param, which IS pivotal
-                    } else {
-                        // TODO(lmr): decide if we still want/need this with new type resolution
-                        false // in this case there is no component instance, so nothing is pivotal
-                    }
+                    // TODO(lmr): decide if we still want/need this with new type resolution
+                    false // in this case there is no component instance, so nothing is pivotal
                 }
                 else -> false
             }

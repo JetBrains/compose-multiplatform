@@ -218,7 +218,7 @@ class ModelViewTests : TestCase() {
                     val instance = Root(composable)
                     cc.setInstance(instance)
                     cc.startCompose(true)
-                    instance.compose()
+                    instance()
                     cc.endCompose(true)
                     cc.endRoot()
                     firstCompose = false

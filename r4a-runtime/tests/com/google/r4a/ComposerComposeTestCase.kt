@@ -22,7 +22,7 @@ import org.robolectric.annotation.Config
     maxSdk = 23
 )
 abstract class ComposerComposeTestCase : TestCase() {
-    fun compose(composable: (CompositionContext) -> Unit) = ComposeTest(Root(composable))
+    fun compose(composable: (ViewComposition) -> Unit) = ComposeTest(Root(composable))
 
     class ComposeTest(val component: Component) {
         fun then(fn: (CompositionContext, Component, ViewGroup, Activity) -> Unit) {
@@ -38,8 +38,8 @@ abstract class ComposerComposeTestCase : TestCase() {
         }
     }
 
-    private class Root(var composable: (CompositionContext) -> Unit) : Component() {
-        override fun compose() = composable(CompositionContext.current)
+    private class Root(var composable: (ViewComposition) -> Unit) : Component() {
+        override fun compose() = composable(composer)
     }
 
     private class TestActivity : Activity() {

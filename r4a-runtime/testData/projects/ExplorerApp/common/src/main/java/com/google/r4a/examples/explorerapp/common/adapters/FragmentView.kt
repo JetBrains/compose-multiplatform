@@ -8,19 +8,15 @@ import android.widget.FrameLayout
 import com.google.r4a.*
 import com.google.r4a.examples.explorerapp.common.R
 
-class FragmentComponent : Component() {
-    lateinit var construct: () -> Fragment
-    var layoutParams: ViewGroup.LayoutParams? = null
-    var id: Int = 0
-    override fun compose() {
-        with(CompositionContext.current) {
-            // NOTE(lmr): if we use R4aContext as ambient reference we can probably get rid of this component
-            // entirely
-            portal(0) { ref ->
-                emitView(0, { FragmentView(it, construct, id, ref) }) {
-                    set(layoutParams) { layoutParams = it }
-                    set(id) { id = it }
-                }
+@Composable
+fun FragmentComponent(construct: () -> Fragment, layoutParams: ViewGroup.LayoutParams? = null, id: Int = 0) {
+    with(composer) {
+        // NOTE(lmr): if we use R4aContext as ambient reference we can probably get rid of this component
+        // entirely
+        portal(0) { ref ->
+            emitView(0, { FragmentView(it, construct, id, ref) }) {
+                set(layoutParams) { this.layoutParams = it }
+                set(id) { this.id = it }
             }
         }
     }

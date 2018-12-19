@@ -2,6 +2,7 @@ package com.google.r4a
 
 import android.content.Context
 import android.view.View
+import android.view.ViewGroup
 import java.util.*
 
 abstract class CompositionContext {
@@ -66,8 +67,6 @@ abstract class CompositionContext {
         fun setRoot(emittable: Emittable, component: Component) {
             EMITTABLE_ROOT_COMPONENT[emittable] = component
         }
-
-        fun <T : Any?> getAmbient(key: Ambient<T>, component: Component): T = find(component)!!.getAmbient(key, component)
     }
 
     abstract fun startRoot()
@@ -94,193 +93,149 @@ abstract class CompositionContext {
     abstract fun recompose(component: Component)
     abstract fun recomposeAll()
     abstract fun recomposeSync(component: Component)
-    abstract fun preserveAmbientScope(component: Component)
     abstract fun <T : Any?> getAmbient(key: Ambient<T>): T
-    abstract fun <T : Any?> getAmbient(key: Ambient<T>, component: Component): T
-    abstract fun debug()
 }
 
-
-class Updater<T>(
-    val cc: CompositionContext,
-    val el: T
-) {
-    inline fun <reified V> set(value: V, noinline block: T.(V) -> Unit) {
-        if (cc.attributeChangedOrInserting(value)) {
-            el.block(value)
-        }
+inline fun ViewComposition.group(key: Int, block: () -> Unit) {
+    try {
+        composer.startGroup(key)
+        block()
+    } finally {
+        composer.endGroup()
     }
 }
 
-inline fun CompositionContext.group(key: Int, key2: Any? = null, block: () -> Unit = {}) {
-    start(key, key2)
-    block()
-    end()
-}
-
-inline fun CompositionContext.viewGroup(key: Int, key2: Any? = null, block: () -> Unit = {}) {
-    startView(key, key2)
-    block()
-    endView()
-}
-
-inline fun <reified T : Component> CompositionContext.emitComponent(
+inline fun <reified T : Component> ViewComposition.emitComponent(
     loc: Int,
     ctor: () -> T,
-    block: Updater<T>.() -> Unit
-) = emitComponent(loc, null, ctor, block)
+    noinline block: ViewValidator.(f: T) -> Boolean
+): Unit = emitComponent(loc, null, ctor, block)
 
-inline fun <reified T : Component> CompositionContext.emitComponent(
+inline fun <reified T : Component> ViewComposition.emitComponent(
     loc: Int,
     ctor: () -> T
-) = emitComponent(loc, null, ctor, {})
+): Unit = emitComponent(loc, null, ctor, { true })
 
-inline fun <reified T : Component> CompositionContext.emitComponent(
+inline fun <reified T : Component> ViewComposition.emitComponent(
     loc: Int,
     key: Int?,
     ctor: () -> T
-) = emitComponent(loc, key, ctor, {})
+): Unit = emitComponent(loc, key, ctor, { true })
 
-inline fun <reified T : Component> CompositionContext.emitComponent(
+inline fun <reified T : Component> ViewComposition.emitComponent(
     loc: Int,
     key: Int?,
     ctor: () -> T,
-    block: Updater<T>.() -> Unit
-) = group(loc, key) {
-    val el: T
-    if (isInserting()) {
-        el = ctor()
-        setInstance(el)
-    } else {
-        el = useInstance() as T
-    }
-    Updater(this, el).block()
-    // TODO(lmr): do pruning
-    startCompose(true)
-    el.compose()
-    endCompose(true)
-}
+    noinline block: ViewValidator.(f: T) -> Boolean
+): Unit = call(
+    joinKey(loc, key),
+    ctor,
+    block,
+    { f -> f() }
+)
 
 
-inline fun <reified T : View> CompositionContext.emitView(
+inline fun <reified T : View> ViewComposition.emitView(
     loc: Int,
     ctor: (context: Context) -> T,
-    updater: Updater<T>.() -> Unit,
-    block: () -> Unit
-) = emitView(loc, null, ctor, updater, block)
+    noinline updater: ViewUpdater<T>.() -> Unit
+): Unit = emitView(loc, null, ctor, updater)
 
-inline fun <reified T : View> CompositionContext.emitView(
-    loc: Int,
-    ctor: (context: Context) -> T,
-    updater: Updater<T>.() -> Unit
-) = emitView(loc, null, ctor, updater, {})
-
-inline fun <reified T : View> CompositionContext.emitView(
+inline fun <reified T : View> ViewComposition.emitView(
     loc: Int,
     ctor: (context: Context) -> T
-) = emitView(loc, null, ctor, {}, {})
+): Unit = emitView(loc, null, ctor, {})
 
-inline fun <reified T : View> CompositionContext.emitView(
-    loc: Int,
-    key: Int?,
-    ctor: (context: Context) -> T,
-    updater: Updater<T>.() -> Unit
-) = emitView(loc, key, ctor, updater, {})
-
-inline fun <reified T : View> CompositionContext.emitView(
+inline fun <reified T : View> ViewComposition.emitView(
     loc: Int,
     key: Int?,
     ctor: (context: Context) -> T
-) = emitView(loc, key, ctor, {}, {})
+): Unit = emitView(loc, key, ctor, {})
 
-inline fun <reified T : View> CompositionContext.emitView(
+inline fun <reified T : View> ViewComposition.emitView(
     loc: Int,
     key: Int?,
     ctor: (context: Context) -> T,
-    updater: Updater<T>.() -> Unit,
-    block: () -> Unit
-) = viewGroup(loc, key) {
-    val el: T
-    if (isInserting()) {
-        el = ctor(context)
-        setInstance(el)
-    } else {
-        el = useInstance() as T
-    }
-    Updater(this, el).updater()
-    block()
-}
+    noinline updater: ViewUpdater<T>.() -> Unit
+): Unit = emit(
+    joinKey(loc, key),
+    ctor,
+    updater
+)
 
-inline fun <reified T: Emittable> CompositionContext.emitEmittable(
+
+inline fun <reified T : ViewGroup> ViewComposition.emitViewGroup(
+    loc: Int,
+    ctor: (context: Context) -> T,
+    noinline updater: ViewUpdater<T>.() -> Unit,
+    block: () -> Unit
+) = emitViewGroup(loc, null, ctor, updater, block)
+
+
+inline fun <reified T : ViewGroup> ViewComposition.emitViewGroup(
     loc: Int,
     key: Int?,
-    ctor: () -> T,
-    updater: Updater<T>.() -> Unit,
-    block: () -> Unit
-) = viewGroup(loc, key) {
-    val el: T = if (isInserting()) ctor().also { setInstance(it) } else  useInstance() as T
-    Updater(this, el).updater()
-    block()
-}
+    ctor: (context: Context) -> T,
+    noinline updater: ViewUpdater<T>.() -> Unit,
+    block: @Composable() () -> Unit
+) = emit(
+    joinKey(loc, key),
+    ctor,
+    updater,
+    block
+)
 
-inline fun <reified T: Emittable> CompositionContext.emitEmittable(
+inline fun <reified T: Emittable> ViewComposition.emitEmittable(
     loc: Int,
     ctor: () -> T,
-    updater: Updater<T>.() -> Unit,
+    noinline updater: ViewUpdater<T>.() -> Unit
+) = emitEmittable(loc, null, ctor, updater, {})
+
+inline fun <reified T: Emittable> ViewComposition.emitEmittable(
+    loc: Int,
+    ctor: () -> T,
+    noinline updater: ViewUpdater<T>.() -> Unit,
     block: () -> Unit
 ) = emitEmittable(loc, null, ctor, updater, block)
 
-inline fun <reified T: Emittable> CompositionContext.emitEmittable(
-    loc: Int, ctor: () -> T, updater: Updater<T>.() -> Unit
-) = emitEmittable(loc, null, ctor, updater, {})
+inline fun <reified T: Emittable> ViewComposition.emitEmittable(
+    loc: Int,
+    key: Int?,
+    ctor: () -> T,
+    noinline updater: ViewUpdater<T>.() -> Unit,
+    block: () -> Unit
+) = emit(
+    joinKey(loc, key),
+    ctor,
+    updater,
+    block
+)
 
-inline fun <reified T> CompositionContext.provideAmbient(
+inline fun <reified T> ViewComposition.provideAmbient(
     key: Ambient<T>,
     value: T,
-    noinline children: () -> Unit
-) = group(0) {
-    val el: Ambient<T>.Provider
-    if (isInserting()) {
-        el = key.Provider(value, children)
-        setInstance(el)
-    } else {
-        @Suppress("UNCHECKED_CAST")
-        el = useInstance() as Ambient<T>.Provider
-    }
-    if (attributeChanged(value)) {
-        el.value = value
-    }
-    if (attributeChanged(children)) {
-        el.children = children
-    }
-    startCompose(true)
-    el.compose()
-    endCompose(true)
-}
+    noinline children: @Composable() () -> Unit
+) = emitComponent(
+    0,
+    { key.Provider(value, children) },
+    { provider -> update(value) { provider.value = it } or update(children) { provider.children = it } }
+)
 
-inline fun <reified T> CompositionContext.consumeAmbient(
+inline fun <reified T> ViewComposition.consumeAmbient(
     key: Ambient<T>,
-    noinline children: (T) -> Unit
-) = group(0) {
-    val el: Ambient<T>.Consumer
-    if (isInserting()) {
-        el = key.Consumer(children)
-        setInstance(el)
-    } else {
-        @Suppress("UNCHECKED_CAST")
-        el = useInstance() as Ambient<T>.Consumer
-    }
-    if (attributeChangedOrInserting(children)) {
-        el.children = children
-    }
-    startCompose(true)
-    el.compose()
-    endCompose(true)
-}
+    noinline children: @Composable() (T) -> Unit
+) = emitComponent(
+    0,
+    { key.Consumer(children) },
+    { consumer -> update(children) { consumer.children = it } }
+)
 
 @Suppress("NOTHING_TO_INLINE")
-inline fun CompositionContext.portal(location: Int, noinline children: (Ambient.Reference) -> Unit) {
-    emitComponent(location, { Ambient.Portal(children) }) {
-        set(children) { this.children = it }
-    }
-}
+inline fun ViewComposition.portal(
+    location: Int,
+    noinline children: @Composable() (Ambient.Reference) -> Unit
+) = emitComponent(
+    location,
+    { Ambient.Portal(children) },
+    { portal -> update(children) { portal.children = it } }
+)

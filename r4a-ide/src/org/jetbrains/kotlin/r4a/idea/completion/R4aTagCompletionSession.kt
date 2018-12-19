@@ -6,12 +6,14 @@ import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupElementPresentation
 import com.intellij.codeInsight.lookup.LookupElementRenderer
+import com.intellij.lang.jvm.JvmModifier
 import com.intellij.openapi.util.Iconable
 import com.intellij.openapi.util.Key
 import com.intellij.psi.*
 import com.intellij.ui.JBColor
 import com.intellij.util.PlatformIcons
 import org.jetbrains.kotlin.asJava.classes.KtLightClass
+import org.jetbrains.kotlin.builtins.DefaultBuiltIns
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.idea.KotlinDescriptorIconProvider
 import org.jetbrains.kotlin.idea.caches.resolve.util.getJavaClassDescriptor
@@ -22,6 +24,8 @@ import org.jetbrains.kotlin.idea.refactoring.fqName.getKotlinFqName
 import org.jetbrains.kotlin.idea.refactoring.hasIdentifiersOnly
 import org.jetbrains.kotlin.idea.stubindex.PackageIndexUtil
 import org.jetbrains.kotlin.idea.util.ImportInsertHelper
+import org.jetbrains.kotlin.incremental.components.LookupLocation
+import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.load.java.JvmAnnotationNames
 import org.jetbrains.kotlin.load.kotlin.header.KotlinClassHeader
@@ -31,13 +35,19 @@ import org.jetbrains.kotlin.psi.KtxElement
 import org.jetbrains.kotlin.psi.psiUtil.endOffset
 import org.jetbrains.kotlin.psi.psiUtil.isIdentifier
 import org.jetbrains.kotlin.psi.psiUtil.nextLeaf
+import org.jetbrains.kotlin.r4a.R4AFlags
+import org.jetbrains.kotlin.r4a.analysis.R4AWritableSlices
 import org.jetbrains.kotlin.r4a.idea.parentOfType
 import org.jetbrains.kotlin.renderer.render
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.descriptorUtil.isSubclassOf
 import org.jetbrains.kotlin.resolve.scopes.utils.collectAllFromMeAndParent
+import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.typeUtil.immediateSupertypes
 import org.jetbrains.kotlin.types.typeUtil.isUnit
+import java.awt.SystemColor.text
+import org.jetbrains.kotlin.util.OperatorNameConventions.INVOKE
 
 class R4aTagCompletionSession(
     configuration: CompletionSessionConfiguration,
@@ -46,33 +56,36 @@ class R4aTagCompletionSession(
     resultSet: CompletionResultSet
 ) : BaseR4aCompletionSession(configuration, parameters, toFromOriginalFileMapper, resultSet) {
 
-    private fun DeclarationDescriptor.isValidTag(): Boolean {
-        return when (this) {
-            is ClassDescriptor -> when {
-                modality == Modality.ABSTRACT -> false
-                androidViewDescriptor != null && isSubclassOf(androidViewDescriptor) -> true
-                r4aComponentDescriptor != null && isSubclassOf(r4aComponentDescriptor) && this != r4aComponentDescriptor -> true
-                else -> false
-            }
-            is FunctionDescriptor -> !isSuspend &&
-                    !isInline &&
-                    extensionReceiverParameter == null &&
-                    (returnType?.isUnit() ?: true) &&
-                    hasComposableAnnotation()
-            is VariableDescriptor -> hasComposableAnnotation() || type.hasComposableAnnotation() ||
-                    hasChildrenAnnotation() || type.hasChildrenAnnotation()
-            else -> false
-        }
+    private val elementExpr = cursorElement.parentOfType<KtxElement>() ?: error("no ktx element found")
+    private val nullableKtxCall = bindingContext.get(R4AWritableSlices.RESOLVED_KTX_CALL, elementExpr)
+
+    private val emitUpperBounds by lazy {
+        if (nullableKtxCall == null) listOf(DefaultBuiltIns.Instance.any)
+        else nullableKtxCall.emitSimpleUpperBoundTypes
+            .mapNotNull { it.constructor.declarationDescriptor as? ClassDescriptor }
     }
 
+    private val emitUpperBoundsPsi by lazy {
+        emitUpperBounds.mapNotNull { psiFacade.findClass(it.fqNameSafe.asString(), searchScope) }
+    }
 
-    private fun PsiClass.isValidTag(): Boolean {
+    private val indiceshelper = KotlinIndicesHelper(
+        resolutionFacade,
+        searchScope,
+        { true },
+        filterOutPrivate = true,
+        declarationTranslator = { toFromOriginalFileMapper.toSyntheticFile(it) },
+        file = file
+    )
+
+    private fun PsiClass.isEmittable(): Boolean {
         return when {
             isSyntheticKotlinClass() -> false
             isAnnotationType -> false
             isInterface -> false
             isEnum -> false
-            isSubclassOf(androidViewPsiClass) -> true
+            hasModifier(JvmModifier.ABSTRACT) -> false
+            emitUpperBoundsPsi.any { isSubclassOf(it) } -> true
             else -> false
         }
     }
@@ -229,8 +242,255 @@ class R4aTagCompletionSession(
             }
     }
 
+    private enum class ComposableKind(val valid: Boolean) {
+        // This is used internally. public functions should never return this as a result.
+        UNKNOWN(false),
+        // This type cannot be used in a tag because it is either uninvokable, or invokable and returning a type which is itself "INVALID"
+        INVALID(false),
+        // This type can be used in a tag but the "terminal" invoke (the one returning Unit) is not marked as @Composable
+        UNIT_TERMINAL(true),
+        // This type can be used in a tag because it is either invokable and marked as @Composable, or invokable and returning a type
+        //. which is itself "COMPOSABLE"
+        COMPOSABLE(true)
+    }
+
+    private inner class ValidTagHelper {
+        private val index = mutableMapOf<KotlinType, ComposableKind>()
+        private val invokeFns = mutableMapOf<KotlinType, MutableList<KotlinType>>()
+
+        fun getComposability(type: KotlinType?): ComposableKind {
+            if (type == null) return ComposableKind.INVALID
+            val kind = index[type] ?: ComposableKind.UNKNOWN
+            return when (kind) {
+                ComposableKind.UNKNOWN -> {
+                    // temporarily set the composability of this type to INVALID, so we don't get into a cycle
+                    index[type] = ComposableKind.INVALID
+
+                    // there might be an invoke function that goes to another type, in which case
+                    // we need to check the composability of the return type
+                    var max = invokeFns[type]
+                        ?.map { getComposability(it) }
+                        ?.maxBy { it.ordinal }
+                        ?: ComposableKind.INVALID
+
+                    // if we are still invalid, we check to see if any invoke functions are defined on the
+                    // type. This is needed because the indicesHelper doesn't seem to go through classes in
+                    // other modules
+                    if (max == ComposableKind.INVALID && type.memberScope.getFunctionNames().contains(INVOKE)) {
+                        type
+                            .memberScope
+                            .getContributedFunctions(INVOKE, NoLookupLocation.FROM_IDE)
+                            .filter { it.name == INVOKE && it.isOperator }
+                            .forEach { invoke ->
+                                addInvoke(type, invoke.returnType ?: DefaultBuiltIns.Instance.unitType, invoke)
+                            }
+
+                        index[type]?.let { max = it }
+                    }
+
+                    // It's possible we have new invokeFns now, so we check again
+                    if (max == ComposableKind.INVALID) {
+                        max = invokeFns[type]
+                            ?.map { getComposability(it) }
+                            ?.maxBy { it.ordinal }
+                                ?: ComposableKind.INVALID
+                    }
+
+                    // if we are still invalid, we want to check the composability of our immediate
+                    // super-types
+                    if (max == ComposableKind.INVALID) {
+                        max = type
+                            .immediateSupertypes()
+                            .map { getComposability(it) }
+                            .maxBy { it.ordinal }
+                                ?: ComposableKind.INVALID
+                    }
+
+                    // at this point we've exhausted all options, so we should set the composability
+                    // of this type
+                    index[type] = max
+                    max
+                }
+                ComposableKind.INVALID,
+                ComposableKind.UNIT_TERMINAL,
+                ComposableKind.COMPOSABLE -> kind
+            }
+        }
+
+        fun addInvoke(type: KotlinType, returnType: KotlinType, descriptor: FunctionDescriptor) {
+            val isUnit = returnType.isUnit()
+            val isComposable = descriptor.hasComposableAnnotation()
+
+            index[type] = when {
+                isComposable -> ComposableKind.COMPOSABLE
+                isUnit -> ComposableKind.UNIT_TERMINAL
+                else -> ComposableKind.UNKNOWN
+            }
+            if (!isUnit) {
+                invokeFns.multiPut(type, returnType)
+            }
+        }
+
+    }
+
+    private fun ClassDescriptor.isEmittable(): Boolean {
+        return emitUpperBounds.any { isSubclassOf(it) }
+    }
+
+    private fun CallableDescriptor.isImmediatelyComposable(): Boolean {
+        return when (this) {
+            is FunctionDescriptor -> returnType?.isUnit() == true && hasComposableAnnotation()
+            is VariableDescriptor -> hasComposableAnnotation() || type.hasComposableAnnotation() ||
+                    hasChildrenAnnotation() || type.hasChildrenAnnotation()
+            else -> false
+        }
+    }
+
+    private fun collectComposable(d: DeclarationDescriptor, type: KotlinType?, tagHelper: ValidTagHelper) {
+        val kind = tagHelper.getComposability(type)
+        if (kind == ComposableKind.INVALID) {
+            // at this point we can just throw it on the floor?
+        } else {
+            val element = d.constructLookupElement()
+            if (element != null) collector.addElement(element)
+        }
+    }
+
+    private fun collectDescriptor(d: DeclarationDescriptor, tagHelper: ValidTagHelper) {
+        when (d) {
+            is ClassDescriptor -> {
+                if (d.modality == Modality.ABSTRACT) return
+                if (d.kind == ClassKind.INTERFACE) return
+                if (!d.isVisibleDescriptor()) return
+                if (d.isEmittable()) {
+                    val element = d.constructLookupElement()
+                    if (element != null) collector.addElement(element)
+                } else {
+                    collectComposable(d, d.defaultType, tagHelper)
+                }
+            }
+            is CallableDescriptor -> {
+                if (d.isImmediatelyComposable()) {
+                    val element = d.constructLookupElement()
+                    if (element != null) collector.addElement(element)
+                } else {
+                    val type = when (d) {
+                        is FunctionDescriptor -> d.returnType
+                        is VariableDescriptor -> d.type
+                        else -> null
+                    }
+                    collectComposable(d, type, tagHelper)
+                }
+            }
+            else -> {
+                // TODO(lmr): are there valid cases here?
+            }
+        }
+    }
+
     override fun doComplete() {
-        doCompleteOld()
+        val receiverText = callTypeAndReceiver.receiver?.text
+        val receiverFqName = receiverText?.let { FqName(it) }
+
+        val tagHelper = ValidTagHelper()
+
+        indiceshelper.getMemberOperatorsByName(INVOKE.identifier).forEach { x ->
+            val dispatchReceiver = x.dispatchReceiverParameter
+            val extensionReceiver = x.extensionReceiverParameter
+            if (extensionReceiver == null && dispatchReceiver != null) {
+                tagHelper.addInvoke(dispatchReceiver.type, x.returnType ?: DefaultBuiltIns.Instance.unitType, x)
+            }
+        }
+
+        indiceshelper.getTopLevelExtensionOperatorsByName(INVOKE.identifier).forEach { x ->
+            val dispatchReceiver = x.dispatchReceiverParameter
+            val extensionReceiver = x.extensionReceiverParameter
+            if (extensionReceiver != null && dispatchReceiver == null) {
+                tagHelper.addInvoke(extensionReceiver.type, x.returnType ?: DefaultBuiltIns.Instance.unitType, x)
+            }
+        }
+
+        if (receiverTypes != null && receiverTypes.isNotEmpty()) {
+            receiverTypes
+                .flatMap { it.type.memberScope.getContributedDescriptors() }
+                .asSequence()
+                .forEach { collectDescriptor(it, tagHelper) }
+            flushToResultSet()
+        }
+
+        if (callTypeAndReceiver.receiver != null) {
+            if (receiverFqName != null) {
+                module
+                    .getPackage(receiverFqName)
+                    .memberScope
+                    .getContributedDescriptors()
+                    .forEach { collectDescriptor(it, tagHelper) }
+                flushToResultSet()
+            }
+        } else {
+            doSimpleCompleteNew(tagHelper)
+        }
+
+        doPackageNameCompletion()
+    }
+
+    private fun doSimpleCompleteNew(tagHelper: ValidTagHelper) {
+        // 1. scoped declarations that are marked @Composable or emittable
+        scope
+            .collectAllFromMeAndParent { s -> s.getContributedDescriptors() }
+            .asIterable()
+            .forEach { collectDescriptor(it, tagHelper) }
+
+        flushToResultSet()
+
+        // 2. top level kotlin classes that are "emittable"
+        //
+        // throw away those that we know can't also be valid composables. keep the ones that might be.
+        indiceshelper.getKotlinClasses({ true }).forEach { d ->
+            if (d.modality == Modality.ABSTRACT) return@forEach
+            if (d.kind == ClassKind.INTERFACE) return@forEach
+            if (!d.isVisibleDescriptor()) return@forEach
+            if (d.isEmittable()) {
+                val element = d.constructLookupElement()
+                if (element != null) collector.addElement(element)
+            } else {
+                collectComposable(d, d.defaultType, tagHelper)
+            }
+        }
+        flushToResultSet()
+
+        // 3. top level callables that are marked @Composable
+        //
+        // As a first order approximation, we will only capture non-nested composables here. keep the rest.
+        indiceshelper.processTopLevelCallables({ true }) { d ->
+            // if it is a constructor, we will capture it in the getKotlinClasses(...) call above
+            if (d is ClassConstructorDescriptor) return@processTopLevelCallables
+            if (!d.isVisibleDescriptor()) return@processTopLevelCallables
+            if (d.isImmediatelyComposable()) {
+                val element = d.constructLookupElement()
+                if (element != null) collector.addElement(element)
+            } else {
+                val type = when (d) {
+                    is FunctionDescriptor -> d.returnType
+                    is VariableDescriptor -> d.type
+                    else -> null
+                }
+                collectComposable(d, type, tagHelper)
+            }
+        }
+        flushToResultSet()
+
+        // 4. top level java classes that are "emittable"
+        AllClassesGetter.processJavaClasses(prefixMatcher, project, searchScope) { psiClass: PsiClass ->
+            if (psiClass is KtLightClass) return@processJavaClasses true // Kotlin class should have already been added as kotlin element before
+            // TODO(lmr): deal with visibility here somehow?
+            if (!psiClass.isEmittable()) return@processJavaClasses true // filter out synthetic classes produced by Kotlin compiler
+            val element = psiClass.constructLookupElement()
+            if (element != null) collector.addElement(element)
+            return@processJavaClasses true
+        }
+
+        flushToResultSet()
     }
 
     private fun doPackageNameCompletion() {
@@ -263,80 +523,6 @@ class R4aTagCompletionSession(
         }
 
         flushToResultSet()
-    }
-
-    private fun doCompleteOld() {
-        val receiverText = callTypeAndReceiver.receiver?.text
-        val receiverFqName = receiverText?.let { FqName(it) }
-        val prefixFqName = receiverFqName ?: FqName.ROOT
-        val prefixString = receiverFqName?.asString() ?: ""
-
-        if (receiverTypes != null && receiverTypes.isNotEmpty()) {
-            collector.addElements(
-                receiverTypes
-                    .flatMap { it.type.memberScope.getContributedDescriptors() }
-                    .asSequence()
-                    .filter { it.isValidTag() }
-                    .mapNotNull { it.constructLookupElement() }
-                    .asIterable()
-            )
-            flushToResultSet()
-        }
-
-        if (callTypeAndReceiver.receiver != null) {
-            if (receiverFqName != null) {
-                collector.addElements(
-                    module
-                        .getPackage(receiverFqName)
-                        .memberScope
-                        .getContributedDescriptors()
-                        .asIterable()
-                        .filter { it.isValidTag() }
-                        .mapNotNull { it.constructLookupElement() }
-                )
-                flushToResultSet()
-            }
-        } else {
-            collector.addElements(
-                scope
-                    .collectAllFromMeAndParent { s -> s.getContributedDescriptors() }
-                    .asIterable()
-                    .filter { it.isValidTag() }
-                    .mapNotNull { it.constructLookupElement() }
-            )
-            flushToResultSet()
-
-            val indiceshelper = KotlinIndicesHelper(
-                resolutionFacade,
-                searchScope,
-                { true },
-                filterOutPrivate = true,
-                declarationTranslator = { toFromOriginalFileMapper.toSyntheticFile(it) },
-                file = file
-            )
-
-            indiceshelper.processTopLevelCallables({ true }) { d ->
-                if (d.isValidTag()) {
-                    val element = d.constructLookupElement()
-                    if (element != null) collector.addElement(element)
-                }
-            }
-
-            flushToResultSet()
-
-
-            AllClassesGetter.processJavaClasses(prefixMatcher, project, searchScope) { psiClass: PsiClass ->
-                if (psiClass is KtLightClass) return@processJavaClasses true // Kotlin class should have already been added as kotlin element before
-                if (!psiClass.isValidTag()) return@processJavaClasses true // filter out synthetic classes produced by Kotlin compiler
-                val element = psiClass.constructLookupElement()
-                if (element != null) collector.addElement(element)
-                return@processJavaClasses true
-            }
-
-            flushToResultSet()
-        }
-
-        doPackageNameCompletion()
     }
 
     override fun createSorter(): CompletionSorter {
@@ -446,5 +632,14 @@ class R4aTagCompletionSession(
         val ALLOWS_CHILDREN = Key<Boolean>("r4a.allows_children")
         val DESCRIPTOR = Key<DeclarationDescriptor>("r4a.descriptor")
         val PSI_CLASS = Key<PsiClass>("r4a.psiClass")
+    }
+}
+
+private fun <T, V> MutableMap<T, MutableList<V>>.multiPut(key: T, value: V) {
+    val current = get(key)
+    if (current != null) {
+        current.add(value)
+    } else {
+        put(key, mutableListOf(value))
     }
 }

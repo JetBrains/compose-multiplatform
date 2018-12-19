@@ -643,8 +643,8 @@ class NewCodeGenTests : TestCase() {
 
         composeCG {
             adaptable {
-                val cc = CompositionContext.current
-                cc.emitView(615, { context -> LinearLayout(context) }, {}) {
+                val cc = composer
+                cc.emitViewGroup(615, { context -> LinearLayout(context) }, {}) {
                     cc.emitEmittable(616, { -> MyEmittable() }, { set("Message") { message = it }}) {
                         cc.emitView(617, { context -> TextView(context)}, {
                             set("SomeValue") { text = it }
@@ -685,7 +685,7 @@ class NewCodeGenTests : TestCase() {
         composeCG { activity ->
             adaptable {
                 R4a.composeInto(root, activity) {
-                    val cc = CompositionContext.current
+                    val cc = composer
                     cc.emitEmittable(686, { MyEmittable() }, { set(first) { message = it }}) {
                         cc.emitEmittable(687, { MyEmittable() }, { set(second) { message = it }})
                     }
