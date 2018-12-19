@@ -4,6 +4,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import kotlin.reflect.KMutableProperty
 
 private var registered = false
 private val View.layoutBuilder: LayoutBuilder
@@ -14,20 +15,35 @@ private val View.layoutBuilder: LayoutBuilder
         return getOrAddLayoutBuilderAdapter()
     }
 
+private fun setOrError(params: Any, value: Any?, name: String) {
+    val klass = params::class
+    try {
+        val prop = klass.members.find { it.name == name }
+        when (prop) {
+            is KMutableProperty<*> -> {
+                prop.setter.call(params, value)
+            }
+            else -> error("$name not possible to be set on ${klass.java.name}")
+        }
+    } catch (e: Exception) {
+        error("$name not possible to be set on ${klass.java.name}")
+    }
+}
+
 private fun registerHandlers() {
     registerIntLayoutHandler(android.R.attr.layout_width) { width = it }
     registerIntLayoutHandler(android.R.attr.layout_height) { height = it }
     registerFloatLayoutHandler(android.R.attr.layout_weight) {
         when (this) {
             is LinearLayout.LayoutParams -> weight = it
-            else -> error("weight not possible to be set on ${this::class.java.simpleName}")
+            else -> setOrError(this, it, "weight")
         }
     }
     registerIntLayoutHandler(android.R.attr.layout_gravity) {
         when (this) {
             is LinearLayout.LayoutParams -> gravity = it
             is FrameLayout.LayoutParams -> gravity = it
-            else -> error("gravity not possible to be set on ${this::class.java.simpleName}")
+            else -> setOrError(this, it, "gravity")
         }
     }
     registerIntLayoutHandler(android.R.attr.layout_margin) {
@@ -99,6 +115,7 @@ fun View.setLayoutHeight(height: Int) {
 }
 
 fun View.setLayoutGravity(gravity: Int) = layoutBuilder.set(android.R.attr.layout_gravity, gravity)
+fun View.setLayoutWeight(weight: Float) = layoutBuilder.set(android.R.attr.layout_weight, weight)
 
 fun View.setMarginTop(resId: Int) = setPixelMarginTop(resources.getDimensionPixelSize(resId.assertDimensionRes()))
 fun View.setMarginLeft(resId: Int) = setPixelMarginLeft(resources.getDimensionPixelSize(resId.assertDimensionRes()))
