@@ -389,7 +389,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
                   composerCall = fun emit(Any, (Context) -> Button, ViewUpdater<Button>.() -> Unit)
                   pivotals = <empty>
                   joinKeyCall = fun joinKey(Any, Any?): Any
-                  ctorCall = Button(Context!)
+                  ctorCall = constructor Button(Context!)
                   ctorParams = (implicit)context
                   validations =
                     - ValidatedAssignment(SET):
