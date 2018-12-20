@@ -83,8 +83,11 @@ class XmlToKtxConverter(private val targetFile: KtFile) {
     fun convertElement(element: PsiElement): Element? = when (element) {
         is XmlFile -> convertFile(element)
         is XmlTag -> convertTag(element)
-        // TODO(jdemeulenaere): If no parent tag, look if we are pasting in existing KTX tag.
-        is XmlAttribute -> convertAttribute(element, element.parent?.let { getAttributeConversions(it) } ?: emptyList())
+        is XmlAttribute -> {
+            val attributeConversions = element.parent?.let { getAttributeConversions(it) } ?: emptyList()
+            // We return an empty element as `maybeConvertAttribute` returns null if the attribute should be skipped.
+            maybeConvertAttribute(element, attributeConversions) ?: Element.Empty
+        }
         else -> null
     }
 
@@ -193,9 +196,7 @@ class XmlToKtxConverter(private val targetFile: KtFile) {
         }
 
         val attributeConversions = getAttributeConversions(tag)
-        val attributes = tag.attributes
-            .filter { shouldConvertAttribute(tag, it) }
-            .map { convertAttribute(it, attributeConversions) }
+        val attributes = tag.attributes.mapNotNull { maybeConvertAttribute(it, attributeConversions) }
 
         val body = tag.subTags.map { convertTag(it) }
         val (simpleName, qualifiedName) = getTagSimpleAndQualifiedName(tag)
@@ -232,12 +233,16 @@ class XmlToKtxConverter(private val targetFile: KtFile) {
         }
     }
 
-    private fun shouldConvertAttribute(tag: XmlTag, attribute: XmlAttribute): Boolean {
+    private fun shouldConvertAttribute(attribute: XmlAttribute): Boolean {
         return attribute.namespacePrefix != NAMESPACE_PREFIX && !attribute.isInNamespace(XmlNamespace.ANDROID_TOOLS)
-                && !(attribute.value ?: "").startsWith("@+id/") && (tag.name != SpecialTags.VIEW.tagName || attribute.name != "class")
+                && !(attribute.value ?: "").startsWith("@+id/") && (attribute.parent.name != SpecialTags.VIEW.tagName || attribute.name != "class")
     }
 
-    private fun convertAttribute(attribute: XmlAttribute, attributeConversions: List<AttributeConversion>): KtxAttribute {
+    private fun maybeConvertAttribute(attribute: XmlAttribute, attributeConversions: List<AttributeConversion>): KtxAttribute? {
+        if (!shouldConvertAttribute(attribute)) {
+            return null
+        }
+
         // TODO(jdemeulenaere): Improve attribute mapping.
         val xmlName = attribute.localName // Strips away the namespace.
         val ktxName = xmlName.replace(Regex("_([a-zA-Z\\d])")) { it.groupValues[1].toUpperCase() }
@@ -248,13 +253,6 @@ class XmlToKtxConverter(private val targetFile: KtFile) {
     }
 
     private fun convertAttributeValue(xmlName: String, ktxName: String, value: String, attributeConversions: List<AttributeConversion>): Expression {
-        // TODO(jdemeulenaere): Improve attribute value conversion. Current implementation simply apply some pattern matching logic on the
-        // value to guess what the attribute value should be converted to.
-        // A second better solution should reflect on available setters/properties on the tag class, and apply the current pattern matching
-        // logic to select between multiple candidates. I am not sure what's the proper way to do that, but
-        // PsiShortNamesCache::getFieldsByName and PsiShortNamesCache::getMethodsByName might be helpful.
-        // A third solution would be to simply keep a mapping (TagClass, AttributeName) => ConversionType of the core android widgets.
-
         // Try all matching conversions.
         return attributeConversions
             .asSequence()

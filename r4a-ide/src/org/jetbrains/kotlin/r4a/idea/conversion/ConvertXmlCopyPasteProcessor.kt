@@ -16,6 +16,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Ref
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
+import com.intellij.psi.impl.source.tree.TreeElement
 import com.intellij.psi.xml.XmlFile
 import com.intellij.psi.xml.XmlTag
 import org.jetbrains.kotlin.idea.caches.resolve.resolveImportReference
@@ -26,15 +27,18 @@ import org.jetbrains.kotlin.idea.util.application.runWriteAction
 import org.jetbrains.kotlin.idea.util.findAnnotation
 import org.jetbrains.kotlin.j2k.CodeBuilder
 import org.jetbrains.kotlin.j2k.EmptyDocCommentConverter
-import org.jetbrains.kotlin.j2k.append
+import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtCallableDeclaration
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtNamedFunction
+import org.jetbrains.kotlin.psi.KtxElement
 import org.jetbrains.kotlin.psi.psiUtil.anyDescendantOfType
 import org.jetbrains.kotlin.psi.psiUtil.elementsInRange
+import org.jetbrains.kotlin.psi.psiUtil.startOffset
 import org.jetbrains.kotlin.r4a.R4aUtils
 import org.jetbrains.kotlin.r4a.idea.editor.KtxEditorOptions
+import org.jetbrains.kotlin.r4a.idea.parentOfType
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
 
@@ -109,18 +113,50 @@ class ConvertXmlCopyPasteProcessor : CopyPastePostProcessor<TextBlockTransferabl
 
         val targetFile = PsiDocumentManager.getInstance(project).getPsiFile(editor.document) as? KtFile ?: return
         val transferableData = values.single()
-        val (fileText, startOffsets, endOffsets) = when (transferableData) {
+        var (fileText, startOffsets, endOffsets) = when (transferableData) {
             is CopiedXmlCode -> Triple(transferableData.fileText, transferableData.startOffsets, transferableData.endOffsets)
-            // TODO(jdemeulenaere): Allow to convert copy pasted attribute/value pairs from anywhere (not only full tags).
             is CopiedText -> Triple(transferableData.text, intArrayOf(0), intArrayOf(transferableData.text.length))
             else -> throw IllegalStateException("Unsupported transferable data: $transferableData")
         }
-        val xmlFile = PsiFileFactory.getInstance(project).createFileFromText(XMLLanguage.INSTANCE, fileText) as XmlFile
-        val hasErrors = xmlFile.anyDescendantOfType<PsiErrorElement>()
+        var xmlFile = createXmlFile(project, fileText)
 
-        // Avoid converting copied text that is not XML.
-        if (transferableData is CopiedText && (hasErrors || !hasAttributeWithNamespace(xmlFile))) {
-            return
+        if (transferableData is CopiedText) {
+            if (hasErrors(xmlFile)) {
+                // Try to parse as attributes if we are inside a KTX tag.
+                val closestKtxTag = targetFile.findElementAt(caretOffset)?.parentOfType<KtxElement>() ?: return
+                val tagName = closestKtxTag.qualifiedTagName?.text ?: closestKtxTag.simpleTagName?.text ?: return
+
+                // Check that the caret is inside that tag attributes list.
+                val bracketsElements = closestKtxTag.bracketsElements
+                val firstLTPosition = bracketsElements
+                    .filter { it is TreeElement && it.elementType == KtTokens.LT }
+                    .map { it.startOffset }
+                    .min() ?: return
+                val firstGTPosition = bracketsElements
+                    .filter { it is TreeElement && it.elementType == KtTokens.GT }
+                    .map { it.startOffset }
+                    .min() ?: return
+
+                if (caretOffset < firstLTPosition || caretOffset > firstGTPosition) {
+                    return
+                }
+
+                // Create dummy XML tag and file.
+                val filePrefix = "<$tagName "
+                val newStartOffset = filePrefix.length
+                startOffsets = intArrayOf(newStartOffset)
+                endOffsets = intArrayOf(newStartOffset + fileText.length)
+                xmlFile = createXmlFile(project, "$filePrefix$fileText />")
+
+                if (hasErrors(xmlFile)) {
+                    return
+                }
+            }
+
+            // Make sure we don't try to convert copied KTX code.
+            if (!hasAttributeWithNamespace(xmlFile)) {
+                return
+            }
         }
 
         val ranges = startOffsets.mapIndexed { i, startOffset -> TextRange(startOffset, endOffsets[i]) }
@@ -212,6 +248,12 @@ class ConvertXmlCopyPasteProcessor : CopyPastePostProcessor<TextBlockTransferabl
         XmlToKtxConverter.formatCode(targetFile, rangeAfterReplace)
         return
     }
+
+    private fun createXmlFile(project: Project, fileText: String): XmlFile {
+        return PsiFileFactory.getInstance(project).createFileFromText(XMLLanguage.INSTANCE, fileText) as XmlFile
+    }
+
+    private fun hasErrors(xmlFile: XmlFile) = xmlFile.anyDescendantOfType<PsiErrorElement>()
 
     private fun enclosingCallable(element: PsiElement): KtCallableDeclaration? {
         var current = element
