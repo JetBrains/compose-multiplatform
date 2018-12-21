@@ -2,7 +2,7 @@ package com.google.r4a
 
 import java.util.*
 
-internal typealias Change<N> = (applier: Applier<N>, slots: SlotTable) -> Unit
+internal typealias Change<N> = (applier: Applier<N>, slots: SlotWriter) -> Unit
 
 private class GroupInfo(
     /** The current location of the slot relative to the start location of the pending slot changes */
@@ -131,7 +131,7 @@ internal class RecomposeScope(val compose: (invalidate: () -> Unit) -> Unit) {
 private val IGNORE_INVALIDATE: () -> Unit = {}
 
 open class Composer<N>(
-    internal val slots: SlotTable,
+    private val slotTable: SlotTable,
     private val applier: Applier<N>
 
 ) : Composition<N>() {
@@ -151,24 +151,39 @@ open class Composer<N>(
     private val insertedParents = Stack<Recomposable>()
     private val invalidateStack = Stack<RecomposeScope>()
 
+    // Temporary to allow staged changes. This will move into a sub-object that represents an active composition
+    // created by startRoot() and recomposeComponentRange()
+    private lateinit var slots: SlotReader
+
     protected fun composeRoot(block: () -> Unit) {
-        slots.reset()
-        slots.beginReading()
+        slotTable.read {
+            slots = it
+            startGroup(RootKey)
+            block()
+            endGroup()
+            finalizeCompose()
+        }
+    }
+
+    fun startRoot() {
+        slots = slotTable.openReader()
         startGroup(RootKey)
-        block()
+    }
+
+    fun endRoot() {
         endGroup()
-        slots.endReading()
         finalizeCompose()
+        slots.close()
     }
 
     override val inserting: Boolean get() = slots.inEmpty
 
     fun applyChanges() {
         invalidateStack.clear()
-        slots.reset()
-        changes.forEach { change -> change(applier, slots) }
-        changes.clear()
-        applier.reset()
+        slotTable.write { slots ->
+            changes.forEach { change -> change(applier, slots) }
+            changes.clear()
+        }
     }
 
     override fun startGroup(key: Any) = start(key, START_GROUP)
@@ -361,7 +376,7 @@ open class Composer<N>(
                     // The slot group must be moved, record the move to be performed during apply.
                     recordOperation { _, slots ->
                         slots.moveItem(currentRelativePosition)
-                        slots.next() // Skip the key
+                        slots.skip() // Skip the key
                         slots.start(action)
                     }
                 } else {
@@ -624,14 +639,14 @@ open class Composer<N>(
         }
     }
 
-    internal fun invalidate(scope: RecomposeScope) {
-        val location = scope.anchor!!.location(slots)
+    private fun invalidate(scope: RecomposeScope) {
+        val location = scope.anchor!!.location(slotTable)
         assert(location >= 0) { "Invalid anchor" }
         invalidations.insertIfMissing(location, scope)
     }
 
     private fun invalidate(instance: Recomposable, anchor: Anchor) {
-        val location = anchor.location(slots)
+        val location = anchor.location(slotTable)
         if (location >= 0) {
             invalidations.insertIfMissing(location, instance)
         }
@@ -723,14 +738,14 @@ open class Composer<N>(
 
     fun recompose() {
         if (invalidations.isNotEmpty()) {
-            slots.reset()
-            slots.beginReading()
-            nodeIndex = 0
+            slotTable.read {
+                slots = it
+                nodeIndex = 0
 
-            recomposeComponentRange(0, Int.MAX_VALUE)
+                recomposeComponentRange(0, Int.MAX_VALUE)
 
-            slots.endReading()
-            finalizeCompose()
+                finalizeCompose()
+            }
         }
     }
 
@@ -761,7 +776,7 @@ open class Composer<N>(
                     SKIP_NODE -> record { _, slots -> slots.skipNode() }
                     DOWN -> record { applier, slots ->
                         @Suppress("UNCHECKED_CAST")
-                        applier.down(slots.next() as N)
+                        applier.down(slots.skip() as N)
                     }
                     UP -> record { applier, _ -> applier.up() }
                     else -> record { _, slots -> slots.current += action - SKIP_SLOTS }
@@ -783,7 +798,7 @@ open class Composer<N>(
                             SKIP_NODE -> slots.skipNode()
                             DOWN -> {
                                 @Suppress("UNCHECKED_CAST")
-                                applier.down(slots.next() as N)
+                                applier.down(slots.skip() as N)
                             }
                             UP -> applier.up()
                             else -> slots.current += action - SKIP_SLOTS
@@ -805,7 +820,7 @@ open class Composer<N>(
 
     internal fun finalizeCompose() {
         finalRealizeSlots()
-        assert(pendingStack.empty()) { "Start end imbalance" }
+        assert(pendingStack.isEmpty()) { "Start end imbalance" }
         pending = null
         nodeIndex = 0
         groupNodeCount = 0
@@ -979,17 +994,9 @@ private fun <K, V> HashMap<K, LinkedHashSet<V>>.remove(key: K, value: V) =
 
 private fun <K, V> HashMap<K, LinkedHashSet<V>>.pop(key: K) = get(key)?.firstOrNull()?.also { remove(key, it) }
 
-// Slot table helper
-private fun SlotTable.start(action: SlotAction) {
-    if (action == START_NODE) startNode() else startGroup()
-}
+private fun SlotReader.start(action: SlotAction) = if (action == START_NODE) startNode() else startGroup()
 
-private fun SlotTable.end(action: SlotAction): Int {
-    return when (action) {
-        START_NODE, END_NODE -> endNode()
-        else -> endGroup()
-    }
-}
+private fun SlotWriter.start(action: SlotAction) = if (action == START_NODE) startNode() else startGroup()
 
 private fun getKey(value: Any?, left: Any?, right: Any?): Any? = (value as? JoinedKey)?.let {
     if (it.left == left && it.right == right) value else getKey(it.left, left, right) ?: getKey(it.right, left, right)

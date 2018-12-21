@@ -754,13 +754,9 @@ class NewCodeGenTests : TestCase() {
 
         inner class ActiveTest(val composition: ViewComposition, val activity: Activity) {
             private fun compose() {
-                composition.composer.slots.reset()
-                composition.composer.slots.beginReading()
-                composition.composer.startGroup(0)
+                composition.composer.startRoot()
                 composition.composable()
-                composition.composer.endGroup()
-                composition.composer.slots.endReading()
-                composition.composer.finalizeCompose()
+                composition.composer.endRoot()
                 composition.composer.applyChanges()
             }
 

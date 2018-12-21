@@ -62,9 +62,7 @@ internal class ComposerCompositionContext(val root: Any, private val rootCompone
     override lateinit var context: Context
 
     override fun startRoot() {
-        composer.slots.reset()
-        composer.slots.beginReading()
-        composer.startGroup(0)
+        composer.startRoot()
     }
 
     override fun start(sourceHash: Int) = composer.startGroup(sourceHash)
@@ -77,9 +75,7 @@ internal class ComposerCompositionContext(val root: Any, private val rootCompone
     override fun endView() = composer.endNode()
 
     override fun endRoot() {
-        composer.endGroup()
-        composer.slots.endReading()
-        composer.finalizeCompose()
+        composer.endRoot()
     }
 
     override fun joinKey(left: Any?, right: Any?): Any = composer.joinKey(left, right)
