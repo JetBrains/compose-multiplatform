@@ -14,25 +14,32 @@ import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.xml.XmlAttribute
 import com.intellij.psi.xml.XmlFile
 import com.intellij.psi.xml.XmlTag
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.builtins.DefaultBuiltIns
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptorWithVisibility
 import org.jetbrains.kotlin.idea.caches.resolve.findModuleDescriptor
 import org.jetbrains.kotlin.idea.caches.resolve.util.getJavaClassDescriptor
 import org.jetbrains.kotlin.idea.core.isExcludedFromAutoImport
 import org.jetbrains.kotlin.idea.core.isVisible
+import org.jetbrains.kotlin.idea.imports.importableFqName
 import org.jetbrains.kotlin.idea.search.allScope
 import org.jetbrains.kotlin.idea.util.application.runWriteAction
 import org.jetbrains.kotlin.j2k.ast.*
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.r4a.idea.AttributeInfo
 import org.jetbrains.kotlin.r4a.idea.AttributeInfoExtractor
 import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameOrNull
 import org.jetbrains.kotlin.resolve.descriptorUtil.getAllSuperClassifiers
+import org.jetbrains.kotlin.resolve.descriptorUtil.isExtension
+import org.jetbrains.kotlin.types.KotlinType
+import org.jetbrains.kotlin.types.typeUtil.isSubtypeOf
+import org.jetbrains.kotlin.utils.addToStdlib.firstIsInstanceOrNull
 
 class XmlToKtxConverter(private val targetFile: KtFile) {
     companion object {
         private const val NAMESPACE_PREFIX = "xmlns"
+        private val NON_ALPHANUMERIC_PATTERN = Regex("[^A-Za-z0-9]")
 
         private val CLASS_PREFIX_LIST = listOf(
             "android.widget.",
@@ -78,16 +85,12 @@ class XmlToKtxConverter(private val targetFile: KtFile) {
         return@lambda descriptor.isExcludedFromAutoImport(project, targetFile)
     }
     private val attributeInfoExtractor = AttributeInfoExtractor(targetFile, visibilityFilter)
-    private val classToAttributeConversions = hashMapOf<String, List<AttributeConversion>>()
 
     fun convertElement(element: PsiElement): Element? = when (element) {
         is XmlFile -> convertFile(element)
         is XmlTag -> convertTag(element)
-        is XmlAttribute -> {
-            val attributeConversions = element.parent?.let { getAttributeConversions(it) } ?: emptyList()
-            // We return an empty element as `maybeConvertAttribute` returns null if the attribute should be skipped.
-            maybeConvertAttribute(element, attributeConversions) ?: Element.Empty
-        }
+        // We return an empty element as `maybeConvertAttribute` returns null if the attribute should be skipped.
+        is XmlAttribute -> maybeConvertAttribute(element) ?: Element.Empty
         else -> null
     }
 
@@ -95,71 +98,51 @@ class XmlToKtxConverter(private val targetFile: KtFile) {
         return element.rootTag?.let { convertTag(it) } ?: Element.Empty
     }
 
-    private fun getAttributeConversions(tag: XmlTag): List<AttributeConversion> {
-        val (_, qualifiedName) = getTagSimpleAndQualifiedName(tag)
-        val cachedAttributeConversions = classToAttributeConversions[qualifiedName]
-        if (cachedAttributeConversions != null) {
-            return cachedAttributeConversions
+    private val valueConversionsCache = hashMapOf<Pair<String, String>, List<ValueConversion>>()
+    private fun getValueConversions(tagQualifiedName: String, xmlAttributeName: String): List<ValueConversion> {
+        return valueConversionsCache.computeIfAbsent(Pair(tagQualifiedName, xmlAttributeName)) {
+            val descriptor = findClass(tagQualifiedName)?.getJavaClassDescriptor() ?: return@computeIfAbsent emptyList()
+            val classNames = descriptor.getAllSuperClassifiers().toList().mapNotNull { it.fqNameOrNull()?.asString() }.toSet()
+            ANDROID_CONVERSION.classConversions
+                .filter { it.matchesAny(classNames) }
+                .flatMap { it.attributeConversions }
+                .filter { it.matches(xmlAttributeName) }
+                .flatMap { it.valueConversions }
         }
-
-        val attributeConversions = doGetAttributeConversions(qualifiedName)
-        classToAttributeConversions[qualifiedName] = attributeConversions
-        return attributeConversions
     }
 
-    private fun doGetAttributeConversions(qualifiedName: String): List<AttributeConversion> {
-        val descriptor = findClass(qualifiedName)?.getJavaClassDescriptor() ?: return emptyList()
-        val classNames = descriptor.getAllSuperClassifiers().toList().mapNotNull { it.fqNameOrNull()?.asString() }.toSet()
-        return ANDROID_CONVERSION.classConversions
-            .filter { it.matchesAny(classNames) }
-            .flatMap { it.attributeConversions }
-            .plus(getEnumAttributeConversions(descriptor))
+    private val attributeInfosCache = hashMapOf<String, Map<String, List<AttributeInfo>>>()
+    private fun getAttributeInfos(tagQualifiedName: String, ktxAttributeName: String): List<AttributeInfo> {
+        return attributeInfosCache.computeIfAbsent(tagQualifiedName) {
+            val descriptor = findClass(tagQualifiedName)?.getJavaClassDescriptor() ?: return@computeIfAbsent emptyMap()
+            val attributeInfos = arrayListOf<AttributeInfo>()
+            // TODO(jdemeulenaere): Allow to filter with ktxAttributeName at the AttributeInfoExtractor level instead.
+            attributeInfoExtractor.extract(descriptor) { attributeInfos.addAll(it) }
+            attributeInfos.groupBy { it.name }
+        }[ktxAttributeName] ?: emptyList()
     }
 
     private fun findClass(qualifiedName: String): PsiClass? {
         return JavaPsiFacade.getInstance(project).findClass(qualifiedName, project.allScope())
     }
 
-    private fun getEnumAttributeConversions(descriptor: ClassDescriptor): List<AttributeConversion> {
+    private data class EnumValue(
+        val attributeInfo: AttributeInfo,
+        val fqNames: List<FqName>
+    )
+
+    private val enumValuesCache = hashMapOf<Pair<String, String>, List<EnumValue>>()
+    private fun getEnumValues(tagQualifiedName: String, ktxAttributeName: String): List<EnumValue> {
         // TODO(jdemeulenaere): Precompute those for Android views or download android SDK & external annotations jars.
         // TODO(jdemeulenaere): We might want to somehow filter those, as some incorrect attribute conversions will be returned (e.g.
         // "notFocusable" in XML will be mapped to android.view.View.NOT_FOCUSABLE, which does not exist).
-        val enumConversions = arrayListOf<AttributeConversion>()
-        attributeInfoExtractor.extract(descriptor) {
-            it
-                .forEach { attributeInfo ->
-                    val possibleValues = attributeInfo.getPossibleValues(project)
-                    if (possibleValues.isEmpty()) {
-                        return@forEach
-                    }
-
-                    // TODO(jdemeulenaere): We certainly want to remove common prefix only for values coming from magic annotations and not
-                    // actual enum classes.
-                    val commonPrefixLength = if (possibleValues.size == 1) 0 else getCommonPrefixLength(possibleValues.map { it.shortName().asString() })
-                    val attributeConversion = ExactKtxAttributeConversion(attributeInfo.name)
-                    attributeConversion.valueConversions.addAll(possibleValues.map { fqName ->
-                        val shortName = fqName.shortName()
-                        val upperUnderscoreValue = shortName.asString().substring(commonPrefixLength)
-
-                        object : ValueConversion() {
-                            private val nonAlphaNumericPattern = Regex("[^A-Za-z0-9]")
-
-                            private fun simplify(s: String) = s.replace(nonAlphaNumericPattern, "").toLowerCase()
-
-                            override fun matches(attributeValue: String): Boolean {
-                                // Remove all non alpha numeric characters and lower case when matching values.
-                                return simplify(upperUnderscoreValue) == simplify(attributeValue)
-                            }
-
-                            override fun convert(attributeName: String, attributeValue: String): Expression? {
-                                return Identifier(shortName.asString(), imports = listOf(fqName))
-                            }
-                        }
-                    })
-                    enumConversions.add(attributeConversion)
-                }
+        return enumValuesCache.computeIfAbsent(Pair(tagQualifiedName, ktxAttributeName)) {
+            getAttributeInfos(tagQualifiedName, ktxAttributeName).mapNotNull { attributeInfo ->
+                attributeInfo.getPossibleValues(project)
+                    .takeIf { it.isNotEmpty() }
+                    ?.let { EnumValue(attributeInfo, it) }
+            }
         }
-        return enumConversions
     }
 
     /**
@@ -195,12 +178,10 @@ class XmlToKtxConverter(private val targetFile: KtFile) {
             SpecialTags.REQUEST_FOCUS.tagName -> return Element.Empty
         }
 
-        val attributeConversions = getAttributeConversions(tag)
-        val attributes = tag.attributes.mapNotNull { maybeConvertAttribute(it, attributeConversions) }
-
-        val body = tag.subTags.map { convertTag(it) }
+        val attributes = tag.attributes.mapNotNull(::maybeConvertAttribute)
+        val body = tag.subTags.map(::convertTag)
         val (simpleName, qualifiedName) = getTagSimpleAndQualifiedName(tag)
-        return KtxElement(simpleName.asIdentifier(FqName(qualifiedName)), attributes, body)
+        return KtxElement(simpleName.asIdentifier(qualifiedName), attributes, body)
     }
 
     private fun getTagSimpleAndQualifiedName(tag: XmlTag): Pair<String, String> {
@@ -238,30 +219,101 @@ class XmlToKtxConverter(private val targetFile: KtFile) {
                 && !(attribute.value ?: "").startsWith("@+id/") && (attribute.parent.name != SpecialTags.VIEW.tagName || attribute.name != "class")
     }
 
-    private fun maybeConvertAttribute(attribute: XmlAttribute, attributeConversions: List<AttributeConversion>): KtxAttribute? {
+    private fun maybeConvertAttribute(attribute: XmlAttribute): KtxAttribute? {
         if (!shouldConvertAttribute(attribute)) {
             return null
         }
 
-        // TODO(jdemeulenaere): Improve attribute mapping.
-        val xmlName = attribute.localName // Strips away the namespace.
-        val ktxName = xmlName.replace(Regex("_([a-zA-Z\\d])")) { it.groupValues[1].toUpperCase() }
-        // TODO(jdemeulenaere): Better handling of missing value.
-        val xmlValue = attribute.value ?: ""
-        val ktxValue = convertAttributeValue(xmlName, ktxName, xmlValue, attributeConversions)
-        return KtxAttribute(ktxName, ktxValue)
+        return convertAttribute(attribute)
     }
 
-    private fun convertAttributeValue(xmlName: String, ktxName: String, value: String, attributeConversions: List<AttributeConversion>): Expression {
-        // Try all matching conversions.
-        return attributeConversions
+    private fun convertAttribute(attribute: XmlAttribute): KtxAttribute {
+        val xmlName = attribute.localName // Strips away the namespace.
+        val ktxName = getKtxAttributeName(xmlName)
+        val xmlValue = attribute.value ?: ""
+
+        val tag: XmlTag? = attribute.parent
+
+        // Convert the value.
+        val tagQualifiedName = tag?.let { getTagSimpleAndQualifiedName(it).second }
+        val valueConversions = tagQualifiedName?.let { getValueConversions(it, xmlName) } ?: emptyList()
+        val conversionResult = valueConversions
             .asSequence()
-            .filter { it.matches(xmlName, ktxName) }
-            .flatMap { it.valueConversions.asSequence() }
-            .filter { it.matches(value) }
-            .mapNotNull { it.convert(xmlName, value) }
-            .firstOrNull() ?: LiteralExpression(value.quoted())
+            .filter { it.matches(xmlValue) }
+            .mapNotNull {
+                it.convert(object : ConversionContext {
+                    override val xmlName = xmlName
+                    override val xmlValue = xmlValue
+                })
+            }
+            .firstIsInstanceOrNull<ConversionResult.Success>()
+
+        var valueType: KotlinType? = null
+        var valueExpression: Expression? = null
+        if (conversionResult != null) {
+            // If conversion from the ConversionConfiguration succeeded, we end up with an Expression and the fully qualified name of this
+            // expression type. We compare the fully qualified name with the KotlinType of the AttributeInfos corresponding to this attribute
+            // to try to guess if we should import any extension function/property.
+            // The current logic is that if there is one and only one AttributeInfo with that type, and that AttributeInfo is associated to
+            // an extension, then we import it, otherwise we don't.
+
+            // TODO(jdemeulenaere): Make sure that the comparison with f.q. name from converter and KotlinType from AttributeInfo works well
+            // for all cases (e.g. generics).
+
+            valueExpression = conversionResult.expression
+
+            // TODO(jdemeulenaere/lelandr): There is certainly a better way to map FqName => KotlinType.
+            val fqName = conversionResult.kotlinType
+            val classDescriptor = DefaultBuiltIns.Instance.getBuiltInClassByFqNameNullable(fqName)
+                ?: findClass(fqName.asString())?.getJavaClassDescriptor()
+            valueType = classDescriptor?.defaultType
+        } else {
+            // If conversion from ConversionConfiguration failed, then we try to match the XML value to an enum using reflection.
+
+            val enumValues = tagQualifiedName?.let { getEnumValues(it, ktxName) }
+            enumValues?.forEach { (attributeInfo, possibleValues) ->
+                assert(possibleValues.isNotEmpty())
+
+                // TODO(jdemeulenaere): We certainly want to remove common prefix only for values coming from magic annotations and not
+                //  actual enum classes.
+                val commonPrefixLength =
+                    if (possibleValues.size == 1) 0 else getCommonPrefixLength(possibleValues.map { it.shortName().asString() })
+
+                // We remove all non alpha numeric characters and lower case when matching values.
+                fun simplify(s: String) = s.replace(NON_ALPHANUMERIC_PATTERN, "").toLowerCase()
+
+                possibleValues.forEach { fqName ->
+                    val shortName = fqName.shortName().asString()
+                    val upperUnderscoreValue = shortName.substring(commonPrefixLength)
+
+                    if (simplify(upperUnderscoreValue) == simplify(xmlValue)) {
+                        val nameImport = attributeInfo.descriptor?.takeIf { it.isExtension }?.importableFqName
+                        return KtxAttribute(ktxName.asIdentifier(nameImport), shortName.asIdentifier(fqName))
+                    }
+                }
+            }
+        }
+
+        if (valueExpression == null) {
+            valueExpression = LiteralExpression(xmlValue.quoted())
+            valueType = DefaultBuiltIns.Instance.stringType
+        }
+
+        // Add import if we are using an extension function.
+        val attributeImport = valueType?.let { theValueType ->
+            val attributeInfos = tagQualifiedName?.let { getAttributeInfos(it, ktxName) } ?: emptyList()
+            attributeInfos
+                .filter { theValueType.isSubtypeOf(it.type) }
+                // Only import extension function if it's the only one matching that KotlinType.
+                .takeIf { it.size == 1 }
+                ?.firstOrNull { it.isExtension }
+                ?.let { it.descriptor?.importableFqName }
+        }
+
+        return KtxAttribute(ktxName.asIdentifier(attributeImport), valueExpression)
     }
+
+    private fun getKtxAttributeName(xmlName: String) = xmlName.replace(Regex("_([a-zA-Z\\d])")) { it.groupValues[1].toUpperCase() }
 
     private fun String.quoted() = "\"${escaped()}\""
 

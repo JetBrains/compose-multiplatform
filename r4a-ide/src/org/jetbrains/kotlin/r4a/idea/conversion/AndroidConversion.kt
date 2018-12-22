@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.r4a.idea.conversion
 
+import org.jetbrains.kotlin.builtins.DefaultBuiltIns
 import org.jetbrains.kotlin.j2k.ast.Expression
 import org.jetbrains.kotlin.j2k.ast.LiteralExpression
 import org.jetbrains.kotlin.j2k.ast.QualifiedExpression
@@ -12,23 +13,44 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.r4a.R4aUtils
 
 internal val ANDROID_CONVERSION = conversion {
+    DefaultBuiltIns.Instance.booleanType
     anyClass {
         anyAttribute {
-            "true" { LiteralExpression("true") }
-            "false" { LiteralExpression("false") }
+            "true" { success<Boolean>(LiteralExpression("true")) }
+            "false" { success<Boolean>(LiteralExpression("false")) }
         }
     }
     "android.view.View" {
-        val viewEnum: (String) -> Expression = { it.asIdentifier(import = FqName("android.view.View.$it")) }
         "focusable" {
-            "auto" { viewEnum("FOCUSABLE_AUTO") }
-            "true" { viewEnum("FOCUSABLE") }
-            "false" { viewEnum("NOT_FOCUSABLE") }
+            anyValue {
+                val enumValue = when (xmlValue) {
+                    "auto" -> "FOCUSABLE_AUTO"
+                    "true" -> "FOCUSABLE"
+                    "false" -> "NOT_FOCUSABLE"
+                    else -> null
+                }
+
+                if (enumValue != null) {
+                    success<Int>(enumValue.asIdentifier("android.view.View.$enumValue"))
+                } else {
+                    failure()
+                }
+            }
         }
         anyOf("layout_width", "layout_height") {
-            val layoutParamsEnum: (String) -> Expression = { it.asIdentifier(import = FqName("android.view.ViewGroup.LayoutParams.$it")) }
-            anyOf("match_parent", "fill_parent") { layoutParamsEnum("MATCH_PARENT") }
-            "wrap_content" { layoutParamsEnum("WRAP_CONTENT") }
+            anyValue {
+                val enumValue = when (xmlValue) {
+                    "match_parent", "fill_parent" -> "MATCH_PARENT"
+                    "wrap_content" -> "WRAP_CONTENT"
+                    else -> null
+                }
+
+                if (enumValue != null) {
+                    success<Int>(enumValue.asIdentifier(FqName("android.view.ViewGroup.LayoutParams.$enumValue")))
+                } else {
+                    failure()
+                }
+            }
         }
         anyAttribute {
             // Resource.
@@ -37,18 +59,18 @@ internal val ANDROID_CONVERSION = conversion {
                 "mipmap", "string", "style", "styleable"
             ).joinToString("|")
             pattern("^@(([^:]+):)?($resourceTypes)/(.+)$") { matcher ->
-                with(matcher) { resourceExpression(group(2), group(3), group(4)) }
+                success<Int>(with(matcher) { resourceExpression(group(2), group(3), group(4)) })
             }
 
             // Dimension.
             pattern("^(\\d+(\\.\\d+)?)(px|dip|dp|sp|pt|in|mm)$") { matcher ->
                 // Returns expression: <value>.<unit>
                 val unit = matcher.group(3)
-                QualifiedExpression(
+                success(QualifiedExpression(
                     qualifier = LiteralExpression(matcher.group(1)),
                     identifier = unit.asIdentifier(R4aUtils.r4aFqName("adapters.$unit")),
                     dotPrototype = null
-                )
+                ), R4aUtils.r4aFqName("adapters.Dimension"))
             }
         }
     }

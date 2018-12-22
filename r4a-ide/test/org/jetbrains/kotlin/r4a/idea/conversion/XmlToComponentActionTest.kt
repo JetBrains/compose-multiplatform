@@ -45,6 +45,10 @@ class XmlToComponentActionTest : BaseXmlToKtxConversionTest() {
             import android.widget.LinearLayout
             import android.widget.TextView
             import com.google.r4a.Composable
+            import com.google.r4a.adapters.setLayoutHeight
+            import com.google.r4a.adapters.setLayoutWidth
+            import com.google.r4a.adapters.setPadding
+            import com.google.r4a.adapters.setTextSize
             import com.google.r4a.adapters.sp
 
             @Composable
