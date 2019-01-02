@@ -36,7 +36,8 @@ import org.jetbrains.dokka.gradle.PackageOptions
 
 object Dokka {
     private val RUNNER_TASK_NAME = "dokka"
-    public val ARCHIVE_TASK_NAME: String = "distDokkaDocs"
+    public val ARCHIVE_TASK_NAME: String = "distDokkaDocs" // TODO(b/72330103) make "generateDocs" be the only archive task once Doclava is fully removed
+    private val ALTERNATE_ARCHIVE_TASK_NAME: String = "generateDocs"
 
     private val hiddenPackages = listOf(
         "androidx.core.internal",
@@ -73,7 +74,7 @@ object Dokka {
                 opts.suppress = true
                 docsTask.perPackageOptions.add(opts)
             }
-            project.tasks.create(ARCHIVE_TASK_NAME, Zip::class.java) { task ->
+            val archiveTask = project.tasks.create(ARCHIVE_TASK_NAME, Zip::class.java) { task ->
                 task.dependsOn(docsTask)
                 task.description =
                         "Generates documentation artifact for pushing to developer.android.com"
@@ -82,6 +83,10 @@ object Dokka {
                 task.version = getBuildId()
                 task.destinationDir = project.getDistributionDirectory()
             }
+            if (project.tasks.findByName(ALTERNATE_ARCHIVE_TASK_NAME) == null) {
+                project.tasks.create(ALTERNATE_ARCHIVE_TASK_NAME)
+            }
+            project.tasks.getByName(ALTERNATE_ARCHIVE_TASK_NAME).dependsOn(archiveTask)
         }
         return runnerProject.tasks.getByName(Dokka.RUNNER_TASK_NAME) as DokkaTask
     }
