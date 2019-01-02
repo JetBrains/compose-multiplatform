@@ -5,7 +5,7 @@ import com.google.r4a.adapters.setLayoutHeight
 import com.google.r4a.adapters.setLayoutWidth
 
 @Composable
-fun MyComponent() {
+fun PasteAttributesInKtxElement() {
     <TextView
         layoutWidth=WRAP_CONTENT
         layoutHeight=WRAP_CONTENT

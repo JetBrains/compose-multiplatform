@@ -29,6 +29,11 @@ public class XmlToKtxCopyPasteConversionTestGenerated extends AbstractXmlToKtxCo
         KotlinTestUtils.assertAllTestsPresentByMetadata(this.getClass(), new File("plugins/r4a/r4a-ide/testData/conversion"), Pattern.compile("^([^\\.]+)\\.to.kt$"), TargetBackend.ANY, true);
     }
 
+    @TestMetadata("PasteAttributesInKtxElement.to.kt")
+    public void testPasteAttributesInKtxElement() throws Exception {
+        runTest("plugins/r4a/r4a-ide/testData/conversion/PasteAttributesInKtxElement.to.kt");
+    }
+
     @TestMetadata("PasteInClass.to.kt")
     public void testPasteInClass() throws Exception {
         runTest("plugins/r4a/r4a-ide/testData/conversion/PasteInClass.to.kt");

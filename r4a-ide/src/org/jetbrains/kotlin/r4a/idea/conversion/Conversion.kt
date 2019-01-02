@@ -60,18 +60,31 @@ class ExactClassConversion(val className: String) : ClassConversion() {
 
 interface ConversionContext {
     // TODO(jdemeulenaere): Add tagClass here if a converter needs it.
-    val attributeName: String
-    val attributeValue: String
+    val xmlName: String
+    val xmlValue: String
 }
 
-typealias Conversion = ConversionContext.() -> Expression?
-typealias ConversionWithMatcher = ConversionContext.(Matcher) -> Expression?
+sealed class ConversionResult {
+    class Success(
+        val expression: Expression,
+        val kotlinType: FqName
+    ) : ConversionResult()
+
+    object Failure : ConversionResult()
+}
+
+inline fun <reified T> success(expression: Expression) = ConversionResult.Success(expression, FqName(T::class.qualifiedName!!))
+fun success(expression: Expression, kotlinType: FqName) = ConversionResult.Success(expression, kotlinType)
+fun failure() = ConversionResult.Failure
+
+typealias Conversion = ConversionContext.() -> ConversionResult
+typealias ConversionWithMatcher = ConversionContext.(Matcher) -> ConversionResult
 
 @ConversionDsl
 sealed class AttributeConversion {
     val valueConversions = arrayListOf<ValueConversion>()
 
-    abstract fun matches(xmlName: String, ktxName: String): Boolean
+    abstract fun matches(xmlName: String): Boolean
 
     fun anyValue(conversion: Conversion) {
         valueConversions.add(AnyValueConversion(conversion))
@@ -92,28 +105,20 @@ sealed class AttributeConversion {
     }
 }
 class AnyAttributeConversion : AttributeConversion() {
-    override fun matches(xmlName: String, ktxName: String) = true
+    override fun matches(xmlName: String) = true
 }
 class ExactXmlAttributeConversion(private val attributeName: String) : AttributeConversion() {
-    override fun matches(xmlName: String, ktxName: String): Boolean = this.attributeName == xmlName
-}
-class ExactKtxAttributeConversion(private val attributeName: String) : AttributeConversion() {
-    override fun matches(xmlName: String, ktxName: String): Boolean = this.attributeName == ktxName
+    override fun matches(xmlName: String): Boolean = this.attributeName == xmlName
 }
 
 abstract class ValueConversion {
     abstract fun matches(attributeValue: String): Boolean
 
-    abstract fun convert(attributeName: String, attributeValue: String): Expression?
+    abstract fun convert(context: ConversionContext): ConversionResult
 }
 
 abstract class BaseValueConversion(private val conversion: Conversion) : ValueConversion() {
-    override fun convert(attributeName: String, attributeValue: String): Expression? {
-        return conversion.invoke(object : ConversionContext {
-            override val attributeName: String = attributeName
-            override val attributeValue: String = attributeValue
-        })
-    }
+    override fun convert(context: ConversionContext): ConversionResult = conversion(context)
 }
 
 class AnyValueConversion(conversion: Conversion) : BaseValueConversion(conversion) {
@@ -129,12 +134,11 @@ class PatternValueConversion(pattern: String,
     private val pattern = Pattern.compile(pattern)
     override fun matches(attributeValue: String): Boolean = pattern.matcher(attributeValue).matches()
 
-    override fun convert(attributeName: String, attributeValue: String): Expression? {
-        return conversion.invoke(object : ConversionContext {
-            override val attributeName: String = attributeName
-            override val attributeValue: String = attributeValue
-        }, pattern.matcher(attributeValue).also { assert(it.matches()) })
+    override fun convert(context: ConversionContext): ConversionResult {
+        return context.conversion(pattern.matcher(context.xmlValue).also { assert(it.matches()) })
     }
 }
 
 internal fun String.asIdentifier(import: FqName? = null) = Identifier(this, isNullable = false, imports = import?.let(::listOf) ?: emptyList())
+internal fun String.asIdentifier(import: String): Identifier = Identifier(this, isNullable = false, imports = listOf(FqName(import)))
+
