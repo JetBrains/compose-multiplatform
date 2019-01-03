@@ -31,10 +31,22 @@ interface Record {
 }
 
 /**
+ * The frame records are created with frame ID CREATION_FRAME when not in a frame.
+ * This allows framed object to be created in the in static initializers when a
+ * frame could not have been created yet.
+ *
+ * The value 2 was chosen because it must be greater than 0, as 0 is reserved to
+ * indicated an invalid frame (in order to avoid an uninitialized record begin
+ * treated a valid record) and 1 is odd and treated as a speculation frame. That
+ * leaves 2 as the lowest valid frame.
+ */
+private const val CREATION_FRAME = 2
+
+/**
  * Base implementation of a frame record
  */
 abstract class AbstractRecord : Record {
-    override var frameId: Int = currentFrame().id
+    override var frameId: Int = threadFrame.get()?.id ?: CREATION_FRAME
     override var next: Record? = null
 }
 
@@ -43,7 +55,6 @@ internal val threadFrame = ThreadLocal<Frame>()
 typealias FrameReadObserver = (read: Any) -> Unit
 typealias FrameWriteObserver = (write: Any) -> Unit
 typealias FrameCommitObserver = (committed: Set<Any>) -> Unit
-
 
 /**
  * Information about a frame including the frame id and whether or not it is read only.
@@ -103,7 +114,7 @@ private val sync = Object()
 // The following variables should only be written when sync is taken
 private val openFrames = BitSet()
 private val abortedFrames = BitSet()
-private var maxFrameId = 0
+private var maxFrameId = CREATION_FRAME
 
 /**
  * Return the frames that are currently open or aborted which should be considered invalid for any new frames
@@ -360,7 +371,7 @@ fun <T : Record> T.readable(frame: Frame, framed: Framed): T {
 
 fun _readable(r: Record, framed: Framed): Record = r.readable(framed)
 fun _writable(r: Record, framed: Framed): Record = r.writable(framed)
-fun _created(framed: Framed) = currentFrame().writeObserver?.let { it(framed) }
+fun _created(framed: Framed) = threadFrame.get()?.writeObserver?.let { it(framed) }
 
 interface Framed {
     val firstFrameRecord: Record
