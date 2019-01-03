@@ -123,4 +123,4 @@ tasks.withType<Test> {
     }
 }
 
-configureInstrumentation()
+configureFormInstrumentation()
