@@ -188,7 +188,7 @@ internal object FrameManager {
 private fun <T> Iterable<Set<T>>.reduceSet(): Set<T> {
     val iterator = iterator()
     if (!iterator.hasNext()) return emptySet<T>()
-    var acc = iterator.next()
+    var acc = mutableSetOf<T>() + iterator.next()
     while (iterator.hasNext()) {
         acc += iterator.next()
     }

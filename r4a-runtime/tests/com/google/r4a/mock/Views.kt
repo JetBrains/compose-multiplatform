@@ -23,6 +23,10 @@ fun MockViewComposition.linear(block: Compose) {
     emit(linear, {View().apply { name = "linear"} }, block)
 }
 
+fun MockViewComposition.linear(key: Any, block: Compose) {
+    emit(key, { View().apply { name = "linear" } }, block)
+}
+
 val text = SourceLocation("text")
 fun MockViewComposition.text(value: String) {
     emit(text, { View().apply { name = "text"} }, value, { attribute("text", it ) })

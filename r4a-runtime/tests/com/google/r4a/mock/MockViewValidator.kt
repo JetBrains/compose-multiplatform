@@ -24,9 +24,9 @@ class MockViewListValidator(private val views: List<View>) : MockViewValidator {
         if (block != null) {
             this.block()
             val hasNext = next()
-            Assert.assertEquals(false, hasNext)
+            Assert.assertEquals("Expected children but none found", false, hasNext)
         } else {
-            Assert.assertEquals(0, views.size)
+            Assert.assertEquals("Not expecting children but some found", 0, views.size)
         }
 
     }

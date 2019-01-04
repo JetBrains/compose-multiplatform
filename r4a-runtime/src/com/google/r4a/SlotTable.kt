@@ -354,9 +354,10 @@ class SlotWriter internal constructor(table: SlotTable) : SlotEditor(table) {
     /**
      * Set the value of the next slot.
      */
-    fun update(value: Any?) {
-        skip()
+    fun update(value: Any?): Any? {
+        val result = skip()
         set(value)
+        return result
     }
 
     /**
@@ -470,6 +471,23 @@ class SlotWriter internal constructor(table: SlotTable) : SlotEditor(table) {
         current = oldCurrent
         nodeCount -= count
         return anchorsRemoved
+    }
+
+    /**
+     * Returns an iterator for the slots of the item.
+     */
+    fun itemSlots(): Iterator<Any?> {
+        val start = current
+        val oldCount = nodeCount
+        advanceToNextItem()
+        val end = current
+        current = start
+        nodeCount = oldCount
+        return object : Iterator<Any?> {
+            var current = start + 2
+            override fun hasNext(): Boolean = current < end
+            override fun next(): Any? = slots[effectiveIndex(current++)]
+        }
     }
 
     /**
@@ -590,7 +608,7 @@ class SlotWriter internal constructor(table: SlotTable) : SlotEditor(table) {
 
 private val Any?.asGroupStart: GroupStart get() = this as? GroupStart ?: error("Expected a group start ")
 
-private data class GroupStart(val kind: GroupKind, val slots: Int, val nodes: Int) {
+internal data class GroupStart(val kind: GroupKind, val slots: Int, val nodes: Int) {
     val isNode get() = kind == NODE
 }
 

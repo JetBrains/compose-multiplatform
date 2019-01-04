@@ -3,7 +3,7 @@ package com.google.r4a
 import android.view.ViewGroup
 import java.util.*
 
-internal typealias Change<N> = (applier: Applier<N>, slots: SlotWriter) -> Unit
+internal typealias Change<N> = (applier: Applier<N>, slots: SlotWriter, lifecycleManager: LifeCycleManager) -> Unit
 
 private class GroupInfo(
     /** The current location of the slot relative to the start location of the pending slot changes */
@@ -15,6 +15,11 @@ private class GroupInfo(
     /** The current number of nodes the group contains after changes have been applied */
     var nodeCount: Int
 )
+
+internal interface LifeCycleManager {
+    fun entering(holder: CompositionLifecycleObserverHolder): CompositionLifecycleObserverHolder
+    fun leaving(holder: CompositionLifecycleObserverHolder)
+}
 
 /**
  * Pending starts when the key is different than expected indicating that the structure of the tree changed. It is used
@@ -137,6 +142,7 @@ open class Composer<N>(
 
 ) : Composition<N>() {
     private val changes = mutableListOf<Change<N>>()
+    private val lifecycleObservers = mutableMapOf<CompositionLifecycleObserverHolder,CompositionLifecycleObserverHolder>()
     private val pendingStack = Stack<Pending?>()
     private var pending: Pending? = null
     private val keyStack = Stack<KeyInfo?>()
@@ -183,9 +189,44 @@ open class Composer<N>(
 
     fun applyChanges() {
         invalidateStack.clear()
+        val enters = mutableSetOf<CompositionLifecycleObserverHolder>()
+        val leaves = mutableSetOf<CompositionLifecycleObserverHolder>()
+        val manager = object : LifeCycleManager {
+            override fun entering(holder: CompositionLifecycleObserverHolder): CompositionLifecycleObserverHolder {
+                return lifecycleObservers.getOrPut(holder) {
+                    enters.add(holder)
+                    holder
+                }.apply { count++ }
+            }
+
+            override fun leaving(holder: CompositionLifecycleObserverHolder) {
+                if (--holder.count == 0) {
+                    leaves.add(holder)
+                }
+            }
+
+        }
+
+        // Apply all changes
         slotTable.write { slots ->
-            changes.forEach { change -> change(applier, slots) }
+            changes.forEach { change -> change(applier, slots, manager) }
             changes.clear()
+        }
+
+        // Send lifecycle enters
+        for (holder in enters) {
+            holder.instance.onEnter()
+        }
+
+        // Send lifecycle leaves
+        for (holder in leaves) {
+            // The count of the holder might be greater than 0 here as it might leave one part
+            // of the composition and reappear in another. Only send a leave if the count is still
+            // 0 after all changes have been applied.
+            if (holder.count == 0) {
+                holder.instance.onLeave()
+                lifecycleObservers.remove(holder)
+            }
         }
     }
 
@@ -210,7 +251,7 @@ open class Composer<N>(
             val insertIndex = nodeIndexStack.peek()
             pending!!.nodeCount++
             groupNodeCount++
-            recordOperation { applier, slots ->
+            recordOperation { applier, slots, _ ->
                 val node = factory()
                 slots.update(node)
                 applier.insert(insertIndex, node)
@@ -229,7 +270,7 @@ open class Composer<N>(
         val insertIndex = nodeIndexStack.peek()
         pending!!.nodeCount++
         groupNodeCount++
-        recordOperation { applier, slots ->
+        recordOperation { applier, slots, _ ->
             val node = factory()
             slots.update(node)
             applier.insert(insertIndex, node)
@@ -243,7 +284,7 @@ open class Composer<N>(
         val insertIndex = nodeIndexStack.peek()
         pending!!.nodeCount++
         groupNodeCount++
-        recordOperation { applier, slots ->
+        recordOperation { applier, slots, _ ->
             slots.update(node)
             applier.insert(insertIndex, node)
             applier.down(node)
@@ -265,7 +306,7 @@ open class Composer<N>(
     }
 
     override fun <V, T> apply(value: V, block: T.(V) -> Unit) {
-        recordOperation { applier, _ ->
+        recordOperation { applier, _, _ ->
             @Suppress("UNCHECKED_CAST")
             (applier.current as T).block(value)
         }
@@ -279,7 +320,15 @@ open class Composer<N>(
     override fun skipValue() = recordSlotNext()
 
     override fun updateValue(value: Any?) {
-        recordOperation { _, slots -> slots.update(value) }
+        recordOperation { _, slots, lifecycleManager ->
+            val previous = if (value is CompositionLifecycleObserver) {
+                val slotValue = lifecycleManager.entering(CompositionLifecycleObserverHolder(value))
+                slots.update(slotValue)
+            } else slots.update(value)
+            if (previous is CompositionLifecycleObserverHolder) {
+                lifecycleManager.leaving(previous)
+            }
+        }
     }
 
     override fun enumParents(callback: (Recomposable) -> Boolean) {
@@ -555,7 +604,7 @@ open class Composer<N>(
                 pending.registerMoveSlot(relativePosition, pending.groupIndex)
                 if (currentRelativePosition > 0) {
                     // The slot group must be moved, record the move to be performed during apply.
-                    recordOperation { _, slots ->
+                    recordOperation { _, slots, _ ->
                         slots.moveItem(currentRelativePosition)
                         slots.skip() // Skip the key
                         slots.start(action)
@@ -571,10 +620,10 @@ open class Composer<N>(
             } else {
                 // The group is new, go into insert mode. All child groups will be inserted until this group is complete.
                 if (!slots.inEmpty) {
-                    recordOperation { _, slots -> slots.beginInsert() }
+                    recordOperation { _, slots, _ -> slots.beginInsert() }
                 }
                 slots.beginEmpty()
-                recordOperation { _, slots ->
+                recordOperation { _, slots, _ ->
                     slots.update(key)
                     slots.start(action)
                 }
@@ -634,10 +683,8 @@ open class Composer<N>(
                     val deleteOffset = pending.nodePositionOf(previousInfo)
                     recordRemoveNode(deleteOffset + pending.startIndex, previousInfo.nodes)
                     pending.updateNodeCount(previousInfo, 0)
-                    recordOperation { _, slots ->
-                        if (slots.removeItem()) {
-                            FrameManager.scheduleCleanup()
-                        }
+                    recordOperation { _, slots, lifecycleManager ->
+                        removeCurrentItem(slots, lifecycleManager)
                     }
                     previousIndex++
                     continue
@@ -690,10 +737,8 @@ open class Composer<N>(
             slots.next() // Skip key
             val nodesToRemove = slots.skipGroup()
             recordRemoveNode(removeIndex, nodesToRemove)
-            recordOperation { _, slots ->
-                if (slots.removeItem()) {
-                    FrameManager.scheduleCleanup()
-                }
+            recordOperation { _, slots, lifeCycleManager ->
+                removeCurrentItem(slots, lifeCycleManager)
             }
             slots.reportUncertainNodeCount()
         }
@@ -708,7 +753,7 @@ open class Composer<N>(
 
         if (slots.inEmpty) {
             slots.endEmpty()
-            if (!slots.inEmpty) recordOperation { _, slots -> slots.endInsert() }
+            if (!slots.inEmpty) recordOperation { _, slots, _ -> slots.endInsert() }
         }
 
         // Restore the parent's state updating them if they have changed based on changes in the children. For example, if a group generates
@@ -845,7 +890,7 @@ open class Composer<N>(
             recordStart(START_GROUP)
             if (inserting) {
                 insertedParents.push(recomposable)
-                recordOperation { _, slots ->
+                recordOperation { _, slots, _ ->
                     val anchor = slots.anchor(slots.current - 1)
                     recomposable.setRecompose { this.invalidate(recomposable, anchor) }
                 }
@@ -883,7 +928,7 @@ open class Composer<N>(
                 invalidateStack.push(scope)
                 scope.invalidate = { invalidate(scope) }
                 recordStart(START_GROUP)
-                recordOperation { _, slots -> scope.anchor = slots.anchor(slots.current - 1) }
+                recordOperation { _, slots, _ -> scope.anchor = slots.anchor(slots.current - 1) }
                 updateValue(scope)
                 slots.beginEmpty()
                 scope.invalidate
@@ -949,18 +994,18 @@ open class Composer<N>(
             if (actionsSize == 1) {
                 val action = slotActions.first()
                 when (action) {
-                    START_GROUP -> record { _, slots -> slots.startGroup() }
-                    END_GROUP -> record { _, slots -> slots.endGroup() }
-                    SKIP_GROUP -> record { _, slots -> slots.skipGroup() }
-                    START_NODE -> record { _, slots -> slots.startNode() }
-                    END_NODE -> record { _, slots -> slots.endNode() }
-                    SKIP_NODE -> record { _, slots -> slots.skipNode() }
-                    DOWN -> record { applier, slots ->
+                    START_GROUP -> record { _, slots, _ -> slots.startGroup() }
+                    END_GROUP -> record { _, slots, _ -> slots.endGroup() }
+                    SKIP_GROUP -> record { _, slots, _ -> slots.skipGroup() }
+                    START_NODE -> record { _, slots, _ -> slots.startNode() }
+                    END_NODE -> record { _, slots, _ -> slots.endNode() }
+                    SKIP_NODE -> record { _, slots, _ -> slots.skipNode() }
+                    DOWN -> record { applier, slots, _ ->
                         @Suppress("UNCHECKED_CAST")
                         applier.down(slots.skip() as N)
                     }
-                    UP -> record { applier, _ -> applier.up() }
-                    else -> record { _, slots -> slots.current += action - SKIP_SLOTS }
+                    UP -> record { applier, _, _ -> applier.up() }
+                    else -> record { _, slots, _ -> slots.current += action - SKIP_SLOTS }
                 }
                 slotActions.clear()
                 slotsStartStack.clear()
@@ -968,7 +1013,7 @@ open class Composer<N>(
                 val actions = slotActions.clone()
                 slotActions.clear()
                 slotsStartStack.clear()
-                record { applier, slots ->
+                record { applier, slots, _ ->
                     actions.forEach { action ->
                         when (action) {
                             START_GROUP -> slots.startGroup()
@@ -1005,7 +1050,6 @@ open class Composer<N>(
         pending = null
         nodeIndex = 0
         groupNodeCount = 0
-
     }
 
     private fun recordSlotNext(count: Int = 1) {
@@ -1092,16 +1136,77 @@ open class Composer<N>(
             if (previousRemove >= 0) {
                 val removeIndex = previousRemove
                 previousRemove = -1
-                recordOperation { applier, _ -> applier.remove(removeIndex, count) }
+                recordOperation { applier, _, _ -> applier.remove(removeIndex, count) }
 
             } else {
                 val from = previousMoveFrom
                 previousMoveFrom = -1
                 val to = previousMoveTo
                 previousMoveTo = -1
-                recordOperation { applier, _ -> applier.move(from, to, count) }
+                recordOperation { applier, _, _ -> applier.move(from, to, count) }
             }
         }
+    }
+}
+
+private fun removeCurrentItem(slots: SlotWriter, lifecycleManager: LifeCycleManager) {
+    // Notify the lifecycle manager of any observers leaving the slot table
+    // The notification order should ensure that the listeners of children are called
+    // before the listeners of their parents. A group in the slot table is used as an
+    // indicator that the slots in the group are children of the group that contains
+    // the slots.
+
+    // To ensure order this order the deepest groups are notified before shallower
+    // groups.
+
+    var groupEnd = Int.MAX_VALUE
+    val holders = mutableListOf<MutableList<CompositionLifecycleObserverHolder>>()
+    var level = 0
+    var index = 0
+    val groupEndStack = IntStack()
+
+    fun ensureLevel(level: Int): MutableList<CompositionLifecycleObserverHolder> {
+        while (holders.size <= level) {
+            holders.add(mutableListOf())
+        }
+        return holders[level]
+    }
+
+    for (slot in slots.itemSlots()) {
+        when (slot) {
+            is CompositionLifecycleObserverHolder -> {
+                ensureLevel(level).add(slot)
+            }
+            is GroupStart -> {
+                groupEndStack.push(groupEnd)
+                level++
+                groupEnd = index + slot.slots
+            }
+        }
+
+        index++
+
+        while (index >= groupEnd) {
+            level--
+            groupEnd = groupEndStack.pop()
+        }
+    }
+
+    if (groupEndStack.isNotEmpty()) error("Invalid slot structure")
+
+    // Emit the leaving notifications deepest to shallowest
+    holders.reverse()
+
+    for (holdersByLevel in holders) {
+        for (holder in holdersByLevel) {
+            lifecycleManager.leaving(holder)
+        }
+    }
+
+    // Remove the item from the slot table and notify the FrameManager if any
+    // anchors are orphaned by removing the slots.
+    if (slots.removeItem()) {
+        FrameManager.scheduleCleanup()
     }
 }
 

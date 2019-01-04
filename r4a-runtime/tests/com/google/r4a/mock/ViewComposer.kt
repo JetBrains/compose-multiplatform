@@ -45,7 +45,6 @@ class MockViewComposer(val root: View) : Composer<View>(SlotTable(), Applier(roo
     }
 
     fun compose(composition: MockViewComposition.() -> Unit) {
-
         composeRoot {
             rootComposer.composition()
         }

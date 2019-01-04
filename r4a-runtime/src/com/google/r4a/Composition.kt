@@ -40,8 +40,10 @@ abstract class Composition<N> : RecomposableContext() {
     abstract fun <V, T> apply(value: V, block: T.(V) -> Unit)
 }
 
+fun <N> Composition<N>.nextValue(): Any? = nextSlot().let { if (it is CompositionLifecycleObserverHolder) it.instance else it }
+
 inline fun <N, T> Composition<N>.cache(valid: Boolean = true, block: () -> T): T {
-    var result = nextSlot()
+    var result = nextValue()
     if (result === SlotTable.EMPTY || !valid) {
         val value = block()
         updateValue(value)
@@ -53,7 +55,7 @@ inline fun <N, T> Composition<N>.cache(valid: Boolean = true, block: () -> T): T
 }
 
 inline fun <N, reified V> Composition<N>.changed(value: V): Boolean {
-    return if (value != nextSlot()) {
+    return if (nextSlot() != value) {
         updateValue(value)
         true
     } else {

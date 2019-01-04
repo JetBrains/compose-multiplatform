@@ -516,7 +516,7 @@ class CompositionTests : TestCase() {
 
     fun testRecomposeWithReplace() {
         val slReportReports = object {}
-        var recomposeLois: (()->Unit)? = null
+        var recomposeLois: (() -> Unit)? = null
         var key = 0
 
         class Reporter : ViewComponent() {
@@ -543,7 +543,7 @@ class CompositionTests : TestCase() {
                     composeComponent(
                         slReportReports,
                         ::Reporter,
-                        a1 = report, set1 = { this.report = it})
+                        a1 = report, set1 = { this.report = it })
                 }
             }
         }
@@ -883,8 +883,428 @@ class CompositionTests : TestCase() {
 
         validate(composer.root) { composition() }
     }
+
+    fun testLifecycle_Enter_Simple() {
+        val lifecycleObject = object : CompositionLifecycleObserver {
+            var count = 0
+            override fun onEnter() {
+                count++
+            }
+
+            override fun onLeave() {
+                count--
+            }
+        }
+
+        fun MockViewComposition.composition() {
+            linear {
+                remember { lifecycleObject }
+                text("Some text")
+            }
+        }
+
+        fun MockViewValidator.composition() {
+            linear {
+                text("Some text")
+            }
+        }
+
+        val composer = compose { composition() }
+        validate(composer.root) { composition() }
+
+        assertEquals("object should have been notified of an enter", 1, lifecycleObject.count)
+
+        compose(composer, expectChanges = false) {
+            composition()
+        }
+        validate(composer.root) { composition() }
+
+        assertEquals("Object should have only been notified once", 1, lifecycleObject.count)
+    }
+
+    fun testLifecycle_Enter_SingleNotification() {
+        val lifecycleObject = object : CompositionLifecycleObserver {
+            var count = 0
+            override fun onEnter() {
+                count++
+            }
+
+            override fun onLeave() {
+                count--
+            }
+        }
+
+        fun MockViewComposition.composition() {
+            linear {
+                val l = remember { lifecycleObject }
+                assertEquals("Lifecycle object should be returned", lifecycleObject, l)
+                text("Some text")
+            }
+            linear {
+                val l = remember { lifecycleObject }
+                assertEquals("Lifecycle object should be returned", lifecycleObject, l)
+                text("Some other text")
+            }
+        }
+
+        fun MockViewValidator.composition() {
+            linear {
+                text("Some text")
+            }
+            linear {
+                text("Some other text")
+            }
+        }
+
+        val composer = compose { composition() }
+        validate(composer.root) { composition() }
+
+        assertEquals("object should have been notified of an enter", 1, lifecycleObject.count)
+
+        compose(composer, expectChanges = false) {
+            composition()
+        }
+        validate(composer.root) { composition() }
+
+        assertEquals("Object should have only been notified once", 1, lifecycleObject.count)
+    }
+
+    fun testLifecycle_Leave_Simple() {
+        val lifecycleObject = object : CompositionLifecycleObserver {
+            var count = 0
+            override fun onEnter() {
+                count++
+            }
+
+            override fun onLeave() {
+                count--
+            }
+        }
+
+        fun MockViewComposition.composition(includeLifecycleObject: Boolean) {
+            linear {
+                if (includeLifecycleObject) {
+                    linear {
+                        val l = remember { lifecycleObject }
+                        assertEquals("Lifecycle object should be returned", lifecycleObject, l)
+                        text("Some text")
+                    }
+                }
+            }
+        }
+
+        fun MockViewValidator.composition(includeLifecycleObject: Boolean) {
+            linear {
+                if (includeLifecycleObject) {
+                    linear {
+                        text("Some text")
+                    }
+                }
+            }
+        }
+
+        val composer = compose { composition(true) }
+        validate(composer.root) { composition(true) }
+
+        assertEquals("object should have been notified of an enter", 1, lifecycleObject.count)
+
+        compose(composer, expectChanges = false) {
+            composition(true)
+        }
+        validate(composer.root) { composition(true) }
+
+        assertEquals("Object should have only been notified once", 1, lifecycleObject.count)
+
+        compose(composer, expectChanges = true) {
+            composition(false)
+        }
+        validate(composer.root) { composition(false) }
+
+        assertEquals("Object should have been notified of a leave", 0, lifecycleObject.count)
+    }
+
+    fun testLifecycle_Leave_NoLeaveOnReenter() {
+        var expectedEnter = true
+        var expectedLeave = true
+        val lifecycleObject = object : CompositionLifecycleObserver {
+            var count = 0
+            override fun onEnter() {
+                count++
+                assertTrue("No enter expected", expectedEnter)
+            }
+
+            override fun onLeave() {
+                count--
+                assertTrue("No leave expected", expectedLeave)
+            }
+        }
+
+        fun MockViewComposition.composition(a: Boolean, b: Boolean, c: Boolean) {
+            linear {
+                if (a) {
+                    linear(1) {
+                        val l = remember { lifecycleObject }
+                        assertEquals("Lifecycle object should be returned", lifecycleObject, l)
+                        text("a")
+                    }
+                }
+                if (b) {
+                    linear(2) {
+                        val l = remember { lifecycleObject }
+                        assertEquals("Lifecycle object should be returned", lifecycleObject, l)
+                        text("b")
+                    }
+                }
+                if (c) {
+                    linear(3) {
+                        val l = remember { lifecycleObject }
+                        assertEquals("Lifecycle object should be returned", lifecycleObject, l)
+                        text("c")
+                    }
+                }
+            }
+        }
+
+        fun MockViewValidator.composition(a: Boolean, b: Boolean, c: Boolean) {
+            linear {
+                if (a) {
+                    linear {
+                        text("a")
+                    }
+                }
+                if (b) {
+                    linear {
+                        text("b")
+                    }
+                }
+                if (c) {
+                    linear {
+                        text("c")
+                    }
+                }
+            }
+        }
+
+        expectedEnter = true
+        expectedLeave = false
+        val composer = compose { composition(a = true, b = false, c = false) }
+        validate(composer.root) { composition(a = true, b = false, c = false) }
+
+        assertEquals("object should have been notified of an enter", 1, lifecycleObject.count)
+
+        expectedEnter = false
+        expectedLeave = false
+        compose(composer, expectChanges = false) {
+            composition(a = true, b = false, c = false)
+        }
+        validate(composer.root) { composition(a = true, b = false, c = false) }
+        assertEquals("Object should have only been notified once", 1, lifecycleObject.count)
+
+        expectedEnter = false
+        expectedLeave = false
+        compose(composer, expectChanges = true) {
+            composition(a = false, b = true, c = false)
+        }
+        validate(composer.root) { composition(a = false, b = true, c = false) }
+        assertEquals("No enter or leaves", 1, lifecycleObject.count)
+
+        expectedEnter = false
+        expectedLeave = false
+        compose(composer, expectChanges = true) {
+            composition(a = false, b = false, c = true)
+        }
+        validate(composer.root) { composition(a = false, b = false, c = true) }
+        assertEquals("No enter or leaves", 1, lifecycleObject.count)
+
+        expectedEnter = false
+        expectedLeave = false
+        compose(composer, expectChanges = true) {
+            composition(a = true, b = false, c = false)
+        }
+        validate(composer.root) { composition(a = true, b = false, c = false) }
+        assertEquals("No enter or leaves", 1, lifecycleObject.count)
+
+        expectedEnter = false
+        expectedLeave = true
+        compose(composer, expectChanges = true) {
+            composition(a = false, b = false, c = false)
+        }
+        validate(composer.root) { composition(a = false, b = false, c = false) }
+        assertEquals("A leave", 0, lifecycleObject.count)
+    }
+
+    fun testLifecycle_Leave_LeaveOnReplace() {
+        val lifecycleObject1 = object : CompositionLifecycleObserver {
+            var count = 0
+            override fun onEnter() {
+                count++
+            }
+
+            override fun onLeave() {
+                count--
+            }
+        }
+
+        val lifecycleObject2 = object : CompositionLifecycleObserver {
+            var count = 0
+            override fun onEnter() {
+                count++
+            }
+
+            override fun onLeave() {
+                count--
+            }
+        }
+
+        fun MockViewComposition.composition(obj: Any) {
+            linear {
+                linear(1) {
+                    remember(obj) { obj }
+                    text("Some value")
+                }
+            }
+        }
+
+        fun MockViewValidator.composition() {
+            linear {
+                linear {
+                    text("Some value")
+                }
+            }
+        }
+
+        val composer = compose { composition(obj = lifecycleObject1) }
+        validate(composer.root) { composition() }
+        assertEquals("first object should enter", 1, lifecycleObject1.count)
+        assertEquals("second object should not have entered", 0, lifecycleObject2.count)
+
+        compose(composer, expectChanges = true) {
+            composition(lifecycleObject2)
+        }
+        validate(composer.root) { composition() }
+        assertEquals("first object should have left", 0, lifecycleObject1.count)
+        assertEquals("second object should have entered", 1, lifecycleObject2.count)
+
+        compose(composer, expectChanges = true) {
+            composition(object {})
+        }
+        validate(composer.root) { composition() }
+        assertEquals("first object should have left", 0, lifecycleObject1.count)
+        assertEquals("second object should have left", 0, lifecycleObject2.count)
+    }
+
+    fun testLifecycle_EnterLeaveOrder() {
+        var order = 0
+        val objects = mutableListOf<Any>()
+        val newLifecycleObject = { name: String ->
+            object : CompositionLifecycleObserver, Counted, Ordered, Named {
+                override var name = name
+                override var count = 0
+                override var enterOrder = -1
+                override var leaveOrder = -1
+                override fun onEnter() {
+                    assertEquals("Only one call to onEnter expected", -1, enterOrder)
+                    enterOrder = order++
+                    count++
+                }
+
+                override fun onLeave() {
+                    assertEquals("Only one call to onLeave expected", -1, leaveOrder)
+                    leaveOrder = order++
+                    count--
+                }
+            }.also { objects.add(it) }
+        }
+
+        fun MockViewComposition.lifecycleUser(name: String) {
+            linear {
+                remember(name) { newLifecycleObject(name) }
+                text(value = name)
+            }
+        }
+
+        /*
+        A
+        |- B
+        |  |- C
+        |  |- D
+        |- E
+        |- F
+        |  |- G
+        |  |- H
+        |     |-I
+        |- J
+
+        Should enter as: A, B, C, D, E, F, G, H, I, J
+        Should leave as: I, C, D, G, H, B, E, F, J, A
+        */
+
+        fun MockViewComposition.tree() {
+            linear {
+                lifecycleUser("A")
+                linear {
+                    lifecycleUser("B")
+                    linear {
+                        lifecycleUser("C")
+                        lifecycleUser("D")
+                    }
+                    lifecycleUser("E")
+                    lifecycleUser("F")
+                    linear {
+                        lifecycleUser("G")
+                        lifecycleUser("H")
+                        linear {
+                            lifecycleUser("I")
+                        }
+                    }
+                    lifecycleUser("J")
+                }
+            }
+        }
+
+        fun MockViewComposition.composition(includeTree: Boolean) {
+            linear {
+                if (includeTree) tree()
+            }
+        }
+
+        val composer = compose { composition(true) }
+
+        assertTrue(
+            "All object should have entered",
+            objects.mapNotNull { it as? Counted }.map { it.count == 1 }.all { it })
+
+        compose(composer) {
+            composition(false)
+        }
+
+        assertTrue(
+            "All object should have left",
+            objects.mapNotNull { it as? Counted }.map { it.count == 0 }.all { it })
+
+        assertArrayEquals(
+            "Expected enter order",
+            arrayOf("A", "B", "C", "D", "E", "F", "G", "H", "I", "J"),
+            objects.mapNotNull { it as? Ordered }.sortedBy { it.enterOrder }.map { (it as Named).name }.toTypedArray()
+        )
+
+        assertArrayEquals(
+            "Expected leave order",
+            arrayOf("I", "C", "D", "G", "H", "B", "E", "F", "J", "A"),
+            objects.mapNotNull { it as? Ordered }.sortedBy { it.leaveOrder }.map { (it as Named).name }.toTypedArray()
+        )
+    }
 }
 
+private fun <T> assertArrayEquals(message: String, expected: Array<T>, received: Array<T>) {
+    fun Array<T>.getString() = this.joinToString(", ") { it.toString() }
+    fun err(msg: String): Nothing = error("$message: $msg, expected: [${expected.getString()}], received: [${received.getString()}]")
+    if (expected.size != received.size) err("sizes are different")
+    expected.indices.forEach { index ->
+        if (expected[index] != received[index])
+            err("item at index $index was different (expected [${expected[index]}], received: [${received[index]}]")
+    }
+}
 
 private fun compose(composer: MockViewComposer? = null, expectChanges: Boolean = true, block: Compose): MockViewComposer {
     val myComposer = composer ?: run {
@@ -896,10 +1316,10 @@ private fun compose(composer: MockViewComposer? = null, expectChanges: Boolean =
         block()
     }
     if (expectChanges) {
-        Assert.assertNotEquals(0, myComposer.changeCount)
+        Assert.assertNotEquals("changes were expected", 0, myComposer.changeCount)
         myComposer.applyChanges()
     } else {
-        Assert.assertEquals(0, myComposer.changeCount)
+        Assert.assertEquals("no changes were expected", 0, myComposer.changeCount)
     }
 
     return myComposer
@@ -921,4 +1341,17 @@ private fun testModel(contacts: MutableList<Contact> = mutableListOf(bob, jon, s
 private val jim_reports_to_sally = Report("Jim", "Sally")
 private val rob_reports_to_alice = Report("Rob", "Alice")
 private val clark_reports_to_lois = Report("Clark", "Lois")
-private val griffin_reports_to_alice = Report("Griffin", "Alice")
+
+
+private interface Counted {
+    val count: Int
+}
+
+private interface Ordered {
+    val enterOrder: Int
+    val leaveOrder: Int
+}
+
+private interface Named {
+    val name: String
+}
