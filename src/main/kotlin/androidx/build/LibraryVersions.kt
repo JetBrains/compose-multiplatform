@@ -73,7 +73,7 @@ object LibraryVersions {
     val PRINT = Version("1.0.0")
     val PERCENTLAYOUT = Version("1.0.0")
     val PERSISTENCE = Version("2.0.0")
-    val PREFERENCE = Version("1.1.0-alpha02")
+    val PREFERENCE = Version("1.1.0-alpha03")
     val RECOMMENDATION = Version("1.0.0")
     val RECYCLERVIEW = Version("1.1.0-alpha01")
     val REMOTECALLBACK = Version("1.0.0-alpha02")
