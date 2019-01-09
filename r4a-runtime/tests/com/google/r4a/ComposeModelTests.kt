@@ -197,6 +197,41 @@ class ModelViewTests : TestCase() {
         }
     }
 
+    // b/122548164
+    @Test
+    fun testObserverEntering(): Unit = isolated {
+        val president = Person(PRESIDENT_NAME_1, PRESIDENT_AGE_1)
+        val tvName = 204
+
+        fun ViewComposition.display(person: Person) {
+            call(167, { true }) {
+                Observe {
+                    emit(93, { context -> TextView(context).apply { id = tvName } }) { set(person.name) { text = it } }
+                    emit(94, { context -> TextView(context) }) { set(person.age) { text = it.toString() } }
+                }
+                if (person.name == PRESIDENT_NAME_16) {
+                    Observe {
+                        emit(211, { context -> TextView(context)}) { set(person.name) { text = it}}
+                        emit(211, { context -> TextView(context)}) { set(person.age) { text = it.toString() }}
+                    }
+                }
+            }
+        }
+
+        compose {
+            call(219, {true}) {
+                Observe {
+                    display(president)
+                }
+            }
+        }.then { activity ->
+            assertEquals(PRESIDENT_NAME_1, (activity.findViewById(tvName) as TextView).text)
+            president.name = PRESIDENT_NAME_16
+        }.then { activity ->
+            assertEquals(PRESIDENT_NAME_16, (activity.findViewById(tvName) as TextView).text)
+        }
+    }
+
     private class Root(val block: ViewComposition.() -> Unit) : Component() {
         override fun compose() {
             ViewComposition((CompositionContext.current as ComposerCompositionContext).composer).block()
