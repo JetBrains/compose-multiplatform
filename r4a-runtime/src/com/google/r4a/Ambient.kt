@@ -47,9 +47,7 @@ class Ambient<T>(private val key: String, private val defaultFactory: (() -> T)?
             cc as ComposerCompositionContext
 
             with(cc.composer) {
-                val value = startConsumer(this@Consumer)
-                children(value)
-                endConsumer()
+                children(consume(ambient))
             }
         }
 

@@ -226,7 +226,7 @@ class ComposerCompositionContextTests: ComposerComposeTestCase() {
             assertEquals(2, counter["A"])
             assertEquals(2, counter["100"])
             assertEquals(1, counter["101"])
-            assertEquals(2, counter["102"]) // TODO(lmr): this should be 3?
+            assertEquals(3, counter["102"])
         }
     }
 

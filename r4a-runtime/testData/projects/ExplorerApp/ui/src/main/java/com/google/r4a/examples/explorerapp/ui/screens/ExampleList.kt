@@ -17,7 +17,7 @@ class ExampleList : Component() {
                 paddingBottom=6.pt
             />
 
-            val navigator = CompositionContext.current.getAmbient(Ambients.NavController)
+            val navigator = with (composer) { +ambient(Ambients.NavController) }
             for (example in EXAMPLES) {
                 <Button
                     text=example

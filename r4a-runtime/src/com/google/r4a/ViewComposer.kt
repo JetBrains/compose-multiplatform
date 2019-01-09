@@ -117,12 +117,17 @@ class ViewComposer(val root: Any, val context: Context, val adapters: ViewAdapte
     fun skipGroup(key: Any) {
         nextSlot()
         skipValue()
-        skipGroup()
+        skipGroupAndRecomposeRange()
     }
 }
 
 @Suppress("UNCHECKED_CAST")
+@EffectsDsl
 /* inline */ class ViewComposition(val composer: ViewComposer) {
+
+    @Suppress("NOTHING_TO_INLINE")
+    inline operator fun <V> Effect<V>.unaryPlus(): V = resolve(this@ViewComposition.composer)
+
     inline fun <T : View> emit(
         key: Any,
         /*crossinline*/ ctor: (context: Context) -> T,

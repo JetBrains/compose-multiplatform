@@ -20,6 +20,7 @@ repositories {
 
 dependencies {
     compile(project(":kotlin-stdlib"))
+    compile("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.0")
     compileOnly("com.android.support:support-annotations:27.1.1")
     compileOnly("com.google.android:android:4.1.1.4")
     testCompile("com.google.android:android:4.1.1.4")
