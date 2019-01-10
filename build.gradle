@@ -37,6 +37,13 @@ apply from: "kotlin-dsl-dependency.gradle.kts"
 
 allprojects {
     repos.addMavenRepositories(repositories)
+
+    tasks.withType(Test) {
+        testLogging {
+            events = ["failed"]
+            exceptionFormat "full"
+        }
+    }
 }
 
 dependencies {
