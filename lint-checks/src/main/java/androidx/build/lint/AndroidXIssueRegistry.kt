@@ -22,6 +22,7 @@ class AndroidXIssueRegistry : IssueRegistry() {
     override val issues get() = listOf(
             BanParcelableUsage.ISSUE,
             BanKeepAnnotation.ISSUE,
-            BanTargetApiAnnotation.ISSUE
+            BanTargetApiAnnotation.ISSUE,
+            ObsoleteBuildCompatUsageDetector.ISSUE
     )
 }
