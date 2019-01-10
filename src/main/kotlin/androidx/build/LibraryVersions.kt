@@ -92,7 +92,7 @@ object LibraryVersions {
     val VECTORDRAWABLE_ANIMATED = Version("1.1.0-alpha01")
     val VERSIONED_PARCELABLE = Version("1.1.0-alpha02")
     val VIEWPAGER = Version("1.1.0-alpha01")
-    val VIEWPAGER2 = Version("1.0.0")
+    val VIEWPAGER2 = Version("1.0.0-alpha01")
     val WEAR = Version("1.0.0")
     val WEBKIT = Version("1.1.0-alpha01")
     val WORKMANAGER = Version("1.0.0-beta02")
