@@ -1,5 +1,6 @@
 package com.google.r4a.examples.explorerapp.ui.infinitescroll
 
+import android.content.Context
 import android.graphics.Color
 import android.support.v7.widget.LinearLayoutManager
 import android.widget.*

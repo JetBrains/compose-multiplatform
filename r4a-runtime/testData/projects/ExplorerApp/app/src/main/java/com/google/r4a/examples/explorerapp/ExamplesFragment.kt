@@ -2,7 +2,7 @@ package com.google.r4a.examples.explorerapp
 
 import com.google.r4a.composer
 import com.google.r4a.examples.explorerapp.common.adapters.ComposeFragment
-import com.google.r4a.examples.explorerapp.ui.screens.ExampleList
+import com.google.r4a.examples.explorerapp.ui.screens.*
 
 class ExamplesFragment: ComposeFragment() {
     override fun compose() {

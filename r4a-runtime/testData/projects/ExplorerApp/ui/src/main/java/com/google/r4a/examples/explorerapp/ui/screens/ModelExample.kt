@@ -4,7 +4,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.r4a.*
-import com.google.r4a.examples.explorerapp.common.adapters.setOnClick
+import com.google.r4a.adapters.*
 
 @Model
 class Counter {
@@ -39,7 +39,7 @@ fun ModelExample(model: ExampleModel = remember { ExampleModel() }) {
         <LinearLayout>
             <TextView text="Recompose count=${recomposeCount++}" />
             <CounterView counter=model.buttonCounter />
-            <Button text="Press me" onClick={ _ -> model.buttonCounter.next() } />
+            <Button text="Press me" onClick={ model.buttonCounter.next() } />
         </LinearLayout>
     </Observe>
 }

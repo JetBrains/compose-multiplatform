@@ -54,6 +54,95 @@ class KtxCodegenTests : AbstractCodeGenTest() {
     }
 
     @Test
+    fun testInliningTemp(): Unit = ensureSetup {
+        compose(
+            """
+                @Composable
+                fun Foo(x: Double, @Children children: Double.() -> Unit) {
+                  <x.children />
+                }
+            """,
+            { mapOf("foo" to "bar") },
+            """
+                <Foo x=1.0>
+                    <TextView text=this.toString() id=123 />
+                </Foo>
+            """
+        ).then { activity ->
+            val textView = activity.findViewById(123) as TextView
+            assertEquals("1.0", textView.text)
+        }
+    }
+
+    @Test
+    fun testInliningTemp2(): Unit = ensureSetup {
+        compose(
+            """
+                @Composable
+                fun Foo(onClick: Double.() -> Unit) {
+
+                }
+            """,
+            { mapOf("foo" to "bar") },
+            """
+                <Foo onClick={} />
+            """
+        ).then { _ ->
+
+        }
+    }
+
+    @Test
+    fun testInliningTemp3(): Unit = ensureSetup {
+        compose(
+            """
+                @Composable
+                fun Foo(onClick: (Double) -> Unit) {
+
+                }
+            """,
+            { mapOf("foo" to "bar") },
+            """
+                <Foo onClick={} />
+            """
+        ).then { _ ->
+
+        }
+    }
+
+    @Test
+    fun testInliningTemp4(): Unit = ensureSetup {
+        compose(
+            """
+                @Composable
+                fun Foo(onClick: (Double) -> Unit) {
+
+                }
+            """,
+            { mapOf("foo" to "bar") },
+            """
+                <Foo onClick={} />
+            """
+        ).then { _ ->
+
+        }
+    }
+
+    @Test
+    fun testCGNInlining(): Unit = ensureSetup {
+        compose(
+            """
+                <LinearLayout orientation=LinearLayout.VERTICAL>
+                    <TextView text="Hello, world!" id=42 />
+                </LinearLayout>
+            """
+        ).then { activity ->
+            val textView = activity.findViewById(42) as TextView
+            assertEquals("Hello, world!", textView.text)
+        }
+    }
+
+    @Test
     fun testCGUpdatedComposition(): Unit = ensureSetup {
         var value = "Hello, world!"
 

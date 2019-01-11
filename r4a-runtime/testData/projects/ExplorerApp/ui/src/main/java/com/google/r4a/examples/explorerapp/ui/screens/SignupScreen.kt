@@ -59,7 +59,7 @@ class SignupScreen: Component() {
                         hint="Username"
                         imeOptions=EditorInfo.IME_ACTION_NEXT
                         controlledText=username
-                        onTextChange={ it ->
+                        onTextChange={
                             username = it
                             recomposeSync()
                         }
@@ -81,7 +81,7 @@ class SignupScreen: Component() {
                             imeOptions=EditorInfo.IME_ACTION_DONE
                             inputType=InputType.TYPE_TEXT_VARIATION_PASSWORD
                             controlledText=password
-                            onTextChange={ it ->
+                            onTextChange={
                                 password = it
                                 recomposeSync()
                             }
@@ -101,7 +101,7 @@ class SignupScreen: Component() {
                         backgroundColor=Colors.PRIMARY
                         textColor=Colors.TEXT_LIGHT
                         enabled=buttonEnabled
-                        onClick={ _ -> onSubmit(authentication) } />
+                        onClick={ onSubmit(authentication) } />
                 </AuthenticationService.Ambient.Consumer>
                 <Ambients.NavController.Consumer> navigator ->
                     <TextView
@@ -111,7 +111,7 @@ class SignupScreen: Component() {
                         padding=10.dp
                         textAlignment=TextView.TEXT_ALIGNMENT_CENTER
                         text="Already a member? Login."
-                        onClick={ _ ->
+                        onClick={
                             navigator.navigate(R.id.nav_to_login)
                         }
                         textSize=15.sp
@@ -123,7 +123,7 @@ class SignupScreen: Component() {
                         padding=10.dp
                         textAlignment=TextView.TEXT_ALIGNMENT_CENTER
                         text="Use app without logging in."
-                        onClick={ _ ->
+                        onClick={
                             navigator.navigate(R.id.screen_link_list)
                         }
                         textSize=15.sp

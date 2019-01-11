@@ -3,7 +3,7 @@ package com.google.r4a.examples.explorerapp
 import com.google.r4a.*
 import com.google.r4a.examples.explorerapp.common.adapters.ComposeFragment
 import com.google.r4a.examples.explorerapp.common.data.Link
-import com.google.r4a.examples.explorerapp.ui.screens.LinkDetailScreen
+import com.google.r4a.examples.explorerapp.ui.screens.*
 
 class LinkDetailFragment: ComposeFragment() {
     override fun compose() {

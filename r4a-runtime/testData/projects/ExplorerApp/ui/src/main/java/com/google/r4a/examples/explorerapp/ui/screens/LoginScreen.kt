@@ -63,7 +63,7 @@ class LoginScreen: Component() { // component because of need for recomposeSync(
                         textSize=15.sp
                         hint="Username"
                         controlledText=username
-                        onTextChange={ it ->
+                        onTextChange={
                             username = it
                             recomposeSync()
                         }
@@ -83,7 +83,7 @@ class LoginScreen: Component() { // component because of need for recomposeSync(
                         textSize=15.sp
                         hint="Password"
                         controlledText=password
-                        onTextChange={ it ->
+                        onTextChange={
                             password = it
                             recomposeSync()
                         }
@@ -106,7 +106,7 @@ class LoginScreen: Component() { // component because of need for recomposeSync(
                     backgroundColor=Colors.PRIMARY
                     textColor=Colors.TEXT_LIGHT
                     enabled=buttonEnabled
-                    onClick={ _ ->
+                    onClick={
                         onSubmit()
                     }
                 />
@@ -118,7 +118,7 @@ class LoginScreen: Component() { // component because of need for recomposeSync(
                         padding=10.dp
                         textAlignment=TextView.TEXT_ALIGNMENT_CENTER
                         text="No account yet? Create one."
-                        onClick={ _ ->
+                        onClick={
                             navigator.navigate(R.id.nav_to_signup)
                         }
                         textSize=15.sp
@@ -131,7 +131,7 @@ class LoginScreen: Component() { // component because of need for recomposeSync(
                         padding=10.dp
                         textAlignment=TextView.TEXT_ALIGNMENT_CENTER
                         text="Use app without logging in."
-                        onClick={ _ ->
+                        onClick={
                             navigator.navigate(R.id.screen_link_list)
                         }
                         textSize=15.sp

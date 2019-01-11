@@ -126,7 +126,7 @@ class ViewComposer(val root: Any, val context: Context, val adapters: ViewAdapte
     inline fun <T : View> emit(
         key: Any,
         /*crossinline*/ ctor: (context: Context) -> T,
-        noinline update: ViewUpdater<T>.() -> Unit
+        update: ViewUpdater<T>.() -> Unit
     ) = with(composer) {
         startNode(key)
         val node = if (inserting)
@@ -140,7 +140,7 @@ class ViewComposer(val root: Any, val context: Context, val adapters: ViewAdapte
     inline fun <T : ViewGroup> emit(
         key: Any,
         /*crossinline*/ ctor: (context: Context) -> T,
-        noinline update: ViewUpdater<T>.() -> Unit,
+        update: ViewUpdater<T>.() -> Unit,
         children: () -> Unit
     ) = with(composer) {
         startNode(key)
@@ -183,7 +183,7 @@ class ViewComposer(val root: Any, val context: Context, val adapters: ViewAdapte
 
     inline fun call(
         key: Any,
-        /*crossinline*/ noinline invalid: ViewValidator.() -> Boolean,
+        /*crossinline*/ invalid: ViewValidator.() -> Boolean,
         block: () -> Unit
     ) = with(composer) {
         startGroup(key)
@@ -200,7 +200,7 @@ class ViewComposer(val root: Any, val context: Context, val adapters: ViewAdapte
     inline fun <T> call(
         key: Any,
         /*crossinline*/ ctor: () -> T,
-        /*crossinline*/ noinline invalid: ViewValidator.(f: T) -> Boolean,
+        /*crossinline*/ invalid: ViewValidator.(f: T) -> Boolean,
         block: (f: T) -> Unit
     ) = with(composer) {
         startGroup(key)
@@ -237,7 +237,7 @@ class ViewComposer(val root: Any, val context: Context, val adapters: ViewAdapte
         }
     }
 
-    inline fun </*reified*/ T> changed(value: T) = with(composer) {
+    inline fun <reified T> changed(value: T) = with(composer) {
         if (nextSlot() != value || inserting) {
             updateValue(value)
             true
@@ -259,7 +259,7 @@ class ViewComposer(val root: Any, val context: Context, val adapters: ViewAdapte
         }
     }
 
-    inline fun </*reified*/ T> updated(value: T) = with(composer) {
+    inline fun <reified T> updated(value: T) = with(composer) {
         inserting.let { inserting ->
             if (nextSlot() != value || inserting) {
                 updateValue(value)
@@ -272,11 +272,11 @@ class ViewComposer(val root: Any, val context: Context, val adapters: ViewAdapte
     }
 
     inline fun set(value: Int, /*crossinline*/ block: (value: Int) -> Unit): Boolean = changed(value).also { if (it) block(value) }
-    inline fun </*reified*/ T> set(value: T, /*crossinline*/ block: (value: T) -> Unit): Boolean =
+    inline fun <reified T> set(value: T, /*crossinline*/ block: (value: T) -> Unit): Boolean =
         changed(value).also { if (it) block(value) }
 
     inline fun update(value: Int, /*crossinline*/ block: (value: Int) -> Unit): Boolean = updated(value).also { if (it) block(value) }
-    inline fun </*reified*/ T> update(value: T, /*crossinline*/ block: (value: T) -> Unit): Boolean =
+    inline fun <reified T> update(value: T, /*crossinline*/ block: (value: T) -> Unit): Boolean =
         updated(value).also { if (it) block(value) }
 
     /*inline*/ operator fun Boolean.plus(other: Boolean) = this || other
@@ -293,7 +293,7 @@ class ViewComposer(val root: Any, val context: Context, val adapters: ViewAdapte
         } else skipValue()
     }
 
-    inline fun <V> set(value: V, /*crossinline*/ block: T.(value: V) -> Unit) = with(composer) {
+    inline fun <reified V> set(value: V, /*crossinline*/ block: T.(value: V) -> Unit) = with(composer) {
         if (inserting || nextSlot() != value) {
             updateValue(value)
             node.block(value)
@@ -311,7 +311,7 @@ class ViewComposer(val root: Any, val context: Context, val adapters: ViewAdapte
         } else skipValue()
     }
 
-    inline fun </*reified*/ V> update(value: V, /*crossinline*/ block: T.(value: V) -> Unit) = with(composer) {
+    inline fun <reified V> update(value: V, /*crossinline*/ block: T.(value: V) -> Unit) = with(composer) {
         if (inserting || nextSlot() != value) {
             updateValue(value)
             node.block(value)

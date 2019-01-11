@@ -765,7 +765,8 @@ private fun StatementGenerator.buildCall(
                     this.extensionReceiver = extensionReceiver ?: extensionReceiverValue?.load()
                 }
                 ExplicitReceiverKind.BOTH_RECEIVERS -> {
-                    TODO("Figure out how to handle both receivers")
+                    this.dispatchReceiver = dispatchReceiver ?: dispatchReceiverValue?.load()
+                    this.extensionReceiver = extensionReceiver ?: extensionReceiverValue?.load()
                 }
             }
             putTypeArguments(resolvedCall.typeArguments) { it.toIrType() }

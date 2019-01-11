@@ -19,7 +19,7 @@ class SpinnerForm: Component() {
                 layoutHeight=WRAP_CONTENT
                 data=AllRegions
                 controlledSelectedIndex=selectedIndex
-                onSelectedIndexChange={ it ->
+                onSelectedIndexChange={
                     selectedIndex = it
                     recomposeSync()
                 }
