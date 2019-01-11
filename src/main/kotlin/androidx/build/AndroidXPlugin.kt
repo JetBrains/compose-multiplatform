@@ -148,7 +148,8 @@ class AndroidXPlugin : Plugin<Project> {
                 if ("assembleAndroidTest" == task.name ||
                         "assembleDebug" == task.name ||
                         ERROR_PRONE_TASK == task.name ||
-                        "lintMinDepVersionsDebug" == task.name) {
+                        ("lintDebug" == task.name &&
+                        !project.rootProject.hasProperty("useMaxDepVersions"))) {
                     buildOnServerTask.dependsOn(task)
                 }
                 if ("assembleAndroidTest" == task.name ||
@@ -175,15 +176,23 @@ class AndroidXPlugin : Plugin<Project> {
 
         AffectedModuleDetector.configure(gradle, this)
 
-        // Iterate through all the project and substitute any artifact dependency of a
-        // maxdepversions future configuration with the corresponding tip of tree project.
-        subprojects { project ->
-            project.configurations.all { configuration ->
-                if (configuration.name.toLowerCase().contains("maxdepversions") &&
-                        project.extra.has("publish")) {
-                    configuration.resolutionStrategy.dependencySubstitution.apply {
-                        for (e in projectModules) {
-                            substitute(module(e.key)).with(project(e.value))
+        // If useMaxDepVersions is set, iterate through all the project and substitute any androidx
+        // artifact dependency with the local tip of tree version of the library.
+        if (project.hasProperty("useMaxDepVersions")) {
+            // This requires evaluating all sub-projects to create the module:project map
+            // and project dependencies.
+            evaluationDependsOnChildren()
+            subprojects { project ->
+                project.configurations.all { configuration ->
+                    // Substitute only for debug configurations/tasks only because we can not
+                    // change release dependencies after evaluation. Test hooks, buildOnServer
+                    // and buildTestApks use the debug configurations as well.
+                    if (project.extra.has("publish") && configuration.name
+                            .toLowerCase().contains("debug")) {
+                        configuration.resolutionStrategy.dependencySubstitution.apply {
+                            for (e in projectModules) {
+                                substitute(module(e.key)).with(project(e.value))
+                            }
                         }
                     }
                 }
@@ -219,22 +228,6 @@ class AndroidXPlugin : Plugin<Project> {
                                         "dependency to list a fixed version.")
                     }
                 }
-            }
-        }
-        if (project.name != "docs-fake") {
-            // Add another "version" flavor dimension which would have two flavors minDepVersions
-            // and maxDepVersions. Flavor minDepVersions builds the libraries against the specified
-            // versions of their dependencies while maxDepVersions builds the libraries against
-            // the local versions of their dependencies (so for example if library A specifies
-            // androidx.collection:collection:1.2.0 as its dependency then minDepVersions would
-            // build using exactly that version while maxDepVersions would build against
-            // project(":collection") instead.)
-            extension.flavorDimensions("version")
-            extension.productFlavors {
-                it.create("minDepVersions")
-                it.get("minDepVersions").dimension = "version"
-                it.create("maxDepVersions")
-                it.get("maxDepVersions").dimension = "version"
             }
         }
 
@@ -372,6 +365,6 @@ private fun Project.configureResourceApiChecks() {
 }
 
 private fun Project.getGenerateResourceApiFile(): File {
-    return File(project.buildDir, "intermediates/public_res/minDepVersionsRelease" +
-            "/packageMinDepVersionsReleaseResources/public.txt")
+    return File(project.buildDir, "intermediates/public_res/release" +
+            "/packageReleaseResources/public.txt")
 }
