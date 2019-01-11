@@ -18,7 +18,6 @@ package androidx.build.metalava
 
 import androidx.build.AndroidXPlugin.Companion.BUILD_ON_SERVER_TASK
 import androidx.build.SupportLibraryExtension
-import androidx.build.androidJarFile
 import androidx.build.checkapi.ApiLocation
 import androidx.build.checkapi.getCurrentApiLocation
 import androidx.build.checkapi.getRequiredCompatibilityApiLocation
@@ -90,7 +89,11 @@ object Metalava {
         task.bootClasspath = inputs.bootClasspath
     }
 
-    fun setupProject(project: Project, javaCompileInputs: JavaCompileInputs, extension: SupportLibraryExtension) {
+    fun setupProject(
+        project: Project,
+        javaCompileInputs: JavaCompileInputs,
+        extension: SupportLibraryExtension
+    ) {
         val metalavaConfiguration = project.createMetalavaConfiguration()
 
         // the api files whose file names contain the version of the library
@@ -108,6 +111,8 @@ object Metalava {
         val builtApiLocation = ApiLocation.fromPublicApiFile(File(project.docsDir(), "release/${project.name}/current.txt"))
 
         var generateApi = project.tasks.create("generateApi", GenerateApiTask::class.java) { task ->
+            task.group = "API"
+            task.description = "Generates API files from source"
             task.apiLocation = builtApiLocation
             task.configuration = metalavaConfiguration
             task.dependsOn(metalavaConfiguration)
@@ -115,6 +120,8 @@ object Metalava {
         applyInputs(javaCompileInputs, generateApi)
 
         val checkApi = project.tasks.create("checkApi", CheckApiEquivalenceTask::class.java) { task ->
+            task.group = "API"
+            task.description = "Checks that the API generated from source code matches the checked in API file"
             task.builtApi = generateApi.apiLocation
             task.checkedInApis = outputApiLocations
             task.checkRestrictedAPIs = extension.trackRestrictedAPIs
@@ -134,6 +141,8 @@ object Metalava {
         }
 
         project.tasks.create("updateApi", UpdateApiTask::class.java) { task ->
+            task.group = "API"
+            task.description = "Updates the checked in API files to match source code API"
             task.inputApiLocation = generateApi.apiLocation
             task.outputApiLocations = checkApi.checkedInApis
             task.updateRestrictedAPIs = extension.trackRestrictedAPIs
