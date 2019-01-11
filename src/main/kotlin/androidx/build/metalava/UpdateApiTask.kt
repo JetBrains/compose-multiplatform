@@ -22,6 +22,7 @@ import com.android.build.gradle.api.BaseVariant
 import com.google.common.io.Files
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.InputFiles
@@ -60,15 +61,29 @@ open class UpdateApiTask : DefaultTask() {
     fun exec() {
         val inputPublicApi = checkNotNull(inputApiLocation?.publicApiFile) { "inputPublicApi not set" }
         val inputRestrictedApi = checkNotNull(inputApiLocation?.restrictedApiFile) { "inputRestrictedApi not set" }
+        var permitOverwriting = true
         for (outputApi in outputApiLocations) {
-            copy(inputPublicApi, outputApi.publicApiFile, project.logger)
+            val version = outputApi.version()
+            if (version != null && version.isFinalApi() && outputApi.publicApiFile.exists() && !project.hasProperty("force")) {
+                permitOverwriting = false
+            }
+        }
+        for (outputApi in outputApiLocations) {
+            copy(inputPublicApi, outputApi.publicApiFile, permitOverwriting, project.logger)
             if (updateRestrictedAPIs) {
-                copy(inputRestrictedApi, outputApi.restrictedApiFile, project.logger)
+                copy(inputRestrictedApi, outputApi.restrictedApiFile, permitOverwriting, project.logger)
             }
         }
     }
 
-    fun copy(source: File, dest: File, logger: Logger) {
+    fun copy(source: File, dest: File, permitOverwriting: Boolean, logger: Logger) {
+        if (!permitOverwriting) {
+            // determine whether file contents is changing
+            if (dest.exists() && source.readText() != dest.readText()) {
+                throw GradleException("Once an artifact has had a final release, its public API may no longer be modified. Did you mean to increment the library version first?")
+            }
+        }
+
         Files.copy(source, dest)
         logger.lifecycle("Copied ${source} to ${dest}")
     }
