@@ -18,6 +18,8 @@ package androidx.build.checkapi
 
 import java.io.File
 
+import androidx.build.Version
+
 // A ApiLocation contains the filepath of a public API and restricted API of a library
 data class ApiLocation (
     // file specifying the public API of the library
@@ -27,6 +29,14 @@ data class ApiLocation (
 ) {
 
     fun files() = listOf(publicApiFile, restrictedApiFile)
+
+    fun version(): Version? {
+        val text = publicApiFile.name.removeSuffix(".txt")
+        if (text == "current") {
+            return null
+        }
+        return Version(text)
+    }
 
     companion object {
         fun fromPublicApiFile(f: File): ApiLocation {
