@@ -22,9 +22,16 @@ import org.gradle.api.artifacts.Dependency
 import org.gradle.api.tasks.TaskAction
 
 /**
- * Task for updating the checked in API file with the newly generated one.
+ * Task for verifying the androidx dependency-stability-suffix rule
+ * (A library is only as stable as its lease stable dependency)
  */
 open class VerifyDependencyVersionsTask : DefaultTask() {
+
+    init {
+        group = "Verification"
+        description = "Task for verifying the androidx dependency-stability-suffix rule"
+    }
+
     /**
      * Iterate through the dependencies of the project and ensure none of them are of an inferior
      * release. This means that a beta project should not have any alpha dependencies, an rc project
