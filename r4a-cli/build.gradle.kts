@@ -11,7 +11,7 @@ plugins {
 
 dependencies {
     compileOnly(intellijDep()) { includeJars("extensions", "openapi", "util", "idea", "platform-api", "platform-impl", "android-base-common", rootProject = rootProject) }
-    compileOnly(intellijDep()) { includeJars("asm-all-7.0") }
+    compileOnly(intellijDep()) { includeJars(if (Platform[191].orHigher()) "asm-all-7.0" else "asm-all") }
     testRuntime(intellijDep())
     compileOnly(project(":compiler:plugin-api"))
     compileOnly(project(":compiler:frontend"))
