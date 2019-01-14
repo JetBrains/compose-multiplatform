@@ -122,7 +122,11 @@ class DiffAndDocs private constructor(
             anchorTask.dependsOn(createDistDocsTask(root, task, it.name))
         }
 
-        root.tasks.create("generateDocs").dependsOn(docsTasks[TIP_OF_TREE.name])
+        root.tasks.create("generateDocs") { task ->
+            task.group = JavaBasePlugin.DOCUMENTATION_GROUP
+            task.description = "Generates distribution artifact for d.android.com-style docs."
+            task.dependsOn(docsTasks[TIP_OF_TREE.name])
+        }
 
         val docletClasspath = doclavaConfiguration.resolve()
 
