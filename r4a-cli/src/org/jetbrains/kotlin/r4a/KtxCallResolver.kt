@@ -1918,6 +1918,8 @@ class KtxCallResolver(
             context, "trace to resolve as function call", childrenExpr
         )
 
+        val refExpr = psiFactory.createSimpleName(setterName.identifier)
+
         val results = callResolver.computeTasksAndResolveCall<FunctionDescriptor>(
             BasicCallResolutionContext.create(
                 context.replaceTraceAndCache(temporaryForFunction),
@@ -1926,7 +1928,7 @@ class KtxCallResolver(
                 DataFlowInfoForArgumentsImpl(context.dataFlowInfo, call)
             ),
             setterName,
-            childrenExpr,
+            refExpr,
             NewResolutionOldInference.ResolutionKind.Function
         )
 
