@@ -76,8 +76,6 @@ private fun JavaCompile.configureWithErrorProne(toolChain: ErrorProneToolChain) 
             "-Xep:ObjectToString:OFF",
             "-Xep:CatchAndPrintStackTrace:OFF",
 
-            "-Xep:BadImport:OFF", // DO NOT SUBMIT
-
             // Enforce the following checks.
             "-Xep:ParameterNotNullable:ERROR",
             "-Xep:MissingOverride:ERROR",
