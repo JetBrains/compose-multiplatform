@@ -134,6 +134,6 @@ private fun CalculatorButton(
         textSize=21.sp
         textColor=Color.WHITE
         backgroundResource=R.drawable.pad_button_background
-        onClick={ v -> onClick(value) }
+        onClick={ onClick(value) }
     />
 }

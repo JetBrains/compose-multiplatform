@@ -67,7 +67,7 @@ class SubredditLinkList: Component() { // component for getAmbient() and subscri
             layoutParams=listParams
             paddingTop=(48.dp + 56.dp)
             headerCount=1
-            composeHeader={ it: Int ->
+            composeHeader={
                 <FrameLayout
                     layoutWidth=MATCH_PARENT
                     layoutHeight=WRAP_CONTENT
@@ -91,7 +91,7 @@ class SubredditLinkList: Component() { // component for getAmbient() and subscri
                         // TODO(lmr): textColor?
 
                         controlledSelectedIndex=selectedSortIndex
-                        onSelectedIndexChange={ it ->
+                        onSelectedIndexChange={
                             if (it != selectedSortIndex) {
                                 selectedSortIndex = it
                                 recomposeSync()
@@ -102,7 +102,7 @@ class SubredditLinkList: Component() { // component for getAmbient() and subscri
             }
 
             loadingRowCount=(if (isLoading) 1 else 0)
-            composeLoadingRow={ _ -> <LoadingRow /> }
+            composeLoadingRow={ <LoadingRow /> }
             backgroundColor=Colors.LIGHT_GRAY
             data=model.links.value
         > link ->

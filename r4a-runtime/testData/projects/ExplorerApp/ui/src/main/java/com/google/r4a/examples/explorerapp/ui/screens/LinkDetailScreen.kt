@@ -108,12 +108,12 @@ class LinkDetailScreen: Component() { // component because of need for getAmbien
                                     backgroundColor=Colors.LIGHT_GRAY
 
                                     headerCount=(if (link != null) 1 else 0)
-                                    composeHeader={ _ ->
+                                    composeHeader={
                                         <LinkHeader link=link!! />
                                     }
 
                                     loadingRowCount=(if (isLoading) 1 else 0)
-                                    composeLoadingRow={ _ ->
+                                    composeLoadingRow={
                                         <LoadingRow />
                                     }
 

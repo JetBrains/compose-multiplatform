@@ -41,7 +41,7 @@ class EditForm: Component() { // need recomposeSync()
                         recomposeSync()
                     }
                     data=AllRegions
-                    composeItem={it ->
+                    composeItem={
                         <TextView text=(it as String) />
                     }
                 />
@@ -78,7 +78,7 @@ class EditForm: Component() { // need recomposeSync()
                     layoutWidth=MATCH_PARENT
                     layoutHeight=WRAP_CONTENT
                     controlledChecked=checked
-                    onCheckedChange={it ->
+                    onCheckedChange={
                         checked = it
                         recomposeSync()
                     }
@@ -94,7 +94,7 @@ class EditForm: Component() { // need recomposeSync()
                     layoutWidth=MATCH_PARENT
                     layoutHeight=WRAP_CONTENT
                     controlledProgress=progress
-                    onProgressChange={it ->
+                    onProgressChange={
                         progress = Math.min(it, 70)
                         recomposeSync()
                     }
@@ -109,7 +109,7 @@ class EditForm: Component() { // need recomposeSync()
                 // TODO(lmr): we could build a better RadioGroup component
                 <RadioGroup
                     controlledCheckedId=checkedId
-                    onCheckedIdChange={it ->
+                    onCheckedIdChange={
                         checkedId = it
                         recomposeSync()
                     }

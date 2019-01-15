@@ -359,25 +359,25 @@ class KtxTypeResolutionTests : AbstractR4aDiagnosticsTest() {
 
             @Composable fun Test() {
 
-                val fa: (A) -> Unit = { it -> it.a() }
-                val fb: (B) -> Unit = { it -> it.b() }
+                val fa: (A) -> Unit = { it.a() }
+                val fb: (B) -> Unit = { it.b() }
 
-                <Foo value=A() f={ it -> it.a() } />
-                <Foo value=B() f={ it -> it.b() } />
+                <Foo value=A() f={ it.a() } />
+                <Foo value=B() f={ it.b() } />
                 <Foo value=A() f=fa />
                 <Foo value=B() f=fb />
-                <Foo value=B() f={ it -> it.<!UNRESOLVED_REFERENCE!>a<!>() } />
-                <Foo value=A() f={ it -> it.<!UNRESOLVED_REFERENCE!>b<!>() } />
+                <Foo value=B() f={ it.<!UNRESOLVED_REFERENCE!>a<!>() } />
+                <Foo value=A() f={ it.<!UNRESOLVED_REFERENCE!>b<!>() } />
                 <<!TYPE_INFERENCE_CONFLICTING_SUBSTITUTIONS!>Foo<!> <!MISMATCHED_INFERRED_ATTRIBUTE_TYPE!>value<!>=A() <!MISMATCHED_INFERRED_ATTRIBUTE_TYPE!>f<!>=fb />
                 <<!TYPE_INFERENCE_CONFLICTING_SUBSTITUTIONS!>Foo<!> <!MISMATCHED_INFERRED_ATTRIBUTE_TYPE!>value<!>=B() <!MISMATCHED_INFERRED_ATTRIBUTE_TYPE!>f<!>=fa />
 
 
-                <Bar x=1 value=A() f={ it -> it.a() } />
-                <Bar x=1 value=B() f={ it -> it.b() } />
+                <Bar x=1 value=A() f={ it.a() } />
+                <Bar x=1 value=B() f={ it.b() } />
                 <Bar x=1 value=A() f=fa />
                 <Bar x=1 value=B() f=fb />
-                <Bar x=1 value=B() f={ it -> it.<!UNRESOLVED_REFERENCE!>a<!>() } />
-                <Bar x=1 value=A() f={ it -> it.<!UNRESOLVED_REFERENCE!>b<!>() } />
+                <Bar x=1 value=B() f={ it.<!UNRESOLVED_REFERENCE!>a<!>() } />
+                <Bar x=1 value=A() f={ it.<!UNRESOLVED_REFERENCE!>b<!>() } />
                 <<!TYPE_INFERENCE_CONFLICTING_SUBSTITUTIONS!>Bar<!> x=1 <!MISMATCHED_INFERRED_ATTRIBUTE_TYPE!>value<!>=A() <!MISMATCHED_INFERRED_ATTRIBUTE_TYPE!>f<!>=fb />
                 <<!TYPE_INFERENCE_CONFLICTING_SUBSTITUTIONS!>Bar<!> x=1 <!MISMATCHED_INFERRED_ATTRIBUTE_TYPE!>value<!>=B() <!MISMATCHED_INFERRED_ATTRIBUTE_TYPE!>f<!>=fa />
             }

@@ -453,41 +453,6 @@ class KtxCallResolver(
                 )
             }
 
-        // TODO: Remove this when we fix lambda inferencing
-        // Until we can figure out what is wrong with lambda inferencing and KTX tags, we add this additional check in
-        // to find lambda literals that have receiver scopes (which won't work right now) or an implicit it parameter
-        // (which also won't work right now). It's better to fail early with a diagnostic than to fail at build time,
-        // so we detect it here and put an error on the element.
-        usedAttributeNodes.forEach {
-            if (it.type.isFunctionType) {
-                val elementToReport = attrInfos[it.name]?.key ?: openTagExpr
-                val lambda = it.expression as? KtLambdaExpression
-                val isLambda = lambda != null
-                val descriptor = contextToUse.trace.get(BindingContext.FUNCTION, lambda?.functionLiteral)
-                val params = it.type.getValueParameterTypesFromFunctionType()
-
-                if (params.size == 1 && isLambda) {
-                    val firstParamDescriptor = descriptor?.valueParameters?.firstOrNull()
-                    if (firstParamDescriptor != null) {
-                        if (contextToUse.trace.get(BindingContext.AUTO_CREATED_IT, firstParamDescriptor) == true) {
-                            contextToUse.trace.reportFromPlugin(
-                                R4AErrors.TEMPORARY_NEED_TO_ADD_IMPLICIT_IT.on(elementToReport),
-                                R4ADefaultErrorMessages
-                            )
-                        }
-                    }
-                }
-
-                val receiverType = it.type.getReceiverTypeFromFunctionType()
-                if (receiverType != null && isLambda) {
-                    contextToUse.trace.reportFromPlugin(
-                        R4AErrors.TEMPORARY_RECEIVER_SCOPES_NOT_SUPPORTED.on(elementToReport),
-                        R4ADefaultErrorMessages
-                    )
-                }
-            }
-        }
-
         // it's okay if the tag doesn't show up as used, so we remove it from this list
         val unusedAttributes = (attrInfos - usedAttributes - TAG_KEY).toMutableMap()
 
@@ -2185,7 +2150,7 @@ class KtxCallResolver(
             ?: ExpressionReceiver.create(receiverExpr, receiverType, context.trace.bindingContext)
     }
 
-    private fun makeValueArgument(type: KotlinType, context: ExpressionTypingContext): ValueArgument {
+    private fun makeValueArgument(type: KotlinType, context: ExpressionTypingContext, forceType: Boolean = false): ValueArgument {
         val fakeExpr = psiFactory.createSimpleName("tmpVar")
 
         context.trace.record(
@@ -2197,7 +2162,11 @@ class KtxCallResolver(
             )
         )
 
-        return CallMaker.makeValueArgument(fakeExpr)
+        if (forceType) {
+            context.trace.record(BindingContext.PROCESSED, fakeExpr, true)
+        }
+
+        return CallMaker.makeExternalValueArgument(fakeExpr)
     }
 
     private fun resolveJoinKey(
@@ -2401,12 +2370,11 @@ class KtxCallResolver(
         }
         val lambdaArg = lambdaType?.let { makeValueArgument(it, contextToUse) }
         val lambdaDescriptor = lambdaType?.let { createFunctionDescriptor(it, contextToUse) }
-
         val call = makeCall(
-            callElement = expressionToReportErrorsOn,
+            callElement = calleeExpression,
             calleeExpression = calleeExpression,
             valueArguments = listOfNotNull(
-                CallMaker.makeValueArgument(valueExpr),
+                makeValueArgument(attrType, contextToUse, forceType = true),
                 lambdaArg
             ),
             receiver = TransientReceiver(receiverScope)
