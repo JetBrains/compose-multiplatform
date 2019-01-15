@@ -703,5 +703,17 @@ class ComposableCheckerTests: AbstractR4aDiagnosticsTest() {
             }
         """)
     }
+
+    fun testComposableReporting035() {
+        doTest(MODE_PEDANTIC, """
+            import com.google.r4a.*
+
+            @Composable
+            fun Foo(x: String) {
+                @Composable operator fun String.invoke() {}
+                <x />
+            }
+        """)
+    }
 }
 
