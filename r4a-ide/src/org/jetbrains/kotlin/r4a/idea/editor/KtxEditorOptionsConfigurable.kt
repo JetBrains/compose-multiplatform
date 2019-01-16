@@ -18,7 +18,7 @@ class KtxEditorOptionsConfigurable : BeanConfigurable<KtxEditorOptions>(KtxEdito
         checkBox("Don't show XML to Kotlin KTX conversion dialog on paste",
                  { instance.donTShowKtxConversionDialog },
                  { instance.donTShowKtxConversionDialog = it })
-        checkBox("Automatically add @Composable annotation when pasting XML in KTX function",
+        checkBox("Automatically add @Composable annotation and import com.google.r4a.* when converting XML to KTX code",
                  { instance.enableAddComposableAnnotation && instance.donTShowAddComposableAnnotationDialog },
                  { shouldAutomaticallyAddAnnotation ->
                      if (shouldAutomaticallyAddAnnotation) {

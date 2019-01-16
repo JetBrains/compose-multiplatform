@@ -206,13 +206,33 @@ class ConvertXmlCopyPasteProcessor : CopyPastePostProcessor<TextBlockTransferabl
         val rangeAfterReplace = replaceText(editor, conversionResultText, bounds)
         PsiDocumentManager.getInstance(project).commitAllDocuments()
 
-        // Suggest to add @Composable annotation if necessary.
-        if (enclosingCallable != null && editorOptions.enableAddComposableAnnotation
-            // TODO(jdemeulenaere): For some reason, checking for annotations on lambdas doesn't work. Fix that and remove this check.
-            && enclosingCallable is KtNamedFunction) {
-            val annotationFqName = R4aUtils.r4aFqName("Composable")
-            if (enclosingCallable.findAnnotation(annotationFqName) == null) {
-                val shouldAddAnnotation = if (editorOptions.donTShowAddComposableAnnotationDialog) {
+        // Suggest to add @Composable annotation and/or com.google.r4A.* import if necessary.
+        if (editorOptions.enableAddComposableAnnotation) {
+            val fixes = arrayListOf<() -> Unit>()
+
+            // Add @Composable annotation.
+            if (enclosingCallable != null
+                // TODO(jdemeulenaere): For some reason, checking for annotations on lambdas doesn't work. Fix that and remove this check.
+                && enclosingCallable is KtNamedFunction) {
+                val annotationFqName = R4aUtils.r4aFqName("Composable")
+                if (enclosingCallable.findAnnotation(annotationFqName) == null) {
+                    fixes.add {
+                        runWriteAction {
+                            enclosingCallable.addAnnotation(annotationFqName)
+                        }
+                    }
+                }
+            }
+
+            // Add com.google.r4A.* import.
+            val r4aStarFqName = R4aUtils.r4aFqName("*")
+            if (targetFile.importDirectives.none { it.importedFqName == r4aStarFqName }) {
+                fixes.add { addR4aStarImport(targetFile) }
+            }
+
+            if (fixes.isNotEmpty()) {
+                // Ask for approval if necessary.
+                val shouldApplyFixes = if (editorOptions.donTShowAddComposableAnnotationDialog) {
                     true
                 } else {
                     val dialog = KtxAddComposableAnnotationDialog(project)
@@ -220,10 +240,9 @@ class ConvertXmlCopyPasteProcessor : CopyPastePostProcessor<TextBlockTransferabl
                     dialog.isOK
                 }
 
-                if (shouldAddAnnotation) {
-                    runWriteAction {
-                        enclosingCallable.addAnnotation(annotationFqName)
-                    }
+                // Apply fixes.
+                if (shouldApplyFixes) {
+                    fixes.forEach { it() }
                 }
             }
         }
