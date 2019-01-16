@@ -60,11 +60,14 @@ class KtxCallResolver(
     private class TempResolveInfo(
         val valid: Boolean,
         val trace: TemporaryTraceAndCache,
-        val attributesLeft: Int,
+        val unusedAttributes: Set<String>,
         val usedAttributes: Set<String>,
         val missingRequiredAttributes: List<DeclarationDescriptor>,
         val build: () -> EmitOrCallNode
-    )
+    ) {
+        val attributesLeft: Int
+            get() = unusedAttributes.count { it != TAG_KEY }
+    }
 
     private class TempParameterInfo(
         val attribute: AttributeInfo,
@@ -872,7 +875,7 @@ class KtxCallResolver(
             if (candidateResults.isNothing) return@mapNotNull TempResolveInfo(
                 false,
                 tmpForCandidate,
-                (attributes - attrsUsedInCall).size,
+                (attributes - attrsUsedInCall).keys,
                 attrsUsedInCall,
                 subMissingRequiredAttributes
             ) {
@@ -932,7 +935,7 @@ class KtxCallResolver(
                                     return@mapNotNull TempResolveInfo(
                                         false,
                                         tmpForCandidate,
-                                        (attributes - attrsUsedInCall).size,
+                                        (attributes - attrsUsedInCall).keys,
                                         attrsUsedInCall,
                                         subMissingRequiredAttributes
                                     ) {
@@ -948,7 +951,7 @@ class KtxCallResolver(
                         return@mapNotNull TempResolveInfo(
                             false,
                             tmpForCandidate,
-                            (attributes - attrsUsedInCall).size,
+                            (attributes - attrsUsedInCall).keys,
                             attrsUsedInCall,
                             subMissingRequiredAttributes
                         ) {
@@ -973,7 +976,7 @@ class KtxCallResolver(
                 return@mapNotNull TempResolveInfo(
                     false,
                     tmpForCandidate,
-                    (attributes - attrsUsedInCall).size,
+                    (attributes - attrsUsedInCall).keys,
                     attrsUsedInCall,
                     subMissingRequiredAttributes
                 ) {
@@ -1007,7 +1010,7 @@ class KtxCallResolver(
                 return@mapNotNull TempResolveInfo(
                     true, // TODO(lmr): valid
                     tmpForCandidate,
-                    (attributes - attrsUsedInCall).size,
+                    (attributes - attrsUsedInCall).keys,
                     attrsUsedInCall,
                     subMissingRequiredAttributes
                 ) {
@@ -1091,7 +1094,7 @@ class KtxCallResolver(
                 ) ?: return@mapNotNull TempResolveInfo(
                     false,
                     tmpForCandidate,
-                    (attributes - attrsUsedInCall - attrsUsedInSets).size,
+                    (attributes - attrsUsedInCall - attrsUsedInSets).keys,
                     attrsUsedInCall + attrsUsedInSets,
                     subMissingRequiredAttributes
                 ) {
@@ -1134,7 +1137,7 @@ class KtxCallResolver(
                 return@mapNotNull TempResolveInfo(
                     true,
                     tmpForCandidate,
-                    (attributes - attrsUsedInCall - attrsUsedInSets).size,
+                    (attributes - attrsUsedInCall - attrsUsedInSets).keys,
                     attrsUsedInCall + attrsUsedInSets,
                     subMissingRequiredAttributes
                 ) {
@@ -1159,7 +1162,7 @@ class KtxCallResolver(
             ) ?: return@mapNotNull TempResolveInfo(
                 false,
                 tmpForCandidate,
-                (attributes - attrsUsedInCall - attrsUsedInSets).size,
+                (attributes - attrsUsedInCall - attrsUsedInSets).keys,
                 attrsUsedInCall + attrsUsedInSets,
                 subMissingRequiredAttributes
             ) {
@@ -1278,12 +1281,10 @@ class KtxCallResolver(
 
             val subUsedAttributes = attrsUsedInCall + attrsUsedInSets + attrsUsedInFollowingCalls
 
-            val attrsLeft = (attributes - subUsedAttributes).size
-
             return@mapNotNull TempResolveInfo(
                 true, // TODO(lmr): valid
                 tmpForCandidate,
-                attrsLeft,
+                (attributes - subUsedAttributes).keys,
                 subUsedAttributes,
                 subMissingRequiredAttributes
             ) {
@@ -1331,13 +1332,19 @@ class KtxCallResolver(
 
         if (resolveInfos.size > 1) {
             val nextBest = resolveInfos[1]
-            if (result.attributesLeft == 0 && result.attributesLeft == nextBest.attributesLeft) {
-                R4AErrors.AMBIGUOUS_KTX_CALL.report(
-                    context,
-                    tagExpressions,
-                    resultNode,
-                    nextBest.build()
+            if (result.attributesLeft == 0 && result.attributesLeft == nextBest.attributesLeft && nextBest.valid) {
+                val nextNode = nextBest.build()
+                val primaryCalls = listOfNotNull(
+                    resultNode.primaryCall,
+                    nextNode.primaryCall
                 )
+                if (primaryCalls.size > 1) {
+                    R4AErrors.AMBIGUOUS_KTX_CALL.report(
+                        context,
+                        tagExpressions,
+                        primaryCalls
+                    )
+                }
             }
         }
         return resultNode
@@ -2922,6 +2929,10 @@ private fun descriptorsEqualWithSubstitution(
     for ((param1, param2) in parameters1.zip(parameters2)) {
         if (!typeChecker.equalTypes(param1.type, param2.type)) return false
     }
+    // NOTE(lmr): edit
+    // this check was added
+    if (descriptor1.javaClass !== descriptor2.javaClass) return false
+    // NOTE(lmr): /end
     return true
 }
 

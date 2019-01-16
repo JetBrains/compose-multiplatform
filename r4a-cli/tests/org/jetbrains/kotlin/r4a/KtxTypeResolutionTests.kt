@@ -19,6 +19,24 @@ class KtxTypeResolutionTests : AbstractR4aDiagnosticsTest() {
         """
     )
 
+    fun testAmbiguousKtxTags() = doTest(
+        """
+            import com.google.r4a.*
+
+            class Foo {
+                var foo: Int = 0
+                @Composable operator fun invoke() {}
+            }
+
+            @Composable
+            fun Foo(foo: Int) { print(foo) }
+
+            @Composable fun test() {
+                <<!AMBIGUOUS_KTX_CALL!>Foo<!> foo=0 />
+            }
+        """
+    )
+
     fun testExtensionInvoke() = doTest(
         """
             import com.google.r4a.*
