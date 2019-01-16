@@ -992,7 +992,15 @@ class KtxCallResolver(
 
                 // it is important to pass in "result" here and not "resolvedCall" since "result" is the one that will have
                 // the composable annotation on it in the case of lambda invokes
-                val composability = composableAnnotationChecker.analyze(candidateContext.trace, result.semanticCall.resultingDescriptor)
+                var composability = composableAnnotationChecker.analyze(candidateContext.trace, result.semanticCall.resultingDescriptor)
+
+                // if it's not composable and a variable call, it's possible that there was an operator invoke extension function defined
+                // locally that is composable. In this case, that function being marked as composable is enough. So we perform an additional
+                // check to see.
+                if (composability == ComposableAnnotationChecker.Composability.NOT_COMPOSABLE && result is VariableAsFunctionResolvedCall) {
+                    composability = composableAnnotationChecker.analyze(candidateContext.trace, result.functionCall.resultingDescriptor)
+                }
+
                 if (composability == ComposableAnnotationChecker.Composability.NOT_COMPOSABLE) {
                     candidateContext.trace.reportFromPlugin(
                         R4AErrors.NON_COMPOSABLE_INVOCATION.on(

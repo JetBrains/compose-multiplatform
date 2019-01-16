@@ -43,6 +43,72 @@ class KtxCodegenTests : AbstractCodeGenTest() {
     }
 
     @Test
+    fun testCGLocallyScopedFunction(): Unit = ensureSetup {
+        compose(
+            """
+                @Composable
+                fun Foo() {
+                    @Composable fun Bar() {
+                        <TextView text="Hello, world!" id=42 />
+                    }
+                    <Bar />
+                }
+            """,
+            { mapOf<String,String>() },
+            """
+                <Foo />
+            """
+        ).then { activity ->
+            val textView = activity.findViewById(42) as TextView
+            assertEquals("Hello, world!", textView.text)
+        }
+    }
+
+    @Test
+    fun testCGLocallyScopedExtensionFunction(): Unit = ensureSetup {
+        compose(
+            """
+                @Composable
+                fun Foo(x: String) {
+                    @Composable fun String.Bar() {
+                        <TextView text=this id=42 />
+                    }
+                    <x.Bar />
+                }
+            """,
+            { mapOf<String, String>() },
+            """
+                <Foo x="Hello, world!" />
+            """
+        ).then { activity ->
+            val textView = activity.findViewById(42) as TextView
+            assertEquals("Hello, world!", textView.text)
+        }
+    }
+
+    @Test
+    fun testCGLocallyScopedInvokeOperator(): Unit = ensureSetup {
+        compose(
+            """
+                @Composable
+                fun Foo(x: String) {
+                    @Composable operator fun String.invoke() {
+                        <TextView text=this id=42 />
+                    }
+                    <x />
+                }
+            """,
+            { mapOf<String, String>() },
+            """
+                <Foo x="Hello, world!" />
+            """
+        ).then { activity ->
+            val textView = activity.findViewById(42) as TextView
+            assertEquals("Hello, world!", textView.text)
+        }
+    }
+
+    @Test
     fun testCGNSimpleTextView(): Unit = ensureSetup {
         compose(
             """
