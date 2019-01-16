@@ -87,6 +87,35 @@ class KtxCodegenTests : AbstractCodeGenTest() {
     }
 
     @Test
+    fun testImplicitReceiverScopeCall(): Unit = ensureSetup {
+        compose(
+            """
+                import com.google.r4a.*
+
+                class Bar(val text: String)
+
+                @Composable fun Bar.Foo() {
+                    <TextView text=text id=42 />
+                }
+
+                @Composable
+                fun Bam(bar: Bar) {
+                    with(bar) {
+                        <Foo />
+                    }
+                }
+            """,
+            { mapOf<String, String>() },
+            """
+                <Bam bar=Bar("Hello, world!") />
+            """
+        ).then { activity ->
+            val textView = activity.findViewById(42) as TextView
+            assertEquals("Hello, world!", textView.text)
+        }
+    }
+
+    @Test
     fun testCGLocallyScopedInvokeOperator(): Unit = ensureSetup {
         compose(
             """

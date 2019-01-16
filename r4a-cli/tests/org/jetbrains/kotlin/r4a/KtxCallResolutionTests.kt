@@ -38,6 +38,41 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
         """
     )
 
+    fun testImplicitReceiverScopeCall() = doTest(
+        """
+            import com.google.r4a.*
+
+            class Bar {}
+
+            @Composable fun Bar.Foo() {}
+
+            @Composable
+            fun test(bar: Bar) {
+                with(bar) {
+                    <caret><Foo />
+                }
+            }
+        """,
+        """
+            ResolvedKtxElementCall:
+              emitOrCall = MemoizedCallNode:
+                memoize = ComposerCallInfo:
+                  composerCall = fun call(Any, ViewValidator.() -> Boolean, () -> Unit)
+                  pivotals = <empty>
+                  joinKeyCall = fun joinKey(Any, Any?): Any
+                  ctorCall = <null>
+                  ctorParams = <empty>
+                  validations = <empty>
+                call = NonMemoizedCallNode:
+                  resolvedCall = fun Bar.Foo()
+                  params = <empty>
+                  postAssignments = <empty>
+                  nextCall = <null>
+              usedAttributes = <empty>
+              unusedAttributes = <empty>
+        """
+    )
+
     fun testSomethingQualifiedTag() = doTest(
         """
             import com.google.r4a.*
