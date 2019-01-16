@@ -302,6 +302,14 @@ fun EmitOrCallNode?.consumedAttributes(): List<AttributeNode> {
     }
 }
 
+val EmitOrCallNode.primaryCall: ResolvedCall<*>?
+    get() = when (this) {
+        is MemoizedCallNode -> memoize.ctorCall ?: call.primaryCall
+        is NonMemoizedCallNode -> resolvedCall
+        is EmitCallNode -> memoize.ctorCall
+        is ErrorNode -> null
+    }
+
 fun List<ValueNode>.print(): String {
     return if (isEmpty()) "<empty>"
     else joinToString(", ") { it.print() }

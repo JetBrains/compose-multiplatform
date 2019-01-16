@@ -144,6 +144,11 @@ object R4ADefaultErrorMessages : DefaultErrorMessages.Extension {
             RENDER_COLLECTION_OF_TYPES,
             RENDER_COLLECTION_OF_TYPES
         )
+        MAP.put(
+            R4AErrors.AMBIGUOUS_KTX_CALL,
+            "Ambiguous targets. {0}",
+            Renderers.AMBIGUOUS_CALLS
+        )
 
     }
 }
