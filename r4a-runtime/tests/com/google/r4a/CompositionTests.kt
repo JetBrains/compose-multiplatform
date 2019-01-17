@@ -1236,7 +1236,7 @@ class CompositionTests : TestCase() {
         |- J
 
         Should enter as: A, B, C, D, E, F, G, H, I, J
-        Should leave as: I, C, D, G, H, B, E, F, J, A
+        Should leave as: J, I, H, G, F, E, D, C, B, A
         */
 
         fun MockViewComposition.tree() {
@@ -1290,7 +1290,7 @@ class CompositionTests : TestCase() {
 
         assertArrayEquals(
             "Expected leave order",
-            arrayOf("I", "C", "D", "G", "H", "B", "E", "F", "J", "A"),
+            arrayOf("J", "I", "H", "G", "F", "E", "D", "C", "B", "A"),
             objects.mapNotNull { it as? Ordered }.sortedBy { it.leaveOrder }.map { (it as Named).name }.toTypedArray()
         )
     }

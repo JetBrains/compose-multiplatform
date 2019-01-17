@@ -213,13 +213,9 @@ open class Composer<N>(
             changes.clear()
         }
 
-        // Send lifecycle enters
-        for (holder in enters) {
-            holder.instance.onEnter()
-        }
 
         // Send lifecycle leaves
-        for (holder in leaves) {
+        for (holder in leaves.reversed()) {
             // The count of the holder might be greater than 0 here as it might leave one part
             // of the composition and reappear in another. Only send a leave if the count is still
             // 0 after all changes have been applied.
@@ -227,6 +223,11 @@ open class Composer<N>(
                 holder.instance.onLeave()
                 lifecycleObservers.remove(holder)
             }
+        }
+
+        // Send lifecycle enters
+        for (holder in enters) {
+            holder.instance.onEnter()
         }
     }
 
@@ -319,6 +320,17 @@ open class Composer<N>(
 
     override fun skipValue() = recordSlotNext()
 
+    fun <T> changed(value: T): Boolean {
+        return if (nextSlot() != value || inserting) {
+            updateValue(value)
+            true
+        } else {
+            skipValue()
+            false
+        }
+    }
+
+
     override fun updateValue(value: Any?) {
         recordOperation { _, slots, lifecycleManager ->
             val previous = if (value is CompositionLifecycleObserver) {
@@ -380,14 +392,10 @@ open class Composer<N>(
 
     fun <T> startProvider(p: Ambient<T>.Provider, value: T) {
         startGroup(provider)
-        nextSlot()
-        updateValue(p)
+        changed(p)
         insertedProviders.push(p)
-        if (value != nextSlot()) {
-            updateValue(value)
+        if (changed(value)) {
             invalidateConsumers(p.ambient)
-        } else {
-            skipValue()
         }
         startGroup(invocation)
     }
@@ -398,17 +406,13 @@ open class Composer<N>(
         insertedProviders.pop()
     }
 
-    fun <T> startConsumer(c: Ambient<T>.Consumer): T {
+    fun <T> consume(key: Ambient<T>): T {
         startGroup(consumer)
-        nextSlot()
-        updateValue(c)
-        startGroup(invocation)
-        return parentAmbient(c.ambient)
-    }
-
-    fun endConsumer() {
+        changed(key)
+        changed(invalidateStack.peek())
+        val result = parentAmbient(key)
         endGroup()
-        endGroup()
+        return result
     }
 
     /**
@@ -532,10 +536,12 @@ open class Composer<N>(
                     val sentinel = slots.get(index - 1)
                     when {
                         sentinel === consumer -> {
-                            val element = slots.get(index + 1)
-                            if (element is Ambient<*>.Consumer && element.ambient == key) {
-                                @Suppress("UNCHECKED_CAST")
-                                element.recomposeCallback?.let { it() }
+                            val ambient = slots.get(index + 1)
+                            if (ambient == key) {
+                                val scope = slots.get(index + 2)
+                                if (scope is RecomposeScope) {
+                                    scope.invalidate?.let { it() }
+                                }
                             }
                         }
                         sentinel === provider -> {
@@ -907,11 +913,15 @@ open class Composer<N>(
             if (inserting) insertedParents.pop()
             end(END_GROUP)
         } else {
-            if (invalidations.isEmpty()) {
-                skipGroup()
-            } else {
-                recomposeComponentRange(slots.current, slots.current + slots.groupSize)
-            }
+            skipGroupAndRecomposeRange()
+        }
+    }
+
+    internal fun skipGroupAndRecomposeRange() {
+        if (invalidations.isEmpty()) {
+            skipGroup()
+        } else {
+            recomposeComponentRange(slots.current, slots.current + slots.groupSize)
         }
     }
 
@@ -954,11 +964,7 @@ open class Composer<N>(
             end(END_GROUP)
             invalidateStack.pop()
         } else {
-            if (invalidations.isEmpty()) {
-                skipGroup()
-            } else {
-                recomposeComponentRange(slots.current, slots.current + slots.groupSize)
-            }
+            skipGroupAndRecomposeRange()
         }
     }
 
@@ -1151,35 +1157,23 @@ open class Composer<N>(
 
 private fun removeCurrentItem(slots: SlotWriter, lifecycleManager: LifeCycleManager) {
     // Notify the lifecycle manager of any observers leaving the slot table
-    // The notification order should ensure that the listeners of children are called
-    // before the listeners of their parents. A group in the slot table is used as an
-    // indicator that the slots in the group are children of the group that contains
-    // the slots.
+    // The notification order should ensure that listeners are notified of leaving
+    // in opposite order that they are notified of entering.
 
-    // To ensure order this order the deepest groups are notified before shallower
-    // groups.
+    // To ensure this order, we call `enters` as a pre-order traversal
+    // of the group tree, and then call `leaves` in the inverse order.
 
     var groupEnd = Int.MAX_VALUE
-    val holders = mutableListOf<MutableList<CompositionLifecycleObserverHolder>>()
-    var level = 0
     var index = 0
     val groupEndStack = IntStack()
-
-    fun ensureLevel(level: Int): MutableList<CompositionLifecycleObserverHolder> {
-        while (holders.size <= level) {
-            holders.add(mutableListOf())
-        }
-        return holders[level]
-    }
 
     for (slot in slots.itemSlots()) {
         when (slot) {
             is CompositionLifecycleObserverHolder -> {
-                ensureLevel(level).add(slot)
+                lifecycleManager.leaving(slot)
             }
             is GroupStart -> {
                 groupEndStack.push(groupEnd)
-                level++
                 groupEnd = index + slot.slots
             }
         }
@@ -1187,21 +1181,11 @@ private fun removeCurrentItem(slots: SlotWriter, lifecycleManager: LifeCycleMana
         index++
 
         while (index >= groupEnd) {
-            level--
             groupEnd = groupEndStack.pop()
         }
     }
 
     if (groupEndStack.isNotEmpty()) error("Invalid slot structure")
-
-    // Emit the leaving notifications deepest to shallowest
-    holders.reverse()
-
-    for (holdersByLevel in holders) {
-        for (holder in holdersByLevel) {
-            lifecycleManager.leaving(holder)
-        }
-    }
 
     // Remove the item from the slot table and notify the FrameManager if any
     // anchors are orphaned by removing the slots.

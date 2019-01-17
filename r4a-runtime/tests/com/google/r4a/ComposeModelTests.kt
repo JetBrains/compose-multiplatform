@@ -64,7 +64,7 @@ class Person(name: String, age: Int) : Framed {
     }
 }
 
-class State<T>(value: T) : Framed {
+class TestState<T>(value: T) : Framed {
     @Suppress("UNCHECKED_CAST")
     var value: T
         get() = (_readable(myFirst, this) as StateRecord<T>).value
@@ -169,7 +169,7 @@ class ModelViewTests : TestCase() {
     fun testModelView_RecomposeScopeCleanup(): Unit = isolated {
         val washington = Person(PRESIDENT_NAME_1, PRESIDENT_AGE_1)
         val lincoln = Person(PRESIDENT_NAME_16, PRESIDENT_AGE_16)
-        val displayLincoln = State(true)
+        val displayLincoln = TestState(true)
 
         fun ViewComposition.display(person: Person) {
             call(167, { true }) {

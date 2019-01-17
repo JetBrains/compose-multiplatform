@@ -97,7 +97,7 @@ inline fun <N, V, reified P1, reified P2, reified P3, reified P4> Composition<N>
     return cache(valid, block)
 }
 
-inline fun <N, V> Composition<N>.remember(vararg args: Any, block: () -> V): V {
+inline fun <N, V> Composition<N>.remember(vararg args: Any?, block: () -> V): V {
     var valid = true
     for (arg in args) valid = !changed(arg) && valid
     return cache(valid, block)
