@@ -3,7 +3,7 @@ package com.google.r4a
 import android.app.Activity
 import android.content.Context
 import android.view.ViewGroup
-import android.widget.LinearLayout
+import android.widget.FrameLayout
 
 object R4a {
 
@@ -56,14 +56,7 @@ object R4a {
     }
 }
 
-inline fun ViewGroup.composeInto(noinline composable: @Composable() () -> Unit) = R4a.composeInto(this, null, composable)
-
-
-inline fun Activity.composeInto(noinline composable: @Composable() () -> Unit) {
-    val root = LinearLayout(this)
-    root.composeInto(composable)
-    this.setContentView(root)
-}
-
-inline fun Activity.setContent(noinline composable: @Composable() () -> Unit) { this.composeInto(composable) }
-inline fun Activity.setContentView(noinline composable: @Composable() () -> Unit) { this.composeInto(composable) }
+fun Activity.composeInto(composable: @Composable() () -> Unit) = setContentView(composable)
+fun Activity.setContent(composable: @Composable() () -> Unit) = setContentView(composable)
+fun Activity.setContentView(composable: @Composable() () -> Unit) = setContentView(FrameLayout(this).apply { composeInto(composable) })
+fun ViewGroup.composeInto(composable: @Composable() () -> Unit) = R4a.composeInto(this, null, composable)
