@@ -287,15 +287,17 @@ class KtxCallResolver(
         val attrInfos = mutableMapOf<String, AttributeInfo>()
 
         for (attr in attributes) {
-            val key = attr.key
+            var key = attr.key
+            var value = attr.value
             val name = key.getReferencedName()
+            var isPunned = false
             if (attrInfos.contains(name)) {
                 contextToUse.trace.reportFromPlugin(
                     R4AErrors.DUPLICATE_ATTRIBUTE.on(key),
                     R4ADefaultErrorMessages
                 )
             }
-            if (attr.value == null && attr.equals == null) {
+            if (value == null && attr.equals == null) {
                 // punning...
                 // punning has a single expression that both acts as reference to the value and to the property/setter. As a result, we
                 // need to save the descriptors that it targets into a different writable slice that we can surface later in a
@@ -316,13 +318,20 @@ class KtxCallResolver(
                     temporaryForPunning.trace.recordAttributeKeyRef(key, it)
                 }
 
+                // in the case of a punned attribute, we create a fake psi node for the "key", or else some type resolution stuff will
+                // get messed up (for example, smart casting).
+                value = key
+                key = psiFactory.createSimpleName(name)
+                isPunned = true
+
                 temporaryForPunning.commit()
             }
 
             attrInfos[name] = AttributeInfo(
-                value = attr.value ?: key,
+                value = value ?: error("value is required"),
                 key = key,
-                name = name
+                name = name,
+                isPunned = isPunned
             )
         }
 
@@ -332,7 +341,8 @@ class KtxCallResolver(
             attrInfos[CHILDREN_KEY] = AttributeInfo(
                 value = it,
                 key = null,
-                name = CHILDREN_KEY
+                name = CHILDREN_KEY,
+                isPunned = false
             )
         }
 
@@ -356,7 +366,8 @@ class KtxCallResolver(
                 else -> openTagExpr
             },
             key = null,
-            name = TAG_KEY
+            name = TAG_KEY,
+            isPunned = false
         )
 
         val emitOrCall = resolveChild(
@@ -496,7 +507,7 @@ class KtxCallResolver(
                         }
                     }
                     else -> {
-                        val key = attr.key ?: error("expected non-null key expression")
+                        val exprToReportOn = if (attr.isPunned) attr.value else (attr.key ?: error("expected non-null key expression"))
                         val valueType = facade.getTypeInfo(attr.value, contextToUse).type
 
                         val descriptors = emitOrCall.resolvedCalls().flatMap {
@@ -527,16 +538,16 @@ class KtxCallResolver(
 
                         val diagnostic = when {
                             attrsOfSameKey.isNotEmpty() && valueType != null ->
-                                R4AErrors.MISMATCHED_ATTRIBUTE_TYPE.on(key, valueType, attrsOfSameKey.map { it.type })
+                                R4AErrors.MISMATCHED_ATTRIBUTE_TYPE.on(exprToReportOn, valueType, attrsOfSameKey.map { it.type })
                             attrsOfSameKey.isEmpty() && valueType != null ->
-                                R4AErrors.UNRESOLVED_ATTRIBUTE_KEY.on(key, descriptors, attr.name, valueType)
+                                R4AErrors.UNRESOLVED_ATTRIBUTE_KEY.on(exprToReportOn, descriptors, attr.name, valueType)
                             attrsOfSameKey.isNotEmpty() && valueType == null ->
                                 R4AErrors.MISMATCHED_ATTRIBUTE_TYPE.on(
-                                    key,
+                                    exprToReportOn,
                                     ErrorUtils.createErrorType("???"),
                                     attrsOfSameKey.map { it.type })
                             else ->
-                                R4AErrors.UNRESOLVED_ATTRIBUTE_KEY_UNKNOWN_TYPE.on(key, descriptors, attr.name)
+                                R4AErrors.UNRESOLVED_ATTRIBUTE_KEY_UNKNOWN_TYPE.on(exprToReportOn, descriptors, attr.name)
                         }
 
                         contextToUse.trace.reportFromPlugin(diagnostic, R4ADefaultErrorMessages)
@@ -1553,6 +1564,7 @@ class KtxCallResolver(
                     attribute.name,
                     keyExpr,
                     attribute.value,
+                    attribute.isPunned,
                     expectedTypes,
                     context.replaceTraceAndCache(tempForAttributes)
                 )
@@ -1564,6 +1576,7 @@ class KtxCallResolver(
                     attribute.name,
                     keyExpr,
                     attribute.value,
+                    attribute.isPunned,
                     expectedTypes,
                     context.replaceTraceAndCache(tempForAttributes)
                 )
@@ -1774,6 +1787,7 @@ class KtxCallResolver(
         name: String,
         keyExpr: KtReferenceExpression,
         valueExpr: KtExpression,
+        isPunned: Boolean,
         expectedTypes: MutableCollection<KotlinType>,
         context: ExpressionTypingContext
     ): ResolvedCall<*>? {
@@ -1816,20 +1830,10 @@ class KtxCallResolver(
 
         val resolvedCall = OverloadResolutionResultsUtil.getResultingCall(results, context) ?: return null
 
-        if (valueExpr === keyExpr) {
-            // punning...
-            // we want to commit this trace, but filter out any REFERENCE_TARGET traces
-            temporaryForFunction.trace.commit(
-                { slice, value ->
-                    !(value === valueExpr && (slice === BindingContext.REFERENCE_TARGET || slice === BindingContext.CALL))
-                }, false
-            )
-            temporaryForFunction.cache.commit()
-            context.trace.recordAttributeKeyRef(keyExpr, resolvedCall.resultingDescriptor)
-        } else {
-            // if we weren't punning, we can just commit like normal
-            temporaryForFunction.commit()
+        if (isPunned) {
+            context.trace.recordAttributeKeyRef(valueExpr, resolvedCall.resultingDescriptor)
         }
+        temporaryForFunction.commit()
 
         return resolvedCall
     }
@@ -1839,6 +1843,7 @@ class KtxCallResolver(
         name: String,
         keyExpr: KtSimpleNameExpression,
         valueExpr: KtExpression,
+        isPunned: Boolean,
         expectedTypes: MutableCollection<KotlinType>,
         context: ExpressionTypingContext
     ): ResolvedCall<*>? {
@@ -1890,20 +1895,8 @@ class KtxCallResolver(
             return null
         }
 
-        if (valueExpr === keyExpr) {
-            // punning...
-            // In the case of punning, we need to make sure we remove the "CALL" that will be bound to the expression itself,
-            // since in codegen we need to use the value expression as "getting the variable" and not "setting the property",
-            // which we code-gen ourself.
-            temporaryForVariable.trace.commit(
-                { slice, value ->
-                    !(value === valueExpr && (slice === BindingContext.REFERENCE_TARGET || slice === BindingContext.CALL))
-                }, false
-            )
-            temporaryForVariable.cache.commit()
-            context.trace.recordAttributeKeyRef(keyExpr, resolvedCall.resultingDescriptor)
-        } else {
-            temporaryForVariable.commit()
+        if (isPunned) {
+            context.trace.recordAttributeKeyRef(valueExpr, resolvedCall.resultingDescriptor)
         }
 
         temporaryForVariable.commit()
@@ -2053,9 +2046,10 @@ class KtxCallResolver(
                 if (childrenAttr != null) {
                     usedAttributes.add(CHILDREN_KEY)
                     var type = param.type
-                    if (type.isComposableFromChildrenAnnotation()) {
+                    if (param.isComposableFromChildrenAnnotation()) {
                         type = type.makeComposable(module)
                     }
+
                     usedAttributeInfos.add(
                         TempParameterInfo(
                             attribute = childrenAttr,
@@ -2088,7 +2082,9 @@ class KtxCallResolver(
                     )
                 )
                 context.trace.record(BindingContext.REFERENCE_TARGET, attr.key, param)
-                context.trace.recordAttributeKeyRef(attr.key, param)
+                if (attr.isPunned) {
+                    context.trace.recordAttributeKeyRef(attr.value, param)
+                }
                 arg = attr.toValueArgument(attr.name, stableParamNames)
             }
 
@@ -2183,7 +2179,7 @@ class KtxCallResolver(
             context.trace.record(BindingContext.PROCESSED, fakeExpr, true)
         }
 
-        return CallMaker.makeExternalValueArgument(fakeExpr)
+        return CallMaker.makeValueArgument(fakeExpr)
     }
 
     private fun resolveJoinKey(
@@ -2998,7 +2994,8 @@ private class ImplicitCtorValueArgument(val type: KotlinType) : ValueArgument {
 private class AttributeInfo(
     val value: KtExpression,
     val key: KtSimpleNameExpression?,
-    val name: String
+    val name: String,
+    val isPunned: Boolean
 )
 
 private sealed class ResolveStep(
@@ -3171,7 +3168,8 @@ private fun isValidStaticQualifiedPart(target: DeclarationDescriptor): Boolean {
 
 private fun DeclarationDescriptor.isRoot() = containingDeclaration?.containingDeclaration is ModuleDescriptor
 
-private fun BindingTrace.recordAttributeKeyRef(key: KtReferenceExpression?, value: DeclarationDescriptor) {
+private fun BindingTrace.recordAttributeKeyRef(expr: KtExpression?, value: DeclarationDescriptor) {
+    val key = expr as? KtReferenceExpression ?: error("expected a KtReferenceExpression")
     val prev = get(R4AWritableSlices.ATTRIBUTE_KEY_REFERENCE_TARGET, key) ?: emptySet()
     record(R4AWritableSlices.ATTRIBUTE_KEY_REFERENCE_TARGET, key, prev + value)
 }
