@@ -37,6 +37,24 @@ class KtxTypeResolutionTests : AbstractR4aDiagnosticsTest() {
         """
     )
 
+    fun testSmartCastsAndPunning() = doTest(
+        """
+            import com.google.r4a.*
+
+            @Composable
+            fun Foo(bar: String) { print(bar) }
+
+            @Composable
+            fun test(bar: String?) {
+                <Foo <!TYPE_MISMATCH!>bar<!> />
+                if (bar != null) {
+                    <Foo bar />
+                    <Foo bar=bar />
+                }
+            }
+        """
+    )
+
     fun testExtensionInvoke() = doTest(
         """
             import com.google.r4a.*
