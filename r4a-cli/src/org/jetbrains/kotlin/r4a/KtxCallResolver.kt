@@ -10,6 +10,12 @@ import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.AnonymousFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.impl.ValueParameterDescriptorImpl
 import org.jetbrains.kotlin.diagnostics.*
+import org.jetbrains.kotlin.idea.caches.resolve.getResolutionFacade
+import org.jetbrains.kotlin.idea.core.KotlinIndicesHelper
+import org.jetbrains.kotlin.idea.resolve.ResolutionFacade
+import org.jetbrains.kotlin.idea.search.allScope
+import org.jetbrains.kotlin.idea.search.projectScope
+import org.jetbrains.kotlin.idea.util.CallTypeAndReceiver
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.*
@@ -328,7 +334,7 @@ class KtxCallResolver(
             }
 
             attrInfos[name] = AttributeInfo(
-                value = value ?: error("value is required"),
+                value = value ?: key,
                 key = key,
                 name = name,
                 isPunned = isPunned
@@ -509,6 +515,9 @@ class KtxCallResolver(
                     else -> {
                         val exprToReportOn = if (attr.isPunned) attr.value else (attr.key ?: error("expected non-null key expression"))
                         val valueType = facade.getTypeInfo(attr.value, contextToUse).type
+                        // if the value expression is an unresolved reference, we don't need to put a diagnostic on the key
+                        val valueIsUnresolvedRef = attr.value is KtReferenceExpression &&
+                                contextToUse.trace[BindingContext.REFERENCE_TARGET, attr.value] != null
 
                         val descriptors = emitOrCall.resolvedCalls().flatMap {
                             listOfNotNull(
@@ -534,6 +543,15 @@ class KtxCallResolver(
                             // NOTE(lmr): it would be great if we could record multiple possible types here instead of just one for
                             // autocomplete
                             contextToUse.trace.record(BindingContext.EXPECTED_EXPRESSION_TYPE, attr.value, attrsOfSameKey.first().type)
+
+                            // even if the type doesn't match the attribute, we should resolve it to something
+                            contextToUse.trace.record(BindingContext.REFERENCE_TARGET, attr.key, attrsOfSameKey.first().descriptor)
+
+                            // we can add all of the possible key targets here so that the user can Command+Click to see the list of
+                            // possible values
+                            attrsOfSameKey.forEach {
+                                context.trace.recordAttributeKeyRef(exprToReportOn, it.descriptor)
+                            }
                         }
 
                         val diagnostic = when {
@@ -541,7 +559,7 @@ class KtxCallResolver(
                                 R4AErrors.MISMATCHED_ATTRIBUTE_TYPE.on(exprToReportOn, valueType, attrsOfSameKey.map { it.type })
                             attrsOfSameKey.isEmpty() && valueType != null ->
                                 R4AErrors.UNRESOLVED_ATTRIBUTE_KEY.on(exprToReportOn, descriptors, attr.name, valueType)
-                            attrsOfSameKey.isNotEmpty() && valueType == null ->
+                            attrsOfSameKey.isNotEmpty() && valueType == null && !valueIsUnresolvedRef ->
                                 R4AErrors.MISMATCHED_ATTRIBUTE_TYPE.on(
                                     exprToReportOn,
                                     ErrorUtils.createErrorType("???"),

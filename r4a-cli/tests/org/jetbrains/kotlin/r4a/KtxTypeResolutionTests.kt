@@ -421,6 +421,36 @@ class KtxTypeResolutionTests : AbstractR4aDiagnosticsTest() {
         """.trimIndent()
     )
 
+    fun testUnresolvedAttributeValueResolvedTarget() = doTest(
+        """
+            import com.google.r4a.*
+
+            class Foo {
+                var bar: Int = 0
+                @Composable operator fun invoke(x: Int) {
+                    print(x)
+                }
+            }
+
+            @Composable fun Fam(bar: Int, x: Int) {
+                print(bar)
+                print(x)
+            }
+
+            @Composable fun Test() {
+                <Foo <!MISMATCHED_ATTRIBUTE_TYPE!>bar<!>=<!UNRESOLVED_REFERENCE!>undefined<!> x=1 />
+                <Foo bar=1 x=<!UNRESOLVED_REFERENCE!>undefined<!> />
+                <Foo <!UNRESOLVED_REFERENCE, MISMATCHED_ATTRIBUTE_TYPE!>bar<!> <!UNRESOLVED_REFERENCE!>x<!> />
+                <Fam bar=<!UNRESOLVED_REFERENCE!>undefined<!> x=1 />
+                <Fam bar=1 x=<!UNRESOLVED_REFERENCE!>undefined<!> />
+                <Fam <!UNRESOLVED_REFERENCE!>bar<!> <!UNRESOLVED_REFERENCE!>x<!> />
+
+                <Fam <!MISMATCHED_ATTRIBUTE_TYPE!>bar<!>=<!TYPE_MISMATCH!>""<!> <!MISMATCHED_ATTRIBUTE_TYPE!>x<!>=<!TYPE_MISMATCH!>""<!> />
+            }
+
+        """.trimIndent()
+    )
+
     fun testValidInvalidAttributes() = doTest(
         """
             import com.google.r4a.*
