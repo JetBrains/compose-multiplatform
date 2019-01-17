@@ -5,4 +5,4 @@ package com.google.r4a
     AnnotationTarget.CLASS,
     AnnotationTarget.ANNOTATION_CLASS
 )
-annotation class Memoized
+annotation class Stateful

@@ -10,12 +10,6 @@ import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.AnonymousFunctionDescriptor
 import org.jetbrains.kotlin.descriptors.impl.ValueParameterDescriptorImpl
 import org.jetbrains.kotlin.diagnostics.*
-import org.jetbrains.kotlin.idea.caches.resolve.getResolutionFacade
-import org.jetbrains.kotlin.idea.core.KotlinIndicesHelper
-import org.jetbrains.kotlin.idea.resolve.ResolutionFacade
-import org.jetbrains.kotlin.idea.search.allScope
-import org.jetbrains.kotlin.idea.search.projectScope
-import org.jetbrains.kotlin.idea.util.CallTypeAndReceiver
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.*
@@ -731,15 +725,15 @@ class KtxCallResolver(
     private fun shouldMemoizeResult(resolvedCall: ResolvedCall<*>): Boolean {
         val descriptor = resolvedCall.resultingDescriptor
         val returnType = descriptor.returnType ?: return false
-        return returnType.shouldMemoizeType() || descriptor.hasMemoizableAnnotation()
+        return returnType.shouldMemoizeType() || descriptor.hasStatefulAnnotation()
     }
 
     private fun KotlinType.shouldMemoizeType(): Boolean {
         if (isUnit() || isAnyOrNullableAny()) return false
         val typeDescriptor = constructor.declarationDescriptor
-        return hasMemoizableAnnotation() ||
+        return hasStatefulAnnotation() ||
                 supertypes().any { it.shouldMemoizeType() } ||
-                (typeDescriptor?.hasMemoizableAnnotation() ?: false)
+                (typeDescriptor?.hasStatefulAnnotation() ?: false)
     }
 
     private fun resolveTagValidations(

@@ -1,6 +1,6 @@
 package com.google.r4a
 
-@Memoized
+@Stateful
 abstract class Component : Recomposable {
     @HiddenAttribute
     internal var recomposeCallback: (() -> Unit)? = null

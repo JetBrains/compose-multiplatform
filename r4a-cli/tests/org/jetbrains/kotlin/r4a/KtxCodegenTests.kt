@@ -494,7 +494,7 @@ class KtxCodegenTests : AbstractCodeGenTest() {
 
         compose(
             """
-                @Memoized
+                @Stateful
                 class SomeClassoawid(var x: String) {
                     @Composable
                     operator fun invoke(y: Int) {

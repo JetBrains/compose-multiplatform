@@ -19,7 +19,7 @@ object R4aFqNames {
     val Composable = R4aUtils.r4aFqName("Composable")
     val Pivotal = R4aUtils.r4aFqName("Pivotal")
     val Children = R4aUtils.r4aFqName("Children")
-    val Memoizable = R4aUtils.r4aFqName("Memoized")
+    val Stateful = R4aUtils.r4aFqName("Stateful")
     val Emittable = R4aUtils.r4aFqName("Emittable")
     val HiddenAttribute = R4aUtils.r4aFqName("HiddenAttribute")
 
@@ -42,7 +42,7 @@ fun KotlinType.hasComposableAnnotation(): Boolean = !isSpecialType && annotation
 fun Annotated.hasComposableAnnotation(): Boolean = annotations.findAnnotation(R4aFqNames.Composable) != null
 fun Annotated.hasPivotalAnnotation(): Boolean = annotations.findAnnotation(R4aFqNames.Pivotal) != null
 fun Annotated.hasChildrenAnnotation(): Boolean = annotations.findAnnotation(R4aFqNames.Children) != null
-fun Annotated.hasMemoizableAnnotation(): Boolean = annotations.findAnnotation(R4aFqNames.Memoizable) != null
+fun Annotated.hasStatefulAnnotation(): Boolean = annotations.findAnnotation(R4aFqNames.Stateful) != null
 fun Annotated.hasEmittableAnnotation(): Boolean = annotations.findAnnotation(R4aFqNames.Emittable) != null
 fun Annotated.hasHiddenAttributeAnnotation(): Boolean = annotations.findAnnotation(R4aFqNames.HiddenAttribute) != null
 

@@ -198,7 +198,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
         """
             import com.google.r4a.*
 
-            @Memoized
+            @Stateful
             class Bar(var y: Int = 0) {
                 @Composable
                 operator fun invoke(z: Int) {
@@ -206,7 +206,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
                 }
             }
 
-            @Memoized
+            @Stateful
             @Composable
             fun Foo(a: Int): @Composable() (y: Int) -> Bar = { y: Int -> Bar(y) }
 
@@ -593,7 +593,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
         """
             import com.google.r4a.*
 
-            @Memoized
+            @Stateful
             class Bar(var a: Int) {
                 @Composable
                 operator fun invoke(b: Int) {}
@@ -717,7 +717,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
         """
             import com.google.r4a.*
 
-            @Memoized
+            @Stateful
             class Bar(var a: Int) {
                 @Composable
                 operator fun invoke(b: Int) {}
@@ -768,7 +768,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
 
 
             class Bar(var a: Int) {
-                @Memoized
+                @Stateful
                 inner class Foo {
                     @Composable
                     operator fun invoke(b: Int) {}
