@@ -451,6 +451,27 @@ class KtxTypeResolutionTests : AbstractR4aDiagnosticsTest() {
         """.trimIndent()
     )
 
+    fun testEmptyAttributeValue() = doTest(
+        """
+            import com.google.r4a.*
+
+            @Composable fun Foo(abc: Int, xyz: Int) {
+                print(abc)
+                print(xyz)
+            }
+
+            @Composable fun Test() {
+                <<!NO_VALUE_FOR_PARAMETER, MISSING_REQUIRED_ATTRIBUTES!>Foo<!> abc= />
+
+                // NOTE(lmr): even though there is NO diagnostic here, there *is* a parse
+                // error. This is intentional and done to mimic how kotlin handles function
+                // calls with no value expression in a call parameter list (ie, `Foo(123,)`)
+                <Foo abc=123 xyz= />
+            }
+
+        """.trimIndent()
+    )
+
     fun testValidInvalidAttributes() = doTest(
         """
             import com.google.r4a.*

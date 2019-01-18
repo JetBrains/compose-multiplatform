@@ -297,6 +297,13 @@ class KtxCallResolver(
                     R4ADefaultErrorMessages
                 )
             }
+            if (value == null && attr.equals != null) {
+                // this isn't punning because there is an equal sign, but there is not yet a value expression. this happens often
+                // when typing and with code completion. To deal with it, we just pass in a fake psi node as the value. This will
+                // result in some diagnostics, but it's okay. We want to continue to pass the attribute in as it can affect which
+                // target descriptor gets chosen.
+                value = psiFactory.createSimpleName("_")
+            }
             if (value == null && attr.equals == null) {
                 // punning...
                 // punning has a single expression that both acts as reference to the value and to the property/setter. As a result, we
@@ -328,7 +335,7 @@ class KtxCallResolver(
             }
 
             attrInfos[name] = AttributeInfo(
-                value = value ?: key,
+                value = value ?: error("expected a value expression"),
                 key = key,
                 name = name,
                 isPunned = isPunned
@@ -950,7 +957,8 @@ class KtxCallResolver(
                                             // do nothing
                                         }
                                         ArgumentMatchStatus.ARGUMENT_HAS_NO_TYPE -> {
-                                            error("ARGUMENT_HAS_NO_TYPE")
+                                            // NOTE(lmr): This can happen when the attribute has no value expression, since
+                                            // we pass in a fake psi node for the value in that case.
                                         }
                                     }
                                 }
