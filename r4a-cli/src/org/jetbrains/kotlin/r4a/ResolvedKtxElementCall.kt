@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.renderer.ClassifierNamePolicy
 import org.jetbrains.kotlin.renderer.DescriptorRenderer
 import org.jetbrains.kotlin.renderer.ParameterNameRenderingPolicy
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
+import org.jetbrains.kotlin.resolve.calls.results.OverloadResolutionResults
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.expressions.ExpressionTypingContext
 
@@ -135,10 +136,11 @@ sealed class EmitOrCallNode {
 
     fun resolvedCalls(): List<ResolvedCall<*>> {
         return when (this) {
-            is ErrorNode -> emptyList()
             is MemoizedCallNode -> listOfNotNull(memoize.ctorCall) + call.resolvedCalls()
             is NonMemoizedCallNode -> listOf(resolvedCall) + (nextCall?.resolvedCalls() ?: emptyList())
             is EmitCallNode -> listOfNotNull(memoize.ctorCall)
+            is ErrorNode.ResolveError -> results.allCandidates?.toList() ?: emptyList()
+            is ErrorNode -> emptyList()
         }
     }
 
@@ -230,7 +232,7 @@ sealed class ErrorNode : EmitOrCallNode() {
     class RecursionLimitAmbiguousAttributesError(val attributes: Set<String>) : ErrorNode()
     class RecursionLimitError : ErrorNode()
     class NonCallableRoot : ErrorNode()
-    class ResolveError : ErrorNode()
+    class ResolveError(val results: OverloadResolutionResults<FunctionDescriptor>) : ErrorNode()
 }
 
 class NonMemoizedCallNode(

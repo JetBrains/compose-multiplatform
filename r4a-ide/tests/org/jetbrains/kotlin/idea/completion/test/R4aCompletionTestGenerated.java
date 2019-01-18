@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
+ * Copyright 2010-2019 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license
  * that can be found in the license/LICENSE.txt file.
  */
 
@@ -47,6 +47,11 @@ public class R4aCompletionTestGenerated extends AbstractR4aCompletionTest {
     @TestMetadata("AttributesFunctionComponents.kt")
     public void testAttributesFunctionComponents() throws Exception {
         runTest("plugins/r4a/r4a-ide/testData/completion/AttributesFunctionComponents.kt");
+    }
+
+    @TestMetadata("AttributesOverloadedFunctionComponents.kt")
+    public void testAttributesOverloadedFunctionComponents() throws Exception {
+        runTest("plugins/r4a/r4a-ide/testData/completion/AttributesOverloadedFunctionComponents.kt");
     }
 
     @TestMetadata("AttributesUsedAreOmitted.kt")
