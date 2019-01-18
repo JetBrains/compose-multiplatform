@@ -30,7 +30,7 @@ object LibraryVersions {
     val ARCH_RUNTIME = Version("2.0.1-alpha01")
     val ASYNCLAYOUTINFLATER = Version("1.0.0")
     val BENCHMARK = Version("1.0.0-alpha01")
-    val BIOMETRIC = Version("1.0.0-alpha03")
+    val BIOMETRIC = Version("1.0.0-alpha04")
     val BROWSER = Version("1.0.0")
     val CAR = Version("1.0.0-alpha6")
     val CAR_CLUSTER = Version("1.0.0-alpha5")
