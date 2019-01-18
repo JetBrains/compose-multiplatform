@@ -902,7 +902,7 @@ class KtxCallResolver(
                 attrsUsedInCall,
                 subMissingRequiredAttributes
             ) {
-                ErrorNode.ResolveError()
+                ErrorNode.ResolveError(results)
             }
 
             val resolvedCall = candidateResults.resultingCalls.first()
@@ -962,7 +962,7 @@ class KtxCallResolver(
                                         attrsUsedInCall,
                                         subMissingRequiredAttributes
                                     ) {
-                                        ErrorNode.ResolveError()
+                                        ErrorNode.ResolveError(results)
                                     }
                                 }
                             }
@@ -978,7 +978,7 @@ class KtxCallResolver(
                             attrsUsedInCall,
                             subMissingRequiredAttributes
                         ) {
-                            ErrorNode.ResolveError()
+                            ErrorNode.ResolveError(results)
                         }
                     }
                     else -> {
@@ -1003,7 +1003,7 @@ class KtxCallResolver(
                     attrsUsedInCall,
                     subMissingRequiredAttributes
                 ) {
-                    ErrorNode.ResolveError()
+                    ErrorNode.ResolveError(results)
                 }
             }
 
@@ -1051,7 +1051,7 @@ class KtxCallResolver(
                         context = candidateContext
                     )
                     // if this doesn't succeed, perhaps we should try and continue???
-                        ?: return@TempResolveInfo ErrorNode.ResolveError()
+                        ?: return@TempResolveInfo ErrorNode.ResolveError(results)
 
                     val invalidReceiverScope = composerCall
                         .resultingDescriptor
@@ -1129,7 +1129,7 @@ class KtxCallResolver(
                     attrsUsedInCall + attrsUsedInSets,
                     subMissingRequiredAttributes
                 ) {
-                    ErrorNode.ResolveError()
+                    ErrorNode.ResolveError(results)
                 }
 
                 if (attributes.contains(CHILDREN_KEY) && returnType.isCompoundEmittable()) {
@@ -1197,7 +1197,7 @@ class KtxCallResolver(
                 attrsUsedInCall + attrsUsedInSets,
                 subMissingRequiredAttributes
             ) {
-                ErrorNode.ResolveError()
+                ErrorNode.ResolveError(results)
             }
 
             // the "invalid" lambda is at a different argument index depending on whether or not there is a "ctor" param.
