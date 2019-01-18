@@ -550,14 +550,14 @@ class KtxCallResolver(
 
                         val diagnostic = when {
                             attrsOfSameKey.isNotEmpty() && valueType != null ->
-                                R4AErrors.MISMATCHED_ATTRIBUTE_TYPE.on(exprToReportOn, valueType, attrsOfSameKey.map { it.type })
+                                R4AErrors.MISMATCHED_ATTRIBUTE_TYPE.on(exprToReportOn, valueType, attrsOfSameKey.map { it.type }.toSet())
                             attrsOfSameKey.isEmpty() && valueType != null ->
                                 R4AErrors.UNRESOLVED_ATTRIBUTE_KEY.on(exprToReportOn, descriptors, attr.name, valueType)
                             attrsOfSameKey.isNotEmpty() && valueType == null && !valueIsUnresolvedRef ->
                                 R4AErrors.MISMATCHED_ATTRIBUTE_TYPE.on(
                                     exprToReportOn,
                                     ErrorUtils.createErrorType("???"),
-                                    attrsOfSameKey.map { it.type })
+                                    attrsOfSameKey.map { it.type }.toSet())
                             else ->
                                 R4AErrors.UNRESOLVED_ATTRIBUTE_KEY_UNKNOWN_TYPE.on(exprToReportOn, descriptors, attr.name)
                         }
