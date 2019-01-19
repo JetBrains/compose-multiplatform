@@ -18,6 +18,7 @@ def build_versions = [:]
 
 build_versions.kotlin = '1.3.1-R4A-20190108'
 build_versions.lint = '26.3.0-rc01'
+build_versions.dokka = "0.9.17-g20181009"
 
 rootProject.ext['build_versions'] = build_versions
 
@@ -44,6 +45,9 @@ build_libs.kotlin = [
         stdlib: "org.jetbrains.kotlin:kotlin-stdlib:${build_versions.kotlin}",
         gradle_plugin: "org.jetbrains.kotlin:kotlin-gradle-plugin:${build_versions.kotlin}"
 ]
-build_libs.dokka_gradle = 'org.jetbrains.dokka:dokka-android-gradle-plugin:0.9.18-SNAPSHOT'
+build_libs.dokka_gradle = [
+        "org.jetbrains.dokka:dokka-android-gradle-plugin:${build_versions.dokka}",
+        "org.jetbrains.dokka:dokka-gradle-plugin:${build_versions.dokka}",
+]
 
 rootProject.ext['build_libs'] = build_libs
