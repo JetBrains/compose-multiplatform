@@ -1,6 +1,5 @@
 // "Import" "true"
 // ERROR: Invalid KTX tag type. Expected 'Emittable, View, ViewGroup'
-// ERROR: Invalid KTX tag type. Expected 'Emittable, View, ViewGroup'
 // ERROR: Unresolved reference: LinearLayout
 
 package testing

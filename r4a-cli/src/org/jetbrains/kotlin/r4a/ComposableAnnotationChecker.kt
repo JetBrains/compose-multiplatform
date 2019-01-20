@@ -40,6 +40,7 @@ import org.jetbrains.kotlin.types.TypeUtils
 import org.jetbrains.kotlin.types.lowerIfFlexible
 import org.jetbrains.kotlin.types.typeUtil.builtIns
 import org.jetbrains.kotlin.types.upperIfFlexible
+import org.jetbrains.kotlin.util.OperatorNameConventions
 
 class ComposableAnnotationChecker(val mode: Mode = DEFAULT_MODE) : CallChecker, DeclarationChecker,
     AdditionalTypeChecker, AdditionalAnnotationChecker, StorageComponentContainerContributor {
@@ -62,6 +63,28 @@ class ComposableAnnotationChecker(val mode: Mode = DEFAULT_MODE) : CallChecker, 
     private fun hasComposableAnnotation(trace: BindingTrace, resolvedCall: ResolvedCall<*>): Composability {
         if (resolvedCall is VariableAsFunctionResolvedCall) {
             return analyze(trace, resolvedCall.variableCall.candidateDescriptor)
+        }
+        return analyze(trace, resolvedCall.candidateDescriptor)
+    }
+
+    fun analyze(trace: BindingTrace, resolvedCall: ResolvedCall<*>): Composability {
+        // if it's not composable and a variable call, it's possible that there was an operator invoke extension function defined
+        // locally that is composable. In this case, that function being marked as composable is enough. So we perform an additional
+        // check to see.
+        if (resolvedCall is VariableAsFunctionResolvedCall) {
+            var result = analyze(trace, resolvedCall.variableCall.candidateDescriptor)
+            if (result == Composability.NOT_COMPOSABLE) {
+                result += analyze(trace, resolvedCall.functionCall.resultingDescriptor)
+            }
+            return result
+        }
+        val candidateDescriptor = resolvedCall.candidateDescriptor
+        if (candidateDescriptor is FunctionDescriptor) {
+            if (candidateDescriptor.isOperator && candidateDescriptor.name == OperatorNameConventions.INVOKE) {
+                if (resolvedCall.dispatchReceiver?.type?.hasComposableAnnotation() == true) {
+                    return Composability.MARKED
+                }
+            }
         }
         return analyze(trace, resolvedCall.candidateDescriptor)
     }

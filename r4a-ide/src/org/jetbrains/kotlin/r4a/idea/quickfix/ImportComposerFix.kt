@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.idea.quickfix.KotlinSingleIntentionActionFactory
 import org.jetbrains.kotlin.idea.util.getFileResolutionScope
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtxElement
 import org.jetbrains.kotlin.r4a.KtxNameConventions
@@ -25,7 +26,7 @@ import org.jetbrains.kotlin.resolve.scopes.utils.findClassifier
 import org.jetbrains.kotlin.resolve.scopes.utils.findFunction
 import org.jetbrains.kotlin.resolve.scopes.utils.findVariable
 
-class ImportComposerFix(private val ktxElement: KtxElement) : R4aImportFix(ktxElement) {
+class ImportComposerFix(element: KtExpression, private val ktxElement: KtxElement) : R4aImportFix(element) {
 
     override fun computeSuggestions(): List<ImportVariant> {
         if (!ktxElement.isValid) return emptyList()
@@ -99,8 +100,9 @@ class ImportComposerFix(private val ktxElement: KtxElement) : R4aImportFix(ktxEl
 
     companion object MyFactory : KotlinSingleIntentionActionFactory() {
         override fun createAction(diagnostic: Diagnostic): IntentionAction? {
-            val ktxElement = diagnostic.psiElement.parentOfType<KtxElement>() ?: return null
-            return ImportComposerFix(ktxElement).apply { collectSuggestions() }
+            val element = diagnostic.psiElement as? KtExpression ?: return null
+            val ktxElement = element.parentOfType<KtxElement>() ?: return null
+            return ImportComposerFix(element, ktxElement).apply { collectSuggestions() }
         }
     }
 }

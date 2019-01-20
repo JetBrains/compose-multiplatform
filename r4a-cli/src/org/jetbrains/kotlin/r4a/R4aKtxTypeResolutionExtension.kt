@@ -19,11 +19,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
     ) {
         val ktxCallResolver = KtxCallResolver(callResolver, facade, element.project)
 
-        val success = ktxCallResolver.resolveComposer(element, context)
-
-        if (!success) {
-            return fallback(element, context, facade)
-        }
+        ktxCallResolver.resolveComposer(element, context)
 
         val temporaryForKtxCall = TemporaryTraceAndCache.create(context, "trace to resolve ktx call", element)
 
@@ -36,18 +32,4 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
 
         context.trace.record(R4AWritableSlices.RESOLVED_KTX_CALL, element, resolvedKtxElementCall)
     }
-
-    private fun fallback(
-        element: KtxElement,
-        context: ExpressionTypingContext,
-        facade: ExpressionTypingFacade
-    ) {
-        // If we can't resolve the tag name, we can't accurately report errors on the element, but we still want the type system to traverse
-        // through all of the children nodes so that specific errors on those can get recorded
-        with(element) {
-            attributes.forEach { facade.checkType(it, context) }
-            body?.forEach { facade.checkType(it, context) }
-        }
-    }
-
 }

@@ -12,7 +12,7 @@ class KtxTypeResolutionTests : AbstractR4aDiagnosticsTest() {
             }
 
             @Composable fun test() {
-                <<!UNRESOLVED_TAG, INVALID_TAG_DESCRIPTOR!>SomeNameThatWillNotResolve<!> foo=123>
+                <<!UNRESOLVED_TAG!>SomeNameThatWillNotResolve<!> <!UNRESOLVED_ATTRIBUTE_KEY!>foo<!>=123>
                     <Foo />
                 </<!INVALID_TAG_DESCRIPTOR!>SomeNameThatWillNotResolve<!>>
             }
@@ -472,6 +472,51 @@ class KtxTypeResolutionTests : AbstractR4aDiagnosticsTest() {
         """.trimIndent()
     )
 
+
+    fun testMissingComposer() = doTest(
+        """
+            import com.google.r4a.Composable
+
+            @Composable fun A() {}
+            @Composable fun B(a: Int, b: Int) { print(a + b) }
+            fun C(a: Int): @Composable() (b: Int) -> Unit = { b: Int -> print(a + b) }
+            class D(var a: Int) {
+                var b: Int = 0
+                @Composable operator fun invoke(c: Int) { print(c) }
+            }
+
+            class E(var a: Int) {
+                var b: Int = 0
+            }
+
+            @Composable fun Test() {
+                <<!NO_COMPOSER_FOUND!>A<!> />
+
+                <<!NO_COMPOSER_FOUND, NO_VALUE_FOR_PARAMETER!>B<!> />
+                <<!NO_COMPOSER_FOUND, NO_VALUE_FOR_PARAMETER!>B<!> a=1 />
+                <<!NO_COMPOSER_FOUND!>B<!> a=1 b=1 />
+                <<!NO_COMPOSER_FOUND!>B<!> a=1 <!MISMATCHED_ATTRIBUTE_TYPE!>b<!>=<!TYPE_MISMATCH!>""<!> />
+
+                <<!NO_COMPOSER_FOUND, NO_VALUE_FOR_PARAMETER!>C<!> />
+                <<!NO_COMPOSER_FOUND!>C<!> a=1 />
+                <<!NO_COMPOSER_FOUND!>C<!> a=1 b=1 />
+                <<!NO_COMPOSER_FOUND!>C<!> a=1 <!MISMATCHED_ATTRIBUTE_TYPE!>b<!>=<!TYPE_MISMATCH!>""<!> />
+
+                <<!NO_COMPOSER_FOUND, NO_VALUE_FOR_PARAMETER!>D<!> />
+                <<!NO_COMPOSER_FOUND!>D<!> a=1 />
+                <<!NO_COMPOSER_FOUND!>D<!> a=1 b=1 />
+                <<!NO_COMPOSER_FOUND!>D<!> a=1 b=1 c=1 />
+                <<!NO_COMPOSER_FOUND!>D<!> a=1 b=1 <!MISMATCHED_ATTRIBUTE_TYPE!>c<!>=<!TYPE_MISMATCH!>""<!> />
+
+                <<!NO_COMPOSER_FOUND, NO_VALUE_FOR_PARAMETER!>E<!> />
+                <<!NO_COMPOSER_FOUND!>E<!> a=1 />
+                <<!NO_COMPOSER_FOUND!>E<!> a=1 b=1 />
+                <<!NO_COMPOSER_FOUND!>E<!> a=1 <!MISMATCHED_ATTRIBUTE_TYPE!>b<!>="" />
+            }
+
+        """.trimIndent()
+    )
+
     fun testValidInvalidAttributes() = doTest(
         """
             import com.google.r4a.*
@@ -636,7 +681,7 @@ class KtxTypeResolutionTests : AbstractR4aDiagnosticsTest() {
                 <<!INVALID_TAG_TYPE!>MyNamespace.<!UNRESOLVED_REFERENCE!>someString<!><!>>
                 </<!INVALID_TAG_TYPE!>MyNamespace.someString<!>>
 
-                <<!UNRESOLVED_REFERENCE!>SomethingThatDoesntExist<!>.Foo>
+                <<!CHILDREN_PROVIDED_BUT_NO_CHILDREN_DECLARED!><!UNRESOLVED_REFERENCE!>SomethingThatDoesntExist<!>.Foo<!>>
                 </SomethingThatDoesntExist.Foo>
 
                 <<!INVALID_TAG_TYPE!>MyNamespace.NonComponent<!>>
@@ -747,8 +792,8 @@ class KtxTypeResolutionTests : AbstractR4aDiagnosticsTest() {
                 <MultiChildren> x, y ->
                     println(x + y)
                 </MultiChildren>
-                <<!UNRESOLVED_CHILDREN!>MultiChildren<!>> x, y, z ->
-                    println(x + y + z)
+                <<!UNRESOLVED_CHILDREN!>MultiChildren<!>> <!TYPE_MISMATCH!><!EXPECTED_PARAMETERS_NUMBER_MISMATCH!><!CANNOT_INFER_PARAMETER_TYPE!>x<!>, <!CANNOT_INFER_PARAMETER_TYPE!>y<!>, <!CANNOT_INFER_PARAMETER_TYPE!>z<!><!> ->
+                    println(x + y + z)<!>
                 </MultiChildren>
 
                 <Button />

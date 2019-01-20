@@ -127,18 +127,18 @@ open class KtxSyntaxReference(val ktxElement: KtxElement) : KtMultiReference<KtE
 
         val results = mutableListOf<DeclarationDescriptor>()
 
-        resolvedElementCall.getComposerCall.resultingDescriptor?.let { results.add(it) }
+        resolvedElementCall.getComposerCall?.resultingDescriptor?.let { results.add(it) }
 
         var node: EmitOrCallNode? = resolvedElementCall.emitOrCall
 
         while (node != null) {
             node = when (node) {
                 is EmitCallNode -> {
-                    node.memoize.composerCall.resultingDescriptor?.let { results.add(it) }
+                    node.memoize.composerCall?.resultingDescriptor?.let { results.add(it) }
                     null
                 }
                 is MemoizedCallNode -> {
-                    node.memoize.composerCall.resultingDescriptor?.let { results.add(it) }
+                    node.memoize.composerCall?.resultingDescriptor?.let { results.add(it) }
                     node.call
                 }
                 is NonMemoizedCallNode -> node.nextCall

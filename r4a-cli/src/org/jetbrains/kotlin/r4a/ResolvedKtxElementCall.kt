@@ -83,16 +83,16 @@ class ValidatedAssignment(
     val attribute: AttributeNode
 )
 
-private fun getParamFnDescriptorFromCall(name: Name, call: ResolvedCall<*>, context: ExpressionTypingContext): FunctionDescriptor? {
-    val param = call.resultingDescriptor?.valueParameters?.firstOrNull { it.name == name } ?: return null
+private fun getParamFnDescriptorFromCall(name: Name, call: ResolvedCall<*>?, context: ExpressionTypingContext): FunctionDescriptor? {
+    val param = call?.resultingDescriptor?.valueParameters?.firstOrNull { it.name == name } ?: return null
     return createFunctionDescriptor(param.type, context)
 }
 
 class ComposerCallInfo(
     context: ExpressionTypingContext,
-    val composerCall: ResolvedCall<*>,
+    val composerCall: ResolvedCall<*>?,
     val pivotals: List<AttributeNode>,
-    val joinKeyCall: ResolvedCall<*>,
+    val joinKeyCall: ResolvedCall<*>?,
     val ctorCall: ResolvedCall<*>?,
     val ctorParams: List<ValueNode>,
     val validations: List<ValidatedAssignment>
@@ -280,10 +280,11 @@ class ResolvedKtxElementCall(
     val usedAttributes: List<AttributeNode>,
     val unusedAttributes: List<String>,
     val emitOrCall: EmitOrCallNode,
-    val getComposerCall: ResolvedCall<*>,
+    val getComposerCall: ResolvedCall<*>?,
     val emitSimpleUpperBoundTypes: Set<KotlinType>,
     val emitCompoundUpperBoundTypes: Set<KotlinType>,
-    val infixOrCall: ResolvedCall<*>
+    val infixOrCall: ResolvedCall<*>?,
+    val attributeInfos: Map<String, AttributeInfo>
 )
 
 

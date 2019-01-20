@@ -87,10 +87,11 @@ class R4ASyntheticIrExtension : SyntheticIrExtension {
         // TODO(lmr): if this is a "get local variable" will this still work?
         val getComposer = statementGenerator.getProperty(
             openTagName.startOffset, openTagName.endOffset,
-            resolvedKtxCall.getComposerCall
+            resolvedKtxCall.getComposerCall ?: error("Invalid KTX Call")
         )
 
         fun keyExpression(callInfo: ComposerCallInfo): IrExpression {
+            val joinKeyCall = callInfo.joinKeyCall ?: error("Expected joinKeyCall to be non-null")
             val sourceKey = getKeyValue(statementGenerator.scopeOwner, element.startOffset)
             val keyValueExpressions = listOf<IrExpression>(
                 IrConstImpl.int(
@@ -105,7 +106,7 @@ class R4ASyntheticIrExtension : SyntheticIrExtension {
                     statementGenerator
                         .callMethod(
                             UNDEFINED_OFFSET, UNDEFINED_OFFSET,
-                            callInfo.joinKeyCall,
+                            joinKeyCall,
                             getComposer
                         )
                         .apply {
@@ -136,7 +137,7 @@ class R4ASyntheticIrExtension : SyntheticIrExtension {
             when (callNode) {
                 is EmitCallNode -> {
                     val memoize = callNode.memoize
-                    val composerCall = memoize.composerCall
+                    val composerCall = memoize.composerCall ?: error("Expected composerCall to be non-null")
 
                     val composerCallParameters = composerCall.resultingDescriptor.valueParameters.map { it.name to it }.toMap()
                     fun getComposerCallParameter(name: Name) = composerCallParameters[name] ?: error("Expected $name parameter to exist")
@@ -339,7 +340,7 @@ class R4ASyntheticIrExtension : SyntheticIrExtension {
                 }
                 is MemoizedCallNode -> {
                     val memoize = callNode.memoize
-                    val composerCall = memoize.composerCall
+                    val composerCall = memoize.composerCall ?: error("Expected composerCall to be non-null")
 
                     val composerCallParameters = composerCall.resultingDescriptor.valueParameters.map { it.name to it }.toMap()
                     fun getComposerCallParameter(name: Name) = composerCallParameters[name] ?: error("Expected $name parameter to exist")
@@ -405,7 +406,7 @@ class R4ASyntheticIrExtension : SyntheticIrExtension {
                                         validationCalls.reduce { left, right ->
                                             statementGenerator.callMethod(
                                                 UNDEFINED_OFFSET, UNDEFINED_OFFSET,
-                                                resolvedKtxCall.infixOrCall,
+                                                resolvedKtxCall.infixOrCall ?: error("Invalid KTX Call"),
                                                 left
                                             ).apply {
                                                 putValueArgument(0, right)

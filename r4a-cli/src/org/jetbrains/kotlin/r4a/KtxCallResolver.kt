@@ -83,13 +83,15 @@ class KtxCallResolver(
     private val composableAnnotationChecker = ComposableAnnotationChecker()
 
     // The type of the `composer` variable in scope of the KTX tag
-    private lateinit var composerType: KotlinType
+    private var composerType: KotlinType = builtIns.unitType
     // A ResolvedCall to "get" the composer variable in scope of the KTX element.
-    private lateinit var composerResolvedCall: ResolvedCall<*>
+    private var composerResolvedCall: ResolvedCall<*>? = null
     // A ResolvedCall to the `joinKey(Any, Any?)` method on the composer in scope.
-    private lateinit var joinKeyCall: ResolvedCall<*>
+    private var joinKeyCall: ResolvedCall<*>? = null
 
-    private lateinit var infixOrCall: ResolvedCall<*>
+    private var infixOrCall: ResolvedCall<*>? = null
+
+    private lateinit var ktxElement: KtxElement
 
     private lateinit var tagExpressions: List<KtExpression>
 
@@ -163,7 +165,7 @@ class KtxCallResolver(
             return false
         }
 
-        composerResolvedCall = resolvedComposer.resultingCall
+        val composerResolvedCall = resolvedComposer.resultingCall.also { composerResolvedCall = it }
 
         val descriptor = composerResolvedCall.resultingDescriptor
 
@@ -276,6 +278,7 @@ class KtxCallResolver(
         element: KtxElement,
         context: ExpressionTypingContext
     ): ResolvedKtxElementCall {
+        ktxElement = element
         val openTagExpr = element.simpleTagName ?: element.qualifiedTagName ?: error("shouldn't happen")
         val closeTagExpr = element.simpleClosingTagName ?: element.qualifiedClosingTagName
         val attributes = element.attributes
@@ -392,7 +395,8 @@ class KtxCallResolver(
             attrInfos,
             usedAttributes,
             missingRequiredAttributes,
-            contextToUse
+            contextToUse,
+            recurseOnUnresolved = false
         )
 
         // TODO(lmr): validate that if it bottoms out at an emit(...) that it doesn't have any call(...)s
@@ -421,6 +425,7 @@ class KtxCallResolver(
                 }
                 is ErrorNode.NonEmittableNonCallable -> {
                     // TODO(lmr): diagnostic
+                    // TODO(lmr): we should probably put more info here, saying the composerType and stuff like that
                     // "ktx tag terminated with type "Foo", which is neither an emittable, nor callable
                     R4AErrors.INVALID_TAG_TYPE.report(
                         contextToUse,
@@ -477,7 +482,7 @@ class KtxCallResolver(
         // it's okay if the tag doesn't show up as used, so we remove it from this list
         val unusedAttributes = (attrInfos - usedAttributes - TAG_KEY).toMutableMap()
 
-        if (errorNode == null && unusedAttributes.isNotEmpty()) {
+        if (unusedAttributes.isNotEmpty()) {
 
             // if we have some unused attributes, we want to provide some helpful diagnostics on them, so we grab
             // every possible attribute for the call. Note that we only want to run this (expensive) calculation in
@@ -499,6 +504,10 @@ class KtxCallResolver(
                                 unusedAttributes.remove(CHILDREN_KEY)
                             }
                         } else {
+                            facade.getTypeInfo(
+                                attr.value,
+                                contextToUse.replaceExpectedType(functionType().makeComposable(module))
+                            )
                             val possibleChildren = allPossibleAttributes[CHILDREN_KEY] ?: emptyList()
                             if (possibleChildren.isNotEmpty()) {
                                 contextToUse.trace.reportFromPlugin(
@@ -624,7 +633,7 @@ class KtxCallResolver(
                     R4ADefaultErrorMessages
                 )
             } else {
-                context.trace.report(diagnostic)
+                context.trace.reportDiagnosticOnce(diagnostic)
             }
         }
 
@@ -637,7 +646,8 @@ class KtxCallResolver(
             getComposerCall = composerResolvedCall,
             emitSimpleUpperBoundTypes = emitSimpleUpperBoundTypes,
             emitCompoundUpperBoundTypes = emitCompoundUpperBoundTypes,
-            infixOrCall = infixOrCall
+            infixOrCall = infixOrCall,
+            attributeInfos = attrInfos
         )
     }
 
@@ -826,7 +836,8 @@ class KtxCallResolver(
         attributes: Map<String, AttributeInfo>,
         usedAttributes: MutableSet<String>,
         missingRequiredAttributes: MutableList<DeclarationDescriptor>,
-        context: ExpressionTypingContext
+        context: ExpressionTypingContext,
+        recurseOnUnresolved: Boolean
     ): EmitOrCallNode {
         if (!resolveStep.canRecurse()) {
             return when (resolveStep) {
@@ -914,8 +925,6 @@ class KtxCallResolver(
 
             val resolvedCall = candidateResults.resultingCalls.first()
 
-
-
             if (!candidateResults.isSuccess) {
                 when (candidateResults.resultCode) {
                     OverloadResolutionResults.Code.SINGLE_CANDIDATE_ARGUMENT_MISMATCH -> {
@@ -963,14 +972,16 @@ class KtxCallResolver(
                                     }
                                 }
                                 is ArgumentUnmapped -> {
-                                    return@mapNotNull TempResolveInfo(
-                                        false,
-                                        tmpForCandidate,
-                                        (attributes - attrsUsedInCall).keys,
-                                        attrsUsedInCall,
-                                        subMissingRequiredAttributes
-                                    ) {
-                                        ErrorNode.ResolveError(results)
+                                    if (!recurseOnUnresolved) {
+                                        return@mapNotNull TempResolveInfo(
+                                            false,
+                                            tmpForCandidate,
+                                            (attributes - attrsUsedInCall).keys,
+                                            attrsUsedInCall,
+                                            subMissingRequiredAttributes
+                                        ) {
+                                            ErrorNode.ResolveError(results)
+                                        }
                                     }
                                 }
                             }
@@ -979,14 +990,18 @@ class KtxCallResolver(
                     OverloadResolutionResults.Code.INCOMPLETE_TYPE_INFERENCE,
                     OverloadResolutionResults.Code.MANY_FAILED_CANDIDATES,
                     OverloadResolutionResults.Code.CANDIDATES_WITH_WRONG_RECEIVER -> {
-                        return@mapNotNull TempResolveInfo(
-                            false,
-                            tmpForCandidate,
-                            (attributes - attrsUsedInCall).keys,
-                            attrsUsedInCall,
-                            subMissingRequiredAttributes
-                        ) {
-                            ErrorNode.ResolveError(results)
+                        if (!recurseOnUnresolved) {
+                            return@mapNotNull TempResolveInfo(
+                                false,
+                                tmpForCandidate,
+                                (attributes - attrsUsedInCall).keys,
+                                attrsUsedInCall,
+                                subMissingRequiredAttributes
+                            ) {
+                                ErrorNode.ResolveError(results)
+                            }
+                        } else {
+                            candidateContext.trace.recordFailedCandidates(ktxElement, results.allCandidates)
                         }
                     }
                     else -> {
@@ -1026,14 +1041,7 @@ class KtxCallResolver(
 
                 // it is important to pass in "result" here and not "resolvedCall" since "result" is the one that will have
                 // the composable annotation on it in the case of lambda invokes
-                var composability = composableAnnotationChecker.analyze(candidateContext.trace, result.semanticCall.resultingDescriptor)
-
-                // if it's not composable and a variable call, it's possible that there was an operator invoke extension function defined
-                // locally that is composable. In this case, that function being marked as composable is enough. So we perform an additional
-                // check to see.
-                if (composability == ComposableAnnotationChecker.Composability.NOT_COMPOSABLE && result is VariableAsFunctionResolvedCall) {
-                    composability = composableAnnotationChecker.analyze(candidateContext.trace, result.functionCall.resultingDescriptor)
-                }
+                val composability = composableAnnotationChecker.analyze(candidateContext.trace, result)
 
                 if (composability == ComposableAnnotationChecker.Composability.NOT_COMPOSABLE) {
                     candidateContext.trace.reportFromPlugin(
@@ -1058,15 +1066,13 @@ class KtxCallResolver(
                         expressionToReportErrorsOn = expression,
                         context = candidateContext
                     )
-                    // if this doesn't succeed, perhaps we should try and continue???
-                        ?: return@TempResolveInfo ErrorNode.ResolveError(results)
 
                     val invalidReceiverScope = composerCall
-                        .resultingDescriptor
-                        .valueParameters
-                        .first { it.name == KtxNameConventions.CALL_INVALID_PARAMETER }
-                        .type
-                        .getReceiverTypeFromFunctionType() ?: error("Expected receiver type")
+                        ?.resultingDescriptor
+                        ?.valueParameters
+                        ?.first { it.name == KtxNameConventions.CALL_INVALID_PARAMETER }
+                        ?.type
+                        ?.getReceiverTypeFromFunctionType() ?: ErrorUtils.createErrorType("???")
 
                     val tagValidations = resolveTagValidations(
                         kind = ComposerCallKind.CALL,
@@ -1198,23 +1204,15 @@ class KtxCallResolver(
                 constructedType = if (shouldMemoizeCtor) returnType else null,
                 expressionToReportErrorsOn = expression,
                 context = candidateContext
-            ) ?: return@mapNotNull TempResolveInfo(
-                false,
-                tmpForCandidate,
-                (attributes - attrsUsedInCall - attrsUsedInSets).keys,
-                attrsUsedInCall + attrsUsedInSets,
-                subMissingRequiredAttributes
-            ) {
-                ErrorNode.ResolveError(results)
-            }
+            )
 
             // the "invalid" lambda is at a different argument index depending on whether or not there is a "ctor" param.
             val invalidReceiverScope = composerCall
-                .resultingDescriptor
-                .valueParameters
-                .first { it.name == KtxNameConventions.CALL_INVALID_PARAMETER }
-                .type
-                .getReceiverTypeFromFunctionType() ?: error("Expected receiver type")
+                ?.resultingDescriptor
+                ?.valueParameters
+                ?.first { it.name == KtxNameConventions.CALL_INVALID_PARAMETER }
+                ?.type
+                ?.getReceiverTypeFromFunctionType() ?: ErrorUtils.createErrorType("???")
 
             val tagValidations = resolveTagValidations(
                 kind = ComposerCallKind.CALL,
@@ -1315,7 +1313,8 @@ class KtxCallResolver(
                 attributes,
                 attrsUsedInFollowingCalls,
                 subMissingRequiredAttributes,
-                candidateContext
+                candidateContext,
+                recurseOnUnresolved
             )
 
             val subUsedAttributes = attrsUsedInCall + attrsUsedInSets + attrsUsedInFollowingCalls
@@ -1355,6 +1354,7 @@ class KtxCallResolver(
             }
         }
             .sortedWith(Comparator { a, b ->
+                // TODO(lmr): should we also use missingRequiredAttributes to sort here?
                 if (a.attributesLeft != b.attributesLeft) {
                     a.attributesLeft - b.attributesLeft
                 } else {
@@ -1363,6 +1363,22 @@ class KtxCallResolver(
             }).toList()
 
         val result = resolveInfos.first()
+
+        if (!recurseOnUnresolved && result.attributesLeft > 0 && !results.allCandidates.isNullOrEmpty()) {
+            // Looking up all possible combinations of resolved calls to satisfy a KTX element can be expensive, so normally we try to do as
+            // few lookups as possible. But if we failed (ie, there is for sure an error), then we go ahead and run it again with a flag
+            // set that explores all options so that we can provide the most meaningful diagnostics.
+            return resolveChild(
+                expression,
+                resolveStep,
+                call,
+                attributes,
+                usedAttributes,
+                missingRequiredAttributes,
+                context,
+                recurseOnUnresolved = true
+            )
+        }
 
         val resultNode = result.build()
         usedAttributes.addAll(result.usedAttributes)
@@ -1376,7 +1392,7 @@ class KtxCallResolver(
                 val primaryCalls = listOfNotNull(
                     resultNode.primaryCall,
                     nextNode.primaryCall
-                )
+                ).distinctBy { it.resultingDescriptor }
                 if (primaryCalls.size > 1) {
                     R4AErrors.AMBIGUOUS_KTX_CALL.report(
                         context,
@@ -3011,7 +3027,7 @@ private class ImplicitCtorValueArgument(val type: KotlinType) : ValueArgument {
     override fun isExternal(): Boolean = true
 }
 
-private class AttributeInfo(
+class AttributeInfo(
     val value: KtExpression,
     val key: KtSimpleNameExpression?,
     val name: String,
@@ -3192,6 +3208,12 @@ private fun BindingTrace.recordAttributeKeyRef(expr: KtExpression?, value: Decla
     val key = expr as? KtReferenceExpression ?: error("expected a KtReferenceExpression")
     val prev = get(R4AWritableSlices.ATTRIBUTE_KEY_REFERENCE_TARGET, key) ?: emptySet()
     record(R4AWritableSlices.ATTRIBUTE_KEY_REFERENCE_TARGET, key, prev + value)
+}
+
+private fun BindingTrace.recordFailedCandidates(expr: KtxElement, results: Collection<ResolvedCall<FunctionDescriptor>>?) {
+    if (results == null) return
+    val prev = get(R4AWritableSlices.FAILED_CANDIDATES, expr) ?: emptyList()
+    record(R4AWritableSlices.FAILED_CANDIDATES, expr, prev + results)
 }
 
 enum class ComposerCallKind { CALL, EMIT }

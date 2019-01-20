@@ -207,7 +207,7 @@ class R4aKtxControlFlowExtension : KtxControlFlowExtension {
 
         fun visitComposerCallInfo(memoize: ComposerCallInfo, inputInstructions: MutableList<InstructionWithValue>) {
             memoize.ctorCall?.let { inputInstructions.add(generateCall(it)) }
-            inputInstructions.add(generateCall(memoize.composerCall))
+            memoize.composerCall?.let { inputInstructions.add(generateCall(it)) }
             memoize.validations.forEach { validation ->
                 validation.validationCall?.let { inputInstructions.add(generateCall(it)) }
                 validation.assignment?.let { inputInstructions.add(generateCall(it)) }
@@ -236,7 +236,7 @@ class R4aKtxControlFlowExtension : KtxControlFlowExtension {
             val elementCall = trace.get(R4AWritableSlices.RESOLVED_KTX_CALL, element) ?: return
             var node: EmitOrCallNode? = elementCall.emitOrCall
 
-            inputInstructions.add(generateCall(elementCall.getComposerCall))
+            elementCall.getComposerCall?.let { inputInstructions.add(generateCall(it)) }
 
             while (node != null) {
                 when (node) {

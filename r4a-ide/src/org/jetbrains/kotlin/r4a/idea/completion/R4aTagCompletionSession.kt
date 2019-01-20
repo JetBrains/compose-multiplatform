@@ -60,7 +60,7 @@ class R4aTagCompletionSession(
     private val nullableKtxCall = bindingContext.get(R4AWritableSlices.RESOLVED_KTX_CALL, elementExpr)
 
     private val emitUpperBounds by lazy {
-        if (nullableKtxCall == null) listOf(DefaultBuiltIns.Instance.any)
+        if (nullableKtxCall == null || nullableKtxCall.getComposerCall == null) listOf(DefaultBuiltIns.Instance.any)
         else nullableKtxCall.emitSimpleUpperBoundTypes
             .mapNotNull { it.constructor.declarationDescriptor as? ClassDescriptor }
     }
