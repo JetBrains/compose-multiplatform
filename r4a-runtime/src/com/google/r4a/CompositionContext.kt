@@ -42,7 +42,7 @@ abstract class CompositionContext {
             find(component)?.recomposeSync(component)
         }
 
-        fun find(view: View): Component? {
+        fun findRoot(view: View): Component? {
             var node: View? = view
             while (node != null) {
                 val cc = node.getTag(TAG_ROOT_COMPONENT) as? Component

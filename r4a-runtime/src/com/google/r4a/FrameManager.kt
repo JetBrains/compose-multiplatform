@@ -1,6 +1,7 @@
 package com.google.r4a
 
-import android.view.Choreographer
+import android.os.Handler
+import android.os.Looper
 import com.google.r4a.frames.open
 import com.google.r4a.frames.commit
 import com.google.r4a.frames.suspend
@@ -49,6 +50,8 @@ internal object FrameManager {
     private var invalidations = HashMap<WeakIdentity<Any>, MutableSet<RecomposeScope>>()
     private var removeCommitObserver: (() -> Unit)? = null
     private var compositions = WeakHashMap<CompositionContext, Boolean>()
+
+    private val handler by lazy { Handler(Looper.getMainLooper()) }
 
     fun ensureStarted() {
         if (!started) {
@@ -180,8 +183,8 @@ internal object FrameManager {
         open(readObserver = readObserver, writeObserver = writeObserver)
     }
 
-    private fun schedule(block: () -> Unit) {
-        Choreographer.getInstance().postFrameCallbackDelayed({ block() }, 0)
+    private inline fun schedule(crossinline block: () -> Unit) {
+        handler.post({ block() })
     }
 }
 
