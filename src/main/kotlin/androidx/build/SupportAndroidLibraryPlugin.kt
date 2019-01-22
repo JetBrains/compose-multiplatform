@@ -80,19 +80,12 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
 
             library.libraryVariants.all { libraryVariant ->
                 if (libraryVariant.getBuildType().getName().equals("debug")) {
-                    @Suppress("DEPRECATION")
-                    val javaCompile = libraryVariant.javaCompile
+                    val javaCompile = libraryVariant.javaCompileProvider.get()
                     if (supportLibraryExtension.failOnUncheckedWarnings) {
                         javaCompile.options.compilerArgs.add("-Xlint:unchecked")
                     }
                     if (supportLibraryExtension.failOnDeprecationWarnings) {
                         javaCompile.options.compilerArgs.add("-Xlint:deprecation")
-                    }
-                    // We don't want useMaxDepVersions to fail when it finds a warning because
-                    // if we introduce warnings to new libraries that were okay to use before,
-                    // we'd like to only display a warning and fix later.
-                    if (!project.rootProject.hasProperty("useMaxDepVersions")) {
-                        javaCompile.options.compilerArgs.add("-Werror")
                     }
                 }
             }

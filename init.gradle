@@ -75,7 +75,7 @@ def setupSubprojectsForBuildServer() {
                         def jarifyTask = project.tasks.create(
                                 name: "package${v.name.capitalize()}ClassFilesForCoverageReport",
                                 type: Jar) {
-                            from v.testedVariant.javaCompile.destinationDir
+                            from v.testedVariant.javaCompileProvider.get().destinationDir
                             exclude "**/R.class"
                             exclude "**/R\$*.class"
                             exclude "**/BuildConfig.class"
