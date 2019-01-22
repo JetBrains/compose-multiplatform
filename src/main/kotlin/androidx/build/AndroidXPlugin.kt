@@ -37,6 +37,7 @@ import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
 import org.gradle.api.DefaultTask
+import org.gradle.api.Task
 import org.gradle.api.JavaVersion.VERSION_1_7
 import org.gradle.api.JavaVersion.VERSION_1_8
 import org.gradle.api.Plugin
@@ -86,6 +87,7 @@ class AndroidXPlugin : Plugin<Project> {
                     val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
                     val compileJavaTask = project.properties["compileJava"] as JavaCompile
                     verifyDependencyVersionsTask.dependsOn(compileJavaTask)
+                    project.createCheckReleaseReadyTask(listOf(verifyDependencyVersionsTask))
                 }
                 is LibraryPlugin -> {
                     val extension = project.extensions.getByType<LibraryExtension>()
@@ -95,8 +97,19 @@ class AndroidXPlugin : Plugin<Project> {
                     project.configureVersionFileWriter(extension)
                     project.configureResourceApiChecks()
                     val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
-                    extension.libraryVariants.all {
-                        variant -> verifyDependencyVersionsTask.dependsOn(variant.javaCompiler)
+                    val checkNoWarningsTask = project.tasks.create(CHECK_NO_WARNINGS_TASK)
+                    project.createCheckReleaseReadyTask(listOf(verifyDependencyVersionsTask,
+                        checkNoWarningsTask))
+                    extension.libraryVariants.all { libraryVariant ->
+                        val javaCompileTask = libraryVariant
+                            .javaCompileProvider.get()
+                        verifyDependencyVersionsTask.dependsOn(javaCompileTask)
+                        checkNoWarningsTask.dependsOn(javaCompileTask)
+                        project.gradle.taskGraph.whenReady {
+                            if (it.hasTask(checkNoWarningsTask)) {
+                                javaCompileTask.options.compilerArgs.add("-Werror")
+                            }
+                        }
                     }
                 }
                 is AppPlugin -> {
@@ -302,6 +315,8 @@ class AndroidXPlugin : Plugin<Project> {
     companion object {
         const val BUILD_ON_SERVER_TASK = "buildOnServer"
         const val BUILD_TEST_APKS = "buildTestApks"
+        const val CHECK_RELEASE_READY_TASK = "checkReleaseReady"
+        const val CHECK_NO_WARNINGS_TASK = "checkNoWarnings"
     }
 }
 
@@ -331,6 +346,13 @@ private fun Project.createCheckResourceApiTask(): DefaultTask {
             CheckResourceApiTask::class.java) {
         newApiFile = getGenerateResourceApiFile()
         oldApiFile = File(project.projectDir, "api/res-${project.version}.txt")
+    }
+}
+
+private fun Project.createCheckReleaseReadyTask(taskList: List<Task>) {
+    val checkReleaseReadyTask = project.tasks.create(AndroidXPlugin.CHECK_RELEASE_READY_TASK)
+    for (task in taskList) {
+        checkReleaseReadyTask.dependsOn(task)
     }
 }
 
