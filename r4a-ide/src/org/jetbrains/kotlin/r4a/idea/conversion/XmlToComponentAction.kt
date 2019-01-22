@@ -126,6 +126,7 @@ class XmlToComponentAction : AnAction() {
                     }
                 }
             }
+            addR4aStarImport(ktFile)
         }
 
         private fun isAnyXmlFileSelected(project: Project, files: Array<VirtualFile>): Boolean {
