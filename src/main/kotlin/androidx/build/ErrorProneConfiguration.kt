@@ -45,7 +45,7 @@ fun Project.configureErrorProneForAndroid(variants: DomainObjectSet<out BaseVari
     variants.all { variant ->
         if (variant.buildType.name == BuilderConstants.DEBUG) {
             @Suppress("DEPRECATION")
-            val task = variant.javaCompile
+            val task = variant.javaCompileProvider.get()
 
             log.info("Configuring error-prone for ${task.path}")
             makeErrorProneTask(task, toolChain)
