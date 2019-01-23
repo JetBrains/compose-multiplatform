@@ -79,7 +79,6 @@ open class CheckApiCompatibilityTask : MetalavaTask() {
                 apiFile.toString(),
 
                 "--compatible-output=no",
-                "--omit-common-packages=yes",
                 "--input-kotlin-nulls=yes"
         )
         if (checkRestrictedApis) {

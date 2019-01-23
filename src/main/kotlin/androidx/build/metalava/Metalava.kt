@@ -36,7 +36,7 @@ import java.io.File
 object Metalava {
     private fun Project.createMetalavaConfiguration(): Configuration {
         return configurations.create("metalava") {
-            val dependency = dependencies.create("com.android:metalava:1.1.2-SNAPSHOT:shadow@jar")
+            val dependency = dependencies.create("com.android:metalava:1.2.5-SNAPSHOT:shadow@jar")
             it.dependencies.add(dependency)
         }
     }
