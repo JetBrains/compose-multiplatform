@@ -80,7 +80,12 @@ open class UpdateApiTask : DefaultTask() {
         if (!permitOverwriting) {
             // determine whether file contents is changing
             if (dest.exists() && source.readText() != dest.readText()) {
-                throw GradleException("Once an artifact has had a final release, its public API may no longer be modified. Did you mean to increment the library version first?")
+                val message = "Modifying the API definition for a previously released artifact having a final API version (version not ending in '-alpha') is not allowed.\n\n" +
+                        "Previously declared definition is $dest\n" +
+                        "Current generated   definition is $source\n\n" +
+                        "Did you mean to increment the library version first?\n\n" +
+                        "If you have reason to overwrite the API files for the previous release anyway, you can run `./gradlew updateApi -Pforce` to ignore this message"
+                throw GradleException(message)
             }
         }
 
