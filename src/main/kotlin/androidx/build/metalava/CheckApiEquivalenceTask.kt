@@ -59,29 +59,29 @@ open class CheckApiEquivalenceTask : DefaultTask() {
      */
     var checkRestrictedAPIs = false
 
-    /**
-     * Message to show on comparison failure of public API
-     */
-    var publicApiFailureMessage: String = "Public API definition has changed. Please run ./gradlew updateApi to confirm\n" +
-                "these changes are intentional by updating the public API definition."
-    /**
-     * Message to show on comparison failure of restricted API
-     */
-    var restrictedApiFailureMessage: String = "Restricted API definition (marked by the RestrictTo annotation) has changed. Please run ./gradlew updateApi to confirm\n" +
-                "these changes are intentional by updating the restricted API definition."
     @TaskAction
     fun exec() {
-        val publicApi1 = checkNotNull(builtApi?.publicApiFile) { "publicApi1 not set" }
-        val restrictedApi1 = checkNotNull(builtApi?.restrictedApiFile) { "restrictedApi1 not set" }
+        val truePublicDefinition = checkNotNull(builtApi?.publicApiFile) { "builtApi.publicApiFile not set" }
+        val trueRestrictedApi = checkNotNull(builtApi?.restrictedApiFile) { "builtApi.restrictedApiFile not set" }
         for (checkedInApi in checkedInApis) {
-            val publicApi2 = checkNotNull(checkedInApi?.publicApiFile) { "publicApi2 not set" }
-            val restrictedApi2 = checkNotNull(checkedInApi?.restrictedApiFile) { "restrictedApi2 not set" }
-            if (!FileUtils.contentEquals(publicApi1, publicApi2)) {
-                throw GradleException(publicApiFailureMessage)
+            val declaredPublicApi = checkNotNull(checkedInApi?.publicApiFile) { "checkedInApi.publicApiFile not set" }
+            val declaredRestrictedApi = checkNotNull(checkedInApi?.restrictedApiFile) { "checkedInApi.restrictedApiFile not set" }
+            if (!FileUtils.contentEquals(declaredPublicApi, truePublicDefinition)) {
+                val message = "Public API definition has changed.\n\n" +
+                        "Declared definition is $declaredPublicApi\n" +
+                        "True     definition is $truePublicDefinition\n\n" +
+                        "Please run `./gradlew updateApi` to confirm these changes are intentional by updating the " +
+                        "public API definition"
+                throw GradleException(message)
             }
             if (checkRestrictedAPIs) {
-                if (!FileUtils.contentEquals(restrictedApi1, restrictedApi2)) {
-                    throw GradleException(publicApiFailureMessage)
+                if (!FileUtils.contentEquals(declaredRestrictedApi, trueRestrictedApi)) {
+                    val message = "Restricted API definition (marked by the RestrictedTo annotation) has changed.\n\n" +
+                            "Declared definition is $declaredRestrictedApi\n" +
+                            "True     definition is $trueRestrictedApi\n" +
+                            "Please run `./gradlew updateApi` to confirm these changes are intentional by updating " +
+                            "the restricted API definition"
+                    throw GradleException(message)
                 }
             }
         }
