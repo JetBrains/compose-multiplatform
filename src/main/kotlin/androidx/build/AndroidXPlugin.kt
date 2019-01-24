@@ -100,6 +100,7 @@ class AndroidXPlugin : Plugin<Project> {
                     project.configureResourceApiChecks()
                     val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
                     val checkNoWarningsTask = project.tasks.register(CHECK_NO_WARNINGS_TASK)
+                    project.createDumpDependenciesTask()
                     project.createCheckReleaseReadyTask(listOf(verifyDependencyVersionsTask,
                         checkNoWarningsTask))
                     extension.libraryVariants.all { libraryVariant ->
@@ -143,6 +144,7 @@ class AndroidXPlugin : Plugin<Project> {
     private fun Project.configureRootProject() {
         val buildOnServerTask = tasks.create(BUILD_ON_SERVER_TASK)
         val buildTestApksTask = tasks.create(BUILD_TEST_APKS)
+        project.configureDependencyGraphFileTask()
         var projectModules = ConcurrentHashMap<String, String>()
         project.extra.set("projects", projectModules)
         tasks.all { task ->
@@ -318,6 +320,29 @@ class AndroidXPlugin : Plugin<Project> {
             TaskProvider<VerifyDependencyVersionsTask> {
         return project.tasks.register("verifyDependencyVersions",
                 VerifyDependencyVersionsTask::class.java)
+    }
+
+    // Task that creates a json file of a project's dependencies
+    private fun Project.createDumpDependenciesTask():
+            TaskProvider<ListProjectDependencyVersionsTask> {
+        return project.tasks.register("dumpDependencies",
+            ListProjectDependencyVersionsTask::class.java)
+    }
+
+    // Task that creates a json file of the AndroidX dependency graph (all projects)
+    private fun Project.configureDependencyGraphFileTask() {
+        project.tasks.register("createDependencyGraphFile",
+            DependencyGraphFileTask::class.java) { depGraphTask ->
+            subprojects { project ->
+                project.tasks.all { dumpDepTask ->
+                    if ("dumpDependencies" == dumpDepTask.name &&
+                        dumpDepTask is ListProjectDependencyVersionsTask) {
+                        depGraphTask.dependsOn(dumpDepTask)
+                        depGraphTask.projectDepDumpFiles.add(dumpDepTask.outputDepFile)
+                    }
+                }
+            }
+        }
     }
 
     companion object {
