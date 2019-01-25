@@ -102,7 +102,7 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.LIFECYCLE, "lifecycle-compiler")
     prebuilts(LibraryGroups.LIFECYCLE, "2.1.0-alpha01")
     prebuilts(LibraryGroups.ARCH_CORE, "2.0.0")
-    prebuilts(LibraryGroups.PAGING, "2.1.0-beta01")
+    prebuilts(LibraryGroups.PAGING, "2.1.0")
     ignore(LibraryGroups.NAVIGATION, "navigation-testing")
     prebuilts(LibraryGroups.NAVIGATION, "1.0.0-alpha11")
     prebuilts(LibraryGroups.WORKMANAGER, "1.0.0-beta03")
