@@ -41,6 +41,7 @@ object LibraryGroups {
     const val DRAWERLAYOUT = "androidx.drawerlayout"
     const val DYNAMICANIMATION = "androidx.dynamicanimation"
     const val EMOJI = "androidx.emoji"
+    const val ENTERPRISE = "androidx.enterprise"
     const val EXIFINTERFACE = "androidx.exifinterface"
     const val FRAGMENT = "androidx.fragment"
     const val GRIDLAYOUT = "androidx.gridlayout"
