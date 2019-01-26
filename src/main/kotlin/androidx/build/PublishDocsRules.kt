@@ -25,8 +25,8 @@ import androidx.build.Strategy.Prebuilts
 import androidx.build.Strategy.TipOfTree
 
 val RELEASE_RULE = docsRules("public", false) {
-    prebuilts(LibraryGroups.ACTIVITY, "1.0.0-alpha03")
-    prebuilts(LibraryGroups.ANNOTATION, "1.0.1")
+    prebuilts(LibraryGroups.ACTIVITY, "1.0.0-alpha04")
+    prebuilts(LibraryGroups.ANNOTATION, "1.1.0-alpha01")
     ignore(LibraryGroups.APPCOMPAT, "appcompat-resources")
     prebuilts(LibraryGroups.APPCOMPAT, "1.1.0-alpha01")
     prebuilts(LibraryGroups.ASYNCLAYOUTINFLATER, "1.0.0")
@@ -37,7 +37,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.CAR, "car", "1.0.0-alpha5")
             .addStubs("car/stubs/android.car.jar")
     prebuilts(LibraryGroups.CARDVIEW, "1.0.0")
-    prebuilts(LibraryGroups.COLLECTION, "1.1.0-alpha01")
+    prebuilts(LibraryGroups.COLLECTION, "1.1.0-alpha02")
     prebuilts(LibraryGroups.CONCURRENT, "1.0.0-alpha03")
     prebuilts(LibraryGroups.CONTENTPAGER, "1.0.0")
     prebuilts(LibraryGroups.COORDINATORLAYOUT, "1.1.0-alpha01")
@@ -55,7 +55,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.GRIDLAYOUT, "1.0.0")
     prebuilts(LibraryGroups.HEIFWRITER, "1.0.0")
     prebuilts(LibraryGroups.INTERPOLATOR, "1.0.0")
-    prebuilts(LibraryGroups.LEANBACK, "1.0.0")
+    prebuilts(LibraryGroups.LEANBACK, "1.1.0-alpha01")
     prebuilts(LibraryGroups.LEGACY, "1.0.0")
     prebuilts(LibraryGroups.LOADER, "1.1.0-alpha01")
     prebuilts(LibraryGroups.LOCALBROADCASTMANAGER, "1.1.0-alpha01")
@@ -101,7 +101,7 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.LIFECYCLE, "lifecycle-livedata-ktx")
     ignore(LibraryGroups.LIFECYCLE, "lifecycle-livedata-core-ktx")
     ignore(LibraryGroups.LIFECYCLE, "lifecycle-compiler")
-    prebuilts(LibraryGroups.LIFECYCLE, "2.1.0-alpha01")
+    prebuilts(LibraryGroups.LIFECYCLE, "2.1.0-alpha02")
     prebuilts(LibraryGroups.ARCH_CORE, "2.0.0")
     prebuilts(LibraryGroups.PAGING, "2.1.0")
     ignore(LibraryGroups.NAVIGATION, "navigation-testing")
