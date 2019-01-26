@@ -3,6 +3,7 @@ package com.google.r4a
 import android.app.Activity
 import android.os.Bundle
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import junit.framework.TestCase
@@ -162,7 +163,8 @@ class EffectsTests : TestCase() {
         val logHistory = mutableListOf<String>()
         fun log(x: String) = logHistory.add(x)
 
-        @Composable fun Unmountable() {
+        @Composable
+        fun Unmountable() {
             log("Unmountable:start")
             +onCommit {
                 log("onCommit")
@@ -221,7 +223,8 @@ class EffectsTests : TestCase() {
         val logHistory = mutableListOf<String>()
         fun log(x: String) = logHistory.add(x)
 
-        @Composable fun Unmountable() {
+        @Composable
+        fun Unmountable() {
             +onCommit {
                 log("onCommit:a2")
                 onDispose {
@@ -410,7 +413,8 @@ class EffectsTests : TestCase() {
         val logHistory = mutableListOf<String>()
         fun log(x: String) = logHistory.add(x)
 
-        @Composable fun Sub() {
+        @Composable
+        fun Sub() {
             +onCommit {
                 val y = c++
                 log("commit c:$y")
@@ -470,7 +474,8 @@ class EffectsTests : TestCase() {
         val Foo = Ambient.of<String>()
         var current = "Hello World"
 
-        @Composable fun Bar() {
+        @Composable
+        fun Bar() {
             composer.call(
                 21323,
                 { true },
@@ -504,6 +509,62 @@ class EffectsTests : TestCase() {
         }.then { activity ->
             val helloText = activity.findViewById(tv1Id) as TextView
             assertEquals(current, helloText.text)
+        }
+    }
+
+    @Test
+    fun testAmbient2() {
+
+        val MyAmbient = Ambient<Double>("Hello") { throw Exception("not set") }
+
+        var requestRecompose: (() -> Unit)? = null
+        var buttonCreated = false
+
+        fun SimpleComposable2() {
+            with(composer) {
+                consumeAmbient(MyAmbient) { value ->
+                    emit(534, { context -> TextView(context) }, {
+                        set("$value") { text = it }
+                    })
+                }
+            }
+        }
+
+        fun SimpleComposable() {
+            composer.call(531, {
+                Recompose().apply {
+                    body = { recompose ->
+                        requestRecompose = recompose
+                        composer.provideAmbient(MyAmbient, Math.random()) {
+                            composer.call(523, { false }) { SimpleComposable2() }
+                            composer.emitView(525, { context -> Button(context).also { buttonCreated = true } })
+                        }
+                    }
+                }
+            }, { true }) { f -> f.invoke() }
+        }
+
+        fun Root() {
+            with(composer) {
+                call(547, { false }) {
+                    SimpleComposable()
+                }
+            }
+        }
+
+        compose {
+            with(composer) {
+                call(556, { false }) {
+                    Root()
+                }
+            }
+        }.then {
+            assertTrue("Expected button to be created", buttonCreated)
+            buttonCreated = false
+            requestRecompose?.invoke()
+        }.then {
+            assertFalse("Expected button to not be recreated", buttonCreated)
+            requestRecompose?.invoke()
         }
     }
 

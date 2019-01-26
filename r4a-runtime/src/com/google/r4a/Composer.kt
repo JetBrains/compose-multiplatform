@@ -827,8 +827,8 @@ open class Composer<N>(
     /**
      * Exit any groups that were entered until a sibling of maxLocation is reached.
      */
-    private fun recordExits(maxLocation: Int) {
-        while (!entersStack.isEmpty()) {
+    private fun recordExits(maxLocation: Int, minStack: Int) {
+        while (entersStack.size > minStack) {
             skipToGroupContaining(maxLocation)
             if (slots.isGroupEnd)
                 end(entersStack.pop())
@@ -840,12 +840,13 @@ open class Composer<N>(
         var recomposed = false
 
         var firstInRange = invalidations.firstInRange(start, end)
+        val enterStackSize = entersStack.size
         while (firstInRange != null) {
             val location = firstInRange.location
 
             invalidations.removeLocation(location)
 
-            recordExits(location)
+            recordExits(location, enterStackSize)
             recordEnters(location)
 
             when (firstInRange) {
@@ -863,7 +864,7 @@ open class Composer<N>(
         }
 
         if (recomposed) {
-            recordExits(end)
+            recordExits(end, enterStackSize)
         } else {
             // No recompositions were requested in the range, skip it.
             recordSkip(START_GROUP)
