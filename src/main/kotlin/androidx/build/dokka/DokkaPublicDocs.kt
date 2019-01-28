@@ -56,8 +56,12 @@ object DokkaPublicDocs {
         "androidx.work.impl.utils.futures",
         "androidx.work.impl.utils.taskexecutor")
 
+    fun tryGetRunnerProject(project: Project): Project? {
+        return project.rootProject.findProject(":docs-runner")
+    }
+
     fun getRunnerProject(project: Project): Project {
-        return project.rootProject.project(":docs-runner")
+        return tryGetRunnerProject(project)!!
     }
 
     fun getDocsTask(project: Project): DokkaTask {
@@ -97,6 +101,9 @@ object DokkaPublicDocs {
         project: Project,
         extension: SupportLibraryExtension
     ) {
+        if (tryGetRunnerProject(project) == null) {
+            return
+        }
         val projectSourcesLocationType = RELEASE_RULE.resolve(extension)?.strategy
         if (projectSourcesLocationType is Prebuilts) {
             val dependency = projectSourcesLocationType.dependency(extension)
