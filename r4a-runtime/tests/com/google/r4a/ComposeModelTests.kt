@@ -14,6 +14,7 @@ import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
+import org.robolectric.shadows.ShadowChoreographer
 
 val PRESIDENT_NAME_1 = "George Washington"
 val PRESIDENT_AGE_1 = 57
@@ -229,6 +230,45 @@ class ModelViewTests : TestCase() {
             president.name = PRESIDENT_NAME_16
         }.then { activity ->
             assertEquals(PRESIDENT_NAME_16, (activity.findViewById(tvName) as TextView).text)
+        }
+    }
+
+    @Test
+    fun testModelUpdatesNextFrameVisibility(): Unit = isolated {
+        val president = Person(PRESIDENT_NAME_1, PRESIDENT_AGE_1)
+        val tvName = 204
+
+        fun ViewComposition.display(person: Person) {
+            call(167, { true }) {
+                Observe {
+                    emit(93, { context -> TextView(context).apply { id = tvName } }) { set(person.name) { text = it } }
+                    emit(94, { context -> TextView(context) }) { set(person.age) { text = it.toString() } }
+                }
+                if (person.name == PRESIDENT_NAME_16) {
+                    Observe {
+                        emit(211, { context -> TextView(context) }) { set(person.name) { text = it } }
+                        emit(211, { context -> TextView(context) }) { set(person.age) { text = it.toString() } }
+                    }
+                }
+            }
+        }
+
+        compose {
+            call(219, { true }) {
+                Observe {
+                    display(president)
+                }
+            }
+        }.then { activity ->
+            assertEquals(PRESIDENT_NAME_1, (activity.findViewById(tvName) as TextView).text)
+            //schedule commit and recompose by this change, all for next frame
+            president.name = PRESIDENT_NAME_16
+            //check that changes aren't there yet
+            assertEquals(PRESIDENT_NAME_1, (activity.findViewById(tvName) as TextView).text)
+                ShadowChoreographer.getInstance().postFrameCallback {
+                    //after one frame we should see changes
+                    assertEquals(PRESIDENT_NAME_16, (activity.findViewById(tvName) as TextView).text)
+                }
         }
     }
 

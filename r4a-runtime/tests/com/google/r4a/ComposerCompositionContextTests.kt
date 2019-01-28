@@ -134,53 +134,11 @@ class ComposerCompositionContextTests: ComposerComposeTestCase() {
     fun testRecompose() {
         val counter = Counter()
 
-        class B : Component() {
-            var id: Int = 0
-            override fun compose() {
-                counter.inc("$id")
-
-                with(composer) {
-                    // <TextView id={id} onClickListener={{ recomposeSync() }} />
-                    emitView(24, ::TextView) {
-                        set(id) { id = it }
-                        set(View.OnClickListener { recompose() }) { setOnClickListener(it) }
-                    }
-                }
-            }
-        }
-
-        class A : Component() {
-            override fun compose() {
-                counter.inc("A")
-                // <LinearLayout onClickListener={{ recompose() }} id={99}>
-                //     <B id={100} />
-                //     <B id={101} />
-                //     <B id={102} />
-                // </LinearLayout>
-
-                with(composer) {
-
-                    // <LinearLayout onClickListener={{ recompose() }} id={99}>
-                    emitViewGroup(897, ::LinearLayout, {
-                        set(99) { id = it }
-                        set(View.OnClickListener { recompose() }) { setOnClickListener(it) }
-                    }) {
-                        for (id in 100..102) {
-                            // <B key={id} id={id} />
-                            emitComponent(878983, id, ::B) { f ->
-                                set(id) { f.id = it }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-
         compose {
             // <A />
-            it.emitComponent(123, ::A)
-
+            it.emitComponent(123) {
+                RecomposeTestComponents.A(counter, RecomposeTestComponents.ClickAction.Recompose)
+            }
         }.then { _, _, _, activity ->
             // everything got rendered once
             assertEquals(1, counter["A"])
@@ -229,54 +187,20 @@ class ComposerCompositionContextTests: ComposerComposeTestCase() {
     fun testRecomposeSync() {
         val counter = Counter()
 
-        class B : Component() {
-            var id: Int = 0
-            override fun compose() {
-                counter.inc("$id")
-
-                with(composer) {
-                    // <TextView id={id} onClickListener={{ recomposeSync() }} />
-                    emitView(24, ::TextView) {
-                        set(id) { id = it }
-                        set(View.OnClickListener { recomposeSync() }) { setOnClickListener(it) }
-                    }
-                }
-            }
-        }
-
-        class A : Component() {
-            override fun compose() {
-                counter.inc("A")
-                // <LinearLayout>
-                //     <B id={100} />
-                //     <B id={101} />
-                //     <B id={102} />
-                // </LinearLayout>
-
-                with(composer) {
-                    // <LinearLayout>
-                    emitViewGroup(897, ::LinearLayout, {}) {
-                        for (id in 100..102) {
-                            // <B key={id} id={id} />
-                            emitComponent(878983, id, ::B) { f ->
-                                set(id) { f.id = it }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-
         compose {
             // <A />
-            it.emitComponent(123, ::A)
+            it.emitComponent(123) {
+                RecomposeTestComponents.A(counter, RecomposeTestComponents.ClickAction.RecomposeSync)
+            }
         }.then { _, _, _, activity ->
             // everything got rendered once
             assertEquals(1, counter["A"])
             assertEquals(1, counter["100"])
             assertEquals(1, counter["101"])
             assertEquals(1, counter["102"])
+
+            //stop the time so only sync recomposes will take place
+            RuntimeEnvironment.getMasterScheduler().pause()
 
             (activity.findViewById(100) as TextView).performClick()
 
@@ -285,6 +209,202 @@ class ComposerCompositionContextTests: ComposerComposeTestCase() {
             assertEquals(2, counter["100"])
             assertEquals(1, counter["101"])
             assertEquals(1, counter["102"])
+
+            //unpause to see if nothing is scheduled during recomposeSync()
+            RuntimeEnvironment.getMasterScheduler().unPause()
+
+            assertEquals(1, counter["A"])
+            assertEquals(2, counter["100"])
+            assertEquals(1, counter["101"])
+            assertEquals(1, counter["102"])
+
+            RuntimeEnvironment.getMasterScheduler().pause()
+            //try to recompose the parent, but ensure that even if we tap textView several times, it's all got recomposed once
+            (activity.findViewById(99) as LinearLayout).performClick()
+            (activity.findViewById(100) as TextView).performClick()
+            (activity.findViewById(100) as TextView).performClick()
+            (activity.findViewById(100) as TextView).performClick()
+
+            // only the twice clicked view got rerendered twice
+            assertEquals(2, counter["A"])
+            // this should be 5, as it gets recomposed synchronously 3 times due to TV taps
+            assertEquals(5, counter["100"])
+            assertEquals(1, counter["101"])
+            assertEquals(1, counter["102"])
+
+            RuntimeEnvironment.getMasterScheduler().unPause()
+        }
+    }
+
+    @Test
+    fun testRootRecompose() {
+        val counter = Counter()
+
+        val listener = RecomposeTestComponents.ClickAction.PerformOnView {
+            CompositionContext.findRoot(it)?.let {
+                CompositionContext.recompose(it)
+            }
+        }
+
+        compose {
+            // <A />
+            it.emitComponent(123) {
+                RecomposeTestComponents.A(counter, listener)
+            }
+        }.then { _, root, _, activity ->
+            // everything got rendered once
+            assertEquals(1, counter["A"])
+            assertEquals(1, counter["100"])
+            assertEquals(1, counter["101"])
+            assertEquals(1, counter["102"])
+
+            // Robolectric will by default just run everything sync. pause() is needed to emulate delays
+            RuntimeEnvironment.getMasterScheduler().pause()
+
+            (activity.findViewById(100) as TextView).performClick()
+            (activity.findViewById(102) as TextView).performClick()
+
+            // nothing should happen synchronously
+            assertEquals(1, counter["A"])
+            assertEquals(1, counter["100"])
+            assertEquals(1, counter["101"])
+            assertEquals(1, counter["102"])
+
+            RuntimeEnvironment.getMasterScheduler().unPause()
+
+            // as we recompose ROOT on every tap, only root(and LinearLayout) counter should we increased
+            // once, because two clicks layed to one frame
+            assertEquals(2, counter["A"])
+            assertEquals(1, counter["100"])
+            assertEquals(1, counter["101"])
+            assertEquals(1, counter["102"])
+
+            RuntimeEnvironment.getMasterScheduler().pause()
+
+            (activity.findViewById(99) as LinearLayout).performClick()
+            (activity.findViewById(102) as TextView).performClick()
+
+            RuntimeEnvironment.getMasterScheduler().unPause()
+            RuntimeEnvironment.getMasterScheduler().advanceToLastPostedRunnable()
+
+            //again, no matter what we tappes, we want to recompose root, so LinearLayout's counter got increased
+            assertEquals(3, counter["A"])
+            assertEquals(1, counter["100"])
+            assertEquals(1, counter["101"])
+            assertEquals(1, counter["102"])
+        }
+    }
+
+    @Test
+    fun testRootRecomposeSync() {
+        val counter = Counter()
+
+        val listener = RecomposeTestComponents.ClickAction.PerformOnView {
+            CompositionContext.findRoot(it)?.let {
+                CompositionContext.recomposeSync(it)
+            }
+        }
+        compose {
+            // <A />
+            it.emitComponent(123) {
+                RecomposeTestComponents.A(counter, listener)
+            }
+        }.then { _, root, _, activity ->
+            // everything got rendered once
+            assertEquals(1, counter["A"])
+            assertEquals(1, counter["100"])
+            assertEquals(1, counter["101"])
+            assertEquals(1, counter["102"])
+
+            //stop the time so only sync recomposes will take place
+            RuntimeEnvironment.getMasterScheduler().pause()
+
+            (activity.findViewById(100) as TextView).performClick()
+
+            //important! as we recompose Root every time
+            // no matter what we clicked, root (and LinearLayout) gets rerendered
+            assertEquals(2, counter["A"])
+            assertEquals(1, counter["100"])
+            assertEquals(1, counter["101"])
+            assertEquals(1, counter["102"])
+
+            (activity.findViewById(99) as LinearLayout).performClick()
+
+            assertEquals(3, counter["A"])
+            assertEquals(1, counter["100"])
+            assertEquals(1, counter["101"])
+            assertEquals(1, counter["102"])
+
+            RuntimeEnvironment.getMasterScheduler().unPause()
+            RuntimeEnvironment.getMasterScheduler().advanceToLastPostedRunnable()
+            //make sure nothing has been scheduled inside recomposeSync()
+            assertEquals(3, counter["A"])
+            assertEquals(1, counter["100"])
+            assertEquals(1, counter["101"])
+            assertEquals(1, counter["102"])
+        }
+    }
+
+    //components for testing recompose behavior above
+    private object RecomposeTestComponents {
+        sealed class ClickAction {
+            object Recompose : ClickAction()
+            object RecomposeSync : ClickAction()
+            class PerformOnView(val action: (View) -> Unit) : ClickAction()
+        }
+
+        class B(val counter: Counter, val listener: ClickAction) : Component() {
+            var id: Int = 0
+            override fun compose() {
+                counter.inc("$id")
+
+                with(composer) {
+                    // <TextView id={id} onClickListener={{ clickAction() }} />
+                    emitView(24, ::TextView) {
+                        set(id) { id = it }
+                        set(View.OnClickListener {
+                            when (listener) {
+                                is ClickAction.Recompose -> recompose()
+                                is ClickAction.RecomposeSync -> recomposeSync()
+                                is ClickAction.PerformOnView -> listener.action.invoke(it)
+                            }
+                        }) { setOnClickListener(it) }
+                    }
+                }
+            }
+        }
+
+        class A(val counter: Counter, val listener: ClickAction) : Component() {
+            override fun compose() {
+                counter.inc("A")
+                // <LinearLayout onClickListener={{ clickAction() }} id={99}>
+                //     <B id={100} />
+                //     <B id={101} />
+                //     <B id={102} />
+                // </LinearLayout>
+
+                with(composer) {
+
+                    // <LinearLayout id={99} onClickListener={{ clickAction() }}/>
+                    emitViewGroup(897, ::LinearLayout, {
+                        set(99) { id = it }
+                        set(View.OnClickListener {
+                            when (listener) {
+                                is ClickAction.Recompose -> recompose()
+                                is ClickAction.RecomposeSync -> recomposeSync()
+                                is ClickAction.PerformOnView -> listener.action.invoke(it)
+                            }
+                        }) { setOnClickListener(it) }
+                    }) {
+                        for (id in 100..102) {
+                            // <B key={id} id={id} />
+                            emitComponent(878983, id, { B(counter, listener) }) { f ->
+                                set(id) { f.id = it }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
