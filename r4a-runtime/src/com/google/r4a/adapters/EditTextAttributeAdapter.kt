@@ -10,35 +10,36 @@ import com.google.r4a.annotations.RequiresOneOf
 
 private val key = tagKey("EditTextInputController")
 
-private fun EditText.getController(): EditTextInputController {
-    var controller = getTag(key) as? EditTextInputController
-    if (controller == null) {
-        controller = EditTextInputController(this)
-        setTag(key, controller)
-        addTextChangedListener(controller)
+private val EditText.controller: EditTextInputController
+    get() {
+        var controller = getTag(key) as? EditTextInputController
+        if (controller == null) {
+            controller = EditTextInputController(this)
+            setTag(key, controller)
+            addTextChangedListener(controller)
+        }
+        return controller
     }
-    return controller
-}
 
 @ConflictsWith("onTextChangedListener")
 @RequiresOneOf("controlledText")
 fun EditText.setOnTextChange(onTextChange: Function1<String, Unit>) {
-    getController().onTextChangedString = onTextChange
+    controller.onControlledTextChanged = onTextChange
 }
 
 @ConflictsWith("onTextChangedListener")
 fun EditText.setOnTextChanged(onTextChanged: Function4<CharSequence?, Int, Int, Int, Unit>) {
-    getController().onTextChangedCharSequence = onTextChanged
+    controller.onTextChangedCharSequence = onTextChanged
 }
 
 @ConflictsWith("onTextChangedListener")
 fun EditText.setOnAfterTextChanged(onAfterTextChanged: Function1<Editable?, Unit>) {
-    getController().onAfterTextChanged = onAfterTextChanged
+    controller.onAfterTextChanged = onAfterTextChanged
 }
 
 @ConflictsWith("onTextChangedListener")
 fun EditText.setOnBeforeTextChanged(onBeforeTextChanged: Function4<CharSequence?, Int, Int, Int, Unit>) {
-    getController().onBeforeTextChanged = onBeforeTextChanged
+    controller.onBeforeTextChanged = onBeforeTextChanged
 }
 
 
@@ -49,6 +50,6 @@ fun EditText.setOnTextChangedListener(onTextChangedListener: TextWatcher) {
 
 @ConflictsWith("text")
 @RequiresOneOf("onTextChange")
-fun EditText.setControlledText(value: CharSequence) {
-    getController().setValueIfNeeded(value.toString())
+fun EditText.setControlledText(value: String) {
+    controller.setValueIfNeeded(value)
 }

@@ -42,6 +42,8 @@ internal class ComposerCompositionContext(val root: Any, private val rootCompone
         recomposePending()
     }
 
+    private val postRecomposeListeners = mutableListOf<PostRecomposeListener>()
+
     private fun recomposePending() {
         if (isComposing) return
         val prev = CompositionContext.current
@@ -50,6 +52,15 @@ internal class ComposerCompositionContext(val root: Any, private val rootCompone
             CompositionContext.current = this
             composer.recompose()
             composer.applyChanges()
+            val listeners = postRecomposeListeners.toList()
+            postRecomposeListeners.clear()
+            listeners.forEach {
+                try {
+                    it.onPostRecompose()
+                } catch (_: Throwable) {
+                    //TODO(malkov): log error
+                }
+            }
         } finally {
             CompositionContext.current = prev
             isComposing = false
@@ -200,5 +211,13 @@ internal class ComposerCompositionContext(val root: Any, private val rootCompone
 
     override fun <T> getAmbient(key: Ambient<T>): T {
         return composer.parentAmbient(key)
+    }
+
+    override fun addPostRecomposeListener(l: PostRecomposeListener) {
+        postRecomposeListeners.add(l)
+    }
+
+    override fun removePostRecomposeListener(l: PostRecomposeListener) {
+        postRecomposeListeners.remove(l)
     }
 }

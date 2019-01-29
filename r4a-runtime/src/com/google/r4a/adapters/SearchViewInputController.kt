@@ -13,10 +13,10 @@ class SearchViewInputController(view: SearchView) : InputController<SearchView, 
     var onSubmit: Function1<String, Unit>? = null
 
     override fun onQueryTextChange(query: String?): Boolean {
+        prepareForChange(query ?: "")
         onQueryChange?.invoke(query ?: "")
         // TODO(lmr): we may only want to call this if onQueryChange isn't set, which seems like a reasonable
         // thing for people to do
-        afterChangeEvent(query ?: "")
         return onQueryChange != null // NOTE(lmr): I'm not sure if this is the right thing to do here
     }
 

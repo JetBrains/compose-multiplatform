@@ -8,24 +8,25 @@ import com.google.r4a.annotations.RequiresOneOf
 
 private val key = tagKey("AdapterViewInputController")
 
-private fun AdapterView<*>.getController(): AdapterViewInputController {
-    var listener = getTag(key) as? AdapterViewInputController
-    if (listener == null) {
-        listener = AdapterViewInputController(this)
-        setTag(key, listener)
-        onItemSelectedListener = listener
+private val AdapterView<*>.controller: AdapterViewInputController
+    get() {
+        var listener = getTag(key) as? AdapterViewInputController
+        if (listener == null) {
+            listener = AdapterViewInputController(this)
+            setTag(key, listener)
+            onItemSelectedListener = listener
+        }
+        return listener
     }
-    return listener
-}
 
 @RequiresOneOf("controlledSelectedIndex")
 @ConflictsWith("onItemSelectedListener")
 fun AdapterView<*>.setOnSelectedIndexChange(listener: (Int) -> Unit) {
-    getController().onSelectedIndexChange = listener
+    controller.onSelectedIndexChange = listener
 }
 
 @RequiresOneOf("onSelectedIndexChange")
 @ConflictsWith("selection")
 fun AdapterView<*>.setControlledSelectedIndex(selectedIndex: Int) {
-    getController().setValueIfNeeded(selectedIndex)
+    controller.setValueIfNeeded(selectedIndex)
 }

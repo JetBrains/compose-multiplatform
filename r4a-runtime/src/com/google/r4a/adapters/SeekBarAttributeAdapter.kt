@@ -8,36 +8,37 @@ import com.google.r4a.annotations.RequiresOneOf
 
 private val key = tagKey("SeekBarInputController")
 
-private fun SeekBar.getController(): SeekBarInputController {
-    var controller = getTag(key) as? SeekBarInputController
-    if (controller == null) {
-        controller = SeekBarInputController(this)
-        setTag(key, controller)
-        setOnSeekBarChangeListener(controller)
+private val SeekBar.controller: SeekBarInputController
+    get() {
+        var controller = getTag(key) as? SeekBarInputController
+        if (controller == null) {
+            controller = SeekBarInputController(this)
+            setTag(key, controller)
+            setOnSeekBarChangeListener(controller)
+        }
+        return controller
     }
-    return controller
-}
 
 @RequiresOneOf("controlledProgress")
 @ConflictsWith("onSeekBarChangeListener")
 fun SeekBar.setOnProgressChange(onProgressChange: Function1<Int, Unit>) {
-    getController().onProgressChange = onProgressChange
+    controller.onProgressChange = onProgressChange
 }
 
 @ConflictsWith("onSeekBarChangeListener")
 fun SeekBar.setOnStartTrackingTouch(onStartTrackingTouch: Function0<Unit>) {
-    getController().onStartTrackingTouch = onStartTrackingTouch
+    controller.onStartTrackingTouch = onStartTrackingTouch
 }
 
 @ConflictsWith("onSeekBarChangeListener")
 fun SeekBar.setOnStopTrackingTouch(onStopTrackingTouch: Function0<Unit>) {
-    getController().onStopTrackingTouch = onStopTrackingTouch
+    controller.onStopTrackingTouch = onStopTrackingTouch
 }
 
 @RequiresOneOf("onProgressChange")
 @ConflictsWith("progress")
 fun SeekBar.setControlledProgress(progress: Int) {
-    getController().setValueIfNeeded(progress)
+    controller.setValueIfNeeded(progress)
 }
 
 //@RequiresApi(26)

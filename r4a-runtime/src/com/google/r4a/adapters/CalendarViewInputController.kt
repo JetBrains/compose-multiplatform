@@ -16,7 +16,10 @@ class CalendarViewInputController(view: CalendarView) : InputController<Calendar
         val cal = Calendar.getInstance()
         cal.set(year, month, dayOfMonth)
         val date = cal.timeInMillis
+        //view.getDate() returns incorrect date even if it shows in UI correctly, so update date here manually
+        //see bug : b/113224600
+        x?.date = date
+        prepareForChange(date)
         onDateChange?.invoke(date)
-        afterChangeEvent(date)
     }
 }

@@ -15,21 +15,22 @@ import android.view.inputmethod.EditorInfo
 import com.google.r4a.*
 import com.google.r4a.examples.explorerapp.common.data.AuthenticationService
 
-class SignupScreen: Component() {
-    private var username: String = ""
-    private var password: String = ""
-    private var isLoading: Boolean = false
+@Model
+private class SignupModel(var username: String = "", var password: String = "", var isLoading: Boolean = false)
+
+class SignupScreen : Component() {
+
+    private val model = SignupModel()
 
     private fun onSubmit(authentication: AuthenticationService) {
-        authentication.signup(username, password)  { _, _ ->
+        authentication.signup(model.username, model.password) { _, _ ->
             // Nothing to do
         }
-        isLoading = true
-        recompose()
+        model.isLoading = true
     }
 
     override fun compose() {
-        val buttonEnabled = username.isNotEmpty() && password.isNotEmpty()
+        val buttonEnabled = model.username.isNotEmpty() && model.password.isNotEmpty()
         <ScrollView
             layoutWidth=MATCH_PARENT
             layoutHeight=MATCH_PARENT
@@ -45,8 +46,7 @@ class SignupScreen: Component() {
                     layoutHeight=160.dp
                     layoutGravity=Gravity.CENTER_HORIZONTAL
                     marginBottom=24.dp
-                    imageResource=R.drawable.reddit_verticallockup_onwhite
-                />
+                    imageResource=R.drawable.reddit_verticallockup_onwhite />
                 <TextInputLayout
                     layoutWidth=MATCH_PARENT
                     layoutHeight=WRAP_CONTENT
@@ -58,10 +58,9 @@ class SignupScreen: Component() {
                         textSize=15.sp
                         hint="Username"
                         imeOptions=EditorInfo.IME_ACTION_NEXT
-                        controlledText=username
+                        controlledText=model.username
                         onTextChange={
-                            username = it
-                            recomposeSync()
+                            model.username = it
                         }
 //                        singleLine=true
                     />
@@ -80,10 +79,9 @@ class SignupScreen: Component() {
                             hint="Password"
                             imeOptions=EditorInfo.IME_ACTION_DONE
                             inputType=InputType.TYPE_TEXT_VARIATION_PASSWORD
-                            controlledText=password
+                            controlledText=model.password
                             onTextChange={
-                                password = it
-                                recomposeSync()
+                                model.password = it
                             }
 //                          transformationMethod={PasswordTransformationMethod.getInstance()}
 //                            singleLine=true

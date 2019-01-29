@@ -8,24 +8,25 @@ import com.google.r4a.annotations.RequiresOneOf
 
 private val key = tagKey("CalendarViewInputController")
 
-private fun CalendarView.getController(): CalendarViewInputController {
-    var controller = getTag(key) as? CalendarViewInputController
-    if (controller == null) {
-        controller = CalendarViewInputController(this)
-        setTag(key, controller)
-        setOnDateChangeListener(controller)
+private val CalendarView.controller: CalendarViewInputController
+    get() {
+        var controller = getTag(key) as? CalendarViewInputController
+        if (controller == null) {
+            controller = CalendarViewInputController(this)
+            setTag(key, controller)
+            setOnDateChangeListener(controller)
+        }
+        return controller
     }
-    return controller
-}
 
 @RequiresOneOf("controlledDate")
 @ConflictsWith("onDateChangeListener")
 fun CalendarView.setOnDateChange(onDateChange: (Long) -> Unit) {
-    getController().onDateChange = onDateChange
+    controller.onDateChange = onDateChange
 }
 
 @ConflictsWith("date")
 @RequiresOneOf("onDateChange")
 fun CalendarView.setControlledDate(date: Long) {
-    getController().setValueIfNeeded(date)
+    controller.setValueIfNeeded(date)
 }
