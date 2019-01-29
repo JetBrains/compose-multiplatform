@@ -17,6 +17,7 @@ import com.intellij.psi.xml.XmlTag
 import org.jetbrains.kotlin.builtins.DefaultBuiltIns
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptorWithVisibility
+import org.jetbrains.kotlin.descriptors.resolveClassByFqName
 import org.jetbrains.kotlin.idea.caches.resolve.findModuleDescriptor
 import org.jetbrains.kotlin.idea.caches.resolve.util.getJavaClassDescriptor
 import org.jetbrains.kotlin.idea.core.isExcludedFromAutoImport
@@ -24,6 +25,7 @@ import org.jetbrains.kotlin.idea.core.isVisible
 import org.jetbrains.kotlin.idea.imports.importableFqName
 import org.jetbrains.kotlin.idea.search.allScope
 import org.jetbrains.kotlin.idea.util.application.runWriteAction
+import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.j2k.ast.*
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
@@ -264,7 +266,7 @@ class XmlToKtxConverter(private val targetFile: KtFile) {
 
             // TODO(jdemeulenaere/lelandr): There is certainly a better way to map FqName => KotlinType.
             val fqName = conversionResult.kotlinType
-            val classDescriptor = DefaultBuiltIns.Instance.getBuiltInClassByFqNameNullable(fqName)
+            val classDescriptor = DefaultBuiltIns.Instance.builtInsModule.resolveClassByFqName(fqName, NoLookupLocation.FROM_BUILTINS)
                 ?: findClass(fqName.asString())?.getJavaClassDescriptor()
             valueType = classDescriptor?.defaultType
         } else {
