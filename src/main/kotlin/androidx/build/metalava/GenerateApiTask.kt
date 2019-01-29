@@ -62,8 +62,7 @@ open class GenerateApiTask : MetalavaTask() {
             "--api",
             publicApiFile.toString(),
 
-            "--compatible-output=no",
-            "--omit-common-packages=yes",
+            "--format=v3",
             "--output-kotlin-nulls=yes"
         )
 
@@ -83,8 +82,7 @@ open class GenerateApiTask : MetalavaTask() {
                 "--show-annotation",
                 "androidx.annotation.RestrictTo",
 
-                "--compatible-output=no",
-                "--omit-common-packages=yes",
+                "--format=v3",
                 "--output-kotlin-nulls=yes"
             )
 

@@ -17,6 +17,7 @@
 package androidx.build.metalava
 
 import androidx.build.checkapi.ApiLocation
+import androidx.build.checkapi.ApiViolationExclusions
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.api.BaseVariant
 import org.gradle.api.attributes.Attribute
@@ -26,49 +27,47 @@ import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
-/** Validate an API signature text file against a set of source files. */
+// Validate an API signature text file against a set of source files.
 open class CheckApiCompatibilityTask : MetalavaTask() {
-    /**
-     * Text file from which the API signatures will be obtained.
-     */
-    var apiLocation: ApiLocation? = null
+    // Text file from which the API signatures will be obtained.
+    var referenceApi: ApiLocation? = null
+    // Text file listing violations that should be ignored
+    var exclusions: ApiViolationExclusions? = null
 
-    /**
-     * Whether to confirm that no restricted APIs were removed since the previous release
-     */
+    // Whether to confirm that no restricted APIs were removed since the previous release
     var checkRestrictedAPIs = false
 
     @InputFiles
-    fun getTaskInputs(): List<File>? {
+    fun getTaskInputs(): List<File> {
         if (checkRestrictedAPIs) {
-            return apiLocation?.files()
+            return referenceApi!!.files() + exclusions!!.files()
         }
-        return listOf(apiLocation!!.publicApiFile)
+        return listOf(referenceApi!!.publicApiFile, exclusions!!.publicApiFile)
     }
 
-    /**
-     * Declaring outputs prevents Gradle from rerunning this task if the inputs haven't changed
-     */
+    // Declaring outputs prevents Gradle from rerunning this task if the inputs haven't changed
     @OutputFiles
-    fun getTaskOutputs(): List<File>? {
-        return getTaskInputs()
+    fun getTaskOutputs(): List<File> {
+        return listOf(referenceApi!!.publicApiFile)
     }
 
     @TaskAction
     fun exec() {
-        val publicApiFile = checkNotNull(apiLocation?.publicApiFile) { "publicApiFile not set." }
-        val restrictedApiFile = checkNotNull(apiLocation?.restrictedApiFile) { "restrictedApiFile not set." }
+        val referenceApi = checkNotNull(referenceApi) { "referenceApi not set." }
+        val exclusions = checkNotNull(exclusions) { "exclusions not set." }
 
         check(bootClasspath.isNotEmpty()) { "Android boot classpath not set." }
 
-        checkApiFile(publicApiFile, false)
+        checkApiFile(referenceApi.publicApiFile, exclusions.publicApiFile, false)
         if (checkRestrictedAPIs) {
-            checkApiFile(restrictedApiFile, true)
+            checkApiFile(referenceApi.restrictedApiFile, exclusions.restrictedApiFile, false)
         }
     }
 
 
-    fun checkApiFile(apiFile: File, checkRestrictedApis: Boolean) {
+    // Confirms that the public API of this library (or the restricted API, if <checkRestrictedAPIs> is set
+    // is compatible with <apiFile> except for any exclusions listed in <exclusionsFile>
+    fun checkApiFile(apiFile: File, exclusionsFile: File, checkRestrictedAPIs: Boolean) {
         var args = listOf("--classpath",
                 (bootClasspath + dependencyClasspath!!.files).joinToString(File.pathSeparator),
 
@@ -78,11 +77,13 @@ open class CheckApiCompatibilityTask : MetalavaTask() {
                 "--check-compatibility:api:released",
                 apiFile.toString(),
 
-                "--compatible-output=no",
-                "--omit-common-packages=yes",
-                "--input-kotlin-nulls=yes"
+                "--warnings-as-errors",
+                "--format=v3"
         )
-        if (checkRestrictedApis) {
+        if (exclusionsFile.exists()) {
+            args = args + listOf("--baseline", exclusionsFile.toString())
+        }
+        if (checkRestrictedAPIs) {
             args = args + listOf("--show-annotation", "androidx.annotation.RestrictTo")
         }
         runWithArgs(args)
