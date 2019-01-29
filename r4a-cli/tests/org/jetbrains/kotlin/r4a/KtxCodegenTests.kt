@@ -22,6 +22,7 @@ import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
+import java.net.URLClassLoader
 
 @RunWith(RobolectricTestRunner::class)
 @Config(
@@ -768,12 +769,14 @@ class KtxCodegenTests : AbstractCodeGenTest() {
 
         val allClassFiles = compiledClasses.allGeneratedFiles.filter { it.relativePath.endsWith(".class") }
 
+        val loader = URLClassLoader(emptyArray(), this.javaClass.classLoader)
+
         val instanceClass = run {
             var instanceClass: Class<*>? = null
             var loadedOne = false
             for (outFile in allClassFiles) {
                 val bytes = outFile.asByteArray()
-                val loadedClass = loadClass(this.javaClass.classLoader, null, bytes)
+                val loadedClass = loadClass(loader, null, bytes)
                 if (loadedClass.name == className) instanceClass = loadedClass
                 loadedOne = true
             }
