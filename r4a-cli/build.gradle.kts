@@ -29,6 +29,7 @@ dependencies {
     testRuntime(intellijPluginDep("android"))
 
     testCompile(project(":compiler:backend"))
+    compile(project(":compiler:backend.jvm"))
     testCompile(project(":compiler:cli"))
     testCompile(project(":compiler:tests-common"))
     testCompile(projectTests(":compiler:tests-common"))
