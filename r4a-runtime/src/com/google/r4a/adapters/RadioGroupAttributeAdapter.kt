@@ -8,23 +8,24 @@ import com.google.r4a.annotations.RequiresOneOf
 
 private val key = tagKey("RadioGroupInputController")
 
-private fun RadioGroup.getController(): RadioGroupInputController {
-    var controller = getTag(key) as? RadioGroupInputController
-    if (controller == null) {
-        controller = RadioGroupInputController(this)
-        setTag(key, controller)
-        setOnCheckedChangeListener(controller)
+private val RadioGroup.controller: RadioGroupInputController
+    get() {
+        var controller = getTag(key) as? RadioGroupInputController
+        if (controller == null) {
+            controller = RadioGroupInputController(this)
+            setTag(key, controller)
+            setOnCheckedChangeListener(controller)
+        }
+        return controller
     }
-    return controller
-}
 
 @RequiresOneOf("controlledCheckedId")
 @ConflictsWith("onCheckedChangeListener")
 fun RadioGroup.setOnCheckedIdChange(onCheckedIdChange: Function1<Int, Unit>) {
-    getController().onCheckedIdChange = onCheckedIdChange
+    controller.onCheckedIdChange = onCheckedIdChange
 }
 
 @RequiresOneOf("onCheckedIdChange")
 fun RadioGroup.setControlledCheckedId(checkedId: Int) {
-    getController().setValueIfNeeded(checkedId)
+    controller.setValueIfNeeded(checkedId)
 }

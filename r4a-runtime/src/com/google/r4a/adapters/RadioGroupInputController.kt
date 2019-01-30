@@ -12,7 +12,7 @@ class RadioGroupInputController(view: RadioGroup): RadioGroup.OnCheckedChangeLis
     var onCheckedIdChange: Function1<Int, Unit>? = null
 
     override fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {
+        prepareForChange(checkedId)
         onCheckedIdChange?.invoke(checkedId)
-        afterChangeEvent(checkedId)
     }
 }

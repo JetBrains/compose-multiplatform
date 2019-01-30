@@ -9,9 +9,13 @@ import android.widget.EditText
 // impact for longer inputs
 class EditTextInputController(view: EditText) : TextWatcher, InputController<EditText, String>(view) {
     override fun getValue() = view.text.toString()
-    override fun setValue(value: String) = view.setTextKeepState(value)
+    override fun setValue(value: String) {
+        view.removeTextChangedListener(this)
+        view.setTextKeepState(value)
+        view.addTextChangedListener(this)
+    }
 
-    var onTextChangedString: Function1<String, Unit>? = null
+    var onControlledTextChanged: Function1<String, Unit>? = null
     var onTextChangedCharSequence: Function4<CharSequence?, Int, Int, Int, Unit>? = null
     var onAfterTextChanged: Function1<Editable?, Unit>? = null
     var onBeforeTextChanged: Function4<CharSequence?, Int, Int, Int, Unit>? = null
@@ -25,9 +29,9 @@ class EditTextInputController(view: EditText) : TextWatcher, InputController<Edi
     }
 
     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        val nextValue = s.toString()
-        onTextChangedString?.invoke(nextValue)
-        onTextChangedCharSequence?.invoke(s, start, before, count)
-        afterChangeEvent(nextValue)
+        val text = s.toString()
+        prepareForChange(text)
+        onControlledTextChanged?.invoke(text)
+        onTextChangedCharSequence?.invoke(text, start, before, count)
     }
 }

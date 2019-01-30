@@ -8,24 +8,25 @@ import com.google.r4a.annotations.RequiresOneOf
 
 private val key = tagKey("CompoundButtonInputController")
 
-private fun CompoundButton.getController(): CompoundButtonInputController {
-    var controller = getTag(key) as? CompoundButtonInputController
-    if (controller == null) {
-        controller = CompoundButtonInputController(this)
-        setTag(key, controller)
-        setOnCheckedChangeListener(controller)
+private val CompoundButton.controller: CompoundButtonInputController
+    get() {
+        var controller = getTag(key) as? CompoundButtonInputController
+        if (controller == null) {
+            controller = CompoundButtonInputController(this)
+            setTag(key, controller)
+            setOnCheckedChangeListener(controller)
+        }
+        return controller
     }
-    return controller
-}
 
 @RequiresOneOf("controlledChecked")
 @ConflictsWith("onCheckedChangeListener")
 fun CompoundButton.setOnCheckedChange(onCheckedChange: Function1<Boolean, Unit>) {
-    getController().onCheckedChange = onCheckedChange
+    controller.onCheckedChange = onCheckedChange
 }
 
 @RequiresOneOf("onCheckedChange")
 @ConflictsWith("checked")
 fun CompoundButton.setControlledChecked(checked: Boolean) {
-    getController().setValueIfNeeded(checked)
+    controller.setValueIfNeeded(checked)
 }

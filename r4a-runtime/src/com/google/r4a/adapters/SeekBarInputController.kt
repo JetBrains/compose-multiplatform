@@ -17,8 +17,8 @@ class SeekBarInputController(view: SeekBar) : SeekBar.OnSeekBarChangeListener, I
     var onStopTrackingTouch: Function0<Unit>? = null
 
     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+        prepareForChange(progress)
         onProgressChange?.invoke(progress)
-        afterChangeEvent(progress)
     }
 
     override fun onStartTrackingTouch(seekBar: SeekBar?) {

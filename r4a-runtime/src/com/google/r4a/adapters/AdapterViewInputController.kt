@@ -18,10 +18,10 @@ class AdapterViewInputController(view: AdapterView<*>) : AdapterView.OnItemSelec
     var onSelectedIndexChange: Function1<Int, Unit>? = null
 
     override fun onItemSelected(parent: AdapterView<*>?, unused: View?, position: Int, id: Long) {
+        prepareForChange(position)
         onItemSelected?.invoke(position, id)
         onSelectedIndexChange?.invoke(position)
 
-        afterChangeEvent(position)
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {

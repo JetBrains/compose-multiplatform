@@ -13,7 +13,7 @@ class RatingBarInputController(view: RatingBar) : RatingBar.OnRatingBarChangeLis
     var onRatingChange: Function1<Float, Unit>? = null
 
     override fun onRatingChanged(ratingBar: RatingBar?, rating: Float, fromUser: Boolean) {
+        prepareForChange(rating)
         onRatingChange?.invoke(rating)
-        afterChangeEvent(rating)
     }
 }

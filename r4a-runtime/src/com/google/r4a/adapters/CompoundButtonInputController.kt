@@ -15,7 +15,7 @@ class CompoundButtonInputController(view: CompoundButton) : CompoundButton.OnChe
     var onCheckedChange: Function1<Boolean, Unit>? = null
 
     override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
+        prepareForChange(isChecked)
         onCheckedChange?.invoke(isChecked)
-        afterChangeEvent(isChecked)
     }
 }

@@ -13,7 +13,7 @@ class NumberPickerInputController(view: NumberPicker) : InputController<NumberPi
     }
 
     override fun onValueChange(view: NumberPicker?, oldVal: Int, newVal: Int) {
+        prepareForChange(newVal)
         onValueChange?.invoke(newVal)
-        afterChangeEvent(newVal)
     }
 }
