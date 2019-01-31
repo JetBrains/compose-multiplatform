@@ -34,8 +34,8 @@ class EmptyCompositionContext: CompositionContext() {
     override fun recomposeSync(component: Component) = emptyComposition()
     override fun recomposeAll() = emptyComposition()
     override fun <T> getAmbient(key: Ambient<T>): T = emptyComposition()
-    override fun addPostRecomposeListener(l: PostRecomposeListener) = emptyComposition()
-    override fun removePostRecomposeListener(l: PostRecomposeListener) = emptyComposition()
+    override fun addPostRecomposeObserver(l: () -> Unit) = emptyComposition()
+    override fun removePostRecomposeObserver(l: () -> Unit) = emptyComposition()
 }
 
 private fun emptyComposition(): Nothing = error("Composition requires an active composition context")

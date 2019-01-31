@@ -42,7 +42,7 @@ internal class ComposerCompositionContext(val root: Any, private val rootCompone
         recomposePending()
     }
 
-    private val postRecomposeListeners = mutableListOf<PostRecomposeListener>()
+    private val postRecomposeObservers = mutableListOf<() -> Unit>()
 
     private fun recomposePending() {
         if (isComposing) return
@@ -52,11 +52,11 @@ internal class ComposerCompositionContext(val root: Any, private val rootCompone
             CompositionContext.current = this
             composer.recompose()
             composer.applyChanges()
-            val listeners = postRecomposeListeners.toList()
-            postRecomposeListeners.clear()
+            val listeners = postRecomposeObservers.toList()
+            postRecomposeObservers.clear()
             listeners.forEach {
                 try {
-                    it.onPostRecompose()
+                    it.invoke()
                 } catch (_: Throwable) {
                     //TODO(malkov): log error
                 }
@@ -213,11 +213,11 @@ internal class ComposerCompositionContext(val root: Any, private val rootCompone
         return composer.parentAmbient(key)
     }
 
-    override fun addPostRecomposeListener(l: PostRecomposeListener) {
-        postRecomposeListeners.add(l)
+    override fun addPostRecomposeObserver(l: () -> Unit) {
+        postRecomposeObservers.add(l)
     }
 
-    override fun removePostRecomposeListener(l: PostRecomposeListener) {
-        postRecomposeListeners.remove(l)
+    override fun removePostRecomposeObserver(l: () -> Unit) {
+        postRecomposeObservers.remove(l)
     }
 }

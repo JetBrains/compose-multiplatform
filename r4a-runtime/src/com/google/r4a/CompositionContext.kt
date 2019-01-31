@@ -5,10 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import java.util.*
 
-interface PostRecomposeListener {
-    fun onPostRecompose()
-}
-
 abstract class CompositionContext {
     companion object {
 
@@ -99,8 +95,8 @@ abstract class CompositionContext {
     abstract fun recomposeSync(component: Component)
     abstract fun <T : Any?> getAmbient(key: Ambient<T>): T
 
-    abstract internal fun addPostRecomposeListener(l: PostRecomposeListener)
-    abstract internal fun removePostRecomposeListener(l: PostRecomposeListener)
+    abstract internal fun addPostRecomposeObserver(l: () -> Unit)
+    abstract internal fun removePostRecomposeObserver(l: () -> Unit)
 }
 
 inline fun ViewComposition.group(key: Int, block: () -> Unit) {

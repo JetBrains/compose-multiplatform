@@ -4,7 +4,6 @@ import android.view.View
 import android.view.ViewTreeObserver
 import com.google.r4a.Component
 import com.google.r4a.CompositionContext
-import com.google.r4a.PostRecomposeListener
 
 // This class is a small helper class for creating objects that properly deal with controlled
 // inputs. The expectation is that you will implement this class and have the implementation also
@@ -13,7 +12,7 @@ import com.google.r4a.PostRecomposeListener
 // directly into this class. This class will call the view's setter only when necessary, but will
 // also ensure that the consumer of the view is properly calling recompose() and setting the view after
 // an event gets fired, or else it will correctly "un-change" the view to whatever it was last set to.
-abstract class InputController<V : View, T>(protected val view: V) : ViewTreeObserver.OnPreDrawListener, PostRecomposeListener {
+abstract class InputController<V : View, T>(protected val view: V) : ViewTreeObserver.OnPreDrawListener {
     @Suppress("LeakingThis")
     private var lastSetValue: T = getValue()
 
@@ -28,7 +27,7 @@ abstract class InputController<V : View, T>(protected val view: V) : ViewTreeObs
     protected abstract fun setValue(value: T)
     protected fun prepareForChange(value: T) {
         inCompositionContext {
-            addPostRecomposeListener(this@InputController)
+            addPostRecomposeObserver(onPostRecompose)
         }
         //TODO(malkov): remove it then we can control lifecycle of InputController
         //for now we don't have proper ways to dispose this listener when view goes out of
@@ -44,14 +43,13 @@ abstract class InputController<V : View, T>(protected val view: V) : ViewTreeObs
         }
     }
 
-    override fun onPostRecompose() {
-        if (lastSetValue == getValue()) return
-        setValueIfNeeded(lastSetValue)
+    val onPostRecompose: () -> Unit = {
+        if (lastSetValue != getValue()) setValueIfNeeded(lastSetValue)
     }
 
     override fun onPreDraw(): Boolean {
         inCompositionContext {
-            removePostRecomposeListener(this@InputController)
+            removePostRecomposeObserver(onPostRecompose)
         }
         //TODO(malkov): remove it then we can control lifecycle of InputController
         //for now we don't have proper ways to dispose this listener when view goes out of
