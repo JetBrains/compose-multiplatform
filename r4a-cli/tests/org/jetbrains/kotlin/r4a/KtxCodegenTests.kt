@@ -719,6 +719,101 @@ class KtxCodegenTests : AbstractCodeGenTest() {
         }
     }
 
+    @Test
+    fun testVariableCalls1(): Unit = ensureSetup {
+        compose(
+            """
+                val component = @Composable {
+                    <TextView text="Hello, world!" id=42 />
+                }
+            """,
+            { mapOf<String, String>() },
+            """
+                <component />
+            """
+        ).then { activity ->
+            val textView = activity.findViewById(42) as TextView
+            assertEquals("Hello, world!", textView.text)
+        }
+    }
+
+    @Test
+    fun testVariableCalls2(): Unit = ensureSetup {
+        compose(
+            """
+                val component = @Composable {
+                    <TextView text="Hello, world!" id=42 />
+                }
+                class HolderA(val composable: @Composable() () -> Unit)
+
+                val holder = HolderA(component)
+
+            """,
+            { mapOf<String, String>() },
+            """
+                <holder.composable />
+            """
+        ).then { activity ->
+            val textView = activity.findViewById(42) as TextView
+            assertEquals("Hello, world!", textView.text)
+        }
+    }
+
+    @Test
+    fun testVariableCalls3(): Unit = ensureSetup {
+        compose(
+            """
+                val component = @Composable {
+                    <TextView text="Hello, world!" id=42 />
+                }
+                class HolderB(val composable: @Composable() () -> Unit) {
+                    @Composable
+                    fun Foo() {
+                        <composable />
+                    }
+                }
+
+                val holder = HolderB(component)
+
+            """,
+            { mapOf<String, String>() },
+            """
+                <holder.Foo />
+            """
+        ).then { activity ->
+            val textView = activity.findViewById(42) as TextView
+            assertEquals("Hello, world!", textView.text)
+        }
+    }
+
+    @Test
+    fun testVariableCalls4(): Unit = ensureSetup {
+        compose(
+            """
+                val component = @Composable {
+                    <TextView text="Hello, world!" id=42 />
+                }
+                class HolderC(val composable: @Composable() () -> Unit) {
+                    inner class Foo(): Component() {
+                        override fun compose() {
+                            <composable />
+                        }
+                    }
+                }
+
+                val holder = HolderC(component)
+
+            """,
+            { mapOf<String, String>() },
+            """
+                <holder.Foo />
+            """
+        ).then { activity ->
+            val textView = activity.findViewById(42) as TextView
+            assertEquals("Hello, world!", textView.text)
+        }
+    }
+
     // b/123721921
     @Test
     fun testDefaultParameters1(): Unit = ensureSetup {
