@@ -249,7 +249,7 @@ class AndroidXPlugin : Plugin<Project> {
 
         // Disable generating BuildConfig.java
         extension.variants.all {
-            it.generateBuildConfig.enabled = false
+            it.generateBuildConfigProvider.get().enabled = false
         }
 
         configureErrorProneForAndroid(extension.variants)
