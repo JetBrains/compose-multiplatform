@@ -238,6 +238,7 @@ class DiffAndDocs private constructor(
                     it.exclude("**/*.html")
                     it.exclude("**/*.kt")
                     it.exclude("**/META-INF/**")
+                    it.exclude("**/OWNERS")
                 }
         root.configurations.remove(configuration)
         return tree
