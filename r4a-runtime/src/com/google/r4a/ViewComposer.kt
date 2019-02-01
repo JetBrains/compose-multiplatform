@@ -209,7 +209,7 @@ class ViewComposer(val root: Any, val context: Context, val adapters: ViewAdapte
         block: (f: T) -> Unit
     ) = with(composer) {
         startGroup(key)
-        val f = remember { ctor() }
+        val f = cache(true, ctor)
         if (ViewValidator(this).invalid(f) || inserting) {
             startGroup(invocation)
             block(f)

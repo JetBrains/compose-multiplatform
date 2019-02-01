@@ -95,7 +95,7 @@ abstract class AbstractR4aDiagnosticsTest: KtUsefulTestCase() {
     }
 
     protected fun createClasspath() = listOf(KotlinTestUtils.getAnnotationsJar(),
-                                             assertExists(File("dist/kotlinc/lib/r4a-runtime.jar")),
+                                             assertExists(File("plugins/r4a/r4a-runtime/build/libs/r4a-runtime-1.3-SNAPSHOT.jar")),
                                              assertExists(File("custom-dependencies/android-sdk/build/libs/android.jar"))
     )
 

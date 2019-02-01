@@ -16,6 +16,10 @@ import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
 import org.jetbrains.kotlin.extensions.TypeResolutionInterceptorExtension
 import org.jetbrains.kotlin.parsing.KtxParsingExtension
 import org.jetbrains.kotlin.psi2ir.extensions.SyntheticIrExtension
+import org.jetbrains.kotlin.r4a.frames.FrameTransformExtension
+import org.jetbrains.kotlin.r4a.frames.analysis.FrameModelChecker
+import org.jetbrains.kotlin.r4a.frames.analysis.PackageAnalysisHandlerExtension
+import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisHandlerExtension
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
@@ -726,6 +730,119 @@ class KtxCodegenTests : AbstractCodeGenTest() {
         }
     }
 
+    @Test
+    fun testEffects1(): Unit = ensureSetup {
+        compose(
+            """
+                import com.google.r4a.adapters.*
+
+                @Composable
+                fun Counter() {
+                    <Observe>
+                        var count = +state { 0 }
+                        <TextView
+                            text=("Count: " + count.value)
+                            onClick={
+                                count.value += 1
+                            }
+                            id=42
+                        />
+                    </Observe>
+                }
+            """,
+            { mapOf<String, String>() },
+            """
+                <Counter />
+            """
+        ).then { activity ->
+            val textView = activity.findViewById(42) as TextView
+            assertEquals("Count: 0", textView.text)
+            textView.performClick()
+        }.then { activity ->
+            val textView = activity.findViewById(42) as TextView
+            assertEquals("Count: 1", textView.text)
+        }
+    }
+
+    @Test
+    fun testEffects2(): Unit = ensureSetup {
+        compose(
+            """
+                import com.google.r4a.adapters.*
+
+                @Model class MyState<T>(var value: T)
+
+                @Composable
+                fun Counter() {
+                    <Observe>
+                        var count = +memo { MyState(0) }
+                        <TextView
+                            text=("Count: " + count.value)
+                            onClick={
+                                count.value += 1
+                            }
+                            id=42
+                        />
+                    </Observe>
+                }
+            """,
+            { mapOf<String, String>() },
+            """
+                <Counter />
+            """
+        ).then { activity ->
+            val textView = activity.findViewById(42) as TextView
+            assertEquals("Count: 0", textView.text)
+            textView.performClick()
+        }.then { activity ->
+            val textView = activity.findViewById(42) as TextView
+            assertEquals("Count: 1", textView.text)
+        }
+    }
+
+    @Test
+    fun testEffects3(): Unit = ensureSetup {
+        val log = StringBuilder()
+        compose(
+            """
+                import com.google.r4a.adapters.*
+
+                @Composable
+                fun Counter(log: StringBuilder) {
+                    <Observe>
+                        var count = +state { 0 }
+                        +onCommit {
+                            log.append("a")
+                        }
+                        +onActive {
+                            log.append("b")
+                        }
+                        <TextView
+                            text=("Count: " + count.value)
+                            onClick={
+                                count.value += 1
+                            }
+                            id=42
+                        />
+                    </Observe>
+                }
+            """,
+            { mapOf("log" to log) },
+            """
+                <Counter log />
+            """
+        ).then { activity ->
+            val textView = activity.findViewById(42) as TextView
+            assertEquals("Count: 0", textView.text)
+            assertEquals("ab", log.toString())
+            textView.performClick()
+        }.then { activity ->
+            val textView = activity.findViewById(42) as TextView
+            assertEquals("Count: 1", textView.text)
+            assertEquals("aba", log.toString())
+        }
+    }
+
     // b/118610495
     @Test
     fun testCGChildCompose(): Unit = ensureSetup {
@@ -909,6 +1026,9 @@ class KtxCodegenTests : AbstractCodeGenTest() {
         TypeResolutionInterceptorExtension.registerExtension(myEnvironment.project, R4aTypeResolutionInterceptorExtension())
         SyntheticIrExtension.registerExtension(myEnvironment.project, R4ASyntheticIrExtension())
         KtxParsingExtension.registerExtension(myEnvironment.project, R4aKtxParsingExtension())
+        AnalysisHandlerExtension.registerExtension(myEnvironment.project, PackageAnalysisHandlerExtension())
+        SyntheticIrExtension.registerExtension(myEnvironment.project, FrameTransformExtension())
+        StorageComponentContainerContributor.registerExtension(myEnvironment.project, FrameModelChecker())
 //        SyntheticResolveExtension.registerExtension(myEnvironment.project, StaticWrapperCreatorFunctionResolveExtension())
 //        SyntheticResolveExtension.registerExtension(myEnvironment.project, WrapperViewSettersGettersResolveExtension())
     }
@@ -1000,7 +1120,7 @@ private class TestActivity : Activity() {
 private val Activity.root get() = findViewById(ROOT_ID) as ViewGroup
 
 private class Root(val composable: () -> Unit) : Component() {
-    override fun compose() {}
+    override fun compose() = composable()
 }
 
 class CompositionTest(val composable: () -> Unit) {

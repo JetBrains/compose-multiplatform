@@ -66,7 +66,7 @@ class Effect<T> internal constructor(
      */
     @Suppress("NOTHING_TO_INLINE")
     @Hide
-    inline fun resolve(composerContext: ViewComposer, key: Int = sourceLocation()): T = with(composerContext) {
+    /* inline */ fun resolve(composerContext: ViewComposer, key: Int = sourceLocation()): T = with(composerContext) {
         this@Effect.context = this
         startGroup(constructKey(key))
         val result = block()
@@ -81,7 +81,7 @@ class Effect<T> internal constructor(
      * The unaryPlus operator, in the scope of an effect, is an alias to resolving the effect
      */
     @Suppress("NOTHING_TO_INLINE")
-    inline operator fun <V> Effect<V>.unaryPlus(): V = resolve(context)
+    /* inline */ operator fun <V> Effect<V>.unaryPlus(): V = resolve(context)
 }
 
 
@@ -211,7 +211,7 @@ fun <T> key(vararg inputs: Any?, block: Effect<T>.() -> T) = Effect(block, input
  * @return The result of the calculation, or the cached value from the composition
  */
 @CheckResult(suggest = "+")
-inline fun <T> memo(crossinline calculation: () -> T) = effectOf<T> {
+/* inline */ fun <T> memo(/* crossinline */ calculation: () -> T) = effectOf<T> {
     context.remember(calculation)
 }
 
@@ -223,7 +223,7 @@ inline fun <T> memo(crossinline calculation: () -> T) = effectOf<T> {
  * @return The result of the calculation, or the cached value from the composition
  */
 @CheckResult(suggest = "+")
-inline fun <T, reified V1> memo(v1: V1, crossinline calculation: () -> T) = effectOf<T> {
+/* inline */ fun <T, /* reified */ V1> memo(v1: V1, /* crossinline */ calculation: () -> T) = effectOf<T> {
     context.remember(v1, calculation)
 }
 
@@ -236,7 +236,7 @@ inline fun <T, reified V1> memo(v1: V1, crossinline calculation: () -> T) = effe
  * @return The result of the calculation, or the cached value from the composition
  */
 @CheckResult(suggest = "+")
-inline fun <T, reified V1, reified V2> memo(v1: V1, v2: V2, crossinline calculation: () -> T) = effectOf<T> {
+/* inline */ fun <T, /* reified */ V1, /* reified */ V2> memo(v1: V1, v2: V2, /* crossinline */ calculation: () -> T) = effectOf<T> {
     context.remember(v1, v2, calculation)
 }
 
@@ -313,7 +313,7 @@ fun onCommit(callback: CommitScope.() -> Unit) = effectOf<Unit> {
  * @see [onActive]
  */
 @CheckResult(suggest = "+")
-inline fun <reified V1> onCommit(v1: V1, noinline callback: CommitScope.() -> Unit) = effectOf<Unit> {
+/* inline */ fun </* reified */ V1> onCommit(v1: V1, /* noinline */ callback: CommitScope.() -> Unit) = effectOf<Unit> {
     context.remember(v1) { CommitScopeImpl(callback) }
 }
 
@@ -331,7 +331,7 @@ inline fun <reified V1> onCommit(v1: V1, noinline callback: CommitScope.() -> Un
  * @see [onActive]
  */
 @CheckResult(suggest = "+")
-inline fun <reified V1, reified V2> onCommit(v1: V1, v2: V2, noinline callback: CommitScope.() -> Unit) = effectOf<Unit> {
+/* inline */ fun </* reified */ V1, /* reified */ V2> onCommit(v1: V1, v2: V2, /* noinline */ callback: CommitScope.() -> Unit) = effectOf<Unit> {
     context.remember(v1, v2) { CommitScopeImpl(callback) }
 }
 
@@ -414,7 +414,7 @@ fun onCommit(vararg inputs: Any?, callback: CommitScope.() -> Unit) = effectOf<U
  * @see [modelFor]
  */
 @CheckResult(suggest = "+")
-inline fun <T> state(crossinline init: () -> T) = memo { State(init()) }
+/* inline */ fun <T> state(/* crossinline */ init: () -> T) = memo { State(init()) }
 
 /**
  * An effect to introduce a state value of type [T] into a composition that will last as long as the input [v1] does not change.
@@ -434,7 +434,7 @@ inline fun <T> state(crossinline init: () -> T) = memo { State(init()) }
  * @see [modelFor]
  */
 @CheckResult(suggest = "+")
-inline fun <T, reified V1> stateFor(v1: V1, crossinline init: () -> T) = memo(v1) { State(init()) }
+/* inline */ fun <T, /* reified */ V1> stateFor(v1: V1, /* crossinline */ init: () -> T) = memo(v1) { State(init()) }
 
 /**
  * An effect to introduce a state value of type [T] into a composition that will last as long as the inputs [v1] and [v2] do not change.
@@ -455,7 +455,7 @@ inline fun <T, reified V1> stateFor(v1: V1, crossinline init: () -> T) = memo(v1
  * @see [modelFor]
  */
 @CheckResult(suggest = "+")
-inline fun <T, reified V1, reified V2> stateFor(v1: V1, v2: V2, crossinline init: () -> T) = memo(v1, v2) { State(init()) }
+/* inline */ fun <T, /* reified */ V1, /* reified */ V2> stateFor(v1: V1, v2: V2, /* crossinline */ init: () -> T) = memo(v1, v2) { State(init()) }
 
 /**
  * An effect to introduce a state value of type [T] into a composition that will last as long as the inputs [inputs] do not change.
@@ -475,7 +475,7 @@ inline fun <T, reified V1, reified V2> stateFor(v1: V1, v2: V2, crossinline init
  * @see [modelFor]
  */
 @CheckResult(suggest = "+")
-inline fun <T> stateFor(vararg inputs: Any?, crossinline init: () -> T) = memo(*inputs) { State(init()) }
+/* inline */ fun <T> stateFor(vararg inputs: Any?, /* crossinline */ init: () -> T) = memo(*inputs) { State(init()) }
 
 /**
  * The State class is an @Model class meant to wrap around a single value. It is used in the `+state` and `+stateFor` effects.
@@ -492,23 +492,27 @@ class State<T> @PublishedApi internal constructor(value: T) : Framed {
 
     @Suppress("UNCHECKED_CAST")
     var value: T
-        get() = (_readable(_first, this) as StateRecord<T>).value
+        get() = next.readable(this).value
         set(value) {
-            (_writable(_first, this) as StateRecord<T>).value = value
+            next.writable(this).value = value
         }
 
-    private var _first: Record = StateRecord(value)
+    private var next: StateRecord<T> = StateRecord(value)
+
+    init {
+        _created(this)
+    }
 
     // NOTE(lmr): ideally we can compile `State` with our own compiler so that this is not visible
     @Hide
     override val firstFrameRecord: Record
-        get() = _first
+        get() = next
 
     // NOTE(lmr): ideally we can compile `State` with our own compiler so that this is not visible
     @Hide
     override fun prependFrameRecord(value: Record) {
-        value.next = _first
-        _first = value
+        value.next = next
+        next = value as StateRecord<T>
     }
 
     private class StateRecord<T>(myValue: T) : AbstractRecord() {
@@ -578,7 +582,7 @@ class State<T> @PublishedApi internal constructor(value: T) : Framed {
  * @see [stateFor]
  */
 @CheckResult(suggest = "+")
-inline fun <T> model(crossinline init: () -> T) = memo { init() }
+/* inline */ fun <T> model(/* crossinline */ init: () -> T) = memo { init() }
 
 /**
  * An effect to introduce a state value of type [T] into a composition. The [init] lambda will be called only once to create the
@@ -596,7 +600,7 @@ inline fun <T> model(crossinline init: () -> T) = memo { init() }
  * @see [stateFor]
  */
 @CheckResult(suggest = "+")
-inline fun <T, reified V1> modelFor(v1: V1, crossinline init: () -> T) = memo(v1) { init() }
+/* inline */ fun <T, /* reified */ V1> modelFor(v1: V1, /* crossinline */ init: () -> T) = memo(v1) { init() }
 
 /**
  * An effect to introduce a state value of type [T] into a composition. The [init] lambda will be called only once to create the
@@ -615,7 +619,7 @@ inline fun <T, reified V1> modelFor(v1: V1, crossinline init: () -> T) = memo(v1
  * @see [stateFor]
  */
 @CheckResult(suggest = "+")
-inline fun <T, reified V1, reified V2> modelFor(v1: V1, v2: V2, crossinline init: () -> T) = memo(v1, v2) { init() }
+/* inline */ fun <T, /* reified */ V1, /* reified */ V2> modelFor(v1: V1, v2: V2, /* crossinline */ init: () -> T) = memo(v1, v2) { init() }
 
 /**
  * An effect to introduce a state value of type [T] into a composition. The [init] lambda will be called only once to create the
@@ -633,7 +637,7 @@ inline fun <T, reified V1, reified V2> modelFor(v1: V1, v2: V2, crossinline init
  * @see [stateFor]
  */
 @CheckResult(suggest = "+")
-inline fun <T> modelFor(vararg inputs: Any?, crossinline init: () -> T) = memo(*inputs) { init() }
+/* inline */ fun <T> modelFor(vararg inputs: Any?, /* crossinline */ init: () -> T) = memo(*inputs) { init() }
 
 /**
  * An Effect used to get the value of an ambient at a specific position during composition.
@@ -666,4 +670,4 @@ val invalidate = effectOf<() -> Unit> {
  * Resolves the effect and returns the result.
  */
 @Suppress("NOTHING_TO_INLINE")
-inline operator fun <T> Effect<T>.unaryPlus(): T = resolve(com.google.r4a.composer.composer)
+/* inline */ operator fun <T> Effect<T>.unaryPlus(): T = resolve(com.google.r4a.composer.composer)
