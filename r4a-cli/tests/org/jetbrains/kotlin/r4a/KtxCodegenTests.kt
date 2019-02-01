@@ -719,6 +719,47 @@ class KtxCodegenTests : AbstractCodeGenTest() {
         }
     }
 
+    // b/123721921
+    @Test
+    fun testDefaultParameters1(): Unit = ensureSetup {
+        compose(
+            """
+                @Composable
+                fun Foo(a: Int = 42, b: String) {
+                    <TextView text=b id=a />
+                }
+            """,
+            { mapOf<String, String>() },
+            """
+                <Foo b="Hello, world!" />
+            """
+        ).then { activity ->
+            val textView = activity.findViewById(42) as TextView
+            assertEquals("Hello, world!", textView.text)
+        }
+    }
+
+    @Test
+    fun testDefaultParameters2(): Unit = ensureSetup {
+        compose(
+            """
+                @Composable
+                fun Foo(a: Int = 42, b: String, @Children c: () -> Unit) {
+                    <c />
+                    <TextView text=b id=a />
+                }
+            """,
+            { mapOf<String, String>() },
+            """
+                <Foo b="Hello, world!">
+                </Foo>
+            """
+        ).then { activity ->
+            val textView = activity.findViewById(42) as TextView
+            assertEquals("Hello, world!", textView.text)
+        }
+    }
+
     override fun setUp() {
         isSetup = true
         super.setUp()

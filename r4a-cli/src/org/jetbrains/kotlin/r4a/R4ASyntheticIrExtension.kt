@@ -606,7 +606,12 @@ private fun IrCall.putValueParameters(
                     )
                 )
             }
-            is AttributeNode -> putValueArgument(index, getAttribute(parameter.name))
+            is AttributeNode -> {
+                if (parameter.descriptor !is ValueParameterDescriptor) {
+                    error("Expected ValueParameterDescriptor. Found: ${parameter.descriptor}")
+                }
+                putValueArgument(parameter.descriptor.index, getAttribute(parameter.name))
+            }
         }
     }
 }
