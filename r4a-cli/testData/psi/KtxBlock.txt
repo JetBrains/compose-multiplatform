@@ -283,5 +283,109 @@ KtFile: KtxBlock.kt
             PsiElement(GT)('>')
           PsiWhiteSpace('\n    ')
           PsiElement(RBRACE)('}')
+      PsiWhiteSpace('\n\n    ')
+      FUN
+        MODIFIER_LIST
+          PsiElement(public)('public')
+          PsiWhiteSpace(' ')
+          PsiElement(override)('override')
+        PsiWhiteSpace(' ')
+        PsiElement(fun)('fun')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('render')
+        VALUE_PARAMETER_LIST
+          PsiElement(LPAR)('(')
+          PsiElement(RPAR)(')')
+        PsiWhiteSpace(' ')
+        BLOCK
+          PsiElement(LBRACE)('{')
+          PsiWhiteSpace('\n        ')
+          PROPERTY
+            PsiElement(val)('val')
+            PsiWhiteSpace(' ')
+            PsiElement(IDENTIFIER)('myArg')
+            PsiElement(COLON)(':')
+            PsiWhiteSpace(' ')
+            TYPE_REFERENCE
+              USER_TYPE
+                REFERENCE_EXPRESSION
+                  PsiElement(IDENTIFIER)('Any')
+            PsiWhiteSpace(' ')
+            PsiElement(EQ)('=')
+            PsiWhiteSpace(' ')
+            INTEGER_CONSTANT
+              PsiElement(INTEGER_LITERAL)('8')
+          PsiWhiteSpace('\n        ')
+          PROPERTY
+            PsiElement(val)('val')
+            PsiWhiteSpace(' ')
+            PsiElement(IDENTIFIER)('arg1')
+            PsiWhiteSpace(' ')
+            PsiElement(EQ)('=')
+            PsiWhiteSpace(' ')
+            BINARY_WITH_TYPE
+              REFERENCE_EXPRESSION
+                PsiElement(IDENTIFIER)('myArg')
+              PsiWhiteSpace(' ')
+              OPERATION_REFERENCE
+                PsiElement(as)('as')
+              PsiWhiteSpace(' ')
+              TYPE_REFERENCE
+                USER_TYPE
+                  REFERENCE_EXPRESSION
+                    PsiElement(IDENTIFIER)('Array')
+                  TYPE_ARGUMENT_LIST
+                    PsiElement(LT)('<')
+                    TYPE_PROJECTION
+                      TYPE_REFERENCE
+                        USER_TYPE
+                          REFERENCE_EXPRESSION
+                            PsiElement(IDENTIFIER)('Int')
+                    PsiElement(GT)('>')
+          PsiWhiteSpace('\n        ')
+          KTX_ELEMENT
+            PsiElement(LT)('<')
+            REFERENCE_EXPRESSION
+              PsiElement(IDENTIFIER)('foo')
+            PsiWhiteSpace(' ')
+            KTX_ATTRIBUTE
+              REFERENCE_EXPRESSION
+                PsiElement(IDENTIFIER)('myArg')
+            PsiWhiteSpace(' ')
+            PsiElement(DIV)('/')
+            PsiElement(GT)('>')
+          PsiWhiteSpace('\n        ')
+          PROPERTY
+            PsiElement(val)('val')
+            PsiWhiteSpace(' ')
+            PsiElement(IDENTIFIER)('arg')
+            PsiWhiteSpace(' ')
+            PsiElement(EQ)('=')
+            PsiWhiteSpace(' ')
+            BINARY_WITH_TYPE
+              REFERENCE_EXPRESSION
+                PsiElement(IDENTIFIER)('myArg')
+              PsiWhiteSpace(' ')
+              OPERATION_REFERENCE
+                PsiElement(as)('as')
+              PsiWhiteSpace(' ')
+              TYPE_REFERENCE
+                USER_TYPE
+                  REFERENCE_EXPRESSION
+                    PsiElement(IDENTIFIER)('Int')
+          PsiWhiteSpace('\n        ')
+          KTX_ELEMENT
+            PsiElement(LT)('<')
+            REFERENCE_EXPRESSION
+              PsiElement(IDENTIFIER)('foo')
+            PsiWhiteSpace(' ')
+            KTX_ATTRIBUTE
+              REFERENCE_EXPRESSION
+                PsiElement(IDENTIFIER)('arg')
+            PsiWhiteSpace(' ')
+            PsiElement(DIV)('/')
+            PsiElement(GT)('>')
+          PsiWhiteSpace('\n    ')
+          PsiElement(RBRACE)('}')
       PsiWhiteSpace('\n')
       PsiElement(RBRACE)('}')

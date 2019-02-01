@@ -28,4 +28,12 @@ class MainComponent : Component() {
                 println("do something");
             </MyTag>
     }
+
+    public override fun render() {
+        val myArg: Any = 8
+        val arg1 = myArg as Array<Int>
+        <foo myArg />
+        val arg = myArg as Int
+        <foo arg />
+    }
 }
