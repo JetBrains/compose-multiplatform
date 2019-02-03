@@ -9,8 +9,6 @@ plugins {
     id("com.adarshr.test-logger").version("1.2.0")
 }
 
-jvmTarget = "1.6"
-
 dependencies {
     compile(project(":r4a-compiler-plugin"))
     compile(project(":compiler:util"))
