@@ -41,6 +41,7 @@ const val KOTLINPOET = "com.squareup:kotlinpoet:1.0.0"
 const val KOTLIN_STDLIB = "org.jetbrains.kotlin:kotlin-stdlib:1.3.0"
 const val KOTLIN_R4A_STDLIB = "org.jetbrains.kotlin:kotlin-stdlib:1.3.1-R4A-20190221"
 const val KOTLIN_METADATA = "me.eugeniomarletti.kotlin.metadata:kotlin-metadata:1.4.0"
+const val KOTLIN_METADATA_JVM = "org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.0.5"
 const val KOTLIN_COROUTINES = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.0"
 const val KOTLIN_R4A_COROUTINES = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.0"
 const val LEAKCANARY_INSTRUMENTATION =
