@@ -3,6 +3,33 @@ package org.jetbrains.kotlin.r4a
 
 class KtxTypeResolutionTests : AbstractR4aDiagnosticsTest() {
 
+    fun testImplicitlyPassedReceiverScope1() = doTest(
+        """
+            import com.google.r4a.*
+
+            @Composable
+            fun Int.Foo(@Children children: Int.() -> Unit) {
+                <children />
+            }
+        """
+    )
+
+    fun testImplicitlyPassedReceiverScope2() = doTest(
+        """
+            import com.google.r4a.*
+
+            @Composable
+            fun Int.Foo(@Children children: Int.(foo: String) -> Unit) {
+                <<!NO_VALUE_FOR_PARAMETER, MISSING_REQUIRED_ATTRIBUTES!>children<!> />
+            }
+
+            @Composable
+            fun Bar(@Children children: Int.() -> Unit) {
+                <<!NO_VALUE_FOR_PARAMETER!>children<!> />
+            }
+        """
+    )
+
     fun testThatUnresolvedTagDiagnosticIsOnlyOnTagName() = doTest(
         """
             import com.google.r4a.*

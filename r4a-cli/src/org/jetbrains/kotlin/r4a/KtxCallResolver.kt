@@ -1390,7 +1390,7 @@ class KtxCallResolver(
                 val primaryCalls = listOfNotNull(
                     resultNode.primaryCall,
                     nextNode.primaryCall
-                ).distinctBy { it.resultingDescriptor }
+                ).distinctBy { it.semanticCall.resultingDescriptor }
                 if (primaryCalls.size > 1) {
                     R4AErrors.AMBIGUOUS_KTX_CALL.report(
                         context,
@@ -2066,7 +2066,7 @@ class KtxCallResolver(
 
         val referencedDescriptor = candidate.semanticCall.resultingDescriptor
 
-        val dispatchReceiver = candidate.semanticCall.dispatchReceiver
+        val dispatchReceiver = candidate.semanticCall.dispatchReceiver ?: candidate.dispatchReceiver
 
         val stableParamNames = referencedDescriptor.hasStableParameterNames()
 
@@ -2130,7 +2130,12 @@ class KtxCallResolver(
                 valueArguments.add(arg)
             } else if (!param.declaresDefaultValue()) {
                 // missing required parameter!
-                missingRequiredAttributes.add(param)
+                if (dispatchReceiver?.type?.isExtensionFunctionType == true && param == candidate.resultingDescriptor.valueParameters[0]) {
+                    // in this case, the missing parameter is an extension parameter... and it will be provided implicitly. We don't want
+                    // to diagnose this as a missing attribute. If it is missing, the call resolver will add a diagnostic anyway.
+                } else {
+                    missingRequiredAttributes.add(param)
+                }
             }
         }
 

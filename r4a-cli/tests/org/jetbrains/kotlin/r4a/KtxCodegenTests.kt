@@ -682,6 +682,50 @@ class KtxCodegenTests : AbstractCodeGenTest() {
         }
     }
 
+    @Test
+    fun testImplicitReceiverPassing1(): Unit = ensureSetup {
+        compose(
+            """
+                fun Int.Foo(x: @Composable() Int.() -> Unit) {
+                    <x />
+                }
+            """,
+            { mapOf<String, String>() },
+            """
+                val id = 42
+
+                <id.Foo x={
+                    <TextView text="Hello, world!" id=this />
+                } />
+            """
+        ).then { activity ->
+            val textView = activity.findViewById(42) as TextView
+            assertEquals("Hello, world!", textView.text)
+        }
+    }
+
+    @Test
+    fun testImplicitReceiverPassing2(): Unit = ensureSetup {
+        compose(
+            """
+                fun Int.Foo(x: @Composable() Int.(text: String) -> Unit, text: String) {
+                    <x text />
+                }
+            """,
+            { mapOf<String, String>() },
+            """
+                val id = 42
+
+                <id.Foo text="Hello, world!" x={ text ->
+                    <TextView text id=this />
+                } />
+            """
+        ).then { activity ->
+            val textView = activity.findViewById(42) as TextView
+            assertEquals("Hello, world!", textView.text)
+        }
+    }
+
     // b/118610495
     @Test
     fun testCGChildCompose(): Unit = ensureSetup {
