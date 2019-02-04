@@ -222,7 +222,7 @@ class R4ASyntheticIrExtension : SyntheticIrExtension {
                         element.endOffset,
                         resolvedCall = resolvedCall,
                         descriptor = resolvedCall.resultingDescriptor as FunctionDescriptor,
-                        dispatchReceiver = receiver
+                        dispatchReceiver = receiver ?: attributeExpressions[TAG_KEY]
                     ).apply {
                         putValueParameters(callNode.params, statementGenerator) { getAttribute(it) }
                     }

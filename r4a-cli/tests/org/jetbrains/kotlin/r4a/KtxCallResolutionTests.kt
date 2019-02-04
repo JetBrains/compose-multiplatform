@@ -1053,13 +1053,17 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
                   joinKeyCall = fun joinKey(Any, Any?): Any
                   ctorCall = <null>
                   ctorParams = <empty>
-                  validations = <empty>
+                  validations =
+                    - ValidatedAssignment(CHANGED):
+                        validationCall = fun changed(UI): Boolean
+                        assignment = <null>
+                        attribute = <tag>
                 call = NonMemoizedCallNode:
                   resolvedCall = fun Foo()
                   params = <empty>
                   postAssignments = <empty>
                   nextCall = <null>
-              usedAttributes = <empty>
+              usedAttributes = <tag>
               unusedAttributes = <empty>
         """
     )

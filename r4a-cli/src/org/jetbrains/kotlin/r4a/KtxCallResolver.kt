@@ -463,8 +463,7 @@ class KtxCallResolver(
             .mapValues { it.value.first() }
             .values
             .map { node ->
-                val attr = attrInfos[node.name] ?: error("could not find attribute ${node.name}")
-                val static = isStatic(attr.value, contextToUse, node.type, constantChecker)
+                val static = isStatic(node.expression, contextToUse, node.type, constantChecker)
 
                 // update all of the nodes in the AST as "static"
                 attributeNodes[node.name]?.forEach { it.isStatic = static }
@@ -473,7 +472,7 @@ class KtxCallResolver(
                 AttributeNode(
                     name = node.name,
                     descriptor = node.descriptor,
-                    expression = attr.value,
+                    expression = node.expression,
                     type = node.type,
                     isStatic = static
                 )
@@ -762,7 +761,6 @@ class KtxCallResolver(
         context: ExpressionTypingContext
     ): List<ValidatedAssignment> {
         if (step !is ResolveStep.Root) return emptyList()
-        if (isStaticCall) return emptyList()
         val descriptor = resolvedCall.resultingDescriptor
         when (resolvedCall.explicitReceiverKind) {
             ExplicitReceiverKind.DISPATCH_RECEIVER -> {
