@@ -8,7 +8,6 @@ import android.widget.TextView
 import com.google.r4a.Component
 import com.google.r4a.CompositionContext
 import com.google.r4a.composer
-import com.google.r4a.isolated
 
 import org.jetbrains.kotlin.extensions.KtxControlFlowExtension
 import org.jetbrains.kotlin.extensions.KtxTypeResolutionExtension
@@ -966,17 +965,18 @@ class CompositionTest(val composable: () -> Unit) {
         fun then(block: (activity: Activity) -> Unit): ActiveTest {
             val previous = CompositionContext.current
             CompositionContext.current = cc
+            val composer = composer.composer
             val scheduler = RuntimeEnvironment.getMasterScheduler()
             scheduler.pause()
             try {
-                cc.startRoot()
+                composer.startRoot()
                 composable()
-                cc.endRoot()
-                cc.applyChanges()
+                composer.endRoot()
+                composer.applyChanges()
             } finally {
                 CompositionContext.current = previous
             }
-            cc.recomposeAll()
+            cc.scheduleRecompose()
             scheduler.advanceToLastPostedRunnable()
             block(activity)
             return this

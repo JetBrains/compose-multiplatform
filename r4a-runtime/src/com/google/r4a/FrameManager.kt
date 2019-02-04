@@ -49,7 +49,6 @@ internal object FrameManager {
     private var reclaimPending = false
     private var invalidations = HashMap<WeakIdentity<Any>, MutableSet<RecomposeScope>>()
     private var removeCommitObserver: (() -> Unit)? = null
-    private var compositions = WeakHashMap<CompositionContext, Boolean>()
 
     private val handler by lazy { Handler(Looper.getMainLooper()) }
 
@@ -69,7 +68,6 @@ internal object FrameManager {
         removeCommitObserver?.let { it() }
         started = false
         invalidations = HashMap()
-        compositions = WeakHashMap()
     }
 
     fun <T> isolated(block: () -> T): T {
@@ -125,14 +123,8 @@ internal object FrameManager {
         }
     }
 
-    fun registerComposition(composition: CompositionContext) {
-        synchronized(this) {
-            compositions[composition] = true
-        }
-    }
-
     private val readObserver: (read: Any) -> Unit = { read ->
-        (CompositionContext.current as? ComposerCompositionContext)?.composer?.currentInvalidate?.let {
+        currentComposer?.currentInvalidate?.let {
             synchronized(this) {
                 invalidations.getOrPut(WeakIdentity(read)) { mutableSetOf() }.add(it)
             }
@@ -155,12 +147,10 @@ internal object FrameManager {
                 invalidations[WeakIdentity(it)] as Set<RecomposeScope>?
             }.reduceSet()
         }
-        currentInvalidations.forEach { scope -> scope.invalidate?.let { it() } }
-        val currentRecomposes = synchronized(this) { ArrayList(compositions.keys) }
-        currentRecomposes.forEach { it.recomposeAll() }
+        currentInvalidations.forEach { scope -> scope.invalidate?.let { it(false) } }
     }
 
-    /***
+    /**
      * Remove all invalidation scopes not currently part of a composition
      */
     private val reclaimInvalid: () -> Unit = {

@@ -25,10 +25,7 @@ class Ambient<T>(private val key: String, private val defaultFactory: (() -> T)?
         var children: @Composable() () -> Unit) : Component() {
 
         override fun compose() {
-            val cc = CompositionContext.current
-            cc as ComposerCompositionContext
-
-            with(cc.composer) {
+            with(composer.composer) {
                 startProvider(this@Provider, value)
                 children()
                 endProvider()
@@ -43,10 +40,7 @@ class Ambient<T>(private val key: String, private val defaultFactory: (() -> T)?
         var children: @Composable() (T) -> Unit) : Component() {
 
         override fun compose() {
-            val cc = CompositionContext.current
-            cc as ComposerCompositionContext
-
-            with(cc.composer) {
+            with(composer.composer) {
                 children(consume(ambient))
             }
         }
@@ -64,9 +58,7 @@ class Ambient<T>(private val key: String, private val defaultFactory: (() -> T)?
         var children: (ref: Reference) -> Unit) : Component() {
 
         override fun compose() {
-            val cc = CompositionContext.current as ComposerCompositionContext
-
-            children(cc.composer.buildReference())
+            children(composer.composer.buildReference())
         }
     }
 }

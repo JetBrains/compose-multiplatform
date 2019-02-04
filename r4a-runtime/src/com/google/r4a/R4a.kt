@@ -10,10 +10,10 @@ object R4a {
     private class Root: Component() {
         lateinit var composable: @Composable() () -> Unit
         override fun compose() {
-            val cc = CompositionContext.current
-            cc.start(0)
+            val cc = composer.composer
+            cc.startGroup(0)
             composable()
-            cc.end()
+            cc.endGroup()
         }
     }
 

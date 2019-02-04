@@ -21,6 +21,11 @@ internal interface LifeCycleManager {
     fun leaving(holder: CompositionLifecycleObserverHolder)
 }
 
+interface Recomposer {
+    fun scheduleRecompose()
+    fun recomposeSync()
+}
+
 /**
  * Pending starts when the key is different than expected indicating that the structure of the tree changed. It is used
  * to determine how to update the nodes and the slot table when changes to the structure of the tree is detected.
@@ -128,18 +133,18 @@ private sealed class Invalidation(val location: Int)
 private class RecomposableInvalidation(val recomposable: Recomposable, location: Int) : Invalidation(location)
 private class ScopeInvalidation(val scope: RecomposeScope, location: Int) : Invalidation(location)
 
-internal class RecomposeScope(val compose: (invalidate: () -> Unit) -> Unit) {
+internal class RecomposeScope(val compose: (invalidate: (sync: Boolean) -> Unit) -> Unit) {
     var anchor: Anchor? = null
-    var invalidate: (() -> Unit)? = null
+    var invalidate: ((sync: Boolean) -> Unit)? = null
     val valid: Boolean get() = anchor?.valid ?: false
 }
 
-private val IGNORE_INVALIDATE: () -> Unit = {}
+private val IGNORE_RECOMPOSE: (sync: Boolean) -> Unit = {}
 
 open class Composer<N>(
     private val slotTable: SlotTable,
-    private val applier: Applier<N>
-
+    private val applier: Applier<N>,
+    private val recomposer: Recomposer?
 ) : Composition<N>() {
     private val changes = mutableListOf<Change<N>>()
     private val lifecycleObservers = mutableMapOf<CompositionLifecycleObserverHolder,CompositionLifecycleObserverHolder>()
@@ -457,6 +462,7 @@ open class Composer<N>(
             while (current >= 0) {
                 val element = insertedProviders[current]
                 if (element is Ambient<*>.Provider && element.ambient === key) {
+                    @Suppress("UNCHECKED_CAST")
                     return element.value as? T ?: key.defaultValue
                 }
                 current--
@@ -471,6 +477,7 @@ open class Composer<N>(
             if (sentinel === provider) {
                 val element = slots.get(index + 1)
                 if (element is Ambient<*>.Provider && element.ambient === key) {
+                    @Suppress("UNCHECKED_CAST")
                     return element.value as? T ?: key.defaultValue
                 }
             }
@@ -540,7 +547,7 @@ open class Composer<N>(
                             if (ambient == key) {
                                 val scope = slots.get(index + 2)
                                 if (scope is RecomposeScope) {
-                                    scope.invalidate?.let { it() }
+                                    scope.invalidate?.let { it(false) }
                                 }
                             }
                         }
@@ -872,16 +879,22 @@ open class Composer<N>(
         }
     }
 
-    private fun invalidate(scope: RecomposeScope) {
+    private fun invalidate(scope: RecomposeScope, sync: Boolean) {
         val location = scope.anchor?.location(slotTable) ?: return
         assert(location >= 0) { "Invalid anchor" }
         invalidations.insertIfMissing(location, scope)
+        if (sync) {
+            recomposer?.recomposeSync()
+        } else {
+            recomposer?.scheduleRecompose()
+        }
     }
 
     private fun invalidate(instance: Recomposable, anchor: Anchor) {
         val location = anchor.location(slotTable)
         if (location >= 0) {
             invalidations.insertIfMissing(location, instance)
+            recomposer?.scheduleRecompose()
         }
     }
 
@@ -932,12 +945,12 @@ open class Composer<N>(
         doneJoin(false)
     }
 
-    fun startJoin(valid: Boolean, compose: (invalidate: () -> Unit) -> Unit): () -> Unit {
+    fun startJoin(valid: Boolean, compose: (invalidate: (sync: Boolean) -> Unit) -> Unit): (sync: Boolean) -> Unit {
         return if (!valid) {
             val invalidate = if (inserting) {
                 val scope = RecomposeScope(compose)
                 invalidateStack.push(scope)
-                scope.invalidate = { invalidate(scope) }
+                scope.invalidate = { invalidate(scope, it) }
                 recordStart(START_GROUP)
                 recordOperation { _, slots, _ -> scope.anchor = slots.anchor(slots.current - 1) }
                 updateValue(scope)
@@ -956,8 +969,8 @@ open class Composer<N>(
 
             }
             enterGroup(START_GROUP, null, null)
-            invalidate ?: IGNORE_INVALIDATE
-        } else IGNORE_INVALIDATE
+            invalidate ?: IGNORE_RECOMPOSE
+        } else IGNORE_RECOMPOSE
     }
 
     fun doneJoin(valid: Boolean) {

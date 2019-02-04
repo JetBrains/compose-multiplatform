@@ -654,7 +654,7 @@ fun <T> ambient(key: Ambient<T>) = effectOf<T> {
  */
 val invalidate = effectOf<() -> Unit> {
     val scope = context.currentInvalidate ?: error("no recompose scope found")
-    return@effectOf { scope.invalidate?.let { it() } }
+    return@effectOf { scope.invalidate?.let { it(false) } }
 }
 
 

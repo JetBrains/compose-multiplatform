@@ -35,11 +35,11 @@ abstract class CompositionContext {
         }
 
         fun recompose(component: Component) {
-            find(component)?.recompose(component)
+            component.recomposeCallback?.invoke(false)
         }
 
         fun recomposeSync(component: Component) {
-            find(component)?.recomposeSync(component)
+            component.recomposeCallback?.invoke(true)
         }
 
         fun findRoot(view: View): Component? {
@@ -69,29 +69,9 @@ abstract class CompositionContext {
         }
     }
 
-    abstract fun startRoot()
-    abstract fun start(sourceHash: Int)
-    abstract fun start(sourceHash: Int, key: Any?)
-    abstract fun startView(sourceHash: Int)
-    abstract fun startView(sourceHash: Int, key: Any?)
-    abstract fun setInstance(instance: Any)
-    abstract fun useInstance(): Any?
-    abstract fun isInserting(): Boolean
-    abstract fun startCompose(willCompose: Boolean)
-    abstract fun endCompose(didCompose: Boolean)
-    abstract fun startCall(willCall: Boolean)
-    abstract fun endCall(didCall: Boolean)
-    abstract fun attributeChanged(value: Any?): Boolean
-    abstract fun attributeChangedOrInserting(value: Any?): Boolean
-    abstract fun end()
-    abstract fun endView()
-    abstract fun endRoot()
-    abstract fun applyChanges()
-    abstract fun joinKey(left: Any?, right: Any?): Any
-
     abstract var context: Context
     abstract fun recompose(component: Component)
-    abstract fun recomposeAll()
+    abstract fun scheduleRecompose()
     abstract fun recomposeSync(component: Component)
     abstract fun <T : Any?> getAmbient(key: Ambient<T>): T
 

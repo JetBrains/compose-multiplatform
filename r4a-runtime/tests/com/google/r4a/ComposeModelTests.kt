@@ -288,16 +288,15 @@ class ModelViewTests : TestCase() {
                 val scheduler = RuntimeEnvironment.getMasterScheduler()
                 scheduler.advanceToLastPostedRunnable()
                 if (firstCompose) {
-                    val cc = CompositionContext.current as ComposerCompositionContext
-                    cc.startRoot()
-                    val instance = Root(composable)
-                    cc.setInstance(instance)
-                    cc.startCompose(true)
+                    val composer = composer.composer
+                    composer.startRoot()
+                    val instance = composer.remember { Root(composable) }
+                    composer.startGroup(invocation)
                     instance()
-                    cc.endCompose(true)
-                    cc.endRoot()
+                    composer.endGroup()
+                    composer.endRoot()
                     firstCompose = false
-                    cc.composer.applyChanges()
+                    composer.applyChanges()
                 }
             }
 
