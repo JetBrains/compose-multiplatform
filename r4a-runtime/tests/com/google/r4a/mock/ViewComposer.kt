@@ -7,7 +7,7 @@ interface MockViewComposition {
 }
 
 abstract class ViewComponent : Recomposable, MockViewComposition {
-    private var recomposer: (() -> Unit)? = null
+    private var recomposer: ((sync: Boolean) -> Unit)? = null
     private lateinit var _composition: Composition<View>
     @PublishedApi
     internal fun setComposition(value: Composition<View>) {
@@ -15,13 +15,14 @@ abstract class ViewComponent : Recomposable, MockViewComposition {
     }
 
     override val cc: Composition<View> get() = _composition
-    override fun setRecompose(recompose: () -> Unit) {
+    override fun setRecompose(recompose: (sync: Boolean) -> Unit) {
         recomposer = recompose
     }
 
     fun recompose() {
-        recomposer?.let { it() }
+        recomposer?.let { it(false) }
     }
+
     override operator fun invoke() = compose()
     abstract fun compose()
 }
@@ -37,7 +38,7 @@ object ViewApplierAdapter : ApplyAdapter<View> {
     override fun View.end(instance: View, parent: View) { }
 }
 
-class MockViewComposer(val root: View) : Composer<View>(SlotTable(), Applier(root, ViewApplierAdapter)) {
+class MockViewComposer(val root: View) : Composer<View>(SlotTable(), Applier(root, ViewApplierAdapter), null) {
     private val rootComposer: MockViewComposition by lazy {
         object : MockViewComposition {
             override val cc: Composition<View> get() = this@MockViewComposer
@@ -112,7 +113,7 @@ inline fun <reified C : ViewComponent, reified A1> MockViewComposition.composeCo
 
 fun MockViewComposition.join(
     key: Any,
-    block: (invalidate: () -> Unit) -> Unit
+    block: (invalidate: (sync: Boolean) -> Unit) -> Unit
 ) {
     val myCC = cc as MockViewComposer
     myCC.startGroup(key)

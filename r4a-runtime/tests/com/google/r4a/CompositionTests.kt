@@ -859,7 +859,7 @@ class CompositionTests : TestCase() {
         fun MockViewComposition.composition() {
             linear {
                 join(860) { myInvalidate ->
-                    invalidate = myInvalidate
+                    invalidate = { myInvalidate(false) }
                     text(text)
                 }
             }

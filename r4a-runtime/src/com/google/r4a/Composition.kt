@@ -4,7 +4,7 @@ package com.google.r4a
 
 interface Recomposable {
     @HiddenAttribute
-    fun setRecompose(recompose: () -> Unit)
+    fun setRecompose(recompose: (sync: Boolean) -> Unit)
     operator fun invoke()
 }
 

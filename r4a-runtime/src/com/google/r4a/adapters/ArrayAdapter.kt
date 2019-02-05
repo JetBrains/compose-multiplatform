@@ -5,8 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import com.google.r4a.CompositionContext
 import com.google.r4a.composeInto
+import com.google.r4a.composer
 
 
 class ArrayAdapter<T> : BaseAdapter(), Filterable {
@@ -98,10 +98,10 @@ class ArrayAdapter<T> : BaseAdapter(), Filterable {
         group.composeInto(object : Function0<Unit> {
             @Suppress("PLUGIN_WARNING")
             override fun invoke() {
-                val cc = CompositionContext.current
-                cc.start(0)
+                val composer = composer.composer
+                composer.startGroup(0)
                 composable(item)
-                cc.end()
+                composer.endGroup()
             }
         })
 

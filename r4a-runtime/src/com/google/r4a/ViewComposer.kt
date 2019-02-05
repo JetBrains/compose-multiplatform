@@ -108,8 +108,9 @@ internal class ViewApplyAdapter(private val adapters: ViewAdapters? = null) : Ap
     }
 }
 
-class ViewComposer(val root: Any, val context: Context, val adapters: ViewAdapters? = ViewAdapters()) :
-    Composer<Any>(SlotTable(), Applier(root, ViewApplyAdapter(adapters))) {
+class ViewComposer(val root: Any, val context: Context, recomposer: Recomposer?, val adapters: ViewAdapters? = ViewAdapters()) :
+    Composer<Any>(SlotTable(), Applier(root, ViewApplyAdapter(adapters)), recomposer) {
+
     init {
         FrameManager.ensureStarted()
     }
@@ -222,7 +223,7 @@ class ViewComposer(val root: Any, val context: Context, val adapters: ViewAdapte
 
     /*inline*/ fun observe(
         key: Any,
-        block: (invalidate: () -> Unit) -> Unit
+        block: (invalidate: (sync: Boolean) -> Unit) -> Unit
     ) {
         composer.startGroup(key)
         val invalidate = composer.startJoin(false, block)
@@ -326,6 +327,7 @@ class ViewComposer(val root: Any, val context: Context, val adapters: ViewAdapte
     }
 }
 
+internal val currentComposer get() = (CompositionContext.current as? ComposerCompositionContext)?.composer
 val composer get() = ViewComposition((CompositionContext.current as ComposerCompositionContext).composer)
 fun ViewComposition.registerAdapter(adapter: (parent: Any, child: Any) -> Any?) = composer.adapters?.register(adapter)
 

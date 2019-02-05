@@ -3,21 +3,21 @@ package com.google.r4a
 @Stateful
 abstract class Component : Recomposable {
     @HiddenAttribute
-    internal var recomposeCallback: (() -> Unit)? = null
+    internal var recomposeCallback: ((sync: Boolean) -> Unit)? = null
     private lateinit var compositionContext: ComposerCompositionContext
     private var composing = false
 
     protected fun recompose() {
         if (composing) return
-        compositionContext.recompose(this)
+        recomposeCallback?.invoke(false)
     }
 
     protected fun recomposeSync() {
         if (composing) return
-        compositionContext.recomposeSync(this)
+        recomposeCallback?.invoke(true)
     }
 
-    override fun setRecompose(recompose: () -> Unit) {
+    override fun setRecompose(recompose: (sync: Boolean) -> Unit) {
         this.recomposeCallback = recompose
     }
 

@@ -770,7 +770,7 @@ class NewCodeGenTests : TestCase() {
         fun then(block: (activity: Activity) -> Unit): ActiveTest {
             val controller = Robolectric.buildActivity(TestActivity::class.java)
             val activity = controller.create().get()
-            val composition = ViewComposition(ViewComposer(activity.root, activity))
+            val composition = ViewComposition(ViewComposer(activity.root, activity, null))
             return ActiveTest(composition, activity).then(block)
         }
     }
@@ -811,10 +811,11 @@ class NewCodeGenTests : TestCase() {
                 val cc = context.cc
                 CompositionContext.current = cc
                 try {
-                    cc.startRoot()
+                    val composer = composer.composer
+                    composer.startRoot()
                     context.composable(activity)
-                    cc.endRoot()
-                    cc.applyChanges()
+                    composer.endRoot()
+                    composer.applyChanges()
                 } finally {
                     CompositionContext.current = previous
                 }
