@@ -2,6 +2,7 @@ package org.jetbrains.kotlin.r4a
 
 import com.intellij.mock.MockProject
 import com.intellij.openapi.project.Project
+import org.jetbrains.kotlin.backend.jvm.extensions.IrLoweringExtension
 import org.jetbrains.kotlin.compiler.plugin.CliOption
 import org.jetbrains.kotlin.compiler.plugin.CliOptionProcessingException
 import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
@@ -53,6 +54,7 @@ class R4AComponentRegistrar : ComponentRegistrar {
         R4aDiagnosticSuppressor.registerExtension(project, R4aDiagnosticSuppressor())
         TypeResolutionInterceptorExtension.registerExtension(project, R4aTypeResolutionInterceptorExtension())
         SyntheticIrExtension.registerExtension(project, R4ASyntheticIrExtension())
+        IrLoweringExtension.registerExtension(project, R4aIrLoweringExtension())
 
         StorageComponentContainerContributor.registerExtension(project, FrameModelChecker())
         AnalysisHandlerExtension.registerExtension(project, PackageAnalysisHandlerExtension())
