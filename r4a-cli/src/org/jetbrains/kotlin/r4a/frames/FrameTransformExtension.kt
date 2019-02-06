@@ -87,8 +87,7 @@ class FrameTransformExtension : SyntheticIrExtension {
 class RecordClassInfo(
     val irClass: IrClass,
     val fields: List<IrField>,
-    val constructorSymbol: IrConstructorSymbol,
-    recordTypeDescriptor: ClassDescriptor
+    val constructorSymbol: IrConstructorSymbol
 )
 
 fun addFramedStateRecord(context: GeneratorContext, file: IrFile, recordClassDescriptor: FrameRecordClassDescriptor): RecordClassInfo {
@@ -174,7 +173,7 @@ fun addFramedStateRecord(context: GeneratorContext, file: IrFile, recordClassDes
         file.declarations.add(recordClass)
 
     }
-    return RecordClassInfo(recordClass, fields, constructor!!.symbol, recordTypeDescriptor)
+    return RecordClassInfo(recordClass, fields, constructor!!.symbol)
 }
 
 fun addField(

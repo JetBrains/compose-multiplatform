@@ -228,10 +228,8 @@ class KtxCallResolver(
             }
         }
 
-        val orName = Name.identifier("or")
         val left = psiFactory.createSimpleName("a")
         val right = psiFactory.createSimpleName("b")
-        val oper = psiFactory.createSimpleName(orName.identifier)
 
         context.trace.record(
             BindingContext.EXPRESSION_TYPE_INFO, left, KotlinTypeInfo(
@@ -346,7 +344,7 @@ class KtxCallResolver(
         }
 
         // The tag expression and the body expression are both implicitly types of "attributes" for the tag, but they
-        // aren't explictly names. As a result, we put them into the `attrInfos` map with special keys
+        // aren't explicitly names. As a result, we put them into the `attrInfos` map with special keys
         element.bodyLambdaExpression?.let {
             attrInfos[CHILDREN_KEY] = AttributeInfo(
                 value = it,
@@ -572,7 +570,8 @@ class KtxCallResolver(
                                 R4AErrors.MISMATCHED_ATTRIBUTE_TYPE.on(
                                     exprToReportOn,
                                     ErrorUtils.createErrorType("???"),
-                                    attrsOfSameKey.map { it.type }.toSet())
+                                    attrsOfSameKey.map { it.type }.toSet()
+                                )
                             else ->
                                 R4AErrors.UNRESOLVED_ATTRIBUTE_KEY_UNKNOWN_TYPE.on(exprToReportOn, descriptors, attr.name)
                         }
@@ -617,7 +616,7 @@ class KtxCallResolver(
         tmpTraceAndCache.cache.commit()
 
         // if the tag target is non-namespaced and there is a closing tag as well, the default "Import" quick fix will not
-        // work appropriately. To counteract this, we intercept UNRESEOLVED_REFERENCE on the tag target specifically, and replace
+        // work appropriately. To counteract this, we intercept UNRESOLVED_REFERENCE on the tag target specifically, and replace
         // it with an UNRESOLVED_TAG diagnostic. We have our own import quickfix that knows how to handle this properly.
         // Ideally in the long run we can fix this in a different / better way.
         val isSimpleTag = openTagExpr is KtSimpleNameExpression && closeTagExpr != null
@@ -755,7 +754,6 @@ class KtxCallResolver(
     private fun resolveTagValidations(
         kind: ComposerCallKind,
         step: ResolveStep,
-        isStaticCall: Boolean,
         resolvedCall: ResolvedCall<*>,
         receiverScope: KotlinType,
         context: ExpressionTypingContext
@@ -775,7 +773,6 @@ class KtxCallResolver(
                             expressionToReportErrorsOn = receiver.expression,
                             receiverScope = receiverScope,
                             assignmentReceiverScope = null,
-                            valueExpr = receiver.expression,
                             context = context
                         ).first,
                         assignment = null,
@@ -819,7 +816,6 @@ class KtxCallResolver(
                 kind = kind,
                 expressionToReportErrorsOn = attr.key ?: expression,
                 receiverScope = invalidReceiverScope,
-                valueExpr = attr.value,
                 context = context
             )
         }
@@ -1075,7 +1071,6 @@ class KtxCallResolver(
                     val tagValidations = resolveTagValidations(
                         kind = ComposerCallKind.CALL,
                         step = resolveStep,
-                        isStaticCall = isStaticCall,
                         resolvedCall = resolvedCall,
                         receiverScope = invalidReceiverScope,
                         context = candidateContext
@@ -1215,7 +1210,6 @@ class KtxCallResolver(
             val tagValidations = resolveTagValidations(
                 kind = ComposerCallKind.CALL,
                 step = resolveStep,
-                isStaticCall = isStaticCall,
                 resolvedCall = resolvedCall,
                 receiverScope = invalidReceiverScope,
                 context = candidateContext
@@ -1265,7 +1259,6 @@ class KtxCallResolver(
                                 expressionToReportErrorsOn = expression,
                                 receiverScope = invalidReceiverScope,
                                 assignmentReceiverScope = null,
-                                valueExpr = it.attribute.expression,
                                 context = context
                             ).first,
                             assignment = null,
@@ -1529,7 +1522,6 @@ class KtxCallResolver(
         kind: ComposerCallKind,
         expressionToReportErrorsOn: KtExpression,
         receiverScope: KotlinType,
-        valueExpr: KtExpression,
         context: ExpressionTypingContext
     ): ValidatedAssignment {
         val validationCall = resolveValidationCall(
@@ -1539,7 +1531,6 @@ class KtxCallResolver(
             expressionToReportErrorsOn = expressionToReportErrorsOn,
             receiverScope = receiverScope,
             assignmentReceiverScope = null,
-            valueExpr = valueExpr,
             context = context
         ).first
 
@@ -1607,7 +1598,6 @@ class KtxCallResolver(
             if (resolvedCall == null) {
                 resolvedCall = resolveAttributeAsProperty(
                     type,
-                    attribute.name,
                     keyExpr,
                     attribute.value,
                     attribute.isPunned,
@@ -1639,7 +1629,6 @@ class KtxCallResolver(
                     assignmentReceiverScope = type,
                     validationType = validationType,
                     attrType = attrType,
-                    valueExpr = attribute.value,
                     context = context.replaceTraceAndCache(tempForValidations)
                 )
 
@@ -1663,8 +1652,6 @@ class KtxCallResolver(
         }
 
         if (children != null) {
-            val expectedTypes = mutableListOf<KotlinType>()
-
             val childrenExpr = children.value as KtxLambdaExpression
 
             var resolvedCall: ResolvedCall<*>? = null
@@ -1678,7 +1665,6 @@ class KtxCallResolver(
                             type,
                             descriptor,
                             childrenExpr,
-                            expectedTypes,
                             context.replaceTraceAndCache(tempForAttributes)
                         )
                     }
@@ -1687,7 +1673,6 @@ class KtxCallResolver(
                             type,
                             descriptor,
                             childrenExpr,
-                            expectedTypes,
                             context.replaceTraceAndCache(tempForAttributes)
                         )
                     }
@@ -1726,7 +1711,7 @@ class KtxCallResolver(
                 val attrType = when (descriptor) {
                     is FunctionDescriptor -> descriptor.valueParameters.firstOrNull()?.type ?: error("Expected single parameter setter")
                     is PropertyDescriptor -> descriptor.type
-                    else -> error("Unkown callable type encountered")
+                    else -> error("Unknown callable type encountered")
                 }
 
                 val (validationCall, lambdaDescriptor) = resolveValidationCall(
@@ -1736,7 +1721,6 @@ class KtxCallResolver(
                     assignmentReceiverScope = type,
                     validationType = validationType,
                     attrType = attrType,
-                    valueExpr = children.value,
                     context = context.replaceTraceAndCache(tempForValidations)
                 )
 
@@ -1797,7 +1781,7 @@ class KtxCallResolver(
             is ClassDescriptor -> {
                 // We have to be careful here because if the property was defined as a constructor parameter, then the @Children
                 // annotation will be on the parameter descriptor, *not* on the property descriptor. These aren't linked in any real
-                // sence at the descriptor level, so we have to find the primary constructor and just use the convention of the
+                // sense at the descriptor level, so we have to find the primary constructor and just use the convention of the
                 // parameter named of the constructor being the same as the property.
                 val ctorParameters = descriptor.unsubstitutedPrimaryConstructor?.valueParameters ?: emptyList()
                 val shouldIncludeCtorParam = attributesUsedInCall.contains(CHILDREN_KEY)
@@ -1874,7 +1858,6 @@ class KtxCallResolver(
 
     private fun resolveAttributeAsProperty(
         instanceType: KotlinType,
-        name: String,
         keyExpr: KtSimpleNameExpression,
         valueExpr: KtExpression,
         isPunned: Boolean,
@@ -1942,7 +1925,6 @@ class KtxCallResolver(
         instanceType: KotlinType,
         childrenDescriptor: SimpleFunctionDescriptor,
         childrenExpr: KtxLambdaExpression,
-        expectedTypes: MutableCollection<KotlinType>,
         context: ExpressionTypingContext
     ): ResolvedCall<*>? {
         val setterName = childrenDescriptor.name
@@ -2001,7 +1983,6 @@ class KtxCallResolver(
         instanceType: KotlinType,
         propertyDescriptor: PropertyDescriptor,
         childrenExpr: KtxLambdaExpression,
-        expectedTypes: MutableCollection<KotlinType>,
         context: ExpressionTypingContext
     ): ResolvedCall<*>? {
         val temporaryForVariable = TemporaryTraceAndCache.create(
@@ -2242,7 +2223,7 @@ class KtxCallResolver(
         val orName = Name.identifier("or")
         val left = psiFactory.createSimpleName("a")
         val right = psiFactory.createSimpleName("b")
-        val oper = psiFactory.createSimpleName(orName.identifier)
+        val operator = psiFactory.createSimpleName(orName.identifier)
 
         context.trace.record(
             BindingContext.EXPRESSION_TYPE_INFO, left, KotlinTypeInfo(
@@ -2266,11 +2247,11 @@ class KtxCallResolver(
             context,
             makeCall(
                 callElement = left,
-                calleeExpression = oper,
+                calleeExpression = operator,
                 receiver = ExpressionReceiver.create(left, builtIns.booleanType, context.trace.bindingContext),
                 valueArguments = listOf(CallMaker.makeValueArgument(right))
             ),
-            oper,
+            operator,
             Name.identifier("or")
         ).resultingCall
     }
@@ -2386,7 +2367,6 @@ class KtxCallResolver(
         assignmentReceiverScope: KotlinType?,
         validationType: ValidationType,
         attrType: KotlinType,
-        valueExpr: KtExpression,
         context: ExpressionTypingContext
     ): Pair<ResolvedCall<*>?, FunctionDescriptor?> {
 
@@ -2452,13 +2432,12 @@ class KtxCallResolver(
             // some help in order to do the type inference for the call. We are just guessing here that the type is going to be
             // the attribute type, and not something more complicated. It is kind of a bummer that we need this and I wonder if
             // there isn't a cleaner way to do this.
-            val typeToSubstitute = attrType
 
             for (candidate in results.resultingCalls) {
 
                 val typeParam = candidate.typeArguments.keys.singleOrNull() ?: continue
 
-                if (!typeToSubstitute.satisfiesConstraintsOf(typeParam)) continue
+                if (!attrType.satisfiesConstraintsOf(typeParam)) continue
 
                 val nextTempTrace = TemporaryTraceAndCache.create(
                     context, "trace to resolve variable", expressionToReportErrorsOn
@@ -2470,7 +2449,7 @@ class KtxCallResolver(
 
                 val substitutor = TypeSubstitutor.create(
                     mapOf(
-                        typeParam.typeConstructor to typeToSubstitute.asTypeProjection()
+                        typeParam.typeConstructor to attrType.asTypeProjection()
                     )
                 )
 
@@ -2642,8 +2621,8 @@ class KtxCallResolver(
         val path = asQualifierPartList()
         val firstPart = path.first()
         var currentDescriptor: DeclarationDescriptor? = scopeForFirstPart.findDescriptor(firstPart)
-        currentDescriptor = currentDescriptor ?:
-                moduleDescriptor.getPackage(FqName.topLevel(firstPart.name)).let { if (it.isEmpty()) null else it }
+        currentDescriptor =
+            currentDescriptor ?: moduleDescriptor.getPackage(FqName.topLevel(firstPart.name)).let { if (it.isEmpty()) null else it }
 
         if (currentDescriptor == null) return
         else storeSimpleNameExpression(firstPart.expression!!, currentDescriptor, trace)
@@ -2717,7 +2696,7 @@ class KtxCallResolver(
         }
     }
 
-    // callresolver extension
+    // call resolver extension
     private fun forceResolveCallForInvoke(
         calleeType: KotlinType,
         context: BasicCallResolutionContext
@@ -2951,14 +2930,15 @@ private fun descriptorsEqualWithSubstitution(
     if (descriptor1 !is CallableDescriptor) return true
     descriptor2 as CallableDescriptor
 
-    val typeChecker = KotlinTypeCheckerImpl.withAxioms(object: KotlinTypeChecker.TypeConstructorEquality {
+    val typeChecker = KotlinTypeCheckerImpl.withAxioms(object : KotlinTypeChecker.TypeConstructorEquality {
         override fun equals(a: TypeConstructor, b: TypeConstructor): Boolean {
             val typeParam1 = a.declarationDescriptor as? TypeParameterDescriptor
             val typeParam2 = b.declarationDescriptor as? TypeParameterDescriptor
             if (typeParam1 != null
                 && typeParam2 != null
                 && typeParam1.containingDeclaration == descriptor1
-                && typeParam2.containingDeclaration == descriptor2) {
+                && typeParam2.containingDeclaration == descriptor2
+            ) {
                 return typeParam1.index == typeParam2.index
             }
 
@@ -2984,12 +2964,12 @@ private fun descriptorsEqualWithSubstitution(
 // trace util
 // ========================
 private fun referenceCopyingTrace(from: KtExpression, to: KtExpression, trace: TemporaryBindingTrace): BindingTrace {
-    val openTagExprs = from.refExpressions()
-    val closeTagExprs = to.refExpressions()
+    val openTagExpressions = from.refExpressions()
+    val closeTagExpressions = to.refExpressions()
 
-    if (openTagExprs.size != closeTagExprs.size) return trace
+    if (openTagExpressions.size != closeTagExpressions.size) return trace
 
-    val elMap = openTagExprs.zip(closeTagExprs).toMap()
+    val elMap = openTagExpressions.zip(closeTagExpressions).toMap()
 
     val observableTrace = ObservableBindingTrace(trace)
 

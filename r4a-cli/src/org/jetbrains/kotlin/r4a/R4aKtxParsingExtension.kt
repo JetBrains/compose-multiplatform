@@ -73,6 +73,7 @@ private fun KotlinExpressionParsing.shouldExitKtxBodyBlock(tags: List<KtxMarkerS
         for (tag in tags)
             if (closeTagToken == tag.tagName)
                 return false
+        @Suppress("SENSELESS_COMPARISON")
         return tagName == null || closeTagToken == tagName
     } finally {
         marker.rollbackTo()
@@ -197,15 +198,15 @@ private fun KotlinExpressionParsing.parseKtxChildrenParameters() {
 
 private fun KotlinExpressionParsing.parseKtxTagNameIdentifier(): String? {
     val ref = mark()
-    if (at(IDENTIFIER)) {
+    return if (at(IDENTIFIER)) {
         val identifierText = myBuilder.getTokenText()
         advance() // IDENTIFIER
         ref.done(REFERENCE_EXPRESSION)
-        return identifierText
+        identifierText
     } else {
         ref.error("Expected identifier as part of KTX tag name")
         ref.rollbackTo()
-        return null
+        null
     }
 }
 
@@ -290,14 +291,14 @@ private fun KotlinExpressionParsing.parseKtxOpenTag(): KtxMarkerStart? {
 
     if (at(DIV)) {
         advance()
-        if (at(GT)) {
+        return if (at(GT)) {
             advance()
             result.close()
-            return result
+            result
         } else {
             result.close()
             errorAndAdvance("Expecting `>` (end of KTX tag)")
-            return result
+            result
         }
     } else if (at(GT)) {
         advance()
@@ -336,25 +337,25 @@ private fun KotlinExpressionParsing.parseKtxCloseTag(): String? {
 
     val tagName = parseKtxTagName()
 
-    if (at(GT)) {
+    return if (at(GT)) {
         advance()
         marker.drop()
-        return tagName
+        tagName
     } else {
         marker.error("Expected `>` (end of KTX close tag)")
-        return tagName
+        tagName
     }
 }
 
 
-class KtxMarkerStart(tagName: String, internal var tagMarker: PsiBuilder.Marker) {
+class KtxMarkerStart(tagName: String, private var tagMarker: PsiBuilder.Marker) {
     var tagName: String
         internal set
     internal var bodyMarker: PsiBuilder.Marker? = null
     internal var functionLiteralMarker: PsiBuilder.Marker? = null
     internal var lambdaExpressionMarker: PsiBuilder.Marker? = null
     internal var isClosed: Boolean = false
-    internal var closedAt: Throwable? = null
+    private var closedAt: Throwable? = null
 
     init {
         this.tagName = tagName

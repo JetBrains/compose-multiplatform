@@ -2,7 +2,6 @@ package org.jetbrains.kotlin.r4a.frames.analysis
 
 import com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.analyzer.AnalysisResult
-import org.jetbrains.kotlin.builtins.DefaultBuiltIns
 import org.jetbrains.kotlin.container.ComponentProvider
 import org.jetbrains.kotlin.container.get
 import org.jetbrains.kotlin.context.ProjectContext
@@ -11,7 +10,6 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.diagnostics.reportFromPlugin
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.r4a.R4AFlags
@@ -19,7 +17,6 @@ import org.jetbrains.kotlin.r4a.analysis.R4ADefaultErrorMessages
 import org.jetbrains.kotlin.r4a.analysis.R4AErrors
 import org.jetbrains.kotlin.r4a.frames.*
 import org.jetbrains.kotlin.resolve.BindingTrace
-import org.jetbrains.kotlin.resolve.descriptorUtil.isSubclassOf
 import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisHandlerExtension
 import org.jetbrains.kotlin.resolve.lazy.ResolveSession
 import org.jetbrains.kotlin.types.typeUtil.isAnyOrNullableAny
@@ -40,7 +37,7 @@ class PackageAnalysisHandlerExtension : AnalysisHandlerExtension {
                     // Can only place an @Model on an object that doesn't inherit from another object
                     val baseTypes = ktType.constructor.supertypes.filter { !it.isInterface() && !it.isAnyOrNullableAny() }
                     if (baseTypes.isNotEmpty())
-                        bindingTrace.reportFromPlugin(R4AErrors.UNSUPPORTED_MODEL_INHERITENCE.on(ktClass.nameIdentifier ?: ktClass), R4ADefaultErrorMessages)
+                        bindingTrace.reportFromPlugin(R4AErrors.UNSUPPORTED_MODEL_INHERITANCE.on(ktClass.nameIdentifier ?: ktClass), R4ADefaultErrorMessages)
 
                     val classFqName = ktClass.fqName!!
                     val recordFqName = classFqName.parent().child(Name.identifier("${classFqName.shortName()}\$Record"))

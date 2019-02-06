@@ -29,9 +29,9 @@ class R4ACommandLineProcessor : CommandLineProcessor {
     override val pluginId = PLUGIN_ID
     override val pluginOptions = emptyList<CliOption>()
 
-    override fun processOption(option: CliOption, value: String, configuration: CompilerConfiguration) = when (option) {
-        else -> throw CliOptionProcessingException("Unknown option: ${option.name}")
-    }
+    @Suppress("OverridingDeprecatedMember")
+    override fun processOption(option: CliOption, value: String, configuration: CompilerConfiguration) =
+        throw CliOptionProcessingException("Unknown option: ${option.optionName}")
 }
 
 class R4AComponentRegistrar : ComponentRegistrar {

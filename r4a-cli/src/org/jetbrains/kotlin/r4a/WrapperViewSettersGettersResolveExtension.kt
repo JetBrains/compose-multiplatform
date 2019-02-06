@@ -8,7 +8,7 @@ import org.jetbrains.kotlin.resolve.extensions.SyntheticResolveExtension
 
 class WrapperViewSettersGettersResolveExtension : SyntheticResolveExtension {
 
-    override fun generateSyntheticMethods(thisDescriptor: ClassDescriptor, name: Name, ctx: BindingContext, fromSupertypes: List<SimpleFunctionDescriptor>, result: MutableCollection<SimpleFunctionDescriptor>) {
+    override fun generateSyntheticMethods(thisDescriptor: ClassDescriptor, name: Name, bindingContext: BindingContext, fromSupertypes: List<SimpleFunctionDescriptor>, result: MutableCollection<SimpleFunctionDescriptor>) {
 
         if (!ComponentMetadata.isWrapperView(thisDescriptor)) return
 

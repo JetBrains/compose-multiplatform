@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.r4a.compiler.lower
 
-import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
@@ -20,7 +19,7 @@ import org.jetbrains.kotlin.r4a.compiler.ir.buildWithScope
 
 // TODO: Create lower function for user when companion already exists.
 fun generateComponentCompanionObject(context: GeneratorContext, componentMetadata: ComponentMetadata): IrClass {
-    val companion = context.symbolTable.declareClass(-1, -1, IrDeclarationOrigin.DEFINED, (componentMetadata.descriptor as ClassDescriptor).companionObjectDescriptor!!)
+    val companion = context.symbolTable.declareClass(-1, -1, IrDeclarationOrigin.DEFINED, (componentMetadata.descriptor).companionObjectDescriptor!!)
     companion.declarations.add(generateCreateInstanceFunction(context, componentMetadata, companion))
     return companion
 }

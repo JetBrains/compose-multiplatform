@@ -11,7 +11,7 @@ import org.jetbrains.kotlin.resolve.diagnostics.DiagnosticSuppressor
 class R4aDiagnosticSuppressor : DiagnosticSuppressor {
 
     companion object {
-        fun registerExtension(project: Project, extension: DiagnosticSuppressor) {
+        fun registerExtension(@Suppress("UNUSED_PARAMETER") project: Project, extension: DiagnosticSuppressor) {
             Extensions.getRootArea().getExtensionPoint(DiagnosticSuppressor.EP_NAME).registerExtension(extension)
         }
     }
@@ -31,6 +31,6 @@ class R4aDiagnosticSuppressor : DiagnosticSuppressor {
                 else if(entry.shortName?.identifier == "Composable") return true
             }
         }
-        return false;
+        return false
     }
 }

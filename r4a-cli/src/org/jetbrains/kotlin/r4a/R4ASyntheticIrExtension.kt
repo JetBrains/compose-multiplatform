@@ -242,7 +242,7 @@ class R4ASyntheticIrExtension : SyntheticIrExtension {
                             false
                         )
 
-                        val statements = mutableListOf<IrStatement>()
+                        val postAssignmentStatements = mutableListOf<IrStatement>()
 
                         val elVarDecl = statementGenerator.context.symbolTable.declareVariable(
                             UNDEFINED_OFFSET, UNDEFINED_OFFSET,
@@ -252,7 +252,7 @@ class R4ASyntheticIrExtension : SyntheticIrExtension {
                             result
                         )
 
-                        statements.add(elVarDecl)
+                        postAssignmentStatements.add(elVarDecl)
 
                         val getEl = IrGetValueImpl(
                             UNDEFINED_OFFSET, UNDEFINED_OFFSET,
@@ -282,15 +282,15 @@ class R4ASyntheticIrExtension : SyntheticIrExtension {
                             }
 
 
-                            statements.add(statement)
+                            postAssignmentStatements.add(statement)
                         }
-                        statements.add(getEl)
+                        postAssignmentStatements.add(getEl)
 
                         result = IrBlockImpl(
                             UNDEFINED_OFFSET, UNDEFINED_OFFSET,
                             type = elType.toIrType()!!,
                             origin = IrStatementOrigin.LAMBDA,
-                            statements = statements
+                            statements = postAssignmentStatements
                         )
                     }
 

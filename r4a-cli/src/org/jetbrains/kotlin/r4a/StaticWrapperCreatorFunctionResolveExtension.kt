@@ -29,7 +29,7 @@ class StaticWrapperCreatorFunctionResolveExtension() : SyntheticResolveExtension
         }
     }
 
-    override fun generateSyntheticMethods(thisDescriptor: ClassDescriptor, name: Name, ctx: BindingContext, fromSupertypes: List<SimpleFunctionDescriptor>, result: MutableCollection<SimpleFunctionDescriptor>) {
+    override fun generateSyntheticMethods(thisDescriptor: ClassDescriptor, name: Name, bindingContext: BindingContext, fromSupertypes: List<SimpleFunctionDescriptor>, result: MutableCollection<SimpleFunctionDescriptor>) {
 
         if (!ComponentMetadata.isComponentCompanion(thisDescriptor)) return
         if (name != Name.identifier("createInstance")) return

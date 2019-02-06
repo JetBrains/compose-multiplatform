@@ -1,7 +1,6 @@
-package org.jetbrains.kotlin.r4a.compiler.ir;
+package org.jetbrains.kotlin.r4a.compiler.ir
 
 import org.jetbrains.kotlin.ir.IrKtxStatement
-import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor

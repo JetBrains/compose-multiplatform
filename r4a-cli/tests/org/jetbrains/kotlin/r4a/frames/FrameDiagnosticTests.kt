@@ -48,7 +48,7 @@ class FrameDiagnosticTests : AbstractR4aDiagnosticsTest() {
         open class NonModel { }
 
         @Model
-        class <!UNSUPPORTED_MODEL_INHERITENCE!>MyModel<!> : NonModel() {
+        class <!UNSUPPORTED_MODEL_INHERITANCE!>MyModel<!> : NonModel() {
           var strValue = "default"
         }
         """

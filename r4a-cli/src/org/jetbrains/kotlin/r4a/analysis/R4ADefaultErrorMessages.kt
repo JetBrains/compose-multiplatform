@@ -27,7 +27,7 @@ object R4ADefaultErrorMessages : DefaultErrorMessages.Extension {
             "Model objects cannot be open or abstract"
         )
         MAP.put(
-            R4AErrors.UNSUPPORTED_MODEL_INHERITENCE,
+            R4AErrors.UNSUPPORTED_MODEL_INHERITANCE,
             "Model objects do not support inheritance"
         )
         MAP.put(

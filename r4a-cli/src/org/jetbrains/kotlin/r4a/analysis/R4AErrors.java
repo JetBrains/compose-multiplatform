@@ -5,7 +5,6 @@ import org.jetbrains.kotlin.descriptors.DeclarationDescriptor;
 import org.jetbrains.kotlin.descriptors.SimpleFunctionDescriptor;
 import org.jetbrains.kotlin.diagnostics.*;
 import org.jetbrains.kotlin.psi.*;
-import org.jetbrains.kotlin.r4a.ast.EmitOrCallNode;
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall;
 import org.jetbrains.kotlin.types.KotlinType;
 
@@ -18,7 +17,7 @@ public interface R4AErrors {
     DiagnosticFactory0<PsiElement> DUPLICATE_ATTRIBUTE = DiagnosticFactory0.create(ERROR);
     DiagnosticFactory0<PsiElement> OPEN_COMPONENT = DiagnosticFactory0.create(ERROR);
     DiagnosticFactory0<PsiElement> OPEN_MODEL = DiagnosticFactory0.create(ERROR);
-    DiagnosticFactory0<PsiElement> UNSUPPORTED_MODEL_INHERITENCE = DiagnosticFactory0.create(ERROR);
+    DiagnosticFactory0<PsiElement> UNSUPPORTED_MODEL_INHERITANCE = DiagnosticFactory0.create(ERROR);
 
     DiagnosticFactory3<KtElement, Collection<DeclarationDescriptor>, String, KotlinType> UNRESOLVED_ATTRIBUTE_KEY = DiagnosticFactory3.create(ERROR);
     DiagnosticFactory2<KtElement, Collection<DeclarationDescriptor>, String> UNRESOLVED_ATTRIBUTE_KEY_UNKNOWN_TYPE = DiagnosticFactory2.create(ERROR);
@@ -38,7 +37,6 @@ public interface R4AErrors {
     DiagnosticFactory0<PsiElement> KTX_IN_NON_COMPOSABLE = DiagnosticFactory0.create(WARNING);
     DiagnosticFactory0<KtElement> INVALID_TYPE_SIGNATURE_SFC = DiagnosticFactory0.create(ERROR);
     DiagnosticFactory1<KtElement, KtReferenceExpression> UNRESOLVED_TAG = DiagnosticFactory1.create(ERROR);
-    DiagnosticFactory0<KtElement> UNCLOSED_TAG = DiagnosticFactory0.create(ERROR);
     DiagnosticFactory0<KtElement> NO_COMPOSER_FOUND = DiagnosticFactory0.create(ERROR);
     DiagnosticFactory2<KtElement, KotlinType, String> INVALID_COMPOSER_IMPLEMENTATION = DiagnosticFactory2.create(ERROR);
     DiagnosticFactory1<KtElement, Collection<ResolvedCall<?>>> AMBIGUOUS_KTX_CALL = DiagnosticFactory1.create(ERROR);
