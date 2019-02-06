@@ -12,75 +12,42 @@ import com.google.r4a.examples.explorerapp.common.data.*
 import com.google.r4a.examples.explorerapp.ui.Colors
 import com.google.r4a.examples.explorerapp.ui.components.LoadingRow
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
-import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.webkit.WebView
-import android.widget.TextView
 import com.google.r4a.examples.explorerapp.common.components.HomogeneousList
 import com.google.r4a.examples.explorerapp.ui.R
 
-class LinkDetailScreen: Component() { // component because of need for getAmbient and subscribe
-    private val repository = CompositionContext.current.getAmbient(RedditRepository.Ambient)
+private val listParams = CoordinatorLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT,
+        LinearLayout.LayoutParams.MATCH_PARENT).apply {
+    behavior = AppBarLayout.ScrollingViewBehavior()
+}
 
-    private val pageSize = 10
-
-    private var linkId: String? = null
-        set(value) {
-            field = value
-            _model = null
-        }
-    // TODO(lmr): for some reason the property setter version of this broke IR
-    fun setId(id: String) {
-        linkId = id
-    }
-    private var minitialLink: Link? = null
-    fun setInitialLink(link: Link?) {
-        minitialLink = link
-    }
-
-    private var _model: LinkModel? = null
-    private val model: LinkModel
-        get() {
-            // NOTE(lmr): this is a good example of derived state. This could be cleaned up with a good memoize
-            // property delegate potentially
-            var result = _model
-            if (result == null) {
-                result = repository.linkDetails(linkId!!, pageSize)
-                _model = result
-                subscribe(result.link, CompositionContext.current)
-                subscribe(result.comments, CompositionContext.current)
-                subscribe(result.networkState, CompositionContext.current)
-                subscribe(result.initialLoad, CompositionContext.current)
-            }
-            return result
-        }
-
-    private val listParams = CoordinatorLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.MATCH_PARENT).apply {
-        behavior = AppBarLayout.ScrollingViewBehavior()
-    }
-
-    private val tlParams = AppBarLayout.LayoutParams(
+private val tlParams = AppBarLayout.LayoutParams(
         AppBarLayout.LayoutParams.MATCH_PARENT,
         AppBarLayout.LayoutParams.WRAP_CONTENT
-    ).apply {
-        scrollFlags = SCROLL_FLAG_SNAP
-    }
+).apply {
+    scrollFlags = SCROLL_FLAG_SNAP
+}
 
-    private val pagerParams = CoordinatorLayout.LayoutParams(
+private val pagerParams = CoordinatorLayout.LayoutParams(
         LinearLayout.LayoutParams.MATCH_PARENT,
         LinearLayout.LayoutParams.MATCH_PARENT
-    ).apply {
-        behavior = AppBarLayout.ScrollingViewBehavior()
-    }
+).apply {
+    behavior = AppBarLayout.ScrollingViewBehavior()
+}
 
-    private val tabTitles = listOf("Comments", "Link")
+private val tabTitles = listOf("Comments", "Link")
 
-    @Suppress("PLUGIN_WARNING") // TODO(lmr): Figure out how to get the compsoableannotationchecker to work better here
-    override fun compose() {
-        val model = model // TODO(lmr): remove when private access works
-        val listParams = listParams // TODO(lmr): remove when private access works
-        val link = model.link.value ?: minitialLink
+@Composable
+fun LinkDetailScreen(@Pivotal linkId: String, pageSize: Int = 10, initialLink: Link? = null) {
+    <Observe>
+        val repository = +ambient(RedditRepository.Ambient)
+        val linkModel = +model { repository.linkDetails(linkId, pageSize) }
+
+        val link = +subscribe(linkModel.link) ?: initialLink
+        val comments = +subscribe(linkModel.comments)
+        val networkState = +subscribe(linkModel.networkState)
+
         <CoordinatorLayout
             layoutWidth=MATCH_PARENT
             layoutHeight=MATCH_PARENT
@@ -100,7 +67,7 @@ class LinkDetailScreen: Component() { // component because of need for getAmbien
                     children={ tabIndex ->
                         when (tabIndex) {
                             0 /* List of Comments */-> {
-                                val isLoading = model.networkState.value == AsyncState.LOADING
+                                val isLoading = networkState == AsyncState.LOADING
                                 <HomogeneousList
                                     comparator=HierarchicalThing.COMPARATOR
                                     layoutParams=listParams
@@ -117,15 +84,15 @@ class LinkDetailScreen: Component() { // component because of need for getAmbien
                                         <LoadingRow />
                                     }
 
-                                    onLoadAround={ pos -> model.loadAround(pos) }
-                                    data=model.comments.value
+                                    onLoadAround={ pos -> linkModel.loadAround(pos) }
+                                    data=comments
                                 > node ->
                                     <CommentRow
                                         node
                                         onClick={
                                             when (node) {
-                                                is RedditMore -> model.loadMore(node)
-                                                is Comment -> model.toggleCollapsedState(node)
+                                                is RedditMore -> linkModel.loadMore(node)
+                                                is Comment -> linkModel.toggleCollapsedState(node)
                                             }
                                         }
                                     />
@@ -137,7 +104,7 @@ class LinkDetailScreen: Component() { // component because of need for getAmbien
                                 if (url != null) {
                                     <WebView
                                         url=url
-//                                                    onReceivedTitle={}
+    //                                                    onReceivedTitle={}
                                     />
                                 }
                                 Unit
@@ -148,7 +115,7 @@ class LinkDetailScreen: Component() { // component because of need for getAmbien
                 />
             </Tabs>
         </CoordinatorLayout>
-    }
+    </Observe>
 }
 
 
