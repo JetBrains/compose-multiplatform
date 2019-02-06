@@ -52,11 +52,13 @@ class MockViewComposer(val root: View) : Composer<View>(SlotTable(), Applier(roo
     }
 }
 
+@Suppress("NOTHING_TO_INLINE")
 inline fun <V> MockViewComposition.remember(/*crossinline*/noinline block: () -> V): V = cc.remember(block)
 inline fun <V, reified P1> MockViewComposition.remember(p1: P1, /*crossinline*/noinline block: () -> V) = cc.remember(p1, block)
 inline fun <V, reified P1, reified P2> MockViewComposition.remember(p1: P1, p2: P2, /*crossinline*/noinline block: () -> V) = cc.remember(p1, p2, block)
 inline fun <V, reified P1, reified P2, reified P3> MockViewComposition.remember(p1: P1, p2: P2, p3: P3, /*crossinline*/noinline block: () -> V) = cc.remember(p1, p2, p3, block)
 inline fun <V, reified P1, reified P2, reified P3, reified P4> MockViewComposition.remember(p1: P1, p2: P2, p3: P3, p4: P4, /*crossinline*/noinline block: () -> V) = cc.remember(p1, p2, p3, p4, block)
+@Suppress("NOTHING_TO_INLINE")
 inline fun <V> MockViewComposition.remember(vararg args: Any, /*crossinline*/noinline block: () -> V): V = cc.remember(*args, block = block)
 
 inline fun <reified P1> MockViewComposition.memoize(key: Any, p1: P1, block: MockViewComposition.(p1: P1) -> Unit) {

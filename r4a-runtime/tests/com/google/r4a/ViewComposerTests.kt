@@ -162,13 +162,13 @@ class NewCodeGenTests : TestCase() {
             call(453, { changed(phone) }) {
                 PhoneView(phone)
             }
-        }.then { activity ->
+        }.then { _ ->
             assertEquals(1, phoneCalled)
-        }.then { activity ->
+        }.then { _ ->
             assertEquals(1, phoneCalled)
 
             phone = Phone("124", "456", "7890")
-        }.then { activity ->
+        }.then { _ ->
             assertEquals(2, phoneCalled)
         }
     }

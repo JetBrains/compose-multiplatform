@@ -281,8 +281,6 @@ class KtxModelCodeGenTests : AbstractCodeGenTest() {
 
     }
 
-
-
     fun compose(prefix: String, valuesFactory: () -> Map<String, Any>, advance: String, composition: String, dumpClasses: Boolean = false): ModelCompositionTest {
         val className = "Test_${uniqueNumber++}"
         val fileName = "$className.kt"

@@ -251,7 +251,7 @@ class ComposerCompositionContextTests: ComposerComposeTestCase() {
             it.emitComponent(123) {
                 RecomposeTestComponents.A(counter, listener)
             }
-        }.then { _, root, _, activity ->
+        }.then { _, _, _, activity ->
             // everything got rendered once
             assertEquals(1, counter["A"])
             assertEquals(1, counter["100"])
@@ -309,7 +309,7 @@ class ComposerCompositionContextTests: ComposerComposeTestCase() {
             it.emitComponent(123) {
                 RecomposeTestComponents.A(counter, listener)
             }
-        }.then { _, root, _, activity ->
+        }.then { _, _, _, activity ->
             // everything got rendered once
             assertEquals(1, counter["A"])
             assertEquals(1, counter["100"])
@@ -424,7 +424,7 @@ class ComposerCompositionContextTests: ComposerComposeTestCase() {
             emitView(123, ::LinearLayout)
         }
 
-    }.then { cc, component, root, activity ->
+    }.then { _, _, root, _ ->
         assertChildHierarchy(root) {
             """
                 <LinearLayout>

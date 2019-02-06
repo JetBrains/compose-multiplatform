@@ -115,7 +115,7 @@ class ViewComposer(val root: Any, val context: Context, recomposer: Recomposer?,
         FrameManager.ensureStarted()
     }
 
-    fun skipGroup(key: Any) {
+    fun skipGroup(@Suppress("UNUSED_PARAMETER") key: Any) {
         nextSlot()
         skipValue()
         skipGroupAndRecomposeRange()
@@ -185,6 +185,7 @@ class ViewComposer(val root: Any, val context: Context, recomposer: Recomposer?,
         endNode()
     }
 
+    @Suppress("NOTHING_TO_INLINE")
     inline fun joinKey(left: Any, right: Any?): Any = composer.joinKey(left, right)
 
     inline fun call(
@@ -233,6 +234,7 @@ class ViewComposer(val root: Any, val context: Context, recomposer: Recomposer?,
 }
 
 /* inline */ class ViewValidator(val composer: ViewComposer) {
+    @Suppress("NOTHING_TO_INLINE")
     inline fun changed(value: Int) = with(composer) {
         if (nextSlot() != value || inserting) {
             updateValue(value)
@@ -253,6 +255,7 @@ class ViewComposer(val root: Any, val context: Context, recomposer: Recomposer?,
         }
     }
 
+    @Suppress("NOTHING_TO_INLINE")
     inline fun updated(value: Int) = with(composer) {
         inserting.let { inserting ->
             if (nextSlot() != value || inserting) {

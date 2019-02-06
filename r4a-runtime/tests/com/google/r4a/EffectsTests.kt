@@ -113,7 +113,6 @@ class EffectsTests : TestCase() {
     fun testState2() {
         val tv1Id = 100
         val tv2Id = 200
-        var inc = 0
         var local1 = State("invalid")
         var local2 = State("invalid")
 

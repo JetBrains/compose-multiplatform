@@ -512,6 +512,7 @@ class State<T> @PublishedApi internal constructor(value: T) : Framed {
     @Hide
     override fun prependFrameRecord(value: Record) {
         value.next = next
+        @Suppress("UNCHECKED_CAST")
         next = value as StateRecord<T>
     }
 
