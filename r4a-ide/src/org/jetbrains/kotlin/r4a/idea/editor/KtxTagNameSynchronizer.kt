@@ -49,6 +49,8 @@ class KtxTagNameSynchronizer(editorFactory: EditorFactory, private val manager: 
             override fun editorCreated(e: EditorFactoryEvent) = install(e.editor)
         }, ApplicationManager.getApplication())
 
+
+        @Suppress("DEPRECATION")
         CommandProcessor.getInstance().addCommandListener(this)
     }
 

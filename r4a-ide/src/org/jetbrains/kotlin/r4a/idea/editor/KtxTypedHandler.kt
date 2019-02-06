@@ -86,7 +86,7 @@ class KtxTypedHandler : TypedHandlerDelegate() {
         editor: Editor,
         file: PsiFile
     ): Result {
-        val editor = editor as EditorEx
+        @Suppress("NAME_SHADOWING") val editor = editor as EditorEx
         when (c) {
             '/' -> {
                 // if `</` is typed, we can complete the closing tag...
@@ -109,7 +109,7 @@ class KtxTypedHandler : TypedHandlerDelegate() {
                     return Result.STOP
                 }
                 // if `/` is typed before a tag is closed, we can add `>` to complete the self-closing tag
-                if (maybeJustTypedTheDivOfASelfClosingTag(editor, file)) {
+                if (maybeJustTypedTheDivOfASelfClosingTag(editor)) {
                     // the above check can have false positives, so to be sure that we are in a KTX element, we commit the document,
                     // and then perform an additional check to ensure that the parent of the div is a ktx element
                     PsiDocumentManager.getInstance(project).commitDocument(editor.document)
@@ -184,7 +184,7 @@ class KtxTypedHandler : TypedHandlerDelegate() {
         return true
     }
 
-    private fun maybeJustTypedTheDivOfASelfClosingTag(editor: EditorEx, file: PsiFile): Boolean {
+    private fun maybeJustTypedTheDivOfASelfClosingTag(editor: EditorEx): Boolean {
         val iterator = editor.highlighter.createIterator(editor.caretModel.offset)
         with(iterator) {
             retreat()
