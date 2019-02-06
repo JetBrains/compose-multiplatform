@@ -843,6 +843,50 @@ class KtxCodegenTests : AbstractCodeGenTest() {
         }
     }
 
+    @Test
+    fun testEffects4(): Unit = ensureSetup {
+        val log = StringBuilder()
+        compose(
+            """
+                import com.google.r4a.adapters.*
+
+                fun printer(log: StringBuilder, str: String) = effectOf<Unit> {
+                    +onCommit {
+                        log.append(str)
+                    }
+                }
+
+                @Composable
+                fun Counter(log: StringBuilder) {
+                    <Observe>
+                        var count = +state { 0 }
+                        +printer(log, "" + count.value)
+                        <TextView
+                            text=("Count: " + count.value)
+                            onClick={
+                                count.value += 1
+                            }
+                            id=42
+                        />
+                    </Observe>
+                }
+            """,
+            { mapOf("log" to log) },
+            """
+                <Counter log />
+            """
+        ).then { activity ->
+            val textView = activity.findViewById(42) as TextView
+            assertEquals("Count: 0", textView.text)
+            assertEquals("0", log.toString())
+            textView.performClick()
+        }.then { activity ->
+            val textView = activity.findViewById(42) as TextView
+            assertEquals("Count: 1", textView.text)
+            assertEquals("01", log.toString())
+        }
+    }
+
     // b/118610495
     @Test
     fun testCGChildCompose(): Unit = ensureSetup {
