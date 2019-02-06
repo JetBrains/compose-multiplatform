@@ -12,6 +12,8 @@ import org.jetbrains.kotlin.r4a.idea.parentOfType
 
 
 class R4aCompletionContributor : CompletionContributor() {
+
+    @Suppress("OverridingDeprecatedMember")
     override fun invokeAutoPopup(position: PsiElement, typeChar: Char): Boolean {
         when (typeChar) {
             ' ' -> {
@@ -41,6 +43,7 @@ class R4aCompletionContributor : CompletionContributor() {
                 }
             }
         }
+        @Suppress("DEPRECATION")
         return super.invokeAutoPopup(position, typeChar)
     }
 }
