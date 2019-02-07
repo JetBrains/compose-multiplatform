@@ -20,22 +20,18 @@ const val MODEL = "Model"
 
 val EXAMPLES = arrayOf(CALCULATOR, EDIT_FORM, NEWS_FEED, FONT_LIST, SPINNER_FORM, REORDERING, MODEL)
 
-class ExamplePage : Component() {
-    override fun compose() {
-        <Ambients.Fragment.Consumer> fragment ->
-            val name = fragment.arguments?.getString(EXAMPLE_NAME)
-            when (name) {
-                CALCULATOR -> { <Calculator /> }
-                EDIT_FORM -> { <EditForm /> }
-                NEWS_FEED -> { <NewsFeed /> }
-                FONT_LIST -> { <FontList /> }
-                SPINNER_FORM -> { <SpinnerForm /> }
-                REORDERING -> { <Reordering /> }
-                MODEL -> { <ModelExample /> }
-                else -> {
-                    <TextView text="ERROR: Unknown example '$name'" />
-                }
-            }
-        </Ambients.Fragment.Consumer>
+@Composable
+fun ExamplePage() {
+    val fragment = +ambient(Ambients.Fragment)
+    val name = fragment.arguments?.getString(EXAMPLE_NAME)
+    when (name) {
+        CALCULATOR -> <Calculator />
+        EDIT_FORM -> <EditForm />
+        NEWS_FEED -> <NewsFeed />
+        FONT_LIST -> <FontList />
+        SPINNER_FORM -> <SpinnerForm />
+        REORDERING -> <Reordering />
+        MODEL -> <ModelExample />
+        else -> <TextView text="ERROR: Unknown example '$name'" />
     }
 }

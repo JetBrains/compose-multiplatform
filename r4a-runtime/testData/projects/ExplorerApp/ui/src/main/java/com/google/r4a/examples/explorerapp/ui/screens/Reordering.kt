@@ -3,51 +3,48 @@ package com.google.r4a.examples.explorerapp.ui.screens
 import com.google.r4a.*
 import com.google.r4a.adapters.*
 import android.widget.*
-import android.view.*
-import com.google.r4a.CompositionContext
 
-class Reordering: Component() { // Component for cc.find()
-    // state
-    private var items = mutableListOf(1, 2, 3, 4, 5)
+fun <T> List<T>.move(from: Int, to: Int): List<T> {
+    if (to < from) return move(to, from)
+    val item = get(from)
+    val currentItem = get(to)
+    val left = if (from > 0) subList(0, from) else emptyList()
+    val right = if (to < size) subList(to + 1, size) else emptyList()
+    val middle = if (to - from > 1) subList(from + 1, to) else emptyList()
+    return left + listOf(currentItem) + middle + listOf(item) + right
+}
 
-    private fun onMove(index: Int): Function1<Int, Unit> {
-        return { amount ->
-            val next = index + amount
-            if (next >= 0 && next < items.size) {
-                val item = items.removeAt(index)
-                // TODO: immutable list ops would be better
-                items.add(next, item)
-                recompose()
-            }
-        }
-    }
+@Composable
+fun Reordering() {
+    <Observe>
+        val items = +state { listOf(1, 2, 3, 4, 5) }
 
-    override fun compose() {
         <LinearLayout orientation=LinearLayout.VERTICAL>
-            <Button
-                text="PRINT TREE"
-                onClick={
-                    // NOTE(lmr): debug() is no longer supported
-                }
-            />
-            items.forEachIndexed { index, id ->
-                <Item key=id id onMove=onMove(index) />
+            items.value.forEachIndexed { index, id ->
+                <Item
+                    id
+                    onMove={ amount ->
+                        val next = index + amount
+                        if (next >= 0 && next < items.value.size) {
+                            items.value = items.value.move(index, index + amount)
+                        }
+                    }
+                />
             }
         </LinearLayout>
-    }
+    </Observe>
+}
 
-    private class Item(var id: Int, var onMove: (Int) -> Unit): Component() { // component for state
-        // state
-        private var count: Int = 0
-
-        override fun compose() {
-            <LinearLayout orientation=LinearLayout.HORIZONTAL>
-                <TextView text="id: $id amt: $count" textSize=20.sp />
-                <Button text="+" onClick={ count++; recompose() } />
-                <Button text="Up" onClick={ onMove(1) } />
-                <Button text="Down" onClick={ onMove(-1) } />
-            </LinearLayout>
-        }
-    }
+@Composable
+private fun Item(@Pivotal id: Int, onMove: (Int) -> Unit) {
+    <Observe>
+        val count = +state { 0 }
+        <LinearLayout orientation=LinearLayout.HORIZONTAL>
+            <TextView text="id: $id amt: ${count.value}" textSize=20.sp />
+            <Button text="+" onClick={ count.value++ } />
+            <Button text="Up" onClick={ onMove(1) } />
+            <Button text="Down" onClick={ onMove(-1) } />
+        </LinearLayout>
+    </Observe>
 }
 

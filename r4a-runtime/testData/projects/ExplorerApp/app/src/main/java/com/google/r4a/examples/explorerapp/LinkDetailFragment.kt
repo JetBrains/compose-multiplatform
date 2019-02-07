@@ -3,7 +3,6 @@ package com.google.r4a.examples.explorerapp
 import com.google.r4a.*
 import com.google.r4a.examples.explorerapp.common.adapters.ComposeFragment
 import com.google.r4a.examples.explorerapp.common.data.Link
-import com.google.r4a.examples.explorerapp.ui.screens.*
 
 class LinkDetailFragment: ComposeFragment() {
     override fun compose() {
@@ -13,13 +12,9 @@ class LinkDetailFragment: ComposeFragment() {
         val initialLink = arguments?.getParcelable<Link>("initialLink")
         with(composer) {
             call(
-                0,
-                    { LinkDetailScreen() },
-                    { f ->
-                        set(id) { f.setId(it) } or
-                        set(initialLink) { f.setInitialLink(it) }
-                    },
-                    { f -> f() }
+                    composer.joinKey(id, 0),
+                    { changed(id) + changed(initialLink) },
+                    { LinkDetailScreen(linkId = id, initialLink = initialLink) }
             )
         }
     }

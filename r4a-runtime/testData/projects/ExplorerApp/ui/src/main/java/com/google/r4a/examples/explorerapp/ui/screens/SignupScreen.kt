@@ -16,118 +16,118 @@ import com.google.r4a.*
 import com.google.r4a.examples.explorerapp.common.data.AuthenticationService
 
 @Model
-private class SignupModel(var username: String = "", var password: String = "", var isLoading: Boolean = false)
+private class SignupModel(
+        var username: String = "",
+        var password: String = "",
+        var isLoading: Boolean = false
+)
 
-class SignupScreen : Component() {
+@Composable
+fun SignupScreen() {
+    val model = +model { SignupModel() }
+    val authentication = +ambient(AuthenticationService.Ambient)
+    val navigator = +ambient(Ambients.NavController)
+    val buttonEnabled = model.username.isNotEmpty() && model.password.isNotEmpty()
 
-    private val model = SignupModel()
-
-    private fun onSubmit(authentication: AuthenticationService) {
+    fun onSubmit(authentication: AuthenticationService) {
         authentication.signup(model.username, model.password) { _, _ ->
             // Nothing to do
         }
         model.isLoading = true
     }
 
-    override fun compose() {
-        val buttonEnabled = model.username.isNotEmpty() && model.password.isNotEmpty()
-        <ScrollView
+    <ScrollView
+        layoutWidth=MATCH_PARENT
+        layoutHeight=MATCH_PARENT
+    >
+        <LinearLayout
             layoutWidth=MATCH_PARENT
             layoutHeight=MATCH_PARENT
+            padding=24.dp
+            orientation=LinearLayout.VERTICAL
         >
-            <LinearLayout
+            <ImageView
+                layoutWidth=160.dp
+                layoutHeight=160.dp
+                layoutGravity=Gravity.CENTER_HORIZONTAL
+                marginBottom=24.dp
+                imageResource=R.drawable.reddit_verticallockup_onwhite />
+            <TextInputLayout
                 layoutWidth=MATCH_PARENT
-                layoutHeight=MATCH_PARENT
-                padding=24.dp
-                orientation=LinearLayout.VERTICAL
+                layoutHeight=WRAP_CONTENT
+                layoutGravity=Gravity.CENTER_HORIZONTAL
             >
-                <ImageView
-                    layoutWidth=160.dp
-                    layoutHeight=160.dp
-                    layoutGravity=Gravity.CENTER_HORIZONTAL
-                    marginBottom=24.dp
-                    imageResource=R.drawable.reddit_verticallockup_onwhite />
-                <TextInputLayout
-                    layoutWidth=MATCH_PARENT
-                    layoutHeight=WRAP_CONTENT
-                    layoutGravity=Gravity.CENTER_HORIZONTAL
-                >
-                    <EditText
-                        paddingHorizontal=16.dp
-                        paddingVertical=16.dp
-                        textSize=15.sp
-                        hint="Username"
-                        imeOptions=EditorInfo.IME_ACTION_NEXT
-                        controlledText=model.username
-                        onTextChange={
-                            model.username = it
-                        }
+                <EditText
+                    paddingHorizontal=16.dp
+                    paddingVertical=16.dp
+                    textSize=15.sp
+                    hint="Username"
+                    imeOptions=EditorInfo.IME_ACTION_NEXT
+                    controlledText=model.username
+                    onTextChange={
+                        model.username = it
+                    }
 //                        singleLine=true
-                    />
-                </TextInputLayout>
-                <AuthenticationService.Ambient.Consumer> authentication ->
-                    <TextInputLayout
-                        layoutWidth=MATCH_PARENT
-                        layoutHeight=WRAP_CONTENT
-                        layoutGravity=Gravity.CENTER_HORIZONTAL
-                        passwordVisibilityToggleEnabled=true
-                    >
-                        <TextInputEditText
-                            paddingHorizontal=16.dp
-                            paddingVertical=16.dp
-                            textSize=15.sp
-                            hint="Password"
-                            imeOptions=EditorInfo.IME_ACTION_DONE
-                            inputType=InputType.TYPE_TEXT_VARIATION_PASSWORD
-                            controlledText=model.password
-                            onTextChange={
-                                model.password = it
-                            }
+                />
+            </TextInputLayout>
+            <TextInputLayout
+                layoutWidth=MATCH_PARENT
+                layoutHeight=WRAP_CONTENT
+                layoutGravity=Gravity.CENTER_HORIZONTAL
+                passwordVisibilityToggleEnabled=true
+            >
+                <TextInputEditText
+                    paddingHorizontal=16.dp
+                    paddingVertical=16.dp
+                    textSize=15.sp
+                    hint="Password"
+                    imeOptions=EditorInfo.IME_ACTION_DONE
+                    inputType=InputType.TYPE_TEXT_VARIATION_PASSWORD
+                    controlledText=model.password
+                    onTextChange={
+                        model.password = it
+                    }
 //                          transformationMethod={PasswordTransformationMethod.getInstance()}
 //                            singleLine=true
-                            onEditorAction={ _, actionId, _ ->
-                                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                                    onSubmit(authentication)
-                                }
-                                false
-                            } />
-                    </TextInputLayout>
-                    <Button
-                        text="Sign Up"
-                        textSize=15.sp
-                        marginBottom=10.dp
-                        backgroundColor=Colors.PRIMARY
-                        textColor=Colors.TEXT_LIGHT
-                        enabled=buttonEnabled
-                        onClick={ onSubmit(authentication) } />
-                </AuthenticationService.Ambient.Consumer>
-                <Ambients.NavController.Consumer> navigator ->
-                    <TextView
-                        layoutWidth=MATCH_PARENT
-                        layoutHeight=WRAP_CONTENT
-                        layoutGravity=Gravity.CENTER_HORIZONTAL
-                        padding=10.dp
-                        textAlignment=TextView.TEXT_ALIGNMENT_CENTER
-                        text="Already a member? Login."
-                        onClick={
-                            navigator.navigate(R.id.nav_to_login)
+                    onEditorAction={ _, actionId, _ ->
+                        if (actionId == EditorInfo.IME_ACTION_DONE) {
+                            onSubmit(authentication)
                         }
-                        textSize=15.sp
-                        textColor=Colors.TEXT_MUTED />
-                    <TextView
-                        layoutWidth=MATCH_PARENT
-                        layoutHeight=WRAP_CONTENT
-                        layoutGravity=Gravity.CENTER_HORIZONTAL
-                        padding=10.dp
-                        textAlignment=TextView.TEXT_ALIGNMENT_CENTER
-                        text="Use app without logging in."
-                        onClick={
-                            navigator.navigate(R.id.screen_link_list)
-                        }
-                        textSize=15.sp
-                        textColor=Colors.TEXT_MUTED />
-                </Ambients.NavController.Consumer>
-            </LinearLayout>
-        </ScrollView>
-    }
+                        false
+                    } />
+            </TextInputLayout>
+            <Button
+                text="Sign Up"
+                textSize=15.sp
+                marginBottom=10.dp
+                backgroundColor=Colors.PRIMARY
+                textColor=Colors.TEXT_LIGHT
+                enabled=buttonEnabled
+                onClick={ onSubmit(authentication) } />
+            <TextView
+                layoutWidth=MATCH_PARENT
+                layoutHeight=WRAP_CONTENT
+                layoutGravity=Gravity.CENTER_HORIZONTAL
+                padding=10.dp
+                textAlignment=TextView.TEXT_ALIGNMENT_CENTER
+                text="Already a member? Login."
+                onClick={
+                    navigator.navigate(R.id.nav_to_login)
+                }
+                textSize=15.sp
+                textColor=Colors.TEXT_MUTED />
+            <TextView
+                layoutWidth=MATCH_PARENT
+                layoutHeight=WRAP_CONTENT
+                layoutGravity=Gravity.CENTER_HORIZONTAL
+                padding=10.dp
+                textAlignment=TextView.TEXT_ALIGNMENT_CENTER
+                text="Use app without logging in."
+                onClick={
+                    navigator.navigate(R.id.screen_link_list)
+                }
+                textSize=15.sp
+                textColor=Colors.TEXT_MUTED />
+        </LinearLayout>
+    </ScrollView>
 }

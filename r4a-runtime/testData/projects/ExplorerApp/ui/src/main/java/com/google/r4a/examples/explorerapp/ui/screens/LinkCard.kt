@@ -20,84 +20,80 @@ import com.google.r4a.examples.explorerapp.common.data.Link
 import com.google.r4a.examples.explorerapp.ui.Colors
 import com.google.r4a.examples.explorerapp.ui.components.TimeAgo
 
-class LinkCard(var link: Link) {
-    var onClick: () -> Unit = {}
-
-    @Composable
-    operator fun invoke() {
-        <CardView
+@Composable
+fun LinkCard(link: Link, onClick: () -> Unit = {}) {
+    <CardView
+        layoutWidth=MATCH_PARENT
+        layoutHeight=WRAP_CONTENT
+        marginLeft=16.dp
+        marginTop=8.dp
+        marginRight=16.dp
+        cardBackgroundColor=Color.WHITE
+        radius=3.dp
+        maxCardElevation=1.dp
+        cardElevation=0.7.dp
+        preventCornerOverlap=true
+        foreground=android.R.attr.selectableItemBackground
+        clickable=true
+        onClick=onClick
+        useCompatPadding=true
+    >
+        <LinearLayout
+            orientation=LinearLayout.VERTICAL
             layoutWidth=MATCH_PARENT
             layoutHeight=WRAP_CONTENT
-            marginLeft=16.dp
-            marginTop=8.dp
-            marginRight=16.dp
-            cardBackgroundColor=Color.WHITE
-            radius=3.dp
-            maxCardElevation=1.dp
-            cardElevation=0.7.dp
-            preventCornerOverlap=true
-            foreground=android.R.attr.selectableItemBackground
-            clickable=true
-            onClick=onClick
-            useCompatPadding=true
         >
+            val image = link.preview?.images?.firstOrNull()
+            if (image != null) {
+                // image will at worst be square
+                <CardImageView
+                    spec=ImageSpec(
+                            uri = image.source.decodedUrl,
+                            aspectRatio = Math.min(1f, image.source.height.toFloat() / image.source.width.toFloat())
+                    )
+                    layoutWidth=MATCH_PARENT
+                    layoutHeight=WRAP_CONTENT
+                />
+            }
             <LinearLayout
                 orientation=LinearLayout.VERTICAL
                 layoutWidth=MATCH_PARENT
                 layoutHeight=WRAP_CONTENT
+                paddingHorizontal=10.dp
+                paddingVertical=10.dp
             >
-                val image = link.preview?.images?.firstOrNull()
-                if (image != null) {
-                    // image will at worst be square
-                    <CardImageView
-                        spec=ImageSpec(
-                                uri = image.source.decodedUrl,
-                                aspectRatio = Math.min(1f, image.source.height.toFloat() / image.source.width.toFloat())
-                        )
-                        layoutWidth=MATCH_PARENT
-                        layoutHeight=WRAP_CONTENT
-                    />
-                }
+                <TextView
+                    text=link.title
+                    textColor=Colors.TEXT_DARK
+                    textSize=21.sp
+                />
+
+                // TODO: number of comments, subreddit, domain
+
                 <LinearLayout
-                    orientation=LinearLayout.VERTICAL
+                    orientation=LinearLayout.HORIZONTAL
                     layoutWidth=MATCH_PARENT
                     layoutHeight=WRAP_CONTENT
-                    paddingHorizontal=10.dp
-                    paddingVertical=10.dp
                 >
                     <TextView
-                        text=link.title
-                        textColor=Colors.TEXT_DARK
-                        textSize=21.sp
+                        text=link.author
+                        fontStyle=Typeface.BOLD
+                        textColor=Colors.TEXT_MUTED
                     />
-
-                    // TODO: number of comments, subreddit, domain
-
-                    <LinearLayout
-                        orientation=LinearLayout.HORIZONTAL
-                        layoutWidth=MATCH_PARENT
-                        layoutHeight=WRAP_CONTENT
-                    >
-                        <TextView
-                            text=link.author
-                            fontStyle=Typeface.BOLD
-                            textColor=Colors.TEXT_MUTED
-                        />
-                        if (link.score != 0) {
-                            <Bullet />
-                            <TextView
-                                text="${link.score}"
-                                textColor=Colors.TEXT_MUTED
-                            />
-                        }
+                    if (link.score != 0) {
                         <Bullet />
-                        <TimeAgo
-                            date=link.createdUtc
+                        <TextView
+                            text="${link.score}"
                             textColor=Colors.TEXT_MUTED
                         />
-                    </LinearLayout>
+                    }
+                    <Bullet />
+                    <TimeAgo
+                        date=link.createdUtc
+                        textColor=Colors.TEXT_MUTED
+                    />
                 </LinearLayout>
             </LinearLayout>
-        </CardView>
-    }
+        </LinearLayout>
+    </CardView>
 }

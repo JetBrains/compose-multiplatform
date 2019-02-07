@@ -1,5 +1,6 @@
 package com.google.r4a.examples.explorerapp.ui.screens
 
+import android.util.Log
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -16,51 +17,28 @@ import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import com.google.r4a.examples.explorerapp.common.components.HomogeneousPagedList
 
-class SubredditLinkList: Component() { // component for getAmbient() and subscribe(...)
-    private val repository get() = CompositionContext.current.getAmbient(RedditRepository.Ambient)
+private val sortOptions = listOf(
+        RedditFilterType.HOT,
+        RedditFilterType.NEW,
+        RedditFilterType.TOP
+)
 
-    private val pageSize = 10
+private val listParams = FrameLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT,
+        LinearLayout.LayoutParams.MATCH_PARENT
+)
 
-    private val sortOptions = listOf(
-            RedditFilterType.HOT,
-            RedditFilterType.NEW,
-            RedditFilterType.TOP
-    )
-    private var selectedSortIndex = 0
-        set(value) {
-            field = value
-            _model = null
+@Composable
+fun SubredditLinkList(subreddit: String, pageSize: Int = 10) {
+    // TODO(lmr): for some reason this observe tag was necessary here, despite our automatic insertion. not sure why.
+    <Observe>
+        val selectedSortIndex = +state { 0 }
+        val repository = +ambient(RedditRepository.Ambient)
+        val model = +modelFor(subreddit, selectedSortIndex.value) {
+            repository.linksOfSubreddit(subreddit, sortOptions[selectedSortIndex.value], pageSize)
         }
-    var subreddit: String = ""
-        set(value) {
-            field = value
-            _model = null
-        }
-
-    private var _model: SubredditModel? = null
-    private val model: SubredditModel
-        get() {
-            var result = _model
-            if (result == null) {
-
-                val repository = repository
-                result = repository.linksOfSubreddit(subreddit, sortOptions[selectedSortIndex], pageSize)
-                _model = result
-                subscribe(result.links, CompositionContext.current)
-                subscribe(result.networkState, CompositionContext.current)
-                subscribe(result.refreshState, CompositionContext.current)
-            }
-            return result
-        }
-
-    private val listParams = FrameLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.MATCH_PARENT
-    )
-
-    override fun compose() {
-        val model = model
-        val isLoading = (model.networkState.value ?: AsyncState.LOADING) == AsyncState.LOADING
+        val links = +subscribe(model.links)
+        val networkState = +subscribe(model.networkState) ?: AsyncState.LOADING
 
         <HomogeneousPagedList
             comparator=Link.COMPARATOR
@@ -90,24 +68,22 @@ class SubredditLinkList: Component() { // component for getAmbient() and subscri
                         data=(sortOptions.map { it.displayText })
                         // TODO(lmr): textColor?
 
-                        controlledSelectedIndex=selectedSortIndex
+                        controlledSelectedIndex=selectedSortIndex.value
                         onSelectedIndexChange={
-                            if (it != selectedSortIndex) {
-                                selectedSortIndex = it
-                                recomposeSync()
+                            if (it != selectedSortIndex.value) {
+                                selectedSortIndex.value = it
                             }
                         }
                     />
                 </FrameLayout>
             }
 
-            loadingRowCount=(if (isLoading) 1 else 0)
+            loadingRowCount=(if (networkState == AsyncState.LOADING) 1 else 0)
             composeLoadingRow={ <LoadingRow /> }
             backgroundColor=Colors.LIGHT_GRAY
-            data=model.links.value
+            data=links
         > link ->
             <PostListItem link />
         </HomogeneousPagedList>
-    }
-
+    </Observe>
 }

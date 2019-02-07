@@ -10,47 +10,40 @@ import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 
 
-/** This component represents an individual feed story, including a title, optional description, and photo **/
-class NewsFeedStoryComponent {
-
-    var story: Story? = null
-
-    @Composable
-    operator fun invoke() {
-        val story = story
-        <LinearLayout
-            orientation=LinearLayout.VERTICAL
-            layoutWidth=MATCH_PARENT
-            layoutHeight=MATCH_PARENT
-            marginTop=125.dp
-            marginBottom=250.dp
-            minimumHeight=1000.dp
-        >
-            if (story == null) {
-                // If we don't have a newsfeed story yet, show a loading spinner instead
-                <ProgressBar />
-            } else {
+@Composable
+fun NewsFeedStoryComponent(story: Story? = null) {
+    <LinearLayout
+        orientation=LinearLayout.VERTICAL
+        layoutWidth=MATCH_PARENT
+        layoutHeight=MATCH_PARENT
+        marginTop=125.dp
+        marginBottom=250.dp
+        minimumHeight=1000.dp
+    >
+        if (story == null) {
+            // If we don't have a newsfeed story yet, show a loading spinner instead
+            <ProgressBar />
+        } else {
+            <TextView
+                text=story.name
+                textSize=30.sp
+                paddingLeft=25.dp
+                paddingBottom=10.dp
+            />
+            if (story.description != null && story.description.isNotEmpty()) {
                 <TextView
-                    text=story.name
-                    textSize=30.sp
+                    text=story.description
+                    textSize=20.sp
                     paddingLeft=25.dp
                     paddingBottom=10.dp
                 />
-                if (story.description != null && story.description.isNotEmpty()) {
-                    <TextView
-                        text=story.description
-                        textSize=20.sp
-                        paddingLeft=25.dp
-                        paddingBottom=10.dp
-                    />
-                }
-                <ImageView
-                    imageBitmap=story.image
-                    layoutWidth=MATCH_PARENT
-                    layoutHeight=WRAP_CONTENT
-                    scaleType=ImageView.ScaleType.CENTER_CROP
-                />
             }
-        </LinearLayout>
-    }
+            <ImageView
+                imageBitmap=story.image
+                layoutWidth=MATCH_PARENT
+                layoutHeight=WRAP_CONTENT
+                scaleType=ImageView.ScaleType.CENTER_CROP
+            />
+        }
+    </LinearLayout>
 }
