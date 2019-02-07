@@ -1032,7 +1032,7 @@ class KtxCallResolver(
 
             val isStaticCall = isStaticTag(resolveStep, resolvedCall, candidateContext)
 
-            val shouldMemoizeCtor = shouldMemoizeResult(resolvedCall)
+            val shouldMemoizeCtor = returnType.isEmittable() || shouldMemoizeResult(resolvedCall)
 
             if (returnType.isUnit()) {
                 // bottomed out

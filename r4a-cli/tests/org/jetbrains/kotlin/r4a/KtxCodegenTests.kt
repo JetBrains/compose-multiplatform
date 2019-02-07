@@ -1017,6 +1017,23 @@ class KtxCodegenTests : AbstractCodeGenTest() {
         }
     }
 
+    @Test
+    fun testPropertiesAndCtorParamsOnEmittables(): Unit = codegen(
+        """
+            class SimpleEmittable(label: String? = null) : Emittable {
+                var label: String? = null
+                override fun emitInsertAt(index: Int, instance: Emittable) {}
+                override fun emitMove(from: Int, to: Int, count: Int) {}
+                override fun emitRemoveAt(index: Int, count: Int) {}
+            }
+
+            @Composable
+            fun foo() {
+                <SimpleEmittable label="Foo" />
+            }
+        """
+    )
+
     override fun setUp() {
         isSetup = true
         super.setUp()
@@ -1037,6 +1054,20 @@ class KtxCodegenTests : AbstractCodeGenTest() {
     private inline fun <T> ensureSetup(block: () -> T): T {
         if (!isSetup) setUp()
         return block()
+    }
+
+    fun codegen(text: String, dumpClasses: Boolean = false): Unit = ensureSetup {
+        val className = "Test_${uniqueNumber++}"
+        val fileName = "$className.kt"
+
+        classLoader("""
+           import android.content.Context
+           import android.widget.*
+           import com.google.r4a.*
+
+           $text
+
+        """, fileName, dumpClasses)
     }
 
     fun compose(text: String, dumpClasses: Boolean = false): CompositionTest = compose({mapOf<String, Any>()}, text, dumpClasses)
