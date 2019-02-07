@@ -1,5 +1,6 @@
 package org.jetbrains.kotlin.r4a
 
+import org.jetbrains.kotlin.backend.jvm.extensions.IrLoweringExtension
 import org.jetbrains.kotlin.extensions.KtxControlFlowExtension
 import org.jetbrains.kotlin.extensions.KtxTypeResolutionExtension
 import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
@@ -18,10 +19,34 @@ class KtxTransformationTest: AbstractCodeGenTest() {
         TypeResolutionInterceptorExtension.registerExtension(myEnvironment.project, R4aTypeResolutionInterceptorExtension())
         SyntheticIrExtension.registerExtension(myEnvironment.project, R4ASyntheticIrExtension())
         KtxParsingExtension.registerExtension(myEnvironment.project, R4aKtxParsingExtension())
+        IrLoweringExtension.registerExtension(myEnvironment.project, R4aIrLoweringExtension())
 //        SyntheticResolveExtension.registerExtension(myEnvironment.project, StaticWrapperCreatorFunctionResolveExtension())
 //        SyntheticResolveExtension.registerExtension(myEnvironment.project, WrapperViewSettersGettersResolveExtension())
     }
 
+
+    fun testObserveLowering() = testCompile(
+        """
+            import android.widget.Button
+            import com.google.r4a.*
+            import com.google.r4a.adapters.setOnClick
+
+            @Model
+            class FancyButtonData() {
+                var x = 0
+            }
+
+            @Composable
+            fun SimpleComposable() {
+                <FancyButton state=FancyButtonData() />
+            }
+
+            @Composable
+            fun FancyButton(state: FancyButtonData) {
+               <Button text=("Clicked "+state.x+" times") onClick={state.x++} id=42 />
+            }
+        """
+    )
 
     fun testEmptyComposeFunction() = testCompile(
         """

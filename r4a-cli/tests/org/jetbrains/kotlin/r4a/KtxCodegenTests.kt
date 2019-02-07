@@ -3,11 +3,14 @@ package org.jetbrains.kotlin.r4a
 import android.app.Activity
 import android.os.Bundle
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.android.internal.R.attr.button
 import com.google.r4a.Component
 import com.google.r4a.CompositionContext
 import com.google.r4a.composer
+import org.jetbrains.kotlin.backend.jvm.extensions.IrLoweringExtension
 
 import org.jetbrains.kotlin.extensions.KtxControlFlowExtension
 import org.jetbrains.kotlin.extensions.KtxTypeResolutionExtension
@@ -34,6 +37,41 @@ import java.net.URLClassLoader
     maxSdk = 23
 )
 class KtxCodegenTests : AbstractCodeGenTest() {
+
+    @Test
+    fun testObservable(): Unit = ensureSetup {
+        compose(
+            """
+                import android.widget.Button
+                import com.google.r4a.*
+                import com.google.r4a.adapters.setOnClick
+
+                @Model
+                class FancyButtonData() {
+                    var x = 0
+                }
+
+                @Composable
+                fun SimpleComposable() {
+                    <FancyButton state=FancyButtonData() />
+                }
+
+                @Composable
+                fun FancyButton(state: FancyButtonData) {
+                    <Button text=("Clicked "+state.x+" times") onClick={state.x++} id=42 />
+                }
+            """,
+            { mapOf<String, String>() },
+            "<SimpleComposable />").then { activity ->
+                val button = activity.findViewById(42) as Button
+                button.performClick();
+                button.performClick();
+                button.performClick();
+            }.then { activity ->
+                val button = activity.findViewById(42) as Button
+                assertEquals("Clicked 3 times", button.text)
+        }
+    }
 
     @Test
     fun testCGSimpleTextView(): Unit = ensureSetup {
@@ -1045,6 +1083,7 @@ class KtxCodegenTests : AbstractCodeGenTest() {
         AnalysisHandlerExtension.registerExtension(myEnvironment.project, PackageAnalysisHandlerExtension())
         SyntheticIrExtension.registerExtension(myEnvironment.project, FrameTransformExtension())
         StorageComponentContainerContributor.registerExtension(myEnvironment.project, FrameModelChecker())
+        IrLoweringExtension.registerExtension(myEnvironment.project, R4aIrLoweringExtension())
 //        SyntheticResolveExtension.registerExtension(myEnvironment.project, StaticWrapperCreatorFunctionResolveExtension())
 //        SyntheticResolveExtension.registerExtension(myEnvironment.project, WrapperViewSettersGettersResolveExtension())
     }
