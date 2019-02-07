@@ -81,7 +81,7 @@ class Effect<T> internal constructor(
      * The unaryPlus operator, in the scope of an effect, is an alias to resolving the effect
      */
     @Suppress("NOTHING_TO_INLINE")
-    /* inline */ operator fun <V> Effect<V>.unaryPlus(): V = resolve(context)
+    /* inline */ operator fun <V> Effect<V>.unaryPlus(): V = resolve(this@Effect.context)
 }
 
 
