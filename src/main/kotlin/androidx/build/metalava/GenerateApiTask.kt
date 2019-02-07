@@ -17,12 +17,6 @@
 package androidx.build.metalava
 
 import androidx.build.checkapi.ApiLocation
-import com.android.build.gradle.BaseExtension
-import com.android.build.gradle.api.BaseVariant
-import com.google.common.io.Files
-import org.gradle.api.attributes.Attribute
-import org.gradle.api.file.FileCollection
-import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
 import java.io.File

@@ -16,12 +16,10 @@
 
 package androidx.build.docs
 
-import org.gradle.api.Action
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.OutputFile
 import java.io.File
-import java.util.SortedMap
 
 open class ConcatenateFilesTask : DefaultTask() {
     private var keyedInputs: MutableMap<String, File> = mutableMapOf()
