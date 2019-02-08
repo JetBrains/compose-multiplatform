@@ -21,7 +21,7 @@ import java.io.File
 import androidx.build.Version
 
 // An ApiLocation contains the filepath of a public API and restricted API of a library
-data class ApiLocation (
+data class ApiLocation(
     // file specifying the public API of the library
     val publicApiFile: File,
     // file specifying the restricted API (marked by the RestrictTo annotation) of the library
@@ -46,7 +46,7 @@ data class ApiLocation (
 }
 
 // An ApiViolationExclusions contains the paths of the API exclusions files for an API
-data class ApiViolationExclusions (
+data class ApiViolationExclusions(
     val publicApiFile: File,
     val restrictedApiFile: File
 ) {
