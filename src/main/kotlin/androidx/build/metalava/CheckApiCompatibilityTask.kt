@@ -18,10 +18,6 @@ package androidx.build.metalava
 
 import androidx.build.checkapi.ApiLocation
 import androidx.build.checkapi.ApiViolationExclusions
-import com.android.build.gradle.BaseExtension
-import com.android.build.gradle.api.BaseVariant
-import org.gradle.api.attributes.Attribute
-import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
@@ -63,7 +59,6 @@ open class CheckApiCompatibilityTask : MetalavaTask() {
             checkApiFile(referenceApi.restrictedApiFile, exclusions.restrictedApiFile, false)
         }
     }
-
 
     // Confirms that the public API of this library (or the restricted API, if <checkRestrictedAPIs> is set
     // is compatible with <apiFile> except for any exclusions listed in <exclusionsFile>

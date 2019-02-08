@@ -17,13 +17,9 @@
 package androidx.build.metalava
 
 import androidx.build.checkapi.ApiLocation
-import com.android.build.gradle.BaseExtension
-import com.android.build.gradle.api.BaseVariant
 import com.google.common.io.Files
-import org.gradle.api.attributes.Attribute
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
-import org.gradle.api.file.FileCollection
 import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFiles
@@ -90,6 +86,6 @@ open class UpdateApiTask : DefaultTask() {
         }
 
         Files.copy(source, dest)
-        logger.lifecycle("Copied ${source} to ${dest}")
+        logger.lifecycle("Copied $source to $dest")
     }
 }

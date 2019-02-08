@@ -130,8 +130,8 @@ private fun <K, V> MutableMap<K, V>.getOrMaybePut(key: K, defaultValue: () -> V?
  * @param artifacts Map of artifact versions keyed by artifact name
  */
 private data class GroupVersionData(
-        val name: String,
-        val artifacts: Map<String, ArtifactVersionData>
+    val name: String,
+    val artifacts: Map<String, ArtifactVersionData>
 ) {
     companion object {
         /**
