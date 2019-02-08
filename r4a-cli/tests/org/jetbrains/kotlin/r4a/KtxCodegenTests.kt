@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.android.internal.R.attr.button
 import com.google.r4a.Component
 import com.google.r4a.CompositionContext
 import com.google.r4a.composer
@@ -62,14 +61,15 @@ class KtxCodegenTests : AbstractCodeGenTest() {
                 }
             """,
             { mapOf<String, String>() },
-            "<SimpleComposable />").then { activity ->
-                val button = activity.findViewById(42) as Button
-                button.performClick();
-                button.performClick();
-                button.performClick();
-            }.then { activity ->
-                val button = activity.findViewById(42) as Button
-                assertEquals("Clicked 3 times", button.text)
+            "<SimpleComposable />"
+        ).then { activity ->
+            val button = activity.findViewById(42) as Button
+            button.performClick()
+            button.performClick()
+            button.performClick()
+        }.then { activity ->
+            val button = activity.findViewById(42) as Button
+            assertEquals("Clicked 3 times", button.text)
         }
     }
 
@@ -78,7 +78,8 @@ class KtxCodegenTests : AbstractCodeGenTest() {
         compose(
             """
                 <TextView text="Hello, world!" id=42 />
-            """).then { activity ->
+            """
+        ).then { activity ->
             val textView = activity.findViewById(42) as TextView
             assertEquals("Hello, world!", textView.text)
         }
@@ -96,7 +97,7 @@ class KtxCodegenTests : AbstractCodeGenTest() {
                     <Bar />
                 }
             """,
-            { mapOf<String,String>() },
+            { mapOf<String, String>() },
             """
                 <Foo />
             """
@@ -184,7 +185,8 @@ class KtxCodegenTests : AbstractCodeGenTest() {
         compose(
             """
                 <TextView text="Hello, world!" id=42 />
-            """).then { activity ->
+            """
+        ).then { activity ->
             val textView = activity.findViewById(42) as TextView
             assertEquals("Hello, world!", textView.text)
         }
@@ -283,9 +285,11 @@ class KtxCodegenTests : AbstractCodeGenTest() {
     fun testCGUpdatedComposition(): Unit = ensureSetup {
         var value = "Hello, world!"
 
-        compose({ mapOf("value" to value) }, """
+        compose(
+            { mapOf("value" to value) }, """
            <TextView text=value id=42 />
-        """).then { activity ->
+        """
+        ).then { activity ->
             val textView = activity.findViewById(42) as TextView
             assertEquals("Hello, world!", textView.text)
 
@@ -300,9 +304,11 @@ class KtxCodegenTests : AbstractCodeGenTest() {
     fun testCGNUpdatedComposition(): Unit = ensureSetup {
         var value = "Hello, world!"
 
-        compose({ mapOf("value" to value) }, """
+        compose(
+            { mapOf("value" to value) }, """
            <TextView text=value id=42 />
-        """).then { activity ->
+        """
+        ).then { activity ->
             val textView = activity.findViewById(42) as TextView
             assertEquals("Hello, world!", textView.text)
 
@@ -320,11 +326,13 @@ class KtxCodegenTests : AbstractCodeGenTest() {
         var text = "Hello, world!"
         var orientation = LinearLayout.HORIZONTAL
 
-        compose({ mapOf("text" to text, "orientation" to orientation) }, """
+        compose(
+            { mapOf("text" to text, "orientation" to orientation) }, """
             <LinearLayout orientation id=$llId>
               <TextView text id=$tvId />
             </LinearLayout>
-        """).then { activity ->
+        """
+        ).then { activity ->
             val textView = activity.findViewById(tvId) as TextView
             val linearLayout = activity.findViewById(llId) as LinearLayout
 
@@ -364,7 +372,8 @@ class KtxCodegenTests : AbstractCodeGenTest() {
             <StringAmbient.Provider value=text>
                 <Foo />
             </StringAmbient.Provider>
-        """).then { activity ->
+        """
+        ).then { activity ->
             val textView = activity.findViewById(tvId) as TextView
 
             assertEquals(text, textView.text)
@@ -382,7 +391,7 @@ class KtxCodegenTests : AbstractCodeGenTest() {
         val tvId = 123
 
         compose(
-        """
+            """
             class Foo {
                 var text = ""
                 @Composable
@@ -392,8 +401,8 @@ class KtxCodegenTests : AbstractCodeGenTest() {
             }
 
         """,
-        { mapOf("text" to text) },
-        """
+            { mapOf("text" to text) },
+            """
              <Foo text bar=123 />
         """
         ).then { activity ->
@@ -445,11 +454,13 @@ class KtxCodegenTests : AbstractCodeGenTest() {
         var text = "Hello, world!"
         var orientation = LinearLayout.HORIZONTAL
 
-        compose({ mapOf("text" to text, "orientation" to orientation) }, """
+        compose(
+            { mapOf("text" to text, "orientation" to orientation) }, """
              <LinearLayout orientation id=$llId>
                <TextView text id=$tvId />
              </LinearLayout>
-        """).then { activity ->
+        """
+        ).then { activity ->
             val textView = activity.findViewById(tvId) as TextView
             val linearLayout = activity.findViewById(llId) as LinearLayout
 
@@ -497,12 +508,12 @@ class KtxCodegenTests : AbstractCodeGenTest() {
 
     @Test
     fun testCGNSimpleCall2(): Unit = ensureSetup {
-            val tvId = 258
-            var text = "Hello, world!"
-            var someInt = 456
+        val tvId = 258
+        var text = "Hello, world!"
+        var someInt = 456
 
-            compose(
-                """
+        compose(
+            """
                 class SomeClass(var x: String) {
                     @Composable
                     operator fun invoke(y: Int) {
@@ -510,23 +521,23 @@ class KtxCodegenTests : AbstractCodeGenTest() {
                     }
                 }
             """,
-                { mapOf("text" to text, "someInt" to someInt) },
-                """
+            { mapOf("text" to text, "someInt" to someInt) },
+            """
                 <SomeClass x=text y=someInt />
             """
-            ).then { activity ->
-                val textView = activity.findViewById(tvId) as TextView
+        ).then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
 
-                assertEquals("Hello, world! 456", textView.text)
+            assertEquals("Hello, world! 456", textView.text)
 
-                text = "Other value"
-                someInt = 123
-            }.then { activity ->
-                val textView = activity.findViewById(tvId) as TextView
+            text = "Other value"
+            someInt = 123
+        }.then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
 
-                assertEquals("Other value 123", textView.text)
-            }
+            assertEquals("Other value 123", textView.text)
         }
+    }
 
     @Test
     fun testCGNSimpleCall3(): Unit = ensureSetup {
@@ -664,13 +675,15 @@ class KtxCodegenTests : AbstractCodeGenTest() {
     fun testCGComposableFunctionInvocationOneParameter(): Unit = ensureSetup {
         val tvId = 91
         var phone = "(123) 456-7890"
-        compose("""
+        compose(
+            """
            fun Phone(value: String) {
              <TextView text=value id=$tvId />
            }
-        """, { mapOf("phone" to phone)}, """
+        """, { mapOf("phone" to phone) }, """
            <Phone value=phone />
-        """).then { activity ->
+        """
+        ).then { activity ->
             val textView = activity.findViewById(tvId) as TextView
             assertEquals(phone, textView.text)
 
@@ -687,7 +700,8 @@ class KtxCodegenTests : AbstractCodeGenTest() {
         val rsId = 112
         var left = 0
         var right = 0
-        compose("""
+        compose(
+            """
            var addCalled = 0
 
            fun AddView(left: Int, right: Int) {
@@ -695,9 +709,10 @@ class KtxCodegenTests : AbstractCodeGenTest() {
              <TextView text="${'$'}left + ${'$'}right = ${'$'}{left + right}" id=$tvId />
              <TextView text="${'$'}addCalled" id=$rsId />
            }
-        """, { mapOf("left" to left, "right" to right)}, """
+        """, { mapOf("left" to left, "right" to right) }, """
            <AddView left right />
-        """).then { activity ->
+        """
+        ).then { activity ->
             // Should be called on the first compose
             assertEquals("1", (activity.findViewById(rsId) as TextView).text)
             assertEquals("$left + $right = ${left + right}", (activity.findViewById(tvId) as TextView).text)
@@ -931,7 +946,8 @@ class KtxCodegenTests : AbstractCodeGenTest() {
 
         var text = "Test 1"
 
-        compose("""
+        compose(
+            """
             var called = 0
 
             class TestContainer(@Children var children: @Composable() ()->Unit): Component() {
@@ -951,7 +967,8 @@ class KtxCodegenTests : AbstractCodeGenTest() {
             }
         """, { mapOf("text" to text) }, """
             <TestClass text />
-        """).then { activity ->
+        """
+        ).then { activity ->
             val tv = activity.findViewById(tvId) as TextView
             assertEquals(text, tv.text)
 
@@ -1115,6 +1132,94 @@ class KtxCodegenTests : AbstractCodeGenTest() {
         """
     )
 
+
+    @Test
+    fun testMovement(): Unit = ensureSetup {
+        val tvId = 50
+        val btnIdAdd = 100
+        val btnIdUp = 200
+        val btnIdDown = 300
+
+        // Duplicate the steps to reproduce an issue discovered in the Reorder example
+        compose(
+            """
+            fun <T> List<T>.move(from: Int, to: Int): List<T> {
+                if (to < from) return move(to, from)
+                val item = get(from)
+                val currentItem = get(to)
+                val left = if (from > 0) subList(0, from) else emptyList()
+                val right = if (to < size) subList(to + 1, size) else emptyList()
+                val middle = if (to - from > 1) subList(from + 1, to) else emptyList()
+                return left + listOf(currentItem) + middle + listOf(item) + right
+            }
+
+            @Composable
+            fun Reordering() {
+                <Observe>
+                    val items = +state { listOf(1, 2, 3, 4, 5) }
+
+                    <LinearLayout orientation=LinearLayout.VERTICAL>
+                        items.value.forEachIndexed { index, id ->
+                            <Item
+                                id
+                                onMove={ amount ->
+                                    val next = index + amount
+                                    if (next >= 0 && next < items.value.size) {
+                                        items.value = items.value.move(index, index + amount)
+                                    }
+                                }
+                            />
+                        }
+                    </LinearLayout>
+                </Observe>
+            }
+
+            @Composable
+            private fun Item(@Pivotal id: Int, onMove: (Int) -> Unit) {
+                <Observe>
+                    val count = +state { 0 }
+                    <LinearLayout orientation=LinearLayout.HORIZONTAL>
+                        <TextView id=(id+$tvId) text="id: ${'$'}id amt: ${'$'}{count.value}" />
+                        <Button id=(id+$btnIdAdd) text="+" onClick={ count.value++ } />
+                        <Button id=(id+$btnIdUp) text="Up" onClick={ onMove(1) } />
+                        <Button id=(id+$btnIdDown) text="Down" onClick={ onMove(-1) } />
+                    </LinearLayout>
+                </Observe>
+            }
+            """, { emptyMap<String, String>() },
+            """
+               <Reordering />
+            """
+        ).then { activity ->
+            // Click 5 add
+            val button = activity.findViewById(btnIdAdd + 5) as Button
+            button.performClick()
+        }.then { activity ->
+            // Click 5 down
+            val button = activity.findViewById(btnIdDown + 5) as Button
+            button.performClick()
+        }.then { activity ->
+            // Click 5 down
+            val button = activity.findViewById(btnIdDown + 5) as Button
+            button.performClick()
+        }.then { activity ->
+            // Click 5 up
+            val button = activity.findViewById(btnIdUp + 5) as Button
+            button.performClick()
+        }.then { activity ->
+            // Click 5 up
+            val button = activity.findViewById(btnIdUp + 5) as Button
+            button.performClick()
+        }.then { activity ->
+            // Click 5 add
+            val button = activity.findViewById(btnIdAdd + 5) as Button
+            button.performClick()
+        }.then { activity ->
+            val textView = activity.findViewById(tvId + 5) as TextView
+            assertEquals("id: 5 amt: 2", textView.text)
+        }
+    }
+
     override fun setUp() {
         isSetup = true
         super.setUp()
@@ -1142,20 +1247,29 @@ class KtxCodegenTests : AbstractCodeGenTest() {
         val className = "Test_${uniqueNumber++}"
         val fileName = "$className.kt"
 
-        classLoader("""
+        classLoader(
+            """
            import android.content.Context
            import android.widget.*
            import com.google.r4a.*
 
            $text
 
-        """, fileName, dumpClasses)
+        """, fileName, dumpClasses
+        )
     }
 
-    fun compose(text: String, dumpClasses: Boolean = false): CompositionTest = compose({mapOf<String, Any>()}, text, dumpClasses)
+    fun compose(text: String, dumpClasses: Boolean = false): CompositionTest = compose({ mapOf<String, Any>() }, text, dumpClasses)
 
-    fun <T: Any> compose(valuesFactory: () -> Map<String, T>, text: String, dumpClasses: Boolean = false) = compose("", valuesFactory, text, dumpClasses)
-    fun <T: Any> compose(prefix: String, valuesFactory: () -> Map<String, T>, text: String, dumpClasses: Boolean = false): CompositionTest {
+    fun <T : Any> compose(valuesFactory: () -> Map<String, T>, text: String, dumpClasses: Boolean = false) =
+        compose("", valuesFactory, text, dumpClasses)
+
+    fun <T : Any> compose(
+        prefix: String,
+        valuesFactory: () -> Map<String, T>,
+        text: String,
+        dumpClasses: Boolean = false
+    ): CompositionTest {
         val className = "Test_${uniqueNumber++}"
         val fileName = "$className.kt"
 
@@ -1165,10 +1279,12 @@ class KtxCodegenTests : AbstractCodeGenTest() {
         val parameterList = candidateValues.map { "${it.key}: ${it.value::class.qualifiedName}" }.joinToString()
         val parameterTypes = candidateValues.map { it.value::class.javaPrimitiveType ?: it.value::class.javaObjectType }.toTypedArray()
 
-        val compiledClasses = classLoader("""
+        val compiledClasses = classLoader(
+            """
            import android.content.Context
            import android.widget.*
            import com.google.r4a.*
+           import com.google.r4a.adapters.*
 
            $prefix
 
@@ -1178,7 +1294,8 @@ class KtxCodegenTests : AbstractCodeGenTest() {
                $text
              }
            }
-        """, fileName, dumpClasses)
+        """, fileName, dumpClasses
+        )
 
         val allClassFiles = compiledClasses.allGeneratedFiles.filter { it.relativePath.endsWith(".class") }
 
@@ -1216,7 +1333,8 @@ fun loadClass(loader: ClassLoader, name: String?, bytes: ByteArray): Class<*> {
         String::class.javaObjectType,
         ByteArray::class.javaObjectType,
         Int::class.javaPrimitiveType,
-        Int::class.javaPrimitiveType)
+        Int::class.javaPrimitiveType
+    )
     defineClassMethod.isAccessible = true
     return defineClassMethod.invoke(loader, name, bytes, 0, bytes.size) as Class<*>
 }

@@ -1,6 +1,7 @@
 package com.google.r4a
 
 import junit.framework.TestCase
+import org.junit.Assert
 
 class SlotTableTests : TestCase() {
     fun testCanCreate() {
@@ -213,7 +214,7 @@ class SlotTableTests : TestCase() {
         val anchors = slots.write { writer -> (1..7).map { writer.anchor(it * 10) } }
         slots.write { writer ->
             for (index in 1..7) {
-                writer.remove(index * 10, 1)
+                writer.remove(index * 10 - (index - 1), 1)
                 assertEquals(-1, anchors[index - 1].location(slots))
             }
         }
@@ -232,22 +233,32 @@ class SlotTableTests : TestCase() {
 
     fun testAnchorTracksExtactRemovesInnerOuter() {
         val slots = testSlotsNumbered()
-        val anchors = slots.write { writer -> (1..7).map { writer.anchor(it * 10) } }
+        val expectedLocations = (1..7).map { it * 10 }.toMutableList()
+        val anchors = slots.write { writer -> expectedLocations.map { writer.anchor(it) } }
         slots.write { writer ->
             for (index in listOf(4, 5, 3, 6, 2, 7, 1) ) {
-                writer.remove(index * 10, 1)
+                val location = expectedLocations[index-1]
+                writer.remove(location, 1)
                 assertEquals(-1, anchors[index - 1].location(slots))
+                for (i in expectedLocations.indices) {
+                    if (expectedLocations[i] > location) expectedLocations[i]--
+                }
             }
         }
     }
 
     fun testAnchorTracksExactRemovesOuterInner() {
         val slots = testSlotsNumbered()
-        val anchors = slots.write { writer -> (1..7).map { writer.anchor(it * 10) } }
+        val expectedLocations = (1..7).map { it * 10 }.toMutableList()
+        val anchors = slots.write { writer -> expectedLocations.map { writer.anchor(it) } }
         slots.write { writer ->
-            for (index in listOf(1, 7, 2, 6, 3, 5, 4) ) {
-                writer.remove(index * 10, 1)
+            for (index in listOf(1, 7, 2, 6, 3, 5, 4)) {
+                val location = expectedLocations[index-1]
+                writer.remove(location, 1)
                 assertEquals(-1, anchors[index - 1].location(slots))
+                for (i in expectedLocations.indices) {
+                    if (expectedLocations[i] > location) expectedLocations[i]--
+                }
             }
         }
     }
@@ -261,10 +272,66 @@ class SlotTableTests : TestCase() {
         slots.read { reader ->
             for (index in 1..7) {
                 val anchor = anchors[index - 1]
-                val expected = (index * 10).let { if (it in 40..60) SlotTable.EMPTY else it }
-                assertEquals(expected , reader.get(anchor))
+                val expected = (index * 10).let { if (it in 40 until 60) SlotTable.EMPTY else it }
+                assertEquals(expected, reader.get(anchor))
             }
         }
+    }
+
+    fun testAnchorMoves() {
+        val slots = SlotTable()
+
+        fun buildSlots(range: List<Int>): Map<Anchor, Any?> {
+            val anchors = mutableListOf<Pair<Anchor, Any?>>()
+            slots.write { writer ->
+                fun item(value: Any?, block: () -> Unit) {
+                    writer.startItem(value)
+                    block()
+                    writer.endItem()
+                }
+
+                fun value(value: Any?) {
+                    writer.update(value)
+                }
+
+                writer.beginInsert()
+                for (i in range) {
+                    item(i) {
+                        value(i * 100)
+                        anchors.add(slots.anchor(writer.current - 1) to i * 100)
+                    }
+                }
+                writer.endInsert()
+            }
+            return anchors.toMap()
+        }
+
+        fun validate(anchors: Map<Anchor, Any?>) {
+            slots.read { reader ->
+                for (anchor in anchors) {
+                    assertEquals(anchor.value, reader.get(slots.anchorLocation(anchor.key)))
+                }
+            }
+        }
+
+        fun moveItems() {
+            slots.write { writer ->
+                writer.skipItem()
+                writer.moveItem(4)
+                writer.skipItem()
+                writer.skipItem()
+                writer.moveItem(1)
+                writer.skipItem()
+                writer.skipItem()
+                writer.moveItem(1)
+            }
+        }
+
+        val expected = listOf(1,2,3,4,5,6,7)
+        val anchors = buildSlots(expected)
+        validate(anchors)
+        moveItems()
+        validate(anchors)
     }
 
     fun testRemovingDuplicateAnchorsMidRange() {
@@ -643,6 +710,289 @@ class SlotTableTests : TestCase() {
     fun testReportUncertainNodeCount() {
         val slots = SlotTable()
         slots.read { reader -> reader.reportUncertainNodeCount() }
+    }
+
+    fun testMoveGroup() {
+        val slots = SlotTable()
+
+        val anchors = mutableListOf<Anchor>()
+
+        fun buildSlots() {
+            slots.write { writer ->
+                fun group(block: () -> Unit) {
+                    writer.startGroup()
+                    block()
+                    writer.endGroup()
+                }
+
+                fun item(key: Any?, block: () -> Unit) {
+                    writer.startItem(key)
+                    block()
+                    writer.endItem()
+                }
+
+                fun element(key: Any?, block: () -> Unit) {
+                    writer.update(key)
+                    writer.startNode()
+                    block()
+                    writer.endNode()
+                }
+
+                fun value(value: Any) {
+                    writer.update(value)
+                }
+
+                // Build a slot table to that duplicates the structure of the slot table produced
+                // in the code generation test testMovement()
+                writer.beginInsert()
+                item(0) {
+                    item(2) {
+                        item(4) {
+                            item(6) {
+                                value(8)
+                                item(9) {
+                                    item(11) {
+                                        group {
+                                            value(14)
+                                            item(15) {
+                                                value(17)
+                                                element(18) {
+                                                    value(20)
+                                                    value(21)
+                                                    for (i in 1..5) {
+                                                        item(i) {
+                                                            value(i)
+                                                            value(25)
+                                                            item(26) {
+                                                                item(28) {
+                                                                    value(30)
+                                                                    item(31) {
+                                                                        item(33) {
+                                                                            group {
+                                                                                value(36)
+                                                                                item(37) {
+                                                                                    value(39)
+                                                                                    element(40) {
+                                                                                        value(42)
+                                                                                        value(43)
+                                                                                        element(44) {
+                                                                                            value(46)
+                                                                                            value(47)
+                                                                                        }
+                                                                                        element(48) {
+                                                                                            value(50)
+                                                                                            value(51)
+                                                                                            value(52)
+                                                                                            value(53)
+                                                                                        }
+                                                                                        element(54) {
+                                                                                            value(56)
+                                                                                            value(57)
+                                                                                            value(58)
+                                                                                            value(59)
+                                                                                        }
+                                                                                        element(60) {
+                                                                                            value(62)
+                                                                                            anchors.add(slots.anchor(writer.current - 1))
+                                                                                            value(63)
+                                                                                            value(64)
+                                                                                            value(65)
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                writer.endInsert()
+            }
+        }
+
+        fun validateSlots(range: List<Int>) {
+            slots.read { reader ->
+                fun group(block: () -> Unit) {
+                    reader.startGroup()
+                    block()
+                    reader.endGroup()
+                }
+
+                fun value(value: Any?) {
+                    Assert.assertEquals(value, reader.next())
+                }
+
+                fun item(key: Any?, block: () -> Unit) {
+                    reader.startItem(key)
+                    block()
+                    reader.endItem()
+                }
+
+                fun element(key: Any?, block: () -> Unit) {
+                    value(key)
+                    reader.startNode()
+                    block()
+                    reader.endNode()
+                }
+
+
+                item(0) {
+                    item(2) {
+                        item(4) {
+                            item(6) {
+                                value(8)
+                                item(9) {
+                                    item(11) {
+                                        group {
+                                            value(14)
+                                            item(15) {
+                                                value(17)
+                                                element(18) {
+                                                    value(20)
+                                                    value(21)
+                                                    for (i in range) {
+                                                        item(i) {
+                                                            value(i)
+                                                            value(25)
+                                                            item(26) {
+                                                                item(28) {
+                                                                    value(30)
+                                                                    item(31) {
+                                                                        item(33) {
+                                                                            group {
+                                                                                value(36)
+                                                                                item(37) {
+                                                                                    value(39)
+                                                                                    element(40) {
+                                                                                        value(42)
+                                                                                        value(43)
+                                                                                        element(44) {
+                                                                                            value(46)
+                                                                                            value(47)
+                                                                                        }
+                                                                                        element(48) {
+                                                                                            value(50)
+                                                                                            value(51)
+                                                                                            value(52)
+                                                                                            value(53)
+                                                                                        }
+                                                                                        element(54) {
+                                                                                            value(56)
+                                                                                            value(57)
+                                                                                            value(58)
+                                                                                            value(59)
+                                                                                        }
+                                                                                        element(60) {
+                                                                                            value(62)
+                                                                                            value(63)
+                                                                                            value(64)
+                                                                                            value(65)
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        fun moveItem5Up() {
+            slots.write { writer ->
+                fun group(block: () -> Unit) {
+                    writer.startGroup()
+                    block()
+                    writer.endGroup()
+                }
+
+                fun item(key: Any?, block: () -> Unit) {
+                    writer.startItem(key)
+                    block()
+                    writer.endItem()
+                }
+
+                fun element(key: Any?, block: () -> Unit) {
+                    writer.update(key)
+                    writer.startNode()
+                    block()
+                    writer.endNode()
+                }
+
+                fun value(value: Any) {
+                    writer.update(value)
+                }
+                item(0) {
+                    item(2) {
+                        item(4) {
+                            item(6) {
+                                value(8)
+                                item(9) {
+                                    item(11) {
+                                        group {
+                                            value(14)
+                                            item(15) {
+                                                value(17)
+                                                element(18) {
+                                                    value(20)
+                                                    value(21)
+
+                                                    // Skip three items
+                                                    writer.skipItem()
+                                                    writer.skipItem()
+                                                    writer.skipItem()
+
+
+                                                    // Move one item up
+                                                    writer.moveItem(1)
+
+                                                    // Skip them
+                                                    writer.skipItem()
+                                                    writer.skipItem()
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        buildSlots()
+        validateSlots((1..5).toList())
+        moveItem5Up()
+        validateSlots(listOf(1,2,3,5,4))
+
+        // Validate that all the anchors still refer to a slot with value 62
+        slots.read { reader ->
+            for (anchor in anchors) {
+                Assert.assertEquals(62, reader.get(slots.anchorLocation(anchor)))
+            }
+        }
     }
 }
 

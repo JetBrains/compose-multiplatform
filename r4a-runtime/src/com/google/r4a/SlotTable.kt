@@ -457,7 +457,13 @@ class SlotWriter internal constructor(table: SlotTable) : SlotEditor(table) {
         current = oldCurrent
         nodeCount = oldNodeCount
         System.arraycopy(slots, effectiveIndex(newMoveLocation), slots, effectiveIndex(current), moveLen)
-        remove(moveLocation + moveLen, moveLen)
+
+        // Before we remove the old location, move any anchors
+        table.moveAnchors(newMoveLocation, current, moveLen)
+
+        // Remove the now duplicate entries
+        val anchorsRemoved = remove(moveLocation + moveLen, moveLen)
+        assert(!anchorsRemoved) { "Unexpectedly removed anchors" }
     }
 
     /**
@@ -544,15 +550,17 @@ class SlotWriter internal constructor(table: SlotTable) : SlotEditor(table) {
             moveGapTo(current)
             if (table.gapLen < size) {
                 // Create a bigger gap
-                val oldSize = slots.size
+                val oldCapacity = slots.size
+                val oldSize = slots.size - table.gapLen
                 // Double the size of the array, but at least MIN_GROWTH_SIZE and >= size
-                val newGapLen = Math.max(Math.max(oldSize, size), MIN_GROWTH_SIZE - oldSize)
-                val newSlots = arrayOfNulls<Any?>(oldSize + newGapLen)
+                val newCapacity = Math.max(Math.max(oldCapacity*2, oldSize + size), MIN_GROWTH_SIZE)
+                val newSlots = arrayOfNulls<Any?>(newCapacity)
+                val newGapLen = newCapacity - oldSize
                 val oldGapEnd = table.gapStart + table.gapLen
                 val newGapEnd = table.gapStart + newGapLen
                 // Copy the old array into the new array
                 System.arraycopy(slots, 0, newSlots, 0, table.gapStart)
-                System.arraycopy(slots, oldGapEnd, newSlots, newGapEnd, oldSize - oldGapEnd)
+                System.arraycopy(slots, oldGapEnd, newSlots, newGapEnd, oldCapacity - oldGapEnd)
 
                 // Update the anchors
                 if (table.anchors.isNotEmpty()) table.anchorGapResize(newGapLen - table.gapLen)
@@ -579,13 +587,13 @@ class SlotWriter internal constructor(table: SlotTable) : SlotEditor(table) {
             if (table.gapLen == 0) {
                 // If there is no current gap, just make the removed items the gap
                 table.gapStart = start
-                if (table.anchors.isNotEmpty()) anchorsRemoved = table.removeAnchors(start + len, len)
+                if (table.anchors.isNotEmpty()) anchorsRemoved = table.removeAnchors(start, len)
                 table.gapLen = len
             } else {
                 // Move the gap to the startGroup + len location and set the gap startGroup to startGroup and gap len to len + gapLen
                 val removeEnd = start + len
                 moveGapTo(removeEnd)
-                if (table.anchors.isNotEmpty()) anchorsRemoved = table.removeAnchors(table.gapStart, len)
+                if (table.anchors.isNotEmpty()) anchorsRemoved = table.removeAnchors(start, len)
                 table.gapStart = start
                 table.gapLen += len
             }
@@ -662,23 +670,30 @@ class SlotTable(internal var slots: Array<Any?> = arrayOf()) {
     }
 
     internal fun updateAnchors(gapMovedTo: Int) {
-        val from = gapStart + gapLen
-        val to = if (gapMovedTo < gapStart) gapMovedTo else gapMovedTo + gapLen
         if (gapStart < gapMovedTo) {
-            var index = anchors.locationOf(from)
+            // Gap is moving up
+            // All anchors between the new gap and the old gap switch to be anchored to the
+            // front of the table instead of the end.
+            val rangeStart = gapStart + gapLen
+            val rangeEnd = gapMovedTo + gapLen
+            var index = anchors.locationOf(rangeStart)
             while (index < anchors.size) {
                 val anchor = anchors[index]
-                if (anchor.loc < to) {
-                    anchor.loc += gapLen
+                if (anchor.loc < rangeEnd) {
+                    anchor.loc -= gapLen
                     index++
                 } else break
             }
         } else {
-            var index = anchors.locationOf(to)
+            // Gap is moving down. All anchors between gapMoveTo and gapStart need now to be
+            // anchored to the end of the table instead of the front of the table.
+            val rangeStart = gapMovedTo
+            val rangeEnd = gapStart
+            var index = anchors.locationOf(rangeStart)
             while (index < anchors.size) {
                 val anchor = anchors[index]
-                if (anchor.loc > from) {
-                    anchor.loc -= gapLen
+                if (anchor.loc < rangeEnd) {
+                    anchor.loc += gapLen
                     index++
                 } else break
             }
@@ -692,19 +707,50 @@ class SlotTable(internal var slots: Array<Any?> = arrayOf()) {
     }
 
     internal fun removeAnchors(gapStart: Int, size: Int): Boolean {
-        val removeStart = gapStart - size
-        var index = anchors.locationOf(gapStart).let { if (it >= anchors.size) it - 1 else it }
+        val removeStart = gapStart
+        val removeEnd = gapStart + size
+        var index = anchors.locationOf(gapStart + size).let { if (it >= anchors.size) it - 1 else it }
         var anchorsRemoved = false
         while (index >= 0) {
             val anchor = anchors[index]
             if (anchor.loc >= removeStart) {
-                anchor.loc = -1
-                anchors.removeAt(index)
-                anchorsRemoved = true
+                if (anchor.loc < removeEnd) {
+                    anchor.loc = -1
+                    anchors.removeAt(index)
+                    anchorsRemoved = true
+                }
                 index--
             } else break
         }
         return anchorsRemoved
+    }
+
+    internal fun moveAnchors(originalLocation: Int, newLocation: Int, size: Int) {
+        val effectiveStart = effectiveIndex(originalLocation)
+        val effectiveEnd = effectiveIndex(originalLocation + size)
+
+        // Remove all the anchors in range from the original location
+        val index = anchors.locationOf(effectiveStart)
+        val removedAnchors = mutableListOf<Anchor>()
+        if (index >= 0) {
+            while (index < anchors.size) {
+                val anchor = anchors[index]
+                if (anchor.loc >= effectiveStart && anchor.loc < effectiveEnd) {
+                    removedAnchors.add(anchor)
+                    anchors.removeAt(index)
+                } else break
+            }
+        }
+
+        // Insert the anchors into there new location
+        for (anchor in removedAnchors) {
+            val location = anchorLocation(anchor)
+            val newAnchorLocation = location - originalLocation + newLocation
+            val effectiveLocation = effectiveIndex(newAnchorLocation)
+            anchor.loc = effectiveLocation
+            val insertIndex = anchors.locationOf(effectiveLocation)
+            anchors.add(insertIndex, anchor)
+        }
     }
 
     internal fun anchorLocation(anchor: Anchor) = anchor.loc.let { if (it > gapStart) it - gapLen else it }

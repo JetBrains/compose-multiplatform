@@ -113,7 +113,7 @@ internal object FrameManager {
     }
 
     fun scheduleCleanup() {
-        if (!reclaimPending && synchronized(this) {
+        if (started && !reclaimPending && synchronized(this) {
                 if (!reclaimPending) {
                     reclaimPending = true
                     true
