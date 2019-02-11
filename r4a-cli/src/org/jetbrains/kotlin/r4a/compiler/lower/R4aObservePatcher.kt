@@ -5,12 +5,8 @@
 
 package org.jetbrains.kotlin.r4a.compiler.lower
 
-import org.jetbrains.kotlin.backend.common.CompilerPhase
 import org.jetbrains.kotlin.backend.common.FileLoweringPass
-import org.jetbrains.kotlin.backend.common.makePhase
 import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
-import org.jetbrains.kotlin.backend.jvm.extensions.IrLoweringExtension
-import org.jetbrains.kotlin.backend.jvm.makePatchParentsPhase
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.AnonymousFunctionDescriptor
@@ -25,21 +21,21 @@ import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.impl.IrFunctionImpl
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
-import org.jetbrains.kotlin.ir.expressions.impl.IrBlockBodyImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrBlockImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrFunctionReferenceImpl
+import org.jetbrains.kotlin.ir.expressions.impl.*
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.toIrType
 import org.jetbrains.kotlin.ir.types.toKotlinType
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
+import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.psi.KtFunctionLiteral
 import org.jetbrains.kotlin.r4a.R4aUtils
 import org.jetbrains.kotlin.r4a.R4aUtils.generateR4APackageName
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
+import org.jetbrains.kotlin.resolve.inline.InlineUtil
 
 
 class R4aObservePatcher(val context: JvmBackendContext) :
@@ -103,7 +99,14 @@ class R4aObservePatcher(val context: JvmBackendContext) :
 
     override fun visitFunction(declaration: IrFunction): IrStatement {
 
+        super.visitFunction(declaration)
         if(!isComposable(declaration)) return declaration
+        declaration.descriptor.findPsi()?.let { psi ->
+            (psi as? KtFunctionLiteral)?.let {
+                if(InlineUtil.isInlinedArgument(it, context.state.bindingContext, true))
+                    return declaration
+            }
+        }
         if(declaration.body == null) return declaration;
 
         val module = declaration.descriptor.module
@@ -138,8 +141,8 @@ class R4aObservePatcher(val context: JvmBackendContext) :
                 else super.visitCall(expression)
             }
 
-            override fun visitFunction(declaration: IrFunction) {
-                // End traversal; do not call super.
+            override fun visitFunction(function: IrFunction) {
+                if(function == declaration) super.visitFunction(function)
             }
 
         }, null)

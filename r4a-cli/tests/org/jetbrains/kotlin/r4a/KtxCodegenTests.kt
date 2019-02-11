@@ -74,6 +74,43 @@ class KtxCodegenTests : AbstractCodeGenTest() {
     }
 
     @Test
+    fun testObservableLambda(): Unit = ensureSetup {
+        compose(
+            """
+                import android.widget.*
+                import com.google.r4a.*
+                import com.google.r4a.adapters.setOnClick
+
+                @Model
+                class FancyButtonCount() {
+                    var count = 0
+                }
+
+                @Composable
+                fun SimpleComposable(state: FancyButtonCount) {
+                    <FancyBox2>
+                        <Button text=("Button clicked "+state.count+" times") onClick={state.count++} id=42 />
+                    </FancyBox2>
+                }
+
+                @Composable
+                fun FancyBox2(@Children children: ()->Unit) {
+                    <children />
+                }
+            """,
+            { mapOf<String, String>() },
+            "<SimpleComposable state=FancyButtonCount() />").then { activity ->
+            val button = activity.findViewById(42) as Button
+            button.performClick();
+            button.performClick();
+            button.performClick();
+        }.then { activity ->
+            val button = activity.findViewById(42) as Button
+            assertEquals("Button clicked 3 times", button.text)
+        }
+    }
+
+    @Test
     fun testCGSimpleTextView(): Unit = ensureSetup {
         compose(
             """
