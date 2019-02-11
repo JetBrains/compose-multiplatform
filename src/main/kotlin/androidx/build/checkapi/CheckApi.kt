@@ -19,7 +19,6 @@ package androidx.build.checkapi
 import androidx.build.SupportLibraryExtension
 import androidx.build.Version
 import androidx.build.androidJarFile
-import androidx.build.createWithConfig
 import androidx.build.doclava.CHECK_API_CONFIG_DEVELOP
 import androidx.build.doclava.CHECK_API_CONFIG_PATCH
 import androidx.build.doclava.CHECK_API_CONFIG_RELEASE
@@ -32,15 +31,16 @@ import androidx.build.processProperty
 import androidx.build.version
 import org.gradle.api.GradleException
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.JavaBasePlugin
+import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.TaskProvider
 import java.io.File
 
 data class CheckApiTasks(
-    val generateApi: DoclavaTask,
-    val checkApi: CheckApiTask,
-    val generateLocalDiffs: JDiffTask
+    val generateApi: TaskProvider<DoclavaTask>,
+    val checkApi: TaskProvider<CheckApiTask>,
+    val generateLocalDiffs: TaskProvider<JDiffTask>
 )
 
 enum class ApiType {
@@ -53,8 +53,8 @@ enum class ApiType {
  */
 fun initializeApiChecksForProject(
     project: Project,
-    aggregateOldApiTxtsTask: ConcatenateFilesTask,
-    aggregateNewApiTxtsTask: ConcatenateFilesTask
+    aggregateOldApiTxtsTask: TaskProvider<ConcatenateFilesTask>,
+    aggregateNewApiTxtsTask: TaskProvider<ConcatenateFilesTask>
 ): CheckApiTasks {
     if (!project.hasProperty("docsDir")) {
         project.extensions.add("docsDir", File(project.rootProject.docsDir(), project.name))
@@ -64,7 +64,9 @@ fun initializeApiChecksForProject(
     val doclavaConfiguration = project.rootProject.configurations.getByName("doclava")
     val docletClasspath = doclavaConfiguration.resolve()
     val generateApi = createGenerateApiTask(project, docletClasspath)
-    generateApi.dependsOn(doclavaConfiguration)
+    generateApi.configure {
+        it.dependsOn(doclavaConfiguration)
+    }
 
     // for verifying that the API surface has not broken since the last minor release
     val lastReleasedApiFile = project.getRequiredCompatibilityApiFile()
@@ -77,14 +79,20 @@ fun initializeApiChecksForProject(
             docletClasspath,
             CHECK_API_CONFIG_RELEASE,
             lastReleasedApiFile,
-            generateApi.apiFile!!,
+            generateApi.map {
+                it.apiFile!!
+            },
             whitelistFile)
-    checkApiRelease.dependsOn(generateApi)
+    checkApiRelease.configure {
+        it.dependsOn(generateApi)
+    }
 
     // Allow a comma-delimited list of whitelisted errors.
     if (project.hasProperty("ignore")) {
-        checkApiRelease.whitelistErrors = (project.properties["ignore"] as String)
-                .split(',').toSet()
+        checkApiRelease.configure {
+            it.whitelistErrors = (project.properties["ignore"] as String)
+                    .split(',').toSet()
+        }
     }
 
     // Check whether the development API surface has changed.
@@ -95,25 +103,31 @@ fun initializeApiChecksForProject(
             docletClasspath,
             verifyConfig,
             currentApiFile,
-            generateApi.apiFile!!,
+            generateApi.map {
+                it.apiFile!!
+            },
             null)
-    checkApi.dependsOn(generateApi, checkApiRelease)
-
-    checkApi.group = JavaBasePlugin.VERIFICATION_GROUP
-    checkApi.description = "Verify the API surface."
+    checkApi.configure {
+        it.dependsOn(generateApi, checkApiRelease)
+        it.group = JavaBasePlugin.VERIFICATION_GROUP
+        it.description = "Verify the API surface."
+    }
 
     val updateApiTask = createUpdateApiTask(project, checkApiRelease)
-    updateApiTask.dependsOn(checkApiRelease)
+    updateApiTask.configure {
+        it.dependsOn(checkApiRelease)
+    }
 
     val oldApiTxt = getOldApiTxtForDocDiffs(project)
     if (oldApiTxt != null) {
-        aggregateOldApiTxtsTask.addInput(project.name, oldApiTxt)
+        aggregateOldApiTxtsTask.configure {
+            it.addInput(project.name, oldApiTxt)
+        }
     }
     val newApiTxtProvider = getNewApiTxt(project, generateApi)
-    aggregateNewApiTxtsTask.inputs.file(newApiTxtProvider.file)
-    aggregateNewApiTxtsTask.addInput(project.name, newApiTxtProvider.file)
-    if (newApiTxtProvider.task != null) {
-        aggregateNewApiTxtsTask.dependsOn(newApiTxtProvider.task)
+    aggregateNewApiTxtsTask.configure {
+        it.inputs.file(newApiTxtProvider.file)
+        it.addInput(project.name, newApiTxtProvider.file.get())
     }
 
     val newApiTask = createNewApiXmlTask(project, generateApi, doclavaConfiguration)
@@ -131,33 +145,36 @@ fun initializeApiChecksForProject(
 
 private fun createGenerateLocalDiffsTask(
     project: Project,
-    oldApiTask: ApiXmlConversionTask,
-    newApiTask: ApiXmlConversionTask,
+    oldApiTask: TaskProvider<ApiXmlConversionTask>,
+    newApiTask: TaskProvider<ApiXmlConversionTask>,
     jdiffConfig: Configuration
-): JDiffTask =
-        project.tasks.createWithConfig("generateLocalDiffs", JDiffTask::class.java) {
-            // Base classpath is Android SDK, sub-projects add their own.
-            classpath = androidJarFile(project)
+): TaskProvider<JDiffTask> =
+        project.tasks.register("generateLocalDiffs", JDiffTask::class.java) {
+            it.apply {
+                // Base classpath is Android SDK, sub-projects add their own.
+                classpath = androidJarFile(project)
 
-            // JDiff properties.
-            oldApiXmlFile = oldApiTask.outputApiXmlFile
-            newApiXmlFile = newApiTask.outputApiXmlFile
+                // JDiff properties.
+                oldApiXmlFile = oldApiTask.get().outputApiXmlFile
+                newApiXmlFile = newApiTask.get().outputApiXmlFile
 
-            val newApi = project.processProperty("toApi") ?: project.version
-            val docsDir = project.rootProject.docsDir()
+                val newApi = project.processProperty("toApi") ?: project.version
+                val docsDir = project.rootProject.docsDir()
 
-            newJavadocPrefix = "../../../../../reference/"
-            destinationDir = File(docsDir, "online/sdk/support_api_diff/${project.name}/$newApi")
-            // Javadoc properties.
-            docletpath = jdiffConfig.resolve()
-            title = "AndroidX&nbsp;Library&nbsp;API&nbsp;Differences&nbsp;Report"
+                newJavadocPrefix = "../../../../../reference/"
+                destinationDir = File(docsDir,
+                        "online/sdk/support_api_diff/${project.name}/$newApi")
+                // Javadoc properties.
+                docletpath = jdiffConfig.resolve()
+                title = "AndroidX&nbsp;Library&nbsp;API&nbsp;Differences&nbsp;Report"
 
-            exclude("**/BuildConfig.java", "**/R.java")
-            dependsOn(oldApiTask, newApiTask, jdiffConfig)
-            doFirst {
-                println("Generating diffs from api version " +
-                        "${stripExtension(oldApiTask.outputApiXmlFile.name)} " +
-                        "to api version $newApi")
+                exclude("**/BuildConfig.java", "**/R.java")
+                dependsOn(oldApiTask, newApiTask, jdiffConfig)
+                doFirst {
+                    println("Generating diffs from api version " +
+                            "${stripExtension(oldApiTask.get().outputApiXmlFile.name)} " +
+                            "to api version $newApi")
+                }
             }
         }
 
@@ -167,23 +184,25 @@ private fun createGenerateLocalDiffsTask(
  * for use by JDiff.
  */
 private fun createOldApiXml(project: Project, doclavaConfig: Configuration) =
-        project.tasks.createWithConfig("oldApiXml", ApiXmlConversionTask::class.java) {
-            val fromApi = project.processProperty("fromApi")
-            classpath = project.files(doclavaConfig.resolve())
-            val rootFolder = project.projectDir
-            inputApiFile = if (fromApi != null) {
-                // Use an explicit API file.
-                File(rootFolder, "api/$fromApi.txt")
-            } else {
-                // Use the most recently released API file.
-                getLastReleasedApiFile(rootFolder, Version(project.processProperty("toApi")
+        project.tasks.register("oldApiXml", ApiXmlConversionTask::class.java) {
+            it.apply {
+                val fromApi = project.processProperty("fromApi")
+                classpath = project.files(doclavaConfig.resolve())
+                val rootFolder = project.projectDir
+                inputApiFile = if (fromApi != null) {
+                    // Use an explicit API file.
+                    File(rootFolder, "api/$fromApi.txt")
+                } else {
+                    // Use the most recently released API file.
+                    getLastReleasedApiFile(rootFolder, Version(project.processProperty("toApi")
                         ?: project.version.toString()), false, false)
-            }
+                }
 
-            outputApiXmlFile = File(project.docsDir(),
+                outputApiXmlFile = File(project.docsDir(),
                     "release/${stripExtension(inputApiFile?.name ?: "creation")}.xml")
 
-            dependsOn(doclavaConfig)
+                dependsOn(doclavaConfig)
+            }
         }
 
 /**
@@ -192,24 +211,26 @@ private fun createOldApiXml(project: Project, doclavaConfig: Configuration) =
  */
 private fun createNewApiXmlTask(
     project: Project,
-    generateApi: DoclavaTask,
+    generateApi: TaskProvider<DoclavaTask>,
     doclavaConfig: Configuration
 ) =
-        project.tasks.createWithConfig("newApiXml", ApiXmlConversionTask::class.java) {
-            classpath = project.files(doclavaConfig.resolve())
-            val toApi = project.processProperty("toApi")
+        project.tasks.register("newApiXml", ApiXmlConversionTask::class.java) {
+            it.apply {
+                classpath = project.files(doclavaConfig.resolve())
+                val toApi = project.processProperty("toApi")
 
-            if (toApi != null && toApi != project.version) {
-                // Use an explicit API file.
-                inputApiFile = File(project.projectDir, "api/$toApi.txt")
-            } else {
-                // Use the current API file (e.g. current.txt).
-                inputApiFile = generateApi.apiFile!!
-                dependsOn(generateApi, doclavaConfig)
-            }
-            // Use either the toApi version, otherwise the most recent version.
-            outputApiXmlFile = File(project.docsDir(),
+                if (toApi != null && toApi != project.version) {
+                    // Use an explicit API file.
+                    inputApiFile = File(project.projectDir, "api/$toApi.txt")
+                } else {
+                    // Use the current API file (e.g. current.txt).
+                    inputApiFile = generateApi.get().apiFile!!
+                    dependsOn(generateApi, doclavaConfig)
+                }
+                // Use either the toApi version, otherwise the most recent version.
+                outputApiXmlFile = File(project.docsDir(),
                     "release/${toApi ?: project.version}.xml")
+            }
         }
 
 fun Project.hasApiFolder() = File(projectDir, "api").exists()
@@ -240,19 +261,21 @@ fun hasApiTasks(project: Project, extension: SupportLibraryExtension): Boolean {
 
 // Creates a new task on the project for generating API files
 private fun createGenerateApiTask(project: Project, docletpathParam: Collection<File>) =
-        project.tasks.createWithConfig("generateApi", DoclavaTask::class.java) {
-            setDocletpath(docletpathParam)
-            destinationDir = project.docsDir()
-            // Base classpath is Android SDK, sub-projects add their own.
-            classpath = androidJarFile(project)
-            apiFile = File(project.docsDir(), "release/${project.name}/current.txt")
-            generateDocs = false
+        project.tasks.register("generateApi", DoclavaTask::class.java) {
+            it.apply {
+                // Base classpath is Android SDK, sub-projects add their own.
+                classpath = androidJarFile(project)
+                apiFile = File(project.docsDir(), "release/${project.name}/current.txt")
+                setDocletpath(docletpathParam)
+                destinationDir = project.docsDir()
+                generateDocs = false
 
-            coreJavadocOptions {
-                addBooleanOption("stubsourceonly", true)
+                coreJavadocOptions {
+                    addBooleanOption("stubsourceonly", true)
+                }
+
+                exclude("**/R.java")
             }
-
-            exclude("**/R.java")
         }
 
 /**
@@ -267,17 +290,19 @@ private fun createGenerateApiTask(project: Project, docletpathParam: Collection<
  *     finalized and the file already exists
  * </ul>
  */
-private fun createUpdateApiTask(project: Project, checkApiRelease: CheckApiTask) =
-        project.tasks.createWithConfig("updateApi", UpdateApiTask::class.java) {
-            group = JavaBasePlugin.VERIFICATION_GROUP
-            description = "Updates the candidate API file to incorporate valid changes."
-            newApiFile = checkApiRelease.newApiFile
-            oldApiFile = project.getCurrentApiFile()
-            whitelistErrors = checkApiRelease.whitelistErrors
-            whitelistErrorsFile = checkApiRelease.whitelistErrorsFile
-            doFirst {
-                // Replace the expected whitelist with the detected whitelist.
-                whitelistErrors = checkApiRelease.detectedWhitelistErrors
+private fun createUpdateApiTask(project: Project, checkApiRelease: TaskProvider<CheckApiTask>) =
+        project.tasks.register("updateApi", UpdateApiTask::class.java) {
+            it.apply {
+                group = JavaBasePlugin.VERIFICATION_GROUP
+                description = "Updates the candidate API file to incorporate valid changes."
+                newApiFile = checkApiRelease.get().newApiFile
+                oldApiFile = project.getCurrentApiFile()
+                whitelistErrors = checkApiRelease.get().whitelistErrors
+                whitelistErrorsFile = checkApiRelease.get().whitelistErrorsFile
+                doFirst {
+                    // Replace the expected whitelist with the detected whitelist.
+                    whitelistErrors = checkApiRelease.get().detectedWhitelistErrors
+                }
             }
         }
 
@@ -401,32 +426,38 @@ private fun createCheckApiTask(
     docletpath: Collection<File>,
     config: ChecksConfig,
     oldApi: File?,
-    newApi: File,
+    newApi: Provider<File>,
     whitelist: File? = null
 ) =
-        project.tasks.createWithConfig(taskName, CheckApiTask::class.java) {
-            doclavaClasspath = docletpath
-            checksConfig = config
-            newApiFile = newApi
-            oldApiFile = oldApi
-            whitelistErrorsFile = whitelist
-            doFirst {
-                logger.lifecycle("Verifying ${newApi.name} " +
-                        "against ${oldApi?.name ?: "nothing"}...")
+        project.tasks.register(taskName, CheckApiTask::class.java) {
+            it.apply {
+                doclavaClasspath = docletpath
+                checksConfig = config
+                newApiFile = newApi.get()
+                oldApiFile = oldApi
+                whitelistErrorsFile = whitelist
+                doFirst {
+                    logger.lifecycle("Verifying ${newApi.get().name} " +
+                            "against ${oldApi?.name ?: "nothing"}...")
+                }
             }
         }
 
-private fun getNewApiTxt(project: Project, generateApi: DoclavaTask): FileProvider {
+private fun getNewApiTxt(project: Project, generateApi: TaskProvider<DoclavaTask>): FileProvider {
     val toApi = project.processProperty("toApi")
     return if (toApi != null) {
         // Use an explicit API file.
-        FileProvider(File(project.projectDir, "api/$toApi.txt"), null)
+        FileProvider(project.provider {
+            File(project.projectDir, "api/$toApi.txt")
+        }, null)
     } else {
         // Use the current API file (e.g. current.txt).
-        FileProvider(generateApi.apiFile!!, generateApi)
+        FileProvider(generateApi.map {
+            it.apiFile!!
+        }, generateApi)
     }
 }
 
-private data class FileProvider(val file: File, val task: Task?)
+private data class FileProvider(val file: Provider<File>, val task: TaskProvider<*>?)
 
 private fun stripExtension(fileName: String) = fileName.substringBeforeLast('.')
