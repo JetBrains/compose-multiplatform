@@ -25,9 +25,13 @@ fun Project.configureNonAndroidProjectForLint(extension: SupportLibraryExtension
     apply(mapOf("plugin" to "com.android.lint"))
 
     // Create fake variant tasks since that is what is invoked on CI and by developers.
-    val lintTask = tasks.getByName("lint")
-    tasks.create("lintDebug").dependsOn(lintTask)
-    tasks.create("lintRelease").dependsOn(lintTask)
+    val lintTask = tasks.named("lint")
+    tasks.register("lintDebug") {
+        it.dependsOn(lintTask)
+    }
+    tasks.register("lintRelease") {
+        it.dependsOn(lintTask)
+    }
 
     val lintOptions = extensions.getByType<LintOptions>()
     project.configureLint(lintOptions, extension)
