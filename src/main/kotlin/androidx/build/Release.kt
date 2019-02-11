@@ -18,6 +18,7 @@ package androidx.build
 import androidx.build.gmaven.GMavenVersionChecker
 import org.gradle.api.Action
 import org.gradle.api.Project
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.Upload
 import org.gradle.api.tasks.bundling.Zip
 import java.io.File
@@ -211,10 +212,12 @@ object Release {
                 projectName = project.name,
                 version = version.toString()
         )
-        val uploadTask = project.tasks.getByName("uploadArchives") as Upload
+        val uploadTask = project.tasks.named("uploadArchives", Upload::class.java)
         zipTasks.forEach {
-            it.candidates.add(artifact)
-            it.dependsOn(uploadTask)
+            it.configure {
+                it.candidates.add(artifact)
+                it.dependsOn(uploadTask)
+            }
         }
     }
 
@@ -255,40 +258,53 @@ object Release {
     /**
      * Creates and returns the task that generates the combined gmaven diff file for all projects.
      */
-    private fun getGlobalReleaseZipTask(project: Project): GMavenZipTask {
+    private fun getGlobalReleaseZipTask(project: Project): TaskProvider<GMavenZipTask> {
         val taskName = "${DIFF_TASK_PREFIX}ForAll"
-        return project.rootProject.tasks.findByName(taskName) as? GMavenZipTask
-                ?: project.rootProject.tasks.create(
-                        taskName, GMavenZipTask::class.java,
-                        GMavenZipTask.ConfigAction(getParams(project))
-                )
+        return project.rootProject.maybeRegister(
+            name = taskName,
+            onConfigure = {
+                GMavenZipTask.ConfigAction(getParams(project)).execute(it)
+            },
+            onRegister = {
+            }
+        )
     }
 
     /**
      * Creates and returns the task that includes all projects regardless of their release status.
      */
-    private fun getGlobalFullZipTask(project: Project): GMavenZipTask {
-        val taskName = FULL_ARCHIVE_TASK_NAME
-        return project.rootProject.tasks.findByName(taskName) as? GMavenZipTask
-                ?: project.rootProject.tasks.create(
-                        taskName, GMavenZipTask::class.java,
-                        GMavenZipTask.ConfigAction(getParams(project).copy(
-                                includeReleased = true,
-                                includeMetadata = true
-                        ))
-                )
+    private fun getGlobalFullZipTask(project: Project): TaskProvider<GMavenZipTask> {
+        return project.rootProject.maybeRegister(
+            name = FULL_ARCHIVE_TASK_NAME,
+            onConfigure = {
+                GMavenZipTask.ConfigAction(
+                    getParams(project).copy(
+                        includeReleased = true,
+                        includeMetadata = true
+                    )
+                ).execute(it)
+            },
+            onRegister = {
+            }
+        )
     }
 
     /**
      * Creates and returns the zip task that includes artifacts only in the given maven group.
      */
-    private fun getGroupReleaseZipTask(project: Project, group: String): GMavenZipTask {
+    private fun getGroupReleaseZipTask(
+        project: Project,
+        group: String
+    ): TaskProvider<GMavenZipTask> {
         val taskName = "${DIFF_TASK_PREFIX}For${groupToTaskNameSuffix(group)}"
-        return project.rootProject.tasks.findByName(taskName) as? GMavenZipTask
-                ?: project.rootProject.tasks.create(
-                        taskName, GMavenZipTask::class.java,
-                        GMavenZipTask.ConfigAction(getParams(project, group))
-                )
+        return project.rootProject.maybeRegister(
+            name = taskName,
+            onConfigure = {
+                GMavenZipTask.ConfigAction(getParams(project, group)).execute(it)
+            },
+            onRegister = {
+            }
+        )
     }
 }
 
