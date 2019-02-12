@@ -73,7 +73,7 @@ fun Project.configureVersionFileWriter(library: LibraryExtension) {
     }
 
     library.libraryVariants.all {
-        it.processJavaResources.dependsOn(writeVersionFile)
+        it.processJavaResourcesProvider.get().dependsOn(writeVersionFile)
     }
 
     val resources = library.sourceSets.getByName("main").resources
