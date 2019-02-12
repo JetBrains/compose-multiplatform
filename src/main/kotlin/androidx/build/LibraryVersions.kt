@@ -54,7 +54,7 @@ object LibraryVersions {
     val GRIDLAYOUT = Version("1.1.0-alpha01")
     val HEIFWRITER = Version("1.1.0-alpha01")
     val INTERPOLATOR = Version("1.1.0-alpha01")
-    val JETIFIER = Version("1.0.0-beta03")
+    val JETIFIER = Version("1.0.0-beta04")
     val LEANBACK = Version("1.1.0-alpha02")
     val LEANBACK_PREFERENCE = Version("1.1.0-alpha02")
     val LEGACY = Version("1.1.0-alpha01")
