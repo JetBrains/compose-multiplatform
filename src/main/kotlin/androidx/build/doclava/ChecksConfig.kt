@@ -45,7 +45,7 @@ private const val MSG_HIDE_API =
         "If you are adding APIs that should be excluded from the public API surface,\n" +
                 "consider using package or private visibility. If the API must have public\n" +
                 "visibility, you may exclude it from public API by using the @hide javadoc\n" +
-                "annotation paired with the @RestrictTo(LIBRARY_GROUP) code annotation."
+                "annotation paired with the @RestrictTo(LIBRARY_GROUP_PREFIX) code annotation."
 
 val CHECK_API_CONFIG_RELEASE = ChecksConfig(
         onFailMessage =
