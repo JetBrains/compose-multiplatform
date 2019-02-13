@@ -63,7 +63,7 @@ open class IgnoreApiChangesTask : MetalavaTask() {
         check(bootClasspath.isNotEmpty()) { "Android boot classpath not set." }
 
         updateExclusions(referenceApi.publicApiFile, exclusions.publicApiFile, false)
-        if (processRestrictedAPIs) {
+        if (processRestrictedAPIs && referenceApi.restrictedApiFile.exists()) {
             updateExclusions(referenceApi.restrictedApiFile, exclusions.restrictedApiFile, true)
         }
     }
@@ -72,6 +72,7 @@ open class IgnoreApiChangesTask : MetalavaTask() {
     // present in the current source path
     fun updateExclusions(apiFile: File, exclusionsFile: File, processRestrictedAPIs: Boolean) {
         val intermediateExclusionsFile = checkNotNull(intermediateExclusionsFile) { "intermediateExclusionsFile not set" }
+        intermediateExclusionsFile.parentFile.mkdirs()
         intermediateExclusionsFile.createNewFile()
 
         var args = listOf("--classpath",
