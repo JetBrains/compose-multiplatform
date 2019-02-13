@@ -18,7 +18,7 @@ import com.intellij.util.PathUtil;
 import kotlin.jvm.functions.Function1;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.kotlin.KtNodeTypes;
-import org.jetbrains.kotlin.cli.common.script.CliScriptDefinitionProvider;
+import org.jetbrains.kotlin.scripting.legacy.CliScriptDefinitionProvider;
 import org.jetbrains.kotlin.psi.*;
 import org.jetbrains.kotlin.r4a.R4aKtxParsingExtension;
 import org.jetbrains.kotlin.script.ScriptDefinitionProvider;

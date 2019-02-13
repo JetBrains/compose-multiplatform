@@ -403,6 +403,7 @@ fun augmentFramedClass(
         irFramedProperty.backingField = null
         irFramedProperty.getter?.let { getter ->
             // replace this.field with (_readable(this.next) as <record>).<field>
+            getter.origin = IrDeclarationOrigin.DEFINED
             getter.body?.transform(object : IrElementTransformer<Nothing?> {
                 override fun visitGetField(expression: IrGetField, data: Nothing?): IrExpression {
                     val newExpression = if (expression.descriptor == irFramedProperty.descriptor) {
@@ -427,6 +428,7 @@ fun augmentFramedClass(
         }
 
         irFramedProperty.setter?.let { setter ->
+            setter.origin = IrDeclarationOrigin.DEFINED
             // replace "this.field = value" with "(_writable(this.next) as <record>).<field> = value"
             setter.body?.transform(object : IrElementTransformer<Nothing?> {
                 override fun visitSetField(expression: IrSetField, data: Nothing?): IrExpression {

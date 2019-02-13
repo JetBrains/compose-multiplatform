@@ -5,12 +5,8 @@
 
 package org.jetbrains.kotlin.r4a.compiler.lower
 
-import org.jetbrains.kotlin.backend.common.CompilerPhase
 import org.jetbrains.kotlin.backend.common.FileLoweringPass
-import org.jetbrains.kotlin.backend.common.makePhase
 import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
-import org.jetbrains.kotlin.backend.jvm.extensions.IrLoweringExtension
-import org.jetbrains.kotlin.backend.jvm.makePatchParentsPhase
 import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.AnonymousFunctionDescriptor
