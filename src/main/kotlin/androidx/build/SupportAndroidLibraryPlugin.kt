@@ -39,7 +39,6 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
 
         val supportLibraryExtension = project.extensions.create("supportLibrary",
                 SupportLibraryExtension::class.java, project)
-        project.setupVersion(supportLibraryExtension)
         project.configureMavenArtifactUpload(supportLibraryExtension)
 
         // Workaround for concurrentfuture
@@ -80,12 +79,13 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
 
             library.libraryVariants.all { libraryVariant ->
                 if (libraryVariant.getBuildType().getName().equals("debug")) {
-                    val javaCompile = libraryVariant.javaCompileProvider.get()
-                    if (supportLibraryExtension.failOnUncheckedWarnings) {
-                        javaCompile.options.compilerArgs.add("-Xlint:unchecked")
-                    }
-                    if (supportLibraryExtension.failOnDeprecationWarnings) {
-                        javaCompile.options.compilerArgs.add("-Xlint:deprecation")
+                    libraryVariant.javaCompileProvider.configure { javaCompile ->
+                        if (supportLibraryExtension.failOnUncheckedWarnings) {
+                            javaCompile.options.compilerArgs.add("-Xlint:unchecked")
+                        }
+                        if (supportLibraryExtension.failOnDeprecationWarnings) {
+                            javaCompile.options.compilerArgs.add("-Xlint:deprecation")
+                        }
                     }
                 }
             }
