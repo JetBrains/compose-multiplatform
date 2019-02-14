@@ -41,15 +41,18 @@ open class IgnoreApiChangesTask : MetalavaTask() {
     @InputFiles
     fun getTaskInputs(): List<File> {
         if (processRestrictedAPIs) {
-            return referenceApi!!.files() + exclusions!!.files()
+            return referenceApi!!.files()
         }
-        return listOf(referenceApi!!.publicApiFile, exclusions!!.publicApiFile)
+        return listOf(referenceApi!!.publicApiFile)
     }
 
     // Declaring outputs prevents Gradle from rerunning this task if the inputs haven't changed
     @OutputFiles
     fun getTaskOutputs(): List<File>? {
-        return getTaskInputs()
+        if (processRestrictedAPIs) {
+            return exclusions!!.files()
+        }
+        return listOf(exclusions!!.publicApiFile)
     }
 
     @TaskAction
@@ -61,7 +64,7 @@ open class IgnoreApiChangesTask : MetalavaTask() {
 
         updateExclusions(referenceApi.publicApiFile, exclusions.publicApiFile, false)
         if (processRestrictedAPIs) {
-            updateExclusions(referenceApi.restrictedApiFile, exclusions.restrictedApiFile, false)
+            updateExclusions(referenceApi.restrictedApiFile, exclusions.restrictedApiFile, true)
         }
     }
 
@@ -95,6 +98,10 @@ open class IgnoreApiChangesTask : MetalavaTask() {
 
         if (intermediateExclusionsFile.length() > 0) {
             Files.copy(intermediateExclusionsFile, exclusionsFile)
+        } else {
+            if (exclusionsFile.exists()) {
+                exclusionsFile.delete()
+            }
         }
     }
 }
