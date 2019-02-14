@@ -146,7 +146,6 @@ class AndroidXPlugin : Plugin<Project> {
                     "distDocs" == task.name ||
                     Dokka.ARCHIVE_TASK_NAME == task.name ||
                     "partiallyDejetifyArchive" == task.name ||
-                    "dejetifyArchive" == task.name ||
                     CheckExternalDependencyLicensesTask.TASK_NAME == task.name) {
                 buildOnServerTask.dependsOn(task)
             }
