@@ -40,6 +40,7 @@ const val JUNIT = "junit:junit:4.12"
 const val KOTLINPOET = "com.squareup:kotlinpoet:1.0.0"
 const val KOTLIN_STDLIB = "org.jetbrains.kotlin:kotlin-stdlib:1.3.0"
 const val KOTLIN_METADATA = "me.eugeniomarletti.kotlin.metadata:kotlin-metadata:1.4.0"
+const val KOTLIN_METADATA_JVM = "org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.0.5"
 const val KOTLIN_COROUTINES = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.0.0"
 const val LEAKCANARY_INSTRUMENTATION =
         "com.squareup.leakcanary:leakcanary-android-instrumentation:1.6.2"
