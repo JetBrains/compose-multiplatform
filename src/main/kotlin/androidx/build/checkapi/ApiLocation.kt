@@ -56,7 +56,7 @@ data class ApiViolationExclusions(
     companion object {
         fun fromApiLocation(apiLocation: ApiLocation): ApiViolationExclusions {
             val publicExclusionsFile = File(apiLocation.publicApiFile.toString().removeSuffix(".txt") + ".ignore")
-            val restrictedExclusionsFile = File(apiLocation.restrictedApiFile.parentFile.toString().removeSuffix(".txt") + ".ignore")
+            val restrictedExclusionsFile = File(apiLocation.restrictedApiFile.toString().removeSuffix(".txt") + ".ignore")
             return ApiViolationExclusions(publicExclusionsFile, restrictedExclusionsFile)
         }
     }
