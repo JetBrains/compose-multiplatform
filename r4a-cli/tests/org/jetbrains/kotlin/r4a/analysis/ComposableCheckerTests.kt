@@ -715,5 +715,105 @@ class ComposableCheckerTests: AbstractR4aDiagnosticsTest() {
             }
         """)
     }
+
+    fun testComposableReporting036() {
+        doTest(MODE_CHECKED, """
+            import com.google.r4a.*
+            import android.widget.TextView;
+
+            fun Foo() {
+                repeat(5) {
+                    <TextView text="Hello World" />
+                }
+            }
+
+            fun Bar() {
+                <!SVC_INVOCATION!>Foo<!>()
+            }
+        """)
+        doTest(MODE_CHECKED, """
+            import com.google.r4a.*
+            import android.widget.TextView;
+
+            fun Foo() {
+                repeat(5) {
+                    <TextView text="Hello World" />
+                }
+            }
+
+            fun Bar() {
+                <!SVC_INVOCATION!>Foo<!>()
+            }
+        """)
+    }
+
+    fun testComposableReporting037() {
+        doTest(MODE_CHECKED, """
+            import com.google.r4a.*
+            import android.widget.TextView;
+
+            fun Foo() {
+                fun Noise() {
+                    <TextView text="Hello World" />
+                }
+            }
+
+            fun Bar() {
+                Foo()
+            }
+        """)
+    }
+
+    fun testComposableReporting038() {
+        doTest(
+            MODE_STRICT or MODE_PEDANTIC, """
+            import com.google.r4a.*
+            import android.widget.TextView;
+
+            // Function intentionally not inline
+            fun repeat(x: Int, l: ()->Unit) { for(i in 1..x) l() }
+
+            fun Foo() {
+                repeat(5) <!KTX_IN_NON_COMPOSABLE!>{
+                    <TextView text="Hello World" />
+                }<!>
+            }
+        """)
+    }
+
+    fun testComposableReporting039() {
+        doTest(MODE_CHECKED, """
+            import com.google.r4a.*
+            import android.widget.TextView;
+
+            fun composeInto(l: @Composable() ()->Unit) { System.out.println(l) }
+
+            fun Foo() {
+                composeInto {
+                    <TextView text="Hello World" />
+                }
+            }
+
+            fun Bar() {
+                Foo()
+            }
+        """)
+        doTest(MODE_CHECKED, """
+            import com.google.r4a.*
+            import android.widget.TextView;
+
+            inline fun noise(l: ()->Unit) { l() }
+
+            fun Foo() {
+                noise {
+                    <TextView text="Hello World" />
+                }
+            }
+
+            fun Bar() {
+                <!SVC_INVOCATION!>Foo<!>()
+            }
+        """)
+    }
 }
 
