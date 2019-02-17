@@ -54,7 +54,8 @@ import org.jetbrains.kotlin.utils.addToStdlib.ifNotEmpty
 class KtxCallResolver(
     private val callResolver: CallResolver,
     private val facade: ExpressionTypingFacade,
-    private val project: Project
+    private val project: Project,
+    private val composableAnnotationChecker: ComposableAnnotationChecker
 ) {
 
     private class TempResolveInfo(
@@ -79,8 +80,6 @@ class KtxCallResolver(
     // call, which seems like something we definitely do not want, but it's also used in resolving for(..) loops, so
     // maybe it's not terrible.
     private val psiFactory = KtPsiFactory(project, markGenerated = false)
-
-    private val composableAnnotationChecker = ComposableAnnotationChecker()
 
     // The type of the `composer` variable in scope of the KTX tag
     private var composerType: KotlinType = builtIns.unitType
@@ -1035,9 +1034,7 @@ class KtxCallResolver(
 
                 // it is important to pass in "result" here and not "resolvedCall" since "result" is the one that will have
                 // the composable annotation on it in the case of lambda invokes
-                val composability = composableAnnotationChecker.analyze(candidateContext.trace, result)
-
-                if (composability == ComposableAnnotationChecker.Composability.NOT_COMPOSABLE) {
+                if (!composableAnnotationChecker.shouldInvokeAsTag(candidateContext.trace, result)) {
                     candidateContext.trace.reportFromPlugin(
                         R4AErrors.NON_COMPOSABLE_INVOCATION.on(
                             expression,

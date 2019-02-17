@@ -9,6 +9,7 @@ import android.widget.TextView
 import com.google.r4a.Component
 import com.google.r4a.CompositionContext
 import com.google.r4a.composer
+import junit.framework.TestCase
 import org.jetbrains.kotlin.backend.jvm.extensions.IrLoweringExtension
 
 import org.jetbrains.kotlin.extensions.KtxControlFlowExtension
@@ -1254,6 +1255,43 @@ class KtxCodegenTests : AbstractCodeGenTest() {
         }.then { activity ->
             val textView = activity.findViewById(tvId + 5) as TextView
             assertEquals("id: 5 amt: 2", textView.text)
+        }
+    }
+
+
+    @Test
+    fun testObserveKtxWithInline(): Unit = ensureSetup {
+        compose(
+            """
+                @Composable
+                fun SimpleComposable() {
+                    val count = +state { 1 }
+                    <Box>
+                        repeat(count.value) {
+                            <Button text="Increment" onClick={ count.value += 1 } id=(41+it) />
+                        }
+                    </Box>
+                }
+
+                @Composable
+                fun Box(@Children children: ()->Unit) {
+                    <LinearLayout orientation=LinearLayout.VERTICAL>
+                        <children />
+                    </LinearLayout>
+                }
+            """, { emptyMap<String, String>() },
+            """
+               <SimpleComposable />
+            """
+        ).then { activity ->
+            val button = activity.findViewById(41) as Button
+            button.performClick()
+            button.performClick()
+            button.performClick()
+            button.performClick()
+            button.performClick()
+        }.then { activity ->
+            TestCase.assertNotNull(activity.findViewById(46))
         }
     }
 
