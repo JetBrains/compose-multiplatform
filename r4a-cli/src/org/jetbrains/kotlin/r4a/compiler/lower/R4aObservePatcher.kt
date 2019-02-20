@@ -11,7 +11,6 @@ import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.AnonymousFunctionDescriptor
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
-import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrConstructor
@@ -19,21 +18,20 @@ import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.impl.IrFunctionImpl
-import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 import org.jetbrains.kotlin.ir.expressions.impl.*
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.toIrType
 import org.jetbrains.kotlin.ir.types.toKotlinType
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
-import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtFunctionLiteral
-import org.jetbrains.kotlin.r4a.R4aUtils
+import org.jetbrains.kotlin.r4a.ComposableAnnotationChecker
 import org.jetbrains.kotlin.r4a.R4aUtils.generateR4APackageName
+import org.jetbrains.kotlin.resolve.DelegatingBindingTrace
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
 import org.jetbrains.kotlin.resolve.inline.InlineUtil
 
@@ -122,32 +120,12 @@ class R4aObservePatcher(val context: JvmBackendContext) :
     }
 
     fun isComposable(declaration: IrFunction): Boolean {
-
-        if(declaration.descriptor.annotations.hasAnnotation(R4aUtils.r4aFqName("Composable"))) return true
-
-        var isComposable = false
-        declaration.accept(object : IrElementVisitorVoid {
-            override fun visitElement(element: IrElement) {
-                if(isComposable) return
-                element.acceptChildren(this, null)
-            }
-
-            override fun visitCall(expression: IrCall) {
-
-                // TODO: When we change to jetbrains proposal, the synthetic calls will be more accurately identifiable.
-                if(expression.descriptor.name == Name.identifier("emit") || expression.descriptor.name == Name.identifier("call")) {
-                    isComposable = true
-                }
-                else super.visitCall(expression)
-            }
-
-            override fun visitFunction(function: IrFunction) {
-                if(function == declaration) super.visitFunction(function)
-            }
-
-        }, null)
-        if(isComposable) return true
-
-        return false
+        val tmpTrace = DelegatingBindingTrace(context.state.bindingContext, "tmp for composable analysis")
+        val composability = ComposableAnnotationChecker(ComposableAnnotationChecker.Mode.CHECKED).analyze(tmpTrace, declaration.descriptor)
+        return when(composability) {
+            ComposableAnnotationChecker.Composability.NOT_COMPOSABLE -> false
+            ComposableAnnotationChecker.Composability.MARKED -> true
+            ComposableAnnotationChecker.Composability.INFERRED -> true
+        }
     }
 }

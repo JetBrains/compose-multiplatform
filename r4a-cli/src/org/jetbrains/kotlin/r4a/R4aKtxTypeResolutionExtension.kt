@@ -17,7 +17,7 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
         facade: ExpressionTypingFacade,
         callResolver: CallResolver
     ) {
-        val ktxCallResolver = KtxCallResolver(callResolver, facade, element.project)
+        val ktxCallResolver = KtxCallResolver(callResolver, facade, element.project, ComposableAnnotationChecker.get(element.project))
 
         ktxCallResolver.resolveComposer(element, context)
 

@@ -25,7 +25,6 @@ class R4aTypeResolutionInterceptorExtension : TypeResolutionInterceptorExtension
         val module = context.scope.ownerDescriptor.module
         val checker =
             StorageComponentContainerContributor.getInstances(element.project).single { it is ComposableAnnotationChecker } as ComposableAnnotationChecker
-        @Suppress("USELESS_IS_CHECK")
         if (element is KtLambdaExpression && (context.expectedType.hasComposableAnnotation() || checker.analyze(
                 context.trace,
                 element,
