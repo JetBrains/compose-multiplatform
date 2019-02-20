@@ -5,29 +5,21 @@
 
 package org.jetbrains.kotlin.r4a
 
-import org.jetbrains.kotlin.backend.common.CompilerPhase
-import org.jetbrains.kotlin.backend.common.makePhase
+import org.jetbrains.kotlin.backend.common.phaser.*
 import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
 import org.jetbrains.kotlin.backend.jvm.extensions.IrLoweringExtension
-import org.jetbrains.kotlin.backend.jvm.makePatchParentsPhase
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.r4a.compiler.lower.R4aObservePatcher
 
-val PatchParentsPhase0 = makePatchParentsPhase(0)
-
-val R4aObservePhase = makePhase<JvmBackendContext, IrFile>(
-    { context, file -> R4aObservePatcher(context).lower(file) },
-    "R4aObserve",
-    "Insert calls to Observe in composable functions",
-    emptySet<CompilerPhase<JvmBackendContext, IrFile>>()
+val R4aObservePhase = makeIrFilePhase(
+    ::R4aObservePatcher,
+    name = "R4aObservePhase",
+    description = "Observe @Model"
 )
 
 class R4aIrLoweringExtension : IrLoweringExtension {
-    override fun interceptLoweringPhases(phases: List<CompilerPhase<JvmBackendContext, IrFile>>): List<CompilerPhase<JvmBackendContext, IrFile>> {
-        val phases = phases.toMutableList()
-        phases.add(1, PatchParentsPhase0)
-        phases.add(2, R4aObservePhase)
-        return phases
+    override fun interceptLoweringPhases(phases: CompilerPhase<JvmBackendContext, IrFile, IrFile>): CompilerPhase<JvmBackendContext, IrFile, IrFile> {
+        return R4aObservePhase then phases
     }
 }
 
