@@ -17,7 +17,7 @@ import org.jetbrains.kotlin.parsing.KtxParsingExtension
 import org.jetbrains.kotlin.psi2ir.extensions.SyntheticIrExtension
 import org.jetbrains.kotlin.r4a.frames.FrameTransformExtension
 import org.jetbrains.kotlin.r4a.frames.analysis.FrameModelChecker
-import org.jetbrains.kotlin.r4a.frames.analysis.PackageAnalysisHandlerExtension
+import org.jetbrains.kotlin.r4a.frames.analysis.FramePackageAnalysisHandlerExtension
 import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisHandlerExtension
 import org.junit.Before
 import org.junit.Test
@@ -56,7 +56,7 @@ class KtxModelCodeGenTests : AbstractCodeGenTest() {
         TypeResolutionInterceptorExtension.registerExtension(myEnvironment.project, R4aTypeResolutionInterceptorExtension())
         SyntheticIrExtension.registerExtension(myEnvironment.project, R4ASyntheticIrExtension())
         KtxParsingExtension.registerExtension(myEnvironment.project, R4aKtxParsingExtension())
-        AnalysisHandlerExtension.registerExtension(myEnvironment.project, PackageAnalysisHandlerExtension())
+        AnalysisHandlerExtension.registerExtension(myEnvironment.project, FramePackageAnalysisHandlerExtension())
         SyntheticIrExtension.registerExtension(myEnvironment.project, FrameTransformExtension())
         StorageComponentContainerContributor.registerExtension(myEnvironment.project, FrameModelChecker())
     }

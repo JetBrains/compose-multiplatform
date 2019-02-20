@@ -5,15 +5,14 @@ import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi2ir.extensions.SyntheticIrExtension
 import org.jetbrains.kotlin.r4a.AbstractCodeGenTest
 import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisHandlerExtension
-import org.jetbrains.kotlin.r4a.frames.analysis.PackageAnalysisHandlerExtension
-import org.jetbrains.kotlin.r4a.frames.FrameTransformExtension
+import org.jetbrains.kotlin.r4a.frames.analysis.FramePackageAnalysisHandlerExtension
 import org.jetbrains.kotlin.r4a.frames.analysis.FrameModelChecker
 
 class FrameTransformExtensionTests : AbstractCodeGenTest() {
 
     override fun setUp() {
         super.setUp()
-        AnalysisHandlerExtension.registerExtension(myEnvironment.project, PackageAnalysisHandlerExtension())
+        AnalysisHandlerExtension.registerExtension(myEnvironment.project, FramePackageAnalysisHandlerExtension())
         SyntheticIrExtension.registerExtension(myEnvironment.project, FrameTransformExtension())
         StorageComponentContainerContributor.registerExtension(myEnvironment.project, FrameModelChecker())
     }

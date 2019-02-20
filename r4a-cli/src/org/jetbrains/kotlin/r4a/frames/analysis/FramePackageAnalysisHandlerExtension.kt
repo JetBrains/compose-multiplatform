@@ -22,7 +22,7 @@ import org.jetbrains.kotlin.resolve.lazy.ResolveSession
 import org.jetbrains.kotlin.types.typeUtil.isAnyOrNullableAny
 import org.jetbrains.kotlin.types.typeUtil.isInterface
 
-class PackageAnalysisHandlerExtension : AnalysisHandlerExtension {
+class FramePackageAnalysisHandlerExtension : AnalysisHandlerExtension {
     companion object {
         fun doAnalysis(module: ModuleDescriptor, bindingTrace: BindingTrace, files: Collection<KtFile>, resolveSession: ResolveSession) {
             if (!R4AFlags.FRAMED_MODEL_CLASSES) return
