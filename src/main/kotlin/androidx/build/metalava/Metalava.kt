@@ -116,6 +116,7 @@ object Metalava {
             task.description = "Generates API files from source"
             task.apiLocation = builtApiLocation
             task.configuration = metalavaConfiguration
+            task.generateRestrictedAPIs = extension.trackRestrictedAPIs
             task.dependsOn(metalavaConfiguration)
         }
         applyInputs(javaCompileInputs, generateApi)

@@ -56,7 +56,7 @@ open class CheckApiCompatibilityTask : MetalavaTask() {
 
         checkApiFile(referenceApi.publicApiFile, exclusions.publicApiFile, false)
         if (checkRestrictedAPIs) {
-            checkApiFile(referenceApi.restrictedApiFile, exclusions.restrictedApiFile, false)
+            checkApiFile(referenceApi.restrictedApiFile, exclusions.restrictedApiFile, true)
         }
     }
 
