@@ -36,6 +36,7 @@ import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
+import com.android.build.gradle.internal.tasks.factory.dependsOn
 import org.gradle.api.DefaultTask
 import org.gradle.api.Task
 import org.gradle.api.JavaVersion.VERSION_1_7
@@ -46,10 +47,9 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.JavaLibraryPlugin
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
-import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.kotlin.dsl.extra
-import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getPlugin
 import org.gradle.kotlin.dsl.withType
 import java.util.concurrent.ConcurrentHashMap
@@ -85,8 +85,9 @@ class AndroidXPlugin : Plugin<Project> {
                         targetCompatibility = VERSION_1_7
                     }
                     val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
-                    val compileJavaTask = project.properties["compileJava"] as JavaCompile
-                    verifyDependencyVersionsTask.dependsOn(compileJavaTask)
+                    verifyDependencyVersionsTask.configure {
+                        it.dependsOn(project.tasks.named(JavaPlugin.COMPILE_JAVA_TASK_NAME))
+                    }
                     project.createCheckReleaseReadyTask(listOf(verifyDependencyVersionsTask))
                 }
                 is LibraryPlugin -> {
@@ -97,17 +98,19 @@ class AndroidXPlugin : Plugin<Project> {
                     project.configureVersionFileWriter(extension)
                     project.configureResourceApiChecks()
                     val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
-                    val checkNoWarningsTask = project.tasks.create(CHECK_NO_WARNINGS_TASK)
+                    val checkNoWarningsTask = project.tasks.register(CHECK_NO_WARNINGS_TASK)
                     project.createCheckReleaseReadyTask(listOf(verifyDependencyVersionsTask,
                         checkNoWarningsTask))
                     extension.libraryVariants.all { libraryVariant ->
-                        val javaCompileTask = libraryVariant
-                            .javaCompileProvider.get()
-                        verifyDependencyVersionsTask.dependsOn(javaCompileTask)
-                        checkNoWarningsTask.dependsOn(javaCompileTask)
-                        project.gradle.taskGraph.whenReady {
-                            if (it.hasTask(checkNoWarningsTask)) {
-                                javaCompileTask.options.compilerArgs.add("-Werror")
+                        verifyDependencyVersionsTask.configure { task ->
+                            task.dependsOn(libraryVariant.javaCompileProvider)
+                        }
+                        checkNoWarningsTask.dependsOn(libraryVariant.javaCompileProvider)
+                        project.gradle.taskGraph.whenReady { executionGraph ->
+                            if (executionGraph.hasTask(checkNoWarningsTask.get())) {
+                                libraryVariant.javaCompileProvider.configure { task ->
+                                    task.options.compilerArgs.add("-Werror")
+                                }
                             }
                         }
                     }
@@ -247,8 +250,11 @@ class AndroidXPlugin : Plugin<Project> {
         extension.signingConfigs.getByName("debug").storeFile = SupportConfig.getKeystore(this)
 
         // Disable generating BuildConfig.java
+        // TODO remove after https://issuetracker.google.com/72050365
         extension.variants.all {
-            it.generateBuildConfigProvider.get().enabled = false
+            it.generateBuildConfigProvider.configure {
+                it.enabled = false
+            }
         }
 
         configureErrorProneForAndroid(extension.variants)
@@ -306,8 +312,9 @@ class AndroidXPlugin : Plugin<Project> {
         }
     }
 
-    private fun Project.createVerifyDependencyVersionsTask(): DefaultTask {
-        return project.tasks.create("verifyDependencyVersions",
+    private fun Project.createVerifyDependencyVersionsTask():
+            TaskProvider<VerifyDependencyVersionsTask> {
+        return project.tasks.register("verifyDependencyVersions",
                 VerifyDependencyVersionsTask::class.java)
     }
 
@@ -348,10 +355,11 @@ private fun Project.createCheckResourceApiTask(): DefaultTask {
     }
 }
 
-private fun Project.createCheckReleaseReadyTask(taskList: List<Task>) {
-    val checkReleaseReadyTask = project.tasks.create(AndroidXPlugin.CHECK_RELEASE_READY_TASK)
-    for (task in taskList) {
-        checkReleaseReadyTask.dependsOn(task)
+private fun Project.createCheckReleaseReadyTask(taskProviderList: List<TaskProvider<out Task>>) {
+    project.tasks.register(AndroidXPlugin.CHECK_RELEASE_READY_TASK) {
+        for (taskProvider in taskProviderList) {
+            it.dependsOn(taskProvider)
+        }
     }
 }
 
