@@ -108,7 +108,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.PAGING, "2.1.0")
     ignore(LibraryGroups.NAVIGATION, "navigation-testing")
     prebuilts(LibraryGroups.NAVIGATION, "1.0.0-beta02")
-    prebuilts(LibraryGroups.WORKMANAGER, "1.0.0-rc01")
+    prebuilts(LibraryGroups.WORKMANAGER, "1.0.0-rc02")
     default(Ignore)
 }
 
