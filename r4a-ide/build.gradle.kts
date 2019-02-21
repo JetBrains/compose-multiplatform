@@ -33,8 +33,8 @@ dependencies {
     testCompile(commonDep("junit:junit"))
 
     testRuntime(project(":plugins:kapt3-idea")) { isTransitive = false }
-    testRuntime(projectDist(":kotlin-reflect"))
-    testRuntime(projectDist(":kotlin-preloader"))
+    testRuntime(project(":kotlin-reflect"))
+    testRuntime(project(":kotlin-preloader"))
 
     testCompile(project(":kotlin-sam-with-receiver-compiler-plugin")) { isTransitive = false }
 

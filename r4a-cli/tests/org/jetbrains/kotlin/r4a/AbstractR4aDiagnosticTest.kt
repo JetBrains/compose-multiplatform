@@ -1,7 +1,8 @@
 package org.jetbrains.kotlin.r4a
 
 import org.jetbrains.kotlin.checkers.BaseDiagnosticsTest
-import org.jetbrains.kotlin.checkers.CheckerTestUtil
+import org.jetbrains.kotlin.checkers.utils.CheckerTestUtil
+import org.jetbrains.kotlin.checkers.DiagnosedRange
 import org.jetbrains.kotlin.checkers.CompilerTestLanguageVersionSettings
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
@@ -30,7 +31,7 @@ abstract class AbstractR4aDiagnosticsTest: KtUsefulTestCase() {
     }
 
     fun doTest(expectedText: String, environment: KotlinCoreEnvironment) {
-        val diagnosedRanges: List<CheckerTestUtil.DiagnosedRange> = ArrayList()
+        val diagnosedRanges: MutableList<DiagnosedRange> = ArrayList()
         val clearText = CheckerTestUtil.parseDiagnosedRanges(expectedText, diagnosedRanges)
         val file = KotlinTestUtils.createFile("test.kt", clearText, environment.project)
         val files = listOf(file)
@@ -61,7 +62,7 @@ abstract class AbstractR4aDiagnosticsTest: KtUsefulTestCase() {
         // Ensure all the expected messages are there
         val found = mutableSetOf<Diagnostic>()
         for (range in diagnosedRanges) {
-            for (diagnostic in range.diagnostics) {
+            for (diagnostic in range.getDiagnostics()) {
                 val reportedDiagnostics = errors.filter { it.factoryName == diagnostic.name }
                 if (reportedDiagnostics.isNotEmpty()) {
                     var reportedDiagnostic = reportedDiagnostics.find { it.textRanges.find { it.startOffset == range.start && it.endOffset == range.end } != null }
