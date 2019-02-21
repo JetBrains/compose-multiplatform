@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 import androidx.build.BuildServerConfigurationKt
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.gmaven.GMavenVersionChecker
@@ -93,7 +92,7 @@ def setupSubprojectsForBuildServer() {
         // Copy instrumentation test APKs and app APKs into the dist dir
         // For test apks, they are uploaded only if we have java test sources.
         // For regular app apks, they are uploaded only if they have java sources.
-        project.tasks.whenTaskAdded { task ->
+        project.tasks.configureEach { task ->
             if (task.name.startsWith("packageDebug")) {
                 // run this task only if we should run it
                 def testApk = task.name.contains("AndroidTest")
@@ -142,22 +141,21 @@ def setupSubprojectsForBuildServer() {
         }
 
         // copy host side test results to DIST
-        project.tasks.whenTaskAdded { task ->
-            if (task instanceof org.gradle.api.tasks.testing.Test) {
-                def junitReport = task.reports.junitXml
-                if (junitReport.enabled) {
-                    def zipTask = project.tasks.create(name : "zipResultsOf${task.name.capitalize()}", type : Zip) {
-                        destinationDir(BuildServerConfigurationKt.getHostTestResultDirectory(project))
-                        // first one is always :, drop it.
-                        archiveName("${project.getPath().split(":").join("_").substring(1)}.zip")
-                    }
-                    if (BuildServerConfigurationKt.isRunningOnBuildServer()) {
-                        task.ignoreFailures = true
-                    }
-                    task.finalizedBy zipTask
-                    task.doFirst {
-                        zipTask.from(junitReport.destination)
-                    }
+        project.tasks.withType(Test) { task ->
+            def junitReport = task.reports.junitXml
+            if (junitReport.enabled) {
+                def zipTask = project.tasks.create(
+                        name: "zipResultsOf${task.name.capitalize()}", type: Zip) {
+                    destinationDir(BuildServerConfigurationKt.getHostTestResultDirectory(project))
+                    // first one is always :, drop it.
+                    archiveName("${project.getPath().split(":").join("_").substring(1)}.zip")
+                }
+                if (BuildServerConfigurationKt.isRunningOnBuildServer()) {
+                    task.ignoreFailures = true
+                }
+                task.finalizedBy zipTask
+                task.doFirst {
+                    zipTask.from(junitReport.destination)
                 }
             }
         }
