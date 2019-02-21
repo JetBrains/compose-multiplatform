@@ -61,6 +61,7 @@ object LibraryGroups {
     const val RECOMMENDATION = "androidx.recommendation"
     const val RECYCLERVIEW = "androidx.recyclerview"
     const val SAVEDSTATE = "androidx.savedstate"
+    const val SECURITY = "androidx.security"
     const val SHARETARGET = "androidx.sharetarget"
     const val SLICE = "androidx.slice"
     const val REMOTECALLBACK = "androidx.remotecallback"
