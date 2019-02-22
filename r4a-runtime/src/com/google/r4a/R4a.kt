@@ -21,7 +21,7 @@ object R4a {
     fun composeInto(
         container: ViewGroup,
         parent: Ambient.Reference? = null,
-        composable: () -> Unit
+        composable: @Composable() () -> Unit
     ) {
         var root = CompositionContext.getRootComponent(container) as? Root
         if (root == null) {
@@ -40,7 +40,7 @@ object R4a {
         container: Emittable,
         context: Context,
         parent: Ambient.Reference? = null,
-        composable: () -> Unit
+        composable: @Composable() () -> Unit
     ) {
         var root = CompositionContext.getRootComponent(container) as? Root
         if (root == null) {
