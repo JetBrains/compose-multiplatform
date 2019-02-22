@@ -4,6 +4,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 import java.util.SortedSet
@@ -21,15 +22,18 @@ open class UpdateResourceApiTask : DefaultTask() {
     @Optional
     var newApiFile: File? = null
 
+    @OutputFile
+    var destApiFile: File? = null
+
     @TaskAction
     fun UpdateResourceApi() {
+        val destApiFile = checkNotNull(destApiFile) { "destApiFile not set" }
         if (oldApiFile == null || !!oldApiFile!!.exists()) {
             if (newApiFile != null && newApiFile!!.exists()) {
-                newApiFile?.copyTo(File(project.projectDir,
-                    "api/res-${project.version}.txt"), true, 8)
+                newApiFile?.copyTo(destApiFile, true, 8)
                 return
             } else {
-                File(project.projectDir, "api/res-${project.version}.txt").createNewFile()
+                destApiFile.createNewFile()
                 return
             }
         }
@@ -68,7 +72,7 @@ open class UpdateResourceApiTask : DefaultTask() {
         }
         newResourceApi.addAll(newResourceApi)
         val sortedNewResourceApi: SortedSet<String> = newResourceApi.toSortedSet()
-        File(project.projectDir, "api/res-${project.version}.txt").bufferedWriter().use { out ->
+        destApiFile.bufferedWriter().use { out ->
             sortedNewResourceApi.forEach {
                 out.write(it)
                 out.newLine()
