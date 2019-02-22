@@ -17,6 +17,7 @@
 package androidx.build.metalava
 
 import androidx.build.checkapi.ApiLocation
+import org.gradle.api.GradleException
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
 import java.io.File
@@ -88,11 +89,22 @@ open class GenerateApiTask : MetalavaTask() {
     fun removeRestrictToLibraryLines(inputFile: File, outputFile: File) {
         val outputBuilder = StringBuilder()
         val lines = inputFile.readLines()
+        var skipScopeUntil: String? = null
         for (line in lines) {
-            if (!line.contains("@RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY)")) {
+            val skip = line.contains("@RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY)")
+            if (skip && line.endsWith("{")) {
+                skipScopeUntil = line.commonPrefixWith("    ") + "}"
+            }
+            if (!skip && skipScopeUntil == null) {
                 outputBuilder.append(line)
                 outputBuilder.append("\n")
             }
+            if (line == skipScopeUntil) {
+                skipScopeUntil = null
+            }
+        }
+        if (skipScopeUntil != null) {
+            throw GradleException("Skipping until `$skipScopeUntil`, but found EOF")
         }
         outputFile.writeText(outputBuilder.toString())
     }
