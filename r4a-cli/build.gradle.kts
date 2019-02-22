@@ -24,7 +24,7 @@ dependencies {
     compileOnly(intellijCoreDep()) { includeJars("intellij-core") }
 
     runtime(projectRuntimeJar(":kotlin-compiler"))
-    runtime(projectDist(":kotlin-stdlib"))
+    runtime(project(":kotlin-stdlib"))
     testCompile(project(":r4a-runtime"))
     testCompile(project(":kotlin-scripting-compiler"))
     testRuntime(intellijPluginDep("android"))
