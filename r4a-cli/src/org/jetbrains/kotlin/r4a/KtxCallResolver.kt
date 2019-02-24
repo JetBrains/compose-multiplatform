@@ -1662,7 +1662,8 @@ class KtxCallResolver(
                             type,
                             descriptor,
                             childrenExpr,
-                            context.replaceTraceAndCache(tempForAttributes)
+                            context.replaceTraceAndCache(tempForAttributes),
+                            attributesUsedInCall.contains(CHILDREN_KEY)
                         )
                     }
                     is SimpleFunctionDescriptor -> {
@@ -1980,7 +1981,8 @@ class KtxCallResolver(
         instanceType: KotlinType,
         propertyDescriptor: PropertyDescriptor,
         childrenExpr: KtxLambdaExpression,
-        context: ExpressionTypingContext
+        context: ExpressionTypingContext,
+        shouldIncludeCtorParam: Boolean
     ): ResolvedCall<*>? {
         val temporaryForVariable = TemporaryTraceAndCache.create(
             context, "trace to resolve as local variable or property", childrenExpr
@@ -2013,11 +2015,28 @@ class KtxCallResolver(
 
         val resolvedCall = OverloadResolutionResultsUtil.getResultingCall(results, context) ?: return null
 
+        val composableFromChildrenAnnotation = (propertyDescriptor.containingDeclaration as? ClassDescriptor)?.let { containingDeclaration ->
+            val ctorParameters = containingDeclaration.unsubstitutedPrimaryConstructor?.valueParameters ?: emptyList()
+            fun DeclarationDescriptor.isComposableChildrenCtorParam(): Boolean {
+                if (!shouldIncludeCtorParam) return false
+                if (this !is PropertyDescriptor) return false
+                val param = ctorParameters.firstOrNull { p -> name == p.name } ?: return false
+                return param.isComposableFromChildrenAnnotation()
+            }
+
+            resolvedCall.resultingDescriptor.isComposableFromChildrenAnnotation() || resolvedCall.resultingDescriptor.isComposableChildrenCtorParam()
+        } ?: false
+
+
+        val expectedType =
+            if(composableFromChildrenAnnotation) (resolvedCall.resultingDescriptor).type.makeComposable(module)
+            else (resolvedCall.resultingDescriptor).type
+
         facade.getTypeInfo(
             childrenExpr,
             context
                 .replaceTraceAndCache(temporaryForVariable)
-                .replaceExpectedType((resolvedCall.resultingDescriptor).type)
+                .replaceExpectedType(expectedType)
                 .replaceCallPosition(CallPosition.PropertyAssignment(null))
         )
 
