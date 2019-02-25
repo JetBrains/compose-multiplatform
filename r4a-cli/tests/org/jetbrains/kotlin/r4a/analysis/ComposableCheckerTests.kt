@@ -815,5 +815,43 @@ class ComposableCheckerTests: AbstractR4aDiagnosticsTest() {
             }
         """)
     }
+
+    fun testComposableReporting040() {
+        doTest(MODE_ALL, """
+            import com.google.r4a.*
+            import android.widget.TextView;
+
+            @Composable
+            fun CraneWrapperComposable(@Children children: () -> Unit) {
+                <MyCraneWrapper>
+                    <children />
+                </MyCraneWrapper>
+            }
+
+            class MyCraneWrapper(@Children var children: () -> Unit) : Component() {
+                override fun compose() { }
+            }
+        """)
+    }
+
+    fun testComposableReporting041() {
+        doTest(MODE_ALL, """
+            import com.google.r4a.*
+            import android.widget.TextView;
+
+            typealias UNIT_LAMBDA = () -> Unit
+
+            @Composable
+            fun CraneWrapperComposable(@Children children: UNIT_LAMBDA) {
+                <MyCraneWrapper>
+                    <children />
+                </MyCraneWrapper>
+            }
+
+            class MyCraneWrapper(@Children var children: UNIT_LAMBDA) : Component() {
+                override fun compose() { }
+            }
+        """)
+    }
 }
 

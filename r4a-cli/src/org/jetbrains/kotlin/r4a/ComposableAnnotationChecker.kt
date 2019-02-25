@@ -283,6 +283,7 @@ class ComposableAnnotationChecker(val mode: Mode = DEFAULT_MODE) : CallChecker, 
             }
             is PropertyDescriptor -> {}
             is LocalVariableDescriptor -> {}
+            is TypeAliasDescriptor -> {}
             is FunctionDescriptor -> analyze(context.trace, descriptor)
             else ->
                 throw Error("currently unsupported "+descriptor.javaClass)
