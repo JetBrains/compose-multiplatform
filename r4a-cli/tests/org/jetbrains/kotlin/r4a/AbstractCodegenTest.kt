@@ -22,7 +22,8 @@ abstract class AbstractCodeGenTest : CodegenTestCase() {
             KotlinTestUtils.getAnnotationsJar(),
             assertExists(File("plugins/r4a/r4a-runtime/build/libs/r4a-runtime-1.3-SNAPSHOT.jar")),
             assertExists(File("custom-dependencies/android-sdk/build/libs/android.jar"))
-        )
+        ) + additionalPaths
+
         val configuration = createConfiguration(
                 ConfigurationKind.ALL,
                 TestJdkKind.MOCK_JDK,
@@ -70,6 +71,18 @@ abstract class AbstractCodeGenTest : CodegenTestCase() {
         return loader
     }
 
+    protected fun classLoader(sources: Map<String, String>, dumpClasses: Boolean = false): GeneratedClassLoader {
+        val files = mutableListOf<KtFile>()
+        files.addAll(helperFiles())
+        for ((fileName, source) in sources) {
+            files.add(sourceFile(fileName, source))
+        }
+        myFiles = CodegenTestFiles.create(files)
+        val loader = createClassLoader()
+        if (dumpClasses) dumpClasses(loader)
+        return loader
+    }
+
     protected fun testFile(source: String, dumpClasses: Boolean = false) {
         val files = mutableListOf<KtFile>()
         files.addAll(helperFiles())
@@ -105,4 +118,6 @@ abstract class AbstractCodeGenTest : CodegenTestCase() {
         val loader = createClassLoader()
         return loader.loadClass(className)
     }
+
+    open protected val additionalPaths = emptyList<File>()
 }
