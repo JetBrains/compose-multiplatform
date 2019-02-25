@@ -423,6 +423,137 @@ class KtxCodegenTests : AbstractCodeGenTest() {
         }
     }
 
+
+    @Test
+    fun testAmbientPortal1(): Unit = ensureSetup {
+        val llId = 123
+        val tvId = 345
+        var text = "Hello, world!"
+
+        // NOTE(lmr): The fact that "bust" is needed here is actually an issue with the fact that
+        // changes to providers don't invalidate consumers from other composers via Ambient.Portal.
+        // When that gets fixed, we should update this test to show that.
+        compose(
+            """
+            val StringAmbient = Ambient.of<String> { "default" }
+
+            fun buildPortal() = effectOf<Ambient.Reference> {
+                context.buildReference()
+            }
+
+            @Composable fun App(value: String) {
+                <StringAmbient.Provider value>
+                    <Parent bust=Math.random() />
+                </StringAmbient.Provider>
+            }
+
+            @Composable fun Parent(bust: Double) {
+                val ambientRef = +buildPortal()
+                val viewRef = +memo { Ref<LinearLayout>() }
+
+                <LinearLayout id=$llId ref=viewRef />
+
+                +onCommit {
+                    R4a.composeInto(
+                        container = viewRef.value ?: error("No View Ref!"),
+                        parent = ambientRef
+                    ) {
+                        <Child bust=Math.random() />
+                    }
+                }
+            }
+
+            @Composable fun Child(bust: Double) {
+                <StringAmbient.Consumer> value ->
+                    <TextView id=$tvId text=value />
+                </StringAmbient.Consumer>
+            }
+
+            """,
+            { mapOf("text" to text) },
+            """
+            <App value=text />
+            """
+        ).then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+            val layout = activity.findViewById(llId) as LinearLayout
+
+            assertEquals(1, layout.childCount)
+            assertEquals(text, textView.text)
+            text = "wat"
+        }.then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+            val layout = activity.findViewById(llId) as LinearLayout
+
+            assertEquals(1, layout.childCount)
+            assertEquals(text, textView.text)
+        }
+    }
+
+
+    @Test
+    fun testAmbientPortal2(): Unit = ensureSetup {
+        val llId = 123
+        val tvId = 345
+        var text = "Hello, world!"
+
+        // NOTE(lmr): The fact that "bust" is needed here is actually an issue with the fact that
+        // changes to providers don't invalidate consumers from other composers via Ambient.Portal.
+        // When that gets fixed, we should update this test to show that.
+        compose(
+            """
+            val StringAmbient = Ambient.of<String> { "default" }
+
+            @Composable fun App(value: String) {
+                <StringAmbient.Provider value>
+                    <Parent bust=Math.random() />
+                </StringAmbient.Provider>
+            }
+
+            @Composable fun Parent(bust: Double) {
+                <Ambient.Portal> ambientRef ->
+                    val viewRef = +memo { Ref<LinearLayout>() }
+
+                    <LinearLayout id=$llId ref=viewRef />
+
+                    +onCommit {
+                        R4a.composeInto(
+                            container = viewRef.value ?: error("No View Ref!"),
+                            parent = ambientRef
+                        ) {
+                            <Child bust=Math.random() />
+                        }
+                    }
+                </Ambient.Portal>
+            }
+
+            @Composable fun Child(bust: Double) {
+                <StringAmbient.Consumer> value ->
+                    <TextView id=$tvId text=value />
+                </StringAmbient.Consumer>
+            }
+
+            """,
+            { mapOf("text" to text) },
+            """
+            <App value=text />
+            """
+        ).then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+            val layout = activity.findViewById(llId) as LinearLayout
+
+            assertEquals(1, layout.childCount)
+            assertEquals(text, textView.text)
+            text = "wat"
+        }.then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+            val layout = activity.findViewById(llId) as LinearLayout
+
+            assertEquals(1, layout.childCount)
+            assertEquals(text, textView.text)
+        }
+    }
+
     @Test
     fun testCGNClassComponent(): Unit = ensureSetup {
         var text = "Hello, world!"
