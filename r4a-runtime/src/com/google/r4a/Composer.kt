@@ -431,7 +431,6 @@ open class Composer<N>(
         var ref = nextSlot() as? Ambient.Reference
         if (ref != null && !inserting) {
             skipValue()
-            return ref
         } else {
             val scope = invalidateStack.peek()
             ref = object : Ambient.Reference {
