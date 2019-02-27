@@ -14,81 +14,60 @@
  * limitations under the License.
  */
 
-// This file creates tasks for generating documentation from source code using Dokka
+// This file creates tasks for generating documentation using Dokka
 // TODO: after DiffAndDocs and Doclava are fully obsoleted and removed, rename this from Dokka to just Docs
 package androidx.build.dokka
 
+import java.io.File
 import androidx.build.DiffAndDocs
-import androidx.build.Release
-import androidx.build.SupportLibraryExtension
 import androidx.build.getBuildId
 import androidx.build.getDistributionDirectory
-import androidx.build.java.JavaCompileInputs
+import androidx.build.SupportLibraryExtension
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Project
-import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.kotlin.dsl.apply
-import org.gradle.kotlin.dsl.getPlugin
-import org.jetbrains.dokka.gradle.DokkaPlugin
-import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.dokka.gradle.DokkaAndroidPlugin
+import org.jetbrains.dokka.gradle.DokkaAndroidTask
 import org.jetbrains.dokka.gradle.PackageOptions
 
 object Dokka {
-    private val RUNNER_TASK_NAME = "dokka"
-    public val ARCHIVE_TASK_NAME: String = "distDokkaDocs" // TODO(b/72330103) make "generateDocs" be the only archive task once Doclava is fully removed
-    private val ALTERNATE_ARCHIVE_TASK_NAME: String = "generateDocs"
-
-    private val hiddenPackages = listOf(
-        "androidx.core.internal",
-        "androidx.preference.internal",
-        "androidx.wear.internal.widget.drawer",
-        "androidx.webkit.internal",
-        "androidx.work.impl",
-        "androidx.work.impl.background",
-        "androidx.work.impl.background.systemalarm",
-        "androidx.work.impl.background.systemjob",
-        "androidx.work.impl.constraints",
-        "androidx.work.impl.constraints.controllers",
-        "androidx.work.impl.constraints.trackers",
-        "androidx.work.impl.model",
-        "androidx.work.impl.utils",
-        "androidx.work.impl.utils.futures",
-        "androidx.work.impl.utils.taskexecutor"
-    )
-
-    fun getDocsTask(project: Project): DokkaTask {
-        return project.rootProject.getOrCreateDocsTask()
-    }
-
-    @Synchronized
-    fun Project.getOrCreateDocsTask(): DokkaTask {
-        val runnerProject = this
-        if (runnerProject.tasks.findByName(Dokka.RUNNER_TASK_NAME) == null) {
-            project.apply<DokkaPlugin>()
-            val docsTask = project.tasks.getByName(Dokka.RUNNER_TASK_NAME) as DokkaTask
+    fun createDocsTask(
+        taskName: String,
+        project: Project,
+        hiddenPackages: List<String>,
+        archiveTaskName: String
+    ) {
+        project.apply<DokkaAndroidPlugin>()
+        if (project.name != "support" && project.name != "docs-runner") {
+            throw Exception("Illegal project passed to createDocsTask: " + project.name)
+        }
+        val docsTask = project.tasks.create(taskName, DokkaAndroidTask::class.java) { docsTask ->
+            docsTask.moduleName = project.name
+            docsTask.outputDirectory = File(project.buildDir, taskName).absolutePath
             docsTask.outputFormat = "dac"
+            docsTask.outlineRoot = "androidx/"
+            docsTask.dacRoot = "/reference/kotlin"
+            docsTask.moduleName = ""
             for (hiddenPackage in hiddenPackages) {
                 val opts = PackageOptions()
                 opts.prefix = hiddenPackage
                 opts.suppress = true
                 docsTask.perPackageOptions.add(opts)
             }
-            val archiveTask = project.tasks.create(ARCHIVE_TASK_NAME, Zip::class.java) { task ->
-                task.dependsOn(docsTask)
-                task.description =
-                        "Generates documentation artifact for pushing to developer.android.com"
-                task.from(docsTask.outputDirectory)
-                task.baseName = "android-support-dokka-docs"
-                task.version = getBuildId()
-                task.destinationDir = project.getDistributionDirectory()
-            }
-            if (project.tasks.findByName(ALTERNATE_ARCHIVE_TASK_NAME) == null) {
-                project.tasks.create(ALTERNATE_ARCHIVE_TASK_NAME)
-            }
-            project.tasks.getByName(ALTERNATE_ARCHIVE_TASK_NAME).dependsOn(archiveTask)
         }
-        return runnerProject.tasks.getByName(Dokka.RUNNER_TASK_NAME) as DokkaTask
+
+        project.tasks.create(archiveTaskName, Zip::class.java) { zipTask ->
+            zipTask.dependsOn(docsTask)
+            zipTask.description = "Generates documentation artifact for pushing to " +
+                "developer.android.com"
+            zipTask.from(docsTask.outputDirectory) { copySpec ->
+                copySpec.into("reference/kotlin")
+            }
+            zipTask.baseName = taskName
+            zipTask.version = getBuildId()
+            zipTask.destinationDir = project.getDistributionDirectory()
+        }
     }
 
     fun registerAndroidProject(
@@ -96,43 +75,17 @@ object Dokka {
         library: LibraryExtension,
         extension: SupportLibraryExtension
     ) {
-        if (extension.toolingProject) {
-            project.logger.info("Project ${project.name} is tooling project; ignoring API tasks.")
-            return
-        }
-        library.libraryVariants.all { variant ->
-            if (variant.name == Release.DEFAULT_PUBLISH_CONFIG) {
-                project.afterEvaluate({
-                    val inputs = JavaCompileInputs.fromLibraryVariant(library, variant)
-                    registerInputs(inputs, project)
-                })
-            }
-        }
         DiffAndDocs.get(project).registerPrebuilts(extension)
+        DokkaPublicDocs.registerProject(project, extension)
+        DokkaSourceDocs.registerAndroidProject(project, library, extension)
     }
 
     fun registerJavaProject(
         project: Project,
         extension: SupportLibraryExtension
     ) {
-        if (extension.toolingProject) {
-            project.logger.info("Project ${project.name} is tooling project; ignoring API tasks.")
-            return
-        }
-        val javaPluginConvention = project.convention.getPlugin<JavaPluginConvention>()
-        val mainSourceSet = javaPluginConvention.sourceSets.getByName("main")
-        project.afterEvaluate({
-            val inputs = JavaCompileInputs.fromSourceSet(mainSourceSet, project)
-            registerInputs(inputs, project)
-        })
         DiffAndDocs.get(project).registerPrebuilts(extension)
-    }
-
-    fun registerInputs(inputs: JavaCompileInputs, project: Project) {
-        val docsTask = getDocsTask(project)
-        docsTask.sourceDirs += inputs.sourcePaths
-        docsTask.classpath =
-                docsTask.classpath.plus(inputs.dependencyClasspath).plus(inputs.bootClasspath)
-        docsTask.dependsOn(inputs.dependencyClasspath)
+        DokkaPublicDocs.registerProject(project, extension)
+        DokkaSourceDocs.registerJavaProject(project, extension)
     }
 }
