@@ -249,6 +249,7 @@ class DiffAndDocs private constructor(
                     it.exclude("**/*.kt")
                     it.exclude("**/META-INF/**")
                     it.exclude("**/OWNERS")
+                    it.exclude("**/NOTICE.txt")
                 }
         root.configurations.remove(configuration)
         return tree
@@ -678,14 +679,6 @@ fun androidJarFile(project: Project): FileCollection =
 
 private fun androidSrcJarFile(project: Project): File = File(project.sdkPath(),
         "platforms/${SupportConfig.COMPILE_SDK_VERSION}/android-stubs-src.jar")
-
-private fun PublishDocsRules.resolve(extension: SupportLibraryExtension): DocsRule? {
-    val mavenGroup = extension.mavenGroup
-    return if (mavenGroup == null) null else resolve(mavenGroup, extension.project.name)
-}
-
-private fun Prebuilts.dependency(extension: SupportLibraryExtension) =
-        "${extension.mavenGroup}:${extension.project.name}:$version"
 
 private fun BaseVariant.rFile() = "${applicationId.replace('.', '/')}/R.java"
 
