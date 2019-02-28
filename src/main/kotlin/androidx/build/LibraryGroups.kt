@@ -57,7 +57,7 @@ object LibraryGroups {
     const val MEDIA = "androidx.media"
     const val MEDIA2 = "androidx.media2"
     const val MEDIAROUTER = "androidx.mediarouter"
-    const val NAVIGATION = "android.arch.navigation"
+    const val NAVIGATION = "androidx.navigation"
     const val PAGING = "androidx.paging"
     const val PALETTE = "androidx.palette"
     const val PERCENTLAYOUT = "androidx.percentlayout"
