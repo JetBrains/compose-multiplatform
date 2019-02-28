@@ -54,6 +54,7 @@ const val TEST_CORE = "androidx.test:core:1.1.0"
 const val TEST_RUNNER = "androidx.test:runner:1.1.0"
 const val TEST_RULES = "androidx.test:rules:1.1.0"
 const val TEST_EXT_JUNIT = "androidx.test.ext:junit:1.0.0"
+const val TEST_UIAUTOMATOR = "androidx.test.uiautomator:uiautomator:2.2.0"
 const val TRUTH = "com.google.truth:truth:0.42"
 /**
  * this Xerial version is newer than we want but we need it to fix
