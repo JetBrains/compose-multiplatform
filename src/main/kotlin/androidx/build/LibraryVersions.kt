@@ -22,12 +22,12 @@ package androidx.build
 object LibraryVersions {
     val ACTIVITY = Version("1.0.0-alpha05")
     val ANIMATION = Version("1.0.0-alpha01")
-    val ANIMATION_TESTING = Version("1.0.0")
+    val ANIMATION_TESTING = Version("1.1.0-alpha01")
     val ANNOTATION = Version("1.1.0-alpha02")
     val APPCOMPAT = Version("1.1.0-alpha03")
-    val ARCH_CORE = Version("2.0.0")
+    val ARCH_CORE = Version("2.1.0-alpha01")
     val ARCH_CORE_TESTING = ARCH_CORE
-    val ARCH_RUNTIME = Version("2.0.1-alpha01")
+    val ARCH_RUNTIME = Version("2.1.0-alpha01")
     val ASYNCLAYOUTINFLATER = Version("1.1.0-alpha01")
     val BENCHMARK = Version("1.0.0-alpha01")
     val BIOMETRIC = Version("1.0.0-alpha04")
