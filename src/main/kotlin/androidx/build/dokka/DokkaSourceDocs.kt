@@ -36,8 +36,16 @@ object DokkaSourceDocs {
 
     private val hiddenPackages = DokkaPublicDocs.hiddenPackages
 
+    fun tryGetRunnerProject(project: Project): Project? {
+        return project.rootProject.findProject(":docs-runner")
+    }
+
+    fun getRunnerProject(project: Project): Project {
+        return tryGetRunnerProject(project)!!
+    }
+
     fun getDocsTask(project: Project): DokkaTask {
-        var runnerProject = project.rootProject.project(":docs-runner")
+        var runnerProject = getRunnerProject(project)
         return runnerProject.tasks.getOrCreateDocsTask(runnerProject)
     }
 
@@ -59,6 +67,9 @@ object DokkaSourceDocs {
         library: LibraryExtension,
         extension: SupportLibraryExtension
     ) {
+        if (tryGetRunnerProject(project) == null) {
+            return
+        }
         if (extension.toolingProject) {
             project.logger.info("Project ${project.name} is tooling project; ignoring API tasks.")
             return
@@ -77,6 +88,9 @@ object DokkaSourceDocs {
         project: Project,
         extension: SupportLibraryExtension
     ) {
+        if (tryGetRunnerProject(project) == null) {
+            return
+        }
         if (extension.toolingProject) {
             project.logger.info("Project ${project.name} is tooling project; ignoring API tasks.")
             return
