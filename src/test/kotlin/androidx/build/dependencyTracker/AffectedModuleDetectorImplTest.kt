@@ -129,7 +129,7 @@ class AffectedModuleDetectorImplTest {
                 rootProject = root,
                 logger = logger,
                 ignoreUnknownProjects = false,
-                projectSubset = ProjectSubset.ALL,
+                projectSubset = ProjectSubset.ALL_AFFECTED_PROJECTS,
                 injectedGitClient = MockGitClient(
                         lastMergeSha = "foo",
                         changedFiles = emptyList())
@@ -177,7 +177,7 @@ class AffectedModuleDetectorImplTest {
                 rootProject = root,
                 logger = logger,
                 ignoreUnknownProjects = false,
-            projectSubset = ProjectSubset.ALL,
+            projectSubset = ProjectSubset.ALL_AFFECTED_PROJECTS,
                 injectedGitClient = MockGitClient(
                         lastMergeSha = "foo",
                         changedFiles = listOf(convertToFilePath("p1", "foo.java")))
@@ -225,7 +225,7 @@ class AffectedModuleDetectorImplTest {
                 rootProject = root,
                 logger = logger,
                 ignoreUnknownProjects = false,
-                projectSubset = ProjectSubset.ALL,
+                projectSubset = ProjectSubset.ALL_AFFECTED_PROJECTS,
                 injectedGitClient = MockGitClient(
                         lastMergeSha = "foo",
                         changedFiles = listOf(
@@ -279,7 +279,7 @@ class AffectedModuleDetectorImplTest {
                 rootProject = root,
                 logger = logger,
                 ignoreUnknownProjects = false,
-                projectSubset = ProjectSubset.ALL,
+                projectSubset = ProjectSubset.ALL_AFFECTED_PROJECTS,
                 injectedGitClient = MockGitClient(
                         lastMergeSha = "foo",
                         changedFiles = listOf("foo.java"))
