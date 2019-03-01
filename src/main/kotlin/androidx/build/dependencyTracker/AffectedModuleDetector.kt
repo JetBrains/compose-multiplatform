@@ -67,7 +67,7 @@ abstract class AffectedModuleDetector {
         private const val LOG_FILE_NAME = "affected_module_detector_log.txt"
         private const val ENABLE_ARG = "androidx.enableAffectedModuleDetection"
         private const val DEPENDENT_PROJECTS_ARG = "androidx.onlyDependent"
-        private const val CHANGED_PROJECTS_ARG = "androidx.onlyDirectlyAffected"
+        private const val CHANGED_PROJECTS_ARG = "androidx.changedProjects"
         @JvmStatic
         fun configure(gradle: Gradle, rootProject: Project) {
             val enabled = rootProject.hasProperty(ENABLE_ARG)
@@ -206,11 +206,11 @@ internal class AffectedModuleDetectorImpl constructor(
     }
 
     /**
-     * By default, finds all modules that are affected by current changes, and always built modules
+     * By default, finds all modules that are affected by current changes
      *
-     * With param onlyDependent, finds only modules dependent on directly affected modules
+     * With param dependentProjects, finds only modules dependent on directly changed modules
      *
-     * With param onlyDirectlyAffected, finds only directly affectedModules and always built modules
+     * With param changedProjects, finds only directly changed modules
      *
      * If it cannot determine the containing module for a file (e.g. buildSrc or root), it
      * defaults to all projects unless [ignoreUnknownProjects] is set to true.
@@ -247,14 +247,14 @@ internal class AffectedModuleDetectorImpl constructor(
             ALWAYS_BUILD.any {
                 project.name.contains(it)
             }
-        }
+        }.toSet()
 
-        return when (projectSubset) {
+        return alwaysBuild + when (projectSubset) {
             ProjectSubset.DEPENDENT_PROJECTS
                 -> expandToDependents(containingProjects) - containingProjects.filterNotNull()
             ProjectSubset.CHANGED_PROJECTS
-                -> (containingProjects + alwaysBuild).filterNotNull().toSet()
-            else -> expandToDependents(containingProjects) + alwaysBuild
+                -> (containingProjects).filterNotNull().toSet()
+            else -> expandToDependents(containingProjects)
         }
     }
 
@@ -271,7 +271,8 @@ internal class AffectedModuleDetectorImpl constructor(
     }
 
     companion object {
-        // list of projects that should always be built
-        private val ALWAYS_BUILD = arrayOf("dumb-test", "wear", "media2-test")
+        // dummy test to ensure no failure due to "no instrumentation. See b/112645580
+        // and b/126377106
+        private val ALWAYS_BUILD = setOf("dumb-test")
     }
 }
