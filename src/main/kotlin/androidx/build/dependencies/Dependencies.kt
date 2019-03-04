@@ -102,7 +102,7 @@ const val ARCH_CORE_TESTING = "androidx.arch.core:core-testing:2.0.0"
 
 const val SAFE_ARGS_ANDROID_GRADLE_PLUGIN = "com.android.tools.build:gradle:3.3.0"
 const val SAFE_ARGS_KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.20"
-const val SAFE_ARGS_NAVIGATION_COMMON = "android.arch.navigation:navigation-common:1.0.0-alpha10"
+const val SAFE_ARGS_NAVIGATION_COMMON = "androidx.navigation:navigation-common:2.0.0-rc02"
 
 const val ARCH_PAGING_COMMON = "androidx.paging:paging-common:2.0.0"
 const val ARCH_PAGING_RUNTIME = "androidx.paging:paging-runtime:2.0.0"
