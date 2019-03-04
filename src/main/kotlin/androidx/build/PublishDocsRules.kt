@@ -89,7 +89,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.RECYCLERVIEW, "recyclerview", "1.1.0-alpha02")
     prebuilts(LibraryGroups.RECYCLERVIEW, "recyclerview-selection", "1.1.0-alpha01")
     prebuilts(LibraryGroups.REMOTECALLBACK, "1.0.0-alpha01")
-    prebuilts(LibraryGroups.ROOM, "2.1.0-alpha04")
+    prebuilts(LibraryGroups.ROOM, "2.1.0-alpha05")
     prebuilts(LibraryGroups.SLICE, "slice-builders", "1.0.0")
     prebuilts(LibraryGroups.SLICE, "slice-builders-ktx", "1.0.0-alpha6")
     prebuilts(LibraryGroups.SLICE, "slice-core", "1.0.0")

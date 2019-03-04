@@ -82,9 +82,12 @@ const val SUPPORT_DESIGN = "com.google.android.material:material:1.0.0@aar"
 const val SUPPORT_FRAGMENTS = "androidx.fragment:fragment:$SUPPORT_VERSION"
 const val SUPPORT_RECYCLERVIEW = "androidx.recyclerview:recyclerview:$SUPPORT_VERSION"
 
+const val ANDROIDX_ANNOTATION = "androidx.annotation:annotation:1.1.0-alpha02"
 const val ANDROIDX_COLLECTION = "androidx.collection:collection:$SUPPORT_VERSION"
 const val ANDROIDX_CORE = "androidx.core:core:1.0.0"
 const val ANDROIDX_RECYCLERVIEW = "androidx.recyclerview:recyclerview:1.0.0"
+const val ANDROIDX_SQLITE = "androidx.sqlite:sqlite:2.0.1"
+const val ANDROIDX_SQLITE_FRAMEWORK = "androidx.sqlite:sqlite-framework:2.0.1"
 
 // Arch libraries
 const val ARCH_LIFECYCLE_RUNTIME = "androidx.lifecycle:lifecycle-runtime:2.0.0"
