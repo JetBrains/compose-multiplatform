@@ -100,7 +100,10 @@ class AndroidXPlugin : Plugin<Project> {
                     project.configureResourceApiChecks()
                     val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
                     val checkNoWarningsTask = project.tasks.register(CHECK_NO_WARNINGS_TASK)
-                    project.createDumpDependenciesTask()
+                    // Only dump dependencies of published projects
+                    if (project.extra.has("publish")) {
+                        project.createDumpDependenciesTask()
+                    }
                     project.createCheckReleaseReadyTask(listOf(verifyDependencyVersionsTask,
                         checkNoWarningsTask))
                     extension.libraryVariants.all { libraryVariant ->
