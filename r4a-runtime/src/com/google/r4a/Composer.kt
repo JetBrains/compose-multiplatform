@@ -698,6 +698,10 @@ open class Composer<N>(
                     recordOperation { _, slots, lifecycleManager ->
                         removeCurrentItem(slots, lifecycleManager)
                     }
+
+                    // Remove any invalidations pending for the group being removed. These are no longer part of the composition.
+                    // The group being composed is one after the start of the item (the first slot being the key).
+                    invalidations.removeRange(previousInfo.location + 1, previousInfo.location + slots.groupSize(previousInfo.location + 1))
                     previousIndex++
                     continue
                 }
@@ -746,12 +750,14 @@ open class Composer<N>(
         // composition than we expect (i.e. we are not yet at an end)
         val removeIndex = nodeIndex
         while (!slots.isGroupEnd) {
+            val startSlot = slots.current
             slots.next() // Skip key
             val nodesToRemove = slots.skipGroup()
             recordRemoveNode(removeIndex, nodesToRemove)
             recordOperation { _, slots, lifeCycleManager ->
                 removeCurrentItem(slots, lifeCycleManager)
             }
+            invalidations.removeRange(startSlot, slots.current)
             slots.reportUncertainNodeCount()
         }
 
@@ -1316,4 +1322,13 @@ private fun MutableList<Invalidation>.firstInRange(start: Int, end: Int): Invali
 private fun MutableList<Invalidation>.removeLocation(location: Int) {
     val index = findLocation(location)
     if (index >= 0) removeAt(index)
+}
+
+private fun MutableList<Invalidation>.removeRange(start: Int, end: Int) {
+    val index = findLocation(start).let { if (it < 0) -(it + 1) else it }
+    while (index < size) {
+        val validation = get(index)
+        if (validation.location <= end) removeAt(index)
+        else break
+    }
 }
