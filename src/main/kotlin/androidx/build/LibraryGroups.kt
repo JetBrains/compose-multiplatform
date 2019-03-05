@@ -83,5 +83,5 @@ object LibraryGroups {
     const val VIEWPAGER2 = "androidx.viewpager2"
     const val WEAR = "androidx.wear"
     const val WEBKIT = "androidx.webkit"
-    const val WORKMANAGER = "android.arch.work"
+    const val WORKMANAGER = "androidx.work"
 }
