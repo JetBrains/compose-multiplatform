@@ -45,7 +45,7 @@ abstract class AbstractResolvedKtxCallsTest : KotlinTestWithEnvironment() {
             testRootDisposable, configuration, EnvironmentConfigFiles.JVM_CONFIG_FILES
         )
 
-        R4AComponentRegistrar().registerProjectComponents(env.project, env.configuration)
+        R4AComponentRegistrar.registerProjectExtensions(env.project, env.configuration)
 
         return env
     }

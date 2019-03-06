@@ -38,27 +38,27 @@ class R4AComponentRegistrar : ComponentRegistrar {
 
     companion object {
         val COMPOSABLE_CHECKER_MODE_KEY = CompilerConfigurationKey<ComposableAnnotationChecker.Mode>("@composable checker mode")
+
+        fun registerProjectExtensions(project: Project, configuration: CompilerConfiguration) {
+            StorageComponentContainerContributor.registerExtension(project, ComponentsClosedDeclarationChecker())
+            StorageComponentContainerContributor.registerExtension(project, ComposableAnnotationChecker(configuration.get(COMPOSABLE_CHECKER_MODE_KEY, ComposableAnnotationChecker.DEFAULT_MODE)))
+            StorageComponentContainerContributor.registerExtension(project, UnionAnnotationCheckerProvider())
+            KtxParsingExtension.registerExtension(project, R4aKtxParsingExtension())
+            KtxTypeResolutionExtension.registerExtension(project, R4aKtxTypeResolutionExtension())
+            KtxControlFlowExtension.registerExtension(project, R4aKtxControlFlowExtension())
+            R4aDiagnosticSuppressor.registerExtension(project, R4aDiagnosticSuppressor())
+            TypeResolutionInterceptorExtension.registerExtension(project, R4aTypeResolutionInterceptorExtension())
+            SyntheticIrExtension.registerExtension(project, R4ASyntheticIrExtension())
+            IrLoweringExtension.registerExtension(project, R4aIrLoweringExtension())
+
+            StorageComponentContainerContributor.registerExtension(project, FrameModelChecker())
+            AnalysisHandlerExtension.registerExtension(project, FramePackageAnalysisHandlerExtension())
+            SyntheticIrExtension.registerExtension(project, FrameTransformExtension())
+        }
     }
 
     override fun registerProjectComponents(project: MockProject, configuration: CompilerConfiguration) {
-        registerProjectComponents(project as Project, configuration)
-    }
-
-    fun registerProjectComponents(project: Project, configuration: CompilerConfiguration) {
-        StorageComponentContainerContributor.registerExtension(project, ComponentsClosedDeclarationChecker())
-        StorageComponentContainerContributor.registerExtension(project, ComposableAnnotationChecker(configuration.get(COMPOSABLE_CHECKER_MODE_KEY, ComposableAnnotationChecker.DEFAULT_MODE)))
-        StorageComponentContainerContributor.registerExtension(project, UnionAnnotationCheckerProvider())
-        KtxParsingExtension.registerExtension(project, R4aKtxParsingExtension())
-        KtxTypeResolutionExtension.registerExtension(project, R4aKtxTypeResolutionExtension())
-        KtxControlFlowExtension.registerExtension(project, R4aKtxControlFlowExtension())
-        R4aDiagnosticSuppressor.registerExtension(project, R4aDiagnosticSuppressor())
-        TypeResolutionInterceptorExtension.registerExtension(project, R4aTypeResolutionInterceptorExtension())
-        SyntheticIrExtension.registerExtension(project, R4ASyntheticIrExtension())
-        IrLoweringExtension.registerExtension(project, R4aIrLoweringExtension())
-
-        StorageComponentContainerContributor.registerExtension(project, FrameModelChecker())
-        AnalysisHandlerExtension.registerExtension(project, FramePackageAnalysisHandlerExtension())
-        SyntheticIrExtension.registerExtension(project, FrameTransformExtension())
+        registerProjectExtensions(project as Project, configuration)
     }
 }
 

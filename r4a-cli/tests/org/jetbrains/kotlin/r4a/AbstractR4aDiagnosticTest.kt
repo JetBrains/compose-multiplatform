@@ -113,7 +113,7 @@ abstract class AbstractR4aDiagnosticsTest: KtUsefulTestCase() {
     }
 
     fun setupEnvironment(environment: KotlinCoreEnvironment) {
-        R4AComponentRegistrar().registerProjectComponents(environment.project, environment.configuration)
+        R4AComponentRegistrar.registerProjectExtensions(environment.project, environment.configuration)
     }
 }
 
