@@ -44,6 +44,8 @@ const val KOTLIN_METADATA = "me.eugeniomarletti.kotlin.metadata:kotlin-metadata:
 const val KOTLIN_METADATA_JVM = "org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.0.5"
 const val KOTLIN_COROUTINES = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.0"
 const val KOTLIN_R4A_COROUTINES = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.0"
+const val KOTLIN_COROUTINES_CORE = "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.0"
+const val KOTLIN_COROUTINES_TEST = "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.1.0"
 const val LEAKCANARY_INSTRUMENTATION =
         "com.squareup.leakcanary:leakcanary-android-instrumentation:1.6.2"
 const val MOCKITO_CORE = "org.mockito:mockito-core:2.19.0"
@@ -56,6 +58,7 @@ const val TEST_CORE = "androidx.test:core:1.1.0"
 const val TEST_RUNNER = "androidx.test:runner:1.1.0"
 const val TEST_RULES = "androidx.test:rules:1.1.0"
 const val TEST_EXT_JUNIT = "androidx.test.ext:junit:1.0.0"
+const val TEST_EXT_KTX = "androidx.test.ext:junit-ktx:1.1.0"
 const val TEST_UIAUTOMATOR = "androidx.test.uiautomator:uiautomator:2.2.0"
 const val TRUTH = "com.google.truth:truth:0.42"
 /**
