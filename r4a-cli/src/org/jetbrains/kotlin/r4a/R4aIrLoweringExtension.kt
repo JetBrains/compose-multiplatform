@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.backend.common.phaser.*
 import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
 import org.jetbrains.kotlin.backend.jvm.extensions.IrLoweringExtension
 import org.jetbrains.kotlin.ir.declarations.IrFile
+import org.jetbrains.kotlin.r4a.compiler.lower.R4aFcsPatcher
 import org.jetbrains.kotlin.r4a.compiler.lower.R4aObservePatcher
 import org.jetbrains.kotlin.r4a.frames.FrameIrTransformer
 
@@ -21,12 +22,20 @@ val R4aObservePhase = makeIrFilePhase(
 val FrameClassGenPhase = makeIrFilePhase(
     ::FrameIrTransformer,
     name = "R4aFrameTransformPhase",
-    description = "Transform @Model classes into framed classes"
+    description = "Transform @Model classes into framed c" +
+            "lasses"
+)
+
+val R4aFcsPhase = makeIrFilePhase(
+    ::R4aFcsPatcher,
+    name = "R4aFcsPhase",
+    description = "Rewrite FCS descriptors to IR bytecode"
 )
 
 class R4aIrLoweringExtension : IrLoweringExtension {
     override fun interceptLoweringPhases(phases: CompilerPhase<JvmBackendContext, IrFile, IrFile>): CompilerPhase<JvmBackendContext, IrFile, IrFile> {
-        return FrameClassGenPhase then R4aObservePhase then phases
+
+        return FrameClassGenPhase then R4aObservePhase then R4aFcsPhase then phases
     }
 }
 
