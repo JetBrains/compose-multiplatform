@@ -89,7 +89,7 @@ object LibraryVersions {
     val SLIDINGPANELAYOUT = Version("1.1.0-alpha01")
     val SWIPE_REFRESH_LAYOUT = Version("1.1.0-alpha01")
     val TEXTCLASSIFIER = Version("1.0.0-alpha03")
-    val TRANSITION = Version("1.1.0-alpha02")
+    val TRANSITION = Version("1.1.0-beta01")
     val TVPROVIDER = Version("1.1.0-alpha01")
     val UI = Version("1.0.0-alpha01")
     val VECTORDRAWABLE = Version("1.1.0-alpha02")
