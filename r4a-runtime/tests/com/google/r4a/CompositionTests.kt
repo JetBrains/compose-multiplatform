@@ -884,6 +884,106 @@ class CompositionTests : TestCase() {
         validate(composer.root) { composition() }
     }
 
+    fun testInvalidateJoin_End() {
+        var text = "Starting"
+        var includeNested = true
+        var invalidate1: (() -> Unit)? = null
+        var invalidate2: (() -> Unit)? = null
+
+        fun MockViewComposition.composition() {
+            linear {
+                join(860) { myInvalidate ->
+                    invalidate1 = { myInvalidate(false) }
+                    text(text)
+                    if (includeNested) {
+                        join(899) { myInvalidate ->
+                            invalidate2 = { myInvalidate(false) }
+                            text("Nested in $text")
+                        }
+                    }
+                }
+            }
+        }
+
+        fun MockViewValidator.composition() {
+            linear {
+                text(text)
+                if (includeNested) {
+                    text("Nested in $text")
+                }
+            }
+        }
+
+        val composer = compose { composition() }
+
+        validate(composer.root) { composition() }
+
+        text = "Ending"
+        includeNested = false
+        invalidate1?.invoke()
+        invalidate2?.invoke()
+
+        composer.recompose()
+        composer.applyChanges()
+
+        validate(composer.root) { composition() }
+
+        composer.recompose()
+        composer.applyChanges()
+
+        validate(composer.root) { composition() }
+    }
+
+    fun testInvalidateJoin_Start() {
+        var text = "Starting"
+        var includeNested = true
+        var invalidate1: (() -> Unit)? = null
+        var invalidate2: (() -> Unit)? = null
+
+        fun MockViewComposition.composition() {
+            linear {
+                join(860) { myInvalidate ->
+                    invalidate1 = { myInvalidate(false) }
+                    if (includeNested) {
+                        join(899) { myInvalidate ->
+                            invalidate2 = { myInvalidate(false) }
+                            text("Nested in $text")
+                        }
+                    }
+                    text(text)
+                }
+            }
+        }
+
+        fun MockViewValidator.composition() {
+            linear {
+                if (includeNested) {
+                    text("Nested in $text")
+                }
+                text(text)
+            }
+        }
+
+        val composer = compose { composition() }
+
+        validate(composer.root) { composition() }
+
+        text = "Ending"
+        includeNested = false
+        invalidate1?.invoke()
+        invalidate2?.invoke()
+
+        composer.recompose()
+        composer.applyChanges()
+
+        validate(composer.root) { composition() }
+
+        composer.recompose()
+        composer.applyChanges()
+
+        validate(composer.root) { composition() }
+    }
+
     fun testLifecycle_Enter_Simple() {
         val lifecycleObject = object : CompositionLifecycleObserver {
             var count = 0
