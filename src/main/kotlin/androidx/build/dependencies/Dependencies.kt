@@ -114,5 +114,6 @@ const val ARCH_PAGING_RUNTIME = "androidx.paging:paging-runtime:2.0.0"
 const val ARCH_ROOM_RUNTIME = "androidx.room:room-runtime:2.0.0"
 const val ARCH_ROOM_COMPILER = "androidx.room:room-compiler:2.0.0"
 const val ARCH_ROOM_RXJAVA = "androidx.room:room-rxjava2:2.0.0"
+const val ARCH_ROOM_TESTING = "androidx.room:room-testing:2.0.0"
 
 const val ROBOLECTRIC = "org.robolectric:robolectric:4.1"
