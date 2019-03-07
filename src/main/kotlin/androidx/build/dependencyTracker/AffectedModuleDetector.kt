@@ -276,8 +276,8 @@ internal class AffectedModuleDetectorImpl constructor(
     }
 
     companion object {
-        // dummy test to ensure no failure due to "no instrumentation. See b/112645580
-        // and b/126377106
+        // dummy test to ensure no failure due to "no instrumentation. We can eventually remove
+        // if we resolve b/127819369
         private val ALWAYS_BUILD = setOf("dumb-test")
     }
 }
