@@ -1426,6 +1426,52 @@ class KtxCodegenTests : AbstractCodeGenTest() {
         }
     }
 
+    @Test
+    fun testKeyTag(): Unit = ensureSetup {
+        compose(
+            """
+            val list = mutableListOf(0,1,2,3)
+
+            @Composable
+            fun Reordering() {
+                <LinearLayout>
+                    <Recompose> recompose ->
+                        <Button id=50 text="Recompose!" onClick={ list.add(list.removeAt(0)); recompose(); } />
+                        <LinearLayout id=100>
+                            for(id in list) {
+                                <Key key=id>
+                                    <StatefulButton />
+                                </Key>
+                            }
+                        </LinearLayout>
+                    </Recompose>
+                </LinearLayout>
+            }
+
+            @Composable
+            private fun StatefulButton() {
+                val count = +state { 0 }
+                <Button text="Clicked ${'$'}{count.value} times!" onClick={ count.value++ } />
+            }
+            """, { emptyMap<String, String>() },
+            """
+               <Reordering />
+            """
+        ).then { activity ->
+            val layout = activity.findViewById(100) as LinearLayout
+            layout.getChildAt(0).performClick()
+        }.then { activity ->
+            val recomposeButton = activity.findViewById(50) as Button
+            recomposeButton.performClick()
+        }.then { activity ->
+            val layout = activity.findViewById(100) as LinearLayout
+            assertEquals("Clicked 0 times!", (layout.getChildAt(0) as Button).text)
+            assertEquals("Clicked 0 times!", (layout.getChildAt(1) as Button).text)
+            assertEquals("Clicked 0 times!", (layout.getChildAt(2) as Button).text)
+            assertEquals("Clicked 1 times!", (layout.getChildAt(3) as Button).text)
+        }
+    }
+
     override fun setUp() {
         isSetup = true
         super.setUp()
