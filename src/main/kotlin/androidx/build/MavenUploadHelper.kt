@@ -30,7 +30,7 @@ import java.util.concurrent.ConcurrentHashMap
 fun Project.configureMavenArtifactUpload(extension: SupportLibraryExtension) {
     afterEvaluate {
         if (extension.publish) {
-            val mavenGroup = extension.mavenGroup
+            val mavenGroup = extension.mavenGroup?.group
             if (mavenGroup == null) {
                 throw Exception("You must specify mavenGroup for $name project")
             }

@@ -27,13 +27,13 @@ import androidx.build.Strategy.TipOfTree
 val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.ACTIVITY, "1.0.0-alpha04")
     prebuilts(LibraryGroups.ANNOTATION, "1.1.0-alpha01")
-    ignore(LibraryGroups.APPCOMPAT, "appcompat-resources")
+    ignore(LibraryGroups.APPCOMPAT.group, "appcompat-resources")
     prebuilts(LibraryGroups.APPCOMPAT, "1.1.0-alpha02")
     prebuilts(LibraryGroups.ARCH_CORE, "2.0.0")
     prebuilts(LibraryGroups.ASYNCLAYOUTINFLATER, "1.0.0")
     prebuilts(LibraryGroups.BIOMETRIC, "biometric", "1.0.0-alpha03")
     prebuilts(LibraryGroups.BROWSER, "1.0.0")
-    ignore(LibraryGroups.CAR, "car-moderator")
+    ignore(LibraryGroups.CAR.group, "car-moderator")
     prebuilts(LibraryGroups.CAR, "car-cluster", "1.0.0-alpha5")
     prebuilts(LibraryGroups.CAR, "car", "1.0.0-alpha5")
             .addStubs("car/stubs/android.car.jar")
@@ -59,25 +59,25 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.INTERPOLATOR, "1.0.0")
     prebuilts(LibraryGroups.LEANBACK, "1.1.0-alpha01")
     prebuilts(LibraryGroups.LEGACY, "1.0.0")
-    ignore(LibraryGroups.LIFECYCLE, "lifecycle-savedstate-core")
-    ignore(LibraryGroups.LIFECYCLE, "lifecycle-savedstate-fragment")
-    ignore(LibraryGroups.LIFECYCLE, "lifecycle-viewmodel-savedstate")
-    ignore(LibraryGroups.LIFECYCLE, "lifecycle-viewmodel-fragment")
-    ignore(LibraryGroups.LIFECYCLE, "lifecycle-livedata-ktx")
-    ignore(LibraryGroups.LIFECYCLE, "lifecycle-livedata-core-ktx")
-    ignore(LibraryGroups.LIFECYCLE, "lifecycle-compiler")
-    ignore(LibraryGroups.LIFECYCLE, "lifecycle-common-eap")
+    ignore(LibraryGroups.LIFECYCLE.group, "lifecycle-savedstate-core")
+    ignore(LibraryGroups.LIFECYCLE.group, "lifecycle-savedstate-fragment")
+    ignore(LibraryGroups.LIFECYCLE.group, "lifecycle-viewmodel-savedstate")
+    ignore(LibraryGroups.LIFECYCLE.group, "lifecycle-viewmodel-fragment")
+    ignore(LibraryGroups.LIFECYCLE.group, "lifecycle-livedata-ktx")
+    ignore(LibraryGroups.LIFECYCLE.group, "lifecycle-livedata-core-ktx")
+    ignore(LibraryGroups.LIFECYCLE.group, "lifecycle-compiler")
+    ignore(LibraryGroups.LIFECYCLE.group, "lifecycle-common-eap")
     prebuilts(LibraryGroups.LIFECYCLE, "2.1.0-alpha02")
     prebuilts(LibraryGroups.LOADER, "1.1.0-alpha01")
     prebuilts(LibraryGroups.LOCALBROADCASTMANAGER, "1.1.0-alpha01")
     prebuilts(LibraryGroups.MEDIA, "media", "1.1.0-alpha01")
     // TODO: Rename media-widget to media2-widget after 1.0.0-alpha06
     prebuilts(LibraryGroups.MEDIA, "media-widget", "1.0.0-alpha06")
-    ignore(LibraryGroups.MEDIA2, "media2-widget")
-    ignore(LibraryGroups.MEDIA2, "media2-exoplayer")
+    ignore(LibraryGroups.MEDIA2.group, "media2-widget")
+    ignore(LibraryGroups.MEDIA2.group, "media2-exoplayer")
     prebuilts(LibraryGroups.MEDIA2, "1.0.0-alpha03")
     prebuilts(LibraryGroups.MEDIAROUTER, "1.1.0-alpha01")
-    ignore(LibraryGroups.NAVIGATION, "navigation-testing")
+    ignore(LibraryGroups.NAVIGATION.group, "navigation-testing")
     prebuilts(LibraryGroups.NAVIGATION, "2.0.0-rc02")
     prebuilts(LibraryGroups.PAGING, "2.1.0")
     prebuilts(LibraryGroups.PALETTE, "1.0.0")
@@ -95,8 +95,8 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.SLICE, "slice-builders-ktx", "1.0.0-alpha6")
     prebuilts(LibraryGroups.SLICE, "slice-core", "1.0.0")
     // TODO: land prebuilts
-//    prebuilts(LibraryGroups.SLICE, "slice-test", "1.0.0")
-    ignore(LibraryGroups.SLICE, "slice-test")
+//    prebuilts(LibraryGroups.SLICE.group, "slice-test", "1.0.0")
+    ignore(LibraryGroups.SLICE.group, "slice-test")
     prebuilts(LibraryGroups.SLICE, "slice-view", "1.0.0")
     prebuilts(LibraryGroups.SLIDINGPANELAYOUT, "1.0.0")
     prebuilts(LibraryGroups.SWIPEREFRESHLAYOUT, "1.1.0-alpha01")
@@ -110,13 +110,13 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.WEAR, "1.0.0")
             .addStubs("wear/wear_stubs/com.google.android.wearable-stubs.jar")
     prebuilts(LibraryGroups.WEBKIT, "1.0.0")
-    ignore(LibraryGroups.WORKMANAGER, "2.0.0-rc01")
+    ignore(LibraryGroups.WORKMANAGER.group, "2.0.0-rc01")
     default(Ignore)
 }
 
 val TIP_OF_TREE = docsRules("tipOfTree", true) {
     // TODO: remove once we'll figure out our strategy about it
-    ignore(LibraryGroups.CONCURRENT)
+    ignore(LibraryGroups.CONCURRENT.group)
     default(TipOfTree)
 }
 
@@ -155,23 +155,24 @@ class PublishDocsRulesBuilder(private val name: String, private val offline: Boo
      * docs for a project with the given [groupName] and [name] will be built from a prebuilt with
      * the given [version].
      */
-    fun prebuilts(groupName: String, moduleName: String, version: String): Prebuilts {
+    fun prebuilts(libraryGroup: LibraryGroup, moduleName: String, version: String): Prebuilts {
         val strategy = Prebuilts(Version(version))
-        rules.add(DocsRule(Exact(groupName, moduleName), strategy))
+        rules.add(DocsRule(Exact(libraryGroup.group, moduleName), strategy))
         return strategy
     }
 
     /**
      * docs for projects within [groupName] will be built from prebuilts with the given [version]
      */
-    fun prebuilts(groupName: String, version: String) = prebuilts(groupName, Version(version))
+    fun prebuilts(libraryGroup: LibraryGroup, version: String) =
+            prebuilts(libraryGroup, Version(version))
 
     /**
      * docs for projects within [groupName] will be built from prebuilts with the given [version]
      */
-    fun prebuilts(groupName: String, version: Version): Prebuilts {
+    fun prebuilts(libraryGroup: LibraryGroup, version: Version): Prebuilts {
         val strategy = Prebuilts(version)
-        rules.add(DocsRule(Group(groupName), strategy))
+        rules.add(DocsRule(Group(libraryGroup.group), strategy))
         return strategy
     }
 
@@ -245,7 +246,7 @@ sealed class Strategy {
 
         override fun toString() = "Prebuilts(\"$version\")"
         fun dependency(extension: SupportLibraryExtension): String {
-            return "${extension.mavenGroup}:${extension.project.name}:$version"
+            return "${extension.mavenGroup?.group}:${extension.project.name}:$version"
         }
     }
 }
@@ -253,7 +254,7 @@ sealed class Strategy {
 class PublishDocsRules(val name: String, val offline: Boolean, private val rules: List<DocsRule>) {
     fun resolve(extension: SupportLibraryExtension): DocsRule? {
         val mavenGroup = extension.mavenGroup
-        return if (mavenGroup == null) null else resolve(mavenGroup, extension.project.name)
+        return if (mavenGroup == null) null else resolve(mavenGroup.group, extension.project.name)
     }
 
     fun resolve(groupName: String, moduleName: String): DocsRule {

@@ -57,7 +57,7 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
             }
             if (supportLibraryExtension.publish) {
                 project.extra.set("publish", true)
-                project.addToProjectMap(supportLibraryExtension.mavenGroup)
+                project.addToProjectMap(supportLibraryExtension.mavenGroup?.group)
             }
             val library = project.extensions.findByType(LibraryExtension::class.java)
                     ?: return@afterEvaluate
@@ -128,7 +128,7 @@ private fun Project.injectCompilationForBenchmarks(
             }
         }
 
-        val group = supportLibraryExtension.mavenGroup
+        val group = supportLibraryExtension.mavenGroup?.group
 
         // NOTE: we assume here that all benchmarks have package name $groupname.benchmark.test
         val aotCompile = "cmd package compile -m speed -f $group.benchmark.test"
