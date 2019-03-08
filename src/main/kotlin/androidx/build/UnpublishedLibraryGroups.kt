@@ -7,5 +7,5 @@ package androidx.build
  * TODO(b/124783972): Merge into LibraryGroups.kt when ready.
  */
 object UnpublishedLibraryGroups {
-    const val CAMERA = "androidx.camera"
+    val CAMERA = LibraryGroup("androidx.camera", false)
 }
