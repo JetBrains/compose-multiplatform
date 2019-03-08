@@ -44,7 +44,7 @@ class SupportJavaLibraryPlugin : Plugin<Project> {
             }
             if (supportLibraryExtension.publish) {
                 project.extra.set("publish", true)
-                project.addToProjectMap(supportLibraryExtension.mavenGroup)
+                project.addToProjectMap(supportLibraryExtension.mavenGroup?.group)
             }
             Dokka.registerJavaProject(project, supportLibraryExtension)
             if (supportLibraryExtension.useMetalava) {

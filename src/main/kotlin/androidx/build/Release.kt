@@ -197,7 +197,7 @@ object Release {
                             " because publish is false!"
             )
         }
-        val mavenGroup = extension.mavenGroup ?: throw IllegalArgumentException(
+        val mavenGroup = extension.mavenGroup?.group ?: throw IllegalArgumentException(
                 "Cannot register a project to release if it does not have a mavenGroup set up"
         )
         val version = extension.mavenVersion ?: throw IllegalArgumentException(
