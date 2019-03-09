@@ -18,7 +18,11 @@ def build_versions = [:]
 
 build_versions.kotlin = '1.3.10'
 build_versions.lint = '26.4.0-beta03'
-build_versions.dokka = "0.9.17-g20190228"
+build_versions.dokka = '0.9.17-g20190228'
+
+build_versions.studio = new Properties()
+new File(buildscript.sourceFile.parentFile, "studio_versions.properties").withInputStream { build_versions.studio.load(it) }
+
 
 rootProject.ext['build_versions'] = build_versions
 
@@ -32,7 +36,7 @@ if (androidPluginVersionOverride != null) {
     logger.warn("USING OVERRIDDEN ANDROID GRADLE PLUGIN DEPENDENCY OF " + build_libs.gradle)
 } else {
     // Keep gradle plugin version in sync with ub_supportlib-master manifest.
-    build_libs.gradle = 'com.android.tools.build:gradle:3.4.0-beta03'
+    build_libs.gradle = "com.android.tools.build:gradle:${build_versions.studio.agp}"
 }
 
 build_libs.lint = [
