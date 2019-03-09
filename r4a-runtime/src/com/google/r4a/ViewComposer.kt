@@ -234,6 +234,7 @@ class ViewComposer(val root: Any, val context: Context, recomposer: Recomposer?,
 }
 
 /* inline */ class ViewValidator(val composer: ViewComposer) {
+    // TODO: Add more overloads for common primitive types like String and Float etc to avoid boxing and the immutable check
     @Suppress("NOTHING_TO_INLINE")
     inline fun changed(value: Int) = with(composer) {
         if (nextSlot() != value || inserting) {
@@ -246,7 +247,7 @@ class ViewComposer(val root: Any, val context: Context, recomposer: Recomposer?,
     }
 
     inline fun <reified T> changed(value: T) = with(composer) {
-        if (nextSlot() != value || inserting) {
+        if (nextSlot() != value || inserting || !isEffectivelyImmutable(value)) {
             updateValue(value)
             true
         } else {
@@ -270,7 +271,7 @@ class ViewComposer(val root: Any, val context: Context, recomposer: Recomposer?,
 
     inline fun <reified T> updated(value: T) = with(composer) {
         inserting.let { inserting ->
-            if (nextSlot() != value || inserting) {
+            if (nextSlot() != value || inserting || !isEffectivelyImmutable(value)) {
                 updateValue(value)
                 !inserting
             } else {
