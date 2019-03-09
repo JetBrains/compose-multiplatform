@@ -75,7 +75,10 @@ object Dokka {
         library: LibraryExtension,
         extension: SupportLibraryExtension
     ) {
-        DiffAndDocs.get(project).registerPrebuilts(extension)
+        if (project.name != "docs-runner") {
+            DiffAndDocs.get(project).registerAndroidProject(project, library, extension)
+        }
+
         DokkaPublicDocs.registerProject(project, extension)
         DokkaSourceDocs.registerAndroidProject(project, library, extension)
     }
@@ -84,7 +87,9 @@ object Dokka {
         project: Project,
         extension: SupportLibraryExtension
     ) {
-        DiffAndDocs.get(project).registerPrebuilts(extension)
+        if (project.name != "docs-runner") {
+            DiffAndDocs.get(project).registerJavaProject(project, extension)
+        }
         DokkaPublicDocs.registerProject(project, extension)
         DokkaSourceDocs.registerJavaProject(project, extension)
     }
