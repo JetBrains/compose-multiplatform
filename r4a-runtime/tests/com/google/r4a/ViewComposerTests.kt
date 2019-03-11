@@ -553,6 +553,25 @@ class NewCodeGenTests : TestCase() {
     }
 
     @Test
+    fun testMoveComponents() {
+        val data = mutableListOf(1, 2, 3, 4, 5)
+        compose {
+            for (item in data) {
+                emit(joinKey(560, item), { context -> TextView(context).apply { text = "$item View" } }) { }
+            }
+        }.then {
+            data.add(data.removeAt(0))
+        }.then { activity ->
+            val root = activity.root
+            for (index in 0 until data.size) {
+                val textView = root.getChildAt(index) as TextView
+                assertEquals("${data[index]} View", textView.text)
+            }
+        }
+    }
+
+
+    @Test
     fun testViewClassWithCtorParametersInvocation() {
         val tvId = 749
 

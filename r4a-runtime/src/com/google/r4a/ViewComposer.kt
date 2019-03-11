@@ -37,12 +37,14 @@ internal class ViewApplyAdapter(private val adapters: ViewAdapters? = null) : Ap
         when (this) {
             is ViewGroup -> {
                 if (from > to) {
-                    var current = to
+                    var currentFrom = from
+                    var currentTo = to
                     repeat(count) {
-                        val view = getChildAt(from)
-                        removeViewAt(from)
-                        addView(view, current)
-                        current++
+                        val view = getChildAt(currentFrom)
+                        removeViewAt(currentFrom)
+                        addView(view, currentTo)
+                        currentFrom++
+                        currentTo++
                     }
                 } else {
                     repeat(count) {
