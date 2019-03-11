@@ -25,7 +25,9 @@ data class ApiLocation(
     // file specifying the public API of the library
     val publicApiFile: File,
     // file specifying the restricted API (marked by the RestrictTo annotation) of the library
-    val restrictedApiFile: File
+    val restrictedApiFile: File,
+    // file specifying the API of the resources
+    val resourceFile: File
 ) {
 
     fun files() = listOf(publicApiFile, restrictedApiFile)
@@ -40,7 +42,7 @@ data class ApiLocation(
 
     companion object {
         fun fromPublicApiFile(f: File): ApiLocation {
-            return ApiLocation(f, File(f.parentFile, "restricted_" + f.name))
+            return ApiLocation(f, File(f.parentFile, "restricted_" + f.name), File(f.parentFile, "res-" + f.name))
         }
     }
 }
