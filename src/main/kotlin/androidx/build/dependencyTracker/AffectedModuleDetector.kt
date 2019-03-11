@@ -218,16 +218,31 @@ internal class AffectedModuleDetectorImpl constructor(
      * With param changedProjects, finds only directly changed modules
      *
      * If it cannot determine the containing module for a file (e.g. buildSrc or root), it
-     * defaults to all projects unless [ignoreUnknownProjects] is set to true.
+     * defaults to all projects unless [ignoreUnknownProjects] is set to true. However,
+     * with param changedProjects, it only returns the dumb-test (see companion object below).
+     * This is because we run all tests including @large on the changed set. So when we must
+     * build all, we only want to run @small and @medium tests in the test runner for
+     * DEPENDENT_PROJECTS.
      */
     private fun findLocallyAffectedProjects(): Set<Project> {
         val lastMergeSha = git.findPreviousMergeCL() ?: return allProjects
         val changedFiles = git.findChangedFilesSince(
                 sha = lastMergeSha,
                 includeUncommitted = true)
+
+        val alwaysBuild = rootProject.subprojects.filter { project ->
+            ALWAYS_BUILD.any {
+                project.name.contains(it)
+            }
+        }.toSet()
+
         if (changedFiles.isEmpty()) {
             logger?.info("Cannot find any changed files after last merge, will run all")
-            return allProjects
+            return when (projectSubset) {
+                ProjectSubset.DEPENDENT_PROJECTS -> allProjects
+                ProjectSubset.CHANGED_PROJECTS -> alwaysBuild
+                ProjectSubset.ALL_AFFECTED_PROJECTS -> allProjects
+            }
         }
         val containingProjects = changedFiles
                 .map(::findContainingProject)
@@ -246,13 +261,12 @@ internal class AffectedModuleDetectorImpl constructor(
                         ${expandToDependents(containingProjects.filterNotNull())}
                     """.trimIndent()
             )
-            return allProjects
-        }
-        val alwaysBuild = rootProject.subprojects.filter { project ->
-            ALWAYS_BUILD.any {
-                project.name.contains(it)
+            return when (projectSubset) {
+                ProjectSubset.DEPENDENT_PROJECTS -> allProjects
+                ProjectSubset.CHANGED_PROJECTS -> alwaysBuild
+                ProjectSubset.ALL_AFFECTED_PROJECTS -> allProjects
             }
-        }.toSet()
+        }
 
         return alwaysBuild + when (projectSubset) {
             ProjectSubset.DEPENDENT_PROJECTS

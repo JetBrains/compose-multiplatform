@@ -167,7 +167,7 @@ class AffectedModuleDetectorImplTest {
                 changedFiles = emptyList())
         )
         MatcherAssert.assertThat(detector.affectedProjects, CoreMatchers.`is`(
-            setOf(p1, p2, p3, p4, p5, p6, p7)
+            setOf()
         ))
     }
 
@@ -317,7 +317,7 @@ class AffectedModuleDetectorImplTest {
                 changedFiles = listOf("foo.java"))
         )
         MatcherAssert.assertThat(detector.affectedProjects, CoreMatchers.`is`(
-            setOf(p1, p2, p3, p4, p5, p6, p7)
+            setOf()
         ))
     }
 
