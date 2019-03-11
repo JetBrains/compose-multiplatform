@@ -347,8 +347,17 @@ fun Project.getRequiredCompatibilityApiLocation(): ApiLocation? {
  * @return the API file of this version
  */
 private fun getApiFile(rootDir: File, version: Version): File {
+    if (version.patch != 0 && version.extra != null) {
+        val suggestedVersion = Version("${version.major}.${version.minor}.${version.patch}")
+        throw GradleException("Illegal version ${version} . It is not allowed to have a nonzero patch number and be alpha, beta, or RC at the same time.\nDid you mean ${suggestedVersion}?")
+    }
+
+    var extra = ""
+    if (version.patch == 0 && version.extra != null) {
+        extra = version.extra
+    }
     val apiDir = File(rootDir, "api")
-    return File(apiDir, "${version.major}.${version.minor}.0${version.extra ?: ""}.txt")
+    return File(apiDir, "${version.major}.${version.minor}.0${extra}.txt")
 }
 
 /**

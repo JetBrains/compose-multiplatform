@@ -44,7 +44,8 @@ data class Version(
 
     fun isAlpha(): Boolean = extra?.toLowerCase()?.startsWith("-alpha") ?: false
 
-    fun isFinalApi(): Boolean = isPatch() || !(isSnapshot() || isAlpha())
+    // Returns whether the API surface is allowed to change within the current revision (see go/androidx/versioning for policy definition)
+    fun isFinalApi(): Boolean = !(isSnapshot() || isAlpha())
 
     override fun compareTo(other: Version) = compareValuesBy(this, other,
             { it.major },

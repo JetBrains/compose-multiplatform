@@ -22,6 +22,7 @@ import androidx.build.SupportConfig.TARGET_SDK_VERSION
 import androidx.build.SupportConfig.DEFAULT_MIN_SDK_VERSION
 import androidx.build.SupportConfig.INSTRUMENTATION_RUNNER
 import androidx.build.checkapi.ApiType
+import androidx.build.checkapi.getCurrentApiLocation
 import androidx.build.checkapi.getLastReleasedApiFileFromDir
 import androidx.build.checkapi.hasApiFolder
 import androidx.build.dependencyTracker.AffectedModuleDetector
@@ -390,7 +391,7 @@ private fun Project.createCheckResourceApiTask(): DefaultTask {
     return project.tasks.createWithConfig("checkResourceApi",
             CheckResourceApiTask::class.java) {
         newApiFile = getGenerateResourceApiFile()
-        oldApiFile = File(project.projectDir, "api/res-${project.version}.txt")
+        oldApiFile = project.getCurrentApiLocation().resourceFile
     }
 }
 
@@ -407,6 +408,7 @@ private fun Project.createUpdateResourceApiTask(): DefaultTask {
         newApiFile = getGenerateResourceApiFile()
         oldApiFile = getLastReleasedApiFileFromDir(File(project.projectDir, "api/"),
                 project.version(), true, false, ApiType.RESOURCEAPI)
+        destApiFile = project.getCurrentApiLocation().resourceFile
     }
 }
 
