@@ -347,3 +347,6 @@ internal val provider = Object()
 
 @PublishedApi
 internal val consumer = Object()
+
+@PublishedApi
+internal val reference = Object()

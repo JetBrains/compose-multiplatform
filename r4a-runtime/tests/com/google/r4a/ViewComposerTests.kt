@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import junit.framework.TestCase
@@ -81,6 +82,51 @@ class NewCodeGenTests : TestCase() {
             val yellowText = activity.findViewById(tv2Id) as TextView
             assertEquals(text2, yellowText.text)
         }
+    }
+
+    @Test
+    fun testDisposeComposition() {
+        class DisposeTestActivity : Activity() {
+            override fun onCreate(savedInstanceState: Bundle?) {
+                super.onCreate(savedInstanceState)
+                val root = FrameLayout(this)
+                val log = mutableListOf<String>()
+                val composable = @Composable {
+                    +onCommit {
+                        log.add("onCommit")
+                        onDispose {
+                            log.add("onCommitDispose")
+                        }
+                    }
+                    +onActive {
+                        log.add("onActive")
+                        onDispose {
+                            log.add("onActiveDispose")
+                        }
+                    }
+                }
+
+
+                log.clear()
+                R4a.composeInto(container = root, composable = composable)
+                assertEquals("onCommit, onActive", log.joinToString())
+
+                log.clear()
+                R4a.composeInto(container = root, composable = composable)
+                assertEquals("onCommitDispose, onCommit", log.joinToString())
+
+                log.clear()
+                R4a.disposeComposition(container = root)
+                assertEquals("onActiveDispose, onCommitDispose", log.joinToString())
+
+                log.clear()
+                R4a.composeInto(container = root, composable = composable)
+                assertEquals("onCommit, onActive", log.joinToString())
+            }
+        }
+
+        val controller = Robolectric.buildActivity(DisposeTestActivity::class.java)
+        controller.create()
     }
 
     @Test

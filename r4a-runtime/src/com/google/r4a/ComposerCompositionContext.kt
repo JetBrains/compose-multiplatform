@@ -16,6 +16,7 @@ internal class ComposerCompositionContext(val root: Any, private val rootCompone
                     val result = ComposerCompositionContext(root, component)
                     result.context = context
                     result.composer.ambientReference = ambientReference
+                    ambientReference?.registerComposer(result.composer)
                     return result
                 }
             }

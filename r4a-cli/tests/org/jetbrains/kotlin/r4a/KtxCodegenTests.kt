@@ -618,6 +618,83 @@ class KtxCodegenTests : AbstractCodeGenTest() {
     }
 
     @Test
+    fun testAmbientReference(): Unit = ensureSetup {
+        val outerId = 123
+        val innerId = 345
+        val buttonId = 456
+
+        compose(
+            """
+                fun buildPortal() = effectOf<Ambient.Reference> {
+                    context.buildReference()
+                }
+
+                fun <T> refFor() = memo { Ref<T>() }
+
+                val textAmbient = Ambient.of { "default" }
+
+                @Composable fun DisplayTest(id: Int) {
+                    val text = +ambient(textAmbient)
+                    <TextView id text />
+                }
+
+                @Composable fun PortalTest() {
+                    val portal = +buildPortal()
+                    val ref = +refFor<LinearLayout>()
+                    <DisplayTest id=$outerId />
+
+                    <LinearLayout ref />
+
+                    val root = ref.value ?: error("Expected a linear")
+
+                    R4a.composeInto(root, portal) {
+                        <DisplayTest id=$innerId />
+                    }
+                }
+
+                @Composable
+                fun TestApp() {
+                    val inc = +state { 1 }
+
+                    <Button id=$buttonId text="Click Me" onClick={ inc.value += 1 } />
+
+                    <textAmbient.Provider value="value: ${"$"}{inc.value}">
+                        <PortalTest />
+                    </textAmbient.Provider>
+                }
+            """,
+            { mapOf("text" to "") },
+            """
+                <TestApp />
+            """
+        ).then { activity ->
+            val inner = activity.findViewById(innerId) as TextView
+            val outer = activity.findViewById(outerId) as TextView
+            val button = activity.findViewById(buttonId) as Button
+
+            assertEquals("inner", "value: 1", inner.text)
+            assertEquals("outer", "value: 1", outer.text)
+
+            button.performClick()
+        }.then { activity ->
+            val inner = activity.findViewById(innerId) as TextView
+            val outer = activity.findViewById(outerId) as TextView
+            val button = activity.findViewById(buttonId) as Button
+
+            assertEquals("inner", "value: 2", inner.text)
+            assertEquals("outer", "value: 2", outer.text)
+
+            button.performClick()
+        }.then { activity ->
+            val inner = activity.findViewById(innerId) as TextView
+            val outer = activity.findViewById(outerId) as TextView
+
+            assertEquals("inner", "value: 3", inner.text)
+            assertEquals("outer", "value: 3", outer.text)
+        }
+    }
+
+    @Test
     fun testCGNViewGroup(): Unit = ensureSetup {
         val tvId = 258
         val llId = 260

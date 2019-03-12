@@ -36,6 +36,11 @@ object R4a {
         }
     }
 
+    fun disposeComposition(container: ViewGroup, parent: Ambient.Reference? = null) {
+        composeInto(container, parent) {} // temporary easy way to call correct lifecycles on everything
+        CompositionContext.disposeComposition(container, parent)
+    }
+
     fun composeInto(
         container: Emittable,
         context: Context,
@@ -53,6 +58,11 @@ object R4a {
             root.composable = composable
             CompositionContext.recomposeSync(root)
         }
+    }
+
+    fun disposeComposition(container: Emittable, context: Context, parent: Ambient.Reference? = null) {
+        composeInto(container, context, parent) {} // temporary easy way to call correct lifecycles on everything
+        CompositionContext.disposeComposition(container, parent)
     }
 }
 

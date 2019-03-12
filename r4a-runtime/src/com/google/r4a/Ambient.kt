@@ -1,7 +1,5 @@
 package com.google.r4a
 
-import android.view.ViewGroup
-
 class Ambient<T>(private val key: String, private val defaultFactory: (() -> T)? = null) {
     internal val defaultValue by lazy {
         val fn = defaultFactory
@@ -50,7 +48,9 @@ class Ambient<T>(private val key: String, private val defaultFactory: (() -> T)?
 
     interface Reference {
         fun <T> getAmbient(key: Ambient<T>): T
-        fun composeInto(container: ViewGroup, composable: @Composable() () -> Unit)
+        fun invalidate()
+        fun <T> invalidateConsumers(key: Ambient<T>)
+        fun <N> registerComposer(composer: Composer<N>)
     }
 
     class Portal(

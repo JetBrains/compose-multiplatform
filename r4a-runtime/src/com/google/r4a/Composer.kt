@@ -425,28 +425,14 @@ open class Composer<N>(
      * Used to implement Ambient.Portal.
      */
     fun buildReference(): Ambient.Reference {
-        val reference = 0
         startGroup(reference)
 
-        var ref = nextSlot() as? Ambient.Reference
+        // NOTE(lmr): VERY important to call nextValue() here instead of nextSlot()
+        var ref = nextValue() as? Ambient.Reference
         if (ref != null && !inserting) {
             skipValue()
         } else {
-            val scope = invalidateStack.peek()
-            ref = object : Ambient.Reference {
-                override fun <T> getAmbient(key: Ambient<T>): T {
-                    val anchor = scope.anchor
-                    return if (anchor != null && anchor.valid) {
-                        parentAmbient(key, anchor.location(slotTable))
-                    } else {
-                        parentAmbient(key)
-                    }
-                }
-
-                override fun composeInto(container: ViewGroup, composable: () -> Unit) {
-                    R4a.composeInto(container, this, composable)
-                }
-            }
+            ref = AmbientReferenceImpl(invalidateStack.peek())
             updateValue(ref)
         }
         endGroup()
@@ -528,7 +514,8 @@ open class Composer<N>(
         // Inserting components don't have children yet.
         if (!inserting) {
             // Get the parent size from the slot table
-            val containingGroupIndex = slots.startStack.peek()
+            val startStack = slots.startStack
+            val containingGroupIndex = if (startStack.isEmpty()) 1 else startStack.peek()
             val start = containingGroupIndex + 1
             val end = start + slots.groupSize(containingGroupIndex)
             var index = start
@@ -557,14 +544,17 @@ open class Composer<N>(
                                 continue@loop
                             }
                         }
+                        sentinel === reference -> {
+                            val element = slots.get(index + 1)
+                            if (element is CompositionLifecycleObserverHolder) {
+                                val subElement = element.instance as Ambient.Reference
+                                subElement.invalidateConsumers(key)
+                            }
+                        }
                     }
                 }
                 index += 1
             }
-
-            // NOTE(lmr): realistically, we should be invalidating Ambient.References here as well, but soon we will be storing
-            // subcompositions in the same SlotTable which means this won't be necessary. And it doesn't work prior to this being
-            // added anyway, so it continuing to not work is not a huge deal.
         }
     }
 
@@ -1169,6 +1159,54 @@ open class Composer<N>(
                 val to = previousMoveTo
                 previousMoveTo = -1
                 recordOperation { applier, _, _ -> applier.move(from, to, count) }
+            }
+        }
+    }
+
+    private inner class AmbientReferenceImpl(val scope: RecomposeScope) : Ambient.Reference, CompositionLifecycleObserver {
+
+        val composers = mutableSetOf<Composer<*>>()
+
+        override fun onEnter() {
+            // do nothing
+        }
+
+        override fun onLeave() {
+            composers.clear()
+        }
+
+        override fun <T> invalidateConsumers(key: Ambient<T>) {
+            // need to mark the recompose scope that created the reference as invalid
+            invalidate()
+
+            // loop through every child composer
+            for (composer in composers) {
+                composer.slotTable.read {
+                    composer.slots = it
+                    composer.nodeIndex = 0
+
+                    composer.invalidateConsumers(key)
+                }
+            }
+        }
+
+        override fun <N> registerComposer(composer: Composer<N>) {
+            composers.add(composer)
+        }
+
+        override fun invalidate() {
+            // continue invalidating up the spine of AmbientReferences
+            ambientReference?.invalidate()
+
+            scope.invalidate?.invoke(false)
+        }
+
+        override fun <T> getAmbient(key: Ambient<T>): T {
+            val anchor = scope.anchor
+            return if (anchor != null && anchor.valid) {
+                parentAmbient(key, anchor.location(slotTable))
+            } else {
+                parentAmbient(key)
             }
         }
     }
