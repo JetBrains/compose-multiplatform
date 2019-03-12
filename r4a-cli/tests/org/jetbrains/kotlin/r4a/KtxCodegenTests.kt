@@ -2,6 +2,7 @@ package org.jetbrains.kotlin.r4a
 
 import android.app.Activity
 import android.os.Bundle
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
@@ -648,6 +649,81 @@ class KtxCodegenTests : AbstractCodeGenTest() {
     }
 
     @Test
+    fun testMemoization(): Unit = ensureSetup {
+        val tvId = 258
+        val tagId = (3 shl 24) or "composed_set".hashCode()
+
+        fun View.getComposedSet(): Set<String>? = getTag(tagId) as? Set<String>
+
+        compose(
+            """
+                import android.view.View
+
+                var composedSet = mutableSetOf<String>()
+                var inc = 1
+
+                fun View.setComposed(composed: Set<String>) = setTag($tagId, composed)
+
+                @Composable fun ComposePrimitive(value: Int) {
+                    composedSet.add("ComposePrimitive(" + value + ")")
+                }
+
+                class MutableThing(var value: String)
+
+                val constantMutableThing = MutableThing("const")
+
+                @Composable fun ComposeMutable(value: MutableThing) {
+                    composedSet.add("ComposeMutable(" + value.value + ")")
+                }
+            """,
+            { mapOf("text" to "") },
+            """
+                composedSet.clear()
+
+                <ComposePrimitive value=123 />
+                <ComposePrimitive value=inc />
+                <ComposeMutable value=constantMutableThing />
+                <ComposeMutable value=MutableThing("new") />
+
+                <TextView id=$tvId composed=composedSet />
+
+                inc++
+            """
+        ).then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+            val composedSet = textView.getComposedSet() ?: error("expected a compose set to exist")
+
+            fun assertContains(contains: Boolean, key: String) {
+                assertEquals("composedSet contains key '$key'", contains, composedSet.contains(key))
+            }
+
+            assertContains(true, "ComposePrimitive(123)")
+            assertContains(true, "ComposePrimitive(1)")
+            assertContains(true, "ComposeMutable(const)")
+            assertContains(true, "ComposeMutable(new)")
+        }.then { activity ->
+            val textView = activity.findViewById(tvId) as TextView
+            val composedSet = textView.getComposedSet() ?: error("expected a compose set to exist")
+
+            fun assertContains(contains: Boolean, key: String) {
+                assertEquals("composedSet contains key '$key'", contains, composedSet.contains(key))
+            }
+
+            // the primitive component skips based on equality
+            assertContains(false, "ComposePrimitive(123)")
+
+            // since the primitive changed, this one recomposes again
+            assertContains(true, "ComposePrimitive(2)")
+
+            // since this is a potentially mutable object, we don't skip based on it
+            assertContains(true, "ComposeMutable(const)")
+
+            // since its a new one every time, we definitely don't skip
+            assertContains(true, "ComposeMutable(new)")
+        }
+    }
+
+    @Test
     fun testCGNSimpleCall(): Unit = ensureSetup {
         val tvId = 258
         var text = "Hello, world!"
@@ -1056,9 +1132,11 @@ class KtxCodegenTests : AbstractCodeGenTest() {
             val textView = activity.findViewById(42) as TextView
             assertEquals("Count: 0", textView.text)
             assertEquals("ab", log.toString())
-            textView.performClick()
-        }.then { activity ->
-            val textView = activity.findViewById(42) as TextView
+
+            execute {
+                textView.performClick()
+            }
+
             assertEquals("Count: 1", textView.text)
             assertEquals("aba", log.toString())
         }
@@ -1100,9 +1178,11 @@ class KtxCodegenTests : AbstractCodeGenTest() {
             val textView = activity.findViewById(42) as TextView
             assertEquals("Count: 0", textView.text)
             assertEquals("0", log.toString())
-            textView.performClick()
-        }.then { activity ->
-            val textView = activity.findViewById(42) as TextView
+
+            execute {
+                textView.performClick()
+            }
+
             assertEquals("Count: 1", textView.text)
             assertEquals("01", log.toString())
         }
@@ -1469,6 +1549,13 @@ class KtxCodegenTests : AbstractCodeGenTest() {
 
     fun <T : Any> compose(valuesFactory: () -> Map<String, T>, text: String, dumpClasses: Boolean = false) =
         compose("", valuesFactory, text, dumpClasses)
+
+    private fun execute(block: () -> Unit) {
+        val scheduler = RuntimeEnvironment.getMasterScheduler()
+        scheduler.pause()
+        block()
+        scheduler.advanceToLastPostedRunnable()
+    }
 
     fun <T : Any> compose(
         prefix: String,
