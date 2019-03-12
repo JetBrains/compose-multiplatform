@@ -1416,9 +1416,11 @@ class KtxCallResolver(
                 }
         }
 
+        val validationSet = validations.map { it.attribute.name }.toSet()
+
         // if you were in the ctor call but not in the sets, you *have* to be pivotal
         for (info in callParamInfos) {
-            if (attrsUsedInCall.contains(info.attribute.name)) continue
+            if (validationSet.contains(info.attribute.name)) continue
             val attribute = attributes[info.attribute.name] ?: continue
             result.add(
                 AttributeNode(
@@ -1653,7 +1655,7 @@ class KtxCallResolver(
 
             var resolvedCall: ResolvedCall<*>? = null
 
-            for (descriptor in getChildrenDescriptors(type, attributesUsedInCall)) {
+            for (descriptor in getChildrenDescriptors(type, attributesUsedInCall, context)) {
                 if (resolvedCall != null) break
 
                 when (descriptor) {
@@ -1773,7 +1775,11 @@ class KtxCallResolver(
     }
 
     // pure, can be moved out. used in resolveAllSetAttrs
-    private fun getChildrenDescriptors(type: KotlinType, attributesUsedInCall: Set<String>): List<DeclarationDescriptor> {
+    private fun getChildrenDescriptors(
+        type: KotlinType,
+        attributesUsedInCall: Set<String>,
+        context: ExpressionTypingContext
+    ): List<DeclarationDescriptor> {
         val descriptor = type.constructor.declarationDescriptor
         return when (descriptor) {
             is ClassDescriptor -> {
@@ -1793,6 +1799,17 @@ class KtxCallResolver(
                     .unsubstitutedMemberScope
                     .getContributedDescriptors()
                     .filter { it.hasChildrenAnnotation() || it.isChildrenCtorParam() }
+                    .filter {
+                        // if it's a property descriptor, we are only interested if it has a setter
+                        if (it is PropertyDescriptor) it.setter != null else true
+                    }
+                    .filter {
+                        // we want to make sure the descriptor is actually visible from the callsite
+                        it is DeclarationDescriptorWithVisibility && Visibilities.isVisibleIgnoringReceiver(
+                            it,
+                            context.scope.ownerDescriptor
+                        )
+                    }
             }
             else -> emptyList()
         }

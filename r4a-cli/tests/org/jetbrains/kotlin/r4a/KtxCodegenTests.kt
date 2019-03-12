@@ -1306,6 +1306,31 @@ class KtxCodegenTests : AbstractCodeGenTest() {
     }
 
     @Test
+    fun testPrivatePivotalProperties(): Unit = ensureSetup {
+        val tvId = 153
+
+        compose(
+            """
+            class ClassComponent(@Children private val callback: () -> Unit) : Component() {
+                override fun compose() {
+                    <callback />
+                }
+            }
+        """, { mapOf("text" to "") }, """
+            <ClassComponent>
+                <TextView id=$tvId text="Hello world!" />
+            </ClassComponent>
+        """
+        ).then { activity ->
+            val tv = activity.findViewById(tvId) as TextView
+            assertEquals("Hello world!", tv.text)
+        }.then { activity ->
+            val tv = activity.findViewById(tvId) as TextView
+            assertEquals("Hello world!", tv.text)
+        }
+    }
+
+    @Test
     fun testVariableCalls1(): Unit = ensureSetup {
         compose(
             """

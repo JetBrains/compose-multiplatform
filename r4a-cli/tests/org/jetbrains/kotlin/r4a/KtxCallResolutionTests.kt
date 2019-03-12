@@ -220,7 +220,7 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
               emitOrCall = MemoizedCallNode:
                 memoize = ComposerCallInfo:
                   composerCall = fun call(Any, () -> (Int) -> Bar, ViewValidator.((Int) -> Bar) -> Boolean, ((Int) -> Bar) -> Unit)
-                  pivotals = <empty>
+                  pivotals = a
                   joinKeyCall = fun joinKey(Any, Any?): Any
                   ctorCall = fun Foo(Int): (Int) -> Bar
                   ctorParams = a
@@ -969,6 +969,113 @@ class KtxCallResolutionTests : AbstractResolvedKtxCallsTest() {
         """
     )
 
+    fun testConstructorParamsArePivotal() = doTest(
+        """
+            import com.google.r4a.*
+
+            class Foo(a: Int, private val b: Int, var c: Int, d: Int) : Component() {
+              var d: Int = d
+              override fun compose() {}
+            }
+
+            @Composable
+            fun test(a: Int, b: Int, c: Int, d: Int) {
+                <caret><Foo a b c d />
+            }
+        """,
+        """
+            ResolvedKtxElementCall:
+              emitOrCall = MemoizedCallNode:
+                memoize = ComposerCallInfo:
+                  composerCall = fun call(Any, () -> Foo, ViewValidator.(Foo) -> Boolean, (Foo) -> Unit)
+                  pivotals = a, b
+                  joinKeyCall = fun joinKey(Any, Any?): Any
+                  ctorCall = Foo(Int, Int, Int, Int)
+                  ctorParams = a, b, c, d
+                  validations =
+                    - ValidatedAssignment(UPDATE):
+                        validationCall = fun update(Int, (Int) -> Unit): Boolean
+                        assignment = var c: Int
+                        attribute = c
+                    - ValidatedAssignment(UPDATE):
+                        validationCall = fun update(Int, (Int) -> Unit): Boolean
+                        assignment = var d: Int
+                        attribute = d
+                call = NonMemoizedCallNode:
+                  resolvedCall = fun invoke()
+                  params = <empty>
+                  postAssignments = <empty>
+                  nextCall = <null>
+              usedAttributes = a, b, c, d
+              unusedAttributes = <empty>
+        """
+    )
+
+    fun testValChildren() = doTest(
+        """
+            import com.google.r4a.*
+
+            class A(@Children val children: () -> Unit) : Component() {
+                override fun compose() {}
+            }
+
+            @Composable
+            fun test() {
+                <caret><A></A>
+            }
+        """,
+        """
+            ResolvedKtxElementCall:
+              emitOrCall = MemoizedCallNode:
+                memoize = ComposerCallInfo:
+                  composerCall = fun call(Any, () -> A, ViewValidator.(A) -> Boolean, (A) -> Unit)
+                  pivotals = <children>
+                  joinKeyCall = fun joinKey(Any, Any?): Any
+                  ctorCall = A(() -> Unit)
+                  ctorParams = <children>
+                  validations = <empty>
+                call = NonMemoizedCallNode:
+                  resolvedCall = fun invoke()
+                  params = <empty>
+                  postAssignments = <empty>
+                  nextCall = <null>
+              usedAttributes = <children>
+              unusedAttributes = <empty>
+        """
+    )
+
+    fun testPrivateValChildren() = doTest(
+        """
+            import com.google.r4a.*
+
+            class A(@Children private val children: () -> Unit) : Component() {
+                override fun compose() {}
+            }
+
+            @Composable
+            fun test() {
+                <caret><A></A>
+            }
+        """,
+        """
+            ResolvedKtxElementCall:
+              emitOrCall = MemoizedCallNode:
+                memoize = ComposerCallInfo:
+                  composerCall = fun call(Any, () -> A, ViewValidator.(A) -> Boolean, (A) -> Unit)
+                  pivotals = <children>
+                  joinKeyCall = fun joinKey(Any, Any?): Any
+                  ctorCall = A(() -> Unit)
+                  ctorParams = <children>
+                  validations = <empty>
+                call = NonMemoizedCallNode:
+                  resolvedCall = fun invoke()
+                  params = <empty>
+                  postAssignments = <empty>
+                  nextCall = <null>
+              usedAttributes = <children>
+              unusedAttributes = <empty>
+        """
+    )
 
 
     fun testIsStaticNature() = doTest(
