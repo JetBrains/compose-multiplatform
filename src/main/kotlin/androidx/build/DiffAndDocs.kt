@@ -20,7 +20,6 @@ import androidx.build.Strategy.Prebuilts
 import androidx.build.Strategy.TipOfTree
 import androidx.build.checkapi.ApiXmlConversionTask
 import androidx.build.checkapi.CheckApiTasks
-import androidx.build.checkapi.hasApiTasks
 import androidx.build.checkapi.initializeApiChecksForProject
 import androidx.build.doclava.ChecksConfig
 import androidx.build.doclava.DEFAULT_DOCLAVA_CONFIG
@@ -330,21 +329,6 @@ class DiffAndDocs private constructor(
         }
 
         registerJavaProjectForDocsTask(generateDiffsTask, compileJava)
-        if (!hasApiTasks(project, extension)) {
-            return
-        }
-
-        val tasks = initializeApiChecksForProject(project,
-                aggregateOldApiTxtsTask, aggregateNewApiTxtsTask)
-        registerJavaProjectForDocsTask(tasks.generateApi, compileJava)
-        setupApiVersioningInDocsTasks(extension, tasks)
-        addCheckApiTasksToGraph(tasks)
-        registerJavaProjectForDocsTask(tasks.generateLocalDiffs, compileJava)
-        val generateApiDiffsArchiveTask = createGenerateLocalApiDiffsArchiveTask(project,
-                tasks.generateLocalDiffs)
-        generateApiDiffsArchiveTask.configure {
-            it.dependsOn(tasks.generateLocalDiffs)
-        }
     }
 
     /**
@@ -371,21 +355,6 @@ class DiffAndDocs private constructor(
 
                 tipOfTreeTasks(extension) { task ->
                     registerAndroidProjectForDocsTask(task, variant)
-                }
-
-                if (!hasApiTasks(project, extension)) {
-                    return@all
-                }
-                val tasks = initializeApiChecksForProject(project, aggregateOldApiTxtsTask,
-                        aggregateNewApiTxtsTask)
-                registerAndroidProjectForDocsTask(tasks.generateApi, variant)
-                setupApiVersioningInDocsTasks(extension, tasks)
-                addCheckApiTasksToGraph(tasks)
-                registerAndroidProjectForDocsTask(tasks.generateLocalDiffs, variant)
-                val generateApiDiffsArchiveTask = createGenerateLocalApiDiffsArchiveTask(project,
-                        tasks.generateLocalDiffs)
-                generateApiDiffsArchiveTask.configure {
-                    it.dependsOn(tasks.generateLocalDiffs)
                 }
             }
         }
