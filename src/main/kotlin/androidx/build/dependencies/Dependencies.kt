@@ -70,7 +70,6 @@ const val XMLPULL = "xmlpull:xmlpull:1.1.3.1"
 
 private const val NAV_SUPPORT_VERSION = "1.0.0"
 const val NAV_SUPPORT_DESIGN = "com.google.android.material:material:$NAV_SUPPORT_VERSION"
-const val NAV_SUPPORT_FRAGMENTS = "androidx.fragment:fragment:$NAV_SUPPORT_VERSION"
 
 private const val SUPPORT_VERSION = "1.0.0"
 const val SUPPORT_ANNOTATIONS = "androidx.annotation:annotation:$SUPPORT_VERSION"
