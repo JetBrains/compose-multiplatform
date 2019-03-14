@@ -69,7 +69,6 @@ const val XPP3 = "xpp3:xpp3:1.1.4c"
 const val XMLPULL = "xmlpull:xmlpull:1.1.3.1"
 
 private const val NAV_SUPPORT_VERSION = "1.0.0"
-const val NAV_SUPPORT_CORE_UTILS = "androidx.legacy:legacy-support-core-utils:$NAV_SUPPORT_VERSION"
 const val NAV_SUPPORT_DESIGN = "com.google.android.material:material:$NAV_SUPPORT_VERSION"
 const val NAV_SUPPORT_FRAGMENTS = "androidx.fragment:fragment:$NAV_SUPPORT_VERSION"
 const val NAV_SUPPORT_COLLECTIONS = "androidx.collection:collection:$NAV_SUPPORT_VERSION"
