@@ -86,6 +86,7 @@ class AndroidXPlugin : Plugin<Project> {
                         sourceCompatibility = VERSION_1_7
                         targetCompatibility = VERSION_1_7
                     }
+                    project.hideJavadocTask()
                     val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
                     verifyDependencyVersionsTask.configure {
                         it.dependsOn(project.tasks.named(JavaPlugin.COMPILE_JAVA_TASK_NAME))
@@ -369,6 +370,18 @@ class AndroidXPlugin : Plugin<Project> {
 fun Project.isBenchmark(): Boolean {
     // benchmark convention is to end name with "-benchmark"
     return name.endsWith("-benchmark")
+}
+
+fun Project.hideJavadocTask() {
+    // Most tasks named "javadoc" are unused
+    // So, few tasks named "javadoc" are interesting to developers
+    // So, we don't want "javadoc" to appear in the output of `./gradlew tasks`
+    // So, we set the group to null for any task named "javadoc"
+    project.tasks.all { task ->
+        if (task.name == "javadoc") {
+            task.group = null
+        }
+    }
 }
 
 fun Project.addToProjectMap(group: String?) {
