@@ -27,7 +27,6 @@ import androidx.build.Strategy.TipOfTree
 val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.ACTIVITY, "1.0.0-alpha05")
     prebuilts(LibraryGroups.ANNOTATION, "1.1.0-alpha02")
-    ignore(LibraryGroups.APPCOMPAT.group, "appcompat-resources")
     prebuilts(LibraryGroups.APPCOMPAT, "1.1.0-alpha03")
     prebuilts(LibraryGroups.ARCH_CORE, "2.0.0")
     prebuilts(LibraryGroups.ASYNCLAYOUTINFLATER, "1.0.0")
