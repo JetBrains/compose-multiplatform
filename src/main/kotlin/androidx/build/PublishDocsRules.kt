@@ -112,7 +112,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.WEAR, "1.0.0")
             .addStubs("wear/wear_stubs/com.google.android.wearable-stubs.jar")
     prebuilts(LibraryGroups.WEBKIT, "1.0.0")
-    ignore(LibraryGroups.WORKMANAGER.group, "2.0.0-rc01")
+    prebuilts(LibraryGroups.WORKMANAGER, "2.0.0-rc01")
     default(Ignore)
 }
 
