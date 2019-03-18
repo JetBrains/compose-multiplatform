@@ -127,7 +127,8 @@ class DiffAndDocs private constructor(
 
         root.tasks.create("generateDocs") { task ->
             task.group = JavaBasePlugin.DOCUMENTATION_GROUP
-            task.description = "Generates distribution artifact for d.android.com-style docs."
+            task.description = "Generates documentation (both Java and Kotlin) from tip-of-tree " +
+                "sources, in the style of those used in d.android.com."
             task.dependsOn(docsTasks[TIP_OF_TREE.name])
         }
 
@@ -517,14 +518,15 @@ private fun createDistDocsTask(
 ): TaskProvider<Zip> = project.tasks.register("dist${ruleName}Docs", Zip::class.java) {
     it.apply {
         dependsOn(generateDocs)
-        group = JavaBasePlugin.DOCUMENTATION_GROUP
-        description = "Generates distribution artifact for d.android.com-style documentation."
         from(generateDocs.map {
             it.destinationDir
         })
         baseName = "android-support-$ruleName-docs"
         version = getBuildId()
         destinationDir = project.getDistributionDirectory()
+        group = JavaBasePlugin.DOCUMENTATION_GROUP
+        description = "Zips ${ruleName} Java documentation (generated via Doclava in the " +
+            "style of d.android.com) into ${archivePath}"
         doLast {
             logger.lifecycle("'Wrote API reference to $archivePath")
         }
@@ -582,7 +584,7 @@ private fun createGenerateDocsTask(
             it.apply {
                 dependsOn(generateSdkApiTask, doclavaConfig)
                 group = JavaBasePlugin.DOCUMENTATION_GROUP
-                description = "Generates d.android.com-style documentation. To generate offline " +
+                description = "Generates Java documentation in the style of d.android.com. To generate offline " +
                         "docs use \'-PofflineDocs=true\' parameter."
 
                 setDocletpath(doclavaConfig.resolve())

@@ -25,6 +25,7 @@ import androidx.build.getDistributionDirectory
 import androidx.build.SupportLibraryExtension
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Project
+import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.kotlin.dsl.apply
 import org.jetbrains.dokka.gradle.DokkaAndroidPlugin
@@ -32,17 +33,28 @@ import org.jetbrains.dokka.gradle.DokkaAndroidTask
 import org.jetbrains.dokka.gradle.PackageOptions
 
 object Dokka {
+    fun generatorTaskNameForType(docsType: String): String {
+        return "dokka${docsType}Docs"
+    }
+    fun archiveTaskNameForType(docsType: String): String {
+        return "dist${docsType}DokkaDocs"
+    }
     fun createDocsTask(
-        taskName: String,
+        docsType: String, // "public" or "tipOfTree"
         project: Project,
-        hiddenPackages: List<String>,
-        archiveTaskName: String
+        hiddenPackages: List<String>
     ) {
+        val taskName = generatorTaskNameForType(docsType)
+        val archiveTaskName = archiveTaskNameForType(docsType)
         project.apply<DokkaAndroidPlugin>()
+        // We don't use the `dokka` task, but it normally appears in `./gradlew tasks`
+        // so replace it with a new task that doesn't show up and doesn't do anything
+        project.tasks.replace("dokka")
         if (project.name != "support" && project.name != "docs-runner") {
             throw Exception("Illegal project passed to createDocsTask: " + project.name)
         }
         val docsTask = project.tasks.create(taskName, DokkaAndroidTask::class.java) { docsTask ->
+            docsTask.description = "Generates ${docsType} Kotlin documentation in the style of d.android.com"
             docsTask.moduleName = project.name
             docsTask.outputDirectory = File(project.buildDir, taskName).absolutePath
             docsTask.outputFormat = "dac"
@@ -59,14 +71,15 @@ object Dokka {
 
         project.tasks.create(archiveTaskName, Zip::class.java) { zipTask ->
             zipTask.dependsOn(docsTask)
-            zipTask.description = "Generates documentation artifact for pushing to " +
-                "developer.android.com"
             zipTask.from(docsTask.outputDirectory) { copySpec ->
                 copySpec.into("reference/kotlin")
             }
             zipTask.baseName = taskName
             zipTask.version = getBuildId()
             zipTask.destinationDir = project.getDistributionDirectory()
+            zipTask.description = "Zips ${docsType} Kotlin documentation (generated via "+
+                "Dokka in the style of d.android.com) into ${zipTask.archivePath}"
+            zipTask.group = JavaBasePlugin.DOCUMENTATION_GROUP
         }
     }
 
