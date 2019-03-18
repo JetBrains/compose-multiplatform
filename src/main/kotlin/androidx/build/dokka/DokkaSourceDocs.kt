@@ -29,8 +29,8 @@ import org.gradle.kotlin.dsl.getPlugin
 import org.jetbrains.dokka.gradle.DokkaTask
 
 object DokkaSourceDocs {
-    private val RUNNER_TASK_NAME = "dokkaTipOfTreeDocs"
-    public val ARCHIVE_TASK_NAME: String = "distTipOfTreeDokkaDocs"
+    private val RUNNER_TASK_NAME = Dokka.generatorTaskNameForType("TipOfTree")
+    public val ARCHIVE_TASK_NAME: String = Dokka.archiveTaskNameForType("TipOfTree")
     // TODO(b/72330103) make "generateDocs" be the only archive task once Doclava is fully removed
     private val ALTERNATE_ARCHIVE_TASK_NAME: String = "generateDocs"
 
@@ -52,7 +52,7 @@ object DokkaSourceDocs {
     @Synchronized fun TaskContainer.getOrCreateDocsTask(runnerProject: Project): DokkaTask {
         val tasks = this
         if (tasks.findByName(DokkaSourceDocs.RUNNER_TASK_NAME) == null) {
-            Dokka.createDocsTask(RUNNER_TASK_NAME, runnerProject, hiddenPackages, ARCHIVE_TASK_NAME)
+            Dokka.createDocsTask("TipOfTree", runnerProject, hiddenPackages)
             if (tasks.findByName(DokkaSourceDocs.ALTERNATE_ARCHIVE_TASK_NAME) == null) {
                 tasks.create(ALTERNATE_ARCHIVE_TASK_NAME)
             }
