@@ -1,4 +1,5 @@
-import com.google.r4a.frames.*
+package com.google.r4a.frames
+
 import junit.framework.TestCase
 import org.junit.Assert
 import java.util.ArrayDeque

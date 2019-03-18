@@ -1,8 +1,4 @@
-import com.google.r4a.frames.AbstractRecord
-import com.google.r4a.frames.Framed
-import com.google.r4a.frames.readable
-import com.google.r4a.frames.writable
-import com.google.r4a.frames.Record
+package com.google.r4a.frames
 
 class Address(street: String, city: String): Framed {
     var street: String
