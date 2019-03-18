@@ -77,7 +77,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.MEDIA2, "1.0.0-alpha03")
     prebuilts(LibraryGroups.MEDIAROUTER, "1.1.0-alpha02")
     ignore(LibraryGroups.NAVIGATION.group, "navigation-testing")
-    prebuilts(LibraryGroups.NAVIGATION, "2.0.0-rc02")
+    prebuilts(LibraryGroups.NAVIGATION, "2.1.0-alpha01")
     prebuilts(LibraryGroups.PAGING, "2.1.0")
     prebuilts(LibraryGroups.PALETTE, "1.0.0")
     prebuilts(LibraryGroups.PERCENTLAYOUT, "1.0.0")
