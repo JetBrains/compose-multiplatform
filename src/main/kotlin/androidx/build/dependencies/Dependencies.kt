@@ -62,12 +62,7 @@ const val TEST_EXT_JUNIT = "androidx.test.ext:junit:1.0.0"
 const val TEST_EXT_KTX = "androidx.test.ext:junit-ktx:1.1.0"
 const val TEST_UIAUTOMATOR = "androidx.test.uiautomator:uiautomator:2.2.0"
 const val TRUTH = "com.google.truth:truth:0.42"
-/**
- * this Xerial version is newer than we want but we need it to fix
- * https://github.com/xerial/sqlite-jdbc/issues/97
- * https://github.com/xerial/sqlite-jdbc/issues/267
- */
-const val XERIAL = "org.xerial:sqlite-jdbc:3.20.1"
+const val XERIAL = "org.xerial:sqlite-jdbc:3.25.2"
 const val XPP3 = "xpp3:xpp3:1.1.4c"
 const val XMLPULL = "xmlpull:xmlpull:1.1.3.1"
 
