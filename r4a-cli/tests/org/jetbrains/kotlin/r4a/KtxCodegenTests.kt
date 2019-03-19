@@ -1,3 +1,5 @@
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package org.jetbrains.kotlin.r4a
 
 import android.app.Activity
@@ -11,18 +13,6 @@ import com.google.r4a.Component
 import com.google.r4a.CompositionContext
 import com.google.r4a.composer
 import junit.framework.TestCase
-import org.jetbrains.kotlin.backend.jvm.extensions.IrLoweringExtension
-
-import org.jetbrains.kotlin.extensions.KtxControlFlowExtension
-import org.jetbrains.kotlin.extensions.KtxTypeResolutionExtension
-import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
-import org.jetbrains.kotlin.extensions.TypeResolutionInterceptorExtension
-import org.jetbrains.kotlin.parsing.KtxParsingExtension
-import org.jetbrains.kotlin.psi2ir.extensions.SyntheticIrExtension
-import org.jetbrains.kotlin.r4a.frames.FrameTransformExtension
-import org.jetbrains.kotlin.r4a.frames.analysis.FrameModelChecker
-import org.jetbrains.kotlin.r4a.frames.analysis.FramePackageAnalysisHandlerExtension
-import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisHandlerExtension
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
@@ -101,11 +91,12 @@ class KtxCodegenTests : AbstractCodeGenTest() {
                 }
             """,
             { mapOf<String, String>() },
-            "<SimpleComposable state=FancyButtonCount() />").then { activity ->
+            "<SimpleComposable state=FancyButtonCount() />"
+        ).then { activity ->
             val button = activity.findViewById(42) as Button
-            button.performClick();
-            button.performClick();
-            button.performClick();
+            button.performClick()
+            button.performClick()
+            button.performClick()
         }.then { activity ->
             val button = activity.findViewById(42) as Button
             assertEquals("Button clicked 3 times", button.text)
@@ -265,7 +256,7 @@ class KtxCodegenTests : AbstractCodeGenTest() {
             """
                 <Foo onClick={} />
             """
-        ).then { _ ->
+        ).then {
 
         }
     }
@@ -283,7 +274,7 @@ class KtxCodegenTests : AbstractCodeGenTest() {
             """
                 <Foo onClick={} />
             """
-        ).then { _ ->
+        ).then {
 
         }
     }
@@ -301,7 +292,7 @@ class KtxCodegenTests : AbstractCodeGenTest() {
             """
                 <Foo onClick={} />
             """
-        ).then { _ ->
+        ).then {
 
         }
     }
@@ -730,6 +721,7 @@ class KtxCodegenTests : AbstractCodeGenTest() {
         val tvId = 258
         val tagId = (3 shl 24) or "composed_set".hashCode()
 
+        @Suppress("UNCHECKED_CAST")
         fun View.getComposedSet(): Set<String>? = getTag(tagId) as? Set<String>
 
         compose(
@@ -1657,18 +1649,6 @@ class KtxCodegenTests : AbstractCodeGenTest() {
     override fun setUp() {
         isSetup = true
         super.setUp()
-        KtxTypeResolutionExtension.registerExtension(myEnvironment.project, R4aKtxTypeResolutionExtension())
-        KtxControlFlowExtension.registerExtension(myEnvironment.project, R4aKtxControlFlowExtension())
-        StorageComponentContainerContributor.registerExtension(myEnvironment.project, ComposableAnnotationChecker())
-        TypeResolutionInterceptorExtension.registerExtension(myEnvironment.project, R4aTypeResolutionInterceptorExtension())
-        SyntheticIrExtension.registerExtension(myEnvironment.project, R4ASyntheticIrExtension())
-        KtxParsingExtension.registerExtension(myEnvironment.project, R4aKtxParsingExtension())
-        AnalysisHandlerExtension.registerExtension(myEnvironment.project, FramePackageAnalysisHandlerExtension())
-        SyntheticIrExtension.registerExtension(myEnvironment.project, FrameTransformExtension())
-        StorageComponentContainerContributor.registerExtension(myEnvironment.project, FrameModelChecker())
-        IrLoweringExtension.registerExtension(myEnvironment.project, R4aIrLoweringExtension())
-//        SyntheticResolveExtension.registerExtension(myEnvironment.project, StaticWrapperCreatorFunctionResolveExtension())
-//        SyntheticResolveExtension.registerExtension(myEnvironment.project, WrapperViewSettersGettersResolveExtension())
     }
 
     private var isSetup = false
@@ -1797,7 +1777,7 @@ private class Root(val composable: () -> Unit) : Component() {
 
 class CompositionTest(val composable: () -> Unit) {
 
-    inner class ActiveTest(val activity: Activity, val cc: CompositionContext, val component: Component) {
+    inner class ActiveTest(val activity: Activity, val cc: CompositionContext) {
 
         fun then(block: (activity: Activity) -> Unit): ActiveTest {
             val previous = CompositionContext.current
@@ -1827,7 +1807,7 @@ class CompositionTest(val composable: () -> Unit) {
         val component = Root(composable)
         val cc = CompositionContext.create(root.context, root, component, null)
         cc.context = activity
-        return ActiveTest(activity, cc, component).then(block)
+        return ActiveTest(activity, cc).then(block)
     }
 }
 

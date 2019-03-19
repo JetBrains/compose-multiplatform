@@ -22,40 +22,15 @@ import org.jetbrains.kotlin.test.KotlinTestWithEnvironment
 import org.jetbrains.kotlin.test.TestJdkKind
 import java.io.File
 
-abstract class AbstractResolvedKtxCallsTest : KotlinTestWithEnvironment() {
-    override fun createEnvironment(): KotlinCoreEnvironment {
-
-        val classPath = listOf(
-            KotlinTestUtils.getAnnotationsJar(),
-            assertExists(File("plugins/r4a/r4a-runtime/build/libs/r4a-runtime-1.3-SNAPSHOT.jar")),
-            assertExists(File("custom-dependencies/android-sdk/build/libs/android.jar"))
-        )
-
-        val configuration = KotlinTestUtils.newConfiguration(
-            ConfigurationKind.ALL,
-            TestJdkKind.MOCK_JDK,
-            classPath,
-            emptyList()
-        )
-
-        configuration.put(JVMConfigurationKeys.IR, true)
-        configuration.put(JVMConfigurationKeys.JVM_TARGET, JvmTarget.JVM_1_6)
-
-        val env = KotlinCoreEnvironment.createForTests(
-            testRootDisposable, configuration, EnvironmentConfigFiles.JVM_CONFIG_FILES
-        )
-
-        R4AComponentRegistrar.registerProjectExtensions(env.project, env.configuration)
-
-        return env
-    }
+abstract class AbstractResolvedKtxCallsTest : AbstractCodeGenTest() {
 
     fun doTest(srcText: String, expected: String) {
         val (text, carets) = extractCarets(srcText)
 
+        val environment = myEnvironment ?: error("Environment not initialized")
         setupLanguageVersionSettingsForCompilerTests(srcText, environment)
 
-        val ktFile = KtPsiFactory(project).createFile(text)
+        val ktFile = KtPsiFactory(environment.project).createFile(text)
         val bindingContext = JvmResolveUtil.analyze(ktFile, environment).bindingContext
 
         val resolvedCalls = carets.mapNotNull { caret ->

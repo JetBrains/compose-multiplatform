@@ -2,35 +2,28 @@ package org.jetbrains.kotlin.r4a
 
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
-import org.jetbrains.kotlin.codegen.CodegenTestCase
 import org.jetbrains.kotlin.codegen.CodegenTestFiles
 import org.jetbrains.kotlin.codegen.GeneratedClassLoader
-import org.jetbrains.kotlin.config.*
+import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.config.JVMConfigurationKeys
+import org.jetbrains.kotlin.config.JvmTarget
 import org.jetbrains.kotlin.psi.KtFile
-
 import org.jetbrains.kotlin.resolve.AnalyzingUtils
 import org.jetbrains.kotlin.test.ConfigurationKind
 import org.jetbrains.kotlin.test.KotlinTestUtils
 import org.jetbrains.kotlin.test.TestJdkKind
-
 import java.io.File
 
-abstract class AbstractCodeGenTest : CodegenTestCase() {
+abstract class AbstractCodeGenTest : AbstractCompilerTest() {
     override fun setUp() {
         super.setUp()
-        val classPath = listOf(
-            KotlinTestUtils.getAnnotationsJar(),
-            assertExists(File("plugins/r4a/r4a-runtime/build/libs/r4a-runtime-1.3-SNAPSHOT.jar")),
-            assertExists(File("custom-dependencies/android-sdk/build/libs/android.jar"))
-        ) + additionalPaths
+        val classPath = createClasspath() + additionalPaths
 
-        val configuration = createConfiguration(
-                ConfigurationKind.ALL,
-                TestJdkKind.MOCK_JDK,
-                classPath,
-                emptyList(),
-                emptyList()
-        )
+        val configuration = KotlinTestUtils.newConfiguration(
+            ConfigurationKind.ALL,
+            TestJdkKind.MOCK_JDK,
+            classPath,
+            emptyList())
         updateConfiguration(configuration)
 
         additionalDependencies = listOf(
@@ -39,17 +32,18 @@ abstract class AbstractCodeGenTest : CodegenTestCase() {
         )
 
         myEnvironment = KotlinCoreEnvironment.createForTests(
-                testRootDisposable, configuration, EnvironmentConfigFiles.JVM_CONFIG_FILES
-        )
+            myTestRootDisposable, configuration, EnvironmentConfigFiles.JVM_CONFIG_FILES
+        ).also { installPlugins(it) }
+
     }
 
-    override fun updateConfiguration(configuration: CompilerConfiguration) {
+    open fun updateConfiguration(configuration: CompilerConfiguration) {
         configuration.put(JVMConfigurationKeys.IR, true)
         configuration.put(JVMConfigurationKeys.JVM_TARGET, JvmTarget.JVM_1_6)
     }
 
-    override fun extractConfigurationKind(files: MutableList<TestFile>): ConfigurationKind {
-        return ConfigurationKind.ALL
+    open fun installPlugins(environment: KotlinCoreEnvironment) {
+        R4AComponentRegistrar.registerProjectExtensions(environment.project, environment.configuration)
     }
 
     protected open fun helperFiles(): List<KtFile> = emptyList()

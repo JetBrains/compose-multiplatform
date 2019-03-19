@@ -9,16 +9,6 @@ import com.google.r4a.Component
 import com.google.r4a.CompositionContext
 import com.google.r4a.composer
 import com.google.r4a.isolated
-import org.jetbrains.kotlin.extensions.KtxControlFlowExtension
-import org.jetbrains.kotlin.extensions.KtxTypeResolutionExtension
-import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
-import org.jetbrains.kotlin.extensions.TypeResolutionInterceptorExtension
-import org.jetbrains.kotlin.parsing.KtxParsingExtension
-import org.jetbrains.kotlin.psi2ir.extensions.SyntheticIrExtension
-import org.jetbrains.kotlin.r4a.frames.FrameTransformExtension
-import org.jetbrains.kotlin.r4a.frames.analysis.FrameModelChecker
-import org.jetbrains.kotlin.r4a.frames.analysis.FramePackageAnalysisHandlerExtension
-import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisHandlerExtension
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -50,15 +40,6 @@ class KtxModelCodeGenTests : AbstractCodeGenTest() {
     override fun setUp() {
         isSetup = true
         super.setUp()
-        KtxTypeResolutionExtension.registerExtension(myEnvironment.project, R4aKtxTypeResolutionExtension())
-        KtxControlFlowExtension.registerExtension(myEnvironment.project, R4aKtxControlFlowExtension())
-        StorageComponentContainerContributor.registerExtension(myEnvironment.project, ComposableAnnotationChecker())
-        TypeResolutionInterceptorExtension.registerExtension(myEnvironment.project, R4aTypeResolutionInterceptorExtension())
-        SyntheticIrExtension.registerExtension(myEnvironment.project, R4ASyntheticIrExtension())
-        KtxParsingExtension.registerExtension(myEnvironment.project, R4aKtxParsingExtension())
-        AnalysisHandlerExtension.registerExtension(myEnvironment.project, FramePackageAnalysisHandlerExtension())
-        SyntheticIrExtension.registerExtension(myEnvironment.project, FrameTransformExtension())
-        StorageComponentContainerContributor.registerExtension(myEnvironment.project, FrameModelChecker())
     }
 
     private var isSetup = false

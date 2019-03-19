@@ -11,20 +11,6 @@ import org.jetbrains.kotlin.resolve.extensions.SyntheticResolveExtension
 
 class KtxTransformationTest: AbstractCodeGenTest() {
 
-    override fun setUp() {
-        super.setUp()
-        KtxTypeResolutionExtension.registerExtension(myEnvironment.project, R4aKtxTypeResolutionExtension())
-        KtxControlFlowExtension.registerExtension(myEnvironment.project, R4aKtxControlFlowExtension())
-        StorageComponentContainerContributor.registerExtension(myEnvironment.project, ComposableAnnotationChecker())
-        TypeResolutionInterceptorExtension.registerExtension(myEnvironment.project, R4aTypeResolutionInterceptorExtension())
-        SyntheticIrExtension.registerExtension(myEnvironment.project, R4ASyntheticIrExtension())
-        KtxParsingExtension.registerExtension(myEnvironment.project, R4aKtxParsingExtension())
-        IrLoweringExtension.registerExtension(myEnvironment.project, R4aIrLoweringExtension())
-//        SyntheticResolveExtension.registerExtension(myEnvironment.project, StaticWrapperCreatorFunctionResolveExtension())
-//        SyntheticResolveExtension.registerExtension(myEnvironment.project, WrapperViewSettersGettersResolveExtension())
-    }
-
-
     fun testObserveLowering() = testCompile(
         """
             import android.widget.Button

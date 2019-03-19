@@ -4,7 +4,6 @@ import org.jetbrains.kotlin.checkers.BaseDiagnosticsTest
 import org.jetbrains.kotlin.checkers.utils.CheckerTestUtil
 import org.jetbrains.kotlin.checkers.DiagnosedRange
 import org.jetbrains.kotlin.checkers.CompilerTestLanguageVersionSettings
-import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.cli.jvm.compiler.TopDownAnalyzerFacadeForJVM
 import org.jetbrains.kotlin.cli.jvm.compiler.NoScopeRecordCliBindingTrace
@@ -15,16 +14,12 @@ import org.jetbrains.kotlin.config.languageVersionSettings
 import org.jetbrains.kotlin.diagnostics.Diagnostic
 import org.jetbrains.kotlin.diagnostics.DiagnosticWithParameters1
 import org.jetbrains.kotlin.diagnostics.RenderedDiagnostic
-import org.jetbrains.kotlin.test.ConfigurationKind
 import org.jetbrains.kotlin.test.KotlinTestUtils
-import org.jetbrains.kotlin.test.TestJdkKind
-import org.jetbrains.kotlin.test.testFramework.KtUsefulTestCase
 import java.io.File
 
-abstract class AbstractR4aDiagnosticsTest: KtUsefulTestCase() {
+abstract class AbstractR4aDiagnosticsTest : AbstractCompilerTest() {
 
     fun doTest(expectedText: String) {
-        // Setup the environment for the analysis
         val environment = createEnvironment()
         setupEnvironment(environment)
         doTest(expectedText, environment)
@@ -36,22 +31,22 @@ abstract class AbstractR4aDiagnosticsTest: KtUsefulTestCase() {
         val file = KotlinTestUtils.createFile("test.kt", clearText, environment.project)
         val files = listOf(file)
         val languageVersionSettings = CompilerTestLanguageVersionSettings(
-                BaseDiagnosticsTest.DEFAULT_DIAGNOSTIC_TESTS_FEATURES,
-                LanguageVersionSettingsImpl.DEFAULT.apiVersion,
-                LanguageVersionSettingsImpl.DEFAULT.languageVersion
+            BaseDiagnosticsTest.DEFAULT_DIAGNOSTIC_TESTS_FEATURES,
+            LanguageVersionSettingsImpl.DEFAULT.apiVersion,
+            LanguageVersionSettingsImpl.DEFAULT.languageVersion
         )
 
         // Use the JVM version of the analyzer to allow using classes in .jar files
         val moduleTrace = NoScopeRecordCliBindingTrace()
         val result = TopDownAnalyzerFacadeForJVM.analyzeFilesWithJavaIntegration(
-                environment.project,
-                files,
-                moduleTrace,
-                environment.configuration.copy().apply {
-                    this.languageVersionSettings = languageVersionSettings
-                    this.put(JVMConfigurationKeys.JVM_TARGET, JvmTarget.JVM_1_6)
-                },
-                environment::createPackagePartProvider
+            environment.project,
+            files,
+            moduleTrace,
+            environment.configuration.copy().apply {
+                this.languageVersionSettings = languageVersionSettings
+                this.put(JVMConfigurationKeys.JVM_TARGET, JvmTarget.JVM_1_6)
+            },
+            environment::createPackagePartProvider
         )
 
         // Collect the errors
@@ -65,13 +60,13 @@ abstract class AbstractR4aDiagnosticsTest: KtUsefulTestCase() {
             for (diagnostic in range.getDiagnostics()) {
                 val reportedDiagnostics = errors.filter { it.factoryName == diagnostic.name }
                 if (reportedDiagnostics.isNotEmpty()) {
-                    var reportedDiagnostic = reportedDiagnostics.find { it.textRanges.find { it.startOffset == range.start && it.endOffset == range.end } != null }
+                    val reportedDiagnostic =
+                        reportedDiagnostics.find { it.textRanges.find { it.startOffset == range.start && it.endOffset == range.end } != null }
                     if (reportedDiagnostic == null) {
                         val firstRange = reportedDiagnostics.first().textRanges.first()
                         message.append("  Error ${diagnostic.name} reported at ${firstRange.startOffset}-${firstRange.endOffset} but expected at ${range.start}-${range.end}\n")
                         message.append(sourceInfo(clearText, firstRange.startOffset, firstRange.endOffset, "  "))
-                    }
-                    else {
+                    } else {
                         errors.remove(reportedDiagnostic)
                         found.add(reportedDiagnostic)
                     }
@@ -94,27 +89,6 @@ abstract class AbstractR4aDiagnosticsTest: KtUsefulTestCase() {
         // Throw an error if anything was found that was not expected
         if (message.length > 0) throw Exception("Mismatched errors:\n" + message.toString())
     }
-
-    protected fun createClasspath() = listOf(KotlinTestUtils.getAnnotationsJar(),
-                                             assertExists(File("plugins/r4a/r4a-runtime/build/libs/r4a-runtime-1.3-SNAPSHOT.jar")),
-                                             assertExists(File("custom-dependencies/android-sdk/build/libs/android.jar"))
-    )
-
-    protected fun createEnvironment(): KotlinCoreEnvironment {
-        val classPath = createClasspath()
-        val configuration = KotlinTestUtils.newConfiguration(
-                ConfigurationKind.ALL,
-                TestJdkKind.MOCK_JDK,
-                classPath,
-                emptyList<File>()
-        )
-
-        return KotlinCoreEnvironment.createForTests(myTestRootDisposable, configuration, EnvironmentConfigFiles.JVM_CONFIG_FILES)
-    }
-
-    fun setupEnvironment(environment: KotlinCoreEnvironment) {
-        R4AComponentRegistrar.registerProjectExtensions(environment.project, environment.configuration)
-    }
 }
 
 
@@ -128,13 +102,13 @@ fun assertExists(file: File): File {
 // Normalize the factory's name to find the name supplied by a plugin
 @Suppress("UNCHECKED_CAST")
 val Diagnostic.factoryName: String
-  inline get() {
-      if (factory.name == "PLUGIN_ERROR")
-          return (this as DiagnosticWithParameters1<*,RenderedDiagnostic<*>>).a.diagnostic.factory.name
-      if (factory.name == "PLUGIN_WARNING")
-          return (this as DiagnosticWithParameters1<*,RenderedDiagnostic<*>>).a.diagnostic.factory.name
-      return factory.name
-  }
+    inline get() {
+        if (factory.name == "PLUGIN_ERROR")
+            return (this as DiagnosticWithParameters1<*, RenderedDiagnostic<*>>).a.diagnostic.factory.name
+        if (factory.name == "PLUGIN_WARNING")
+            return (this as DiagnosticWithParameters1<*, RenderedDiagnostic<*>>).a.diagnostic.factory.name
+        return factory.name
+    }
 
 fun String.lineStart(offset: Int): Int {
     return this.lastIndexOf('\n', offset) + 1
@@ -151,5 +125,5 @@ fun sourceInfo(clearText: String, start: Int, end: Int, prefix: String = ""): St
     val lineEnd = clearText.lineEnd(start)
     val displayEnd = if (end > lineEnd) lineEnd else end
     return prefix + clearText.substring(lineStart, lineEnd) + "\n" +
-            prefix + " ".repeat(start - lineStart) + "~".repeat(displayEnd- start) + "\n"
+            prefix + " ".repeat(start - lineStart) + "~".repeat(displayEnd - start) + "\n"
 }
