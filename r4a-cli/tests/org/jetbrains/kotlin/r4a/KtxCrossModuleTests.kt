@@ -9,12 +9,6 @@ import com.google.r4a.Component
 import com.google.r4a.CompositionContext
 import com.google.r4a.composer
 import com.intellij.openapi.util.io.FileUtil
-import org.jetbrains.kotlin.extensions.KtxControlFlowExtension
-import org.jetbrains.kotlin.extensions.KtxTypeResolutionExtension
-import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
-import org.jetbrains.kotlin.extensions.TypeResolutionInterceptorExtension
-import org.jetbrains.kotlin.parsing.KtxParsingExtension
-import org.jetbrains.kotlin.psi2ir.extensions.SyntheticIrExtension
 import org.jetbrains.kotlin.test.KotlinTestUtils
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -22,6 +16,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.io.File
 import org.jetbrains.kotlin.backend.common.output.OutputFile
+import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.robolectric.Robolectric
@@ -451,12 +446,12 @@ class KtxCrossModuleTests : AbstractCodeGenTest() {
             super.setUp()
         } else {
             super.setUp()
-            KtxTypeResolutionExtension.registerExtension(myEnvironment.project, R4aKtxTypeResolutionExtension())
-            KtxControlFlowExtension.registerExtension(myEnvironment.project, R4aKtxControlFlowExtension())
-            StorageComponentContainerContributor.registerExtension(myEnvironment.project, ComposableAnnotationChecker())
-            TypeResolutionInterceptorExtension.registerExtension(myEnvironment.project, R4aTypeResolutionInterceptorExtension())
-            SyntheticIrExtension.registerExtension(myEnvironment.project, R4ASyntheticIrExtension())
-            KtxParsingExtension.registerExtension(myEnvironment.project, R4aKtxParsingExtension())
+        }
+    }
+
+    override fun installPlugins(environment: KotlinCoreEnvironment) {
+        if (!disableIrAndKtx) {
+            super.installPlugins(environment)
         }
     }
 
