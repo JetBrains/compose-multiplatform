@@ -582,6 +582,7 @@ private fun createGenerateDocsTask(
 ): TaskProvider<GenerateDocsTask> =
         project.tasks.register(taskName, GenerateDocsTask::class.java) {
             it.apply {
+                exclude("**/R.java")
                 dependsOn(generateSdkApiTask, doclavaConfig)
                 group = JavaBasePlugin.DOCUMENTATION_GROUP
                 description = "Generates Java documentation in the style of d.android.com. To generate offline " +
