@@ -89,9 +89,9 @@ const val ARCH_LIFECYCLE_LIVEDATA =
         "androidx.lifecycle:lifecycle-livedata:2.0.0"
 const val ARCH_LIFECYCLE_VIEWMODEL = "androidx.lifecycle:lifecycle-viewmodel:2.0.0"
 const val ARCH_LIFECYCLE_EXTENSIONS = "androidx.lifecycle:lifecycle-extensions:2.0.0"
-const val ARCH_CORE_COMMON = "androidx.arch.core:core-common:2.0.0@jar"
-const val ARCH_CORE_RUNTIME = "androidx.arch.core:core-runtime:2.0.0"
-const val ARCH_CORE_TESTING = "androidx.arch.core:core-testing:2.0.0"
+const val ARCH_CORE_COMMON = "androidx.arch.core:core-common:2.0.1@jar"
+const val ARCH_CORE_RUNTIME = "androidx.arch.core:core-runtime:2.0.1"
+const val ARCH_CORE_TESTING = "androidx.arch.core:core-testing:2.0.1"
 
 const val SAFE_ARGS_ANDROID_GRADLE_PLUGIN = "com.android.tools.build:gradle:3.3.0"
 const val SAFE_ARGS_KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.20"
@@ -103,5 +103,8 @@ const val ARCH_ROOM_RUNTIME = "androidx.room:room-runtime:2.0.0"
 const val ARCH_ROOM_COMPILER = "androidx.room:room-compiler:2.0.0"
 const val ARCH_ROOM_RXJAVA = "androidx.room:room-rxjava2:2.0.0"
 const val ARCH_ROOM_TESTING = "androidx.room:room-testing:2.0.0"
+
+const val WORK_ARCH_CORE_RUNTIME = "androidx.arch.core:core-runtime:2.0.0"
+const val WORK_ARCH_CORE_TESTING = "androidx.arch.core:core-testing:2.0.0"
 
 const val ROBOLECTRIC = "org.robolectric:robolectric:4.1"
