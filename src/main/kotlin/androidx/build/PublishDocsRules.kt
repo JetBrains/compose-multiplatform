@@ -70,7 +70,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.LIFECYCLE, "2.1.0-alpha03")
     prebuilts(LibraryGroups.LOADER, "1.1.0-beta01")
     prebuilts(LibraryGroups.LOCALBROADCASTMANAGER, "1.1.0-alpha01")
-    prebuilts(LibraryGroups.MEDIA, "media", "1.1.0-alpha02")
+    prebuilts(LibraryGroups.MEDIA, "media", "1.1.0-alpha03")
     // TODO: Rename media-widget to media2-widget after 1.0.0-alpha06
     prebuilts(LibraryGroups.MEDIA, "media-widget", "1.0.0-alpha06")
     ignore(LibraryGroups.MEDIA2.group, "media2-widget")
