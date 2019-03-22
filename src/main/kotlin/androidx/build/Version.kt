@@ -44,6 +44,8 @@ data class Version(
 
     fun isAlpha(): Boolean = extra?.toLowerCase()?.startsWith("-alpha") ?: false
 
+    fun isBeta(): Boolean = extra?.toLowerCase()?.startsWith("-beta") ?: false
+
     // Returns whether the API surface is allowed to change within the current revision (see go/androidx/versioning for policy definition)
     fun isFinalApi(): Boolean = !(isSnapshot() || isAlpha())
 
