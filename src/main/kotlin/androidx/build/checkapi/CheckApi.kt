@@ -347,9 +347,9 @@ fun Project.getRequiredCompatibilityApiLocation(): ApiLocation? {
  * @return the API file of this version
  */
 private fun getApiFile(rootDir: File, version: Version): File {
-    if (version.patch != 0 && version.extra != null) {
-        val suggestedVersion = Version("${version.major}.${version.minor}.${version.patch}")
-        throw GradleException("Illegal version ${version} . It is not allowed to have a nonzero patch number and be alpha, beta, or RC at the same time.\nDid you mean ${suggestedVersion}?")
+    if (version.patch != 0 && (version.isAlpha() || version.isBeta())) {
+        val suggestedVersion = Version("${version.major}.${version.minor}.${version.patch}-rc01")
+        throw GradleException("Illegal version ${version} . It is not allowed to have a nonzero patch number and be alpha or beta at the same time.\nDid you mean ${suggestedVersion}?")
     }
 
     var extra = ""
