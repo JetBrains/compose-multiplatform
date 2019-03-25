@@ -76,7 +76,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.MEDIA, "media-widget", "1.0.0-alpha06")
     ignore(LibraryGroups.MEDIA2.group, "media2-widget")
     ignore(LibraryGroups.MEDIA2.group, "media2-exoplayer")
-    prebuilts(LibraryGroups.MEDIA2, "1.0.0-alpha03")
+    prebuilts(LibraryGroups.MEDIA2, "1.0.0-alpha04")
     prebuilts(LibraryGroups.MEDIAROUTER, "1.1.0-alpha02")
     ignore(LibraryGroups.NAVIGATION.group, "navigation-testing")
     prebuilts(LibraryGroups.NAVIGATION, "2.1.0-alpha01")
