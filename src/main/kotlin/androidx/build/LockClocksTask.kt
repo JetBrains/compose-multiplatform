@@ -75,6 +75,7 @@ open class LockClocksTask : ClockTask() {
         runAdb(arrayOf("shell", "rm", dest), "Failed to remove clock locking script")
     }
 }
+
 open class UnlockClocksTask : ClockTask() {
     init {
         description = "unlocks clocks of device by rebooting"
