@@ -180,7 +180,7 @@ object DokkaPublicDocs {
             configuration.resolvedConfiguration.resolvedArtifacts
         } catch (e: ResolveException) {
             runnerProject.logger.error("DokkaPublicDocs failed to find prebuilts for $mavenId. " +
-                    "specified in publichDocsRules.kt ." +
+                    "specified in publicDocsRules.kt ." +
                     "You should either add a prebuilt sources jar, " +
                     "or add an overriding \"ignore\" rule into PublishDocsRules.kt")
             throw e
