@@ -18,7 +18,7 @@ def build_versions = [:]
 
 build_versions.kotlin = '1.3.10'
 build_versions.lint = '26.4.0-beta03'
-build_versions.dokka = '0.9.17-g20190228'
+build_versions.dokka = '0.9.17-g20190326'
 
 build_versions.studio = new Properties()
 new File(buildscript.sourceFile.parentFile, "studio_versions.properties").withInputStream { build_versions.studio.load(it) }
