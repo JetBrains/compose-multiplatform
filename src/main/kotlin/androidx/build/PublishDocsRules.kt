@@ -67,6 +67,7 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.LIFECYCLE.group, "lifecycle-common-eap")
     ignore(LibraryGroups.LIFECYCLE.group, "lifecycle-runtime-eap")
     ignore(LibraryGroups.LIFECYCLE.group, "lifecycle-livedata-eap")
+    ignore(LibraryGroups.LIFECYCLE.group, "lifecycle-runtime-eap-lint")
     prebuilts(LibraryGroups.LIFECYCLE, "lifecycle-viewmodel-savedstate", "1.0.0-alpha01")
     prebuilts(LibraryGroups.LIFECYCLE, "2.1.0-alpha03")
     prebuilts(LibraryGroups.LOADER, "1.1.0-beta01")
