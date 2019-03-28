@@ -17,8 +17,11 @@
 package androidx.build.jacoco
 
 import androidx.build.getDistributionDirectory
+import androidx.build.gradle.isRoot
+import com.google.common.base.Preconditions
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.create
 
@@ -27,41 +30,44 @@ object Jacoco {
     const val CORE_DEPENDENCY = "org.jacoco:org.jacoco.core:$VERSION"
     private const val ANT_DEPENDENCY = "org.jacoco:org.jacoco.ant:$VERSION"
 
-    fun createUberJarTask(project: Project): Task {
+    fun createUberJarTask(project: Project): TaskProvider<Jar> {
         // This "uber" jacoco jar is used by the build server. Instrumentation tests are executed
         // outside of Gradle and this is needed to process the coverage files.
 
         val config = project.configurations.create("myJacoco")
         config.dependencies.add(project.dependencies.create(ANT_DEPENDENCY))
 
-        val task = project.tasks.create<Jar>("jacocoAntUberJar")
-        task.apply {
-            inputs.files(config)
-            from(config.resolvedConfiguration.resolvedArtifacts.map { project.zipTree(it.file) }) {
+        val task = project.tasks.register("jacocoAntUberJar", Jar::class.java) {
+            it.inputs.files(config)
+            val resolvedArtifacts = config.resolvedConfiguration.resolvedArtifacts
+            it.from(resolvedArtifacts.map { project.zipTree(it.file) }) {
                 it.exclude("META-INF/*.SF")
                 it.exclude("META-INF/*.DSA")
                 it.exclude("META-INF/*.RSA")
             }
-            destinationDir = project.getDistributionDirectory()
-            archiveName = "jacocoant.jar"
+            it.destinationDir = project.getDistributionDirectory()
+            it.archiveName = "jacocoant.jar"
         }
         return task
     }
 
-    fun createCoverageJarTask(project: Project): Task {
+    @JvmStatic
+    fun registerClassFilesTask(project: Project, provider: TaskProvider<out Task>) {
+        project.rootProject.tasks.named("packageAllClassFilesForCoverageReport", Jar::class.java)
+            .configure {
+                it.from(provider)
+            }
+    }
+
+    fun createCoverageJarTask(project: Project): TaskProvider<Jar> {
+        Preconditions.checkArgument(project.isRoot, "Must be root project")
         // Package the individual *-allclasses.jar files together to generate code coverage reports
-        val packageAllClassFiles = project.tasks.create("packageAllClassFilesForCoverageReport",
-                Jar::class.java) {
+        return project.tasks.register(
+            "packageAllClassFilesForCoverageReport",
+            Jar::class.java
+        ) {
             it.destinationDir = project.getDistributionDirectory()
             it.archiveName = "jacoco-report-classes-all.jar"
         }
-        project.subprojects { subproject ->
-            subproject.tasks.whenTaskAdded { task ->
-                if (task.name.endsWith("ClassFilesForCoverageReport")) {
-                    packageAllClassFiles.from(task)
-                }
-            }
-        }
-        return packageAllClassFiles
     }
 }
