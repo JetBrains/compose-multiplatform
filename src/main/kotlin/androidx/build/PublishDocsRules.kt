@@ -64,7 +64,6 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.LIFECYCLE.group, "lifecycle-livedata-ktx")
     ignore(LibraryGroups.LIFECYCLE.group, "lifecycle-livedata-core-ktx")
     ignore(LibraryGroups.LIFECYCLE.group, "lifecycle-compiler")
-    ignore(LibraryGroups.LIFECYCLE.group, "lifecycle-common-eap")
     ignore(LibraryGroups.LIFECYCLE.group, "lifecycle-runtime-eap")
     ignore(LibraryGroups.LIFECYCLE.group, "lifecycle-livedata-eap")
     ignore(LibraryGroups.LIFECYCLE.group, "lifecycle-runtime-eap-lint")
