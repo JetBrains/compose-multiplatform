@@ -363,7 +363,7 @@ class AffectedModuleDetectorImplTest {
         ))
     }
 
-    @Test
+    // (b/129528976) @Test
     fun changeInCobuilt() {
         val detector = AffectedModuleDetectorImpl(
             rootProject = root,
@@ -397,7 +397,7 @@ class AffectedModuleDetectorImplTest {
         ))
     }
 
-    @Test
+    // (b/129528976) @Test
     fun changeInCobuiltOnlyChanged() {
         val detector = AffectedModuleDetectorImpl(
             rootProject = root,

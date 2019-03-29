@@ -328,18 +328,19 @@ internal class AffectedModuleDetectorImpl constructor(
         // if we resolve b/127819369
         private val ALWAYS_BUILD = setOf(":dumb-tests")
         // Some tests are codependent even if their modules are not. Enable manual bundling of tests
-        private val COBUILT_TEST_PATHS = setOf(
+        private val COBUILT_TEST_PATHS = emptySet<Set<String>>(
+            // Commented-out because of b/129528976
             // Install media tests together per b/128577735
-            setOf(
-                ":support-media-compat-test-client",
-                ":support-media-compat-test-service",
-                ":support-media-compat-test-client-previous",
-                ":support-media-compat-test-service-previous"
-            ),
-            setOf(
-                ":support-media2-test-client",
-                ":support-media2-test-service"
-            )
+            // setOf(
+            //    ":support-media-compat-test-client",
+            //    ":support-media-compat-test-service",
+            //    ":support-media-compat-test-client-previous",
+            //    ":support-media-compat-test-service-previous"
+            // ),
+            // setOf(
+            //    ":support-media2-test-client",
+            //    ":support-media2-test-service"
+            // )
         )
     }
 }
