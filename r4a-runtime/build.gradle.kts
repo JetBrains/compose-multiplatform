@@ -33,13 +33,13 @@ sourceSets {
     "test" { projectDefault() }
 }
 
+publish()
+
 runtimeJar()
 sourcesJar()
 javadocJar()
 
 dist(targetName = "r4a-runtime.jar")
-
-publish()
 
 tasks.withType<Test> {
     testLogging {

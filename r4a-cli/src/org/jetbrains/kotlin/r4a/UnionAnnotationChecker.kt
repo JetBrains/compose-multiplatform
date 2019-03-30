@@ -70,6 +70,6 @@ class UnionAnnotationChecker(val moduleDescriptor: ModuleDescriptor) : Additiona
     private fun getUnionTypes(type: KotlinType): List<KotlinType> {
         val annotation = type.annotations.findAnnotation(UNIONTYPE_ANNOTATION_NAME) ?: return listOf(type)
         val types = annotation.allValueArguments.get(Name.identifier("types")) as ArrayValue
-        return types.value.map { KClassValue(it.value as ClassLiteralValue).getType(moduleDescriptor).arguments.single().type }
+        return types.value.map { it.getType(moduleDescriptor).arguments.single().type }
     }
 }

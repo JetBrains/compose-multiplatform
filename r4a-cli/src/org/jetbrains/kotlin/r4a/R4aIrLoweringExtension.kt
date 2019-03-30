@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
 import org.jetbrains.kotlin.backend.jvm.extensions.IrLoweringExtension
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.r4a.compiler.lower.R4aObservePatcher
+import org.jetbrains.kotlin.r4a.frames.FrameIrTransformer
 
 val R4aObservePhase = makeIrFilePhase(
     ::R4aObservePatcher,
@@ -17,9 +18,15 @@ val R4aObservePhase = makeIrFilePhase(
     description = "Observe @Model"
 )
 
+val FrameClassGenPhase = makeIrFilePhase(
+    ::FrameIrTransformer,
+    name = "R4aFrameTransformPhase",
+    description = "Transform @Model classes into framed classes"
+)
+
 class R4aIrLoweringExtension : IrLoweringExtension {
     override fun interceptLoweringPhases(phases: CompilerPhase<JvmBackendContext, IrFile, IrFile>): CompilerPhase<JvmBackendContext, IrFile, IrFile> {
-        return R4aObservePhase then phases
+        return FrameClassGenPhase then R4aObservePhase then phases
     }
 }
 

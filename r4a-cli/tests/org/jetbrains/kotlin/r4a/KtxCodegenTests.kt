@@ -30,6 +30,18 @@ import java.net.URLClassLoader
 class KtxCodegenTests : AbstractCodeGenTest() {
 
     @Test
+    fun testModelOne(): Unit = ensureSetup {
+        codegen(
+            """
+@Model
+class ModelClass() {
+    var x = 0
+}
+            """, true
+        )
+    }
+
+    @Test
     fun testObservable(): Unit = ensureSetup {
         compose(
             """
