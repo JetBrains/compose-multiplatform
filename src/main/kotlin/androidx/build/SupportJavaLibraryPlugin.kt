@@ -43,11 +43,7 @@ class SupportJavaLibraryPlugin : Plugin<Project> {
                 project.extra.set("publish", true)
                 project.addToProjectMap(androidXExtension.mavenGroup?.group)
             }
-            if (androidXExtension.useMetalava) {
-                Metalava.registerJavaProject(project, androidXExtension)
-            } else {
-                DiffAndDocs.get(project).registerJavaProject(project, androidXExtension)
-            }
+            Metalava.registerJavaProject(project, androidXExtension)
         }
     }
 }

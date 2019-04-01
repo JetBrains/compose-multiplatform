@@ -40,7 +40,6 @@ open class AndroidXExtension(val project: Project) {
 
     var compilationTarget: CompilationTarget = CompilationTarget.DEVICE
 
-    var useMetalava = true
     var trackRestrictedAPIs = true
 
     /**

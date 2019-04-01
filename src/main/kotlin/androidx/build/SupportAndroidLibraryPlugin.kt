@@ -57,12 +57,7 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
             val library = project.extensions.findByType(LibraryExtension::class.java)
                     ?: return@afterEvaluate
 
-            if (androidXExtension.useMetalava) {
-                Metalava.registerAndroidProject(project, library, androidXExtension)
-            } else {
-                DiffAndDocs.get(project)
-                    .registerAndroidProject(project, library, androidXExtension)
-            }
+            Metalava.registerAndroidProject(project, library, androidXExtension)
 
             if (androidXExtension.compilationTarget != CompilationTarget.DEVICE) {
                 throw IllegalStateException(
