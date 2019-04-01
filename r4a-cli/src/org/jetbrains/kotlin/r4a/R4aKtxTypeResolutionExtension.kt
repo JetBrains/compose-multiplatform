@@ -19,11 +19,11 @@ class R4aKtxTypeResolutionExtension : KtxTypeResolutionExtension {
     ) {
         val ktxCallResolver = KtxCallResolver(callResolver, facade, element.project, ComposableAnnotationChecker.get(element.project))
 
-        ktxCallResolver.resolveComposer(element, context)
+        ktxCallResolver.initializeFromKtxElement(element, context)
 
         val temporaryForKtxCall = TemporaryTraceAndCache.create(context, "trace to resolve ktx call", element)
 
-        val resolvedKtxElementCall = ktxCallResolver.resolve(
+        val resolvedKtxElementCall = ktxCallResolver.resolveFromKtxElement(
             element,
             context.replaceTraceAndCache(temporaryForKtxCall)
         )

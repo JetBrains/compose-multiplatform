@@ -90,7 +90,7 @@ class KtxCallResolver(
 
     private var infixOrCall: ResolvedCall<*>? = null
 
-    private lateinit var ktxElement: KtxElement
+    private lateinit var mainElement: KtElement
 
     private lateinit var tagExpressions: List<KtExpression>
 
@@ -136,14 +136,7 @@ class KtxCallResolver(
         return false
     }
 
-    /**
-     * KTX tags are defined to resolve a "composer" in the scope of the tag itself, and then the tag translates into a call
-     * or a set of calls on that composer instance. This method should be called first, and will resolve the composer in scope
-     * and record various pieces of metadata about the composer that will make resolving the tag possible. If it returns false
-     * then something went wrong and you should not try and resolve the tag. If the method returns false, at least one
-     * diagnostic will have been added to the tag somewhere to indicate that there was a problem.
-     */
-    fun resolveComposer(element: KtxElement, context: ExpressionTypingContext): Boolean {
+    fun initializeFromKtxElement(element: KtxElement, context: ExpressionTypingContext): Boolean {
 
         module = context.scope.ownerDescriptor.module
 
@@ -155,6 +148,29 @@ class KtxCallResolver(
             element.qualifiedTagName,
             element.qualifiedClosingTagName
         )
+
+        return resolveComposer(element, context)
+    }
+
+    fun initializeFromCall(call: Call, context: ExpressionTypingContext): Boolean {
+
+        val callee = call.calleeExpression ?: error("Expected calleeExpression")
+
+        module = context.scope.ownerDescriptor.module
+
+        tagExpressions = listOf(callee)
+
+        return resolveComposer(callee, context)
+    }
+
+    /**
+     * KTX tags are defined to resolve a "composer" in the scope of the tag itself, and then the tag translates into a call
+     * or a set of calls on that composer instance. This method should be called first, and will resolve the composer in scope
+     * and record various pieces of metadata about the composer that will make resolving the tag possible. If it returns false
+     * then something went wrong and you should not try and resolve the tag. If the method returns false, at least one
+     * diagnostic will have been added to the tag somewhere to indicate that there was a problem.
+     */
+    private fun resolveComposer(element: KtExpression, context: ExpressionTypingContext): Boolean {
 
         // The composer is currently resolved as whatever is currently in scope with the name "composer".
         val resolvedComposer = resolveVar(KtxNameConventions.COMPOSER, element, context)
@@ -266,16 +282,12 @@ class KtxCallResolver(
         return true
     }
 
-    /**
-     * This call is the main function of this class, and will take in a KtxElement and return an object with all of the information
-     * necessary to generate the code for the KTX tag. This method will always return a result, but the result may contain errors
-     * and it is the responsibility of the consumer of this class to handle that properly.
-     */
-    fun resolve(
+    fun resolveFromKtxElement(
         element: KtxElement,
         context: ExpressionTypingContext
     ): ResolvedKtxElementCall {
-        ktxElement = element
+        mainElement = element
+
         val openTagExpr = element.simpleTagName ?: element.qualifiedTagName ?: error("shouldn't happen")
         val closeTagExpr = element.simpleClosingTagName ?: element.qualifiedClosingTagName
         val attributes = element.attributes
@@ -353,10 +365,6 @@ class KtxCallResolver(
             )
         }
 
-        val usedAttributes = mutableSetOf<String>()
-
-        val missingRequiredAttributes = mutableListOf<DeclarationDescriptor>()
-
         // we want to resolve all reference targets on the open tag on the closing tag as well, but we don't want
         // to have to execute the resolution code for both the open and close each time, so we create a binding
         // trace that will observe for traces on the open tag and copy them over to the closing tag if one
@@ -377,6 +385,136 @@ class KtxCallResolver(
             isPunned = false
         )
 
+
+        val result = resolve(
+            openTagExpr,
+            closeTagExpr,
+            receiver,
+            attrInfos,
+            contextToUse
+        )
+
+        // Instead of committing the whole temp trace, we do so individually because there are some diagnostics that we are going
+        // to switch out with others.
+        tmpTraceAndCache.cache.commit()
+
+        // if the tag target is non-namespaced and there is a closing tag as well, the default "Import" quick fix will not
+        // work appropriately. To counteract this, we intercept UNRESOLVED_REFERENCE on the tag target specifically, and replace
+        // it with an UNRESOLVED_TAG diagnostic. We have our own import quickfix that knows how to handle this properly.
+        // Ideally in the long run we can fix this in a different / better way.
+        val isSimpleTag = openTagExpr is KtSimpleNameExpression && closeTagExpr != null
+
+        val diagnostics = tmpTraceAndCache.trace.bindingContext.diagnostics
+        for (diagnostic in diagnostics) {
+            if (isSimpleTag && diagnostic.psiElement in tagExpressions && diagnostic.factory == Errors.UNRESOLVED_REFERENCE) {
+                val refExpression = diagnostic.psiElement as KtReferenceExpression
+                // here we want to swallow this diagnostic and replace it with UNRESOLVED_TAG, so that the quickfix works properly:
+                context.trace.reportFromPlugin(
+                    R4AErrors.UNRESOLVED_TAG.on(refExpression, refExpression),
+                    R4ADefaultErrorMessages
+                )
+            } else {
+                context.trace.reportDiagnosticOnce(diagnostic)
+            }
+        }
+
+        tmpTraceAndCache.trace.commit({ _, _ -> true }, false) // commit, but don't include diagnostics
+
+        return result
+    }
+
+
+    fun resolveFromCall(
+        call: Call,
+        context: ExpressionTypingContext
+    ): ResolvedKtxElementCall {
+
+        val callee = call.calleeExpression ?: error("Expected calleeExpression")
+
+        mainElement = callee
+
+        val openTagExpr = callee
+        val closeTagExpr = null
+
+        val tmpTraceAndCache = TemporaryTraceAndCache.create(context, "trace for ktx tag", callee)
+
+        val contextToUse = context.replaceTraceAndCache(tmpTraceAndCache)
+
+        val attrInfos = mutableMapOf<String, AttributeInfo>()
+
+        for (arg in call.valueArguments) {
+            val argName = arg.getArgumentName()
+
+            if (argName == null) TODO("indexed arguments not yet supported!")
+
+            val key = argName.referenceExpression
+            val value = arg.getArgumentExpression()
+            val name = argName.asName.asString()
+
+            // NOTE: We don't have to check for duplicate argument names, that will be done elsewhere.
+
+            // NOTE: We don't have to deal with punning. punning isn't supported in FCS.
+
+            attrInfos[name] = AttributeInfo(
+                value = value ?: error("expected a value expression"),
+                key = key,
+                name = name,
+                isPunned = false
+            )
+        }
+
+        for (arg in call.functionLiteralArguments) {
+            if (attrInfos.containsKey(CHILDREN_KEY)) error("Only one children argument supported at a time")
+            attrInfos[CHILDREN_KEY] = AttributeInfo(
+                value = arg.getLambdaExpression() ?: error("expected a value expression"),
+                key = null,
+                name = CHILDREN_KEY,
+                isPunned = false
+            )
+        }
+
+        val receiver = resolveReceiver(openTagExpr, contextToUse)
+
+        attrInfos[TAG_KEY] = AttributeInfo(
+            value = when (receiver) {
+                is ExpressionReceiver -> receiver.expression
+                else -> openTagExpr
+            },
+            key = null,
+            name = TAG_KEY,
+            isPunned = false
+        )
+
+        val result = resolve(
+            openTagExpr,
+            closeTagExpr,
+            receiver,
+            attrInfos,
+            contextToUse
+        )
+
+        tmpTraceAndCache.commit()
+
+        return result
+    }
+
+    /**
+     * This call is the main function of this class, and will take in a KtxElement and return an object with all of the information
+     * necessary to generate the code for the KTX tag. This method will always return a result, but the result may contain errors
+     * and it is the responsibility of the consumer of this class to handle that properly.
+     */
+    private fun resolve(
+        openTagExpr: KtExpression,
+        closeTagExpr: KtExpression?,
+        receiver: Receiver?,
+        attrInfos: Map<String, AttributeInfo>,
+        context: ExpressionTypingContext
+    ): ResolvedKtxElementCall {
+
+        val usedAttributes = mutableSetOf<String>()
+
+        val missingRequiredAttributes = mutableListOf<DeclarationDescriptor>()
+
         val emitOrCall = resolveChild(
             openTagExpr,
             ResolveStep.Root(openTagExpr, closeTagExpr),
@@ -392,7 +530,7 @@ class KtxCallResolver(
             attrInfos,
             usedAttributes,
             missingRequiredAttributes,
-            contextToUse,
+            context,
             recurseOnUnresolved = false
         )
 
@@ -407,14 +545,14 @@ class KtxCallResolver(
 
                     if (type != null) {
                         R4AErrors.INVALID_TAG_TYPE.report(
-                            contextToUse,
+                            context,
                             tagExpressions,
                             type,
                             emitSimpleUpperBoundTypes
                         )
                     } else {
                         R4AErrors.INVALID_TAG_DESCRIPTOR.report(
-                            contextToUse,
+                            context,
                             tagExpressions,
                             emitSimpleUpperBoundTypes
                         )
@@ -425,25 +563,25 @@ class KtxCallResolver(
                     // TODO(lmr): we should probably put more info here, saying the composerType and stuff like that
                     // "ktx tag terminated with type "Foo", which is neither an emittable, nor callable
                     R4AErrors.INVALID_TAG_TYPE.report(
-                        contextToUse,
+                        context,
                         tagExpressions,
                         error.type,
                         emitSimpleUpperBoundTypes
                     )
                 }
                 is ErrorNode.RecursionLimitAmbiguousAttributesError -> {
-                    R4AErrors.AMBIGUOUS_ATTRIBUTES_DETECTED.report(contextToUse, tagExpressions, error.attributes)
+                    R4AErrors.AMBIGUOUS_ATTRIBUTES_DETECTED.report(context, tagExpressions, error.attributes)
                 }
                 is ErrorNode.RecursionLimitError -> {
-                    R4AErrors.CALLABLE_RECURSION_DETECTED.report(contextToUse, tagExpressions)
+                    R4AErrors.CALLABLE_RECURSION_DETECTED.report(context, tagExpressions)
                 }
             }
         }
 
         val constantChecker = ConstantExpressionEvaluator(
             project = project,
-            module = contextToUse.scope.ownerDescriptor.module,
-            languageVersionSettings = contextToUse.languageVersionSettings
+            module = context.scope.ownerDescriptor.module,
+            languageVersionSettings = context.languageVersionSettings
         )
 
         val attributeNodes = emitOrCall
@@ -460,7 +598,7 @@ class KtxCallResolver(
             .mapValues { it.value.first() }
             .values
             .map { node ->
-                val static = isStatic(node.expression, contextToUse, node.type, constantChecker)
+                val static = isStatic(node.expression, context, node.type, constantChecker)
 
                 // update all of the nodes in the AST as "static"
                 attributeNodes[node.name]?.forEach { it.isStatic = static }
@@ -491,7 +629,7 @@ class KtxCallResolver(
                         if (emitOrCall is EmitCallNode) {
                             val type = emitOrCall.memoize.ctorCall?.resultingDescriptor?.returnType ?: error("expected a return type")
                             if (!type.isCompoundEmittable()) {
-                                contextToUse.trace.reportFromPlugin(
+                                context.trace.reportFromPlugin(
                                     R4AErrors.CHILDREN_PROVIDED_BUT_NO_CHILDREN_DECLARED.on(openTagExpr),
                                     R4ADefaultErrorMessages
                                 )
@@ -502,16 +640,16 @@ class KtxCallResolver(
                         } else {
                             facade.getTypeInfo(
                                 attr.value,
-                                contextToUse.replaceExpectedType(functionType().makeComposable(module))
+                                context.replaceExpectedType(functionType().makeComposable(module))
                             )
                             val possibleChildren = allPossibleAttributes[CHILDREN_KEY] ?: emptyList()
                             if (possibleChildren.isNotEmpty()) {
-                                contextToUse.trace.reportFromPlugin(
+                                context.trace.reportFromPlugin(
                                     R4AErrors.UNRESOLVED_CHILDREN.on(openTagExpr, possibleChildren.map { it.type }),
                                     R4ADefaultErrorMessages
                                 )
                             } else {
-                                contextToUse.trace.reportFromPlugin(
+                                context.trace.reportFromPlugin(
                                     R4AErrors.CHILDREN_PROVIDED_BUT_NO_CHILDREN_DECLARED.on(openTagExpr),
                                     R4ADefaultErrorMessages
                                 )
@@ -520,10 +658,10 @@ class KtxCallResolver(
                     }
                     else -> {
                         val exprToReportOn = if (attr.isPunned) attr.value else (attr.key ?: error("expected non-null key expression"))
-                        val valueType = facade.getTypeInfo(attr.value, contextToUse).type
+                        val valueType = facade.getTypeInfo(attr.value, context).type
                         // if the value expression is an unresolved reference, we don't need to put a diagnostic on the key
                         val valueIsUnresolvedRef = attr.value is KtReferenceExpression &&
-                                contextToUse.trace[BindingContext.REFERENCE_TARGET, attr.value] != null
+                                context.trace[BindingContext.REFERENCE_TARGET, attr.value] != null
 
                         val descriptors = emitOrCall.resolvedCalls().flatMap {
                             listOfNotNull(
@@ -548,10 +686,10 @@ class KtxCallResolver(
                         if (attrsOfSameKey.isNotEmpty()) {
                             // NOTE(lmr): it would be great if we could record multiple possible types here instead of just one for
                             // autocomplete
-                            contextToUse.trace.record(BindingContext.EXPECTED_EXPRESSION_TYPE, attr.value, attrsOfSameKey.first().type)
+                            context.trace.record(BindingContext.EXPECTED_EXPRESSION_TYPE, attr.value, attrsOfSameKey.first().type)
 
                             // even if the type doesn't match the attribute, we should resolve it to something
-                            contextToUse.trace.record(BindingContext.REFERENCE_TARGET, attr.key, attrsOfSameKey.first().descriptor)
+                            context.trace.record(BindingContext.REFERENCE_TARGET, attr.key, attrsOfSameKey.first().descriptor)
 
                             // we can add all of the possible key targets here so that the user can Command+Click to see the list of
                             // possible values
@@ -575,7 +713,7 @@ class KtxCallResolver(
                                 R4AErrors.UNRESOLVED_ATTRIBUTE_KEY_UNKNOWN_TYPE.on(exprToReportOn, descriptors, attr.name)
                         }
 
-                        contextToUse.trace.reportFromPlugin(diagnostic, R4ADefaultErrorMessages)
+                        context.trace.reportFromPlugin(diagnostic, R4ADefaultErrorMessages)
                     }
                 }
             }
@@ -585,12 +723,12 @@ class KtxCallResolver(
             missingRequiredAttributes
                 .filter { !it.hasChildrenAnnotation() }
                 .ifNotEmpty {
-                    R4AErrors.MISSING_REQUIRED_ATTRIBUTES.report(contextToUse, tagExpressions, this)
+                    R4AErrors.MISSING_REQUIRED_ATTRIBUTES.report(context, tagExpressions, this)
                 }
             missingRequiredAttributes
                 .filter { it.hasChildrenAnnotation() }
                 .ifNotEmpty {
-                    R4AErrors.MISSING_REQUIRED_CHILDREN.report(contextToUse, tagExpressions, first().typeAsAttribute())
+                    R4AErrors.MISSING_REQUIRED_CHILDREN.report(context, tagExpressions, first().typeAsAttribute())
                 }
         }
 
@@ -605,36 +743,12 @@ class KtxCallResolver(
 
             facade.checkType(
                 expr,
-                contextToUse.replaceExpectedType(type)
+                context.replaceExpectedType(type)
             )
         }
 
 
-        // Instead of committing the whole temp trace, we do so individually because there are some diagnostics that we are going
-        // to switch out with others.
-        tmpTraceAndCache.cache.commit()
 
-        // if the tag target is non-namespaced and there is a closing tag as well, the default "Import" quick fix will not
-        // work appropriately. To counteract this, we intercept UNRESOLVED_REFERENCE on the tag target specifically, and replace
-        // it with an UNRESOLVED_TAG diagnostic. We have our own import quickfix that knows how to handle this properly.
-        // Ideally in the long run we can fix this in a different / better way.
-        val isSimpleTag = openTagExpr is KtSimpleNameExpression && closeTagExpr != null
-
-        val diagnostics = tmpTraceAndCache.trace.bindingContext.diagnostics
-        for (diagnostic in diagnostics) {
-            if (isSimpleTag && diagnostic.psiElement in tagExpressions && diagnostic.factory == Errors.UNRESOLVED_REFERENCE) {
-                val refExpression = diagnostic.psiElement as KtReferenceExpression
-                // here we want to swallow this diagnostic and replace it with UNRESOLVED_TAG, so that the quickfix works properly:
-                context.trace.reportFromPlugin(
-                    R4AErrors.UNRESOLVED_TAG.on(refExpression, refExpression),
-                    R4ADefaultErrorMessages
-                )
-            } else {
-                context.trace.reportDiagnosticOnce(diagnostic)
-            }
-        }
-
-        tmpTraceAndCache.trace.commit({ _, _ -> true }, false) // commit, but don't include diagnostics
 
         return ResolvedKtxElementCall(
             usedAttributes = usedAttributeNodes,
@@ -994,7 +1108,7 @@ class KtxCallResolver(
                                 ErrorNode.ResolveError(results)
                             }
                         } else {
-                            candidateContext.trace.recordFailedCandidates(ktxElement, results.allCandidates)
+                            candidateContext.trace.recordFailedCandidates(mainElement, results.allCandidates)
                         }
                     }
                     else -> {
@@ -1651,7 +1765,7 @@ class KtxCallResolver(
         }
 
         if (children != null) {
-            val childrenExpr = children.value as KtxLambdaExpression
+            val childrenExpr = children.value
 
             var resolvedCall: ResolvedCall<*>? = null
 
@@ -1939,7 +2053,7 @@ class KtxCallResolver(
     private fun resolveChildrenAsSetter(
         instanceType: KotlinType,
         childrenDescriptor: SimpleFunctionDescriptor,
-        childrenExpr: KtxLambdaExpression,
+        childrenExpr: KtExpression,
         context: ExpressionTypingContext
     ): ResolvedCall<*>? {
         val setterName = childrenDescriptor.name
@@ -1997,7 +2111,7 @@ class KtxCallResolver(
     private fun resolveChildrenAsProperty(
         instanceType: KotlinType,
         propertyDescriptor: PropertyDescriptor,
-        childrenExpr: KtxLambdaExpression,
+        childrenExpr: KtExpression,
         context: ExpressionTypingContext,
         shouldIncludeCtorParam: Boolean
     ): ResolvedCall<*>? {
@@ -2333,7 +2447,7 @@ class KtxCallResolver(
     }
 
     private fun resolveComposerMethodCandidates(
-        element: KtxElement,
+        element: KtExpression,
         name: Name,
         context: ExpressionTypingContext
     ): Collection<ResolvedCall<*>> {
@@ -3226,7 +3340,7 @@ private fun BindingTrace.recordAttributeKeyRef(expr: KtExpression?, value: Decla
     record(R4AWritableSlices.ATTRIBUTE_KEY_REFERENCE_TARGET, key, prev + value)
 }
 
-private fun BindingTrace.recordFailedCandidates(expr: KtxElement, results: Collection<ResolvedCall<FunctionDescriptor>>?) {
+private fun BindingTrace.recordFailedCandidates(expr: KtElement, results: Collection<ResolvedCall<FunctionDescriptor>>?) {
     if (results == null) return
     val prev = get(R4AWritableSlices.FAILED_CANDIDATES, expr) ?: emptyList()
     record(R4AWritableSlices.FAILED_CANDIDATES, expr, prev + results)
