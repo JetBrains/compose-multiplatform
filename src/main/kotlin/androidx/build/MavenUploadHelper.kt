@@ -29,7 +29,7 @@ import org.gradle.kotlin.dsl.withGroovyBuilder
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
-fun Project.configureMavenArtifactUpload(extension: SupportLibraryExtension) {
+fun Project.configureMavenArtifactUpload(extension: AndroidXExtension) {
     afterEvaluate {
         if (extension.publish) {
             val mavenGroup = extension.mavenGroup?.group
