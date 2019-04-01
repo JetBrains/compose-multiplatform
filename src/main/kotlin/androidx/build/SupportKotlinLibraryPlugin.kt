@@ -25,7 +25,7 @@ class SupportKotlinLibraryPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.apply<AndroidXPlugin>()
 
-        val supportLibraryExtension = project.extensions.create("supportLibrary",
+        val supportLibraryExtension = project.extensions.create("androidx",
                 SupportLibraryExtension::class.java, project)
         project.configureMavenArtifactUpload(supportLibraryExtension)
         project.apply(mapOf("plugin" to "kotlin"))
