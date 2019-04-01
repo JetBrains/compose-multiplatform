@@ -21,7 +21,7 @@ package androidx.build.dokka
 import java.io.File
 import androidx.build.androidJarFile
 import androidx.build.java.JavaCompileInputs
-import androidx.build.SupportLibraryExtension
+import androidx.build.AndroidXExtension
 import androidx.build.RELEASE_RULE
 import androidx.build.Strategy.Ignore
 import androidx.build.Strategy.Prebuilts
@@ -98,7 +98,7 @@ object DokkaPublicDocs {
     // specifies that <project> exists and might need us to generate documentation for it
     fun registerProject(
         project: Project,
-        extension: SupportLibraryExtension
+        extension: AndroidXExtension
     ) {
         if (tryGetRunnerProject(project) == null) {
             return

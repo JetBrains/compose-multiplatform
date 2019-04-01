@@ -20,7 +20,6 @@ import androidx.build.Strategy.Prebuilts
 import androidx.build.Strategy.TipOfTree
 import androidx.build.checkapi.ApiXmlConversionTask
 import androidx.build.checkapi.CheckApiTasks
-import androidx.build.checkapi.initializeApiChecksForProject
 import androidx.build.doclava.ChecksConfig
 import androidx.build.doclava.DEFAULT_DOCLAVA_CONFIG
 import androidx.build.doclava.DoclavaTask
@@ -280,7 +279,7 @@ class DiffAndDocs private constructor(
         }
     }
 
-    fun registerPrebuilts(extension: SupportLibraryExtension) =
+    fun registerPrebuilts(extension: AndroidXExtension) =
             docsProject?.afterEvaluate { docs ->
         val depHandler = docs.dependencies
         val root = docs.rootProject
@@ -301,7 +300,7 @@ class DiffAndDocs private constructor(
     }
 
     private fun tipOfTreeTasks(
-        extension: SupportLibraryExtension,
+        extension: AndroidXExtension,
         setup: (TaskProvider<out DoclavaTask>) -> Unit
     ) {
         rules.filter { rule -> rule.resolve(extension)?.strategy == TipOfTree }
@@ -313,7 +312,7 @@ class DiffAndDocs private constructor(
      * Registers a Java project to be included in docs generation, local API file generation, and
      * local API diff generation tasks.
      */
-    fun registerJavaProject(project: Project, extension: SupportLibraryExtension) {
+    fun registerJavaProject(project: Project, extension: AndroidXExtension) {
         val compileJava = project.tasks.named("compileJava", JavaCompile::class.java)
 
         registerPrebuilts(extension)
@@ -332,7 +331,7 @@ class DiffAndDocs private constructor(
     fun registerAndroidProject(
         project: Project,
         library: LibraryExtension,
-        extension: SupportLibraryExtension
+        extension: AndroidXExtension
     ) {
 
         registerPrebuilts(extension)
@@ -355,7 +354,7 @@ class DiffAndDocs private constructor(
     }
 
     private fun setupApiVersioningInDocsTasks(
-        extension: SupportLibraryExtension,
+        extension: AndroidXExtension,
         checkApiTasks: CheckApiTasks
     ) {
         rules.forEach { rules ->
@@ -518,8 +517,8 @@ private fun createDistDocsTask(
         version = getBuildId()
         destinationDir = project.getDistributionDirectory()
         group = JavaBasePlugin.DOCUMENTATION_GROUP
-        description = "Zips ${ruleName} Java documentation (generated via Doclava in the " +
-            "style of d.android.com) into ${archivePath}"
+        description = "Zips $ruleName Java documentation (generated via Doclava in the " +
+            "style of d.android.com) into $archivePath"
         doLast {
             logger.lifecycle("'Wrote API reference to $archivePath")
         }
@@ -570,8 +569,8 @@ private fun createGenerateDocsTask(
                 exclude("**/R.java")
                 dependsOn(generateSdkApiTask, doclavaConfig)
                 group = JavaBasePlugin.DOCUMENTATION_GROUP
-                description = "Generates Java documentation in the style of d.android.com. To generate offline " +
-                        "docs use \'-PofflineDocs=true\' parameter."
+                description = "Generates Java documentation in the style of d.android.com. To " +
+                        "generate offline docs use \'-PofflineDocs=true\' parameter."
 
                 setDocletpath(doclavaConfig.resolve())
                 destinationDir = File(destDir, if (offline) "offline" else "online")

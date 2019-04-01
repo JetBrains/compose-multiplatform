@@ -76,6 +76,8 @@ class AndroidXPlugin : Plugin<Project> {
             project.configureRootProject()
         }
 
+        project.extensions.create("androidx", AndroidXExtension::class.java, project)
+
         project.plugins.all {
             when (it) {
                 is JavaPlugin,

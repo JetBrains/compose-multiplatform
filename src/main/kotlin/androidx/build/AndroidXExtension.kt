@@ -24,7 +24,7 @@ import kotlin.properties.Delegates
 /**
  * Extension for [SupportAndroidLibraryPlugin] and [SupportJavaLibraryPlugin].
  */
-open class SupportLibraryExtension(val project: Project) {
+open class AndroidXExtension(val project: Project) {
     var name: String? = null
     var mavenVersion: Version? by Delegates.observable<Version?>(null) { _, _, new: Version? ->
         project.version = new?.toString()
