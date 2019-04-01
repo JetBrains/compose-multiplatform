@@ -125,11 +125,15 @@ def setupSubprojectsForBuildServer() {
                             include '*.apk'
                             into(BuildServerConfigurationKt.getDistributionDirectory(rootProject))
                             rename { String fileName ->
-                                // Exclude media-compat-test-* and media2-test-* modules from
-                                // existing support library presubmit tests.
                                 if (fileName.contains("media-compat-test")
                                         || fileName.contains("media2-test")) {
+                                    // Exclude media-compat-test-* and media2-test-* modules from
+                                    // existing support library presubmit tests.
                                     fileName.replace("-debug-androidTest", "")
+                                } else if (fileName.contains("-benchmark-debug-androidTest")){
+                                    // Exclude '-benchmark' modules from correctness tests, and
+                                    // remove '-debug' from the APK name, since it's incorrect
+                                    fileName.replace("-debug-androidTest", "-androidBenchmark")
                                 } else {
                                     // multiple modules may have the same name so prefix the name with
                                     // the module's path to ensure it is unique.
