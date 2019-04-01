@@ -32,9 +32,8 @@ class SupportJavaLibraryPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.apply<AndroidXPlugin>()
 
-        val supportLibraryExtension = project.extensions.create("supportLibrary",
-                SupportLibraryExtension::class.java, project)
-        project.configureMavenArtifactUpload(supportLibraryExtension)
+        val androidXExtension = project.extensions.getByType(AndroidXExtension::class.java)
+        project.configureMavenArtifactUpload(androidXExtension)
 
         project.apply(mapOf("plugin" to "java"))
         project.afterEvaluate {
@@ -42,18 +41,18 @@ class SupportJavaLibraryPlugin : Plugin<Project> {
             project.configurations.all {
                 it.resolutionStrategy.preferProjectModules()
             }
-            if (supportLibraryExtension.publish) {
+            if (androidXExtension.publish) {
                 project.extra.set("publish", true)
-                project.addToProjectMap(supportLibraryExtension.mavenGroup?.group)
+                project.addToProjectMap(androidXExtension.mavenGroup?.group)
             }
-            Dokka.registerJavaProject(project, supportLibraryExtension)
-            if (supportLibraryExtension.useMetalava) {
-                Metalava.registerJavaProject(project, supportLibraryExtension)
+            Dokka.registerJavaProject(project, androidXExtension)
+            if (androidXExtension.useMetalava) {
+                Metalava.registerJavaProject(project, androidXExtension)
             } else {
-                DiffAndDocs.get(project).registerJavaProject(project, supportLibraryExtension)
+                DiffAndDocs.get(project).registerJavaProject(project, androidXExtension)
             }
         }
 
-        project.configureNonAndroidProjectForLint(supportLibraryExtension)
+        project.configureNonAndroidProjectForLint(androidXExtension)
     }
 }

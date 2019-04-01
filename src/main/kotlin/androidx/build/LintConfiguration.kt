@@ -21,7 +21,7 @@ import com.android.build.gradle.internal.dsl.LintOptions
 import org.gradle.api.Project
 import java.io.File
 
-fun Project.configureNonAndroidProjectForLint(extension: SupportLibraryExtension) {
+fun Project.configureNonAndroidProjectForLint(extension: AndroidXExtension) {
     apply(mapOf("plugin" to "com.android.lint"))
 
     // Create fake variant tasks since that is what is invoked on CI and by developers.
@@ -37,7 +37,7 @@ fun Project.configureNonAndroidProjectForLint(extension: SupportLibraryExtension
     project.configureLint(lintOptions, extension)
 }
 
-fun Project.configureLint(lintOptions: LintOptions, extension: SupportLibraryExtension) {
+fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension) {
     // Lint is configured entirely in afterEvaluate so that individual projects cannot easily
     // disable individual checks in the DSL for any reason. That being said, when rolling out a new
     // check as fatal, it can be beneficial to set it to fatal above this comment. This allows you

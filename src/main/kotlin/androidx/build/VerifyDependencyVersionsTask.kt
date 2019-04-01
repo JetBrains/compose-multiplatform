@@ -57,10 +57,10 @@ open class VerifyDependencyVersionsTask : DefaultTask() {
         // version is unspecified then it won't matter, and if the dependency's version is
         // unspecified then any non alpha project won't be able to depend on it to ensure safety.
         val projectVersionExtra = if (project.version ==
-            SupportLibraryExtension.DEFAULT_UNSPECIFIED_VERSION) "-alpha01"
+            AndroidXExtension.DEFAULT_UNSPECIFIED_VERSION) "-alpha01"
             else Version(project.version.toString()).extra ?: ""
         val dependencyVersionExtra = if (dependency.version!! ==
-            SupportLibraryExtension.DEFAULT_UNSPECIFIED_VERSION) "-alpha01" else
+            AndroidXExtension.DEFAULT_UNSPECIFIED_VERSION) "-alpha01" else
             Version(dependency.version!!).extra ?: ""
         val projectReleasePhase = releasePhase(projectVersionExtra)
         if (projectReleasePhase < 0) {
