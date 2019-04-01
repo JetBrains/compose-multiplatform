@@ -86,10 +86,5 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
         }
 
         project.apply<LibraryPlugin>()
-
-        val library = project.extensions.findByType(LibraryExtension::class.java)
-                ?: throw Exception("Failed to find Android extension")
-
-        project.configureLint(library.lintOptions, androidXExtension)
     }
 }

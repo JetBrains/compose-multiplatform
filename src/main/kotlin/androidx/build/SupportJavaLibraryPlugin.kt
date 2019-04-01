@@ -51,7 +51,5 @@ class SupportJavaLibraryPlugin : Plugin<Project> {
                 DiffAndDocs.get(project).registerJavaProject(project, androidXExtension)
             }
         }
-
-        project.configureNonAndroidProjectForLint(androidXExtension)
     }
 }
