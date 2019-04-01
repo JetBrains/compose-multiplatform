@@ -15,7 +15,6 @@
  */
 package androidx.build
 
-import androidx.build.metalava.Metalava
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
@@ -23,13 +22,7 @@ import org.gradle.kotlin.dsl.apply
 class SupportKotlinLibraryPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.apply<AndroidXPlugin>()
-
-        val androidXExtension = project.extensions.getByType(AndroidXExtension::class.java)
         project.apply(mapOf("plugin" to "kotlin"))
         project.apply(mapOf("plugin" to "kotlin-kapt"))
-
-        project.afterEvaluate {
-            Metalava.registerJavaProject(project, androidXExtension)
-        }
     }
 }

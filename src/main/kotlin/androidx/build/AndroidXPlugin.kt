@@ -35,6 +35,8 @@ import androidx.build.gradle.isRoot
 import androidx.build.jacoco.Jacoco
 import androidx.build.license.CheckExternalDependencyLicensesTask
 import androidx.build.license.configureExternalDependencyLicenseCheck
+import androidx.build.metalava.Metalava.configureAndroidProjectForMetalava
+import androidx.build.metalava.Metalava.configureJavaProjectForMetalava
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.BaseExtension
@@ -99,6 +101,7 @@ class AndroidXPlugin : Plugin<Project> {
                     project.createCheckReleaseReadyTask(listOf(verifyDependencyVersionsTask))
                     project.configureNonAndroidProjectForLint(androidXExtension)
                     project.configureJavaProjectForDokka(androidXExtension)
+                    project.configureJavaProjectForMetalava(androidXExtension)
                 }
                 is LibraryPlugin -> {
                     val extension = project.extensions.getByType<LibraryExtension>()
@@ -130,6 +133,7 @@ class AndroidXPlugin : Plugin<Project> {
                     }
                     project.configureLint(extension.lintOptions, androidXExtension)
                     project.configureAndroidProjectForDokka(extension, androidXExtension)
+                    project.configureAndroidProjectForMetalava(extension, androidXExtension)
                 }
                 is AppPlugin -> {
                     val extension = project.extensions.getByType<AppExtension>()
