@@ -25,6 +25,7 @@ import org.jetbrains.kotlin.TestsCompiletimeError
 import org.jetbrains.kotlin.cli.jvm.compiler.NoScopeRecordCliBindingTrace
 import org.jetbrains.kotlin.codegen.ClassBuilderFactories
 import org.jetbrains.kotlin.codegen.GenerationUtils
+import org.junit.After
 
 @Suppress("MemberVisibilityCanBePrivate")
 abstract class AbstractCompilerTest: TestCase() {
@@ -50,6 +51,11 @@ abstract class AbstractCompilerTest: TestCase() {
         classFileFactory = null
         Disposer.dispose(myTestRootDisposable)
         super.tearDown()
+    }
+
+    @After
+    fun after() {
+        tearDown()
     }
 
     protected fun createClasspath() = listOf(
