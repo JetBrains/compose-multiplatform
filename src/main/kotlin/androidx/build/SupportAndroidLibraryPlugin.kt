@@ -36,7 +36,6 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
         project.apply<AndroidXPlugin>()
 
         val androidXExtension = project.extensions.getByType(AndroidXExtension::class.java)
-        project.configureMavenArtifactUpload(androidXExtension)
 
         // Workaround for concurrentfuture
         project.dependencies.modules.module("com.google.guava:listenablefuture") {

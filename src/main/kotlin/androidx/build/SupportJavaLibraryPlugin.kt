@@ -33,7 +33,6 @@ class SupportJavaLibraryPlugin : Plugin<Project> {
         project.apply<AndroidXPlugin>()
 
         val androidXExtension = project.extensions.getByType(AndroidXExtension::class.java)
-        project.configureMavenArtifactUpload(androidXExtension)
 
         project.apply(mapOf("plugin" to "java"))
         project.afterEvaluate {

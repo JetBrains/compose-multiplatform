@@ -76,7 +76,9 @@ class AndroidXPlugin : Plugin<Project> {
             project.configureRootProject()
         }
 
-        project.extensions.create("androidx", AndroidXExtension::class.java, project)
+        val androidXExtension =
+            project.extensions.create("androidx", AndroidXExtension::class.java, project)
+        project.configureMavenArtifactUpload(androidXExtension)
 
         project.plugins.all {
             when (it) {

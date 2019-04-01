@@ -26,7 +26,6 @@ class SupportKotlinLibraryPlugin : Plugin<Project> {
         project.apply<AndroidXPlugin>()
 
         val androidXExtension = project.extensions.getByType(AndroidXExtension::class.java)
-        project.configureMavenArtifactUpload(androidXExtension)
         project.apply(mapOf("plugin" to "kotlin"))
         project.apply(mapOf("plugin" to "kotlin-kapt"))
 
