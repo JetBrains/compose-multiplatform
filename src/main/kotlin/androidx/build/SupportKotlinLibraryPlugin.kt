@@ -15,7 +15,6 @@
  */
 package androidx.build
 
-import androidx.build.dokka.Dokka
 import androidx.build.metalava.Metalava
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -31,7 +30,6 @@ class SupportKotlinLibraryPlugin : Plugin<Project> {
 
         project.afterEvaluate {
             Metalava.registerJavaProject(project, androidXExtension)
-            Dokka.registerJavaProject(project, androidXExtension)
         }
     }
 }

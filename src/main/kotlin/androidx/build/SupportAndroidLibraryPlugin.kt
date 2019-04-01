@@ -16,7 +16,6 @@
 
 package androidx.build
 
-import androidx.build.dokka.Dokka
 import androidx.build.metalava.Metalava
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
@@ -58,7 +57,6 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
             val library = project.extensions.findByType(LibraryExtension::class.java)
                     ?: return@afterEvaluate
 
-            Dokka.registerAndroidProject(project, library, androidXExtension)
             if (androidXExtension.useMetalava) {
                 Metalava.registerAndroidProject(project, library, androidXExtension)
             } else {
