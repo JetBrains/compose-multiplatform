@@ -19,7 +19,7 @@
 package androidx.build.dokka
 
 import androidx.build.java.JavaCompileInputs
-import androidx.build.SupportLibraryExtension
+import androidx.build.AndroidXExtension
 import androidx.build.Release
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Project
@@ -65,7 +65,7 @@ object DokkaSourceDocs {
     fun registerAndroidProject(
         project: Project,
         library: LibraryExtension,
-        extension: SupportLibraryExtension
+        extension: AndroidXExtension
     ) {
         if (tryGetRunnerProject(project) == null) {
             return
@@ -86,7 +86,7 @@ object DokkaSourceDocs {
 
     fun registerJavaProject(
         project: Project,
-        extension: SupportLibraryExtension
+        extension: AndroidXExtension
     ) {
         if (tryGetRunnerProject(project) == null) {
             return

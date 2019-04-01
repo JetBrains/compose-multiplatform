@@ -35,9 +35,8 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.apply<AndroidXPlugin>()
 
-        val supportLibraryExtension = project.extensions.create("supportLibrary",
-                SupportLibraryExtension::class.java, project)
-        project.configureMavenArtifactUpload(supportLibraryExtension)
+        val androidXExtension = project.extensions.getByType(AndroidXExtension::class.java)
+        project.configureMavenArtifactUpload(androidXExtension)
 
         // Workaround for concurrentfuture
         project.dependencies.modules.module("com.google.guava:listenablefuture") {
@@ -53,22 +52,22 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
                     it.resolutionStrategy.preferProjectModules()
                 }
             }
-            if (supportLibraryExtension.publish) {
+            if (androidXExtension.publish) {
                 project.extra.set("publish", true)
-                project.addToProjectMap(supportLibraryExtension.mavenGroup?.group)
+                project.addToProjectMap(androidXExtension.mavenGroup?.group)
             }
             val library = project.extensions.findByType(LibraryExtension::class.java)
                     ?: return@afterEvaluate
 
-            Dokka.registerAndroidProject(project, library, supportLibraryExtension)
-            if (supportLibraryExtension.useMetalava) {
-                Metalava.registerAndroidProject(project, library, supportLibraryExtension)
+            Dokka.registerAndroidProject(project, library, androidXExtension)
+            if (androidXExtension.useMetalava) {
+                Metalava.registerAndroidProject(project, library, androidXExtension)
             } else {
                 DiffAndDocs.get(project)
-                    .registerAndroidProject(project, library, supportLibraryExtension)
+                    .registerAndroidProject(project, library, androidXExtension)
             }
 
-            if (supportLibraryExtension.compilationTarget != CompilationTarget.DEVICE) {
+            if (androidXExtension.compilationTarget != CompilationTarget.DEVICE) {
                 throw IllegalStateException(
                         "Android libraries must use a compilation target of DEVICE")
             }
@@ -76,10 +75,10 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
             library.libraryVariants.all { libraryVariant ->
                 if (libraryVariant.getBuildType().getName().equals("debug")) {
                     libraryVariant.javaCompileProvider.configure { javaCompile ->
-                        if (supportLibraryExtension.failOnUncheckedWarnings) {
+                        if (androidXExtension.failOnUncheckedWarnings) {
                             javaCompile.options.compilerArgs.add("-Xlint:unchecked")
                         }
-                        if (supportLibraryExtension.failOnDeprecationWarnings) {
+                        if (androidXExtension.failOnDeprecationWarnings) {
                             javaCompile.options.compilerArgs.add("-Xlint:deprecation")
                         }
                     }
@@ -92,6 +91,6 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
         val library = project.extensions.findByType(LibraryExtension::class.java)
                 ?: throw Exception("Failed to find Android extension")
 
-        project.configureLint(library.lintOptions, supportLibraryExtension)
+        project.configureLint(library.lintOptions, androidXExtension)
     }
 }

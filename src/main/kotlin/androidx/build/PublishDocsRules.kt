@@ -251,14 +251,14 @@ sealed class Strategy {
         }
 
         override fun toString() = "Prebuilts(\"$version\")"
-        fun dependency(extension: SupportLibraryExtension): String {
+        fun dependency(extension: AndroidXExtension): String {
             return "${extension.mavenGroup?.group}:${extension.project.name}:$version"
         }
     }
 }
 
 class PublishDocsRules(val name: String, val offline: Boolean, private val rules: List<DocsRule>) {
-    fun resolve(extension: SupportLibraryExtension): DocsRule? {
+    fun resolve(extension: AndroidXExtension): DocsRule? {
         val mavenGroup = extension.mavenGroup
         return if (mavenGroup == null) null else resolve(mavenGroup.group, extension.project.name)
     }
