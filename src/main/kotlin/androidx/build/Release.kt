@@ -190,7 +190,7 @@ object Release {
     /**
      * Registers the project to be included in its group's zip file as well as the global zip files.
      */
-    fun register(project: Project, extension: SupportLibraryExtension) {
+    fun register(project: Project, extension: AndroidXExtension) {
         if (!extension.publish) {
             throw IllegalArgumentException(
                     "Cannot register ${project.path} into the release" +

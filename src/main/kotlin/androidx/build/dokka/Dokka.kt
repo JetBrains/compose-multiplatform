@@ -22,7 +22,7 @@ import java.io.File
 import androidx.build.DiffAndDocs
 import androidx.build.getBuildId
 import androidx.build.getDistributionDirectory
-import androidx.build.SupportLibraryExtension
+import androidx.build.AndroidXExtension
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaBasePlugin
@@ -54,7 +54,8 @@ object Dokka {
             throw Exception("Illegal project passed to createDocsTask: " + project.name)
         }
         val docsTask = project.tasks.create(taskName, DokkaAndroidTask::class.java) { docsTask ->
-            docsTask.description = "Generates ${docsType} Kotlin documentation in the style of d.android.com"
+            docsTask.description = "Generates $docsType Kotlin documentation in the style of " +
+                    "d.android.com"
             docsTask.moduleName = project.name
             docsTask.outputDirectory = File(project.buildDir, taskName).absolutePath
             docsTask.outputFormat = "dac"
@@ -77,7 +78,7 @@ object Dokka {
             zipTask.baseName = taskName
             zipTask.version = getBuildId()
             zipTask.destinationDir = project.getDistributionDirectory()
-            zipTask.description = "Zips ${docsType} Kotlin documentation (generated via "+
+            zipTask.description = "Zips $docsType Kotlin documentation (generated via " +
                 "Dokka in the style of d.android.com) into ${zipTask.archivePath}"
             zipTask.group = JavaBasePlugin.DOCUMENTATION_GROUP
         }
@@ -86,7 +87,7 @@ object Dokka {
     fun registerAndroidProject(
         project: Project,
         library: LibraryExtension,
-        extension: SupportLibraryExtension
+        extension: AndroidXExtension
     ) {
         if (project.name != "docs-runner") {
             DiffAndDocs.get(project).registerAndroidProject(project, library, extension)
@@ -98,7 +99,7 @@ object Dokka {
 
     fun registerJavaProject(
         project: Project,
-        extension: SupportLibraryExtension
+        extension: AndroidXExtension
     ) {
         if (project.name != "docs-runner") {
             DiffAndDocs.get(project).registerJavaProject(project, extension)

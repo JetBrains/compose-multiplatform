@@ -25,17 +25,16 @@ class SupportKotlinLibraryPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.apply<AndroidXPlugin>()
 
-        val supportLibraryExtension = project.extensions.create("supportLibrary",
-                SupportLibraryExtension::class.java, project)
-        project.configureMavenArtifactUpload(supportLibraryExtension)
+        val androidXExtension = project.extensions.getByType(AndroidXExtension::class.java)
+        project.configureMavenArtifactUpload(androidXExtension)
         project.apply(mapOf("plugin" to "kotlin"))
         project.apply(mapOf("plugin" to "kotlin-kapt"))
 
-        project.configureNonAndroidProjectForLint(supportLibraryExtension)
+        project.configureNonAndroidProjectForLint(androidXExtension)
 
         project.afterEvaluate {
-            Metalava.registerJavaProject(project, supportLibraryExtension)
-            Dokka.registerJavaProject(project, supportLibraryExtension)
+            Metalava.registerJavaProject(project, androidXExtension)
+            Dokka.registerJavaProject(project, androidXExtension)
         }
     }
 }
