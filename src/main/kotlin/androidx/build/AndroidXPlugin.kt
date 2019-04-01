@@ -76,7 +76,9 @@ class AndroidXPlugin : Plugin<Project> {
             project.configureRootProject()
         }
 
-        project.extensions.create("androidx", AndroidXExtension::class.java, project)
+        val androidXExtension =
+            project.extensions.create("androidx", AndroidXExtension::class.java, project)
+        project.configureMavenArtifactUpload(androidXExtension)
 
         project.plugins.all {
             when (it) {
@@ -94,6 +96,7 @@ class AndroidXPlugin : Plugin<Project> {
                         it.dependsOn(project.tasks.named(JavaPlugin.COMPILE_JAVA_TASK_NAME))
                     }
                     project.createCheckReleaseReadyTask(listOf(verifyDependencyVersionsTask))
+                    project.configureNonAndroidProjectForLint(androidXExtension)
                 }
                 is LibraryPlugin -> {
                     val extension = project.extensions.getByType<LibraryExtension>()
@@ -123,6 +126,7 @@ class AndroidXPlugin : Plugin<Project> {
                             }
                         }
                     }
+                    project.configureLint(extension.lintOptions, androidXExtension)
                 }
                 is AppPlugin -> {
                     val extension = project.extensions.getByType<AppExtension>()
