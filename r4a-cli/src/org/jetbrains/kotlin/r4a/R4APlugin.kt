@@ -9,10 +9,7 @@ import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
 import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
-import org.jetbrains.kotlin.extensions.KtxControlFlowExtension
-import org.jetbrains.kotlin.extensions.KtxTypeResolutionExtension
-import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
-import org.jetbrains.kotlin.extensions.TypeResolutionInterceptorExtension
+import org.jetbrains.kotlin.extensions.*
 import org.jetbrains.kotlin.parsing.KtxParsingExtension
 import org.jetbrains.kotlin.psi2ir.extensions.SyntheticIrExtension
 import org.jetbrains.kotlin.r4a.frames.analysis.FrameModelChecker
@@ -34,6 +31,9 @@ class R4ACommandLineProcessor : CommandLineProcessor {
 }
 
 class R4AComponentRegistrar : ComponentRegistrar {
+    override fun registerProjectComponents(project: MockProject, configuration: CompilerConfiguration) {
+        registerProjectExtensions(project as Project, configuration)
+    }
 
     companion object {
         val COMPOSABLE_CHECKER_MODE_KEY = CompilerConfigurationKey<ComposableAnnotationChecker.Mode>("@composable checker mode")
@@ -49,14 +49,11 @@ class R4AComponentRegistrar : ComponentRegistrar {
             TypeResolutionInterceptorExtension.registerExtension(project, R4aTypeResolutionInterceptorExtension())
             SyntheticIrExtension.registerExtension(project, R4ASyntheticIrExtension())
             IrLoweringExtension.registerExtension(project, R4aIrLoweringExtension())
+            CallResolutionInterceptorExtension.registerExtension(project, R4aCallResolutionInterceptorExtension())
 
             StorageComponentContainerContributor.registerExtension(project, FrameModelChecker())
             AnalysisHandlerExtension.registerExtension(project, FramePackageAnalysisHandlerExtension())
         }
-    }
-
-    override fun registerProjectComponents(project: MockProject, configuration: CompilerConfiguration) {
-        registerProjectExtensions(project as Project, configuration)
     }
 }
 
