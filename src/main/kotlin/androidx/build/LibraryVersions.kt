@@ -63,7 +63,7 @@ object LibraryVersions {
     val LIFECYCLES_COROUTINES = Version("1.0.0-alpha01")
     val LIFECYCLES_SAVEDSTATE = Version("1.0.0-alpha01")
     val LOADER = Version("1.1.0-beta02")
-    val MEDIA = Version("1.1.0-alpha03")
+    val MEDIA = Version("1.1.0-alpha04")
     val MEDIA2 = Version("1.0.0-alpha05")
     val MEDIA2_EXOPLAYER = Version("1.0.0-alpha02")
     val MEDIA2_WIDGET = Version("1.0.0-alpha07")
