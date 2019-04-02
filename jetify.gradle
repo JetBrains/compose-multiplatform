@@ -87,7 +87,13 @@ task stripArchiveForPartialDejetification(type: Zip) {
     destinationDir rootProject.buildDir
     archiveName "stripped_archive_partial.zip"
     include archivesToDejetify
-
+    doLast {
+        if (archivePath.exists()) {
+            project.logger.info("stripArchiveForPartialDejetification sees that " + archivePath + " exists")
+        } else {
+            throw new Exception("stripArchiveForPartialDejetification sees that " + archivePath + " does not exist!?")
+        }
+    }
 }
 
 task partiallyDejetifyArchive(type: Exec) {
