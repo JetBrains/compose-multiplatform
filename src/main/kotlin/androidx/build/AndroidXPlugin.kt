@@ -18,14 +18,16 @@ package androidx.build
 
 import androidx.build.SupportConfig.BUILD_TOOLS_VERSION
 import androidx.build.SupportConfig.COMPILE_SDK_VERSION
-import androidx.build.SupportConfig.TARGET_SDK_VERSION
 import androidx.build.SupportConfig.DEFAULT_MIN_SDK_VERSION
 import androidx.build.SupportConfig.INSTRUMENTATION_RUNNER
+import androidx.build.SupportConfig.TARGET_SDK_VERSION
 import androidx.build.checkapi.ApiType
 import androidx.build.checkapi.getCurrentApiLocation
 import androidx.build.checkapi.getLastReleasedApiFileFromDir
 import androidx.build.checkapi.hasApiFolder
 import androidx.build.dependencyTracker.AffectedModuleDetector
+import androidx.build.dokka.Dokka.configureAndroidProjectForDokka
+import androidx.build.dokka.Dokka.configureJavaProjectForDokka
 import androidx.build.dokka.DokkaPublicDocs
 import androidx.build.dokka.DokkaSourceDocs
 import androidx.build.gradle.getByType
@@ -33,6 +35,8 @@ import androidx.build.gradle.isRoot
 import androidx.build.jacoco.Jacoco
 import androidx.build.license.CheckExternalDependencyLicensesTask
 import androidx.build.license.configureExternalDependencyLicenseCheck
+import androidx.build.metalava.Metalava.configureAndroidProjectForMetalava
+import androidx.build.metalava.Metalava.configureJavaProjectForMetalava
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.BaseExtension
@@ -40,12 +44,11 @@ import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.internal.tasks.factory.dependsOn
 import org.gradle.api.DefaultTask
-import org.gradle.api.Task
 import org.gradle.api.JavaVersion.VERSION_1_7
 import org.gradle.api.JavaVersion.VERSION_1_8
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-
+import org.gradle.api.Task
 import org.gradle.api.plugins.JavaLibraryPlugin
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPluginConvention
@@ -54,8 +57,8 @@ import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.getPlugin
 import org.gradle.kotlin.dsl.withType
-import java.util.concurrent.ConcurrentHashMap
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * A plugin which enables all of the Gradle customizations for AndroidX.
@@ -97,6 +100,8 @@ class AndroidXPlugin : Plugin<Project> {
                     }
                     project.createCheckReleaseReadyTask(listOf(verifyDependencyVersionsTask))
                     project.configureNonAndroidProjectForLint(androidXExtension)
+                    project.configureJavaProjectForDokka(androidXExtension)
+                    project.configureJavaProjectForMetalava(androidXExtension)
                 }
                 is LibraryPlugin -> {
                     val extension = project.extensions.getByType<LibraryExtension>()
@@ -127,6 +132,8 @@ class AndroidXPlugin : Plugin<Project> {
                         }
                     }
                     project.configureLint(extension.lintOptions, androidXExtension)
+                    project.configureAndroidProjectForDokka(extension, androidXExtension)
+                    project.configureAndroidProjectForMetalava(extension, androidXExtension)
                 }
                 is AppPlugin -> {
                     val extension = project.extensions.getByType<AppExtension>()
