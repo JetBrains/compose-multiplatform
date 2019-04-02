@@ -42,46 +42,50 @@ object Metalava {
         }
     }
 
-    fun registerAndroidProject(
-        project: Project,
+    fun Project.configureAndroidProjectForMetalava(
         library: LibraryExtension,
         extension: AndroidXExtension
     ) {
-        if (!hasApiTasks(project, extension)) {
-            return
-        }
+        afterEvaluate {
+            if (!hasApiTasks(this, extension)) {
+                return@afterEvaluate
+            }
 
-        library.libraryVariants.all { variant ->
-            if (variant.name == Release.DEFAULT_PUBLISH_CONFIG) {
-                if (!project.hasApiFolder()) {
-                    project.logger.info(
-                        "Project ${project.name} doesn't have an api folder, ignoring API tasks.")
-                    return@all
+            library.libraryVariants.all { variant ->
+                if (variant.name == Release.DEFAULT_PUBLISH_CONFIG) {
+                    if (!hasApiFolder()) {
+                        logger.info(
+                            "Project $name doesn't have an api folder, ignoring API tasks."
+                        )
+                        return@all
+                    }
+
+                    val javaInputs = JavaCompileInputs.fromLibraryVariant(library, variant)
+                    setupProject(this, javaInputs, extension)
                 }
-
-                val javaInputs = JavaCompileInputs.fromLibraryVariant(library, variant)
-                setupProject(project, javaInputs, extension)
             }
         }
     }
 
-    fun registerJavaProject(
-        project: Project,
+    fun Project.configureJavaProjectForMetalava(
         extension: AndroidXExtension
     ) {
-        if (!hasApiTasks(project, extension)) {
-            return
-        }
-        if (!project.hasApiFolder()) {
-            project.logger.info(
-                    "Project ${project.name} doesn't have an api folder, ignoring API tasks.")
-            return
-        }
+        afterEvaluate {
+            if (!hasApiTasks(this, extension)) {
+                return@afterEvaluate
+            }
+            if (!hasApiFolder()) {
+                logger.info(
+                    "Project $name doesn't have an api folder, ignoring API tasks."
+                )
+                return@afterEvaluate
+            }
 
-        val javaPluginConvention = project.convention.getPlugin<JavaPluginConvention>()
-        val mainSourceSet = javaPluginConvention.sourceSets.getByName("main")
-        val javaInputs = JavaCompileInputs.fromSourceSet(mainSourceSet, project)
-        setupProject(project, javaInputs, extension)
+            val javaPluginConvention = convention.getPlugin<JavaPluginConvention>()
+            val mainSourceSet = javaPluginConvention.sourceSets.getByName("main")
+            val javaInputs = JavaCompileInputs.fromSourceSet(mainSourceSet, this)
+            setupProject(this, javaInputs, extension)
+        }
     }
 
     fun applyInputs(inputs: JavaCompileInputs, task: MetalavaTask) {

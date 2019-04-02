@@ -18,11 +18,10 @@
 // TODO: after DiffAndDocs and Doclava are fully obsoleted and removed, rename this from Dokka to just Docs
 package androidx.build.dokka
 
-import java.io.File
+import androidx.build.AndroidXExtension
 import androidx.build.DiffAndDocs
 import androidx.build.getBuildId
 import androidx.build.getDistributionDirectory
-import androidx.build.AndroidXExtension
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaBasePlugin
@@ -31,6 +30,7 @@ import org.gradle.kotlin.dsl.apply
 import org.jetbrains.dokka.gradle.DokkaAndroidPlugin
 import org.jetbrains.dokka.gradle.DokkaAndroidTask
 import org.jetbrains.dokka.gradle.PackageOptions
+import java.io.File
 
 object Dokka {
     fun generatorTaskNameForType(docsType: String): String {
@@ -84,27 +84,27 @@ object Dokka {
         }
     }
 
-    fun registerAndroidProject(
-        project: Project,
+    fun Project.configureAndroidProjectForDokka(
         library: LibraryExtension,
         extension: AndroidXExtension
     ) {
-        if (project.name != "docs-runner") {
-            DiffAndDocs.get(project).registerAndroidProject(project, library, extension)
-        }
+        afterEvaluate {
+            if (name != "docs-runner") {
+                DiffAndDocs.get(this).registerAndroidProject(this, library, extension)
+            }
 
-        DokkaPublicDocs.registerProject(project, extension)
-        DokkaSourceDocs.registerAndroidProject(project, library, extension)
+            DokkaPublicDocs.registerProject(this, extension)
+            DokkaSourceDocs.registerAndroidProject(this, library, extension)
+        }
     }
 
-    fun registerJavaProject(
-        project: Project,
-        extension: AndroidXExtension
-    ) {
-        if (project.name != "docs-runner") {
-            DiffAndDocs.get(project).registerJavaProject(project, extension)
+    fun Project.configureJavaProjectForDokka(extension: AndroidXExtension) {
+        afterEvaluate {
+            if (name != "docs-runner") {
+                DiffAndDocs.get(this).registerJavaProject(this, extension)
+            }
+            DokkaPublicDocs.registerProject(this, extension)
+            DokkaSourceDocs.registerJavaProject(this, extension)
         }
-        DokkaPublicDocs.registerProject(project, extension)
-        DokkaSourceDocs.registerJavaProject(project, extension)
     }
 }
