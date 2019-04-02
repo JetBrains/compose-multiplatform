@@ -77,7 +77,7 @@ object LibraryVersions {
     val PERSISTENCE = Version("2.0.1")
     val PREFERENCE = Version("1.1.0-alpha05")
     val RECOMMENDATION = Version("1.1.0-alpha01")
-    val RECYCLERVIEW = Version("1.1.0-alpha04")
+    val RECYCLERVIEW = Version("1.1.0-alpha05")
     val REMOTECALLBACK = Version("1.0.0-alpha02")
     val ROOM = Version("2.1.0-alpha06")
     val SAVEDSTATE = Version("1.0.0-alpha03")
