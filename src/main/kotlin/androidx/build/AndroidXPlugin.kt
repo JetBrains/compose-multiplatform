@@ -75,13 +75,15 @@ class AndroidXPlugin : Plugin<Project> {
         // TODO do not use evaluationDependsOn in DiffAndDocs to break this cycle!
         project.configureExternalDependencyLicenseCheck()
 
+        val androidXExtension =
+            project.extensions.create("androidx", AndroidXExtension::class.java, project)
+        // This has to be first due to bad behavior by DiffAndDocs. It fails if this configuration
+        // is called after DiffAndDocs.configureDiffAndDocs. b/129762955
+        project.configureMavenArtifactUpload(androidXExtension)
+
         if (project.isRoot) {
             project.configureRootProject()
         }
-
-        val androidXExtension =
-            project.extensions.create("androidx", AndroidXExtension::class.java, project)
-        project.configureMavenArtifactUpload(androidXExtension)
 
         project.plugins.all {
             when (it) {
