@@ -52,6 +52,7 @@ def archivesToDejetify = [
     "m2repository/androidx/localbroadcastmanager/**",
     "m2repository/androidx/media/media/**",
     "m2repository/androidx/mediarouter/**",
+    "m2repository/androidx/navigation/**",
     "m2repository/androidx/palette/palette/**",
     "m2repository/androidx/percentlayout/**",
     "m2repository/androidx/preference/preference/**",
