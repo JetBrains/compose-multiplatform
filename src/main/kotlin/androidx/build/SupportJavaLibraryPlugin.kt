@@ -19,7 +19,6 @@ package androidx.build
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
-import org.gradle.kotlin.dsl.extra
 
 /**
  * Support java library specific plugin that sets common configurations needed for
@@ -29,18 +28,11 @@ class SupportJavaLibraryPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
         project.apply<AndroidXPlugin>()
-
-        val androidXExtension = project.extensions.getByType(AndroidXExtension::class.java)
-
         project.apply(mapOf("plugin" to "java"))
         project.afterEvaluate {
             // workaround for b/120487939
             project.configurations.all {
                 it.resolutionStrategy.preferProjectModules()
-            }
-            if (androidXExtension.publish) {
-                project.extra.set("publish", true)
-                project.addToProjectMap(androidXExtension.mavenGroup?.group)
             }
         }
     }

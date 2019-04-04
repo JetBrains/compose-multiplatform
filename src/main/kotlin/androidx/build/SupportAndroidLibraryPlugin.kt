@@ -22,7 +22,6 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ComponentModuleMetadataDetails
 import org.gradle.kotlin.dsl.apply
-import org.gradle.kotlin.dsl.extra
 
 /**
  * Support library specific com.android.library plugin that sets common configurations needed for
@@ -48,10 +47,6 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
                 if (!it.name.toLowerCase().contains("androidtest")) {
                     it.resolutionStrategy.preferProjectModules()
                 }
-            }
-            if (androidXExtension.publish) {
-                project.extra.set("publish", true)
-                project.addToProjectMap(androidXExtension.mavenGroup?.group)
             }
             val library = project.extensions.findByType(LibraryExtension::class.java)
                     ?: return@afterEvaluate

@@ -109,6 +109,7 @@ class AndroidXPlugin : Plugin<Project> {
                     project.configureJavaProjectForDokka(androidXExtension)
                     project.configureJavaProjectForMetalava(androidXExtension)
                     project.configureJacoco()
+                    project.addToProjectMap(androidXExtension)
                 }
                 is LibraryPlugin -> {
                     val extension = project.extensions.getByType<LibraryExtension>()
@@ -117,12 +118,9 @@ class AndroidXPlugin : Plugin<Project> {
                     project.configureAndroidLibraryOptions(extension)
                     project.configureVersionFileWriter(extension)
                     project.configureResourceApiChecks()
+                    project.createDumpDependenciesTask(androidXExtension)
                     val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
                     val checkNoWarningsTask = project.tasks.register(CHECK_NO_WARNINGS_TASK)
-                    // Only dump dependencies of published projects
-                    if (project.extra.has("publish")) {
-                        project.createDumpDependenciesTask()
-                    }
                     project.createCheckReleaseReadyTask(listOf(verifyDependencyVersionsTask,
                         checkNoWarningsTask))
                     extension.libraryVariants.all { libraryVariant ->
@@ -141,6 +139,7 @@ class AndroidXPlugin : Plugin<Project> {
                     project.configureLint(extension.lintOptions, androidXExtension)
                     project.configureAndroidProjectForDokka(extension, androidXExtension)
                     project.configureAndroidProjectForMetalava(extension, androidXExtension)
+                    project.addToProjectMap(androidXExtension)
                 }
                 is AppPlugin -> {
                     val extension = project.extensions.getByType<AppExtension>()
@@ -239,14 +238,19 @@ class AndroidXPlugin : Plugin<Project> {
             evaluationDependsOnChildren()
             subprojects { project ->
                 project.configurations.all { configuration ->
-                    // Substitute only for debug configurations/tasks only because we can not
-                    // change release dependencies after evaluation. Test hooks, buildOnServer
-                    // and buildTestApks use the debug configurations as well.
-                    if (project.extra.has("publish") && configuration.name
-                            .toLowerCase().contains("debug")) {
-                        configuration.resolutionStrategy.dependencySubstitution.apply {
-                            for (e in projectModules) {
-                                substitute(module(e.key)).with(project(e.value))
+                    project.afterEvaluate {
+                        val androidXExtension =
+                            project.extensions.getByType(AndroidXExtension::class.java)
+                        // Substitute only for debug configurations/tasks only because we can not
+                        // change release dependencies after evaluation. Test hooks, buildOnServer
+                        // and buildTestApks use the debug configurations as well.
+                        if (androidXExtension.publish && configuration.name
+                                .toLowerCase().contains("debug")
+                        ) {
+                            configuration.resolutionStrategy.dependencySubstitution.apply {
+                                for (e in projectModules) {
+                                    substitute(module(e.key)).with(project(e.value))
+                                }
                             }
                         }
                     }
@@ -361,10 +365,15 @@ class AndroidXPlugin : Plugin<Project> {
     }
 
     // Task that creates a json file of a project's dependencies
-    private fun Project.createDumpDependenciesTask():
-            TaskProvider<ListProjectDependencyVersionsTask> {
-        return project.tasks.register("dumpDependencies",
-            ListProjectDependencyVersionsTask::class.java)
+    private fun Project.createDumpDependenciesTask(extension: AndroidXExtension) {
+        afterEvaluate {
+            if (extension.publish) { // Only dump dependencies of published projects
+                project.tasks.register(
+                    "dumpDependencies",
+                    ListProjectDependencyVersionsTask::class.java
+                )
+            }
+        }
     }
 
     // Task that creates a json file of the AndroidX dependency graph (all projects)
@@ -427,13 +436,18 @@ fun Project.hideJavadocTask() {
     }
 }
 
-fun Project.addToProjectMap(group: String?) {
-    if (group != null) {
-        val module = "$group:${project.name}"
-        val projectName = "${project.path}"
-        var projectModules = project.rootProject.extra.get("projects")
-                as ConcurrentHashMap<String, String>
-        projectModules.put(module, projectName)
+fun Project.addToProjectMap(extension: AndroidXExtension) {
+    afterEvaluate {
+        if (extension.publish) {
+            val group = extension.mavenGroup?.group
+            if (group != null) {
+                val module = "$group:${project.name}"
+                @Suppress("UNCHECKED_CAST")
+                val projectModules =
+                    project.rootProject.extra.get("projects") as ConcurrentHashMap<String, String>
+                projectModules[module] = project.path
+            }
+        }
     }
 }
 
