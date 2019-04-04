@@ -199,6 +199,9 @@ class AndroidXPlugin : Plugin<Project> {
                         "assembleDebug" == task.name) {
                     buildTestApksTask.dependsOn(task)
                 }
+                if ("verifyDependencyVersions" == task.name) {
+                    buildOnServerTask.dependsOn(task)
+                }
             }
         }
 
