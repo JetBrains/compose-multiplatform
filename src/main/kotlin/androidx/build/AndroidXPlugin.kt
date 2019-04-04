@@ -110,6 +110,10 @@ class AndroidXPlugin : Plugin<Project> {
                     project.configureJavaProjectForMetalava(androidXExtension)
                     project.configureJacoco()
                     project.addToProjectMap(androidXExtension)
+                    // workaround for b/120487939
+                    project.configurations.all { configuration ->
+                        configuration.resolutionStrategy.preferProjectModules()
+                    }
                 }
                 is LibraryPlugin -> {
                     val extension = project.extensions.getByType<LibraryExtension>()
@@ -145,14 +149,6 @@ class AndroidXPlugin : Plugin<Project> {
                     val extension = project.extensions.getByType<AppExtension>()
                     project.configureAndroidCommonOptions(extension)
                     project.configureAndroidApplicationOptions(extension)
-                    // workaround for b/120487939
-                    project.configurations.all {
-                        // Gradle seems to crash on androidtest configurations
-                        // preferring project modules...
-                        if (!it.name.toLowerCase().contains("androidtest")) {
-                            it.resolutionStrategy.preferProjectModules()
-                        }
-                    }
                 }
             }
         }
@@ -314,6 +310,15 @@ class AndroidXPlugin : Plugin<Project> {
         // Set the officially published version to be the release version with minimum dependency
         // versions.
         extension.defaultPublishConfig(Release.DEFAULT_PUBLISH_CONFIG)
+
+        // workaround for b/120487939
+        configurations.all { configuration ->
+            // Gradle seems to crash on androidtest configurations
+            // preferring project modules...
+            if (!configuration.name.toLowerCase().contains("androidtest")) {
+                configuration.resolutionStrategy.preferProjectModules()
+            }
+        }
     }
 
     private fun Project.configureAndroidLibraryOptions(extension: LibraryExtension) {

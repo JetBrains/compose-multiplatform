@@ -41,13 +41,6 @@ class SupportAndroidLibraryPlugin : Plugin<Project> {
         }
 
         project.afterEvaluate {
-            // workaround for b/120487939
-            project.configurations.all {
-                // Gradle seems to crash an androidtest configurations preferring project modules...
-                if (!it.name.toLowerCase().contains("androidtest")) {
-                    it.resolutionStrategy.preferProjectModules()
-                }
-            }
             val library = project.extensions.findByType(LibraryExtension::class.java)
                     ?: return@afterEvaluate
 

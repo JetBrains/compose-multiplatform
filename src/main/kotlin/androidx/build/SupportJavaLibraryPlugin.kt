@@ -25,15 +25,8 @@ import org.gradle.kotlin.dsl.apply
  * support library modules.
  */
 class SupportJavaLibraryPlugin : Plugin<Project> {
-
     override fun apply(project: Project) {
         project.apply<AndroidXPlugin>()
         project.apply(mapOf("plugin" to "java"))
-        project.afterEvaluate {
-            // workaround for b/120487939
-            project.configurations.all {
-                it.resolutionStrategy.preferProjectModules()
-            }
-        }
     }
 }
