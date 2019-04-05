@@ -330,7 +330,6 @@ class DiffAndDocs private constructor(
      * generation, and local API diff generation tasks.
      */
     fun registerAndroidProject(
-        project: Project,
         library: LibraryExtension,
         extension: AndroidXExtension
     ) {
@@ -514,9 +513,9 @@ private fun createDistDocsTask(
         from(generateDocs.map {
             it.destinationDir
         })
-        baseName = "android-support-$ruleName-docs"
-        version = getBuildId()
-        destinationDir = project.getDistributionDirectory()
+        archiveBaseName.set("android-support-$ruleName-docs")
+        archiveVersion.set(getBuildId())
+        destinationDirectory.set(project.getDistributionDirectory())
         group = JavaBasePlugin.DOCUMENTATION_GROUP
         description = "Zips $ruleName Java documentation (generated via Doclava in the " +
             "style of d.android.com) into $archivePath"
@@ -617,7 +616,7 @@ private fun createGenerateLocalApiDiffsArchiveTask(
     it.from(diffTask.map {
         it.destinationDir
     })
-    it.destinationDir = File(docsDir, "online/sdk/support_api_diff/${project.name}")
+    it.destinationDirectory.set(File(docsDir, "online/sdk/support_api_diff/${project.name}"))
     it.to("${project.version}.zip")
 }
 

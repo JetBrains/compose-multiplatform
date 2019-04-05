@@ -23,7 +23,6 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
-import org.gradle.kotlin.dsl.create
 
 object Jacoco {
     public const val VERSION = "0.8.3"
@@ -40,13 +39,13 @@ object Jacoco {
         val task = project.tasks.register("jacocoAntUberJar", Jar::class.java) {
             it.inputs.files(config)
             val resolvedArtifacts = config.resolvedConfiguration.resolvedArtifacts
-            it.from(resolvedArtifacts.map { project.zipTree(it.file) }) {
-                it.exclude("META-INF/*.SF")
-                it.exclude("META-INF/*.DSA")
-                it.exclude("META-INF/*.RSA")
+            it.from(resolvedArtifacts.map { project.zipTree(it.file) }) { copySpec ->
+                copySpec.exclude("META-INF/*.SF")
+                copySpec.exclude("META-INF/*.DSA")
+                copySpec.exclude("META-INF/*.RSA")
             }
-            it.destinationDir = project.getDistributionDirectory()
-            it.archiveName = "jacocoant.jar"
+            it.destinationDirectory.set(project.getDistributionDirectory())
+            it.archiveFileName.set("jacocoant.jar")
         }
         return task
     }
@@ -66,8 +65,8 @@ object Jacoco {
             "packageAllClassFilesForCoverageReport",
             Jar::class.java
         ) {
-            it.destinationDir = project.getDistributionDirectory()
-            it.archiveName = "jacoco-report-classes-all.jar"
+            it.destinationDirectory.set(project.getDistributionDirectory())
+            it.archiveFileName.set("jacoco-report-classes-all.jar")
         }
     }
 }
