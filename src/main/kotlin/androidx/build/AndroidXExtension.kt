@@ -22,7 +22,7 @@ import java.util.ArrayList
 import kotlin.properties.Delegates
 
 /**
- * Extension for [SupportAndroidLibraryPlugin] and [SupportJavaLibraryPlugin].
+ * Extension for [AndroidXPlugin].
  */
 open class AndroidXExtension(val project: Project) {
     var name: String? = null
