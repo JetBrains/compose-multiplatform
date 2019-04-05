@@ -108,7 +108,7 @@ open class GMavenZipTask : Zip() {
                         """.trimIndent()
                 task.versionChecker = gMavenVersionChecker
                 task.from(supportRepoOut)
-                task.destinationDir = distDir
+                task.destinationDirectory.set(distDir)
                 task.includeReleased = params.includeReleased
                 task.includeMetadata = params.includeMetadata
                 task.into("m2repository")
@@ -120,11 +120,11 @@ open class GMavenZipTask : Zip() {
                             .joinToString("-")
                 } + "-$buildNumber"
                 if (includeReleased) {
-                    task.baseName = "top-of-tree-m2repository-$fileSuffix"
+                    task.archiveBaseName.set("top-of-tree-m2repository-$fileSuffix")
                 } else {
-                    task.baseName = "gmaven-diff-$fileSuffix"
+                    task.archiveBaseName.set("gmaven-diff-$fileSuffix")
                 }
-                task.onlyIf { _ ->
+                task.onlyIf {
                     task.setupIncludes()
                 }
             }

@@ -101,8 +101,8 @@ class AndroidXPlugin : Plugin<Project> {
                     }
                     project.hideJavadocTask()
                     val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
-                    verifyDependencyVersionsTask.configure {
-                        it.dependsOn(project.tasks.named(JavaPlugin.COMPILE_JAVA_TASK_NAME))
+                    verifyDependencyVersionsTask.configure { task ->
+                        task.dependsOn(project.tasks.named(JavaPlugin.COMPILE_JAVA_TASK_NAME))
                     }
                     project.createCheckReleaseReadyTask(listOf(verifyDependencyVersionsTask))
                     project.configureNonAndroidProjectForLint(androidXExtension)
@@ -165,7 +165,7 @@ class AndroidXPlugin : Plugin<Project> {
         val buildOnServerTask = tasks.create(BUILD_ON_SERVER_TASK)
         val buildTestApksTask = tasks.create(BUILD_TEST_APKS)
         project.configureDependencyGraphFileTask()
-        var projectModules = ConcurrentHashMap<String, String>()
+        val projectModules = ConcurrentHashMap<String, String>()
         project.extra.set("projects", projectModules)
         tasks.all { task ->
             if (task.name.startsWith(Release.DIFF_TASK_PREFIX) ||
@@ -323,8 +323,8 @@ class AndroidXPlugin : Plugin<Project> {
 
     private fun Project.configureAndroidLibraryOptions(extension: LibraryExtension) {
         extension.compileOptions.apply {
-            setSourceCompatibility(VERSION_1_7)
-            setTargetCompatibility(VERSION_1_7)
+            sourceCompatibility = VERSION_1_7
+            targetCompatibility = VERSION_1_7
         }
 
         afterEvaluate {
@@ -349,8 +349,8 @@ class AndroidXPlugin : Plugin<Project> {
         }
 
         extension.compileOptions.apply {
-            setSourceCompatibility(VERSION_1_8)
-            setTargetCompatibility(VERSION_1_8)
+            sourceCompatibility = VERSION_1_8
+            targetCompatibility = VERSION_1_8
         }
 
         extension.lintOptions.apply {
