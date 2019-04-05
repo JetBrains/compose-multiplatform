@@ -75,9 +75,9 @@ object Dokka {
             zipTask.from(docsTask.outputDirectory) { copySpec ->
                 copySpec.into("reference/kotlin")
             }
-            zipTask.baseName = taskName
-            zipTask.version = getBuildId()
-            zipTask.destinationDir = project.getDistributionDirectory()
+            zipTask.archiveBaseName.set(taskName)
+            zipTask.archiveVersion.set(getBuildId())
+            zipTask.destinationDirectory.set(project.getDistributionDirectory())
             zipTask.description = "Zips $docsType Kotlin documentation (generated via " +
                 "Dokka in the style of d.android.com) into ${zipTask.archivePath}"
             zipTask.group = JavaBasePlugin.DOCUMENTATION_GROUP
@@ -90,7 +90,7 @@ object Dokka {
     ) {
         afterEvaluate {
             if (name != "docs-runner") {
-                DiffAndDocs.get(this).registerAndroidProject(this, library, extension)
+                DiffAndDocs.get(this).registerAndroidProject(library, extension)
             }
 
             DokkaPublicDocs.registerProject(this, extension)
