@@ -124,7 +124,7 @@ class DiffAndDocs private constructor(
             }
         }
 
-        root.tasks.create("generateDocs") { task ->
+        root.tasks.register("generateDocs") { task ->
             task.group = JavaBasePlugin.DOCUMENTATION_GROUP
             task.description = "Generates documentation (both Java and Kotlin) from tip-of-tree " +
                 "sources, in the style of those used in d.android.com."
@@ -132,10 +132,10 @@ class DiffAndDocs private constructor(
         }
 
         val docletClasspath = doclavaConfiguration.resolve()
-
+        val oldOutputTxt = File(root.docsDir(), "previous.txt")
         aggregateOldApiTxtsTask = root.tasks.register("aggregateOldApiTxts",
             ConcatenateFilesTask::class.java) {
-            it.Output = File(root.docsDir(), "previous.txt")
+            it.Output = oldOutputTxt
         }
 
         val oldApisTask = root.tasks.register("oldApisXml",
@@ -143,22 +143,23 @@ class DiffAndDocs private constructor(
             it.classpath = root.files(docletClasspath)
             it.dependsOn(doclavaConfiguration)
 
-            it.inputApiFile = aggregateOldApiTxtsTask.get().Output
+            it.inputApiFile = oldOutputTxt
             it.dependsOn(aggregateOldApiTxtsTask)
 
             it.outputApiXmlFile = File(root.docsDir(), "previous.xml")
         }
 
+        val newApiTxt = File(root.docsDir(), newVersion)
         aggregateNewApiTxtsTask = root.tasks.register("aggregateNewApiTxts",
             ConcatenateFilesTask::class.java) {
-            it.Output = File(root.docsDir(), newVersion)
+            it.Output = newApiTxt
         }
 
         val newApisTask = root.tasks.register("newApisXml",
             ApiXmlConversionTask::class.java) {
             it.classpath = root.files(docletClasspath)
 
-            it.inputApiFile = aggregateNewApiTxtsTask.get().Output
+            it.inputApiFile = newApiTxt
             it.dependsOn(aggregateNewApiTxtsTask)
 
             it.outputApiXmlFile = File(root.docsDir(), "$newVersion.xml")
