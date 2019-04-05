@@ -186,6 +186,7 @@ internal class AffectedModuleDetectorImpl constructor(
         // used for debugging purposes when we want to ignore non module files
     private val ignoreUnknownProjects: Boolean = false,
     private val projectSubset: ProjectSubset = ProjectSubset.ALL_AFFECTED_PROJECTS,
+    private val cobuiltTestPaths: Set<Set<String>> = COBUILT_TEST_PATHS,
     private val injectedGitClient: GitClient? = null
 ) : AffectedModuleDetector() {
     private val git by lazy {
@@ -272,7 +273,7 @@ internal class AffectedModuleDetectorImpl constructor(
             }
         }
 
-        val cobuiltTestProjects = lookupProjectSetsFromPaths(COBUILT_TEST_PATHS)
+        val cobuiltTestProjects = lookupProjectSetsFromPaths(cobuiltTestPaths)
 
         val affectedProjects = when (projectSubset) {
             ProjectSubset.DEPENDENT_PROJECTS
