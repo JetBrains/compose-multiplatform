@@ -26,7 +26,7 @@ import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.create
 
 object Jacoco {
-    private const val VERSION = "0.7.8"
+    public const val VERSION = "0.8.3"
     const val CORE_DEPENDENCY = "org.jacoco:org.jacoco.core:$VERSION"
     private const val ANT_DEPENDENCY = "org.jacoco:org.jacoco.ant:$VERSION"
 

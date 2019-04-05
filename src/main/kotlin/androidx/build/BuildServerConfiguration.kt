@@ -50,6 +50,12 @@ fun Project.getDistributionDirectory(): File {
 fun Project.getHostTestResultDirectory(): File =
         File(getDistributionDirectory(), "host-test-reports")
 
+/**
+ * Directory to put host test coverage results so they can be consumed by the testing dashboard.
+ */
+fun Project.getHostTestCoverageDirectory(): File =
+    File(getDistributionDirectory(), "host-test-coverage")
+
 private fun getRootDirectory(project: Project): File {
     val actualRootProject = if (project.isRoot) project else project.rootProject
     return actualRootProject.extensions.extraProperties.get("supportRootFolder") as File
