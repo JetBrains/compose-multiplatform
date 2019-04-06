@@ -59,6 +59,7 @@ def archivesToDejetify = [
     "m2repository/androidx/print/**",
     "m2repository/androidx/paging/**",
     "m2repository/androidx/room/**",
+    "m2repository/androidx/work/**",
     "m2repository/androidx/recommendation/**",
     "m2repository/androidx/recyclerview/**",
     "m2repository/androidx/remotecallback/**",
