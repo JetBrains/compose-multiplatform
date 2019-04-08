@@ -49,6 +49,7 @@ import org.gradle.api.JavaVersion.VERSION_1_8
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.artifacts.ComponentModuleMetadataDetails
 import org.gradle.api.plugins.JavaLibraryPlugin
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPluginConvention
@@ -118,8 +119,8 @@ class AndroidXPlugin : Plugin<Project> {
                 is LibraryPlugin -> {
                     val extension = project.extensions.getByType<LibraryExtension>()
                     project.configureSourceJarForAndroid(extension)
-                    project.configureAndroidCommonOptions(extension)
-                    project.configureAndroidLibraryOptions(extension)
+                    project.configureAndroidCommonOptions(extension, androidXExtension)
+                    project.configureAndroidLibraryOptions(extension, androidXExtension)
                     project.configureVersionFileWriter(extension)
                     project.configureResourceApiChecks()
                     project.createDumpDependenciesTask(androidXExtension)
@@ -147,7 +148,7 @@ class AndroidXPlugin : Plugin<Project> {
                 }
                 is AppPlugin -> {
                     val extension = project.extensions.getByType<AppExtension>()
-                    project.configureAndroidCommonOptions(extension)
+                    project.configureAndroidCommonOptions(extension, androidXExtension)
                     project.configureAndroidApplicationOptions(extension)
                 }
             }
@@ -255,7 +256,10 @@ class AndroidXPlugin : Plugin<Project> {
         }
     }
 
-    private fun Project.configureAndroidCommonOptions(extension: BaseExtension) {
+    private fun Project.configureAndroidCommonOptions(
+        extension: BaseExtension,
+        androidXExtension: AndroidXExtension
+    ) {
         // Force AGP to use our version of JaCoCo
         extension.jacoco.version = Jacoco.VERSION
         extension.compileSdkVersion(COMPILE_SDK_VERSION)
@@ -285,6 +289,11 @@ class AndroidXPlugin : Plugin<Project> {
                                         "dependency to list a fixed version.")
                     }
                 }
+            }
+
+            if (androidXExtension.compilationTarget != CompilationTarget.DEVICE) {
+                throw IllegalStateException(
+                    "Android libraries must use a compilation target of DEVICE")
             }
         }
 
@@ -321,10 +330,19 @@ class AndroidXPlugin : Plugin<Project> {
         }
     }
 
-    private fun Project.configureAndroidLibraryOptions(extension: LibraryExtension) {
+    private fun Project.configureAndroidLibraryOptions(
+        extension: LibraryExtension,
+        androidXExtension: AndroidXExtension
+    ) {
         extension.compileOptions.apply {
             sourceCompatibility = VERSION_1_7
             targetCompatibility = VERSION_1_7
+        }
+
+        // Workaround for concurrentfuture
+        project.dependencies.modules.module("com.google.guava:listenablefuture") {
+            (it as ComponentModuleMetadataDetails).replacedBy(
+                "com.google.guava:guava", "guava contains listenablefuture")
         }
 
         afterEvaluate {
@@ -336,6 +354,19 @@ class AndroidXPlugin : Plugin<Project> {
             if (compilesAgainstJava8 && minSdkLessThan24) {
                 throw IllegalArgumentException(
                         "Libraries can only support Java 8 if minSdkVersion is 24 or higher")
+            }
+
+            extension.libraryVariants.all { libraryVariant ->
+                if (libraryVariant.buildType.name == "debug") {
+                    libraryVariant.javaCompileProvider.configure { javaCompile ->
+                        if (androidXExtension.failOnUncheckedWarnings) {
+                            javaCompile.options.compilerArgs.add("-Xlint:unchecked")
+                        }
+                        if (androidXExtension.failOnDeprecationWarnings) {
+                            javaCompile.options.compilerArgs.add("-Xlint:deprecation")
+                        }
+                    }
+                }
             }
         }
     }
