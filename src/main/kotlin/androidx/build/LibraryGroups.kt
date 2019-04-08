@@ -35,6 +35,7 @@ object LibraryGroups {
     val CONCURRENT = LibraryGroup("androidx.concurrent", false)
     val CONTENTPAGER = LibraryGroup("androidx.contentpager", false)
     val COORDINATORLAYOUT = LibraryGroup("androidx.coordinatorlayout", false)
+    val COMPOSE = LibraryGroup("androidx.compose", false)
     val CORE = LibraryGroup("androidx.core", false)
     val CURSORADAPTER = LibraryGroup("androidx.cursoradapter", false)
     val CUSTOMVIEW = LibraryGroup("androidx.customview", false)
