@@ -6,6 +6,7 @@ import android.widget.AutoCompleteTextView
 import com.google.r4a.Composable
 
 private fun AutoCompleteTextView.getR4aAdapter(): ArrayAdapter<Any> {
+    @Suppress("UNCHECKED_CAST")
     var adapter = adapter as? ArrayAdapter<Any>
     if (adapter == null) {
         adapter = ArrayAdapter<Any>()

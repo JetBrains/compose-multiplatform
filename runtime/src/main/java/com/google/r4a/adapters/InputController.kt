@@ -28,7 +28,7 @@ abstract class InputController<V : View, T>(
 
     protected abstract fun getValue(): T
     protected abstract fun setValue(value: T)
-    protected fun prepareForChange(value: T) {
+    protected fun prepareForChange(@Suppress("UNUSED_PARAMETER") value: T) {
         inCompositionContext {
             addPostRecomposeObserver(onPostRecompose)
         }

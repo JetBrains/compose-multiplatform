@@ -2,6 +2,7 @@ package com.google.r4a.adapters
 
 import android.widget.TimePicker
 
+@Suppress("DEPRECATION")
 class TimePickerInputController(private val view: TimePicker) : TimePicker.OnTimeChangedListener {
 
     private var lastSetHour = view.currentHour

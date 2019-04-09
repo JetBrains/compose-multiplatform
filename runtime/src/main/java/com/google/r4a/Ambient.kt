@@ -1,6 +1,7 @@
 package com.google.r4a
 
 class Ambient<T>(private val key: String, private val defaultFactory: (() -> T)? = null) {
+    @Suppress("UNCHECKED_CAST")
     internal val defaultValue by lazy {
         val fn = defaultFactory
         if (fn != null) fn()

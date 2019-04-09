@@ -61,15 +61,19 @@ abstract class CompositionContext {
             return view.getTag(TAG_ROOT_COMPONENT) as? Component
         }
 
-        fun disposeComposition(container: ViewGroup, parent: Ambient.Reference? = null) {
+        fun disposeComposition(
+            container: ViewGroup,
+            @Suppress("UNUSED_PARAMETER") parent: Ambient.Reference? = null
+        ) {
             container.setTag(TAG_ROOT_COMPONENT, null)
         }
 
-        fun disposeComposition(container: Emittable, parent: Ambient.Reference? = null) {
-            val context = EMITTABLE_ROOT_COMPONENT[container]
+        fun disposeComposition(
+            container: Emittable,
+            @Suppress("UNUSED_PARAMETER") parent: Ambient.Reference? = null
+        ) {
             // TODO(lmr): clear the ambient reference?
             EMITTABLE_ROOT_COMPONENT.remove(container)
-//            parent?.registerComposer()
         }
 
         fun getRootComponent(emittable: Emittable): Component? {

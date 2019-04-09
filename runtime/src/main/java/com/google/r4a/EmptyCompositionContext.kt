@@ -10,7 +10,7 @@ import android.content.Context
 class EmptyCompositionContext : CompositionContext() {
     override var context: Context
         get() = emptyComposition()
-        set(value) = emptyComposition()
+        set(@Suppress("UNUSED_PARAMETER") value) = emptyComposition()
     override fun recompose(component: Component) = emptyComposition()
     override fun recomposeSync(component: Component) = emptyComposition()
     override fun scheduleRecompose() = emptyComposition()

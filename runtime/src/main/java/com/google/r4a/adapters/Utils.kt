@@ -30,6 +30,7 @@ class ComposeViewAdapter : ViewAdapter {
     val adapters = mutableListOf<ViewAdapter>()
 
     inline fun <T : ViewAdapter> get(id: Int, factory: () -> T): T {
+        @Suppress("UNCHECKED_CAST")
         val existing = adapters.firstOrNull { it.id == id } as? T
         if (existing != null) return existing
         val next = factory()

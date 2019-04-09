@@ -6,6 +6,7 @@ import android.widget.AbsSpinner
 import android.widget.Spinner
 
 private fun AbsSpinner.getR4aAdapter(): ArrayAdapter<Any> {
+    @Suppress("UNCHECKED_CAST")
     var adapter = adapter as? ArrayAdapter<Any>
     if (adapter == null) {
         adapter = ArrayAdapter<Any>()

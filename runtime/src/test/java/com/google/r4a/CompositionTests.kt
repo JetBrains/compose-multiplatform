@@ -921,8 +921,8 @@ class CompositionTests : TestCase() {
                     invalidate1 = { myInvalidate(false) }
                     text(text)
                     if (includeNested) {
-                        join(899) { myInvalidate ->
-                            invalidate2 = { myInvalidate(false) }
+                        join(899) { joinInvalidate ->
+                            invalidate2 = { joinInvalidate(false) }
                             text("Nested in $text")
                         }
                     }
@@ -970,8 +970,8 @@ class CompositionTests : TestCase() {
                 join(860) { myInvalidate ->
                     invalidate1 = { myInvalidate(false) }
                     if (includeNested) {
-                        join(899) { myInvalidate ->
-                            invalidate2 = { myInvalidate(false) }
+                        join(899) { joinInvalidate ->
+                            invalidate2 = { joinInvalidate(false) }
                             text("Nested in $text")
                         }
                     }
