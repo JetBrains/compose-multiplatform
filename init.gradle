@@ -24,31 +24,9 @@ if (supportRoot == null) {
     throw new RuntimeException("variable supportRootFolder is not set. you must set it before" +
             " including this script")
 }
-def init = new Properties()
-ext.init = init
+apply from: "${supportRoot}/buildSrc/out.gradle"
 rootProject.ext.versionChecker = new GMavenVersionChecker(rootProject.logger)
 apply from: "${supportRoot}/buildSrc/dependencies.gradle"
-
-def setupRepoOutAndBuildNumber() {
-    /*
-     * The OUT_DIR is a temporary directory you can use to put things during the build.
-     */
-    if (BuildServerConfigurationKt.isRunningOnBuildServer()) {
-        buildDir = new File(System.env.OUT_DIR + '/gradle/frameworks/support/build')
-                .getCanonicalFile()
-        // the build server should always print out full stack traces for any failures.
-        gradle.startParameter.showStacktrace = ShowStacktrace.ALWAYS
-    } else {
-        buildDir = file("${ext.supportRootFolder}/../../out/host/gradle/frameworks/support/build")
-    }
-    subprojects {
-        // Change buildDir first so that all plugins pick up the new value.
-        project.buildDir = new File("$project.parent.buildDir/../$project.name/build")
-    }
-    ext.supportRepoOut = new File(buildDir, 'support_repo')
-    ext.supportRepoOut.mkdirs()
-    ext.docsDir = new File(buildDir, 'javadoc')
-}
 
 def configureSubProjects() {
     subprojects {
@@ -170,5 +148,12 @@ def setupSubprojectsForBuildServer() {
     }
 }
 
-ext.init.setupRepoOutAndBuildNumber = this.&setupRepoOutAndBuildNumber
+def setupRepoOutAndStartParam() {
+    ext.init.chooseOutDir()
+    if (BuildServerConfigurationKt.isRunningOnBuildServer()) {
+        gradle.startParameter.showStacktrace = ShowStacktrace.ALWAYS
+    }
+}
+
+ext.init.setupRepoOutAndStartParam = this.&setupRepoOutAndStartParam
 ext.init.configureSubProjects = this.&configureSubProjects
