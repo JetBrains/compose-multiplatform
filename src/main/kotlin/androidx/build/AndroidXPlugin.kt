@@ -105,6 +105,7 @@ class AndroidXPlugin : Plugin<Project> {
                     verifyDependencyVersionsTask.configure { task ->
                         task.dependsOn(project.tasks.named(JavaPlugin.COMPILE_JAVA_TASK_NAME))
                     }
+                    project.addCreateLibraryBuildInfoFileTask(androidXExtension)
                     project.createCheckReleaseReadyTask(listOf(verifyDependencyVersionsTask))
                     project.configureNonAndroidProjectForLint(androidXExtension)
                     project.configureJavaProjectForDokka(androidXExtension)
@@ -123,7 +124,7 @@ class AndroidXPlugin : Plugin<Project> {
                     project.configureAndroidLibraryOptions(extension, androidXExtension)
                     project.configureVersionFileWriter(extension)
                     project.configureResourceApiChecks()
-                    project.createDumpDependenciesTask(androidXExtension)
+                    project.addCreateLibraryBuildInfoFileTask(androidXExtension)
                     val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
                     val checkNoWarningsTask = project.tasks.register(CHECK_NO_WARNINGS_TASK)
                     project.createCheckReleaseReadyTask(listOf(verifyDependencyVersionsTask,
@@ -163,9 +164,11 @@ class AndroidXPlugin : Plugin<Project> {
     }
 
     private fun Project.configureRootProject() {
+        val createLibraryBuildInfoFilesTask = project.tasks
+            .register(CREATE_LIBRARY_BUILD_INFO_FILES_TASK)
         val buildOnServerTask = tasks.create(BUILD_ON_SERVER_TASK)
+        buildOnServerTask.dependsOn(createLibraryBuildInfoFilesTask)
         val buildTestApksTask = tasks.create(BUILD_TEST_APKS)
-        project.configureDependencyGraphFileTask()
         val projectModules = ConcurrentHashMap<String, String>()
         project.extra.set("projects", projectModules)
         tasks.all { task ->
@@ -192,6 +195,7 @@ class AndroidXPlugin : Plugin<Project> {
                 if ("assembleAndroidTest" == task.name ||
                         "assembleDebug" == task.name ||
                         ERROR_PRONE_TASK == task.name ||
+                    "verifyDependencyVersions" == task.name ||
                         ("lintDebug" == task.name &&
                         !project.rootProject.hasProperty("useMaxDepVersions"))) {
                     buildOnServerTask.dependsOn(task)
@@ -199,9 +203,6 @@ class AndroidXPlugin : Plugin<Project> {
                 if ("assembleAndroidTest" == task.name ||
                         "assembleDebug" == task.name) {
                     buildTestApksTask.dependsOn(task)
-                }
-                if ("verifyDependencyVersions" == task.name) {
-                    buildOnServerTask.dependsOn(task)
                 }
             }
         }
@@ -403,29 +404,15 @@ class AndroidXPlugin : Plugin<Project> {
     }
 
     // Task that creates a json file of a project's dependencies
-    private fun Project.createDumpDependenciesTask(extension: AndroidXExtension) {
+    private fun Project.addCreateLibraryBuildInfoFileTask(extension: AndroidXExtension) {
         afterEvaluate {
-            if (extension.publish) { // Only dump dependencies of published projects
-                project.tasks.register(
-                    "dumpDependencies",
-                    ListProjectDependencyVersionsTask::class.java
+            if (extension.publish) { // Only generate build info files for published libraries.
+                val task = project.tasks.register(
+                    "createLibraryBuildInfoFile",
+                    CreateLibraryBuildInfoFileTask::class.java
                 )
-            }
-        }
-    }
-
-    // Task that creates a json file of the AndroidX dependency graph (all projects)
-    private fun Project.configureDependencyGraphFileTask() {
-        project.tasks.register("createDependencyGraphFile",
-            DependencyGraphFileTask::class.java) { depGraphTask ->
-            subprojects { project ->
-                project.tasks.all { dumpDepTask ->
-                    if ("dumpDependencies" == dumpDepTask.name &&
-                        dumpDepTask is ListProjectDependencyVersionsTask) {
-                        depGraphTask.dependsOn(dumpDepTask)
-                        depGraphTask.projectDepDumpFiles.add(dumpDepTask.outputDepFile)
-                    }
-                }
+                project.rootProject.tasks.getByName(CREATE_LIBRARY_BUILD_INFO_FILES_TASK)
+                    .dependsOn(task)
             }
         }
     }
@@ -454,6 +441,7 @@ class AndroidXPlugin : Plugin<Project> {
         const val CHECK_RELEASE_READY_TASK = "checkReleaseReady"
         const val CHECK_NO_WARNINGS_TASK = "checkNoWarnings"
         const val CHECK_SAME_VERSION_LIBRARY_GROUPS = "checkSameVersionLibraryGroups"
+        const val CREATE_LIBRARY_BUILD_INFO_FILES_TASK = "createLibraryBuildInfoFiles"
     }
 }
 
@@ -481,8 +469,7 @@ fun Project.addToProjectMap(extension: AndroidXExtension) {
             if (group != null) {
                 val module = "$group:${project.name}"
                 @Suppress("UNCHECKED_CAST")
-                val projectModules =
-                    project.rootProject.extra.get("projects") as ConcurrentHashMap<String, String>
+                val projectModules = getProjectsMap()
                 projectModules[module] = project.path
             }
         }
@@ -518,6 +505,10 @@ private fun Project.createUpdateResourceApiTask(): DefaultTask {
                 project.version(), true, false, ApiType.RESOURCEAPI)
         destApiFile = project.getCurrentApiLocation().resourceFile
     }
+}
+
+fun Project.getProjectsMap(): ConcurrentHashMap<String, String> {
+    return project.rootProject.extra.get("projects") as ConcurrentHashMap<String, String>
 }
 
 private fun Project.configureResourceApiChecks() {

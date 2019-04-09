@@ -111,6 +111,15 @@ def setupSubprojectsForBuildServer() {
                     }
                 }
             }
+            if (task.name == "createLibraryBuildInfoFile") {
+                task.doLast {
+                    copy {
+                        from(task.outputDirectory)
+                        include '*_build_info.txt'
+                        into(BuildServerConfigurationKt.getDistributionDirectory(rootProject))
+                    }
+                }
+            }
         }
 
         // copy host side test results to DIST
