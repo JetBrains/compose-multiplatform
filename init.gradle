@@ -58,41 +58,6 @@ def configureSubProjects() {
 }
 def setupSubprojectsForBuildServer() {
     subprojects {
-        project.plugins.whenPluginAdded { plugin ->
-            def isAndroidLibrary = "com.android.build.gradle.LibraryPlugin"
-                    .equals(plugin.class.name)
-            def isAndroidApp = "com.android.build.gradle.AppPlugin".equals(plugin.class.name)
-
-            if (isAndroidLibrary || isAndroidApp) {
-                // Copy the class files in a jar to be later used to generate code coverage report
-                project.android.testVariants.all { v ->
-                    // check if the variant has any source files
-                    // and test coverage is enabled
-                    if (v.buildType.testCoverageEnabled
-                            && v.sourceSets.any { !it.java.sourceFiles.isEmpty() }) {
-                        def jarifyTask = project.tasks.register(
-                                "package${v.name.capitalize()}ClassFilesForCoverageReport",
-                                Jar) {
-                            dependsOn v.testedVariant.javaCompileProvider
-                            // using get() here forces task configuration, but is necessary
-                            // to obtain a valid value for destinationDir
-                            from v.testedVariant.javaCompileProvider.get().destinationDir
-                            exclude "**/R.class"
-                            exclude "**/R\$*.class"
-                            exclude "**/BuildConfig.class"
-                            destinationDir BuildServerConfigurationKt.getDistributionDirectory(rootProject)
-                            archiveName "${project.name}-${v.baseName}-allclasses.jar"
-                        }
-                        Jacoco.registerClassFilesTask(project, jarifyTask)
-
-                        v.assembleProvider.configure {
-                            it.dependsOn jarifyTask
-                        }
-                    }
-                }
-            }
-        }
-
         // Copy instrumentation test APKs and app APKs into the dist dir
         // For test apks, they are uploaded only if we have java test sources.
         // For regular app apks, they are uploaded only if they have java sources.

@@ -18,9 +18,9 @@ package androidx.build.jacoco
 
 import androidx.build.getDistributionDirectory
 import androidx.build.gradle.isRoot
+import com.android.build.gradle.TestedExtension
 import com.google.common.base.Preconditions
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 
@@ -51,11 +51,31 @@ object Jacoco {
     }
 
     @JvmStatic
-    fun registerClassFilesTask(project: Project, provider: TaskProvider<out Task>) {
-        project.rootProject.tasks.named("packageAllClassFilesForCoverageReport", Jar::class.java)
-            .configure {
-                it.from(provider)
+    fun registerClassFilesTask(project: Project, extension: TestedExtension) {
+        extension.testVariants.all { v ->
+            if (v.buildType.isTestCoverageEnabled &&
+                v.sourceSets.any { it.javaDirectories.isNotEmpty()}) {
+                val jarifyTask = project.tasks.register(
+                    "package${v.name.capitalize()}ClassFilesForCoverageReport",
+                    Jar::class.java
+                ) {
+                    it.dependsOn(v.testedVariant.javaCompileProvider)
+                    // using get() here forces task configuration, but is necessary
+                    // to obtain a valid value for destinationDir
+                    it.from(v.testedVariant.javaCompileProvider.get().destinationDir)
+                    it.exclude("**/R.class", "**/R\$*.class", "**/BuildConfig.class")
+                    it.destinationDirectory.set(project.getDistributionDirectory())
+                    it.archiveFileName.set("${project.name}-${v.baseName}-allclasses.jar")
+                }
+                project.rootProject.tasks.named(
+                    "packageAllClassFilesForCoverageReport",
+                    Jar::class.java
+                ).configure { it.from(jarifyTask) }
+                v.assembleProvider.configure {
+                    it.dependsOn(jarifyTask)
+                }
             }
+        }
     }
 
     fun createCoverageJarTask(project: Project): TaskProvider<Jar> {
