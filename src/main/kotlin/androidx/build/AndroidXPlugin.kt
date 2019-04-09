@@ -55,6 +55,8 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.api.tasks.bundling.Zip
+import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.extra
@@ -159,6 +161,31 @@ class AndroidXPlugin : Plugin<Project> {
         project.tasks.withType<Jar> {
             isReproducibleFileOrder = true
             isPreserveFileTimestamps = false
+        }
+
+        // copy host side test results to DIST
+        project.tasks.withType(Test::class.java) { task ->
+            val report = task.reports.junitXml
+            if (report.isEnabled) {
+                val zipTask = project.tasks.register(
+                    "zipResultsOf${task.name.capitalize()}",
+                    Zip::class.java
+                ) {
+                    it.destinationDirectory.set(project.getHostTestResultDirectory())
+                    // first one is always :, drop it.
+                    it.archiveFileName.set(
+                        "${project.path.split(":").joinToString("_").substring(1)}.zip")
+                }
+                if (isRunningOnBuildServer()) {
+                    task.ignoreFailures = true
+                }
+                task.finalizedBy(zipTask)
+                task.doFirst {
+                    zipTask.configure {
+                        it.from(report.destination)
+                    }
+                }
+            }
         }
     }
 
