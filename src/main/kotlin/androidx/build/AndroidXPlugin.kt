@@ -39,9 +39,9 @@ import androidx.build.metalava.Metalava.configureAndroidProjectForMetalava
 import androidx.build.metalava.Metalava.configureJavaProjectForMetalava
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
-import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
+import com.android.build.gradle.TestedExtension
 import com.android.build.gradle.internal.tasks.factory.dependsOn
 import org.gradle.api.DefaultTask
 import org.gradle.api.JavaVersion.VERSION_1_7
@@ -257,7 +257,7 @@ class AndroidXPlugin : Plugin<Project> {
     }
 
     private fun Project.configureAndroidCommonOptions(
-        extension: BaseExtension,
+        extension: TestedExtension,
         androidXExtension: AndroidXExtension
     ) {
         // Force AGP to use our version of JaCoCo
@@ -328,6 +328,8 @@ class AndroidXPlugin : Plugin<Project> {
                 configuration.resolutionStrategy.preferProjectModules()
             }
         }
+
+        Jacoco.registerClassFilesTask(project, extension)
     }
 
     private fun Project.configureAndroidLibraryOptions(
