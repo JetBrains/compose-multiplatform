@@ -24,11 +24,7 @@ buildscript {
         }
     }
 }
-
-apply from: "out.gradle"
-init.chooseOutDir()
-
-def runningInBuildServer = System.env.DIST_DIR != null
+def runningInBuildServer = System.env.DIST_DIR != null && System.env.OUT_DIR != null
 if (runningInBuildServer) {
     System.setProperty("kotlin.compiler.execution.strategy", "in-process")
 }
