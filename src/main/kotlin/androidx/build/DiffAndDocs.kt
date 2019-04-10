@@ -30,6 +30,7 @@ import androidx.build.jdiff.JDiffTask
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.BaseVariant
+import com.android.build.gradle.api.SourceKind;
 import com.google.common.base.Preconditions
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -432,9 +433,9 @@ private fun registerAndroidProjectForDocsTask(
             fileTreeElement.name != "R.java" ||
                     fileTreeElement.path.endsWith(releaseVariant.rFile())
         }
-        it.source(javaCompileProvider.map {
-            it.source
-        })
+        releaseVariant.getSourceFolders(SourceKind.JAVA).forEach { sourceSet ->
+            it.source(sourceSet)
+        }
         it.classpath += releaseVariant.getCompileClasspath(null) +
                 it.project.files(javaCompileProvider.get().destinationDir)
     }
