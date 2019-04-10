@@ -13,9 +13,9 @@ const val UNIT_TYPE_IN = 5
 const val UNIT_TYPE_MM = 6
 // TODO(lmr): degrees/radians ?
 
-private inline val Int.scalar: Dimension get() = IntDimension(this, UNIT_TYPE_PX)
-private inline val Float.scalar: Dimension get() = FloatDimension(this, UNIT_TYPE_PX)
-private inline val Double.scalar: Dimension get() = FloatDimension(this.toFloat(), UNIT_TYPE_PX)
+internal inline val Int.scalar: Dimension get() = IntDimension(this, UNIT_TYPE_PX)
+internal inline val Float.scalar: Dimension get() = FloatDimension(this, UNIT_TYPE_PX)
+internal inline val Double.scalar: Dimension get() = FloatDimension(this.toFloat(), UNIT_TYPE_PX)
 
 interface Dimension {
     fun toIntPixels(metrics: DisplayMetrics): Int
@@ -52,14 +52,14 @@ operator fun Double.times(dim: Dimension): Dimension =
 operator fun Double.div(dim: Dimension): Dimension =
     CombinedDimension(this.scalar, dim, INT_DIV, FLOAT_DIV)
 
-private val INT_PLUS = { a: Int, b: Int -> a + b }
-private val FLOAT_PLUS = { a: Float, b: Float -> a + b }
-private val INT_MULT = { a: Int, b: Int -> a * b }
-private val FLOAT_MULT = { a: Float, b: Float -> a * b }
-private val INT_DIV = { a: Int, b: Int -> a / b }
-private val FLOAT_DIV = { a: Float, b: Float -> a / b }
-private val INT_MINUS = { a: Int, b: Int -> a - b }
-private val FLOAT_MINUS = { a: Float, b: Float -> a - b }
+internal val INT_PLUS = { a: Int, b: Int -> a + b }
+internal val FLOAT_PLUS = { a: Float, b: Float -> a + b }
+internal val INT_MULT = { a: Int, b: Int -> a * b }
+internal val FLOAT_MULT = { a: Float, b: Float -> a * b }
+internal val INT_DIV = { a: Int, b: Int -> a / b }
+internal val FLOAT_DIV = { a: Float, b: Float -> a / b }
+internal val INT_MINUS = { a: Int, b: Int -> a - b }
+internal val FLOAT_MINUS = { a: Float, b: Float -> a - b }
 
 private data class CombinedDimension(
     val left: Dimension,
