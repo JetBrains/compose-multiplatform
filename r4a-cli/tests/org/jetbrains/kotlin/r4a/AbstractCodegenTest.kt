@@ -28,7 +28,7 @@ abstract class AbstractCodeGenTest : AbstractCompilerTest() {
 
         additionalDependencies = listOf(
             File("dist/kotlinc/lib/r4a-runtime.jar"),
-            File("custom-dependencies/android-sdk/build/libs/android.jar")
+            File(System.getProperty("android.jar"))
         )
 
         myEnvironment = KotlinCoreEnvironment.createForTests(

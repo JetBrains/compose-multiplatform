@@ -11,7 +11,6 @@ import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.impl.*
 import org.jetbrains.kotlin.ir.types.toIrType
-import org.jetbrains.kotlin.ir.util.createParameterDeclarations
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi2ir.generators.GeneratorContext
 import org.jetbrains.kotlin.r4a.analysis.ComponentMetadata
@@ -29,7 +28,7 @@ fun generateCreateInstanceFunction(context: GeneratorContext, componentMetadata:
         Name.identifier("createInstance"), NoLookupLocation.FROM_BACKEND).single())
         .buildWithScope(context) { irFunction ->
 
-            irFunction.createParameterDeclarations()
+//            irFunction.createParameterDeclarations()
 
             val constructorDescriptor = componentMetadata.wrapperViewDescriptor.unsubstitutedPrimaryConstructor
             val wrapperViewInstance = IrCallImpl(-1, -1, constructorDescriptor.returnType.toIrType()!!, context.symbolTable.referenceConstructor(constructorDescriptor))

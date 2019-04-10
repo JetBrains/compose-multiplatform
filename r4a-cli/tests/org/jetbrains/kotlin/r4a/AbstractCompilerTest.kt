@@ -60,7 +60,7 @@ abstract class AbstractCompilerTest: TestCase() {
 
     protected fun createClasspath() = listOf(
         assertExists(File(homeDir, "dist/kotlinc/lib/r4a-runtime.jar").normalize()),
-        assertExists(File(homeDir, "custom-dependencies/android-sdk/build/libs/android.jar").normalize())
+        assertExists(File(System.getProperty("android.jar")).normalize())
     )
 
     val myTestRootDisposable = TestDisposable()

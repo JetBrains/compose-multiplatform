@@ -11,7 +11,6 @@ import org.jetbrains.kotlin.ir.expressions.IrGetValue
 import org.jetbrains.kotlin.ir.expressions.impl.*
 import org.jetbrains.kotlin.ir.types.toIrType
 import org.jetbrains.kotlin.ir.types.toKotlinType
-import org.jetbrains.kotlin.ir.util.createParameterDeclarations
 import org.jetbrains.kotlin.ir.util.endOffset
 import org.jetbrains.kotlin.ir.util.startOffset
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
@@ -93,7 +92,7 @@ private fun generateConstructor(
 
             statements.add(superCall)
 
-            statements.add(IrInstanceInitializerCallImpl(-1, -1, context.symbolTable.referenceClass(syntheticClassDescriptor), syntheticClassDescriptor.toIrType()))
+            statements.add(IrInstanceInitializerCallImpl(-1, -1, context.symbolTable.referenceClass(syntheticClassDescriptor), syntheticClassDescriptor.defaultType.toIrType()!!))
 
             constructor.valueParameters.forEachIndexed { index, irValueParameter ->
                 val propertyDescriptor = syntheticClassDescriptor.capturedAccessesAsProperties[index]

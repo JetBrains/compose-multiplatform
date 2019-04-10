@@ -22,8 +22,7 @@ val R4aObservePhase = makeIrFilePhase(
 val FrameClassGenPhase = makeIrFilePhase(
     ::FrameIrTransformer,
     name = "R4aFrameTransformPhase",
-    description = "Transform @Model classes into framed c" +
-            "lasses"
+    description = "Transform @Model classes into framed classes"
 )
 
 val R4aFcsPhase = makeIrFilePhase(
