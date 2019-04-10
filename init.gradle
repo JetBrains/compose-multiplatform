@@ -15,7 +15,6 @@
  */
 
 import androidx.build.BuildServerConfigurationKt
-import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.gmaven.GMavenVersionChecker
 
 def supportRoot = ext.supportRootFolder
@@ -35,59 +34,7 @@ def configureSubProjects() {
 }
 def setupSubprojectsForBuildServer() {
     subprojects {
-        // Copy instrumentation test APKs and app APKs into the dist dir
-        // For test apks, they are uploaded only if we have java test sources.
-        // For regular app apks, they are uploaded only if they have java sources.
         project.tasks.configureEach { task ->
-            if (task.name.startsWith("packageDebug")) {
-                // run this task only if we should run it
-                def testApk = task.name.contains("AndroidTest")
-                if (testApk) {
-                    AffectedModuleDetector.configureTaskGuard(task)
-                }
-                task.doLast {
-                    def source = testApk ? project.android.sourceSets.androidTest
-                            : project.android.sourceSets.main
-                    def hasKotlinSources = false
-                    if (source.hasProperty('kotlin')) {
-                        if (!source.kotlin.files.isEmpty()) {
-                            hasKotlinSources = true
-                        } else {
-                            // kotlin files does not show in java sources due to the *.java filter
-                            // so we need to check them manually
-                            hasKotlinSources = source.java.sourceDirectoryTrees.any {
-                                !fileTree(dir: it.dir, include:'**/*.kt').files.isEmpty()
-                            }
-                        }
-                    }
-                    def hasSourceCode = !source.java.sourceFiles.isEmpty() || hasKotlinSources
-                    if (task.hasProperty("outputDirectory") && (hasSourceCode || !testApk)) {
-                        copy {
-                            from(task.outputDirectory)
-                            include '*.apk'
-                            into(BuildServerConfigurationKt.getDistributionDirectory(rootProject))
-                            rename { String fileName ->
-                                if (fileName.contains("media-compat-test")
-                                        || fileName.contains("media2-test")) {
-                                    // Exclude media-compat-test-* and media2-test-* modules from
-                                    // existing support library presubmit tests.
-                                    fileName.replace("-debug-androidTest", "")
-                                } else if (fileName.contains("-benchmark-debug-androidTest")){
-                                    // Exclude '-benchmark' modules from correctness tests, and
-                                    // remove '-debug' from the APK name, since it's incorrect
-                                    fileName.replace("-debug-androidTest", "-androidBenchmark")
-                                } else {
-                                    // multiple modules may have the same name so prefix the name with
-                                    // the module's path to ensure it is unique.
-                                    // e.g. palette-v7-debug-androidTest.apk becomes
-                                    // support-palette-v7_palette-v7-debug-androidTest.apk
-                                    "${project.getPath().replace(':', '-').substring(1)}_${fileName}"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
             if (task.name == "createLibraryBuildInfoFile") {
                 task.doLast {
                     copy {
