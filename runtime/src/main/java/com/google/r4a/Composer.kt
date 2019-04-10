@@ -427,7 +427,9 @@ open class Composer<N>(
     fun <T> startProvider(p: Ambient<T>.Provider, value: T) {
         startGroup(provider)
         changed(p)
-        insertedProviders.push(p)
+        if (inserting) {
+            insertedProviders.push(p)
+        }
         if (changed(value)) {
             invalidateConsumers(p.ambient)
         }
@@ -436,8 +438,10 @@ open class Composer<N>(
 
     fun endProvider() {
         endGroup()
+        if (inserting) {
+            insertedProviders.pop()
+        }
         endGroup()
-        insertedProviders.pop()
     }
 
     fun <T> consume(key: Ambient<T>): T {
