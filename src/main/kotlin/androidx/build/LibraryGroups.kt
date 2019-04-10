@@ -29,6 +29,7 @@ object LibraryGroups {
     val BIOMETRIC = LibraryGroup("androidx.biometric", false)
     val BROWSER = LibraryGroup("androidx.browser", false)
     val BENCHMARK = LibraryGroup("androidx.benchmark", false)
+    val CAMERA = LibraryGroup("androidx.camera", false)
     val CAR = LibraryGroup("androidx.car", false)
     val CARDVIEW = LibraryGroup("androidx.cardview", false)
     val COLLECTION = LibraryGroup("androidx.collection", false)
