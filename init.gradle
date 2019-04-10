@@ -17,7 +17,6 @@
 import androidx.build.BuildServerConfigurationKt
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.gmaven.GMavenVersionChecker
-import androidx.build.jacoco.Jacoco
 
 def supportRoot = ext.supportRootFolder
 if (supportRoot == null) {
@@ -87,26 +86,6 @@ def setupSubprojectsForBuildServer() {
                             }
                         }
                     }
-                }
-            }
-        }
-
-        // copy host side test results to DIST
-        project.tasks.withType(Test) { task ->
-            def junitReport = task.reports.junitXml
-            if (junitReport.enabled) {
-                def zipTask = project.tasks.create(
-                        name: "zipResultsOf${task.name.capitalize()}", type: Zip) {
-                    destinationDir(BuildServerConfigurationKt.getHostTestResultDirectory(project))
-                    // first one is always :, drop it.
-                    archiveName("${project.getPath().split(":").join("_").substring(1)}.zip")
-                }
-                if (BuildServerConfigurationKt.isRunningOnBuildServer()) {
-                    task.ignoreFailures = true
-                }
-                task.finalizedBy zipTask
-                task.doFirst {
-                    zipTask.from(junitReport.destination)
                 }
             }
         }
