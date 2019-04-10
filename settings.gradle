@@ -15,3 +15,4 @@
  */
 
 include ':lint-checks'
+include ':jetpad-integration'
