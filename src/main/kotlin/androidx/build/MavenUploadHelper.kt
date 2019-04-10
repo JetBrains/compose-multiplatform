@@ -24,10 +24,8 @@ import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.maven.MavenDeployer
 import org.gradle.api.artifacts.maven.MavenPom
 import org.gradle.api.tasks.Upload
-import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.withGroovyBuilder
 import java.io.File
-import java.util.concurrent.ConcurrentHashMap
 
 fun Project.configureMavenArtifactUpload(extension: AndroidXExtension) {
     afterEvaluate {
@@ -230,8 +228,7 @@ private fun Project.isAndroidProject(
             }
         }
     }
-    var projectModules = project.rootProject.extra.get("projects")
-            as ConcurrentHashMap<String, String>
+    var projectModules = project.getProjectsMap()
     if (projectModules.containsKey("$groupId:$artifactId")) {
         val localProjectVersion = project.findProject(
                 projectModules.get("$groupId:$artifactId"))
