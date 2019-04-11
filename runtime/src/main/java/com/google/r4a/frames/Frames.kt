@@ -79,7 +79,7 @@ class Frame(
     /**
      * Observe a frame read
      */
-    internal val readObserver: FrameReadObserver?,
+    readObserver: FrameReadObserver?,
 
     /**
      * Observe a frame write
@@ -88,11 +88,31 @@ class Frame(
 ) {
     internal val modified = if (readOnly) null else HashSet<Framed>()
 
+    internal val readObservers = mutableListOf<FrameReadObserver>()
+
+    init {
+        if (readObserver != null) {
+            readObservers += readObserver
+        }
+    }
+
     /**
      * True if any change to a frame object will throw.
      */
     val readonly: Boolean
         get() = modified == null
+
+    /**
+     * Add a [FrameReadObserver] during execution of the [block].
+     */
+    fun observeReads(readObserver: FrameReadObserver, block: () -> Unit) {
+        try {
+            readObservers += readObserver
+            block()
+        } finally {
+            readObservers -= readObserver
+        }
+    }
 }
 
 private fun validateNotInFrame() {
@@ -381,7 +401,7 @@ fun <T : Record> T.readable(framed: Framed): T {
 }
 
 fun <T : Record> T.readable(frame: Frame, framed: Framed): T {
-    frame.readObserver?.let { it(framed) }
+    frame.readObservers.forEach { it(framed) }
     return readable(this, frame.id, frame.invalid)
 }
 

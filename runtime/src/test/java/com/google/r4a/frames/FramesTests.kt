@@ -256,6 +256,23 @@ class FrameTest : TestCase() {
         Assert.assertEquals(address, read)
     }
 
+    fun testFrameObserver_addReadObserver_Single() {
+        val address = frame { Address(OLD_STREET, OLD_CITY) }
+        var read: Address? = null
+        var otherRead: Address? = null
+        val frame = open({ obj -> read = obj as Address })
+        try {
+            frame.observeReads({ obj -> otherRead = obj as Address }) {
+                Assert.assertEquals(OLD_STREET, address.street)
+            }
+            Assert.assertEquals(1, frame.readObservers.size)
+        } finally {
+            commitHandler()
+        }
+        Assert.assertEquals(address, read)
+        Assert.assertEquals(address, otherRead)
+    }
+
     fun testFrameObserver_ObserveCommit_Single() {
         val address = frame { Address(OLD_STREET, OLD_CITY) }
         var committed: Set<Any>? = null
