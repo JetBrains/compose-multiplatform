@@ -6,7 +6,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
 import com.google.r4a.Component
 import com.google.r4a.*
-import com.google.r4a.adapters.*
+import androidx.ui.androidview.adapters.*
 import com.google.r4a.examples.explorerapp.common.adapters.*
 import com.google.r4a.examples.explorerapp.common.data.HierarchicalThing
 

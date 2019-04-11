@@ -7,9 +7,9 @@ import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
 import com.google.r4a.*
 import com.google.r4a.CompositionContext
-import com.google.r4a.adapters.Dimension
-import com.google.r4a.adapters.px
-import com.google.r4a.adapters.setPaddingTop
+import androidx.ui.androidview.adapters.Dimension
+import androidx.ui.androidview.adapters.px
+import androidx.ui.androidview.adapters.setPaddingTop
 import com.google.r4a.examples.explorerapp.common.adapters.*
 import com.google.r4a.examples.explorerapp.common.data.Link
 

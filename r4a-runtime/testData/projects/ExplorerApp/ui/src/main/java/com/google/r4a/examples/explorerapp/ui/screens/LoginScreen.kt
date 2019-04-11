@@ -8,7 +8,7 @@ import android.view.KeyEvent
 import android.view.View
 import android.widget.*
 import com.google.r4a.Component
-import com.google.r4a.adapters.*
+import androidx.ui.androidview.adapters.*
 import com.google.r4a.examples.explorerapp.common.adapters.*
 import com.google.r4a.examples.explorerapp.ui.Colors
 import com.google.r4a.examples.explorerapp.ui.R

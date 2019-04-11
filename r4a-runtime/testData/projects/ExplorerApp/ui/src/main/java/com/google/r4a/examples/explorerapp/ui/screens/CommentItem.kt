@@ -7,7 +7,7 @@ import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.r4a.Composable
-import com.google.r4a.adapters.*
+import androidx.ui.androidview.adapters.*
 import com.google.r4a.composer
 import com.google.r4a.examples.explorerapp.common.adapters.setForeground
 import com.google.r4a.examples.explorerapp.common.data.Comment

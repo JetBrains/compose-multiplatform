@@ -11,7 +11,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.FragmentNavigatorDestinationBuilder
 import com.google.r4a.*
-import com.google.r4a.adapters.*
+import androidx.ui.androidview.adapters.*
 import com.google.r4a.examples.explorerapp.common.adapters.*
 import com.google.r4a.examples.explorerapp.common.api.RedditApi
 import com.google.r4a.examples.explorerapp.common.data.*

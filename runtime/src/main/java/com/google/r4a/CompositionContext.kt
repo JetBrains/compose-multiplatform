@@ -95,8 +95,8 @@ abstract class CompositionContext {
     abstract fun recomposeSync(component: Component)
     abstract fun <T : Any?> getAmbient(key: Ambient<T>): T
 
-    internal abstract fun addPostRecomposeObserver(l: () -> Unit)
-    internal abstract fun removePostRecomposeObserver(l: () -> Unit)
+    abstract fun addPostRecomposeObserver(l: () -> Unit)
+    abstract fun removePostRecomposeObserver(l: () -> Unit)
 }
 
 inline fun ViewComposition.group(key: Int, block: () -> Unit) {

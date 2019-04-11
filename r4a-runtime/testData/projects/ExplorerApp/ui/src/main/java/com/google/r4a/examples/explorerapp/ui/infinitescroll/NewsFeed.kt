@@ -6,7 +6,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.widget.*
 import android.support.v7.widget.*
 import com.google.r4a.*
-import com.google.r4a.adapters.*
+import androidx.ui.androidview.adapters.*
 import com.google.r4a.examples.explorerapp.common.adapters.*
 import android.view.Gravity
 import android.view.ViewGroup

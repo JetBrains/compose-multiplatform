@@ -17,7 +17,7 @@ import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.FragmentNavigatorDestinationBuilder
 import com.google.r4a.CompositionContext
 import com.google.r4a.*
-import com.google.r4a.adapters.*
+import androidx.ui.androidview.adapters.*
 import com.google.r4a.examples.explorerapp.common.R
 
 /**

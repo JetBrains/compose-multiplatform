@@ -3,7 +3,7 @@ package com.google.r4a.examples.explorerapp.ui.components
 import android.content.Context
 import android.widget.TextView
 import com.google.r4a.*
-import com.google.r4a.adapters.*
+import androidx.ui.androidview.adapters.*
 import java.util.*
 
 // NOTE(lmr): having this as a view instead of just a helper function is pretty questionable. Perhaps we should change.

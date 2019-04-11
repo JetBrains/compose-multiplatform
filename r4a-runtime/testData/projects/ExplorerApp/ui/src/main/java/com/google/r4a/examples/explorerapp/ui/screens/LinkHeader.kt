@@ -2,8 +2,8 @@ package com.google.r4a.examples.explorerapp.ui.screens
 
 import android.widget.LinearLayout
 import com.google.r4a.Composable
-import com.google.r4a.adapters.dp
-import com.google.r4a.adapters.setPaddingBottom
+import androidx.ui.androidview.adapters.dp
+import androidx.ui.androidview.adapters.setPaddingBottom
 import com.google.r4a.composer
 import com.google.r4a.examples.explorerapp.common.data.Link
 

@@ -6,7 +6,7 @@ import android.support.design.widget.AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP
 import android.support.v7.widget.Toolbar
 import android.widget.LinearLayout
 import com.google.r4a.*
-import com.google.r4a.adapters.*
+import androidx.ui.androidview.adapters.*
 import com.google.r4a.examples.explorerapp.common.adapters.*
 import com.google.r4a.examples.explorerapp.common.data.*
 import com.google.r4a.examples.explorerapp.ui.Colors

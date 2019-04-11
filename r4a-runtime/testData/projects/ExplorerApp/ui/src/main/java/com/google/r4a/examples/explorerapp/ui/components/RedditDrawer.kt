@@ -12,14 +12,14 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.*
 import com.google.r4a.*
-import com.google.r4a.adapters.*
+import androidx.ui.androidview.adapters.*
 import com.google.r4a.examples.explorerapp.common.adapters.*
 import com.google.r4a.examples.explorerapp.ui.Colors
 import com.google.r4a.examples.explorerapp.ui.R
 import com.makeramen.roundedimageview.RoundedImageView
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
-import com.google.r4a.adapters.Ref
+import androidx.ui.androidview.adapters.Ref
 
 class RedditDrawer: Component() { // component due to being called from a macro
     private var children: (@Composable() () -> Unit)? = null

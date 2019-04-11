@@ -2,7 +2,7 @@ package com.google.r4a.examples.explorerapp.ui.screens
 
 import android.os.Bundle
 import com.google.r4a.*
-import com.google.r4a.adapters.*
+import androidx.ui.androidview.adapters.*
 import android.widget.*
 import android.widget.LinearLayout.VERTICAL
 import com.google.r4a.examples.explorerapp.common.adapters.Ambients

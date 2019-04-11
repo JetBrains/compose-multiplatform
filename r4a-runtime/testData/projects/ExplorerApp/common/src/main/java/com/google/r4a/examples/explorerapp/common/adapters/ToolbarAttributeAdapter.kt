@@ -8,7 +8,7 @@ import android.support.v7.widget.Toolbar
 import android.widget.Spinner
 
 import com.google.r4a.CompositionContext
-import com.google.r4a.adapters.Dimension
+import androidx.ui.androidview.adapters.Dimension
 
 fun Toolbar.setTitleTextColor(color: String) {
     setTitleTextColor(Color.parseColor(color))

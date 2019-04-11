@@ -4,7 +4,7 @@ package com.google.r4a.examples.explorerapp.ui.infinitescroll
 import android.view.ViewGroup
 import android.widget.*
 import com.google.r4a.*
-import com.google.r4a.adapters.*
+import androidx.ui.androidview.adapters.*
 import com.google.r4a.examples.explorerapp.common.adapters.*
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT

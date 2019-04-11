@@ -2,9 +2,9 @@ package com.google.r4a.examples.explorerapp.common.adapters
 
 import android.view.View
 import android.widget.RelativeLayout
-import com.google.r4a.adapters.LayoutBuilder
-import com.google.r4a.adapters.getOrAddLayoutBuilderAdapter
-import com.google.r4a.adapters.registerIntLayoutHandler
+import androidx.ui.androidview.adapters.LayoutBuilder
+import androidx.ui.androidview.adapters.getOrAddLayoutBuilderAdapter
+import androidx.ui.androidview.adapters.registerIntLayoutHandler
 
 
 private var registered = false

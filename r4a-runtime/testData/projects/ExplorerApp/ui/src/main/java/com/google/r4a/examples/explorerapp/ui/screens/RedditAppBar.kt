@@ -8,7 +8,7 @@ import android.support.v7.widget.Toolbar
 //import android.widget.Toolbar
 import com.google.r4a.Component
 import com.google.r4a.composer
-import com.google.r4a.adapters.*
+import androidx.ui.androidview.adapters.*
 import com.google.r4a.examples.explorerapp.common.adapters.*
 import com.google.r4a.examples.explorerapp.ui.Colors
 import com.google.r4a.examples.explorerapp.ui.R

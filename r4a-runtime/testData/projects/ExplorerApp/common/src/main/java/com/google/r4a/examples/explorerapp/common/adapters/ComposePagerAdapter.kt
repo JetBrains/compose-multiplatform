@@ -18,9 +18,9 @@ import com.google.r4a.Ambient
 import com.google.r4a.Component
 import com.google.r4a.CompositionContext
 import com.google.r4a.*
-import com.google.r4a.adapters.Ref
-import com.google.r4a.adapters.RefForwarder
-import com.google.r4a.adapters.setRef
+import androidx.ui.androidview.adapters.Ref
+import androidx.ui.androidview.adapters.RefForwarder
+import androidx.ui.androidview.adapters.setRef
 import com.google.r4a.examples.explorerapp.common.R
 
 

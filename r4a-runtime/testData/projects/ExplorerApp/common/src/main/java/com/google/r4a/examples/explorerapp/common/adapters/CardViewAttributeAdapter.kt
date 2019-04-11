@@ -11,8 +11,8 @@ import android.util.TypedValue
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
-import com.google.r4a.adapters.Dimension
-import com.google.r4a.adapters.setMinimumHeight
+import androidx.ui.androidview.adapters.Dimension
+import androidx.ui.androidview.adapters.setMinimumHeight
 
 internal val View.metrics: DisplayMetrics get() = resources.displayMetrics
 

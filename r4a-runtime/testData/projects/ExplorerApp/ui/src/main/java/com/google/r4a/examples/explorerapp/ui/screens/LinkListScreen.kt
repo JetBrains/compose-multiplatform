@@ -5,8 +5,8 @@ import android.support.design.widget.CoordinatorLayout
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.LinearLayout
 import com.google.r4a.Composable
-import com.google.r4a.adapters.setLayoutHeight
-import com.google.r4a.adapters.setLayoutWidth
+import androidx.ui.androidview.adapters.setLayoutHeight
+import androidx.ui.androidview.adapters.setLayoutWidth
 import com.google.r4a.composer
 import com.google.r4a.examples.explorerapp.common.adapters.Tabs
 import com.google.r4a.examples.explorerapp.ui.Colors

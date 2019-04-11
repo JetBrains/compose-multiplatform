@@ -2,7 +2,7 @@ package com.google.r4a.examples.explorerapp.ui.components
 
 import android.view.Gravity
 import com.google.r4a.*
-import com.google.r4a.adapters.*
+import androidx.ui.androidview.adapters.*
 import android.widget.*
 import com.google.r4a.examples.explorerapp.common.adapters.*
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT

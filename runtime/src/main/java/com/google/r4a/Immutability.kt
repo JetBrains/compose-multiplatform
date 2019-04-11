@@ -1,6 +1,5 @@
 package com.google.r4a
 
-import com.google.r4a.adapters.Dimension
 
 /**
  * Just a dummy implementation to prove the behavior for a couple simple cases.
@@ -18,7 +17,6 @@ internal fun isEffectivelyImmutable(value: Any?): Boolean {
         is Byte,
         is Char,
         is Boolean -> true
-        is Dimension -> true
         else -> false
     }
 }
