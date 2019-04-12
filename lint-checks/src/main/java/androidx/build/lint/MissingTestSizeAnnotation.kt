@@ -43,11 +43,13 @@ class MissingTestSizeAnnotation : Detector(), SourceCodeScanner {
         override fun visitClass(node: UClass) {
             // Ignore any non-test class (missing a @RunWith() annotation)
             val runWith = node.findAnnotation(RUN_WITH) ?: return
-            // If the class has @RunWith(JUnit4.class), then it's a host side test and
-            // we don't need to enforce annotations here
-            if (runWith.attributeValues[0].expression.asRenderString() == JUNIT_RUNNER) {
+
+            // Ignore host side tests as test size is ignored in this case
+            val runner = runWith.attributeValues[0].expression.asRenderString()
+            if (HOST_SIDE_TEST_RUNNERS.any { runner == it }) {
                 return
             }
+
             node.methods.filter {
                 it.hasAnnotation(TEST_ANNOTATION)
             }.forEach { method ->
@@ -68,7 +70,12 @@ class MissingTestSizeAnnotation : Detector(), SourceCodeScanner {
 
     companion object {
         const val RUN_WITH = "org.junit.runner.RunWith"
-        const val JUNIT_RUNNER = "org.junit.runners.JUnit4"
+        val HOST_SIDE_TEST_RUNNERS = listOf(
+            "org.junit.runners.JUnit4",
+            "org.robolectric.RobolectricTestRunner",
+            "JUnit4",
+            "RobolectricTestRunner"
+        )
         const val TEST_ANNOTATION = "org.junit.Test"
         val TEST_SIZE_ANNOTATIONS = listOf(
             "androidx.test.filters.SmallTest",
