@@ -42,6 +42,7 @@ import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.TestedExtension
+import com.android.build.gradle.api.ApkVariant
 import com.android.build.gradle.internal.tasks.factory.dependsOn
 import org.gradle.api.DefaultTask
 import org.gradle.api.JavaVersion.VERSION_1_7
@@ -64,6 +65,7 @@ import org.gradle.kotlin.dsl.getPlugin
 import org.gradle.kotlin.dsl.withType
 import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
 import org.gradle.testing.jacoco.tasks.JacocoReport
+import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
@@ -358,6 +360,57 @@ class AndroidXPlugin : Plugin<Project> {
         }
 
         Jacoco.registerClassFilesTask(project, extension)
+
+        extension.testVariants.all { variant ->
+            variant.configureApkCopy(project, extension, true)
+        }
+    }
+
+    private fun hasAndroidTestSourceCode(project: Project, extension: TestedExtension): Boolean {
+        val javaSourceSet = extension.sourceSets.findByName("androidTest") ?: return false
+        val hasJava = !javaSourceSet.java.sourceFiles.isEmpty
+        val kotlinExtension =
+            project.extensions.findByType(KotlinProjectExtension::class.java) ?: return hasJava
+        val kotlinSourceSet = kotlinExtension.sourceSets.findByName("androidTest") ?: return hasJava
+        return hasJava || kotlinSourceSet.kotlin.files.isNotEmpty()
+    }
+
+    private fun ApkVariant.configureApkCopy(
+        project: Project,
+        extension: TestedExtension,
+        testApk: Boolean
+    ) {
+        packageApplicationProvider.configure { packageTask ->
+            AffectedModuleDetector.configureTaskGuard(packageTask)
+            packageTask.doLast {
+                // Skip copying AndroidTest apks if they have no source code (no tests to run).
+                if (testApk && !hasAndroidTestSourceCode(project, extension)) return@doLast
+
+                project.copy {
+                    it.from(packageTask.outputDirectory)
+                    it.include("*.apk")
+                    it.into(project.getDistributionDirectory())
+                    it.rename { fileName ->
+                        if (fileName.contains("media-compat-test") ||
+                            fileName.contains("media2-test")) {
+                            // Exclude media-compat-test-* and media2-test-* modules from
+                            // existing support library presubmit tests.
+                            fileName.replace("-debug-androidTest", "")
+                        } else if (fileName.contains("-benchmark-debug-androidTest")) {
+                            // Exclude '-benchmark' modules from correctness tests, and
+                            // remove '-debug' from the APK name, since it's incorrect
+                            fileName.replace("-debug-androidTest", "-androidBenchmark")
+                        } else {
+                            // multiple modules may have the same name so prefix the name with
+                            // the module's path to ensure it is unique.
+                            // e.g. palette-v7-debug-androidTest.apk becomes
+                            // support-palette-v7_palette-v7-debug-androidTest.apk
+                            "${project.path.replace(':', '-').substring(1)}_$fileName"
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun Project.configureAndroidLibraryOptions(
@@ -421,6 +474,10 @@ class AndroidXPlugin : Plugin<Project> {
             if (baseline.exists()) {
                 baseline(baseline)
             }
+        }
+
+        extension.applicationVariants.all { variant ->
+            variant.configureApkCopy(project, extension, false)
         }
     }
 
