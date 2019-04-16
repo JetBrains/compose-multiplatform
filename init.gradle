@@ -15,7 +15,6 @@
  */
 
 import androidx.build.BuildServerConfigurationKt
-import androidx.build.gmaven.GMavenVersionChecker
 
 def supportRoot = ext.supportRootFolder
 if (supportRoot == null) {
@@ -23,7 +22,6 @@ if (supportRoot == null) {
             " including this script")
 }
 apply from: "${supportRoot}/buildSrc/out.gradle"
-rootProject.ext.versionChecker = new GMavenVersionChecker(rootProject.logger)
 apply from: "${supportRoot}/buildSrc/dependencies.gradle"
 
 def configureSubProjects() {
