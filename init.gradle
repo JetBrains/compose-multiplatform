@@ -28,22 +28,6 @@ def configureSubProjects() {
     subprojects {
         repos.addMavenRepositories(repositories)
     }
-    setupSubprojectsForBuildServer()
-}
-def setupSubprojectsForBuildServer() {
-    subprojects {
-        project.tasks.configureEach { task ->
-            if (task.name == "createLibraryBuildInfoFile") {
-                task.doLast {
-                    copy {
-                        from(task.outputDirectory)
-                        include '*_build_info.txt'
-                        into(BuildServerConfigurationKt.getDistributionDirectory(rootProject))
-                    }
-                }
-            }
-        }
-    }
 }
 
 def setupRepoOutAndStartParam() {
