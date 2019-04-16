@@ -30,6 +30,7 @@ import androidx.build.dokka.Dokka.configureAndroidProjectForDokka
 import androidx.build.dokka.Dokka.configureJavaProjectForDokka
 import androidx.build.dokka.DokkaPublicDocs
 import androidx.build.dokka.DokkaSourceDocs
+import androidx.build.gmaven.GMavenVersionChecker
 import androidx.build.gradle.getByType
 import androidx.build.gradle.isRoot
 import androidx.build.jacoco.Jacoco
@@ -193,13 +194,13 @@ class AndroidXPlugin : Plugin<Project> {
     }
 
     private fun Project.configureRootProject() {
-        val createLibraryBuildInfoFilesTask = project.tasks
-            .register(CREATE_LIBRARY_BUILD_INFO_FILES_TASK)
+        val createLibraryBuildInfoFilesTask =
+            tasks.register(CREATE_LIBRARY_BUILD_INFO_FILES_TASK)
         val buildOnServerTask = tasks.create(BUILD_ON_SERVER_TASK)
         buildOnServerTask.dependsOn(createLibraryBuildInfoFilesTask)
         val buildTestApksTask = tasks.create(BUILD_TEST_APKS)
         val projectModules = ConcurrentHashMap<String, String>()
-        project.extra.set("projects", projectModules)
+        extra.set("projects", projectModules)
         tasks.all { task ->
             if (task.name.startsWith(Release.DIFF_TASK_PREFIX) ||
                     "distDocs" == task.name ||
@@ -219,8 +220,6 @@ class AndroidXPlugin : Plugin<Project> {
                 return@subprojects
             }
             project.tasks.all { task ->
-                // TODO remove androidTest from buildOnServer once test runners do not
-                // expect them anymore. (wait for master)
                 if ("assembleAndroidTest" == task.name ||
                         "assembleDebug" == task.name ||
                         ERROR_PRONE_TASK == task.name ||
@@ -240,6 +239,7 @@ class AndroidXPlugin : Plugin<Project> {
         buildOnServerTask.dependsOn(createCoverageJarTask)
         buildTestApksTask.dependsOn(createCoverageJarTask)
 
+        extra.set("versionChecker", GMavenVersionChecker(logger))
         Release.createGlobalArchiveTask(this)
         val allDocsTask = DiffAndDocs.configureDiffAndDocs(this, projectDir,
                 DacOptions("androidx", "ANDROIDX_DATA"),
@@ -248,18 +248,18 @@ class AndroidXPlugin : Plugin<Project> {
 
         val jacocoUberJar = Jacoco.createUberJarTask(this)
         buildOnServerTask.dependsOn(jacocoUberJar)
-        val checkSameVersionLibraryGroupsTask = project.tasks.register(
+        val checkSameVersionLibraryGroupsTask = tasks.register(
             CHECK_SAME_VERSION_LIBRARY_GROUPS,
             CheckSameVersionLibraryGroupsTask::class.java)
         buildOnServerTask.dependsOn(checkSameVersionLibraryGroupsTask)
 
-        project.createClockLockTasks()
+        createClockLockTasks()
 
         AffectedModuleDetector.configure(gradle, this)
 
         // If useMaxDepVersions is set, iterate through all the project and substitute any androidx
         // artifact dependency with the local tip of tree version of the library.
-        if (project.hasProperty("useMaxDepVersions")) {
+        if (hasProperty("useMaxDepVersions")) {
             // This requires evaluating all sub-projects to create the module:project map
             // and project dependencies.
             evaluationDependsOnChildren()
