@@ -17,25 +17,47 @@
 package androidx.build
 
 import com.android.build.gradle.LibraryExtension
+import com.android.build.gradle.LibraryPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 /**
  * Plugin to apply options across all of the androidx.ui projects
  */
 class AndroidXUiPlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        val library = project.extensions.findByType(LibraryExtension::class.java)
-            ?: throw Exception("Failed to find Android extension")
+        project.plugins.all {
+            when (it) {
+                is LibraryPlugin -> {
+                    val library = project.extensions.findByType(LibraryExtension::class.java)
+                        ?: throw Exception("Failed to find Android extension")
 
-        library.defaultConfig.apply {
-            minSdkVersion(21)
-        }
+                    library.defaultConfig.apply {
+                        minSdkVersion(21)
+                    }
 
-        library.lintOptions.apply {
-            // Too many Kotlin features require synthetic accessors - we want to rely on R8 to
-            // remove these accessors
-            disable("SyntheticAccessor")
+                    library.lintOptions.apply {
+                        // Too many Kotlin features require synthetic accessors - we want to rely on R8 to
+                        // remove these accessors
+                        disable("SyntheticAccessor")
+                    }
+                }
+                is KotlinBasePluginWrapper -> {
+                    val conf = project.configurations.create("kotlinPlugin")
+
+                    project.tasks.withType(KotlinCompile::class.java).configureEach { compile ->
+                        compile.dependsOn(conf)
+                        compile.doFirst {
+                            if (!conf.isEmpty) {
+                                compile.kotlinOptions.freeCompilerArgs +=
+                                    "-Xplugin=${conf.files.first()}"
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
