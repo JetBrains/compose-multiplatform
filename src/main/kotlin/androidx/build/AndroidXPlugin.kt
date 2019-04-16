@@ -52,6 +52,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.artifacts.ComponentModuleMetadataDetails
+import org.gradle.api.logging.configuration.ShowStacktrace
 import org.gradle.api.plugins.JavaLibraryPlugin
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPluginConvention
@@ -194,6 +195,9 @@ class AndroidXPlugin : Plugin<Project> {
     }
 
     private fun Project.configureRootProject() {
+        if (isRunningOnBuildServer()) {
+            gradle.startParameter.showStacktrace = ShowStacktrace.ALWAYS
+        }
         val createLibraryBuildInfoFilesTask =
             tasks.register(CREATE_LIBRARY_BUILD_INFO_FILES_TASK)
         val buildOnServerTask = tasks.create(BUILD_ON_SERVER_TASK)
