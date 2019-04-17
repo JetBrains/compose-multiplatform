@@ -26,37 +26,29 @@ import com.google.gson.GsonBuilder
 import java.io.File
 import java.util.ArrayList
 
-
-
 /**
  * This task generates a library build information file containing the version,
  * public androidx dependencies and release checklist of the library for consumption
  * by the Jetpack Release Service (JetPad).
  */
 open class CreateLibraryBuildInfoFileTask : DefaultTask() {
-
     init {
         group = "Help"
         description = "Generates a file containing library build information serialized to json"
     }
 
-    val outputDirectory = project.buildDir
-
     @OutputFile
-    val outputFile = File("${project.buildDir}/${getLibraryBuildInfoFilename()}")
+    val outputFile = File(project.getDistributionDirectory(), getLibraryBuildInfoFilename())
 
     private fun getLibraryBuildInfoFilename(): String {
         return "${project.group}_${project.name}_build_info.txt"
     }
 
     private fun writeJsonToFile(info: LibraryBuildInfoFile) {
-
-
-
-        if (!project.buildDir.exists()) {
-            if (!project.buildDir.mkdirs()) {
+        if (!project.getDistributionDirectory().exists()) {
+            if (!project.getDistributionDirectory().mkdirs()) {
                 throw RuntimeException("Failed to create " +
-                        "output directory: ${project.buildDir}")
+                        "output directory: ${project.getDistributionDirectory()}")
             }
         }
         if (!outputFile.exists()) {
