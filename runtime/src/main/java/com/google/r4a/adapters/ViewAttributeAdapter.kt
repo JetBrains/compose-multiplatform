@@ -2,14 +2,9 @@
 
 package com.google.r4a.adapters
 
-import android.graphics.Color
 import androidx.annotation.DimenRes
 import android.view.View
-import com.google.r4a.adapters.Utils.stringToIntPx
-import com.google.r4a.annotations.Aesthetic
-import com.google.r4a.annotations.ColorString
 import com.google.r4a.annotations.ConflictsWith
-import com.google.r4a.annotations.DimensionString
 
 // NOTE: these attributes are added to every view/component so that we can have a "key" attribute
 // that the users define to preserve state across composes. In the long run, we may decide to
@@ -111,51 +106,6 @@ fun View.setPaddingTop(padding: Dimension) = setPixelPaddingTop(padding.toIntPix
 fun View.setPaddingRight(padding: Dimension) = setPixelPaddingRight(padding.toIntPixels(metrics))
 
 fun View.setPaddingBottom(padding: Dimension) = setPixelPaddingBottom(padding.toIntPixels(metrics))
-
-// String-based compatibility setters
-
-@Aesthetic
-@DimensionString
-@ConflictsWith(
-    "paddingLeft",
-    "paddingRight",
-    "paddingTop",
-    "paddingBottom",
-    "paddingHorizontal",
-    "paddingHorizontal"
-)
-fun View.setPadding(padding: String) = setPixelPadding(stringToIntPx(padding, metrics))
-
-@Aesthetic
-@DimensionString
-@ConflictsWith("paddingLeft", "paddingRight")
-fun View.setPaddingHorizontal(padding: String) =
-    setPixelPaddingHorizontal(stringToIntPx(padding, metrics))
-
-@Aesthetic
-@DimensionString
-@ConflictsWith("paddingTop", "paddingBottom")
-fun View.setPaddingVertical(padding: String) =
-    setPixelPaddingVertical(stringToIntPx(padding, metrics))
-
-@Aesthetic
-@DimensionString
-fun View.setPaddingLeft(padding: String) = setPixelPaddingLeft(stringToIntPx(padding, metrics))
-
-@Aesthetic
-@DimensionString
-fun View.setPaddingTop(padding: String) = setPixelPaddingTop(stringToIntPx(padding, metrics))
-
-@Aesthetic
-@DimensionString
-fun View.setPaddingRight(padding: String) = setPixelPaddingRight(stringToIntPx(padding, metrics))
-
-@Aesthetic
-@DimensionString
-fun View.setPaddingBottom(padding: String) = setPixelPaddingBottom(stringToIntPx(padding, metrics))
-
-@ColorString
-fun View.setBackgroundColor(color: String) = setBackgroundColor(Color.parseColor(color))
 
 fun View.setPivotX(pivotX: Dimension) = setPivotX(pivotX.toFloatPixels(metrics))
 fun View.setPivotY(pivotY: Dimension) = setPivotY(pivotY.toFloatPixels(metrics))

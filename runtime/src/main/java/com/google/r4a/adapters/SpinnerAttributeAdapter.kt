@@ -5,24 +5,26 @@ package com.google.r4a.adapters
 import android.widget.AbsSpinner
 import android.widget.Spinner
 
-private fun AbsSpinner.getR4aAdapter(): ArrayAdapter<Any> {
-    @Suppress("UNCHECKED_CAST")
-    var adapter = adapter as? ArrayAdapter<Any>
-    if (adapter == null) {
-        adapter = ArrayAdapter<Any>()
-        setAdapter(adapter)
+private val AbsSpinner.composeAdapter: ArrayAdapter<Any>
+    get() {
+        @Suppress("UNCHECKED_CAST")
+        var adapter = adapter as? ArrayAdapter<Any>
+        if (adapter == null) {
+            adapter = ArrayAdapter<Any>()
+            setAdapter(adapter)
+        }
+        return adapter
     }
-    return adapter
-}
 
 fun AbsSpinner.setData(data: Collection<Any>) {
-    val adapter = getR4aAdapter()
-    adapter.items = data.toMutableList()
-    adapter.notifyDataSetChanged()
+    composeAdapter.apply {
+        items = data.toMutableList()
+        notifyDataSetChanged()
+    }
 }
 
 fun AbsSpinner.setComposeItem(composeItem: Function1<Any, Unit>) {
-    getR4aAdapter().composable = composeItem
+    composeAdapter.composable = composeItem
 }
 
 fun Spinner.setDropDownHorizontalOffset(dropDownHorizontalOffset: Dimension) =
