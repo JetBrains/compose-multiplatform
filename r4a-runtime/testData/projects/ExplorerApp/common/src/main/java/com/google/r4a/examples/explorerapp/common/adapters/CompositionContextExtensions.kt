@@ -93,10 +93,3 @@ import com.google.r4a.ViewComposition
 //    compose()
 //    end()
 //}
-//
-//
-//fun CompositionContext.portal(children: (Ambient.Reference) -> Unit) {
-//    emitComponent({ Ambient.Portal() }) {
-//        set(it, children) { this.children = it }
-//    }
-//}

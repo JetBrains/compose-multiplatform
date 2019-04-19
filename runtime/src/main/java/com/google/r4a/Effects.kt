@@ -702,6 +702,15 @@ val invalidate = effectOf<() -> Unit> {
 }
 
 /**
+ * An Effect to construct a CompositionReference at the current point of composition. This can be used
+ * to run a separate composition in the context of the current one, preserving ambients and propagating
+ * invalidations.
+ */
+fun compositionReference() = effectOf<CompositionReference> {
+    context.buildReference()
+}
+
+/**
  * IMPORTANT:
  * This global operator is TEMPORARY, and should be removed whenever an answer for contextual composers is reached. At that time, the
  * unaryPlus operator on the composer itself is the one that should be used.

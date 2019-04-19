@@ -49,7 +49,7 @@ class HeaderFooterPagedListAdapter<T>(callback: DiffUtil.ItemCallback<T>) : Recy
         const val TYPE_FOOTER = 3
     }
 
-    lateinit var reference: Ambient.Reference
+    lateinit var reference: CompositionReference
 
     var headerCount: Int = 0
         set(value) {

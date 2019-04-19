@@ -12,7 +12,7 @@ abstract class CompositionContext {
         private val EMITTABLE_ROOT_COMPONENT = WeakHashMap<Emittable, Component>()
         private val COMPONENTS_TO_CONTEXT = WeakHashMap<Component, CompositionContext>()
 
-        val factory: Function4<Context, Any, Component, Ambient.Reference?, CompositionContext>
+        val factory: Function4<Context, Any, Component, CompositionReference?, CompositionContext>
             get() = ComposerCompositionContext.factory
 
         var current: CompositionContext = EmptyCompositionContext()
@@ -21,7 +21,7 @@ abstract class CompositionContext {
             context: Context,
             group: Any,
             component: Component,
-            reference: Ambient.Reference?
+            reference: CompositionReference?
         ): CompositionContext {
             val cc = factory(context, group, component, reference)
             when (group) {
@@ -63,14 +63,14 @@ abstract class CompositionContext {
 
         fun disposeComposition(
             container: ViewGroup,
-            @Suppress("UNUSED_PARAMETER") parent: Ambient.Reference? = null
+            @Suppress("UNUSED_PARAMETER") parent: CompositionReference? = null
         ) {
             container.setTag(TAG_ROOT_COMPONENT, null)
         }
 
         fun disposeComposition(
             container: Emittable,
-            @Suppress("UNUSED_PARAMETER") parent: Ambient.Reference? = null
+            @Suppress("UNUSED_PARAMETER") parent: CompositionReference? = null
         ) {
             // TODO(lmr): clear the ambient reference?
             EMITTABLE_ROOT_COMPONENT.remove(container)
@@ -230,14 +230,4 @@ inline fun <reified T> ViewComposition.consumeAmbient(
     0,
     { key.Consumer(children) },
     { consumer -> update(children) { consumer.children = it } }
-)
-
-@Suppress("NOTHING_TO_INLINE")
-inline fun ViewComposition.portal(
-    location: Int,
-    noinline children: @Composable() (Ambient.Reference) -> Unit
-) = emitComponent(
-    location,
-    { Ambient.Portal(children) },
-    { portal -> update(children) { portal.children = it } }
 )

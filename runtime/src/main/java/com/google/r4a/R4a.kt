@@ -20,7 +20,7 @@ object R4a {
 
     fun composeInto(
         container: ViewGroup,
-        parent: Ambient.Reference? = null,
+        parent: CompositionReference? = null,
         composable: @Composable() () -> Unit
     ) {
         var root = CompositionContext.getRootComponent(container) as? Root
@@ -36,7 +36,7 @@ object R4a {
         }
     }
 
-    fun disposeComposition(container: ViewGroup, parent: Ambient.Reference? = null) {
+    fun disposeComposition(container: ViewGroup, parent: CompositionReference? = null) {
         // temporary easy way to call correct lifecycles on everything
         composeInto(container, parent) { }
         CompositionContext.disposeComposition(container, parent)
@@ -45,7 +45,7 @@ object R4a {
     fun composeInto(
         container: Emittable,
         context: Context,
-        parent: Ambient.Reference? = null,
+        parent: CompositionReference? = null,
         composable: @Composable() () -> Unit
     ) {
         var root = CompositionContext.getRootComponent(container) as? Root
@@ -64,7 +64,7 @@ object R4a {
     fun disposeComposition(
         container: Emittable,
         context: Context,
-        parent: Ambient.Reference? = null
+        parent: CompositionReference? = null
     ) {
         // temporary easy way to call correct lifecycles on everything
         composeInto(container, context, parent) {}

@@ -81,22 +81,21 @@ class HomogeneousPagedList<T>(
     @Composable
     operator fun invoke() {
         with(composer) {
-            portal(0) { ref ->
-                adapter.reference = ref
-                emitView(0, ::RecyclerView) {
-                    set(true) { isNestedScrollingEnabled = it }
-                    set(adapter) { adapter = it }
-                    set(layoutManager) { layoutManager = it }
-                    set(paddingTop) { setPaddingTop(it) }
+            val ref = +compositionReference()
+            adapter.reference = ref
+            emitView(0, ::RecyclerView) {
+                set(true) { isNestedScrollingEnabled = it }
+                set(adapter) { adapter = it }
+                set(layoutManager) { layoutManager = it }
+                set(paddingTop) { setPaddingTop(it) }
 //                    set(it, true) { setHasFixedSize(it) }
-                    val layoutParams = layoutParams
-                    if (layoutParams != null) {
-                        set(layoutParams) { this.layoutParams = it }
-                    }
-                    val backgroundColor = backgroundColor
-                    if (backgroundColor != null) {
-                        set(backgroundColor) { this.setBackgroundColor(it) }
-                    }
+                val layoutParams = layoutParams
+                if (layoutParams != null) {
+                    set(layoutParams) { this.layoutParams = it }
+                }
+                val backgroundColor = backgroundColor
+                if (backgroundColor != null) {
+                    set(backgroundColor) { this.setBackgroundColor(it) }
                 }
             }
         }

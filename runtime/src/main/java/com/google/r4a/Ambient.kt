@@ -50,21 +50,4 @@ class Ambient<T>(private val key: String, private val defaultFactory: (() -> T)?
 
         val ambient = this@Ambient
     }
-
-    interface Reference {
-        fun <T> getAmbient(key: Ambient<T>): T
-        fun invalidate()
-        fun <T> invalidateConsumers(key: Ambient<T>)
-        fun <N> registerComposer(composer: Composer<N>)
-    }
-
-    class Portal(
-        @Children
-        var children: (ref: Reference) -> Unit
-    ) : Component() {
-
-        override fun compose() {
-            children(composer.composer.buildReference())
-        }
-    }
 }

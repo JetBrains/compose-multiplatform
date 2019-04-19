@@ -31,7 +31,7 @@ abstract class ComposePagerAdapter : PagerAdapter() {
 
     private val instantiated = SparseArray<FrameLayout>()
 
-    var reference: Ambient.Reference? = null
+    var reference: CompositionReference? = null
     abstract fun composeItem(position: Int)
 
     fun recomposeAll() {
@@ -90,7 +90,7 @@ class ComposeViewPager: RefForwarder<ViewPager>, Component() { // keeping a comp
     var children: (Int) -> Unit = {}
     var getCount: () -> Int = { 0 }
     var getPageTitle: (Int) -> CharSequence? = { null }
-    var reference: Ambient.Reference? = null
+    var reference: CompositionReference? = null
     var offscreenPageLimit: Int = 1
     lateinit var layoutParams: ViewGroup.LayoutParams
 
@@ -112,14 +112,13 @@ class ComposeViewPager: RefForwarder<ViewPager>, Component() { // keeping a comp
         // TODO(lmr): I think we realistically should call myAdapter.notifyDatasetChanged() here or in a
         // componentDidUpdate() like lifecycle
         with(composer) {
-            portal(0) { ref ->
-                myAdapter.reference = ref
-                emitView(0, ::ViewPager) {
-                    set(R.id.view_pager_id) { id = it }
-                    set(myAdapter) { adapter = it }
-                    set(refToForward) { this.setRef(it) }
-                    set(offscreenPageLimit) { setOffscreenPageLimit(it) }
-                }
+            val ref = +compositionReference()
+            myAdapter.reference = ref
+            emitView(0, ::ViewPager) {
+                set(R.id.view_pager_id) { id = it }
+                set(myAdapter) { adapter = it }
+                set(refToForward) { this.setRef(it) }
+                set(offscreenPageLimit) { setOffscreenPageLimit(it) }
             }
         }
         myAdapter.recomposeAll()
@@ -182,16 +181,15 @@ class Tabs {
                         set(tabRef) { setRef(it) }
                     }
                 }, { composeTab ->
-                    portal(0) { ambients ->
-                        emitComponent(0, ::ComposeViewPager) { f ->
-                            set(pagerLayoutParams) { f.layoutParams = it } or
-                            set(ambients) { f.reference = it } or
-                            set(composeTab) { f.children = it } or
-                            set({ titles.size }) { f.getCount = it } or
-                            set({ position: Int -> titles[position] }) { f.getPageTitle = it } or
-                            set(pagerRef) { f.ref = it } or
-                            set(offscreenPageLimit) { offscreenPageLimit = it }
-                        }
+                    val ambients = +compositionReference()
+                    emitComponent(0, ::ComposeViewPager) { f ->
+                        set(pagerLayoutParams) { f.layoutParams = it } or
+                        set(ambients) { f.reference = it } or
+                        set(composeTab) { f.children = it } or
+                        set({ titles.size }) { f.getCount = it } or
+                        set({ position: Int -> titles[position] }) { f.getPageTitle = it } or
+                        set(pagerRef) { f.ref = it } or
+                        set(offscreenPageLimit) { offscreenPageLimit = it }
                     }
                 })
             }

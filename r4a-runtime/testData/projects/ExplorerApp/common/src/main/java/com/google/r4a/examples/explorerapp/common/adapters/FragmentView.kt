@@ -13,11 +13,10 @@ fun FragmentComponent(construct: () -> Fragment, layoutParams: ViewGroup.LayoutP
     with(composer) {
         // NOTE(lmr): if we use R4aContext as ambient reference we can probably get rid of this component
         // entirely
-        portal(0) { ref ->
-            emitView(0, { FragmentView(it, construct, id, ref) }) {
-                set(layoutParams) { this.layoutParams = it }
-                set(id) { this.id = it }
-            }
+        val ref = +compositionReference()
+        emitView(0, { FragmentView(it, construct, id, ref) }) {
+            set(layoutParams) { this.layoutParams = it }
+            set(id) { this.id = it }
         }
     }
 }
@@ -26,7 +25,7 @@ private class FragmentView(
         context: Context,
         construct: () -> Fragment,
         thisId: Int,
-        reference: Ambient.Reference?
+        reference: CompositionReference?
 ) : FrameLayout(context) {
     private var fragmentManager = CompositionContext.current.getAmbient(Ambients.FragmentManager)
     init {
@@ -46,15 +45,15 @@ private class FragmentView(
 }
 
 
-internal fun View.setAmbientReference(ref: Ambient.Reference) {
+internal fun View.setAmbientReference(ref: CompositionReference) {
     setTag(R.id.ambient_reference_tag_key, ref)
 }
 
-internal fun View.findAmbientReference(): Ambient.Reference? {
+internal fun View.findAmbientReference(): CompositionReference? {
     var node: View? = this
 
     while (node != null) {
-        val value = node.getTag(R.id.ambient_reference_tag_key) as? Ambient.Reference
+        val value = node.getTag(R.id.ambient_reference_tag_key) as? CompositionReference
         if (value != null) return value
         node = node.parent as? View
     }

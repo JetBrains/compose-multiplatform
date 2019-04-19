@@ -8,20 +8,20 @@ internal class ComposerCompositionContext(
     private val rootComponent: Component
 ) : CompositionContext(), Recomposer {
     companion object {
-        val factory: Function4<Context, Any, Component, Ambient.Reference?, CompositionContext>
+        val factory: Function4<Context, Any, Component, CompositionReference?, CompositionContext>
                 by lazy {
                     object : Function4<
                             Context,
                             Any,
                             Component,
-                            Ambient.Reference?,
+                            CompositionReference?,
                             CompositionContext
                             > {
                         override fun invoke(
                             context: Context,
                             root: Any,
                             component: Component,
-                            ambientReference: Ambient.Reference?
+                            ambientReference: CompositionReference?
                         ): CompositionContext {
                             val result = ComposerCompositionContext(root, component)
                             result.context = context

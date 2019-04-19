@@ -83,28 +83,27 @@ class HomogeneousList<T>(comparator: DiffUtil.ItemCallback<T>) {
     @Composable
     operator fun invoke() {
         with(composer) {
-            portal(0) { ref ->
-                adapter.reference = ref
-                // NOTE(lmr): Realistically, we should call notifyDataSetChanged() on every compose. Otherwise, there
-                // may be updates that some of the items of the recycler view. This ideally should be cheap if things
-                // are working correctly, as it will essentially call "recompose()" on only the items that are in the
-                // window which is what we want.
-                adapter.notifyItemRangeChanged(0, adapter.itemCount)
-                emitView(0, ::RecyclerView) {
-                    set(adapter) { adapter = it }
-                    set(layoutManager) { layoutManager = it }
-                    set(paddingTop) { setPaddingTop(it) }
-                    val layoutParams = layoutParams
-                    if (layoutParams != null) {
-                        set(layoutParams) { this.layoutParams = it }
-                    }
-                    // TODO(lmr): this is problematic with making components composable. I think this
-                    // goes away if we make this a View instead of a Component, but handling this differently
-                    // is something to consider.
-                    val backgroundColor = backgroundColor
-                    if (backgroundColor != null) {
-                        set(backgroundColor) { this.setBackgroundColor(it) }
-                    }
+            val ref = +compositionReference()
+            adapter.reference = ref
+            // NOTE(lmr): Realistically, we should call notifyDataSetChanged() on every compose. Otherwise, there
+            // may be updates that some of the items of the recycler view. This ideally should be cheap if things
+            // are working correctly, as it will essentially call "recompose()" on only the items that are in the
+            // window which is what we want.
+            adapter.notifyItemRangeChanged(0, adapter.itemCount)
+            emitView(0, ::RecyclerView) {
+                set(adapter) { adapter = it }
+                set(layoutManager) { layoutManager = it }
+                set(paddingTop) { setPaddingTop(it) }
+                val layoutParams = layoutParams
+                if (layoutParams != null) {
+                    set(layoutParams) { this.layoutParams = it }
+                }
+                // TODO(lmr): this is problematic with making components composable. I think this
+                // goes away if we make this a View instead of a Component, but handling this differently
+                // is something to consider.
+                val backgroundColor = backgroundColor
+                if (backgroundColor != null) {
+                    set(backgroundColor) { this.setBackgroundColor(it) }
                 }
             }
         }

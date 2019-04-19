@@ -190,7 +190,7 @@ open class Composer<N>(
     private val insertedParents = Stack<Recomposable>()
     private val insertedProviders = Stack<Ambient<*>.Provider>()
     private val invalidateStack = Stack<RecomposeScope>()
-    internal var ambientReference: Ambient.Reference? = null
+    internal var ambientReference: CompositionReference? = null
 
     // Temporary to allow staged changes. This will move into a sub-object that represents an active
     // composition created by startRoot() and recomposeComponentRange()
@@ -454,14 +454,13 @@ open class Composer<N>(
     }
 
     /**
-     * Create or use a memoized `Ambient.Reference` instance at this position in the slot table.
-     * Used to implement Ambient.Portal.
+     * Create or use a memoized `CompositionReference` instance at this position in the slot table.
      */
-    fun buildReference(): Ambient.Reference {
+    fun buildReference(): CompositionReference {
         startGroup(reference)
 
         // NOTE(lmr): VERY important to call nextValue() here instead of nextSlot()
-        var ref = nextValue() as? Ambient.Reference
+        var ref = nextValue() as? CompositionReference
         if (ref != null && !inserting) {
             skipValue()
         } else {
@@ -581,7 +580,7 @@ open class Composer<N>(
                         sentinel === reference -> {
                             val element = slots.get(index + 1)
                             if (element is CompositionLifecycleObserverHolder) {
-                                val subElement = element.instance as Ambient.Reference
+                                val subElement = element.instance as CompositionReference
                                 subElement.invalidateConsumers(key)
                             }
                         }
@@ -1222,7 +1221,7 @@ open class Composer<N>(
         }
     }
 
-    private inner class AmbientReferenceImpl(val scope: RecomposeScope) : Ambient.Reference,
+    private inner class AmbientReferenceImpl(val scope: RecomposeScope) : CompositionReference,
         CompositionLifecycleObserver {
 
         val composers = mutableSetOf<Composer<*>>()

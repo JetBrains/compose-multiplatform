@@ -44,7 +44,7 @@ import com.google.r4a.Ambient
 class MyNavHostFragment : Fragment(), NavHost {
 
     var controller: NavController? = null
-    var reference: Ambient.Reference? = null
+    var reference: CompositionReference? = null
 
     // State that will be saved and restored
     private var mDefaultNavHost: Boolean = false

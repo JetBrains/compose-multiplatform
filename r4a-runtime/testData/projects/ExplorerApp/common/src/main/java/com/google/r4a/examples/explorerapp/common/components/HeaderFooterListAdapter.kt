@@ -63,7 +63,7 @@ class HeaderFooterListAdapter<T>(callback: DiffUtil.ItemCallback<T>) : RecyclerV
 
     // TODO(lmr): we end up requiring a reference here, but if we move to an Ambient via Context model, we
     // might be able to get rid of it.
-    lateinit var reference: Ambient.Reference
+    lateinit var reference: CompositionReference
 
     var headerCount: Int = 0
         set(value) {

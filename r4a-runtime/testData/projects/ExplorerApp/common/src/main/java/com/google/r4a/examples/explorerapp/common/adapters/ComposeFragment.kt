@@ -13,7 +13,7 @@ import com.google.r4a.*
  * A fragment that uses a Component as it's UI.
  */
 abstract class ComposeFragment : Fragment() {
-    var reference: Ambient.Reference? = null
+    var reference: CompositionReference? = null
     abstract fun compose()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
