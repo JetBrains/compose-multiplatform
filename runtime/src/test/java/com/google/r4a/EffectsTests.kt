@@ -12,6 +12,7 @@ import org.junit.runner.RunWith
 import org.junit.Test
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 
 private class EffectTestActivity : Activity() {
@@ -154,7 +155,7 @@ class EffectsTests : TestCase() {
     }
 
     @Test
-    fun testDidCommit1() {
+    fun testPreCommit1() {
         var mount = true
 
         val logHistory = mutableListOf<String>()
@@ -163,8 +164,8 @@ class EffectsTests : TestCase() {
         @Composable
         fun Unmountable() {
             log("Unmountable:start")
-            +onCommit {
-                log("onCommit")
+            +onPreCommit {
+                log("onPreCommit")
                 onDispose {
                     log("onDispose")
                 }
@@ -191,7 +192,7 @@ class EffectsTests : TestCase() {
                     "Unmountable:start",
                     "Unmountable:end",
                     "compose:end",
-                    "onCommit"
+                    "onPreCommit"
                 ),
                 logHistory
             )
@@ -203,7 +204,7 @@ class EffectsTests : TestCase() {
                     "Unmountable:start",
                     "Unmountable:end",
                     "compose:end",
-                    "onCommit",
+                    "onPreCommit",
                     "compose:start",
                     "compose:end",
                     "onDispose"
@@ -214,7 +215,7 @@ class EffectsTests : TestCase() {
     }
 
     @Test
-    fun testDidCommit2() {
+    fun testPreCommit2() {
         var mount = true
 
         val logHistory = mutableListOf<String>()
@@ -222,14 +223,14 @@ class EffectsTests : TestCase() {
 
         @Composable
         fun Unmountable() {
-            +onCommit {
-                log("onCommit:a2")
+            +onPreCommit {
+                log("onPreCommit:a2")
                 onDispose {
                     log("onDispose:a2")
                 }
             }
-            +onCommit {
-                log("onCommit:b2")
+            +onPreCommit {
+                log("onPreCommit:b2")
                 onDispose {
                     log("onDispose:b2")
                 }
@@ -237,8 +238,8 @@ class EffectsTests : TestCase() {
         }
 
         compose {
-            +onCommit {
-                log("onCommit:a1")
+            +onPreCommit {
+                log("onPreCommit:a1")
                 onDispose {
                     log("onDispose:a1")
                 }
@@ -250,8 +251,8 @@ class EffectsTests : TestCase() {
                     { @Suppress("PLUGIN_ERROR") Unmountable() }
                 )
             }
-            +onCommit {
-                log("onCommit:b1")
+            +onPreCommit {
+                log("onPreCommit:b1")
                 onDispose {
                     log("onDispose:b1")
                 }
@@ -259,10 +260,10 @@ class EffectsTests : TestCase() {
         }.then { _ ->
             assertArrayEquals(
                 listOf(
-                    "onCommit:a1",
-                    "onCommit:a2",
-                    "onCommit:b2",
-                    "onCommit:b1"
+                    "onPreCommit:a1",
+                    "onPreCommit:a2",
+                    "onPreCommit:b2",
+                    "onPreCommit:b1"
                 ),
                 logHistory
             )
@@ -271,17 +272,17 @@ class EffectsTests : TestCase() {
         }.then { _ ->
             assertArrayEquals(
                 listOf(
-                    "onCommit:a1",
-                    "onCommit:a2",
-                    "onCommit:b2",
-                    "onCommit:b1",
+                    "onPreCommit:a1",
+                    "onPreCommit:a2",
+                    "onPreCommit:b2",
+                    "onPreCommit:b1",
                     "recompose",
                     "onDispose:b2",
                     "onDispose:a2",
                     "onDispose:b1",
                     "onDispose:a1",
-                    "onCommit:a1",
-                    "onCommit:b1"
+                    "onPreCommit:a1",
+                    "onPreCommit:b1"
                 ),
                 logHistory
             )
@@ -289,16 +290,16 @@ class EffectsTests : TestCase() {
     }
 
     @Test
-    fun testOnCommit3() {
+    fun testPreCommit3() {
         var x = 0
 
         val logHistory = mutableListOf<String>()
         fun log(x: String) = logHistory.add(x)
 
         compose {
-            +onCommit {
+            +onPreCommit {
                 val y = x++
-                log("commit:$y")
+                log("onPreCommit:$y")
                 onDispose {
                     log("dispose:$y")
                 }
@@ -308,10 +309,10 @@ class EffectsTests : TestCase() {
         }.then { _ ->
             assertArrayEquals(
                 listOf(
-                    "commit:0",
+                    "onPreCommit:0",
                     "recompose",
                     "dispose:0",
-                    "commit:1"
+                    "onPreCommit:1"
                 ),
                 logHistory
             )
@@ -319,7 +320,7 @@ class EffectsTests : TestCase() {
     }
 
     @Test
-    fun testOnCommit31() {
+    fun testPreCommit31() {
         var a = 0
         var b = 0
 
@@ -327,16 +328,16 @@ class EffectsTests : TestCase() {
         fun log(x: String) = logHistory.add(x)
 
         compose {
-            +onCommit {
+            +onPreCommit {
                 val y = a++
-                log("commit a:$y")
+                log("onPreCommit a:$y")
                 onDispose {
                     log("dispose a:$y")
                 }
             }
-            +onCommit {
+            +onPreCommit {
                 val y = b++
-                log("commit b:$y")
+                log("onPreCommit b:$y")
                 onDispose {
                     log("dispose b:$y")
                 }
@@ -346,13 +347,13 @@ class EffectsTests : TestCase() {
         }.then { _ ->
             assertArrayEquals(
                 listOf(
-                    "commit a:0",
-                    "commit b:0",
+                    "onPreCommit a:0",
+                    "onPreCommit b:0",
                     "recompose",
                     "dispose b:0",
                     "dispose a:0",
-                    "commit a:1",
-                    "commit b:1"
+                    "onPreCommit a:1",
+                    "onPreCommit b:1"
                 ),
                 logHistory
             )
@@ -360,7 +361,7 @@ class EffectsTests : TestCase() {
     }
 
     @Test
-    fun testOnCommit4() {
+    fun testPreCommit4() {
         var x = 0
         var key = 123
 
@@ -368,9 +369,9 @@ class EffectsTests : TestCase() {
         fun log(x: String) = logHistory.add(x)
 
         compose {
-            +onCommit(key) {
+            +onPreCommit(key) {
                 val y = x++
-                log("commit:$y")
+                log("onPreCommit:$y")
                 onDispose {
                     log("dispose:$y")
                 }
@@ -380,7 +381,7 @@ class EffectsTests : TestCase() {
         }.then { _ ->
             assertArrayEquals(
                 listOf(
-                    "commit:0",
+                    "onPreCommit:0",
                     "recompose"
                 ),
                 logHistory
@@ -390,11 +391,11 @@ class EffectsTests : TestCase() {
         }.then { _ ->
             assertArrayEquals(
                 listOf(
-                    "commit:0",
+                    "onPreCommit:0",
                     "recompose",
                     "recompose (key -> 345)",
                     "dispose:0",
-                    "commit:1"
+                    "onPreCommit:1"
                 ),
                 logHistory
             )
@@ -402,7 +403,7 @@ class EffectsTests : TestCase() {
     }
 
     @Test
-    fun testOnCommit5() {
+    fun testPreCommit5() {
         var a = 0
         var b = 0
         var c = 0
@@ -412,9 +413,9 @@ class EffectsTests : TestCase() {
 
         @Composable
         fun Sub() {
-            +onCommit {
+            +onPreCommit {
                 val y = c++
-                log("commit c:$y")
+                log("onPreCommit c:$y")
                 onDispose {
                     log("dispose c:$y")
                 }
@@ -422,17 +423,17 @@ class EffectsTests : TestCase() {
         }
 
         compose {
-            +onCommit {
+            +onPreCommit {
                 val y = a++
-                log("commit a:$y")
+                log("onPreCommit a:$y")
                 onDispose {
                     log("dispose a:$y")
                 }
             }
 
-            +onCommit {
+            +onPreCommit {
                 val y = b++
-                log("commit b:$y")
+                log("onPreCommit b:$y")
                 onDispose {
                     log("dispose b:$y")
                 }
@@ -448,16 +449,101 @@ class EffectsTests : TestCase() {
         }.then { _ ->
             assertArrayEquals(
                 listOf(
-                    "commit a:0",
-                    "commit b:0",
-                    "commit c:0",
+                    "onPreCommit a:0",
+                    "onPreCommit b:0",
+                    "onPreCommit c:0",
                     "recompose",
                     "dispose c:0",
                     "dispose b:0",
                     "dispose a:0",
-                    "commit a:1",
-                    "commit b:1",
-                    "commit c:1"
+                    "onPreCommit a:1",
+                    "onPreCommit b:1",
+                    "onPreCommit c:1"
+                ),
+                logHistory
+            )
+        }
+    }
+
+    @Test
+    fun testOnCommit1() {
+        var mount = true
+
+        val logHistory = mutableListOf<String>()
+        fun log(x: String) = logHistory.add(x)
+
+        @Composable
+        fun Unmountable() {
+            log("Unmountable:start")
+            +onCommit {
+                log("onCommit 1")
+                onDispose {
+                    log("onDispose 1")
+                }
+            }
+            +onPreCommit {
+                log("onPreCommit 2")
+                onDispose {
+                    log("onDispose 2")
+                }
+            }
+            +onCommit {
+                log("onCommit 3")
+                onDispose {
+                    log("onDispose 3")
+                }
+            }
+            log("Unmountable:end")
+        }
+
+        val scheduler = RuntimeEnvironment.getMasterScheduler()
+
+        scheduler.pause()
+
+        compose {
+            with(composer) {
+                log("compose:start")
+                if (mount) {
+                    call(
+                        168,
+                        { true },
+                        { @Suppress("PLUGIN_ERROR") Unmountable() }
+                    )
+                }
+                log("compose:end")
+            }
+        }.then { _ ->
+            scheduler.unPause()
+            assertArrayEquals(
+                listOf(
+                    "compose:start",
+                    "Unmountable:start",
+                    "Unmountable:end",
+                    "compose:end",
+                    "onPreCommit 2",
+                    "onCommit 1",
+                    "onCommit 3"
+                ),
+                logHistory
+            )
+            mount = false
+            scheduler.pause()
+        }.then { _ ->
+            scheduler.unPause()
+            assertArrayEquals(
+                listOf(
+                    "compose:start",
+                    "Unmountable:start",
+                    "Unmountable:end",
+                    "compose:end",
+                    "onPreCommit 2",
+                    "onCommit 1",
+                    "onCommit 3",
+                    "compose:start",
+                    "compose:end",
+                    "onDispose 3",
+                    "onDispose 2",
+                    "onDispose 1"
                 ),
                 logHistory
             )

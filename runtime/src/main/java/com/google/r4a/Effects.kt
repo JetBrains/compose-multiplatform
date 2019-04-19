@@ -2,6 +2,7 @@
 
 package com.google.r4a
 
+import android.view.Choreographer
 import androidx.annotation.CheckResult
 import com.google.r4a.annotations.Hide
 import com.google.r4a.frames.AbstractRecord
@@ -133,7 +134,7 @@ interface CommitScope {
 private val emptyDispose: () -> Unit = {}
 
 @PublishedApi
-internal class CommitScopeImpl(
+internal class PreCommitScopeImpl(
     internal val onCommit: CommitScope.() -> Unit
 ) : CommitScope, CompositionLifecycleObserver {
     private var disposeCallback = emptyDispose
@@ -151,6 +152,42 @@ internal class CommitScopeImpl(
 
     override fun onLeave() {
         disposeCallback()
+    }
+}
+
+@PublishedApi
+internal class PostCommitScopeImpl(
+    internal val onCommit: CommitScope.() -> Unit
+) : CommitScope, CompositionLifecycleObserver, Choreographer.FrameCallback {
+
+    private var disposeCallback = emptyDispose
+    private var hasRun = false
+
+    override fun onDispose(callback: () -> Unit) {
+        assert(disposeCallback === emptyDispose) {
+            "onDispose(...) should only be called once"
+        }
+        disposeCallback = callback
+    }
+
+    override fun doFrame(frameTimeNanos: Long) {
+        hasRun = true
+        onCommit(this)
+    }
+
+    override fun onEnter() {
+        // TODO(lmr): we should eventually move this to an expect/actual "scheduler" of some sort
+        Choreographer.getInstance().postFrameCallback(this)
+    }
+
+    override fun onLeave() {
+        // If `onCommit` hasn't executed yet, we should not call `onDispose`. We should document
+        // somewhere the invariants we intend to have around call order for these.
+        if (hasRun) {
+            disposeCallback()
+        } else {
+            Choreographer.getInstance().removeFrameCallback(this)
+        }
     }
 }
 
@@ -280,11 +317,12 @@ fun <T> memo(vararg inputs: Any?, calculation: () -> T) = effectOf<T> {
  * @param callback The lambda to execute when the composition commits for the first time and becomes active.
  *
  * @see [onCommit]
+ * @see [onPreCommit]
  * @see [onDispose]
  */
 @CheckResult(suggest = "+")
 fun onActive(callback: CommitScope.() -> Unit) = effectOf<Unit> {
-    context.remember { CommitScopeImpl(callback) }
+    context.remember { PostCommitScopeImpl(callback) }
 }
 
 /**
@@ -295,6 +333,7 @@ fun onActive(callback: CommitScope.() -> Unit) = effectOf<Unit> {
  * @param callback The lambda to be executed when the effect leaves the composition.
  *
  * @see [onCommit]
+ * @see [onPreCommit]
  * @see [onActive]
  */
 @CheckResult(suggest = "+")
@@ -309,11 +348,12 @@ fun onDispose(callback: () -> Unit) = onActive { onDispose(callback) }
  * @param callback The lambda to be executed when the effect is committed to the composition.
  *
  * @see [onDispose]
+ * @see [onPreCommit]
  * @see [onActive]
  */
 @CheckResult(suggest = "+")
 fun onCommit(callback: CommitScope.() -> Unit) = effectOf<Unit> {
-    context.changed(CommitScopeImpl(callback))
+    context.changed(PostCommitScopeImpl(callback))
 }
 
 /**
@@ -326,6 +366,7 @@ fun onCommit(callback: CommitScope.() -> Unit) = effectOf<Unit> {
  * @param callback The lambda to be executed when the effect is committed to the composition.
  *
  * @see [onDispose]
+ * @see [onPreCommit]
  * @see [onActive]
  */
 @CheckResult(suggest = "+")
@@ -334,7 +375,7 @@ fun onCommit(callback: CommitScope.() -> Unit) = effectOf<Unit> {
     /* noinline */
     callback: CommitScope.() -> Unit
 ) = effectOf<Unit> {
-    context.remember(v1) { CommitScopeImpl(callback) }
+    context.remember(v1) { PostCommitScopeImpl(callback) }
 }
 
 /**
@@ -348,6 +389,7 @@ fun onCommit(callback: CommitScope.() -> Unit) = effectOf<Unit> {
  * @param callback The lambda to be executed when the effect is committed to the composition.
  *
  * @see [onDispose]
+ * @see [onPreCommit]
  * @see [onActive]
  */
 @CheckResult(suggest = "+")
@@ -357,7 +399,7 @@ fun onCommit(callback: CommitScope.() -> Unit) = effectOf<Unit> {
     /* noinline */
     callback: CommitScope.() -> Unit
 ) = effectOf<Unit> {
-    context.remember(v1, v2) { CommitScopeImpl(callback) }
+    context.remember(v1, v2) { PostCommitScopeImpl(callback) }
 }
 
 /**
@@ -370,11 +412,102 @@ fun onCommit(callback: CommitScope.() -> Unit) = effectOf<Unit> {
  * @param callback The lambda to be executed when the effect is committed to the composition.
  *
  * @see [onDispose]
+ * @see [onPreCommit]
  * @see [onActive]
  */
 @CheckResult(suggest = "+")
 fun onCommit(vararg inputs: Any?, callback: CommitScope.() -> Unit) = effectOf<Unit> {
-    context.remember(*inputs) { CommitScopeImpl(callback) }
+    context.remember(*inputs) { PostCommitScopeImpl(callback) }
+}
+
+
+/**
+ * The onPreCommit effect is a lifecycle effect that will execute [callback] every time the composition commits,
+ * but before those changes have been reflected on the screen. It is useful for executing code that needs to
+ * update in response to a composition and it is critical that the previous results are never seen by the user.
+ * If it is not critical, [onCommit] is recommended instead. The [callback] will get executed with a receiver scope that has an
+ * [onDispose][CommitScope.onDispose] method which can be used to schedule a callback to schedule code that cleans up the code in the
+ * callback.
+ *
+ * @param callback The lambda to be executed when the effect is committed to the composition.
+ *
+ * @see [onDispose]
+ * @see [onPreCommit]
+ * @see [onActive]
+ */
+@CheckResult(suggest = "+")
+fun onPreCommit(callback: CommitScope.() -> Unit) = effectOf<Unit> {
+    context.changed(PreCommitScopeImpl(callback))
+}
+
+/**
+ * The onPreCommit effect is a lifecycle effect that will execute [callback] every time the inputs to the
+ * effect have changed, but before those changes have been reflected on the screen. It is useful for executing
+ * code that needs to update in response to a composition and it is critical that the previous results are
+ * never seen by the user. If it is not critical, [onCommit] is recommended instead. The [callback] will get
+ * executed with a receiver scope that has an [onDispose][CommitScope.onDispose] method which can be used to
+ * schedule a callback to schedule code that cleans up the code in the callback.
+ *
+ * @param v1 The input which will be compared across compositions to determine if [callback] will get executed.
+ * @param callback The lambda to be executed when the effect is committed to the composition.
+ *
+ * @see [onDispose]
+ * @see [onCommit]
+ * @see [onActive]
+ */
+@CheckResult(suggest = "+")
+/* inline */ fun </* reified */ V1> onPreCommit(
+    v1: V1,
+    /* noinline */
+    callback: CommitScope.() -> Unit
+) = effectOf<Unit> {
+    context.remember(v1) { PreCommitScopeImpl(callback) }
+}
+
+/**
+ * The onPreCommit effect is a lifecycle effect that will execute [callback] every time the inputs to the
+ * effect have changed, but before those changes have been reflected on the screen. It is useful for executing
+ * code that needs to update in response to a composition and it is critical that the previous results are
+ * never seen by the user. If it is not critical, [onCommit] is recommended instead. The [callback] will get
+ * executed with a receiver scope that has an [onDispose][CommitScope.onDispose] method which can be used to
+ * schedule a callback to schedule code that cleans up the code in the callback.
+ *
+ * @param v1 An input value which will be compared across compositions to determine if [callback] will get executed.
+ * @param v2 An input value which will be compared across compositions to determine if [callback] will get executed.
+ * @param callback The lambda to be executed when the effect is committed to the composition.
+ *
+ * @see [onDispose]
+ * @see [onCommit]
+ * @see [onActive]
+ */
+@CheckResult(suggest = "+")
+/* inline */ fun </* reified */ V1, /* reified */ V2> onPreCommit(
+    v1: V1,
+    v2: V2,
+    /* noinline */
+    callback: CommitScope.() -> Unit
+) = effectOf<Unit> {
+    context.remember(v1, v2) { PreCommitScopeImpl(callback) }
+}
+
+/**
+ * The onPreCommit effect is a lifecycle effect that will execute [callback] every time the inputs to the
+ * effect have changed, but before those changes have been reflected on the screen. It is useful for executing
+ * code that needs to update in response to a composition and it is critical that the previous results are
+ * never seen by the user. If it is not critical, [onCommit] is recommended instead. The [callback] will get
+ * executed with a receiver scope that has an [onDispose][CommitScope.onDispose] method which can be used to
+ * schedule a callback to schedule code that cleans up the code in the callback.
+ *
+ * @param inputs A set of inputs which will be compared across compositions to determine if [callback] will get executed.
+ * @param callback The lambda to be executed when the effect is committed to the composition.
+ *
+ * @see [onDispose]
+ * @see [onCommit]
+ * @see [onActive]
+ */
+@CheckResult(suggest = "+")
+fun onPreCommit(vararg inputs: Any?, callback: CommitScope.() -> Unit) = effectOf<Unit> {
+    context.remember(*inputs) { PreCommitScopeImpl(callback) }
 }
 
 /**

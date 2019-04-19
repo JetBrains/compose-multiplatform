@@ -13,6 +13,7 @@ import org.junit.runner.RunWith
 import org.junit.Test
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 
 private class TestActivity : Activity() {
@@ -99,10 +100,10 @@ class NewCodeGenTests : TestCase() {
                 val root = FrameLayout(this)
                 val log = mutableListOf<String>()
                 val composable = @Composable {
-                    +onCommit {
-                        log.add("onCommit")
+                    +onPreCommit {
+                        log.add("onPreCommit")
                         onDispose {
-                            log.add("onCommitDispose")
+                            log.add("onPreCommitDispose")
                         }
                     }
                     +onActive {
@@ -113,21 +114,27 @@ class NewCodeGenTests : TestCase() {
                     }
                 }
 
-                log.clear()
-                R4a.composeInto(container = root, composable = composable)
-                assertEquals("onCommit, onActive", log.joinToString())
+                val scheduler = RuntimeEnvironment.getMasterScheduler()
 
                 log.clear()
                 R4a.composeInto(container = root, composable = composable)
-                assertEquals("onCommitDispose, onCommit", log.joinToString())
+                scheduler.advanceToLastPostedRunnable()
+                assertEquals("onPreCommit, onActive", log.joinToString())
+
+                log.clear()
+                R4a.composeInto(container = root, composable = composable)
+                scheduler.advanceToLastPostedRunnable()
+                assertEquals("onPreCommitDispose, onPreCommit", log.joinToString())
 
                 log.clear()
                 R4a.disposeComposition(container = root)
-                assertEquals("onActiveDispose, onCommitDispose", log.joinToString())
+                scheduler.advanceToLastPostedRunnable()
+                assertEquals("onActiveDispose, onPreCommitDispose", log.joinToString())
 
                 log.clear()
                 R4a.composeInto(container = root, composable = composable)
-                assertEquals("onCommit, onActive", log.joinToString())
+                scheduler.advanceToLastPostedRunnable()
+                assertEquals("onPreCommit, onActive", log.joinToString())
             }
         }
 
