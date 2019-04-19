@@ -222,12 +222,3 @@ inline fun <reified T> ViewComposition.provideAmbient(
         provider.children = it
     } }
 )
-
-inline fun <reified T> ViewComposition.consumeAmbient(
-    key: Ambient<T>,
-    noinline children: @Composable() (T) -> Unit
-) = emitComponent(
-    0,
-    { key.Consumer(children) },
-    { consumer -> update(children) { consumer.children = it } }
-)

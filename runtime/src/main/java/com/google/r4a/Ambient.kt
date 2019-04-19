@@ -35,19 +35,4 @@ class Ambient<T>(private val key: String, private val defaultFactory: (() -> T)?
 
         val ambient = this@Ambient
     }
-
-    inner class Consumer(
-        @Children
-        var children: @Composable() (T) -> Unit
-    ) : Component() {
-
-        @Suppress("PLUGIN_ERROR")
-        override fun compose() {
-            with(composer.composer) {
-                children(consume(ambient))
-            }
-        }
-
-        val ambient = this@Ambient
-    }
 }
