@@ -54,10 +54,10 @@ object Dokka {
             throw Exception("Illegal project passed to createDocsTask: " + project.name)
         }
         val docsTask = project.tasks.create(taskName, DokkaAndroidTask::class.java) { docsTask ->
-            docsTask.description = "Generates $docsType Kotlin documentation in the style of " +
-                    "d.android.com"
             docsTask.moduleName = project.name
             docsTask.outputDirectory = File(project.buildDir, taskName).absolutePath
+            docsTask.description = "Generates $docsType Kotlin documentation in the style of " +
+                    "d.android.com.  Places docs in ${docsTask.outputDirectory}"
             docsTask.outputFormat = "dac"
             docsTask.outlineRoot = "androidx/"
             docsTask.dacRoot = "/reference/kotlin"
