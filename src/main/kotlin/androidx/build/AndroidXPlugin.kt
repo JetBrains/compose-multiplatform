@@ -426,10 +426,19 @@ class AndroidXPlugin : Plugin<Project> {
             targetCompatibility = VERSION_1_7
         }
 
-        // Workaround for concurrentfuture
-        project.dependencies.modules.module("com.google.guava:listenablefuture") {
-            (it as ComponentModuleMetadataDetails).replacedBy(
-                "com.google.guava:guava", "guava contains listenablefuture")
+        project.configurations.all { config ->
+            // Remove strict constraints on listenablefuture:1.0
+            config.dependencyConstraints.configureEach { dependencyConstraint ->
+                dependencyConstraint.apply {
+                    if (group == "com.google.guava" &&
+                        name == "listenablefuture" &&
+                        version == "1.0") {
+                        version { versionConstraint ->
+                            versionConstraint.strictly("")
+                        }
+                    }
+                }
+            }
         }
 
         afterEvaluate {
