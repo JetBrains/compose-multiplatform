@@ -4,6 +4,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.google.r4a.frames.currentFrame
 import junit.framework.TestCase
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -554,6 +555,16 @@ class ComposerCompositionContextTests : ComposerComposeTestCase() {
                 </LinearLayout>
                 """
             }
+        }
+    }
+
+    @Test
+    fun testFrameTransition() {
+        var frameId: Int? = null
+        compose {
+            frameId = currentFrame().id
+        }.then { _, _, _, _ ->
+            assertNotSame(frameId, currentFrame().id)
         }
     }
 }

@@ -14,6 +14,8 @@ fun <T> isolated(block: () -> T) = FrameManager.isolated(block)
 fun <T> unframed(block: () -> T) = FrameManager.unframed(block)
 fun <T> framed(block: () -> T) = FrameManager.framed(block)
 
+fun nextFrame() = FrameManager.nextFrame()
+
 /**
  * Ignore the object's implementation of hashCode and equals as they will change for data classes
  * that are mutated. The read observer needs to track the object identity, not the object value.

@@ -60,6 +60,7 @@ internal class ComposerCompositionContext(
             composer.recompose()
             composer.applyChanges()
             dispatchRecomposeObservers()
+            nextFrame()
         } finally {
             CompositionContext.current = prev
             isComposing = false
@@ -101,6 +102,7 @@ internal class ComposerCompositionContext(
                 composer.endGroup()
                 composer.endRoot()
                 composer.applyChanges()
+                nextFrame()
             } finally {
                 CompositionContext.current = prev
                 isComposing = previousComposing
