@@ -571,7 +571,8 @@ private fun createGenerateDocsTask(
                 dependsOn(generateSdkApiTask, doclavaConfig)
                 group = JavaBasePlugin.DOCUMENTATION_GROUP
                 description = "Generates Java documentation in the style of d.android.com. To " +
-                        "generate offline docs use \'-PofflineDocs=true\' parameter."
+                        "generate offline docs use \'-PofflineDocs=true\' parameter.  Places the " +
+                        "documentation in ${destDir}"
 
                 setDocletpath(doclavaConfig.resolve())
                 destinationDir = File(destDir, if (offline) "offline" else "online")
