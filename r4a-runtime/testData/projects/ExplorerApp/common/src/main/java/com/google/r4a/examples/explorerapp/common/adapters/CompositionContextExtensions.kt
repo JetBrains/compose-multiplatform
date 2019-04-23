@@ -82,14 +82,3 @@ import com.google.r4a.ViewComposition
 //    compose()
 //    end()
 //}
-//
-//inline fun <reified T> CompositionContext.consumeAmbient(key: Ambient<T>, noinline children: (T) -> Unit) {
-//    var el = start(0) as? Ambient<T>.Consumer
-//    if (el == null) {
-//        el = key.Consumer()
-//        setInstance(el)
-//    }
-//    set(el, children) { this.children = it }
-//    compose()
-//    end()
-//}

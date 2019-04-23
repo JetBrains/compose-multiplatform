@@ -520,11 +520,10 @@ class EffectsTests : TestCase() {
 
         fun SimpleComposable2() {
             with(composer) {
-                consumeAmbient(MyAmbient) { value ->
-                    emit(534, { context -> TextView(context) }, {
-                        set("$value") { text = it }
-                    })
-                }
+                val value = +ambient(MyAmbient)
+                emit(534, { context -> TextView(context) }, {
+                    set("$value") { text = it }
+                })
             }
         }
 
