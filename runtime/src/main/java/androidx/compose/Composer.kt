@@ -201,6 +201,22 @@ open class Composer<N>(
     private val invalidateStack = Stack<RecomposeScope>()
     internal var ambientReference: CompositionReference? = null
 
+    private val changesAppliedObservers = mutableListOf<() -> Unit>()
+
+    private fun dispatchChangesAppliedObservers() {
+        val listeners = changesAppliedObservers.toTypedArray()
+        changesAppliedObservers.clear()
+        listeners.forEach { it() }
+    }
+
+    internal fun addChangesAppliedObserver(l: () -> Unit) {
+        changesAppliedObservers.add(l)
+    }
+
+    internal fun removeChangesAppliedObserver(l: () -> Unit) {
+        changesAppliedObservers.remove(l)
+    }
+
     // Temporary to allow staged changes. This will move into a sub-object that represents an active
     // composition created by startRoot() and recomposeComponentRange()
     private lateinit var slots: SlotReader
@@ -270,6 +286,7 @@ open class Composer<N>(
         for (holder in enters) {
             holder.instance.onEnter()
         }
+        dispatchChangesAppliedObservers()
     }
 
     override fun startGroup(key: Any) = start(key, START_GROUP)

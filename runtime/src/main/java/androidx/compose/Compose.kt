@@ -119,7 +119,7 @@ object Compose {
         container: ViewGroup,
         parent: CompositionReference? = null,
         composable: @Composable() () -> Unit
-    ) {
+    ): CompositionContext? {
         var root = getRootComponent(container) as? Root
         if (root == null) {
             container.removeAllViews()
@@ -133,10 +133,12 @@ object Compose {
                 parent
             )
             cc.recompose()
+            return cc
         } else {
             root.composable = composable
             root.recomposeCallback?.invoke(true)
         }
+        return null
     }
 
     /**
@@ -191,12 +193,7 @@ object Compose {
             root = Root()
             root.composable = composable
             setRoot(container, root)
-            val cc = CompositionContext.create(
-                context,
-                container,
-                root,
-                parent
-            )
+            val cc = CompositionContext.create(context, container, root, parent)
             cc.recompose()
         } else {
             root.composable = composable

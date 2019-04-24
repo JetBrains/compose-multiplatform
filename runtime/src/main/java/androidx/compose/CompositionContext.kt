@@ -61,14 +61,6 @@ class CompositionContext private constructor(
         recomposePending()
     }
 
-    private val postRecomposeObservers = mutableListOf<() -> Unit>()
-
-    private fun dispatchRecomposeObservers() {
-        val listeners = postRecomposeObservers.toTypedArray()
-        postRecomposeObservers.clear()
-        listeners.forEach { it() }
-    }
-
     private fun recomposePending() {
         if (isComposing) return
         runWithCurrent {
@@ -76,7 +68,6 @@ class CompositionContext private constructor(
                 isComposing = true
                 composer.recompose()
                 composer.applyChanges()
-                dispatchRecomposeObservers()
                 FrameManager.nextFrame()
             } finally {
                 isComposing = false
@@ -119,11 +110,11 @@ class CompositionContext private constructor(
     }
 
     fun addPostRecomposeObserver(l: () -> Unit) {
-        postRecomposeObservers.add(l)
+        composer.addChangesAppliedObserver(l)
     }
 
     fun removePostRecomposeObserver(l: () -> Unit) {
-        postRecomposeObservers.remove(l)
+        composer.removeChangesAppliedObserver(l)
     }
 }
 
