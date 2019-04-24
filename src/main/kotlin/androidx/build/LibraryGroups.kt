@@ -26,6 +26,7 @@ object LibraryGroups {
     val APPCOMPAT = LibraryGroup("androidx.appcompat", false)
     val ARCH_CORE = LibraryGroup("androidx.arch.core", false)
     val ASYNCLAYOUTINFLATER = LibraryGroup("androidx.asynclayoutinflater", false)
+    val AUTOFILL = LibraryGroup("androidx.autofill", false)
     val BIOMETRIC = LibraryGroup("androidx.biometric", false)
     val BROWSER = LibraryGroup("androidx.browser", false)
     val BENCHMARK = LibraryGroup("androidx.benchmark", false)
