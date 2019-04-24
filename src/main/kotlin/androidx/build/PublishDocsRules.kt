@@ -25,10 +25,10 @@ import androidx.build.Strategy.Prebuilts
 import androidx.build.Strategy.TipOfTree
 
 val RELEASE_RULE = docsRules("public", false) {
-    prebuilts(LibraryGroups.ACTIVITY, "1.0.0-alpha06")
+    prebuilts(LibraryGroups.ACTIVITY, "1.0.0-alpha07")
     prebuilts(LibraryGroups.ANNOTATION, "1.1.0-beta01")
     prebuilts(LibraryGroups.APPCOMPAT, "1.1.0-alpha04")
-    prebuilts(LibraryGroups.ARCH_CORE, "2.1.0-alpha01")
+    prebuilts(LibraryGroups.ARCH_CORE, "2.1.0-alpha02")
     prebuilts(LibraryGroups.ASYNCLAYOUTINFLATER, "1.0.0")
     prebuilts(LibraryGroups.BIOMETRIC, "biometric", "1.0.0-alpha04")
     prebuilts(LibraryGroups.BROWSER, "1.0.0")
@@ -52,7 +52,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.EMOJI, "1.0.0")
     prebuilts(LibraryGroups.ENTERPRISE, "1.0.0-alpha01")
     prebuilts(LibraryGroups.EXIFINTERFACE, "1.1.0-alpha01")
-    prebuilts(LibraryGroups.FRAGMENT, "1.1.0-alpha06")
+    prebuilts(LibraryGroups.FRAGMENT, "1.1.0-alpha07")
     prebuilts(LibraryGroups.GRIDLAYOUT, "1.0.0")
     prebuilts(LibraryGroups.HEIFWRITER, "1.0.0")
     prebuilts(LibraryGroups.INTERPOLATOR, "1.0.0")
