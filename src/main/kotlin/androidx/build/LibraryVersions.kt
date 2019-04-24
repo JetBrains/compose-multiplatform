@@ -51,7 +51,7 @@ object LibraryVersions {
     val ENTERPRISE = Version("1.0.0-alpha02")
     val EXIFINTERFACE = Version("1.1.0-alpha02")
     val FRAGMENT = Version("1.1.0-alpha07")
-    val FUTURES = Version("1.0.0-alpha03")
+    val FUTURES = Version("1.0.0-beta01")
     val GRIDLAYOUT = Version("1.1.0-alpha01")
     val HEIFWRITER = Version("1.1.0-alpha01")
     val INTERPOLATOR = Version("1.1.0-alpha01")
