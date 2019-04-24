@@ -19,58 +19,37 @@ import androidx.build.CompilationTarget
 import androidx.build.LibraryGroups
 import androidx.build.LibraryVersions
 
-buildscript {
-    dependencies {
-        classpath 'org.anarres.jarjar:jarjar-gradle:1.0.1'
-    }
-}
-
 plugins {
     id("AndroidXPlugin")
     id("kotlin")
 }
 
-apply plugin: 'org.anarres.jarjar'
-
 dependencies {
-    api(KOTLIN_STDLIB)
-    api("org.jetbrains.kotlin:kotlin-compiler-embeddable")
+    implementation(KOTLIN_STDLIB)
+    implementation project(":compose-plugin-cli")
+
+    implementation("org.jetbrains.kotlin:kotlin-compiler")
+    implementation("org.jetbrains.kotlin:kotlin-plugin")
+    implementation("org.jetbrains.kotlin:kotlin-intellij-core")
+    implementation("org.jetbrains.kotlin:kotlin-platform-api")
+    implementation("org.jetbrains.kotlin:kotlin-platform-impl")
+    implementation("org.jetbrains.kotlin:kotlin-j2k")
+    implementation("org.jetbrains.kotlin:kotlin-java-impl")
 }
 
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+compileKotlin {
     kotlinOptions {
-        jvmTarget = "1.8"
-    }
-}
-
-jarjar.repackage('ideVersion') {
-    destinationName "compose-cli-plugin-ide.jar"
-    from files(sourceSets.main.output.classesDirs)
-    from files(sourceSets.main.output.resourcesDir)
-    dependsOn sourceSets.main.output
-    classRename 'org.jetbrains.kotlin.com.**', 'com.@1'
-}
-
-
-configurations {
-    pluginForIde
-}
-
-artifacts {
-    pluginForIde(ideVersion.destinationPath) {
-        name 'compose-cli-plugin-ide'
-        type 'jar'
-        builtBy ideVersion
+        jvmTarget = '1.8'
     }
 }
 
 androidx {
-    name = "AndroidX Compose Compiler Plugin"
+    name = "AndroidX Compose IDE Plugin"
     publish = true
     toolingProject = true
     mavenVersion = LibraryVersions.COMPOSE
     mavenGroup = LibraryGroups.COMPOSE
     inceptionYear = "2019"
-    description = "Contains the Kotlin compiler plugin for Compose"
+    description = "Contains the IDE plugin for Compose"
     compilationTarget = CompilationTarget.HOST
 }
