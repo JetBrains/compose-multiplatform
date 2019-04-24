@@ -1,19 +1,7 @@
 package com.google.r4a
 
-/* Old code generation model */
-
-interface Recomposable {
-    @HiddenAttribute
-    fun setRecompose(recompose: (sync: Boolean) -> Unit)
-    operator fun invoke()
-}
-
-abstract class RecomposableContext {
-    internal abstract fun enumParents(callback: (Recomposable) -> Boolean)
-    internal abstract fun enumChildren(callback: (Recomposable) -> Boolean)
-}
-
-abstract class Composition<N> : RecomposableContext() {
+// TODO(lmr): this should be named Composer. also we can probably remove
+abstract class Composition<N> {
     abstract val inserting: Boolean
 
     abstract fun startGroup(key: Any)
@@ -21,19 +9,17 @@ abstract class Composition<N> : RecomposableContext() {
     abstract fun skipGroup()
 
     abstract fun startNode(key: Any)
-    abstract fun <T : N> emitNode(factory: () -> T) // Deprecated
-    abstract fun <T : N> createNode(factory: () -> T)
+    // NOTE(lmr): When we move to a model where composition defers creations/mutations to nodes
+    // to the applyChanges phase, we will want to move all usages of emitNode(N) to createNode(() -> T)
+    abstract fun <T : N> emitNode(factory: () -> T) // Deprecated // TODO(lmr): only used in mock
+    abstract fun <T : N> createNode(factory: () -> T) // TODO(lmr): never used. replace usages of emitNode?
     abstract fun emitNode(node: N) // Deprecated - single threaded
     abstract fun useNode(): N
     abstract fun endNode()
 
-    abstract fun startCompose(valid: Boolean, recomposable: Recomposable)
-    abstract fun doneCompose(valid: Boolean)
-
     abstract fun joinKey(left: Any?, right: Any?): Any
 
     abstract fun nextSlot(): Any?
-    abstract fun peekSlot(): Any? // Deprecated - old runtime adapter
 
     abstract fun skipValue()
     abstract fun updateValue(value: Any?)
@@ -65,9 +51,6 @@ inline fun <N, T> Composition<N>.cache(valid: Boolean = true, block: () -> T): T
         false
     }
 }
-
-/* inline */ fun <N, /* reified */ V> Composition<N>.applyNeeded(value: V): Boolean =
-    changed(value) && !inserting
 
 /* inline */ fun <N, V> Composition<N>.remember(block: () -> V): V = cache(true, block)
 

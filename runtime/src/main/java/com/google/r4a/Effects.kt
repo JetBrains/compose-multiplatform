@@ -47,7 +47,7 @@ class Effect<T> internal constructor(
      * from the primitives, as opposed to using the ViewComposer directly.
      */
     @Hide
-    lateinit var context: ViewComposer
+    lateinit var context: Composer<*>
 
     /**
      * We add a composer here with type Unit so that it blocks people from writing KTX elements where there is a
@@ -73,7 +73,7 @@ class Effect<T> internal constructor(
     @Suppress("NOTHING_TO_INLINE")
     @Hide
     /* inline */ fun resolve(
-        composerContext: ViewComposer,
+        composerContext: Composer<*>,
         key: Int = sourceLocation()
     ): T = with(composerContext) {
         this@Effect.context = this
@@ -851,4 +851,4 @@ fun compositionReference() = effectOf<CompositionReference> {
  * Resolves the effect and returns the result.
  */
 @Suppress("NOTHING_TO_INLINE")
-/* inline */ operator fun <T> Effect<T>.unaryPlus(): T = resolve(com.google.r4a.composer.composer)
+/* inline */ operator fun <T> Effect<T>.unaryPlus(): T = resolve(currentComposerNonNull)

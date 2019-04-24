@@ -56,7 +56,7 @@ class ComposerCompositionContextTests : ComposerComposeTestCase() {
         }.then { cc, component, root, activity ->
             val tv1 = activity.findViewById(456) as TextView
 
-            cc.recompose(component)
+            component.recomposeCallback?.invoke(false)
 
             assertEquals("Compose got called twice", 3, i)
 
@@ -261,8 +261,8 @@ class ComposerCompositionContextTests : ComposerComposeTestCase() {
         val counter = Counter()
 
         val listener = RecomposeTestComponents.ClickAction.PerformOnView {
-            CompositionContext.findRoot(it)?.let {
-                CompositionContext.recompose(it)
+            R4a.findRoot(it)?.let {
+                it.recomposeCallback?.invoke(false)
             }
         }
 
@@ -322,8 +322,8 @@ class ComposerCompositionContextTests : ComposerComposeTestCase() {
         val counter = Counter()
 
         val listener = RecomposeTestComponents.ClickAction.PerformOnView {
-            CompositionContext.findRoot(it)?.let {
-                CompositionContext.recomposeSync(it)
+            R4a.findRoot(it)?.let {
+                it.recomposeCallback?.invoke(true)
             }
         }
         compose {

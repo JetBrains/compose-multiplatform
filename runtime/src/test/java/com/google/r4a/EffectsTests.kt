@@ -682,7 +682,7 @@ class EffectsTests : TestCase() {
         ) {
 
             fun then(block: (activity: Activity) -> Unit): ActiveTest {
-                cc.recomposeSync(component)
+                cc.recompose()
                 block(activity)
                 return this
             }
@@ -697,8 +697,7 @@ class EffectsTests : TestCase() {
             val activity = controller.create().get()
             val root = activity.root
             val component = Root(composable)
-            val cc = CompositionContext.create(root.context, root, component, null)
-            cc.context = activity
+            val cc = R4a.createCompositionContext(root.context, root, component, null)
             return ActiveTest(activity, cc, component).then(block)
         }
     }

@@ -4,9 +4,8 @@ import com.google.r4a.Applier
 import com.google.r4a.ApplyAdapter
 import com.google.r4a.Composer
 import com.google.r4a.Composition
-import com.google.r4a.Recomposable
 import com.google.r4a.SlotTable
-import com.google.r4a.applyNeeded
+import com.google.r4a.cache
 import com.google.r4a.changed
 import com.google.r4a.remember
 
@@ -14,7 +13,7 @@ interface MockViewComposition {
     val cc: Composition<View>
 }
 
-abstract class ViewComponent : Recomposable, MockViewComposition {
+abstract class ViewComponent : MockViewComposition {
     private var recomposer: ((sync: Boolean) -> Unit)? = null
     private lateinit var _composition: Composition<View>
     @PublishedApi
@@ -23,15 +22,18 @@ abstract class ViewComponent : Recomposable, MockViewComposition {
     }
 
     override val cc: Composition<View> get() = _composition
-    override fun setRecompose(recompose: (sync: Boolean) -> Unit) {
-        recomposer = recompose
-    }
 
     fun recompose() {
         recomposer?.let { it(false) }
     }
 
-    override operator fun invoke() = compose()
+    operator fun invoke() {
+        val cc = cc as MockViewComposer
+        val callback = cc.startJoin(false) { compose() }
+        compose()
+        cc.doneJoin(false)
+        recomposer = callback
+    }
     abstract fun compose()
 }
 
@@ -62,6 +64,10 @@ class MockViewComposer(
         }
     }
 }
+
+/* inline */ fun <N, /* reified */ V> Composition<N>.applyNeeded(value: V): Boolean =
+    changed(value) && !inserting
+
 
 @Suppress("NOTHING_TO_INLINE")
 inline fun <V> MockViewComposition.remember(
@@ -149,24 +155,50 @@ inline fun <V : View, reified A1> MockViewComposition.emit(
     cc.endNode()
 }
 
-inline fun <reified C : ViewComponent, reified A1> MockViewComposition.composeComponent(
+val invocation = Object()
+
+inline fun MockViewComposition.call(
     key: Any,
-    crossinline factory: () -> C,
-    a1: A1,
-    set1: C.(A1) -> Unit
-) {
-    val myCC = cc
-    myCC.startGroup(key)
-    val component = myCC.remember { factory().apply { setComposition(myCC) } }
-    var skip = true
-    if (myCC.changed(a1)) {
-        apply { component.set1(a1) }
-        skip = false
+    invalid: Composition<View>.() -> Boolean,
+    block: () -> Unit
+) = with(cc) {
+    startGroup(key)
+    if (invalid() || inserting) {
+        startGroup(invocation)
+        block()
+        endGroup()
+    } else {
+        nextSlot()
+        skipValue()
+        skipGroup()
     }
-    myCC.startCompose(skip, component)
-    if (!skip) component.compose()
-    myCC.doneCompose(skip)
-    myCC.endGroup()
+    endGroup()
+}
+
+inline fun <T: ViewComponent> MockViewComposition.call(
+    key: Any,
+    ctor: () -> T,
+    invalid: ComponentUpdater<T>.() -> Unit,
+    block: (f: T) -> Unit
+) = with(cc) {
+    startGroup(key)
+    val f = cache(true, ctor).apply { setComposition(this@with) }
+    val updater = object : ComponentUpdater<T> {
+        override val cc: Composition<View> = this@with
+        override var changed: Boolean = false
+        override val component = f
+    }
+    updater.invalid()
+    if (updater.changed || inserting) {
+        startGroup(invocation)
+        block(f)
+        endGroup()
+    } else {
+        nextSlot()
+        skipValue()
+        skipGroup()
+    }
+    endGroup()
 }
 
 fun MockViewComposition.join(
@@ -181,69 +213,6 @@ fun MockViewComposition.join(
     myCC.endGroup()
 }
 
-inline fun <reified C : ViewComponent, reified A1, reified A2> MockViewComposition.composeComponent(
-    key: Any,
-    crossinline factory: () -> C,
-    a1: A1,
-    set1: C.(A1) -> Unit,
-    a2: A2,
-    set2: C.(A2) -> Unit
-) {
-    val myCC = cc
-    myCC.startGroup(key)
-    val component = myCC.remember { factory().apply { setComposition(myCC) } }
-    component.setComposition(cc)
-    var skip = true
-    if (myCC.changed(a1)) {
-        apply { component.set1(a1) }
-        skip = false
-    }
-    if (myCC.changed(a2)) {
-        apply { component.set2(a2) }
-        skip = false
-    }
-    myCC.startCompose(skip, component)
-    if (!skip) component()
-    myCC.doneCompose(skip)
-    myCC.endGroup()
-}
-
-inline fun <
-        reified C : ViewComponent,
-        reified A1,
-        reified A2,
-        reified A3
-        > MockViewComposition.composeComponent(
-            key: Any,
-            crossinline factory: () -> C,
-            a1: A1,
-            set1: C.(A1) -> Unit,
-            a2: A2,
-            set2: C.(A2) -> Unit,
-            a3: A3,
-            set3: C.(A3) -> Unit
-        ) {
-    val myCC = cc
-    myCC.startGroup(key)
-    val component = myCC.remember { factory().apply { setComposition(myCC) } }
-    var skip = true
-    if (myCC.changed(a1)) {
-        apply { component.set1(a1) }
-        skip = false
-    }
-    if (myCC.changed(a2)) {
-        apply { component.set2(a2) }
-        skip = false
-    }
-    if (myCC.changed(a3)) {
-        apply { component.set3(a3) }
-        skip = false
-    }
-    myCC.startCompose(skip, component)
-    if (!skip) component()
-    myCC.doneCompose(skip)
-    myCC.endGroup()
-}
 
 interface ComponentUpdater<C> : MockViewComposition {
     val component: C
@@ -264,31 +233,4 @@ inline fun <C, reified V> ComponentUpdater<C>.update(value: V, noinline block: C
         component.block(value)
         changed = true
     }
-}
-
-inline fun <C, V> ComponentUpdater<C>.change(value: V, block: C.(V) -> Unit) {
-    component.block(value)
-    changed = true
-}
-
-inline fun <reified C : ViewComponent> MockViewComposition.composeComponent(
-    key: Any,
-    crossinline factory: () -> C,
-    crossinline block: ComponentUpdater<C>.() -> Unit
-) {
-    val myCC = cc
-    myCC.startGroup(key)
-    val component = myCC.remember { factory().apply { setComposition(myCC)} }
-    val updater = object : ComponentUpdater<C> {
-        override val cc = myCC
-        override var changed: Boolean = false
-        override val component = component
-    }
-    if (myCC.inserting) updater.changed = true
-    updater.block()
-    val skip = !updater.changed
-    myCC.startCompose(skip, component)
-    if (!skip) component()
-    myCC.doneCompose(skip)
-    myCC.endGroup()
 }

@@ -10,12 +10,6 @@ import com.google.r4a.frames.registerCommitObserver
 import com.google.r4a.frames.inFrame
 import java.lang.ref.WeakReference
 
-fun <T> isolated(block: () -> T) = FrameManager.isolated(block)
-fun <T> unframed(block: () -> T) = FrameManager.unframed(block)
-fun <T> framed(block: () -> T) = FrameManager.framed(block)
-
-fun nextFrame() = FrameManager.nextFrame()
-
 /**
  * Ignore the object's implementation of hashCode and equals as they will change for data classes
  * that are mutated. The read observer needs to track the object identity, not the object value.
@@ -43,7 +37,7 @@ private class WeakIdentity<T>(value: T) {
  * model objects read during composition are recorded in an invalidations map. If they are mutated during a frame the recompose
  * scope that was active during the read is invalidated.
  */
-internal object FrameManager {
+object FrameManager {
     private var started = false
     private var commitPending = false
     private var reclaimPending = false
@@ -60,7 +54,7 @@ internal object FrameManager {
         }
     }
 
-    fun close() {
+    internal fun close() {
         synchronized(this) {
             invalidations.clear()
         }
@@ -112,7 +106,7 @@ internal object FrameManager {
         }
     }
 
-    fun scheduleCleanup() {
+    internal fun scheduleCleanup() {
         if (started && !reclaimPending && synchronized(this) {
                 if (!reclaimPending) {
                     reclaimPending = true
@@ -181,7 +175,8 @@ internal object FrameManager {
 private fun <T> Iterable<Set<T>>.reduceSet(): Set<T> {
     val iterator = iterator()
     if (!iterator.hasNext()) return emptySet<T>()
-    var acc = mutableSetOf<T>() + iterator.next()
+    val acc = mutableSetOf<T>()
+    acc += iterator.next()
     while (iterator.hasNext()) {
         acc += iterator.next()
     }

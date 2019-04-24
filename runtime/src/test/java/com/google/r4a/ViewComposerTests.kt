@@ -743,7 +743,7 @@ class NewCodeGenTests : TestCase() {
                     cc.emitEmittable(616, { -> MyEmittable() }, {
                         set("Message") { message = it }
                     }) {
-                        cc.emitView(617, { context -> TextView(context)}, {
+                        cc.emit(617, { context -> TextView(context)}, {
                             set("SomeValue") { text = it }
                         })
                         cc.emitEmittable(620, { -> MyEmittable() }, {
@@ -890,7 +890,7 @@ class NewCodeGenTests : TestCase() {
                 when (parent) {
                     is ViewGroup -> when (child) {
                         is View -> child
-                        is Emittable -> ViewEmitWrapper(cc.context).apply { emittable = child }
+                        is Emittable -> ViewEmitWrapper(parent.context).apply { emittable = child }
                         else -> null
                     }
                     is Emittable -> when (child) {
@@ -919,17 +919,12 @@ class NewCodeGenTests : TestCase() {
         ) {
 
             fun then(block: TestContext.(activity: Activity) -> Unit): ActiveTest {
-                val previous = CompositionContext.current
-                val cc = context.cc
-                CompositionContext.current = cc
-                try {
+                context.cc.runWithCurrent {
                     val composer = composer.composer
                     composer.startRoot()
                     context.composable(activity)
                     composer.endRoot()
                     composer.applyChanges()
-                } finally {
-                    CompositionContext.current = previous
                 }
                 context.block(activity)
                 return this
@@ -941,8 +936,7 @@ class NewCodeGenTests : TestCase() {
             val activity = controller.create().get()
             val root = activity.root
             val component = Root()
-            val cc = CompositionContext.create(root.context, root, component, null)
-            cc.context = activity
+            val cc = R4a.createCompositionContext(root.context, root, component, null)
             return ActiveTest(activity, TestContext(cc), component).then(block)
         }
     }
