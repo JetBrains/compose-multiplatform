@@ -23,9 +23,14 @@ class ComposableAnnotationChecker() : org.jetbrains.kotlin.r4a.ComposableAnnotat
     override fun getMode(psi: PsiElement): Mode {
         if (nullableMode != null) return nullableMode
         val module = ModuleUtilCore.findModuleForPsiElement(psi) ?: return DEFAULT_MODE
-        val kotlinFacet = org.jetbrains.kotlin.idea.facet.KotlinFacet.get(module) ?: return DEFAULT_MODE
+        val kotlinFacet = org.jetbrains.kotlin.idea.facet.KotlinFacet.get(module)
+                ?: return DEFAULT_MODE
         val commonArgs = kotlinFacet.configuration.settings.compilerArguments ?: return DEFAULT_MODE
-        val modeOption = commonArgs.pluginOptions?.single { it.startsWith("plugin:org.jetbrains.kotlin.r4a:syntax=") } ?: return DEFAULT_MODE
-        return Mode.valueOf(modeOption.substring(modeOption.indexOf("=")+1).toUpperCase())
+        val modeOption = commonArgs.pluginOptions?.firstOrNull {
+            it.startsWith("plugin:org.jetbrains.kotlin.r4a:syntax=")
+        } ?: return DEFAULT_MODE
+        return Mode.valueOf(
+                modeOption.substring(modeOption.indexOf("=")+1).toUpperCase()
+        )
     }
 }
