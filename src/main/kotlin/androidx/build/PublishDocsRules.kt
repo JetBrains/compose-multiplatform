@@ -96,7 +96,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.RECYCLERVIEW, "recyclerview-selection", "1.1.0-alpha01")
     prebuilts(LibraryGroups.REMOTECALLBACK, "1.0.0-alpha01")
     ignore(LibraryGroups.ROOM.group, "room-common-java8")
-    prebuilts(LibraryGroups.ROOM, "2.1.0-alpha06")
+    prebuilts(LibraryGroups.ROOM, "2.1.0-alpha07")
     prebuilts(LibraryGroups.SAVEDSTATE, "1.0.0-alpha02")
     prebuilts(LibraryGroups.SHARETARGET, "1.0.0-alpha01")
     prebuilts(LibraryGroups.SLICE, "slice-builders", "1.0.0")
