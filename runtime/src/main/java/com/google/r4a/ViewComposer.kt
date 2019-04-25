@@ -129,12 +129,6 @@ class ViewComposer(
     init {
         FrameManager.ensureStarted()
     }
-
-    fun skipGroup(@Suppress("UNUSED_PARAMETER") key: Any) {
-        nextSlot()
-        skipValue()
-        skipGroupAndRecomposeRange()
-    }
 }
 
 @Suppress("UNCHECKED_CAST")
@@ -251,7 +245,7 @@ class ViewComposer(
     }
 }
 
-/* inline */ class ViewValidator(val composer: ViewComposer) {
+/* inline */ class ViewValidator(val composer: Composer<*>) {
     // TODO: Add more overloads for common primitive types like String and Float etc to avoid boxing
     // and the immutable check
     @Suppress("NOTHING_TO_INLINE")
@@ -369,11 +363,15 @@ class ViewComposer(
     }
 }
 
-internal val currentComposer get() =
-    (CompositionContext.current as? ComposerCompositionContext)?.composer
+internal val currentComposer get() = currentCompositionContext?.composer
 
-val composer get() =
-    ViewComposition((CompositionContext.current as ComposerCompositionContext).composer)
+internal val currentComposerNonNull
+    get() = currentCompositionContext?.composer ?: emptyComposition()
+
+private fun emptyComposition(): Nothing =
+    error("Composition requires an active composition context")
+
+val composer get() = ViewComposition(currentComposerNonNull as ViewComposer)
 
 fun ViewComposition.registerAdapter(
     adapter: (parent: Any, child: Any) -> Any?

@@ -145,17 +145,10 @@ private class Pending(
 
 private object RootKey
 
-private sealed class Invalidation(val location: Int)
-
-private class RecomposableInvalidation(
-    val recomposable: Recomposable,
-    location: Int
-) : Invalidation(location)
-
-private class ScopeInvalidation(
+private class Invalidation(
     val scope: RecomposeScope,
-    location: Int
-) : Invalidation(location)
+    val location: Int
+)
 
 internal class RecomposeScope(val compose: (invalidate: (sync: Boolean) -> Unit) -> Unit) {
     var anchor: Anchor? = null
@@ -165,6 +158,7 @@ internal class RecomposeScope(val compose: (invalidate: (sync: Boolean) -> Unit)
 
 private val IGNORE_RECOMPOSE: (sync: Boolean) -> Unit = {}
 
+// TODO(lmr): this could be named MutableTreeComposer
 open class Composer<N>(
     private val slotTable: SlotTable,
     private val applier: Applier<N>,
@@ -187,7 +181,6 @@ open class Composer<N>(
     private var childrenAllowed = true
     private var invalidations: MutableList<Invalidation> = mutableListOf()
     private val entersStack = IntStack()
-    private val insertedParents = Stack<Recomposable>()
     private val insertedProviders = Stack<Ambient<*>.Provider>()
     private val invalidateStack = Stack<RecomposeScope>()
     internal var ambientReference: CompositionReference? = null
@@ -271,6 +264,12 @@ open class Composer<N>(
         groupNodeCount += slots.skipGroup()
     }
 
+    fun skipGroup(@Suppress("UNUSED_PARAMETER") key: Any) {
+        nextSlot()
+        skipValue()
+        skipGroupAndRecomposeRange()
+    }
+
     override fun startNode(key: Any) {
         start(key, START_NODE)
         childrenAllowed = false
@@ -349,7 +348,6 @@ open class Composer<N>(
         getKey(slots.get(slots.current), left, right) ?: JoinedKey(left, right)
 
     override fun nextSlot(): Any? = slots.next()
-    override fun peekSlot(): Any? = slots.get(slots.current)
 
     override fun skipValue() = recordSlotNext()
 
@@ -371,55 +369,6 @@ open class Composer<N>(
             } else slots.update(value)
             if (previous is CompositionLifecycleObserverHolder) {
                 lifecycleManager.leaving(previous)
-            }
-        }
-    }
-
-    override fun enumParents(callback: (Recomposable) -> Boolean) {
-        // Enumerate the parents that have been inserted
-        if (insertedParents.isNotEmpty()) {
-            var current = insertedParents.size - 1
-            while (current >= 0) {
-                val parent = insertedParents[current]
-                if (!callback(parent)) return
-                current--
-            }
-        }
-
-        // Enumerate the parents that were also in the previous composition
-        var current = slots.startStack.size - 1
-        while (current > 0) {
-            val index = slots.startStack.peek(current)
-            val maybeParent = slots.get(index + 1)
-            if (maybeParent is Recomposable) {
-                if (!callback(maybeParent)) return
-            }
-            current--
-        }
-    }
-
-    override fun enumChildren(callback: (Recomposable) -> Boolean) {
-        // Inserting components don't have children yet.
-        if (!inserting) {
-            // Get the parent size from the slot table
-            val containingGroupIndex = slots.startStack.peek()
-            val start = containingGroupIndex + 1
-            val end = start + slots.groupSize(containingGroupIndex)
-
-            // Check the slots in range for recomposabile instances
-            for (index in start until end) {
-                // A recomposable (i.e. a component) will always be in the first slot after the
-                // group marker.  This is true because that is where the recompose routine will look
-                // for it. If the slot does not hold a recomposable it is not a recomposable group
-                // so skip it.
-                if (slots.isGroup(index)) {
-                    val maybeChild = slots.get(index + 1)
-                    if (maybeChild is Recomposable) {
-                        // Call the callback with the recomposable but stop enumerating if the
-                        // callback returns true.
-                        if (!callback(maybeChild)) break
-                    }
-                }
             }
         }
     }
@@ -902,10 +851,7 @@ open class Composer<N>(
             recordExits(location, enterStackSize)
             recordEnters(location)
 
-            when (firstInRange) {
-                is RecomposableInvalidation -> composeInstance(firstInRange.recomposable)
-                is ScopeInvalidation -> composeScope(firstInRange.scope)
-            }
+            composeScope(firstInRange.scope)
 
             recomposed = true
 
@@ -935,47 +881,6 @@ open class Composer<N>(
             recomposer?.recomposeSync()
         } else {
             recomposer?.scheduleRecompose()
-        }
-    }
-
-    private fun invalidate(instance: Recomposable, anchor: Anchor) {
-        val location = anchor.location(slotTable)
-        if (location >= 0) {
-            invalidations.insertIfMissing(location, instance)
-            recomposer?.scheduleRecompose()
-        }
-    }
-
-    private fun composeInstance(instance: Recomposable) {
-        startCompose(false, instance)
-        instance()
-        doneCompose(false)
-    }
-
-    override fun startCompose(valid: Boolean, recomposable: Recomposable) {
-        if (!valid) {
-            slots.startGroup()
-            recordStart(START_GROUP)
-            if (inserting) {
-                insertedParents.push(recomposable)
-                recordOperation { _, slots, _ ->
-                    val anchor = slots.anchor(slots.current - 1)
-                    recomposable.setRecompose { this.invalidate(recomposable, anchor) }
-                }
-                slots.beginEmpty()
-            } else {
-                invalidations.removeLocation(slots.current - 1)
-            }
-            enterGroup(START_GROUP, null, null)
-        }
-    }
-
-    override fun doneCompose(valid: Boolean) {
-        if (!valid) {
-            if (inserting) insertedParents.pop()
-            end(END_GROUP)
-        } else {
-            skipGroupAndRecomposeRange()
         }
     }
 
@@ -1402,18 +1307,10 @@ private fun getKey(value: Any?, left: Any?, right: Any?): Any? = (value as? Join
 private fun MutableList<Invalidation>.findLocation(location: Int): Int =
     binarySearch { it.location.compareTo(location) }
 
-private fun MutableList<Invalidation>.insertIfMissing(location: Int, recomposable: Recomposable) {
-    val index = findLocation(location)
-    if (index < 0) {
-        add(-(index + 1), RecomposableInvalidation(recomposable, location))
-    }
-}
-
 private fun MutableList<Invalidation>.insertIfMissing(location: Int, scope: RecomposeScope) {
     val index = findLocation(location)
     if (index < 0) {
-        // TODO: Remove Recomposable
-        add(-(index + 1), ScopeInvalidation(scope, location))
+        add(-(index + 1), Invalidation(scope, location))
     }
 }
 

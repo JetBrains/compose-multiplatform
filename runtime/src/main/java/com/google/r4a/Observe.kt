@@ -3,7 +3,7 @@ package com.google.r4a
 @Composable
 @Suppress("PLUGIN_ERROR")
 fun Observe(@Children body: @Composable() () -> Unit) =
-    composer.composer.let { composer ->
+    currentComposerNonNull.let { composer ->
         composer.startGroup(observer)
         composer.startJoin(false) { body() }
         body()

@@ -26,7 +26,7 @@ class Ambient<T>(private val key: String, private val defaultFactory: (() -> T)?
 
         @Suppress("PLUGIN_ERROR")
         override fun compose() {
-            with(composer.composer) {
+            with(currentComposerNonNull) {
                 startProvider(this@Provider, value)
                 children()
                 endProvider()

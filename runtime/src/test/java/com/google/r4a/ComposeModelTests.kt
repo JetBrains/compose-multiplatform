@@ -120,7 +120,7 @@ class ModelViewTests : TestCase() {
     }
 
     @Test
-    fun testModelView_Simple(): Unit = isolated {
+    fun testModelView_Simple(): Unit = FrameManager.isolated {
         val tvId = 67
         compose {
             emit(62, { context -> TextView(context).apply {
@@ -133,7 +133,7 @@ class ModelViewTests : TestCase() {
     }
 
     @Test
-    fun testModelView_Simple_Recompose(): Unit = isolated {
+    fun testModelView_Simple_Recompose(): Unit = FrameManager.isolated {
         val tvId = 71
         compose {
             emit(73, { context -> TextView(context).apply {
@@ -149,7 +149,7 @@ class ModelViewTests : TestCase() {
     }
 
     @Test
-    fun testModelView_PersonModel(): Unit = isolated {
+    fun testModelView_PersonModel(): Unit = FrameManager.isolated {
         val tvIdName = 90
         val tvIdAge = 91
         val president = Person(PRESIDENT_NAME_1, PRESIDENT_AGE_1)
@@ -182,7 +182,7 @@ class ModelViewTests : TestCase() {
     }
 
     @Test
-    fun testModelView_RecomposeScopeCleanup(): Unit = isolated {
+    fun testModelView_RecomposeScopeCleanup(): Unit = FrameManager.isolated {
         val washington = Person(PRESIDENT_NAME_1, PRESIDENT_AGE_1)
         val lincoln = Person(PRESIDENT_NAME_16, PRESIDENT_AGE_16)
         val displayLincoln = TestState(true)
@@ -221,7 +221,7 @@ class ModelViewTests : TestCase() {
 
     // b/122548164
     @Test
-    fun testObserverEntering(): Unit = isolated {
+    fun testObserverEntering(): Unit = FrameManager.isolated {
         val president = Person(PRESIDENT_NAME_1, PRESIDENT_AGE_1)
         val tvName = 204
 
@@ -266,7 +266,7 @@ class ModelViewTests : TestCase() {
     }
 
     @Test
-    fun testModelUpdatesNextFrameVisibility(): Unit = isolated {
+    fun testModelUpdatesNextFrameVisibility(): Unit = FrameManager.isolated {
         val president = Person(PRESIDENT_NAME_1, PRESIDENT_AGE_1)
         val tvName = 204
 
@@ -317,8 +317,7 @@ class ModelViewTests : TestCase() {
 
     private class Root(val block: ViewComposition.() -> Unit) : Component() {
         override fun compose() {
-            ViewComposition((CompositionContext.current as
-                    ComposerCompositionContext).composer).block()
+            ViewComposition(composer.composer).block()
         }
     }
 
@@ -354,13 +353,14 @@ class ModelViewTests : TestCase() {
         fun then(block: (activity: Activity) -> Unit): ActiveTest {
             val controller = Robolectric.buildActivity(FrameTestActivity::class.java)
             val activity = controller.create().get()
-            CompositionContext.current = CompositionContext.factory(
+            return R4a.createCompositionContext(
                 activity,
                 activity.root,
                 Root(composable),
                 null
-            )
-            return ActiveTest(activity).then(block)
+            ).runWithCurrent {
+                ActiveTest(activity).then(block)
+            }
         }
     }
 }

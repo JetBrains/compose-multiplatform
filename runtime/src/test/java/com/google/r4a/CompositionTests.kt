@@ -10,7 +10,7 @@ import com.google.r4a.mock.Point
 import com.google.r4a.mock.Report
 import com.google.r4a.mock.View
 import com.google.r4a.mock.ViewComponent
-import com.google.r4a.mock.composeComponent
+import com.google.r4a.mock.call
 import com.google.r4a.mock.contact
 import com.google.r4a.mock.edit
 import com.google.r4a.mock.join
@@ -265,10 +265,12 @@ class CompositionTests : TestCase() {
         fun MockViewComposition.reportsReport(reports: Iterable<Report>) {
             linear {
                 repeat(of = reports) { report ->
-                    composeComponent(
+                    call(
                         slReportReports,
-                        ::Reporter,
-                        a1 = report, set1 = { this.report = it })
+                        { Reporter() },
+                        { set(report) { this.report = it } },
+                        { it() }
+                    )
                 }
             }
         }
@@ -311,11 +313,15 @@ class CompositionTests : TestCase() {
 
         val two = object {}
         val composer = compose {
-            composeComponent(
+            call(
                 two,
-                ::Two,
-                41, { first = it },
-                42, { second = it })
+                { Two() },
+                {
+                    set(41) { this.first = it }
+                    set(42) { this.second = it }
+                },
+                { it() }
+            )
         }
 
         validate(composer.root) {
@@ -344,12 +350,16 @@ class CompositionTests : TestCase() {
 
         val three = object {}
         val composer = compose {
-            composeComponent(
+            call(
                 three,
-                ::Three,
-                41, { first = it },
-                42, { second = it },
-                43, { third = it })
+                { Three() },
+                {
+                    set(41) { this.first = it }
+                    set(42) { this.second = it }
+                    set(43) { this.third = it }
+                },
+                { it() }
+            )
         }
 
         validate(composer.root) {
@@ -379,12 +389,17 @@ class CompositionTests : TestCase() {
 
         val four = object {}
         val composer = compose {
-            composeComponent(four, ::Four) {
-                set(41) { first = it }
-                set(42) { second = it }
-                set(43) { third = it }
-                set(44) { fourth = it }
-            }
+            call(
+                four,
+                { Four() },
+                {
+                    set(41) { this.first = it }
+                    set(42) { this.second = it }
+                    set(43) { this.third = it }
+                    set(44) { this.fourth = it }
+                },
+                { it() }
+            )
         }
 
         validate(composer.root) {
@@ -405,9 +420,14 @@ class CompositionTests : TestCase() {
 
         val key = object {}
         fun MockViewComposition.callOne(value: Int) {
-            composeComponent(key, { One(first = value) }) {
-                update(value) { first = it }
-            }
+            call(
+                key,
+                { One(first = value) },
+                {
+                    update(value) { this.first = it }
+                },
+                { it() }
+            )
         }
 
         var value = 42
@@ -443,7 +463,12 @@ class CompositionTests : TestCase() {
 
         val key = object {}
         fun MockViewComposition.callOne(value: Int) {
-            composeComponent(cc.joinKey(key, value), { One(first = value) }) { }
+            call(
+                cc.joinKey(key, value),
+                { One(first = value) },
+                { },
+                { it() }
+            )
         }
 
         var value = 42
@@ -493,10 +518,12 @@ class CompositionTests : TestCase() {
         fun MockViewComposition.reportsReport(reports: Iterable<Report>) {
             linear {
                 repeat(of = reports) { report ->
-                    composeComponent(
+                    call(
                         slReportReports,
-                        ::Reporter,
-                        a1 = report, set1 = { this.report = it })
+                        { Reporter() },
+                        { set(report) { this.report = it } },
+                        { it() }
+                    )
                 }
             }
         }
@@ -566,10 +593,12 @@ class CompositionTests : TestCase() {
         fun MockViewComposition.reportsReport(reports: Iterable<Report>) {
             linear {
                 repeat(of = reports) { report ->
-                    composeComponent(
+                    call(
                         slReportReports,
-                        ::Reporter,
-                        a1 = report, set1 = { this.report = it })
+                        { Reporter() },
+                        { set(report) { this.report = it } },
+                        { it() }
+                    )
                 }
             }
         }
