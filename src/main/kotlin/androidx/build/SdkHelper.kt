@@ -23,9 +23,16 @@ import java.util.Properties
  * Writes the appropriate SDK path to local.properties file.
  */
 fun setSdkInLocalPropertiesFile(supportRoot: File) {
+    setSdkInLocalPropertiesFile(supportRoot, supportRoot)
+}
+
+/**
+ * Writes the appropriate SDK path to local.properties file in specified location.
+ */
+fun setSdkInLocalPropertiesFile(supportRoot: File, propertiesFile: File) {
     val sdkPath = getSdkPath(supportRoot)
     if (sdkPath.exists()) {
-        val props = File(supportRoot, "local.properties")
+        val props = File(propertiesFile, "local.properties")
         // gradle always deliminate directories with '/' regardless of the OS.
         // So convert deliminator here.
         val gradlePath = sdkPath.absolutePath.replace(File.separator, "/")
