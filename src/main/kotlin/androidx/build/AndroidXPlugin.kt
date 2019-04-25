@@ -44,7 +44,6 @@ import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.TestedExtension
 import com.android.build.gradle.api.ApkVariant
-import com.android.build.gradle.internal.tasks.factory.dependsOn
 import org.gradle.api.DefaultTask
 import org.gradle.api.JavaVersion.VERSION_1_7
 import org.gradle.api.JavaVersion.VERSION_1_8
@@ -131,14 +130,17 @@ class AndroidXPlugin : Plugin<Project> {
                     project.configureResourceApiChecks()
                     project.addCreateLibraryBuildInfoFileTask(androidXExtension)
                     val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
-                    val checkNoWarningsTask = project.tasks.register(CHECK_NO_WARNINGS_TASK)
+                    val checkNoWarningsTask = project.tasks.register(CHECK_NO_WARNINGS_TASK) {
+                        extension.libraryVariants.all { libraryVariant ->
+                            it.dependsOn(libraryVariant.javaCompileProvider)
+                        }
+                    }
                     project.createCheckReleaseReadyTask(listOf(verifyDependencyVersionsTask,
                         checkNoWarningsTask))
                     extension.libraryVariants.all { libraryVariant ->
                         verifyDependencyVersionsTask.configure { task ->
                             task.dependsOn(libraryVariant.javaCompileProvider)
                         }
-                        checkNoWarningsTask.dependsOn(libraryVariant.javaCompileProvider)
                         project.gradle.taskGraph.whenReady { executionGraph ->
                             if (executionGraph.hasTask(checkNoWarningsTask.get())) {
                                 libraryVariant.javaCompileProvider.configure { task ->
@@ -237,7 +239,7 @@ class AndroidXPlugin : Plugin<Project> {
         val createCoverageJarTask = Jacoco.createCoverageJarTask(this)
         buildOnServerTask.dependsOn(createCoverageJarTask)
 
-        tasks.register(BUILD_TEST_APKS) { it ->
+        tasks.register(BUILD_TEST_APKS) {
             it.dependsOn(createCoverageJarTask)
         }
 
@@ -365,7 +367,9 @@ class AndroidXPlugin : Plugin<Project> {
 
         val buildTestApksTask = rootProject.tasks.named(BUILD_TEST_APKS)
         extension.testVariants.all { variant ->
-            buildTestApksTask.dependsOn(variant.assembleProvider)
+            buildTestApksTask.configure {
+                it.dependsOn(variant.assembleProvider)
+            }
             variant.configureApkCopy(project, extension, true)
         }
     }
@@ -491,7 +495,9 @@ class AndroidXPlugin : Plugin<Project> {
         val buildTestApksTask = rootProject.tasks.named(BUILD_TEST_APKS)
         extension.applicationVariants.all { variant ->
             if (variant.buildType.name == "debug") {
-                buildTestApksTask.dependsOn(variant.assembleProvider)
+                buildTestApksTask.configure {
+                    it.dependsOn(variant.assembleProvider)
+                }
             }
             variant.configureApkCopy(project, extension, false)
         }
