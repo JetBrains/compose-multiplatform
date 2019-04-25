@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-import static androidx.build.dependencies.DependenciesKt.*
+
 import androidx.build.CompilationTarget
 import androidx.build.LibraryGroups
 import androidx.build.LibraryVersions
+
+import static androidx.build.dependencies.DependenciesKt.*
 
 plugins {
     id("AndroidXPlugin")
@@ -35,6 +37,8 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-platform-impl")
     implementation("org.jetbrains.kotlin:kotlin-j2k")
     implementation("org.jetbrains.kotlin:kotlin-java-impl")
+    implementation("org.jetbrains.kotlin:kotlin-openapi")
+    implementation("org.jetbrains.kotlin:kotlin-jps-common-ide")
 }
 
 compileKotlin {

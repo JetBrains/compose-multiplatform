@@ -8,8 +8,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import junit.framework.TestCase
 import junit.framework.TestCase.assertEquals
-import org.junit.runner.RunWith
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
@@ -614,8 +614,8 @@ class EffectsTests : TestCase() {
         }
 
         fun SimpleComposable() {
-            composer.call(531, {
-                Recompose().apply {
+            composer.call(531, { true }) {
+                Recompose(
                     body = { recompose ->
                         requestRecompose = recompose
                         composer.provideAmbient(MyAmbient, Math.random()) {
@@ -625,8 +625,8 @@ class EffectsTests : TestCase() {
                             } })
                         }
                     }
-                }
-            }, { true }) { f -> @Suppress("PLUGIN_ERROR") f.invoke() }
+                )
+            }
         }
 
         fun Root() {
