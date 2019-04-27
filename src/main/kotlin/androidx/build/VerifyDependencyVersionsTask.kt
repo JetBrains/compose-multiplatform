@@ -35,13 +35,14 @@ open class VerifyDependencyVersionsTask : DefaultTask() {
     /**
      * Iterate through the dependencies of the project and ensure none of them are of an inferior
      * release. This means that a beta project should not have any alpha dependencies, an rc project
-     * should not have any alpha or beta dependencies and a stable verison should only depend on
-     * other stable verisons.
+     * should not have any alpha or beta dependencies and a stable version should only depend on
+     * other stable versions. Dependencies defined with testCompile and friends along with
+     * androidTestImplementation and similars are excluded from this verification.
      */
     @TaskAction
     fun verifyDependencyVersions() {
         project.configurations.all { configuration ->
-            if (!configuration.name.toLowerCase().contains("androidtest")) {
+            if (!configuration.name.toLowerCase().contains("test")) {
                 configuration.allDependencies.forEach { dep ->
                     if (dep.group != null && dep.group.toString().startsWith("androidx.") &&
                         !dep.group.toString().startsWith("androidx.test")) {
