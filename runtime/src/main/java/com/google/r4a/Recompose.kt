@@ -6,18 +6,20 @@ class RecomposeHelper : Function0<Unit> {
     var recompose: () -> Unit = { throw Error("Recompose not yet initialized") }
 
     override fun invoke() {
-        recompose();
+        recompose()
     }
-
 }
 
+@Composable
 fun Recompose(@Children body: @Composable() (recompose: () -> Unit) -> Unit) {
     val composer = currentComposerNonNull
     val recomposer = RecomposeHelper()
-    val callback = composer.startJoin(false) { recomposer.isComposing = true; body(recomposer); recomposer.isComposing = false }
-    recomposer.recompose = { if(!recomposer.isComposing) callback(false) }
-    recomposer.isComposing = true;
+    val callback = composer.startJoin(false) {
+        recomposer.isComposing = true; body(recomposer); recomposer.isComposing = false
+    }
+    recomposer.recompose = { if (!recomposer.isComposing) callback(false) }
+    recomposer.isComposing = true
     body(recomposer)
-    recomposer.isComposing = false;
+    recomposer.isComposing = false
     composer.doneJoin(false)
 }
