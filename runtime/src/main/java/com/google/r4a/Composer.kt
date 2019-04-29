@@ -181,7 +181,7 @@ open class Composer<N>(
     private var childrenAllowed = true
     private var invalidations: MutableList<Invalidation> = mutableListOf()
     private val entersStack = IntStack()
-    private val insertedProviders = Stack<Ambient<*>.Provider>()
+    private val insertedProviders = Stack<Ambient.Holder<*>>()
     private val invalidateStack = Stack<RecomposeScope>()
     internal var ambientReference: CompositionReference? = null
 
@@ -373,7 +373,7 @@ open class Composer<N>(
         }
     }
 
-    fun <T> startProvider(p: Ambient<T>.Provider, value: T) {
+    internal fun <T> startProvider(p: Ambient.Holder<T>, value: T) {
         startGroup(provider)
         changed(p)
         if (inserting) {
@@ -385,7 +385,7 @@ open class Composer<N>(
         startGroup(invocation)
     }
 
-    fun endProvider() {
+    internal fun endProvider() {
         endGroup()
         if (inserting) {
             insertedProviders.pop()
@@ -393,7 +393,7 @@ open class Composer<N>(
         endGroup()
     }
 
-    fun <T> consume(key: Ambient<T>): T {
+    internal fun <T> consume(key: Ambient<T>): T {
         startGroup(consumer)
         changed(key)
         changed(invalidateStack.peek())
@@ -427,7 +427,7 @@ open class Composer<N>(
             var current = insertedProviders.size - 1
             while (current >= 0) {
                 val element = insertedProviders[current]
-                if (element is Ambient<*>.Provider && element.ambient === key) {
+                if (element is Ambient.Holder<*> && element.ambient === key) {
                     @Suppress("UNCHECKED_CAST")
                     return element.value as? T ?: key.defaultValue
                 }
@@ -442,7 +442,7 @@ open class Composer<N>(
             val sentinel = slots.get(index - 1)
             if (sentinel === provider) {
                 val element = slots.get(index + 1)
-                if (element is Ambient<*>.Provider && element.ambient === key) {
+                if (element is Ambient.Holder<*> && element.ambient === key) {
                     @Suppress("UNCHECKED_CAST")
                     return element.value as? T ?: key.defaultValue
                 }
@@ -472,7 +472,7 @@ open class Composer<N>(
                 when {
                     sentinel === provider -> {
                         val element = slots.get(index + 1)
-                        if (element is Ambient<*>.Provider && element.ambient == key) {
+                        if (element is Ambient.Holder<*> && element.ambient == key) {
                             @Suppress("UNCHECKED_CAST")
                             return element.value as T
                         }
@@ -521,7 +521,7 @@ open class Composer<N>(
                         }
                         sentinel === provider -> {
                             val element = slots.get(index + 1)
-                            if (element is Ambient<*>.Provider && element.ambient == key) {
+                            if (element is Ambient.Holder<*> && element.ambient == key) {
                                 index += slots.groupSize(index)
                                 continue@loop
                             }

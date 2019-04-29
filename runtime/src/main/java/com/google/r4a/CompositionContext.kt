@@ -5,7 +5,7 @@ import android.view.Choreographer
 
 // TODO(lmr): this is really only needed for "composition management", but that could maybe move
 // somewhere else. Consider ways to remove this class. Maybe should merge with FrameManager?
-class CompositionContext(
+class CompositionContext private constructor(
     val root: Any,
     private val rootComponent: Component,
     makeComposer: CompositionContext.() -> Composer<*>

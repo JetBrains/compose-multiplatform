@@ -10,7 +10,6 @@ import kotlin.reflect.KClass
  * by the compiler.  @UnionType is particularly useful when a composable function
  * is wrapping a native View because it allows a composable to accept the multiplicity
  * of types corresponding to the overloaded setters for that attribute.
- * Learn more at: https://goto.google.com/r4a-uniontype
  */
 @MustBeDocumented
 @Retention(AnnotationRetention.BINARY)

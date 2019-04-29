@@ -16,6 +16,16 @@
 
 package com.google.r4a
 
+/**
+ * A [CompositionReference] is an opaque type that is used to logically "link" two compositions
+ * together. The [CompositionReference] instance represents a reference to the "parent" composition
+ * in a specific position of that composition's tree, and the instance can then be given to a new
+ * "child" composition. This reference ensures that invalidations and ambients flow logically
+ * through the two compositions as if they were not separate.
+ *
+ * @see compositionReference
+ * @see R4a.composeInto
+ */
 interface CompositionReference {
     fun <T> getAmbient(key: Ambient<T>): T
     fun invalidate()

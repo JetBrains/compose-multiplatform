@@ -50,7 +50,7 @@ package com.google.r4a
  *
  *   LinearLayout {
  *       Contact(contact=bob)
- *       Contact contact=jim)
+ *       Contact(contact=jim)
  *   }
  *
  *  the previous result can be reused by moving the views generated bob's item before jim's (or vis

@@ -599,7 +599,7 @@ class EffectsTests : TestCase() {
     @Test
     fun testAmbient2() {
 
-        val MyAmbient = Ambient<Double>("Hello") { throw Exception("not set") }
+        val MyAmbient = Ambient.of<Double>("Hello") { throw Exception("not set") }
 
         var requestRecompose: (() -> Unit)? = null
         var buttonCreated = false

@@ -136,10 +136,8 @@ inline fun <reified T> ViewComposition.provideAmbient(
     key: Ambient<T>,
     value: T,
     noinline children: @Composable() () -> Unit
-) = emitComponent(
+) = call(
     0,
-    { key.Provider(value, children) },
-    { provider -> update(value) { provider.value = it } or update(children) {
-        provider.children = it
-    } }
+    { changed(key) + changed(value) + changed(children) },
+    { @Suppress("PLUGIN_ERROR") key.Provider(value, children) }
 )

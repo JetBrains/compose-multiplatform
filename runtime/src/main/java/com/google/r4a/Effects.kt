@@ -26,7 +26,12 @@ private fun joinKey(left: Any?, right: Any?): Any = JoinedKey(left, right)
 
 /**
  * The Effect class is really an opaque class that holds a block of executable code that is meant to be executed positionally in the
- * context of a ViewComposer. Since this block is positional, it must also know how to construct its own "key".
+ * context of a composition. Since this block is positional, it must also know how to construct its own "key".
+ *
+ * NOTE: Effects are equivalent to [Composable] functions that are able to have a return value, where the [unaryPlus] operator
+ * is the manner in which it is "invoked". Effect will likely go away in favor of unifying with [Composable].
+ *
+ * @see [Composable]
  */
 @EffectsDsl
 class Effect<T> internal constructor(
@@ -50,8 +55,10 @@ class Effect<T> internal constructor(
     lateinit var context: Composer<*>
 
     /**
-     * We add a composer here with type Unit so that it blocks people from writing KTX elements where there is a
+     * We add a composer here with type Unit so that it blocks people from invoking composables where there is a
      * receiver scope of type Effect<T>
+     *
+     * @suppress
      */
     @Hide
     val composer = Unit
@@ -83,8 +90,6 @@ class Effect<T> internal constructor(
         return result
     }
 
-    // TODO(lmr): is there a way that we can make Effect use a DslMarker or something so that people must use it as a receiver scope
-    // directly, and not in a captured lambda
     /**
      * The unaryPlus operator, in the scope of an effect, is an alias to resolving the effect
      */
@@ -123,6 +128,8 @@ interface CommitScope {
     /**
      * Provide a lambda which will be executed as this CommitScope leaves the composition. It will be executed only once. Use this to
      * schedule cleanup for anything that you construct during the CommitScope's creation.
+     *
+     * @param callback A callback to be executed when this CommitScope leaves the composition.
      */
     fun onDispose(callback: () -> Unit)
 }
@@ -194,14 +201,14 @@ internal class PostCommitScopeImpl(
 /**
  * The key effect is a primitive effect that allows for an effect to have a custom group key. This allows for effects to be
  * associated with data. If you are constructing effects based on data such as lists or collections, keys can be used to help
- * R4A determine which effects should be removed or added.  Any other effects can be created inside of the block of the key
- * effect.
+ * Compose determine which effects should be removed or added.  Any other effects can be created inside of the block of the
+ * key effect.
  *
  * Example:
  *
  *     for (el in elements)
  *       val selected = +key(el.id) { +state { false } }
- *       <ListItem item=el selected=selected />
+ *       ListItem(item=el, selected=selected)
  *
  * @param v1 The value to use as the key. This will be compared to its previous value using `Object.equals`
  * @param block The block to execute other effects in
@@ -212,8 +219,8 @@ fun <T, V1> key(v1: V1, block: Effect<T>.() -> T) = Effect(block, v1)
 /**
  * The key effect is a primitive effect that allows for an effect to have a custom group key. This allows for effects to be
  * associated with data. If you are constructing effects based on data such as lists or collections, keys can be used to help
- * R4A determine which effects should be removed or added.  Any other effects can be created inside of the block of the key
- * effect.
+ * Compose determine which effects should be removed or added.  Any other effects can be created inside of the block of the
+ * key effect.
  *
  * A compound key will be created from both [v1] and [v2].
  *
@@ -221,7 +228,7 @@ fun <T, V1> key(v1: V1, block: Effect<T>.() -> T) = Effect(block, v1)
  *
  *     for (el in elements)
  *       val selected = +key(el.id, parentId) { +state { false } }
- *       <ListItem item=el selected=selected />
+ *       ListItem(item=el, selected=selected)
  *
  * @param v1 The first value to use as a key. This will be compared to its previous value using `Object.equals`
  * @param v2 The second value to use as a key. This will be compared to its previous value using `Object.equals`
@@ -233,14 +240,14 @@ fun <T, V1, V2> key(v1: V1, v2: V2, block: Effect<T>.() -> T) = Effect(block, jo
 /**
  * The key effect is a primitive effect that allows for an effect to have a custom group key. This allows for effects to be
  * associated with data. If you are constructing effects based on data such as lists or collections, keys can be used to help
- * R4A determine which effects should be removed or added.  Any other effects can be created inside of the block of the key
+ * Compose determine which effects should be removed or added.  Any other effects can be created inside of the block of the key
  * effect.
  *
  * Example:
  *
  *     for (el in elements)
  *       val selected = +key(el.id, parentId) { +state { false } }
- *       <ListItem item=el selected=selected />
+ *       ListItem(item=el, selected=selected)
  *
  * @param inputs The set of values to be used to create a compound key. This will be compared to its previous value using `Object.equals`
  * @param block The block to execute other effects in
@@ -526,11 +533,11 @@ fun onPreCommit(vararg inputs: Any?, callback: CommitScope.() -> Unit) = effectO
  *    fun Example() {
  *        val count = +state { 0 }
  *
- *        <TextView text="You clicked ${count.value} times" />
- *        <Button
- *            text="Click me"
+ *        TextView(text="You clicked ${count.value} times")
+ *        Button(
+ *            text="Click me",
  *            onClick={ count.value += 1 }
- *        />
+ *        )
  *    }
  *
  * Additionally, you can destructure the [State] object into a value and a "setter" function.
@@ -541,11 +548,11 @@ fun onPreCommit(vararg inputs: Any?, callback: CommitScope.() -> Unit) = effectO
  *    fun Example() {
  *        val (count, setCount) = +state { 0 }
  *
- *        <TextView text="You clicked ${count} times" />
- *        <Button
- *            text="Click me"
+ *        TextView(text="You clicked ${count} times")
+ *        Button(
+ *            text="Click me",
  *            onClick={ setCount(count + 1) }
- *        />
+ *        )
  *    }
  *
  * Finally, the [State] instance can be used as a variable delegate to a local mutable variable.
@@ -556,11 +563,11 @@ fun onPreCommit(vararg inputs: Any?, callback: CommitScope.() -> Unit) = effectO
  *    fun Example() {
  *        var count by +state { 0 }
  *
- *        <TextView text="You clicked $count times" />
- *        <Button
- *            text="Click me"
+ *        TextView(text="You clicked $count times")
+ *        Button(
+ *            text="Click me",
  *            onClick={ count += 1 }
- *        />
+ *        )
  *    }
  *
  *

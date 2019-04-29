@@ -1,16 +1,30 @@
 package com.google.r4a
 
 /**
- * @Children can be applied to one parameter of a composable function, to indicate that this
- * parameter represents the composable's children.  The @Children parameter is generally used
- * to describe the composable's sub-nodes within the composable's view hierarchy.  The type
- * of the @Children parameter is assumed to be @Composable unless otherwise specified.
- * To learn more, see the "children" section of the r4a-composable documentation available
- * here: https://goto.google.com/r4a-composable
+ * [Children] can be applied to one parameter of a composable function, to indicate that this
+ * parameter represents the composable's children.  The general expectation is that the parameter
+ * this annotates is used to describe the composable's sub-nodes within the composable's view
+ * hierarchy.  The type of the parameter that [Children] annotates is expected to be a function of
+ * some type, and it is assumed to be [Composable] unless otherwise specified with the [composable]
+ * parameter. One does not need to use both [Composable] and [Children] in conjunction with one
+ * another.
+ *
+ * NOTE: It is expected that this annotation will eventually go away and function parameters at the
+ * end of a parameter list will be treated as Children parameters, just like postfix lambda
+ * arguments in normal Kotlin.
+ *
+ * @param composable If false, the type of the argument will be compiled as a function that is _not_
+ *  [Composable]. Defaults to true.
+ *
+ * @see Composable
  */
+@MustBeDocumented
 @Target(
+    // Parameters of [Composable] functions
     AnnotationTarget.VALUE_PARAMETER,
+    // Properties of [Component] classes
     AnnotationTarget.PROPERTY,
+    // Setter functions of [Component] classes
     AnnotationTarget.FUNCTION
 )
 annotation class Children(val composable: Boolean = true)
