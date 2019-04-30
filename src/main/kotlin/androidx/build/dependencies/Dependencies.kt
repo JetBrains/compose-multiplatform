@@ -84,7 +84,7 @@ const val SUPPORT_CORE_UTILS = "androidx.legacy:legacy-support-core-utils:$SUPPO
 const val SUPPORT_FRAGMENTS = "androidx.fragment:fragment:$SUPPORT_VERSION"
 const val SUPPORT_RECYCLERVIEW = "androidx.recyclerview:recyclerview:$SUPPORT_VERSION"
 
-const val ANDROIDX_ANNOTATION = "androidx.annotation:annotation:1.1.0-alpha02"
+const val ANDROIDX_ANNOTATION = "androidx.annotation:annotation:1.1.0-beta01"
 const val ANDROIDX_COLLECTION = "androidx.collection:collection:$SUPPORT_VERSION"
 const val ANDROIDX_CORE = "androidx.core:core:1.0.0"
 const val ANDROIDX_RECYCLERVIEW = "androidx.recyclerview:recyclerview:1.0.0"
