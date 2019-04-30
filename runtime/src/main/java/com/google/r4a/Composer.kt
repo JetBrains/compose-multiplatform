@@ -1148,7 +1148,6 @@ open class Composer<N>(
                 composer.slotTable.read {
                     composer.slots = it
                     composer.nodeIndex = 0
-
                     composer.invalidateConsumers(key)
                 }
             }
