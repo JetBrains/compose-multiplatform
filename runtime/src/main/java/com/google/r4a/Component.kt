@@ -55,7 +55,7 @@ abstract class Component {
     /**
      * @suppress
      */
-    @Deprecated("Use recompose() instead", replaceWith = ReplaceWith("recompose"))
+    @Deprecated("Use recompose() instead", replaceWith = ReplaceWith("recompose()"))
     protected fun recomposeSync() {
         if (composing) return
         recomposeCallback?.invoke(true)

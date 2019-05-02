@@ -31,7 +31,7 @@ class CompositionContext private constructor(
         }
     }
 
-    internal val composer: Composer<*> = makeComposer()
+    internal val composer: Composer<*> = this.makeComposer()
 
     private var hasPendingFrame = false
     private var isComposing = false

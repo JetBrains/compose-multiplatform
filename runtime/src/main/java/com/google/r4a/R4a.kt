@@ -17,6 +17,7 @@ import java.util.WeakHashMap
 object R4a {
 
     private class Root : Component() {
+        @Suppress("DEPRECATION")
         fun update() = recomposeSync()
         lateinit var composable: @Composable() () -> Unit
         @Suppress("PLUGIN_ERROR")
@@ -221,7 +222,7 @@ fun Activity.setContent(composable: @Composable() () -> Unit) =
  * @see setContent
  * @see R4a.disposeComposition
  */
-fun Activity.disposeComposition(composable: @Composable() () -> Unit) {
+fun Activity.disposeComposition() {
     val view = window
         .decorView
         .findViewById<ViewGroup>(android.R.id.content)

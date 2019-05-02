@@ -53,7 +53,7 @@ class ComposerCompositionContextTests : ComposerComposeTestCase() {
                     set("some text") { text = it }
                 }
             }
-        }.then { cc, component, root, activity ->
+        }.then { _, component, root, activity ->
             val tv1 = activity.findViewById(456) as TextView
 
             component.recomposeCallback?.invoke(false)
@@ -385,6 +385,7 @@ class ComposerCompositionContextTests : ComposerComposeTestCase() {
                     emitView(24, ::TextView) {
                         set(id) { id = it }
                         set(View.OnClickListener {
+                            @Suppress("DEPRECATION")
                             when (listener) {
                                 is ClickAction.Recompose -> recompose()
                                 is ClickAction.RecomposeSync -> recomposeSync()
@@ -411,6 +412,7 @@ class ComposerCompositionContextTests : ComposerComposeTestCase() {
                     emitViewGroup(897, ::LinearLayout, {
                         set(99) { id = it }
                         set(View.OnClickListener {
+                            @Suppress("DEPRECATION")
                             when (listener) {
                                 is ClickAction.Recompose -> recompose()
                                 is ClickAction.RecomposeSync -> recomposeSync()
