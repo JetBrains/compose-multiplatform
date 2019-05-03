@@ -45,7 +45,7 @@ object Compose {
         }
     }
 
-    private val TAG_ROOT_COMPONENT = "r4aRootComponent".hashCode()
+    private val TAG_ROOT_COMPONENT = "composeRootComponent".hashCode()
     private val EMITTABLE_ROOT_COMPONENT = WeakHashMap<Emittable, Component>()
 
     private fun getRootComponent(view: View): Component? {
