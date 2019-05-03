@@ -30,7 +30,7 @@ import androidx.build.jdiff.JDiffTask
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.BaseVariant
-import com.android.build.gradle.api.SourceKind;
+import com.android.build.gradle.api.SourceKind
 import com.google.common.base.Preconditions
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -39,6 +39,7 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ResolveException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTree
+import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
@@ -587,7 +588,7 @@ private fun createGenerateDocsTask(
                 group = JavaBasePlugin.DOCUMENTATION_GROUP
                 description = "Generates Java documentation in the style of d.android.com. To " +
                         "generate offline docs use \'-PofflineDocs=true\' parameter.  Places the " +
-                        "documentation in ${destDir}"
+                        "documentation in $destDir"
 
                 setDocletpath(doclavaConfig.resolve())
                 destinationDir = File(destDir, if (offline) "offline" else "online")
@@ -658,7 +659,11 @@ private fun BaseVariant.rFile() = "${applicationId.replace('.', '/')}/R.java"
 // Nasty part. Get rid of that eventually!
 fun Project.docsDir(): File = properties["docsDir"] as File
 
-private fun Project.sdkPath(): File = getSdkPath(rootProject.projectDir)
+private fun Project.sdkPath(): File {
+    val supportRoot = (project.rootProject.property("ext") as ExtraPropertiesExtension)
+        .get("supportRootFolder") as File
+    return getSdkPath(supportRoot)
+}
 
 fun Project.processProperty(name: String) =
         if (hasProperty(name)) {
