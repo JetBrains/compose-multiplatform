@@ -119,3 +119,5 @@ const val WORK_ARCH_CORE_RUNTIME = "androidx.arch.core:core-runtime:2.0.0"
 const val WORK_ARCH_CORE_TESTING = "androidx.arch.core:core-testing:2.0.0"
 
 const val ROBOLECTRIC = "org.robolectric:robolectric:4.1"
+
+const val PROTOBUF = "com.google.protobuf:protobuf-java:3.4.0"
