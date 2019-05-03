@@ -280,7 +280,7 @@ class ComposerCompositionContextTests : ComposerComposeTestCase() {
 
         val listener =
             RecomposeTestComponents.ClickAction.PerformOnView {
-                R4a.findRoot(it)?.let {
+                Compose.findRoot(it)?.let {
                     it.recomposeCallback?.invoke(false)
                 }
             }
@@ -345,7 +345,7 @@ class ComposerCompositionContextTests : ComposerComposeTestCase() {
 
         val listener =
             RecomposeTestComponents.ClickAction.PerformOnView {
-                R4a.findRoot(it)?.let {
+                Compose.findRoot(it)?.let {
                     it.recomposeCallback?.invoke(true)
                 }
             }

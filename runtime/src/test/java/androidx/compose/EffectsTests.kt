@@ -716,7 +716,7 @@ class EffectsTests : TestCase() {
             val activity = controller.create().get()
             val root = activity.root
             val component = Root(composable)
-            val cc = R4a.createCompositionContext(root.context, root, component, null)
+            val cc = Compose.createCompositionContext(root.context, root, component, null)
             return ActiveTest(activity, cc, component).then(block)
         }
     }

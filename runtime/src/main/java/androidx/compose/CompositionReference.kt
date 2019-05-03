@@ -24,7 +24,7 @@ package androidx.compose
  * through the two compositions as if they were not separate.
  *
  * @see compositionReference
- * @see R4a.composeInto
+ * @see Compose.composeInto
  */
 interface CompositionReference {
     fun <T> getAmbient(key: Ambient<T>): T

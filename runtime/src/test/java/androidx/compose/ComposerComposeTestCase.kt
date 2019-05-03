@@ -42,7 +42,7 @@ abstract class ComposerComposeTestCase : TestCase() {
             val controller = Robolectric.buildActivity(TestActivity::class.java)
             val activity = controller.create().get()
             val root = activity.findViewById(ROOT_ID) as ViewGroup
-            val cc = R4a.createCompositionContext(root.context, root, component, null)
+            val cc = Compose.createCompositionContext(root.context, root, component, null)
             cc.runWithCurrent {
                 cc.recompose()
                 fn(cc, component, root, activity)

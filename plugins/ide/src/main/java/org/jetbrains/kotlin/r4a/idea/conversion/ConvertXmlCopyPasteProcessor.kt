@@ -247,7 +247,7 @@ class ConvertXmlCopyPasteProcessor : CopyPastePostProcessor<TextBlockTransferabl
         val rangeAfterReplace = replaceText(editor, conversionResultText, bounds)
         PsiDocumentManager.getInstance(project).commitAllDocuments()
 
-        // Suggest to add @Composable annotation and/or com.google.r4A.* import if necessary.
+        // Suggest to add @Composable annotation and/or androidx.compose.* import if necessary.
         if (editorOptions.enableAddComposableAnnotation) {
             val fixes = arrayListOf<() -> Unit>()
 
@@ -265,7 +265,7 @@ class ConvertXmlCopyPasteProcessor : CopyPastePostProcessor<TextBlockTransferabl
                 }
             }
 
-            // Add com.google.r4A.* import.
+            // Add androidx.compose.* import.
             val r4aStarFqName = R4aUtils.r4aFqName("*")
             if (targetFile.importDirectives.none { it.importedFqName == r4aStarFqName }) {
                 fixes.add { addR4aStarImport(targetFile) }

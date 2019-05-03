@@ -134,22 +134,22 @@ class NewCodeGenTests : TestCase() {
                 val scheduler = RuntimeEnvironment.getMasterScheduler()
 
                 log.clear()
-                R4a.composeInto(container = root, composable = composable)
+                Compose.composeInto(container = root, composable = composable)
                 scheduler.advanceToLastPostedRunnable()
                 assertEquals("onPreCommit, onActive", log.joinToString())
 
                 log.clear()
-                R4a.composeInto(container = root, composable = composable)
+                Compose.composeInto(container = root, composable = composable)
                 scheduler.advanceToLastPostedRunnable()
                 assertEquals("onPreCommitDispose, onPreCommit", log.joinToString())
 
                 log.clear()
-                R4a.disposeComposition(container = root)
+                Compose.disposeComposition(container = root)
                 scheduler.advanceToLastPostedRunnable()
                 assertEquals("onActiveDispose, onPreCommitDispose", log.joinToString())
 
                 log.clear()
-                R4a.composeInto(container = root, composable = composable)
+                Compose.composeInto(container = root, composable = composable)
                 scheduler.advanceToLastPostedRunnable()
                 assertEquals("onPreCommit, onActive", log.joinToString())
             }
@@ -800,7 +800,7 @@ class NewCodeGenTests : TestCase() {
         var second = "there"
         composeCG { activity ->
             adaptable {
-                R4a.composeInto(root, activity) {
+                Compose.composeInto(root, activity) {
                     val cc = composer
                     cc.emitEmittable(686, { MyEmittable() }, { set(first) { message = it }}) {
                         cc.emitEmittable(687, { MyEmittable() }, {
@@ -955,7 +955,7 @@ class NewCodeGenTests : TestCase() {
             val activity = controller.create().get()
             val root = activity.root
             val component = Root()
-            val cc = R4a.createCompositionContext(root.context, root, component, null)
+            val cc = Compose.createCompositionContext(root.context, root, component, null)
             return ActiveTest(activity, TestContext(cc), component).then(block)
         }
     }

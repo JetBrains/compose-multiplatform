@@ -29,8 +29,8 @@ plugins {
 
 dependencies {
     implementation "androidx.annotation:annotation:1.0.0"
-    implementation(KOTLIN_R4A_STDLIB)
-    implementation(KOTLIN_R4A_REFLECT)
+    implementation(KOTLIN_COMPOSE_STDLIB)
+    implementation(KOTLIN_COMPOSE_REFLECT)
     testImplementation(JUNIT)
     testImplementation(ROBOLECTRIC)
 }

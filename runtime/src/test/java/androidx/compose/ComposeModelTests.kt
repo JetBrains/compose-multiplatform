@@ -390,7 +390,7 @@ class ModelViewTests : TestCase() {
         fun then(block: (activity: Activity) -> Unit): ActiveTest {
             val controller = Robolectric.buildActivity(FrameTestActivity::class.java)
             val activity = controller.create().get()
-            return R4a.createCompositionContext(
+            return Compose.createCompositionContext(
                 activity,
                 activity.root,
                 Root(composable),
