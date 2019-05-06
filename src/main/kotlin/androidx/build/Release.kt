@@ -273,7 +273,7 @@ object Release {
     /**
      * Creates and returns the task that includes all projects regardless of their release status.
      */
-    private fun getGlobalFullZipTask(project: Project): TaskProvider<GMavenZipTask> {
+    fun getGlobalFullZipTask(project: Project): TaskProvider<GMavenZipTask> {
         return project.rootProject.maybeRegister(
             name = FULL_ARCHIVE_TASK_NAME,
             onConfigure = {
