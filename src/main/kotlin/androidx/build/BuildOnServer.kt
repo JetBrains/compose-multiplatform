@@ -40,16 +40,23 @@ open class BuildOnServer : DefaultTask() {
     fun getRequiredFiles(): List<File> {
         val distributionDirectory = project.getDistributionDirectory()
         val buildId = getBuildId()
-        return listOf(
-            "android-support-public-docs-$buildId.zip",
-            "android-support-tipOfTree-docs-$buildId.zip",
-            "dokkaTipOfTreeDocs-$buildId.zip",
-            "dokkaPublicDocs-$buildId.zip",
-            "gmaven-diff-all-$buildId.zip",
-            "jetifier-standalone.zip",
-            "top-of-tree-m2repository-all-$buildId.zip",
-            "top-of-tree-m2repository-partially-dejetified-$buildId.zip"
-        ).map { fileName -> File(distributionDirectory, fileName) }
+
+        val filesNames = mutableListOf(
+        // TODO: re-add after merge to compose merge to master
+        // "android-support-public-docs-$buildId.zip",
+        // "dokkaPublicDocs-$buildId.zip",
+        "android-support-tipOfTree-docs-$buildId.zip",
+        "dokkaTipOfTreeDocs-$buildId.zip",
+
+        "gmaven-diff-all-$buildId.zip",
+        "top-of-tree-m2repository-all-$buildId.zip")
+
+        if (project.findProject(":jetifier-standalone") != null) {
+            filesNames.add("jetifier-standalone.zip")
+            filesNames.add("top-of-tree-m2repository-partially-dejetified-$buildId.zip")
+        }
+
+        return filesNames.map { fileName -> File(distributionDirectory, fileName) }
     }
 
     @TaskAction

@@ -207,6 +207,7 @@ class AndroidXPlugin : Plugin<Project> {
         val createArchiveTask = Release.getGlobalFullZipTask(this)
 
         val buildOnServerTask = tasks.create(BUILD_ON_SERVER_TASK, BuildOnServer::class.java)
+        buildOnServerTask.dependsOn(createArchiveTask)
         buildOnServerTask.dependsOn(createLibraryBuildInfoFilesTask)
 
         val partiallyDejetifyArchiveTask = partiallyDejetifyArchiveTask(
