@@ -40,7 +40,8 @@ fun Project.getDistributionDirectory(): File {
     return if (System.getenv("DIST_DIR") != null) {
         File(System.getenv("DIST_DIR"))
     } else {
-        File(getRootDirectory(this), "../../out/dist")
+        val subdir = System.getProperty("DIST_SUBDIR") ?: ""
+        File(getRootDirectory(this), "../../out/dist$subdir")
     }
 }
 
