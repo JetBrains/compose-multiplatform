@@ -86,29 +86,31 @@ val archivesToDejetify = listOf(
     "m2repository/androidx/concurrent/**",
     "m2repository/androidx/sharetarget/**")
 
-fun Project.partiallyDejetifyArchiveTask(archiveFile: Provider<RegularFile>): TaskProvider<Exec> {
-    val standaloneProject = project(":jetifier-standalone")
-    val stripTask = stripArchiveForPartialDejetificationTask(archiveFile)
+fun Project.partiallyDejetifyArchiveTask(archiveFile: Provider<RegularFile>): TaskProvider<Exec>? {
+    return findProject(":jetifier-standalone")?.let { standaloneProject ->
+        val stripTask = stripArchiveForPartialDejetificationTask(archiveFile)
 
-    return tasks.register("partiallyDejetifyArchive", Exec::class.java) {
-        val outputFileName = "${getDistributionDirectory().absolutePath}/" +
-                "top-of-tree-m2repository-partially-dejetified-${getBuildId()}.zip"
-        val jetifierBin = "${standaloneProject.buildDir}/install/jetifier-standalone/bin/" +
-                "jetifier-standalone"
-        val migrationConfig = "${standaloneProject.projectDir.getParentFile()}/migration.config"
+        tasks.register("partiallyDejetifyArchive", Exec::class.java) {
+            val outputFileName = "${getDistributionDirectory().absolutePath}/" +
+                    "top-of-tree-m2repository-partially-dejetified-${getBuildId()}.zip"
+            val jetifierBin = "${standaloneProject.buildDir}/install/jetifier-standalone/bin/" +
+                    "jetifier-standalone"
+            val migrationConfig = "${standaloneProject.projectDir.getParentFile()}/migration.config"
 
-        it.dependsOn(stripTask)
-        it.inputs.file(stripTask.get().archiveFile)
-        it.outputs.file(outputFileName)
+            it.dependsOn(stripTask)
+            it.inputs.file(stripTask.get().archiveFile)
+            it.outputs.file(outputFileName)
 
-        it.commandLine = listOf(
-            jetifierBin,
-            "-i", "${it.inputs.files.singleFile}",
-            "-o", "${it.outputs.files.singleFile}",
-            "-c", migrationConfig,
-            "--log", "warning",
-            "--reversed",
-            "--rebuildTopOfTree")
+            it.commandLine = listOf(
+                jetifierBin,
+                "-i", "${it.inputs.files.singleFile}",
+                "-o", "${it.outputs.files.singleFile}",
+                "-c", migrationConfig,
+                "--log", "warning",
+                "--reversed",
+                "--rebuildTopOfTree"
+            )
+        }
     }
 }
 

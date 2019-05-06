@@ -211,7 +211,8 @@ class AndroidXPlugin : Plugin<Project> {
 
         val partiallyDejetifyArchiveTask = partiallyDejetifyArchiveTask(
             createArchiveTask.get().archiveFile)
-        buildOnServerTask.dependsOn(partiallyDejetifyArchiveTask)
+        if (partiallyDejetifyArchiveTask != null)
+            buildOnServerTask.dependsOn(partiallyDejetifyArchiveTask)
 
         val projectModules = ConcurrentHashMap<String, String>()
         extra.set("projects", projectModules)
@@ -244,12 +245,14 @@ class AndroidXPlugin : Plugin<Project> {
             }
         }
 
-        project(":jetifier-standalone").afterEvaluate { standAloneProject ->
-            partiallyDejetifyArchiveTask.configure {
-                it.dependsOn(standAloneProject.tasks.named("installDist"))
-            }
-            createArchiveTask.configure {
-                it.dependsOn(standAloneProject.tasks.named("dist"))
+        if (partiallyDejetifyArchiveTask != null) {
+            project(":jetifier-standalone").afterEvaluate { standAloneProject ->
+                partiallyDejetifyArchiveTask.configure {
+                    it.dependsOn(standAloneProject.tasks.named("installDist"))
+                }
+                createArchiveTask.configure {
+                    it.dependsOn(standAloneProject.tasks.named("dist"))
+                }
             }
         }
 
