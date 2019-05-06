@@ -61,6 +61,7 @@ import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.extra
+import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getPlugin
 import org.gradle.kotlin.dsl.withType
 import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
@@ -201,15 +202,21 @@ class AndroidXPlugin : Plugin<Project> {
         }
         val createLibraryBuildInfoFilesTask =
             tasks.register(CREATE_LIBRARY_BUILD_INFO_FILES_TASK)
+        extra.set("versionChecker", GMavenVersionChecker(logger))
+        val createArchiveTask = Release.getGlobalFullZipTask(this)
+
         val buildOnServerTask = tasks.create(BUILD_ON_SERVER_TASK)
         buildOnServerTask.dependsOn(createLibraryBuildInfoFilesTask)
+
+        val partiallyDejetifyArchiveTask = partiallyDejetifyArchiveTask(
+            createArchiveTask.get().archiveFile)
+        buildOnServerTask.dependsOn(partiallyDejetifyArchiveTask)
 
         val projectModules = ConcurrentHashMap<String, String>()
         extra.set("projects", projectModules)
         tasks.all { task ->
             if (task.name.startsWith(Release.DIFF_TASK_PREFIX) ||
                     "distDocs" == task.name ||
-                    "partiallyDejetifyArchive" == task.name ||
                     CheckExternalDependencyLicensesTask.TASK_NAME == task.name) {
                 buildOnServerTask.dependsOn(task)
             }
@@ -236,6 +243,15 @@ class AndroidXPlugin : Plugin<Project> {
             }
         }
 
+        project(":jetifier-standalone").afterEvaluate { standAloneProject ->
+            partiallyDejetifyArchiveTask.configure {
+                it.dependsOn(standAloneProject.tasks.named("installDist"))
+            }
+            createArchiveTask.configure {
+                it.dependsOn(standAloneProject.tasks.named("dist"))
+            }
+        }
+
         val createCoverageJarTask = Jacoco.createCoverageJarTask(this)
         buildOnServerTask.dependsOn(createCoverageJarTask)
 
@@ -243,8 +259,6 @@ class AndroidXPlugin : Plugin<Project> {
             it.dependsOn(createCoverageJarTask)
         }
 
-        extra.set("versionChecker", GMavenVersionChecker(logger))
-        Release.createGlobalArchiveTask(this)
         val allDocsTask = DiffAndDocs.configureDiffAndDocs(this, projectDir,
                 DacOptions("androidx", "ANDROIDX_DATA"),
                 listOf(RELEASE_RULE))
