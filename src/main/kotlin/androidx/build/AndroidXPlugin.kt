@@ -202,10 +202,11 @@ class AndroidXPlugin : Plugin<Project> {
         }
         val createLibraryBuildInfoFilesTask =
             tasks.register(CREATE_LIBRARY_BUILD_INFO_FILES_TASK)
+
         extra.set("versionChecker", GMavenVersionChecker(logger))
         val createArchiveTask = Release.getGlobalFullZipTask(this)
 
-        val buildOnServerTask = tasks.create(BUILD_ON_SERVER_TASK)
+        val buildOnServerTask = tasks.create(BUILD_ON_SERVER_TASK, BuildOnServer::class.java)
         buildOnServerTask.dependsOn(createLibraryBuildInfoFilesTask)
 
         val partiallyDejetifyArchiveTask = partiallyDejetifyArchiveTask(
