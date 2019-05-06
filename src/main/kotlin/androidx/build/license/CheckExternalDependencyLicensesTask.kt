@@ -76,7 +76,10 @@ open class CheckExternalDependencyLicensesTask : DefaultTask() {
     }
 
     private fun findLicenseFile(dependency: File, prebuiltsRoot: File): File? {
-        if (!dependency.absolutePath.startsWith(prebuiltsRoot.absolutePath)) {
+        if (
+            !dependency.absolutePath.startsWith(prebuiltsRoot.absolutePath) &&
+            !dependency.absolutePath.contains("tools/vendor/google_prebuilts")
+        ) {
             throw GradleException("prebuilts should come from prebuilts folder. $dependency is" +
                     " not there")
         }

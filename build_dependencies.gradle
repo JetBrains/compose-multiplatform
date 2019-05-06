@@ -16,7 +16,13 @@
 
 def build_versions = [:]
 
-build_versions.kotlin = '1.3.20'
+def kotlin_override = System.getenv("KOTLIN_OVERRIDE")
+if (kotlin_override != null) {
+    build_versions.kotlin = kotlin_override
+    logger.warn("USING OVERRIDDEN KOTLIN GRADLE PLUGIN DEPENDENCY " + build_versions.kotlin)
+} else {
+    build_versions.kotlin = '1.3.20'
+}
 build_versions.lint = '26.4.0'
 build_versions.dokka = '0.9.17-g002'
 
@@ -25,7 +31,6 @@ new File(buildscript.sourceFile.parentFile, "studio_versions.properties").withIn
 
 
 rootProject.ext['build_versions'] = build_versions
-
 
 def build_libs = [:]
 
