@@ -352,7 +352,7 @@ class AffectedModuleDetectorImplTest {
         ))
     }
 
-    // (b/129528976) @Test
+    @Test
     fun changeInCobuilt() {
         val detector = AffectedModuleDetectorImpl(
             rootProject = root,
@@ -388,7 +388,7 @@ class AffectedModuleDetectorImplTest {
         ))
     }
 
-    // (b/129528976) @Test
+    @Test
     fun changeInCobuiltOnlyChanged() {
         val detector = AffectedModuleDetectorImpl(
             rootProject = root,
@@ -403,6 +403,42 @@ class AffectedModuleDetectorImplTest {
         )
         MatcherAssert.assertThat(detector.affectedProjects, CoreMatchers.`is`(
             setOf(p8, p9, p10)
+        ))
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun changeInCobuiltOnlyChangedMissingCobuilt() {
+        val detector = AffectedModuleDetectorImpl(
+            rootProject = root,
+            logger = logger,
+            ignoreUnknownProjects = false,
+            projectSubset = ProjectSubset.CHANGED_PROJECTS,
+            cobuiltTestPaths = setOf(setOf("cobuilt1", "cobuilt2", "cobuilt3")),
+            injectedGitClient = MockGitClient(
+                lastMergeSha = "foo",
+                changedFiles = listOf(convertToFilePath(
+                    "p8", "foo.java")))
+        )
+        // This should trigger IllegalStateException due to missing cobuilt3
+        detector.affectedProjects
+    }
+
+    @Test
+    fun changeInCobuiltOnlyChangedAllCobuiltsMissing() {
+        val detector = AffectedModuleDetectorImpl(
+            rootProject = root,
+            logger = logger,
+            ignoreUnknownProjects = false,
+            projectSubset = ProjectSubset.CHANGED_PROJECTS,
+            cobuiltTestPaths = setOf(setOf("cobuilt3", "cobuilt4", "cobuilt5")),
+            injectedGitClient = MockGitClient(
+                lastMergeSha = "foo",
+                changedFiles = listOf(convertToFilePath(
+                    "p8", "foo.java")))
+        )
+        // There should be no exception thrown here because *all* cobuilts are missing.
+        MatcherAssert.assertThat(detector.affectedProjects, CoreMatchers.`is`(
+            setOf(p8, p10)
         ))
     }
 
