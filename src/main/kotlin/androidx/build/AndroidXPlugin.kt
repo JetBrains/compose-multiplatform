@@ -632,6 +632,7 @@ private fun Project.createUpdateResourceApiTask(): DefaultTask {
     }
 }
 
+@Suppress("UNCHECKED_CAST")
 fun Project.getProjectsMap(): ConcurrentHashMap<String, String> {
     return project.rootProject.extra.get("projects") as ConcurrentHashMap<String, String>
 }

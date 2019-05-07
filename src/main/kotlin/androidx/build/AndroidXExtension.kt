@@ -27,7 +27,7 @@ import kotlin.properties.Delegates
 open class AndroidXExtension(val project: Project) {
     var name: String? = null
     var mavenVersion: Version? by Delegates.observable<Version?>(null) { _, _, new: Version? ->
-        project.version = new?.toString()
+        project.version = new?.toString() as Any
     }
     var mavenGroup: LibraryGroup? = null
     var description: String? = null

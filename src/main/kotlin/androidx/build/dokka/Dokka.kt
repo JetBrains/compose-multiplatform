@@ -75,11 +75,14 @@ object Dokka {
             zipTask.from(docsTask.outputDirectory) { copySpec ->
                 copySpec.into("reference/kotlin")
             }
+            val buildId = getBuildId()
             zipTask.archiveBaseName.set(taskName)
-            zipTask.archiveVersion.set(getBuildId())
+            zipTask.archiveVersion.set(buildId)
             zipTask.destinationDirectory.set(project.getDistributionDirectory())
+            val filePath = "${project.getDistributionDirectory().canonicalPath}/"
+            val fileName = "$taskName-$buildId.zip"
             zipTask.description = "Zips $docsType Kotlin documentation (generated via " +
-                "Dokka in the style of d.android.com) into ${zipTask.archivePath}"
+                "Dokka in the style of d.android.com) into ${filePath + fileName}"
             zipTask.group = JavaBasePlugin.DOCUMENTATION_GROUP
         }
     }

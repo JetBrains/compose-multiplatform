@@ -207,11 +207,9 @@ private fun collectDependenciesForConfiguration(
     name: String
 ) {
     val config = project.configurations.findByName(name)
-    if (config != null) {
-        config.dependencies.forEach { dep ->
-            if (dep.group?.startsWith("androidx.") ?: false) {
-                androidxDependencies.add(dep)
-            }
+    config?.dependencies?.forEach { dep ->
+        if (dep.group?.startsWith("androidx.") == true) {
+            androidxDependencies.add(dep)
         }
     }
 }
@@ -224,17 +222,13 @@ private fun Project.isAndroidProject(
     for (dep in deps) {
         if (dep is ProjectDependency) {
             if (dep.group == groupId && dep.name == artifactId) {
-                return dep.getDependencyProject().plugins.hasPlugin(LibraryPlugin::class.java)
+                return dep.dependencyProject.plugins.hasPlugin(LibraryPlugin::class.java)
             }
         }
     }
-    var projectModules = project.getProjectsMap()
-    if (projectModules.containsKey("$groupId:$artifactId")) {
-        val localProjectVersion = project.findProject(
-                projectModules.get("$groupId:$artifactId"))
-        if (localProjectVersion != null) {
-            return localProjectVersion.plugins.hasPlugin(LibraryPlugin::class.java)
-        }
+    val projectModules = project.getProjectsMap()
+    projectModules["$groupId:$artifactId"]?.let { module ->
+        return project.findProject(module)?.plugins?.hasPlugin(LibraryPlugin::class.java) ?: false
     }
     return false
 }
