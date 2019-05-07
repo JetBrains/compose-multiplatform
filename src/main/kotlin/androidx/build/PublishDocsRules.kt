@@ -30,6 +30,8 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.APPCOMPAT, "1.1.0-alpha05")
     prebuilts(LibraryGroups.ARCH_CORE, "2.1.0-beta01")
     prebuilts(LibraryGroups.ASYNCLAYOUTINFLATER, "1.0.0")
+    ignore(LibraryGroups.BENCHMARK.group, "benchmark-gradle-plugin")
+    prebuilts(LibraryGroups.BENCHMARK, "1.0.0-alpha01")
     prebuilts(LibraryGroups.BIOMETRIC, "biometric", "1.0.0-alpha04")
     prebuilts(LibraryGroups.BROWSER, "1.0.0")
     ignore(LibraryGroups.CAMERA.group, "camera-view")
