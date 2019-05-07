@@ -50,11 +50,6 @@ android {
             testCoverageEnabled = false
         }
     }
-    tasks.withType(KotlinCompile).all {
-        kotlinOptions {
-            freeCompilerArgs += ["-Werror"]
-        }
-    }
 }
 
 androidx {
