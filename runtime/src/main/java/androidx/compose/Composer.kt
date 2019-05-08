@@ -69,11 +69,11 @@ private class Pending(
     private val usedKeys = mutableListOf<KeyInfo>()
     private val groupInfos = run {
         var runningNodeIndex = 0
-        keyInfos.mapIndexed { index, key ->
+        keyInfos.withIndex().associateTo(mutableMapOf()) { (index, key) ->
             Pair(key, GroupInfo(index, runningNodeIndex, key.nodes)).also {
                 runningNodeIndex += key.nodes
             }
-        }.toMap().toMutableMap()
+        }
     }
 
     /**
