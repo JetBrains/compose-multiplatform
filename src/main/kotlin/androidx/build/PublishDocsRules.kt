@@ -90,6 +90,8 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.MEDIA2, "1.0.0-beta02")
     prebuilts(LibraryGroups.MEDIAROUTER, "1.1.0-beta02")
     ignore(LibraryGroups.NAVIGATION.group, "navigation-testing")
+    ignore(LibraryGroups.NAVIGATION.group, "navigation-safe-args-generator")
+    ignore(LibraryGroups.NAVIGATION.group, "navigation-safe-args-gradle-plugin")
     prebuilts(LibraryGroups.NAVIGATION, "2.1.0-alpha05")
     prebuilts(LibraryGroups.PAGING, "2.1.0")
     prebuilts(LibraryGroups.PALETTE, "1.0.0")
@@ -105,7 +107,7 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.ROOM.group, "room-common-java8")
     prebuilts(LibraryGroups.ROOM, "2.1.0-rc01")
     prebuilts(LibraryGroups.SAVEDSTATE, "1.0.0-beta01")
-    // TODO: Remove this ignore once androidx.security:security-identity-credential:1.0.0-alph01 is released
+    // TODO: Remove this ignore once androidx.security:security-identity-credential:1.0.0-alpha01 is released
     ignore(LibraryGroups.SECURITY.group, "security-identity-credential")
     prebuilts(LibraryGroups.SECURITY, "1.0.0-alpha02")
     prebuilts(LibraryGroups.SHARETARGET, "1.0.0-alpha02")
