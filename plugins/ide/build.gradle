@@ -48,12 +48,6 @@ compileKotlin {
     }
 }
 
-tasks.withType(KotlinCompile).all {
-    kotlinOptions {
-        freeCompilerArgs += ["-Werror"]
-    }
-}
-
 androidx {
     name = "AndroidX Compose IDE Plugin"
     publish = true
