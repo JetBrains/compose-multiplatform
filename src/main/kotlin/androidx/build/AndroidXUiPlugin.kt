@@ -55,6 +55,12 @@ class AndroidXUiPlugin : Plugin<Project> {
                                     "-Xplugin=${conf.files.first()}"
                             }
                         }
+
+                        // Switch on warnings as errors and enable FCS syntax for all Kotlin tasks
+                        compile.kotlinOptions.freeCompilerArgs += "-Werror"
+                        compile.kotlinOptions.freeCompilerArgs += "-P"
+                        compile.kotlinOptions.freeCompilerArgs +=
+                            "plugin:androidx.compose.plugins.kotlin:syntax=FCS"
                     }
                 }
             }

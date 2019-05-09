@@ -109,7 +109,7 @@ private fun Project.makeErrorProneTask(
     compileTaskProvider: TaskProvider<JavaCompile>,
     toolChain: ErrorProneToolChain
 ) {
-    val provider = maybeRegister<JavaCompile>(
+    maybeRegister<JavaCompile>(
         name = ERROR_PRONE_TASK,
         onConfigure = {
             val compileTask = compileTaskProvider.get()
