@@ -19,6 +19,7 @@ package androidx.build.checkapi
 import java.io.File
 
 import androidx.build.Version
+import java.io.Serializable
 
 // An ApiLocation contains the filepath of a public API and restricted API of a library
 data class ApiLocation(
@@ -28,7 +29,7 @@ data class ApiLocation(
     val restrictedApiFile: File,
     // file specifying the API of the resources
     val resourceFile: File
-) {
+) : Serializable {
 
     fun files() = listOf(publicApiFile, restrictedApiFile)
 
@@ -42,7 +43,11 @@ data class ApiLocation(
 
     companion object {
         fun fromPublicApiFile(f: File): ApiLocation {
-            return ApiLocation(f, File(f.parentFile, "restricted_" + f.name), File(f.parentFile, "res-" + f.name))
+            return ApiLocation(
+                f,
+                File(f.parentFile, "restricted_" + f.name),
+                File(f.parentFile, "res-" + f.name)
+            )
         }
     }
 }
@@ -51,14 +56,16 @@ data class ApiLocation(
 data class ApiViolationExclusions(
     val publicApiFile: File,
     val restrictedApiFile: File
-) {
+) : Serializable {
 
     fun files() = listOf(publicApiFile, restrictedApiFile)
 
     companion object {
         fun fromApiLocation(apiLocation: ApiLocation): ApiViolationExclusions {
-            val publicExclusionsFile = File(apiLocation.publicApiFile.toString().removeSuffix(".txt") + ".ignore")
-            val restrictedExclusionsFile = File(apiLocation.restrictedApiFile.toString().removeSuffix(".txt") + ".ignore")
+            val publicExclusionsFile =
+                File(apiLocation.publicApiFile.toString().removeSuffix(".txt") + ".ignore")
+            val restrictedExclusionsFile =
+                File(apiLocation.restrictedApiFile.toString().removeSuffix(".txt") + ".ignore")
             return ApiViolationExclusions(publicExclusionsFile, restrictedExclusionsFile)
         }
     }
