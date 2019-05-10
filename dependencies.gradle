@@ -25,11 +25,6 @@ libs.exclude_bytebuddy = {
     exclude group: 'net.bytebuddy'
 }
 
-libs.exclude_support = {
-    exclude group: 'com.android.support'
-    exclude group: 'androidx.annotation'
-}
-
 libs.exclude_for_espresso = {
     exclude group: 'androidx.annotation'
     exclude group: 'androidx.appcompat'
