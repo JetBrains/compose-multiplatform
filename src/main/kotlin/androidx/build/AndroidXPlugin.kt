@@ -450,10 +450,13 @@ class AndroidXPlugin : Plugin<Project> {
         }
 
         project.configurations.all { config ->
-            // Remove strict constraints on listenablefuture:1.0
+            val isTestConfig = config.name.toLowerCase().contains("test")
+
             config.dependencyConstraints.configureEach { dependencyConstraint ->
                 dependencyConstraint.apply {
-                    if (group == "com.google.guava" &&
+                    // Remove strict constraints on test dependencies and listenablefuture:1.0
+                    if (isTestConfig ||
+                        group == "com.google.guava" &&
                         name == "listenablefuture" &&
                         version == "1.0") {
                         version { versionConstraint ->
