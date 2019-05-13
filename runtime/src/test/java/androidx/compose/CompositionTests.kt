@@ -1099,6 +1099,47 @@ class CompositionTests : TestCase() {
         validate(composer.root) { composition() }
     }
 
+    // b/132638679
+    fun testJoinInvalidate() {
+        var texts = 5
+        var invalidateOuter: (() -> Unit)? = null
+        var invalidateInner: (() -> Unit)? = null
+
+        fun MockViewComposition.composition() {
+            linear {
+                join(1106) { outerInvalidate ->
+                    invalidateOuter = { outerInvalidate(false) }
+                    for (i in 1..texts) {
+                        text("Some text")
+                    }
+
+                    skip(1114) {
+                        join(1116) { innerInvalidate ->
+                            text("Some text")
+
+                            // Force the invalidation to survive the compose
+                            innerInvalidate(false)
+                            invalidateInner = { innerInvalidate(false) }
+                        }
+                    }
+                }
+            }
+        }
+
+        val composer = compose { composition() }
+
+        texts = 4
+        invalidateOuter?.invoke()
+        invalidateInner?.invoke()
+        composer.recompose()
+        composer.applyChanges()
+
+        texts = 3
+        invalidateOuter?.invoke()
+        composer.recompose()
+        composer.applyChanges()
+    }
+
     fun testLifecycle_Enter_Simple() {
         val lifecycleObject = object : CompositionLifecycleObserver {
             var count = 0
