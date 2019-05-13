@@ -82,6 +82,7 @@ val archivesToDejetify = listOf(
     "m2repository/androidx/viewpager/**",
     "m2repository/androidx/viewpager2/**",
     "m2repository/androidx/wear/**",
+    "m2repository/androidx/webkit/**",
     "m2repository/androidx/media2/**",
     "m2repository/androidx/concurrent/**",
     "m2repository/androidx/sharetarget/**")
