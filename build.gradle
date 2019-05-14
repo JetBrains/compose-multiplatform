@@ -59,6 +59,11 @@ allprojects {
     }
 }
 
+sourceSets {
+    main.java.srcDirs += '../benchmark/gradle-plugin/src/main/kotlin'
+    main.resources.srcDirs += '../benchmark/gradle-plugin/src/main/resources'
+}
+
 dependencies {
     compile build_libs.gradle
     compile build_libs.error_prone_gradle

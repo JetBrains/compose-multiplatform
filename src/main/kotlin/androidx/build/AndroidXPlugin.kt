@@ -16,6 +16,9 @@
 
 package androidx.build
 
+import androidx.benchmark.gradle.Adb
+import androidx.benchmark.gradle.LockClocksTask
+import androidx.benchmark.gradle.UnlockClocksTask
 import androidx.build.SupportConfig.BUILD_TOOLS_VERSION
 import androidx.build.SupportConfig.COMPILE_SDK_VERSION
 import androidx.build.SupportConfig.DEFAULT_MIN_SDK_VERSION
@@ -298,7 +301,9 @@ class AndroidXPlugin : Plugin<Project> {
             CheckSameVersionLibraryGroupsTask::class.java)
         buildOnServerTask.dependsOn(checkSameVersionLibraryGroupsTask)
 
-        createClockLockTasks()
+        val adb = Adb(getSdkPath(project.projectDir).path + "/platform-tools/adb", logger)
+        tasks.register("lockClocks", LockClocksTask::class.java, adb)
+        tasks.register("unlockClocks", UnlockClocksTask::class.java, adb)
 
         AffectedModuleDetector.configure(gradle, this)
 
