@@ -38,6 +38,7 @@ import androidx.build.license.CheckExternalDependencyLicensesTask
 import androidx.build.license.configureExternalDependencyLicenseCheck
 import androidx.build.metalava.Metalava.configureAndroidProjectForMetalava
 import androidx.build.metalava.Metalava.configureJavaProjectForMetalava
+import androidx.build.metalava.UpdateApiTask
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryExtension
@@ -61,9 +62,7 @@ import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.extra
-import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getPlugin
-import org.gradle.kotlin.dsl.withType
 import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
 import org.gradle.testing.jacoco.tasks.JacocoReport
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
@@ -130,7 +129,7 @@ class AndroidXPlugin : Plugin<Project> {
                     project.configureAndroidCommonOptions(extension, androidXExtension)
                     project.configureAndroidLibraryOptions(extension, androidXExtension)
                     project.configureVersionFileWriter(extension)
-                    project.configureResourceApiChecks()
+                    project.configureResourceApiChecks(extension)
                     project.addCreateLibraryBuildInfoFileTask(androidXExtension)
                     val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
                     val checkNoWarningsTask = project.tasks.register(CHECK_NO_WARNINGS_TASK) {
@@ -187,9 +186,9 @@ class AndroidXPlugin : Plugin<Project> {
 
         // Disable timestamps and ensure filesystem-independent archive ordering to maximize
         // cross-machine byte-for-byte reproducibility of artifacts.
-        project.tasks.withType<Jar> {
-            isReproducibleFileOrder = true
-            isPreserveFileTimestamps = false
+        project.tasks.withType(Jar::class.java).configureEach { task ->
+            task.isReproducibleFileOrder = true
+            task.isPreserveFileTimestamps = false
         }
 
         // copy host side test results to DIST
@@ -573,8 +572,8 @@ class AndroidXPlugin : Plugin<Project> {
             toolVersion = Jacoco.VERSION
         }
 
-        project.tasks.withType<JacocoReport> {
-            reports {
+        project.tasks.withType(JacocoReport::class.java).configureEach { task ->
+            task.reports {
                 it.xml.isEnabled = true
                 it.html.isEnabled = false
                 it.csv.isEnabled = false
@@ -662,29 +661,30 @@ fun Project.getProjectsMap(): ConcurrentHashMap<String, String> {
     return project.rootProject.extra.get("projects") as ConcurrentHashMap<String, String>
 }
 
-private fun Project.configureResourceApiChecks() {
-    project.afterEvaluate {
+private fun Project.configureResourceApiChecks(extension: LibraryExtension) {
+    afterEvaluate {
         if (project.hasApiFolder()) {
             val checkResourceApiTask = project.createCheckResourceApiTask()
             val updateResourceApiTask = project.createUpdateResourceApiTask()
-            project.tasks.all { task ->
-                if (task.name == "assembleRelease") {
-                    checkResourceApiTask.dependsOn(task)
-                    updateResourceApiTask.dependsOn(task)
-                } else if (task.name == "updateApi") {
-                    task.dependsOn(updateResourceApiTask)
+
+            extension.libraryVariants.all { libraryVariant ->
+                if (libraryVariant.buildType.name == "debug") {
+                    // Check and update resource api tasks rely compile to generate public.txt
+                    checkResourceApiTask.dependsOn(libraryVariant.javaCompileProvider)
+                    updateResourceApiTask.dependsOn(libraryVariant.javaCompileProvider)
                 }
             }
-            project.rootProject.tasks.all { task ->
-                if (task.name == AndroidXPlugin.BUILD_ON_SERVER_TASK) {
-                    task.dependsOn(checkResourceApiTask)
-                }
+            tasks.withType(UpdateApiTask::class.java).configureEach { task ->
+                task.dependsOn(checkResourceApiTask)
+            }
+            rootProject.tasks.named(AndroidXPlugin.BUILD_ON_SERVER_TASK).configure { task ->
+                task.dependsOn(checkResourceApiTask)
             }
         }
     }
 }
 
 private fun Project.getGenerateResourceApiFile(): File {
-    return File(project.buildDir, "intermediates/public_res/release" +
-            "/packageReleaseResources/public.txt")
+    return File(project.buildDir, "intermediates/public_res/debug" +
+            "/packageDebugResources/public.txt")
 }
