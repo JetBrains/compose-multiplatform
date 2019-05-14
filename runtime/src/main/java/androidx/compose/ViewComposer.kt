@@ -103,7 +103,7 @@ internal class ViewApplyAdapter(private val adapters: ViewAdapters? = null) :
                                 val adaptedView = adapters?.adapt(parent, instance) as? View
                                     ?: error(
                                         "Could not convert ${
-                                            instance.javaClass.simpleName
+                                        instance.javaClass.simpleName
                                         } to a View"
                                     )
                                 adapter?.willInsert(adaptedView, parent)
@@ -119,7 +119,7 @@ internal class ViewApplyAdapter(private val adapters: ViewAdapters? = null) :
                                 adapters?.adapt(parent, instance) as? Emittable
                                     ?: error(
                                         "Could not convert ${
-                                            instance.javaClass.name
+                                        instance.javaClass.name
                                         } to an Emittable"
                                     )
                             )
@@ -139,11 +139,12 @@ internal class ViewApplyAdapter(private val adapters: ViewAdapters? = null) :
 class ViewComposer(
     val root: Any,
     val context: Context,
-    recomposer: Recomposer?,
+    recomposer: Recomposer,
     val adapters: ViewAdapters? = ViewAdapters()
 ) : Composer<Any>(
     SlotTable(),
-    Applier(root, ViewApplyAdapter(adapters)), recomposer) {
+    Applier(root, ViewApplyAdapter(adapters)), recomposer
+) {
 
     init {
         FrameManager.ensureStarted()
@@ -321,6 +322,7 @@ class ViewComposer(
 
     inline fun update(value: Int, /*crossinline*/ block: (value: Int) -> Unit): Boolean =
         updated(value).also { if (it) block(value) }
+
     inline fun <reified T> update(value: T, /*crossinline*/ block: (value: T) -> Unit): Boolean =
         updated(value).also { if (it) block(value) }
 
@@ -382,15 +384,26 @@ class ViewComposer(
     }
 }
 
-internal val currentComposer get() = currentCompositionContext?.composer
-
 internal val currentComposerNonNull
-    get() = currentCompositionContext?.composer ?: emptyComposition()
+    get() = currentComposer ?: emptyComposition()
 
 private fun emptyComposition(): Nothing =
     error("Composition requires an active composition context")
 
 val composer get() = ViewComposition(currentComposerNonNull as ViewComposer)
+
+internal var currentComposer: Composer<*>? = null
+    private set
+
+fun <T> Composer<*>.runWithCurrent(block: () -> T): T {
+    val prev = currentComposer
+    try {
+        currentComposer = this
+        return block()
+    } finally {
+        currentComposer = prev
+    }
+}
 
 fun ViewComposition.registerAdapter(
     adapter: (parent: Any, child: Any) -> Any?

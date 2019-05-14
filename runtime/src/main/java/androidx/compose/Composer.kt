@@ -43,11 +43,6 @@ internal interface LifeCycleManager {
     fun leaving(holder: CompositionLifecycleObserverHolder)
 }
 
-interface Recomposer {
-    fun scheduleRecompose()
-    fun recomposeSync()
-}
-
 /**
  * Pending starts when the key is different than expected indicating that the structure of the tree
  * changed. It is used to determine how to update the nodes and the slot table when changes to the
@@ -146,9 +141,9 @@ private class Pending(
             it.nodeCount = newCount
             if (difference != 0) {
                 nodeCount += difference
-                groupInfos.values.forEach {
-                        group -> if (group.nodeIndex >= index && group != it)
-                                    group.nodeIndex += difference
+                groupInfos.values.forEach { group ->
+                    if (group.nodeIndex >= index && group != it)
+                        group.nodeIndex += difference
                 }
             }
         }
@@ -178,7 +173,7 @@ private val IGNORE_RECOMPOSE: (sync: Boolean) -> Unit = {}
 open class Composer<N>(
     private val slotTable: SlotTable,
     private val applier: Applier<N>,
-    private val recomposer: Recomposer?
+    private val recomposer: Recomposer
 ) : Composition<N>() {
     private val changes = mutableListOf<Change<N>>()
     private val lifecycleObservers = mutableMapOf<
@@ -199,7 +194,8 @@ open class Composer<N>(
     private val entersStack = IntStack()
     private val insertedProviders = Stack<Ambient.Holder<*>>()
     private val invalidateStack = Stack<RecomposeScope>()
-    internal var ambientReference: CompositionReference? = null
+
+    internal var parentReference: CompositionReference? = null
 
     private val changesAppliedObservers = mutableListOf<() -> Unit>()
 
@@ -494,7 +490,7 @@ open class Composer<N>(
             current--
         }
 
-        val ref = ambientReference
+        val ref = parentReference
 
         if (ref != null) {
             return ref.getAmbient(key)
@@ -526,7 +522,7 @@ open class Composer<N>(
             index -= 1
         }
 
-        val ref = ambientReference
+        val ref = parentReference
 
         if (ref != null) {
             return ref.getAmbient(key)
@@ -586,8 +582,9 @@ open class Composer<N>(
 
     val changeCount get() = changes.size
 
-    internal val currentInvalidate: RecomposeScope? get() =
-        invalidateStack.let { if (it.isNotEmpty()) it.peek() else null }
+    internal val currentInvalidate: RecomposeScope?
+        get() =
+            invalidateStack.let { if (it.isNotEmpty()) it.peek() else null }
 
     private fun start(key: Any, action: SlotAction) {
         assert(childrenAllowed) { "A call to creadNode(), emitNode() or useNode() expected" }
@@ -724,8 +721,10 @@ open class Composer<N>(
                     // If the key info was not used the group was deleted, remove the nodes in the
                     // group
                     val deleteOffset = pending.nodePositionOf(previousInfo)
-                    recordRemoveNode(deleteOffset +
-                            pending.startIndex, previousInfo.nodes)
+                    recordRemoveNode(
+                        deleteOffset +
+                                pending.startIndex, previousInfo.nodes
+                    )
                     pending.updateNodeCount(previousInfo, 0)
                     recordOperation { _, slots, lifecycleManager ->
                         removeCurrentItem(slots, lifecycleManager)
@@ -734,8 +733,10 @@ open class Composer<N>(
                     // Remove any invalidations pending for the group being removed. These are no
                     // longer part of the composition. The group being composed is one after the
                     // start of the item (the first slot being the key).
-                    invalidations.removeRange(previousInfo.location + 1,
-                        previousInfo.location + slots.groupSize(previousInfo.location + 1))
+                    invalidations.removeRange(
+                        previousInfo.location + 1,
+                        previousInfo.location + slots.groupSize(previousInfo.location + 1)
+                    )
                     previousIndex++
                     continue
                 }
@@ -754,8 +755,10 @@ open class Composer<N>(
                         val nodePosition = pending.nodePositionOf(currentInfo)
                         if (nodePosition != nodeOffset) {
                             val updatedCount = pending.updatedNodeCountOf(currentInfo)
-                            recordMoveNode(nodePosition + pending.startIndex,
-                                nodeOffset + pending.startIndex, updatedCount)
+                            recordMoveNode(
+                                nodePosition + pending.startIndex,
+                                nodeOffset + pending.startIndex, updatedCount
+                            )
                             pending.registerMoveNode(nodePosition, nodeOffset, updatedCount)
                             movedKeys.add(currentInfo)
                         } // else the nodes are already in the correct position
@@ -851,15 +854,19 @@ open class Composer<N>(
     private fun recordEnters(location: Int) {
         while (true) {
             skipToGroupContaining(location)
-            assert(slots.isGroup && location >= slots.current &&
-                    location < slots.current + slots.groupSize) {
+            assert(
+                slots.isGroup && location >= slots.current &&
+                        location < slots.current + slots.groupSize
+            ) {
                 "Could not find group at $location"
             }
             if (slots.current == location) {
                 return
             } else {
-                enterGroup(if (slots.isNode) START_NODE
-                    else START_GROUP, null, null)
+                enterGroup(
+                    if (slots.isNode) START_NODE
+                    else START_GROUP, null, null
+                )
                 if (slots.isNode) {
                     recordStart(START_NODE)
                     recordDown()
@@ -928,9 +935,9 @@ open class Composer<N>(
         assert(location >= 0) { "Invalid anchor" }
         invalidations.insertIfMissing(location, scope)
         if (sync) {
-            recomposer?.recomposeSync()
+            recomposer.recomposeSync(this)
         } else {
-            recomposer?.scheduleRecompose()
+            recomposer.scheduleRecompose(this)
         }
     }
 
@@ -1066,9 +1073,9 @@ open class Composer<N>(
             0 -> Unit
             1 -> if (slotActions.first() == SKIP_GROUP) slotActions.clear() else realizeSlots()
             2 -> if (slotActions.first() >= SKIP_NODE &&
-                    slotActions.last() == SKIP_GROUP
+                slotActions.last() == SKIP_GROUP
             ) slotActions.clear()
-                else realizeSlots()
+            else realizeSlots()
             else -> realizeSlots()
         }
     }
@@ -1148,7 +1155,8 @@ open class Composer<N>(
     private fun recordMoveNode(from: Int, to: Int, count: Int) {
         if (count > 0) {
             if (previousCount > 0 && previousMoveFrom == from - previousCount &&
-                previousMoveTo == to - previousCount) {
+                previousMoveTo == to - previousCount
+            ) {
                 previousCount += count
             } else {
                 realizeMovement()
@@ -1210,7 +1218,7 @@ open class Composer<N>(
 
         override fun invalidate() {
             // continue invalidating up the spine of AmbientReferences
-            ambientReference?.invalidate()
+            parentReference?.invalidate()
 
             scope.invalidate?.invoke(false)
         }
