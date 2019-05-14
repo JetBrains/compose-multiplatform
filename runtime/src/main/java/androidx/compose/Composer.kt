@@ -163,7 +163,7 @@ private object RootKey
 
 private class Invalidation(
     val scope: RecomposeScope,
-    val location: Int
+    var location: Int
 )
 
 internal class RecomposeScope(val compose: (invalidate: (sync: Boolean) -> Unit) -> Unit) {
@@ -265,10 +265,16 @@ open class Composer<N>(
             }
         }
 
+        val invalidationAnchors = invalidations.map { slotTable.anchor(it.location) to it }
+
         // Apply all changes
         slotTable.write { slots ->
             changes.forEach { change -> change(applier, slots, manager) }
             changes.clear()
+        }
+
+        for ((anchor, invalidation) in invalidationAnchors) {
+            invalidation.location = slotTable.anchorLocation(anchor)
         }
 
         // Send lifecycle leaves
@@ -959,13 +965,13 @@ open class Composer<N>(
                 slots.beginEmpty()
                 scope.invalidate
             } else {
+                invalidations.removeLocation(slots.current)
                 slots.startGroup()
                 @Suppress("UNCHECKED_CAST")
                 val scope = slots.next() as RecomposeScope
                 invalidateStack.push(scope)
                 recordStart(START_GROUP)
                 skipValue()
-                invalidations.removeLocation(slots.current - 1)
                 scope.invalidate
             }
             enterGroup(START_GROUP, null, null)

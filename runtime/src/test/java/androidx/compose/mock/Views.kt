@@ -18,7 +18,7 @@ inline fun <T : Any> MockViewComposition.repeat(
 
 val linear = SourceLocation("linear")
 fun MockViewComposition.linear(block: Compose) {
-    emit(linear, { View().apply { name = "linear"} }, block)
+    emit(linear, { View().apply { name = "linear" } }, block)
 }
 
 fun MockViewComposition.linear(key: Any, block: Compose) {
@@ -27,19 +27,23 @@ fun MockViewComposition.linear(key: Any, block: Compose) {
 
 val text = SourceLocation("text")
 fun MockViewComposition.text(value: String) {
-    emit(text, { View().apply { name = "text"} }, value, { attribute("text", it) })
+    emit(text, { View().apply { name = "text" } }, value, { attribute("text", it) })
 }
 
 val edit = SourceLocation("edit")
 fun MockViewComposition.edit(value: String) {
-    emit(edit, { View().apply { name = "edit"} }, value, { attribute("value", it) })
+    emit(edit, { View().apply { name = "edit" } }, value, { attribute("value", it) })
 }
 
 val box = SourceLocation("box")
 fun MockViewComposition.selectBox(selected: Boolean, block: Compose) {
     if (selected) {
-        emit(box, { View().apply { name = "box"} }, block)
+        emit(box, { View().apply { name = "box" } }, block)
     } else {
         block()
     }
+}
+
+fun MockViewComposition.skip(key: Any, block: Compose) {
+    call(key, { false }) { block() }
 }
