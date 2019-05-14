@@ -58,6 +58,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.DYNAMICANIMATION, "dynamicanimation-ktx", "1.0.0-alpha02")
     prebuilts(LibraryGroups.DYNAMICANIMATION, "1.1.0-alpha01")
     prebuilts(LibraryGroups.EMOJI, "1.0.0")
+    ignore(LibraryGroups.ENTERPRISE.group, "enterprise-feedback-testing")
     prebuilts(LibraryGroups.ENTERPRISE, "1.0.0-alpha01")
     prebuilts(LibraryGroups.EXIFINTERFACE, "1.1.0-alpha01")
     prebuilts(LibraryGroups.FRAGMENT, "1.1.0-alpha09")
