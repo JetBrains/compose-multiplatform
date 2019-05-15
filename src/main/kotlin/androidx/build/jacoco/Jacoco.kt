@@ -25,18 +25,16 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 
 object Jacoco {
-    public const val VERSION = "0.8.3"
-    const val CORE_DEPENDENCY = "org.jacoco:org.jacoco.core:$VERSION"
+    const val VERSION = "0.8.3"
     private const val ANT_DEPENDENCY = "org.jacoco:org.jacoco.ant:$VERSION"
 
     fun createUberJarTask(project: Project): TaskProvider<Jar> {
         // This "uber" jacoco jar is used by the build server. Instrumentation tests are executed
         // outside of Gradle and this is needed to process the coverage files.
-
         val config = project.configurations.create("myJacoco")
         config.dependencies.add(project.dependencies.create(ANT_DEPENDENCY))
 
-        val task = project.tasks.register("jacocoAntUberJar", Jar::class.java) {
+        return project.tasks.register("jacocoAntUberJar", Jar::class.java) {
             it.inputs.files(config)
             val resolvedArtifacts = config.resolvedConfiguration.resolvedArtifacts
             it.from(resolvedArtifacts.map { project.zipTree(it.file) }) { copySpec ->
@@ -47,14 +45,12 @@ object Jacoco {
             it.destinationDirectory.set(project.getDistributionDirectory())
             it.archiveFileName.set("jacocoant.jar")
         }
-        return task
     }
 
-    @JvmStatic
     fun registerClassFilesTask(project: Project, extension: TestedExtension) {
         extension.testVariants.all { v ->
             if (v.buildType.isTestCoverageEnabled &&
-                v.sourceSets.any { it.javaDirectories.isNotEmpty()}) {
+                v.sourceSets.any { it.javaDirectories.isNotEmpty() }) {
                 val jarifyTask = project.tasks.register(
                     "package${v.name.capitalize()}ClassFilesForCoverageReport",
                     Jar::class.java
@@ -71,9 +67,6 @@ object Jacoco {
                     "packageAllClassFilesForCoverageReport",
                     Jar::class.java
                 ).configure { it.from(jarifyTask) }
-                v.assembleProvider.configure {
-                    it.dependsOn(jarifyTask)
-                }
             }
         }
     }
