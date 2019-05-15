@@ -32,6 +32,7 @@ val archivesToDejetify = listOf(
     "m2repository/androidx/asynclayoutinflater/**",
     "m2repository/androidx/biometric/**",
     "m2repository/androidx/browser/**",
+    "m2repository/androidx/camera/**",
     "m2repository/androidx/car/**",
     "m2repository/androidx/cardview/**",
     "m2repository/androidx/collection/collection/**",
