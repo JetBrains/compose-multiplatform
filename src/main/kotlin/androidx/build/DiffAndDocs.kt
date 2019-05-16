@@ -18,15 +18,12 @@ package androidx.build
 
 import androidx.build.Strategy.Prebuilts
 import androidx.build.Strategy.TipOfTree
-import androidx.build.checkapi.ApiXmlConversionTask
-import androidx.build.checkapi.CheckApiTasks
 import androidx.build.doclava.ChecksConfig
 import androidx.build.doclava.DEFAULT_DOCLAVA_CONFIG
 import androidx.build.doclava.DoclavaTask
 import androidx.build.docs.ConcatenateFilesTask
 import androidx.build.docs.GenerateDocsTask
 import androidx.build.gradle.isRoot
-import androidx.build.jdiff.JDiffTask
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.BaseVariant
@@ -48,7 +45,6 @@ import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.util.PatternSet
 import java.io.File
-import java.lang.IllegalStateException
 import java.net.URLClassLoader
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -56,10 +52,6 @@ import javax.tools.ToolProvider
 import kotlin.collections.set
 
 private const val DOCLAVA_DEPENDENCY = "com.android:doclava:1.0.6"
-
-private const val JDIFF_DEPENDENCY = "com.android:jdiff:1.1.0"
-private const val XML_PARSER_APIS_DEPENDENCY = "xerces:xmlParserAPIs:2.6.2"
-private const val XERCES_IMPL_DEPENDENCY = "xerces:xercesImpl:2.6.2"
 
 data class DacOptions(val libraryroot: String, val dataname: String)
 
@@ -76,7 +68,6 @@ class DiffAndDocs private constructor(
     private val docsTasks: MutableMap<String, TaskProvider<GenerateDocsTask>> = mutableMapOf()
     private val aggregateOldApiTxtsTask: TaskProvider<ConcatenateFilesTask>
     private val aggregateNewApiTxtsTask: TaskProvider<ConcatenateFilesTask>
-    private val generateDiffsTask: TaskProvider<JDiffTask>
 
     init {
         val doclavaConfiguration = root.configurations.create("doclava")
@@ -133,54 +124,16 @@ class DiffAndDocs private constructor(
             task.dependsOn(docsTasks[TIP_OF_TREE.name])
         }
 
-        val docletClasspath = doclavaConfiguration.resolve()
         val oldOutputTxt = File(root.docsDir(), "previous.txt")
         aggregateOldApiTxtsTask = root.tasks.register("aggregateOldApiTxts",
             ConcatenateFilesTask::class.java) {
             it.Output = oldOutputTxt
         }
 
-        val oldApisTask = root.tasks.register("oldApisXml",
-            ApiXmlConversionTask::class.java) {
-            it.classpath = root.files(docletClasspath)
-            it.dependsOn(doclavaConfiguration)
-
-            it.inputApiFile = oldOutputTxt
-            it.dependsOn(aggregateOldApiTxtsTask)
-
-            it.outputApiXmlFile = File(root.docsDir(), "previous.xml")
-        }
-
         val newApiTxt = File(root.docsDir(), newVersion)
         aggregateNewApiTxtsTask = root.tasks.register("aggregateNewApiTxts",
             ConcatenateFilesTask::class.java) {
             it.Output = newApiTxt
-        }
-
-        val newApisTask = root.tasks.register("newApisXml",
-            ApiXmlConversionTask::class.java) {
-            it.classpath = root.files(docletClasspath)
-
-            it.inputApiFile = newApiTxt
-            it.dependsOn(aggregateNewApiTxtsTask)
-
-            it.outputApiXmlFile = File(root.docsDir(), "$newVersion.xml")
-        }
-
-        val jdiffConfiguration = root.configurations.create("jdiff")
-        jdiffConfiguration.dependencies.add(root.dependencies.create(JDIFF_DEPENDENCY))
-        jdiffConfiguration.dependencies.add(root.dependencies.create(XML_PARSER_APIS_DEPENDENCY))
-        jdiffConfiguration.dependencies.add(root.dependencies.create(XERCES_IMPL_DEPENDENCY))
-
-        generateDiffsTask = createGenerateDiffsTask(root,
-            oldApisTask,
-            newApisTask,
-            jdiffConfiguration)
-
-        generateDiffsTask.configure { diffTask ->
-            docsTasks.values.forEach { docs ->
-                diffTask.dependsOn(docs)
-            }
         }
     }
 
@@ -330,8 +283,6 @@ class DiffAndDocs private constructor(
         tipOfTreeTasks(extension) { task ->
             registerJavaProjectForDocsTask(task, compileJava)
         }
-
-        registerJavaProjectForDocsTask(generateDiffsTask, compileJava)
     }
 
     /**
@@ -359,40 +310,6 @@ class DiffAndDocs private constructor(
                     registerAndroidProjectForDocsTask(task, variant)
                 }
             }
-        }
-    }
-
-    private fun setupApiVersioningInDocsTasks(
-        extension: AndroidXExtension,
-        checkApiTasks: CheckApiTasks
-    ) {
-        rules.forEach { rules ->
-            val project = extension.project
-            val strategy = rules.resolve(extension)?.strategy
-            val version = if (strategy is Prebuilts) {
-                strategy.version
-            } else {
-                extension.project.version()
-            }
-            docsTasks[rules.name]!!.configure { docs ->
-                // Track API change history.
-                docs.addSinceFilesFrom(project.projectDir)
-                // Associate current API surface with the Maven artifact.
-                val artifact = "${project.group}:${project.name}:$version"
-                docs.addArtifact(checkApiTasks.generateApi.get().apiFile!!.absolutePath, artifact)
-                docs.dependsOn(checkApiTasks.generateApi)
-            }
-        }
-    }
-
-    private fun addCheckApiTasksToGraph(tasks: CheckApiTasks) {
-        docsTasks.values.forEach { docs ->
-            docs.configure {
-                it.dependsOn(tasks.generateApi)
-            }
-        }
-        anchorTask.configure {
-            it.dependsOn(tasks.checkApi)
         }
     }
 }
@@ -448,68 +365,6 @@ private fun registerAndroidProjectForDocsTask(
                 it.project.files(javaCompileProvider.get().destinationDir)
     }
 }
-
-/**
- * Generates API diffs.
- * <p>
- * By default, diffs are generated for the delta between current.txt and the
- * next most recent X.Y.Z.txt API file. Behavior may be changed by specifying
- * one or both of -PtoApi and -PfromApi.
- * <p>
- * If both fromApi and toApi are specified, diffs will be generated for
- * fromApi -> toApi. For example, 25.0.0 -> 26.0.0 diffs could be generated by
- * using:
- * <br><code>
- *   ./gradlew generateDiffs -PfromApi=25.0.0 -PtoApi=26.0.0
- * </code>
- * <p>
- * If only toApi is specified, it MUST be specified as X.Y.Z and diffs will be
- * generated for (release before toApi) -> toApi. For example, 24.2.0 -> 25.0.0
- * diffs could be generated by using:
- * <br><code>
- *   ./gradlew generateDiffs -PtoApi=25.0.0
- * </code>
- * <p>
- * If only fromApi is specified, diffs will be generated for fromApi -> current.
- * For example, lastApiReview -> current diffs could be generated by using:
- * <br><code>
- *   ./gradlew generateDiffs -PfromApi=lastApiReview
- * </code>
- * <p>
- */
-private fun createGenerateDiffsTask(
-    project: Project,
-    oldApiTask: TaskProvider<ApiXmlConversionTask>,
-    newApiTask: TaskProvider<ApiXmlConversionTask>,
-    jdiffConfig: Configuration
-): TaskProvider<JDiffTask> =
-        project.tasks.register("generateDiffs", JDiffTask::class.java) {
-            it.apply {
-                // Base classpath is Android SDK, sub-projects add their own.
-                classpath = androidJarFile(project)
-
-                // JDiff properties.
-                oldApiXmlFile = oldApiTask.get().outputApiXmlFile
-                newApiXmlFile = newApiTask.get().outputApiXmlFile
-
-                val newApi = newApiXmlFile.name.substringBeforeLast('.')
-                val docsDir = File(project.rootProject.docsDir(), "public")
-
-                newJavadocPrefix = "../../../../../reference/"
-                destinationDir = File(docsDir,
-                        "online/sdk/support_api_diff/${project.name}/$newApi")
-
-                // Javadoc properties.
-                docletpath = jdiffConfig.resolve()
-                title = "Support&nbsp;Library&nbsp;API&nbsp;Differences&nbsp;Report"
-
-                exclude("**/R.java")
-                dependsOn(oldApiTask, newApiTask, jdiffConfig)
-                doLast {
-                    project.logger.lifecycle("generated diffs into $destinationDir")
-                }
-            }
-        }
 
 // Generates a distribution artifact for online docs.
 private fun createDistDocsTask(
@@ -630,18 +485,6 @@ private fun createGenerateDocsTask(
                 addArtifactsAndSince()
             }
         }
-
-private fun createGenerateLocalApiDiffsArchiveTask(
-    project: Project,
-    diffTask: TaskProvider<JDiffTask>
-): TaskProvider<Zip> = project.tasks.register("generateLocalApiDiffsArchive", Zip::class.java) {
-    val docsDir = project.rootProject.docsDir()
-    it.from(diffTask.map {
-        it.destinationDir
-    })
-    it.destinationDirectory.set(File(docsDir, "online/sdk/support_api_diff/${project.name}"))
-    it.to("${project.version}.zip")
-}
 
 private fun sdkApiFile(project: Project) = File(project.docsDir(), "release/sdk_current.txt")
 
