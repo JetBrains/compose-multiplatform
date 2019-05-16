@@ -70,7 +70,6 @@ class MockViewComposer(
 /* inline */ fun <N, /* reified */ V> Composition<N>.applyNeeded(value: V): Boolean =
     changed(value) && !inserting
 
-
 @Suppress("NOTHING_TO_INLINE")
 inline fun <V> MockViewComposition.remember(
     /*crossinline*/
@@ -170,14 +169,12 @@ inline fun MockViewComposition.call(
         block()
         endGroup()
     } else {
-        nextSlot()
-        skipValue()
-        skipGroup()
+        (cc as Composer<*>).skipGroup(invocation)
     }
     endGroup()
 }
 
-inline fun <T: ViewComponent> MockViewComposition.call(
+inline fun <T : ViewComponent> MockViewComposition.call(
     key: Any,
     ctor: () -> T,
     invalid: ComponentUpdater<T>.() -> Unit,
@@ -214,7 +211,6 @@ fun MockViewComposition.join(
     myCC.doneJoin(false)
     myCC.endGroup()
 }
-
 
 interface ComponentUpdater<C> : MockViewComposition {
     val component: C

@@ -668,8 +668,7 @@ class SlotWriter internal constructor(table: SlotTable) : SlotEditor(table) {
 }
 
 private val Any?.asGroupStart: GroupStart
-    get() =
-    this as? GroupStart ?: error("Expected a group start ")
+    get() = this as? GroupStart ?: error("Expected a group start")
 
 internal data class GroupStart(val kind: GroupKind, val slots: Int, val nodes: Int) {
     val isNode get() = kind == NODE
@@ -708,7 +707,7 @@ class SlotTable(internal var slots: Array<Any?> = arrayOf()) {
     }
 
     internal fun close(writer: SlotWriter) {
-        assert(writer.table === this && this.writer) { "Unexpected writer close()"}
+        assert(writer.table === this && this.writer) { "Unexpected writer close()" }
         this.writer = false
         clearGap()
     }
