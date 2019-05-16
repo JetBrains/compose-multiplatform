@@ -49,7 +49,11 @@ abstract class MetalavaTask : DefaultTask() {
         project.javaexec {
             it.classpath = checkNotNull(configuration) { "Configuration not set." }
             it.main = "com.android.tools.metalava.Driver"
-            it.args = listOf("--no-banner") + args
+            it.args = listOf(
+                "--no-banner",
+                "--error",
+                "DeprecationMismatch" // Enforce deprecation mismatch
+            ) + args
         }
     }
 }
