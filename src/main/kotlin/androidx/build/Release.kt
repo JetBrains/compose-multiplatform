@@ -180,14 +180,6 @@ object Release {
     private var configActionParams: GMavenZipTask.ConfigAction.Params? = null
 
     /**
-     * Creates the global [FULL_ARCHIVE_TASK_NAME] that create the zip for all available libraries.
-     */
-    @JvmStatic
-    fun createGlobalArchiveTask(project: Project) {
-        getGlobalFullZipTask(project)
-    }
-
-    /**
      * Registers the project to be included in its group's zip file as well as the global zip files.
      */
     fun register(project: Project, extension: AndroidXExtension) {
