@@ -31,7 +31,6 @@ import java.io.File
  * b) has a license file.
  */
 open class CheckExternalDependencyLicensesTask : DefaultTask() {
-    @Suppress("unused")
     @TaskAction
     fun checkDependencies() {
         val supportRoot = (project.rootProject.property("ext") as ExtraPropertiesExtension)
