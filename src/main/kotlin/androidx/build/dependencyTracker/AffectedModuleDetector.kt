@@ -22,6 +22,7 @@ import androidx.build.dependencyTracker.AffectedModuleDetector.Companion.ENABLE_
 import androidx.build.getDistributionDirectory
 import androidx.build.gradle.isRoot
 import androidx.build.isRunningOnBuildServer
+import java.io.File
 import org.gradle.BuildAdapter
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -213,7 +214,7 @@ internal class AffectedModuleDetectorImpl constructor(
 
     override fun shouldInclude(project: Project): Boolean {
         return (project.isRoot || affectedProjects.contains(project)).also {
-            logger?.info("checking whether i should include ${project.path} and my answer is $it")
+            logger?.info("checking whether I should include ${project.path} and my answer is $it")
         }
     }
 
@@ -251,6 +252,31 @@ internal class AffectedModuleDetectorImpl constructor(
                 ProjectSubset.ALL_AFFECTED_PROJECTS -> allProjects
             }
         }
+
+        // TODO: around Q3 2019, revert to resolve b/132901339
+        val isRootProjectUi = rootProject.name.contains("ui")
+        var hasNormalFile = false
+        var hasUiFile = false
+        changedFiles.forEach {
+            val projectBaseDir = it.split(File.separatorChar)[0]
+            if (projectBaseDir == "ui" || projectBaseDir == "compose") {
+                hasUiFile = true
+            } else {
+                hasNormalFile = true
+            }
+        }
+        // if changes in both codebases, continue as usual (will test everything)
+        if (hasUiFile && hasNormalFile) {
+            // normal file exists in ui build -> don't build anything except the dummy
+            // since the "other" build will pick up the appropriate projects.
+        } else if (isRootProjectUi && hasNormalFile) {
+            return alwaysBuild
+            // ui file exists in normal build -> don't build anything except the dummy
+            // since the "other" build will pick up the appropriate projects.
+        } else if (!isRootProjectUi && hasUiFile) {
+            return alwaysBuild
+        }
+
         val containingProjects = changedFiles
                 .map(::findContainingProject)
                 .let {
