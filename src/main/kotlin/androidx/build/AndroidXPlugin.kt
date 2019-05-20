@@ -678,7 +678,7 @@ private fun Project.configureResourceApiChecks(extension: LibraryExtension) {
                 }
             }
             tasks.withType(UpdateApiTask::class.java).configureEach { task ->
-                task.dependsOn(checkResourceApiTask)
+                task.dependsOn(updateResourceApiTask)
             }
             rootProject.tasks.named(AndroidXPlugin.BUILD_ON_SERVER_TASK).configure { task ->
                 task.dependsOn(checkResourceApiTask)
