@@ -19,61 +19,66 @@ package androidx.build.metalava
 import androidx.build.checkapi.ApiLocation
 import androidx.build.checkapi.ApiViolationExclusions
 import com.google.common.io.Files
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
 // Updates an API tracking exceptions file (api/*.*.*.ignore) to match the current set of violations
-open class IgnoreApiChangesTask : MetalavaTask() {
+abstract class IgnoreApiChangesTask : MetalavaTask() {
     // The API that the library is supposed to be compatible with
-    var referenceApi: ApiLocation? = null
+    @get:Input
+    abstract val referenceApi: Property<ApiLocation>
 
     // The exclusions files (api/*.*.*.ignore) to update
-    var exclusions: ApiViolationExclusions? = null
+    @get:Input
+    abstract val exclusions: Property<ApiViolationExclusions>
 
     // Whether to update the file having restricted APIs too
+    @get:Input
     var processRestrictedAPIs = false
 
     // Path of temporary api-changes exemptions file
-    var intermediateExclusionsFile: File? = null
+    @get:Input
+    abstract val intermediateExclusionsFile: Property<File>
 
     @InputFiles
     fun getTaskInputs(): List<File> {
         if (processRestrictedAPIs) {
-            return referenceApi!!.files()
+            return referenceApi.get().files()
         }
-        return listOf(referenceApi!!.publicApiFile)
+        return listOf(referenceApi.get().publicApiFile)
     }
 
     // Declaring outputs prevents Gradle from rerunning this task if the inputs haven't changed
     @OutputFiles
     fun getTaskOutputs(): List<File>? {
         if (processRestrictedAPIs) {
-            return exclusions!!.files()
+            return exclusions.get().files()
         }
-        return listOf(exclusions!!.publicApiFile)
+        return listOf(exclusions.get().publicApiFile)
     }
 
     @TaskAction
     fun exec() {
-        val referenceApi = checkNotNull(referenceApi) { "referenceApi not set." }
-        val exclusions = checkNotNull(exclusions) { "exclusions not set." }
-
         check(bootClasspath.isNotEmpty()) { "Android boot classpath not set." }
 
-        updateExclusions(referenceApi.publicApiFile, exclusions.publicApiFile, false)
-        if (processRestrictedAPIs && referenceApi.restrictedApiFile.exists()) {
-            updateExclusions(referenceApi.restrictedApiFile, exclusions.restrictedApiFile, true)
+        updateExclusions(referenceApi.get().publicApiFile, exclusions.get().publicApiFile, false)
+        if (processRestrictedAPIs && referenceApi.get().restrictedApiFile.exists()) {
+            updateExclusions(referenceApi.get().restrictedApiFile,
+                exclusions.get().restrictedApiFile,
+                true)
         }
     }
 
     // Updates the contents of exclusionsFile to specify an exception for every API present in apiFile but not
     // present in the current source path
     fun updateExclusions(apiFile: File, exclusionsFile: File, processRestrictedAPIs: Boolean) {
-        val intermediateExclusionsFile = checkNotNull(intermediateExclusionsFile) { "intermediateExclusionsFile not set" }
-        intermediateExclusionsFile.parentFile.mkdirs()
-        intermediateExclusionsFile.createNewFile()
+        val intermediateExclusions = intermediateExclusionsFile.get()
+        intermediateExclusions.parentFile.mkdirs()
+        intermediateExclusions.createNewFile()
 
         var args = listOf("--classpath",
             (bootClasspath + dependencyClasspath!!.files).joinToString(File.pathSeparator),
@@ -97,8 +102,8 @@ open class IgnoreApiChangesTask : MetalavaTask() {
         }
         runWithArgs(args)
 
-        if (intermediateExclusionsFile.length() > 0) {
-            Files.copy(intermediateExclusionsFile, exclusionsFile)
+        if (intermediateExclusions.length() > 0) {
+            Files.copy(intermediateExclusions, exclusionsFile)
         } else {
             if (exclusionsFile.exists()) {
                 exclusionsFile.delete()

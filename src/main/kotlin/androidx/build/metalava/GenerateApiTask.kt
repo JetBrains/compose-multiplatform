@@ -18,31 +18,39 @@ package androidx.build.metalava
 
 import androidx.build.checkapi.ApiLocation
 import org.gradle.api.GradleException
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
 /** Generate an API signature text file from a set of source files. */
-open class GenerateApiTask : MetalavaTask() {
+abstract class GenerateApiTask : MetalavaTask() {
     /** Text file to which API signatures will be written. */
-    var apiLocation: ApiLocation? = null
+    @get:Input
+    abstract val apiLocation: Property<ApiLocation>
 
+    @get:Input
     var generateRestrictedAPIs = false
 
     @OutputFiles
     fun getTaskOutputs(): List<File>? {
         if (generateRestrictedAPIs) {
-            return apiLocation?.files()
+            return apiLocation.get().files()
         }
-        return listOf(apiLocation!!.publicApiFile)
+        return listOf(apiLocation.get().publicApiFile)
     }
 
     @TaskAction
     fun exec() {
         val dependencyClasspath = checkNotNull(
                 dependencyClasspath) { "Dependency classpath not set." }
-        val publicApiFile = checkNotNull(apiLocation?.publicApiFile) { "Current public API file not set." }
-        val restrictedApiFile = checkNotNull(apiLocation?.restrictedApiFile) { "Current restricted API file not set." }
+        val publicApiFile = checkNotNull(apiLocation.get().publicApiFile) {
+            "Current public API file not set."
+        }
+        val restrictedApiFile = checkNotNull(apiLocation.get().restrictedApiFile) {
+            "Current restricted API file not set."
+        }
         check(bootClasspath.isNotEmpty()) { "Android boot classpath not set." }
         check(sourcePaths.isNotEmpty()) { "Source paths not set." }
 
