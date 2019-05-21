@@ -95,10 +95,9 @@ const val ANDROIDX_SQLITE_FRAMEWORK = "androidx.sqlite:sqlite-framework:2.0.1"
 // Arch libraries
 const val ARCH_LIFECYCLE_RUNTIME = "androidx.lifecycle:lifecycle-runtime:2.0.0"
 const val ARCH_LIFECYCLE_COMMON = "androidx.lifecycle:lifecycle-common:2.0.0@jar"
-const val ARCH_LIFECYCLE_LIVEDATA_CORE =
-        "androidx.lifecycle:lifecycle-livedata-core:2.0.0"
-const val ARCH_LIFECYCLE_LIVEDATA =
-        "androidx.lifecycle:lifecycle-livedata:2.0.0"
+const val ARCH_LIFECYCLE_LIVEDATA_CORE = "androidx.lifecycle:lifecycle-livedata-core:2.0.0"
+const val ARCH_LIFECYCLE_LIVEDATA = "androidx.lifecycle:lifecycle-livedata:2.0.0"
+const val ARCH_LIFECYCLE_SERVICE = "androidx.lifecycle:lifecycle-service:2.0.0"
 const val ARCH_LIFECYCLE_VIEWMODEL = "androidx.lifecycle:lifecycle-viewmodel:2.0.0"
 const val ARCH_LIFECYCLE_EXTENSIONS = "androidx.lifecycle:lifecycle-extensions:2.0.0"
 const val ARCH_CORE_COMMON = "androidx.arch.core:core-common:2.0.1@jar"
