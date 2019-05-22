@@ -90,8 +90,8 @@ abstract class IgnoreApiChangesTask : MetalavaTask() {
             apiFile.toString(),
 
             "--update-baseline",
-            intermediateExclusionsFile.toString(),
-            "--baseline", intermediateExclusionsFile.toString(),
+            intermediateExclusions.toString(),
+            "--baseline", intermediateExclusions.toString(),
             "--pass-baseline-updates",
 
             "--format=v3",
