@@ -19,6 +19,7 @@ package androidx.build
 import androidx.benchmark.gradle.Adb
 import androidx.benchmark.gradle.LockClocksTask
 import androidx.benchmark.gradle.UnlockClocksTask
+import androidx.build.SupportConfig.BENCHMARK_INSTRUMENTATION_RUNNER
 import androidx.build.SupportConfig.BUILD_TOOLS_VERSION
 import androidx.build.SupportConfig.COMPILE_SDK_VERSION
 import androidx.build.SupportConfig.DEFAULT_MIN_SDK_VERSION
@@ -346,7 +347,8 @@ class AndroidXPlugin : Plugin<Project> {
         compileSdkVersion(COMPILE_SDK_VERSION)
         buildToolsVersion = BUILD_TOOLS_VERSION
         defaultConfig.targetSdkVersion(TARGET_SDK_VERSION)
-        defaultConfig.testInstrumentationRunner = INSTRUMENTATION_RUNNER
+        defaultConfig.testInstrumentationRunner =
+            if (project.isBenchmark()) BENCHMARK_INSTRUMENTATION_RUNNER else INSTRUMENTATION_RUNNER
         testOptions.unitTests.isReturnDefaultValues = true
 
         defaultConfig.minSdkVersion(DEFAULT_MIN_SDK_VERSION)
@@ -599,7 +601,8 @@ class AndroidXPlugin : Plugin<Project> {
 
 fun Project.isBenchmark(): Boolean {
     // benchmark convention is to end name with "-benchmark"
-    return name.endsWith("-benchmark")
+    // Note: also match benchmark/src/androidTest, so it gets the BENCHMARK_INSTRUMENTATION_RUNNER
+    return name.endsWith("-benchmark") || name == "benchmark"
 }
 
 fun Project.hideJavadocTask() {
