@@ -48,6 +48,7 @@ abstract class Recomposer {
     protected var isComposing: Boolean = false
     private val composers = mutableSetOf<Composer<*>>()
 
+    @Suppress("PLUGIN_WARNING")
     private fun recompose(component: Component, composer: Composer<*>) {
         composer.runWithCurrent {
             val previousComposing = isComposing
