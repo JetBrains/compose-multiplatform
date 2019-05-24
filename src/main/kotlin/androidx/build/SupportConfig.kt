@@ -23,6 +23,7 @@ import java.io.File
 object SupportConfig {
     const val DEFAULT_MIN_SDK_VERSION = 14
     const val INSTRUMENTATION_RUNNER = "androidx.test.runner.AndroidJUnitRunner"
+    const val BENCHMARK_INSTRUMENTATION_RUNNER = "androidx.benchmark.AndroidBenchmarkRunner"
     const val BUILD_TOOLS_VERSION = "28.0.3"
 
     /**
