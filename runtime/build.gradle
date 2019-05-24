@@ -37,7 +37,7 @@ dependencies {
 
 android {
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 18
     }
     lintOptions {
         disable("SyntheticAccessor")
