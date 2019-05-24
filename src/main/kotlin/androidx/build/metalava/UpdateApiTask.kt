@@ -39,7 +39,6 @@ abstract class UpdateApiTask : DefaultTask() {
     abstract val inputApiLocation: Property<ApiLocation>
 
     /** Text files to which API signatures will be written. */
-    @get:Input
     abstract val outputApiLocations: ListProperty<ApiLocation>
 
     /** Whether to update restricted API files too */

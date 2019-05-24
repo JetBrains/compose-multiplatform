@@ -31,7 +31,6 @@ import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.JavaPluginConvention
-import org.gradle.api.provider.ListProperty
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.getPlugin
 import java.io.File
@@ -110,13 +109,11 @@ object Metalava {
             libraryVersionApi.publicApiFile.parentFile, "current.txt"))
 
         // make sure to update current.txt if it wasn't previously planned to be updated
-        val outputApiLocations: ListProperty<ApiLocation> =
+        val outputApiLocations =
             if (libraryVersionApi.publicApiFile.path.equals(currentTxtApi.publicApiFile.path)) {
-                project.objects.listProperty(ApiLocation::class.java)
-                    .convention(listOf(libraryVersionApi))
+                listOf(libraryVersionApi)
             } else {
-                project.objects.listProperty(ApiLocation::class.java)
-                    .convention(listOf(libraryVersionApi, currentTxtApi))
+                listOf(libraryVersionApi, currentTxtApi)
             }
 
         val builtApiLocation = ApiLocation.fromPublicApiFile(

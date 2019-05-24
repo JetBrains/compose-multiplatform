@@ -41,7 +41,6 @@ abstract class IgnoreApiChangesTask : MetalavaTask() {
     var processRestrictedAPIs = false
 
     // Path of temporary api-changes exemptions file
-    @get:Input
     abstract val intermediateExclusionsFile: Property<File>
 
     @InputFiles
