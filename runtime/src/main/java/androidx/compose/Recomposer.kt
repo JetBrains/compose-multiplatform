@@ -49,10 +49,12 @@ abstract class Recomposer {
     private val composers = mutableSetOf<Composer<*>>()
 
     private fun recompose(component: Component, composer: Composer<*>) {
-        val previousComposing = isComposing
         composer.runWithCurrent {
+            val previousComposing = isComposing
+            val composerWasComposing = composer.isComposing
             try {
                 isComposing = true
+                composer.isComposing = true
                 trace("Compose:recompose") {
                     composer.startRoot()
                     composer.startGroup(invocation)
@@ -64,6 +66,7 @@ abstract class Recomposer {
                 FrameManager.nextFrame()
             } finally {
                 isComposing = previousComposing
+                composer.isComposing = composerWasComposing
             }
         }
     }

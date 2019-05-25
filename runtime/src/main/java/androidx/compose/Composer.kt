@@ -161,7 +161,7 @@ private class Invalidation(
     var location: Int
 )
 
-internal class RecomposeScope(val compose: (invalidate: (sync: Boolean) -> Unit) -> Unit) {
+internal class RecomposeScope(var compose: (invalidate: (sync: Boolean) -> Unit) -> Unit) {
     var anchor: Anchor? = null
     var invalidate: ((sync: Boolean) -> Unit)? = null
     val valid: Boolean get() = anchor?.valid ?: false
@@ -196,6 +196,7 @@ open class Composer<N>(
     private val invalidateStack = Stack<RecomposeScope>()
 
     internal var parentReference: CompositionReference? = null
+    internal var isComposing = false
 
     private val changesAppliedObservers = mutableListOf<() -> Unit>()
 
@@ -596,7 +597,7 @@ open class Composer<N>(
             invalidateStack.let { if (it.isNotEmpty()) it.peek() else null }
 
     private fun start(key: Any, action: SlotAction) {
-        assert(childrenAllowed) { "A call to creadNode(), emitNode() or useNode() expected" }
+        assert(childrenAllowed) { "A call to createNode(), emitNode() or useNode() expected" }
         if (pending == null) {
             val slotKey = slots.next()
             if (slotKey == key) {
@@ -905,6 +906,8 @@ open class Composer<N>(
     }
 
     private fun recomposeComponentRange(start: Int, end: Int) {
+        val wasComposing = isComposing
+        isComposing = true
         var recomposed = false
 
         var firstInRange = invalidations.firstInRange(start, end)
@@ -937,16 +940,26 @@ open class Composer<N>(
             recordSkip(START_GROUP)
             slots.skipGroup()
         }
+        isComposing = wasComposing
     }
 
     private fun invalidate(scope: RecomposeScope, sync: Boolean) {
         val location = scope.anchor?.location(slotTable) ?: return
         assert(location >= 0) { "Invalid anchor" }
         invalidations.insertIfMissing(location, scope)
-        if (sync) {
-            recomposer.recomposeSync(this)
+        if (isComposing && location > slots.current) {
+            // if we are invalidating a scope that is going to be traversed during this
+            // composition, we don't want to schedule a recomposition
+            return
+        }
+        if (parentReference != null) {
+            parentReference?.invalidate(sync)
         } else {
-            recomposer.scheduleRecompose(this)
+            if (sync) {
+                recomposer.recomposeSync(this)
+            } else {
+                recomposer.scheduleRecompose(this)
+            }
         }
     }
 
@@ -985,6 +998,7 @@ open class Composer<N>(
                 slots.startGroup()
                 @Suppress("UNCHECKED_CAST")
                 val scope = slots.next() as RecomposeScope
+                scope.compose = compose
                 invalidateStack.push(scope)
                 recordStart(START_GROUP)
                 skipValue()
@@ -1211,7 +1225,7 @@ open class Composer<N>(
 
         override fun <T> invalidateConsumers(key: Ambient<T>) {
             // need to mark the recompose scope that created the reference as invalid
-            invalidate()
+            invalidate(false)
 
             // loop through every child composer
             for (composer in composers) {
@@ -1227,11 +1241,11 @@ open class Composer<N>(
             composers.add(composer)
         }
 
-        override fun invalidate() {
+        override fun invalidate(sync: Boolean) {
             // continue invalidating up the spine of AmbientReferences
-            parentReference?.invalidate()
+            parentReference?.invalidate(sync)
 
-            scope.invalidate?.invoke(false)
+            invalidate(scope, sync)
         }
 
         override fun <T> getAmbient(key: Ambient<T>): T {

@@ -33,10 +33,10 @@ import java.util.WeakHashMap
 object Compose {
 
     private class Root : Component() {
-        @Suppress("DEPRECATION")
-        fun update() = recomposeSync()
+        fun update() = composer.compose()
 
         lateinit var composable: @Composable() () -> Unit
+        lateinit var composer: CompositionContext
         @Suppress("PLUGIN_ERROR")
         override fun compose() {
             val cc = currentComposerNonNull
@@ -127,15 +127,18 @@ object Compose {
             root = Root()
             root.composable = composable
             setRoot(container, root)
-            CompositionContext.prepare(
+            val cc = CompositionContext.prepare(
                 container.context,
                 container,
                 root,
                 parent
-            ).compose()
+            )
+            root.composer = cc
+            root.update()
+            return cc
         } else {
             root.composable = composable
-            root.recomposeCallback?.invoke(true)
+            root.update()
         }
         return null
     }
@@ -193,10 +196,12 @@ object Compose {
             root = Root()
             root.composable = composable
             setRoot(container, root)
-            CompositionContext.prepare(context, container, root, parent).compose()
+            val cc = CompositionContext.prepare(context, container, root, parent)
+            root.composer = cc
+            root.update()
         } else {
             root.composable = composable
-            root.recomposeCallback?.invoke(true)
+            root.update()
         }
     }
 
