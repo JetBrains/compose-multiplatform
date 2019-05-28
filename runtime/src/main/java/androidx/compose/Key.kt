@@ -46,7 +46,7 @@ package androidx.compose
  *         Key(parent.id) {
  *             User(user=child)
  *             User(user=parent)
-*          }
+ *          }
  *     }
  *
  * This example assumes that `parent.id` is a unique key for each item in the collection,

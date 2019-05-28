@@ -28,7 +28,7 @@ package androidx.compose
  */
 interface CompositionReference {
     fun <T> getAmbient(key: Ambient<T>): T
-    fun invalidate()
+    fun invalidate(sync: Boolean)
     fun <T> invalidateConsumers(key: Ambient<T>)
     fun <N> registerComposer(composer: Composer<N>)
 }
