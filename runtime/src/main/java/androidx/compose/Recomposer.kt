@@ -53,11 +53,13 @@ abstract class Recomposer {
         composer.runWithCurrent {
             try {
                 isComposing = true
-                composer.startRoot()
-                composer.startGroup(invocation)
-                component()
-                composer.endGroup()
-                composer.endRoot()
+                trace("Compose:recompose") {
+                    composer.startRoot()
+                    composer.startGroup(invocation)
+                    component()
+                    composer.endGroup()
+                    composer.endRoot()
+                }
                 composer.applyChanges()
                 FrameManager.nextFrame()
             } finally {

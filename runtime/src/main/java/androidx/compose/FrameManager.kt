@@ -133,18 +133,22 @@ object FrameManager {
     }
 
     private val commitObserver: (committed: Set<Any>) -> Unit = { committed ->
-        val currentInvalidations = synchronized(this) { invalidations[committed] }
-        currentInvalidations.forEach { scope -> scope.invalidate?.invoke(false) }
+        trace("Model:commitTransaction") {
+            val currentInvalidations = synchronized(this) { invalidations[committed] }
+            currentInvalidations.forEach { scope -> scope.invalidate?.invoke(false) }
+        }
     }
 
     /**
      * Remove all invalidation scopes not currently part of a composition
      */
     private val reclaimInvalid: () -> Unit = {
-        synchronized(this) {
-            if (reclaimPending) {
-                reclaimPending = false
-                invalidations.clearValues { !it.valid }
+        trace("Model:reclaimInvalid") {
+            synchronized(this) {
+                if (reclaimPending) {
+                    reclaimPending = false
+                    invalidations.clearValues { !it.valid }
+                }
             }
         }
     }

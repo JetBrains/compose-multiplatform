@@ -574,22 +574,25 @@ class SlotWriter internal constructor(table: SlotTable) : SlotEditor(table) {
 
     private fun moveGapTo(index: Int) {
         if (table.gapLen > 0 && table.gapStart != index) {
-            pendingClear = false
-            if (table.anchors.isNotEmpty()) table.updateAnchors(index)
-            if (index < table.gapStart) {
-                val len = table.gapStart - index
-                System.arraycopy(slots, index, slots, index + table.gapLen, len)
-            } else {
-                val len = index - table.gapStart
-                System.arraycopy(
-                    slots,
-                    table.gapStart + table.gapLen,
-                    slots,
-                    table.gapStart,
-                    len)
+            trace("SlotTable:moveGap") {
+                pendingClear = false
+                if (table.anchors.isNotEmpty()) table.updateAnchors(index)
+                if (index < table.gapStart) {
+                    val len = table.gapStart - index
+                    System.arraycopy(slots, index, slots, index + table.gapLen, len)
+                } else {
+                    val len = index - table.gapStart
+                    System.arraycopy(
+                        slots,
+                        table.gapStart + table.gapLen,
+                        slots,
+                        table.gapStart,
+                        len
+                    )
+                }
+                table.gapStart = index
+                pendingClear = true
             }
-            table.gapStart = index
-            pendingClear = true
         } else {
             table.gapStart = index
         }
@@ -599,27 +602,30 @@ class SlotWriter internal constructor(table: SlotTable) : SlotEditor(table) {
         if (size > 0) {
             moveGapTo(current)
             if (table.gapLen < size) {
-                // Create a bigger gap
-                val oldCapacity = slots.size
-                val oldSize = slots.size - table.gapLen
-                // Double the size of the array, but at least MIN_GROWTH_SIZE and >= size
-                val newCapacity = Math.max(Math.max(oldCapacity*2, oldSize + size),
-                    MIN_GROWTH_SIZE
-                )
-                val newSlots = arrayOfNulls<Any?>(newCapacity)
-                val newGapLen = newCapacity - oldSize
-                val oldGapEnd = table.gapStart + table.gapLen
-                val newGapEnd = table.gapStart + newGapLen
-                // Copy the old array into the new array
-                System.arraycopy(slots, 0, newSlots, 0, table.gapStart)
-                System.arraycopy(slots, oldGapEnd, newSlots, newGapEnd, oldCapacity - oldGapEnd)
+                trace("SlotTable:grow") {
+                    // Create a bigger gap
+                    val oldCapacity = slots.size
+                    val oldSize = slots.size - table.gapLen
+                    // Double the size of the array, but at least MIN_GROWTH_SIZE and >= size
+                    val newCapacity = Math.max(
+                        Math.max(oldCapacity * 2, oldSize + size),
+                        MIN_GROWTH_SIZE
+                    )
+                    val newSlots = arrayOfNulls<Any?>(newCapacity)
+                    val newGapLen = newCapacity - oldSize
+                    val oldGapEnd = table.gapStart + table.gapLen
+                    val newGapEnd = table.gapStart + newGapLen
+                    // Copy the old array into the new array
+                    System.arraycopy(slots, 0, newSlots, 0, table.gapStart)
+                    System.arraycopy(slots, oldGapEnd, newSlots, newGapEnd, oldCapacity - oldGapEnd)
 
-                // Update the anchors
-                if (table.anchors.isNotEmpty()) table.anchorGapResize(newGapLen - table.gapLen)
+                    // Update the anchors
+                    if (table.anchors.isNotEmpty()) table.anchorGapResize(newGapLen - table.gapLen)
 
-                // Update the gap and slots
-                table.slots = newSlots
-                table.gapLen = newGapLen
+                    // Update the gap and slots
+                    table.slots = newSlots
+                    table.gapLen = newGapLen
+                }
             }
             if (currentEnd >= table.gapStart) currentEnd += size
             table.gapStart += size
