@@ -92,6 +92,7 @@ class AndroidXPlugin : Plugin<Project> {
 
         val androidXExtension =
             project.extensions.create("androidx", AndroidXExtension::class.java, project)
+
         // This has to be first due to bad behavior by DiffAndDocs. It fails if this configuration
         // is called after DiffAndDocs.configureDiffAndDocs. b/129762955
         project.configureMavenArtifactUpload(androidXExtension)
@@ -323,8 +324,8 @@ class AndroidXPlugin : Plugin<Project> {
                         // Substitute only for debug configurations/tasks only because we can not
                         // change release dependencies after evaluation. Test hooks, buildOnServer
                         // and buildTestApks use the debug configurations as well.
-                        if (androidXExtension.publish && configuration.name
-                                .toLowerCase().contains("debug")
+                        if (androidXExtension.publish.shouldRelease() &&
+                            configuration.name.toLowerCase().contains("debug")
                         ) {
                             configuration.resolutionStrategy.dependencySubstitution.apply {
                                 for (e in projectModules) {
@@ -565,7 +566,8 @@ class AndroidXPlugin : Plugin<Project> {
     // Task that creates a json file of a project's dependencies
     private fun Project.addCreateLibraryBuildInfoFileTask(extension: AndroidXExtension) {
         afterEvaluate {
-            if (extension.publish) { // Only generate build info files for published libraries.
+            if (extension.publish.shouldRelease()) {
+                // Only generate build info files for published libraries.
                 val task = project.tasks.register(
                     "createLibraryBuildInfoFile",
                     CreateLibraryBuildInfoFileTask::class.java
@@ -624,7 +626,7 @@ fun Project.hideJavadocTask() {
 
 fun Project.addToProjectMap(extension: AndroidXExtension) {
     afterEvaluate {
-        if (extension.publish) {
+        if (extension.publish.shouldRelease()) {
             val group = extension.mavenGroup?.group
             if (group != null) {
                 val module = "$group:${project.name}"

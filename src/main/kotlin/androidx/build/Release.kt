@@ -183,10 +183,10 @@ object Release {
      * Registers the project to be included in its group's zip file as well as the global zip files.
      */
     fun register(project: Project, extension: AndroidXExtension) {
-        if (!extension.publish) {
+        if (!extension.publish.shouldRelease()) {
             throw IllegalArgumentException(
                     "Cannot register ${project.path} into the release" +
-                            " because publish is false!"
+                            " because publish is not Publish.SNAPSHOT_AND_RELEASE!"
             )
         }
         val mavenGroup = extension.mavenGroup?.group ?: throw IllegalArgumentException(
@@ -225,7 +225,7 @@ object Release {
         val params = configActionParams ?: GMavenZipTask.ConfigAction.Params(
                 mavenGroup = "",
                 includeMetadata = false,
-                supportRepoOut = project.property("supportRepoOut") as File,
+                supportRepoOut = project.getRepositoryDirectory(),
                 gMavenVersionChecker =
                 project.property("versionChecker") as GMavenVersionChecker,
                 distDir = projectDist,
