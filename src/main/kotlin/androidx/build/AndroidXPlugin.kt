@@ -377,8 +377,13 @@ class AndroidXPlugin : Plugin<Project> {
             }
         }
 
+        val debugSigningConfig = signingConfigs.getByName("debug")
         // Use a local debug keystore to avoid build server issues.
-        signingConfigs.getByName("debug").storeFile = SupportConfig.getKeystore(project)
+        debugSigningConfig.storeFile = SupportConfig.getKeystore(project)
+        buildTypes.all { buildType ->
+            // Sign all the builds (including release) with debug key
+            buildType.signingConfig = debugSigningConfig
+        }
 
         // Disable generating BuildConfig.java
         // TODO remove after https://issuetracker.google.com/72050365
