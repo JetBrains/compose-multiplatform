@@ -21,6 +21,7 @@ package androidx.build
  */
 object LibraryGroups {
     val ACTIVITY = LibraryGroup("androidx.activity")
+    val ADS = LibraryGroup("androidx.ads", false)
     val ANIMATION = LibraryGroup("androidx.animation", false)
     val ANNOTATION = LibraryGroup("androidx.annotation")
     val APPCOMPAT = LibraryGroup("androidx.appcompat", false)

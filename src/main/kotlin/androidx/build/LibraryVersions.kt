@@ -21,6 +21,7 @@ package androidx.build
  */
 object LibraryVersions {
     val ACTIVITY = Version("1.0.0-beta01")
+    val ADS_IDENTIFIER = Version("1.0.0-alpha01")
     val ANIMATION = Version("1.0.0-alpha01")
     val ANIMATION_TESTING = Version("1.1.0-alpha01")
     val ANNOTATION = Version("1.2.0-alpha01")
