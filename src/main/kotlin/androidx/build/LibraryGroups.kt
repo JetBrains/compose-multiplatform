@@ -47,7 +47,7 @@ object LibraryGroups {
     val EMOJI = LibraryGroup("androidx.emoji", false)
     val ENTERPRISE = LibraryGroup("androidx.enterprise")
     val EXIFINTERFACE = LibraryGroup("androidx.exifinterface")
-    val FRAGMENT = LibraryGroup("androidx.fragment", false)
+    val FRAGMENT = LibraryGroup("androidx.fragment")
     val GRIDLAYOUT = LibraryGroup("androidx.gridlayout")
     val HEIFWRITER = LibraryGroup("androidx.heifwriter")
     val INTERPOLATOR = LibraryGroup("androidx.interpolator")
