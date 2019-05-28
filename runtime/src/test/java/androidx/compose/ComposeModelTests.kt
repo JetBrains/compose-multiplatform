@@ -138,9 +138,11 @@ class ModelViewTests : TestCase() {
     fun testModelView_Simple(): Unit = FrameManager.isolated {
         val tvId = 67
         compose {
-            emit(62, { context -> TextView(context).apply {
-                text = "Hello world!"; id = tvId
-            } }) { }
+            emit(62, { context ->
+                TextView(context).apply {
+                    text = "Hello world!"; id = tvId
+                }
+            }) { }
         }.then { activity ->
             val tv = activity.root.findViewById(tvId) as TextView
             assertEquals("Hello world!", tv.text)
@@ -151,9 +153,11 @@ class ModelViewTests : TestCase() {
     fun testModelView_Simple_Recompose(): Unit = FrameManager.isolated {
         val tvId = 71
         compose {
-            emit(73, { context -> TextView(context).apply {
-                text = "Hello world!"; id = tvId
-            } }) { }
+            emit(73, { context ->
+                TextView(context).apply {
+                    text = "Hello world!"; id = tvId
+                }
+            }) { }
         }.then { activity ->
             val tv = activity.root.findViewById(tvId) as TextView
             assertEquals("Hello world!", tv.text)
@@ -175,13 +179,13 @@ class ModelViewTests : TestCase() {
             call(147, { true }) {
                 @Suppress("PLUGIN_ERROR")
                 (Observe {
-        emit(93, { context -> TextView(context).apply { id = tvIdName } }) {
-            set(president.name) { text = it }
-        }
-        emit(94, { context -> TextView(context).apply { id = tvIdAge } }) {
-            set(president.age) { text = it.toString() }
-        }
-    })
+                    emit(93, { context -> TextView(context).apply { id = tvIdName } }) {
+                        set(president.name) { text = it }
+                    }
+                    emit(94, { context -> TextView(context).apply { id = tvIdAge } }) {
+                        set(president.age) { text = it.toString() }
+                    }
+                })
             }
         }.then {
             val tvName = it.findViewById(tvIdName) as TextView
@@ -215,13 +219,13 @@ class ModelViewTests : TestCase() {
             call(167, { true }) {
                 @Suppress("PLUGIN_ERROR")
                 (Observe {
-        emit(93, { context -> TextView(context) }) {
-            set(person.name) { text = it }
-        }
-        emit(94, { context -> TextView(context) }) {
-            set(person.age) { text = it.toString() }
-        }
-    })
+                    emit(93, { context -> TextView(context) }) {
+                        set(person.name) { text = it }
+                    }
+                    emit(94, { context -> TextView(context) }) {
+                        set(person.age) { text = it.toString() }
+                    }
+                })
             }
         }
 
@@ -229,10 +233,10 @@ class ModelViewTests : TestCase() {
             call(185, { true }) {
                 @Suppress("PLUGIN_ERROR")
                 (Observe {
-        display(washington)
-        if (displayLincoln.value)
-            display(lincoln)
-    })
+                    display(washington)
+                    if (displayLincoln.value)
+                        display(lincoln)
+                })
             }
         }.then {
             displayLincoln.value = false
@@ -256,33 +260,33 @@ class ModelViewTests : TestCase() {
             call(167, { true }) {
                 @Suppress("PLUGIN_ERROR")
                 (Observe {
-        emit(93, { context -> TextView(context).apply { id = tvName } }) {
-            set(person.name) { text = it }
-        }
-        emit(94, { context -> TextView(context) }) {
-            set(person.age) { text = it.toString() }
-        }
-    })
+                    emit(93, { context -> TextView(context).apply { id = tvName } }) {
+                        set(person.name) { text = it }
+                    }
+                    emit(94, { context -> TextView(context) }) {
+                        set(person.age) { text = it.toString() }
+                    }
+                })
                 if (person.name == PRESIDENT_NAME_16) {
                     @Suppress("PLUGIN_ERROR")
                     (Observe {
-        emit(211, { context -> TextView(context) }) {
-            set(person.name) { text = it }
-        }
-        emit(211, { context -> TextView(context) }) {
-            set(person.age) { text = it.toString() }
-        }
-    })
+                        emit(211, { context -> TextView(context) }) {
+                            set(person.name) { text = it }
+                        }
+                        emit(211, { context -> TextView(context) }) {
+                            set(person.age) { text = it.toString() }
+                        }
+                    })
                 }
             }
         }
 
         compose {
-            call(219, {true}) {
+            call(219, { true }) {
                 @Suppress("PLUGIN_ERROR")
                 (Observe {
-        display(president)
-    })
+                    display(president)
+                })
             }
         }.then { activity ->
             assertEquals(PRESIDENT_NAME_1, (activity.findViewById(tvName) as TextView).text)
@@ -304,25 +308,25 @@ class ModelViewTests : TestCase() {
             call(167, { true }) {
                 @Suppress("PLUGIN_ERROR")
                 (Observe {
-        emit(93, { context -> TextView(context).apply { id = tvName } }) {
-            set(person.name) { text = it }
-        }
-        emit(94, { context -> TextView(context) }) {
-            set(person.age) {
-                text = it.toString()
-            }
-        }
-    })
+                    emit(93, { context -> TextView(context).apply { id = tvName } }) {
+                        set(person.name) { text = it }
+                    }
+                    emit(94, { context -> TextView(context) }) {
+                        set(person.age) {
+                            text = it.toString()
+                        }
+                    }
+                })
                 if (person.name == PRESIDENT_NAME_16) {
                     @Suppress("PLUGIN_ERROR")
                     (Observe {
-        emit(211, { context -> TextView(context) }) {
-            set(person.name) { text = it }
-        }
-        emit(211, { context -> TextView(context) }) {
-            set(person.age) { text = it.toString() }
-        }
-    })
+                        emit(211, { context -> TextView(context) }) {
+                            set(person.name) { text = it }
+                        }
+                        emit(211, { context -> TextView(context) }) {
+                            set(person.age) { text = it.toString() }
+                        }
+                    })
                 }
             }
         }
@@ -331,8 +335,8 @@ class ModelViewTests : TestCase() {
             call(219, { true }) {
                 @Suppress("PLUGIN_ERROR")
                 (Observe {
-        display(president)
-    })
+                    display(president)
+                })
             }
         }.then { activity ->
             assertEquals(PRESIDENT_NAME_1, (activity.findViewById(tvName) as TextView).text)
@@ -390,12 +394,13 @@ class ModelViewTests : TestCase() {
         fun then(block: (activity: Activity) -> Unit): ActiveTest {
             val controller = Robolectric.buildActivity(FrameTestActivity::class.java)
             val activity = controller.create().get()
-            return Compose.createCompositionContext(
+            val cc = Compose.createCompositionContext(
                 activity,
                 activity.root,
                 Root(composable),
                 null
-            ).runWithCurrent {
+            )
+            return cc.composer.runWithCurrent {
                 ActiveTest(activity).then(block)
             }
         }
@@ -407,8 +412,9 @@ private val Activity.root get() = findViewById(ComposerComposeTestCase.ROOT_ID) 
 private class FrameTestActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(LinearLayout(this).apply { id =
-            ComposerComposeTestCase.ROOT_ID
+        setContentView(LinearLayout(this).apply {
+            id =
+                ComposerComposeTestCase.ROOT_ID
         })
     }
 }

@@ -4,6 +4,7 @@ import androidx.compose.Applier
 import androidx.compose.ApplyAdapter
 import androidx.compose.Composer
 import androidx.compose.Composition
+import androidx.compose.Recomposer
 import androidx.compose.SlotTable
 import androidx.compose.cache
 import androidx.compose.changed
@@ -34,6 +35,7 @@ abstract class ViewComponent : MockViewComposition {
         cc.doneJoin(false)
         recomposer = callback
     }
+
     abstract fun compose()
 }
 
@@ -42,18 +44,23 @@ typealias Compose = MockViewComposition.() -> Unit
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 object ViewApplierAdapter :
     ApplyAdapter<View> {
-    override fun View.start(instance: View) { }
+    override fun View.start(instance: View) {}
     override fun View.insertAt(index: Int, instance: View) = addAt(index, instance)
     override fun View.removeAt(index: Int, count: Int) = removeAt(index, count)
     override fun View.move(from: Int, to: Int, count: Int) = moveAt(from, to, count)
-    override fun View.end(instance: View, parent: View) { }
+    override fun View.end(instance: View, parent: View) {}
 }
 
 class MockViewComposer(
     val root: View
 ) : Composer<View>(
     SlotTable(),
-    Applier(root, ViewApplierAdapter), null) {
+    Applier(root, ViewApplierAdapter), object : Recomposer() {
+        override fun scheduleChangesDispatch() {
+        }
+
+        override fun hasPendingChanges(): Boolean = false
+    }) {
     private val rootComposer: MockViewComposition by lazy {
         object : MockViewComposition {
             override val cc: Composition<View> get() = this@MockViewComposer

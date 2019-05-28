@@ -157,6 +157,6 @@ object FrameManager {
     }
 
     private inline fun schedule(crossinline block: () -> Unit) {
-        handler.post({ block() })
+        handler.postAtFrontOfQueue { block() }
     }
 }

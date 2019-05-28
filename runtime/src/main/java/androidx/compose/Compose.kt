@@ -35,6 +35,7 @@ object Compose {
     private class Root : Component() {
         @Suppress("DEPRECATION")
         fun update() = recomposeSync()
+
         lateinit var composable: @Composable() () -> Unit
         @Suppress("PLUGIN_ERROR")
         override fun compose() {
@@ -84,7 +85,7 @@ object Compose {
         group: Any,
         component: Component,
         reference: CompositionReference?
-    ): CompositionContext = CompositionContext.create(
+    ): CompositionContext = CompositionContext.prepare(
         context,
         group,
         component,
@@ -126,14 +127,12 @@ object Compose {
             root = Root()
             root.composable = composable
             setRoot(container, root)
-            val cc = CompositionContext.create(
+            CompositionContext.prepare(
                 container.context,
                 container,
                 root,
                 parent
-            )
-            cc.recompose()
-            return cc
+            ).compose()
         } else {
             root.composable = composable
             root.recomposeCallback?.invoke(true)
@@ -158,6 +157,7 @@ object Compose {
     @MainThread
     fun disposeComposition(container: ViewGroup, parent: CompositionReference? = null) {
         // temporary easy way to call correct lifecycles on everything
+        // need to remove compositionContext from context map as well
         composeInto(container, parent) { }
         container.setTag(TAG_ROOT_COMPONENT, null)
     }
@@ -193,8 +193,7 @@ object Compose {
             root = Root()
             root.composable = composable
             setRoot(container, root)
-            val cc = CompositionContext.create(context, container, root, parent)
-            cc.recompose()
+            CompositionContext.prepare(context, container, root, parent).compose()
         } else {
             root.composable = composable
             root.recomposeCallback?.invoke(true)
@@ -250,7 +249,7 @@ fun Activity.disposeComposition() {
         .decorView
         .findViewById<ViewGroup>(android.R.id.content)
         .getChildAt(0) as? ViewGroup
-            ?: error("No root view found")
+        ?: error("No root view found")
     Compose.disposeComposition(view, null)
 }
 
