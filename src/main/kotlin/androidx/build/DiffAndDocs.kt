@@ -489,9 +489,15 @@ private fun androidSrcJarFile(project: Project): File = File(project.sdkPath(),
 
 private fun BaseVariant.rFile() = "${applicationId.replace('.', '/')}/R.java"
 
-// Nasty part. Get rid of that eventually!
-fun Project.docsDir(): File = properties["docsDir"] as File
+/**
+ * @return Directory in which documentation artifacts should be placed.
+ */
+fun Project.docsDir(): File {
+    val actualRootProject = if (project.isRoot) project else project.rootProject
+    return File(actualRootProject.buildDir, "javadoc")
+}
 
+// Nasty part. Get rid of that eventually!
 private fun Project.sdkPath(): File {
     val supportRoot = (project.rootProject.property("ext") as ExtraPropertiesExtension)
         .get("supportRootFolder") as File
