@@ -47,9 +47,31 @@ object SupportConfig {
      */
     const val TARGET_SDK_VERSION = 28
 
+    @JvmStatic
     fun getKeystore(project: Project): File {
         val supportRoot = (project.rootProject.property("ext") as ExtraPropertiesExtension)
                 .get("supportRootFolder") as File
         return File(supportRoot, "development/keystore/debug.keystore")
+    }
+
+    @JvmStatic
+    fun getPrebuiltsRootPath(project: Project): String {
+        val reposProperties = (project.rootProject.property("ext") as ExtraPropertiesExtension)
+            .get("repos") as Map<*, *>
+        return reposProperties["prebuiltsRoot"].toString()
+    }
+
+    @JvmStatic
+    fun getSupportRepoPath(project: Project): String {
+        return (project.rootProject.property("ext") as ExtraPropertiesExtension)
+            .get("supportRepoOut").toString()
+    }
+
+    @JvmStatic
+    fun getAGPVersion(project: Project): String {
+        val studioProperties = (project.rootProject.property("ext") as ExtraPropertiesExtension)
+            .let { it.get("build_versions") as Map<*, *> }
+            .let { it["studio"] as Map<*, *> }
+        return studioProperties["agp"].toString()
     }
 }
