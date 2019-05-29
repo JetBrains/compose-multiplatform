@@ -59,8 +59,7 @@ object SupportConfig {
 
     @JvmStatic
     fun getSupportRepoPath(project: Project): String {
-        return (project.rootProject.property("ext") as ExtraPropertiesExtension)
-            .get("supportRepoOut").toString()
+        return project.getRepositoryDirectory().absolutePath
     }
 
     @JvmStatic
