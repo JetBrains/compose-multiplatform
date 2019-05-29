@@ -40,13 +40,13 @@ fun hasApiTasks(project: Project, extension: AndroidXExtension): Boolean {
         return true
     }
 
-    if (!extension.publish) {
+    if (!extension.publish.shouldRelease()) {
         project.logger.info("Project ${project.name} is not published, ignoring API tasks." +
                 "If you still want to trackApi, simply create \"api\" folder in your project path")
         return false
     }
 
-    if (extension.publish && project.version().isFinalApi()) {
+    if (extension.publish.shouldRelease() && project.version().isFinalApi()) {
         throw GradleException("Project ${project.name} must track API before stabilizing API\n." +
                 "To do that create \"api\" in your project directory and " +
                 "run \"./gradlew updateApi\" command")

@@ -31,8 +31,6 @@ def chooseOutDir(subdir = "") {
         // Change buildDir first so that all plugins pick up the new value.
         project.buildDir = new File("$project.parent.buildDir/../$project.name/build")
     }
-    ext.supportRepoOut = new File(buildDir, 'support_repo')
-    ext.supportRepoOut.mkdirs()
     ext.docsDir = new File(buildDir, 'javadoc')
 }
 
