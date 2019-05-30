@@ -266,6 +266,7 @@ class AndroidXPlugin : Plugin<Project> {
                 if ("assembleAndroidTest" == task.name ||
                         "assembleDebug" == task.name ||
                         ERROR_PRONE_TASK == task.name ||
+                        "jar" == task.name ||
                     "verifyDependencyVersions" == task.name ||
                         ("lintDebug" == task.name &&
                         !project.rootProject.hasProperty("useMaxDepVersions"))) {
