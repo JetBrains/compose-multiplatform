@@ -122,3 +122,5 @@ const val WORK_ARCH_ROOM_COMPILER = "androidx.room:room-compiler:2.1.0-rc01"
 const val WORK_ARCH_ROOM_TESTING = "androidx.room:room-testing:2.1.0-rc01"
 
 const val ROBOLECTRIC = "org.robolectric:robolectric:4.1"
+
+const val PROTOBUF = "com.google.protobuf:protobuf-java:3.4.0"
