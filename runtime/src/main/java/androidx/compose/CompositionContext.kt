@@ -49,4 +49,12 @@ class CompositionContext private constructor(val component: Component, val compo
     fun compose() {
         Recomposer.recompose(component, composer)
     }
+
+    /**
+     * Recomposes any changes without forcing the [component] to compose and blocks until
+     * composition completes.
+     */
+    fun recomposeSync() {
+        Recomposer.current().recomposeSync(composer)
+    }
 }
