@@ -55,6 +55,13 @@ class ObserverMap<K : Any, V : Any> {
     }
 
     /**
+     * Returns `true` when the map contains the given key and value
+     */
+    fun contains(key: K, value: V): Boolean {
+        return map[WeakIdentity(key)]?.contains(WeakIdentity(value)) ?: false
+    }
+
+    /**
      * Clears all the keys and values from the map.
      */
     fun clear() {
