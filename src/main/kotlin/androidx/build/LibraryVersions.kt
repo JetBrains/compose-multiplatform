@@ -44,7 +44,7 @@ object LibraryVersions {
     val COMPOSE = Version("1.0.0-alpha01")
     val CONCURRENT_LISTENABLEFUTURE_CALLBACK = Version("1.0.0-beta02")
     val CONCURRENT_LISTENABLEFUTURE = Version("1.0.0-beta02")
-    val COORDINATORLAYOUT = Version("1.1.0-alpha02")
+    val COORDINATORLAYOUT = Version("1.1.0-beta01")
     val CORE = Version("1.2.0-alpha02")
     val CORE_ROLE = Version("1.0.0-alpha01")
     val CURSORADAPTER = Version("1.1.0-alpha01")
