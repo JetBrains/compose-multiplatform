@@ -24,6 +24,9 @@ import androidx.build.Strategy.Ignore
 import androidx.build.Strategy.Prebuilts
 import androidx.build.Strategy.TipOfTree
 
+/**
+ * Rule set used to generate public documentation.
+ */
 val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.ACTIVITY, "1.0.0-beta01")
     prebuilts(LibraryGroups.ANNOTATION, "1.1.0-rc01")
@@ -130,6 +133,9 @@ val RELEASE_RULE = docsRules("public", false) {
     default(Ignore)
 }
 
+/**
+ * Rule set used to generate tip-of-tree documentation, typically for local and pre-submit use.
+ */
 val TIP_OF_TREE = docsRules("tipOfTree", true) {
     ignore(LibraryGroups.COMPOSE.group)
     // TODO: remove once we'll figure out our strategy about it
@@ -138,8 +144,15 @@ val TIP_OF_TREE = docsRules("tipOfTree", true) {
 }
 
 /**
- * Rules are resolved in addition order. So if you have two rules that specify how docs should be
- * built for a module, first defined rule wins.
+ * Builds rules describing how to generate documentation for a set of libraries.
+ *
+ * Rules are resolved in the order in which they were added. So, if you have two rules that specify
+ * how docs should be built for a module, the first matching rule will be used.
+ *
+ * @property name human-readable label for this documentation set
+ * @property offline true if generating documentation for local use, false otherwise.
+ * @property init lambda that initializes a rule builder.
+ * @return rules describing how to generate documentation.
  */
 fun docsRules(
     name: String,
@@ -151,26 +164,34 @@ fun docsRules(
     return f.build()
 }
 
+/**
+ * Builder for rules describing how to generate documentation for a set of libraries.
+ *
+ * @property name human-readable label for this documentation set
+ * @property offline true if generating documentation for local use, false otherwise.
+ * @constructor Creates a builder with no rules specified.
+ */
 class PublishDocsRulesBuilder(private val name: String, private val offline: Boolean) {
-
     private val rules: MutableList<DocsRule> = mutableListOf(DocsRule(Benchmark, Ignore))
+
     /**
-     * docs for projects within [groupName] will be built from sources.
+     * Specifies that docs for projects within [groupName] will be built from sources.
      */
     fun tipOfTree(groupName: String) {
         rules.add(DocsRule(Group(groupName), TipOfTree))
     }
 
     /**
-     * docs for a project with the given [groupName] and [name] will be built from sources.
+     * Specifies that docs for a project with the given [groupName] and artifact [name] will be
+     * built from sources.
      */
     fun tipOfTree(groupName: String, name: String) {
         rules.add(DocsRule(Exact(groupName, name), TipOfTree))
     }
 
     /**
-     * docs for a project with the given [groupName] and [name] will be built from a prebuilt with
-     * the given [version].
+     * Specifies that docs for a project with the given [groupName] and artifact [name] will be
+     * built from a prebuilt with the given [version].
      */
     fun prebuilts(libraryGroup: LibraryGroup, moduleName: String, version: String): Prebuilts {
         val strategy = Prebuilts(Version(version))
@@ -179,13 +200,15 @@ class PublishDocsRulesBuilder(private val name: String, private val offline: Boo
     }
 
     /**
-     * docs for projects within [groupName] will be built from prebuilts with the given [version]
+     * Specifies that docs for projects within [groupName] will be built from prebuilts with the
+     * given [version].
      */
     fun prebuilts(libraryGroup: LibraryGroup, version: String) =
             prebuilts(libraryGroup, Version(version))
 
     /**
-     * docs for projects within [groupName] will be built from prebuilts with the given [version]
+     * Specifies that docs for projects within [groupName] will be built from prebuilts with the
+     * given [version].
      */
     fun prebuilts(libraryGroup: LibraryGroup, version: Version): Prebuilts {
         val strategy = Prebuilts(version)
@@ -194,48 +217,94 @@ class PublishDocsRulesBuilder(private val name: String, private val offline: Boo
     }
 
     /**
-     * defines a default strategy for building docs
+     * Specifies the default strategy for building docs.
+     *
+     * This method should be called last, as it matches all candidates. No rules specified after
+     * calling this method will have any effect.
      */
     fun default(strategy: Strategy) {
         rules.add(DocsRule(All, strategy))
     }
 
     /**
-     * docs for projects within [groupName] won't be built
+     * Specifies that docs for projects with the given [groupName] won't be built.
      */
     fun ignore(groupName: String) {
         rules.add(DocsRule(Group(groupName), Ignore))
     }
 
     /**
-     * docs for a specified project won't be built
+     * Specifies that docs for a project with the given [groupName] and artifact [name] won't be
+     * built.
      */
     fun ignore(groupName: String, name: String) {
         rules.add(DocsRule(Exact(groupName, name), Ignore))
     }
 
+    /**
+     * Builds a fully-initialized set of documentation rules.
+     */
     fun build() = PublishDocsRules(name, offline, rules)
 }
 
+/**
+ * ArtifactsPredicates are used to match libraries.
+ */
 sealed class ArtifactsPredicate {
+    /**
+     * Returns true if the predicate matches the specified library project.
+     *
+     * @param inGroup the library Maven groupId to be matched.
+     * @param inName the library Maven artifact name to be matched.
+     * @return true if the predicate matches the library.
+     */
     abstract fun apply(inGroup: String, inName: String): Boolean
+
+    /**
+     * Predicate that matches all library projects.
+     */
     object All : ArtifactsPredicate() {
         override fun apply(inGroup: String, inName: String) = true
     }
+
+    /**
+     * Predicate that matches library projects with the specified Maven groupId.
+     *
+     * @property group the Maven groupId to be matched.
+     * @constructor Creates a predicate to match the specified Maven groupId.
+     */
     class Group(val group: String) : ArtifactsPredicate() {
         override fun apply(inGroup: String, inName: String) = inGroup == group
         override fun toString() = "\"$group\""
     }
+
+    /**
+     * Predicate that matches library projects with the specified Maven groupId and artifact name.
+     *
+     * @property group the Maven groupId to be matched.
+     * @peoperty name the Maven artifact name to be matched.
+     * @constructor Creates a predicate to match the specified Maven groupId and artifact name.
+     */
     class Exact(val group: String, val name: String) : ArtifactsPredicate() {
         override fun apply(inGroup: String, inName: String) = group == inGroup && name == inName
         override fun toString() = "\"$group\", \"$name\""
     }
 
+    /**
+     * Predicate that matches all benchmark projects, e.g. all library projects where the project
+     * name is suffixed with "-benchmark".
+     */
     object Benchmark : ArtifactsPredicate() {
         override fun apply(inGroup: String, inName: String) = inName.endsWith("-benchmark")
     }
 }
 
+/**
+ * Rule associating a [predicate] -- used to match libraries -- with a documentation strategy.
+ *
+ * @property predicate the predicate used to match libraries.
+ * @property strategy the strategy used to generate documentation.
+ */
 data class DocsRule(val predicate: ArtifactsPredicate, val strategy: Strategy) {
     override fun toString(): String {
         if (predicate is All) {
@@ -249,11 +318,40 @@ data class DocsRule(val predicate: ArtifactsPredicate, val strategy: Strategy) {
     }
 }
 
+/**
+ * Strategies are used to inform the build of which source set should be used when generating
+ * documentation.
+ */
 sealed class Strategy {
+    /**
+     * Strategy that uses tip-of-tree source code, equivalent to a project() dependency.
+     */
     object TipOfTree : Strategy()
+
+    /**
+     * Strategy that does not generate documentation.
+     */
     object Ignore : Strategy()
+
+    /**
+     * Strategy that uses a versioned prebuilt, equivalent to a Maven coordinate dependency.
+     */
     class Prebuilts(val version: Version) : Strategy() {
+        /**
+         * List of stub JARs that should be made available on the documentation generator's
+         * classpath.
+         */
         var stubs: MutableList<String>? = null
+
+        /**
+         * Adds a stub JAR to the documentation generation tool's classpath.
+         *
+         * Useful for generating documentation for libraries that depend on sidecar JARs or other
+         * run-time dependencies that would not otherwise be available on the classpath for the
+         * documentation generation tool.
+         *
+         * @param path the path to the stub JAR relative to the top-level AndroidX project root.
+         */
         fun addStubs(path: String) {
             if (stubs == null) {
                 stubs = mutableListOf()
@@ -262,18 +360,44 @@ sealed class Strategy {
         }
 
         override fun toString() = "Prebuilts(\"$version\")"
+
+        /**
+         * Returns a Maven dependency spec for the specified library [extension].
+         */
         fun dependency(extension: AndroidXExtension): String {
             return "${extension.mavenGroup?.group}:${extension.project.name}:$version"
         }
     }
 }
 
+/**
+ * Rules describing how to generate documentation for a set of libraries.
+ *
+ * @property name human-readable label for this documentation set
+ * @property offline true if generating documentation for local use, false otherwise.
+ * @constructor Creates a documentation rule set.
+ */
 class PublishDocsRules(val name: String, val offline: Boolean, private val rules: List<DocsRule>) {
+    /**
+     * Resolves a rule describing how to generate documentation for the given library.
+     *
+     * If multiple rules match, the matching first rule is returned.
+     *
+     * @return the documentation rule
+     */
     fun resolve(extension: AndroidXExtension): DocsRule? {
         val mavenGroup = extension.mavenGroup
         return if (mavenGroup == null) null else resolve(mavenGroup.group, extension.project.name)
     }
 
+    /**
+     * Resolves a rule describing how to generate documentation for a given Maven group and module
+     * name.
+     *
+     * If multiple rules match, the matching first rule is returned.
+     *
+     * @return the documentation rule
+     */
     fun resolve(groupName: String, moduleName: String): DocsRule {
         return rules.find { it.predicate.apply(groupName, moduleName) } ?: throw Error()
     }
