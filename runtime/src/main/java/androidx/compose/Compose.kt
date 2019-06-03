@@ -239,8 +239,11 @@ object Compose {
  * @see Compose.composeInto
  * @see Activity.setContentView
  */
-fun Activity.setContent(composable: @Composable() () -> Unit) =
-    setContentView(FrameLayout(this).apply { compose(composable) })
+fun Activity.setContent(composable: @Composable() () -> Unit): CompositionContext? {
+    var compositionContext: CompositionContext?
+    setContentView(FrameLayout(this).apply { compositionContext = compose(composable) })
+    return compositionContext
+}
 
 /**
  * Disposes of a composition that was started using [setContent]. This is a convenience method
@@ -265,7 +268,7 @@ fun Activity.disposeComposition() {
  * @see Compose.composeInto
  * @see disposeComposition
  */
-fun ViewGroup.compose(composable: @Composable() () -> Unit) =
+fun ViewGroup.compose(composable: @Composable() () -> Unit): CompositionContext? =
     Compose.composeInto(this, null, composable)
 
 /**
