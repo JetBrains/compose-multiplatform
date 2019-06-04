@@ -213,8 +213,8 @@ class ObsoleteBuildCompatUsageDetectorTest {
             +     if (Build.VERSION.SDK_INT >= 28) {
         """
         check(input.trimIndent())
-                .expect(expected.trimIndent())
-                .expectFixDiffs(expectedDiff.trimIndent())
+            .expect(expected.trimIndent())
+            .expectFixDiffs(expectedDiff.trimIndent())
     }
 
     @Test fun isAtLeastQ() {
@@ -229,6 +229,20 @@ class ObsoleteBuildCompatUsageDetectorTest {
               }
             }
         """
-        check(input.trimIndent()).expectClean()
+        val expected = """
+            src/foo/Example.java:5: Error: Using deprecated BuildCompat methods [ObsoleteBuildCompat]
+                if (BuildCompat.isAtLeastQ()) {
+                    ~~~~~~~~~~~~~~~~~~~~~~~~
+            1 errors, 0 warnings
+        """
+        val expectedDiff = """
+            Fix for src/foo/Example.java line 5: Use SDK_INT >= 29:
+            @@ -5 +5
+            -     if (BuildCompat.isAtLeastQ()) {
+            +     if (Build.VERSION.SDK_INT >= 29) {
+        """
+        check(input.trimIndent())
+            .expect(expected.trimIndent())
+            .expectFixDiffs(expectedDiff.trimIndent())
     }
 }

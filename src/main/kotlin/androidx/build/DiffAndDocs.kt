@@ -73,6 +73,12 @@ class DiffAndDocs private constructor(
         val doclavaConfiguration = root.configurations.create("doclava")
         doclavaConfiguration.dependencies.add(root.dependencies.create(DOCLAVA_DEPENDENCY))
 
+        // Pulls in the :fakeannotations project, which provides modified annotations required to
+        // generate SDK API stubs in Doclava from Metalava-generated platform SDK stubs.
+        val annotationConfiguration = root.configurations.create("annotation")
+        annotationConfiguration.dependencies.add(root.dependencies.project(
+            mapOf("path" to ":fakeannotations")))
+
         // tools.jar required for com.sun.javadoc
         // TODO this breaks the ability to use JDK 9+ for compilation.
         doclavaConfiguration.dependencies.add(root.dependencies.create(root.files(
@@ -81,7 +87,8 @@ class DiffAndDocs private constructor(
         rules = additionalRules + TIP_OF_TREE
         docsProject = root.findProject(":docs-fake")
         anchorTask = root.tasks.register("anchorDocsTask")
-        val generateSdkApiTask = createGenerateSdkApiTask(root, doclavaConfiguration)
+        val generateSdkApiTask = createGenerateSdkApiTask(root, doclavaConfiguration,
+            annotationConfiguration)
         val now = LocalDateTime.now()
         // The diff output assumes that each library is of the same version,
         // but our libraries may each be of different versions
@@ -392,13 +399,21 @@ private fun createDistDocsTask(
  * <p>
  * This is useful for federating docs against the platform SDK when no API XML file is available.
  */
-private fun createGenerateSdkApiTask(project: Project, doclavaConfig: Configuration): DoclavaTask =
+private fun createGenerateSdkApiTask(
+    project: Project,
+    doclavaConfig: Configuration,
+    annotationConfig: Configuration
+): DoclavaTask =
         project.tasks.createWithConfig("generateSdkApi", DoclavaTask::class.java) {
             dependsOn(doclavaConfig)
+            dependsOn(annotationConfig)
             description = "Generates API files for the current SDK."
             setDocletpath(doclavaConfig.resolve())
             destinationDir = project.docsDir()
+            // Strip the androidx.annotation classes injected by Metalava. They are not accessible.
             classpath = androidJarFile(project)
+                .filter { it.path.contains("androidx/annotation") }
+                .plus(project.files(annotationConfig.resolve()))
             source(project.zipTree(androidSrcJarFile(project))
                 .matching(PatternSet().include("**/*.java")))
             exclude("**/overview.html") // TODO https://issuetracker.google.com/issues/116699307

@@ -28,20 +28,24 @@ object SupportConfig {
 
     /**
      * The Android SDK version to use for compilation.
-     *
+     * <p>
      * Either an integer value or a pre-release platform code, prefixed with "android-" (ex.
      * "android-28" or "android-Q") as you would see within the SDK's platforms directory.
      */
-    const val COMPILE_SDK_VERSION = "android-28"
+    const val COMPILE_SDK_VERSION = "android-29"
 
     /**
      * The Android SDK version to use for targetSdkVersion meta-data.
-     *
+     * <p>
      * Either an integer value (ex. 28), a pre-release platform code (ex. "Q") as you would see
      * within the SDK's platforms directory as android-<version>, or a released platform version
      * code as you would see within Build.VERSIONS.VERSION_CODE (ex. "HONEYCOMB" or "P").
+     * <p>
+     * <strong>Note:</strong> This must be set to an integer value or released platform version in
+     * order for tests to run on devices running released versions of the Android OS. If this is
+     * set to a pre-release version, tests will only be able to run on pre-release devices.
      */
-    const val TARGET_SDK_VERSION = "28"
+    const val TARGET_SDK_VERSION = 28
 
     @JvmStatic
     fun getKeystore(project: Project): File {

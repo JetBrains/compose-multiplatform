@@ -32,7 +32,8 @@ class ObsoleteBuildCompatUsageDetector : Detector(), Detector.UastScanner {
             "isAtLeastNMR1" to 25,
             "isAtLeastO" to 26,
             "isAtLeastOMR1" to 27,
-            "isAtLeastP" to 28
+            "isAtLeastP" to 28,
+            "isAtLeastQ" to 29
     )
 
     override fun getApplicableMethodNames() = methodsToApiLevels.keys.toList()
