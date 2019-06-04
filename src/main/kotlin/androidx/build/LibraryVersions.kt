@@ -68,7 +68,7 @@ object LibraryVersions {
     val LOCALBROADCASTMANAGER = Version("1.1.0-alpha02")
     val LIFECYCLE = Version("2.2.0-alpha02")
     val LIFECYCLES_SAVEDSTATE = Version("1.0.0-alpha01")
-    val LOADER = Version("1.1.0-rc01")
+    val LOADER = Version("1.2.0-alpha01")
     val MEDIA = Version("1.2.0-alpha01")
     val MEDIA2_COMMON = Version("1.1.0-alpha01")
     val MEDIA2_PLAYER = Version("1.1.0-alpha01")
