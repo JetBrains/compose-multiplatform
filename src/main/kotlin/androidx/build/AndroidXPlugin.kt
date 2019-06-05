@@ -39,8 +39,8 @@ import androidx.build.gradle.isRoot
 import androidx.build.jacoco.Jacoco
 import androidx.build.license.CheckExternalDependencyLicensesTask
 import androidx.build.license.configureExternalDependencyLicenseCheck
-import androidx.build.metalava.Metalava.configureAndroidProjectForMetalava
-import androidx.build.metalava.Metalava.configureJavaProjectForMetalava
+import androidx.build.metalava.MetalavaTasks.configureAndroidProjectForMetalava
+import androidx.build.metalava.MetalavaTasks.configureJavaProjectForMetalava
 import androidx.build.metalava.UpdateApiTask
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin

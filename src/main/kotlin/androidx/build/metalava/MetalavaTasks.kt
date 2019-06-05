@@ -35,7 +35,7 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.getPlugin
 import java.io.File
 
-object Metalava {
+object MetalavaTasks {
     private fun Project.createMetalavaConfiguration(): Configuration {
         return configurations.create("metalava") {
             val dependency = dependencies.create("com.android:metalava:1.3.0:shadow@jar")
