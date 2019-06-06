@@ -65,7 +65,7 @@ open class AndroidXExtension(val project: Project) {
         val ARCHITECTURE_URL =
                 "https://developer.android.com/topic/libraries/architecture/index.html"
         @JvmField
-        val SUPPORT_URL = "http://developer.android.com/tools/extras/support-library.html"
+        val SUPPORT_URL = "https://developer.android.com/jetpack/androidx"
         val DEFAULT_UNSPECIFIED_VERSION = "unspecified"
     }
 }
