@@ -361,7 +361,7 @@ class ModelViewTests : TestCase() {
         CompositionModelTest(block)
 
     class CompositionModelTest(val composable: ViewComposition.() -> Unit) {
-
+        var savedContext: CompositionContext? = null
         inner class ActiveTest(val activity: Activity) {
             private var firstCompose = true
             private fun compose() {
@@ -400,6 +400,10 @@ class ModelViewTests : TestCase() {
                 Root(composable),
                 null
             )
+
+            // Ensure the context is not collected until the test completes.
+            savedContext = cc
+
             return cc.composer.runWithCurrent {
                 ActiveTest(activity).then(block)
             }
