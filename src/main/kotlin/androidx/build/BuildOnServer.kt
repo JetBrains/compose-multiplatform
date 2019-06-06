@@ -25,7 +25,7 @@ import java.io.FileNotFoundException
 /**
  * Task for building all of Androidx libraries and documentation
  *
- * AndroidXPlugin configuration add dependencies to BuildOnServer for all of the tasks that
+ * AndroidXPlugin configuration adds dependencies to BuildOnServer for all of the tasks that
  * produce artifacts that we want to build on server builds
  * When BuildOnServer executes, it double-checks that all expected artifacts were built
  */
