@@ -502,9 +502,6 @@ class AndroidXPlugin : Plugin<Project> {
         project: Project,
         androidXExtension: AndroidXExtension
     ) {
-        project.afterEvaluate {
-            verifyJava7Targeting(project.version as String, compileOptions.sourceCompatibility)
-        }
 
         project.configurations.all { config ->
             val isTestConfig = config.name.toLowerCase().contains("test")
@@ -525,6 +522,8 @@ class AndroidXPlugin : Plugin<Project> {
         }
 
         project.afterEvaluate {
+            verifyJava7Targeting(project.version as String, compileOptions.sourceCompatibility)
+
             libraryVariants.all { libraryVariant ->
                 if (libraryVariant.buildType.name == "debug") {
                     libraryVariant.javaCompileProvider.configure { javaCompile ->
