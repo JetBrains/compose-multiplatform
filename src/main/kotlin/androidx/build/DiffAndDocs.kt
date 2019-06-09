@@ -21,7 +21,6 @@ import androidx.build.Strategy.TipOfTree
 import androidx.build.doclava.ChecksConfig
 import androidx.build.doclava.DEFAULT_DOCLAVA_CONFIG
 import androidx.build.doclava.DoclavaTask
-import androidx.build.docs.ConcatenateFilesTask
 import androidx.build.docs.GenerateDocsTask
 import androidx.build.gradle.isRoot
 import com.android.build.gradle.AppExtension
@@ -46,8 +45,6 @@ import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.util.PatternSet
 import java.io.File
 import java.net.URLClassLoader
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import javax.tools.ToolProvider
 import kotlin.collections.set
 
@@ -55,6 +52,15 @@ private const val DOCLAVA_DEPENDENCY = "com.android:doclava:1.0.6"
 
 data class DacOptions(val libraryroot: String, val dataname: String)
 
+/**
+ * Object used to manage configuration of documentation generation tasks.
+ *
+ * @property root the top-level AndroidX project.
+ * @property supportRootFolder the directory in which the top-level AndroidX project lives.
+ * @property dacOptions additional options for generating output compatible with d.android.com.
+ * @property additionalRules optional list of rule sets used to generate documentation.
+ * @constructor Creates a DiffAndDocs object and immediately creates related documentation tasks.
+ */
 class DiffAndDocs private constructor(
     root: Project,
     supportRootFolder: File,
@@ -62,16 +68,29 @@ class DiffAndDocs private constructor(
     additionalRules: List<PublishDocsRules> = emptyList()
 ) {
     private val anchorTask: TaskProvider<Task>
-    private var docsProject: Project? = null
 
+    /**
+     * Placeholder project used to generate top-level documentation.
+     */
+    private val docsProject: Project?
+
+    /**
+     * List of documentation rule sets.
+     */
     private val rules: List<PublishDocsRules>
+
+    /**
+     * Map of documentation rule sets (by human-readable label) to documentation generation tasks.
+     */
     private val docsTasks: MutableMap<String, TaskProvider<GenerateDocsTask>> = mutableMapOf()
-    private val aggregateOldApiTxtsTask: TaskProvider<ConcatenateFilesTask>
-    private val aggregateNewApiTxtsTask: TaskProvider<ConcatenateFilesTask>
 
     init {
+        // Hack to force tools.jar (required by com.sun.javadoc) to be available on the Doclava
+        // run-time classpath. Note this breaks the ability to use JDK 9+ for compilation.
         val doclavaConfiguration = root.configurations.create("doclava")
         doclavaConfiguration.dependencies.add(root.dependencies.create(DOCLAVA_DEPENDENCY))
+        doclavaConfiguration.dependencies.add(root.dependencies.create(root.files(
+                (ToolProvider.getSystemToolClassLoader() as URLClassLoader).urLs)))
 
         // Pulls in the :fakeannotations project, which provides modified annotations required to
         // generate SDK API stubs in Doclava from Metalava-generated platform SDK stubs.
@@ -79,41 +98,32 @@ class DiffAndDocs private constructor(
         annotationConfiguration.dependencies.add(root.dependencies.project(
             mapOf("path" to ":fakeannotations")))
 
-        // tools.jar required for com.sun.javadoc
-        // TODO this breaks the ability to use JDK 9+ for compilation.
-        doclavaConfiguration.dependencies.add(root.dependencies.create(root.files(
-                (ToolProvider.getSystemToolClassLoader() as URLClassLoader).urLs)))
-
         rules = additionalRules + TIP_OF_TREE
         docsProject = root.findProject(":docs-fake")
         anchorTask = root.tasks.register("anchorDocsTask")
         val generateSdkApiTask = createGenerateSdkApiTask(root, doclavaConfiguration,
             annotationConfiguration)
-        val now = LocalDateTime.now()
-        // The diff output assumes that each library is of the same version,
-        // but our libraries may each be of different versions
-        // So, we display the date as the new version
-        val newVersion = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
         val offlineOverride = root.processProperty("offlineDocs")
 
-        rules.forEach {
+        // Associate each documentation generation rule set with a GenerateDocsTask.
+        rules.forEach { rule ->
             val offline = if (offlineOverride != null) {
                 offlineOverride == "true"
             } else {
-                it.offline
+                rule.offline
             }
 
-            val task = createGenerateDocsTask(
+            val generateDocsTask = createGenerateDocsTask(
                 project = root, generateSdkApiTask = generateSdkApiTask,
                 doclavaConfig = doclavaConfiguration,
                 supportRootFolder = supportRootFolder, dacOptions = dacOptions,
-                destDir = File(root.docsDir(), it.name),
-                taskName = "${it.name}DocsTask",
+                destDir = File(root.docsDir(), rule.name),
+                taskName = "${rule.name}DocsTask",
                 offline = offline)
-            docsTasks[it.name] = task
-            val createDistDocsTask = createDistDocsTask(root, task, it.name)
-            anchorTask.configure {
-                it.dependsOn(createDistDocsTask)
+            docsTasks[rule.name] = generateDocsTask
+            val createDistDocsTask = createDistDocsTask(root, generateDocsTask, rule.name)
+            anchorTask.configure { task ->
+                task.dependsOn(createDistDocsTask)
             }
         }
 
@@ -122,18 +132,6 @@ class DiffAndDocs private constructor(
             task.description = "Generates documentation (both Java and Kotlin) from tip-of-tree " +
                 "sources, in the style of those used in d.android.com."
             task.dependsOn(docsTasks[TIP_OF_TREE.name])
-        }
-
-        val oldOutputTxt = File(root.docsDir(), "previous.txt")
-        aggregateOldApiTxtsTask = root.tasks.register("aggregateOldApiTxts",
-            ConcatenateFilesTask::class.java) {
-            it.Output = oldOutputTxt
-        }
-
-        val newApiTxt = File(root.docsDir(), newVersion)
-        aggregateNewApiTxtsTask = root.tasks.register("aggregateNewApiTxts",
-            ConcatenateFilesTask::class.java) {
-            it.Output = newApiTxt
         }
     }
 
@@ -148,8 +146,16 @@ class DiffAndDocs private constructor(
         }
 
         /**
-         * Initialization that should happen only once (and on the root project).
-         * Returns the anchor task
+         * Initializes documentation generation.
+         *
+         * This should happen only once (and on the root project).
+         *
+         * @property root the top-level AndroidX project.
+         * @property supportRootFolder the directory in which the top-level AndroidX project lives.
+         * @property dacOptions additional options for generating output compatible with
+         *           d.android.com.
+         * @property additionalRules optional list of rule sets used to generate documentation.
+         * @return the anchor task.
          */
         fun configureDiffAndDocs(
             root: Project,
@@ -172,6 +178,19 @@ class DiffAndDocs private constructor(
         }
     }
 
+    /**
+     * Builds a file tree containing source files for the specified [mavenId]. As a side-effect, the
+     * resulting file tree is also added to a configuration on the [root] project.
+     *
+     * This method is intended to be called as the result of a resolved DocsRule, and takes the
+     * [originName] as the name of the containing rule set and [originRule] as the name of the rule.
+     *
+     * @param root the project to which the sources of the resolved artifact should be added.
+     * @param mavenId the Maven coordinate of the artifact whose source files should be returned.
+     * @param originName the name of the documentation rule set in which [originRule] was specified.
+     * @param originRule the documentation rule that depends on the source of [mavenId].
+     * @return a file tree containing the source files to be documented.
+     */
     private fun prebuiltSources(
         root: Project,
         mavenId: String,
@@ -216,23 +235,27 @@ class DiffAndDocs private constructor(
                     ?: throw GradleException("Android app plugin is missing on docsProject")
 
             rules.forEach { rule ->
-                appExtension.productFlavors.create(rule.name) {
+                appExtension.productFlavors.register(rule.name).configure {
                     it.dimension = "library-group"
                 }
             }
-            appExtension.applicationVariants.all { v ->
-                val taskProvider = docsTasks[v.flavorName]
-                if (v.buildType.name == "release" && taskProvider != null) {
-                    registerAndroidProjectForDocsTask(taskProvider, v)
+
+            appExtension.applicationVariants.all { appVariant ->
+                val taskProvider = docsTasks[appVariant.flavorName]
+                if (appVariant.buildType.name == "release" && taskProvider != null) {
+                    registerAndroidProjectForDocsTask(taskProvider, appVariant)
+
+                    // Exclude the R.java file from documentation.
                     taskProvider.configure {
                         it.exclude { fileTreeElement ->
-                            fileTreeElement.path.endsWith(v.rFile())
+                            fileTreeElement.path.endsWith(appVariant.rFile())
                         }
                     }
                 }
             }
         }
 
+        // Before evaluation, make the docs placeholder project depend on every other project.
         docsProject?.let { docsProject ->
             docsProject.beforeEvaluate {
                 docsProject.rootProject.subprojects.asSequence()
@@ -242,26 +265,50 @@ class DiffAndDocs private constructor(
         }
     }
 
-    fun registerPrebuilts(extension: AndroidXExtension) =
-            docsProject?.afterEvaluate { docs ->
-        val depHandler = docs.dependencies
-        val root = docs.rootProject
-        rules.forEach { rule ->
-            val resolvedRule = rule.resolve(extension)
-            val strategy = resolvedRule?.strategy
-            if (strategy is Prebuilts) {
-                val dependency = strategy.dependency(extension)
-                depHandler.add("${rule.name}Implementation", dependency)
-                strategy.stubs?.forEach { path ->
-                    depHandler.add("${rule.name}CompileOnly", root.files(path))
-                }
-                docsTasks[rule.name]!!.configure {
-                    it.source(prebuiltSources(root, dependency, rule.name, resolvedRule))
+    /**
+     * Registers prebuilt sources for the library represented by the specified [extension].
+     *
+     * Note that this method is not synchronous. It sets up an after-evaluate block that resolves
+     * the documentation rule for the library and sets up the necessary prebuilt dependencies.
+     *
+     * @param extension the library for which prebuilts should be registered.
+     */
+    fun registerPrebuilts(extension: AndroidXExtension) {
+        docsProject?.afterEvaluate { docs ->
+            val depHandler = docs.dependencies
+            val root = docs.rootProject
+            rules.forEach { rule ->
+                val resolvedRule = rule.resolve(extension)
+                val strategy = resolvedRule?.strategy
+                if (strategy is Prebuilts) {
+                    // Add the library's prebuilt JAR to the documentation generation project's
+                    // implementation dependencies as a Maven spec. Note there is no requirement to
+                    // use the Maven spec here -- this could also be a direct reference to the AAR.
+                    val dependency = strategy.dependency(extension)
+                    depHandler.add("${rule.name}Implementation", dependency)
+
+                    // Optionally add the library's stub JAR dependencies (ex. sidecar JARs) to the
+                    // documentation generation project's compilation classpath. This ensures the
+                    // stub JARs will be available on the documentation generators's run-time
+                    // classpath.
+                    strategy.stubs?.forEach { path ->
+                        depHandler.add("${rule.name}CompileOnly", root.files(path))
+                    }
+
+                    // Add the library's prebuilt source JAR to the GenerateDocsTask associated
+                    // with this rule.
+                    docsTasks[rule.name]!!.configure {
+                        it.source(prebuiltSources(root, dependency, rule.name, resolvedRule))
+                    }
                 }
             }
         }
     }
 
+    /**
+     * Applies the [setup] lambda to all docs rules where the strategy for [extension] resolves to
+     * TipOfTree.
+     */
     private fun tipOfTreeTasks(
         extension: AndroidXExtension,
         setup: (TaskProvider<out DoclavaTask>) -> Unit
@@ -366,7 +413,13 @@ private fun registerAndroidProjectForDocsTask(
     }
 }
 
-// Generates a distribution artifact for online docs.
+/**
+ * Registers a task for bundling online documentation as a ZIP file.
+ *
+ * @param project the project from which source files and JARs will be used to generate docs.
+ * @param generateDocs a Doclava task configured to generate online documentation.
+ * @param ruleName the human-readable label to use for the task and ZIP file.
+ */
 private fun createDistDocsTask(
     project: Project,
     generateDocs: TaskProvider<out DoclavaTask>,
@@ -424,13 +477,35 @@ private fun createGenerateSdkApiTask(
             }
         }
 
+/**
+ * List of Doclava checks that should be ignored when generating documentation.
+ */
 private val GENERATEDOCS_HIDDEN = listOf(105, 106, 107, 111, 112, 113, 115, 116, 121)
+
+/**
+ * Doclava checks configuration for use in generating documentation.
+ */
 private val GENERATE_DOCS_CONFIG = ChecksConfig(
         warnings = emptyList(),
         hidden = GENERATEDOCS_HIDDEN + DEFAULT_DOCLAVA_CONFIG.hidden,
         errors = ((101..122) - GENERATEDOCS_HIDDEN)
 )
 
+/**
+ * Registers a documentation generation task for the specified project.
+ *
+ * Note that unlike many other methods, the [project] passed into this method is *not* the root
+ * project but rather the project for which documentation should be generated.
+ *
+ * @param project the project from which source files and JARs will be used to generate docs.
+ * @param generateSdkApiTask the task that provides the Android SDK's API txt file.
+ * @param doclavaConfig command-line options to pass to the Doclava javadoc tool.
+ * @param supportRootFolder the directory in which the top-level AndroidX project lives.
+ * @param dacOptions additional options for generating output compatible with d.android.com.
+ * @param destDir the directory into which generated documentation should be output.
+ * @param taskName the name to give the resulting task.
+ * @param offline true if generating documentation for local use, false otherwise.
+ */
 private fun createGenerateDocsTask(
     project: Project,
     generateSdkApiTask: DoclavaTask,
@@ -486,8 +561,14 @@ private fun createGenerateDocsTask(
             }
         }
 
+/**
+ * @return the project's Android SDK API txt as a File.
+ */
 private fun sdkApiFile(project: Project) = File(project.docsDir(), "release/sdk_current.txt")
 
+/**
+ * @return the [taskClass] constructed and configured using the provided [config].
+ */
 fun <T : Task> TaskContainer.createWithConfig(
     name: String,
     taskClass: Class<T>,
@@ -495,30 +576,44 @@ fun <T : Task> TaskContainer.createWithConfig(
 ) =
         create(name, taskClass) { task -> task.config() }
 
+/**
+ * @return the project's Android SDK stub JAR as a File.
+ */
 fun androidJarFile(project: Project): FileCollection =
         project.files(arrayOf(File(project.sdkPath(),
                 "platforms/${SupportConfig.COMPILE_SDK_VERSION}/android.jar")))
 
+/**
+ * @return the project's Android SDK stub source JAR as a File.
+ */
 private fun androidSrcJarFile(project: Project): File = File(project.sdkPath(),
         "platforms/${SupportConfig.COMPILE_SDK_VERSION}/android-stubs-src.jar")
 
+/**
+ * @return the R.java file for the variant, which may not exist.
+ */
 private fun BaseVariant.rFile() = "${applicationId.replace('.', '/')}/R.java"
 
 /**
- * @return Directory in which documentation artifacts should be placed.
+ * @return the directory in which to place documentation output.
  */
 fun Project.docsDir(): File {
     val actualRootProject = if (project.isRoot) project else project.rootProject
     return File(actualRootProject.buildDir, "javadoc")
 }
 
-// Nasty part. Get rid of that eventually!
+/**
+ * @return the root project's SDK path as a File.
+ */
 private fun Project.sdkPath(): File {
     val supportRoot = (project.rootProject.property("ext") as ExtraPropertiesExtension)
         .get("supportRootFolder") as File
     return getSdkPath(supportRoot)
 }
 
+/**
+ * Extension for accessing Strings in Project.properties by [name].
+ */
 fun Project.processProperty(name: String) =
         if (hasProperty(name)) {
             properties[name] as String
