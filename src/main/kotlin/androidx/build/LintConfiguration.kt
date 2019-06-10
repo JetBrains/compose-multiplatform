@@ -68,6 +68,9 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
                 fatal("ObsoleteSdkInt")
                 fatal("NoHardKeywords")
                 fatal("UnusedResources")
+                fatal("KotlinPropertyAccess")
+                fatal("LambdaLast")
+                fatal("NoHardKeywords")
 
                 // Only override if not set explicitly.
                 // Some Kotlin projects may wish to disable this.
