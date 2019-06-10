@@ -97,6 +97,7 @@ object LibraryVersions {
     val SLICE_BUILDERS_KTX = Version("1.0.0-alpha08")
     val SLIDINGPANELAYOUT = Version("1.1.0-alpha01")
     val SWIPE_REFRESH_LAYOUT = Version("1.1.0-alpha01")
+    val TEST_SCREENSHOT = Version("1.0.0-alpha01")
     val TEXTCLASSIFIER = Version("1.0.0-alpha03")
     val TRANSITION = Version("1.2.0-alpha02")
     val TVPROVIDER = Version("1.1.0-alpha01")

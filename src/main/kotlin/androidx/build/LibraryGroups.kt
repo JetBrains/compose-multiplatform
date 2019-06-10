@@ -78,6 +78,7 @@ object LibraryGroups {
     val SLICE = LibraryGroup("androidx.slice", false)
     val SLIDINGPANELAYOUT = LibraryGroup("androidx.slidingpanelayout")
     val SWIPEREFRESHLAYOUT = LibraryGroup("androidx.swiperefreshlayout")
+    val TESTSCREENSHOT = LibraryGroup("androidx.test.screenshot")
     val TEXTCLASSIFIER = LibraryGroup("androidx.textclassifier")
     val TRANSITION = LibraryGroup("androidx.transition")
     val TVPROVIDER = LibraryGroup("androidx.tvprovider")
