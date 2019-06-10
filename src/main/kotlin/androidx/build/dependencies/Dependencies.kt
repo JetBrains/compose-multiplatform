@@ -105,7 +105,7 @@ const val ARCH_CORE_COMMON = "androidx.arch.core:core-common:2.0.1@jar"
 const val ARCH_CORE_RUNTIME = "androidx.arch.core:core-runtime:2.0.1"
 const val ARCH_CORE_TESTING = "androidx.arch.core:core-testing:2.0.1"
 
-const val SAFE_ARGS_ANDROID_GRADLE_PLUGIN = "com.android.tools.build:gradle:3.3.0"
+const val SAFE_ARGS_ANDROID_GRADLE_PLUGIN = "com.android.tools.build:gradle:3.4.0"
 const val SAFE_ARGS_KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.20"
 const val SAFE_ARGS_NAVIGATION_COMMON = "androidx.navigation:navigation-common:2.0.0-rc02"
 
