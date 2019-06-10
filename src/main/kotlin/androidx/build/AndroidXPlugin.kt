@@ -187,7 +187,6 @@ class AndroidXPlugin : Plugin<Project> {
                         project.name == "room-testapp-kotlin" || // b/130643290
                         project.name == "activity" ||
                         project.name == "camera-testapp-timing" ||
-                        project.name == "fragment" || // b/130586088
                         project.name == "fragment-testing" ||
                         project.name == "benchmark" ||
                         project.name == "navigation-safe-args-gradle-plugin") {
