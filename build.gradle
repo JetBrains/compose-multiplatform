@@ -64,12 +64,12 @@ sourceSets {
 }
 
 dependencies {
-    compile build_libs.gradle
-    compile build_libs.error_prone_gradle
-    compile build_libs.dokka_gradle
-    compile build_libs.kotlin.gradle_plugin
-    compile gradleApi()
-    compile project("jetpad-integration")
-    testCompile "junit:junit:4.12"
+    implementation build_libs.gradle
+    implementation build_libs.error_prone_gradle
+    implementation build_libs.dokka_gradle
+    implementation build_libs.kotlin.gradle_plugin
+    implementation gradleApi()
+    implementation project("jetpad-integration")
+    testImplementation "junit:junit:4.12"
 }
 
