@@ -179,8 +179,7 @@ class AndroidXPlugin : Plugin<Project> {
                 is KotlinBasePluginWrapper -> {
                     if (project.name == "lifecycle-runtime-ktx" || // b/134925073
                         project.name == "lifecycle-livedata-ktx" || // b/134925073
-                        project.name == "benchmark" || // b/134925431
-                        project.name == "navigation-safe-args-gradle-plugin") { // b/134925735
+                        project.name == "benchmark") { // b/134925431
                         return@all
                     }
                     project.tasks.withType(KotlinCompile::class.java).configureEach { compile ->
