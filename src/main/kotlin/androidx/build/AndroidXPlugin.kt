@@ -177,18 +177,10 @@ class AndroidXPlugin : Plugin<Project> {
                     }
                 }
                 is KotlinBasePluginWrapper -> {
-                    if (project.name == "lifecycle-livedata-eap" || // b/130585490
-                        project.name == "lifecycle-runtime-eap" ||
-                        project.name == "lifecycle-runtime-ktx" ||
-                        project.name == "lifecycle-livedata-ktx" ||
-                        project.name == "work-runtime-ktx" || // b/130582237
-                        project.name == "room-compiler" || // b/130580662
-                        project.name == "room-testapp-kotlin" || // b/130643290
-                        project.name == "activity" ||
-                        project.name == "camera-testapp-timing" ||
-                        project.name == "fragment-testing" ||
-                        project.name == "benchmark" ||
-                        project.name == "navigation-safe-args-gradle-plugin") {
+                    if (project.name == "lifecycle-runtime-ktx" || // b/134925073
+                        project.name == "lifecycle-livedata-ktx" || // b/134925073
+                        project.name == "benchmark" || // b/134925431
+                        project.name == "navigation-safe-args-gradle-plugin") { // b/134925735
                         return@all
                     }
                     project.tasks.withType(KotlinCompile::class.java).configureEach { compile ->
