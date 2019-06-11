@@ -76,6 +76,12 @@ import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
 /**
+ * Setting this property indicates that a build is being performed to check for forward
+ * compatibility.
+ */
+const val USE_MAX_DEP_VERSIONS = "useMaxDepVersions"
+
+/**
  * A plugin which enables all of the Gradle customizations for AndroidX.
  * This plugin reacts to other plugins being added and adds required and optional functionality.
  */
@@ -121,11 +127,13 @@ class AndroidXPlugin : Plugin<Project> {
 
                     project.hideJavadocTask()
                     val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
-                    verifyDependencyVersionsTask.configure { task ->
+                    verifyDependencyVersionsTask?.configure { task ->
                         task.dependsOn(project.tasks.named(JavaPlugin.COMPILE_JAVA_TASK_NAME))
                     }
                     project.addCreateLibraryBuildInfoFileTask(androidXExtension)
-                    project.createCheckReleaseReadyTask(listOf(verifyDependencyVersionsTask))
+                    if (verifyDependencyVersionsTask != null) {
+                        project.createCheckReleaseReadyTask(listOf(verifyDependencyVersionsTask))
+                    }
                     project.configureNonAndroidProjectForLint(androidXExtension)
                     project.configureJavaProjectForDokka(androidXExtension)
                     project.configureJavaProjectForMetalava(androidXExtension)
@@ -151,10 +159,18 @@ class AndroidXPlugin : Plugin<Project> {
                             it.dependsOn(libraryVariant.javaCompileProvider)
                         }
                     }
-                    project.createCheckReleaseReadyTask(listOf(verifyDependencyVersionsTask,
-                        checkNoWarningsTask))
+                    val checkReleaseReadyTasks = mutableListOf<TaskProvider<out Task>>()
+                    if (!project.hasProperty(USE_MAX_DEP_VERSIONS)) {
+                        checkReleaseReadyTasks.add(checkNoWarningsTask)
+                    }
+                    if (verifyDependencyVersionsTask != null) {
+                        checkReleaseReadyTasks.add(verifyDependencyVersionsTask)
+                    }
+                    if (!checkReleaseReadyTasks.isEmpty()) {
+                        project.createCheckReleaseReadyTask(checkReleaseReadyTasks)
+                    }
                     extension.libraryVariants.all { libraryVariant ->
-                        verifyDependencyVersionsTask.configure { task ->
+                        verifyDependencyVersionsTask?.configure { task ->
                             task.dependsOn(libraryVariant.javaCompileProvider)
                         }
                         project.gradle.taskGraph.whenReady { executionGraph ->
@@ -267,7 +283,7 @@ class AndroidXPlugin : Plugin<Project> {
                         "jar" == task.name ||
                     "verifyDependencyVersions" == task.name ||
                         ("lintDebug" == task.name &&
-                        !project.rootProject.hasProperty("useMaxDepVersions"))) {
+                        !project.rootProject.hasProperty(USE_MAX_DEP_VERSIONS))) {
                     buildOnServerTask.dependsOn(task)
                 }
             }
@@ -315,7 +331,7 @@ class AndroidXPlugin : Plugin<Project> {
 
         // If useMaxDepVersions is set, iterate through all the project and substitute any androidx
         // artifact dependency with the local tip of tree version of the library.
-        if (hasProperty("useMaxDepVersions")) {
+        if (hasProperty(USE_MAX_DEP_VERSIONS)) {
             // This requires evaluating all sub-projects to create the module:project map
             // and project dependencies.
             evaluationDependsOnChildren()
@@ -559,7 +575,15 @@ class AndroidXPlugin : Plugin<Project> {
     }
 
     private fun Project.createVerifyDependencyVersionsTask():
-            TaskProvider<VerifyDependencyVersionsTask> {
+            TaskProvider<VerifyDependencyVersionsTask>? {
+        /**
+         * Ignore -PuseMaxDepVersions when verifying dependency versions because it is a
+         * hypothetical build which is only intended to check for forward compatibility.
+         */
+        if (project.hasProperty(USE_MAX_DEP_VERSIONS)) {
+            return null
+        }
+
         return project.tasks.register("verifyDependencyVersions",
                 VerifyDependencyVersionsTask::class.java)
     }
