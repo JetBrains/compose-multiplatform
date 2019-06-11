@@ -41,8 +41,13 @@ open class VerifyDependencyVersionsTask : DefaultTask() {
      */
     @TaskAction
     fun verifyDependencyVersions() {
+        /**
+         * Ignore --PuseMaxDepVersions when verifying dependency versions because it is a
+         * hypothetical build which is only intended to check for forward compatibility.
+         */
+        val hasMaxDepVersions = project.hasProperty("useMaxDepVersions")
         project.configurations.all { configuration ->
-            if (!configuration.name.toLowerCase().contains("test")) {
+            if (!hasMaxDepVersions && !configuration.name.toLowerCase().contains("test")) {
                 configuration.allDependencies.forEach { dep ->
                     if (dep.group != null && dep.group.toString().startsWith("androidx.") &&
                         !dep.group.toString().startsWith("androidx.test")) {
