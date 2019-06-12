@@ -26,9 +26,9 @@ object LibraryVersions {
     val ANIMATION_TESTING = Version("1.1.0-alpha01")
     val ANNOTATION = Version("1.2.0-alpha01")
     val APPCOMPAT = Version("1.1.0-beta02")
-    val ARCH_CORE = Version("2.1.0-beta02")
+    val ARCH_CORE = Version("2.1.0-rc01")
     val ARCH_CORE_TESTING = ARCH_CORE
-    val ARCH_RUNTIME = Version("2.1.0-beta02")
+    val ARCH_RUNTIME = Version("2.1.0-rc01")
     val ASYNCLAYOUTINFLATER = Version("1.1.0-alpha01")
     val AUTOFILL = Version("1.0.0-alpha01")
     val BENCHMARK = Version("1.0.0-alpha03")
