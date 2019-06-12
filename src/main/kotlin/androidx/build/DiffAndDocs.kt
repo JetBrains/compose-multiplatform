@@ -430,7 +430,7 @@ private fun createDistDocsTask(
         from(generateDocs.map {
             it.destinationDir
         })
-        val baseName = "android-support-$ruleName-docs"
+        val baseName = "androidx-$ruleName-docs"
         val buildId = getBuildId()
         archiveBaseName.set(baseName)
         archiveVersion.set(buildId)
