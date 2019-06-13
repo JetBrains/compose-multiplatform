@@ -16,6 +16,8 @@
 
 package androidx.build.metalava
 
+import androidx.build.checkapi.ApiLocation
+import androidx.build.java.JavaCompileInputs
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -36,9 +38,7 @@ fun Project.runMetalavaWithArgs(configuration: Configuration, args: List<String>
         it.classpath = checkNotNull(configuration) { "Configuration not set." }
         it.main = "com.android.tools.metalava.Driver"
         it.args = listOf(
-            "--no-banner",
-            "--error",
-            "DeprecationMismatch" // Enforce deprecation mismatch
+            "--no-banner"
         ) + args
     }
 }
@@ -91,19 +91,43 @@ val API_LINT_ARGS: List<String> = listOf(
 )
 
 sealed class GenerateApiMode {
-    class PublicApi(val apiLintBaseline: File) : GenerateApiMode()
+    object PublicApi : GenerateApiMode()
     object RestrictedApi : GenerateApiMode()
 }
 
+sealed class ApiLintMode {
+    class CheckBaseline(val apiLintBaseline: File) : ApiLintMode()
+    object Skip : ApiLintMode()
+}
+
+// Generates all of the specified api files
+fun Project.generateApi(
+    files: JavaCompileInputs,
+    apiLocation: ApiLocation,
+    tempDir: File,
+    apiLintMode: ApiLintMode,
+    includeRestrictedApis: Boolean
+) {
+    generateApi(files.bootClasspath, files.dependencyClasspath, files.sourcePaths,
+        apiLocation.publicApiFile, tempDir, GenerateApiMode.PublicApi, apiLintMode)
+    if (includeRestrictedApis) {
+        generateApi(files.bootClasspath, files.dependencyClasspath, files.sourcePaths,
+            apiLocation.restrictedApiFile, tempDir, GenerateApiMode.RestrictedApi, ApiLintMode.Skip)
+    }
+}
+
+// Generates the specified api file
 fun Project.generateApi(
     bootClasspath: Collection<File>,
     dependencyClasspath: FileCollection,
     sourcePaths: Collection<File>,
     outputFile: File,
-    generateApiMode: GenerateApiMode
+    tempDir: File,
+    generateApiMode: GenerateApiMode,
+    apiLintMode: ApiLintMode
 ) {
     val tempOutputFile = if (generateApiMode is GenerateApiMode.RestrictedApi) {
-        File(outputFile.path + ".tmp")
+        File(tempDir, outputFile.name + ".tmp")
     } else {
         outputFile
     }
@@ -124,18 +148,36 @@ fun Project.generateApi(
 
     when (generateApiMode) {
         is GenerateApiMode.PublicApi -> {
-            args += API_LINT_ARGS
-            if (generateApiMode.apiLintBaseline.exists()) {
-                args += listOf("--baseline", generateApiMode.apiLintBaseline.toString())
-            }
         }
         is GenerateApiMode.RestrictedApi -> {
             args += listOf("--show-annotation", "androidx.annotation.RestrictTo")
         }
     }
 
-    val metalavaConfiguration = getMetalavaConfiguration()
+    when (apiLintMode) {
+        is ApiLintMode.CheckBaseline -> {
+            args += API_LINT_ARGS
+            if (apiLintMode.apiLintBaseline.exists()) {
+                args += listOf("--baseline", apiLintMode.apiLintBaseline.toString())
+            }
+            args.addAll(listOf(
+                "--error",
+                "DeprecationMismatch" // Enforce deprecation mismatch
+            ))
+        }
+        is ApiLintMode.Skip -> {
+            args.addAll(listOf(
+                "--hide",
+                "DeprecationMismatch",
+                "--hide",
+                "UnhiddenSystemApi",
+                "--hide",
+                "ReferencesHidden"
+            ))
+        }
+    }
 
+    val metalavaConfiguration = getMetalavaConfiguration()
     runMetalavaWithArgs(metalavaConfiguration, args)
 
     if (generateApiMode is GenerateApiMode.RestrictedApi) {
