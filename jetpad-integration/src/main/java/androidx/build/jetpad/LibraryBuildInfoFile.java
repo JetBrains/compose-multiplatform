@@ -26,6 +26,8 @@ import java.util.ArrayList;
  * DO NOT TOUCH.
  */
 public class LibraryBuildInfoFile {
+  public String groupId;
+  public String artifactId;
   public String version;
   public ArrayList<Dependency> dependencies;
   public ArrayList<Check> checks;

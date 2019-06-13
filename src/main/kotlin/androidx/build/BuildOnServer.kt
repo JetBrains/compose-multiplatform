@@ -47,7 +47,7 @@ open class BuildOnServer : DefaultTask() {
         // "dokkaPublicDocs-$buildId.zip",
         "android-support-tipOfTree-docs-$buildId.zip",
         "dokkaTipOfTreeDocs-$buildId.zip",
-
+        "androidx_aggregate_build_info.txt",
         "gmaven-diff-all-$buildId.zip",
         "top-of-tree-m2repository-all-$buildId.zip")
 
