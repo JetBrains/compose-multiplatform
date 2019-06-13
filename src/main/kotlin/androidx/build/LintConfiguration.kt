@@ -21,6 +21,11 @@ import com.android.build.gradle.internal.dsl.LintOptions
 import org.gradle.api.Project
 import java.io.File
 
+/**
+ * Setting this property means that lint will fail for UnknownNullness issues.
+ */
+private const val CHECK_UNKNOWN_NULLNESS = "checkUnknownNullness"
+
 fun Project.configureNonAndroidProjectForLint(extension: AndroidXExtension) {
     apply(mapOf("plugin" to "com.android.lint"))
 
@@ -34,7 +39,7 @@ fun Project.configureNonAndroidProjectForLint(extension: AndroidXExtension) {
     }
 
     val lintOptions = extensions.getByType<LintOptions>()
-    project.configureLint(lintOptions, extension)
+    configureLint(lintOptions, extension)
 }
 
 fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension) {
@@ -63,35 +68,77 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
 
             fatal("VisibleForTests")
 
+            // If -PcheckUnknownNullness was set we should fail on UnknownNullness warnings
+            val checkUnknownNullness = hasProperty(CHECK_UNKNOWN_NULLNESS)
+
             if (extension.compilationTarget != CompilationTarget.HOST) {
-                fatal("NewApi")
-                fatal("ObsoleteSdkInt")
-                fatal("NoHardKeywords")
-                fatal("UnusedResources")
-                fatal("KotlinPropertyAccess")
-                fatal("LambdaLast")
-                fatal("NoHardKeywords")
-
-                // Only override if not set explicitly.
-                // Some Kotlin projects may wish to disable this.
-                if (lintOptions.severityOverrides["SyntheticAccessor"] == null) {
-                    fatal("SyntheticAccessor")
-                }
-
-                if (extension.mavenVersion?.isFinalApi() == true) {
-                    fatal("MissingTranslation")
+                // Ignore other errors since we are only interested in nullness here
+                if (checkUnknownNullness) {
+                    fatal("UnknownNullness")
                 } else {
-                    disable("MissingTranslation")
+                    fatal("NewApi")
+                    fatal("ObsoleteSdkInt")
+                    fatal("NoHardKeywords")
+                    fatal("UnusedResources")
+                    fatal("KotlinPropertyAccess")
+                    fatal("LambdaLast")
+                    fatal("NoHardKeywords")
+                    fatal("UnknownNullness")
+
+                    // Only override if not set explicitly.
+                    // Some Kotlin projects may wish to disable this.
+                    if (lintOptions.severityOverrides["SyntheticAccessor"] == null) {
+                        fatal("SyntheticAccessor")
+                    }
+
+                    if (extension.mavenVersion?.isFinalApi() == true) {
+                        fatal("MissingTranslation")
+                    } else {
+                        disable("MissingTranslation")
+                    }
                 }
             }
 
-            // Set baseline file for all legacy lint warnings.
+            // Baseline file for all legacy lint warnings.
             val baselineFile = lintBaseline
-            if (baselineFile.exists()) {
+
+            val lintDebugTask = tasks.named("lintDebug")
+
+            if (checkUnknownNullness) {
+                lintDebugTask.configure {
+                    it.doFirst {
+                        logger.warn(
+                            "-PcheckUnknownNullness set - checking UnknownNullness lint warnings."
+                        )
+                    }
+                }
+            } else if (baselineFile.exists()) {
+                // Number of currently ignored UnknownNullness errors
+                val count = baselineFile.readText().split("UnknownNullness").size - 1
+                if (count > 0) {
+                    lintDebugTask.configure {
+                        it.doLast {
+                            logger.warn(getIgnoreNullnessError(count))
+                        }
+                    }
+                }
                 baseline(baselineFile)
             }
         }
     }
 }
 
-val Project.lintBaseline get() = File(project.projectDir, "/lint-baseline.xml")
+val Project.lintBaseline get() = File(projectDir, "/lint-baseline.xml")
+
+private fun Project.getIgnoreNullnessError(count: Int): String = (
+        "\n${pluralizeMessage(count)} currently whitelisted in " +
+                "$projectDir/nullness-lint-baseline.xml - these warnings need to be fixed before " +
+                "this library moves to a stable release. Run " +
+                "'./gradlew $name:lintDebug -PcheckUnknownNullness' to fail on these warnings."
+        )
+
+private fun pluralizeMessage(count: Int) = if (count > 1) {
+    "$count UnknownNullness issues are"
+} else {
+    " UnknownNullness issue is"
+}
