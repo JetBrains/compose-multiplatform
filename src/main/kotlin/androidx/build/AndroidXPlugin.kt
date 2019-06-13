@@ -154,31 +154,20 @@ class AndroidXPlugin : Plugin<Project> {
                     project.configureResourceApiChecks(extension)
                     project.addCreateLibraryBuildInfoFileTask(androidXExtension)
                     val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
-                    val checkNoWarningsTask = project.tasks.register(CHECK_NO_WARNINGS_TASK) {
-                        extension.libraryVariants.all { libraryVariant ->
-                            it.dependsOn(libraryVariant.javaCompileProvider)
-                        }
-                    }
                     val checkReleaseReadyTasks = mutableListOf<TaskProvider<out Task>>()
-                    if (!project.hasProperty(USE_MAX_DEP_VERSIONS)) {
-                        checkReleaseReadyTasks.add(checkNoWarningsTask)
-                    }
                     if (verifyDependencyVersionsTask != null) {
                         checkReleaseReadyTasks.add(verifyDependencyVersionsTask)
                     }
-                    if (!checkReleaseReadyTasks.isEmpty()) {
+                    if (checkReleaseReadyTasks.isNotEmpty()) {
                         project.createCheckReleaseReadyTask(checkReleaseReadyTasks)
                     }
                     extension.libraryVariants.all { libraryVariant ->
                         verifyDependencyVersionsTask?.configure { task ->
                             task.dependsOn(libraryVariant.javaCompileProvider)
                         }
-                        project.gradle.taskGraph.whenReady { executionGraph ->
-                            if (executionGraph.hasTask(checkNoWarningsTask.get())) {
-                                libraryVariant.javaCompileProvider.configure { task ->
-                                    task.options.compilerArgs.add("-Werror")
-                                }
-                            }
+                        libraryVariant.javaCompileProvider.configure { task ->
+                            task.options.compilerArgs.add("-Werror")
+                            task.options.compilerArgs.add("-Xlint:unchecked")
                         }
                     }
                     project.configureLint(extension.lintOptions, androidXExtension)
@@ -536,9 +525,6 @@ class AndroidXPlugin : Plugin<Project> {
             libraryVariants.all { libraryVariant ->
                 if (libraryVariant.buildType.name == "debug") {
                     libraryVariant.javaCompileProvider.configure { javaCompile ->
-                        if (androidXExtension.failOnUncheckedWarnings) {
-                            javaCompile.options.compilerArgs.add("-Xlint:unchecked")
-                        }
                         if (androidXExtension.failOnDeprecationWarnings) {
                             javaCompile.options.compilerArgs.add("-Xlint:deprecation")
                         }
@@ -625,7 +611,6 @@ class AndroidXPlugin : Plugin<Project> {
         const val BUILD_ON_SERVER_TASK = "buildOnServer"
         const val BUILD_TEST_APKS = "buildTestApks"
         const val CHECK_RELEASE_READY_TASK = "checkReleaseReady"
-        const val CHECK_NO_WARNINGS_TASK = "checkNoWarnings"
         const val CHECK_SAME_VERSION_LIBRARY_GROUPS = "checkSameVersionLibraryGroups"
         const val CREATE_LIBRARY_BUILD_INFO_FILES_TASK = "createLibraryBuildInfoFiles"
     }

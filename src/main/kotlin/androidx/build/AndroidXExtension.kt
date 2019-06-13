@@ -36,7 +36,6 @@ open class AndroidXExtension(val project: Project) {
     var url = SUPPORT_URL
     private var licenses: MutableCollection<License> = ArrayList()
     var publish: Publish = Publish.NONE
-    var failOnUncheckedWarnings = true
     var failOnDeprecationWarnings = true
 
     var compilationTarget: CompilationTarget = CompilationTarget.DEVICE
