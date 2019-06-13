@@ -190,18 +190,20 @@ object Compose {
         context: Context,
         parent: CompositionReference? = null,
         composable: @Composable() () -> Unit
-    ) {
+    ): CompositionContext {
         var root = getRootComponent(container) as? Root
-        if (root == null) {
+        return if (root == null) {
             root = Root()
             root.composable = composable
             setRoot(container, root)
             val cc = CompositionContext.prepare(context, container, root, parent)
             root.composer = cc
             root.update()
+            cc
         } else {
             root.composable = composable
             root.update()
+            root.composer
         }
     }
 
