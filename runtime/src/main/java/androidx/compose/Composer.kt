@@ -461,7 +461,7 @@ open class Composer<N>(
         if (ref != null && !inserting) {
             skipValue()
         } else {
-            ref = AmbientReferenceImpl(invalidateStack.peek())
+            ref = CompositionReferenceImpl(invalidateStack.peek())
             updateValue(ref)
         }
         endGroup()
@@ -1210,7 +1210,7 @@ open class Composer<N>(
         }
     }
 
-    private inner class AmbientReferenceImpl(val scope: RecomposeScope) : CompositionReference,
+    private inner class CompositionReferenceImpl(val scope: RecomposeScope) : CompositionReference,
         CompositionLifecycleObserver {
 
         val composers = mutableSetOf<Composer<*>>()

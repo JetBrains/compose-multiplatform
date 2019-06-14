@@ -45,15 +45,12 @@ abstract class Recomposer {
         }
     }
 
-    protected var isComposing: Boolean = false
     private val composers = mutableSetOf<Composer<*>>()
 
     private fun recompose(component: Component, composer: Composer<*>) {
         composer.runWithCurrent {
-            val previousComposing = isComposing
             val composerWasComposing = composer.isComposing
             try {
-                isComposing = true
                 composer.isComposing = true
                 trace("Compose:recompose") {
                     composer.startRoot()
@@ -65,21 +62,20 @@ abstract class Recomposer {
                 composer.applyChanges()
                 FrameManager.nextFrame()
             } finally {
-                isComposing = previousComposing
                 composer.isComposing = composerWasComposing
             }
         }
     }
 
     private fun performRecompose(composer: Composer<*>) {
-        if (isComposing) return
+        if (composer.isComposing) return
         composer.runWithCurrent {
             try {
-                isComposing = true
+                composer.isComposing = true
                 composer.recompose()
                 composer.applyChanges()
             } finally {
-                isComposing = false
+                composer.isComposing = false
             }
         }
     }
@@ -115,7 +111,7 @@ private class AndroidRecomposer : Recomposer() {
     }
 
     override fun scheduleChangesDispatch() {
-        if (!frameScheduled && !isComposing) {
+        if (!frameScheduled) {
             frameScheduled = true
             Choreographer.getInstance().postFrameCallback(frameCallback)
         }

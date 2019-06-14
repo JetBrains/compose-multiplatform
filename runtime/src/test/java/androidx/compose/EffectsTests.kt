@@ -623,11 +623,13 @@ class EffectsTests : TestCase() {
         var buttonCreated = false
 
         fun SimpleComposable2() {
-            with(composer) {
-                val value = +ambient(MyAmbient)
-                emit(534, { context -> TextView(context) }, {
-                    set("$value") { text = it }
-                })
+            Observe {
+                with(composer) {
+                    val value = +ambient(MyAmbient)
+                    emit(534, { context -> TextView(context) }, {
+                        set("$value") { text = it }
+                    })
+                }
             }
         }
 
