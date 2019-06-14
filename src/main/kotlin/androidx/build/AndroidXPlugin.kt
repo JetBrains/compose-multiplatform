@@ -466,7 +466,7 @@ class AndroidXPlugin : Plugin<Project> {
                 project.copy {
                     it.from(packageTask.outputDirectory)
                     it.include("*.apk")
-                    it.into(project.getDistributionDirectory())
+                    it.into(File(project.getDistributionDirectory(), "apks"))
                     it.rename { fileName ->
                         if (fileName.contains("media-compat-test") ||
                             fileName.contains("media2-test")) {
