@@ -378,8 +378,9 @@ class AndroidXPlugin : Plugin<Project> {
             project.configurations.all { configuration ->
                 configuration.resolutionStrategy.eachDependency { dep ->
                     val target = dep.target
+                    val version = target.version
                     // Enforce the ban on declaring dependencies with version ranges.
-                    if (isDependencyRange(target.version)) {
+                    if (version != null && Version.isDependencyRange(version)) {
                         throw IllegalArgumentException(
                                 "Dependency ${dep.target} declares its version as " +
                                         "version range ${dep.target.version} however the use of " +
@@ -669,18 +670,6 @@ fun Project.addToProjectMap(extension: AndroidXExtension) {
             }
         }
     }
-}
-
-private fun isDependencyRange(version: String?): Boolean {
-    if ((version!!.startsWith("[") || version.startsWith("(")) &&
-        version.contains(",") &&
-        (version.endsWith("]") || version.endsWith(")"))) {
-        return true
-    }
-    if (version.endsWith("+")) {
-        return true
-    }
-    return false
 }
 
 private fun Project.createCheckResourceApiTask(): DefaultTask {
