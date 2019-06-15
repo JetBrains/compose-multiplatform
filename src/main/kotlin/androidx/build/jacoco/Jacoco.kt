@@ -60,7 +60,7 @@ object Jacoco {
                     // to obtain a valid value for destinationDir
                     it.from(v.testedVariant.javaCompileProvider.get().destinationDir)
                     it.exclude("**/R.class", "**/R\$*.class", "**/BuildConfig.class")
-                    it.destinationDirectory.set(project.getDistributionDirectory())
+                    it.destinationDirectory.set(project.buildDir)
                     it.archiveFileName.set("${project.name}-${v.baseName}-allclasses.jar")
                 }
                 project.rootProject.tasks.named(
