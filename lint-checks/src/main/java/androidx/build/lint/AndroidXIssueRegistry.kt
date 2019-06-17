@@ -24,6 +24,12 @@ class AndroidXIssueRegistry : IssueRegistry() {
             BanKeepAnnotation.ISSUE,
             BanTargetApiAnnotation.ISSUE,
             MissingTestSizeAnnotation.ISSUE,
+            SampledAnnotationEnforcer.MISSING_SAMPLED_ANNOTATION,
+            SampledAnnotationEnforcer.OBSOLETE_SAMPLED_ANNOTATION,
+            SampledAnnotationEnforcer.MISSING_SAMPLES_DIRECTORY,
+            SampledAnnotationEnforcer.UNRESOLVED_SAMPLE_LINK,
+            SampledAnnotationEnforcer.MULTIPLE_FUNCTIONS_FOUND,
+            SampledAnnotationEnforcer.INVALID_SAMPLES_LOCATION,
             ObsoleteBuildCompatUsageDetector.ISSUE
     )
 }
