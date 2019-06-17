@@ -182,9 +182,6 @@ class AndroidXPlugin : Plugin<Project> {
                     }
                 }
                 is KotlinBasePluginWrapper -> {
-                    if (project.name == "benchmark") { // b/134925431
-                        return@all
-                    }
                     project.tasks.withType(KotlinCompile::class.java).configureEach { compile ->
                         compile.kotlinOptions.allWarningsAsErrors = true
                     }
