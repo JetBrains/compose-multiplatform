@@ -22,13 +22,14 @@ import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.provider.Property
 import com.google.gson.GsonBuilder
 import java.io.File
 import java.util.ArrayList
 
 /**
- * This task generates a library build information file containing the version,
- * public androidx dependencies and release checklist of the library for consumption
+ * This task generates a library build information file containing the artifactId, groupId, and
+ * version of public androidx dependencies and release checklist of the library for consumption
  * by the Jetpack Release Service (JetPad).
  */
 open class CreateLibraryBuildInfoFileTask : DefaultTask() {
@@ -38,7 +39,7 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
     }
 
     @OutputFile
-    val outputFile = File(project.getDistributionDirectory(), getLibraryBuildInfoFilename())
+    val outputFile: Property<File> = project.objects.property(File::class.java)
 
     private fun getLibraryBuildInfoFilename(): String {
         return "${project.group}_${project.name}_build_info.txt"
@@ -51,8 +52,9 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
                         "output directory: ${project.getDistributionDirectory()}")
             }
         }
-        if (!outputFile.exists()) {
-            if (!outputFile.createNewFile()) {
+        var resolvedOutputFile: File = outputFile.get()
+        if (!resolvedOutputFile.exists()) {
+            if (!resolvedOutputFile.createNewFile()) {
                 throw RuntimeException("Failed to create " +
                         "output dependency dump file: $outputFile")
             }
@@ -61,11 +63,13 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
         // Create json object from the artifact instance
         val gson = GsonBuilder().setPrettyPrinting().create()
         val serializedInfo: String = gson.toJson(info)
-        outputFile.writeText(serializedInfo)
+        resolvedOutputFile.writeText(serializedInfo)
     }
 
     private fun resolveAndCollectDependencies(): LibraryBuildInfoFile {
         val libraryBuildInfoFile = LibraryBuildInfoFile()
+        libraryBuildInfoFile.artifactId = project.name.toString()
+        libraryBuildInfoFile.groupId = project.group.toString()
         libraryBuildInfoFile.version = project.version.toString()
         val libraryDependencies = ArrayList<LibraryBuildInfoFile.Dependency>()
         val checks = ArrayList<LibraryBuildInfoFile.Check>()
@@ -111,7 +115,7 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
     }
 
     /**
-     * Task: dumpDependencies
+     * Task: createLibraryBuildInfoFile
      * Iterates through each configuration of the project and builds the set of all dependencies.
      * Then adds each dependency to the Artifact class as a project or prebuilt dependency.  Finally,
      * writes these dependencies to a json file as a json object.
