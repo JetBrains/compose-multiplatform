@@ -31,7 +31,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.ACTIVITY, "1.0.0-beta01")
     prebuilts(LibraryGroups.ANNOTATION, "1.1.0")
     prebuilts(LibraryGroups.APPCOMPAT, "1.1.0-beta01")
-    prebuilts(LibraryGroups.ARCH_CORE, "2.1.0-beta01")
+    prebuilts(LibraryGroups.ARCH_CORE, "2.1.0-rc01")
     prebuilts(LibraryGroups.ASYNCLAYOUTINFLATER, "1.0.0")
     ignore(LibraryGroups.BENCHMARK.group, "benchmark-gradle-plugin")
     prebuilts(LibraryGroups.BENCHMARK, "1.0.0-alpha02")
