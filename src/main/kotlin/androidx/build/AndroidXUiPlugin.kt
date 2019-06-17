@@ -36,6 +36,7 @@ class AndroidXUiPlugin : Plugin<Project> {
 
                     library.defaultConfig.apply {
                         minSdkVersion(21)
+                        targetSdkVersion(29)
                     }
 
                     library.lintOptions.apply {
