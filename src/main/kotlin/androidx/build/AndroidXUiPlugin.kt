@@ -55,9 +55,6 @@ class AndroidXUiPlugin : Plugin<Project> {
                                     "-Xplugin=${conf.files.first()}"
                             }
                         }
-
-                        // Switch on warnings as errors for all Kotlin tasks
-                        compile.kotlinOptions.freeCompilerArgs += "-Werror"
                     }
                 }
             }
