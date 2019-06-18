@@ -89,6 +89,21 @@ data class Version(
             val matcher = VERSION_REGEX.matcher(versionString)
             return if (matcher.matches()) Version(versionString) else null
         }
+
+        /**
+         * Tells whether a version string would refer to a dependency range
+         */
+        fun isDependencyRange(version: String): Boolean {
+            if ((version.startsWith("[") || version.startsWith("(")) &&
+                version.contains(",") &&
+                (version.endsWith("]") || version.endsWith(")"))) {
+                return true
+            }
+            if (version.endsWith("+")) {
+                return true
+            }
+            return false
+        }
     }
 }
 
