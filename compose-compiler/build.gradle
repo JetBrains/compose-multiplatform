@@ -37,26 +37,26 @@ configurations {
 }
 
 dependencies {
-    jarFiles(project(":compose-plugin-cli")) {
+    jarFiles(project(":compose:compose-compiler-hosted")) {
         transitive = false
     }
 }
 
-jarjar.repackage('gradlePlugin') {
-    destinationName "compose-cli-plugin-embedded.jar"
+jarjar.repackage('embeddedPlugin') {
+    destinationName "compose-compiler.jar"
     from configurations.jarFiles
     classRename 'com.intellij.**', 'org.jetbrains.kotlin.com.intellij.@1'
 }
 
 configurations {
-    pluginForGradle
+    embeddablePlugin
 }
 
 artifacts {
-    pluginForGradle(gradlePlugin.destinationPath) {
-        name "compose-cli-plugin-embedded"
+    embeddablePlugin(embeddedPlugin.destinationPath) {
+        name "compose-compiler"
         type "jar"
-        builtBy gradlePlugin
+        builtBy embeddedPlugin
     }
 }
 

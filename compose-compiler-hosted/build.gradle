@@ -15,13 +15,19 @@
  */
 
 
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+import static androidx.build.dependencies.DependenciesKt.*
 import androidx.build.CompilationTarget
 import androidx.build.LibraryGroups
 import androidx.build.LibraryVersions
 import androidx.build.Publish
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-import static androidx.build.dependencies.DependenciesKt.*
+buildscript {
+    dependencies {
+        classpath 'org.anarres.jarjar:jarjar-gradle:1.0.1'
+    }
+}
 
 plugins {
     id("AndroidXPlugin")
@@ -29,33 +35,26 @@ plugins {
 }
 
 dependencies {
-    implementation(KOTLIN_STDLIB)
-    implementation project(":compose-plugin-cli")
-
-    implementation("org.jetbrains.kotlin:kotlin-compiler")
-    implementation("org.jetbrains.kotlin:kotlin-plugin")
-    implementation("org.jetbrains.kotlin:kotlin-intellij-core")
-    implementation("org.jetbrains.kotlin:kotlin-platform-api")
-    implementation("org.jetbrains.kotlin:kotlin-platform-impl")
-    implementation("org.jetbrains.kotlin:kotlin-j2k")
-    implementation("org.jetbrains.kotlin:kotlin-java-impl")
-    implementation("org.jetbrains.kotlin:kotlin-openapi")
-    implementation("org.jetbrains.kotlin:kotlin-jps-common-ide")
+    api(KOTLIN_STDLIB)
+    api("org.jetbrains.kotlin:kotlin-compiler")
+    api("org.jetbrains.kotlin:kotlin-plugin")
+    api("org.jetbrains.kotlin:kotlin-intellij-core")
+    api("org.jetbrains.kotlin:kotlin-platform-api")
 }
 
-compileKotlin {
+tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = "1.8"
     }
 }
 
 androidx {
-    name = "AndroidX Compose IDE Plugin"
+    name = "AndroidX Compose Hosted Compiler Plugin"
     publish = Publish.SNAPSHOT_AND_RELEASE
     toolingProject = true
     mavenVersion = LibraryVersions.COMPOSE
     mavenGroup = LibraryGroups.COMPOSE
     inceptionYear = "2019"
-    description = "Contains the IDE plugin for Compose"
+    description = "Contains the Kotlin compiler plugin for Compose used in Android Studio and IDEA"
     compilationTarget = CompilationTarget.HOST
 }
