@@ -58,4 +58,16 @@ class VersionTest {
         assert(version2700TNAPSHOT > version2700SNAPSHOT)
         assert(version2700SNAPSHOT < version2700TNAPSHOT)
     }
+
+    @Test
+    fun testParsingDependencyRanges() {
+        assert(Version.isDependencyRange("[1.0.0]") == false)
+        assert(Version.isDependencyRange("[1.0.0,2.0.0]") == true)
+        assert(Version.isDependencyRange("1.0.0+") == true)
+        assert(Version.isDependencyRange("1.0.0") == false)
+        assert(Version.isDependencyRange("") == false)
+        assert(Version.isDependencyRange("(1.0.0)") == false)
+        assert(Version.isDependencyRange("(1.0.0,2.0.0)") == true)
+        assert(Version.isDependencyRange("(1.0.0-beta01,2.0.0)") == true)
+    }
 }
