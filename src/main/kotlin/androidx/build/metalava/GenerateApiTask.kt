@@ -17,8 +17,11 @@
 package androidx.build.metalava
 
 import androidx.build.checkapi.ApiLocation
+import androidx.build.checkapi.ApiViolationBaselines
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
 import java.io.File
@@ -30,7 +33,17 @@ abstract class GenerateApiTask : MetalavaTask() {
     abstract val apiLocation: Property<ApiLocation>
 
     @get:Input
+    abstract val baselines: Property<ApiViolationBaselines>
+
+    @get:Input
     var generateRestrictedAPIs = false
+
+    @Optional
+    @InputFile
+    fun getApiLintBaseline(): File? {
+        val baseline = baselines.get().apiLintFile
+        return if (baseline.exists()) baseline else null
+    }
 
     @OutputFiles
     fun getTaskOutputs(): List<File>? {
@@ -52,7 +65,7 @@ abstract class GenerateApiTask : MetalavaTask() {
             dependencyClasspath,
             sourcePaths,
             apiLocation.get().publicApiFile,
-            false
+            GenerateApiMode.PublicApi(baselines.get().apiLintFile)
         )
 
         if (generateRestrictedAPIs) {
@@ -61,7 +74,7 @@ abstract class GenerateApiTask : MetalavaTask() {
                 dependencyClasspath,
                 sourcePaths,
                 apiLocation.get().restrictedApiFile,
-                true
+                GenerateApiMode.RestrictedApi
             )
         }
     }
