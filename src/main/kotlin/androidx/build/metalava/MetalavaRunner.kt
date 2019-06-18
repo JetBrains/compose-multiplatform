@@ -38,7 +38,9 @@ fun Project.runMetalavaWithArgs(configuration: Configuration, args: List<String>
         it.args = listOf(
             "--no-banner",
             "--error",
-            "DeprecationMismatch" // Enforce deprecation mismatch
+            "DeprecationMismatch", // Enforce deprecation mismatch
+            "--hide",
+            "HiddenSuperclass" // We allow having a hidden parent class
         ) + args
     }
 }
