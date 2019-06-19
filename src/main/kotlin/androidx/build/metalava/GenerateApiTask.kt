@@ -17,7 +17,6 @@
 package androidx.build.metalava
 
 import androidx.build.checkapi.ApiLocation
-import org.gradle.api.GradleException
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFiles
@@ -54,66 +53,15 @@ abstract class GenerateApiTask : MetalavaTask() {
         check(bootClasspath.isNotEmpty()) { "Android boot classpath not set." }
         check(sourcePaths.isNotEmpty()) { "Source paths not set." }
 
-        // generate public API txt
-        runWithArgs(
-            "--classpath",
-            (bootClasspath + dependencyClasspath.files).joinToString(File.pathSeparator),
-
-            "--source-path",
-            sourcePaths.filter { it.exists() }.joinToString(File.pathSeparator),
-
-            "--api",
-            publicApiFile.toString(),
-
-            "--format=v3",
-            "--output-kotlin-nulls=yes"
-        )
+        project.generateApi(bootClasspath,
+            dependencyClasspath,
+            sourcePaths,
+            publicApiFile,
+            false)
 
         if (generateRestrictedAPIs) {
-            // generate restricted API txt
-            val metalavaRestrictedOutputFile = File(restrictedApiFile.path + ".tmp")
-            runWithArgs(
-                "--classpath",
-                (bootClasspath + dependencyClasspath.files).joinToString(File.pathSeparator),
-
-                "--source-path",
-                sourcePaths.filter { it.exists() }.joinToString(File.pathSeparator),
-
-                "--api",
-                metalavaRestrictedOutputFile.toString(),
-
-                "--show-annotation",
-                "androidx.annotation.RestrictTo",
-
-                "--format=v3",
-                "--output-kotlin-nulls=yes"
-            )
-
-            removeRestrictToLibraryLines(metalavaRestrictedOutputFile, restrictedApiFile)
+            project.generateApi(bootClasspath, dependencyClasspath,
+                sourcePaths, restrictedApiFile, true)
         }
-    }
-
-    // until b/119617147 is done, remove lines containing "@RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY)"
-    fun removeRestrictToLibraryLines(inputFile: File, outputFile: File) {
-        val outputBuilder = StringBuilder()
-        val lines = inputFile.readLines()
-        var skipScopeUntil: String? = null
-        for (line in lines) {
-            val skip = line.contains("@RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY)")
-            if (skip && line.endsWith("{")) {
-                skipScopeUntil = line.commonPrefixWith("    ") + "}"
-            }
-            if (!skip && skipScopeUntil == null) {
-                outputBuilder.append(line)
-                outputBuilder.append("\n")
-            }
-            if (line == skipScopeUntil) {
-                skipScopeUntil = null
-            }
-        }
-        if (skipScopeUntil != null) {
-            throw GradleException("Skipping until `$skipScopeUntil`, but found EOF")
-        }
-        outputFile.writeText(outputBuilder.toString())
     }
 }

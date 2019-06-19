@@ -27,7 +27,7 @@ import org.gradle.api.tasks.InputFiles
 abstract class MetalavaTask : DefaultTask() {
     /** Configuration containing Metalava and its dependencies. */
     @get:Classpath
-    var configuration: Configuration? = null
+    lateinit var configuration: Configuration
 
     /** Android's boot classpath. Obtained from [BaseExtension.getBootClasspath]. */
     @get:InputFiles
@@ -46,14 +46,6 @@ abstract class MetalavaTask : DefaultTask() {
     }
 
     protected fun runWithArgs(args: List<String>) {
-        project.javaexec {
-            it.classpath = checkNotNull(configuration) { "Configuration not set." }
-            it.main = "com.android.tools.metalava.Driver"
-            it.args = listOf(
-                "--no-banner",
-                "--error",
-                "DeprecationMismatch" // Enforce deprecation mismatch
-            ) + args
-        }
+        project.runMetalavaWithArgs(configuration, args)
     }
 }
