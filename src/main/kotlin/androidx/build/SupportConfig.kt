@@ -55,6 +55,13 @@ object SupportConfig {
     }
 
     @JvmStatic
+    fun getSupportRoot(project: Project): File {
+        val extension = (project.rootProject.property("ext") as ExtraPropertiesExtension)
+        val file = extension.get("supportRootFolder") as File
+        return file
+    }
+
+    @JvmStatic
     fun getPrebuiltsRootPath(project: Project): String {
         val reposProperties = (project.rootProject.property("ext") as ExtraPropertiesExtension)
             .get("repos") as Map<*, *>

@@ -17,6 +17,7 @@
 package androidx.build.dependencyTracker
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
+import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Rule
 import org.junit.Test
@@ -38,6 +39,8 @@ class ProjectGraphTest {
                 .withProjectDir(tmpDir)
                 .withName("root")
                 .build()
+        // Project Graph expects supportRootFolder.
+        (root.properties.get("ext") as ExtraPropertiesExtension).set("supportRootFolder", tmpDir)
         val p1 = ProjectBuilder.builder()
                 .withProjectDir(tmpDir.resolve("p1"))
                 .withName("p1")
