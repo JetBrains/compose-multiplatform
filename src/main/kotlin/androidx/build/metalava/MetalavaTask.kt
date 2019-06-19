@@ -41,10 +41,6 @@ abstract class MetalavaTask : DefaultTask() {
     @get:InputFiles
     var sourcePaths: Collection<File> = emptyList()
 
-    protected fun runWithArgs(vararg args: String) {
-        runWithArgs(args.asList())
-    }
-
     protected fun runWithArgs(args: List<String>) {
         project.runMetalavaWithArgs(configuration, args)
     }
