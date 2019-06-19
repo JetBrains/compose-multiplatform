@@ -29,19 +29,12 @@ import androidx.build.java.JavaCompileInputs
 import androidx.build.Release
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Project
-import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.kotlin.dsl.getPlugin
 import java.io.File
 
-object Metalava {
-    private fun Project.createMetalavaConfiguration(): Configuration {
-        return configurations.create("metalava") {
-            val dependency = dependencies.create("com.android:metalava:1.3.0:shadow@jar")
-            it.dependencies.add(dependency)
-        }
-    }
+object MetalavaTasks {
 
     fun Project.configureAndroidProjectForMetalava(
         library: LibraryExtension,
@@ -100,7 +93,7 @@ object Metalava {
         javaCompileInputs: JavaCompileInputs,
         extension: AndroidXExtension
     ) {
-        val metalavaConfiguration = project.createMetalavaConfiguration()
+        val metalavaConfiguration = project.getMetalavaConfiguration()
 
         // the api files whose file names contain the version of the library
         val libraryVersionApi = project.getCurrentApiLocation()
