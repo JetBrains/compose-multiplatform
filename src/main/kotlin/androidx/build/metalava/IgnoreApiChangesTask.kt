@@ -101,7 +101,14 @@ abstract class IgnoreApiChangesTask : MetalavaTask() {
         }
         runWithArgs(args)
 
-        if (intermediateExclusions.length() > 0) {
+        var moreThanHeader = false
+        intermediateExclusions.forEachLine {
+            if (!it.startsWith("// Baseline format: ")) {
+                moreThanHeader = true
+                return@forEachLine
+            }
+        }
+        if (moreThanHeader) {
             Files.copy(intermediateExclusions, exclusionsFile)
         } else {
             if (exclusionsFile.exists()) {
