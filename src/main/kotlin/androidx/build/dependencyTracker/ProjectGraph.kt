@@ -16,6 +16,7 @@
 
 package androidx.build.dependencyTracker
 
+import androidx.build.SupportConfig
 import org.gradle.api.Project
 import java.io.File
 
@@ -31,7 +32,7 @@ class ProjectGraph(rootProject: Project, val logger: Logger? = null) {
         // always use cannonical file: b/112205561
         logger?.info("initializing ProjectGraph")
         rootNode = Node(logger)
-        val rootProjectDir = rootProject.projectDir.canonicalFile
+        val rootProjectDir = SupportConfig.getSupportRoot(rootProject)
         rootProject.subprojects.forEach {
             logger?.info("creating node for ${it.path}")
             val relativePath = it.projectDir.canonicalFile.toRelativeString(rootProjectDir)

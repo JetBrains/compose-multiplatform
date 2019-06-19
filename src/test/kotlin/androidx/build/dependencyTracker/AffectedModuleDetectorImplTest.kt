@@ -17,6 +17,7 @@
 package androidx.build.dependencyTracker
 
 import org.gradle.api.Project
+import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.testfixtures.ProjectBuilder
 import org.hamcrest.CoreMatchers
 import org.hamcrest.MatcherAssert
@@ -88,10 +89,14 @@ class AffectedModuleDetectorImplTest {
                 .withProjectDir(tmpDir)
                 .withName("root")
                 .build()
+        // Project Graph expects supportRootFolder.
+        (root.properties.get("ext") as ExtraPropertiesExtension).set("supportRootFolder", tmpDir)
         root2 = ProjectBuilder.builder()
             .withProjectDir(tmpDir2)
             .withName("root2/ui")
             .build()
+        // Project Graph expects supportRootFolder.
+        (root2.properties.get("ext") as ExtraPropertiesExtension).set("supportRootFolder", tmpDir2)
         p1 = ProjectBuilder.builder()
                 .withProjectDir(tmpDir.resolve("p1"))
                 .withName("p1")
