@@ -60,13 +60,6 @@ abstract class UpdateApiTask : DefaultTask() {
 
     @TaskAction
     fun exec() {
-        val inputPublicApi = checkNotNull(inputApiLocation.get().publicApiFile) {
-            "inputPublicApi not set"
-        }
-
-        val inputRestrictedApi = checkNotNull(inputApiLocation.get().restrictedApiFile) {
-            "inputRestrictedApi not set"
-        }
         var permitOverwriting = true
         for (outputApi in outputApiLocations.get()) {
             val version = outputApi.version()
@@ -77,12 +70,19 @@ abstract class UpdateApiTask : DefaultTask() {
             }
         }
         for (outputApi in outputApiLocations.get()) {
-            copy(inputPublicApi, outputApi.publicApiFile, permitOverwriting, project.logger)
+            copy(
+                inputApiLocation.get().publicApiFile,
+                outputApi.publicApiFile,
+                permitOverwriting,
+                project.logger
+            )
             if (updateRestrictedAPIs) {
-                copy(inputRestrictedApi,
+                copy(
+                    inputApiLocation.get().restrictedApiFile,
                     outputApi.restrictedApiFile,
                     permitOverwriting,
-                    project.logger)
+                    project.logger
+                )
             }
         }
     }
