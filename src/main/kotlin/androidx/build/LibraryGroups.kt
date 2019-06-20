@@ -90,7 +90,7 @@ object LibraryGroups {
     val VIEWPAGER2 = LibraryGroup("androidx.viewpager2")
     val WEAR = LibraryGroup("androidx.wear")
     val WEBKIT = LibraryGroup("androidx.webkit")
-    val WORKMANAGER = LibraryGroup("androidx.work")
+    val WORK = LibraryGroup("androidx.work")
 }
 
 /**
