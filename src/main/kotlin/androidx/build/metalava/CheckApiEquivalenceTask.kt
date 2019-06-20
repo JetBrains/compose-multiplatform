@@ -57,33 +57,27 @@ abstract class CheckApiEquivalenceTask : DefaultTask() {
 
     @TaskAction
     fun exec() {
-        val truePublicDefinition = checkNotNull(builtApi.get().publicApiFile) {
-            "builtApi.publicApiFile not set"
-        }
-        val trueRestrictedApi = checkNotNull(builtApi.get().restrictedApiFile) {
-            "builtApi.restrictedApiFile not set"
-        }
         for (checkedInApi in checkedInApis.get()) {
-            val declaredPublicApi = checkNotNull(checkedInApi.publicApiFile) {
-                "checkedInApi.publicApiFile not set"
-            }
-            val declaredRestrictedApi = checkNotNull(checkedInApi.restrictedApiFile) {
-                "checkedInApi.restrictedApiFile not set"
-            }
-            if (!FileUtils.contentEquals(declaredPublicApi, truePublicDefinition)) {
+            if (!FileUtils.contentEquals(
+                    checkedInApi.publicApiFile,
+                    builtApi.get().publicApiFile
+                )) {
                 val message = "Public API definition has changed.\n\n" +
-                        "Declared definition is $declaredPublicApi\n" +
-                        "True     definition is $truePublicDefinition\n\n" +
+                        "Declared definition is $checkedInApi.publicApiFile\n" +
+                        "True     definition is $builtApi.get().publicApiFile\n\n" +
                         "Please run `./gradlew updateApi` to confirm these changes are " +
                         "intentional by updating the public API definition"
                 throw GradleException(message)
             }
             if (checkRestrictedAPIs) {
-                if (!FileUtils.contentEquals(declaredRestrictedApi, trueRestrictedApi)) {
+                if (!FileUtils.contentEquals(
+                        checkedInApi.restrictedApiFile,
+                        builtApi.get().restrictedApiFile
+                    )) {
                     val message = "Restricted API definition (marked by the RestrictedTo " +
                             "annotation) has changed.\n\n" +
-                            "Declared definition is $declaredRestrictedApi\n" +
-                            "True     definition is $trueRestrictedApi\n" +
+                            "Declared definition is $checkedInApi.restrictedApiFile\n" +
+                            "True     definition is $builtApi.get().restrictedApiFile\n" +
                             "Please run `./gradlew updateApi` to confirm these changes are " +
                             "intentional by updating the restricted API definition"
                     throw GradleException(message)

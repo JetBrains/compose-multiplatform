@@ -44,24 +44,25 @@ abstract class GenerateApiTask : MetalavaTask() {
     fun exec() {
         val dependencyClasspath = checkNotNull(
                 dependencyClasspath) { "Dependency classpath not set." }
-        val publicApiFile = checkNotNull(apiLocation.get().publicApiFile) {
-            "Current public API file not set."
-        }
-        val restrictedApiFile = checkNotNull(apiLocation.get().restrictedApiFile) {
-            "Current restricted API file not set."
-        }
         check(bootClasspath.isNotEmpty()) { "Android boot classpath not set." }
         check(sourcePaths.isNotEmpty()) { "Source paths not set." }
 
-        project.generateApi(bootClasspath,
+        project.generateApi(
+            bootClasspath,
             dependencyClasspath,
             sourcePaths,
-            publicApiFile,
-            false)
+            apiLocation.get().publicApiFile,
+            false
+        )
 
         if (generateRestrictedAPIs) {
-            project.generateApi(bootClasspath, dependencyClasspath,
-                sourcePaths, restrictedApiFile, true)
+            project.generateApi(
+                bootClasspath,
+                dependencyClasspath,
+                sourcePaths,
+                apiLocation.get().restrictedApiFile,
+                true
+            )
         }
     }
 }
