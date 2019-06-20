@@ -32,7 +32,7 @@ class ProjectGraph(rootProject: Project, val logger: Logger? = null) {
         // always use cannonical file: b/112205561
         logger?.info("initializing ProjectGraph")
         rootNode = Node(logger)
-        val rootProjectDir = SupportConfig.getSupportRoot(rootProject)
+        val rootProjectDir = SupportConfig.getSupportRoot(rootProject).canonicalFile
         rootProject.subprojects.forEach {
             logger?.info("creating node for ${it.path}")
             val relativePath = it.projectDir.canonicalFile.toRelativeString(rootProjectDir)
