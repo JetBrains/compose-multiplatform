@@ -28,7 +28,7 @@ open class UpdateResourceApiTask : DefaultTask() {
     @TaskAction
     fun UpdateResourceApi() {
         val destApiFile = checkNotNull(destApiFile) { "destApiFile not set" }
-        if (oldApiFile == null || !!oldApiFile!!.exists()) {
+        if (oldApiFile == null || !oldApiFile!!.exists()) {
             if (newApiFile != null && newApiFile!!.exists()) {
                 newApiFile?.copyTo(destApiFile, true, 8)
                 return
@@ -55,7 +55,7 @@ open class UpdateResourceApiTask : DefaultTask() {
         if (oldVersion.major == project.version().major && !removedResourceApi.isEmpty()) {
             var errorMessage = "Cannot remove public resources within the same major version, " +
                     "the following were removed since version $oldVersion:\n"
-            for (e in oldResourceApi) {
+            for (e in removedResourceApi) {
                 errorMessage = errorMessage + "$e\n"
             }
             throw GradleException(errorMessage)
@@ -65,7 +65,7 @@ open class UpdateResourceApiTask : DefaultTask() {
                 project.version().isFinalApi()) {
             var errorMessage = "Cannot add public resources when api becomes final, " +
                     "the following resources were added since version $oldVersion:\n"
-            for (e in newResourceApi) {
+            for (e in addedResourceApi) {
                 errorMessage = errorMessage + "$e\n"
             }
             throw GradleException(errorMessage)
