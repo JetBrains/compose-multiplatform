@@ -26,7 +26,7 @@ import androidx.build.SupportConfig.INSTRUMENTATION_RUNNER
 import androidx.build.SupportConfig.TARGET_SDK_VERSION
 import androidx.build.checkapi.ApiType
 import androidx.build.checkapi.getCurrentApiLocation
-import androidx.build.checkapi.getLastReleasedApiFileFromDir
+import androidx.build.checkapi.getRequiredCompatibilityApiFileFromDir
 import androidx.build.checkapi.hasApiFolder
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.dokka.Dokka.configureAndroidProjectForDokka
@@ -686,8 +686,8 @@ private fun Project.createCheckReleaseReadyTask(taskProviderList: List<TaskProvi
 private fun Project.createUpdateResourceApiTask(): DefaultTask {
     return project.tasks.createWithConfig("updateResourceApi", UpdateResourceApiTask::class.java) {
         newApiFile = getGenerateResourceApiFile()
-        oldApiFile = getLastReleasedApiFileFromDir(File(project.projectDir, "api/"),
-                project.version(), true, false, ApiType.RESOURCEAPI)
+        oldApiFile = getRequiredCompatibilityApiFileFromDir(File(project.projectDir, "api/"),
+                project.version(), ApiType.RESOURCEAPI)
         destApiFile = project.getCurrentApiLocation().resourceFile
     }
 }
