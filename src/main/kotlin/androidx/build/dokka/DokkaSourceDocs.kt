@@ -24,17 +24,19 @@ import androidx.build.Release
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.tasks.TaskCollection
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.kotlin.dsl.getPlugin
 import org.jetbrains.dokka.gradle.DokkaTask
 
 object DokkaSourceDocs {
-    private val RUNNER_TASK_NAME = Dokka.generatorTaskNameForType("TipOfTree")
-    public val ARCHIVE_TASK_NAME: String = Dokka.archiveTaskNameForType("TipOfTree")
+    private const val DOCS_TYPE = "TipOfTree"
+    public val ARCHIVE_TASK_NAME: String = Dokka.archiveTaskNameForType(DOCS_TYPE)
     // TODO(b/72330103) make "generateDocs" be the only archive task once Doclava is fully removed
     private val ALTERNATE_ARCHIVE_TASK_NAME: String = "generateDocs"
 
     private val hiddenPackages = DokkaPublicDocs.hiddenPackages
+    private var docsTasks: TaskCollection<DokkaTask>? = null
 
     fun tryGetRunnerProject(project: Project): Project? {
         return project.rootProject.findProject(":docs-runner")
@@ -44,22 +46,33 @@ object DokkaSourceDocs {
         return tryGetRunnerProject(project)!!
     }
 
-    fun getDocsTask(project: Project): DokkaTask {
-        var runnerProject = getRunnerProject(project)
-        return runnerProject.tasks.getOrCreateDocsTask(runnerProject)
+    fun getDocsTasks(project: Project): TaskCollection<DokkaTask>? {
+        docsTasks?.let {
+            return it
+        }
+        val runnerProject = getRunnerProject(project)
+        docsTasks = runnerProject.tasks.getOrCreateDocsTask(runnerProject)
+        return docsTasks
     }
 
-    @Synchronized fun TaskContainer.getOrCreateDocsTask(runnerProject: Project): DokkaTask {
+    @Synchronized fun TaskContainer.getOrCreateDocsTask(runnerProject: Project):
+            TaskCollection<DokkaTask> {
         val tasks = this
-        if (tasks.findByName(DokkaSourceDocs.RUNNER_TASK_NAME) == null) {
-            Dokka.createDocsTask("TipOfTree", runnerProject, hiddenPackages)
-            if (tasks.findByName(DokkaSourceDocs.ALTERNATE_ARCHIVE_TASK_NAME) == null) {
+        var dokkaTasks = runnerProject.tasks.withType(DokkaTask::class.java)
+            .matching { it.name.contains(DOCS_TYPE) }
+
+        if (dokkaTasks.isEmpty()) {
+            Dokka.createDocsTask(DOCS_TYPE, runnerProject, hiddenPackages)
+            dokkaTasks = runnerProject.tasks.withType(DokkaTask::class.java)
+                .matching { it.name.contains(DOCS_TYPE) }
+
+            if (tasks.findByName(ALTERNATE_ARCHIVE_TASK_NAME) == null) {
                 tasks.create(ALTERNATE_ARCHIVE_TASK_NAME)
             }
             tasks.getByName(ALTERNATE_ARCHIVE_TASK_NAME)
                 .dependsOn(tasks.getByName(ARCHIVE_TASK_NAME))
         }
-        return tasks.getByName(DokkaSourceDocs.RUNNER_TASK_NAME) as DokkaTask
+        return dokkaTasks
     }
 
     fun registerAndroidProject(
@@ -104,10 +117,13 @@ object DokkaSourceDocs {
     }
 
     fun registerInputs(inputs: JavaCompileInputs, project: Project) {
-        val docsTask = getDocsTask(project)
-        docsTask.sourceDirs += inputs.sourcePaths
-        docsTask.classpath = docsTask.classpath.plus(inputs.dependencyClasspath)
-            .plus(inputs.bootClasspath)
-        docsTask.dependsOn(inputs.dependencyClasspath)
+        val dokkaTasks = getDocsTasks(project)
+
+        dokkaTasks?.forEach {
+            it.sourceDirs += inputs.sourcePaths
+            it.classpath = it.classpath.plus(inputs.dependencyClasspath)
+                .plus(inputs.bootClasspath)
+            it.dependsOn(inputs.dependencyClasspath)
+        }
     }
 }
