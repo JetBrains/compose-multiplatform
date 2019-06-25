@@ -126,6 +126,7 @@ val RELEASE_RULE = docsRules("public", false) {
             .addStubs("wear/wear_stubs/com.google.android.wearable-stubs.jar")
     prebuilts(LibraryGroups.WEBKIT, "1.1.0-alpha01")
     ignore(LibraryGroups.WORK.group, "work-gcm")
+    ignore(LibraryGroups.WORK.group, "work-foreground")
     prebuilts(LibraryGroups.WORK, "2.1.0-beta02")
     default(Ignore)
 }
