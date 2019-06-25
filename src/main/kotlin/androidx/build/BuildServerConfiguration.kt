@@ -46,6 +46,12 @@ fun Project.getDistributionDirectory(): File {
 }
 
 /**
+ * Directory to put build info files for release service dependency files.
+ */
+fun Project.getBuildInfoDirectory(): File =
+        File(getDistributionDirectory(), "build-info")
+
+/**
  * Directory to put host test results so they can be consumed by the testing dashboard.
  */
 fun Project.getHostTestResultDirectory(): File =

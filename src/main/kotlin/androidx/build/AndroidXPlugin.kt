@@ -80,6 +80,7 @@ import java.util.concurrent.ConcurrentHashMap
  * compatibility.
  */
 const val USE_MAX_DEP_VERSIONS = "useMaxDepVersions"
+const val BUILD_INFO_DIR = "build-info"
 
 /**
  * A plugin which enables all of the Gradle customizations for AndroidX.
@@ -583,7 +584,7 @@ class AndroidXPlugin : Plugin<Project> {
                     CREATE_LIBRARY_BUILD_INFO_FILES_TASK,
                     CreateLibraryBuildInfoFileTask::class.java
                 ) {
-                    it.outputFile.set(File(project.getDistributionDirectory(),
+                    it.outputFile.set(File(project.getBuildInfoDirectory(),
                         "${project.group}_${project.name}_build_info.txt"))
                 }
                 project.rootProject.tasks.named(CREATE_LIBRARY_BUILD_INFO_FILES_TASK).configure {
