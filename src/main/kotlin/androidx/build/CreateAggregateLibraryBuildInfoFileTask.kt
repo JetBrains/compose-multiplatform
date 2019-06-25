@@ -50,7 +50,7 @@ abstract class CreateAggregateLibraryBuildInfoFileTask : DefaultTask() {
     }
 
     private data class AllLibraryBuildInfoFiles(
-        val Artifacts: ArrayList<LibraryBuildInfoFile>
+        val artifacts: ArrayList<LibraryBuildInfoFile>
     )
 
     /**
@@ -63,7 +63,7 @@ abstract class CreateAggregateLibraryBuildInfoFileTask : DefaultTask() {
         val gson = Gson()
         val jsonString: String = jsonFile.readText(Charsets.UTF_8)
         val aggregateBuildInfoFile = gson.fromJson(jsonString, AllLibraryBuildInfoFiles::class.java)
-        aggregateBuildInfoFile.Artifacts.forEach { artifact ->
+        aggregateBuildInfoFile.artifacts.forEach { artifact ->
             if (!artifactList.contains("${artifact.groupId}_${artifact.artifactId}")) {
                 println("Failed to find ${artifact.artifactId} in artifact list!")
                 return false
@@ -83,7 +83,7 @@ abstract class CreateAggregateLibraryBuildInfoFileTask : DefaultTask() {
         // Loop through each file in the list of libraryBuildInfoFiles and collect all build info
         // data from each of these $groupId-$artifactId-_build_info.txt files
         var output = StringBuilder()
-        output.append("{ \"Artifacts\": [\n")
+        output.append("{ \"artifacts\": [\n")
         var artifactList = mutableListOf<String>()
         for (infoFile in libraryBuildInfoFiles.get()) {
             if ((infoFile.isFile and (infoFile.name != outputFile.name))
