@@ -296,7 +296,8 @@ class AndroidXPlugin : Plugin<Project> {
             it.dependsOn(createCoverageJarTask)
         }
 
-        val allDocsTask = DiffAndDocs.configureDiffAndDocs(this, projectDir,
+        val rootProjectDir = SupportConfig.getSupportRoot(rootProject).canonicalFile
+        val allDocsTask = DiffAndDocs.configureDiffAndDocs(this, rootProjectDir,
                 DacOptions("androidx", "ANDROIDX_DATA"),
                 listOf(RELEASE_RULE))
         buildOnServerTask.dependsOn(allDocsTask)
