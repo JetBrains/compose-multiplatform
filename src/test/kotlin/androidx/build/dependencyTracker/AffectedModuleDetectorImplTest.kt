@@ -379,6 +379,40 @@ class AffectedModuleDetectorImplTest {
     }
 
     @Test
+    fun changeInRootAndSubproject_onlyChanged() {
+        val detector = AffectedModuleDetectorImpl(
+            rootProject = root,
+            logger = logger,
+            ignoreUnknownProjects = false,
+            projectSubset = ProjectSubset.CHANGED_PROJECTS,
+            cobuiltTestPaths = cobuiltTestPaths,
+            injectedGitClient = MockGitClient(
+                lastMergeSha = "foo",
+                changedFiles = listOf("foo.java", convertToFilePath("p7", "bar.java")))
+        )
+        MatcherAssert.assertThat(detector.affectedProjects, CoreMatchers.`is`(
+            setOf(p7, p10)
+        ))
+    }
+
+    @Test
+    fun changeInRootAndSubproject_onlyDependent() {
+        val detector = AffectedModuleDetectorImpl(
+            rootProject = root,
+            logger = logger,
+            ignoreUnknownProjects = false,
+            projectSubset = ProjectSubset.DEPENDENT_PROJECTS,
+            cobuiltTestPaths = cobuiltTestPaths,
+            injectedGitClient = MockGitClient(
+                lastMergeSha = "foo",
+                changedFiles = listOf("foo.java", convertToFilePath("p7", "bar.java")))
+        )
+        MatcherAssert.assertThat(detector.affectedProjects, CoreMatchers.`is`(
+            setOf(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10)
+        ))
+    }
+
+    @Test
     fun changeInCobuilt() {
         val detector = AffectedModuleDetectorImpl(
             rootProject = root,
@@ -707,7 +741,7 @@ class AffectedModuleDetectorImplTest {
                     convertToFilePath("compose", "foo.java")))
         )
         MatcherAssert.assertThat(detector.affectedProjects, CoreMatchers.`is`(
-            setOf(p12)
+            setOf(p11, p12)
         ))
     }
 
@@ -761,7 +795,7 @@ class AffectedModuleDetectorImplTest {
                     convertToFilePath("compose", "foo.java")))
         )
         MatcherAssert.assertThat(detector.affectedProjects, CoreMatchers.`is`(
-            setOf(p10)
+            setOf(p7, p10)
         ))
     }
 

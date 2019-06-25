@@ -294,10 +294,10 @@ internal class AffectedModuleDetectorImpl constructor(
                         ${expandToDependents(containingProjects.filterNotNull())}
                     """.trimIndent()
             )
-            return when (projectSubset) {
-                ProjectSubset.DEPENDENT_PROJECTS -> allProjects
-                ProjectSubset.CHANGED_PROJECTS -> alwaysBuild
-                ProjectSubset.ALL_AFFECTED_PROJECTS -> allProjects
+            when (projectSubset) {
+                ProjectSubset.DEPENDENT_PROJECTS -> return allProjects
+                ProjectSubset.ALL_AFFECTED_PROJECTS -> return allProjects
+                else -> {}
             }
         }
 
