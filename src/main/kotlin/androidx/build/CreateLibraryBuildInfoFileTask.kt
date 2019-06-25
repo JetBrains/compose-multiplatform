@@ -46,10 +46,10 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
     }
 
     private fun writeJsonToFile(info: LibraryBuildInfoFile) {
-        if (!project.getDistributionDirectory().exists()) {
-            if (!project.getDistributionDirectory().mkdirs()) {
+        if (!project.getBuildInfoDirectory().exists()) {
+            if (!project.getBuildInfoDirectory().mkdirs()) {
                 throw RuntimeException("Failed to create " +
-                        "output directory: ${project.getDistributionDirectory()}")
+                        "output directory: ${project.getBuildInfoDirectory()}")
             }
         }
         var resolvedOutputFile: File = outputFile.get()
