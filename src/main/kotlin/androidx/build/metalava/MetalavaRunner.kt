@@ -38,11 +38,61 @@ fun Project.runMetalavaWithArgs(configuration: Configuration, args: List<String>
         it.args = listOf(
             "--no-banner",
             "--error",
-            "DeprecationMismatch", // Enforce deprecation mismatch
-            "--hide",
-            "HiddenSuperclass" // We allow having a hidden parent class
+            "DeprecationMismatch" // Enforce deprecation mismatch
         ) + args
     }
+}
+
+val API_LINT_ARGS: List<String> = listOf(
+    "--api-lint",
+    "--hide",
+    listOf(
+        // The list of checks that are hidden as they are not useful in androidx
+        "Enum", // Enums are allowed to be use in androidx
+        "CallbackInterface", // With target Java 8, we have default methods
+        "HiddenSuperclass", // We allow having a hidden parent class
+        "ProtectedMember", // We allow using protected members in androidx
+        "ManagerLookup", // Managers in androidx are not the same as platfrom services
+        "ManagerConstructor",
+
+        // List of checks that have bugs, but should be enabled once fixed.
+        "GetterSetterNames", // b/135498039
+        "StaticUtils", // b/135489083
+        "AllUpper", // b/135708486
+        "StartWithLower", // b/135710527
+
+        // The list of checks that are API lint warnings and are yet to be enabled
+        "MinMaxConstant",
+        "IntentBuilderName",
+        "OnNameExpected",
+        "TopLevelBuilder",
+        "MissingBuild",
+        "BuilderSetStyle",
+        "SetterReturnsThis",
+        "PackageLayering",
+        "OverlappingConstants",
+        "IllegalStateException",
+        "ListenerLast",
+        "ExecutorRegistration",
+        "StreamFiles",
+        "ParcelableList",
+        "AbstractInner",
+        "NotCloseable",
+        "ArrayReturn",
+        "UserHandle",
+        "UserHandleName",
+        "MethodNameTense",
+        "UseIcu",
+        "NoByteOrShort",
+        "CommonArgsFirst",
+        "SamShouldBeLast",
+        "MissingJvmStatic"
+    ).joinToString()
+)
+
+sealed class GenerateApiMode {
+    class PublicApi(val apiLintBaseline: File) : GenerateApiMode()
+    object RestrictedApi : GenerateApiMode()
 }
 
 fun Project.generateApi(
@@ -50,17 +100,16 @@ fun Project.generateApi(
     dependencyClasspath: FileCollection,
     sourcePaths: Collection<File>,
     outputFile: File,
-    includeRestrictedApis: Boolean
+    generateApiMode: GenerateApiMode
 ) {
-
-    val tempOutputFile = if (includeRestrictedApis) {
+    val tempOutputFile = if (generateApiMode is GenerateApiMode.RestrictedApi) {
         File(outputFile.path + ".tmp")
     } else {
         outputFile
     }
 
     // generate public API txt
-    var args = listOf("--classpath",
+    val args = mutableListOf("--classpath",
         (bootClasspath + dependencyClasspath.files).joinToString(File.pathSeparator),
 
         "--source-path",
@@ -73,15 +122,23 @@ fun Project.generateApi(
         "--output-kotlin-nulls=yes"
     )
 
-    if (includeRestrictedApis) {
-        args = args + listOf("--show-annotation", "androidx.annotation.RestrictTo")
+    when (generateApiMode) {
+        is GenerateApiMode.PublicApi -> {
+            args += API_LINT_ARGS
+            if (generateApiMode.apiLintBaseline.exists()) {
+                args += listOf("--baseline", generateApiMode.apiLintBaseline.toString())
+            }
+        }
+        is GenerateApiMode.RestrictedApi -> {
+            args += listOf("--show-annotation", "androidx.annotation.RestrictTo")
+        }
     }
 
     val metalavaConfiguration = getMetalavaConfiguration()
 
     runMetalavaWithArgs(metalavaConfiguration, args)
 
-    if (includeRestrictedApis) {
+    if (generateApiMode is GenerateApiMode.RestrictedApi) {
         removeRestrictToLibraryLines(tempOutputFile, outputFile)
     }
 }

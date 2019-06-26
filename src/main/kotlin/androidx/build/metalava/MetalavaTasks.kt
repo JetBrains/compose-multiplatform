@@ -19,7 +19,7 @@ package androidx.build.metalava
 import androidx.build.AndroidXPlugin.Companion.BUILD_ON_SERVER_TASK
 import androidx.build.AndroidXExtension
 import androidx.build.checkapi.ApiLocation
-import androidx.build.checkapi.ApiViolationExclusions
+import androidx.build.checkapi.ApiViolationBaselines
 import androidx.build.checkapi.getCurrentApiLocation
 import androidx.build.checkapi.getRequiredCompatibilityApiLocation
 import androidx.build.checkapi.hasApiFolder
@@ -112,6 +112,8 @@ object MetalavaTasks {
         val builtApiLocation = ApiLocation.fromPublicApiFile(
             File(project.docsDir(), "release/${project.name}/current.txt"))
 
+        val baselines = ApiViolationBaselines.fromApiLocation(libraryVersionApi)
+
         val generateApi = project.tasks.register("generateApi", GenerateApiTask::class.java) {
                 task ->
             task.group = "API"
@@ -119,12 +121,12 @@ object MetalavaTasks {
             task.apiLocation.set(builtApiLocation)
             task.configuration = metalavaConfiguration
             task.generateRestrictedAPIs = extension.trackRestrictedAPIs
+            task.baselines.set(baselines)
             task.dependsOn(metalavaConfiguration)
             applyInputs(javaCompileInputs, task)
         }
 
         var checkApiRelease: TaskProvider<CheckApiCompatibilityTask>? = null
-        val exclusions = ApiViolationExclusions.fromApiLocation(libraryVersionApi)
 
         project.getRequiredCompatibilityApiLocation()?.let { lastReleasedApiFile ->
             checkApiRelease = project.tasks.register(
@@ -133,7 +135,7 @@ object MetalavaTasks {
             ) { task ->
                 task.configuration = metalavaConfiguration
                 task.referenceApi.set(lastReleasedApiFile)
-                task.exclusions.set(exclusions)
+                task.baselines.set(baselines)
                 task.dependsOn(metalavaConfiguration)
                 task.checkRestrictedAPIs = extension.trackRestrictedAPIs
                 applyInputs(javaCompileInputs, task)
@@ -142,12 +144,19 @@ object MetalavaTasks {
             project.tasks.register("ignoreApiChanges", IgnoreApiChangesTask::class.java) { task ->
                 task.configuration = metalavaConfiguration
                 task.referenceApi.set(checkApiRelease!!.flatMap { it.referenceApi })
-                task.exclusions.set(checkApiRelease!!.flatMap { it.exclusions })
-                task.processRestrictedAPIs = extension.trackRestrictedAPIs
-                task.intermediateExclusionsFile.set(
-                    File(project.docsDir(), "release/${project.name}/api-changes.ignore"))
+                task.baselines.set(checkApiRelease!!.flatMap { it.baselines })
+                task.processRestrictedApis = extension.trackRestrictedAPIs
                 applyInputs(javaCompileInputs, task)
             }
+        }
+
+        project.tasks.register(
+            "updateApiLintBaseline",
+            UpdateApiLintBaselineTask::class.java
+        ) { task ->
+            task.configuration = metalavaConfiguration
+            task.baselines.set(baselines)
+            applyInputs(javaCompileInputs, task)
         }
 
         val checkApi =
