@@ -23,6 +23,8 @@ import java.io.Serializable
 
 // An ApiLocation contains the filepath of a public API and restricted API of a library
 data class ApiLocation(
+    // file specifying the directory of API files for the library
+    val apiFileDirectory: File,
     // file specifying the public API of the library
     val publicApiFile: File,
     // file specifying the restricted API (marked by the RestrictTo annotation) of the library
@@ -44,6 +46,7 @@ data class ApiLocation(
     companion object {
         fun fromPublicApiFile(f: File): ApiLocation {
             return ApiLocation(
+                f.parentFile,
                 f,
                 File(f.parentFile, "restricted_" + f.name),
                 File(f.parentFile, "res-" + f.name)
@@ -52,21 +55,28 @@ data class ApiLocation(
     }
 }
 
-// An ApiViolationExclusions contains the paths of the API exclusions files for an API
-data class ApiViolationExclusions(
+// An ApiViolationBaselines contains the paths of the API baselines files for an API
+data class ApiViolationBaselines(
     val publicApiFile: File,
-    val restrictedApiFile: File
+    val restrictedApiFile: File,
+    val apiLintFile: File
 ) : Serializable {
 
     fun files() = listOf(publicApiFile, restrictedApiFile)
 
     companion object {
-        fun fromApiLocation(apiLocation: ApiLocation): ApiViolationExclusions {
-            val publicExclusionsFile =
+        fun fromApiLocation(apiLocation: ApiLocation): ApiViolationBaselines {
+            val publicBaselineFile =
                 File(apiLocation.publicApiFile.toString().removeSuffix(".txt") + ".ignore")
-            val restrictedExclusionsFile =
+            val restrictedBaselineFile =
                 File(apiLocation.restrictedApiFile.toString().removeSuffix(".txt") + ".ignore")
-            return ApiViolationExclusions(publicExclusionsFile, restrictedExclusionsFile)
+            val apiLintBaselineFile =
+                File(apiLocation.apiFileDirectory, "api_lint.ignore")
+            return ApiViolationBaselines(
+                publicBaselineFile,
+                restrictedBaselineFile,
+                apiLintBaselineFile
+            )
         }
     }
 }
