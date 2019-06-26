@@ -107,9 +107,12 @@ data class Version(
     }
 }
 
-fun Project.setupVersion(extension: AndroidXExtension) = afterEvaluate {
-    @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
-    version = extension.mavenVersion?.toString()
-}
+fun Project.isVersionSet() = project.version is Version
 
-fun Project.version() = Version(project.version as String)
+fun Project.version(): Version {
+    return if (project.version is Version) {
+        project.version as Version
+    } else {
+        throw IllegalStateException("Tried to use project version for $name that was never set.")
+    }
+}

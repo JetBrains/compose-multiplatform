@@ -34,7 +34,7 @@ open class CheckSameVersionLibraryGroupsTask : DefaultTask() {
                 project.extensions.findByType(AndroidXExtension::class.java) ?: return@subprojects
             val requireSameVersion = library.mavenGroup?.requireSameVersion ?: false
             if (requireSameVersion && library.publish.shouldRelease()) {
-                if (project.version == AndroidXExtension.DEFAULT_UNSPECIFIED_VERSION) {
+                if (!project.isVersionSet()) {
                     throw GradleException("Library $group:${project.name} does not specify " +
                             "a version, however it is within library group $group which requires" +
                             " all member libraries to be of the same version")
@@ -43,7 +43,7 @@ open class CheckSameVersionLibraryGroupsTask : DefaultTask() {
                 if (map.contains(group)) {
                     val existingVersion = map.get(group)!!.first
                     val libraryInSameGroup = map.get(group)!!.second
-                    if (existingVersion != project.version) {
+                    if (existingVersion != project.version.toString()) {
                         throw GradleException("Library $group:${project.name} with version " +
                                 "${project.version} is part of the $group library group" +
                                 " which requires all member libraries to have the same " +
@@ -51,7 +51,7 @@ open class CheckSameVersionLibraryGroupsTask : DefaultTask() {
                                 " the same library group has different version $existingVersion")
                     }
                 } else {
-                    map.put(group, Pair(project.version as String, project.name))
+                    map.put(group, Pair(project.version.toString(), project.name))
                 }
             }
         }
