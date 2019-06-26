@@ -120,10 +120,9 @@ class AndroidXPlugin : Plugin<Project> {
                         targetCompatibility = VERSION_1_8
                     }
                     project.afterEvaluate {
-                        verifyJava7Targeting(
-                            project.version as String,
-                            convention.sourceCompatibility
-                        )
+                        if (androidXExtension.publish.shouldPublish()) {
+                            verifyJava7Targeting(project.version(), convention.sourceCompatibility)
+                        }
                     }
 
                     project.hideJavadocTask()
@@ -151,7 +150,7 @@ class AndroidXPlugin : Plugin<Project> {
                         configureAndroidLibraryOptions(project, androidXExtension)
                     }
                     project.configureSourceJarForAndroid(extension)
-                    project.configureVersionFileWriter(extension)
+                    project.configureVersionFileWriter(extension, androidXExtension)
                     project.configureResourceApiChecks(extension)
                     project.addCreateLibraryBuildInfoFileTask(androidXExtension)
                     val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
@@ -488,9 +487,9 @@ class AndroidXPlugin : Plugin<Project> {
         }
     }
 
-    private fun verifyJava7Targeting(libraryVersion: String, javaVersion: JavaVersion) {
+    private fun verifyJava7Targeting(libraryVersion: Version, javaVersion: JavaVersion) {
         if (javaVersion == VERSION_1_7) {
-            if (libraryVersion.contains("alpha")) {
+            if (libraryVersion.isAlpha()) {
                 throw IllegalStateException("You moved a library that was targeting " +
                         "Java 7 to alpha version. Please remove " +
                         "`sourceCompatibility = VERSION_1_7` from build.gradle")
@@ -522,7 +521,9 @@ class AndroidXPlugin : Plugin<Project> {
         }
 
         project.afterEvaluate {
-            verifyJava7Targeting(project.version as String, compileOptions.sourceCompatibility)
+            if (androidXExtension.publish.shouldPublish()) {
+                verifyJava7Targeting(project.version(), compileOptions.sourceCompatibility)
+            }
 
             libraryVariants.all { libraryVariant ->
                 if (libraryVariant.buildType.name == "debug") {
