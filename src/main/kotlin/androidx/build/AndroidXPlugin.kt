@@ -119,11 +119,6 @@ class AndroidXPlugin : Plugin<Project> {
                         sourceCompatibility = VERSION_1_8
                         targetCompatibility = VERSION_1_8
                     }
-                    project.afterEvaluate {
-                        if (androidXExtension.publish.shouldPublish()) {
-                            verifyJava7Targeting(project.version(), convention.sourceCompatibility)
-                        }
-                    }
 
                     project.hideJavadocTask()
                     val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
@@ -487,16 +482,6 @@ class AndroidXPlugin : Plugin<Project> {
         }
     }
 
-    private fun verifyJava7Targeting(libraryVersion: Version, javaVersion: JavaVersion) {
-        if (javaVersion == VERSION_1_7) {
-            if (libraryVersion.isAlpha()) {
-                throw IllegalStateException("You moved a library that was targeting " +
-                        "Java 7 to alpha version. Please remove " +
-                        "`sourceCompatibility = VERSION_1_7` from build.gradle")
-            }
-        }
-    }
-
     private fun LibraryExtension.configureAndroidLibraryOptions(
         project: Project,
         androidXExtension: AndroidXExtension
@@ -521,10 +506,6 @@ class AndroidXPlugin : Plugin<Project> {
         }
 
         project.afterEvaluate {
-            if (androidXExtension.publish.shouldPublish()) {
-                verifyJava7Targeting(project.version(), compileOptions.sourceCompatibility)
-            }
-
             libraryVariants.all { libraryVariant ->
                 if (libraryVariant.buildType.name == "debug") {
                     libraryVariant.javaCompileProvider.configure { javaCompile ->
