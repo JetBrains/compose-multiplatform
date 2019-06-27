@@ -31,7 +31,7 @@ class ComposableAnnotationChecker() : ComposableAnnotationChecker() {
             it.startsWith("plugin:androidx.compose.plugins.kotlin:syntax=")
         } ?: return DEFAULT_MODE
         return Mode.valueOf(
-                modeOption.substring(modeOption.indexOf("=")+1).toUpperCase()
+                modeOption.substring(modeOption.indexOf("=") + 1).toUpperCase()
         )
     }
 }

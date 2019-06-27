@@ -90,7 +90,9 @@ internal val ANDROID_CONVERSION = conversion {
                 success(
                     QualifiedExpression(
                         qualifier = LiteralExpression(matcher.group(1)),
-                        identifier = unit.asIdentifier(ComposeUtils.composeFqName("adapters.$unit")),
+                        identifier = unit.asIdentifier(
+                            ComposeUtils.composeFqName("adapters.$unit")
+                        ),
                         dotPrototype = null
                     ), ComposeUtils.composeFqName("adapters.Dimension")
                 )

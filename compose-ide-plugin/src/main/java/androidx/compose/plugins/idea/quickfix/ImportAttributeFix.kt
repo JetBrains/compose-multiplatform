@@ -44,7 +44,8 @@ class ImportAttributeFix(expression: KtSimpleNameExpression) : ComposeImportFix(
         bindingContext: BindingContext,
         element: KtxElement
     ): List<KotlinType>? {
-        val ktxCall = bindingContext[ComposeWritableSlices.RESOLVED_KTX_CALL, element] ?: return null
+        val ktxCall = bindingContext[ComposeWritableSlices.RESOLVED_KTX_CALL, element]
+            ?: return null
         return ktxCall.emitOrCall.resolvedCalls().mapNotNull { it.resultingDescriptor.returnType }
     }
 

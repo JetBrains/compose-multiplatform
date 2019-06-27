@@ -68,7 +68,7 @@ fun Recompose(@Children body: @Composable() (recompose: () -> Unit) -> Unit) {
         body(recomposer)
         recomposer.isComposing = false
     }
-    recomposer.recompose = { if(!recomposer.isComposing) callback(false) }
+    recomposer.recompose = { if (!recomposer.isComposing) callback(false) }
     recomposer.isComposing = true
     @Suppress("PLUGIN_ERROR")
     body(recomposer)

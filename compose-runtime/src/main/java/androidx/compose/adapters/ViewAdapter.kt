@@ -19,7 +19,6 @@ package androidx.compose.adapters
 import android.view.View
 import android.view.ViewGroup
 
-
 interface ViewAdapter {
     val id: Int
     fun willInsert(view: View, parent: ViewGroup)

@@ -252,7 +252,7 @@ class SlotTableTests : TestCase() {
         val anchors = slots.write { writer -> expectedLocations.map { writer.anchor(it) } }
         slots.write { writer ->
             for (index in listOf(4, 5, 3, 6, 2, 7, 1)) {
-                val location = expectedLocations[index-1]
+                val location = expectedLocations[index - 1]
                 writer.remove(location, 1)
                 assertEquals(-1, anchors[index - 1].location(slots))
                 for (i in expectedLocations.indices) {
@@ -268,7 +268,7 @@ class SlotTableTests : TestCase() {
         val anchors = slots.write { writer -> expectedLocations.map { writer.anchor(it) } }
         slots.write { writer ->
             for (index in listOf(1, 7, 2, 6, 3, 5, 4)) {
-                val location = expectedLocations[index-1]
+                val location = expectedLocations[index - 1]
                 writer.remove(location, 1)
                 assertEquals(-1, anchors[index - 1].location(slots))
                 for (i in expectedLocations.indices) {
@@ -1025,7 +1025,7 @@ fun testSlotsNumbered(): SlotTable {
     return SlotTable(items)
 }
 
-private val elementKey = object{}
+private val elementKey = object {}
 // Creates 0 until 10 items each with 10 elements numbered 0...n with 0..n slots
 fun testItems(): SlotTable {
     val slots = SlotTable()

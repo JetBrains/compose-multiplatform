@@ -112,8 +112,9 @@ internal constructor(private val key: String, private val defaultFactory: (() ->
      */
     @Composable
     fun Provider(
-        value: T, @Children
-        children: @Composable() () -> Unit
+        value: T,
+        @Children
+                children: @Composable() () -> Unit
     ) {
         with(currentComposerNonNull) {
             val holder = +memo {

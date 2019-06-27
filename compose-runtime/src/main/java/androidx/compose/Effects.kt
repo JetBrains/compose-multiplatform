@@ -452,7 +452,6 @@ fun onCommit(vararg inputs: Any?, callback: CommitScope.() -> Unit) =
         context.remember(*inputs) { PostCommitScopeImpl(callback) }
     }
 
-
 /**
  * The onPreCommit effect is a lifecycle effect that will execute [callback] every time the composition commits,
  * but before those changes have been reflected on the screen. It is useful for executing code that needs to

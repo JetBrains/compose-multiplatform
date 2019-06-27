@@ -222,7 +222,8 @@ class XmlToKtxConverter(private val targetFile: KtFile) {
 
     private fun getTagSimpleAndQualifiedName(tag: XmlTag): Pair<String, String> {
         val fullName = when (tag.name) {
-            Companion.SpecialTags.VIEW.tagName -> tag.getAttributeValue("class") ?: "android.view.View"
+            Companion.SpecialTags.VIEW.tagName -> tag.getAttributeValue("class")
+                ?: "android.view.View"
             // The <blink></blink> tag will be inflated as a android.view.LayoutInflater.BlinkLayout, which is a private class that extends
             // FrameLayout. User will lose the blinking but this is the closest we can get.
             Companion.SpecialTags.BLINK.tagName -> "android.widget.FrameLayout"
@@ -255,7 +256,8 @@ class XmlToKtxConverter(private val targetFile: KtFile) {
         return attribute.namespacePrefix != NAMESPACE_PREFIX &&
                 !attribute.isInNamespace(Companion.XmlNamespace.ANDROID_TOOLS) &&
                 !(attribute.value ?: "").startsWith("@+id/") &&
-                (attribute.parent.name != Companion.SpecialTags.VIEW.tagName || attribute.name != "class")
+                (attribute.parent.name != Companion.SpecialTags.VIEW.tagName ||
+                        attribute.name != "class")
     }
 
     private fun maybeConvertAttribute(attribute: XmlAttribute): KtxAttribute? {

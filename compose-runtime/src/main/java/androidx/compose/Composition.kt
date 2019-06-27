@@ -28,7 +28,8 @@ abstract class Composition<N> {
     // NOTE(lmr): When we move to a model where composition defers creations/mutations to nodes
     // to the applyChanges phase, we will want to move all usages of emitNode(N) to createNode(() -> T)
     abstract fun <T : N> emitNode(factory: () -> T) // Deprecated // TODO(lmr): only used in mock
-    abstract fun <T : N> createNode(factory: () -> T) // TODO(lmr): never used. replace usages of emitNode?
+    // TODO(lmr): never used. replace usages of emitNode?
+    abstract fun <T : N> createNode(factory: () -> T)
     abstract fun emitNode(node: N) // Deprecated - single threaded
     abstract fun useNode(): N
     abstract fun endNode()

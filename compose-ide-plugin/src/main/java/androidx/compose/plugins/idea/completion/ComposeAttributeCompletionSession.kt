@@ -58,8 +58,10 @@ class ComposeAttributeCompletionSession(
         ?: error("no tag info found on element. Call isValid() before using this class")
 
     private val ktxCallResolvedCalls by lazy {
-        val failedCandidates = bindingContext.get(ComposeWritableSlices.FAILED_CANDIDATES, elementExpr)
-            ?: emptyList()
+        val failedCandidates = bindingContext.get(
+            ComposeWritableSlices.FAILED_CANDIDATES,
+            elementExpr
+        ) ?: emptyList()
         val resolvedCalls = ktxCall.emitOrCall.resolvedCalls()
         resolvedCalls + failedCandidates
     }

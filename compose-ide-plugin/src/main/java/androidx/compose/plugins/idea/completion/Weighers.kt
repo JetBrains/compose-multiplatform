@@ -21,12 +21,14 @@ object Weighers {
         abstract fun weigh(info: AttributeInfo): Int
     }
 
-    val IsImmediateAttribute = object : AttributeInfoWeigher("compose.isImmediateAttributeWeigher") {
-        override fun weigh(info: AttributeInfo): Int = if (info.isImmediate) -1 else 0
-    }
-    val IsRequiredAttribute = object : AttributeInfoWeigher("compose.isRequiredAttributeWeigher") {
-        override fun weigh(info: AttributeInfo): Int = if (info.isRequired) -1 else 0
-    }
+    val IsImmediateAttribute =
+        object : AttributeInfoWeigher("compose.isImmediateAttributeWeigher") {
+            override fun weigh(info: AttributeInfo): Int = if (info.isImmediate) -1 else 0
+        }
+    val IsRequiredAttribute =
+        object : AttributeInfoWeigher("compose.isRequiredAttributeWeigher") {
+            override fun weigh(info: AttributeInfo): Int = if (info.isRequired) -1 else 0
+        }
 
     val IsChildAttribute = object : AttributeInfoWeigher("compose.isChildAttributeWeigher") {
         override fun weigh(info: AttributeInfo): Int = if (info.isChildren) 1 else 0

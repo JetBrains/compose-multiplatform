@@ -1035,7 +1035,7 @@ fun expectError(block: () -> Unit) {
 
 // Helpers for the above tests
 
-inline fun <T> frame(crossinline block: ()->T): T {
+inline fun <T> frame(crossinline block: () -> T): T {
     open(false)
     try {
         return block()
@@ -1071,7 +1071,7 @@ inline fun <T> observeCommit(
     }
 }
 
-inline fun suspended(crossinline block: ()->Unit): Frame {
+inline fun suspended(crossinline block: () -> Unit): Frame {
     open(false)
     try {
         block()
@@ -1082,7 +1082,7 @@ inline fun suspended(crossinline block: ()->Unit): Frame {
     }
 }
 
-inline fun <T> restored(frame: Frame, crossinline block: ()->T): T {
+inline fun <T> restored(frame: Frame, crossinline block: () -> T): T {
     restore(frame)
     try {
         return block()
@@ -1094,7 +1094,7 @@ inline fun <T> restored(frame: Frame, crossinline block: ()->T): T {
     }
 }
 
-inline fun aborted(crossinline block: ()->Unit) {
+inline fun aborted(crossinline block: () -> Unit) {
     open(false)
     try {
         block()
@@ -1103,7 +1103,7 @@ inline fun aborted(crossinline block: ()->Unit) {
     }
 }
 
-inline fun speculation(crossinline block: ()->Unit) {
+inline fun speculation(crossinline block: () -> Unit) {
     speculate()
     try {
         block()
@@ -1144,5 +1144,5 @@ class AddressProp(streetValue: String) {
 
     var street: String
         get() = _street
-        set(value) {_street = value }
+        set(value) { _street = value }
 }

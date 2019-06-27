@@ -16,7 +16,6 @@
 
 package androidx.compose
 
-
 /**
  * Just a dummy implementation to prove the behavior for a couple simple cases.
  * TODO: Should return true for deeply immutable objects, frozen objects, primitives, value types, inline classes of immutables, @Model
