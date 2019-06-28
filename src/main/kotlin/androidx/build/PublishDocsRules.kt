@@ -28,7 +28,7 @@ import androidx.build.Strategy.TipOfTree
  * Rule set used to generate public documentation.
  */
 val RELEASE_RULE = docsRules("public", false) {
-    prebuilts(LibraryGroups.ACTIVITY, "1.0.0-beta01")
+    prebuilts(LibraryGroups.ACTIVITY, "1.1.0-alpha01")
     prebuilts(LibraryGroups.ANNOTATION, "annotation", "1.1.0")
     prebuilts(LibraryGroups.APPCOMPAT, "1.1.0-rc01")
     prebuilts(LibraryGroups.ARCH_CORE, "2.1.0-rc01")
@@ -63,7 +63,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.EMOJI, "1.0.0")
     prebuilts(LibraryGroups.ENTERPRISE, "1.0.0-alpha02")
     prebuilts(LibraryGroups.EXIFINTERFACE, "1.1.0-alpha01")
-    prebuilts(LibraryGroups.FRAGMENT, "1.1.0-beta01")
+    prebuilts(LibraryGroups.FRAGMENT, "1.2.0-alpha01")
     prebuilts(LibraryGroups.GRIDLAYOUT, "1.0.0")
     prebuilts(LibraryGroups.HEIFWRITER, "1.0.0")
     prebuilts(LibraryGroups.INTERPOLATOR, "1.0.0")
@@ -71,8 +71,8 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.LEGACY, "1.0.0")
     ignore(LibraryGroups.LIFECYCLE.group, "lifecycle-compiler")
     ignore(LibraryGroups.LIFECYCLE.group, "lifecycle-runtime-ktx-lint")
-    prebuilts(LibraryGroups.LIFECYCLE, "lifecycle-viewmodel-savedstate", "1.0.0-alpha01")
-    prebuilts(LibraryGroups.LIFECYCLE, "2.2.0-alpha01")
+    prebuilts(LibraryGroups.LIFECYCLE, "lifecycle-viewmodel-savedstate", "1.0.0-alpha02")
+    prebuilts(LibraryGroups.LIFECYCLE, "2.2.0-alpha02")
     ignore(LibraryGroups.LOADER.group, "loader-ktx")
     prebuilts(LibraryGroups.LOADER, "1.1.0-rc01")
     prebuilts(LibraryGroups.LOCALBROADCASTMANAGER, "1.1.0-alpha01")
