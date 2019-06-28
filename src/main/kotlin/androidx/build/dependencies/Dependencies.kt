@@ -110,7 +110,6 @@ const val ARCH_LIFECYCLE_LIVEDATA = "androidx.lifecycle:lifecycle-livedata:2.0.0
 const val ARCH_LIFECYCLE_SERVICE = "androidx.lifecycle:lifecycle-service:2.0.0"
 const val ARCH_LIFECYCLE_VIEWMODEL = "androidx.lifecycle:lifecycle-viewmodel:2.0.0"
 const val ARCH_LIFECYCLE_VIEWMODEL_KTX = "androidx.lifecycle:lifecycle-viewmodel-ktx:2.0.0"
-const val ARCH_LIFECYCLE_EXTENSIONS = "androidx.lifecycle:lifecycle-extensions:2.0.0"
 const val ARCH_CORE_COMMON = "androidx.arch.core:core-common:2.0.1@jar"
 const val ARCH_CORE_RUNTIME = "androidx.arch.core:core-runtime:2.0.1"
 const val ARCH_CORE_TESTING = "androidx.arch.core:core-testing:2.0.1"
