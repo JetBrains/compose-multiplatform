@@ -53,8 +53,10 @@ class CompositionContext private constructor(val component: Component, val compo
     /**
      * Recomposes any changes without forcing the [component] to compose and blocks until
      * composition completes.
+     *
+     * @return true if there were pending changes, false otherwise.
      */
-    fun recomposeSync() {
-        Recomposer.current().recomposeSync(composer)
+    fun recomposeSync(): Boolean {
+        return Recomposer.current().recomposeSync(composer)
     }
 }

@@ -1018,7 +1018,7 @@ open class Composer<N>(
         }
     }
 
-    fun recompose() {
+    fun recompose(): Boolean {
         if (invalidations.isNotEmpty()) {
             trace("Compose:recompose") {
                 slotTable.read {
@@ -1030,7 +1030,9 @@ open class Composer<N>(
                     finalizeCompose()
                 }
             }
+            return true
         }
+        return false
     }
 
     private fun record(change: Change<N>) {

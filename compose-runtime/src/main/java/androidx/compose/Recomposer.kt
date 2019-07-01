@@ -68,16 +68,18 @@ abstract class Recomposer {
         }
     }
 
-    private fun performRecompose(composer: Composer<*>) {
-        if (composer.isComposing) return
-        composer.runWithCurrent {
+    private fun performRecompose(composer: Composer<*>): Boolean {
+        if (composer.isComposing) return false
+        return composer.runWithCurrent {
+            var hadChanges: Boolean
             try {
                 composer.isComposing = true
-                composer.recompose()
+                hadChanges = composer.recompose()
                 composer.applyChanges()
             } finally {
                 composer.isComposing = false
             }
+            hadChanges
         }
     }
 
@@ -88,8 +90,8 @@ abstract class Recomposer {
         scheduleChangesDispatch()
     }
 
-    internal fun recomposeSync(composer: Composer<*>) {
-        performRecompose(composer)
+    internal fun recomposeSync(composer: Composer<*>): Boolean {
+        return performRecompose(composer)
     }
 
     protected abstract fun scheduleChangesDispatch()
