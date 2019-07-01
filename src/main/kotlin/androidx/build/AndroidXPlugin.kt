@@ -187,6 +187,7 @@ class AndroidXPlugin : Plugin<Project> {
                 is KotlinBasePluginWrapper -> {
                     project.tasks.withType(KotlinCompile::class.java).configureEach { compile ->
                         compile.kotlinOptions.allWarningsAsErrors = true
+                        compile.kotlinOptions.jvmTarget = "1.8"
                     }
                 }
             }
