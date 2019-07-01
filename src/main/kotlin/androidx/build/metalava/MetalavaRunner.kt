@@ -150,7 +150,11 @@ fun Project.generateApi(
         is GenerateApiMode.PublicApi -> {
         }
         is GenerateApiMode.RestrictedApi -> {
-            args += listOf("--show-annotation", "androidx.annotation.RestrictTo")
+            args += listOf(
+                "--show-annotation",
+                "androidx.annotation.RestrictTo",
+                "--show-unannotated"
+            )
         }
     }
 

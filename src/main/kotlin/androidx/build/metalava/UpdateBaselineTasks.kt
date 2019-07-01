@@ -125,6 +125,7 @@ abstract class IgnoreApiChangesTask : MetalavaTask() {
         )
         if (processRestrictedApis) {
             args += listOf(
+                "--show-unannotated",
                 "--show-annotation",
                 "androidx.annotation.RestrictTo"
             )
