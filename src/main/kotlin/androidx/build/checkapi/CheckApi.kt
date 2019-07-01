@@ -65,9 +65,11 @@ fun hasApiTasks(project: Project, extension: AndroidXExtension): Boolean {
 fun Project.getCurrentApiFile() = getApiFile(project.projectDir, project.version())
 
 /**
- * Same as getCurrentApiFile but also contains a restricted API file too
+ * Returns an ApiLocation with the given version
  */
-fun Project.getCurrentApiLocation() = ApiLocation.fromPublicApiFile(project.getCurrentApiFile())
+fun Project.getApiLocation(version: Version = project.version()): ApiLocation {
+    return ApiLocation.fromPublicApiFile(getApiFile(project.projectDir, version))
+}
 
 /**
  * Returns the API file containing the public API that this library promises to support
@@ -95,8 +97,8 @@ fun Project.getRequiredCompatibilityApiLocation(): ApiLocation? {
  * @param version the API version, ex. 25.0.0-SNAPSHOT
  * @return the API file of this version
  */
-private fun getApiFile(rootDir: File, version: Version): File {
-    if (version.patch != 0 && (version.isAlpha() || version.isBeta())) {
+fun getApiFile(rootDir: File, version: Version): File {
+    if (!isValidApiVersion(version)) {
         val suggestedVersion = Version("${version.major}.${version.minor}.${version.patch}-rc01")
         throw GradleException("Illegal version $version . It is not allowed to have a nonzero " +
                 "patch number and be alpha or beta at the same time.\n" +
@@ -109,6 +111,16 @@ private fun getApiFile(rootDir: File, version: Version): File {
     }
     val apiDir = File(rootDir, "api")
     return File(apiDir, "${version.major}.${version.minor}.0$extra.txt")
+}
+
+/**
+ * Whether it is allowed to generate an API of the given version
+ */
+fun isValidApiVersion(version: Version): Boolean {
+    if (version.patch != 0 && (version.isAlpha() || version.isBeta())) {
+        return false
+    }
+    return true
 }
 
 /**

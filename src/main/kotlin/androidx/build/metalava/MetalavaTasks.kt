@@ -20,7 +20,7 @@ import androidx.build.AndroidXPlugin.Companion.BUILD_ON_SERVER_TASK
 import androidx.build.AndroidXExtension
 import androidx.build.checkapi.ApiLocation
 import androidx.build.checkapi.ApiViolationBaselines
-import androidx.build.checkapi.getCurrentApiLocation
+import androidx.build.checkapi.getApiLocation
 import androidx.build.checkapi.getRequiredCompatibilityApiLocation
 import androidx.build.checkapi.hasApiFolder
 import androidx.build.checkapi.hasApiTasks
@@ -96,7 +96,7 @@ object MetalavaTasks {
         val metalavaConfiguration = project.getMetalavaConfiguration()
 
         // the api files whose file names contain the version of the library
-        val libraryVersionApi = project.getCurrentApiLocation()
+        val libraryVersionApi = project.getApiLocation()
         // the api files whose file names contain "current.txt"
         val currentTxtApi = ApiLocation.fromPublicApiFile(File(
             libraryVersionApi.publicApiFile.parentFile, "current.txt"))
@@ -173,13 +173,23 @@ object MetalavaTasks {
                 }
             }
 
-        project.tasks.register("updateApi", UpdateApiTask::class.java) { task ->
+        val updateApi = project.tasks.register("updateApi", UpdateApiTask::class.java) { task ->
             task.group = "API"
             task.description = "Updates the checked in API files to match source code API"
             task.inputApiLocation.set(generateApi.flatMap { it.apiLocation })
             task.outputApiLocations.set(checkApi.flatMap { it.checkedInApis })
             task.updateRestrictedAPIs = extension.trackRestrictedAPIs
             task.dependsOn(generateApi)
+        }
+
+        project.tasks.register("regenerateOldApis", RegenerateOldApisTask::class.java) { task ->
+            task.group = "API"
+            task.description = "Regenerates current and historic API .txt files using the " +
+                "corresponding prebuilt and the latest Metalava"
+            // Technically this doesn't need updateApi to happen first, but adding this dependency
+            // is a convenient way to make updateApi also happen when the user runs
+            // `./gradlew regenerateOldApis`
+            task.dependsOn(updateApi)
         }
 
         project.tasks.named("check").configure {

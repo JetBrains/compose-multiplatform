@@ -57,6 +57,14 @@ data class JavaCompileInputs(
         fun fromSourceSet(sourceSet: SourceSet, project: Project): JavaCompileInputs {
             val sourcePaths: Collection<File> = sourceSet.allSource.srcDirs
             val dependencyClasspath = sourceSet.compileClasspath
+            return fromSourcesAndDeps(sourcePaths, dependencyClasspath, project)
+        }
+
+        fun fromSourcesAndDeps(
+            sourcePaths: Collection<File>,
+            dependencyClasspath: FileCollection,
+            project: Project
+        ): JavaCompileInputs {
             val bootClasspath: Collection<File> = androidJarFile(project).files
             return JavaCompileInputs(sourcePaths, dependencyClasspath, bootClasspath)
         }
