@@ -98,8 +98,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.RECYCLERVIEW, "recyclerview", "1.1.0-beta01")
     prebuilts(LibraryGroups.RECYCLERVIEW, "recyclerview-selection", "1.1.0-alpha06")
     prebuilts(LibraryGroups.REMOTECALLBACK, "1.0.0-alpha02")
-    ignore(LibraryGroups.ROOM.group, "room-common-java8")
-    prebuilts(LibraryGroups.ROOM, "2.1.0")
+    prebuilts(LibraryGroups.ROOM, "2.2.0-alpha01")
     prebuilts(LibraryGroups.SAVEDSTATE, "1.0.0-beta01")
     // TODO: Remove this ignore once androidx.security:security-identity-credential:1.0.0-alpha01 is released
     ignore(LibraryGroups.SECURITY.group, "security-identity-credential")
