@@ -862,32 +862,34 @@ open class Composer<N>(
      * generated with no changes.
      */
     private fun recordEnters(location: Int) {
-        while (true) {
-            skipToGroupContaining(location)
-            assert(
-                slots.isGroup && location >= slots.current &&
-                        location < slots.current + slots.groupSize
-            ) {
-                "Could not find group at $location"
-            }
-            if (slots.current == location) {
-                return
-            } else {
-                enterGroup(
-                    if (slots.isNode) START_NODE
-                    else START_GROUP, null, null
-                )
-                if (slots.isNode) {
-                    recordStart(START_NODE)
-                    recordDown()
-                    entersStack.push(END_NODE)
-                    slots.startNode()
-                    slots.next() // skip navigation slot
-                    nodeIndex = 0
+        trace("Compose:recordEnters") {
+            while (true) {
+                skipToGroupContaining(location)
+                assert(
+                    slots.isGroup && location >= slots.current &&
+                            location < slots.current + slots.groupSize
+                ) {
+                    "Could not find group at $location"
+                }
+                if (slots.current == location) {
+                    return
                 } else {
-                    recordStart(START_GROUP)
-                    entersStack.push(END_GROUP)
-                    slots.startGroup()
+                    enterGroup(
+                        if (slots.isNode) START_NODE
+                        else START_GROUP, null, null
+                    )
+                    if (slots.isNode) {
+                        recordStart(START_NODE)
+                        recordDown()
+                        entersStack.push(END_NODE)
+                        slots.startNode()
+                        slots.next() // skip navigation slot
+                        nodeIndex = 0
+                    } else {
+                        recordStart(START_GROUP)
+                        entersStack.push(END_GROUP)
+                        slots.startGroup()
+                    }
                 }
             }
         }
@@ -897,11 +899,13 @@ open class Composer<N>(
      * Exit any groups that were entered until a sibling of maxLocation is reached.
      */
     private fun recordExits(maxLocation: Int, minStack: Int) {
-        while (entersStack.size > minStack) {
-            skipToGroupContaining(maxLocation)
-            if (slots.isGroupEnd)
-                end(entersStack.pop())
-            else return
+        trace("Compose:recordExits") {
+            while (entersStack.size > minStack) {
+                skipToGroupContaining(maxLocation)
+                if (slots.isGroupEnd)
+                    end(entersStack.pop())
+                else return
+            }
         }
     }
 
