@@ -46,7 +46,7 @@ abstract class RegenerateOldApisTask : DefaultTask() {
         val versions = listVersions(projectPrebuiltsDir)
 
         for (version in versions) {
-            if (version != project.version) {
+            if (version != project.version.toString()) {
                 regenerate(project.rootProject, groupId, artifactId, version)
             }
         }
