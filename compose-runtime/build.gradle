@@ -15,6 +15,7 @@
  */
 
 
+import org.jetbrains.kotlin.codegen.ImplementationBodyCodegen
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 import static androidx.build.dependencies.DependenciesKt.*
@@ -25,15 +26,30 @@ import androidx.build.Publish
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
-    id("kotlin-android")
+    id("kotlin-multiplatform")
 }
 
-dependencies {
-    implementation "androidx.annotation:annotation:1.0.0"
-    implementation(KOTLIN_COMPOSE_STDLIB)
-    implementation(KOTLIN_COMPOSE_REFLECT)
-    testImplementation(JUNIT)
-    testImplementation(ROBOLECTRIC)
+kotlin {
+    android()
+
+    sourceSets {
+        commonMain.dependencies {
+            implementation "org.jetbrains.kotlin:kotlin-stdlib-common:$KOTLIN_VERSION"
+        }
+        commonTest.dependencies {
+            // TODO https://youtrack.jetbrains.com/issue/KT-29343
+            implementation "org.jetbrains.kotlin:kotlin-stdlib-common:$KOTLIN_VERSION"
+            implementation(kotlin("test-annotations-common"))
+        }
+        androidMain.dependencies {
+            implementation "androidx.annotation:annotation:1.0.0"
+            implementation(KOTLIN_COMPOSE_STDLIB)
+            implementation(KOTLIN_COMPOSE_REFLECT)
+        }
+        androidTest.dependencies {
+        }
+
+    }
 }
 
 android {
@@ -49,6 +65,11 @@ android {
         }
         release {
             testCoverageEnabled = false
+        }
+    }
+    sourceSets {
+        main {
+            manifest.srcFile 'src/androidMain/AndroidManifest.xml'
         }
     }
 }
