@@ -134,3 +134,6 @@ const val WORK_ARCH_ROOM_TESTING = "androidx.room:room-testing:2.1.0"
 const val ROBOLECTRIC = "org.robolectric:robolectric:4.1"
 
 const val PROTOBUF = "com.google.protobuf:protobuf-java:3.4.0"
+
+const val FLOGGER = "com.google.flogger:flogger:0.4"
+const val FLOGGER_SYSTEM_BACKEND = "com.google.flogger:flogger-system-backend:0.4"
