@@ -30,6 +30,10 @@ import org.jetbrains.uast.UElement
 import java.util.Collections
 import java.util.EnumSet
 
+/**
+ * Lint check to enforce that every device side test (tests in the androidTest dir) has correct
+ * size annotations, so that we can correctly split up test runs and enforce timeouts.
+ */
 class MissingTestSizeAnnotation : Detector(), SourceCodeScanner {
 
     override fun getApplicableUastTypes(): List<Class<out UElement>>? =
@@ -42,11 +46,12 @@ class MissingTestSizeAnnotation : Detector(), SourceCodeScanner {
     class TestSizeAnnotationHandler(private val context: JavaContext) : UElementHandler() {
         override fun visitClass(node: UClass) {
             // Ignore any non-test class (missing a @RunWith() annotation)
-            val runWith = node.findAnnotation(RUN_WITH) ?: return
+            if (!node.hasAnnotation(RUN_WITH)) {
+                return
+            }
 
-            // Ignore host side tests as test size is ignored in this case
-            val runner = runWith.attributeValues[0].expression.asRenderString()
-            if (HOST_SIDE_TEST_RUNNERS.any { runner == it }) {
+            // Ignore host side tests as we only enforce timeouts on device tests
+            if (!context.file.absolutePath.contains(ANDROID_TEST_DIR)) {
                 return
             }
 
@@ -70,12 +75,7 @@ class MissingTestSizeAnnotation : Detector(), SourceCodeScanner {
 
     companion object {
         const val RUN_WITH = "org.junit.runner.RunWith"
-        val HOST_SIDE_TEST_RUNNERS = listOf(
-            "org.junit.runners.JUnit4",
-            "org.robolectric.RobolectricTestRunner",
-            "JUnit4",
-            "RobolectricTestRunner"
-        )
+        const val ANDROID_TEST_DIR = "androidTest"
         const val TEST_ANNOTATION = "org.junit.Test"
         val TEST_SIZE_ANNOTATIONS = listOf(
             "androidx.test.filters.SmallTest",
