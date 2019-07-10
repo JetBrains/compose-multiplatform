@@ -83,7 +83,10 @@ abstract class CheckApiCompatibilityTask : MetalavaTask() {
             args = args + listOf("--baseline", baselineFile.toString())
         }
         if (checkRestrictedAPIs) {
-            args = args + listOf("--show-annotation", "androidx.annotation.RestrictTo")
+            args = args + listOf("--show-annotation",
+                "androidx.annotation.RestrictTo",
+                "--show-unannotated"
+            )
         }
         runWithArgs(args)
     }
