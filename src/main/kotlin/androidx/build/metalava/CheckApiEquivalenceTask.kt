@@ -63,8 +63,8 @@ abstract class CheckApiEquivalenceTask : DefaultTask() {
                     builtApi.get().publicApiFile
                 )) {
                 val message = "Public API definition has changed.\n\n" +
-                        "Declared definition is $checkedInApi.publicApiFile\n" +
-                        "True     definition is $builtApi.get().publicApiFile\n\n" +
+                        "Declared definition is ${checkedInApi.publicApiFile}\n" +
+                        "True     definition is ${builtApi.get().publicApiFile}\n\n" +
                         "Please run `./gradlew updateApi` to confirm these changes are " +
                         "intentional by updating the public API definition"
                 throw GradleException(message)
@@ -76,8 +76,8 @@ abstract class CheckApiEquivalenceTask : DefaultTask() {
                     )) {
                     val message = "Restricted API definition (marked by the RestrictedTo " +
                             "annotation) has changed.\n\n" +
-                            "Declared definition is $checkedInApi.restrictedApiFile\n" +
-                            "True     definition is $builtApi.get().restrictedApiFile\n" +
+                            "Declared definition is ${checkedInApi.restrictedApiFile}\n" +
+                            "True     definition is ${builtApi.get().restrictedApiFile}\n" +
                             "Please run `./gradlew updateApi` to confirm these changes are " +
                             "intentional by updating the restricted API definition"
                     throw GradleException(message)
