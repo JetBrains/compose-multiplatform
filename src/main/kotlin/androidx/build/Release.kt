@@ -175,7 +175,7 @@ object Release {
     @Suppress("MemberVisibilityCanBePrivate")
     const val DIFF_TASK_PREFIX = "createDiffArchive"
     const val FULL_ARCHIVE_TASK_NAME = "createArchive"
-    const val DEFAULT_PUBLISH_CONFIG = "release"
+    const val DEFAULT_PUBLISH_CONFIG = "debug"
     // lazily created config action params so that we don't keep re-creating them
     private var configActionParams: GMavenZipTask.ConfigAction.Params? = null
 
