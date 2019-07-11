@@ -20,6 +20,8 @@ import androidx.build.dependencyTracker.AffectedModuleDetector.Companion.CHANGED
 import androidx.build.dependencyTracker.AffectedModuleDetector.Companion.DEPENDENT_PROJECTS_ARG
 import androidx.build.dependencyTracker.AffectedModuleDetector.Companion.ENABLE_ARG
 import androidx.build.getDistributionDirectory
+import androidx.build.gitclient.GitClient
+import androidx.build.gitclient.GitClientImpl
 import androidx.build.gradle.isRoot
 import androidx.build.isRunningOnBuildServer
 import java.io.File
