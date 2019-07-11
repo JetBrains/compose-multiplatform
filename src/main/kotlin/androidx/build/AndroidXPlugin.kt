@@ -39,6 +39,7 @@ import androidx.build.gradle.isRoot
 import androidx.build.jacoco.Jacoco
 import androidx.build.license.CheckExternalDependencyLicensesTask
 import androidx.build.license.configureExternalDependencyLicenseCheck
+import androidx.build.metalava.CREATE_STUB_API_JAR_TASK
 import androidx.build.metalava.MetalavaTasks.configureAndroidProjectForMetalava
 import androidx.build.metalava.MetalavaTasks.configureJavaProjectForMetalava
 import androidx.build.metalava.UpdateApiTask
@@ -275,6 +276,7 @@ class AndroidXPlugin : Plugin<Project> {
                         "jar" == task.name ||
                         "verifyDependencyVersions" == task.name ||
                         "reportLibraryMetrics" == task.name ||
+                        CREATE_STUB_API_JAR_TASK == task.name ||
                         ("lintDebug" == task.name &&
                         !project.rootProject.hasProperty(USE_MAX_DEP_VERSIONS))) {
                     buildOnServerTask.dependsOn(task)
