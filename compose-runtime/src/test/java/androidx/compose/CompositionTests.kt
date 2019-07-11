@@ -706,6 +706,94 @@ class CompositionTests : TestCase() {
         }
     }
 
+    fun testInvalidationAfterRemoval() {
+        val slReportReports = object {}
+        var recomposeLois: (() -> Unit)? = null
+        val key = 0
+
+        class Reporter : ViewComponent() {
+            var report: Report? = null
+
+            override fun compose() {
+                val r = report
+                if (r != null) {
+                    if (r.from == "Lois" || r.to == "Lois") recomposeLois = { recompose() }
+                    cc.startGroup(key)
+                    text(r.from)
+                    text("reports to")
+                    text(r.to)
+                    cc.endGroup()
+                } else {
+                    text("no report to report")
+                }
+            }
+        }
+
+        fun MockViewComposition.reportsReport(
+            reports: Iterable<Report>,
+            include: (report: Report) -> Boolean
+        ) {
+            linear {
+                repeat(of = reports) { report ->
+                    if (include(report)) {
+                        call(
+                            slReportReports,
+                            { Reporter() },
+                            { set(report) { this.report = it } },
+                            { it() }
+                        )
+                    }
+                }
+            }
+        }
+
+        val r = Report("Lois", "Perry")
+        val reports = listOf(
+            jim_reports_to_sally,
+            rob_reports_to_alice,
+            clark_reports_to_lois,
+            r
+        )
+        val all: (report: Report) -> Boolean = { true }
+        val notLois: (report: Report) -> Boolean = { it.from != "Lois" && it.to != "Lois" }
+        val composer = compose {
+            reportsReport(reports, all)
+        }.apply { applyChanges() }
+
+        validate(composer.root) {
+            linear {
+                reportsTo(jim_reports_to_sally)
+                reportsTo(rob_reports_to_alice)
+                reportsTo(clark_reports_to_lois)
+                reportsTo(r)
+            }
+        }
+
+        compose(composer, expectChanges = true) {
+            reportsReport(reports, notLois)
+        }
+
+        validate(composer.root) {
+            linear {
+                reportsTo(jim_reports_to_sally)
+                reportsTo(rob_reports_to_alice)
+            }
+        }
+
+        // Invalidate Lois which is now removed.
+        recomposeLois?.let { it() }
+
+        composer.recompose()
+        composer.applyChanges()
+
+        validate(composer.root) {
+            linear {
+                reportsTo(jim_reports_to_sally)
+                reportsTo(rob_reports_to_alice)
+            }
+        }
+    }
+
     // remember()
 
     fun testSimpleRemember() {
