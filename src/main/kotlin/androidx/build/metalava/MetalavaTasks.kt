@@ -26,7 +26,7 @@ import androidx.build.checkapi.hasApiFolder
 import androidx.build.checkapi.hasApiTasks
 import androidx.build.docsDir
 import androidx.build.java.JavaCompileInputs
-import androidx.build.Release
+import androidx.build.defaultPublishVariant
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginConvention
@@ -45,18 +45,16 @@ object MetalavaTasks {
                 return@afterEvaluate
             }
 
-            library.libraryVariants.all { variant ->
-                if (variant.name == Release.DEFAULT_PUBLISH_CONFIG) {
-                    if (!hasApiFolder()) {
-                        logger.info(
-                            "Project $name doesn't have an api folder, ignoring API tasks."
-                        )
-                        return@all
-                    }
-
-                    val javaInputs = JavaCompileInputs.fromLibraryVariant(library, variant)
-                    setupProject(this, javaInputs, extension)
+            library.defaultPublishVariant { variant ->
+                if (!hasApiFolder()) {
+                    logger.info(
+                        "Project $name doesn't have an api folder, ignoring API tasks."
+                    )
+                    return@defaultPublishVariant
                 }
+
+                val javaInputs = JavaCompileInputs.fromLibraryVariant(library, variant)
+                setupProject(this, javaInputs, extension)
             }
         }
     }

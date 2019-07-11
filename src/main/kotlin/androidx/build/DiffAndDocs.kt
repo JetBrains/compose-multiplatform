@@ -340,22 +340,19 @@ class DiffAndDocs private constructor(
         library: LibraryExtension,
         extension: AndroidXExtension
     ) {
-
         registerPrebuilts(extension)
-        library.libraryVariants.all { variant ->
-            if (variant.name == Release.DEFAULT_PUBLISH_CONFIG) {
-                // include R.file generated for prebuilts
-                rules.filter { it.resolve(extension)?.strategy is Prebuilts }.forEach { rule ->
-                    docsTasks[rule.name]?.configure {
-                        it.include { fileTreeElement ->
-                            fileTreeElement.path.endsWith(variant.rFile())
-                        }
+        library.defaultPublishVariant { variant ->
+            // include R.file generated for prebuilts
+            rules.filter { it.resolve(extension)?.strategy is Prebuilts }.forEach { rule ->
+                docsTasks[rule.name]?.configure {
+                    it.include { fileTreeElement ->
+                        fileTreeElement.path.endsWith(variant.rFile())
                     }
                 }
+            }
 
-                tipOfTreeTasks(extension) { task ->
-                    registerAndroidProjectForDocsTask(task, variant)
-                }
+            tipOfTreeTasks(extension) { task ->
+                registerAndroidProjectForDocsTask(task, variant)
             }
         }
     }
