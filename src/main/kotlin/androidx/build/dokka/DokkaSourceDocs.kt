@@ -20,7 +20,7 @@ package androidx.build.dokka
 
 import androidx.build.java.JavaCompileInputs
 import androidx.build.AndroidXExtension
-import androidx.build.Release
+import androidx.build.defaultPublishVariant
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginConvention
@@ -74,12 +74,10 @@ object DokkaSourceDocs {
             project.logger.info("Project ${project.name} is tooling project; ignoring API tasks.")
             return
         }
-        library.libraryVariants.all { variant ->
-            if (variant.name == Release.DEFAULT_PUBLISH_CONFIG) {
-                project.afterEvaluate({
-                    val inputs = JavaCompileInputs.fromLibraryVariant(library, variant)
-                    registerInputs(inputs, project)
-                })
+        library.defaultPublishVariant { variant ->
+            project.afterEvaluate {
+                val inputs = JavaCompileInputs.fromLibraryVariant(library, variant)
+                registerInputs(inputs, project)
             }
         }
     }

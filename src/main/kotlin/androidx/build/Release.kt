@@ -16,6 +16,8 @@
 package androidx.build
 
 import androidx.build.gmaven.GMavenVersionChecker
+import com.android.build.gradle.LibraryExtension
+import com.android.build.gradle.api.LibraryVariant
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
@@ -297,6 +299,17 @@ object Release {
             onRegister = {
             }
         )
+    }
+}
+
+/**
+ * Let you configure a library variant associated with [Release.DEFAULT_PUBLISH_CONFIG]
+ */
+fun LibraryExtension.defaultPublishVariant(config: (LibraryVariant) -> Unit) {
+    libraryVariants.all { variant ->
+        if (variant.name == Release.DEFAULT_PUBLISH_CONFIG) {
+            config(variant)
+        }
     }
 }
 
