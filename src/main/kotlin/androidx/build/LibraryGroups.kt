@@ -23,7 +23,7 @@ object LibraryGroups {
     val ACTIVITY = LibraryGroup("androidx.activity")
     val ADS = LibraryGroup("androidx.ads", false)
     val ANIMATION = LibraryGroup("androidx.animation", false)
-    val ANNOTATION = LibraryGroup("androidx.annotation")
+    val ANNOTATION = LibraryGroup("androidx.annotation", false)
     val APPCOMPAT = LibraryGroup("androidx.appcompat", false)
     val ARCH_CORE = LibraryGroup("androidx.arch.core")
     val ASYNCLAYOUTINFLATER = LibraryGroup("androidx.asynclayoutinflater")
