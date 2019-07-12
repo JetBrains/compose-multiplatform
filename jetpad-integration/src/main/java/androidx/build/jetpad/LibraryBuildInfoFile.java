@@ -29,6 +29,7 @@ public class LibraryBuildInfoFile {
   public String groupId;
   public String artifactId;
   public String version;
+  public String path;
   public ArrayList<Dependency> dependencies;
   public ArrayList<Check> checks;
 

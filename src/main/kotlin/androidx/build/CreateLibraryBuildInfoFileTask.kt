@@ -45,6 +45,11 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
         return "${project.group}_${project.name}_build_info.txt"
     }
 
+    /* Returns the local project directory without the full framework/support root directory path */
+    private fun getProjectSpecificDirectory(): String {
+        return project.projectDir.toString().removePrefix(project.rootDir.toString())
+    }
+
     private fun writeJsonToFile(info: LibraryBuildInfoFile) {
         if (!project.getBuildInfoDirectory().exists()) {
             if (!project.getBuildInfoDirectory().mkdirs()) {
@@ -68,6 +73,7 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
 
     private fun resolveAndCollectDependencies(): LibraryBuildInfoFile {
         val libraryBuildInfoFile = LibraryBuildInfoFile()
+        libraryBuildInfoFile.path = getProjectSpecificDirectory()
         libraryBuildInfoFile.artifactId = project.name.toString()
         libraryBuildInfoFile.groupId = project.group.toString()
         libraryBuildInfoFile.version = project.version.toString()
