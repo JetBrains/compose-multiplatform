@@ -91,24 +91,31 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
         val checks = ArrayList<LibraryBuildInfoFile.Check>()
         libraryBuildInfoFile.checks = checks
         val publishedProjects = project.getProjectsMap()
-        project.configurations.all { configuration ->
+        project.configurations.filter {
+            /* Ignore test configuration dependencies */
+            !it.name.contains("test", ignoreCase = true)
+        }.forEach { configuration ->
             configuration.allDependencies.forEach { dep ->
                 // Only consider androidx dependencies
                 if (dep.group != null &&
                     dep.group.toString().startsWith("androidx.") &&
-                    !dep.group.toString().startsWith("androidx.test")) {
-                        if ((dep is ProjectDependency && publishedProjects
-                                .containsKey("${dep.group}:${dep.name}")) ||
-                                dep is ExternalModuleDependency) {
-                            val androidXPublishedDependency = LibraryBuildInfoFile().Dependency()
-                            androidXPublishedDependency.artifactId = dep.name.toString()
-                            androidXPublishedDependency.groupId = dep.group.toString()
-                            androidXPublishedDependency.version = dep.version.toString()
-                            androidXPublishedDependency.isTipOfTree = dep is ProjectDependency
-                            addDependencyToListIfNotAlreadyAdded(libraryDependencies,
-                                androidXPublishedDependency)
-                        }
+                    !dep.group.toString().startsWith("androidx.test")
+                ) {
+                    if ((dep is ProjectDependency && publishedProjects
+                            .containsKey("${dep.group}:${dep.name}")) ||
+                        dep is ExternalModuleDependency
+                    ) {
+                        val androidXPublishedDependency = LibraryBuildInfoFile().Dependency()
+                        androidXPublishedDependency.artifactId = dep.name.toString()
+                        androidXPublishedDependency.groupId = dep.group.toString()
+                        androidXPublishedDependency.version = dep.version.toString()
+                        androidXPublishedDependency.isTipOfTree = dep is ProjectDependency
+                        addDependencyToListIfNotAlreadyAdded(
+                            libraryDependencies,
+                            androidXPublishedDependency
+                        )
                     }
+                }
             }
         }
         libraryBuildInfoFile.dependencies = libraryDependencies
