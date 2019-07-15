@@ -50,6 +50,15 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
         return project.projectDir.toString().removePrefix(project.rootDir.toString())
     }
 
+    /* Returns whether or not the groupId of the project requires the same version for all
+     * artifactIds.  See CheckSameVersionLibraryGroupsTask.kt
+     */
+    private fun requiresSameVersion(): Boolean {
+        val library =
+            project.extensions.findByType(AndroidXExtension::class.java)
+        return library?.mavenGroup?.requireSameVersion ?: false
+    }
+
     private fun writeJsonToFile(info: LibraryBuildInfoFile) {
         if (!project.getBuildInfoDirectory().exists()) {
             if (!project.getBuildInfoDirectory().mkdirs()) {
@@ -73,10 +82,11 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
 
     private fun resolveAndCollectDependencies(): LibraryBuildInfoFile {
         val libraryBuildInfoFile = LibraryBuildInfoFile()
-        libraryBuildInfoFile.path = getProjectSpecificDirectory()
         libraryBuildInfoFile.artifactId = project.name.toString()
         libraryBuildInfoFile.groupId = project.group.toString()
         libraryBuildInfoFile.version = project.version.toString()
+        libraryBuildInfoFile.path = getProjectSpecificDirectory()
+        libraryBuildInfoFile.groupIdRequiresSameVersion = requiresSameVersion()
         val libraryDependencies = ArrayList<LibraryBuildInfoFile.Dependency>()
         val checks = ArrayList<LibraryBuildInfoFile.Check>()
         libraryBuildInfoFile.checks = checks
