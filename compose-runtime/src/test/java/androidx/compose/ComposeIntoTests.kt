@@ -54,7 +54,7 @@ private class ComposeIntoTestActivity : Activity() {
         run()
     }
     fun run() {
-        setContent {
+        setViewContent {
             +onActive { initializationCount++ }
             +onCommit { commitCount++ }
         }

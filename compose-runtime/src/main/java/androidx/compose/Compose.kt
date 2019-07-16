@@ -241,7 +241,7 @@ object Compose {
  * @see Compose.composeInto
  * @see Activity.setContentView
  */
-fun Activity.setContent(composable: @Composable() () -> Unit): CompositionContext? {
+fun Activity.setViewContent(composable: @Composable() () -> Unit): CompositionContext? {
     // If there is already a FrameLayout in the root, we assume we want to compose
     // into it instead of create a new one. This allows for `setContent` to be
     // called multiple times.
@@ -250,7 +250,7 @@ fun Activity.setContent(composable: @Composable() () -> Unit): CompositionContex
         .findViewById<ViewGroup>(android.R.id.content)
         .getChildAt(0) as? ViewGroup
     ?: FrameLayout(this).also { setContentView(it) }
-    return root.compose(composable)
+    return root.setViewContent(composable)
 }
 
 /**
@@ -276,7 +276,7 @@ fun Activity.disposeComposition() {
  * @see Compose.composeInto
  * @see disposeComposition
  */
-fun ViewGroup.compose(composable: @Composable() () -> Unit): CompositionContext? =
+fun ViewGroup.setViewContent(composable: @Composable() () -> Unit): CompositionContext? =
     Compose.composeInto(this, null, composable)
 
 /**

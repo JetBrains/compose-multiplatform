@@ -26,15 +26,14 @@ import androidx.compose.FrameManager
 import androidx.compose.Model
 import androidx.compose.Observe
 import androidx.compose.benchmark.realworld4.RealWorld4_FancyWidget_000
-import androidx.compose.compose
 import androidx.compose.composer
 import androidx.compose.runWithCurrent
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
-import androidx.ui.core.CraneWrapper
 import androidx.ui.core.dp
+import androidx.ui.core.setContent
 import androidx.ui.foundation.ColoredRect
 import androidx.ui.graphics.Color
 import org.junit.Assert.assertTrue
@@ -174,8 +173,8 @@ class ComposeBenchmark {
                 root
             }
 
-            root.compose {
-                CraneWrapper(block)
+            root.setContent {
+                block()
             }
 
             runWithTimingDisabled {
@@ -191,9 +190,9 @@ class ComposeBenchmark {
 
         val root = FrameLayout(activityRule.activity)
         activityRule.activity.setContentView(root)
-        root.compose {
+        root.setContent {
             activeComposer = composer.composer
-            CraneWrapper(receiver.composeCb)
+            receiver.composeCb()
         }
 
         benchmarkRule.measureRepeated {
