@@ -47,7 +47,7 @@ const val JSR250 = "javax.annotation:javax.annotation-api:1.2"
 const val JUNIT = "junit:junit:4.12"
 const val KOTLINPOET = "com.squareup:kotlinpoet:1.1.0"
 
-private const val KOTLIN_VERSION = "1.3.40"
+private const val KOTLIN_VERSION = "1.3.41"
 const val KOTLIN_STDLIB = "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
 const val KOTLIN_TEST_COMMON = "org.jetbrains.kotlin:kotlin-test:$KOTLIN_VERSION"
 const val COMPOSE_VERSION = "1.3.30-compose-20190520"
