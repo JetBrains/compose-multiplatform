@@ -269,7 +269,17 @@ class ViewComposer(
     // TODO: Add more overloads for common primitive types like String and Float etc to avoid boxing
     // and the immutable check
     @Suppress("NOTHING_TO_INLINE")
-    inline fun changed(value: Int) = with(composer) {
+    fun changed(value: Int) = with(composer) {
+        if ((nextSlot() as? Int)?.let { value != it } ?: true || inserting) {
+            updateValue(value)
+            true
+        } else {
+            skipValue()
+            false
+        }
+    }
+
+    fun <T> changed(value: T) = with(composer) {
         if (nextSlot() != value || inserting) {
             updateValue(value)
             true
@@ -279,20 +289,10 @@ class ViewComposer(
         }
     }
 
-    inline fun <reified T> changed(value: T) = with(composer) {
-        if (nextSlot() != value || inserting || !isEffectivelyImmutable(value)) {
-            updateValue(value)
-            true
-        } else {
-            skipValue()
-            false
-        }
-    }
-
     @Suppress("NOTHING_TO_INLINE")
-    inline fun updated(value: Int) = with(composer) {
+    fun updated(value: Int) = with(composer) {
         inserting.let { inserting ->
-            if (nextSlot() != value || inserting) {
+            if (((nextSlot() as? Int)?.let { it != value } ?: true) || inserting) {
                 updateValue(value)
                 !inserting
             } else {
@@ -302,9 +302,9 @@ class ViewComposer(
         }
     }
 
-    inline fun <reified T> updated(value: T) = with(composer) {
+    fun <T> updated(value: T) = with(composer) {
         inserting.let { inserting ->
-            if (nextSlot() != value || inserting || !isEffectivelyImmutable(value)) {
+            if (nextSlot() != value || inserting) {
                 updateValue(value)
                 !inserting
             } else {
@@ -325,6 +325,21 @@ class ViewComposer(
 
     inline fun <reified T> update(value: T, /*crossinline*/ block: (value: T) -> Unit): Boolean =
         updated(value).also { if (it) block(value) }
+
+    @Suppress("UNUSED")
+    fun <T> changedUnchecked(@Suppress("UNUSED_PARAMETER") value: T) = true
+
+    @Suppress("UNUSED")
+    inline fun <T> setUnchecked(value: T, block: (value: T) -> Unit): Boolean {
+        block(value)
+        return true
+    }
+
+    @Suppress("UNUSED")
+    inline fun <T> updateUnchecked(value: T, block: (value: T) -> Unit): Boolean {
+        block(value)
+        return true
+    }
 
     /*inline*/ operator fun Boolean.plus(other: Boolean) = this || other
 }

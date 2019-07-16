@@ -234,7 +234,7 @@ class NewCodeGenTests : TestCase() {
             //  @Composable
             //  fun PhoneView(phone: Phone) {
             //    phoneCalled++
-            //   <TextView text="..." />
+            //   TextView(text="...")
             //  }
             fun PhoneView(phone: Phone) {
                 phoneCalled++
@@ -253,11 +253,11 @@ class NewCodeGenTests : TestCase() {
         }.then { _ ->
             assertEquals(1, phoneCalled)
         }.then { _ ->
-            assertEquals(2, phoneCalled)
+            assertEquals(1, phoneCalled)
 
             phone = Phone("124", "456", "7890")
         }.then { _ ->
-            assertEquals(3, phoneCalled)
+            assertEquals(2, phoneCalled)
         }
     }
 
