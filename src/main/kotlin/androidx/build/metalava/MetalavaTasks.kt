@@ -24,7 +24,6 @@ import androidx.build.checkapi.getApiLocation
 import androidx.build.checkapi.getRequiredCompatibilityApiLocation
 import androidx.build.checkapi.hasApiFolder
 import androidx.build.checkapi.hasApiTasks
-import androidx.build.docsDir
 import androidx.build.java.JavaCompileInputs
 import androidx.build.defaultPublishVariant
 import com.android.build.gradle.LibraryExtension
@@ -108,7 +107,7 @@ object MetalavaTasks {
             }
 
         val builtApiLocation = ApiLocation.fromPublicApiFile(
-            File(project.docsDir(), "release/${project.name}/current.txt"))
+            File(project.buildDir, "api/current.txt"))
 
         val baselines = ApiViolationBaselines.fromApiLocation(libraryVersionApi)
 

@@ -18,7 +18,6 @@ package androidx.build.metalava
 
 import androidx.build.SupportConfig
 import androidx.build.Version
-import androidx.build.docsDir
 import androidx.build.checkapi.getApiLocation
 import androidx.build.checkapi.isValidApiVersion
 import androidx.build.java.JavaCompileInputs
@@ -83,7 +82,7 @@ abstract class RegenerateOldApisTask : DefaultTask() {
         }
 
         val outputApiLocation = project.getApiLocation(version)
-        val tempDir = File(project.docsDir(), "release/${project.name}")
+        val tempDir = File(project.buildDir, "api")
         if (outputApiLocation.publicApiFile.exists()) {
             val generateRestrictedAPIs = outputApiLocation.restrictedApiFile.exists()
             project.generateApi(
