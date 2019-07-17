@@ -141,7 +141,10 @@ object MetalavaTasks {
                 task.baselines.set(baselines)
                 task.dependsOn(metalavaConfiguration)
                 task.checkRestrictedAPIs = extension.trackRestrictedAPIs
-                applyInputs(javaCompileInputs, task)
+                task.api.set(builtApiLocation)
+                task.dependencyClasspath = javaCompileInputs.dependencyClasspath
+                task.bootClasspath = javaCompileInputs.bootClasspath
+                task.dependsOn(generateApi)
             }
 
             project.tasks.register("ignoreApiChanges", IgnoreApiChangesTask::class.java) { task ->
@@ -149,7 +152,10 @@ object MetalavaTasks {
                 task.referenceApi.set(checkApiRelease!!.flatMap { it.referenceApi })
                 task.baselines.set(checkApiRelease!!.flatMap { it.baselines })
                 task.processRestrictedApis = extension.trackRestrictedAPIs
-                applyInputs(javaCompileInputs, task)
+                task.api.set(builtApiLocation)
+                task.dependencyClasspath = javaCompileInputs.dependencyClasspath
+                task.bootClasspath = javaCompileInputs.bootClasspath
+                task.dependsOn(generateApi)
             }
         }
 
