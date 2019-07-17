@@ -185,12 +185,17 @@ object Release {
      * Registers the project to be included in its group's zip file as well as the global zip files.
      */
     fun register(project: Project, extension: AndroidXExtension) {
-        if (!extension.publish.shouldRelease()) {
-            throw IllegalArgumentException(
-                    "Cannot register ${project.path} into the release" +
-                            " because publish is not Publish.SNAPSHOT_AND_RELEASE!"
-            )
+        if (extension.publish == Publish.NONE) {
+            project.logger.info("project ${project.name} isn't part of release," +
+                    " because its \"publish\" property is explicitly set to Publish.NONE")
+            return
         }
+        if (extension.publish == Publish.SNAPSHOT_ONLY && !isSnapshotBuild()) {
+            project.logger.info("project ${project.name} isn't part of release, because its" +
+                    " \"publish\" property is SNAPSHOT_ONLY, but it is not a snapshot build")
+            return
+        }
+
         val mavenGroup = extension.mavenGroup?.group ?: throw IllegalArgumentException(
                 "Cannot register a project to release if it does not have a mavenGroup set up"
         )
