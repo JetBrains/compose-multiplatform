@@ -44,7 +44,7 @@ abstract class UpdateApiLintBaselineTask : MetalavaTask() {
         check(bootClasspath.isNotEmpty()) { "Android boot classpath not set." }
         val args = getCommonBaselineUpdateArgs(
             bootClasspath,
-            dependencyClasspath!!,
+            dependencyClasspath,
             sourcePaths,
             baselines.get().apiLintFile
         )
@@ -115,7 +115,7 @@ abstract class IgnoreApiChangesTask : MetalavaTask() {
     ) {
         val args = getCommonBaselineUpdateArgs(
             bootClasspath,
-            dependencyClasspath!!,
+            dependencyClasspath,
             sourcePaths,
             baselineFile
         )
