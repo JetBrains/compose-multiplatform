@@ -17,7 +17,6 @@
 package androidx.build
 
 import com.android.build.gradle.LibraryExtension
-import com.android.builder.core.BuilderConstants
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.bundling.Jar
@@ -27,11 +26,7 @@ import org.gradle.kotlin.dsl.getPlugin
  * Sets up a source jar task for an Android library project.
  */
 fun Project.configureSourceJarForAndroid(extension: LibraryExtension) {
-    extension.libraryVariants.all { variant ->
-        if (variant.buildType.name != BuilderConstants.RELEASE) {
-            return@all // Skip non-release builds.
-        }
-
+    extension.defaultPublishVariant { variant ->
         val sourceJar = tasks.register("sourceJar${variant.name.capitalize()}", Jar::class.java) {
             it.archiveClassifier.set("sources")
             it.from(extension.sourceSets.getByName("main").java.srcDirs)

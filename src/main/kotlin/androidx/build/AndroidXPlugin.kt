@@ -158,11 +158,9 @@ class AndroidXPlugin : Plugin<Project> {
                         REPORT_LIBRARY_METRICS, ReportLibraryMetricsTask::class.java
                     )
 
-                    extension.libraryVariants.all { libraryVariant ->
-                        if (libraryVariant.buildType.name == "debug") {
-                            reportLibraryMetrics.configure {
-                                it.debugVariants.add(libraryVariant)
-                            }
+                    extension.defaultPublishVariant { libraryVariant ->
+                        reportLibraryMetrics.configure {
+                            it.debugVariants.add(libraryVariant)
                         }
 
                         verifyDependencyVersionsTask?.configure { task ->
@@ -518,12 +516,10 @@ class AndroidXPlugin : Plugin<Project> {
         }
 
         project.afterEvaluate {
-            libraryVariants.all { libraryVariant ->
-                if (libraryVariant.buildType.name == "debug") {
-                    libraryVariant.javaCompileProvider.configure { javaCompile ->
-                        if (androidXExtension.failOnDeprecationWarnings) {
-                            javaCompile.options.compilerArgs.add("-Xlint:deprecation")
-                        }
+            defaultPublishVariant { libraryVariant ->
+                libraryVariant.javaCompileProvider.configure { javaCompile ->
+                    if (androidXExtension.failOnDeprecationWarnings) {
+                        javaCompile.options.compilerArgs.add("-Xlint:deprecation")
                     }
                 }
             }
@@ -700,12 +696,10 @@ private fun Project.configureResourceApiChecks(extension: LibraryExtension) {
             val checkResourceApiTask = createCheckResourceApiTask()
             val updateResourceApiTask = createUpdateResourceApiTask()
 
-            extension.libraryVariants.all { libraryVariant ->
-                if (libraryVariant.buildType.name == "debug") {
-                    // Check and update resource api tasks rely compile to generate public.txt
-                    checkResourceApiTask.dependsOn(libraryVariant.javaCompileProvider)
-                    updateResourceApiTask.dependsOn(libraryVariant.javaCompileProvider)
-                }
+            extension.defaultPublishVariant { libraryVariant ->
+                // Check and update resource api tasks rely compile to generate public.txt
+                checkResourceApiTask.dependsOn(libraryVariant.javaCompileProvider)
+                updateResourceApiTask.dependsOn(libraryVariant.javaCompileProvider)
             }
             tasks.withType(UpdateApiTask::class.java).configureEach { task ->
                 task.dependsOn(updateResourceApiTask)
