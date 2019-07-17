@@ -114,10 +114,8 @@ fun Project.configureMavenArtifactUpload(extension: AndroidXExtension) {
                 }
             }
 
-            if (extension.publish.shouldRelease()) {
-                // Register it as part of release so that we create a Zip file for it
-                Release.register(this, extension)
-            }
+            // Register it as part of release so that we create a Zip file for it
+            Release.register(this, extension)
         } else {
             uploadTask.enabled = false
         }
