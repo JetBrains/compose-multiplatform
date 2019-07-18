@@ -59,8 +59,8 @@ allprojects {
 }
 
 sourceSets {
-    main.java.srcDirs += '../benchmark/gradle-plugin/src/main/kotlin'
-    main.resources.srcDirs += '../benchmark/gradle-plugin/src/main/resources'
+    main.java.srcDirs += "${supportRootFolder}/benchmark/gradle-plugin/src/main/kotlin"
+    main.resources.srcDirs += "${supportRootFolder}/benchmark/gradle-plugin/src/main/resources"
 }
 
 dependencies {
