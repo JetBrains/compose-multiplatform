@@ -17,11 +17,12 @@
 package androidx.build.java
 
 import androidx.build.androidJarFile
-import com.android.build.gradle.api.BaseVariant
 import com.android.build.gradle.LibraryExtension
+import com.android.build.gradle.api.BaseVariant
+import com.android.build.gradle.api.SourceKind
+import org.gradle.api.Project
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.file.FileCollection
-import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSet
 import java.io.File
 
@@ -40,17 +41,22 @@ data class JavaCompileInputs(
     companion object {
         // Constructs a JavaCompileInputs from a library and its variant
         fun fromLibraryVariant(library: LibraryExtension, variant: BaseVariant): JavaCompileInputs {
-            var sourcePaths: Collection<File> = variant.sourceSets.find({ it ->
-                it.name == "main"
-            })!!.javaDirectories
+            val folders = variant.getSourceFolders(SourceKind.JAVA)
+            val sourcePaths: MutableCollection<File> = mutableListOf()
+            for (folder in folders) {
+                sourcePaths.add(folder.dir)
+            }
             val dependencyClasspath = variant.compileConfiguration.incoming.artifactView { config ->
                 config.attributes { container ->
                     container.attribute(Attribute.of("artifactType", String::class.java), "jar")
                 }
             }.artifacts.artifactFiles
-            var bootClasspath: Collection<File> = library.bootClasspath
 
-            return JavaCompileInputs(sourcePaths, dependencyClasspath, bootClasspath)
+            return JavaCompileInputs(
+                sourcePaths,
+                dependencyClasspath,
+                library.bootClasspath
+            )
         }
 
         // Constructs a JavaCompileInputs from a sourceset

@@ -31,11 +31,11 @@ abstract class MetalavaTask : DefaultTask() {
 
     /** Android's boot classpath. Obtained from [BaseExtension.getBootClasspath]. */
     @get:InputFiles
-    var bootClasspath: Collection<File> = emptyList()
+    lateinit var bootClasspath: Collection<File>
 
     /** Dependencies of [sourcePaths]. */
     @get:InputFiles
-    var dependencyClasspath: FileCollection? = null
+    lateinit var dependencyClasspath: FileCollection
 
     /** Source files against which API signatures will be validated. */
     @get:InputFiles
