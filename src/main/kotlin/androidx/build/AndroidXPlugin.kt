@@ -712,6 +712,6 @@ private fun Project.configureResourceApiChecks(extension: LibraryExtension) {
 }
 
 private fun Project.getGenerateResourceApiFile(): File {
-    return File(buildDir, "intermediates/public_res/debug" +
-            "/packageDebugResources/public.txt")
+    return File(buildDir, "intermediates/public_res/release" +
+            "/packageReleaseResources/public.txt")
 }
