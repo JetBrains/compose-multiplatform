@@ -313,7 +313,7 @@ class AndroidXPlugin : Plugin<Project> {
             CheckSameVersionLibraryGroupsTask::class.java)
         buildOnServerTask.dependsOn(checkSameVersionLibraryGroupsTask)
 
-        val adbPath = getSdkPath(project.projectDir).path + "/platform-tools/adb"
+        val adbPath = "${getSdkPath(SupportConfig.getSupportRoot(project)).path}/platform-tools/adb"
         tasks.register("lockClocks", LockClocksTask::class.java).configure {
             it.adbPath.set(adbPath)
         }
