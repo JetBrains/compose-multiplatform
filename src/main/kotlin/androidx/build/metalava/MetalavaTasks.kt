@@ -189,6 +189,14 @@ object MetalavaTasks {
             task.outputApiLocations.set(checkApi.flatMap { it.checkedInApis })
             task.updateRestrictedAPIs = extension.trackRestrictedAPIs
             task.dependsOn(generateApi)
+            if (checkApiRelease != null) {
+                // If a developer (accidentally) makes a non-backwards compatible change to an
+                // api, the developer will want to be informed of it as soon as possible.
+                // So, whenever a developer updates an api, if backwards compatibility checks are
+                // enabled in the library, then we want to check that the changes are backwards
+                // compatible
+                task.dependsOn(checkApiRelease)
+            }
         }
 
         project.tasks.register("regenerateOldApis", RegenerateOldApisTask::class.java) { task ->
