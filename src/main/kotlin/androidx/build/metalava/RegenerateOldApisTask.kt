@@ -72,7 +72,6 @@ abstract class RegenerateOldApisTask : DefaultTask() {
             runnerProject.logger.info("Skipping illegal version $version from $mavenId")
             return
         }
-        project.logger.lifecycle("Regenerating $mavenId")
         val inputs: JavaCompileInputs?
         try {
             inputs = getFiles(runnerProject, mavenId)
@@ -84,6 +83,7 @@ abstract class RegenerateOldApisTask : DefaultTask() {
         val outputApiLocation = project.getApiLocation(version)
         val tempDir = File(project.buildDir, "api")
         if (outputApiLocation.publicApiFile.exists()) {
+            project.logger.lifecycle("Regenerating $mavenId")
             val generateRestrictedAPIs = outputApiLocation.restrictedApiFile.exists()
             project.generateApi(
                 inputs, outputApiLocation, tempDir, ApiLintMode.Skip, generateRestrictedAPIs)
