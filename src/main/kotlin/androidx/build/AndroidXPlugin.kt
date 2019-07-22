@@ -370,6 +370,14 @@ class AndroidXPlugin : Plugin<Project> {
         defaultConfig.targetSdkVersion(TARGET_SDK_VERSION)
         defaultConfig.testInstrumentationRunner =
             if (project.isBenchmark()) BENCHMARK_INSTRUMENTATION_RUNNER else INSTRUMENTATION_RUNNER
+
+        // Pass the --no-window-animation flag with a hack (b/138120842)
+        // NOTE - We're exploiting the fact that anything after a space in the value of a
+        // instrumentation runner argument is passed raw to the `am instrument` command.
+        // NOTE - instrumentation args aren't respected by CI - window animations are
+        // disabled there separately
+        defaultConfig.testInstrumentationRunnerArgument("thisisignored",
+            "thisisignored --no-window-animation")
         testOptions.unitTests.isReturnDefaultValues = true
 
         defaultConfig.minSdkVersion(DEFAULT_MIN_SDK_VERSION)
