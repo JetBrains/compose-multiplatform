@@ -120,7 +120,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.VECTORDRAWABLE, "vectordrawable-animated", "1.1.0-rc01")
     prebuilts(LibraryGroups.VERSIONEDPARCELABLE, "1.1.0-rc01")
     prebuilts(LibraryGroups.VIEWPAGER, "1.0.0")
-    prebuilts(LibraryGroups.VIEWPAGER2, "1.0.0-beta01")
+    prebuilts(LibraryGroups.VIEWPAGER2, "1.0.0-beta02")
     prebuilts(LibraryGroups.WEAR, "1.0.0")
             .addStubs("wear/wear_stubs/com.google.android.wearable-stubs.jar")
     prebuilts(LibraryGroups.WEBKIT, "1.1.0-alpha01")
