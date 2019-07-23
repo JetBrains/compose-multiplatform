@@ -16,17 +16,16 @@
 
 package androidx.compose.benchmark
 
-import android.widget.FrameLayout
 import androidx.benchmark.BenchmarkRule
 import androidx.benchmark.measureRepeated
 import androidx.compose.Composable
-import androidx.compose.Compose
 import androidx.compose.Composer
 import androidx.compose.FrameManager
 import androidx.compose.Model
 import androidx.compose.Observe
 import androidx.compose.benchmark.realworld4.RealWorld4_FancyWidget_000
 import androidx.compose.composer
+import androidx.compose.disposeComposition
 import androidx.compose.runWithCurrent
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -38,6 +37,7 @@ import androidx.ui.foundation.ColoredRect
 import androidx.ui.graphics.Color
 import org.junit.Assert.assertTrue
 import org.junit.FixMethodOrder
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -152,6 +152,7 @@ class ComposeBenchmark {
 
     @UiThreadTest
     @Test
+    @Ignore("Disabled as it appears to not do anything")
     fun benchmark_realworld4_mid_recompose() {
         val model = androidx.compose.benchmark.realworld4.createSampleData()
         measureRecompose {
@@ -166,19 +167,14 @@ class ComposeBenchmark {
 
     private fun measureCompose(block: @Composable() () -> Unit) {
         benchmarkRule.measureRepeated {
-            val root = runWithTimingDisabled {
-                val root = FrameLayout(activityRule.activity)
-                activityRule.activity.setContentView(root)
+            val activity = activityRule.activity
 
-                root
-            }
-
-            root.setContent {
+            activity.setContent {
                 block()
             }
 
             runWithTimingDisabled {
-                Compose.disposeComposition(root)
+                activity.disposeComposition()
             }
         }
     }
@@ -188,9 +184,9 @@ class ComposeBenchmark {
         receiver.block()
         var activeComposer: Composer<*>? = null
 
-        val root = FrameLayout(activityRule.activity)
-        activityRule.activity.setContentView(root)
-        root.setContent {
+        val activity = activityRule.activity
+
+        activity.setContent {
             activeComposer = composer.composer
             receiver.composeCb()
         }
@@ -209,7 +205,7 @@ class ComposeBenchmark {
             assertTrue(didSomething)
         }
 
-        Compose.disposeComposition(root)
+        activity.disposeComposition()
     }
 }
 
