@@ -16,6 +16,20 @@
 
 package androidx.compose
 
+internal class Stack<T> {
+    private val backing = ArrayList<T>()
+
+    val size: Int get() = backing.size
+
+    fun push(value: T) = backing.add(value)
+    fun pop(): T = backing.removeAt(size - 1)
+    fun peek(): T = backing.get(size - 1)
+    fun peek(index: Int): T = backing.get(index)
+    fun isEmpty() = backing.isEmpty()
+    fun isNotEmpty() = !isEmpty()
+    fun clear() = backing.clear()
+}
+
 internal class IntStack {
     private var slots = IntArray(10)
     private var tos = 0

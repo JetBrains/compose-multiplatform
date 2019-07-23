@@ -20,7 +20,6 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.adapters.getViewAdapterIfExists
-import java.util.Stack
 
 class ViewAdapters {
     private val adapters = mutableListOf<(parent: Any, child: Any) -> Any?>()

@@ -16,8 +16,6 @@
 
 package androidx.compose
 
-import java.util.Stack
-
 /**
  * An adapter that performs tree based operations on some tree startNode N without requiring a specific base type for N
  */
