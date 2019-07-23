@@ -16,8 +16,6 @@
 
 package androidx.compose
 
-import java.util.Stack
-
 internal typealias Change<N> = (
     applier: Applier<N>,
     slots: SlotWriter,
@@ -474,8 +472,8 @@ open class Composer<N>(
         if (insertedProviders.isNotEmpty()) {
             var current = insertedProviders.size - 1
             while (current >= 0) {
-                val element = insertedProviders[current]
-                if (element is Ambient.Holder<*> && element.ambient === key) {
+                val element = insertedProviders.peek(current)
+                if (element.ambient === key) {
                     @Suppress("UNCHECKED_CAST")
                     return element.value as? T ?: key.defaultValue
                 }
