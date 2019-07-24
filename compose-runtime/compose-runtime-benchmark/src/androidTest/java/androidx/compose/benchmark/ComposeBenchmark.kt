@@ -16,29 +16,19 @@
 
 package androidx.compose.benchmark
 
-import androidx.benchmark.BenchmarkRule
-import androidx.benchmark.measureRepeated
 import androidx.compose.Composable
-import androidx.compose.Composer
-import androidx.compose.FrameManager
 import androidx.compose.Model
 import androidx.compose.Observe
 import androidx.compose.benchmark.realworld4.RealWorld4_FancyWidget_000
 import androidx.compose.composer
-import androidx.compose.disposeComposition
-import androidx.compose.runWithCurrent
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.test.rule.ActivityTestRule
 import androidx.ui.core.dp
-import androidx.ui.core.setContent
 import androidx.ui.foundation.ColoredRect
 import androidx.ui.graphics.Color
-import org.junit.Assert.assertTrue
 import org.junit.FixMethodOrder
 import org.junit.Ignore
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
@@ -46,12 +36,7 @@ import org.junit.runners.MethodSorters
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-class ComposeBenchmark {
-    @get:Rule
-    val benchmarkRule = BenchmarkRule()
-
-    @get:Rule
-    val activityRule = ActivityTestRule(ComposeActivity::class.java)
+class ComposeBenchmark: ComposeBenchmarkBase() {
 
     @UiThreadTest
     @Test
@@ -76,7 +61,7 @@ class ComposeBenchmark {
     fun benchmark_03_Compose_100Rects() {
         val model = ColorModel()
         measureCompose {
-            HunderedRects(model)
+            HundredRects(model = model)
         }
     }
 
@@ -128,7 +113,7 @@ class ComposeBenchmark {
         val model = ColorModel()
         measureRecompose {
             compose {
-                HunderedRects(model, narrow = false)
+                HundredRects(model, narrow = false)
             }
             update {
                 model.toggle()
@@ -142,7 +127,7 @@ class ComposeBenchmark {
         val model = ColorModel()
         measureRecompose {
             compose {
-                HunderedRects(model, narrow = true)
+                HundredRects(model, narrow = true)
             }
             update {
                 model.toggle()
@@ -165,48 +150,6 @@ class ComposeBenchmark {
         }
     }
 
-    private fun measureCompose(block: @Composable() () -> Unit) {
-        benchmarkRule.measureRepeated {
-            val activity = activityRule.activity
-
-            activity.setContent {
-                block()
-            }
-
-            runWithTimingDisabled {
-                activity.disposeComposition()
-            }
-        }
-    }
-
-    private fun measureRecompose(block: RecomposeReceiver.() -> Unit) {
-        val receiver = RecomposeReceiver()
-        receiver.block()
-        var activeComposer: Composer<*>? = null
-
-        val activity = activityRule.activity
-
-        activity.setContent {
-            activeComposer = composer.composer
-            receiver.composeCb()
-        }
-
-        benchmarkRule.measureRepeated {
-            runWithTimingDisabled {
-                receiver.updateModelCb()
-                FrameManager.nextFrame()
-            }
-
-            val didSomething = activeComposer?.let { composer ->
-                composer.runWithCurrent {
-                    composer.recompose().also { composer.applyChanges() }
-                }
-            } ?: false
-            assertTrue(didSomething)
-        }
-
-        activity.disposeComposition()
-    }
 }
 
 private val color = Color.Yellow
@@ -238,7 +181,7 @@ fun TenRects(model: ColorModel, narrow: Boolean = false) {
 }
 
 @Composable
-fun HunderedRects(model: ColorModel, narrow: Boolean = false) {
+fun HundredRects(model: ColorModel, narrow: Boolean = false) {
     repeat(100) {
         if (it % 10 == 0)
             if (narrow) {
@@ -250,18 +193,5 @@ fun HunderedRects(model: ColorModel, narrow: Boolean = false) {
             }
         else
             ColoredRect(color = color, width = 10.dp, height = 10.dp)
-    }
-}
-
-private class RecomposeReceiver {
-    var composeCb: @Composable() () -> Unit = @Composable { }
-    var updateModelCb: () -> Unit = { }
-
-    fun compose(block: @Composable() () -> Unit) {
-        composeCb = block
-    }
-
-    fun update(block: () -> Unit) {
-        updateModelCb = block
     }
 }

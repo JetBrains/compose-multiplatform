@@ -71,6 +71,6 @@ package androidx.compose
 @Composable
 @Suppress("PLUGIN_ERROR")
 /* inline */
-fun Key(@Suppress("UNUSED_PARAMETER") @Pivotal key: Any?, @Children children: () -> Unit) {
+fun Key(@Suppress("UNUSED_PARAMETER") @Pivotal key: Any?, @Children children: @Composable() () -> Unit) {
     children()
 }
