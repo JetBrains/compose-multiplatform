@@ -141,7 +141,10 @@ object MetalavaTasks {
                 task.baselines.set(baselines)
                 task.dependsOn(metalavaConfiguration)
                 task.checkRestrictedAPIs = extension.trackRestrictedAPIs
-                applyInputs(javaCompileInputs, task)
+                task.api.set(builtApiLocation)
+                task.dependencyClasspath = javaCompileInputs.dependencyClasspath
+                task.bootClasspath = javaCompileInputs.bootClasspath
+                task.dependsOn(generateApi)
             }
 
             project.tasks.register("ignoreApiChanges", IgnoreApiChangesTask::class.java) { task ->
@@ -149,7 +152,10 @@ object MetalavaTasks {
                 task.referenceApi.set(checkApiRelease!!.flatMap { it.referenceApi })
                 task.baselines.set(checkApiRelease!!.flatMap { it.baselines })
                 task.processRestrictedApis = extension.trackRestrictedAPIs
-                applyInputs(javaCompileInputs, task)
+                task.api.set(builtApiLocation)
+                task.dependencyClasspath = javaCompileInputs.dependencyClasspath
+                task.bootClasspath = javaCompileInputs.bootClasspath
+                task.dependsOn(generateApi)
             }
         }
 
@@ -183,6 +189,14 @@ object MetalavaTasks {
             task.outputApiLocations.set(checkApi.flatMap { it.checkedInApis })
             task.updateRestrictedAPIs = extension.trackRestrictedAPIs
             task.dependsOn(generateApi)
+            if (checkApiRelease != null) {
+                // If a developer (accidentally) makes a non-backwards compatible change to an
+                // api, the developer will want to be informed of it as soon as possible.
+                // So, whenever a developer updates an api, if backwards compatibility checks are
+                // enabled in the library, then we want to check that the changes are backwards
+                // compatible
+                task.dependsOn(checkApiRelease)
+            }
         }
 
         project.tasks.register("regenerateOldApis", RegenerateOldApisTask::class.java) { task ->
