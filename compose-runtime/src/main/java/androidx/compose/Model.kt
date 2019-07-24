@@ -53,4 +53,5 @@ package androidx.compose
 @MustBeDocumented
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.BINARY)
+@StableMarker
 annotation class Model
