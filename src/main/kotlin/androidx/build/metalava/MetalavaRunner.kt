@@ -38,7 +38,9 @@ fun Project.runMetalavaWithArgs(configuration: Configuration, args: List<String>
         it.classpath = checkNotNull(configuration) { "Configuration not set." }
         it.main = "com.android.tools.metalava.Driver"
         it.args = listOf(
-            "--no-banner"
+            "--no-banner",
+            "--hide",
+            "HiddenSuperclass" // We allow having a hidden parent class
         ) + args
     }
 }
@@ -50,7 +52,6 @@ val API_LINT_ARGS: List<String> = listOf(
         // The list of checks that are hidden as they are not useful in androidx
         "Enum", // Enums are allowed to be use in androidx
         "CallbackInterface", // With target Java 8, we have default methods
-        "HiddenSuperclass", // We allow having a hidden parent class
         "ProtectedMember", // We allow using protected members in androidx
         "ManagerLookup", // Managers in androidx are not the same as platfrom services
         "ManagerConstructor",

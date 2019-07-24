@@ -45,10 +45,13 @@ abstract class UpdateApiLintBaselineTask : MetalavaTask() {
         val args = getCommonBaselineUpdateArgs(
             bootClasspath,
             dependencyClasspath,
-            sourcePaths,
             baselines.get().apiLintFile
         )
-        args += API_LINT_ARGS
+        args.addAll(API_LINT_ARGS + listOf<String>(
+            "--source-path",
+            sourcePaths.filter { it.exists() }.joinToString(File.pathSeparator)
+        ))
+
         runWithArgs(args)
     }
 }
@@ -62,6 +65,9 @@ abstract class IgnoreApiChangesTask : MetalavaTask() {
     // The API that the library is supposed to be compatible with
     @get:Input
     abstract val referenceApi: Property<ApiLocation>
+
+    @get:Input
+    abstract val api: Property<ApiLocation>
 
     // The baseline files (api/*.*.*.ignore) to update
     @get:Input
@@ -93,12 +99,14 @@ abstract class IgnoreApiChangesTask : MetalavaTask() {
         check(bootClasspath.isNotEmpty()) { "Android boot classpath not set." }
 
         updateBaseline(
+            api.get().publicApiFile,
             referenceApi.get().publicApiFile,
             baselines.get().publicApiFile,
             false
         )
         if (processRestrictedApis && referenceApi.get().restrictedApiFile.exists()) {
             updateBaseline(
+                api.get().restrictedApiFile,
                 referenceApi.get().restrictedApiFile,
                 baselines.get().restrictedApiFile,
                 true
@@ -109,19 +117,21 @@ abstract class IgnoreApiChangesTask : MetalavaTask() {
     // Updates the contents of baselineFile to specify an exception for every API present in apiFile but not
     // present in the current source path
     private fun updateBaseline(
-        apiFile: File,
+        api: File,
+        prevApi: File,
         baselineFile: File,
         processRestrictedApis: Boolean
     ) {
         val args = getCommonBaselineUpdateArgs(
             bootClasspath,
             dependencyClasspath,
-            sourcePaths,
             baselineFile
         )
         args += listOf(
             "--check-compatibility:api:released",
-            apiFile.toString()
+            prevApi.toString(),
+            "--source-files",
+            api.toString()
         )
         if (processRestrictedApis) {
             args += listOf(
@@ -137,7 +147,6 @@ abstract class IgnoreApiChangesTask : MetalavaTask() {
 private fun getCommonBaselineUpdateArgs(
     bootClasspath: Collection<File>,
     dependencyClasspath: FileCollection,
-    sourcePaths: Collection<File>,
     baselineFile: File
 ): MutableList<String> {
     // Create the baseline file if it does exist, as Metalava cannot handle non-existent files.
@@ -145,9 +154,6 @@ private fun getCommonBaselineUpdateArgs(
     return mutableListOf(
         "--classpath",
         (bootClasspath + dependencyClasspath.files).joinToString(File.pathSeparator),
-
-        "--source-path",
-        sourcePaths.filter { it.exists() }.joinToString(File.pathSeparator),
 
         "--update-baseline",
         baselineFile.toString(),
