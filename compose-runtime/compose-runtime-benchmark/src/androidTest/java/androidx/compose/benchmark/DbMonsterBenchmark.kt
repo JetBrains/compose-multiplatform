@@ -17,8 +17,6 @@
 package androidx.compose.benchmark
 
 import android.app.Activity
-import androidx.benchmark.BenchmarkRule
-import androidx.benchmark.measureRepeated
 import androidx.compose.Composable
 import androidx.compose.Composer
 import androidx.compose.FrameManager
@@ -50,7 +48,7 @@ import kotlin.random.Random
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-class DbMonsterBenchmark: ComposeBenchmarkBase() {
+class DbMonsterBenchmark : ComposeBenchmarkBase() {
 
     @UiThreadTest
     @Test
@@ -74,7 +72,7 @@ class DbMonsterBenchmark: ComposeBenchmarkBase() {
             compose {
                 Table {
                     for (db in list.databases) {
-                        DatabaseRow(db=db)
+                        DatabaseRow(db = db)
                     }
                 }
             }

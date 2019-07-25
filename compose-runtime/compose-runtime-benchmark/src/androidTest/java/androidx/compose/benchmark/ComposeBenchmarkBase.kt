@@ -16,8 +16,8 @@
 
 package androidx.compose.benchmark
 
-import androidx.benchmark.BenchmarkRule
-import androidx.benchmark.measureRepeated
+import androidx.benchmark.junit4.BenchmarkRule
+import androidx.benchmark.junit4.measureRepeated
 import androidx.compose.Composable
 import androidx.compose.Composer
 import androidx.compose.FrameManager

@@ -62,7 +62,7 @@ dependencies {
     androidTestImplementation(ANDROIDX_TEST_RULES)
     androidTestImplementation(KOTLIN_COMPOSE_STDLIB)
     androidTestImplementation(KOTLIN_COMPOSE_REFLECT)
-    androidTestImplementation(project(":benchmark:benchmark-common"))
+    androidTestImplementation(project(":benchmark:benchmark-junit4"))
 }
 
 tasks.withType(KotlinCompile).configureEach {

@@ -16,8 +16,6 @@
 
 package androidx.compose.benchmark
 
-import androidx.benchmark.BenchmarkRule
-import androidx.benchmark.measureRepeated
 import androidx.compose.Composable
 import androidx.compose.Composer
 import androidx.compose.FrameManager
@@ -77,11 +75,13 @@ import kotlin.random.Random
 @LargeTest
 @RunWith(Parameterized::class)
 class SiblingBenchmark(
-    val count: Int, val reorder: ReorderType, val identity: IdentityType
-): ComposeBenchmarkBase() {
+    val count: Int,
+    val reorder: ReorderType,
+    val identity: IdentityType
+) : ComposeBenchmarkBase() {
     companion object {
         @JvmStatic
-        @Parameterized.Parameters(name="{0}_{1}_{2}")
+        @Parameterized.Parameters(name = "{0}_{1}_{2}")
         fun data(): Collection<Array<Any>> {
             val counts = listOf(100)
             val reorders = ReorderType.values()
@@ -109,7 +109,7 @@ class SiblingBenchmark(
             val random = Random(0)
             measureRecompose {
                 compose {
-                    SiblingManagement(identity=identity, items=items.value)
+                    SiblingManagement(identity = identity, items = items.value)
                 }
                 update {
                     items.value = items.value.update(reorder, random) { Item(it + 1) }
@@ -117,7 +117,6 @@ class SiblingBenchmark(
             }
         }
     }
-
 }
 
 // NOTE: remove when SAM conversion works in IR
@@ -128,6 +127,5 @@ fun ActivityTestRule<ComposeActivity>.runUiRunnable(block: () -> Unit) {
         }
     })
 }
-
 
 @Model private class ValueHolder<T>(var value: T)

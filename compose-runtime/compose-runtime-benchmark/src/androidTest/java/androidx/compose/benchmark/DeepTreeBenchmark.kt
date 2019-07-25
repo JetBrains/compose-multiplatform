@@ -16,8 +16,6 @@
 
 package androidx.compose.benchmark
 
-import androidx.benchmark.BenchmarkRule
-import androidx.benchmark.measureRepeated
 import androidx.compose.Composable
 import androidx.compose.benchmark.deeptree.DeepTree
 import androidx.compose.disposeComposition
@@ -42,7 +40,7 @@ import org.junit.runners.MethodSorters
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-class DeepTreeBenchmark: ComposeBenchmarkBase() {
+class DeepTreeBenchmark : ComposeBenchmarkBase() {
     @UiThreadTest
     @Test
     fun benchmark_deep_tree_01_depth1_breadth100_wrap2() {
