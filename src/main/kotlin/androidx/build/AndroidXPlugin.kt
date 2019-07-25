@@ -640,8 +640,7 @@ class AndroidXPlugin : Plugin<Project> {
 
 fun Project.isBenchmark(): Boolean {
     // benchmark convention is to end name with "-benchmark"
-    // Note: also match benchmark/src/androidTest, so it gets the BENCHMARK_INSTRUMENTATION_RUNNER
-    return name.endsWith("-benchmark") || name == "benchmark"
+    return name.endsWith("-benchmark")
 }
 
 fun Project.hideJavadocTask() {
