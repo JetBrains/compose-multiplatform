@@ -55,6 +55,7 @@ val API_LINT_ARGS: List<String> = listOf(
         "ProtectedMember", // We allow using protected members in androidx
         "ManagerLookup", // Managers in androidx are not the same as platfrom services
         "ManagerConstructor",
+        "RethrowRemoteException", // This check is for calls into system_server
 
         // List of checks that have bugs, but should be enabled once fixed.
         "GetterSetterNames", // b/135498039
