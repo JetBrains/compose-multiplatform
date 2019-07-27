@@ -58,11 +58,6 @@ allprojects {
     }
 }
 
-sourceSets {
-    main.java.srcDirs += "${supportRootFolder}/benchmark/gradle-plugin/src/main/kotlin"
-    main.resources.srcDirs += "${supportRootFolder}/benchmark/gradle-plugin/src/main/resources"
-}
-
 dependencies {
     implementation build_libs.gradle
     implementation build_libs.error_prone_gradle
@@ -73,3 +68,18 @@ dependencies {
     testImplementation "junit:junit:4.12"
 }
 
+apply plugin: "java-gradle-plugin"
+
+sourceSets {
+    main.java.srcDirs += "${supportRootFolder}/benchmark/gradle-plugin/src/main/kotlin"
+    main.resources.srcDirs += "${supportRootFolder}/benchmark/gradle-plugin/src/main/resources"
+}
+
+gradlePlugin {
+    plugins {
+        benchmark {
+            id = 'androidx.benchmark'
+            implementationClass = 'androidx.benchmark.gradle.BenchmarkPlugin'
+        }
+    }
+}
