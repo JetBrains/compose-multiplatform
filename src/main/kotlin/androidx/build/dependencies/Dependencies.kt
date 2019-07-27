@@ -68,6 +68,8 @@ const val KOTLIN_COROUTINES_GUAVA =
     "org.jetbrains.kotlinx:kotlinx-coroutines-guava:$KOTLIN_COROUTINES_VERSION"
 const val KOTLIN_COROUTINES_TEST =
     "org.jetbrains.kotlinx:kotlinx-coroutines-test:$KOTLIN_COROUTINES_VERSION"
+const val KOTLIN_COROUTINES_PREVIEW =
+    "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.0-RC"
 
 const val LEAKCANARY_INSTRUMENTATION =
     "com.squareup.leakcanary:leakcanary-android-instrumentation:1.6.2"
