@@ -16,7 +16,7 @@
 
 package androidx.build
 
-import androidx.build.SupportConfig.BENCHMARK_INSTRUMENTATION_RUNNER
+import androidx.benchmark.gradle.BenchmarkPlugin
 import androidx.build.SupportConfig.BUILD_TOOLS_VERSION
 import androidx.build.SupportConfig.COMPILE_SDK_VERSION
 import androidx.build.SupportConfig.DEFAULT_MIN_SDK_VERSION
@@ -359,8 +359,13 @@ class AndroidXPlugin : Plugin<Project> {
         compileSdkVersion(COMPILE_SDK_VERSION)
         buildToolsVersion = BUILD_TOOLS_VERSION
         defaultConfig.targetSdkVersion(TARGET_SDK_VERSION)
-        defaultConfig.testInstrumentationRunner =
-            if (project.isBenchmark()) BENCHMARK_INSTRUMENTATION_RUNNER else INSTRUMENTATION_RUNNER
+
+        defaultConfig.testInstrumentationRunner = INSTRUMENTATION_RUNNER
+
+        // Enable code coverage for debug builds only if we are not running inside the IDE, since
+        // enabling coverage reports breaks the method parameter resolution in the IDE debugger.
+        buildTypes.getByName("debug").isTestCoverageEnabled =
+            !project.hasProperty("android.injected.invoked.from.ide")
 
         // Pass the --no-window-animation flag with a hack (b/138120842)
         // NOTE - We're exploiting the fact that anything after a space in the value of a
@@ -416,18 +421,6 @@ class AndroidXPlugin : Plugin<Project> {
 
         project.configureErrorProneForAndroid(variants)
 
-        // Enable code coverage for debug builds only if we are not running inside the IDE, since
-        // enabling coverage reports breaks the method parameter resolution in the IDE debugger.
-        buildTypes.getByName("debug").isTestCoverageEnabled =
-                !project.hasProperty("android.injected.invoked.from.ide") &&
-                !project.isBenchmark()
-
-        // Benchmarks need release build type to avoid pulling in debug libraries, which
-        // may have been compiled with coverage enabled.
-        if (project.isBenchmark()) {
-            testBuildType = "release"
-        }
-
         // Set the officially published version to be the debug version with minimum dependency
         // versions.
         defaultPublishConfig(Release.DEFAULT_PUBLISH_CONFIG)
@@ -482,10 +475,9 @@ class AndroidXPlugin : Plugin<Project> {
                             // Exclude media-compat-test-* and media2-test-* modules from
                             // existing support library presubmit tests.
                             fileName.replace("-debug-androidTest", "")
-                        } else if (fileName.contains("-benchmark-debug-androidTest")) {
-                            // Exclude '-benchmark' modules from correctness tests, and
-                            // remove '-debug' from the APK name, since it's incorrect
-                            fileName.replace("-debug-androidTest", "-androidBenchmark")
+                        } else if (project.plugins.hasPlugin(BenchmarkPlugin::class.java)) {
+                            // Exclude '-benchmark' modules from correctness tests
+                            fileName.replace("-androidTest", "-androidBenchmark")
                         } else {
                             // multiple modules may have the same name so prefix the name with
                             // the module's path to ensure it is unique.
@@ -633,11 +625,6 @@ class AndroidXPlugin : Plugin<Project> {
         const val CREATE_AGGREGATE_BUILD_INFO_FILES_TASK = "createAggregateBuildInfoFiles"
         const val REPORT_LIBRARY_METRICS = "reportLibraryMetrics"
     }
-}
-
-fun Project.isBenchmark(): Boolean {
-    // benchmark convention is to end name with "-benchmark"
-    return name.endsWith("-benchmark")
 }
 
 fun Project.hideJavadocTask() {
