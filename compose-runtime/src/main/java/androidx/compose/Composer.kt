@@ -834,7 +834,8 @@ open class Composer<N>(
         if (action == END_NODE) recordUp()
         recordEnd(action)
 
-        if (slots.inEmpty) {
+        val inserting = slots.inEmpty
+        if (inserting) {
             slots.endEmpty()
             if (!slots.inEmpty) recordOperation { _, slots, _ -> slots.endInsert() }
         }
@@ -847,7 +848,8 @@ open class Composer<N>(
         previousPending?.let<Pending, Unit> { previous ->
             // Update the parent count of nodes
             previous.updateNodeCount(pending?.parentKeyInfo, expectedNodeCount)
-            previous.groupIndex++
+            if (!inserting)
+                previous.groupIndex++
         }
         this.pending = previousPending
         this.parentKeyInfo = keyStack.pop()
