@@ -20,7 +20,7 @@ import org.gradle.api.logging.Logger
 import java.io.File
 import java.util.concurrent.TimeUnit
 
-internal interface GitClient {
+interface GitClient {
     fun findChangedFilesSince(
         sha: String,
         top: String = "HEAD",
@@ -42,7 +42,7 @@ internal interface GitClient {
  * A simple git client that uses system process commands to communicate with the git setup in the
  * given working directory.
  */
-internal class GitClientImpl(
+class GitClientImpl(
     /**
      * The root location for git
      */
@@ -109,7 +109,7 @@ internal class GitClientImpl(
     }
 
     companion object {
-        internal const val PREV_MERGE_CMD = "git log -1 --merges --oneline"
-        internal const val CHANGED_FILES_CMD_PREFIX = "git diff --name-only"
+        const val PREV_MERGE_CMD = "git log -1 --merges --oneline"
+        const val CHANGED_FILES_CMD_PREFIX = "git diff --name-only"
     }
 }

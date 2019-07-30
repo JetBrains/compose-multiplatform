@@ -24,7 +24,7 @@ import java.io.File
  *
  * Currently, we don't use it since build system does not give us the right shas.
  */
-internal object BuildPropParser {
+object BuildPropParser {
     /**
      * Returns the sha which is the reference sha that we should use to find changed files.
      *

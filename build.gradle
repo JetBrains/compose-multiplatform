@@ -44,13 +44,6 @@ apply from: "kotlin-dsl-dependency.gradle.kts"
 allprojects {
     repos.addMavenRepositories(repositories)
 
-    tasks.withType(Test) {
-        testLogging {
-            events = ["failed"]
-            exceptionFormat "full"
-        }
-    }
-
     tasks.withType(KotlinCompile).configureEach {
         kotlinOptions {
             freeCompilerArgs += ["-Werror"]
@@ -65,7 +58,6 @@ dependencies {
     implementation build_libs.kotlin.gradle_plugin
     implementation gradleApi()
     implementation project("jetpad-integration")
-    testImplementation "junit:junit:4.12"
 }
 
 apply plugin: "java-gradle-plugin"
