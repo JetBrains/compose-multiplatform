@@ -210,6 +210,52 @@ class CompositionTests : TestCase() {
         }
     }
 
+    fun testReplace() {
+        var includeA = true
+        fun MockViewComposition.composition() {
+            text("Before")
+            if (includeA) {
+                linear {
+                    text("A")
+                }
+            } else {
+                edit("B")
+            }
+            text("After")
+        }
+        fun MockViewValidator.composition() {
+            text("Before")
+            if (includeA) {
+                linear {
+                    text("A")
+                }
+            } else {
+                edit("B")
+            }
+            text("After")
+        }
+        val composer = compose {
+            composition()
+        }
+        validate(composer.root) {
+            composition()
+        }
+        includeA = false
+        compose(composer) {
+            composition()
+        }
+        validate(composer.root) {
+            composition()
+        }
+        includeA = true
+        compose(composer) {
+            composition()
+        }
+        validate(composer.root) {
+            composition()
+        }
+    }
+
     fun testInsertWithMultipleRoots() {
         val chars = listOf('a', 'b', 'c')
 
