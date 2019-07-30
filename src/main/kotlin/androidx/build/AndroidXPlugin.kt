@@ -432,6 +432,12 @@ class AndroidXPlugin : Plugin<Project> {
                 !project.hasProperty("android.injected.invoked.from.ide") &&
                 !project.isBenchmark()
 
+        // Benchmarks need release build type to avoid pulling in debug libraries, which
+        // may have been compiled with coverage enabled.
+        if (project.isBenchmark()) {
+            testBuildType = "release"
+        }
+
         // Set the officially published version to be the debug version with minimum dependency
         // versions.
         defaultPublishConfig(Release.DEFAULT_PUBLISH_CONFIG)
