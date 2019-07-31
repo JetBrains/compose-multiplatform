@@ -37,17 +37,17 @@ abstract class ComposeBenchmarkBase {
     val activityRule = ActivityTestRule(ComposeActivity::class.java)
 
     fun measureCompose(block: @Composable() () -> Unit) {
+        val activity = activityRule.activity
         benchmarkRule.measureRepeated {
-            val activity = activityRule.activity
-
             activity.setContent {
                 block()
             }
 
             runWithTimingDisabled {
-                activity.disposeComposition()
+                activity.setContent { }
             }
         }
+        activity.disposeComposition()
     }
 
     fun measureRecompose(block: RecomposeReceiver.() -> Unit) {
