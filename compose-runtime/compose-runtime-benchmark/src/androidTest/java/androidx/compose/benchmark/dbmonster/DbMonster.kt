@@ -73,7 +73,7 @@ class DatabaseList(n: Int, val random: Random) {
 }
 
 @Composable
-fun Table(@Children children: @Composable() () -> Unit) {
+fun Table(children: @Composable() () -> Unit) {
     Column { children() }
 }
 

@@ -36,7 +36,7 @@ fun Terminal(style: Int) {
 }
 
 @Composable
-fun Stack(vertical: Boolean, @Children children: @Composable() () -> Unit) {
+fun Stack(vertical: Boolean, children: @Composable() () -> Unit) {
     if (vertical) {
         Column { children() }
     } else {
@@ -45,7 +45,7 @@ fun Stack(vertical: Boolean, @Children children: @Composable() () -> Unit) {
 }
 
 @Composable
-fun Container(@Children children: @Composable() () -> Unit) {
+fun Container(children: @Composable() () -> Unit) {
     // non-layout node component. just adds depth to the composition hierarchy.
     children()
 }

@@ -31,7 +31,7 @@ import androidx.ui.text.TextStyle
 import kotlin.random.Random
 
 @Composable
-fun Stack(@Children children: @Composable() () -> Unit) {
+fun Stack(children: @Composable() () -> Unit) {
     Column {
         children()
     }
