@@ -441,7 +441,7 @@ open class Composer<N>(
         endGroup()
     }
 
-    internal fun <T> consume(key: Ambient<T>): T = trace("Compose:consumeAmbient:$key") {
+    internal fun <T> consume(key: Ambient<T>): T {
         startGroup(consumer)
         changed(key)
         changed(invalidateStack.peek())
@@ -542,50 +542,48 @@ open class Composer<N>(
     private fun <T> invalidateConsumers(key: Ambient<T>) {
         // Inserting components don't have children yet.
         if (!inserting) {
-            trace("Compose:invalidateAmbient:$key") {
-                // Get the parent size from the slot table
-                val startStack = slots.startStack
-                val containingGroupIndex = if (startStack.isEmpty()) 1 else startStack.peek()
-                val start = containingGroupIndex + 1
-                val end = start + slots.groupSize(containingGroupIndex)
-                var index = start
+            // Get the parent size from the slot table
+            val startStack = slots.startStack
+            val containingGroupIndex = if (startStack.isEmpty()) 1 else startStack.peek()
+            val start = containingGroupIndex + 1
+            val end = start + slots.groupSize(containingGroupIndex)
+            var index = start
 
-                // Check the slots in range for recomposabile instances
-                loop@ while (index < end) {
-                    // A recomposable (i.e. a component) will always be in the first slot after the
-                    // group marker.  This is true because that is where the recompose routine will look
-                    // for it. If the slot does not hold a recomposable it is not a recomposable group
-                    // so skip it.
-                    if (slots.isGroup(index)) {
-                        val sentinel = slots.get(index - 1)
-                        when {
-                            sentinel === consumer -> {
-                                val ambient = slots.get(index + 1)
-                                if (ambient == key) {
-                                    val scope = slots.get(index + 2)
-                                    if (scope is RecomposeScope) {
-                                        scope.invalidate?.let { it(false) }
-                                    }
-                                }
-                            }
-                            sentinel === provider -> {
-                                val element = slots.get(index + 1)
-                                if (element is Ambient.Holder<*> && element.ambient == key) {
-                                    index += slots.groupSize(index)
-                                    continue@loop
-                                }
-                            }
-                            sentinel === reference -> {
-                                val element = slots.get(index + 1)
-                                if (element is CompositionLifecycleObserverHolder) {
-                                    val subElement = element.instance as CompositionReference
-                                    subElement.invalidateConsumers(key)
+            // Check the slots in range for recomposabile instances
+            loop@ while (index < end) {
+                // A recomposable (i.e. a component) will always be in the first slot after the
+                // group marker.  This is true because that is where the recompose routine will look
+                // for it. If the slot does not hold a recomposable it is not a recomposable group
+                // so skip it.
+                if (slots.isGroup(index)) {
+                    val sentinel = slots.get(index - 1)
+                    when {
+                        sentinel === consumer -> {
+                            val ambient = slots.get(index + 1)
+                            if (ambient == key) {
+                                val scope = slots.get(index + 2)
+                                if (scope is RecomposeScope) {
+                                    scope.invalidate?.let { it(false) }
                                 }
                             }
                         }
+                        sentinel === provider -> {
+                            val element = slots.get(index + 1)
+                            if (element is Ambient.Holder<*> && element.ambient == key) {
+                                index += slots.groupSize(index)
+                                continue@loop
+                            }
+                        }
+                        sentinel === reference -> {
+                            val element = slots.get(index + 1)
+                            if (element is CompositionLifecycleObserverHolder) {
+                                val subElement = element.instance as CompositionReference
+                                subElement.invalidateConsumers(key)
+                            }
+                        }
                     }
-                    index += 1
                 }
+                index += 1
             }
         }
     }
