@@ -83,7 +83,7 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.MEDIA2.group, "media2-exoplayer")
     prebuilts(LibraryGroups.MEDIA2, "media2-widget", "1.0.0-beta01")
     prebuilts(LibraryGroups.MEDIA2, "1.0.0-rc01")
-    prebuilts(LibraryGroups.MEDIAROUTER, "1.1.0")
+    prebuilts(LibraryGroups.MEDIAROUTER, "1.1.0-rc01")
     ignore(LibraryGroups.NAVIGATION.group, "navigation-testing")
     ignore(LibraryGroups.NAVIGATION.group, "navigation-safe-args-generator")
     ignore(LibraryGroups.NAVIGATION.group, "navigation-safe-args-gradle-plugin")
