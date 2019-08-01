@@ -16,6 +16,7 @@
 
 package androidx.build.dependencies
 
+const val ANDROID_GRADLE_PLUGIN = "com.android.tools.build:gradle:3.4.2"
 const val ANDROIDX_TEST_CORE = "androidx.test:core:1.1.0"
 const val ANDROIDX_TEST_EXT_JUNIT = "androidx.test.ext:junit:1.1.0"
 const val ANDROIDX_TEST_EXT_KTX = "androidx.test.ext:junit-ktx:1.1.0"
@@ -49,6 +50,7 @@ const val JUNIT = "junit:junit:4.12"
 const val KOTLINPOET = "com.squareup:kotlinpoet:1.1.0"
 
 private const val KOTLIN_VERSION = "1.3.41"
+const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.20"
 const val KOTLIN_STDLIB = "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
 const val KOTLIN_TEST_COMMON = "org.jetbrains.kotlin:kotlin-test:$KOTLIN_VERSION"
 const val COMPOSE_VERSION = "1.3.30-compose-20190520"
@@ -117,16 +119,14 @@ const val ARCH_CORE_COMMON = "androidx.arch.core:core-common:2.0.1@jar"
 const val ARCH_CORE_RUNTIME = "androidx.arch.core:core-runtime:2.0.1"
 const val ARCH_CORE_TESTING = "androidx.arch.core:core-testing:2.0.1"
 
-const val SAFE_ARGS_ANDROID_GRADLE_PLUGIN = "com.android.tools.build:gradle:3.4.0"
-const val SAFE_ARGS_KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.20"
-const val SAFE_ARGS_NAVIGATION_COMMON = "androidx.navigation:navigation-common:2.0.0-rc02"
-
 const val ARCH_PAGING_COMMON = "androidx.paging:paging-common:2.0.0"
 const val ARCH_PAGING_RUNTIME = "androidx.paging:paging-runtime:2.0.0"
 const val ARCH_ROOM_RUNTIME = "androidx.room:room-runtime:2.0.0"
 const val ARCH_ROOM_COMPILER = "androidx.room:room-compiler:2.0.0"
 const val ARCH_ROOM_RXJAVA = "androidx.room:room-rxjava2:2.0.0"
 const val ARCH_ROOM_TESTING = "androidx.room:room-testing:2.0.0"
+
+const val NAVIGATION_COMMON = "androidx.navigation:navigation-common:2.0.0-rc02"
 
 const val WORK_ARCH_CORE_RUNTIME = "androidx.arch.core:core-runtime:2.0.0"
 const val WORK_ARCH_CORE_TESTING = "androidx.arch.core:core-testing:2.0.0"
