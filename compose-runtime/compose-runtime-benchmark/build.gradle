@@ -30,10 +30,6 @@ plugins {
 android {
     defaultConfig {
         minSdkVersion 21
-
-        // Work-around for setting the testBuildType to "release" for benchmark projects causes gradle import get
-        // confused.
-        testBuildType = "debug"
     }
     lintOptions {
         disable("SyntheticAccessor")
