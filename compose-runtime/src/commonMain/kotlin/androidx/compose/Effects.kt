@@ -158,12 +158,13 @@ interface CommitScope {
  * onDispose. Saving this into a constant saves us an allocation on every initialization
  */
 private val emptyDispose: () -> Unit = {}
+private val emptyCommit: CommitScope.() -> Unit = {}
 
 @PublishedApi
 internal class PreCommitScopeImpl(
     internal val onCommit: CommitScope.() -> Unit
 ) : CommitScope, CompositionLifecycleObserver {
-    private var disposeCallback = emptyDispose
+    internal var disposeCallback = emptyDispose
 
     override fun onDispose(callback: () -> Unit) {
         require(disposeCallback === emptyDispose) {
@@ -357,7 +358,7 @@ fun onActive(callback: CommitScope.() -> Unit) = effectOf<Unit> {
 /**
  * An effect used to schedule work to be done when the effect leaves the composition.
  *
- * The `onDispose` effect is essentially a convenience effect for `onActive { onDispose { ... } }`.
+ * The `onDispose` effect is essentially a convenience effect for `onPreCommit(true) { onDispose { ... } }`.
  *
  * @param callback The lambda to be executed when the effect leaves the composition.
  *
@@ -366,7 +367,9 @@ fun onActive(callback: CommitScope.() -> Unit) = effectOf<Unit> {
  * @see [onActive]
  */
 @CheckResult("+")
-fun onDispose(callback: () -> Unit) = onActive { onDispose(callback) }
+fun onDispose(callback: () -> Unit) = effectOf<Unit> {
+    context.remember { PreCommitScopeImpl(emptyCommit).also { it.disposeCallback = callback } }
+}
 
 /**
  * The onCommit effect is a lifecycle effect that will execute [callback] every time the composition commits. It is useful for
