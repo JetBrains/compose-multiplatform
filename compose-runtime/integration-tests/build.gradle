@@ -34,6 +34,8 @@ dependencies {
     implementation(KOTLIN_COMPOSE_STDLIB)
 
     implementation(JUNIT)
+    androidTestImplementation(ANDROIDX_TEST_EXT_JUNIT)
+    androidTestImplementation(ANDROIDX_TEST_RULES)
 }
 
 android {

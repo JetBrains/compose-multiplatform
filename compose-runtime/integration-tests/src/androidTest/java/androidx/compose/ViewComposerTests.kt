@@ -19,6 +19,7 @@ package androidx.compose
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
+import android.os.Looper
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -29,10 +30,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import androidx.test.rule.ActivityTestRule
 import junit.framework.TestCase.assertEquals
-import org.junit.Ignore
+import org.junit.Assert
 import org.junit.Rule
 import org.junit.runner.RunWith
 import org.junit.Test
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 class TestActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -932,8 +935,7 @@ class NewCodeGenTests {
     ) {
         inner class ActiveTest(
             val activity: Activity,
-            val context: TestContext,
-            val component: Component
+            val context: TestContext
         ) {
 
             fun then(block: TestContext.(activity: Activity) -> Unit): ActiveTest {
@@ -953,7 +955,7 @@ class NewCodeGenTests {
             val root = activity.root
             val component = Root()
             val cc = Compose.createCompositionContext(root.context, root, component, null)
-            return ActiveTest(activity, TestContext(cc), component).then(block)
+            return ActiveTest(activity, TestContext(cc)).then(block)
         }
     }
 }
@@ -965,49 +967,96 @@ class DisposeTests {
     val disposeActivityRule = ActivityTestRule(DisposeTestActivity::class.java)
 
     class DisposeTestActivity : Activity() {
+        lateinit var root: ViewGroup
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
-            val root = FrameLayout(this)
-            val log = mutableListOf<String>()
-            val composable = @Composable {
-                +onPreCommit {
-                    log.add("onPreCommit")
-                    onDispose {
-                        log.add("onPreCommitDispose")
-                    }
-                }
-                +onActive {
-                    log.add("onActive")
-                    onDispose {
-                        log.add("onActiveDispose")
-                    }
-                }
-            }
-
-            log.clear()
-            Compose.composeInto(container = root, composable = composable)
-            assertEquals("onPreCommit, onActive", log.joinToString())
-
-            log.clear()
-            Compose.composeInto(container = root, composable = composable)
-            assertEquals("onPreCommitDispose, onPreCommit", log.joinToString())
-
-            log.clear()
-            Compose.disposeComposition(container = root)
-            assertEquals("onActiveDispose, onPreCommitDispose", log.joinToString())
-
-            log.clear()
-            Compose.composeInto(container = root, composable = composable)
-            assertEquals("onPreCommit, onActive", log.joinToString())
+            root = FrameLayout(this)
+            root.id = ComposerComposeTestCase.ROOT_ID
+            setContentView(root)
         }
     }
 
     @Test
     @SmallTest
-    @Ignore("TODO(b/138720405): Investigate synchronisation issues in tests")
     fun testDisposeComposition() {
-        disposeActivityRule.activity
+        val log = mutableListOf<String>()
+
+        val composable = @Composable {
+            +onPreCommit {
+                log.add("onPreCommit")
+                onDispose {
+                    log.add("onPreCommitDispose")
+                }
+            }
+            +onActive {
+                log.add("onActive")
+                onDispose {
+                    log.add("onActiveDispose")
+                }
+            }
+        }
+
+        val activity = disposeActivityRule.activity
+
+        fun assertLog(expected: String, block: () -> Unit) {
+            log.clear()
+            block()
+            assertEquals(expected, log.joinToString())
+        }
+
+        assertLog("onPreCommit, onActive") {
+            activity.show(composable)
+            activity.waitForAFrame()
+        }
+
+        assertLog("onPreCommitDispose, onPreCommit") {
+            activity.show(composable)
+            activity.waitForAFrame()
+        }
+
+        assertLog("onActiveDispose, onPreCommitDispose") {
+            activity.disposeTestComposition()
+            activity.waitForAFrame()
+        }
+
+        assertLog("onPreCommit, onActive") {
+            activity.show(composable)
+            activity.waitForAFrame()
+        }
+    } }
+
+internal val Activity.root get() = findViewById(ComposerComposeTestCase.ROOT_ID) as ViewGroup
+
+internal fun Activity.uiThread(block: () -> Unit) {
+    runOnUiThread(object : Runnable {
+        override fun run() {
+            block()
+        }
+    })
+}
+
+internal fun Activity.disposeTestComposition() {
+    uiThread {
+        Compose.disposeComposition(root)
     }
 }
 
-private val Activity.root get() = findViewById(ComposerComposeTestCase.ROOT_ID) as ViewGroup
+internal fun Activity.show(block: @Composable() () -> Unit) {
+    uiThread {
+        FrameManager.nextFrame()
+        Compose.composeInto(container = root, composable = block)
+    }
+}
+
+internal fun Activity.waitForAFrame() {
+    if (Looper.getMainLooper() == Looper.myLooper()) {
+        throw Exception("Cannot be run from the main looper thread")
+    }
+    val latch = CountDownLatch(1)
+    uiThread {
+        Choreographer.postFrameCallback {
+            latch.countDown()
+        }
+    }
+    Assert.assertTrue(latch.await(1, TimeUnit.MINUTES))
+}

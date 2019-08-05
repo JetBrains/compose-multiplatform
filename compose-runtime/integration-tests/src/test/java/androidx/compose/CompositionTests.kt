@@ -43,11 +43,9 @@ import androidx.compose.mock.skip
 import androidx.compose.mock.text
 import androidx.compose.mock.update
 import androidx.compose.mock.validate
-import androidx.test.filters.SmallTest
 import junit.framework.TestCase
 import org.junit.Assert
 
-@SmallTest
 class CompositionTests : TestCase() {
     fun testComposeAModel() {
         val model = testModel()

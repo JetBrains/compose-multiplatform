@@ -90,7 +90,7 @@ inline fun <reified T : ViewGroup> ViewComposition.emitViewGroup(
     loc: Int,
     ctor: (context: Context) -> T,
     noinline updater: ViewUpdater<T>.() -> Unit,
-    block: () -> Unit
+    block: @Composable() () -> Unit
 ) = emitViewGroup(loc, null, ctor, updater, block)
 
 inline fun <reified T : ViewGroup> ViewComposition.emitViewGroup(
@@ -116,7 +116,7 @@ inline fun <reified T : Emittable> ViewComposition.emitEmittable(
     loc: Int,
     ctor: () -> T,
     noinline updater: ViewUpdater<T>.() -> Unit,
-    block: () -> Unit
+    block: @Composable() () -> Unit
 ) = emitEmittable(loc, null, ctor, updater, block)
 
 inline fun <reified T : Emittable> ViewComposition.emitEmittable(
@@ -124,7 +124,7 @@ inline fun <reified T : Emittable> ViewComposition.emitEmittable(
     key: Int?,
     ctor: () -> T,
     noinline updater: ViewUpdater<T>.() -> Unit,
-    block: () -> Unit
+    block: @Composable() () -> Unit
 ) = emit(
     joinKey(loc, key),
     ctor,

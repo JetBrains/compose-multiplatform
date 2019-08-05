@@ -17,7 +17,6 @@
 package androidx.compose
 
 import android.app.Activity
-import android.view.ViewGroup
 import android.widget.TextView
 import androidx.compose.frames.AbstractRecord
 import androidx.compose.frames.Framed
@@ -25,14 +24,15 @@ import androidx.compose.frames.Record
 import androidx.compose.frames._created
 import androidx.compose.frames._readable
 import androidx.compose.frames._writable
+import androidx.compose.frames.commit
 import androidx.compose.frames.currentFrame
-import androidx.test.annotation.UiThreadTest
+import androidx.compose.frames.inFrame
+import androidx.compose.frames.open
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import androidx.test.rule.ActivityTestRule
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -128,8 +128,7 @@ class ModelViewTests {
     val activityRule = ActivityTestRule(TestActivity::class.java)
 
     @Test
-    @UiThreadTest
-    fun testModelView_Simple(): Unit = FrameManager.isolated {
+    fun testModelView_Simple() {
         val tvId = 67
         compose {
             emit(62, { context ->
@@ -144,8 +143,7 @@ class ModelViewTests {
     }
 
     @Test
-    @UiThreadTest
-    fun testModelView_Simple_Recompose(): Unit = FrameManager.isolated {
+    fun testModelView_Simple_Recompose() {
         val tvId = 71
         compose {
             emit(73, { context ->
@@ -163,18 +161,20 @@ class ModelViewTests {
     }
 
     @Test
-    @Ignore("TODO(b/138720405): Investigate synchronisation issues in tests")
-    @UiThreadTest
-    fun testModelView_PersonModel(): Unit = FrameManager.isolated {
+    fun testModelView_PersonModel() {
         val tvIdName = 90
         val tvIdAge = 91
-        val president = Person(
-            PRESIDENT_NAME_1,
-            PRESIDENT_AGE_1
-        )
+        val president = frame {
+            Person(
+                PRESIDENT_NAME_1,
+                PRESIDENT_AGE_1
+            )
+        }
+
+        @Suppress("PLUGIN_WARNING")
         compose {
             call(147, { true }) {
-                @Suppress("PLUGIN_ERROR")
+
                 (Observe {
                     emit(93, { context -> TextView(context).apply { id = tvIdName } }) {
                         set(president.name) { text = it }
@@ -201,18 +201,18 @@ class ModelViewTests {
     }
 
     @Test
-    @UiThreadTest
-    fun testModelView_RecomposeScopeCleanup(): Unit = FrameManager.isolated {
-        val washington = Person(
+    fun testModelView_RecomposeScopeCleanup() {
+        val washington = frame { Person(
             PRESIDENT_NAME_1,
             PRESIDENT_AGE_1
-        )
-        val lincoln = Person(
+        ) }
+        val lincoln = frame { Person(
             PRESIDENT_NAME_16,
             PRESIDENT_AGE_16
-        )
-        val displayLincoln = TestState(true)
+        ) }
+        val displayLincoln = frame { TestState(true) }
 
+        @Suppress("PLUGIN_WARNING")
         fun ViewComposition.display(person: Person) {
             call(167, { true }) {
                 @Suppress("PLUGIN_ERROR")
@@ -227,6 +227,7 @@ class ModelViewTests {
             }
         }
 
+        @Suppress("PLUGIN_WARNING")
         compose {
             call(185, { true }) {
                 @Suppress("PLUGIN_ERROR")
@@ -247,17 +248,16 @@ class ModelViewTests {
 
     // b/122548164
     @Test
-    @Ignore("TODO(b/138720405): Investigate synchronisation issues in tests")
-    fun testObserverEntering(): Unit = FrameManager.isolated {
-        val president = Person(
+    @Suppress("PLUGIN_WARNING")
+    fun testObserverEntering() {
+        val president = frame { Person(
             PRESIDENT_NAME_1,
             PRESIDENT_AGE_1
-        )
+        ) }
         val tvName = 204
 
         fun ViewComposition.display(person: Person) {
             call(167, { true }) {
-                @Suppress("PLUGIN_ERROR")
                 (Observe {
                     emit(93, { context -> TextView(context).apply { id = tvName } }) {
                         set(person.name) { text = it }
@@ -267,7 +267,6 @@ class ModelViewTests {
                     }
                 })
                 if (person.name == PRESIDENT_NAME_16) {
-                    @Suppress("PLUGIN_ERROR")
                     (Observe {
                         emit(211, { context -> TextView(context) }) {
                             set(person.name) { text = it }
@@ -282,7 +281,6 @@ class ModelViewTests {
 
         compose {
             call(219, { true }) {
-                @Suppress("PLUGIN_ERROR")
                 (Observe {
                     display(president)
                 })
@@ -296,17 +294,16 @@ class ModelViewTests {
     }
 
     @Test
-    @Ignore("TODO(b/138720405): Investigate synchronisation issues in tests")
-    fun testModelUpdatesNextFrameVisibility(): Unit = FrameManager.isolated {
-        val president = Person(
+    @Suppress("PLUGIN_WARNING")
+    fun testModelUpdatesNextFrameVisibility() {
+        val president = frame { Person(
             PRESIDENT_NAME_1,
             PRESIDENT_AGE_1
-        )
+        ) }
         val tvName = 204
 
         fun ViewComposition.display(person: Person) {
             call(167, { true }) {
-                @Suppress("PLUGIN_ERROR")
                 (Observe {
                     emit(93, { context -> TextView(context).apply { id = tvName } }) {
                         set(person.name) { text = it }
@@ -318,7 +315,6 @@ class ModelViewTests {
                     }
                 })
                 if (person.name == PRESIDENT_NAME_16) {
-                    @Suppress("PLUGIN_ERROR")
                     (Observe {
                         emit(211, { context -> TextView(context) }) {
                             set(person.name) { text = it }
@@ -333,7 +329,6 @@ class ModelViewTests {
 
         compose {
             call(219, { true }) {
-                @Suppress("PLUGIN_ERROR")
                 (Observe {
                     display(president)
                 })
@@ -344,10 +339,8 @@ class ModelViewTests {
             president.name = PRESIDENT_NAME_16
             // check that changes aren't there yet
             assertEquals(PRESIDENT_NAME_1, (activity.findViewById(tvName) as TextView).text)
-            Choreographer.postFrameCallback {
-                // after one frame we should see changes
-                assertEquals(PRESIDENT_NAME_16, (activity.findViewById(tvName) as TextView).text)
-            }
+        }.then { activity ->
+            assertEquals(PRESIDENT_NAME_16, (activity.findViewById(tvName) as TextView).text)
         }
     }
 
@@ -361,50 +354,31 @@ class ModelViewTests {
         CompositionModelTest(block, activityRule.activity)
 
     class CompositionModelTest(val composable: ViewComposition.() -> Unit, val activity: Activity) {
-        var savedContext: CompositionContext? = null
         inner class ActiveTest(val activity: Activity) {
-            private var firstCompose = true
-            private fun compose() {
-                if (firstCompose) {
-                    val composer = composer.composer
-                    composer.startRoot()
-                    val instance = composer.remember {
-                        Root(
-                            composable
-                        )
-                    }
-                    composer.startGroup(invocation)
-                    instance()
-                    composer.endGroup()
-                    composer.endRoot()
-                    firstCompose = false
-                    composer.applyChanges()
-                }
-            }
-
             fun then(block: (activity: Activity) -> Unit): ActiveTest {
-                compose()
-                block(activity)
+                activity.waitForAFrame()
+                activity.uiThread {
+                    block(activity)
+                }
                 return this
             }
         }
 
         fun then(block: (activity: Activity) -> Unit): ActiveTest {
-            val cc = Compose.createCompositionContext(
-                activity,
-                activity.root,
-                Root(composable),
-                null
-            )
-
-            // Ensure the context is not collected until the test completes.
-            savedContext = cc
-
-            return cc.composer.runWithCurrent {
-                ActiveTest(activity).then(block)
+            activity.show {
+                composer.composable()
             }
+            activity.waitForAFrame()
+            activity.uiThread {
+                block(activity)
+            }
+            return ActiveTest(activity)
         }
     }
 }
 
-private val Activity.root get() = findViewById(ComposerComposeTestCase.ROOT_ID) as ViewGroup
+fun <T> frame(block: () -> T): T {
+    val wasInFrame = inFrame
+    if (!wasInFrame) open()
+    return block().also { if (!wasInFrame) commit() }
+}

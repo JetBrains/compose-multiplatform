@@ -16,12 +16,10 @@
 
 package androidx.compose
 
-import android.app.Activity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import androidx.test.rule.ActivityTestRule
 import org.junit.Assert.assertEquals
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,34 +28,32 @@ import org.junit.runner.RunWith
 class ComposeIntoTests {
 
     @get:Rule
-    val activityRule = ActivityTestRule(ComposeIntoTestActivity::class.java)
+    val activityRule = ActivityTestRule(DisposeTests.DisposeTestActivity::class.java)
 
     @Test
     @SmallTest
-    @Ignore("TODO(b/138720405): Investigate synchronisation issues in tests")
     fun testMultipleSetContentCalls() {
         val activity = activityRule.activity
-        activity.run()
 
-        assertEquals(1, activity.initializationCount)
-        assertEquals(1, activity.commitCount)
-        activity.run()
-
-        // if we call setContent multiple times, we want to ensure that it doesn't tear
-        // down the whole hierarchy, so onActive should only get called once.
-        assertEquals(1, activity.initializationCount)
-        assertEquals(2, activity.commitCount)
-    }
-}
-
-class ComposeIntoTestActivity : Activity() {
-    var initializationCount = 0
-    var commitCount = 0
-
-    fun run() {
-        setViewContent {
+        var initializationCount = 0
+        var commitCount = 0
+        val composable = @Composable {
             +onActive { initializationCount++ }
             +onCommit { commitCount++ }
         }
+
+        activity.show(composable)
+        activity.waitForAFrame()
+
+        assertEquals(1, initializationCount)
+        assertEquals(1, commitCount)
+
+        activity.show(composable)
+        activity.waitForAFrame()
+
+        // if we call setContent multiple times, we want to ensure that it doesn't tear
+        // down the whole hierarchy, so onActive should only get called once.
+        assertEquals(1, initializationCount)
+        assertEquals(2, commitCount)
     }
 }
