@@ -17,30 +17,28 @@
 package androidx.compose
 
 import android.app.Activity
-import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
-import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.test.filters.SmallTest
 import androidx.test.rule.ActivityTestRule
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @SmallTest
 @RunWith(AndroidJUnit4::class)
+@Suppress("PLUGIN_WARNING")
 class EffectsTests {
 
     @get:Rule
     val activityRule = ActivityTestRule(TestActivity::class.java)
 
     @Test
-    @UiThreadTest
     fun testMemoization1() {
         var inc = 0
 
@@ -54,7 +52,6 @@ class EffectsTests {
     }
 
     @Test
-    @UiThreadTest
     fun testMemoization2() {
         var calculations = 0
         var compositions = 0
@@ -90,7 +87,6 @@ class EffectsTests {
     }
 
     @Test
-    @UiThreadTest
     fun testState1() {
         val tv1Id = 100
         var inc = 0
@@ -121,7 +117,6 @@ class EffectsTests {
     }
 
     @Test
-    @UiThreadTest
     fun testState2() {
         val tv1Id = 100
         val tv2Id = 200
@@ -168,7 +163,6 @@ class EffectsTests {
     }
 
     @Test
-    @UiThreadTest
     fun testPreCommit1() {
         var mount = true
 
@@ -229,7 +223,6 @@ class EffectsTests {
     }
 
     @Test
-    @UiThreadTest
     fun testPreCommit2() {
         var mount = true
 
@@ -305,7 +298,6 @@ class EffectsTests {
     }
 
     @Test
-    @UiThreadTest
     fun testPreCommit3() {
         var x = 0
 
@@ -336,7 +328,6 @@ class EffectsTests {
     }
 
     @Test
-    @UiThreadTest
     fun testPreCommit31() {
         var a = 0
         var b = 0
@@ -378,7 +369,6 @@ class EffectsTests {
     }
 
     @Test
-    @UiThreadTest
     fun testPreCommit4() {
         var x = 0
         var key = 123
@@ -421,7 +411,6 @@ class EffectsTests {
     }
 
     @Test
-    @UiThreadTest
     fun testPreCommit5() {
         var a = 0
         var b = 0
@@ -485,7 +474,6 @@ class EffectsTests {
     }
 
     @Test
-    @Ignore("TODO(b/138720405): Investigate synchronisation issues in tests")
     fun testOnCommit1() {
         var mount = true
 
@@ -564,7 +552,6 @@ class EffectsTests {
     }
 
     @Test
-    @UiThreadTest
     fun testAmbient1() {
         val tv1Id = 100
 
@@ -611,13 +598,13 @@ class EffectsTests {
     }
 
     @Test
-    @UiThreadTest
+    @MediumTest
     fun testAmbient2() {
-
-        val MyAmbient = Ambient.of<Double>("Hello") { throw Exception("not set") }
+        val MyAmbient = Ambient.of<Int>("Hello") { throw Exception("not set") }
 
         var requestRecompose: (() -> Unit)? = null
         var buttonCreated = false
+        var ambientValue = 1
 
         fun SimpleComposable2() {
             Observe {
@@ -632,19 +619,17 @@ class EffectsTests {
 
         fun SimpleComposable() {
             composer.call(531, { true }) {
-                Recompose(
-                    body = { recompose ->
-                        requestRecompose = recompose
-                        composer.provideAmbient(MyAmbient, Math.random()) {
-                            composer.call(523, { false }) { SimpleComposable2() }
-                            composer.emitView(525, { context ->
-                                Button(context).also {
-                                    buttonCreated = true
-                                }
-                            })
+                Recompose {
+                    requestRecompose = it
+                    composer.provideAmbient(MyAmbient, ambientValue++) {
+                        composer.call(523, { false }) { SimpleComposable2() }
+                        composer.emitView(525) { context ->
+                            Button(context).also {
+                                buttonCreated = true
+                            }
                         }
                     }
-                )
+                }
             }
         }
 
@@ -656,7 +641,7 @@ class EffectsTests {
             }
         }
 
-        compose {
+        compose(manualRecompose = true) {
             with(composer) {
                 call(556, { false }) {
                     Root()
@@ -668,12 +653,10 @@ class EffectsTests {
             requestRecompose?.invoke()
         }.then {
             assertFalse("Expected button to not be recreated", buttonCreated)
-            requestRecompose?.invoke()
         }
     }
 
     @Test
-    @UiThreadTest
     fun testUpdatedComposition() {
         val tv1Id = 100
         var inc = 0
@@ -694,39 +677,45 @@ class EffectsTests {
         }
     }
 
-    class CompositionTest(val composable: () -> Unit, val activity: Activity) {
-
-        inner class ActiveTest(
-            val activity: Activity,
-            val cc: CompositionContext,
-            val component: Component
-        ) {
-
+    class CompositionTest(
+        val composable: () -> Unit,
+        private val manualRecompose: Boolean,
+        private val activity: Activity
+    ) {
+        lateinit var doRecompose: () -> Unit
+        inner class ActiveTest(private val activity: Activity) {
             fun then(block: (activity: Activity) -> Unit): ActiveTest {
-                cc.composer.runWithCurrent {
-                    cc.compose()
+                if (!manualRecompose) {
+                    activity.uiThread {
+                        doRecompose()
+                    }
                 }
-                block(activity)
+                activity.waitForAFrame()
+                activity.uiThread {
+                    block(activity)
+                }
                 return this
             }
         }
 
-        private class Root(var composable: () -> Unit) : Component() {
-            override fun compose() = composable()
-        }
-
         fun then(block: (activity: Activity) -> Unit): ActiveTest {
-            val root = activity.root
-            val component = Root(composable)
-            val cc = Compose.createCompositionContext(root.context, root, component, null)
-            return ActiveTest(activity, cc, component).then(block)
+            activity.show {
+                Recompose {
+                    doRecompose = it
+                    composable()
+                }
+            }
+            activity.waitForAFrame()
+            activity.uiThread {
+                block(activity)
+            }
+            return ActiveTest(activity)
         }
     }
 
-    fun compose(composable: () -> Unit) = CompositionTest(composable, activityRule.activity)
+    fun compose(manualRecompose: Boolean = false, composable: () -> Unit) =
+        CompositionTest(composable, manualRecompose, activityRule.activity)
 }
-
-private val Activity.root get() = findViewById(ComposerComposeTestCase.ROOT_ID) as ViewGroup
 
 fun <T> assertArrayEquals(
     expected: Collection<T>,

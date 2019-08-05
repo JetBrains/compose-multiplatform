@@ -14,7 +14,6 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   -->
-<manifest
-        package="androidx.compose.integrationtests.androidtests" xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest package="androidx.compose.integrationtests.androidtests">
     <application/>
 </manifest>

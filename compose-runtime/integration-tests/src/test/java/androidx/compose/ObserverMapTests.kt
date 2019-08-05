@@ -16,12 +16,10 @@
 
 package androidx.compose
 
-import androidx.test.filters.SmallTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
-@SmallTest
 class ObserverMapTests {
 
     private val node1 = 1

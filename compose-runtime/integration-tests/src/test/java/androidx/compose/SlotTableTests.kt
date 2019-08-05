@@ -16,11 +16,9 @@
 
 package androidx.compose
 
-import androidx.test.filters.SmallTest
 import junit.framework.TestCase
 import org.junit.Assert
 
-@SmallTest
 class SlotTableTests : TestCase() {
     fun testCanCreate() {
         SlotTable()

@@ -170,12 +170,13 @@ class ViewComposer(
         endNode()
     }
 
+    @Suppress("PLUGIN_WARNING")
     inline fun <T : ViewGroup> emit(
         key: Any,
         /*crossinline*/
         ctor: (context: Context) -> T,
         update: ViewUpdater<T>.() -> Unit,
-        children: () -> Unit
+        children: @Composable() () -> Unit
     ) = with(composer) {
         startNode(key)
         val node = if (inserting) ctor(context).also { emitNode(it) }
@@ -198,12 +199,13 @@ class ViewComposer(
         endNode()
     }
 
+    @Suppress("PLUGIN_WARNING")
     inline fun <T : Emittable> emit(
         key: Any,
         /*crossinline*/
         ctor: () -> T,
         update: ViewUpdater<T>.() -> Unit,
-        children: () -> Unit
+        children: @Composable() () -> Unit
     ) = with(composer) {
         startNode(key)
         val node = if (inserting) ctor().also { emitNode(it) }
@@ -216,11 +218,12 @@ class ViewComposer(
     @Suppress("NOTHING_TO_INLINE")
     inline fun joinKey(left: Any, right: Any?): Any = composer.joinKey(left, right)
 
+    @Suppress("PLUGIN_WARNING")
     inline fun call(
         key: Any,
         /*crossinline*/
         invalid: ViewValidator.() -> Boolean,
-        block: () -> Unit
+        block: @Composable() () -> Unit
     ) = with(composer) {
         startGroup(key)
         if (ViewValidator(composer).invalid() || inserting) {

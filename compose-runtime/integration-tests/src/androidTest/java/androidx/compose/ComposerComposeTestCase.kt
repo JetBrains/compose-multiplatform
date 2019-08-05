@@ -21,19 +21,47 @@ import android.view.ViewGroup
 
 abstract class ComposerComposeTestCase {
 
-    fun compose(activity: Activity, composable: (ViewComposition) -> Unit) =
+    fun compose(
+        activity: Activity,
+        manualRecompose: Boolean,
+        composable: (ViewComposition) -> Unit
+    ) =
         ComposeTest(
             Root(composable),
+            manualRecompose,
             activity
         )
 
-    class ComposeTest(val component: Component, val activity: Activity) {
-
-        fun then(fn: (CompositionContext, Component, ViewGroup, Activity) -> Unit) {
-            val root = activity.findViewById(ROOT_ID) as ViewGroup
-            val cc = Compose.createCompositionContext(root.context, root, component, null)
+    class ComposeTest(
+        val component: Component,
+        val manualRecompose: Boolean,
+        val activity: Activity
+    ) {
+        internal lateinit var root: ViewGroup
+        internal lateinit var cc: CompositionContext
+        fun then(fn: (CompositionContext, Component, ViewGroup, Activity) -> Unit): ActiveTest {
+            activity.uiThread {
+                root = activity.findViewById(ROOT_ID) as ViewGroup
+                cc = Compose.createCompositionContext(root.context, root, component, null)
                 cc.compose()
                 fn(cc, component, root, activity)
+            }
+            return ActiveTest()
+        }
+
+        inner class ActiveTest {
+            fun then(fn: (CompositionContext, Component, ViewGroup, Activity) -> Unit): ActiveTest {
+                if (!manualRecompose) {
+                    activity.uiThread {
+                        component.recomposeCallback?.invoke(false)
+                    }
+                }
+                activity.waitForAFrame()
+                activity.uiThread {
+                    fn(cc, component, root, activity)
+                }
+                return this
+            }
         }
     }
 

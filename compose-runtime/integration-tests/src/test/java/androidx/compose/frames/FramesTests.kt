@@ -16,7 +16,6 @@
 
 package androidx.compose.frames
 
-import androidx.test.filters.SmallTest
 import junit.framework.TestCase
 import org.junit.Assert
 import java.util.ArrayDeque
@@ -27,7 +26,6 @@ const val OLD_CITY = "AnyTown"
 const val NEW_STREET = "456 New Street"
 const val NEW_CITY = "AnyCity"
 
-@SmallTest
 class FrameTest : TestCase() {
 
     fun testCreatingAddress() {
