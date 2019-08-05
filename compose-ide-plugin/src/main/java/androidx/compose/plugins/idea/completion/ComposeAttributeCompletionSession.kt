@@ -122,9 +122,6 @@ class ComposeAttributeCompletionSession(
             myTailText += " (from $klass)"
         }
 
-        if (isChildren) {
-            myTailText += " (@Children)"
-        }
         if (isRequired) {
             myTailText += " (required)"
         }
