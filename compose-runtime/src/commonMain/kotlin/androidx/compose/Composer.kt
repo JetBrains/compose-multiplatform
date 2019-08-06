@@ -174,7 +174,7 @@ open class Composer<N>(
     private val slotTable: SlotTable,
     private val applier: Applier<N>,
     private val recomposer: Recomposer
-) : Composition<N>() {
+) {
     private val changes = mutableListOf<Change<N>>()
     private val lifecycleObservers = mutableMapOf<
             CompositionLifecycleObserverHolder,
@@ -241,7 +241,7 @@ open class Composer<N>(
         slots.close()
     }
 
-    override val inserting: Boolean get() = slots.inEmpty
+    val inserting: Boolean get() = slots.inEmpty
 
     fun applyChanges() {
         trace("Compose:applyChanges") {
@@ -299,10 +299,10 @@ open class Composer<N>(
         }
     }
 
-    override fun startGroup(key: Any) = start(key, START_GROUP)
-    override fun endGroup() = end(END_GROUP)
+    fun startGroup(key: Any) = start(key, START_GROUP)
+    fun endGroup() = end(END_GROUP)
 
-    override fun skipGroup() {
+    fun skipGroup() {
         recordSkip(START_GROUP)
         groupNodeCount += slots.skipGroup()
     }
@@ -313,13 +313,13 @@ open class Composer<N>(
         skipGroupAndRecomposeRange()
     }
 
-    override fun startNode(key: Any) {
+    fun startNode(key: Any) {
         start(key, START_NODE)
         childrenAllowed = false
     }
 
     // Deprecated
-    override fun <T : N> emitNode(factory: () -> T) {
+    fun <T : N> emitNode(factory: () -> T) {
         if (inserting) {
             val insertIndex = nodeIndexStack.peek()
             // The pending is the pending information for where the node is being inserted.
@@ -339,7 +339,7 @@ open class Composer<N>(
         childrenAllowed = true
     }
 
-    override fun <T : N> createNode(factory: () -> T) {
+    fun <T : N> createNode(factory: () -> T) {
         val insertIndex = nodeIndexStack.peek()
         // see emitNode
         pending?.let { it.nodeCount++ }
@@ -353,7 +353,7 @@ open class Composer<N>(
         childrenAllowed = true
     }
 
-    override fun emitNode(node: N) {
+    fun emitNode(node: N) {
         require(inserting) { "emitNode() called when not inserting" }
         val insertIndex = nodeIndexStack.peek()
         // see emitNode
@@ -367,7 +367,7 @@ open class Composer<N>(
         childrenAllowed = true
     }
 
-    override fun useNode(): N {
+    fun useNode(): N {
         require(!inserting) { "useNode() called while inserting" }
         recordDown()
         val result = slots.next()
@@ -376,24 +376,24 @@ open class Composer<N>(
         return result as N
     }
 
-    override fun endNode() {
+    fun endNode() {
         end(END_NODE)
     }
 
-    override fun <V, T> apply(value: V, block: T.(V) -> Unit) {
+    fun <V, T> apply(value: V, block: T.(V) -> Unit) {
         recordOperation { applier, _, _ ->
             @Suppress("UNCHECKED_CAST")
             (applier.current as T).block(value)
         }
     }
 
-    override fun joinKey(left: Any?, right: Any?): Any =
+    fun joinKey(left: Any?, right: Any?): Any =
         getKey(slots.get(slots.current), left, right)
             ?: JoinedKey(left, right)
 
-    override fun nextSlot(): Any? = slots.next()
+    fun nextSlot(): Any? = slots.next()
 
-    override fun skipValue() = recordSlotNext()
+    fun skipValue() = recordSlotNext()
 
     fun <T> changed(value: T): Boolean {
         return if (nextSlot() != value || inserting) {
@@ -405,7 +405,7 @@ open class Composer<N>(
         }
     }
 
-    override fun updateValue(value: Any?) {
+    fun updateValue(value: Any?) {
         recordOperation { _, slots, lifecycleManager ->
             val previous = if (value is CompositionLifecycleObserver) {
                 val slotValue = lifecycleManager.entering(
@@ -1284,6 +1284,92 @@ open class Composer<N>(
             }
         }
     }
+}
+
+fun <N> Composer<N>.nextValue(): Any? = nextSlot().let {
+    if (it is CompositionLifecycleObserverHolder) it.instance else it
+}
+
+inline fun <N, T> Composer<N>.cache(valid: Boolean = true, block: () -> T): T {
+    var result = nextValue()
+    if (result === SlotTable.EMPTY || !valid) {
+        val value = block()
+        updateValue(value)
+        result = value
+    } else skipValue()
+
+    @Suppress("UNCHECKED_CAST")
+    return result as T
+}
+
+/* inline */
+fun <N, V> Composer<N>.remember(block: () -> V): V = cache(true, block)
+
+/* inline */
+fun <N, V, /* reified */ P1> Composer<N>.remember(p1: P1, block: () -> V) =
+    cache(!changed(p1), block)
+
+/* inline */
+fun <
+        N,
+        V,
+        /* reified */
+        P1,
+        /* reified */
+        P2
+        > Composer<N>.remember(p1: P1, p2: P2, block: () -> V): V {
+    var valid = !changed(p1)
+    valid = !changed(p2) && valid
+    return cache(valid, block)
+}
+
+/* inline */
+fun <
+        N,
+        V,
+        /* reified */
+        P1,
+        /* reified */
+        P2,
+        /* reified */
+        P3
+        > Composer<N>.remember(p1: P1, p2: P2, p3: P3, block: () -> V): V {
+    var valid = !changed(p1)
+    valid = !changed(p2) && valid
+    valid = !changed(p3) && valid
+    return cache(valid, block)
+}
+
+/* inline */
+fun <
+        N,
+        V,
+        /* reified */
+        P1,
+        /* reified */
+        P2,
+        /* reified */
+        P3,
+        /* reified */
+        P4
+        > Composer<N>.remember(
+            p1: P1,
+            p2: P2,
+            p3: P3,
+            p4: P4,
+            block: () -> V
+        ): V {
+    var valid = !changed(p1)
+    valid = !changed(p2) && valid
+    valid = !changed(p3) && valid
+    valid = !changed(p4) && valid
+    return cache(valid, block)
+}
+
+/* inline */ fun <N, V> Composer<N>.remember(vararg args: Any?, block: () -> V): V {
+    var valid = true
+    for (arg in args) valid = !changed(arg) && valid
+    return cache(valid, block)
 }
 
 private fun removeCurrentItem(slots: SlotWriter, lifecycleManager: LifeCycleManager) {

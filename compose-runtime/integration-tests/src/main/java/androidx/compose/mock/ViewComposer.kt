@@ -19,26 +19,24 @@ package androidx.compose.mock
 import androidx.compose.Applier
 import androidx.compose.ApplyAdapter
 import androidx.compose.Composer
-import androidx.compose.Composition
 import androidx.compose.Recomposer
 import androidx.compose.SlotTable
 import androidx.compose.cache
-import androidx.compose.changed
 import androidx.compose.remember
 
 interface MockViewComposition {
-    val cc: Composition<View>
+    val cc: Composer<View>
 }
 
 abstract class ViewComponent : MockViewComposition {
     private var recomposer: ((sync: Boolean) -> Unit)? = null
-    private lateinit var _composition: Composition<View>
+    private lateinit var composer: Composer<View>
     @PublishedApi
-    internal fun setComposition(value: Composition<View>) {
-        _composition = value
+    internal fun setComposer(value: Composer<View>) {
+        composer = value
     }
 
-    override val cc: Composition<View> get() = _composition
+    override val cc: Composer<View> get() = composer
 
     fun recompose() {
         recomposer?.let { it(false) }
@@ -79,7 +77,7 @@ class MockViewComposer(
     }) {
     private val rootComposer: MockViewComposition by lazy {
         object : MockViewComposition {
-            override val cc: Composition<View> get() = this@MockViewComposer
+            override val cc: Composer<View> get() = this@MockViewComposer
         }
     }
 
@@ -90,7 +88,7 @@ class MockViewComposer(
     }
 }
 
-/* inline */ fun <N, /* reified */ V> Composition<N>.applyNeeded(value: V): Boolean =
+/* inline */ fun <N, /* reified */ V> Composer<N>.applyNeeded(value: V): Boolean =
     changed(value) && !inserting
 
 @Suppress("NOTHING_TO_INLINE")
@@ -183,7 +181,7 @@ val invocation = Object()
 
 inline fun MockViewComposition.call(
     key: Any,
-    invalid: Composition<View>.() -> Boolean,
+    invalid: Composer<View>.() -> Boolean,
     block: () -> Unit
 ) = with(cc) {
     startGroup(key)
@@ -204,9 +202,9 @@ inline fun <T : ViewComponent> MockViewComposition.call(
     block: (f: T) -> Unit
 ) = with(cc) {
     startGroup(key)
-    val f = cache(true, ctor).apply { setComposition(this@with) }
+    val f = cache(true, ctor).apply { setComposer(this@with) }
     val updater = object : ComponentUpdater<T> {
-        override val cc: Composition<View> = this@with
+        override val cc: Composer<View> = this@with
         override var changed: Boolean = false
         override val component = f
     }
