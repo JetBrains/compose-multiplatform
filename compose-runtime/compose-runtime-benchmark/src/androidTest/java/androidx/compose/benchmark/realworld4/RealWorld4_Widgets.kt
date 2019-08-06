@@ -28,7 +28,7 @@ import androidx.ui.core.WithConstraints
 import androidx.ui.foundation.ColoredRect
 import androidx.ui.core.dp
 import androidx.ui.core.toRect
-import androidx.ui.graphics.vectorgraphics.SolidColor
+import androidx.ui.graphics.SolidColor
 import androidx.ui.painting.Paint
 import androidx.ui.graphics.Color
 import androidx.ui.layout.FlexColumn
