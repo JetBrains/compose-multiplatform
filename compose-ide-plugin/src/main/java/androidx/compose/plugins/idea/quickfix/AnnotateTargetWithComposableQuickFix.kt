@@ -37,7 +37,6 @@ import org.jetbrains.kotlin.psi.KtPsiFactory
 import androidx.compose.plugins.kotlin.ComposeFqNames
 import androidx.compose.plugins.kotlin.analysis.ComposeErrors
 
-// TODO(lmr): we should do the same with @Children
 class AnnotateTargetWithComposableQuickFix(
     private val expression: KtElement
 ) : KotlinQuickFixAction<KtElement>(expression) {
