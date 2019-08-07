@@ -31,8 +31,6 @@ expect open class ThreadLocal<T>() {
 
 expect class WeakHashMap<K, V>() : MutableMap<K, V>
 
-internal expect fun arraycopy(source: Any, sourcePos: Int, dest: Any, destPos: Int, len: Int)
-
 expect fun identityHashCode(instance: Any?): Int
 
 expect interface ViewParent

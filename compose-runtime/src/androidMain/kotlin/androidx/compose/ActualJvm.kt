@@ -34,9 +34,6 @@ actual open class ThreadLocal<T> actual constructor() : java.lang.ThreadLocal<T>
 
 actual typealias WeakHashMap<K, V> = java.util.WeakHashMap<K, V>
 
-internal actual fun arraycopy(source: Any, sourcePos: Int, dest: Any, destPos: Int, len: Int) =
-    System.arraycopy(source, sourcePos, dest, destPos, len)
-
 actual fun identityHashCode(instance: Any?): Int = System.identityHashCode(instance)
 
 actual inline fun <R> synchronized(lock: Any, block: () -> R): R {

@@ -211,6 +211,7 @@ open class SlotEditor internal constructor(val table: SlotTable) {
         ) {
             "Invalid state. Start location stack doesn't refer to a start location"
         }
+
         val len = current - startLocation - 1
         if (writing) {
             slots[effectiveStartLocation] = GroupStart(groupKind, len, nodeCount)
@@ -498,13 +499,9 @@ class SlotWriter internal constructor(table: SlotTable) : SlotEditor(table) {
         val newMoveLocation = moveLocation + moveLen
         current = oldCurrent
         nodeCount = oldNodeCount
-        arraycopy(
-            slots,
-            effectiveIndex(newMoveLocation),
-            slots,
-            effectiveIndex(current),
-            moveLen
-        )
+
+        slots.copyInto(slots, effectiveIndex(current),
+            effectiveIndex(newMoveLocation), effectiveIndex(newMoveLocation) + moveLen)
 
         // Before we remove the old location, move any anchors
         table.moveAnchors(newMoveLocation, current, moveLen)
@@ -581,17 +578,12 @@ class SlotWriter internal constructor(table: SlotTable) : SlotEditor(table) {
                 pendingClear = false
                 if (table.anchors.isNotEmpty()) table.updateAnchors(index)
                 if (index < table.gapStart) {
-                    val len = table.gapStart - index
-                    arraycopy(slots, index, slots, index + table.gapLen, len)
+                    slots.copyInto(slots, index + table.gapLen,
+                        index, table.gapStart)
                 } else {
-                    val len = index - table.gapStart
-                    arraycopy(
-                        slots,
+                    slots.copyInto(slots, table.gapStart,
                         table.gapStart + table.gapLen,
-                        slots,
-                        table.gapStart,
-                        len
-                    )
+                        index + table.gapLen)
                 }
                 table.gapStart = index
                 pendingClear = true
@@ -619,8 +611,8 @@ class SlotWriter internal constructor(table: SlotTable) : SlotEditor(table) {
                     val oldGapEnd = table.gapStart + table.gapLen
                     val newGapEnd = table.gapStart + newGapLen
                     // Copy the old array into the new array
-                    arraycopy(slots, 0, newSlots, 0, table.gapStart)
-                    arraycopy(slots, oldGapEnd, newSlots, newGapEnd, oldCapacity - oldGapEnd)
+                    slots.copyInto(newSlots, 0, 0, table.gapStart)
+                    slots.copyInto(newSlots, newGapEnd, oldGapEnd, oldCapacity)
 
                     // Update the anchors
                     if (table.anchors.isNotEmpty()) table.anchorGapResize(newGapLen - table.gapLen)
