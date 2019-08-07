@@ -633,8 +633,7 @@ class SlotWriter internal constructor(table: SlotTable) : SlotEditor(table) {
         }
     }
 
-    // TODO(138720404): Investigate if Compose APIs can be internal despite MPP limitations
-    fun remove(start: Int, len: Int): Boolean {
+    internal fun remove(start: Int, len: Int): Boolean {
         return if (len > 0) {
             pendingClear = false
             var anchorsRemoved = false
@@ -721,8 +720,7 @@ class SlotTable(internal var slots: Array<Any?> = arrayOf()) {
 
     internal fun clearGap() = repeat(gapLen) { i -> slots[gapStart + i] = null }
 
-    // TODO(138720404): Investigate if Compose APIs can be internal despite MPP limitations
-    fun anchor(index: Int): Anchor {
+    internal fun anchor(index: Int): Anchor {
         // TODO: Consider a buffer gap list of anchors if middle inserts and deletes are common
         val anchorIndex = effectiveIndex(index)
         val location = anchors.search(anchorIndex)
@@ -819,8 +817,7 @@ class SlotTable(internal var slots: Array<Any?> = arrayOf()) {
         }
     }
 
-    // TODO(138720404): Investigate if Compose APIs can be internal despite MPP limitations
-    fun anchorLocation(anchor: Anchor) = anchor.loc.let {
+    internal fun anchorLocation(anchor: Anchor) = anchor.loc.let {
         if (it > gapStart) it - gapLen else it
     }
 

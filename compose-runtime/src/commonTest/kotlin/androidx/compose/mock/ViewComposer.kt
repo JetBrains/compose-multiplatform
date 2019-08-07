@@ -177,7 +177,7 @@ inline fun <V : View, reified A1> MockViewComposition.emit(
     cc.endNode()
 }
 
-val invocation = Object()
+val invocation = Any()
 
 inline fun MockViewComposition.call(
     key: Any,

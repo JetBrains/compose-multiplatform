@@ -16,7 +16,7 @@
 
 package androidx.compose.mock
 
-import org.junit.Assert
+import kotlin.test.assertEquals
 
 interface MockViewValidator {
     val view: View
@@ -41,17 +41,17 @@ class MockViewListValidator(private val views: List<View>) :
         if (block != null) {
             this.block()
             val hasNext = next()
-            Assert.assertEquals("Expected children but none found", false, hasNext)
+            assertEquals(false, hasNext, "Expected children but none found")
         } else {
-            Assert.assertEquals("Not expecting children but some found", 0, views.size)
+            assertEquals(0, views.size, "Not expecting children but some found")
         }
     }
 }
 
 fun MockViewValidator.view(name: String, block: (MockViewValidator.() -> Unit)? = null) {
     val hasNext = next()
-    Assert.assertEquals(true, hasNext)
-    Assert.assertEquals(name, view.name)
+    assertEquals(true, hasNext)
+    assertEquals(name, view.name)
     MockViewListValidator(view.children).validate(block)
 }
 
@@ -66,11 +66,11 @@ fun MockViewValidator.linear(block: MockViewValidator.() -> Unit) = view("linear
 fun MockViewValidator.box(block: MockViewValidator.() -> Unit) = view("box", block)
 fun MockViewValidator.text(value: String) {
     view("text")
-    Assert.assertEquals(value, view.attributes["text"])
+    assertEquals(value, view.attributes["text"])
 }
 fun MockViewValidator.edit(value: String) {
     view("edit")
-    Assert.assertEquals(value, view.attributes["value"])
+    assertEquals(value, view.attributes["value"])
 }
 
 fun MockViewValidator.selectBox(selected: Boolean, block: MockViewValidator.() -> Unit) {
@@ -86,7 +86,7 @@ fun MockViewValidator.selectBox(selected: Boolean, block: MockViewValidator.() -
 fun MockViewValidator.skip(times: Int = 1) {
     repeat(times) {
         val hasNext = next()
-        Assert.assertEquals(true, hasNext)
+        assertEquals(true, hasNext)
     }
 }
 

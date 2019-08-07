@@ -110,8 +110,7 @@ class Frame(
 ) {
     internal val modified = if (readOnly) null else HashSet<Framed>()
 
-    // TODO(138720404): Investigate if Compose APIs can be internal despite MPP limitations
-    val readObservers = mutableListOf<FrameReadObserver>()
+    internal val readObservers = mutableListOf<FrameReadObserver>()
 
     init {
         if (readObserver != null) {

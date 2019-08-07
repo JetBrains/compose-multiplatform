@@ -202,14 +202,18 @@ class ModelViewTests {
 
     @Test
     fun testModelView_RecomposeScopeCleanup() {
-        val washington = frame { Person(
-            PRESIDENT_NAME_1,
-            PRESIDENT_AGE_1
-        ) }
-        val lincoln = frame { Person(
-            PRESIDENT_NAME_16,
-            PRESIDENT_AGE_16
-        ) }
+        val washington = frame {
+            Person(
+                PRESIDENT_NAME_1,
+                PRESIDENT_AGE_1
+            )
+        }
+        val lincoln = frame {
+            Person(
+                PRESIDENT_NAME_16,
+                PRESIDENT_AGE_16
+            )
+        }
         val displayLincoln = frame { TestState(true) }
 
         @Suppress("PLUGIN_WARNING")
@@ -217,13 +221,13 @@ class ModelViewTests {
             call(167, { true }) {
                 @Suppress("PLUGIN_ERROR")
                 (Observe {
-                    emit(93, { context -> TextView(context) }) {
-                        set(person.name) { text = it }
-                    }
-                    emit(94, { context -> TextView(context) }) {
-                        set(person.age) { text = it.toString() }
-                    }
-                })
+        emit(93, { context -> TextView(context) }) {
+            set(person.name) { text = it }
+        }
+        emit(94, { context -> TextView(context) }) {
+            set(person.age) { text = it.toString() }
+        }
+    })
             }
         }
 
@@ -232,10 +236,10 @@ class ModelViewTests {
             call(185, { true }) {
                 @Suppress("PLUGIN_ERROR")
                 (Observe {
-                    display(washington)
-                    if (displayLincoln.value)
-                        display(lincoln)
-                })
+        display(washington)
+        if (displayLincoln.value)
+            display(lincoln)
+    })
             }
         }.then {
             displayLincoln.value = false
@@ -250,10 +254,12 @@ class ModelViewTests {
     @Test
     @Suppress("PLUGIN_WARNING")
     fun testObserverEntering() {
-        val president = frame { Person(
-            PRESIDENT_NAME_1,
-            PRESIDENT_AGE_1
-        ) }
+        val president = frame {
+            Person(
+                PRESIDENT_NAME_1,
+                PRESIDENT_AGE_1
+            )
+        }
         val tvName = 204
 
         fun ViewComposition.display(person: Person) {
@@ -296,10 +302,12 @@ class ModelViewTests {
     @Test
     @Suppress("PLUGIN_WARNING")
     fun testModelUpdatesNextFrameVisibility() {
-        val president = frame { Person(
-            PRESIDENT_NAME_1,
-            PRESIDENT_AGE_1
-        ) }
+        val president = frame {
+            Person(
+                PRESIDENT_NAME_1,
+                PRESIDENT_AGE_1
+            )
+        }
         val tvName = 204
 
         fun ViewComposition.display(person: Person) {

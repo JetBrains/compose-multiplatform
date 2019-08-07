@@ -14,10 +14,6 @@
  * limitations under the License.
  */
 
-
-import org.jetbrains.kotlin.codegen.ImplementationBodyCodegen
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 import static androidx.build.dependencies.DependenciesKt.*
 import androidx.build.LibraryGroups
 import androidx.build.LibraryVersions
@@ -25,6 +21,7 @@ import androidx.build.Publish
 
 plugins {
     id("AndroidXPlugin")
+    id("AndroidXUiPlugin")
     id("com.android.library")
     id("kotlin-multiplatform")
 }
@@ -34,42 +31,30 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation "org.jetbrains.kotlin:kotlin-stdlib-common:$KOTLIN_VERSION"
-        }
-        commonTest.dependencies {
-            // TODO https://youtrack.jetbrains.com/issue/KT-29343
-            implementation "org.jetbrains.kotlin:kotlin-stdlib-common:$KOTLIN_VERSION"
-            implementation(kotlin("test-annotations-common"))
-        }
-        androidMain.dependencies {
-            implementation "androidx.annotation:annotation:1.0.0"
             implementation(KOTLIN_COMPOSE_STDLIB)
             implementation(KOTLIN_COMPOSE_REFLECT)
         }
-        androidTest.dependencies {
+        commonTest.dependencies {
+            implementation kotlin("test-junit")
         }
-
+        androidMain.dependencies {
+            implementation "androidx.annotation:annotation:1.0.0"
+        }
+        androidAndroidTest.dependencies {
+            implementation(KOTLIN_COMPOSE_REFLECT)
+            implementation(ANDROIDX_TEST_EXT_JUNIT)
+            implementation(ANDROIDX_TEST_RULES)
+        }
     }
 }
 
 android {
-    defaultConfig {
-        minSdkVersion 18
-    }
-    lintOptions {
-        disable("SyntheticAccessor")
-    }
     buildTypes {
         debug {
             testCoverageEnabled = false
         }
         release {
             testCoverageEnabled = false
-        }
-    }
-    sourceSets {
-        main {
-            manifest.srcFile 'src/androidMain/AndroidManifest.xml'
         }
     }
 }

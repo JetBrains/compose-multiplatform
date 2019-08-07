@@ -43,10 +43,14 @@ import androidx.compose.mock.skip
 import androidx.compose.mock.text
 import androidx.compose.mock.update
 import androidx.compose.mock.validate
-import junit.framework.TestCase
-import org.junit.Assert
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
+import kotlin.test.assertTrue
 
-class CompositionTests : TestCase() {
+class CompositionTests {
+
+    @Test
     fun testComposeAModel() {
         val model = testModel()
         val composer = compose(model)
@@ -69,6 +73,7 @@ class CompositionTests : TestCase() {
         }
     }
 
+    @Test
     fun testRecomposeWithoutChanges() {
         val model = testModel()
         val composer = compose(model)
@@ -80,6 +85,7 @@ class CompositionTests : TestCase() {
         }
     }
 
+    @Test
     fun testInsertAContact() {
         val model =
             testModel(mutableListOf(bob, jon))
@@ -116,6 +122,7 @@ class CompositionTests : TestCase() {
         }
     }
 
+    @Test
     fun testMoveAContact() {
         val model = testModel(
             mutableListOf(
@@ -144,6 +151,7 @@ class CompositionTests : TestCase() {
         }
     }
 
+    @Test
     fun testChangeTheFilter() {
         val model = testModel(
             mutableListOf(
@@ -170,6 +178,7 @@ class CompositionTests : TestCase() {
         }
     }
 
+    @Test
     fun testComposeCompositionWithMultipleRoots() {
         val reports = listOf(
             jim_reports_to_sally,
@@ -186,6 +195,7 @@ class CompositionTests : TestCase() {
         }
     }
 
+    @Test
     fun testMoveCompositionWithMultipleRoots() {
         val reports = listOf(
             jim_reports_to_sally,
@@ -210,6 +220,7 @@ class CompositionTests : TestCase() {
         }
     }
 
+    @Test
     fun testReplace() {
         var includeA = true
         fun MockViewComposition.composition() {
@@ -256,6 +267,7 @@ class CompositionTests : TestCase() {
         }
     }
 
+    @Test
     fun testInsertWithMultipleRoots() {
         val chars = listOf('a', 'b', 'c')
 
@@ -302,6 +314,7 @@ class CompositionTests : TestCase() {
         }
     }
 
+    @Test
     fun testSimpleMemoize() {
         val points = listOf(Point(1, 2), Point(2, 3))
         val composer = compose {
@@ -315,6 +328,7 @@ class CompositionTests : TestCase() {
         }
     }
 
+    @Test
     fun testMovingMemoization() {
         val points = listOf(
             Point(1, 2),
@@ -341,6 +355,7 @@ class CompositionTests : TestCase() {
         validate(composer.root) { points(modifiedPoints) }
     }
 
+    @Test
     fun testComponent() {
         val slReportReports = object {}
 
@@ -394,6 +409,7 @@ class CompositionTests : TestCase() {
         }
     }
 
+    @Test
     fun testComposeTwoAttributeComponent() {
         class Two : ViewComponent() {
             var first: Int = 1
@@ -430,6 +446,7 @@ class CompositionTests : TestCase() {
         }
     }
 
+    @Test
     fun testComposeThreeAttributeComponent() {
         class Three : ViewComponent() {
             var first: Int = 1
@@ -468,6 +485,7 @@ class CompositionTests : TestCase() {
         }
     }
 
+    @Test
     fun testComposeFourOrMoreAttributeComponent() {
         class Four : ViewComponent() {
             var first: Int = 1
@@ -508,6 +526,7 @@ class CompositionTests : TestCase() {
         }
     }
 
+    @Test
     fun testComponentWithVarCtorParameter() {
         class One(var first: Int) : ViewComponent() {
             override fun compose() {
@@ -551,6 +570,7 @@ class CompositionTests : TestCase() {
         }
     }
 
+    @Test
     fun testComponentWithValCtorParameter() {
         class One(val first: Int) : ViewComponent() {
             override fun compose() {
@@ -596,6 +616,7 @@ class CompositionTests : TestCase() {
         }
     }
 
+    @Test
     fun testComposePartOfTree() {
         val slReportReports = object {}
         var recomposeLois: (() -> Unit)? = null
@@ -671,6 +692,7 @@ class CompositionTests : TestCase() {
         }
     }
 
+    @Test
     fun testRecomposeWithReplace() {
         val slReportReports = object {}
         var recomposeLois: (() -> Unit)? = null
@@ -752,6 +774,7 @@ class CompositionTests : TestCase() {
         }
     }
 
+    @Test
     fun testInvalidationAfterRemoval() {
         val slReportReports = object {}
         var recomposeLois: (() -> Unit)? = null
@@ -842,6 +865,7 @@ class CompositionTests : TestCase() {
 
     // remember()
 
+    @Test
     fun testSimpleRemember() {
         var count = 0
 
@@ -876,6 +900,7 @@ class CompositionTests : TestCase() {
         assertEquals(1, count)
     }
 
+    @Test
     fun testRememberOneParameter() {
         var count = 0
 
@@ -915,6 +940,7 @@ class CompositionTests : TestCase() {
         assertEquals(2, count)
     }
 
+    @Test
     fun testRememberTwoParameters() {
         var count = 0
 
@@ -954,6 +980,7 @@ class CompositionTests : TestCase() {
         assertEquals(2, count)
     }
 
+    @Test
     fun testRememberThreeParameters() {
         var count = 0
 
@@ -993,6 +1020,7 @@ class CompositionTests : TestCase() {
         assertEquals(2, count)
     }
 
+    @Test
     fun testRememberFourParameters() {
         var count = 0
 
@@ -1032,6 +1060,7 @@ class CompositionTests : TestCase() {
         assertEquals(2, count)
     }
 
+    @Test
     fun testRememberFiveParameters() {
         var count = 0
 
@@ -1071,6 +1100,7 @@ class CompositionTests : TestCase() {
         assertEquals(2, count)
     }
 
+    @Test
     fun testInsertGroupInContainer() {
         val values = mutableListOf(0)
 
@@ -1102,6 +1132,7 @@ class CompositionTests : TestCase() {
         }
     }
 
+    @Test
     fun testStartJoin() {
         var text = "Starting"
         var invalidate: (() -> Unit)? = null
@@ -1133,6 +1164,7 @@ class CompositionTests : TestCase() {
         validate(composer.root) { composition() }
     }
 
+    @Test
     fun testInvalidateJoin_End() {
         var text = "Starting"
         var includeNested = true
@@ -1183,6 +1215,7 @@ class CompositionTests : TestCase() {
         validate(composer.root) { composition() }
     }
 
+    @Test
     fun testInvalidateJoin_Start() {
         var text = "Starting"
         var includeNested = true
@@ -1234,6 +1267,7 @@ class CompositionTests : TestCase() {
     }
 
     // b/132638679
+    @Test
     fun testJoinInvalidate() {
         var texts = 5
         var invalidateOuter: (() -> Unit)? = null
@@ -1274,6 +1308,7 @@ class CompositionTests : TestCase() {
         composer.applyChanges()
     }
 
+    @Test
     fun testLifecycle_Enter_Simple() {
         val lifecycleObject = object : CompositionLifecycleObserver {
             var count = 0
@@ -1302,16 +1337,17 @@ class CompositionTests : TestCase() {
         val composer = compose { composition() }
         validate(composer.root) { composition() }
 
-        assertEquals("object should have been notified of an enter", 1, lifecycleObject.count)
+        assertEquals(1, lifecycleObject.count, "object should have been notified of an enter")
 
         compose(composer, expectChanges = false) {
             composition()
         }
         validate(composer.root) { composition() }
 
-        assertEquals("Object should have only been notified once", 1, lifecycleObject.count)
+        assertEquals(1, lifecycleObject.count, "Object should have only been notified once")
     }
 
+    @Test
     fun testLifecycle_Enter_SingleNotification() {
         val lifecycleObject = object : CompositionLifecycleObserver {
             var count = 0
@@ -1327,12 +1363,12 @@ class CompositionTests : TestCase() {
         fun MockViewComposition.composition() {
             linear {
                 val l = remember { lifecycleObject }
-                assertEquals("Lifecycle object should be returned", lifecycleObject, l)
+                assertEquals(lifecycleObject, l, "Lifecycle object should be returned")
                 text("Some text")
             }
             linear {
                 val l = remember { lifecycleObject }
-                assertEquals("Lifecycle object should be returned", lifecycleObject, l)
+                assertEquals(lifecycleObject, l, "Lifecycle object should be returned")
                 text("Some other text")
             }
         }
@@ -1349,16 +1385,17 @@ class CompositionTests : TestCase() {
         val composer = compose { composition() }
         validate(composer.root) { composition() }
 
-        assertEquals("object should have been notified of an enter", 1, lifecycleObject.count)
+        assertEquals(1, lifecycleObject.count, "object should have been notified of an enter")
 
         compose(composer, expectChanges = false) {
             composition()
         }
         validate(composer.root) { composition() }
 
-        assertEquals("Object should have only been notified once", 1, lifecycleObject.count)
+        assertEquals(1, lifecycleObject.count, "Object should have only been notified once")
     }
 
+    @Test
     fun testLifecycle_Leave_Simple() {
         val lifecycleObject = object : CompositionLifecycleObserver {
             var count = 0
@@ -1376,7 +1413,7 @@ class CompositionTests : TestCase() {
                 if (includeLifecycleObject) {
                     linear {
                         val l = remember { lifecycleObject }
-                        assertEquals("Lifecycle object should be returned", lifecycleObject, l)
+                        assertEquals(lifecycleObject, l, "Lifecycle object should be returned")
                         text("Some text")
                     }
                 }
@@ -1396,23 +1433,24 @@ class CompositionTests : TestCase() {
         val composer = compose { composition(true) }
         validate(composer.root) { composition(true) }
 
-        assertEquals("object should have been notified of an enter", 1, lifecycleObject.count)
+        assertEquals(1, lifecycleObject.count, "object should have been notified of an enter")
 
         compose(composer, expectChanges = false) {
             composition(true)
         }
         validate(composer.root) { composition(true) }
 
-        assertEquals("Object should have only been notified once", 1, lifecycleObject.count)
+        assertEquals(1, lifecycleObject.count, "Object should have only been notified once")
 
         compose(composer, expectChanges = true) {
             composition(false)
         }
         validate(composer.root) { composition(false) }
 
-        assertEquals("Object should have been notified of a leave", 0, lifecycleObject.count)
+        assertEquals(0, lifecycleObject.count, "Object should have been notified of a leave")
     }
 
+    @Test
     fun testLifecycle_Leave_NoLeaveOnReenter() {
         var expectedEnter = true
         var expectedLeave = true
@@ -1420,12 +1458,12 @@ class CompositionTests : TestCase() {
             var count = 0
             override fun onEnter() {
                 count++
-                assertTrue("No enter expected", expectedEnter)
+                assertTrue(expectedEnter, "No enter expected")
             }
 
             override fun onLeave() {
                 count--
-                assertTrue("No leave expected", expectedLeave)
+                assertTrue(expectedLeave, "No leave expected")
             }
         }
 
@@ -1434,21 +1472,21 @@ class CompositionTests : TestCase() {
                 if (a) {
                     linear(1) {
                         val l = remember { lifecycleObject }
-                        assertEquals("Lifecycle object should be returned", lifecycleObject, l)
+                        assertEquals(lifecycleObject, l, "Lifecycle object should be returned")
                         text("a")
                     }
                 }
                 if (b) {
                     linear(2) {
                         val l = remember { lifecycleObject }
-                        assertEquals("Lifecycle object should be returned", lifecycleObject, l)
+                        assertEquals(lifecycleObject, l, "Lifecycle object should be returned")
                         text("b")
                     }
                 }
                 if (c) {
                     linear(3) {
                         val l = remember { lifecycleObject }
-                        assertEquals("Lifecycle object should be returned", lifecycleObject, l)
+                        assertEquals(lifecycleObject, l, "Lifecycle object should be returned")
                         text("c")
                     }
                 }
@@ -1487,9 +1525,9 @@ class CompositionTests : TestCase() {
         }
 
         assertEquals(
-            "object should have been notified of an enter",
             1,
-            lifecycleObject.count
+            lifecycleObject.count,
+            "object should have been notified of an enter"
         )
 
         expectedEnter = false
@@ -1505,9 +1543,9 @@ class CompositionTests : TestCase() {
             )
         }
         assertEquals(
-            "Object should have only been notified once",
             1,
-            lifecycleObject.count
+            lifecycleObject.count,
+            "Object should have only been notified once"
         )
 
         expectedEnter = false
@@ -1522,7 +1560,7 @@ class CompositionTests : TestCase() {
                 c = false
             )
         }
-        assertEquals("No enter or leaves", 1, lifecycleObject.count)
+        assertEquals(1, lifecycleObject.count, "No enter or leaves")
 
         expectedEnter = false
         expectedLeave = false
@@ -1536,7 +1574,7 @@ class CompositionTests : TestCase() {
                 c = true
             )
         }
-        assertEquals("No enter or leaves", 1, lifecycleObject.count)
+        assertEquals(1, lifecycleObject.count, "No enter or leaves")
 
         expectedEnter = false
         expectedLeave = false
@@ -1550,7 +1588,7 @@ class CompositionTests : TestCase() {
                 c = false
             )
         }
-        assertEquals("No enter or leaves", 1, lifecycleObject.count)
+        assertEquals(1, lifecycleObject.count, "No enter or leaves")
 
         expectedEnter = false
         expectedLeave = true
@@ -1564,9 +1602,10 @@ class CompositionTests : TestCase() {
                 c = false
             )
         }
-        assertEquals("A leave", 0, lifecycleObject.count)
+        assertEquals(0, lifecycleObject.count, "A leave")
     }
 
+    @Test
     fun testLifecycle_Leave_LeaveOnReplace() {
         val lifecycleObject1 = object : CompositionLifecycleObserver {
             var count = 0
@@ -1609,24 +1648,25 @@ class CompositionTests : TestCase() {
 
         val composer = compose { composition(obj = lifecycleObject1) }
         validate(composer.root) { composition() }
-        assertEquals("first object should enter", 1, lifecycleObject1.count)
-        assertEquals("second object should not have entered", 0, lifecycleObject2.count)
+        assertEquals(1, lifecycleObject1.count, "first object should enter")
+        assertEquals(0, lifecycleObject2.count, "second object should not have entered")
 
         compose(composer, expectChanges = true) {
             composition(lifecycleObject2)
         }
         validate(composer.root) { composition() }
-        assertEquals("first object should have left", 0, lifecycleObject1.count)
-        assertEquals("second object should have entered", 1, lifecycleObject2.count)
+        assertEquals(0, lifecycleObject1.count, "first object should have left")
+        assertEquals(1, lifecycleObject2.count, "second object should have entered")
 
         compose(composer, expectChanges = true) {
             composition(object {})
         }
         validate(composer.root) { composition() }
-        assertEquals("first object should have left", 0, lifecycleObject1.count)
-        assertEquals("second object should have left", 0, lifecycleObject2.count)
+        assertEquals(0, lifecycleObject1.count, "first object should have left")
+        assertEquals(0, lifecycleObject2.count, "second object should have left")
     }
 
+    @Test
     fun testLifecycle_EnterLeaveOrder() {
         var order = 0
         val objects = mutableListOf<Any>()
@@ -1638,13 +1678,13 @@ class CompositionTests : TestCase() {
                 override var enterOrder = -1
                 override var leaveOrder = -1
                 override fun onEnter() {
-                    assertEquals("Only one call to onEnter expected", -1, enterOrder)
+                    assertEquals(-1, enterOrder, "Only one call to onEnter expected")
                     enterOrder = order++
                     count++
                 }
 
                 override fun onLeave() {
-                    assertEquals("Only one call to onLeave expected", -1, leaveOrder)
+                    assertEquals(-1, leaveOrder, "Only one call to onLeave expected")
                     leaveOrder = order++
                     count--
                 }
@@ -1706,16 +1746,18 @@ class CompositionTests : TestCase() {
         val composer = compose { composition(true) }
 
         assertTrue(
-            "All object should have entered",
-            objects.mapNotNull { it as? Counted }.map { it.count == 1 }.all { it })
+            objects.mapNotNull { it as? Counted }.map { it.count == 1 }.all { it },
+            "All object should have entered"
+        )
 
         compose(composer) {
             composition(false)
         }
 
         assertTrue(
-            "All object should have left",
-            objects.mapNotNull { it as? Counted }.map { it.count == 0 }.all { it })
+            objects.mapNotNull { it as? Counted }.map { it.count == 0 }.all { it },
+            "All object should have left"
+        )
 
         assertArrayEquals(
             "Expected enter order",
@@ -1761,10 +1803,10 @@ private fun compose(
         block()
     }
     if (expectChanges) {
-        Assert.assertNotEquals("changes were expected", 0, myComposer.changeCount)
+        assertNotEquals(0, myComposer.changeCount, "changes were expected")
         myComposer.applyChanges()
     } else {
-        Assert.assertEquals("no changes were expected", 0, myComposer.changeCount)
+        assertEquals(0, myComposer.changeCount, "no changes were expected")
     }
 
     return myComposer

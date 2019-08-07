@@ -16,16 +16,20 @@
 
 package androidx.compose
 
-import junit.framework.TestCase
-import org.junit.Assert
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
-class SlotTableTests : TestCase() {
+class SlotTableTests {
+
+    @Test
     fun testCanCreate() {
         SlotTable()
     }
 
     // Raw slot tests (testing the buffer gap)
 
+    @Test
     fun testCanInsert() {
         val slots = SlotTable()
         slots.write { writer ->
@@ -37,6 +41,7 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testValidateSlots() {
         val slots = testSlotsNumbered()
         slots.read { reader ->
@@ -46,6 +51,7 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testPrevious() {
         val slots = testSlotsNumbered()
         slots.read { reader ->
@@ -62,6 +68,7 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testInsertAtTheStart() {
         val slots = testSlotsNumbered()
         slots.write { writer ->
@@ -78,6 +85,7 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testInsertAtTheEnd() {
         val slots = testSlotsNumbered()
 
@@ -104,6 +112,7 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testInsertInTheMiddle() {
         val slots = testSlotsNumbered()
         val current = slots.read { reader ->
@@ -127,6 +136,7 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testRemoveAtTheStart() {
         val slots = testSlotsNumbered()
         slots.write { writer ->
@@ -138,6 +148,7 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testRemoveAtTheEnd() {
         val slots = testSlotsNumbered()
         slots.write { writer ->
@@ -149,6 +160,7 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testRemoveInTheMiddle() {
         val slots = testSlotsNumbered()
         slots.write { writer ->
@@ -162,6 +174,7 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testRemoveTwoSlicesBackToFront() {
         val slots = testSlotsNumbered()
         slots.write { writer ->
@@ -178,6 +191,7 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testRemoveTwoSlicesFrontToBack() {
         val slots = testSlotsNumbered()
         slots.write { writer ->
@@ -196,6 +210,7 @@ class SlotTableTests : TestCase() {
 
     // Anchor tests
 
+    @Test
     fun testAllocateAnchors() {
         val slots = testSlotsNumbered()
         val anchors = slots.write { writer -> (1..7).map { writer.anchor(it * 10) } }
@@ -207,6 +222,7 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testAnchorsTrackInserts() {
         val slots = testSlotsNumbered()
         val anchors = slots.write { writer -> (1..7).map { writer.anchor(it * 10) } }
@@ -224,6 +240,7 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testAnchorTracksExactRemovesUpwards() {
         val slots = testSlotsNumbered()
         val anchors = slots.write { writer -> (1..7).map { writer.anchor(it * 10) } }
@@ -235,6 +252,7 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testAnchorTracksExactRemovesDownwards() {
         val slots = testSlotsNumbered()
         val anchors = slots.write { writer -> (1..7).map { writer.anchor(it * 10) } }
@@ -246,6 +264,7 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testAnchorTracksExtactRemovesInnerOuter() {
         val slots = testSlotsNumbered()
         val expectedLocations = (1..7).map { it * 10 }.toMutableList()
@@ -262,6 +281,7 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testAnchorTracksExactRemovesOuterInner() {
         val slots = testSlotsNumbered()
         val expectedLocations = (1..7).map { it * 10 }.toMutableList()
@@ -278,6 +298,7 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testAnchorTrackRemoves() {
         val slots = testSlotsNumbered()
         val anchors = slots.write { writer -> (1..7).map { writer.anchor(it * 10) } }
@@ -293,6 +314,7 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testAnchorMoves() {
         val slots = SlotTable()
 
@@ -349,6 +371,7 @@ class SlotTableTests : TestCase() {
         validate(anchors)
     }
 
+    @Test
     fun testRemovingDuplicateAnchorsMidRange() {
         val slots = testSlotsNumbered()
 
@@ -359,6 +382,7 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testRemovingDuplicateAnchorsStartRange() {
         val slots = testSlotsNumbered()
         val anchors = slots.write { writer -> (0 until 10).map { writer.anchor(30) } }
@@ -368,6 +392,7 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testRemovingDuplicateAnchorsEndRange() {
         val slots = testSlotsNumbered()
         val anchors = slots.write { writer -> (0 until 10).map { writer.anchor(30) } }
@@ -377,6 +402,7 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testDuplicateAnchorIdentity() {
         val slots = testSlotsNumbered()
         val anchors = slots.write { writer -> (0 until 10).map { writer.anchor(it * 5) } }
@@ -389,6 +415,7 @@ class SlotTableTests : TestCase() {
 
     // Semantic tests (testing groups and nodes)
 
+    @Test
     fun testExtractKeys() {
         val slots = testItems()
         slots.read { reader ->
@@ -401,6 +428,7 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testMoveAnItem() {
         val slots = testItems()
         slots.write { writer ->
@@ -420,6 +448,7 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testRemoveAnItem() {
         val slots = testItems()
         slots.write { writer ->
@@ -446,6 +475,7 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testCountNodes() {
         val slots = testItems()
         slots.read { reader ->
@@ -458,6 +488,7 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testCountNestedNodes() {
         val slots = SlotTable()
         slots.write { writer ->
@@ -484,6 +515,7 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testUpdateNestedNodeCountOnInsert() {
         val slots = SlotTable()
         slots.write { writer ->
@@ -534,6 +566,7 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testUpdateNestedNodeCountOnRemove() {
         val slots = SlotTable()
         slots.write { writer ->
@@ -579,6 +612,7 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testNodesResetNodeCount() {
         val slots = SlotTable()
         slots.write { writer ->
@@ -603,6 +637,7 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testSkipANode() {
         val slots = SlotTable()
         slots.write { writer ->
@@ -635,6 +670,7 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testStartEmpty() {
         val slots = SlotTable()
         slots.read { reader ->
@@ -647,6 +683,7 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testReportGroupSize() {
         val slots = SlotTable()
         slots.write { writer ->
@@ -677,6 +714,7 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testIsGroups() {
         val slots = SlotTable()
         slots.write { writer ->
@@ -720,11 +758,13 @@ class SlotTableTests : TestCase() {
         }
     }
 
+    @Test
     fun testReportUncertainNodeCount() {
         val slots = SlotTable()
         slots.read { reader -> reader.reportUncertainNodeCount() }
     }
 
+    @Test
     fun testMoveGroup() {
         val slots = SlotTable()
 
@@ -848,7 +888,7 @@ class SlotTableTests : TestCase() {
                 }
 
                 fun value(value: Any?) {
-                    Assert.assertEquals(value, reader.next())
+                    assertEquals(value, reader.next())
                 }
 
                 fun item(key: Any?, block: () -> Unit) {
@@ -1011,7 +1051,7 @@ class SlotTableTests : TestCase() {
         // Validate that all the anchors still refer to a slot with value 62
         slots.read { reader ->
             for (anchor in anchors) {
-                Assert.assertEquals(62, reader.get(slots.anchorLocation(anchor)))
+                assertEquals(62, reader.get(slots.anchorLocation(anchor)))
             }
         }
     }
@@ -1066,13 +1106,13 @@ fun testItems(): SlotTable {
 }
 
 fun SlotReader.startItem(key: Any?) {
-    org.junit.Assert.assertEquals(key, next())
+    assertEquals(key, next())
     startGroup()
 }
 fun SlotReader.endItem(): Int = endGroup()
 
 fun SlotReader.expectItem(key: Any?): Int {
-    org.junit.Assert.assertEquals(key, next())
+    assertEquals(key, next())
     return skipGroup()
 }
 

@@ -81,8 +81,7 @@ abstract class Recomposer {
         }
     }
 
-    // TODO(138720404): Investigate if Compose APIs can be internal despite MPP limitations
-    protected abstract fun hasPendingChanges(): Boolean
+    internal abstract fun hasPendingChanges(): Boolean
 
     internal fun scheduleRecompose(composer: Composer<*>) {
         composers.add(composer)

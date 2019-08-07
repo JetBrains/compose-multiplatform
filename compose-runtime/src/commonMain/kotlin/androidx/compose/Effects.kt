@@ -684,9 +684,8 @@ fun onPreCommit(vararg inputs: Any?, callback: CommitScope.() -> Unit) =
  * @see [state]
  * @see [stateFor]
  */
-// TODO(138720404): Investigate if Compose APIs can be internal despite MPP limitations
 @Model
-class State<T> /*@PublishedApi internal*/ constructor(value: T) : Framed {
+class State<T> @PublishedApi internal constructor(value: T) : Framed {
     /* NOTE(lmr): When this module is compiled with IR, we will need to remove the below Framed implementation */
 
     @Suppress("UNCHECKED_CAST")

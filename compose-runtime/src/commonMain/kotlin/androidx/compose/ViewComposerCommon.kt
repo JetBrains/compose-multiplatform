@@ -22,9 +22,8 @@ internal expect var currentComposer: Composer<*>?
 internal expect fun createComposer(root: Any, context: Context, recomposer: Recomposer): Composer<*>
 expect fun <T> Composer<*>.runWithCurrent(block: () -> T): T
 
-// TODO(138720404): Investigate if Compose APIs can be internal despite MPP limitations
-/*@PublishedApi
-internal*/ val invocation = Any()
+@PublishedApi
+internal val invocation = Any()
 
 @PublishedApi
 internal val provider = Any()

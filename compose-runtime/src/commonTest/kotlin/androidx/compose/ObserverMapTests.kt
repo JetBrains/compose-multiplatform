@@ -16,9 +16,9 @@
 
 package androidx.compose
 
-import org.junit.Assert.assertEquals
-import org.junit.Before
-import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 
 class ObserverMapTests {
 
@@ -26,7 +26,7 @@ class ObserverMapTests {
     private val node2 = 2
     private lateinit var map: ObserverMap<TestModel, Int>
 
-    @Before
+    @BeforeTest
     fun setup() {
         map = ObserverMap()
     }

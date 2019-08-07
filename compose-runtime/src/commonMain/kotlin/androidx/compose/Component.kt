@@ -55,8 +55,7 @@ package androidx.compose
 @Suppress("PLUGIN_ERROR")
 abstract class Component {
     @HiddenAttribute
-    // TODO(138720404): Investigate if Compose APIs can be internal despite MPP limitations
-    var recomposeCallback: ((sync: Boolean) -> Unit)? = null
+    internal var recomposeCallback: ((sync: Boolean) -> Unit)? = null
     private var composing = false
 
     /**

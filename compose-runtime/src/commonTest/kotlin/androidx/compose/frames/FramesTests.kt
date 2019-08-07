@@ -16,34 +16,37 @@
 
 package androidx.compose.frames
 
-import junit.framework.TestCase
-import org.junit.Assert
-import java.util.ArrayDeque
-import kotlin.reflect.KClass
+import androidx.compose.Stack
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 const val OLD_STREET = "123 Any Street"
 const val OLD_CITY = "AnyTown"
 const val NEW_STREET = "456 New Street"
 const val NEW_CITY = "AnyCity"
 
-class FrameTest : TestCase() {
+class FrameTest {
 
+    @Test
     fun testCreatingAddress() {
-        val address = frame {
+                val address = frame {
             val address = Address(
                 OLD_STREET,
                 OLD_CITY
             )
-            Assert.assertEquals(OLD_STREET, address.street)
-            Assert.assertEquals(OLD_CITY, address.city)
+            assertEquals(OLD_STREET, address.street)
+            assertEquals(OLD_CITY, address.city)
             address
         }
         frame {
-            Assert.assertEquals(OLD_STREET, address.street)
-            Assert.assertEquals(OLD_CITY, address.city)
+            assertEquals(OLD_STREET, address.street)
+            assertEquals(OLD_CITY, address.city)
         }
     }
 
+    @Test
     fun testModifyingAddress() {
         val address = frame {
             Address(
@@ -55,11 +58,12 @@ class FrameTest : TestCase() {
             address.street = NEW_STREET
         }
         frame {
-            Assert.assertEquals(NEW_STREET, address.street)
-            Assert.assertEquals(OLD_CITY, address.city)
+            assertEquals(NEW_STREET, address.street)
+            assertEquals(OLD_CITY, address.city)
         }
     }
 
+    @Test
     fun testIsolation() {
         val address = frame {
             Address(
@@ -71,16 +75,17 @@ class FrameTest : TestCase() {
             address.street = NEW_STREET
         }
         frame {
-            Assert.assertEquals(OLD_STREET, address.street)
+            assertEquals(OLD_STREET, address.street)
         }
         restored(f) {
-            Assert.assertEquals(NEW_STREET, address.street)
+            assertEquals(NEW_STREET, address.street)
         }
         frame {
-            Assert.assertEquals(NEW_STREET, address.street)
+            assertEquals(NEW_STREET, address.street)
         }
     }
 
+    @Test
     fun testRecordReuse() {
         val address = frame {
             Address(
@@ -88,13 +93,14 @@ class FrameTest : TestCase() {
                 OLD_CITY
             )
         }
-        Assert.assertEquals(1, address.firstFrameRecord.length)
+        assertEquals(1, address.firstFrameRecord.length)
         frame { address.street = NEW_STREET }
-        Assert.assertEquals(2, address.firstFrameRecord.length)
+        assertEquals(2, address.firstFrameRecord.length)
         frame { address.street = "other street" }
-        Assert.assertEquals(2, address.firstFrameRecord.length)
+        assertEquals(2, address.firstFrameRecord.length)
     }
 
+    @Test
     fun testAborted() {
         val address = frame {
             Address(
@@ -104,13 +110,14 @@ class FrameTest : TestCase() {
         }
         aborted {
             address.street = NEW_STREET
-            Assert.assertEquals(NEW_STREET, address.street)
+            assertEquals(NEW_STREET, address.street)
         }
         frame {
-            Assert.assertEquals(OLD_STREET, address.street)
+            assertEquals(OLD_STREET, address.street)
         }
     }
 
+    @Test
     fun testReuseAborted() {
         val address = frame {
             Address(
@@ -118,13 +125,14 @@ class FrameTest : TestCase() {
                 OLD_CITY
             )
         }
-        Assert.assertEquals(1, address.firstFrameRecord.length)
+        assertEquals(1, address.firstFrameRecord.length)
         aborted { address.street = NEW_STREET }
-        Assert.assertEquals(2, address.firstFrameRecord.length)
+        assertEquals(2, address.firstFrameRecord.length)
         frame { address.street = "other street" }
-        Assert.assertEquals(2, address.firstFrameRecord.length)
+        assertEquals(2, address.firstFrameRecord.length)
     }
 
+    @Test
     fun testSpeculation() {
         val address = frame {
             Address(
@@ -134,13 +142,14 @@ class FrameTest : TestCase() {
         }
         speculation {
             address.street = NEW_STREET
-            Assert.assertEquals(NEW_STREET, address.street)
+            assertEquals(NEW_STREET, address.street)
         }
         frame {
-            Assert.assertEquals(OLD_STREET, address.street)
+            assertEquals(OLD_STREET, address.street)
         }
     }
 
+    @Test
     fun testSpeculationIsolation() {
         val address = frame {
             Address(
@@ -152,16 +161,17 @@ class FrameTest : TestCase() {
         address.street = NEW_STREET
         val speculation = suspend()
         frame {
-            Assert.assertEquals(OLD_STREET, address.street)
+            assertEquals(OLD_STREET, address.street)
         }
         restore(speculation)
-        Assert.assertEquals(NEW_STREET, address.street)
+        assertEquals(NEW_STREET, address.street)
         abortHandler()
         frame {
-            Assert.assertEquals(OLD_STREET, address.street)
+            assertEquals(OLD_STREET, address.street)
         }
     }
 
+    @Test
     fun testReuseSpeculation() {
         val address = frame {
             Address(
@@ -169,13 +179,14 @@ class FrameTest : TestCase() {
                 OLD_CITY
             )
         }
-        Assert.assertEquals(1, address.firstFrameRecord.length)
+        assertEquals(1, address.firstFrameRecord.length)
         speculation { address.street = NEW_STREET }
-        Assert.assertEquals(2, address.firstFrameRecord.length)
+        assertEquals(2, address.firstFrameRecord.length)
         frame { address.street = "other street" }
-        Assert.assertEquals(2, address.firstFrameRecord.length)
+        assertEquals(2, address.firstFrameRecord.length)
     }
 
+    @Test
     fun testCommitAbortInteraction() {
         val address = frame {
             Address(
@@ -192,7 +203,7 @@ class FrameTest : TestCase() {
 
         // New frames should see the old value
         frame {
-            Assert.assertEquals(
+            assertEquals(
                 OLD_STREET,
                 address.street
             )
@@ -203,7 +214,7 @@ class FrameTest : TestCase() {
 
         // New frames should still see the old value
         frame {
-            Assert.assertEquals(
+            assertEquals(
                 OLD_STREET,
                 address.street
             )
@@ -211,9 +222,10 @@ class FrameTest : TestCase() {
 
         // Commit frame1, new frames should see frame1's value
         commit(frame1)
-        frame { Assert.assertEquals("From frame1", address.street) }
+        frame { assertEquals("From frame1", address.street) }
     }
 
+    @Test
     fun testCollisionAB() {
         val address = frame {
             Address(
@@ -221,7 +233,7 @@ class FrameTest : TestCase() {
                 OLD_CITY
             )
         }
-        expectThrow(FrameAborted::class) {
+        expectThrow<FrameAborted> {
             val frame1 = suspended {
                 address.street = "From frame1"
             }
@@ -237,10 +249,11 @@ class FrameTest : TestCase() {
 
         // New frames should see the value from the committed frame1
         frame {
-            Assert.assertEquals("From frame1", address.street)
+            assertEquals("From frame1", address.street)
         }
     }
 
+    @Test
     fun testCollisionBA() {
         val address = frame {
             Address(
@@ -248,7 +261,7 @@ class FrameTest : TestCase() {
                 OLD_CITY
             )
         }
-        expectThrow(FrameAborted::class) {
+        expectThrow<FrameAborted> {
             val frame1 = suspended {
                 address.street = "From frame1"
             }
@@ -264,10 +277,11 @@ class FrameTest : TestCase() {
 
         // New frames should see the value from the committed frame2
         frame {
-            Assert.assertEquals("From frame2", address.street)
+            assertEquals("From frame2", address.street)
         }
     }
 
+    @Test
     fun testManyChangesInASingleFrame() {
         val changeCount = 1000
         val addresses = frame {
@@ -283,25 +297,26 @@ class FrameTest : TestCase() {
                 addresses[i].street = "From index $i"
             }
             for (i in 0..changeCount) {
-                Assert.assertEquals("From index $i", addresses[i].street)
+                assertEquals("From index $i", addresses[i].street)
             }
         }
         frame {
             for (i in 0..changeCount) {
-                Assert.assertEquals(OLD_STREET, addresses[i].street)
+                assertEquals(OLD_STREET, addresses[i].street)
             }
         }
         commit(frame1)
         frame {
             for (i in 0..changeCount) {
-                Assert.assertEquals("From index $i", addresses[i].street)
+                assertEquals("From index $i", addresses[i].street)
             }
         }
     }
 
+    @Test
     fun testManySimultaneousFrames() {
         val frameCount = 1000
-        val frames = ArrayDeque<Frame>()
+        val frames = Stack<Frame>()
         val addresses = frame {
             (0..frameCount).map {
                 Address(
@@ -314,11 +329,11 @@ class FrameTest : TestCase() {
             frames.push(suspended { addresses[i].street = "From index $i" })
         }
         for (i in 0..frameCount) {
-            commit(frames.remove())
+            commit(frames.pop())
         }
         for (i in 0..frameCount) {
             frame {
-                Assert.assertEquals(
+                assertEquals(
                     "From index $i",
                     addresses[i].street
                 )
@@ -326,30 +341,33 @@ class FrameTest : TestCase() {
         }
     }
 
+    @Test
     fun testRaw() {
         val count = 1000
         val addresses = (0..count).map { AddressRaw(OLD_STREET) }
         for (i in 0..count) {
             addresses[i].street = "From index $i"
-            Assert.assertEquals("From index $i", addresses[i].street)
+            assertEquals("From index $i", addresses[i].street)
         }
         for (i in 0..count) {
-            Assert.assertEquals("From index $i", addresses[i].street)
+            assertEquals("From index $i", addresses[i].street)
         }
     }
 
+    @Test
     fun testProp() {
         val count = 10000
         val addresses = (0..count).map { AddressProp(OLD_STREET) }
         for (i in 0..count) {
             addresses[i].street = "From index $i"
-            Assert.assertEquals("From index $i", addresses[i].street)
+            assertEquals("From index $i", addresses[i].street)
         }
         for (i in 0..count) {
-            Assert.assertEquals("From index $i", addresses[i].street)
+            assertEquals("From index $i", addresses[i].street)
         }
     }
 
+    @Test
     fun testFrameObserver_ObserveRead_Single() {
         val address = frame {
             Address(
@@ -361,11 +379,12 @@ class FrameTest : TestCase() {
         observeFrame({ obj ->
             read = obj as Address
         }) {
-            Assert.assertEquals(OLD_STREET, address.street)
+            assertEquals(OLD_STREET, address.street)
         }
-        Assert.assertEquals(address, read)
+        assertEquals(address, read)
     }
 
+    @Test
     fun testFrameObserver_addReadObserver_Single() {
         val address = frame {
             Address(
@@ -378,16 +397,17 @@ class FrameTest : TestCase() {
         val frame = open({ obj -> read = obj as Address })
         try {
             frame.observeReads({ obj -> otherRead = obj as Address }) {
-                Assert.assertEquals(OLD_STREET, address.street)
+                assertEquals(OLD_STREET, address.street)
             }
-            Assert.assertEquals(1, frame.readObservers.size)
+            assertEquals(1, frame.readObservers.size)
         } finally {
             commitHandler()
         }
-        Assert.assertEquals(address, read)
-        Assert.assertEquals(address, otherRead)
+        assertEquals(address, read)
+        assertEquals(address, otherRead)
     }
 
+    @Test
     fun testFrameObserver_ObserveCommit_Single() {
         val address = frame {
             Address(
@@ -401,9 +421,10 @@ class FrameTest : TestCase() {
                 address.street = NEW_STREET
             }
         }
-        Assert.assertTrue(committed?.contains(address) ?: false)
+        assertTrue(committed?.contains(address) ?: false)
     }
 
+    @Test
     fun testFrameObserver_OberveRead_Multiple() {
         val addressToRead = frame {
             List(100) {
@@ -424,23 +445,24 @@ class FrameTest : TestCase() {
         val readAddresses = HashSet<Address>()
         observeFrame({ obj -> readAddresses.add(obj as Address) }) {
             for (address in addressToRead) {
-                Assert.assertEquals(OLD_STREET, address.street)
+                assertEquals(OLD_STREET, address.street)
             }
         }
         for (address in addressToRead) {
-            Assert.assertTrue(
-                "Ensure a read callback was called for the address",
-                readAddresses.contains(address)
-            )
+            assertTrue(
+                readAddresses.contains(address),
+                "Ensure a read callback was called for the address"
+                )
         }
         for (address in addressToIgnore) {
-            Assert.assertFalse(
-                "Ensure a read callback was not called for the address",
-                readAddresses.contains(address)
-            )
+            assertFalse(
+                readAddresses.contains(address),
+                "Ensure a read callback was not called for the address"
+                )
         }
     }
 
+    @Test
     fun testFrameObserver_ObserveCommit_Multiple() {
         val addressToWrite = frame {
             List(100) {
@@ -467,19 +489,20 @@ class FrameTest : TestCase() {
             }
         }
         for (address in addressToWrite) {
-            Assert.assertTrue(
-                "Ensure written address is in the set of committed objects",
-                committedAddresses?.contains(address) ?: false
-            )
+            assertTrue(
+                committedAddresses?.contains(address) ?: false,
+                "Ensure written address is in the set of committed objects"
+                )
         }
         for (address in addressToIgnore) {
-            Assert.assertFalse(
-                "Ensure ignored addresses are not in the set of committed objects",
-                committedAddresses?.contains(address) ?: false
-            )
+            assertFalse(
+                committedAddresses?.contains(address) ?: false,
+                "Ensure ignored addresses are not in the set of committed objects"
+                )
         }
     }
 
+    @Test
     fun testModelList_Isolated() {
         val addresses = frame {
             modelListOf(*(Array(100) {
@@ -496,7 +519,7 @@ class FrameTest : TestCase() {
 
             // Iterate list
             for (address in addresses) {
-                Assert.assertEquals(OLD_STREET, address.street)
+                assertEquals(OLD_STREET, address.street)
             }
             assertFalse(wasModified(addresses))
         }
@@ -506,10 +529,10 @@ class FrameTest : TestCase() {
 
             // Iterate list
             for (i in 0 until 100) {
-                Assert.assertEquals(OLD_STREET, addresses[i].street)
+                assertEquals(OLD_STREET, addresses[i].street)
             }
 
-            Assert.assertEquals(NEW_STREET, addresses[100].street)
+            assertEquals(NEW_STREET, addresses[100].street)
         }
 
         frame { validateOriginal() }
@@ -533,6 +556,7 @@ class FrameTest : TestCase() {
         }
     }
 
+    @Test
     fun testModelList_ReadDoesNotModify() {
         val count = 10
         val addresses = frame {
@@ -615,6 +639,7 @@ class FrameTest : TestCase() {
         }
     }
 
+    @Test
     fun testModelList_MutateThrows() {
         val count = 10
         val addresses = frame {
@@ -681,6 +706,7 @@ class FrameTest : TestCase() {
         }
     }
 
+    @Test
     fun testModelList_MutatingModifies() {
         val count = 10
         val addresses = frame {
@@ -782,6 +808,7 @@ class FrameTest : TestCase() {
         validate { addresses.asMutable() }
     }
 
+    @Test
     fun testModelMap_Isolated() {
         val map = frame {
             modelMapOf(
@@ -833,6 +860,7 @@ class FrameTest : TestCase() {
         frame { validateNew() }
     }
 
+    @Test
     @Suppress("USELESS_IS_CHECK")
     fun testModelMap_ReadingDoesntModify() {
         val map = frame {
@@ -911,6 +939,7 @@ class FrameTest : TestCase() {
         }
     }
 
+    @Test
     fun testModelMap_Mutation() {
         val map = frame {
             modelMapOf(
@@ -955,6 +984,7 @@ class FrameTest : TestCase() {
         validate { map.remove(3) }
     }
 
+    @Test
     fun testModelMap_MutateThrows() {
         val map = frame {
             modelMapOf(
@@ -1046,7 +1076,7 @@ fun expectError(block: () -> Unit) {
     } catch (e: IllegalStateException) {
         thrown = true
     }
-    Assert.assertTrue(thrown)
+    assertTrue(thrown)
 }
 
 // Helpers for the above tests
@@ -1129,17 +1159,16 @@ inline fun speculation(crossinline block: () -> Unit) {
 }
 
 inline fun <reified T : Throwable> expectThrow(
-    @Suppress("UNUSED_PARAMETER") e: KClass<T>,
     crossinline block: () -> Unit
 ) {
     var thrown = false
     try {
         block()
     } catch (e: Throwable) {
-        Assert.assertTrue(e is T)
+        assertTrue(e is T)
         thrown = true
     }
-    Assert.assertTrue(thrown)
+    assertTrue(thrown)
 }
 
 val Record.length: Int
