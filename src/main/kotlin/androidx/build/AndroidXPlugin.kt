@@ -78,6 +78,7 @@ import java.util.concurrent.ConcurrentHashMap
  */
 const val USE_MAX_DEP_VERSIONS = "useMaxDepVersions"
 const val BUILD_INFO_DIR = "build-info"
+const val BUILD_ON_SERVER_DEPENDENT_ACTIONS = "buildOnServerDependentActions"
 
 /**
  * A plugin which enables all of the Gradle customizations for AndroidX.
@@ -166,8 +167,10 @@ class AndroidXPlugin : Plugin<Project> {
                             task.dependsOn(libraryVariant.javaCompileProvider)
                         }
                         libraryVariant.javaCompileProvider.configure { task ->
-                            task.options.compilerArgs.add("-Werror")
-                            task.options.compilerArgs.add("-Xlint:unchecked")
+                            project.runIfPartOfBuildOnServer {
+                                task.options.compilerArgs.add("-Werror")
+                                task.options.compilerArgs.add("-Xlint:unchecked")
+                            }
                         }
                     }
                     project.configureLint(extension.lintOptions, androidXExtension)
@@ -183,8 +186,10 @@ class AndroidXPlugin : Plugin<Project> {
                 }
                 is KotlinBasePluginWrapper -> {
                     project.tasks.withType(KotlinCompile::class.java).configureEach { compile ->
-                        compile.kotlinOptions.allWarningsAsErrors = true
                         compile.kotlinOptions.jvmTarget = "1.8"
+                        project.runIfPartOfBuildOnServer {
+                            compile.kotlinOptions.allWarningsAsErrors = true
+                        }
                     }
                 }
             }
@@ -341,6 +346,14 @@ class AndroidXPlugin : Plugin<Project> {
                         }
                     }
                 }
+            }
+        }
+        // If we are running buildOnServer, run all actions in buildOnServerDependentActions after
+        // the task graph has been resolved, before we are in the execution phase.
+        project.gradle.taskGraph.whenReady { taskExecutionGraph ->
+            // hasTask requires the task path, so we are looking for the root :buildOnServer task
+            if (taskExecutionGraph.hasTask(":$BUILD_ON_SERVER_TASK")) {
+                buildOnServerDependentActions.forEach { it() }
             }
         }
     }
@@ -707,4 +720,25 @@ private fun Project.configureResourceApiChecks(extension: LibraryExtension) {
 private fun Project.getGenerateResourceApiFile(): File {
     return File(buildDir, "intermediates/public_res/release" +
             "/packageReleaseResources/public.txt")
+}
+
+/**
+ * Delays execution of the given [action] until the task graph is ready, and we know whether
+ * we are running buildOnServer
+ */
+private fun Project.runIfPartOfBuildOnServer(action: () -> Unit) {
+    buildOnServerDependentActions.add(action)
+}
+
+/**
+ * A list of configuration actions that will only be applied if buildOnServer is part of
+ * the task graph, essentially when we are running ./gradlew buildOnServer
+ */
+private val Project.buildOnServerDependentActions: MutableList<() -> Unit> get() {
+    val extraProperties = rootProject.extensions.extraProperties
+    if (!extraProperties.has(BUILD_ON_SERVER_DEPENDENT_ACTIONS)) {
+        extraProperties.set(BUILD_ON_SERVER_DEPENDENT_ACTIONS, mutableListOf<() -> Unit>())
+    }
+    @Suppress("UNCHECKED_CAST")
+    return extraProperties.get(BUILD_ON_SERVER_DEPENDENT_ACTIONS) as MutableList<() -> Unit>
 }
