@@ -68,10 +68,14 @@ expect class Handler(looper: Looper) {
     fun postAtFrontOfQueue(block: () -> Unit): Boolean
 }
 
+expect interface ChoreographerFrameCallback {
+    fun doFrame(frameTimeNanos: Long)
+}
+
 expect object Choreographer {
-    fun postFrameCallback(callback: (Long) -> Unit)
-    fun postFrameCallbackDelayed(delayMillis: Long, callback: (Long) -> Unit)
-    fun removeFrameCallback(callback: (Long) -> Unit)
+    fun postFrameCallback(callback: ChoreographerFrameCallback)
+    fun postFrameCallbackDelayed(delayMillis: Long, callback: ChoreographerFrameCallback)
+    fun removeFrameCallback(callback: ChoreographerFrameCallback)
 }
 
 @MustBeDocumented

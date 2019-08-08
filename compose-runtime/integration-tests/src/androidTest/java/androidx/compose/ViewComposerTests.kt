@@ -1054,9 +1054,9 @@ internal fun Activity.waitForAFrame() {
     }
     val latch = CountDownLatch(1)
     uiThread {
-        Choreographer.postFrameCallback {
-            latch.countDown()
-        }
+        Choreographer.postFrameCallback(object : ChoreographerFrameCallback {
+            override fun doFrame(frameTimeNanos: Long) = latch.countDown()
+        })
     }
     Assert.assertTrue(latch.await(1, TimeUnit.MINUTES))
 }

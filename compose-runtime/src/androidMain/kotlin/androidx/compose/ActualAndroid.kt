@@ -64,14 +64,16 @@ actual class Handler {
 }
 
 // TODO(b/137794558): Create portable abstraction for scheduling
+actual typealias ChoreographerFrameCallback = android.view.Choreographer.FrameCallback
+
 actual object Choreographer {
-    actual fun postFrameCallback(callback: (Long) -> Unit) {
+    actual fun postFrameCallback(callback: ChoreographerFrameCallback) {
         android.view.Choreographer.getInstance().postFrameCallback(callback)
     }
-    actual fun postFrameCallbackDelayed(delayMillis: Long, callback: (Long) -> Unit) {
+    actual fun postFrameCallbackDelayed(delayMillis: Long, callback: ChoreographerFrameCallback) {
         android.view.Choreographer.getInstance().postFrameCallbackDelayed(callback, delayMillis)
     }
-    actual fun removeFrameCallback(callback: (Long) -> Unit) {
+    actual fun removeFrameCallback(callback: ChoreographerFrameCallback) {
         android.view.Choreographer.getInstance().removeFrameCallback(callback)
     }
 }

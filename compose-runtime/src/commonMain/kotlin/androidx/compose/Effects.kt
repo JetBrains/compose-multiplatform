@@ -184,7 +184,7 @@ internal class PreCommitScopeImpl(
 @PublishedApi
 internal class PostCommitScopeImpl(
     internal val onCommit: CommitScope.() -> Unit
-) : CommitScope, CompositionLifecycleObserver {
+) : CommitScope, CompositionLifecycleObserver, ChoreographerFrameCallback {
 
     private var disposeCallback = emptyDispose
     private var hasRun = false
@@ -196,13 +196,13 @@ internal class PostCommitScopeImpl(
         disposeCallback = callback
     }
 
-    private val doFrame: (Long) -> Unit = {
+    override fun doFrame(frameTimeNanos: Long) {
         hasRun = true
         onCommit(this)
     }
 
     override fun onEnter() {
-        Choreographer.postFrameCallback(doFrame)
+        Choreographer.postFrameCallback(this)
     }
 
     override fun onLeave() {
@@ -211,7 +211,7 @@ internal class PostCommitScopeImpl(
         if (hasRun) {
             disposeCallback()
         } else {
-            Choreographer.removeFrameCallback(doFrame)
+            Choreographer.removeFrameCallback(this)
         }
     }
 }
