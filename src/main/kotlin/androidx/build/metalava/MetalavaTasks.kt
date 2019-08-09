@@ -57,7 +57,7 @@ object MetalavaTasks {
                     return@defaultPublishVariant
                 }
 
-                val javaInputs = JavaCompileInputs.fromLibraryVariant(library, variant)
+                val javaInputs = JavaCompileInputs.fromLibraryVariant(library, variant, project)
                 setupProject(this, javaInputs, extension)
                 setupStubs(this, javaInputs, variant)
             }
@@ -86,7 +86,8 @@ object MetalavaTasks {
     }
 
     fun applyInputs(inputs: JavaCompileInputs, task: MetalavaTask) {
-        task.sourcePaths = inputs.sourcePaths
+        task.sourcePaths = inputs.sourcePaths.files
+        task.dependsOn(inputs.sourcePaths)
         task.dependencyClasspath = inputs.dependencyClasspath
         task.bootClasspath = inputs.bootClasspath
     }
