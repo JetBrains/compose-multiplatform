@@ -89,7 +89,7 @@ object DokkaSourceDocs {
         }
         library.defaultPublishVariant { variant ->
             project.afterEvaluate {
-                val inputs = JavaCompileInputs.fromLibraryVariant(library, variant)
+                val inputs = JavaCompileInputs.fromLibraryVariant(library, variant, project)
                 registerInputs(inputs, project)
             }
         }

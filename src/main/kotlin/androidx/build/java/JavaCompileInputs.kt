@@ -30,7 +30,7 @@ import java.io.File
 // This can be helpful for creating Metalava and Dokka tasks with the same settings
 data class JavaCompileInputs(
     // Source files to process
-    val sourcePaths: Collection<File>,
+    val sourcePaths: FileCollection,
 
     // Dependencies of [sourcePaths].
     val dependencyClasspath: FileCollection,
@@ -40,12 +40,18 @@ data class JavaCompileInputs(
 ) {
     companion object {
         // Constructs a JavaCompileInputs from a library and its variant
-        fun fromLibraryVariant(library: LibraryExtension, variant: BaseVariant): JavaCompileInputs {
+        fun fromLibraryVariant(
+            library: LibraryExtension,
+            variant: BaseVariant,
+            project: Project
+        ): JavaCompileInputs {
             val folders = variant.getSourceFolders(SourceKind.JAVA)
             val sourcePaths: MutableCollection<File> = mutableListOf()
             for (folder in folders) {
                 sourcePaths.add(folder.dir)
             }
+            val sourceCollection = project.files(sourcePaths)
+            sourceCollection.builtBy(variant.javaCompileProvider)
             val dependencyClasspath = variant.compileConfiguration.incoming.artifactView { config ->
                 config.attributes { container ->
                     container.attribute(Attribute.of("artifactType", String::class.java), "jar")
@@ -53,7 +59,7 @@ data class JavaCompileInputs(
             }.artifacts.artifactFiles
 
             return JavaCompileInputs(
-                sourcePaths,
+                sourceCollection,
                 dependencyClasspath,
                 library.bootClasspath
             )
@@ -72,7 +78,8 @@ data class JavaCompileInputs(
             project: Project
         ): JavaCompileInputs {
             val bootClasspath: Collection<File> = androidJarFile(project).files
-            return JavaCompileInputs(sourcePaths, dependencyClasspath, bootClasspath)
+            val sourceCollection = project.files(sourcePaths)
+            return JavaCompileInputs(sourceCollection, dependencyClasspath, bootClasspath)
         }
     }
 }

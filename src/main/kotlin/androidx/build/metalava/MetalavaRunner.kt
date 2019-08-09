@@ -110,10 +110,10 @@ fun Project.generateApi(
     apiLintMode: ApiLintMode,
     includeRestrictedApis: Boolean
 ) {
-    generateApi(files.bootClasspath, files.dependencyClasspath, files.sourcePaths,
+    generateApi(files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
         apiLocation.publicApiFile, tempDir, GenerateApiMode.PublicApi, apiLintMode)
     if (includeRestrictedApis) {
-        generateApi(files.bootClasspath, files.dependencyClasspath, files.sourcePaths,
+        generateApi(files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
             apiLocation.restrictedApiFile, tempDir, GenerateApiMode.RestrictedApi, ApiLintMode.Skip)
     }
 }
