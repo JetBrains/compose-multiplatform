@@ -20,6 +20,7 @@ package androidx.build.dokka
 
 import androidx.build.AndroidXExtension
 import androidx.build.DiffAndDocs
+import androidx.build.dependencies.GUAVA_VERSION
 import androidx.build.getBuildId
 import androidx.build.getDistributionDirectory
 import com.android.build.gradle.LibraryExtension
@@ -28,10 +29,12 @@ import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.kotlin.dsl.apply
+import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.gradle.DokkaAndroidPlugin
 import org.jetbrains.dokka.gradle.DokkaAndroidTask
 import org.jetbrains.dokka.gradle.PackageOptions
 import java.io.File
+import java.net.URL
 
 object Dokka {
     fun generatorTaskNameForType(docsType: String, language: String = ""): String {
@@ -105,6 +108,14 @@ object Dokka {
 
         val docTaskName = generatorTaskNameForType(docsType, language)
 
+        val guavaDocLink = DokkaConfiguration.ExternalDocumentationLink.Builder().apply {
+            this.url = URL("https://guava.dev/releases/$GUAVA_VERSION/api/docs/")
+            // Guava documentation doesn't have the necessary package-list file to provide the packages
+            // to Dokka so we have to host a file internally as a workaround
+            this.packageListUrl = project.projectDir.toPath()
+                .resolve("guava-package.list").toUri().toURL()
+        }.build()
+
         return project.tasks.register(docTaskName, DokkaAndroidTask::class.java) { task ->
             task.moduleName = project.name
             task.outputDirectory = File(project.buildDir, docTaskName).absolutePath
@@ -114,6 +125,7 @@ object Dokka {
             task.outlineRoot = "androidx/"
             task.dacRoot = dacRoot
             task.moduleName = ""
+            task.externalDocumentationLinks.add(guavaDocLink)
             for (hiddenPackage in hiddenPackages) {
                 val opts = PackageOptions()
                 opts.prefix = hiddenPackage
