@@ -16,20 +16,6 @@
 
 package androidx.compose
 
-import kotlin.jvm.JvmField
+internal expect fun recordSourceKeyInfo(key: Any)
 
-internal data class JoinedKey(
-    @JvmField val left: Any?,
-    @JvmField val right: Any?
-)
-
-fun isJoinedKey(key: Any?) = key is JoinedKey
-fun joinedKeyLeft(key: Any?): Any? = when (key) {
-    is JoinedKey -> key.left
-    else -> null
-}
-
-fun joinedKeyRight(key: Any?): Any? = when (key) {
-    is JoinedKey -> key.right
-    else -> null
-}
+expect fun keySourceInfoOf(key: Any): String?

@@ -171,7 +171,7 @@ private val IGNORE_RECOMPOSE: (sync: Boolean) -> Unit = {}
 
 // TODO(lmr): this could be named MutableTreeComposer
 open class Composer<N>(
-    private val slotTable: SlotTable,
+    val slotTable: SlotTable,
     private val applier: Applier<N>,
     private val recomposer: Recomposer
 ) {
@@ -188,6 +188,7 @@ open class Composer<N>(
     private var nodeIndexStack = IntStack()
     private var groupNodeCount: Int = 0
     private var groupNodeCountStack = IntStack()
+    private var collectKeySources = false
 
     private var childrenAllowed = true
     private var invalidations: MutableList<Invalidation> = mutableListOf()
@@ -242,6 +243,10 @@ open class Composer<N>(
     }
 
     val inserting: Boolean get() = slots.inEmpty
+
+    fun collectKeySourceInformation() {
+        collectKeySources = true
+    }
 
     fun applyChanges() {
         trace("Compose:applyChanges") {
@@ -601,6 +606,8 @@ open class Composer<N>(
         // there is no need to track insert, deletes and moves with a pending changes object.
         if (inserting) {
             slots.beginEmpty()
+            if (collectKeySources)
+                recordSourceKeyInfo(key)
             recordOperation { _, slots, _ ->
                 slots.update(key)
                 slots.start(action)
@@ -684,6 +691,8 @@ open class Composer<N>(
                     recordOperation { _, slots, _ -> slots.beginInsert() }
                 }
                 slots.beginEmpty()
+                if (collectKeySources)
+                    recordSourceKeyInfo(key)
                 recordOperation { _, slots, _ ->
                     slots.update(key)
                     slots.start(action)
