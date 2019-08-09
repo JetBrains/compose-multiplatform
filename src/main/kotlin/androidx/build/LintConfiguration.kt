@@ -82,8 +82,11 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
                     fatal("UnusedResources")
                     fatal("KotlinPropertyAccess")
                     fatal("LambdaLast")
-                    fatal("NoHardKeywords")
                     fatal("UnknownNullness")
+
+                    // suppress warnings more specifically than issue-wide severity (regexes)
+                    // Currently suppresses warnings from baseline files working as intended
+                    lintConfig = project.rootProject.file("buildSrc/lint.xml")
 
                     // Only override if not set explicitly.
                     // Some Kotlin projects may wish to disable this.
