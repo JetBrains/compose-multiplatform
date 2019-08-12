@@ -168,7 +168,9 @@ class AndroidXPlugin : Plugin<Project> {
 
                     extension.defaultPublishVariant { libraryVariant ->
                         reportLibraryMetrics.configure {
-                            it.debugVariants.add(libraryVariant)
+                            it.jarFiles.from(libraryVariant.packageLibraryProvider.map { zip ->
+                                zip.inputs.files
+                            })
                         }
 
                         verifyDependencyVersionsTask?.configure { task ->

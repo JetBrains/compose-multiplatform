@@ -55,6 +55,7 @@ build_libs.kotlin = [
         stdlib: "org.jetbrains.kotlin:kotlin-stdlib:${build_versions.kotlin}",
         gradle_plugin: "org.jetbrains.kotlin:kotlin-gradle-plugin:${build_versions.kotlin}"
 ]
+build_libs.dex_member_list = "com.jakewharton.dex:dex-member-list:4.1.1"
 build_libs.dokka_gradle = [
         "org.jetbrains.dokka:dokka-android-gradle-plugin:${build_versions.dokka}",
         "org.jetbrains.dokka:dokka-gradle-plugin:${build_versions.dokka}",
