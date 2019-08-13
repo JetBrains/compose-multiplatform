@@ -865,8 +865,9 @@ fun <T> ambient(key: Ambient<T>) = effectOf<T> {
  * trigger an invalidation on the composition locally to cause a recompose.
  */
 val invalidate = effectOf<() -> Unit> {
-    val scope = context.currentInvalidate ?: error("no recompose scope found")
-    return@effectOf { scope.invalidate?.let { it(false) } }
+    val scope = context.currentRecomposeScope ?: error("no recompose scope found")
+    scope.used = true
+    return@effectOf { scope.invalidate() }
 }
 
 /**

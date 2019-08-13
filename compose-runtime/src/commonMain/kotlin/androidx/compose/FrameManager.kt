@@ -113,8 +113,9 @@ object FrameManager {
     }
 
     private val readObserver: (read: Any) -> Unit = { read ->
-        currentComposer?.currentInvalidate?.let {
+        currentComposer?.currentRecomposeScope?.let {
             synchronized(this) {
+                it.used = true
                 invalidations.add(read, it)
             }
         }
@@ -133,7 +134,7 @@ object FrameManager {
     private val commitObserver: (committed: Set<Any>) -> Unit = { committed ->
         trace("Model:commitTransaction") {
             val currentInvalidations = synchronized(this) { invalidations[committed] }
-            currentInvalidations.forEach { scope -> scope.invalidate?.invoke(false) }
+            currentInvalidations.forEach { scope -> scope.invalidate() }
         }
     }
 

@@ -162,18 +162,77 @@ private class Invalidation(
     var location: Int
 )
 
-internal class RecomposeScope(var compose: (invalidate: (sync: Boolean) -> Unit) -> Unit) {
-    var anchor: Anchor? = null
-    var invalidate: ((sync: Boolean) -> Unit)? = null
-    val valid: Boolean get() = anchor?.valid ?: false
+interface ScopeUpdateScope {
+    fun updateScope(block: () -> Unit)
+}
+
+internal sealed class RecomposeScope {
+    internal var anchor: Anchor? = null
+    internal val valid: Boolean get() = anchor?.valid ?: false
+    var used = false
+
+    /**
+     * Callback that will invalidate the recompose scope
+     */
+    abstract fun invalidate()
+
+    /**
+     * Call that will recompose the scope
+     */
+    internal abstract fun <N> compose(composer: Composer<N>)
+}
+
+internal class JoinScope(
+    var composeCb: (invalidate: (sync: Boolean) -> Unit) -> Unit
+) : RecomposeScope() {
+    var invalidateCallback: ((sync: Boolean) -> Unit)? = null
+
+    override fun <N> compose(composer: Composer<N>) {
+        val invalidate = composer.startJoin(EMPTY, false, composeCb)
+        composeCb(invalidate)
+        composer.doneJoin(false)
+    }
+
+    override fun invalidate() { invalidateCallback?.invoke(false) }
+}
+
+internal class RestartScope(
+    var composer: Composer<*>
+) : RecomposeScope(), ScopeUpdateScope {
+    private var block: (() -> Unit)? = null
+
+    override fun <N> compose(composer: Composer<N>) {
+        block?.invoke() ?: error("Invalid restart scope")
+    }
+
+    override fun invalidate() {
+        composer.invalidate(this, false)
+    }
+
+    // Called caller of endRestartGroup()
+    override fun updateScope(block: (() -> Unit)) { this.block = block }
 }
 
 private val IGNORE_RECOMPOSE: (sync: Boolean) -> Unit = {}
 
 // TODO(lmr): this could be named MutableTreeComposer
+/**
+ * Implementation of a composer for mutable tree.
+ */
 open class Composer<N>(
+    /**
+     * Backing storage for the composition
+     */
     val slotTable: SlotTable,
+
+    /**
+     * An adapter that applies changes to the tree using the Applier abstraction.
+     */
     private val applier: Applier<N>,
+
+    /**
+     * Manager for scheduling recompositions.
+     */
     private val recomposer: Recomposer
 ) {
     private val changes = mutableListOf<Change<N>>()
@@ -232,23 +291,43 @@ open class Composer<N>(
         }
     }
 
+    /**
+     * Start the composition. This should be called, and only be called, as the first group in
+     * the composition.
+     */
     fun startRoot() {
         slots = slotTable.openReader()
         startGroup(RootKey)
     }
 
+    /**
+     * End the composition. This should be called, and only be called, to end the first group in
+     * the composition.
+     */
     fun endRoot() {
         endGroup()
         finalizeCompose()
         slots.close()
     }
 
+    /**
+     * True if the composition is currently scheduling nodes to be inserted into the tree. During
+     * first composition this is always true. During recomposition this is true when new nodes
+     * are being scheduled to be added to the tree.
+     */
     val inserting: Boolean get() = slots.inEmpty
 
+    /**
+     * Start collecting key source information. This enables enables the tool API to be able to
+     * determine the source location of where groups and nodes are created.
+     */
     fun collectKeySourceInformation() {
         collectKeySources = true
     }
 
+    /**
+     * Apply the changes to the tree that were collected during the last composition.
+     */
     fun applyChanges() {
         trace("Compose:applyChanges") {
             invalidateStack.clear()
@@ -286,9 +365,9 @@ open class Composer<N>(
             trace("Compose:lifecycles") {
                 // Send lifecycle leaves
                 for (holder in leaves.reversed()) {
-                    // The count of the holder might be greater than 0 here as it might leave one part
-                    // of the composition and reappear in another. Only send a leave if the count is still
-                    // 0 after all changes have been applied.
+                    // The count of the holder might be greater than 0 here as it might leave one
+                    // part of the composition and reappear in another. Only send a leave if the
+                    // count is still 0 after all changes have been applied.
                     if (holder.count == 0) {
                         holder.instance.onLeave()
                         lifecycleObservers.remove(holder)
@@ -305,7 +384,21 @@ open class Composer<N>(
         }
     }
 
+    /**
+     * Start a group with the given key. During recomposition if the currently expected group does
+     * not match the given key a group the groups emitted in the same parent group are inspected
+     * to determine if one of them has this key and that group the first such group is moved
+     * (along with any nodes emitted by the group) to the current position and composition
+     * continues. If no group with this key is found, then the composition shifts into insert
+     * mode and new nodes are added at the current position.
+     *
+     *  @param key The key for the group
+     */
     fun startGroup(key: Any) = start(key, START_GROUP)
+
+    /**
+     * End the current group.
+     */
     fun endGroup() = end(END_GROUP)
 
     private fun skipGroup() {
@@ -313,6 +406,15 @@ open class Composer<N>(
         groupNodeCount += slots.skipGroup()
     }
 
+    /**
+     * Start emitting a node. It is required that one of [emitNode] or [createNode] is called
+     * after [startNode]. Similar to [startGroup], if, during recomposition, the current node
+     * does not have the provided key a node with that key is scanned for and moved into the
+     * current position if found, if no such node is found the composition switches into insert
+     * mode and a the node is scheduled to be inserted at the current location.
+     *
+     * @param key the key for the node.
+     */
     fun startNode(key: Any) {
         start(key, START_NODE)
         childrenAllowed = false
@@ -339,6 +441,11 @@ open class Composer<N>(
         childrenAllowed = true
     }
 
+    /**
+     * Schedule a node to be created and inserted at the current location. This is only valid to call when the
+     * composer is inserting.
+     */
+    @Suppress("UNUSED")
     fun <T : N> createNode(factory: () -> T) {
         val insertIndex = nodeIndexStack.peek()
         // see emitNode
@@ -353,6 +460,10 @@ open class Composer<N>(
         childrenAllowed = true
     }
 
+    /**
+     * Schedule the given node to be inserted. This is only valid to call when the composer is
+     * inserting.
+     */
     fun emitNode(node: N) {
         require(inserting) { "emitNode() called when not inserting" }
         val insertIndex = nodeIndexStack.peek()
@@ -367,6 +478,11 @@ open class Composer<N>(
         childrenAllowed = true
     }
 
+    /**
+     * Return the instance of the node that was inserted at the given location. This is only
+     * valid to call when the composition is not inserting. This must be called at the same
+     * location as [emitNode] or [createNode] as called even if the value is unused.
+     */
     fun useNode(): N {
         require(!inserting) { "useNode() called while inserting" }
         recordDown()
@@ -376,10 +492,18 @@ open class Composer<N>(
         return result as N
     }
 
+    /**
+     * Called to end the node group.
+     */
     fun endNode() {
         end(END_NODE)
     }
 
+    /**
+     * Schedule a change to be applied to a node's property. This change will be applied to the
+     * node that is the current node in the tree which was either created by [createNode],
+     * emitted by [emitNode] or returned by [useNode].
+     */
     fun <V, T> apply(value: V, block: T.(V) -> Unit) {
         recordOperation { applier, _, _ ->
             @Suppress("UNCHECKED_CAST")
@@ -387,13 +511,31 @@ open class Composer<N>(
         }
     }
 
+    /**
+     * Create a composed key that can be used in calls to [startGroup] or [startNode]. This will
+     * use the key stored at the current location in the slot table to avoid allocating a new key.
+     */
     fun joinKey(left: Any?, right: Any?): Any =
         getKey(slots.groupKey, left, right) ?: JoinedKey(left, right)
 
+    /**
+     * Return the next value in the slot table and advance the current location.
+     */
     fun nextSlot(): Any? = slots.next()
 
+    /**
+     * Schedule a slot advance to happen during [applyChanges].
+     */
     fun skipValue() = recordSlotNext()
 
+    /**
+     * Determine if the current slot table value is equal to the given value, if true, the value
+     * is scheduled to be skipped during [applyChanges] and [changes] return false; otherwise
+     * [applyChanges] will update the slot table to [value]. In either case the composer's slot
+     * table is advanced.
+     *
+     * @param value the value to be compared.
+     */
     fun <T> changed(value: T): Boolean {
         return if (nextSlot() != value || inserting) {
             updateValue(value)
@@ -404,6 +546,11 @@ open class Composer<N>(
         }
     }
 
+    /**
+     * Schedule the current value in the slot table to be updated to [value].
+     *
+     * @param value the value to schedule to be written to the slot table.
+     */
     fun updateValue(value: Any?) {
         recordOperation { _, slots, lifecycleManager ->
             val previous = if (value is CompositionLifecycleObserver) {
@@ -548,12 +695,12 @@ open class Composer<N>(
             val end = start + slots.groupSize(containingGroupIndex)
             var index = start
 
-            // Check the slots in range for recomposabile instances
+            // Check the slots in range for recomposable instances
             loop@ while (index < end) {
                 // A recomposable (i.e. a component) will always be in the first slot after the
-                // group marker.  This is true because that is where the recompose routine will look
-                // for it. If the slot does not hold a recomposable it is not a recomposable group
-                // so skip it.
+                // group marker.  This is true because that is where the recompose routine will
+                // look for it. If the slot does not hold a recomposable it is not a recomposable
+                // group so skip it.
                 if (slots.isGroup(index)) {
                     val sentinel = slots.groupKey(index)
                     when {
@@ -561,8 +708,8 @@ open class Composer<N>(
                             val ambient = slots.get(index + 1)
                             if (ambient == key) {
                                 val scope = slots.get(index + 2)
-                                if (scope is RecomposeScope) {
-                                    scope.invalidate?.let { it(false) }
+                                if (scope is JoinScope) {
+                                    scope.invalidateCallback?.let { it(false) }
                                 }
                             }
                         }
@@ -587,9 +734,15 @@ open class Composer<N>(
         }
     }
 
+    /**
+     * The number of changes that have been scheduled to be applied during [applyChanges].
+     *
+     * Slot table movement (skipping groups and nodes) will be coalesced so this number is
+     * possibly less than the total changes detected.
+     */
     val changeCount get() = changes.size
 
-    internal val currentInvalidate: RecomposeScope?
+    internal val currentRecomposeScope: RecomposeScope?
         get() =
             invalidateStack.let { if (it.isNotEmpty()) it.peek() else null }
 
@@ -956,7 +1109,7 @@ open class Composer<N>(
         isComposing = wasComposing
     }
 
-    private fun invalidate(scope: RecomposeScope, sync: Boolean) {
+    internal fun invalidate(scope: RecomposeScope, sync: Boolean) {
         val location = scope.anchor?.location(slotTable)
             ?: return // The scope never entered the composition
         if (location < 0)
@@ -979,6 +1132,9 @@ open class Composer<N>(
         }
     }
 
+    /**
+     * Skip a group. This is only valid to call if the composition is not inserting.
+     */
     fun skipCurrentGroup() {
         if (invalidations.isEmpty()) {
             skipGroup()
@@ -988,11 +1144,23 @@ open class Composer<N>(
     }
 
     private fun composeScope(scope: RecomposeScope) {
-        val invalidate = startJoin(EMPTY, false, scope.compose)
-        scope.compose(invalidate)
-        doneJoin(false)
+        scope.compose(this)
     }
 
+    private fun scheduleAnchor(scope: RecomposeScope) {
+        recordOperation { _, slots, _ ->
+            scope.anchor = slots.anchor(slots.parentIndex)
+        }
+    }
+
+    /**
+     * Start a data join group which can be invalided by calling the lambda returned by this
+     * function.
+     *
+     * @param valid Deprecated must always be true.
+     * @param compose a function that will produce the same composition that produced by this group.
+     * @return a lambda that will schedule recomposition of this group when invoked.
+     */
     fun startJoin(
         key: Any,
         valid: Boolean,
@@ -1000,32 +1168,35 @@ open class Composer<N>(
     ): (sync: Boolean) -> Unit {
         return if (!valid) {
             val invalidate = if (inserting) {
-                val scope = RecomposeScope(compose)
+                val scope = JoinScope(compose)
                 invalidateStack.push(scope)
-                scope.invalidate = { invalidate(scope, it) }
+                scope.invalidateCallback = { invalidate(scope, it) }
                 recordStart(key, START_GROUP)
-                recordOperation { _, slots, _ ->
-                    scope.anchor = slots.anchor(slots.current - 1)
-                }
+                scheduleAnchor(scope)
                 updateValue(scope)
                 slots.beginEmpty()
-                scope.invalidate
+                scope.invalidateCallback
             } else {
                 invalidations.removeLocation(slots.current)
                 slots.startGroup(key)
                 @Suppress("UNCHECKED_CAST")
-                val scope = slots.next() as RecomposeScope
-                scope.compose = compose
+                val scope = slots.next() as JoinScope
+                scope.composeCb = compose
                 invalidateStack.push(scope)
                 recordStart(key, START_GROUP)
                 skipValue()
-                scope.invalidate
+                scope.invalidateCallback
             }
             enterGroup(START_GROUP, null, null)
             invalidate ?: IGNORE_RECOMPOSE
         } else IGNORE_RECOMPOSE
     }
 
+    /**
+     * End a join group.
+     *
+     * @param valid Deprecated and must always be true.
+     */
     fun doneJoin(valid: Boolean) {
         if (!valid) {
             end(END_GROUP)
@@ -1035,6 +1206,54 @@ open class Composer<N>(
         }
     }
 
+    /**
+     * Start a restart group. A restart group creates a recompose scope and sets it as the current
+     * recompose scope of the composition. If the recompose scope is invalidated then this group
+     * will be recomposed. A recompose scope can be invalidated by calling the lambda returned by
+     * [androidx.compose.invalidate].
+     */
+    fun startRestartGroup(key: Any) {
+        val location = slots.current
+        startGroup(key)
+        if (inserting) {
+            val scope = RestartScope(this)
+            invalidateStack.push(scope)
+            updateValue(scope)
+        } else {
+            invalidations.removeLocation(location)
+            val scope = slots.next() as RestartScope
+            invalidateStack.push(scope)
+            skipValue()
+        }
+    }
+
+    /**
+     * End a restart group. If the recompose scope was marked used during composition then a
+     * [ScopeUpdateScope] is returned that allows attaching a lambda that will produce the same
+     * composition as was produced by this group (including calling [startRestartGroup] and
+     * [endRestartGroup]).
+     */
+    fun endRestartGroup(): ScopeUpdateScope? {
+        // This allows for the invalidate stack to be out of sync since this might be called during exception stack
+        // unwinding that might have not called the doneJoin/endRestartGroup in the wrong order.
+        val scope = if (invalidateStack.isNotEmpty()) invalidateStack.pop() as? RestartScope
+            else null
+        val result = if (scope != null && scope.used) {
+            if (scope.anchor == null) {
+                scheduleAnchor(scope)
+            }
+            scope
+        } else {
+            null
+        }
+        end(END_GROUP)
+        return result
+    }
+
+    /**
+     * Synchronously recompose all invalidated groups. This collects the changes which must be
+     * applied by [applyChanges] to have an effect.
+     */
     fun recompose(): Boolean {
         if (invalidations.isNotEmpty()) {
             trace("Compose:recompose") {
@@ -1288,10 +1507,20 @@ open class Composer<N>(
     }
 }
 
+/**
+ * Get the next value of the slot table. This will unwrap lifecycle observer holders to return
+ * lifecycle observer and should be used instead of [Composer.nextSlot].
+ */
 fun <N> Composer<N>.nextValue(): Any? = nextSlot().let {
     if (it is CompositionLifecycleObserverHolder) it.instance else it
 }
 
+/**
+ * Cache a value in the composition. During initial composition [block] is called to produce the
+ * value that is then * stored in the slot table. During recomposition, if [valid] is true the
+ * value is obtained from the slot table and [block] is not invoked. If [valid] is false a new
+ * value is produced by calling [block] and the slot table is updated to contain the new value.
+ */
 inline fun <N, T> Composer<N>.cache(valid: Boolean = true, block: () -> T): T {
     var result = nextValue()
     if (result === EMPTY || !valid) {
@@ -1304,13 +1533,25 @@ inline fun <N, T> Composer<N>.cache(valid: Boolean = true, block: () -> T): T {
     return result as T
 }
 
+/**
+ * Remember the value produced by [block]. [block] will only be evaluated during the composition.
+ * Recomposition will always return the value produced by composition.
+ */
 /* inline */
 fun <N, V> Composer<N>.remember(block: () -> V): V = cache(true, block)
 
+/**
+ * Remember the value returned by [block] if [p1] is equal to the previous composition, otherwise
+ * produce and remember a new value by calling [block].
+ */
 /* inline */
 fun <N, V, /* reified */ P1> Composer<N>.remember(p1: P1, block: () -> V) =
     cache(!changed(p1), block)
 
+/**
+ * Remember the value returned by [block] if [p1] and [p2] are equal to the previous composition,
+ * otherwise produce and remember a new value by calling [block].
+ */
 /* inline */
 fun <
         N,
@@ -1325,6 +1566,10 @@ fun <
     return cache(valid, block)
 }
 
+/**
+ * Remember the value returned by [block] if [p1], [p2] and [p3] are equal to the previous
+ * composition, otherwise produce and remember a new value by calling [block].
+ */
 /* inline */
 fun <
         N,
@@ -1342,6 +1587,10 @@ fun <
     return cache(valid, block)
 }
 
+/**
+ * Remember the value returned by [block] if [p1], [p2], [p3], [p4] are equal to the previous
+ * composition, otherwise produce and remember a new value by calling [block].
+ */
 /* inline */
 fun <
         N,
@@ -1368,6 +1617,10 @@ fun <
     return cache(valid, block)
 }
 
+/**
+ * Remember the value returned by [block] if all values of [args] are equal to the previous
+ * composition, otherwise produce and remember a new value by calling [block].
+ */
 /* inline */ fun <N, V> Composer<N>.remember(vararg args: Any?, block: () -> V): V {
     var valid = true
     for (arg in args) valid = !changed(arg) && valid

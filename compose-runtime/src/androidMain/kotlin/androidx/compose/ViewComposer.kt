@@ -264,6 +264,9 @@ class ViewComposer(
         block(invalidate)
         composer.doneJoin(false)
     }
+
+    fun startRestartGroup(key: Any) = composer.startRestartGroup(key)
+    fun endRestartGroup(): ScopeUpdateScope? = composer.endRestartGroup()
 }
 
 /* inline */ class ViewValidator(val composer: Composer<*>) {

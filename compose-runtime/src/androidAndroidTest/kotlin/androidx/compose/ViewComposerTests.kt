@@ -30,12 +30,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import androidx.test.rule.ActivityTestRule
 import junit.framework.TestCase.assertEquals
-import org.junit.Assert
 import org.junit.Rule
 import org.junit.runner.RunWith
 import org.junit.Test
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import kotlin.test.assertTrue
 
 class TestActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -1058,5 +1058,6 @@ internal fun Activity.waitForAFrame() {
             override fun doFrame(frameTimeNanos: Long) = latch.countDown()
         })
     }
-    Assert.assertTrue(latch.await(1, TimeUnit.MINUTES))
+    assertTrue(latch.await(1, TimeUnit.MINUTES),
+        "Time-out waiting for choreographer frame")
 }

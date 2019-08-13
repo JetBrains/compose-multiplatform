@@ -125,6 +125,8 @@ open class SlotEditor internal constructor(val table: SlotTable) {
             else slots[effectiveIndex(startStack.peek())].asGroupStart.nodes
         }
 
+    val parentIndex: Int get() = if (startStack.isEmpty()) 0 else startStack.peek()
+
     /**
      * Get the value at an Anchor
      */
