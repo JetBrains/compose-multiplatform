@@ -17,16 +17,21 @@
 package androidx.build.jacoco
 
 import androidx.build.getDistributionDirectory
+import androidx.build.getRootOutDirectory
 import androidx.build.gradle.isRoot
 import com.android.build.gradle.TestedExtension
 import com.google.common.base.Preconditions
 import org.gradle.api.Project
+import org.gradle.api.Task
+import org.gradle.api.file.ConfigurableFileTree
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.api.tasks.bundling.Zip
 
 object Jacoco {
     const val VERSION = "0.8.3"
     private const val ANT_DEPENDENCY = "org.jacoco:org.jacoco.ant:$VERSION"
+    private const val EC_FILE_ZIP_TASK_NAME = "zipEcFiles"
 
     fun createUberJarTask(project: Project): TaskProvider<Jar> {
         // This "uber" jacoco jar is used by the build server. Instrumentation tests are executed
@@ -81,5 +86,35 @@ object Jacoco {
             it.destinationDirectory.set(project.getDistributionDirectory())
             it.archiveFileName.set("jacoco-report-classes-all.jar")
         }
+    }
+
+    /**
+     * Creates a task that will zip the .ec and .exec code execution files produced by jacoco
+     * This is run by our busytown commands that collect and report coverage information
+     */
+    fun createZipEcFilesTask(project: Project): TaskProvider<Zip> {
+        // Examples of the two types of ec file :
+        //"./out/androidx/ads-identifier-common/build/outputs/code_coverage/debugAndroidTest/connected/coverage.ec"
+        //./out/androidx/lifecycle/lifecycle-runtime-ktx-lint/build/jacoco/test.exec
+        Preconditions.checkArgument(project.isRoot, "Must be root project")
+        var ecFilesTree: ConfigurableFileTree = project.fileTree(mapOf("dir" to project
+            .getRootOutDirectory(), "include" to listOf("**/jacoco/*.exec", "**/coverage.ec")))
+        val zipTask = project.tasks.register(EC_FILE_ZIP_TASK_NAME, Zip::class.java) {
+            it.from(ecFilesTree)
+            it.archiveFileName.set("coverage_ec_files.zip")
+            it.destinationDirectory.set(project.getDistributionDirectory())
+            it.includeEmptyDirs = false
+            it.description = "Task for creating a zip file from all of the .ec and .exec files " +
+                    "created as part of host-side test coverage analysis with jacoco."
+        }
+        return zipTask
+    }
+
+    /**
+     * Returns the execution-file-zipping-task associated with the root project.
+     * This should only be called after the task is created.
+     */
+    fun getZipEcFilesTask(project: Project): Task {
+        return project.rootProject.tasks.getByName(EC_FILE_ZIP_TASK_NAME)
     }
 }
