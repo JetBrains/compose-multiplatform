@@ -74,7 +74,7 @@ const val KOTLIN_COROUTINES_GUAVA =
 const val KOTLIN_COROUTINES_TEST =
     "org.jetbrains.kotlinx:kotlinx-coroutines-test:$KOTLIN_COROUTINES_VERSION"
 
-private const val KOTLIN_COROUTINES_PREVIEW_VERSION = "1.3.0-RC"
+private const val KOTLIN_COROUTINES_PREVIEW_VERSION = "1.3.0-RC2"
 const val KOTLIN_COROUTINES_PREVIEW =
     "org.jetbrains.kotlinx:kotlinx-coroutines-android:$KOTLIN_COROUTINES_PREVIEW_VERSION"
 const val KOTLIN_COROUTINES_CORE_PREVIEW =
