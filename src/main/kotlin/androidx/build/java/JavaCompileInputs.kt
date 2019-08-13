@@ -17,6 +17,7 @@
 package androidx.build.java
 
 import androidx.build.androidJarFile
+import androidx.build.multiplatformExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.BaseVariant
 import com.android.build.gradle.api.SourceKind
@@ -45,12 +46,7 @@ data class JavaCompileInputs(
             variant: BaseVariant,
             project: Project
         ): JavaCompileInputs {
-            val folders = variant.getSourceFolders(SourceKind.JAVA)
-            val sourcePaths: MutableCollection<File> = mutableListOf()
-            for (folder in folders) {
-                sourcePaths.add(folder.dir)
-            }
-            val sourceCollection = project.files(sourcePaths)
+            val sourceCollection = project.files(getSourcePaths(variant, project))
             sourceCollection.builtBy(variant.javaCompileProvider)
             val dependencyClasspath = variant.compileConfiguration.incoming.artifactView { config ->
                 config.attributes { container ->
@@ -80,6 +76,21 @@ data class JavaCompileInputs(
             val bootClasspath: Collection<File> = androidJarFile(project).files
             val sourceCollection = project.files(sourcePaths)
             return JavaCompileInputs(sourceCollection, dependencyClasspath, bootClasspath)
+        }
+
+        private fun getSourcePaths(variant: BaseVariant, project: Project): Collection<File> {
+            // If the project has the kotlin-multiplatform plugin, we want to return a combined
+            // collection of all the source files inside '*main' source sets. I.e, given a module
+            // with a common and Android source set, this will look inside commonMain and
+            // androidMain.
+            return project.multiplatformExtension?.run {
+                sourceSets
+                    .filter { it.name.contains("main", ignoreCase = true) }
+                    .flatMap { it.kotlin.sourceDirectories }
+                    .also { require(it.isNotEmpty()) }
+            } ?: variant
+                .getSourceFolders(SourceKind.JAVA)
+                .map { folder -> folder.dir }
         }
     }
 }

@@ -63,11 +63,14 @@ import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.extra
+import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.getPlugin
 import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
 import org.gradle.testing.jacoco.tasks.JacocoReport
-import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
+import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
@@ -189,6 +192,11 @@ class AndroidXPlugin : Plugin<Project> {
                         compile.kotlinOptions.jvmTarget = "1.8"
                         project.runIfPartOfBuildOnServer {
                             compile.kotlinOptions.allWarningsAsErrors = true
+                        }
+                    }
+                    if (plugin is KotlinMultiplatformPluginWrapper) {
+                        project.extensions.findByType<LibraryExtension>()?.apply {
+                            configureAndroidLibraryWithMultiplatformPluginOptions()
                         }
                     }
                 }
@@ -459,12 +467,25 @@ class AndroidXPlugin : Plugin<Project> {
     }
 
     private fun hasAndroidTestSourceCode(project: Project, extension: TestedExtension): Boolean {
-        val javaSourceSet = extension.sourceSets.findByName("androidTest") ?: return false
-        val hasJava = !javaSourceSet.java.sourceFiles.isEmpty
-        val kotlinExtension =
-            project.extensions.findByType(KotlinProjectExtension::class.java) ?: return hasJava
-        val kotlinSourceSet = kotlinExtension.sourceSets.findByName("androidTest") ?: return hasJava
-        return hasJava || kotlinSourceSet.kotlin.files.isNotEmpty()
+        // check Java androidTest source set
+        extension.sourceSets.findByName("androidTest")?.let { sourceSet ->
+            if (!sourceSet.java.sourceFiles.isEmpty) return true
+        }
+
+        // check kotlin-android androidTest source set
+        project.extensions.findByType(KotlinAndroidProjectExtension::class.java)
+            ?.sourceSets?.findByName("androidTest")?.let {
+            if (it.kotlin.files.isNotEmpty()) return true
+        }
+
+        // check kotlin-multiplatform androidAndroidTest source set
+        project.multiplatformExtension?.apply {
+            sourceSets.findByName("androidAndroidTest")?.let {
+                if (it.kotlin.files.isNotEmpty()) return true
+            }
+        }
+
+        return false
     }
 
     private fun ApkVariant.configureApkCopy(
@@ -536,6 +557,12 @@ class AndroidXPlugin : Plugin<Project> {
                 }
             }
         }
+    }
+
+    private fun TestedExtension.configureAndroidLibraryWithMultiplatformPluginOptions() {
+        sourceSets.findByName("main")!!.manifest.srcFile("src/androidMain/AndroidManifest.xml")
+        sourceSets.findByName("androidTest")!!
+            .manifest.srcFile("src/androidAndroidTest/AndroidManifest.xml")
     }
 
     private fun AppExtension.configureAndroidApplicationOptions(project: Project) {
@@ -665,6 +692,9 @@ fun Project.addToProjectMap(extension: AndroidXExtension) {
         }
     }
 }
+
+val Project.multiplatformExtension
+    get() = extensions.findByType(KotlinMultiplatformExtension::class.java)
 
 private fun Project.createCheckResourceApiTask(): DefaultTask {
     return tasks.createWithConfig("checkResourceApi",
