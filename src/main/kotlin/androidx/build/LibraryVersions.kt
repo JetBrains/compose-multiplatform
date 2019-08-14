@@ -55,7 +55,7 @@ object LibraryVersions {
     val DYNAMICANIMATION = Version("1.1.0-alpha03")
     val DYNAMICANIMATION_KTX = Version("1.0.0-alpha03")
     val EMOJI = Version("1.1.0-alpha01")
-    val ENTERPRISE = Version("1.0.0-alpha04")
+    val ENTERPRISE = Version("1.0.0-beta01")
     val EXIFINTERFACE = Version("1.1.0-beta02")
     val FRAGMENT = Version("1.2.0-alpha03")
     val FUTURES = Version("1.0.0-rc01")
