@@ -59,6 +59,12 @@ fun Project.getBuildInfoDirectory(): File =
         File(getDistributionDirectory(), "build-info")
 
 /**
+ * Directory to put release note files for generate release note tasks.
+ */
+fun Project.getReleaseNotesDirectory(): File =
+    File(getDistributionDirectory(), "release-notes")
+
+/**
  * Directory to put host test results so they can be consumed by the testing dashboard.
  */
 fun Project.getHostTestResultDirectory(): File =
