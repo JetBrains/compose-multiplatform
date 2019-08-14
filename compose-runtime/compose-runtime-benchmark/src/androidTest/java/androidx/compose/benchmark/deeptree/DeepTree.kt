@@ -30,7 +30,7 @@ fun Terminal(style: Int) {
     val color = when (style) {
         0 -> Color.Blue
         1 -> Color.Black
-        else -> Color.Fuchsia
+        else -> Color.Magenta
     }
     ColoredRect(color = color, height = 16.dp, width = 16.dp)
 }

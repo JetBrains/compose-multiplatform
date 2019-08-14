@@ -42,7 +42,7 @@ fun PivotalItemRow(@Pivotal item: Item) {
     val color = when (item.id % 3) {
         0 -> Color.Blue
         1 -> Color.Black
-        else -> Color.Fuchsia
+        else -> Color.Magenta
     }
     Row {
         ColoredRect(color=color, width = 16.dp, height = 16.dp)
@@ -58,7 +58,7 @@ fun ItemRow(item: Item) {
     val color = when (item.id % 3) {
         0 -> Color.Blue
         1 -> Color.Black
-        else -> Color.Fuchsia
+        else -> Color.Magenta
     }
     Row {
         ColoredRect(color=color, width = 16.dp, height = 16.dp)
