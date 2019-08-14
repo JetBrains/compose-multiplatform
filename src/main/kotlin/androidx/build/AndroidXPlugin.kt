@@ -41,6 +41,7 @@ import androidx.build.metalava.CREATE_STUB_API_JAR_TASK
 import androidx.build.metalava.MetalavaTasks.configureAndroidProjectForMetalava
 import androidx.build.metalava.MetalavaTasks.configureJavaProjectForMetalava
 import androidx.build.metalava.UpdateApiTask
+import androidx.build.releasenotes.GenerateReleaseNotesTask
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryExtension
@@ -73,6 +74,8 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.File
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -130,6 +133,7 @@ class AndroidXPlugin : Plugin<Project> {
                     if (verifyDependencyVersionsTask != null) {
                         project.createCheckReleaseReadyTask(listOf(verifyDependencyVersionsTask))
                     }
+                    project.createGenerateReleaseNotesTask()
                     project.configureNonAndroidProjectForLint(androidXExtension)
                     project.configureJavaProjectForDokka(androidXExtension)
                     project.configureJavaProjectForMetalava(androidXExtension)
@@ -157,6 +161,7 @@ class AndroidXPlugin : Plugin<Project> {
                     if (checkReleaseReadyTasks.isNotEmpty()) {
                         project.createCheckReleaseReadyTask(checkReleaseReadyTasks)
                     }
+                    project.createGenerateReleaseNotesTask()
                     val reportLibraryMetrics = project.tasks.register(
                         REPORT_LIBRARY_METRICS, ReportLibraryMetricsTask::class.java
                     )
@@ -605,6 +610,37 @@ class AndroidXPlugin : Plugin<Project> {
                 VerifyDependencyVersionsTask::class.java)
     }
 
+    // Task that creates release notes
+    private fun Project.createGenerateReleaseNotesTask() {
+        tasks.register(
+            GENERATE_RELEASE_NOTES_TASK,
+            GenerateReleaseNotesTask::class.java
+        ) { task ->
+            if (project.hasProperty("startCommit")) {
+                task.startSHA = project.property("startCommit").toString()
+            } else {
+                task.startSHA = ""
+            }
+            if (project.hasProperty("endCommit")) {
+                task.endSHA = project.property("endCommit").toString()
+            } else {
+                task.endSHA = "HEAD"
+            }
+            val formatter = DateTimeFormatter.ofPattern("MM-d-yyyy")
+            if (project.hasProperty("releaseDate")) {
+                task.date = LocalDate.parse(project.property("releaseDate").toString(), formatter)
+            } else {
+                task.date = LocalDate.now()
+            }
+            task.outputFile.set(
+                File(
+                    project.getReleaseNotesDirectory(),
+                    "${group}_${name}_release_notes.txt"
+                )
+            )
+        }
+    }
+
     // Task that creates a json file of a project's dependencies
     private fun Project.addCreateLibraryBuildInfoFileTask(extension: AndroidXExtension) {
         afterEvaluate {
@@ -663,6 +699,7 @@ class AndroidXPlugin : Plugin<Project> {
         const val CHECK_SAME_VERSION_LIBRARY_GROUPS = "checkSameVersionLibraryGroups"
         const val CREATE_LIBRARY_BUILD_INFO_FILES_TASK = "createLibraryBuildInfoFiles"
         const val CREATE_AGGREGATE_BUILD_INFO_FILES_TASK = "createAggregateBuildInfoFiles"
+        const val GENERATE_RELEASE_NOTES_TASK = "generateReleaseNotes"
         const val REPORT_LIBRARY_METRICS = "reportLibraryMetrics"
     }
 }
