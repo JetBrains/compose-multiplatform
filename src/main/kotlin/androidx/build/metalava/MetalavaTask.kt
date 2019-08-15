@@ -27,6 +27,7 @@ import org.gradle.api.tasks.InputFiles
 abstract class MetalavaTask : DefaultTask() {
     /** Configuration containing Metalava and its dependencies. */
     @get:Classpath
+    @get:InputFiles
     lateinit var configuration: Configuration
 
     /** Android's boot classpath. Obtained from [BaseExtension.getBootClasspath]. */
