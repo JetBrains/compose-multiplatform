@@ -183,6 +183,20 @@ object MetalavaTasks {
                 }
             }
 
+        val regenerateOldApis = project.tasks.register("regenerateOldApis",
+                RegenerateOldApisTask::class.java) { task ->
+            task.group = "API"
+            task.description = "Regenerates historic API .txt files using the " +
+                "corresponding prebuilt and the latest Metalava"
+            // if checkApiRelease and regenerateOldApis both run, then checkApiRelease must
+            // be the second one run of the two (because checkApiRelease validates
+            // files modified by regenerateOldApis)
+            val cr = checkApiRelease
+            if (cr != null) {
+                cr.get().mustRunAfter(task)
+            }
+        }
+
         val updateApi = project.tasks.register("updateApi", UpdateApiTask::class.java) { task ->
             task.group = "API"
             task.description = "Updates the checked in API files to match source code API"
@@ -200,13 +214,11 @@ object MetalavaTasks {
             }
         }
 
-        project.tasks.register("regenerateOldApis", RegenerateOldApisTask::class.java) { task ->
+        project.tasks.register("regenerateApis") { task ->
             task.group = "API"
             task.description = "Regenerates current and historic API .txt files using the " +
                 "corresponding prebuilt and the latest Metalava"
-            // Technically this doesn't need updateApi to happen first, but adding this dependency
-            // is a convenient way to make updateApi also happen when the user runs
-            // `./gradlew regenerateOldApis`
+            task.dependsOn(regenerateOldApis)
             task.dependsOn(updateApi)
         }
 
