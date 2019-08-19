@@ -9,7 +9,6 @@ import com.intellij.psi.PsiReferenceRegistrar
 import com.intellij.util.ProcessingContext
 import org.jetbrains.kotlin.descriptors.ClassConstructorDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
-import org.jetbrains.kotlin.idea.references.AbstractKotlinReferenceContributor
 import org.jetbrains.kotlin.idea.references.KtMultiReference
 import org.jetbrains.kotlin.idea.references.KtSimpleReference
 import org.jetbrains.kotlin.name.Name
@@ -27,12 +26,13 @@ import androidx.compose.plugins.kotlin.EmitOrCallNode
 import androidx.compose.plugins.kotlin.ErrorNode
 import androidx.compose.plugins.kotlin.MemoizedCallNode
 import androidx.compose.plugins.kotlin.NonMemoizedCallNode
+import com.intellij.psi.PsiReferenceContributor
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
 import org.jetbrains.kotlin.resolve.calls.model.VariableAsFunctionResolvedCall
 import org.jetbrains.kotlin.util.OperatorNameConventions
 
-class KtxReferenceContributor : AbstractKotlinReferenceContributor() {
+class KtxReferenceContributor : PsiReferenceContributor() {
     override fun registerReferenceProviders(registrar: PsiReferenceRegistrar) {
         // We want to search for references on the closest ancestor of the element itself that we are putting a
         // reference on. This ends up being KtSimpleNameExpression for most things, which this provider deals with.

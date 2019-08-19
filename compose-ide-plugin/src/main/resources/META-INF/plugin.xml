@@ -1,0 +1,62 @@
+<!--
+  Copyright 2019 The Android Open Source Project
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+
+<idea-plugin>
+    <id>androidx.compose</id>
+
+    <name>Compose</name>
+    <description><![CDATA[
+The Jetpack Compose IDE plugin
+]]></description>
+    <vendor url="http://www.android.com">Android</vendor>
+
+    <idea-version since-build="191.5109.14" until-build="192.*"/>
+    <depends>org.jetbrains.kotlin</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <completion.contributor language="kotlin" implementationClass="androidx.compose.plugins.idea.completion.ComposeCompletionContributor" />
+        <typedHandler implementation="androidx.compose.plugins.idea.editor.KtxTypedHandler" />
+        <typedHandler implementation="androidx.compose.plugins.idea.editor.KtxAttributeAutoParensHandler" />
+        <enterHandlerDelegate implementation="androidx.compose.plugins.idea.editor.KtxEnterHandler" />
+        <annotator language="kotlin" implementationClass="androidx.compose.plugins.idea.editor.ComposeUnresolvedTagAnnotator" />
+        <psi.referenceContributor language="kotlin" implementation="androidx.compose.plugins.idea.editor.KtxReferenceContributor"/>
+    </extensions>
+    <extensions defaultExtensionNs="org.jetbrains.kotlin">
+        <ktxParsingExtension implementation="androidx.compose.plugins.kotlin.ComposeKtxParsingExtension" />
+        <storageComponentContainerContributor implementation="androidx.compose.plugins.kotlin.ComponentsClosedDeclarationChecker" />
+        <storageComponentContainerContributor implementation="androidx.compose.plugins.idea.ComposableAnnotationChecker" />
+        <storageComponentContainerContributor implementation="androidx.compose.plugins.kotlin.UnionAnnotationCheckerProvider" />
+        <ktxTypeResolutionExtension implementation="androidx.compose.plugins.kotlin.ComposeKtxTypeResolutionExtension"/>
+        <callResolutionInterceptorExtension implementation="androidx.compose.plugins.kotlin.ComposeCallResolutionInterceptorExtension"/>
+        <ktxControlFlowExtension implementation="androidx.compose.plugins.kotlin.ComposeKtxControlFlowExtension"/>
+        <typeResolutionInterceptorExtension implementation="androidx.compose.plugins.kotlin.ComposeTypeResolutionInterceptorExtension"/>
+        <completionExtension implementation="androidx.compose.plugins.idea.completion.ComposeCompletionExtension"/>
+        <diagnosticSuppressor implementation="androidx.compose.plugins.kotlin.ComposeDiagnosticSuppressor"/>
+        <quickFixContributor implementation="androidx.compose.plugins.idea.quickfix.ComposeQuickFixRegistry" />
+    </extensions>
+    <actions>
+        <action id="ConvertXmlToComponent" class="androidx.compose.plugins.idea.conversion.XmlToComponentAction"
+            text="Convert XML File to Component">
+            <add-to-group group-id="ConvertJavaToKotlinGroup" anchor="last"/>
+        </action>
+    </actions>
+
+    <application-components>
+        <component>
+            <implementation-class>androidx.compose.plugins.idea.editor.KtxTagNameSynchronizer</implementation-class>
+        </component>
+    </application-components>
+</idea-plugin>

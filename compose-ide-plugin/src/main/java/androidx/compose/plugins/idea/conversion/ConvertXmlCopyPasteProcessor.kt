@@ -38,9 +38,6 @@ import org.jetbrains.kotlin.idea.caches.resolve.resolveImportReference
 import org.jetbrains.kotlin.idea.conversion.copy.CopiedKotlinCode
 import org.jetbrains.kotlin.idea.conversion.copy.ElementAndTextList
 import org.jetbrains.kotlin.idea.conversion.copy.ElementsAndTextsProcessor
-import org.jetbrains.kotlin.idea.conversion.copy.end
-import org.jetbrains.kotlin.idea.conversion.copy.range
-import org.jetbrains.kotlin.idea.conversion.copy.start
 import org.jetbrains.kotlin.idea.j2k.EmptyDocCommentConverter
 import org.jetbrains.kotlin.idea.util.ImportInsertHelper
 import org.jetbrains.kotlin.idea.util.addAnnotation
@@ -59,6 +56,9 @@ import org.jetbrains.kotlin.psi.psiUtil.startOffset
 import androidx.compose.plugins.kotlin.ComposeUtils
 import androidx.compose.plugins.idea.editor.KtxEditorOptions
 import androidx.compose.plugins.idea.parentOfType
+import org.jetbrains.kotlin.idea.core.util.end
+import org.jetbrains.kotlin.idea.core.util.range
+import org.jetbrains.kotlin.idea.core.util.start
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
 

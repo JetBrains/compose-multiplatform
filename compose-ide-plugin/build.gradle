@@ -19,28 +19,69 @@ import androidx.build.CompilationTarget
 import androidx.build.LibraryGroups
 import androidx.build.LibraryVersions
 import androidx.build.Publish
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 import static androidx.build.dependencies.DependenciesKt.*
 
 plugins {
     id("AndroidXPlugin")
     id("kotlin")
+    id("org.jetbrains.intellij") version("0.4.8")
+}
+
+ext.studioVersionProperties = getStudioVersionProperties()
+ext.studioOsName = getOsName()
+ext.studioFolderName = getStudioFolderName()
+ext.studioAppPath = getStudioBinaryPath()
+ext.studioBuildTxtDir = getStudioBuildTxtDir()
+ext.studioLibPath = getStudioLibPath()
+
+// more info on options for this DSL here:
+// https://github.com/JetBrains/gradle-intellij-plugin
+intellij {
+    // unfortunately, we need to run this here to ensure that files are in the right place as soon as some
+    // of the plugin code is executed
+    studioInstallation()
+    pluginName = "compose-ide-plugin"
+    downloadSources = false
+    intellijRepo = "${repos.prebuiltsRoot}/androidx/external"
+    pluginsRepo = "${repos.prebuiltsRoot}/androidx/external"
+    localPath = "${studioAppPath}"
+}
+
+runIde {
+    maxHeapSize = "2g"
 }
 
 dependencies {
-    implementation(KOTLIN_STDLIB)
+    compileOnly(KOTLIN_COMPOSE_STDLIB)
     implementation project(":compose:compose-compiler-hosted")
 
-    implementation("org.jetbrains.kotlin:kotlin-compiler")
-    implementation("org.jetbrains.kotlin:kotlin-plugin")
-    implementation("org.jetbrains.kotlin:kotlin-intellij-core")
-    implementation("org.jetbrains.kotlin:kotlin-platform-api")
-    implementation("org.jetbrains.kotlin:kotlin-platform-impl")
-    implementation("org.jetbrains.kotlin:kotlin-j2k")
-    implementation("org.jetbrains.kotlin:kotlin-java-impl")
-    implementation("org.jetbrains.kotlin:kotlin-openapi")
-    implementation("org.jetbrains.kotlin:kotlin-jps-common-ide")
+    compileOnly("org.jetbrains.kotlin:kotlin-compiler:$COMPOSE_VERSION")
+    compileOnly("org.jetbrains.kotlin:kotlin-plugin:$COMPOSE_VERSION")
+    compileOnly("org.jetbrains.kotlin:kotlin-intellij-core:$COMPOSE_VERSION")
+    compileOnly("org.jetbrains.kotlin:kotlin-platform-api:$COMPOSE_VERSION")
+    compileOnly("org.jetbrains.kotlin:kotlin-platform-impl:$COMPOSE_VERSION")
+    compileOnly("org.jetbrains.kotlin:kotlin-j2k:$COMPOSE_VERSION")
+    compileOnly("org.jetbrains.kotlin:kotlin-java-impl:$COMPOSE_VERSION")
+    compileOnly("org.jetbrains.kotlin:kotlin-openapi:$COMPOSE_VERSION")
+    compileOnly("org.jetbrains.kotlin:kotlin-jps-common-ide:$COMPOSE_VERSION")
+
+    // intellij plugins have a bunch of implicit dependencies. The Gradle Intellij Plugin usually
+    // adds these automatically, but we are adding them explicitly here, and using the `builtBy`
+    // method to ensure that the Studio installation gets unzipped into the right location whenever
+    // gradle is in its build phase. This ensures that tasks that aren't depending on this plugin
+    // don't unnecessarily spend time unzipping the IDE installation.
+    implementation fileTree("$studioLibPath") {
+        include "**/*.jar"
+        builtBy 'prepareIntellijLibraryDirectory'
+    }
+}
+
+// This task unzips the studio prebuilt Studio zip into the right directory
+task prepareIntellijLibraryDirectory {
+    doLast {
+        studioInstallation()
+    }
 }
 
 compileKotlin {
@@ -58,4 +99,93 @@ androidx {
     inceptionYear = "2019"
     description = "Contains the IDE plugin for Compose"
     compilationTarget = CompilationTarget.HOST
+}
+
+def getStudioBinaryPath() {
+    if (studioOsName == "linux") {
+        return "${project.rootDir}/studio/${ext.studioFolderName}/android-studio"
+    } else {
+        return "${project.rootDir}/studio/${ext.studioFolderName}/Android Studio 3.5 Preview.app"
+    }
+}
+
+def getStudioVersionProperties() {
+    // This mimics the logic in studiow, and if that logic changes, this should update as well
+    def props = new Properties()
+    rootProject.file("studio_versions.properties").withInputStream { props.load(it) }
+    return props
+}
+
+def getOsName() {
+
+    def realOsName = System.properties['os.name'].toLowerCase()
+    def osName = "mac"
+
+    if (realOsName.contains('linux') || realOsName.contains('ubuntu')) {
+        osName = "linux"
+    }
+
+    return osName
+}
+
+def getStudioFolderName() {
+    def ideaMajorVersion = studioVersionProperties.getProperty("idea_major_version")
+    def buildNumber = studioVersionProperties.getProperty("studio_build_number")
+    def osName = studioOsName
+    return "android-studio-ide-${ideaMajorVersion}.${buildNumber}-${osName}"
+}
+
+def getStudioBuildTxtDir() {
+    def appDir = new File(studioAppPath)
+
+    if (studioOsName == "linux") {
+        return appDir
+    } else {
+        return new File("Resources", new File("Contents", appDir))
+    }
+}
+
+def getStudioLibPath() {
+    if (studioOsName == "linux") {
+        return "$studioAppPath/lib"
+    } else {
+        return "$studioAppPath/Contents/lib"
+    }
+}
+
+def studioInstallation() {
+    def appDir = new File(studioAppPath)
+    def libDir = new File("$studioLibPath")
+
+    if (!libDir.exists()) {
+        appDir.delete()
+
+        def extension = "zip"
+
+        if (studioOsName == "linux") {
+            extension="tar.gz"
+        }
+
+        def studioZipPath = "${repos.prebuiltsRoot}/androidx/studio/${studioFolderName}.${extension}"
+
+        project.copy {
+
+            if (studioOsName == "linux") {
+                from project.tarTree(project.resources.gzip(studioZipPath))
+            } else {
+                from project.zipTree(studioZipPath)
+            }
+
+            into project.file("${project.rootDir}/studio/${studioFolderName}")
+        }
+    }
+
+    def ideaMajorVersion = studioVersionProperties.getProperty("idea_major_version")
+    def ideaMinorVersion = studioVersionProperties.getProperty("idea_minor_version")
+    def buildNumber = studioVersionProperties.getProperty("studio_build_number")
+
+    // sometimes the build number put in here by studio is incompatible with the
+    // intellij gradle plugin, so we overwrite it with one that we know it will accept.
+    def buildTxt = new File("build.txt", studioBuildTxtDir)
+    buildTxt.write "AI-${ideaMajorVersion}.${ideaMinorVersion}.${buildNumber}"
 }
