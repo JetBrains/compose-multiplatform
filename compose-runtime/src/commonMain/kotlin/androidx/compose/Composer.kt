@@ -167,8 +167,8 @@ interface ScopeUpdateScope {
 }
 
 internal sealed class RecomposeScope {
-    internal var anchor: Anchor? = null
-    internal val valid: Boolean get() = anchor?.valid ?: false
+    var anchor: Anchor? = null
+    val valid: Boolean get() = anchor?.valid ?: false
     var used = false
 
     /**
@@ -179,7 +179,7 @@ internal sealed class RecomposeScope {
     /**
      * Call that will recompose the scope
      */
-    internal abstract fun <N> compose(composer: Composer<N>)
+    abstract fun <N> compose(composer: Composer<N>)
 }
 
 internal class JoinScope(
@@ -607,7 +607,9 @@ open class Composer<N>(
         if (ref != null && !inserting) {
             skipValue()
         } else {
-            ref = CompositionReferenceImpl(invalidateStack.peek())
+            val scope = invalidateStack.peek()
+            scope.used = true
+            ref = CompositionReferenceImpl(scope)
             updateValue(ref)
         }
         endGroup()
