@@ -79,7 +79,7 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.LOADER.group, "loader-ktx")
     prebuilts(LibraryGroups.LOADER, "1.1.0-rc01")
     prebuilts(LibraryGroups.LOCALBROADCASTMANAGER, "1.1.0-alpha01")
-    prebuilts(LibraryGroups.MEDIA, "media", "1.1.0-rc01")
+    prebuilts(LibraryGroups.MEDIA, "media", "1.1.0")
     ignore(LibraryGroups.MEDIA2.group, "media2-exoplayer")
     prebuilts(LibraryGroups.MEDIA2, "media2-widget", "1.0.0-beta01")
     prebuilts(LibraryGroups.MEDIA2, "1.0.0-rc01")
