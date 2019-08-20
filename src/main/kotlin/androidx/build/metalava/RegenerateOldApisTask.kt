@@ -31,8 +31,6 @@ import java.io.File
 
 /** Generate API signature text files using previously built .jar/.aar artifacts. */
 abstract class RegenerateOldApisTask : DefaultTask() {
-    var generateRestrictedAPIs = false
-
     @TaskAction
     fun exec() {
         val groupId = project.group.toString()

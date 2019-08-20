@@ -24,6 +24,7 @@ import org.gradle.api.logging.Logger
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
@@ -39,6 +40,7 @@ abstract class UpdateApiTask : DefaultTask() {
     abstract val inputApiLocation: Property<ApiLocation>
 
     /** Text files to which API signatures will be written. */
+    @get:Internal // outputs are declared in getTaskOutputs()
     abstract val outputApiLocations: ListProperty<ApiLocation>
 
     /** Whether to update restricted API files too */
