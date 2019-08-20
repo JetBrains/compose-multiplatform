@@ -81,8 +81,8 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.LOCALBROADCASTMANAGER, "1.1.0-alpha01")
     prebuilts(LibraryGroups.MEDIA, "media", "1.1.0")
     ignore(LibraryGroups.MEDIA2.group, "media2-exoplayer")
-    prebuilts(LibraryGroups.MEDIA2, "media2-widget", "1.0.0-beta01")
-    prebuilts(LibraryGroups.MEDIA2, "1.0.0-rc01")
+    prebuilts(LibraryGroups.MEDIA2, "media2-widget", "1.0.0-rc02")
+    prebuilts(LibraryGroups.MEDIA2, "1.0.0-rc02")
     prebuilts(LibraryGroups.MEDIAROUTER, "1.1.0-rc01")
     ignore(LibraryGroups.NAVIGATION.group, "navigation-testing")
     ignore(LibraryGroups.NAVIGATION.group, "navigation-dynamic-feature")
@@ -99,7 +99,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.RECYCLERVIEW, "recyclerview", "1.1.0-beta03")
     prebuilts(LibraryGroups.RECYCLERVIEW, "recyclerview-selection", "1.1.0-alpha06")
     prebuilts(LibraryGroups.REMOTECALLBACK, "1.0.0-alpha02")
-    prebuilts(LibraryGroups.ROOM, "2.2.0-alpha02")
+    prebuilts(LibraryGroups.ROOM, "2.2.0-beta01")
     prebuilts(LibraryGroups.SAVEDSTATE, "1.0.0")
     // TODO: Remove this ignore once androidx.security:security-identity-credential:1.0.0-alpha01 is released
     ignore(LibraryGroups.SECURITY.group, "security-identity-credential")
@@ -128,7 +128,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.WEBKIT, "1.1.0-alpha02")
     ignore(LibraryGroups.WORK.group, "work-gcm")
     ignore(LibraryGroups.WORK.group, "work-foreground")
-    prebuilts(LibraryGroups.WORK, "2.2.0")
+    prebuilts(LibraryGroups.WORK, "2.3.0-alpha01")
     default(Ignore)
 }
 
