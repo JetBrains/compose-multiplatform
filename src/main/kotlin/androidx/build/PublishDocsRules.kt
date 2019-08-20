@@ -31,7 +31,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.ACTIVITY, "1.1.0-alpha02")
     prebuilts(LibraryGroups.ADS, "1.0.0-alpha01")
     prebuilts(LibraryGroups.ANNOTATION, "annotation", "1.1.0")
-    prebuilts(LibraryGroups.APPCOMPAT, "1.1.0-rc01")
+    prebuilts(LibraryGroups.APPCOMPAT, "1.1.0")
     prebuilts(LibraryGroups.ARCH_CORE, "2.1.0")
     prebuilts(LibraryGroups.ASYNCLAYOUTINFLATER, "1.0.0")
     prebuilts(LibraryGroups.AUTOFILL, "1.0.0-alpha02")
