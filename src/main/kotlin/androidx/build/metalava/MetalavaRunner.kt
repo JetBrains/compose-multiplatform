@@ -186,7 +186,9 @@ fun Project.generateApi(
     // Never track @Experimental APIs.
     args += listOf(
         "--hide-annotation", "androidx.annotation.experimental.Experimental",
-        "--hide-meta-annotation", "androidx.annotation.experimental.Experimental"
+        "--hide-annotation", "kotlin.Experimental",
+        "--hide-meta-annotation", "androidx.annotation.experimental.Experimental",
+        "--hide-meta-annotation", "kotlin.Experimental"
     )
 
     val metalavaConfiguration = getMetalavaConfiguration()
