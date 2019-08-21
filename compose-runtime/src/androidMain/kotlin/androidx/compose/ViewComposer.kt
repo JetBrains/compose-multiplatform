@@ -231,7 +231,7 @@ class ViewComposer(
             block()
             endGroup()
         } else {
-            skipGroup(invocation)
+            skipCurrentGroup()
         }
         endGroup()
     }
@@ -251,7 +251,7 @@ class ViewComposer(
             block(f)
             endGroup()
         } else {
-            skipGroup(invocation)
+            skipCurrentGroup()
         }
         endGroup()
     }
@@ -260,8 +260,7 @@ class ViewComposer(
         key: Any,
         block: (invalidate: (sync: Boolean) -> Unit) -> Unit
     ) {
-        composer.startGroup(key)
-        val invalidate = composer.startJoin(false, block)
+        val invalidate = composer.startJoin(key, false, block)
         block(invalidate)
         composer.doneJoin(false)
     }

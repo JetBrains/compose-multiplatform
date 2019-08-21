@@ -17,6 +17,7 @@
 package androidx.compose.mock
 
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 interface MockViewValidator {
     val view: View
@@ -50,7 +51,7 @@ class MockViewListValidator(private val views: List<View>) :
 
 fun MockViewValidator.view(name: String, block: (MockViewValidator.() -> Unit)? = null) {
     val hasNext = next()
-    assertEquals(true, hasNext)
+    assertTrue(hasNext, "Expected a $name, but none found")
     assertEquals(name, view.name)
     MockViewListValidator(view.children).validate(block)
 }

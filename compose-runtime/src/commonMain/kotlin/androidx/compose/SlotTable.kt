@@ -17,27 +17,23 @@
 package androidx.compose
 
 /**
- * A buffer-gap editor implementation of a composition slot space. A slot space can be thought of as
+ * A gap buffer implementation of the composition slot space. A slot space can be thought of as
  * a custom List<Any?> that optimizes around inserts and removes.
  *
- * Slots stores slots, groups, items, and nodes.
+ * Slots stores slots, groups, and nodes.
  *
  *   Slot  - A slot is the primitive base type of the slot space. It is of type Any? and can hold
  *           any value.
- *   Group - A group is a group of slots. The group counts the number of slots and nodes it
+ *   Group - A group is a keyed group of slots. The group counts the number of slots and nodes it
  *           contains.
- *   Item  - An item is a key slot followed by a group. The key is intended to identify the content
- *           of a group. Key values are opaque to the slots and are to be interpreted by the code
- *           that uses the slot space.
  *   Node  - A node is a special group that is counted by the containing groups.
  *
- * All groups, items, and nodes are just grouping of slots and use slots to describe the groups. At
- * the root of a slot space is a group. Groups count the number nodes that are in the group. An item
- * is defined by a key followed by a group or node. A node only counts as one node in its group
- * regardless of the number of nodes it contains.
+ * All groups and nodes are just grouping of slots and use slots to describe the groups. At
+ * the root of a slot space is a group. Groups count the number nodes that are in the group. A node
+ * only counts as one node in its group regardless of the number of nodes it contains.
  *
  * ASIDE:
- *  The intent is for items to represent memoized function calls and nodes represent views. For
+ *  The intent is for groups are to represent memoized function calls and nodes represent views. For
  *  example,
  *
  *   LinearLayout {
@@ -46,7 +42,7 @@ package androidx.compose
  *   }
  *
  *  the <LinearLayout> tag here would be a node (the linear layout view). The node contains the
- *  items for the child views of the linear layout.
+ *  groups for the child views of the linear layout.
  *
  *  If contact's composition looks like:
  *
@@ -57,9 +53,9 @@ package androidx.compose
  *    }
  *
  *  then composing contact into the linear layout would add two views to the linear layout's
- *  children. The composition of contact creates an item, one for each text view. The items for each
+ *  children. The composition of contact creates groups, one for each text view. The groups for each
  *  contact would be able to report that it produces two views (that is the group created for
- *  Contact has two nodes). Summing the nodes in the items group produces the number of views (as
+ *  Contact has two nodes). Summing the nodes in the group produces the number of views (as
  *  each node corresponds to a view).
  *
  *  If the order that jim and bob change above,
@@ -69,25 +65,12 @@ package androidx.compose
  *       Contact(contact=jim)
  *   }
  *
- *  the previous result can be reused by moving the views generated bob's item before jim's (or vis
- *  versa). A composition algorithm could use the key information for each item to determine if they
+ *  the previous result can be reused by moving the views generated bob's group before jim's (or vis
+ *  versa). A composition algorithm could use the key information for each group to determine if they
  *  can be switched. For example, since the first contact's group has two nodes the composition
  *  algorithm can infer that the beginning of jim's views starts at 2 and contains 2 view. To move
  *  jim in front of bob, move the 2 views from offset 2 to offset 0. If contact is immutable, for
  *  example, Contact would only need to be recomposed if the value of jim or bob change.
- *
- * The slot space can be in one of three sub-modes, read-only, inserting and empty. Normally a slot
- * array can be arbitrarily navigated and modified. If the slot array is in read-only mode, trying
- * to update,insert, or remove slots will throw.
- *
- *  ASIDE: This is intended as a debugging aid for composition which should only read the slot
- *  array, not update it.
- *
- * If in insert mode, calling next will insert an empty slot (and return EMPTY). When in empty mode,
- * next() will return EMPTY and will not advance the cursor.
- *
- *  ASIDE: The is intended to allow the same generated code to both to create and update views.
- *  Empty mode is used during composition, insert mode is used during apply.
  */
 
 open class SlotEditor internal constructor(val table: SlotTable) {
@@ -100,6 +83,7 @@ open class SlotEditor internal constructor(val table: SlotTable) {
     internal val groupKindStack = IntStack()
     internal val nodeCountStack = IntStack()
     internal val endStack = IntStack()
+    internal val keyStack = Stack<Any>()
 
     /**
      * Return true if the current slot starts a group
@@ -161,10 +145,11 @@ open class SlotEditor internal constructor(val table: SlotTable) {
         return slots[effectiveIndex(index)]
     }
 
-    internal fun recordStartGroup(kind: GroupKind, validate: Boolean) {
+    internal fun recordStartGroup(key: Any, kind: GroupKind, validate: Boolean) {
         startStack.push(current)
         groupKindStack.push(kind)
         nodeCountStack.push(nodeCount)
+        keyStack.push(if (key == SlotTable.EMPTY) get(current).asGroupStart.key else key)
         // Record the end location as relative to the end of the slot table so when we pop it back
         // off again all inserts and removes that happened while a child group was open are already
         // reflected into its value.
@@ -173,6 +158,7 @@ open class SlotEditor internal constructor(val table: SlotTable) {
         if (validate) {
             val groupStart = advance().asGroupStart
             require(groupStart.kind == kind) { "Group kind changed" }
+            require(key == SlotTable.EMPTY || groupStart.key == key) { "Group key changed" }
             currentEnd = current + groupStart.slots
         }
     }
@@ -187,14 +173,6 @@ open class SlotEditor internal constructor(val table: SlotTable) {
         return count
     }
 
-    internal fun advanceToNextItem(): Int {
-        skipItemHeader()
-        return advanceToNextGroup()
-    }
-
-    // Skip the context key, content key and the memo of an item
-    private fun skipItemHeader() = advance()
-
     internal fun recordEndGroup(writing: Boolean, inserting: Boolean, uncertain: Boolean): Int {
         var count = nodeCount
         require(startStack.isNotEmpty()) {
@@ -206,6 +184,7 @@ open class SlotEditor internal constructor(val table: SlotTable) {
         val startLocation = startStack.pop()
         val groupKind = groupKindStack.pop()
         val effectiveStartLocation = effectiveIndex(startLocation)
+        val key = keyStack.pop()
         require(slots[effectiveStartLocation] === SlotTable.EMPTY ||
                 slots[effectiveStartLocation] is GroupStart
         ) {
@@ -214,7 +193,7 @@ open class SlotEditor internal constructor(val table: SlotTable) {
 
         val len = current - startLocation - 1
         if (writing) {
-            slots[effectiveStartLocation] = GroupStart(groupKind, len, nodeCount)
+            slots[effectiveStartLocation] = GroupStart(groupKind, key, len, nodeCount)
         } else {
             val start = slots[effectiveStartLocation].asGroupStart
             // A node count < 0 means that it was reported as uncertain while reading
@@ -244,6 +223,16 @@ class SlotReader internal constructor(table: SlotTable) : SlotEditor(table) {
      * Get the value at the current slot
      */
     fun get() = if (emptyCount > 0) SlotTable.EMPTY else slots[effectiveIndex(current - 1)]
+
+    /**
+     * Return the key for the current group or EMPTY
+     */
+    val groupKey get() = (get(current) as? GroupStart)?.key ?: SlotTable.EMPTY
+
+    /**
+     * Return the group key at index. isGroup(index) must be true or this will throw.
+     */
+    fun groupKey(index: Int) = get(index).asGroupStart.key
 
     /**
      * Get the value of the next slot. During empty mode this value is always EMPTY which is the
@@ -288,14 +277,13 @@ class SlotReader internal constructor(table: SlotTable) : SlotEditor(table) {
     fun close() = table.close(this)
 
     /**
-     * Start a group
+     * Start a group. Passing an EMPTY as the key will enter the group without validating the key.
      */
+    fun startGroup(key: Any) = startGroup(key, GROUP)
 
-    fun startGroup() = startGroup(GROUP)
-
-    private fun startGroup(kind: GroupKind) {
+    private fun startGroup(key: Any, kind: GroupKind) {
         if (emptyCount <= 0) {
-            recordStartGroup(kind, validate = true)
+            recordStartGroup(key, kind, validate = true)
         }
     }
 
@@ -332,7 +320,7 @@ class SlotReader internal constructor(table: SlotTable) : SlotEditor(table) {
     /**
      * Start a node.
      */
-    fun startNode() = startGroup(NODE)
+    fun startNode(key: Any) = startGroup(key, NODE)
 
     /**
      * End a node
@@ -344,23 +332,15 @@ class SlotReader internal constructor(table: SlotTable) : SlotEditor(table) {
      */
     fun skipNode() = skipGroup()
 
-    /**
-     * Skip the current item
-     */
-    fun skipItem(): Int {
-        require(emptyCount == 0) { "Cannot skip an item in an empty region" }
-        return advanceToNextItem()
-    }
-
     fun reportUncertainNodeCount() {
         uncertainCount = true
     }
 
     /**
      * Extract the keys from this point to the end of the group. The current is left unaffected.
-     * Must be called inside a group at the beginning of an item
+     * Must be called inside a group.
      */
-    fun extractItemKeys(): MutableList<KeyInfo> {
+    fun extractKeys(): MutableList<KeyInfo> {
         val result = mutableListOf<KeyInfo>()
         if (emptyCount > 0) return result
         val oldCurrent = current
@@ -368,7 +348,7 @@ class SlotReader internal constructor(table: SlotTable) : SlotEditor(table) {
         var index = 0
         while (current < currentEnd) {
             val location = current
-            val key = next()!!
+            val key = get(location).asGroupStart.key
             result.add(KeyInfo(key, location, skipGroup(), index++))
         }
         current = oldCurrent
@@ -445,14 +425,18 @@ class SlotWriter internal constructor(table: SlotTable) : SlotEditor(table) {
     }
 
     /**
-     * Start a group
+     * Start a group.
+     *
+     * @param key The group key. Passing EMPTY will retain as was written last time.
+     *            An EMPTY key is not valid when inserting groups.
      */
-    fun startGroup() = startGroup(GROUP)
+    fun startGroup(key: Any) = startGroup(key, GROUP)
 
-    private fun startGroup(kind: GroupKind) {
+    private fun startGroup(key: Any, kind: GroupKind) {
         val inserting = insertCount > 0
-        recordStartGroup(kind, validate = !inserting)
+        recordStartGroup(key, kind, validate = !inserting)
         if (inserting) {
+            require(key != SlotTable.EMPTY) { "Inserting an EMPTY key" }
             skip() // Skip a slot for the GroupStart added by endGroup.
             currentEnd = current
         }
@@ -473,25 +457,24 @@ class SlotWriter internal constructor(table: SlotTable) : SlotEditor(table) {
         recordEndGroup(writing = true, inserting = insertCount > 0, uncertain = false)
 
     /**
-     * Move the offset'th group after the current item to the current location. Must be called when
-     * a keyed group is expected.
+     * Move the offset'th group after the current group to the current location.
      */
-    fun moveItem(offset: Int) {
-        require(insertCount == 0) { "Cannot move an item while inserting" }
+    fun moveGroup(offset: Int) {
+        require(insertCount == 0) { "Cannot move a group while inserting" }
         val oldCurrent = current
         val oldNodeCount = nodeCount
 
-        // Find the item to move
+        // Find the group to move
         var count = offset
         while (count > 0) {
-            advanceToNextItem()
+            advanceToNextGroup()
             count--
         }
 
         // Move the current one here by first inserting room for it then copying it over the spot
         // then removing the old slot.
         val moveLocation = current
-        advanceToNextItem()
+        advanceToNextGroup()
         val moveLen = current - moveLocation
         current = oldCurrent
         insert(moveLen)
@@ -512,12 +495,12 @@ class SlotWriter internal constructor(table: SlotTable) : SlotEditor(table) {
     }
 
     /**
-     * Remove an item. Must be called at the startGroup of an item.
+     * Remove a group. Must be called at group.
      */
-    fun removeItem(): Boolean {
-        require(insertCount == 0) { "Cannot remove and item while inserting" }
+    fun removeGroup(): Boolean {
+        require(insertCount == 0) { "Cannot remove group while inserting" }
         val oldCurrent = current
-        val count = advanceToNextItem()
+        val count = advanceToNextGroup()
         val anchorsRemoved = remove(oldCurrent, current - oldCurrent)
         current = oldCurrent
         nodeCount -= count
@@ -525,17 +508,17 @@ class SlotWriter internal constructor(table: SlotTable) : SlotEditor(table) {
     }
 
     /**
-     * Returns an iterator for the slots of the item.
+     * Returns an iterator for the slots of group.
      */
-    fun itemSlots(): Iterator<Any?> {
+    fun groupSlots(): Iterator<Any?> {
         val start = current
         val oldCount = nodeCount
-        advanceToNextItem()
+        advanceToNextGroup()
         val end = current
         current = start
         nodeCount = oldCount
         return object : Iterator<Any?> {
-            var current = start + 2
+            var current = start + 1
             override fun hasNext(): Boolean = current < end
             override fun next(): Any? = slots[effectiveIndex(current++)]
         }
@@ -544,7 +527,7 @@ class SlotWriter internal constructor(table: SlotTable) : SlotEditor(table) {
     /**
      * Start a node.
      */
-    fun startNode() = startGroup(NODE)
+    fun startNode(key: Any) = startGroup(key, NODE)
 
     /**
      * End a node
@@ -557,17 +540,9 @@ class SlotWriter internal constructor(table: SlotTable) : SlotEditor(table) {
     fun skipNode() = skipGroup()
 
     /**
-     * Skip the current item
-     */
-    fun skipItem(): Int {
-        require(insertCount == 0) { "Cannot skip an item while inserting" }
-        return advanceToNextItem()
-    }
-
-    /**
      * Allocate an anchor for a location. As content is inserted and removed from the slot table the
      * anchor is updated to reflect those changes. For example, if an anchor is requested for an
-     * item, the anchor will report the location of that item even if the item is moved in the slot
+     * group, the anchor will report the location of that group even if the group is moved in the slot
      * table. If the position referenced by the anchor is removed, the anchor location is set to -1.
      */
     fun anchor(index: Int = current): Anchor = table.anchor(index)
@@ -638,7 +613,7 @@ class SlotWriter internal constructor(table: SlotTable) : SlotEditor(table) {
             pendingClear = false
             var anchorsRemoved = false
             if (table.gapLen == 0) {
-                // If there is no current gap, just make the removed items the gap
+                // If there is no current gap, just make the removed slots the gap
                 table.gapStart = start
                 if (table.anchors.isNotEmpty()) anchorsRemoved = table.removeAnchors(start, len)
                 table.gapLen = len
@@ -674,7 +649,7 @@ class SlotWriter internal constructor(table: SlotTable) : SlotEditor(table) {
 private val Any?.asGroupStart: GroupStart
     get() = this as? GroupStart ?: error("Expected a group start")
 
-internal data class GroupStart(val kind: GroupKind, val slots: Int, val nodes: Int) {
+internal data class GroupStart(val kind: GroupKind, val key: Any, val slots: Int, val nodes: Int) {
     val isNode get() = kind == NODE
 }
 
@@ -831,15 +806,15 @@ private fun ArrayList<Anchor>.locationOf(index: Int) =
 private fun ArrayList<Anchor>.search(index: Int) = binarySearch { it.loc.compareTo(index) }
 
 /**
- * Information about items and their keys.
+ * Information about groups and their keys.
  */
 class KeyInfo(
     /**
-     * The key used for an item.
+     * The group key.
      */
     val key: Any,
     /**
-     * The location of the group start of the item.
+     * The location of the group.
      */
     val location: Int,
 
@@ -849,7 +824,7 @@ class KeyInfo(
     val nodes: Int,
 
     /**
-     * The index of the key info in the list returned by extractItemKeys
+     * The index of the key info in the list returned by extractKeys
      */
     val index: Int
 )

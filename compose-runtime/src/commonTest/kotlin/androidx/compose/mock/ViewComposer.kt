@@ -44,7 +44,7 @@ abstract class ViewComponent : MockViewComposition {
 
     operator fun invoke() {
         val cc = cc as MockViewComposer
-        val callback = cc.startJoin(false) { compose() }
+        val callback = cc.startJoin(0, false) { compose() }
         compose()
         cc.doneJoin(false)
         recomposer = callback
@@ -141,9 +141,7 @@ inline fun <reified P1> MockViewComposition.memoize(
 ) {
     cc.startGroup(key)
     if (!cc.changed(p1)) {
-        cc.nextSlot()
-        cc.skipValue()
-        cc.skipGroup()
+        cc.skipCurrentGroup()
     } else {
         cc.startGroup(key)
         block(p1)
@@ -190,7 +188,7 @@ inline fun MockViewComposition.call(
         block()
         endGroup()
     } else {
-        (cc as Composer<*>).skipGroup(invocation)
+        (cc as Composer<*>).skipCurrentGroup()
     }
     endGroup()
 }
@@ -214,9 +212,7 @@ inline fun <T : ViewComponent> MockViewComposition.call(
         block(f)
         endGroup()
     } else {
-        nextSlot()
-        skipValue()
-        skipGroup()
+        skipCurrentGroup()
     }
     endGroup()
 }
@@ -226,11 +222,9 @@ fun MockViewComposition.join(
     block: (invalidate: (sync: Boolean) -> Unit) -> Unit
 ) {
     val myCC = cc as MockViewComposer
-    myCC.startGroup(key)
-    val invalidate = myCC.startJoin(false, block)
+    val invalidate = myCC.startJoin(key, false, block)
     block(invalidate)
     myCC.doneJoin(false)
-    myCC.endGroup()
 }
 
 interface ComponentUpdater<C> : MockViewComposition {

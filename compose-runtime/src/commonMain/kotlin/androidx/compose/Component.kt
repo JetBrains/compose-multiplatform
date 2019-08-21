@@ -107,7 +107,7 @@ abstract class Component {
     @Composable
     operator fun invoke() {
         val composer = currentComposerNonNull
-        val callback = composer.startJoin(false) { doCompose() }
+        val callback = composer.startJoin(0, false) { doCompose() }
         doCompose()
         composer.doneJoin(false)
         recomposeCallback = callback

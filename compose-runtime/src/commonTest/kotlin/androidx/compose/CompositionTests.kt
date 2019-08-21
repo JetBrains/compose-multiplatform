@@ -527,6 +527,79 @@ class CompositionTests {
     }
 
     @Test
+    fun testSkippingACall() {
+
+        fun MockViewComposition.show(value: Int) {
+            linear {
+                text("$value")
+            }
+            linear {
+                text("value")
+            }
+        }
+
+        fun MockViewValidator.show(value: Int) {
+            linear {
+                text("$value")
+            }
+            linear {
+                text("value")
+            }
+        }
+
+        fun MockViewComposition.test(showThree: Boolean) {
+            call(537, { false }) {
+                show(1)
+            }
+            call(540, { false }) {
+                show(2)
+            }
+            if (showThree) {
+                call(544, { false }) {
+                    show(3)
+                }
+            }
+        }
+
+        var showThree = false
+
+        var recomposeTest: () -> Unit = { }
+
+        class Test : ViewComponent() {
+            override fun compose() {
+                recomposeTest = { recompose() }
+                test(showThree)
+            }
+        }
+
+        fun MockViewValidator.test(showThree: Boolean) {
+            show(1)
+            show(2)
+            if (showThree) {
+                show(3)
+            }
+        }
+
+        val composition: MockViewComposition.() -> Unit = {
+            call(579, { Test() }, { }, {
+                it()
+            })
+        }
+        val validation: MockViewValidator.() -> Unit = {
+            test(showThree)
+        }
+
+        val composer = compose(block = composition)
+        validate(composer.root, block = validation)
+
+        showThree = true
+        recomposeTest()
+        composer.recompose()
+        composer.applyChanges()
+        validate(composer.root, block = validation)
+    }
+
+    @Test
     fun testComponentWithVarCtorParameter() {
         class One(var first: Int) : ViewComponent() {
             override fun compose() {

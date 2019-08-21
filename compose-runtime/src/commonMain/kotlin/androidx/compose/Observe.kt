@@ -35,7 +35,7 @@ fun Observe(body: @Composable() () -> Unit) {
     currentComposerNonNull.let { composer ->
         trace("Compose:Observe") {
             composer.startGroup(observer)
-            composer.startJoin(false) { body() }
+            composer.startJoin(observer, false) { body() }
             body()
             composer.doneJoin(false)
             composer.endGroup()

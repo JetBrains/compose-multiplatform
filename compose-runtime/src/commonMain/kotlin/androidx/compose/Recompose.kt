@@ -62,7 +62,7 @@ private class RecomposeHelper : Function0<Unit> {
 fun Recompose(body: @Composable() (recompose: () -> Unit) -> Unit) {
     val composer = currentComposerNonNull
     val recomposer = RecomposeHelper()
-    val callback = composer.startJoin(false) {
+    val callback = composer.startJoin(0, false) {
         recomposer.isComposing = true
         @Suppress("PLUGIN_ERROR")
         body(recomposer)
