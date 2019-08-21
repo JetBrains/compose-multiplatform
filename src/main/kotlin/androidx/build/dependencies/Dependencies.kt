@@ -110,6 +110,7 @@ const val SUPPORT_RECYCLERVIEW = "androidx.recyclerview:recyclerview:$SUPPORT_VE
 
 const val ANDROIDX_ANNOTATION = "androidx.annotation:annotation:1.1.0"
 const val ANDROIDX_COLLECTION = "androidx.collection:collection:$SUPPORT_VERSION"
+const val ANDROIDX_CONCURRENT_FUTURES = "androidx.concurrent:concurrent-futures:1.0.0-rc01"
 const val ANDROIDX_CORE = "androidx.core:core:1.0.0"
 const val ANDROIDX_RECYCLERVIEW = "androidx.recyclerview:recyclerview:1.0.0"
 const val ANDROIDX_SQLITE = "androidx.sqlite:sqlite:2.0.1"
