@@ -112,6 +112,6 @@ object LibraryVersions {
     val VIEWPAGER = Version("1.1.0-alpha01")
     val VIEWPAGER2 = Version("1.0.0-beta04")
     val WEAR = Version("1.1.0-alpha01")
-    val WEBKIT = Version("1.1.0-alpha03")
+    val WEBKIT = Version("1.1.0-beta01")
     val WORK = Version("2.3.0-alpha01")
 }
