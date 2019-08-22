@@ -23,11 +23,18 @@ import androidx.build.studio.StudioWrapper
 
 import static androidx.build.dependencies.DependenciesKt.*
 
+buildscript {
+    dependencies {
+        classpath("gradle.plugin.org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.4.8")
+    }
+}
+
 plugins {
     id("AndroidXPlugin")
     id("kotlin")
-    id("org.jetbrains.intellij") version("0.4.8")
 }
+
+apply(plugin: "org.jetbrains.intellij")
 
 def studioWrapper = StudioWrapper.create(rootProject)
 
