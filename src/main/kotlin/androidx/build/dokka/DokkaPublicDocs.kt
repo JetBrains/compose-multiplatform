@@ -29,6 +29,8 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.Copy
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskCollection
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
@@ -209,9 +211,11 @@ object DokkaPublicDocs {
 
 open class LocateJarsTask : DefaultTask() {
     // dependencies to search for .jar files
+    @get:Input
     val inputDependencies = mutableListOf<String>()
 
     // .jar files found in any dependencies
+    @get:OutputFiles
     val outputJars = mutableListOf<File>()
 
     @TaskAction
