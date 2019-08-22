@@ -113,7 +113,14 @@ object Dokka {
             // Guava documentation doesn't have the necessary package-list file to provide the packages
             // to Dokka so we have to host a file internally as a workaround
             this.packageListUrl = project.projectDir.toPath()
-                .resolve("guava-package.list").toUri().toURL()
+                .resolve("package-lists/guava/package-list").toUri().toURL()
+        }.build()
+
+        val kotlinLangLink = DokkaConfiguration.ExternalDocumentationLink.Builder().apply {
+            this.url = URL("https://kotlinlang.org/api/latest/jvm/stdlib/")
+
+            this.packageListUrl = project.projectDir.toPath()
+                .resolve("package-lists/kotlin/package-list").toUri().toURL()
         }.build()
 
         return project.tasks.register(docTaskName, DokkaAndroidTask::class.java) { task ->
@@ -126,6 +133,7 @@ object Dokka {
             task.dacRoot = dacRoot
             task.moduleName = ""
             task.externalDocumentationLinks.add(guavaDocLink)
+            task.externalDocumentationLinks.add(kotlinLangLink)
             for (hiddenPackage in hiddenPackages) {
                 val opts = PackageOptions()
                 opts.prefix = hiddenPackage
