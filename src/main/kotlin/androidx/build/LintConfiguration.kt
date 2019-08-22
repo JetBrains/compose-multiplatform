@@ -135,9 +135,9 @@ val Project.lintBaseline get() = File(projectDir, "/lint-baseline.xml")
 
 private fun Project.getIgnoreNullnessError(count: Int): String = (
         "\n${pluralizeMessage(count)} currently whitelisted in " +
-                "$projectDir/nullness-lint-baseline.xml - these warnings need to be fixed before " +
+                "$projectDir/lint-baseline.xml - these warnings should ideally be fixed before " +
                 "this library moves to a stable release. Run " +
-                "'./gradlew $name:lintDebug -PcheckUnknownNullness' to fail on these warnings."
+                "'./gradlew $name:lintDebug -PcheckUnknownNullness' to fail lint on these warnings."
         )
 
 private fun pluralizeMessage(count: Int) = if (count > 1) {
