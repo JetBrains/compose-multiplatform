@@ -20,6 +20,8 @@ import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.LibraryVariant
 import org.gradle.api.Action
 import org.gradle.api.Project
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.Upload
 import org.gradle.api.tasks.bundling.Zip
@@ -44,15 +46,18 @@ open class GMavenZipTask : Zip() {
     /**
      * The version checker which is used to check if a library is already released.
      */
+    @get:Internal
     lateinit var versionChecker: GMavenVersionChecker
     /**
      * If `true`, all libraries will be included in the zip. Otherwise, only those which are not
      * in maven.google.com are included.
      */
+    @get:Input
     var includeReleased = false
     /**
      * Set to true to include maven-metadata.xml
      */
+    @get:Input
     var includeMetadata: Boolean = false
     /**
      * List of artifacts that might be included in the generated zip.
