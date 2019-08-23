@@ -16,6 +16,9 @@
 
 package androidx.build
 
+import androidx.build.gitclient.Commit
+import androidx.build.gitclient.GitClientImpl
+import androidx.build.gitclient.GitCommitRange
 import androidx.build.gmaven.GMavenVersionChecker
 import androidx.build.jetpad.LibraryBuildInfoFile
 import org.gradle.api.DefaultTask
@@ -60,6 +63,19 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
         return library?.mavenGroup?.requireSameVersion ?: false
     }
 
+    private fun getCommitShaAtHead(): String {
+        val commitList: List<Commit> = GitClientImpl(project.rootDir).getGitLog(
+            GitCommitRange(
+                top = "HEAD",
+                sha = "",
+                n = 1
+            ),
+            keepMerges = true,
+            fullProjectDir = project.projectDir
+        )
+        return commitList.first().sha
+    }
+
     private fun writeJsonToFile(info: LibraryBuildInfoFile) {
         if (!project.getBuildInfoDirectory().exists()) {
             if (!project.getBuildInfoDirectory().mkdirs()) {
@@ -87,6 +103,7 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
         libraryBuildInfoFile.groupId = project.group.toString()
         libraryBuildInfoFile.version = project.version.toString()
         libraryBuildInfoFile.path = getProjectSpecificDirectory()
+        libraryBuildInfoFile.sha = getCommitShaAtHead()
         libraryBuildInfoFile.groupIdRequiresSameVersion = requiresSameVersion()
         val libraryDependencies = ArrayList<LibraryBuildInfoFile.Dependency>()
         val checks = ArrayList<LibraryBuildInfoFile.Check>()
