@@ -63,7 +63,7 @@ const val KOTLIN_COMPOSE_REFLECT = "org.jetbrains.kotlin:kotlin-reflect:$COMPOSE
 const val KOTLIN_METADATA = "me.eugeniomarletti.kotlin.metadata:kotlin-metadata:1.4.0"
 const val KOTLIN_METADATA_JVM = "org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.0.5"
 
-private const val KOTLIN_COROUTINES_VERSION = "1.1.1"
+private const val KOTLIN_COROUTINES_VERSION = "1.3.0"
 const val KOTLIN_COROUTINES =
     "org.jetbrains.kotlinx:kotlinx-coroutines-android:$KOTLIN_COROUTINES_VERSION"
 const val KOTLIN_COMPOSE_COROUTINES =
@@ -74,14 +74,6 @@ const val KOTLIN_COROUTINES_GUAVA =
     "org.jetbrains.kotlinx:kotlinx-coroutines-guava:$KOTLIN_COROUTINES_VERSION"
 const val KOTLIN_COROUTINES_TEST =
     "org.jetbrains.kotlinx:kotlinx-coroutines-test:$KOTLIN_COROUTINES_VERSION"
-
-private const val KOTLIN_COROUTINES_PREVIEW_VERSION = "1.3.0-RC2"
-const val KOTLIN_COROUTINES_PREVIEW =
-    "org.jetbrains.kotlinx:kotlinx-coroutines-android:$KOTLIN_COROUTINES_PREVIEW_VERSION"
-const val KOTLIN_COROUTINES_CORE_PREVIEW =
-    "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLIN_COROUTINES_PREVIEW_VERSION"
-const val KOTLIN_COROUTINES_TEST_PREVIEW =
-    "org.jetbrains.kotlinx:kotlinx-coroutines-test:$KOTLIN_COROUTINES_PREVIEW_VERSION"
 
 const val LEAKCANARY_INSTRUMENTATION =
     "com.squareup.leakcanary:leakcanary-android-instrumentation:1.6.2"
