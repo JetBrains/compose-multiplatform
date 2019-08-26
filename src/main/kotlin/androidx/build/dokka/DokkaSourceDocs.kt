@@ -36,7 +36,6 @@ object DokkaSourceDocs {
     private val ALTERNATE_ARCHIVE_TASK_NAME: String = "generateDocs"
 
     private val hiddenPackages = DokkaPublicDocs.hiddenPackages
-    private var docsTasks: TaskCollection<DokkaTask>? = null
 
     fun tryGetRunnerProject(project: Project): Project? {
         return project.rootProject.findProject(":docs-runner")
@@ -47,11 +46,8 @@ object DokkaSourceDocs {
     }
 
     fun getDocsTasks(project: Project): TaskCollection<DokkaTask>? {
-        docsTasks?.let {
-            return it
-        }
         val runnerProject = getRunnerProject(project)
-        docsTasks = runnerProject.tasks.getOrCreateDocsTask(runnerProject)
+        val docsTasks = runnerProject.tasks.getOrCreateDocsTask(runnerProject)
         return docsTasks
     }
 
