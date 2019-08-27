@@ -15,6 +15,7 @@
  */
 package androidx.build
 
+import androidx.build.LibraryGroup
 import androidx.build.gmaven.GMavenVersionChecker
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.LibraryVariant
@@ -209,8 +210,7 @@ object Release {
                 "Cannot register a project to release if it does not have a mavenVersion set up"
         )
         val zipTasks = listOf(
-                getProjectZipTask(project),
-                getGroupReleaseZipTask(project, mavenGroup),
+                getProjectOrGroupReleaseZipTask(project, extension),
                 getGlobalReleaseZipTask(project),
                 getGlobalFullZipTask(project))
         val artifact = Artifact(
@@ -343,6 +343,18 @@ object Release {
             onRegister = {
             }
         )
+    }
+
+    private fun getProjectOrGroupReleaseZipTask(
+        project: Project,
+        extension: AndroidXExtension
+    ): TaskProvider<GMavenZipTask> {
+        val group = extension.mavenGroup
+        if (group!!.requireSameVersion) {
+            return getGroupReleaseZipTask(project, group.group)
+        } else {
+            return getProjectZipTask(project)
+        }
     }
 }
 
