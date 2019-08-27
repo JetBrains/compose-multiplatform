@@ -45,52 +45,57 @@ open class VersionFileWriterTask : DefaultTask() {
     }
 }
 
-private val RESOURCE_DIRECTORY = "generatedResources"
-private val VERSION_FILE_PATH = "$RESOURCE_DIRECTORY/META-INF/%s_%s.version"
+private const val RESOURCE_DIRECTORY = "generatedResources"
+private const val VERSION_FILE_PATH = "$RESOURCE_DIRECTORY/META-INF/%s_%s.version"
 
 /**
  * Sets up Android Library project to have a task that generates a version file.
  * It must be called after [LibraryExtension] has been resolved.
  *
- * @param project an Android Library project.
+ * @receiver an Android Library project.
  */
 fun Project.configureVersionFileWriter(
     library: LibraryExtension,
     androidXExtension: AndroidXExtension
 ) {
-    // We only add version file if is a library that is publishing.
-    if (!androidXExtension.publish.shouldPublish()) return
-
-    val writeVersionFile = tasks.register("writeVersionFile",
-            VersionFileWriterTask::class.java)
+    val writeVersionFile = tasks.register(
+        "writeVersionFile",
+        VersionFileWriterTask::class.java
+    )
 
     afterEvaluate {
         writeVersionFile.configure {
             val group = properties["group"] as String
             val artifactId = properties["name"] as String
-            val version = version().toString()
+            val version = if (androidXExtension.publish.shouldPublish()) {
+                version().toString()
+            } else {
+                "0.0.0"
+            }
 
             // Add a java resource file to the library jar for version tracking purposes.
             val artifactName = File(
                 buildDir,
-                String.format(VERSION_FILE_PATH, group, artifactId))
+                String.format(VERSION_FILE_PATH, group, artifactId)
+            )
 
             it.version = version
             it.outputFile = artifactName
+
+            // We only add version file if is a library that is publishing.
+            it.enabled = androidXExtension.publish.shouldPublish()
         }
     }
 
-    library.libraryVariants.all {
-        it.processJavaResourcesProvider.configure {
+    library.libraryVariants.all { variant ->
+        variant.processJavaResourcesProvider.configure {
             it.dependsOn(writeVersionFile)
         }
     }
 
     val resources = library.sourceSets.getByName("main").resources
-    resources.srcDir(File(buildDir, RESOURCE_DIRECTORY))
-    if (!resources.includes.isEmpty()) {
-        val includes = resources.includes
-        includes.add("META-INF/*.version")
-        resources.setIncludes(includes)
-    }
+    resources.srcDirs(setOf(resources.srcDirs, File(buildDir, RESOURCE_DIRECTORY)))
+    val includes = resources.includes
+    includes.add("META-INF/*.version")
+    resources.setIncludes(includes)
 }
