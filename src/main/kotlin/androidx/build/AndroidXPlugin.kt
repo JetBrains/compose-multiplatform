@@ -295,7 +295,8 @@ class AndroidXPlugin : Plugin<Project> {
                         CREATE_STUB_API_JAR_TASK == task.name ||
                         BUILD_ON_SERVER_TASK == task.name ||
                         ("lintDebug" == task.name &&
-                        !project.rootProject.hasProperty(USE_MAX_DEP_VERSIONS))) {
+                        !project.rootProject.hasProperty(USE_MAX_DEP_VERSIONS)) ||
+                        task.name == Release.PROJECT_ARCHIVE_ZIP_TASK_NAME) {
                     buildOnServerTask.dependsOn(task)
                 }
             }
