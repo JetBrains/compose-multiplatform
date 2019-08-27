@@ -59,9 +59,6 @@ object DokkaPublicDocs {
         "androidx.work.impl.utils.futures",
         "androidx.work.impl.utils.taskexecutor")
 
-    private var docsTasks: TaskCollection<DokkaTask>? = null
-    private var unzipTask: LocateJarsTask? = null
-
     fun tryGetRunnerProject(project: Project): Project? {
         return project.rootProject.findProject(":docs-runner")
     }
@@ -71,21 +68,15 @@ object DokkaPublicDocs {
     }
 
     fun getDocsTasks(project: Project): TaskCollection<DokkaTask>? {
-        docsTasks?.let {
-            return it
-        }
         val runnerProject = getRunnerProject(project)
-        docsTasks = runnerProject.tasks.getOrCreateDocsTask(runnerProject)
+        val docsTasks = runnerProject.tasks.getOrCreateDocsTask(runnerProject)
         return docsTasks
     }
 
     fun getUnzipDepsTask(project: Project): LocateJarsTask {
-        unzipTask?.let {
-            return it
-        }
         val runnerProject = getRunnerProject(project)
-        unzipTask = runnerProject.tasks.getByName(UNZIP_DEPS_TASK_NAME) as LocateJarsTask
-        return unzipTask as LocateJarsTask
+        val unzipTask = runnerProject.tasks.getByName(UNZIP_DEPS_TASK_NAME) as LocateJarsTask
+        return unzipTask
     }
 
     @Synchronized fun TaskContainer.getOrCreateDocsTask(runnerProject: Project):
