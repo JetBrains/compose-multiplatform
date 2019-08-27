@@ -473,6 +473,48 @@ class EffectsTests {
         }
     }
 
+
+    @Test
+    fun testOnDispose1() {
+        var mount = true
+
+        val logHistory = mutableListOf<String>()
+        fun log(x: String) = logHistory.add(x)
+
+        fun DisposeLogger(msg: String) {
+            +onDispose { log(msg) }
+        }
+
+        compose {
+            with(composer) {
+                call(
+                    168,
+                    { true },
+                    { @Suppress("PLUGIN_ERROR") DisposeLogger(msg="onDispose:1") }
+                )
+                if (mount) {
+                    call(
+                        169,
+                        { true },
+                        { @Suppress("PLUGIN_ERROR") DisposeLogger(msg="onDispose:2") }
+                    )
+                }
+            }
+        }.then { _ ->
+            assertArrayEquals(
+                emptyList<String>(),
+                logHistory
+            )
+            mount = false
+            log("recompose")
+        }.then { _ ->
+            assertArrayEquals(
+                listOf("recompose", "onDispose:2"),
+                logHistory
+            )
+        }
+    }
+
     @Test
     fun testOnCommit1() {
         var mount = true
