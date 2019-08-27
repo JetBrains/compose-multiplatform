@@ -60,7 +60,7 @@ object LibraryGroups {
     val LOADER = LibraryGroup("androidx.loader")
     val LOCALBROADCASTMANAGER = LibraryGroup("androidx.localbroadcastmanager")
     val MEDIA = LibraryGroup("androidx.media", false)
-    val MEDIA2 = LibraryGroup("androidx.media2", false)
+    val MEDIA2 = LibraryGroup("androidx.media2")
     val MEDIAROUTER = LibraryGroup("androidx.mediarouter")
     val NAVIGATION = LibraryGroup("androidx.navigation")
     val PAGING = LibraryGroup("androidx.paging")
