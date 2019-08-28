@@ -26,23 +26,24 @@ import java.util.ArrayList;
  * DO NOT TOUCH.
  */
 public class LibraryBuildInfoFile {
-  public String groupId;
-  public String artifactId;
-  public String version;
-  public String path;
-  public Boolean groupIdRequiresSameVersion;
-  public ArrayList<Dependency> dependencies;
-  public ArrayList<Check> checks;
-
-  public class Dependency {
     public String groupId;
     public String artifactId;
     public String version;
-    public boolean isTipOfTree;
-  }
+    public String path;
+    public String sha;
+    public Boolean groupIdRequiresSameVersion;
+    public ArrayList<Dependency> dependencies;
+    public ArrayList<Check> checks;
 
-  public class Check {
-    public String name;
-    public boolean passing;
-  }
+    public class Dependency {
+        public String groupId;
+        public String artifactId;
+        public String version;
+        public boolean isTipOfTree;
+    }
+
+    public class Check {
+        public String name;
+        public boolean passing;
+    }
 }
