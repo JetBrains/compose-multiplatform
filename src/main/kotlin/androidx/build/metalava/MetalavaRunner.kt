@@ -72,7 +72,6 @@ val API_LINT_ARGS: List<String> = listOf(
         "StartWithLower", // b/135710527
 
         // The list of checks that are API lint warnings and are yet to be enabled
-        "MinMaxConstant",
         "IntentBuilderName",
         "OnNameExpected",
         "TopLevelBuilder",
@@ -97,7 +96,9 @@ val API_LINT_ARGS: List<String> = listOf(
         "CommonArgsFirst",
         "SamShouldBeLast",
         "MissingJvmStatic"
-    ).joinToString()
+    ).joinToString(),
+    "--error",
+    "MinMaxConstant"
 )
 
 sealed class GenerateApiMode {
