@@ -70,8 +70,9 @@ class MockViewComposer(
 ) : Composer<View>(
     SlotTable(),
     Applier(root, ViewApplierAdapter), object : Recomposer() {
-        override fun scheduleChangesDispatch() {
-        }
+        override fun recomposeSync() {}
+
+        override fun scheduleChangesDispatch() {}
 
         override fun hasPendingChanges(): Boolean = false
     }) {

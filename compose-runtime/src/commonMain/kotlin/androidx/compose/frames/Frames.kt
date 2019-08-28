@@ -145,6 +145,11 @@ class Frame(
             readObservers -= readObserver
         }
     }
+
+    /**
+     * Whether there are any pending changes in this frame.
+     */
+    fun hasPendingChanges(): Boolean = (modified?.size ?: 0) > 0
 }
 
 private fun validateNotInFrame() {
