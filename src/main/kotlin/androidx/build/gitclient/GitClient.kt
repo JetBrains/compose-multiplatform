@@ -31,8 +31,7 @@ interface GitClient {
     fun findPreviousMergeCL(): String?
 
     fun getGitLog(
-        sha: String,
-        top: String = "HEAD",
+        gitCommitRange: GitCommitRange,
         keepMerges: Boolean,
         fullProjectDir: File
     ): List<Commit>
@@ -106,17 +105,41 @@ class GitClientImpl(
         return null
     }
 
+    private fun parseCommitLogString(
+        commitLogString: String,
+        commitStartDelimiter: String,
+        commitSHADelimiter: String,
+        subjectDelimiter: String,
+        authorEmailDelimiter: String,
+        localProjectDir: String
+    ): List<Commit> {
+        // Split commits string out into individual commits (note: this removes the deliminter)
+        val gitLogStringList: List<String>? = commitLogString.split(commitStartDelimiter)
+        var commitLog: MutableList<Commit> = mutableListOf()
+        gitLogStringList?.filter { gitCommit ->
+            gitCommit.trim() != ""
+        }?.forEach { gitCommit ->
+            commitLog.add(
+                Commit(
+                    gitCommit,
+                    localProjectDir,
+                    commitSHADelimiter = commitSHADelimiter,
+                    subjectDelimiter = subjectDelimiter,
+                    authorEmailDelimiter = authorEmailDelimiter
+                ))
+        }
+        return commitLog.toList()
+    }
+
     /**
      * Converts a diff log command into a [List<Commit>]
      *
-     * @param sha the SHA at which the git log starts.
-     * @param top the last SHA included in the git log.
+     * @param gitCommitRange the [GitCommitRange] that defines the parameters of the git log command
      * @param keepMerges boolean for whether or not to add merges to the return [List<Commit>].
      * @param fullProjectDir a [File] object that represents the full project directory.
      */
     override fun getGitLog(
-        sha: String,
-        top: String,
+        gitCommitRange: GitCommitRange,
         keepMerges: Boolean,
         fullProjectDir: File
     ): List<Commit> {
@@ -141,25 +164,22 @@ class GitClientImpl(
                     } else {
                         ""
                     }
-        val gitLogCmd: String = "$GIT_LOG_CMD_PREFIX $gitLogOptions $sha..$top $fullProjectDir"
-        val gitLogString: String = commandRunner.execute(gitLogCmd)
-
-        // Split commits string out into individual commits (note: this removes the deliminter)
-        val gitLogStringList: List<String>? = gitLogString.split(commitStartDelimiter)
-        var commitLog: MutableList<Commit> = mutableListOf()
-        gitLogStringList?.filter { gitCommit ->
-            gitCommit.trim() != ""
-        }?.forEach { gitCommit ->
-            commitLog.add(
-                Commit(
-                    gitCommit,
-                    localProjectDir,
-                    commitSHADelimiter = commitSHADelimiter,
-                    subjectDelimiter = subjectDelimiter,
-                    authorEmailDelimiter = authorEmailDelimiter
-                ))
+        var gitLogCmd: String
+        if (gitCommitRange.sha != "") {
+            gitLogCmd = "$GIT_LOG_CMD_PREFIX $gitLogOptions " +
+                    "${gitCommitRange.sha}..${gitCommitRange.top} $fullProjectDir"
+        } else {
+            gitLogCmd = "$GIT_LOG_CMD_PREFIX $gitLogOptions -n ${gitCommitRange.n} $fullProjectDir"
         }
-        return commitLog.toList()
+        val gitLogString: String = commandRunner.execute(gitLogCmd)
+        return parseCommitLogString(
+            gitLogString,
+            commitStartDelimiter,
+            commitSHADelimiter,
+            subjectDelimiter,
+            authorEmailDelimiter,
+            localProjectDir
+        )
     }
 
     private class RealCommandRunner(
@@ -213,6 +233,19 @@ enum class CommitType {
         }
     }
 }
+
+/**
+ * Defines the parameters for a git log command
+ *
+ * @property top the last SHA included in the git log.  Defaults to HEAD
+ * @property sha the SHA at which the git log starts. Set to an empty string to use [n]
+ * @property n a count of how many commits to go back to.  Only used when [sha] is an empty string
+ */
+data class GitCommitRange(
+    val top: String = "HEAD",
+    val sha: String = "",
+    val n: Int = 0
+)
 
 /**
  * Class implementation of a git commit.  It uses the input delimiters to parse the commit

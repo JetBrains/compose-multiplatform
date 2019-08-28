@@ -19,6 +19,7 @@ package androidx.build.releasenotes
 import androidx.build.gitclient.Commit
 import androidx.build.gitclient.GitClientImpl
 import androidx.build.getReleaseNotesDirectory
+import androidx.build.gitclient.GitCommitRange
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
@@ -105,8 +106,10 @@ open class GenerateReleaseNotesTask : DefaultTask() {
         }
 
         val commitList: List<Commit> = GitClientImpl(project.rootDir).getGitLog(
-            startSHA,
-            endSHA,
+            GitCommitRange(
+                sha = startSHA,
+                top = endSHA
+            ),
             keepMerges,
             project.projectDir
         )
