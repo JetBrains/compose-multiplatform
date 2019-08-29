@@ -17,6 +17,7 @@
 package androidx.build
 
 import com.android.build.gradle.LibraryPlugin
+import java.io.File
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
@@ -96,6 +97,12 @@ fun Project.configureMavenArtifactUpload(extension: AndroidXExtension) {
                 }
 
                 uploadTask.doFirst {
+                    // Delete any existing archives, so that developers don't get
+                    // confused/surprised by the presence of old versions.
+                    // Additionally, deleting old versions makes it more convenient to iterate
+                    // over all existing archives without visiting archives having old versions too
+                    removePreviouslyUploadedArchives(extension.mavenGroup!!.group)
+
                     val androidxDeps = HashSet<Dependency>()
                     collectDependenciesForConfiguration(androidxDeps, this, "api")
                     collectDependenciesForConfiguration(androidxDeps, this, "implementation")
@@ -132,6 +139,14 @@ private fun Project.removeTestDeps(pom: MavenPom) {
         val getScopeMethod = dep::class.java.getDeclaredMethod("getScope")
         getScopeMethod.invoke(dep) as String == "test"
     }
+}
+
+private fun Project.removePreviouslyUploadedArchives(group: String) {
+    val projectArchiveDir = File(
+                                getRepositoryDirectory(),
+                                "${group.replace('.', '/')}/${project.name}"
+                            )
+    projectArchiveDir.deleteRecursively()
 }
 
 // TODO(aurimas): remove this when Gradle bug is fixed.
