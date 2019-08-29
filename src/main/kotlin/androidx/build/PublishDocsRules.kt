@@ -66,7 +66,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.EMOJI, "1.0.0")
     prebuilts(LibraryGroups.ENTERPRISE, "1.0.0-alpha03")
     prebuilts(LibraryGroups.EXIFINTERFACE, "1.1.0-beta01")
-    prebuilts(LibraryGroups.FRAGMENT, "1.2.0-alpha02")
+    prebuilts(LibraryGroups.FRAGMENT, "1.2.0-alpha03")
     prebuilts(LibraryGroups.GRIDLAYOUT, "1.0.0")
     prebuilts(LibraryGroups.HEIFWRITER, "1.0.0")
     prebuilts(LibraryGroups.INTERPOLATOR, "1.0.0")
