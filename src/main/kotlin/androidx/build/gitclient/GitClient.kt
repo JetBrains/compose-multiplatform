@@ -165,11 +165,13 @@ class GitClientImpl(
                         ""
                     }
         var gitLogCmd: String
-        if (gitCommitRange.sha != "") {
+        if (gitCommitRange.fromExclusive != "") {
             gitLogCmd = "$GIT_LOG_CMD_PREFIX $gitLogOptions " +
-                    "${gitCommitRange.sha}..${gitCommitRange.top} $fullProjectDir"
+                    "${gitCommitRange.fromExclusive}..${gitCommitRange.untilInclusive}" +
+                    " -- $fullProjectDir"
         } else {
-            gitLogCmd = "$GIT_LOG_CMD_PREFIX $gitLogOptions -n ${gitCommitRange.n} $fullProjectDir"
+            gitLogCmd = "$GIT_LOG_CMD_PREFIX $gitLogOptions ${gitCommitRange.untilInclusive} -n " +
+                    "${gitCommitRange.n} -- $fullProjectDir"
         }
         val gitLogString: String = commandRunner.execute(gitLogCmd)
         return parseCommitLogString(
@@ -237,13 +239,15 @@ enum class CommitType {
 /**
  * Defines the parameters for a git log command
  *
- * @property top the last SHA included in the git log.  Defaults to HEAD
- * @property sha the SHA at which the git log starts. Set to an empty string to use [n]
- * @property n a count of how many commits to go back to.  Only used when [sha] is an empty string
+ * @property fromExclusive the oldest SHA at which the git log starts. Set to an empty string to use
+ * [n]
+ * @property untilInclusive the latest SHA included in the git log.  Defaults to HEAD
+ * @property n a count of how many commits to go back to.  Only used when [fromExclusive] is an
+ * empty string
  */
 data class GitCommitRange(
-    val top: String = "HEAD",
-    val sha: String = "",
+    val fromExclusive: String = "",
+    val untilInclusive: String = "HEAD",
     val n: Int = 0
 )
 

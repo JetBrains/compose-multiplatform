@@ -66,8 +66,8 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
     private fun getCommitShaAtHead(): String {
         val commitList: List<Commit> = GitClientImpl(project.rootDir).getGitLog(
             GitCommitRange(
-                top = "HEAD",
-                sha = "",
+                fromExclusive = "",
+                untilInclusive = "HEAD",
                 n = 1
             ),
             keepMerges = true,
