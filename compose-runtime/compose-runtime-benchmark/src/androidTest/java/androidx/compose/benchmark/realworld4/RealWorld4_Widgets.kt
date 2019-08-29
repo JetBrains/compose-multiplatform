@@ -29,7 +29,7 @@ import androidx.ui.foundation.ColoredRect
 import androidx.ui.core.dp
 import androidx.ui.core.toRect
 import androidx.ui.graphics.SolidColor
-import androidx.ui.painting.Paint
+import androidx.ui.graphics.Paint
 import androidx.ui.graphics.Color
 import androidx.ui.layout.FlexColumn
 import androidx.ui.layout.FlexRow
