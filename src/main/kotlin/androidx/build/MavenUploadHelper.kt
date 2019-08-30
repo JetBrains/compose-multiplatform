@@ -96,12 +96,21 @@ fun Project.configureMavenArtifactUpload(extension: AndroidXExtension) {
                     }
                 }
 
+                val groupText = extension.mavenGroup!!.group
+
+                uploadTask.outputs.dir(
+                    File(
+                        getRepositoryDirectory(),
+                        "${groupText.replace('.', '/')}/${project.name}/${project.version}"
+                    )
+                )
+
                 uploadTask.doFirst {
                     // Delete any existing archives, so that developers don't get
                     // confused/surprised by the presence of old versions.
                     // Additionally, deleting old versions makes it more convenient to iterate
                     // over all existing archives without visiting archives having old versions too
-                    removePreviouslyUploadedArchives(extension.mavenGroup!!.group)
+                    removePreviouslyUploadedArchives(groupText)
 
                     val androidxDeps = HashSet<Dependency>()
                     collectDependenciesForConfiguration(androidxDeps, this, "api")
