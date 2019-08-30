@@ -48,10 +48,12 @@ abstract class GenerateApiTask : MetalavaTask() {
 
     @OutputFiles
     fun getTaskOutputs(): List<File>? {
-        if (generateRestrictedAPIs) {
-            return apiLocation.get().files()
-        }
-        return listOf(apiLocation.get().publicApiFile)
+        val prop = apiLocation.get()
+        return listOfNotNull(
+            prop.publicApiFile,
+            prop.experimentalApiFile,
+            if (generateRestrictedAPIs) prop.restrictedApiFile else null
+        )
     }
 
     @TaskAction
