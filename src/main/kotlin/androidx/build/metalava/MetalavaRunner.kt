@@ -45,6 +45,14 @@ fun Project.runMetalavaWithArgs(configuration: Configuration, args: List<String>
     }
 }
 
+// Metalava arguments to hide all experimental API surfaces.
+val HIDE_EXPERIMENTAL_ARGS: List<String> = listOf(
+    "--hide-annotation", "androidx.annotation.experimental.Experimental",
+    "--hide-annotation", "kotlin.Experimental",
+    "--hide-meta-annotation", "androidx.annotation.experimental.Experimental",
+    "--hide-meta-annotation", "kotlin.Experimental"
+)
+
 val API_LINT_ARGS: List<String> = listOf(
     "--api-lint",
     "--hide",
@@ -95,6 +103,7 @@ val API_LINT_ARGS: List<String> = listOf(
 sealed class GenerateApiMode {
     object PublicApi : GenerateApiMode()
     object RestrictedApi : GenerateApiMode()
+    object ExperimentalApi : GenerateApiMode()
 }
 
 sealed class ApiLintMode {
@@ -112,6 +121,8 @@ fun Project.generateApi(
 ) {
     generateApi(files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
         apiLocation.publicApiFile, tempDir, GenerateApiMode.PublicApi, apiLintMode)
+    generateApi(files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
+        apiLocation.experimentalApiFile, tempDir, GenerateApiMode.ExperimentalApi, apiLintMode)
     if (includeRestrictedApis) {
         generateApi(files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
             apiLocation.restrictedApiFile, tempDir, GenerateApiMode.RestrictedApi, ApiLintMode.Skip)
@@ -135,7 +146,8 @@ fun Project.generateApi(
     }
 
     // generate public API txt
-    val args = mutableListOf("--classpath",
+    val args = mutableListOf(
+        "--classpath",
         (bootClasspath + dependencyClasspath.files).joinToString(File.pathSeparator),
 
         "--source-path",
@@ -150,13 +162,18 @@ fun Project.generateApi(
 
     when (generateApiMode) {
         is GenerateApiMode.PublicApi -> {
+            args += HIDE_EXPERIMENTAL_ARGS
         }
         is GenerateApiMode.RestrictedApi -> {
+            // Show restricted APIs despite @hide.
             args += listOf(
-                "--show-annotation",
-                "androidx.annotation.RestrictTo",
+                "--show-annotation", "androidx.annotation.RestrictTo",
                 "--show-unannotated"
             )
+            args += HIDE_EXPERIMENTAL_ARGS
+        }
+        is GenerateApiMode.ExperimentalApi -> {
+            // No additional args needed.
         }
     }
 
@@ -182,14 +199,6 @@ fun Project.generateApi(
             ))
         }
     }
-
-    // Never track @Experimental APIs.
-    args += listOf(
-        "--hide-annotation", "androidx.annotation.experimental.Experimental",
-        "--hide-annotation", "kotlin.Experimental",
-        "--hide-meta-annotation", "androidx.annotation.experimental.Experimental",
-        "--hide-meta-annotation", "kotlin.Experimental"
-    )
 
     val metalavaConfiguration = getMetalavaConfiguration()
     runMetalavaWithArgs(metalavaConfiguration, args)

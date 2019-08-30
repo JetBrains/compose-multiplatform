@@ -21,19 +21,24 @@ import java.io.File
 import androidx.build.Version
 import java.io.Serializable
 
-// An ApiLocation contains the filepath of a public API and restricted API of a library
+/**
+ * An ApiLocation contains information about the files used to record a library's API surfaces.
+ */
 data class ApiLocation(
-    // file specifying the directory of API files for the library
+    // Directory where the library's API files are stored
     val apiFileDirectory: File,
-    // file specifying the public API of the library
+    // File where the library's public API surface is recorded
     val publicApiFile: File,
-    // file specifying the restricted API (marked by the RestrictTo annotation) of the library
+    // File where the library's public plus restricted (see @RestrictTo) API surfaces are recorded
     val restrictedApiFile: File,
-    // file specifying the API of the resources
+    // File where the library's public plus experimental (see @Experimental) API surfaces are
+    // recorded
+    val experimentalApiFile: File,
+    // File where the library's public resources are recorded
     val resourceFile: File
 ) : Serializable {
 
-    fun files() = listOf(publicApiFile, restrictedApiFile)
+    fun files() = listOf(publicApiFile, restrictedApiFile, experimentalApiFile)
 
     fun version(): Version? {
         val text = publicApiFile.name.removeSuffix(".txt")
@@ -49,6 +54,7 @@ data class ApiLocation(
                 f.parentFile,
                 f,
                 File(f.parentFile, "restricted_" + f.name),
+                File(f.parentFile, "public_plus_experimental_" + f.name),
                 File(f.parentFile, "res-" + f.name)
             )
         }

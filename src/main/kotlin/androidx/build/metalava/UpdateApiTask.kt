@@ -72,15 +72,22 @@ abstract class UpdateApiTask : DefaultTask() {
             }
         }
         for (outputApi in outputApiLocations.get()) {
+            val inputApi = inputApiLocation.get()
             copy(
-                inputApiLocation.get().publicApiFile,
+                inputApi.publicApiFile,
                 outputApi.publicApiFile,
+                permitOverwriting,
+                project.logger
+            )
+            copy(
+                inputApi.experimentalApiFile,
+                outputApi.experimentalApiFile,
                 permitOverwriting,
                 project.logger
             )
             if (updateRestrictedAPIs) {
                 copy(
-                    inputApiLocation.get().restrictedApiFile,
+                    inputApi.restrictedApiFile,
                     outputApi.restrictedApiFile,
                     permitOverwriting,
                     project.logger
