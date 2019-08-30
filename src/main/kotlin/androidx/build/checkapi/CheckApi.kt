@@ -117,7 +117,7 @@ fun getApiFile(rootDir: File, version: Version): File {
  * Whether it is allowed to generate an API of the given version
  */
 fun isValidApiVersion(version: Version): Boolean {
-    if (version.patch != 0 && (version.isAlpha() || version.isBeta())) {
+    if (version.patch != 0 && (version.isAlpha() || version.isBeta() || version.isDev())) {
         return false
     }
     return true
