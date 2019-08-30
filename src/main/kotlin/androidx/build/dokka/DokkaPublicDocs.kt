@@ -145,10 +145,7 @@ object DokkaPublicDocs {
         val unzipTask = getPrebuiltSources(runnerProject, "$dependency:sources")
         val sourceDir = unzipTask.map { it.destinationDir }
 
-        // Avoid depending on or modifying a task that has already been executed.
-        // Because registerProject is called in an afterEvaluate, we can end up in a case where the dokka tasks are
-        // cached and have been executed in a prior run
-        dokkaTasks?.filter { it.state.isConfigurable }?.forEach {
+        dokkaTasks?.forEach {
             val sourceDirVal = sourceDir.get()
             it.dependsOn(unzipTask)
             it.sourceDirs += sourceDirVal
