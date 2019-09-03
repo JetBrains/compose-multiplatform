@@ -89,7 +89,8 @@ open class VerifyDependencyVersionsTask : DefaultTask() {
             return 3
         } else if (versionExtra.startsWith("-beta")) {
             return 2
-        } else if (versionExtra.startsWith("-alpha") || versionExtra.startsWith("-qpreview")) {
+        } else if (versionExtra.startsWith("-alpha") || versionExtra.startsWith("-qpreview") ||
+                versionExtra.startsWith("-dev")) {
             return 1
         } else {
             return -1

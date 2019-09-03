@@ -46,8 +46,10 @@ data class Version(
 
     fun isBeta(): Boolean = extra?.toLowerCase()?.startsWith("-beta") ?: false
 
+    fun isDev(): Boolean = extra?.toLowerCase()?.startsWith("-dev") ?: false
+
     // Returns whether the API surface is allowed to change within the current revision (see go/androidx/versioning for policy definition)
-    fun isFinalApi(): Boolean = !(isSnapshot() || isAlpha())
+    fun isFinalApi(): Boolean = !(isSnapshot() || isAlpha() || isDev())
 
     override fun compareTo(other: Version) = compareValuesBy(this, other,
             { it.major },
