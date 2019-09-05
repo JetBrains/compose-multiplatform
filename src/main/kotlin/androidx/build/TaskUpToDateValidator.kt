@@ -60,7 +60,6 @@ val EXEMPT_TASK_NAMES = setOf(
     "transformClassesWithDexBuilderForTipOfTreeDebug",
     "lint",
     "checkResourceApi",
-    "checkApi",
     "reportLibraryMetrics",
     "verifyDependencyVersions",
     "lintDebug",

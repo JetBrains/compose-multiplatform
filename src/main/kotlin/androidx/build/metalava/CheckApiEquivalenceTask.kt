@@ -24,6 +24,7 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
@@ -53,6 +54,14 @@ abstract class CheckApiEquivalenceTask : DefaultTask() {
             return checkedInApis.get().flatMap { it.files() }
         }
         return checkedInApis.get().map { it.publicApiFile }
+    }
+
+    /**
+     * A dummy output file so that Gradle will consider this task up-to-date after it runs once
+     */
+    @OutputFile
+    fun getDummyOutput(): File {
+        return getTaskInputs().first()
     }
 
     private fun summarizeDiff(a: File, b: File): String {
