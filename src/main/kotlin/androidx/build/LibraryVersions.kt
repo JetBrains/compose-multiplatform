@@ -94,6 +94,7 @@ object LibraryVersions {
     val SAVEDSTATE = Version("1.0.0-rc01")
     val SECURITY = Version("1.0.0-alpha03")
     val SECURITY_IDENTITY_CREDENTIAL = Version("1.0.0-alpha01")
+    val SERIALIZATION = Version("1.0.0-alpha01")
     val SHARETARGET = Version("1.0.0-beta01")
     val SLICE = Version("1.1.0-alpha02")
     val SLICE_BENCHMARK = Version("1.1.0-alpha02")
