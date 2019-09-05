@@ -74,6 +74,7 @@ object LibraryGroups {
     val ROOM = LibraryGroup("androidx.room")
     val SAVEDSTATE = LibraryGroup("androidx.savedstate")
     val SECURITY = LibraryGroup("androidx.security", false)
+    val SERIALIZATION = LibraryGroup("androidx.serialization")
     val SHARETARGET = LibraryGroup("androidx.sharetarget")
     val SLICE = LibraryGroup("androidx.slice", false)
     val SLIDINGPANELAYOUT = LibraryGroup("androidx.slidingpanelayout")
