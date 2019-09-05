@@ -85,6 +85,7 @@ import java.util.concurrent.ConcurrentHashMap
 const val USE_MAX_DEP_VERSIONS = "useMaxDepVersions"
 const val BUILD_INFO_DIR = "build-info"
 const val BUILD_ON_SERVER_DEPENDENT_ACTIONS = "buildOnServerDependentActions"
+const val DISALLOW_TASK_EXECUTION = "disallowExecution"
 
 /**
  * A plugin which enables all of the Gradle customizations for AndroidX.
@@ -370,6 +371,7 @@ class AndroidXPlugin : Plugin<Project> {
                 buildOnServerDependentActions.forEach { it() }
             }
         }
+        TaskUpToDateValidator.setup(project)
     }
 
     private fun TestedExtension.configureAndroidCommonOptions(
