@@ -20,6 +20,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
@@ -36,9 +37,16 @@ open class CheckResourceApiTask : DefaultTask() {
     @Optional
     var newApiFile: File? = null
 
+    /**
+     * A dummy output file so that Gradle will consider this task up-to-date after it runs once
+     */
+    @OutputFile
+    fun getDummyOutput(): File? {
+        return oldApiFile
+    }
+
     @TaskAction
     fun checkResourceApi() {
-
         if (oldApiFile == null || !oldApiFile!!.exists()) {
             throw GradleException("No resource api file for the current version exists, please" +
                     " run updateApi to create one.")
