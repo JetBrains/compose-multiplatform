@@ -38,7 +38,10 @@ data class ApiLocation(
     val resourceFile: File
 ) : Serializable {
 
+    // all files known to this api location
     fun files() = listOf(publicApiFile, restrictedApiFile, experimentalApiFile)
+    // all files other than the restricted api file
+    fun nonRestrictedFiles() = listOf(publicApiFile, experimentalApiFile)
 
     fun version(): Version? {
         val text = publicApiFile.name.removeSuffix(".txt")

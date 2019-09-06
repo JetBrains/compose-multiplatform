@@ -52,7 +52,7 @@ abstract class CheckApiEquivalenceTask : DefaultTask() {
         if (checkRestrictedAPIs) {
             return checkedInApis.get().flatMap { it.files() }
         }
-        return checkedInApis.get().map { it.publicApiFile }
+        return checkedInApis.get().flatMap { it.nonRestrictedFiles() }
     }
 
     private fun summarizeDiff(a: File, b: File): String {
@@ -90,6 +90,7 @@ abstract class CheckApiEquivalenceTask : DefaultTask() {
     fun exec() {
         for (checkedInApi in checkedInApis.get()) {
             checkEqual(checkedInApi.publicApiFile, builtApi.get().publicApiFile)
+            checkEqual(checkedInApi.experimentalApiFile, builtApi.get().experimentalApiFile)
             if (checkRestrictedAPIs) {
                 checkEqual(checkedInApi.restrictedApiFile, builtApi.get().restrictedApiFile)
             }
