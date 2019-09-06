@@ -57,7 +57,7 @@ abstract class UpdateApiTask : DefaultTask() {
         if (updateRestrictedAPIs) {
             return outputApiLocations.get().flatMap { it.files() }
         }
-        return outputApiLocations.get().map { it.publicApiFile }
+        return outputApiLocations.get().flatMap { it.nonRestrictedFiles() }
     }
 
     @TaskAction
