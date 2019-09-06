@@ -56,6 +56,12 @@ abstract class CheckApiEquivalenceTask : DefaultTask() {
     }
 
     private fun summarizeDiff(a: File, b: File): String {
+        if (!a.exists()) {
+            return "${a.toString()} does not exist"
+        }
+        if (!b.exists()) {
+            return "${b.toString()} does not exist"
+        }
         val process = ProcessBuilder(listOf("diff", a.toString(), b.toString()))
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
                 .start()
