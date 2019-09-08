@@ -15,7 +15,6 @@
  */
 package androidx.build
 
-import androidx.build.LibraryGroup
 import androidx.build.gmaven.GMavenVersionChecker
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.LibraryVariant
@@ -23,19 +22,26 @@ import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.Upload
 import org.gradle.api.tasks.bundling.Zip
 import java.io.File
+import java.util.TreeSet
 
 /**
  * Simple description for an artifact that is released from this project.
  */
 data class Artifact(
+    @get:Input
     val mavenGroup: String,
+    @get:Input
     val projectName: String,
+    @get:Input
     val version: String
-)
+) {
+    override fun toString() = "$mavenGroup:$projectName:$version"
+}
 
 /**
  * Zip task that zips all artifacts from given [candidates].
@@ -63,7 +69,8 @@ open class GMavenZipTask : Zip() {
     /**
      * List of artifacts that might be included in the generated zip.
      */
-    val candidates = arrayListOf<Artifact>()
+    @get:Nested
+    val candidates = TreeSet<Artifact>(compareBy { it.toString() })
 
     /**
      * Config action that configures the task when necessary.
