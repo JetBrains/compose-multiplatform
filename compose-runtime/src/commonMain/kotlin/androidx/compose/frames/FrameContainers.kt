@@ -77,7 +77,7 @@ class ModelList<T> : MutableList<T>, Framed {
         override fun assign(value: Record) {
             @Suppress("UNCHECKED_CAST")
             (value as? ArrayContainer<T>)?.let {
-                this.list = it.list.toList() as ArrayList<T>
+                this.list = it.list.toMutableList() as ArrayList<T>
             }
         }
 

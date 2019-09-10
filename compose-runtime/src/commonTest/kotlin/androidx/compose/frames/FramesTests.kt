@@ -809,6 +809,22 @@ class FrameTest {
     }
 
     @Test
+    fun testModelList_SingletonList() {
+        val numbers = frame {
+            modelListOf(1)
+        }
+
+        frame {
+            // Modify one of the members
+            numbers[0] = numbers[0] * 10
+        }
+
+        frame {
+            assertEquals(numbers[0], 10)
+        }
+    }
+
+    @Test
     fun testModelMap_Isolated() {
         val map = frame {
             modelMapOf(
