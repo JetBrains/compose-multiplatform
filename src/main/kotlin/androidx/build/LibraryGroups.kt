@@ -36,6 +36,7 @@ object LibraryGroups {
     val CARDVIEW = LibraryGroup("androidx.cardview")
     val COLLECTION = LibraryGroup("androidx.collection")
     val CONCURRENT = LibraryGroup("androidx.concurrent")
+    val CONTENTACCESS = LibraryGroup("androidx.contentaccess")
     val CONTENTPAGER = LibraryGroup("androidx.contentpager")
     val COORDINATORLAYOUT = LibraryGroup("androidx.coordinatorlayout")
     val COMPOSE = LibraryGroup("androidx.compose", false)
