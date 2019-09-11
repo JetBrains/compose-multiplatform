@@ -76,7 +76,6 @@ val API_LINT_ARGS: List<String> = listOf(
         "IntentBuilderName",
         "OnNameExpected",
         "TopLevelBuilder",
-        "MissingBuild",
         "BuilderSetStyle",
         "ExecutorRegistration",
         "StreamFiles",
@@ -96,6 +95,7 @@ val API_LINT_ARGS: List<String> = listOf(
     "--error",
     listOf(
         "MinMaxConstant",
+        "MissingBuild",
         "SetterReturnsThis",
         "OverlappingConstants",
         "IllegalStateException",
