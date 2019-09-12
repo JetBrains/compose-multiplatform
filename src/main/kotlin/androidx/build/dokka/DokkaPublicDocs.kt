@@ -43,6 +43,14 @@ object DokkaPublicDocs {
     private const val UNZIP_DEPS_TASK_NAME = "unzipDokkaPublicDocsDeps"
 
     val hiddenPackages = listOf(
+        "androidx.camera.camera2.impl",
+        "androidx.camera.camera2.impl.compat",
+        "androidx.camera.camera2.impl.compat.params",
+        "androidx.camera.core.impl",
+        "androidx.camera.core.impl.utils",
+        "androidx.camera.core.impl.utils.executor",
+        "androidx.camera.core.impl.utils.futures",
+        "androidx.camera.core.impl.utils.futures.internal",
         "androidx.core.internal",
         "androidx.preference.internal",
         "androidx.wear.internal.widget.drawer",
