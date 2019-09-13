@@ -138,7 +138,6 @@ class AndroidXPlugin : Plugin<Project> {
                     project.configureNonAndroidProjectForLint(androidXExtension)
                     project.configureJavaProjectForDokka(androidXExtension)
                     project.configureJavaProjectForMetalava(androidXExtension)
-                    project.configureJacoco()
                     project.addToProjectMap(androidXExtension)
                     // workaround for b/120487939
                     project.configurations.all { configuration ->
@@ -210,6 +209,7 @@ class AndroidXPlugin : Plugin<Project> {
         }
 
         project.configureKtlint()
+        project.configureJacoco()
 
         // Disable timestamps and ensure filesystem-independent archive ordering to maximize
         // cross-machine byte-for-byte reproducibility of artifacts.
@@ -316,6 +316,9 @@ class AndroidXPlugin : Plugin<Project> {
 
         val createCoverageJarTask = Jacoco.createCoverageJarTask(this)
         buildOnServerTask.dependsOn(createCoverageJarTask)
+
+        val createZipEcFilesTask = Jacoco.createZipEcFilesTask(this)
+        buildOnServerTask.dependsOn(createZipEcFilesTask)
 
         tasks.register(BUILD_TEST_APKS) {
             it.dependsOn(createCoverageJarTask)
@@ -683,7 +686,10 @@ class AndroidXPlugin : Plugin<Project> {
             toolVersion = Jacoco.VERSION
         }
 
+        val zipEcFilesTask = Jacoco.getZipEcFilesTask(this)
+
         tasks.withType(JacocoReport::class.java).configureEach { task ->
+            zipEcFilesTask.dependsOn(task) // zip follows every jacocoReport task being run
             task.reports {
                 it.xml.isEnabled = true
                 it.html.isEnabled = false
