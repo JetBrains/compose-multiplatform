@@ -120,18 +120,7 @@ class Effect<T> internal constructor(
  *
  * For example, a custom `observeUser` Effect might look something like this:
  *
- *    fun observeUser(userId: Int) = effectOf<User?> {
- *        val user = +stateFor<User?>(userId) { null }
- *        +onCommit(userId) {
- *            val subscription = UserAPI.subscribeToUser(userId) {
- *                user.value = it
- *            }
- *            onDispose {
- *                subscription.unsubscribe()
- *            }
- *        }
- *        user.value
- *    }
+ * @sample androidx.compose.samples.observeUserSample
  *
  * @param block the executable block of code that returns the value of the effect, run in the context of the Effect
  */
@@ -223,11 +212,7 @@ internal class PostCommitScopeImpl(
  * Compose determine which effects should be removed or added.  Any other effects can be created inside of the block of the
  * key effect.
  *
- * Example:
- *
- *     for (el in elements)
- *       val selected = +key(el.id) { +state { false } }
- *       ListItem(item=el, selected=selected)
+ * @sample androidx.compose.samples.oneInputKeySample
  *
  * @param v1 The value to use as the key. This will be compared to its previous value using `Object.equals`
  * @param block The block to execute other effects in
@@ -244,11 +229,7 @@ fun <T, V1> key(v1: V1, block: Effect<T>.() -> T) =
  *
  * A compound key will be created from both [v1] and [v2].
  *
- * Example:
- *
- *     for (el in elements)
- *       val selected = +key(el.id, parentId) { +state { false } }
- *       ListItem(item=el, selected=selected)
+ * @sample androidx.compose.samples.twoInputsKeySample
  *
  * @param v1 The first value to use as a key. This will be compared to its previous value using `Object.equals`
  * @param v2 The second value to use as a key. This will be compared to its previous value using `Object.equals`
@@ -264,11 +245,7 @@ fun <T, V1, V2> key(v1: V1, v2: V2, block: Effect<T>.() -> T) =
  * Compose determine which effects should be removed or added.  Any other effects can be created inside of the block of the key
  * effect.
  *
- * Example:
- *
- *     for (el in elements)
- *       val selected = +key(el.id, parentId) { +state { false } }
- *       ListItem(item=el, selected=selected)
+ * @sample androidx.compose.samples.twoInputsKeySample
  *
  * @param inputs The set of values to be used to create a compound key. This will be compared to its previous value using `Object.equals`
  * @param block The block to execute other effects in
@@ -554,49 +531,15 @@ fun onPreCommit(vararg inputs: Any?, callback: CommitScope.() -> Unit) =
  * The [State] class can be used several different ways. For example, the most basic way is to store the returned state
  * value into a local immutable variable, and then set the [State.value] property on it.
  *
- * Example:
- *
- *    @Composable
- *    fun Example() {
- *        val count = +state { 0 }
- *
- *        TextView(text="You clicked ${count.value} times")
- *        Button(
- *            text="Click me",
- *            onClick={ count.value += 1 }
- *        )
- *    }
+ * @sample androidx.compose.samples.SimpleStateSample
  *
  * Additionally, you can destructure the [State] object into a value and a "setter" function.
  *
- * Example:
- *
- *    @Composable
- *    fun Example() {
- *        val (count, setCount) = +state { 0 }
- *
- *        TextView(text="You clicked ${count} times")
- *        Button(
- *            text="Click me",
- *            onClick={ setCount(count + 1) }
- *        )
- *    }
+ * @sample androidx.compose.samples.DestructuredStateSample
  *
  * Finally, the [State] instance can be used as a variable delegate to a local mutable variable.
  *
- * Example:
- *
- *    @Composable
- *    fun Example() {
- *        var count by +state { 0 }
- *
- *        TextView(text="You clicked $count times")
- *        Button(
- *            text="Click me",
- *            onClick={ count += 1 }
- *        )
- *    }
- *
+ * @sample androidx.compose.samples.DelegatedStateSample
  *
  * @param init A factory function to create the initial value of this state
  * @return An [Model] instance of [State] that wraps the value.
