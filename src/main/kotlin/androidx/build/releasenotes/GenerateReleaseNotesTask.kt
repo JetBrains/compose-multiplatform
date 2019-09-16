@@ -107,8 +107,8 @@ open class GenerateReleaseNotesTask : DefaultTask() {
 
         val commitList: List<Commit> = GitClientImpl(project.rootDir).getGitLog(
             GitCommitRange(
-                fromExclusive = endSHA,
-                untilInclusive = startSHA
+                fromExclusive = startSHA,
+                untilInclusive = endSHA
             ),
             keepMerges,
             project.projectDir
