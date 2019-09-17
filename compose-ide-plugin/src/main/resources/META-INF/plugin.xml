@@ -37,7 +37,7 @@ The Jetpack Compose IDE plugin
     <extensions defaultExtensionNs="org.jetbrains.kotlin">
         <ktxParsingExtension implementation="androidx.compose.plugins.kotlin.ComposeKtxParsingExtension" />
         <storageComponentContainerContributor implementation="androidx.compose.plugins.kotlin.ComponentsClosedDeclarationChecker" />
-        <storageComponentContainerContributor implementation="androidx.compose.plugins.idea.ComposableAnnotationChecker" />
+        <storageComponentContainerContributor implementation="androidx.compose.plugins.kotlin.ComposableAnnotationChecker" />
         <storageComponentContainerContributor implementation="androidx.compose.plugins.kotlin.UnionAnnotationCheckerProvider" />
         <ktxTypeResolutionExtension implementation="androidx.compose.plugins.kotlin.ComposeKtxTypeResolutionExtension"/>
         <callResolutionInterceptorExtension implementation="androidx.compose.plugins.kotlin.ComposeCallResolutionInterceptorExtension"/>
