@@ -77,7 +77,6 @@ val API_LINT_ARGS: List<String> = listOf(
         "TopLevelBuilder",
         "MissingBuild",
         "BuilderSetStyle",
-        "SetterReturnsThis",
         "PackageLayering",
         "OverlappingConstants",
         "IllegalStateException",
@@ -98,7 +97,10 @@ val API_LINT_ARGS: List<String> = listOf(
         "MissingJvmStatic"
     ).joinToString(),
     "--error",
-    "MinMaxConstant"
+    listOf(
+        "MinMaxConstant",
+        "SetterReturnsThis"
+    ).joinToString()
 )
 
 sealed class GenerateApiMode {
