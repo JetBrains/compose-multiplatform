@@ -53,6 +53,7 @@ allprojects {
 
 dependencies {
     implementation build_libs.gradle
+    implementation build_libs.dex_member_list
     implementation build_libs.error_prone_gradle
     implementation build_libs.dokka_gradle
     implementation build_libs.kotlin.gradle_plugin

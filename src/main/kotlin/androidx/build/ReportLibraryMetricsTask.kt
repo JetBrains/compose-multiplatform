@@ -16,18 +16,21 @@
 
 package androidx.build
 
-import com.android.build.gradle.api.LibraryVariant
+import com.jakewharton.dex.DexParser.Companion.toDexParser
 import org.gradle.api.DefaultTask
-import org.gradle.api.provider.ListProperty
-import org.gradle.api.tasks.Input
+import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.TaskAction
 import org.json.simple.JSONObject
 import java.io.File
+import java.lang.IllegalStateException
 
 private const val AAR_FILE_EXTENSION = ".aar"
-private const val AAR_SIZE = "aar_size"
+private const val BYTECODE_SIZE = "bytecode_size"
+private const val METHOD_COUNT = "method_count"
 private const val METRICS_DIRECTORY = "librarymetrics"
 private const val METRICS_FILE_SUFFIX = "-library_metrics.json"
+private const val JAR_FILE_EXTENSION = ".jar"
 
 abstract class ReportLibraryMetricsTask : DefaultTask() {
 
@@ -39,8 +42,8 @@ abstract class ReportLibraryMetricsTask : DefaultTask() {
     /**
      * The variants we are interested in gathering metrics for.
      */
-    @get:Input
-    abstract val debugVariants: ListProperty<LibraryVariant>
+    @get:InputFiles
+    abstract val jarFiles: ConfigurableFileCollection
 
     @TaskAction
     fun reportLibraryMetrics() {
@@ -53,26 +56,36 @@ abstract class ReportLibraryMetricsTask : DefaultTask() {
         )
         val json = JSONObject()
 
-        val aarSize = getAarSize()
-        if (aarSize > 0L) {
-            json[AAR_SIZE] = aarSize
+        val jarFiles = getJarFiles()
+        val bytecodeSize = getBytecodeSize(jarFiles)
+        if (bytecodeSize > 0L) {
+            json[BYTECODE_SIZE] = bytecodeSize
+        }
+
+        val methodCount = getMethodCount(jarFiles)
+        if (methodCount > 0) {
+            json[METHOD_COUNT] = methodCount
         }
 
         outputFile.writeText(json.toJSONString())
     }
 
-    private fun getAarSize(): Long {
-        val aarFiles = debugVariants.get().flatMap {
-            it.packageLibraryProvider.get().outputs.files.files.filter { file ->
-                file.name.endsWith(AAR_FILE_EXTENSION)
-            }
+    private fun getJarFiles(): List<File> {
+        return jarFiles.files.filter { file ->
+                file.name.endsWith(JAR_FILE_EXTENSION)
         }
+    }
+
+    private fun getBytecodeSize(jarFiles: List<File>): Long {
+        return jarFiles.map { it.length() }.sum()
+    }
+
+    private fun getMethodCount(jarFiles: List<File>): Int {
         return when {
-            aarFiles.isEmpty() -> 0
-            aarFiles.size == 1 -> aarFiles[0].length()
-            else -> {
-                throw IllegalStateException("Found ${aarFiles.size} .aar files, was expecting 1.")
-            }
+            jarFiles.isEmpty() -> 0
+            jarFiles.all { it.isFile } -> jarFiles.toDexParser().listMethods().size
+            else ->
+                throw IllegalStateException("One or more of the items in $jarFiles is not a file.")
         }
     }
 }
