@@ -53,7 +53,7 @@ val RELEASE_RULE = docsRules("public", false) {
             .addStubs("car/stubs/android.car.jar")
     prebuilts(LibraryGroups.CARDVIEW, "1.0.0")
     prebuilts(LibraryGroups.COLLECTION, "1.1.0")
-    prebuilts(LibraryGroups.CONCURRENT, "1.0.0-rc01")
+    prebuilts(LibraryGroups.CONCURRENT, "1.0.0")
     prebuilts(LibraryGroups.CONTENTPAGER, "1.0.0")
     prebuilts(LibraryGroups.COORDINATORLAYOUT, "1.1.0-beta01")
     prebuilts(LibraryGroups.CORE, "core", "1.2.0-alpha04")
