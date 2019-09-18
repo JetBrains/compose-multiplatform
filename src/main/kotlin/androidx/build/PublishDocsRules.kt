@@ -76,6 +76,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.LEGACY, "1.0.0")
     ignore(LibraryGroups.LIFECYCLE.group, "lifecycle-compiler")
     ignore(LibraryGroups.LIFECYCLE.group, "lifecycle-runtime-ktx-lint")
+    ignore(LibraryGroups.LIFECYCLE.group, "lifecycle-livedata-core-truth")
     prebuilts(LibraryGroups.LIFECYCLE, "lifecycle-viewmodel-savedstate", "1.0.0-alpha05")
     prebuilts(LibraryGroups.LIFECYCLE, "2.2.0-alpha05")
     ignore(LibraryGroups.LOADER.group, "loader-ktx")
