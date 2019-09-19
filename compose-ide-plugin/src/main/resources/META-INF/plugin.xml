@@ -47,12 +47,6 @@ The Jetpack Compose IDE plugin
         <diagnosticSuppressor implementation="androidx.compose.plugins.kotlin.ComposeDiagnosticSuppressor"/>
         <quickFixContributor implementation="androidx.compose.plugins.idea.quickfix.ComposeQuickFixRegistry" />
     </extensions>
-    <actions>
-        <action id="ConvertXmlToComponent" class="androidx.compose.plugins.idea.conversion.XmlToComponentAction"
-            text="Convert XML File to Component">
-            <add-to-group group-id="ConvertJavaToKotlinGroup" anchor="last"/>
-        </action>
-    </actions>
 
     <application-components>
         <component>
