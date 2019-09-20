@@ -113,6 +113,8 @@ class AndroidXPlugin : Plugin<Project> {
             project.configureRootProject()
         }
 
+        project.configureJacoco()
+
         project.plugins.all { plugin ->
             when (plugin) {
                 is JavaPlugin,
@@ -138,6 +140,11 @@ class AndroidXPlugin : Plugin<Project> {
                     project.configureNonAndroidProjectForLint(androidXExtension)
                     project.configureJavaProjectForDokka(androidXExtension)
                     project.configureJavaProjectForMetalava(androidXExtension)
+                    project.afterEvaluate {
+                        if (androidXExtension.publish.shouldRelease()) {
+                            project.extra.set("publish", true)
+                        }
+                    }
                     project.addToProjectMap(androidXExtension)
                     // workaround for b/120487939
                     project.configurations.all { configuration ->
@@ -176,8 +183,8 @@ class AndroidXPlugin : Plugin<Project> {
                         verifyDependencyVersionsTask?.configure { task ->
                             task.dependsOn(libraryVariant.javaCompileProvider)
                         }
-                        libraryVariant.javaCompileProvider.configure { task ->
-                            project.runIfPartOfBuildOnServer {
+                        if (!project.rootProject.hasProperty(USE_MAX_DEP_VERSIONS)) {
+                            libraryVariant.javaCompileProvider.configure { task ->
                                 task.options.compilerArgs.add("-Werror")
                                 task.options.compilerArgs.add("-Xlint:unchecked")
                             }
@@ -211,7 +218,6 @@ class AndroidXPlugin : Plugin<Project> {
         }
 
         project.configureKtlint()
-        project.configureJacoco()
 
         // Disable timestamps and ensure filesystem-independent archive ordering to maximize
         // cross-machine byte-for-byte reproducibility of artifacts.
@@ -350,12 +356,10 @@ class AndroidXPlugin : Plugin<Project> {
             subprojects { project ->
                 project.configurations.all { configuration ->
                     project.afterEvaluate {
-                        val androidXExtension =
-                            project.extensions.getByType(AndroidXExtension::class.java)
                         // Substitute only for debug configurations/tasks only because we can not
                         // change release dependencies after evaluation. Test hooks, buildOnServer
                         // and buildTestApks use the debug configurations as well.
-                        if (androidXExtension.publish.shouldRelease() &&
+                        if (project.extra.has("publish") &&
                             configuration.name.toLowerCase().contains("debug")
                         ) {
                             configuration.resolutionStrategy.dependencySubstitution.apply {
@@ -562,10 +566,15 @@ class AndroidXPlugin : Plugin<Project> {
         }
 
         project.afterEvaluate {
-            defaultPublishVariant { libraryVariant ->
-                libraryVariant.javaCompileProvider.configure { javaCompile ->
-                    if (androidXExtension.failOnDeprecationWarnings) {
-                        javaCompile.options.compilerArgs.add("-Xlint:deprecation")
+            if (androidXExtension.publish.shouldRelease()) {
+                project.extra.set("publish", true)
+            }
+            if (!project.rootProject.hasProperty(USE_MAX_DEP_VERSIONS)) {
+                defaultPublishVariant { libraryVariant ->
+                    libraryVariant.javaCompileProvider.configure { javaCompile ->
+                        if (androidXExtension.failOnDeprecationWarnings) {
+                            javaCompile.options.compilerArgs.add("-Xlint:deprecation")
+                        }
                     }
                 }
             }
