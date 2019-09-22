@@ -77,7 +77,6 @@ val API_LINT_ARGS: List<String> = listOf(
         "TopLevelBuilder",
         "MissingBuild",
         "BuilderSetStyle",
-        "OverlappingConstants",
         "IllegalStateException",
         "ListenerLast",
         "ExecutorRegistration",
@@ -99,7 +98,8 @@ val API_LINT_ARGS: List<String> = listOf(
     listOf(
         "MinMaxConstant",
         "SetterReturnsThis",
-        "PackageLayering"
+        "PackageLayering",
+        "OverlappingConstants"
     ).joinToString()
 )
 
