@@ -16,6 +16,7 @@
 
 package androidx.build
 
+import androidx.build.SupportConfig.getSupportRoot
 import androidx.build.gitclient.Commit
 import androidx.build.gitclient.GitClientImpl
 import androidx.build.gitclient.GitCommitRange
@@ -49,9 +50,13 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
         return "${project.group}_${project.name}_build_info.txt"
     }
 
-    /* Returns the local project directory without the full framework/support root directory path */
+    /* Returns the local project directory without the full framework/support root directory path
+    * Note: `project.projectDir.toString().removePrefix(project.rootDir.toString())` does not work
+    * because the project rootDir is not guaranteed to be a substring of the projectDir
+    */
     private fun getProjectSpecificDirectory(): String {
-        return project.projectDir.toString().removePrefix(project.rootDir.toString())
+        return project.projectDir.toString().removePrefix(
+            getSupportRoot(project).toString())
     }
 
     /* Returns whether or not the groupId of the project requires the same version for all
