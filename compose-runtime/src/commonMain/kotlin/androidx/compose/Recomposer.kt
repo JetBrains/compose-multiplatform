@@ -59,7 +59,9 @@ abstract class Recomposer {
                     composer.endRoot()
                 }
                 composer.applyChanges()
-                FrameManager.nextFrame()
+                if (!composerWasComposing) {
+                    FrameManager.nextFrame()
+                }
             } finally {
                 composer.isComposing = composerWasComposing
             }
