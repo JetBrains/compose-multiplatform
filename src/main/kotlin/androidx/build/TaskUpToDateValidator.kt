@@ -62,7 +62,8 @@ val EXEMPT_TASK_NAMES = setOf(
     "reportLibraryMetrics",
     "verifyDependencyVersions",
     "lintDebug",
-    "checkExternalLicenses"
+    "checkExternalLicenses",
+    "dist"
 )
 class TaskUpToDateValidator {
     companion object {
