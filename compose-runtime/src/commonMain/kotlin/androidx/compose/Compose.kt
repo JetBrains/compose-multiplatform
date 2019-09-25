@@ -199,6 +199,38 @@ object Compose {
         }
     }
 
+    // TODO(chuckj): This is a temporary work-around until subframes exist so that
+    // nextFrame() inside recompose() doesn't really start a new frame, but a new subframe
+    // instead.
+    @MainThread
+    fun subcomposeInto(
+        container: Emittable,
+        context: Context,
+        parent: CompositionReference? = null,
+        composable: @Composable() () -> Unit
+    ): CompositionContext {
+        var root = getRootComponent(container) as? Root
+        return if (root == null) {
+            root = Root()
+            root.composable = composable
+            setRoot(container, root)
+            val cc = CompositionContext.prepare(context, container, root, parent)
+            root.composer = cc
+            val wasComposing = cc.composer.isComposing
+            cc.composer.isComposing = true
+            root.update()
+            cc.composer.isComposing = wasComposing
+            cc
+        } else {
+            root.composable = composable
+            val wasComposing = root.composer.composer.isComposing
+            root.composer.composer.isComposing = true
+            root.update()
+            root.composer.composer.isComposing = wasComposing
+            root.composer
+        }
+    }
+
     /**
      * Disposes any composition previously run with [container] as the root. This will
      * release any resources that have been built around the composition, including all [onDispose]
