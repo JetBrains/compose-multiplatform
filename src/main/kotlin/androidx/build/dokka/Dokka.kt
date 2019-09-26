@@ -123,6 +123,13 @@ object Dokka {
                 .resolve("package-lists/kotlin/package-list").toUri().toURL()
         }.build()
 
+        val coroutinesCoreLink = DokkaConfiguration.ExternalDocumentationLink.Builder().apply {
+            this.url = URL("https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/")
+
+            this.packageListUrl = project.projectDir.toPath()
+                .resolve("package-lists/coroutinesCore/package-list").toUri().toURL()
+        }.build()
+
         return project.tasks.register(docTaskName, DokkaAndroidTask::class.java) { task ->
             task.moduleName = project.name
             task.outputDirectory = File(project.buildDir, docTaskName).absolutePath
@@ -134,6 +141,7 @@ object Dokka {
             task.moduleName = ""
             task.externalDocumentationLinks.add(guavaDocLink)
             task.externalDocumentationLinks.add(kotlinLangLink)
+            task.externalDocumentationLinks.add(coroutinesCoreLink)
             for (hiddenPackage in hiddenPackages) {
                 val opts = PackageOptions()
                 opts.prefix = hiddenPackage
