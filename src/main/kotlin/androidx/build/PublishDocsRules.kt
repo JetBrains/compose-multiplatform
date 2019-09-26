@@ -80,7 +80,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.LIFECYCLE, "lifecycle-viewmodel-savedstate", "1.0.0-alpha05")
     prebuilts(LibraryGroups.LIFECYCLE, "2.2.0-alpha05")
     ignore(LibraryGroups.LOADER.group, "loader-ktx")
-    prebuilts(LibraryGroups.LOADER, "1.1.0-rc01")
+    prebuilts(LibraryGroups.LOADER, "1.1.0")
     prebuilts(LibraryGroups.LOCALBROADCASTMANAGER, "1.1.0-alpha01")
     prebuilts(LibraryGroups.MEDIA, "media", "1.1.0")
     ignore(LibraryGroups.MEDIA2.group, "media2-exoplayer")
