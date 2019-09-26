@@ -88,7 +88,7 @@ object LibraryVersions {
     val PERCENTLAYOUT = Version("1.1.0-alpha01")
     val PREFERENCE = Version("1.2.0-alpha01")
     val RECOMMENDATION = Version("1.1.0-alpha01")
-    val RECYCLERVIEW = Version("1.1.0-rc01")
+    val RECYCLERVIEW = Version("1.1.0-rc02")
     val RECYCLERVIEW_SELECTION = Version("1.1.0-alpha07")
     val REMOTECALLBACK = Version("1.0.0-alpha02")
     val ROOM = Version("2.2.0-beta01")
