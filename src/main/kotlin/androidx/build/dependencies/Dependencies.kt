@@ -97,14 +97,6 @@ const val XERIAL = "org.xerial:sqlite-jdbc:3.25.2"
 const val XPP3 = "xpp3:xpp3:1.1.4c"
 const val XMLPULL = "xmlpull:xmlpull:1.1.3.1"
 
-const val ANDROIDX_ANNOTATION = "androidx.annotation:annotation:1.1.0"
-const val ANDROIDX_COLLECTION = "androidx.collection:collection:1.0.0"
-const val ANDROIDX_CONCURRENT_FUTURES = "androidx.concurrent:concurrent-futures:1.0.0-rc01"
-const val ANDROIDX_CORE = "androidx.core:core:1.0.0"
-const val ANDROIDX_RECYCLERVIEW = "androidx.recyclerview:recyclerview:1.0.0"
-const val ANDROIDX_SQLITE = "androidx.sqlite:sqlite:2.0.1"
-const val ANDROIDX_SQLITE_FRAMEWORK = "androidx.sqlite:sqlite-framework:2.0.1"
-
 // Arch libraries
 const val ARCH_LIFECYCLE_RUNTIME = "androidx.lifecycle:lifecycle-runtime:2.0.0"
 const val ARCH_LIFECYCLE_COMMON = "androidx.lifecycle:lifecycle-common:2.0.0@jar"
