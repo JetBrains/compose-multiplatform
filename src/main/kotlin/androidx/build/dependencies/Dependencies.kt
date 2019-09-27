@@ -97,33 +97,6 @@ const val XERIAL = "org.xerial:sqlite-jdbc:3.25.2"
 const val XPP3 = "xpp3:xpp3:1.1.4c"
 const val XMLPULL = "xmlpull:xmlpull:1.1.3.1"
 
-// Arch libraries
-const val ARCH_LIFECYCLE_RUNTIME = "androidx.lifecycle:lifecycle-runtime:2.0.0"
-const val ARCH_LIFECYCLE_COMMON = "androidx.lifecycle:lifecycle-common:2.0.0@jar"
-const val ARCH_LIFECYCLE_LIVEDATA_CORE = "androidx.lifecycle:lifecycle-livedata-core:2.0.0"
-const val ARCH_LIFECYCLE_LIVEDATA = "androidx.lifecycle:lifecycle-livedata:2.0.0"
-const val ARCH_LIFECYCLE_SERVICE = "androidx.lifecycle:lifecycle-service:2.0.0"
-const val ARCH_LIFECYCLE_VIEWMODEL = "androidx.lifecycle:lifecycle-viewmodel:2.0.0"
-const val ARCH_LIFECYCLE_VIEWMODEL_KTX = "androidx.lifecycle:lifecycle-viewmodel-ktx:2.0.0"
-const val ARCH_CORE_COMMON = "androidx.arch.core:core-common:2.0.1@jar"
-const val ARCH_CORE_RUNTIME = "androidx.arch.core:core-runtime:2.0.1"
-const val ARCH_CORE_TESTING = "androidx.arch.core:core-testing:2.0.1"
-
-const val ARCH_PAGING_COMMON = "androidx.paging:paging-common:2.0.0"
-const val ARCH_PAGING_RUNTIME = "androidx.paging:paging-runtime:2.0.0"
-const val ARCH_ROOM_RUNTIME = "androidx.room:room-runtime:2.0.0"
-const val ARCH_ROOM_COMPILER = "androidx.room:room-compiler:2.0.0"
-const val ARCH_ROOM_RXJAVA = "androidx.room:room-rxjava2:2.0.0"
-const val ARCH_ROOM_TESTING = "androidx.room:room-testing:2.0.0"
-
-const val NAVIGATION_COMMON = "androidx.navigation:navigation-common:2.0.0-rc02"
-
-const val WORK_ARCH_CORE_RUNTIME = "androidx.arch.core:core-runtime:2.0.0"
-const val WORK_ARCH_CORE_TESTING = "androidx.arch.core:core-testing:2.0.0"
-const val WORK_ARCH_ROOM_RUNTIME = "androidx.room:room-runtime:2.1.0"
-const val WORK_ARCH_ROOM_COMPILER = "androidx.room:room-compiler:2.1.0"
-const val WORK_ARCH_ROOM_TESTING = "androidx.room:room-testing:2.1.0"
-
 const val ROBOLECTRIC = "org.robolectric:robolectric:4.1"
 
 const val PROTOBUF = "com.google.protobuf:protobuf-java:3.4.0"
