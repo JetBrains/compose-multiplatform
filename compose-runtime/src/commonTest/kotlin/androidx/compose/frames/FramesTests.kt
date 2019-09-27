@@ -640,69 +640,118 @@ class FrameTest {
     }
 
     @Test
-    fun testModelList_MutateThrows() {
+    fun testModelList_IterableList_Mutate() {
+        val count = 10
+        fun streetOf(index: Int) = "$OLD_STREET, Apt #$index"
+        fun initial(index: Int) = Address(
+            street = streetOf(index),
+            city = OLD_CITY
+        )
+        fun initializer() = Array(count) { initial(it) }
+        val addresses = frame {
+            modelListOf(*initializer())
+        }
+
+        fun mutate(
+            index: Int = 0,
+            skip: Int = 1,
+            block: (iterator: MutableListIterator<Address>) -> Unit
+        ) {
+            aborted {
+                // Perform the action on a model list
+                val iterator = addresses.listIterator(index)
+
+                repeat(skip) {
+                    assertTrue(iterator.hasNext())
+                    iterator.next()
+                }
+
+                assertFalse(wasModified(addresses))
+                block(iterator)
+                assertTrue(wasModified(addresses))
+
+                // Perform the action on an array list
+                val normalList = ArrayList<Address>().apply {
+                    repeat(count) {
+                        this.add(initial(it))
+                    }
+                }
+                val normalIterator = normalList.listIterator(index)
+                repeat(skip) {
+                    assertTrue(normalIterator.hasNext())
+                    normalIterator.next()
+                }
+                block(normalIterator)
+
+                // Asset the lists are the same
+                assertEquals(normalList.size, addresses.size)
+                addresses.forEachIndexed { index, address ->
+                    assertEquals(address.street, normalList[index].street)
+                    assertEquals(address.city, normalList[index].city)
+                }
+            }
+
+            frame {
+                assertEquals(addresses.size, count)
+                addresses.forEachIndexed { index, address ->
+                    assertEquals(streetOf(index), address.street)
+                    assertEquals(OLD_CITY, address.city)
+                }
+            }
+        }
+
+        fun validate(block: (iterator: MutableListIterator<Address>) -> Unit) {
+            mutate(block = block)
+            mutate(skip = 3, block = block)
+            mutate(index = 4, block = block)
+            mutate(index = 2, skip = 3, block = block)
+        }
+
+        validate {
+            it.remove()
+        }
+
+        // Expect listIterator.set to throw
+        validate {
+            it.set(
+                Address(
+                    NEW_STREET,
+                    NEW_CITY
+                )
+            )
+        }
+
+        // Expect listIterator.add to throw
+        validate {
+            it.add(
+                Address(
+                    NEW_STREET,
+                    NEW_CITY
+                )
+            )
+        }
+    }
+
+    @Test
+    fun testModelList_MutateAcrossThreadThrows() {
         val count = 10
         val addresses = frame {
             modelListOf(*(Array(count) {
                 Address(
-                    OLD_STREET,
-                    OLD_CITY
+                    street = "$OLD_STREET Apt#$it",
+                    city = OLD_CITY
                 )
             }))
         }
 
-        // Expect iterator.remove to throw
+        val iterator = frame {
+            addresses.listIterator().apply { next() }
+        }
+
         frame {
-            val iterator = addresses.iterator()
-            assertTrue(iterator.hasNext())
-            iterator.next()
             expectError {
                 iterator.remove()
             }
-            assertFalse(wasModified(addresses))
-        }
-
-        // Expect listIterator.remove to throw
-        frame {
-            val iterator = addresses.listIterator()
-            assertTrue(iterator.hasNext())
-            iterator.next()
-            expectError {
-                iterator.remove()
-            }
-            assertFalse(wasModified(addresses))
-        }
-
-        // Expect listIterator.set to throw
-        frame {
-            val iterator = addresses.listIterator()
-            assertTrue(iterator.hasNext())
-            iterator.next()
-            expectError {
-                iterator.set(
-                    Address(
-                        NEW_STREET,
-                        NEW_CITY
-                    )
-                )
-            }
-            assertFalse(wasModified(addresses))
-        }
-
-        // Expect listIterator.add to throw
-        frame {
-            val iterator = addresses.listIterator()
-            assertTrue(iterator.hasNext())
-            iterator.next()
-            expectError {
-                iterator.add(
-                    Address(
-                        NEW_STREET,
-                        NEW_CITY
-                    )
-                )
-            }
-            assertFalse(wasModified(addresses))
         }
     }
 
@@ -803,9 +852,6 @@ class FrameTest {
 
         // Expect subList to modify
         validate { addresses.subList(5, 6) }
-
-        // Expecte asMutable to modify
-        validate { addresses.asMutable() }
     }
 
     @Test
@@ -821,6 +867,23 @@ class FrameTest {
 
         frame {
             assertEquals(numbers[0], 10)
+        }
+    }
+
+    @Test
+    fun testModelList_MutableIterator() {
+        val numbers = frame {
+            modelListOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+        }
+
+        frame {
+            numbers.removeIf { it % 2 == 0 }
+        }
+
+        frame {
+            for (i in numbers) {
+                assertTrue(i and 1 == 1)
+            }
         }
     }
 
@@ -1206,4 +1269,13 @@ class AddressProp(streetValue: String) {
     var street: String
         get() = _street
         set(value) { _street = value }
+}
+
+// Provide an implemtation of java.util.Collection.removeIf for common target
+fun <T> MutableIterable<T>.removeIf(predicate: (T) -> Boolean) {
+    val iterator = this.iterator()
+    while (iterator.hasNext()) {
+        val value = iterator.next()
+        if (predicate(value)) iterator.remove()
+    }
 }
