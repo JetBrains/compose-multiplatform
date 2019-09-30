@@ -64,6 +64,7 @@ val API_LINT_ARGS: List<String> = listOf(
         "ManagerLookup", // Managers in androidx are not the same as platfrom services
         "ManagerConstructor",
         "RethrowRemoteException", // This check is for calls into system_server
+        "PackageLayering", // This check is not relevant to androidx.* code.
 
         // List of checks that have bugs, but should be enabled once fixed.
         "GetterSetterNames", // b/135498039
@@ -97,7 +98,6 @@ val API_LINT_ARGS: List<String> = listOf(
     listOf(
         "MinMaxConstant",
         "SetterReturnsThis",
-        "PackageLayering",
         "OverlappingConstants",
         "IllegalStateException"
     ).joinToString()
