@@ -17,6 +17,7 @@
 package androidx.build
 
 import androidx.benchmark.gradle.BenchmarkPlugin
+import androidx.build.StudioTask.Companion.registerStudioTask
 import androidx.build.SupportConfig.BUILD_TOOLS_VERSION
 import androidx.build.SupportConfig.COMPILE_SDK_VERSION
 import androidx.build.SupportConfig.DEFAULT_MIN_SDK_VERSION
@@ -380,6 +381,9 @@ class AndroidXPlugin : Plugin<Project> {
                 buildOnServerDependentActions.forEach { it() }
             }
         }
+
+        registerStudioTask()
+
         TaskUpToDateValidator.setup(project)
     }
 
