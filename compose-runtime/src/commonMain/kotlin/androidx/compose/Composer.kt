@@ -710,8 +710,8 @@ open class Composer<N>(
                             val ambient = slots.get(index + 1)
                             if (ambient == key) {
                                 val scope = slots.get(index + 2)
-                                if (scope is JoinScope) {
-                                    scope.invalidateCallback?.let { it(false) }
+                                if (scope is RecomposeScope) {
+                                    scope.invalidate()
                                 }
                             }
                         }

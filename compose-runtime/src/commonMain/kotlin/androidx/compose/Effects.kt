@@ -803,6 +803,7 @@ class State<T> @PublishedApi internal constructor(value: T) : Framed {
  */
 @CheckResult("+")
 fun <T> ambient(key: Ambient<T>) = effectOf<T> {
+    context.currentRecomposeScope?.used = true
     context.consume(key)
 }
 
