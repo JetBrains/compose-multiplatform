@@ -93,6 +93,7 @@ class ModelList<T> : MutableList<T>, Framed {
                 currentId -> {
                     // Convert list to being writable
                     currentIterator = modelList.writable.list.listIterator(index)
+                    repeat(-nextCount) { currentIterator.previous() }
                     repeat(nextCount) { currentIterator.next() }
                     readId = -1
                 }

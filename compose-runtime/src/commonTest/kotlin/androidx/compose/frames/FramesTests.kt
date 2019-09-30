@@ -730,6 +730,14 @@ class FrameTest {
                 )
             )
         }
+
+        mutate(index = 5) {
+            it.previous()
+            it.previous()
+            it.previous()
+            it.next()
+            it.add(Address(NEW_STREET, NEW_CITY))
+        }
     }
 
     @Test
