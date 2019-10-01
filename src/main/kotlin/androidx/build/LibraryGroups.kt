@@ -25,6 +25,7 @@ object LibraryGroups {
     val ANIMATION = LibraryGroup("androidx.animation", false)
     val ANNOTATION = LibraryGroup("androidx.annotation", false)
     val APPCOMPAT = LibraryGroup("androidx.appcompat", false)
+    val APPSEARCH = LibraryGroup("androidx.appsearch")
     val ARCH_CORE = LibraryGroup("androidx.arch.core")
     val ASYNCLAYOUTINFLATER = LibraryGroup("androidx.asynclayoutinflater")
     val AUTOFILL = LibraryGroup("androidx.autofill")
