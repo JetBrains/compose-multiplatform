@@ -28,6 +28,7 @@ buildscript {
 
 plugins {
     id("AndroidXPlugin")
+    id("java")
 }
 
 apply plugin: 'org.anarres.jarjar'
