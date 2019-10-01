@@ -473,7 +473,6 @@ class EffectsTests {
         }
     }
 
-
     @Test
     fun testOnDispose1() {
         var mount = true
@@ -490,13 +489,13 @@ class EffectsTests {
                 call(
                     168,
                     { true },
-                    { @Suppress("PLUGIN_ERROR") DisposeLogger(msg="onDispose:1") }
+                    { @Suppress("PLUGIN_ERROR") DisposeLogger(msg = "onDispose:1") }
                 )
                 if (mount) {
                     call(
                         169,
                         { true },
-                        { @Suppress("PLUGIN_ERROR") DisposeLogger(msg="onDispose:2") }
+                        { @Suppress("PLUGIN_ERROR") DisposeLogger(msg = "onDispose:2") }
                     )
                 }
             }
@@ -694,6 +693,70 @@ class EffectsTests {
             buttonCreated = false
             requestRecompose?.invoke()
         }.then {
+            assertFalse("Expected button to not be recreated", buttonCreated)
+        }
+    }
+
+    @Test
+    @MediumTest
+    fun testAmbient_RecomposeScope() {
+        val MyAmbient = Ambient.of<Int>("Hello") { throw Exception("not set") }
+
+        var requestRecompose: (() -> Unit)? = null
+        var buttonCreated = false
+        var componentComposed = false
+        var ambientValue = 1
+
+        fun SimpleComposable2() {
+            with(composer) {
+                composer.startRestartGroup(712)
+                componentComposed = true
+                val value = +ambient(MyAmbient)
+                emit(534, { context -> TextView(context) }, {
+                    set("$value") { text = it }
+                })
+                composer.endRestartGroup()?.updateScope { SimpleComposable2() }
+            }
+        }
+
+        fun SimpleComposable() {
+            composer.call(531, { true }) {
+                Recompose {
+                    requestRecompose = it
+                    composer.provideAmbient(MyAmbient, ambientValue++) {
+                        composer.call(523, { false }) { SimpleComposable2() }
+                        composer.emitView(525) { context ->
+                            Button(context).also {
+                                buttonCreated = true
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        fun Root() {
+            with(composer) {
+                call(547, { false }) {
+                    SimpleComposable()
+                }
+            }
+        }
+
+        compose(manualRecompose = true) {
+            with(composer) {
+                call(556, { false }) {
+                    Root()
+                }
+            }
+        }.then {
+            assertTrue("Expected component to be composed", componentComposed)
+            assertTrue("Expected button to be created", buttonCreated)
+            buttonCreated = false
+            componentComposed = false
+            requestRecompose?.invoke()
+        }.then {
+            assertTrue("Expected component to be composed", componentComposed)
             assertFalse("Expected button to not be recreated", buttonCreated)
         }
     }
