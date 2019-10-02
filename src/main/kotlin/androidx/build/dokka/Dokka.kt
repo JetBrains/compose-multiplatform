@@ -105,6 +105,8 @@ object Dokka {
         outputFormat: String,
         dacRoot: String
     ): TaskProvider<DokkaAndroidTask> {
+        // This function creates and configures a DokkaAndroidTask.
+        // The meanings of these parameters are documented at https://github.com/kotlin/dokka
 
         val docTaskName = generatorTaskNameForType(docsType, language)
 
@@ -130,6 +132,14 @@ object Dokka {
                 .resolve("package-lists/coroutinesCore/package-list").toUri().toURL()
         }.build()
 
+        val androidLink = DokkaConfiguration.ExternalDocumentationLink.Builder().apply {
+            this.url = URL("https://developer.android.com/reference/")
+
+            this.packageListUrl = project.projectDir.toPath()
+                .resolve("package-lists/android/package-list").toUri().toURL()
+        }.build()
+
+
         return project.tasks.register(docTaskName, DokkaAndroidTask::class.java) { task ->
             task.moduleName = project.name
             task.outputDirectory = File(project.buildDir, docTaskName).absolutePath
@@ -142,12 +152,17 @@ object Dokka {
             task.externalDocumentationLinks.add(guavaDocLink)
             task.externalDocumentationLinks.add(kotlinLangLink)
             task.externalDocumentationLinks.add(coroutinesCoreLink)
+            task.externalDocumentationLinks.add(androidLink)
             for (hiddenPackage in hiddenPackages) {
                 val opts = PackageOptions()
                 opts.prefix = hiddenPackage
                 opts.suppress = true
                 task.perPackageOptions.add(opts)
             }
+            // TODO(https://github.com/Kotlin/dokka/issues/508) migrate to 'offline' when it exists
+            task.noJdkLink = true
+            task.noStdlibLink = true
+            task.noAndroidSdkLink = true
         }
     }
 
