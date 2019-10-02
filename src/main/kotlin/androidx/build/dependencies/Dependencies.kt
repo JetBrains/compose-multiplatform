@@ -50,7 +50,7 @@ const val INTELLIJ_ANNOTATIONS = "com.intellij:annotations:12.0"
 const val JAVAPOET = "com.squareup:javapoet:1.8.0"
 const val JSR250 = "javax.annotation:javax.annotation-api:1.2"
 const val JUNIT = "junit:junit:4.12"
-const val KOTLINPOET = "com.squareup:kotlinpoet:1.1.0"
+const val KOTLINPOET = "com.squareup:kotlinpoet:1.4.0"
 const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.20"
 
 const val COMPOSE_VERSION = "1.3.50-compose-20190806"
