@@ -68,7 +68,7 @@ open class BuildOnServer : DefaultTask() {
         val missingFiles = mutableListOf<String>()
         getRequiredFiles().forEach { file ->
             if (!file.exists()) {
-                missingFiles.add(file.name)
+                missingFiles.add(file.path)
             }
         }
 
