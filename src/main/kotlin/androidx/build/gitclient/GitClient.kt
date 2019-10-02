@@ -277,6 +277,12 @@ data class Commit(
     var changeId: String = ""
     var summary: String = ""
     var type: CommitType = CommitType.BUG_FIX
+    var releaseNote: String = ""
+    private val releaseNoteDelimiters: List<String> = listOf(
+        "Release notes:",
+        "Release Notes:",
+        "release notes:"
+    )
 
     init {
         val listedCommit: List<String> = gitCommit.split('\n')
@@ -300,6 +306,11 @@ data class Commit(
                 "fixes b/" in line
             ) {
                 getBugsFromGitLine(line)
+            }
+            releaseNoteDelimiters.forEach { delimiter ->
+                if (delimiter in line) {
+                    getReleaseNotesFromGitLine(line, gitCommit)
+                }
             }
             if (projectDir.trim('/') in line) {
                 getFileFromGitLine(line)
@@ -369,6 +380,64 @@ data class Commit(
             var possibleBug: Int? = word.toIntOrNull()
             if (possibleBug != null && possibleBug > 1000) {
                 bugs.add(possibleBug)
+            }
+        }
+    }
+
+    /**
+     * Reads in the release notes field from the git commit message line
+     *
+     * They can have a couple valid formats:
+     *
+     * `Release notes: This is a one-line release note`
+     * `Release Notes: "This is a multi-line release note.  This accounts for the use case where
+     *                  the commit cannot be explained in one line"
+     * `release notes: "This is a one-line release note.  The quotes can be used this way too"`
+     */
+    private fun getReleaseNotesFromGitLine(line: String, gitCommit: String) {
+        /* Account for the use of quotes in a release note line
+         * No quotes in the Release Note line means it's a one-line release note
+         * If there are quotes, assume it's a multi-line release note
+         */
+        var quoteCountInRelNoteLine: Int = 0
+        line.forEach { character ->
+            if (character == '"') { quoteCountInRelNoteLine++ }
+        }
+        if (quoteCountInRelNoteLine == 0) {
+            getOneLineReleaseNotesFromGitLine(line)
+        } else {
+            releaseNoteDelimiters.forEach { delimiter ->
+                if (delimiter in line) {
+                    // Find the starting quote of the release notes quote block
+                    var releaseNoteStartIndex: Int = gitCommit.lastIndexOf(delimiter)
+                        + delimiter.length
+                    releaseNoteStartIndex = gitCommit.indexOf('"', releaseNoteStartIndex)
+                    // Move to the character after the first quote
+                    if (gitCommit[releaseNoteStartIndex] == '"') {
+                        releaseNoteStartIndex++
+                    }
+                    // Find the ending quote of the release notes quote block
+                    var releaseNoteEndIndex = releaseNoteStartIndex + 1
+                    releaseNoteEndIndex = gitCommit.indexOf('"', releaseNoteEndIndex)
+                    // If there is no closing quote, just use the first line
+                    if (releaseNoteEndIndex < 0) {
+                        getOneLineReleaseNotesFromGitLine(line)
+                        return
+                    }
+                    releaseNote = gitCommit.substring(
+                        startIndex = releaseNoteStartIndex,
+                        endIndex = releaseNoteEndIndex
+                    ).trim()
+                }
+            }
+        }
+    }
+
+    private fun getOneLineReleaseNotesFromGitLine(line: String) {
+        releaseNoteDelimiters.forEach { delimiter ->
+            if (delimiter in line) {
+                releaseNote = line.substringAfter(delimiter).trim(' ', '"')
+                return
             }
         }
     }
