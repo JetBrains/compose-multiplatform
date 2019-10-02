@@ -22,7 +22,7 @@ import org.gradle.api.tasks.JavaExec
 
 private fun Project.getKtlintConfiguration(): Configuration {
     return configurations.findByName("ktlint") ?: configurations.create("ktlint") {
-        val dependency = dependencies.create("com.pinterest:ktlint:0.33.0")
+        val dependency = dependencies.create("com.pinterest:ktlint:0.34.2")
         it.dependencies.add(dependency)
     }
 }
