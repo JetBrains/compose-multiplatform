@@ -37,6 +37,8 @@ configurations {
     jarFiles
 }
 
+// This dependency isn't seen by Jetpad because that artifact declares Publish.NONE
+// This dependency doesn't appear in the .pom because the dependency is of type jarFile
 dependencies {
     jarFiles(project(":compose:compose-compiler-hosted")) {
         transitive = false
