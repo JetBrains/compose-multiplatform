@@ -673,6 +673,13 @@ class AndroidXPlugin : Plugin<Project> {
             } else {
                 task.date = LocalDate.now()
             }
+            /* releaseNotesAllCommits: For use during the migration to using release note fields,
+             * or in the case where a team forgot to include a release notes field in their commit
+             * messages
+             */
+            if (project.hasProperty("releaseNotesAllCommits")) {
+                task.includeAllCommits = true
+            }
             task.outputFile.set(
                 File(
                     project.getReleaseNotesDirectory(),

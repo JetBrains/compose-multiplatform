@@ -48,6 +48,8 @@ open class GenerateReleaseNotesTask : DefaultTask() {
     lateinit var date: LocalDate
     @Input
     var keepMerges: Boolean = false
+    @Input
+    var includeAllCommits: Boolean = false
 
     @OutputFile
     val outputFile: Property<File> = project.objects.property(File::class.java)
@@ -121,7 +123,8 @@ open class GenerateReleaseNotesTask : DefaultTask() {
             date,
             startSHA,
             endSHA,
-            getProjectSpecificDirectory()
+            getProjectSpecificDirectory(),
+            includeAllCommits
         )
 
         if (commitList.isEmpty()) {
