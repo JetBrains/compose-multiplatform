@@ -21,7 +21,6 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import androidx.test.filters.SmallTest
 import androidx.test.rule.ActivityTestRule
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
@@ -30,7 +29,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@SmallTest
 @RunWith(AndroidJUnit4::class)
 @Suppress("PLUGIN_WARNING")
 class EffectsTests {

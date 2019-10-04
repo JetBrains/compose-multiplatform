@@ -38,16 +38,24 @@ internal actual fun recordSourceKeyInfo(key: Any) {
             //  2: recordSourceKey()
             //  3: start()
             //  4: startGroup() or startNode()
-            //  5: <calling method>
+            //  5: non-inline call/emit?
+            //  5 or 6: <calling method>
             // On a desktop VM this looks like:
             //  0: getStackTrace()
             //  1: recordSourceKey()
             //  2: start()
             //  3: startGroup() or startNode()
-            //  4: <calling method>
+            //  4: non-inline call/emit?
+            //  4 or 5: <calling method>
             // If the stack method at 4 is startGroup assume we want 5 instead.
-            val frame = stack[4].let {
-                if (it.methodName == "startGroup" || it.methodName == "startNode") stack[5] else it
+            val frameNumber = stack[4].let {
+                if (it.methodName == "startGroup" || it.methodName == "startNode") 5 else 4
+            }
+            val frame = stack[frameNumber].let {
+                if (it.methodName == "call" || it.methodName == "emit")
+                    stack[frameNumber + 1]
+                else
+                    stack[frameNumber]
             }
             "${frame.fileName}:${frame.lineNumber}"
         })

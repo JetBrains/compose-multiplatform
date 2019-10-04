@@ -27,7 +27,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.SmallTest
 import androidx.test.rule.ActivityTestRule
 import junit.framework.TestCase.assertEquals
 import org.junit.Rule
@@ -47,7 +46,6 @@ class TestActivity : Activity() {
     }
 }
 
-@SmallTest
 @RunWith(AndroidJUnit4::class)
 class NewCodeGenTests {
 
@@ -977,7 +975,6 @@ class DisposeTests {
     }
 
     @Test
-    @SmallTest
     fun testDisposeComposition() {
         val log = mutableListOf<String>()
 

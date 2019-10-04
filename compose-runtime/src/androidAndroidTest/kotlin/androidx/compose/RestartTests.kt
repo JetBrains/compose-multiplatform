@@ -19,7 +19,6 @@ package androidx.compose
 import android.app.Activity
 import android.widget.TextView
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.SmallTest
 import androidx.test.rule.ActivityTestRule
 import junit.framework.TestCase
 import org.junit.Rule
@@ -28,7 +27,6 @@ import org.junit.runner.RunWith
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
-@SmallTest
 @RunWith(AndroidJUnit4::class)
 class RestartTests {
     @get:Rule

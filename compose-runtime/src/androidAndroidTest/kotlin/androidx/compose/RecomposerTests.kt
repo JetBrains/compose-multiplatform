@@ -22,8 +22,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.compose.frames.currentFrame
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.MediumTest
-import androidx.test.filters.SmallTest
 import androidx.test.rule.ActivityTestRule
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
@@ -43,7 +41,6 @@ class ComposerCompositionContextTests : ComposerComposeTestCase() {
         compose(activityRule.activity, manualRecompose = manualRecompose, composable = composable)
 
     @Test
-    @SmallTest
     fun testNativeViewWithAttributes() {
         compose {
             with(it) {
@@ -64,7 +61,6 @@ class ComposerCompositionContextTests : ComposerComposeTestCase() {
     }
 
     @Test
-    @SmallTest
     fun testSlotKeyChangeCausesRecreate() {
         var i = 1
         var tv1: TextView? = null
@@ -100,7 +96,6 @@ class ComposerCompositionContextTests : ComposerComposeTestCase() {
     }
 
     @Test
-    @SmallTest
     fun testViewWithViewChildren() {
         compose {
             // LinearLayout(id = 345) {>
@@ -139,7 +134,6 @@ class ComposerCompositionContextTests : ComposerComposeTestCase() {
     }
 
     @Test
-    @SmallTest
     fun testForLoop() {
         val items = listOf(1, 2, 3, 4, 5, 6)
         compose {
@@ -172,7 +166,6 @@ class ComposerCompositionContextTests : ComposerComposeTestCase() {
     }
 
     @Test
-    @SmallTest
     fun testRecompose() {
         val counter = Counter()
 
@@ -220,7 +213,6 @@ class ComposerCompositionContextTests : ComposerComposeTestCase() {
     }
 
     @Test
-    @SmallTest
     fun testRecomposeSync() {
         val counter = Counter()
 
@@ -271,7 +263,6 @@ class ComposerCompositionContextTests : ComposerComposeTestCase() {
     }
 
     @Test
-    @SmallTest
     fun testRootRecompose() {
         val counter = Counter()
 
@@ -325,7 +316,6 @@ class ComposerCompositionContextTests : ComposerComposeTestCase() {
         }
     }
     @Test
-    @SmallTest
     fun testRootRecomposeSync() {
         val counter = Counter()
 
@@ -444,7 +434,6 @@ class ComposerCompositionContextTests : ComposerComposeTestCase() {
     }
 
     @Test
-    @SmallTest
     fun testCorrectViewTree() {
         compose {
             // LinearLayout {
@@ -474,7 +463,6 @@ class ComposerCompositionContextTests : ComposerComposeTestCase() {
     }
 
     @Test
-    @SmallTest
     fun testCorrectViewTreeWithComponents() {
 
         class B : Component() {
@@ -524,7 +512,6 @@ class ComposerCompositionContextTests : ComposerComposeTestCase() {
     }
 
     @Test
-    @MediumTest
     fun testCorrectViewTreeWithComponentWithMultipleRoots() {
 
         class B : Component() {
@@ -578,7 +565,6 @@ class ComposerCompositionContextTests : ComposerComposeTestCase() {
     }
 
     @Test
-    @SmallTest
     fun testFrameTransition() {
         var frameId: Int? = null
         compose {

@@ -92,7 +92,6 @@ internal constructor(private val key: String, private val defaultFactory: (() ->
         ) = Ambient(key, defaultFactory)
     }
 
-    override fun hashCode() = key.hashCode()
     override fun equals(other: Any?) = this === other
     override fun toString(): String = "Ambient<$key>"
 
