@@ -82,7 +82,7 @@ abstract class UpdateApiTask : DefaultTask() {
             copy(
                 inputApi.experimentalApiFile,
                 outputApi.experimentalApiFile,
-                permitOverwriting,
+                true,
                 project.logger
             )
             if (updateRestrictedAPIs) {
