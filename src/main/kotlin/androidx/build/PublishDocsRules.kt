@@ -56,7 +56,8 @@ val RELEASE_RULE = docsRules("public", false) {
     // branch. There is no reason to push a new release for docs only,
     // so we build docs against the fake prebuilt. This prebuilt is identical
     // to 1.0.0 release modulo changes in docs.
-    prebuilts(LibraryGroups.CONCURRENT, "1.0.0-fixeddocs01")
+    prebuilts(LibraryGroups.CONCURRENT, "concurrent-futures", "1.0.0-fixeddocs01")
+    ignore(LibraryGroups.CONCURRENT.group, "concurrent-futures-ktx")
     prebuilts(LibraryGroups.CONTENTPAGER, "1.0.0")
     prebuilts(LibraryGroups.COORDINATORLAYOUT, "1.1.0-rc01")
     prebuilts(LibraryGroups.CORE, "core", "1.2.0-beta02")
