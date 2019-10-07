@@ -17,6 +17,7 @@
 package androidx.build.dependencies
 
 const val ANDROID_GRADLE_PLUGIN = "com.android.tools.build:gradle:3.4.2"
+const val ANDROID_GRADLE_PLUGIN_3_6 = "com.android.tools.build:gradle:3.6.0-alpha12"
 const val ANDROIDX_TEST_CORE = "androidx.test:core:1.2.0"
 const val ANDROIDX_TEST_EXT_JUNIT = "androidx.test.ext:junit:1.1.1"
 const val ANDROIDX_TEST_EXT_KTX = "androidx.test.ext:junit-ktx:1.1.1"
