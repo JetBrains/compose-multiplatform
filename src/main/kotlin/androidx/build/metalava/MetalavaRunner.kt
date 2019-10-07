@@ -73,7 +73,6 @@ val API_LINT_ARGS: List<String> = listOf(
         "StartWithLower", // b/135710527
 
         // The list of checks that are API lint warnings and are yet to be enabled
-        "IntentBuilderName",
         "OnNameExpected",
         "TopLevelBuilder",
         "BuilderSetStyle",
@@ -90,7 +89,10 @@ val API_LINT_ARGS: List<String> = listOf(
         "NoByteOrShort",
         "CommonArgsFirst",
         "SamShouldBeLast",
-        "MissingJvmStatic"
+        "MissingJvmStatic",
+
+        // We should only treat these as warnings
+        "IntentBuilderName"
     ).joinToString(),
     "--error",
     listOf(
