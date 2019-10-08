@@ -22,8 +22,3 @@ dependencies {
     implementation build_libs.kotlin.stdlib
     api("androidx.annotation:annotation:1.0.0")
 }
-jar {
-    manifest {
-        attributes('Lint-Registry-v2': 'androidx.build.lint.AndroidXIssueRegistry')
-    }
-}
