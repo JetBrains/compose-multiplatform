@@ -36,7 +36,7 @@ import org.junit.runners.MethodSorters
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-class ComposeBenchmark: ComposeBenchmarkBase() {
+class ComposeBenchmark : ComposeBenchmarkBase() {
 
     @UiThreadTest
     @Test
@@ -149,7 +149,6 @@ class ComposeBenchmark: ComposeBenchmarkBase() {
             }
         }
     }
-
 }
 
 private val color = Color.Yellow

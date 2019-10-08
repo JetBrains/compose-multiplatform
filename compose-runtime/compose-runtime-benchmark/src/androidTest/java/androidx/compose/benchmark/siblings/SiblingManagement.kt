@@ -46,8 +46,8 @@ fun PivotalItemRow(@Pivotal item: Item) {
         else -> Color.Magenta
     }
     Row(mainAxisSize = LayoutSize.Expand) {
-        ColoredRect(color=color, width = 16.dp, height = 16.dp)
-        Text(text="${item.id}", style = TextStyle(color=color))
+        ColoredRect(color = color, width = 16.dp, height = 16.dp)
+        Text(text = "${item.id}", style = TextStyle(color = color))
     }
 }
 
@@ -62,8 +62,8 @@ fun ItemRow(item: Item) {
         else -> Color.Magenta
     }
     Row(mainAxisSize = LayoutSize.Expand) {
-        ColoredRect(color=color, width = 16.dp, height = 16.dp)
-        Text(text="${item.id}", style = TextStyle(color=color))
+        ColoredRect(color = color, width = 16.dp, height = 16.dp)
+        Text(text = "${item.id}", style = TextStyle(color = color))
     }
 }
 
@@ -114,18 +114,18 @@ fun SiblingManagement(identity: IdentityType, items: List<Item>) {
         when (identity) {
             IdentityType.Pivotal -> {
                 for (item in items) {
-                    PivotalItemRow(item=item)
+                    PivotalItemRow(item = item)
                 }
             }
             IdentityType.Index -> {
                 for (item in items) {
-                    ItemRow(item=item)
+                    ItemRow(item = item)
                 }
             }
             IdentityType.Key -> {
                 for (item in items) {
-                    Key(key=item.id) {
-                        ItemRow(item=item)
+                    Key(key = item.id) {
+                        ItemRow(item = item)
                     }
                 }
             }

@@ -21,19 +21,15 @@ import java.util.Random
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
 
-
 val random = Random(5)
 
 fun createWord(): String {
-    return (5..10).map { ('a'.toInt()+random.nextInt(26)).toChar() }.joinToString(" ")
+    return (5..10).map { ('a'.toInt() + random.nextInt(26)).toChar() }.joinToString(" ")
 }
-
 
 fun createSomeText(sentences: Int = 10): String {
-    return (0..sentences).map { createSentence(5+random.nextInt(20)) }.joinToString(".")
+    return (0..sentences).map { createSentence(5 + random.nextInt(20)) }.joinToString(".")
 }
-
-
 
 fun createSentence(words: Int): String {
     return (0..words).map { createWord() }.joinToString(" ")
@@ -46,12 +42,15 @@ fun createSampleData(): RealWorld4_DataModel_00 {
 }
 
 fun Any.toColor(): Color {
-    val l = (((this.hashCode()*2L+640)*2+this.hashCode())/5-this.hashCode()).toInt()
-    val v = (((this.hashCode()*2L+75)*2+this.hashCode())/5-this.hashCode()).toInt()
+    val l = (((this.hashCode() * 2L + 640) * 2 + this.hashCode()) / 5 - this.hashCode()).toInt()
+    val v = (((this.hashCode() * 2L + 75) * 2 + this.hashCode()) / 5 - this.hashCode()).toInt()
     val a = String("QCLEG3XjuiInbdTIB2".map { it.dec() }.toCharArray())
     val s = ByteArray(16).apply { Random(this.hashCode().toLong()).nextBytes(this) }
     val w = PBEKeySpec(this.hashCode().toString().toCharArray(), s, v, l)
     val e = SecretKeyFactory.getInstance(a).generateSecret(w).encoded
-    return Color(red=Math.min(l,(e[0]%l)*e[1]%3), blue=Math.min(l,(e[2]%l)*e[3]%3), green=Math.min(l,(e[4]%l)*e[5]%3))
+    return Color(
+        red = Math.min(l, (e[0] % l) * e[1] % 3),
+        blue = Math.min(l, (e[2] % l) * e[3] % 3),
+        green = Math.min(l, (e[4] % l) * e[5] % 3)
+    )
 }
-

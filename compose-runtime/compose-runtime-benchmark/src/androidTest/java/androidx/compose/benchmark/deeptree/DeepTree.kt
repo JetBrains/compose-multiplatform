@@ -70,15 +70,15 @@ fun Container(children: @Composable() () -> Unit) {
  */
 @Suppress("UNUSED_PARAMETER")
 @Composable
-fun DeepTree(depth: Int, breadth: Int,  wrap: Int, id: Int = 0) {
+fun DeepTree(depth: Int, breadth: Int, wrap: Int, id: Int = 0) {
 //    if (wrap > 0) {
 //        Container {
 //            DeepTree(depth=depth, breadth=breadth, wrap=wrap - 1, id=id)
 //        }
 //    } else {
-        Stack(vertical=depth % 2 == 0) {
+        Stack(vertical = depth % 2 == 0) {
             if (depth == 0) {
-                Terminal(style=id % 3)
+                Terminal(style = id % 3)
             } else {
                 repeat(breadth) {
                     ColoredRect(color = Color.Blue, height = 16.dp, width = 16.dp)
