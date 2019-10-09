@@ -29,7 +29,7 @@ fun isRunningOnBuildServer() = System.getenv("DIST_DIR") != null
  * distribution directory name.
  */
 fun getBuildId(): String {
-    return if (System.getenv("DIST_DIR") != null) File(System.getenv("DIST_DIR")).name else "0"
+    return if (System.getenv("DIST_DIR") != null) File(System.getenv("DIST_DIR").removeSuffix("/ui")).name else "0"
 }
 
 /**
