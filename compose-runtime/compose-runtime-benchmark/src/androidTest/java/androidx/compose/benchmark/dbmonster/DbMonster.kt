@@ -82,8 +82,8 @@ fun Table(children: @Composable() () -> Unit) {
 fun QueryColumn(query: Query) {
     // TODO: we could do some conditional styling here which would make the test better
     Column(mainAxisSize = LayoutSize.Expand) {
-        Text(text="${query.elapsed}")
-        Text(text=query.query)
+        Text(text = "${query.elapsed}")
+        Text(text = query.query)
     }
 }
 
@@ -93,8 +93,8 @@ fun DatabaseRow(db: Database) {
     val columns = 5
     val topQueries = db.topQueries(columns)
     Row(mainAxisSize = LayoutSize.Expand) {
-        Column(mainAxisSize = LayoutSize.Expand) { Text(text=db.name) }
-        Column(mainAxisSize = LayoutSize.Expand) { Text(text="${db.queries.size}") }
+        Column(mainAxisSize = LayoutSize.Expand) { Text(text = db.name) }
+        Column(mainAxisSize = LayoutSize.Expand) { Text(text = "${db.queries.size}") }
         topQueries.forEach { query ->
             QueryColumn(query = query)
         }

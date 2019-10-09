@@ -27,39 +27,46 @@ import java.util.Random
 
 @Model
 class RealWorld4_DataModel_09() {
-    var f0: Color = Color(red=random.nextInt(255), green=random.nextInt(255), blue=random.nextInt(255))
+    var f0: Color =
+        Color(red = random.nextInt(255), green = random.nextInt(255), blue = random.nextInt(255))
     var f1: String = smallRange().map { createSomeText() }.joinToString("\n")
     var f2: RealWorld4_DataModel_10 = RealWorld4_DataModel_10()
     var f3: Boolean = random.nextBoolean()
-    var f4: Color = Color(red=random.nextInt(255), green=random.nextInt(255), blue=random.nextInt(255))
+    var f4: Color =
+        Color(red = random.nextInt(255), green = random.nextInt(255), blue = random.nextInt(255))
     var f5: RealWorld4_DataModel_10 = RealWorld4_DataModel_10()
- }
+}
 
 @Model
 class RealWorld4_DataModel_06() {
     var f0: Boolean = random.nextBoolean()
     var f1: Int = random.nextInt()
     var f2: Boolean = random.nextBoolean()
-    var f3: Color = Color(red=random.nextInt(255), green=random.nextInt(255), blue=random.nextInt(255))
-    var f4: Color = Color(red=random.nextInt(255), green=random.nextInt(255), blue=random.nextInt(255))
+    var f3: Color =
+        Color(red = random.nextInt(255), green = random.nextInt(255), blue = random.nextInt(255))
+    var f4: Color =
+        Color(red = random.nextInt(255), green = random.nextInt(255), blue = random.nextInt(255))
     var f5: Int = random.nextInt()
     var f6: Int = random.nextInt()
-    var f7: Color = Color(red=random.nextInt(255), green=random.nextInt(255), blue=random.nextInt(255))
-    var f8: Color = Color(red=random.nextInt(255), green=random.nextInt(255), blue=random.nextInt(255))
+    var f7: Color =
+        Color(red = random.nextInt(255), green = random.nextInt(255), blue = random.nextInt(255))
+    var f8: Color =
+        Color(red = random.nextInt(255), green = random.nextInt(255), blue = random.nextInt(255))
     var f9: Int = random.nextInt()
     var f10: RealWorld4_DataModel_07 = RealWorld4_DataModel_07()
     var f11: RealWorld4_DataModel_07 = RealWorld4_DataModel_07()
- }
+}
 
 @Model
 class RealWorld4_DataModel_08() {
     var f0: RealWorld4_DataModel_09 = RealWorld4_DataModel_09()
     var f1: String = smallRange().map { createSomeText() }.joinToString("\n")
-    var f2: Color = Color(red=random.nextInt(255), green=random.nextInt(255), blue=random.nextInt(255))
+    var f2: Color =
+        Color(red = random.nextInt(255), green = random.nextInt(255), blue = random.nextInt(255))
     var f3: Int = random.nextInt()
     var f4: RealWorld4_DataModel_09 = RealWorld4_DataModel_09()
     var f5: String = smallRange().map { createSomeText() }.joinToString("\n")
- }
+}
 
 @Model
 class RealWorld4_DataModel_10() {
@@ -67,7 +74,7 @@ class RealWorld4_DataModel_10() {
     var f1: Int = random.nextInt()
     var f2: Boolean = random.nextBoolean()
     var f3: Boolean = random.nextBoolean()
- }
+}
 
 @Model
 class RealWorld4_DataModel_07() {
@@ -79,19 +86,22 @@ class RealWorld4_DataModel_07() {
     var f5: RealWorld4_DataModel_08 = RealWorld4_DataModel_08()
     var f6: String = smallRange().map { createSomeText() }.joinToString("\n")
     var f7: RealWorld4_DataModel_08 = RealWorld4_DataModel_08()
- }
+}
 
 @Model
 class RealWorld4_DataModel_05() {
     var f0: RealWorld4_DataModel_06 = RealWorld4_DataModel_06()
-    var f1: Color = Color(red=random.nextInt(255), green=random.nextInt(255), blue=random.nextInt(255))
-    var f2: Color = Color(red=random.nextInt(255), green=random.nextInt(255), blue=random.nextInt(255))
-    var f3: Color = Color(red=random.nextInt(255), green=random.nextInt(255), blue=random.nextInt(255))
+    var f1: Color =
+        Color(red = random.nextInt(255), green = random.nextInt(255), blue = random.nextInt(255))
+    var f2: Color =
+        Color(red = random.nextInt(255), green = random.nextInt(255), blue = random.nextInt(255))
+    var f3: Color =
+        Color(red = random.nextInt(255), green = random.nextInt(255), blue = random.nextInt(255))
     var f4: Boolean = random.nextBoolean()
     var f5: Boolean = random.nextBoolean()
     var f6: RealWorld4_DataModel_06 = RealWorld4_DataModel_06()
     var f7: String = smallRange().map { createSomeText() }.joinToString("\n")
- }
+}
 
 @Model
 class RealWorld4_DataModel_00() {
@@ -100,25 +110,28 @@ class RealWorld4_DataModel_00() {
     var f2: RealWorld4_DataModel_01 = RealWorld4_DataModel_01()
     var f3: RealWorld4_DataModel_01 = RealWorld4_DataModel_01()
     var f4: Int = random.nextInt()
-    var f5: Color = Color(red=random.nextInt(255), green=random.nextInt(255), blue=random.nextInt(255))
+    var f5: Color =
+        Color(red = random.nextInt(255), green = random.nextInt(255), blue = random.nextInt(255))
     var f6: String = smallRange().map { createSomeText() }.joinToString("\n")
     var f7: Int = random.nextInt()
     var f8: Int = random.nextInt()
- }
+}
 
 @Model
 class RealWorld4_DataModel_02() {
     var f0: Int = random.nextInt()
     var f1: RealWorld4_DataModel_03 = RealWorld4_DataModel_03()
     var f2: Boolean = random.nextBoolean()
-    var f3: Color = Color(red=random.nextInt(255), green=random.nextInt(255), blue=random.nextInt(255))
+    var f3: Color =
+        Color(red = random.nextInt(255), green = random.nextInt(255), blue = random.nextInt(255))
     var f4: Int = random.nextInt()
     var f5: Int = random.nextInt()
     var f6: RealWorld4_DataModel_03 = RealWorld4_DataModel_03()
     var f7: Int = random.nextInt()
     var f8: Int = random.nextInt()
-    var f9: Color = Color(red=random.nextInt(255), green=random.nextInt(255), blue=random.nextInt(255))
- }
+    var f9: Color =
+        Color(red = random.nextInt(255), green = random.nextInt(255), blue = random.nextInt(255))
+}
 
 @Model
 class RealWorld4_DataModel_04() {
@@ -133,13 +146,14 @@ class RealWorld4_DataModel_04() {
     var f8: String = smallRange().map { createSomeText() }.joinToString("\n")
     var f9: String = smallRange().map { createSomeText() }.joinToString("\n")
     var f10: String = smallRange().map { createSomeText() }.joinToString("\n")
- }
+}
 
 @Model
 class RealWorld4_DataModel_01() {
     var f0: RealWorld4_DataModel_02 = RealWorld4_DataModel_02()
     var f1: Int = random.nextInt()
-    var f2: Color = Color(red=random.nextInt(255), green=random.nextInt(255), blue=random.nextInt(255))
+    var f2: Color =
+        Color(red = random.nextInt(255), green = random.nextInt(255), blue = random.nextInt(255))
     var f3: Boolean = random.nextBoolean()
     var f4: Boolean = random.nextBoolean()
     var f5: Int = random.nextInt()
@@ -153,14 +167,16 @@ class RealWorld4_DataModel_01() {
     var f13: Boolean = random.nextBoolean()
     var f14: Int = random.nextInt()
     var f15: RealWorld4_DataModel_02 = RealWorld4_DataModel_02()
- }
+}
 
 @Model
 class RealWorld4_DataModel_03() {
-    var f0: Color = Color(red=random.nextInt(255), green=random.nextInt(255), blue=random.nextInt(255))
+    var f0: Color =
+        Color(red = random.nextInt(255), green = random.nextInt(255), blue = random.nextInt(255))
     var f1: RealWorld4_DataModel_04 = RealWorld4_DataModel_04()
     var f2: Int = random.nextInt()
-    var f3: Color = Color(red=random.nextInt(255), green=random.nextInt(255), blue=random.nextInt(255))
+    var f3: Color =
+        Color(red = random.nextInt(255), green = random.nextInt(255), blue = random.nextInt(255))
     var f4: Boolean = random.nextBoolean()
     var f5: RealWorld4_DataModel_04 = RealWorld4_DataModel_04()
- }
+}
