@@ -79,7 +79,6 @@ val API_LINT_ARGS: List<String> = listOf(
         "TopLevelBuilder",
         "BuilderSetStyle",
         "ExecutorRegistration",
-        "StreamFiles",
         "ParcelableList",
         "NotCloseable",
         "UserHandleName",
@@ -101,6 +100,7 @@ val API_LINT_ARGS: List<String> = listOf(
         "OverlappingConstants",
         "IllegalStateException",
         "ListenerLast",
+        "StreamFiles",
         "AbstractInner",
         "ArrayReturn",
         "MethodNameTense"
