@@ -216,10 +216,15 @@ object Release {
         val version = extension.mavenVersion ?: throw IllegalArgumentException(
                 "Cannot register a project to release if it does not have a mavenVersion set up"
         )
-        val zipTasks = listOf(
-                getProjectOrGroupReleaseZipTask(project, extension),
+
+        var zipTasks: MutableList<TaskProvider<GMavenZipTask>> = mutableListOf()
+        if (!extension.mavenGroup!!.requireSameVersion) {
+            zipTasks.add(getProjectZipTask(project))
+        }
+        zipTasks.addAll(listOf(
+                getGroupReleaseZipTask(project, mavenGroup),
                 getGlobalReleaseZipTask(project),
-                getGlobalFullZipTask(project))
+                getGlobalFullZipTask(project)))
         val artifact = Artifact(
                 mavenGroup = mavenGroup,
                 projectName = project.name,
@@ -350,18 +355,6 @@ object Release {
             onRegister = {
             }
         )
-    }
-
-    private fun getProjectOrGroupReleaseZipTask(
-        project: Project,
-        extension: AndroidXExtension
-    ): TaskProvider<GMavenZipTask> {
-        val group = extension.mavenGroup
-        if (group!!.requireSameVersion) {
-            return getGroupReleaseZipTask(project, group.group)
-        } else {
-            return getProjectZipTask(project)
-        }
     }
 }
 
