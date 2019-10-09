@@ -28,12 +28,37 @@ private fun Project.getKtlintConfiguration(): Configuration {
 }
 
 fun Project.configureKtlint() {
+    // These classes use invalid Kotlin KTX syntax (b/131882889)
+    // We disable ktlint on these files as it crashes on them.
+    val disabledComposeClasses = listOf(
+        "!src/main/java/androidx/ui/core/Clip.kt",
+        "!src/main/java/androidx/ui/core/Draw.kt",
+        "!src/main/java/androidx/ui/core/DrawShadow.kt",
+        "!src/main/java/androidx/ui/core/Layout.kt",
+        "!src/main/java/androidx/ui/core/Opacity.kt",
+        "!src/main/java/androidx/ui/core/ParentData.kt",
+        "!src/main/java/androidx/ui/core/PointerInputWrapper.kt",
+        "!src/main/java/androidx/ui/core/RepaintBoundary.kt",
+        "!src/main/java/androidx/ui/core/Wrapper.kt",
+        "!src/main/java/androidx/ui/graphics/vector/VectorCompose.kt",
+        "!src/main/java/androidx/ui/semantics/Semantics.kt"
+    )
+
     tasks.register("ktlint", JavaExec::class.java) { task ->
         task.description = "Check Kotlin code style."
         task.group = "Verification"
         task.classpath = getKtlintConfiguration()
         task.main = "com.pinterest.ktlint.Main"
-        task.args = listOf("--android", "src/**/*.kt", "!src/**/test-data/**/*.kt")
+        task.args = listOf(
+            "--android",
+            "--disabled_rules",
+            // Unused imports check fails on compose. b/135698036
+            // Import ordering check does not match IJ default ordering.
+            // New line check at the end of file is not useful for our project.
+            "no-unused-imports,import-ordering,final-newline",
+            "src/**/*.kt",
+            "!src/**/test-data/**/*.kt"
+        ) + disabledComposeClasses
     }
 
     tasks.register("ktlintFormat", JavaExec::class.java) { task ->
@@ -41,6 +66,13 @@ fun Project.configureKtlint() {
         task.group = "formatting"
         task.classpath = getKtlintConfiguration()
         task.main = "com.pinterest.ktlint.Main"
-        task.args = listOf("--android", "-F", "src/**/*.kt", "!src/**/test-data/**/*.kt")
+        task.args = listOf(
+            "--android",
+            "-F",
+            "--disabled_rules",
+            "no-unused-imports,import-ordering,final-newline",
+            "src/**/*.kt",
+            "!src/**/test-data/**/*.kt"
+        ) + disabledComposeClasses
     }
 }
