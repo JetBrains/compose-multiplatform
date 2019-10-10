@@ -17,7 +17,7 @@
 package androidx.build.dependencies
 
 const val ANDROID_GRADLE_PLUGIN = "com.android.tools.build:gradle:3.4.2"
-const val ANDROID_GRADLE_PLUGIN_3_6 = "com.android.tools.build:gradle:3.6.0-alpha12"
+const val ANDROID_GRADLE_PLUGIN_3_6 = "com.android.tools.build:gradle:3.6.0-beta01"
 const val ANDROIDX_TEST_CORE = "androidx.test:core:1.2.0"
 const val ANDROIDX_TEST_EXT_JUNIT = "androidx.test.ext:junit:1.1.1"
 const val ANDROIDX_TEST_EXT_KTX = "androidx.test.ext:junit-ktx:1.1.1"
@@ -82,9 +82,9 @@ const val KOTLIN_COROUTINES_RX2 =
 const val LEAKCANARY_INSTRUMENTATION =
     "com.squareup.leakcanary:leakcanary-android-instrumentation:1.6.2"
 const val LINT_API_MIN = "com.android.tools.lint:lint-api:26.3.0"
-const val LINT_API_LATEST = "com.android.tools.lint:lint-api:26.6.0-alpha12"
-const val LINT_CORE = "com.android.tools.lint:lint:26.6.0-alpha12"
-const val LINT_TESTS = "com.android.tools.lint:lint-tests:26.6.0-alpha12"
+const val LINT_API_LATEST = "com.android.tools.lint:lint-api:26.6.0-beta01"
+const val LINT_CORE = "com.android.tools.lint:lint:26.6.0-beta01"
+const val LINT_TESTS = "com.android.tools.lint:lint-tests:26.6.0-beta01"
 const val MATERIAL = "com.google.android.material:material:1.0.0"
 const val MOCKITO_CORE = "org.mockito:mockito-core:2.19.0"
 const val MOCKITO_KOTLIN = "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0"
