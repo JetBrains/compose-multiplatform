@@ -23,7 +23,7 @@ if (kotlin_override != null) {
 } else {
     build_versions.kotlin = '1.3.41'
 }
-build_versions.lint = '26.6.0-alpha12'
+build_versions.lint = '26.6.0-beta01'
 build_versions.dokka = '0.9.17-g002'
 
 build_versions.studio = new Properties()
