@@ -54,7 +54,7 @@ const val JUNIT = "junit:junit:4.12"
 const val KOTLINPOET = "com.squareup:kotlinpoet:1.4.0"
 const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.20"
 
-const val COMPOSE_VERSION = "1.3.50-compose-20190806"
+const val COMPOSE_VERSION = "1.3.50-compose-20191004"
 private val isUiProject = System.getProperty("DIST_SUBDIR") == "/ui"
 private val KOTLIN_VERSION = if (isUiProject) COMPOSE_VERSION else "1.3.50"
 val KOTLIN_STDLIB = "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
