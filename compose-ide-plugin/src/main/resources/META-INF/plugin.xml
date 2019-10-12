@@ -26,31 +26,11 @@ The Jetpack Compose IDE plugin
     <idea-version since-build="191.5109.14" until-build="192.*"/>
     <depends>org.jetbrains.kotlin</depends>
 
-    <extensions defaultExtensionNs="com.intellij">
-        <completion.contributor language="kotlin" implementationClass="androidx.compose.plugins.idea.completion.ComposeCompletionContributor" />
-        <typedHandler implementation="androidx.compose.plugins.idea.editor.KtxTypedHandler" />
-        <typedHandler implementation="androidx.compose.plugins.idea.editor.KtxAttributeAutoParensHandler" />
-        <enterHandlerDelegate implementation="androidx.compose.plugins.idea.editor.KtxEnterHandler" />
-        <annotator language="kotlin" implementationClass="androidx.compose.plugins.idea.editor.ComposeUnresolvedTagAnnotator" />
-        <psi.referenceContributor language="kotlin" implementation="androidx.compose.plugins.idea.editor.KtxReferenceContributor"/>
-    </extensions>
     <extensions defaultExtensionNs="org.jetbrains.kotlin">
-        <ktxParsingExtension implementation="androidx.compose.plugins.kotlin.ComposeKtxParsingExtension" />
-        <storageComponentContainerContributor implementation="androidx.compose.plugins.kotlin.ComponentsClosedDeclarationChecker" />
         <storageComponentContainerContributor implementation="androidx.compose.plugins.kotlin.ComposableAnnotationChecker" />
         <storageComponentContainerContributor implementation="androidx.compose.plugins.kotlin.UnionAnnotationCheckerProvider" />
-        <ktxTypeResolutionExtension implementation="androidx.compose.plugins.kotlin.ComposeKtxTypeResolutionExtension"/>
         <callResolutionInterceptorExtension implementation="androidx.compose.plugins.kotlin.ComposeCallResolutionInterceptorExtension"/>
-        <ktxControlFlowExtension implementation="androidx.compose.plugins.kotlin.ComposeKtxControlFlowExtension"/>
         <typeResolutionInterceptorExtension implementation="androidx.compose.plugins.kotlin.ComposeTypeResolutionInterceptorExtension"/>
-        <completionExtension implementation="androidx.compose.plugins.idea.completion.ComposeCompletionExtension"/>
         <diagnosticSuppressor implementation="androidx.compose.plugins.kotlin.ComposeDiagnosticSuppressor"/>
-        <quickFixContributor implementation="androidx.compose.plugins.idea.quickfix.ComposeQuickFixRegistry" />
     </extensions>
-
-    <application-components>
-        <component>
-            <implementation-class>androidx.compose.plugins.idea.editor.KtxTagNameSynchronizer</implementation-class>
-        </component>
-    </application-components>
 </idea-plugin>

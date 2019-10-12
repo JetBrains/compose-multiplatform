@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package androidx.compose
+package androidx.compose.plugins.kotlin
 
-/**
- * @suppress
- */
-@Target(
-    AnnotationTarget.FUNCTION,
-    AnnotationTarget.CLASS,
-    AnnotationTarget.ANNOTATION_CLASS
+import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
+
+class ResolvedRestartCalls(
+    val composer: ResolvedCall<*>,
+    val startRestartGroup: ResolvedCall<*>,
+    val endRestartGroup: ResolvedCall<*>
 )
-annotation class Stateful

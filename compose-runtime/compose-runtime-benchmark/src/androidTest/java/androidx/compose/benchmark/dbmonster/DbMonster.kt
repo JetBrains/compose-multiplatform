@@ -16,7 +16,6 @@
 
 package androidx.compose.benchmark.dbmonster
 
-import androidx.compose.Children
 import androidx.compose.Composable
 import androidx.compose.Model
 import androidx.compose.composer

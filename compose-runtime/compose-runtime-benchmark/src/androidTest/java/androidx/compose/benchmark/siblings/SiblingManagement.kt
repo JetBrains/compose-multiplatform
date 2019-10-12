@@ -16,7 +16,6 @@
 
 package androidx.compose.benchmark.siblings
 
-import androidx.compose.Children
 import androidx.compose.Composable
 import androidx.compose.Key
 import androidx.compose.composer

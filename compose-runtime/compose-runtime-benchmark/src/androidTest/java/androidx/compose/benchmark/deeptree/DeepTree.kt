@@ -16,7 +16,6 @@
 
 package androidx.compose.benchmark.deeptree
 
-import androidx.compose.Children
 import androidx.compose.Composable
 import androidx.compose.composer
 import androidx.ui.core.dp

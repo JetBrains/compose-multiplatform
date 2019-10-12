@@ -51,7 +51,6 @@ package androidx.compose
  *
  * @see Composable
  */
-@Stateful
 @Suppress("PLUGIN_ERROR")
 abstract class Component {
     @HiddenAttribute
