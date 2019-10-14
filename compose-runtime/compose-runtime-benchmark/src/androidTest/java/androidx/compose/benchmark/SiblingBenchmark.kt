@@ -29,7 +29,6 @@ import androidx.compose.benchmark.siblings.Item
 import androidx.compose.benchmark.siblings.ReorderType
 import androidx.compose.benchmark.siblings.SiblingManagement
 import androidx.compose.benchmark.siblings.update
-import androidx.compose.composer
 import androidx.compose.disposeComposition
 import androidx.compose.runWithCurrent
 import androidx.compose.state

@@ -18,7 +18,6 @@ package androidx.compose.benchmark.siblings
 
 import androidx.compose.Composable
 import androidx.compose.Key
-import androidx.compose.composer
 import androidx.compose.Pivotal
 import androidx.ui.core.Text
 import androidx.ui.core.dp

@@ -20,7 +20,6 @@ import androidx.compose.Composable
 import androidx.compose.Model
 import androidx.compose.Observe
 import androidx.compose.benchmark.realworld4.RealWorld4_FancyWidget_000
-import androidx.compose.composer
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest

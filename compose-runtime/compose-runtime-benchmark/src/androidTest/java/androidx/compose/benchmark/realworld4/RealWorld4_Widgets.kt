@@ -22,7 +22,6 @@ package androidx.compose.benchmark.realworld4
  */
 
 import androidx.compose.Composable
-import androidx.compose.composer
 import androidx.ui.core.Draw
 import androidx.ui.core.WithConstraints
 import androidx.ui.foundation.ColoredRect

@@ -16,24 +16,13 @@
 
 package androidx.compose.benchmark
 
-import android.app.Activity
-import androidx.compose.Composable
-import androidx.compose.Composer
-import androidx.compose.FrameManager
 import androidx.compose.benchmark.dbmonster.DatabaseList
 import androidx.compose.benchmark.dbmonster.DatabaseRow
 import androidx.compose.benchmark.dbmonster.Table
-import androidx.compose.composer
-import androidx.compose.disposeComposition
-import androidx.compose.runWithCurrent
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.test.rule.ActivityTestRule
-import androidx.ui.core.setContent
-import org.junit.Assert
 import org.junit.FixMethodOrder
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters

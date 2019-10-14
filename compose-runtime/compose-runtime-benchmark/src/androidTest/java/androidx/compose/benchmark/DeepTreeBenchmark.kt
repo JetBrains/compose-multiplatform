@@ -19,7 +19,6 @@ package androidx.compose.benchmark
 import androidx.compose.Composable
 import androidx.compose.benchmark.deeptree.DeepTree
 import androidx.compose.disposeComposition
-import androidx.compose.composer
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
