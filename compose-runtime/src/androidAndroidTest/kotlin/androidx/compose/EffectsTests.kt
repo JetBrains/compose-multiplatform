@@ -639,7 +639,7 @@ class EffectsTests {
     @Test
     @MediumTest
     fun testAmbient2() {
-        val MyAmbient = Ambient.of<Int>("Hello") { throw Exception("not set") }
+        val MyAmbient = Ambient.of<Int> { throw Exception("not set") }
 
         var requestRecompose: (() -> Unit)? = null
         var buttonCreated = false
@@ -698,7 +698,7 @@ class EffectsTests {
     @Test
     @MediumTest
     fun testAmbient_RecomposeScope() {
-        val MyAmbient = Ambient.of<Int>("Hello") { throw Exception("not set") }
+        val MyAmbient = Ambient.of<Int> { throw Exception("not set") }
 
         var requestRecompose: (() -> Unit)? = null
         var buttonCreated = false
