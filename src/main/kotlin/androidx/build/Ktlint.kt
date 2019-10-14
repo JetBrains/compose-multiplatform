@@ -28,22 +28,6 @@ private fun Project.getKtlintConfiguration(): Configuration {
 }
 
 fun Project.configureKtlint() {
-    // These classes use invalid Kotlin KTX syntax (b/131882889)
-    // We disable ktlint on these files as it crashes on them.
-    val disabledComposeClasses = listOf(
-        "!src/main/java/androidx/ui/core/Clip.kt",
-        "!src/main/java/androidx/ui/core/Draw.kt",
-        "!src/main/java/androidx/ui/core/DrawShadow.kt",
-        "!src/main/java/androidx/ui/core/Layout.kt",
-        "!src/main/java/androidx/ui/core/Opacity.kt",
-        "!src/main/java/androidx/ui/core/ParentData.kt",
-        "!src/main/java/androidx/ui/core/PointerInputWrapper.kt",
-        "!src/main/java/androidx/ui/core/RepaintBoundary.kt",
-        "!src/main/java/androidx/ui/core/Wrapper.kt",
-        "!src/main/java/androidx/ui/graphics/vector/VectorCompose.kt",
-        "!src/main/java/androidx/ui/semantics/Semantics.kt"
-    )
-
     val outputDir = "${project.buildDir}/reports/ktlint/"
     val inputDir = "src"
     val includeFiles = "**/*.kt"
@@ -70,7 +54,7 @@ fun Project.configureKtlint() {
             "--reporter=checkstyle,output=$outputFile",
             "$inputDir/$includeFiles",
             "!$inputDir/$excludeFiles"
-        ) + disabledComposeClasses
+        )
     }
 
     tasks.register("ktlintFormat", JavaExec::class.java) { task ->
@@ -89,6 +73,6 @@ fun Project.configureKtlint() {
             "--reporter=checkstyle,output=$outputFile",
             "$inputDir/$includeFiles",
             "!$inputDir/$excludeFiles"
-        ) + disabledComposeClasses
+        )
     }
 }
