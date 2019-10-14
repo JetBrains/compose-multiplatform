@@ -281,7 +281,8 @@ data class Commit(
     private val releaseNoteDelimiters: List<String> = listOf(
         "Release notes:",
         "Release Notes:",
-        "release notes:"
+        "release notes:",
+        "Release note:"
     )
 
     init {
@@ -440,6 +441,15 @@ data class Commit(
                 return
             }
         }
+    }
+
+    fun getReleaseNoteString(): String {
+        var releaseNoteString: String = releaseNote
+        releaseNoteString += " ${getAOSPLink(changeId)}"
+        bugs.forEach { bug ->
+            releaseNoteString += " ${getBuganizerLink(bug)}"
+        }
+        return releaseNoteString
     }
 
     override fun toString(): String {

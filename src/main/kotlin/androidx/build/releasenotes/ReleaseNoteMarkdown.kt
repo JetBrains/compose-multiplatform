@@ -56,7 +56,9 @@ class LibraryHeader(groupId: String, version: String) : MarkdownHeader() {
  * - <[Commit.summary]> <[getAOSPLink]> <[getBuganizerLink] 1> <[getBuganizerLink] 2>...
  *
  */
-class CommitMarkdownList {
+class CommitMarkdownList(
+    private var includeAllCommits: Boolean = false
+) {
     private var commits: MutableList<Commit> = mutableListOf()
 
     fun add(commit: Commit) {
@@ -74,10 +76,19 @@ class CommitMarkdownList {
         commits.filter { commit ->
             commit.type == sectionCommitType
         }.forEach { commit ->
-            markdownStringSection = "$markdownStringSection${getListItemStr()}$commit"
-            if (markdownStringSection.last() != '\n') {
-                markdownStringSection += '\n'
+            // While we are choosing to ignore Release Note field
+            val commitString: String = getListItemStr() + if (commit.releaseNote.isNotEmpty())
+                commit.getReleaseNoteString() else commit.toString()
+            if (includeAllCommits || commit.releaseNote.isNotEmpty()) {
+                markdownStringSection = markdownStringSection + commitString
+                if (markdownStringSection.last() != '\n') {
+                    markdownStringSection += '\n'
+                }
             }
+            /* If we are not ignoring Release Note fields (meaning we are respecting it) and
+             * the commit does not contain a Release Note field, then don't include the commit
+             * in the release notes.
+             */
         }
         markdownStringSection = if (markdownStringSection.isEmpty()) {
             "\n${MarkdownComment(sectionHeader.toString())}\n\n$markdownStringSection"
@@ -175,6 +186,9 @@ fun getBuganizerLink(bugId: Int): MarkdownLink {
  * @param startSHA The first SHA to include in the release notes.
  * @param endSHA The last SHA to be included in the release notes.
  * @param projectDir The filepath relative to the parent directory of the .git directory.
+ * @param includeAllCommits Set to true to include all commits, both with and without a
+ *          release note field in the commit message.  Defaults to false, which means only commits
+ *          with a release note field are included in the release notes.
  */
 class LibraryReleaseNotes(
     private val groupId: String,
@@ -183,13 +197,13 @@ class LibraryReleaseNotes(
     private val releaseDate: LocalDate,
     startSHA: String,
     endSHA: String,
-    projectDir: String
+    projectDir: String,
+    includeAllCommits: Boolean = false
 ) {
-
     private var diffLogLink: MarkdownLink
     private var header: LibraryHeader
     private var commits: MutableList<Commit> = mutableListOf()
-    private var commitMarkdownList: CommitMarkdownList = CommitMarkdownList()
+    private var commitMarkdownList: CommitMarkdownList = CommitMarkdownList(includeAllCommits)
     private var summary: String = ""
     private var bugsFixed: MutableList<Int> = mutableListOf()
 
