@@ -55,8 +55,7 @@ package androidx.compose
  * @sample androidx.compose.samples.consumeAmbient
  */
 class Ambient<T>
-@PublishedApi
-internal constructor(private val key: String, private val defaultFactory: (() -> T)? = null) {
+internal constructor(private val defaultFactory: (() -> T)? = null) {
     @Suppress("UNCHECKED_CAST")
     internal val defaultValue by lazy {
         val fn = defaultFactory
@@ -68,21 +67,15 @@ internal constructor(private val key: String, private val defaultFactory: (() ->
         /**
          * Creates an ambient to be used during composition.
          *
-         * @param key A string identifier used to disambiguate the Ambient.
-         *  Defaults to the name of [T].
          * @param defaultFactory A lambda to run to create a default value of this ambient for when
-         *  the ambient is consumed in a composition and there is no provider above the point of
-         *  consumption. If no factory is provided, and [T] is not a nullable type, an exception
-         *  will be thrown. This factory will not be executed more than once.
+         * the ambient is consumed in a composition and there is no provider above the point of
+         * consumption. If no factory is provided, and [T] is not a nullable type, an exception
+         * will be thrown. This factory will not be executed more than once.
          */
-        inline fun <reified T> of(
-            key: String = T::class.simpleName!!,
-            noinline defaultFactory: (() -> T)? = null
-        ) = Ambient(key, defaultFactory)
+        fun <T> of(defaultFactory: (() -> T)? = null) = Ambient(defaultFactory)
     }
 
     override fun equals(other: Any?) = this === other
-    override fun toString(): String = "Ambient<$key>"
 
     internal class Holder<T>(val ambient: Ambient<T>, var value: T)
 

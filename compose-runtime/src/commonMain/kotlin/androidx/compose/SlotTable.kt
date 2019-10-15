@@ -348,7 +348,7 @@ class SlotReader internal constructor(table: SlotTable) : SlotEditor(table) {
     }
 
     override fun toString(): String {
-        return "${this::class.simpleName}" +
+        return "SlotReader" +
                 "(current=$current, " +
                 "size=${slots.size - table.gapLen}, " +
                 "gap=${
@@ -628,7 +628,7 @@ class SlotWriter internal constructor(table: SlotTable) : SlotEditor(table) {
             pendingClear = false
             table.clearGap()
         }
-        return "${this::class.simpleName}" +
+        return "SlotWriter" +
                 "(current=$current, " +
                 "size=${slots.size - table.gapLen}, " +
                 "gap=${

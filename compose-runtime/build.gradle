@@ -32,7 +32,6 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(KOTLIN_COMPOSE_STDLIB)
-            implementation(KOTLIN_COMPOSE_REFLECT)
         }
         commonTest.dependencies {
             implementation kotlin("test-junit")
@@ -41,7 +40,6 @@ kotlin {
             implementation "androidx.annotation:annotation:1.0.0"
         }
         androidAndroidTest.dependencies {
-            implementation(KOTLIN_COMPOSE_REFLECT)
             implementation(ANDROIDX_TEST_EXT_JUNIT)
             implementation(ANDROIDX_TEST_RULES)
         }
