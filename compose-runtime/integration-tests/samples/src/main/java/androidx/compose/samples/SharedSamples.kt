@@ -14,23 +14,22 @@
  * limitations under the License.
  */
 
-import static androidx.build.dependencies.DependenciesKt.*
+@file:Suppress("UNUSED_PARAMETER", "unused")
 
-plugins {
-    id("AndroidXPlugin")
-    id("com.android.library")
-    id("AndroidXUiPlugin")
-    id("org.jetbrains.kotlin.android")
+package androidx.compose.samples
+
+import androidx.compose.Composable
+
+@Composable
+internal fun ProfileIcon(src: String) {}
+
+internal class User {
+    val id = 0
+    val name = ""
+    val profilePhotoUrl = ""
 }
 
-dependencies {
-    kotlinPlugin project(path: ":compose:compose-compiler", configuration: "embeddablePlugin")
-
-    implementation(KOTLIN_COMPOSE_STDLIB)
-
-    implementation project(":annotation:annotation-sampled")
-    implementation project(":compose:compose-runtime")
-    implementation project(":ui:ui-framework")
-    implementation project(":ui:ui-layout")
-    implementation project(":ui:ui-material")
+internal object Api {
+    fun login(username: String, password: String) {}
+    fun getUserAsync(id: Int, user: (User) -> Unit): () -> Unit = {}
 }

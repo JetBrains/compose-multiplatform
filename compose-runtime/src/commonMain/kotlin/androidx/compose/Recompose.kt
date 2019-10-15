@@ -37,20 +37,7 @@ private class RecomposeHelper : Function0<Unit> {
  *
  * Example:
  *
- *     class LoginState(var username: String, var password: String) {
- *       val valid: Boolean get() = username.length > 0 && password.length > 0
- *       fun login() = Api.login(username, password)
- *     }
- *
- *     @Composable
- *     fun LoginScreen() {
- *       val model = +memo { LoginState() }
- *       Recompose { recompose ->
- *         EditText(text=model.username, onTextChange={ model.username = it; recompose() })
- *         EditText(text=model.password, onTextChange={ model.password = it; recompose() })
- *         Button(text="Login", enabled=model.valid, onPress={ model.login() })
- *       }
- *     }
+ * @sample androidx.compose.samples.recomposeSample
  *
  * Note: The above example can be done without [Recompose] by annotating `LoginState` with [Model].
  *

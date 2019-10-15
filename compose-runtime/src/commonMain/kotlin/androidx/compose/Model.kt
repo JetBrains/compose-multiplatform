@@ -28,24 +28,11 @@ package androidx.compose
  *
  * Consider the following example:
  *
- *     @Model
- *     class LoginState(var username: String, var password: String) {
- *       val valid: Boolean get() = username.length > 0 && password.length > 0
- *       fun login() = Api.login(username, password)
- *     }
- *
- *     @Composable
- *     fun LoginScreen() {
- *       val model = +memo { LoginState() }
- *
- *       EditText(text=model.username, onTextChange={ model.username = it })
- *       EditText(text=model.password, onTextChange={ model.password = it })
- *       Button(text="Login", enabled=model.valid, onPress={ model.login() })
- *     }
+ * @sample androidx.compose.samples.modelSample
  *
  * In this example, `LoginScreen` is recomposed every time the username and password of the
- * model updates, keeping the UI synchronized with the model. There is no need to call `recompose`
- * manually.
+ * model updates, keeping the UI synchronized with the model. There is no need to call
+ * [androidx.compose.Recompose] manually.
  *
  * @see FrameManager
  * @see Observe

@@ -16,8 +16,6 @@
 
 package androidx.compose.samples
 
-import android.widget.Button
-import android.widget.TextView
 import androidx.annotation.Sampled
 import androidx.compose.Composable
 import androidx.compose.State
@@ -27,7 +25,8 @@ import androidx.compose.onCommit
 import androidx.compose.state
 import androidx.compose.stateFor
 import androidx.compose.unaryPlus
-import androidx.ui.androidview.adapters.setOnClick
+import androidx.ui.core.Text
+import androidx.ui.material.Button
 
 @Suppress("unused")
 @Sampled
@@ -70,7 +69,7 @@ fun twoInputsKeySample() {
 fun SimpleStateSample() {
     val count = +state { 0 }
 
-    TextView(text = "You clicked ${count.value} times")
+    Text(text = "You clicked ${count.value} times")
     Button(text = "Click me", onClick = { count.value++ })
 }
 
@@ -79,7 +78,7 @@ fun SimpleStateSample() {
 fun DestructuredStateSample() {
     val (count, setCount) = +state { 0 }
 
-    TextView(text = "You clicked $count times")
+    Text(text = "You clicked $count times")
     Button(text = "Click me", onClick = { setCount(count + 1) })
 }
 
@@ -91,11 +90,10 @@ fun DestructuredStateSample() {
 fun DelegatedStateSample() {
     var count by +state { 0 }
 
-    TextView(text = "You clicked $count times")
+    Text(text = "You clicked $count times")
     Button(text = "Click me", onClick = { count = count + 1 })
 }
 
-private class User
 private class Subscription {
     fun unsubscribe() {}
 }
@@ -112,6 +110,7 @@ private val elements = listOf<Element>()
 private class Element(val id: Int)
 
 @Suppress("UNUSED_PARAMETER")
+@Composable
 private fun ListItem(item: Any, selected: Boolean) {}
 
 private const val parentId = 0

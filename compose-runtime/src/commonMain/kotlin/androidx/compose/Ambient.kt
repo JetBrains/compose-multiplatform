@@ -29,41 +29,30 @@ package androidx.compose
  * [Ambient]s by their nature are hierarchical. They make sense when the value of the ambient needs
  * to be scoped to a particular sub-hierarchy of the composition.
  *
- * ```
- *     // One must create an Ambient instance, which can be referenced by the consumers
- *     // statically. Ambient instances themselves hold no data, and can be thought of as a
- *     // type-safe identifier for the data being passed down a tree. The Ambient constructor takes a
- *     // single parameter, a factory to create a default value in cases where an ambient is
- *     // used without a Provider. If this is a situation you would rather not handle, you
- *     // can throw an error in this factory
- *     val ActiveUser = Ambient.of<User> { error("No active user found!") }
+ * One must create an Ambient instance, which can be referenced by the consumers statically. Ambient
+ * instances themselves hold no data, and can be thought of as a type-safe identifier for the data
+ * being passed down a tree. The Ambient constructor takes a single parameter, a factory to create a
+ * default value in cases where an ambient is used without a Provider. If this is a situation you
+ * would rather not handle, you can throw an error in this factory
  *
- *     // Somewhere up the tree, a "Provider" component can be used, which has a required
- *     // "value" parameter. This would often be at the "root" of a tree, but could be
- *     // anywhere, and can also be used in multiple places to override the provided value
- *     // for a sub-tree.
- *     @Composable fun App(user: User) {
- *         ActiveUser.Provider(value=user) {
- *              SomeScreen()
- *         }
- *     }
+ * @sample androidx.compose.samples.createAmbient
  *
- *     // intermediate components do not need to know about the ambient value, and can have
- *     // zero dependencies on it
- *     @Composable fun SomeScreen() {
- *         UserPhoto()
- *     }
+ * Somewhere up the tree, a [Provider] component can be used, which has a required `value`
+ * parameter. This would often be at the "root" of a tree, but could be anywhere, and can also be
+ * used in multiple places to override the provided value for a sub-tree.
  *
- *     // A component that wishes to consume the ambient value can use the corresponding
- *     // "ambient" effect, which returns the current value of the ambient, and subscribes the component
- *     // to changes of it
- *     @Composable fun UserPhoto() {
- *         val user = +ambient(ActiveUser)
- *         ImageView(src=user.profilePhotoUrl)
- *     }
- * ```
+ * @sample androidx.compose.samples.ambientProvider
  *
- * @see [ambient]
+ * Intermediate components do not need to know about the ambient value, and can have zero
+ * dependencies on it. For example, `SomeScreen` might look like this:
+ *
+ * @sample androidx.compose.samples.someScreenSample
+ *
+ * Finally, a component that wishes to consume the ambient value can use the corresponding
+ * [ambient] effect, which returns the current value of the ambient, and subscribes the component
+ * to changes of it.
+ *
+ * @sample androidx.compose.samples.consumeAmbient
  */
 class Ambient<T>
 @PublishedApi
@@ -105,7 +94,7 @@ internal constructor(private val key: String, private val defaultFactory: (() ->
      *
      * @param value The current value of the ambient.
      * @param children Everything composed inside this block will get [value] when consuming this
-     *  ambient
+     * ambient
      *
      * @see ambient
      */

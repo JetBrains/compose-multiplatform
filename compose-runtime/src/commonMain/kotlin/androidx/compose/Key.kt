@@ -26,13 +26,7 @@ package androidx.compose
  *
  * For instance, consider the following example:
  *
- *     for (user in users) {
- *         Key(user.id) { UserPreview(user=child) }
- *     }
- *
- *     for (user in users.filter { isAdmin }) {
- *         Key(user.id) { Friend(friend=user) }
- *     }
+ * @sample androidx.compose.samples.locallyUniqueKeys
  *
  * Even though there are users with the same id composed in both the top and the bottom loop,
  * because they are different calls to Key, there is no need to create compound keys.
@@ -42,27 +36,16 @@ package androidx.compose
  *
  * For instance, consider the following example:
  *
- *     for ((child, parent) in relationships) {
- *         Key(parent.id) {
- *             User(user=child)
- *             User(user=parent)
- *          }
- *     }
+ * @sample androidx.compose.samples.notAlwaysUniqueKeys
  *
  * This example assumes that `parent.id` is a unique key for each item in the collection,
  * but this is only true if it is fair to assume that a parent will only ever have a single child,
  * which may not be the case.  Instead, it may be more correct to do the following:
  *
- *     for ((child, parent) in relationships) {
- *          Key(parent.id to child.id) {
- *             User(user=child)
- *             User(user=parent)
- *          }
- *     }
- *
+ * @sample androidx.compose.samples.moreCorrectUniqueKeys
  *
  * @param key The value used to identify this group. The value will be compared for equality
- *  using [Object.equals] and hashed using [Object.hashCode].
+ *  using [Any.equals] and hashed using [Any.hashCode].
  * @param children The composable children for this group.
  *
  * @see [androidx.compose.key]

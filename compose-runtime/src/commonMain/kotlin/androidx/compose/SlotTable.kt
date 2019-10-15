@@ -33,46 +33,35 @@ package androidx.compose
  * only counts as one node in its group regardless of the number of nodes it contains.
  *
  * ASIDE:
- *  The intent is for groups are to represent memoized function calls and nodes represent views. For
- *  example,
+ * The intent is that groups represent memoized function calls and nodes represent views. For
+ * example:
  *
- *   LinearLayout {
- *       Contact(contact=jim)
- *       Contact(contact=bob)
- *   }
+ * @sample androidx.compose.samples.initialGroup
  *
- *  the <LinearLayout> tag here would be a node (the linear layout view). The node contains the
- *  groups for the child views of the linear layout.
+ * the `LinearLayout` here would be a node (the linear layout view). The node contains the
+ * groups for the child views of the linear layout.
  *
- *  If contact's composition looks like:
+ * If contact's composition looks like:
  *
- *    @Composable
- *    fun Contact(contact: Contact) {
- *      TextView(text=contact.name)
- *      TextView(text=contact.email)
- *    }
+ * @sample androidx.compose.samples.contactSample
  *
- *  then composing contact into the linear layout would add two views to the linear layout's
- *  children. The composition of contact creates groups, one for each text view. The groups for each
- *  contact would be able to report that it produces two views (that is the group created for
- *  Contact has two nodes). Summing the nodes in the group produces the number of views (as
- *  each node corresponds to a view).
+ * then composing contact into the linear layout would add two views to the linear layout's
+ * children. The composition of contact creates groups, one for each text view. The groups for each
+ * contact would be able to report that it produces two views (that is the group created for
+ * Contact has two nodes). Summing the nodes in the group produces the number of views (as
+ * each node corresponds to a view).
  *
- *  If the order that jim and bob change above,
+ * If the order of jim and bob change:
  *
- *   LinearLayout {
- *       Contact(contact=bob)
- *       Contact(contact=jim)
- *   }
+ * @sample androidx.compose.samples.reorderedGroup
  *
- *  the previous result can be reused by moving the views generated bob's group before jim's (or vis
- *  versa). A composition algorithm could use the key information for each group to determine if they
- *  can be switched. For example, since the first contact's group has two nodes the composition
- *  algorithm can infer that the beginning of jim's views starts at 2 and contains 2 view. To move
- *  jim in front of bob, move the 2 views from offset 2 to offset 0. If contact is immutable, for
- *  example, Contact would only need to be recomposed if the value of jim or bob change.
+ * the previous result can be reused by moving the views generated bob's group before jim's (or vis
+ * versa). A composition algorithm could use the key information for each group to determine if they
+ * can be switched. For example, since the first contact's group has two nodes the composition
+ * algorithm can infer that the beginning of jim's views starts at 2 and contains 2 view. To move
+ * jim in front of bob, move the 2 views from offset 2 to offset 0. If contact is immutable, for
+ * example, Contact would only need to be recomposed if the value of jim or bob change.
  */
-
 open class SlotEditor internal constructor(val table: SlotTable) {
     var current = 0
     internal val slots get() = table.slots

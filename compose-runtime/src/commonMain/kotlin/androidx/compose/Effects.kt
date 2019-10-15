@@ -214,7 +214,8 @@ internal class PostCommitScopeImpl(
  *
  * @sample androidx.compose.samples.oneInputKeySample
  *
- * @param v1 The value to use as the key. This will be compared to its previous value using `Object.equals`
+ * @param v1 The value to use as the key. This will be compared to its previous value using
+ * [Any.equals]
  * @param block The block to execute other effects in
  */
 @CheckResult("+")
@@ -231,8 +232,10 @@ fun <T, V1> key(v1: V1, block: Effect<T>.() -> T) =
  *
  * @sample androidx.compose.samples.twoInputsKeySample
  *
- * @param v1 The first value to use as a key. This will be compared to its previous value using `Object.equals`
- * @param v2 The second value to use as a key. This will be compared to its previous value using `Object.equals`
+ * @param v1 The first value to use as a key. This will be compared to its previous value using
+ * [Any.equals]
+ * @param v2 The second value to use as a key. This will be compared to its previous value using
+ * [Any.equals]
  * @param block The block to execute other effects in
  */
 @CheckResult("+")
@@ -247,7 +250,8 @@ fun <T, V1, V2> key(v1: V1, v2: V2, block: Effect<T>.() -> T) =
  *
  * @sample androidx.compose.samples.twoInputsKeySample
  *
- * @param inputs The set of values to be used to create a compound key. This will be compared to its previous value using `Object.equals`
+ * @param inputs The set of values to be used to create a compound key. This will be compared to
+ * its previous value using [Any.equals]
  * @param block The block to execute other effects in
  */
 @CheckResult("+")
