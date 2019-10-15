@@ -22,6 +22,39 @@ package androidx.compose
  * [Compose.disposeComposition].
  */
 object Compose {
+    /**
+     * Apply Code Changes will invoke the two functions before and after a code swap.
+     *
+     * This forces the whole view hierarchy to be redrawn to invoke any code change that was
+     * introduce in the code swap.
+     *
+     * All these are private as within JVMTI / JNI accessibility is mostly a formality.
+     */
+    private class HotReloader {
+        companion object {
+            private var state = HashMap<Emittable, @Composable() () -> Unit>()
+
+            // Called before Dex Code Swap
+            private fun saveStateAndDispose(context: Context) {
+                state.clear()
+                for ((emittable, component) in EMITTABLE_ROOT_COMPONENT) {
+                    var root = component as? Root
+                    if (root != null) {
+                        state.put(emittable, root.composable)
+                        disposeComposition(emittable, context, null)
+                    }
+                }
+            }
+
+            // Called after Dex Code Swap
+            private fun loadStateAndCompose(context: Context) {
+                for ((emittable, composable) in state) {
+                    composeInto(emittable, context, null, composable)
+                }
+                state.clear()
+            }
+        }
+    }
 
     private class Root : Component() {
         fun update() = composer.compose()
