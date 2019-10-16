@@ -29,7 +29,7 @@ import java.io.File
 
 abstract class UpdateApiLintBaselineTask : MetalavaTask() {
     init {
-        group = "Suppression"
+        group = "API"
         description = "Updates an API lint baseline file (api/api_lint.ignore) to match the " +
                 "current set of violations. Only use a baseline " +
                 "if you are in a library without Android dependencies, or when enabling a new " +
