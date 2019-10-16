@@ -28,6 +28,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
  */
 class AndroidXUiPlugin : Plugin<Project> {
     override fun apply(project: Project) {
+        project.tasks.withType(KotlinCompile::class.java).configureEach { compile ->
+            compile.kotlinOptions.freeCompilerArgs +=
+                listOf("-P", "plugin:androidx.compose.plugins.idea:enabled=true")
+        }
         project.plugins.all {
             when (it) {
                 is LibraryPlugin -> {
