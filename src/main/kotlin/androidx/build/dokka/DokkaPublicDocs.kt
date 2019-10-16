@@ -65,7 +65,16 @@ object DokkaPublicDocs {
         "androidx.work.impl.model",
         "androidx.work.impl.utils",
         "androidx.work.impl.utils.futures",
-        "androidx.work.impl.utils.taskexecutor")
+        "androidx.work.impl.utils.taskexecutor",
+        "androidx.compose.samples",
+        "androidx.ui.animation.samples",
+        "androidx.ui.foundation.samples",
+        "androidx.ui.framework.samples",
+        "androidx.ui.layout.samples",
+        "androidx.ui.material.samples",
+        "androidx.ui.text.samples",
+        "sample",
+        "sample.foo")
 
     fun tryGetRunnerProject(project: Project): Project? {
         return project.rootProject.findProject(":docs-runner")
