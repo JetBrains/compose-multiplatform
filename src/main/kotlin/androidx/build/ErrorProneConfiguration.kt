@@ -94,6 +94,7 @@ private fun JavaCompile.configureWithErrorProne(toolChain: ErrorProneToolChain) 
             "-Xep:StringSplitter:ERROR",
             "-Xep:ReferenceEquality:ERROR",
             "-Xep:AssertionFailureIgnored:ERROR",
+            "-Xep:UnnecessaryParentheses:ERROR",
 
             // Nullaway
             "-XepIgnoreUnknownCheckNames", // https://github.com/uber/NullAway/issues/25
