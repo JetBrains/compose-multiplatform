@@ -139,7 +139,6 @@ object Dokka {
                 .resolve("package-lists/android/package-list").toUri().toURL()
         }.build()
 
-
         return project.tasks.register(docTaskName, DokkaAndroidTask::class.java) { task ->
             task.moduleName = project.name
             task.outputDirectory = File(project.buildDir, docTaskName).absolutePath
@@ -163,6 +162,8 @@ object Dokka {
             task.noJdkLink = true
             task.noStdlibLink = true
             task.noAndroidSdkLink = true
+
+            LogUtils.turnWarningsIntoInfos(task)
         }
     }
 
