@@ -15,7 +15,7 @@
   -->
 
 <idea-plugin>
-    <id>androidx.compose</id>
+    <id>androidx.compose.plugins.idea</id>
 
     <name>Compose</name>
     <description><![CDATA[
@@ -27,10 +27,10 @@ The Jetpack Compose IDE plugin
     <depends>org.jetbrains.kotlin</depends>
 
     <extensions defaultExtensionNs="org.jetbrains.kotlin">
-        <storageComponentContainerContributor implementation="androidx.compose.plugins.kotlin.ComposableAnnotationChecker" />
-        <storageComponentContainerContributor implementation="androidx.compose.plugins.kotlin.UnionAnnotationCheckerProvider" />
-        <callResolutionInterceptorExtension implementation="androidx.compose.plugins.kotlin.ComposeCallResolutionInterceptorExtension"/>
-        <typeResolutionInterceptorExtension implementation="androidx.compose.plugins.kotlin.ComposeTypeResolutionInterceptorExtension"/>
-        <diagnosticSuppressor implementation="androidx.compose.plugins.kotlin.ComposeDiagnosticSuppressor"/>
+        <storageComponentContainerContributor implementation="androidx.compose.plugins.idea.IdeComposableAnnotationChecker" />
+        <storageComponentContainerContributor implementation="androidx.compose.plugins.idea.IdeUnionAnnotationCheckerProvider" />
+        <callResolutionInterceptorExtension implementation="androidx.compose.plugins.idea.IdeComposeCallResolutionInterceptorExtension"/>
+        <typeResolutionInterceptorExtension implementation="androidx.compose.plugins.idea.IdeComposeTypeResolutionInterceptorExtension"/>
+        <diagnosticSuppressor implementation="androidx.compose.plugins.idea.IdeComposeDiagnosticSuppressor"/>
     </extensions>
 </idea-plugin>
