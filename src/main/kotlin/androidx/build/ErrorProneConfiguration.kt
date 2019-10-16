@@ -74,6 +74,7 @@ private fun JavaCompile.configureWithErrorProne(toolChain: ErrorProneToolChain) 
             "-Xep:RestrictTo:OFF",
             "-Xep:ObjectToString:OFF",
             "-Xep:CatchAndPrintStackTrace:OFF",
+            "-Xep:MixedMutabilityReturnType:OFF",
 
             // Enforce the following checks.
             "-Xep:ParameterNotNullable:ERROR",
