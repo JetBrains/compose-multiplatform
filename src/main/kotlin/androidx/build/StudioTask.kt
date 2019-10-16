@@ -471,18 +471,19 @@ open class UiStudioWrapper(project: Project) : StudioWrapper(project) {
     override fun preLaunchConfiguration() {
         // Copy the built compose plugin into the studio plugin directory every time to ensure it
         // is up to date
-        val builtComposePluginDirectory = File(
+   /*     val builtComposePluginDirectory = File(
             project.getRootOutDirectory(),
             "ui/compose/compose-ide-plugin/build/idea-sandbox/plugins/compose-ide-plugin"
-        )
+        ) */
         println("Copying Compose IDE plugin to Studio directory")
         with(platformUtilities) {
             // Ensure the directory exists
+            composeIdePluginDirectory.deleteRecursively()
             composeIdePluginDirectory.mkdirs()
-            builtComposePluginDirectory.copyRecursively(
+   /*         builtComposePluginDirectory.copyRecursively(
                 target = composeIdePluginDirectory,
                 overwrite = true
-            )
+            ) */
         }
     }
 
