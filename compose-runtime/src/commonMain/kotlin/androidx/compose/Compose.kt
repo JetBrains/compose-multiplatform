@@ -32,26 +32,47 @@ object Compose {
      */
     private class HotReloader {
         companion object {
-            private var state = HashMap<Emittable, @Composable() () -> Unit>()
+            private var emittables = HashMap<Emittable, @Composable() () -> Unit>()
+            private var views = HashMap<ViewGroup, @Composable() () -> Unit>()
 
             // Called before Dex Code Swap
             private fun saveStateAndDispose(context: Context) {
-                state.clear()
+                emittables.clear()
+                views.clear()
+
                 for ((emittable, component) in EMITTABLE_ROOT_COMPONENT) {
-                    var root = component as? Root
-                    if (root != null) {
-                        state.put(emittable, root.composable)
+                    (component as? Root)?.let {
+                        emittables.put(emittable, it.composable)
                         disposeComposition(emittable, context, null)
+                    }
+                }
+
+                for ((view, component) in VIEWGROUP_ROOT_COMPONENT) {
+                    (component as? Root)?.let {
+                        views.put(view, it.composable)
+                        disposeComposition(view)
                     }
                 }
             }
 
             // Called after Dex Code Swap
             private fun loadStateAndCompose(context: Context) {
-                for ((emittable, composable) in state) {
+                for ((emittable, composable) in emittables) {
                     composeInto(emittable, context, null, composable)
                 }
-                state.clear()
+
+                for ((view, composable) in views) {
+                    view.setViewContent(composable)
+                }
+
+                emittables.clear()
+                views.clear()
+            }
+
+            @TestOnly
+            internal fun simulateHotReload(context: Context) {
+                saveStateAndDispose(context)
+                loadStateAndCompose(context)
             }
         }
     }
@@ -72,6 +93,7 @@ object Compose {
 
     private val TAG_ROOT_COMPONENT = "composeRootComponent".hashCode()
     private val EMITTABLE_ROOT_COMPONENT = WeakHashMap<Emittable, Component>()
+    private val VIEWGROUP_ROOT_COMPONENT = WeakHashMap<ViewGroup, Component>()
 
     private fun getRootComponent(view: View): Component? {
         return view.getTag(TAG_ROOT_COMPONENT) as? Component
@@ -90,6 +112,8 @@ object Compose {
 
     internal fun setRoot(view: View, component: Component) {
         view.setTag(TAG_ROOT_COMPONENT, component)
+        if (view is ViewGroup)
+            VIEWGROUP_ROOT_COMPONENT[view] = component
     }
 
     private fun getRootComponent(emittable: Emittable): Component? {
@@ -121,6 +145,12 @@ object Compose {
             is Emittable -> setRoot(group, component)
         }
     }
+
+    /**
+     * @suppress
+     */
+    @TestOnly
+    fun simulateHotReload(context: Context) = HotReloader.simulateHotReload(context)
 
     /**
      * This method is the way to initiate a composition. The [composable] passed in will be executed
