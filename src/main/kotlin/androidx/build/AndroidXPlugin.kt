@@ -55,7 +55,6 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.logging.configuration.ShowStacktrace
-import org.gradle.api.plugins.JavaLibraryPlugin
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.TaskProvider
@@ -123,8 +122,7 @@ class AndroidXPlugin : Plugin<Project> {
 
         project.plugins.all { plugin ->
             when (plugin) {
-                is JavaPlugin,
-                is JavaLibraryPlugin -> {
+                is JavaPlugin -> {
                     project.configureErrorProneForJava()
                     project.configureSourceJarForJava()
                     val convention = project.convention.getPlugin<JavaPluginConvention>()
