@@ -97,7 +97,15 @@ internal lateinit var kotlinVersion: String
 
 val KOTLIN_VERSION get() = kotlinVersion
 val KOTLIN_STDLIB get() = "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+val KOTLIN_STDLIB_COMMON get() = "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlinVersion"
+val KOTLIN_STDLIB_JDK8 get() = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+val KOTLIN_STDLIB_JS get() = "org.jetbrains.kotlin:kotlin-stdlib-js:$kotlinVersion"
 val KOTLIN_TEST get() = "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
+val KOTLIN_TEST_COMMON get() = "org.jetbrains.kotlin:kotlin-test-common:$kotlinVersion"
+val KOTLIN_TEST_ANNOTATIONS_COMMON get() =
+    "org.jetbrains.kotlin:kotlin-test-annotations-common:$kotlinVersion"
+val KOTLIN_TEST_JUNIT get() = "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion"
+val KOTLIN_TEST_JS get() = "org.jetbrains.kotlin:kotlin-test-js:$kotlinVersion"
 val KOTLIN_REFLECT get() = "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
 
 internal lateinit var agpVersion: String
