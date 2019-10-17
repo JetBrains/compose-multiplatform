@@ -16,7 +16,6 @@
 
 package androidx.build
 
-import com.android.build.gradle.internal.tasks.factory.dependsOn
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.internal.tasks.userinput.UserInputHandler
@@ -48,11 +47,13 @@ abstract class StudioTask : DefaultTask() {
         private const val STUDIO_TASK = "studio"
 
         fun Project.registerStudioTask() {
-            val taskProvider = tasks.register(STUDIO_TASK, StudioTask::class.java)
+            tasks.register(STUDIO_TASK, StudioTask::class.java)
+            // TODO: b/142859295 re-enable IDE plugin when we fix circular dependency
+            /*val taskProvider = tasks.register(STUDIO_TASK, StudioTask::class.java)
             if (isUiProject) {
                 // Need to prepare the sandbox before we can run studio
                 taskProvider.dependsOn(":compose:compose-ide-plugin:prepareSandbox")
-            }
+            }*/
         }
     }
 }
@@ -468,22 +469,31 @@ open class UiStudioWrapper(project: Project) : StudioWrapper(project) {
         studioPrebuiltArchive.copyTo(File(studioArchivePath))
     }
 
-    override fun preLaunchConfiguration() {
+    // TODO: b/142859295 re-enable IDE plugin when we fix circular dependency
+    /*override fun preLaunchConfiguration() {
         // Copy the built compose plugin into the studio plugin directory every time to ensure it
         // is up to date
-   /*     val builtComposePluginDirectory = File(
+        val builtComposePluginDirectory = File(
             project.getRootOutDirectory(),
             "ui/compose/compose-ide-plugin/build/idea-sandbox/plugins/compose-ide-plugin"
-        ) */
+        )
         println("Copying Compose IDE plugin to Studio directory")
         with(platformUtilities) {
             // Ensure the directory exists
             composeIdePluginDirectory.deleteRecursively()
             composeIdePluginDirectory.mkdirs()
-   /*         builtComposePluginDirectory.copyRecursively(
+            builtComposePluginDirectory.copyRecursively(
                 target = composeIdePluginDirectory,
                 overwrite = true
-            ) */
+            )
+        }
+    }*/
+
+    // TODO: temporarily deleting the directory if it exists for existing installations,
+    //  until b/142859295 is fixed
+    override fun preLaunchConfiguration() {
+        with(platformUtilities) {
+            composeIdePluginDirectory.deleteRecursively()
         }
     }
 
