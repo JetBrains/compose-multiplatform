@@ -78,7 +78,6 @@ val API_LINT_ARGS: List<String> = listOf(
         "ExecutorRegistration",
         "StreamFiles",
         "ParcelableList",
-        "AbstractInner",
         "NotCloseable",
         "ArrayReturn",
         "UserHandle",
@@ -101,7 +100,8 @@ val API_LINT_ARGS: List<String> = listOf(
         "SetterReturnsThis",
         "OverlappingConstants",
         "IllegalStateException",
-        "ListenerLast"
+        "ListenerLast",
+        "AbstractInner"
     ).joinToString()
 )
 
