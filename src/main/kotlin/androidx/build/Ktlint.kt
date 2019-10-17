@@ -76,3 +76,12 @@ fun Project.configureKtlint() {
         )
     }
 }
+
+fun Project.configureKtlintCheckFile() {
+    tasks.register("ktlintCheckFile", JavaExec::class.java) { task ->
+        task.description = "Check Kotlin code style."
+        task.group = "Verification"
+        task.classpath = getKtlintConfiguration()
+        task.main = "com.pinterest.ktlint.Main"
+    }
+}
