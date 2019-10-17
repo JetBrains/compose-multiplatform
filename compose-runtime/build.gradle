@@ -75,3 +75,10 @@ afterEvaluate {
         }
     }
 }
+
+//TODO: decide whether and how to move this to AndroidX(UI)Plugin
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from kotlin.sourceSets.commonMain.kotlin
+    from kotlin.sourceSets.androidMain.kotlin
+}
