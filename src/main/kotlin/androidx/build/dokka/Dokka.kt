@@ -53,8 +53,13 @@ object Dokka {
         val archiveTaskName = archiveTaskNameForType(docsType)
         project.apply<DokkaAndroidPlugin>()
         // We don't use the `dokka` task, but it normally appears in `./gradlew tasks`
-        // so replace it with a new task that doesn't show up and doesn't do anything
-        project.tasks.replace("dokka")
+        // so we make it invisible by removing it from its task group and
+        // let it do nothing by removing all its actions
+        project.tasks.getByName("dokka") {
+            it.group = null
+            it.actions = emptyList()
+            it.taskDependencies
+        }
         if (project.name != "support" && project.name != "docs-runner") {
             throw Exception("Illegal project passed to createDocsTask: " + project.name)
         }
