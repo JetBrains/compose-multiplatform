@@ -42,6 +42,10 @@ abstract class CheckApiEquivalenceTask : DefaultTask() {
     @get:Input
     abstract val checkedInApis: ListProperty<ApiLocation>
 
+    private fun allApiLocations(): List<ApiLocation> {
+        return checkedInApis.get() + listOf(builtApi.get())
+    }
+
     /**
      * Whether to check restricted APIs too
      */
@@ -51,9 +55,9 @@ abstract class CheckApiEquivalenceTask : DefaultTask() {
     @InputFiles
     fun getTaskInputs(): List<File> {
         if (checkRestrictedAPIs) {
-            return checkedInApis.get().flatMap { it.files() }
+            return allApiLocations().flatMap { it.files() }
         }
-        return checkedInApis.get().flatMap { it.nonRestrictedFiles() }
+        return allApiLocations().flatMap { it.nonRestrictedFiles() }
     }
 
     /**
