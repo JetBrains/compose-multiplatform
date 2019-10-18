@@ -82,3 +82,7 @@ task sourcesJar(type: Jar) {
     from kotlin.sourceSets.commonMain.kotlin
     from kotlin.sourceSets.androidMain.kotlin
 }
+
+artifacts {
+    archives sourcesJar
+}
