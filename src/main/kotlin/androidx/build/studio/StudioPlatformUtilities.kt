@@ -83,7 +83,7 @@ sealed class StudioPlatformUtilities(val projectRoot: File, val studioInstallati
         val osName = if (System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("linux")) {
             "linux"
         } else {
-            "osx"
+            "mac"
         }
 
         fun get(projectRoot: File, studioInstallationDir: File): StudioPlatformUtilities {
