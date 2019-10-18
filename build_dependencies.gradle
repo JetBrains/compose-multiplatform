@@ -14,35 +14,26 @@
  * limitations under the License.
  */
 
+def isUiProject = System.getenv("DIST_SUBDIR") == "/ui"
+
 def build_versions = [:]
 
-def kotlin_override = System.getenv("KOTLIN_OVERRIDE")
-if (kotlin_override != null) {
-    build_versions.kotlin = kotlin_override
-    logger.warn("USING OVERRIDDEN KOTLIN GRADLE PLUGIN DEPENDENCY " + build_versions.kotlin)
+if (isUiProject) {
+    build_versions.kotlin = "1.3.60-withExperimentalGoogleExtensions-20191016"
+    build_versions.agp = "3.5.0-beta05"
 } else {
-    build_versions.kotlin = '1.3.41'
+    build_versions.kotlin = "1.3.41"
+    build_versions.agp = "3.6.0-beta01"
 }
+
 build_versions.lint = '26.6.0-beta01'
 build_versions.dokka = '0.9.17-g002'
-
-build_versions.studio = new Properties()
-new File(buildscript.sourceFile.parentFile, "studio_versions.properties").withInputStream { build_versions.studio.load(it) }
-
 
 rootProject.ext['build_versions'] = build_versions
 
 def build_libs = [:]
 
-def androidPluginVersionOverride = System.getenv("GRADLE_PLUGIN_VERSION")
-
-if (androidPluginVersionOverride != null) {
-    build_libs.gradle = 'com.android.tools.build:gradle:' + androidPluginVersionOverride
-    logger.warn("USING OVERRIDDEN ANDROID GRADLE PLUGIN DEPENDENCY OF " + build_libs.gradle)
-} else {
-    // Keep gradle plugin version in sync with ub_supportlib-master manifest.
-    build_libs.gradle = "com.android.tools.build:gradle:${build_versions.studio.agp}"
-}
+build_libs.agp = "com.android.tools.build:gradle:${build_versions.agp}"
 
 build_libs.lint = [
         core: "com.android.tools.lint:lint:${build_versions.lint}",

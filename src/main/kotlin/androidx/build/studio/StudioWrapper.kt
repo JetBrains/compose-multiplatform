@@ -14,89 +14,46 @@
  * limitations under the License.
  */
 
-package androidx.build
+package androidx.build.studio
 
-import org.gradle.api.DefaultTask
+import androidx.build.SupportConfig
 import org.gradle.api.Project
 import org.gradle.api.internal.tasks.userinput.UserInputHandler
-import org.gradle.api.tasks.TaskAction
 import org.gradle.internal.service.ServiceRegistry
-import org.gradle.process.ExecSpec
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.util.Locale
-import java.util.Properties
 
 /**
- * Task responsible for updating / installing the Studio version used in the current root project,
- * and launching it.
- */
-abstract class StudioTask : DefaultTask() {
-
-    // TODO: support -y and --update-only options? Can use @Option for this
-    @TaskAction
-    fun studiow() {
-        StudioWrapper.create(project).run {
-            update()
-            launch(services)
-        }
-    }
-
-    companion object {
-        private const val STUDIO_TASK = "studio"
-
-        fun Project.registerStudioTask() {
-            tasks.register(STUDIO_TASK, StudioTask::class.java)
-            // TODO: b/142859295 re-enable IDE plugin when we fix circular dependency
-            /*val taskProvider = tasks.register(STUDIO_TASK, StudioTask::class.java)
-            if (isUiProject) {
-                // Need to prepare the sandbox before we can run studio
-                taskProvider.dependsOn(":compose:compose-ide-plugin:prepareSandbox")
-            }*/
-        }
-    }
-}
-
-// TODO: compose-compiler-plugin relies on logic in here to set up the environment for its Intellij
-// plugin. If that is changed then this can be made to extend DefaultTask like a normal task
-/**
- * Project-independent common logic for updating / launching studio.
+ * Base class with common logic for updating and launching studio in both the frameworks/support
+ * project and the frameworks/support/ui project. Project-specific configuration is provided by
+ * [RootStudioWrapper] and [UiStudioWrapper].
  *
  * @param project the root project that Studio should be launched for
  */
 abstract class StudioWrapper(val project: Project) {
 
+    // TODO: compose-compiler-plugin relies on logic in this class to set up the environment for its
+    // Intellij plugin. If that is changed then this class can be made to extend DefaultTask
+    // like a normal task.
+
     protected val platformUtilities by lazy {
-        if (System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("linux")) {
-            PlatformUtilities.LinuxUtilities
-        } else {
-            PlatformUtilities.MacOsUtilities
-        }
+        StudioPlatformUtilities.get(projectRoot, studioInstallationDir)
     }
 
     protected val projectRoot: File = project.rootDir
 
-    private val studioVersions by lazy {
-        Properties().apply {
-            studioVersionsFile.inputStream().use(::load)
-        }
-    }
-
-    // Properties that come from studio_versions.properties
-    // Note: not all of these may be set for both projects
-    protected val ideaMajorVersion get() = studioVersions["idea_major_version"].toString()
-    protected val ideaMinorVersion get() = studioVersions["idea_minor_version"].toString()
-    protected val studioBuildNumber get() = studioVersions["studio_build_number"].toString()
-    protected val studioVersion get() = studioVersions["studio_version"].toString()
+    protected val studioVersions by lazy { StudioVersions.get() }
 
     /**
      * Directory name (not path) that Studio will be unzipped into.
      */
     private val studioDirectoryName: String
         get() {
-            val osName = platformUtilities.osName
-            return "android-studio-ide-$ideaMajorVersion.$studioBuildNumber-$osName"
+            val osName = StudioPlatformUtilities.osName
+            with(studioVersions) {
+                return "android-studio-ide-$ideaMajorVersion.$studioBuildNumber-$osName"
+            }
         }
 
     /**
@@ -108,7 +65,7 @@ abstract class StudioWrapper(val project: Project) {
     /**
      * The install directory containing Studio
      */
-    protected val studioInstallationDir by lazy { File(projectRoot, "studio/$studioDirectoryName") }
+    private val studioInstallationDir by lazy { File(projectRoot, "studio/$studioDirectoryName") }
 
     /**
      * Absolute path of the Studio archive
@@ -121,11 +78,6 @@ abstract class StudioWrapper(val project: Project) {
      * The idea.properties file that we want to tell Studio to use
      */
     protected abstract val ideaProperties: File
-
-    /**
-     * The studio_versions.properties file containing information about the version of Studio to use
-     */
-    protected abstract val studioVersionsFile: File
 
     /**
      * Creates the archive file and places it at [studioArchivePath], to be extracted later.
@@ -246,171 +198,10 @@ abstract class StudioWrapper(val project: Project) {
          * Creates the relevant [StudioWrapper] for the current root project.
          */
         @JvmStatic
-        fun create(project: Project) = if (isUiProject) {
+        fun create(project: Project) = if (SupportConfig.isUiProject()) {
             UiStudioWrapper(project)
         } else {
             RootStudioWrapper(project)
-        }
-    }
-
-    /**
-     * Utility class containing helper functions and values that change between Linux and OSX
-     */
-    sealed class PlatformUtilities {
-        /**
-         * The file extension used for this platform's Studio archive
-         */
-        abstract val archiveExtension: String
-
-        /**
-         * The name of this platform - this matches Studio's naming for their downloads.
-         */
-        abstract val osName: String
-        /**
-         * The binary directory of the Studio installation.
-         */
-        abstract val StudioWrapper.binaryDirectory: File
-
-        /**
-         * The build.txt file of the Studio installation.
-         */
-        abstract val StudioWrapper.buildTxt: File
-
-        /**
-         * The directory to copy the built compose ide plugn into, where it will get automatically
-         * picked up and enabled by Studio.
-         */
-        abstract val StudioWrapper.composeIdePluginDirectory: File
-
-        /**
-         * A list of arguments that will be executed in a shell to launch Studio.
-         */
-        abstract val StudioWrapper.launchCommandArguments: List<String>
-
-        /**
-         * The lib directory of the Studio installation.
-         */
-        abstract val StudioWrapper.libDirectory: File
-
-        /**
-         * The license path for the Studio installation.
-         */
-        abstract val StudioWrapper.licensePath: String
-
-        /**
-         * Extracts an archive at [fromPath] with [archiveExtension] to [toPath]
-         */
-        abstract fun extractArchive(fromPath: String, toPath: String, execSpec: ExecSpec)
-
-        /**
-         * Updates the Jvm heap size for this Studio installation.
-         * TODO: this is temporary until b/135183535 is fixed
-         */
-        abstract fun StudioWrapper.updateJvmHeapSize()
-
-        /**
-         * Regex to match '-Xmx512m' or similar, so we can replace it with a larger heap size.
-         */
-        protected val jvmHeapRegex = "-Xmx.*".toRegex()
-
-        object MacOsUtilities : PlatformUtilities() {
-            override val archiveExtension: String get() = ".zip"
-
-            override val osName: String get() = "mac"
-
-            override val StudioWrapper.binaryDirectory: File
-                get() {
-                    val file = studioInstallationDir.walk().maxDepth(1).find { file ->
-                        file.nameWithoutExtension.startsWith("Android Studio") &&
-                                file.extension == "app"
-                    }
-                    return requireNotNull(file) { "Android Studio*.app not found!" }
-                }
-
-            override val StudioWrapper.buildTxt: File
-                get() = File(binaryDirectory, "Contents/Resources/build.txt")
-
-            override val StudioWrapper.composeIdePluginDirectory: File
-                get() = File(binaryDirectory, "Contents/plugins/compose-ide-plugin")
-
-            override val StudioWrapper.launchCommandArguments: List<String>
-                get() {
-                    return listOf(
-                        "open",
-                        "-a",
-                        binaryDirectory.absolutePath,
-                        projectRoot.absolutePath
-                    )
-                }
-
-            override val StudioWrapper.libDirectory: File
-                get() = File(binaryDirectory, "Contents/lib")
-
-            override val StudioWrapper.licensePath: String
-                get() = File(binaryDirectory, "Contents/Resources/LICENSE.txt").absolutePath
-
-            override fun extractArchive(fromPath: String, toPath: String, execSpec: ExecSpec) {
-                with(execSpec) {
-                    executable("unzip")
-                    args(fromPath, "-d", toPath)
-                }
-            }
-
-            override fun StudioWrapper.updateJvmHeapSize() {
-                val vmoptions = File(binaryDirectory, "Contents/bin/studio.vmoptions")
-                val newText = vmoptions.readText().replace(jvmHeapRegex, "-Xmx8g")
-                vmoptions.writeText(newText)
-            }
-        }
-
-        object LinuxUtilities : PlatformUtilities() {
-            override val archiveExtension: String get() = ".tar.gz"
-
-            override val osName: String get() = "linux"
-
-            override val StudioWrapper.binaryDirectory: File
-                get() = File(studioInstallationDir, "android-studio")
-
-            override val StudioWrapper.buildTxt: File
-                get() = File(binaryDirectory, "build.txt")
-
-            override val StudioWrapper.composeIdePluginDirectory: File
-                get() = File(binaryDirectory, "plugins/compose-ide-plugin")
-
-            override val StudioWrapper.launchCommandArguments: List<String>
-                get() {
-                    val studioScript = File(binaryDirectory, "bin/studio.sh")
-                    return listOf(
-                        "sh",
-                        studioScript.absolutePath,
-                        projectRoot.absolutePath
-                    )
-                }
-
-            override val StudioWrapper.libDirectory: File
-                get() = File(binaryDirectory, "lib")
-
-            override val StudioWrapper.licensePath: String
-                get() = File(binaryDirectory, "LICENSE.txt").absolutePath
-
-            override fun extractArchive(fromPath: String, toPath: String, execSpec: ExecSpec) {
-                with(execSpec) {
-                    executable("tar")
-                    args("-xf", fromPath, "-C", toPath)
-                }
-            }
-
-            override fun StudioWrapper.updateJvmHeapSize() {
-                val vmoptions =
-                    File(binaryDirectory, "bin/studio.vmoptions")
-                val newText = vmoptions.readText().replace(jvmHeapRegex, "-Xmx4g")
-                vmoptions.writeText(newText)
-
-                val vmoptions64 =
-                    File(binaryDirectory, "bin/studio64.vmoptions")
-                val newText64 = vmoptions64.readText().replace(jvmHeapRegex, "-Xmx8g")
-                vmoptions64.writeText(newText64)
-            }
         }
     }
 }
@@ -420,7 +211,9 @@ open class RootStudioWrapper(project: Project) : StudioWrapper(project) {
      * Url to download the correct version of Studio from.
      */
     private val studioUrl by lazy {
-        "https://dl.google.com/dl/android/studio/ide-zips/$studioVersion/$studioArchiveName"
+        with(studioVersions) {
+            "https://dl.google.com/dl/android/studio/ide-zips/$studioVersion/$studioArchiveName"
+        }
     }
 
     override fun createStudioArchiveFile() {
@@ -438,10 +231,6 @@ open class RootStudioWrapper(project: Project) : StudioWrapper(project) {
         Files.move(Paths.get(tmpDownloadPath), Paths.get(studioArchivePath))
     }
 
-    override val studioVersionsFile by lazy {
-        File(projectRoot, "buildSrc/studio_versions.properties")
-    }
-
     override val ideaProperties by lazy {
         File(projectRoot, "development/studio/idea.properties")
     }
@@ -455,13 +244,6 @@ open class UiStudioWrapper(project: Project) : StudioWrapper(project) {
         val prebuiltsDir = SupportConfig.getPrebuiltsRootPath(project)
         File("$prebuiltsDir/androidx/studio/$studioArchiveName")
     }
-
-    /**
-     * Custom build version we set in build.txt as the Intellij gradle plugin doesn't like the
-     * dashes in the normal build.txt that comes from the prebuilts.
-     */
-    private val buildVersion: String
-        get() = "AI-$ideaMajorVersion.$ideaMinorVersion.$studioBuildNumber"
 
     override fun createStudioArchiveFile() {
         // Copy archive from prebuilts to the parent directory of the install directory
@@ -502,17 +284,11 @@ open class UiStudioWrapper(project: Project) : StudioWrapper(project) {
         // Intellij gradle plugin, so we overwrite it with one that we know it will accept.
         with(platformUtilities) {
             buildTxt.createNewFile()
-            buildTxt.writeText(buildVersion)
+            buildTxt.writeText(studioVersions.buildTxtOverride)
         }
-    }
-
-    override val studioVersionsFile by lazy {
-        File(projectRoot, "studio_versions.properties")
     }
 
     override val ideaProperties by lazy {
         File(projectRoot, "idea.properties")
     }
 }
-
-private val isUiProject get() = System.getProperty("DIST_SUBDIR") == "/ui"

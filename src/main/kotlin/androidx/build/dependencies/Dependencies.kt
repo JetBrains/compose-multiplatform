@@ -16,6 +16,8 @@
 
 package androidx.build.dependencies
 
+import androidx.build.SupportConfig
+
 const val ANDROID_GRADLE_PLUGIN = "com.android.tools.build:gradle:3.4.2"
 const val ANDROIDX_TEST_CORE = "androidx.test:core:1.2.0"
 const val ANDROIDX_TEST_EXT_JUNIT = "androidx.test.ext:junit:1.1.1"
@@ -54,8 +56,7 @@ const val KOTLINPOET = "com.squareup:kotlinpoet:1.4.0"
 const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.20"
 
 const val COMPOSE_VERSION = "1.3.60-withExperimentalGoogleExtensions-20191016"
-private val isUiProject = System.getProperty("DIST_SUBDIR") == "/ui"
-private val KOTLIN_VERSION = if (isUiProject) COMPOSE_VERSION else "1.3.50"
+private val KOTLIN_VERSION = if (SupportConfig.isUiProject()) COMPOSE_VERSION else "1.3.50"
 val KOTLIN_STDLIB = "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
 val KOTLIN_TEST_COMMON = "org.jetbrains.kotlin:kotlin-test:$KOTLIN_VERSION"
 const val KOTLIN_COMPOSE_STDLIB = "org.jetbrains.kotlin:kotlin-stdlib:$COMPOSE_VERSION"

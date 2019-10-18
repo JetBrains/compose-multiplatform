@@ -29,7 +29,11 @@ fun isRunningOnBuildServer() = System.getenv("DIST_DIR") != null
  * distribution directory name.
  */
 fun getBuildId(): String {
-    return if (System.getenv("DIST_DIR") != null) File(System.getenv("DIST_DIR").removeSuffix("/ui")).name else "0"
+    return if (System.getenv("DIST_DIR") != null) {
+        File(System.getenv("DIST_DIR").removeSuffix("/ui")).name
+    } else {
+        "0"
+    }
 }
 
 /**
@@ -40,7 +44,7 @@ fun Project.getDistributionDirectory(): File {
     return if (System.getenv("DIST_DIR") != null) {
         File(System.getenv("DIST_DIR"))
     } else {
-        val subdir = System.getProperty("DIST_SUBDIR") ?: ""
+        val subdir = System.getenv("DIST_SUBDIR") ?: ""
         File(getRootDirectory(this), "../../out/dist$subdir")
     }
 }
