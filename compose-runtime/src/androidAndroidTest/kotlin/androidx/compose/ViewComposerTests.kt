@@ -32,6 +32,8 @@ import junit.framework.TestCase.assertEquals
 import org.junit.Rule
 import org.junit.runner.RunWith
 import org.junit.Test
+import java.lang.AssertionError
+import java.lang.IllegalStateException
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertTrue
@@ -1025,11 +1027,32 @@ class DisposeTests {
 internal val Activity.root get() = findViewById(ComposerComposeTestCase.ROOT_ID) as ViewGroup
 
 internal fun Activity.uiThread(block: () -> Unit) {
+    val latch = CountDownLatch(1)
+    var throwable: Throwable? = null
     runOnUiThread(object : Runnable {
         override fun run() {
-            block()
+            try {
+                block()
+            } catch (e: Throwable) {
+                throwable = e
+            } finally {
+                latch.countDown()
+            }
         }
     })
+
+    val completed = latch.await(5, TimeUnit.SECONDS)
+    if (!completed) error("UI thread work did not complete within 5 seconds")
+    throwable?.let {
+        throw when (it) {
+            is AssertionError -> AssertionError(it.localizedMessage, it)
+            else ->
+                IllegalStateException(
+                    "UI thread threw an exception: ${it.localizedMessage}",
+                    it
+                )
+        }
+    }
 }
 
 internal fun Activity.disposeTestComposition() {
