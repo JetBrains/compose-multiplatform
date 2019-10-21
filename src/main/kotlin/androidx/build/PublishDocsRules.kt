@@ -100,7 +100,7 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.NAVIGATION.group, "navigation-dynamic-features-fragment")
     ignore(LibraryGroups.NAVIGATION.group, "navigation-safe-args-generator")
     ignore(LibraryGroups.NAVIGATION.group, "navigation-safe-args-gradle-plugin")
-    prebuilts(LibraryGroups.NAVIGATION, "2.2.0-beta01")
+    prebuilts(LibraryGroups.NAVIGATION, "2.2.0-rc01")
     prebuilts(LibraryGroups.PAGING, "2.1.0")
     prebuilts(LibraryGroups.PALETTE, "1.0.0")
     prebuilts(LibraryGroups.PERCENTLAYOUT, "1.0.0")
