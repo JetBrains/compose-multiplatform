@@ -23,6 +23,17 @@ import androidx.compose.synchronized
 class FrameAborted(val frame: Frame) : RuntimeException("Frame aborted")
 
 /**
+ * Frame id of 0 is reserved as invalid and no state record with frame 0 is considered valid.
+ *
+ * The value 0 was chosen as it is the default value of the Int frame id type and records initially
+ * created will naturally have a frame id of 0. If this wasn't considered invalid adding such a
+ * record to a framed object will make the state record immediately visible to all frames instead of
+ * being born invalid. Using 0 ensures all state records are created invalid and must be explicitly
+ * marked as valid in for a frame.
+ */
+private const val INVALID_FRAME = 0
+
+/**
  * The frame records are created with frame ID CREATION_FRAME when not in a frame.
  * This allows framed object to be created in the in static initializers when a
  * frame could not have been created yet.
@@ -160,12 +171,12 @@ fun currentFrame(): Frame {
 
 val inFrame: Boolean get() = threadFrame.get() != null
 
-// A global synchronization object
+// A global synchronization object. This synchronization object should be taken before modifying any
+// of the fields below.
 private val sync = Any()
 
 // The following variables should only be written when sync is taken
 private val openFrames = BitSet()
-private val abortedFrames = BitSet()
 
 // The first frame created must be at least on more than the CREATION_FRAME so objects
 // created ouside a frame (that use the CREATION_FRAME as there id) and modified in the first
@@ -177,10 +188,7 @@ private var maxFrameId = CREATION_FRAME + 1
  * new frames
  */
 private fun currentInvalid(): BitSet {
-    return BitSet().apply {
-        or(openFrames)
-        or(abortedFrames)
-    }
+    return openFrames.copy()
 }
 
 private fun BitSet.copy(): BitSet {
@@ -228,9 +236,7 @@ fun open(readObserver: FrameReadObserver? = null, writeObserver: FrameWriteObser
  * Commits the pending frame if there one is open. Intended to be used in a `finally` clause
  */
 fun commitHandler() = threadFrame.get()?.let {
-    commit(
-        it
-    )
+    commit(it)
 }
 
 /**
@@ -291,7 +297,7 @@ fun commit(frame: Frame) {
             // (e.g. using a conflict-free data type) this could also be allowed here.
 
             val current = currentInvalid()
-            val nextFrame = maxFrameId + 1
+            val nextFrame = maxFrameId
             val start = frame.invalid.copy().apply { set(frame.id) }
             val id = frame.id
             for (framed in frame.modified) {
@@ -353,7 +359,22 @@ fun abortHandler() {
 fun abortHandler(frame: Frame) {
     synchronized(sync) {
         validateOpen(frame)
-        abortedFrames.set(frame.id)
+
+        // Reset all state records created in this frame as invalid
+        frame.modified?.let { modified ->
+            val id = frame.id
+            for (framed in modified) {
+                var current: Record? = framed.firstFrameRecord
+                while (current != null) {
+                    if (current.frameId == id) {
+                        current.frameId = INVALID_FRAME
+                    }
+                    current = current.next
+                }
+            }
+        }
+
+        // The frame can now be closed.
         closeFrame(frame)
     }
 }
@@ -396,8 +417,9 @@ private fun valid(currentFrame: Int, candidateFrame: Int, invalid: BitSet): Bool
     // All frames born after the current frame are considered invalid since they occur after the
     // current frame was open.
     //
-    // Id 0 is reserved as an invalid frame.
-    return candidateFrame != 0 && candidateFrame <= currentFrame && !invalid.get(candidateFrame)
+    // INVALID_FRAME is reserved as an invalid frame.
+    return candidateFrame != INVALID_FRAME && candidateFrame <= currentFrame &&
+            !invalid.get(candidateFrame)
 }
 
 // Determine if the given data is valid for the frame.
@@ -450,8 +472,10 @@ private fun used(framed: Framed, id: Int, invalid: BitSet): Record? {
     var validRecord: Record? = null
     while (current != null) {
         val currentId = current.frameId
-        if (abortedFrames[currentId])
+        if (currentId == INVALID_FRAME) {
+            // Any frames that were marked invalid by an aborted frame can be used immediately.
             return current
+        }
         if (valid(current, id - 1, invalid)) {
             if (validRecord == null) {
                 validRecord = current
