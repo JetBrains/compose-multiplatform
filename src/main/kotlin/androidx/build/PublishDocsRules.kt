@@ -97,6 +97,7 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.NAVIGATION.group, "navigation-testing")
     ignore(LibraryGroups.NAVIGATION.group, "navigation-dynamic-features-activity")
     ignore(LibraryGroups.NAVIGATION.group, "navigation-dynamic-features-core")
+    ignore(LibraryGroups.NAVIGATION.group, "navigation-dynamic-features-fragment")
     ignore(LibraryGroups.NAVIGATION.group, "navigation-safe-args-generator")
     ignore(LibraryGroups.NAVIGATION.group, "navigation-safe-args-gradle-plugin")
     prebuilts(LibraryGroups.NAVIGATION, "2.2.0-beta01")
