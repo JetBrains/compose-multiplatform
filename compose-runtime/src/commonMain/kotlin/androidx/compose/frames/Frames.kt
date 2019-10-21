@@ -16,7 +16,6 @@
 
 package androidx.compose.frames
 
-import androidx.compose.BitSet
 import androidx.compose.ThreadLocal
 import androidx.compose.synchronized
 
@@ -102,7 +101,7 @@ private val threadFrame = ThreadLocal<Frame>()
 /**
  * Information about a frame including the frame id and whether or not it is read only.
  */
-class Frame(
+class Frame internal constructor(
     /**
      * The id of the frame. This value is monotonically increasing for each frame created.
      */
@@ -112,7 +111,7 @@ class Frame(
      * A set of all the frames that should be treated as invalid. That is the set of all frames open
      * or aborted.
      */
-    internal val invalid: BitSet,
+    internal val invalid: FrameIdSet,
 
     /**
      * True if the frame is read only
@@ -176,24 +175,12 @@ val inFrame: Boolean get() = threadFrame.get() != null
 private val sync = Any()
 
 // The following variables should only be written when sync is taken
-private val openFrames = BitSet()
+private var openFrames = FrameIdSet.EMPTY
 
 // The first frame created must be at least on more than the CREATION_FRAME so objects
 // created ouside a frame (that use the CREATION_FRAME as there id) and modified in the first
 // frame will be seen as modified.
 private var maxFrameId = CREATION_FRAME + 1
-
-/**
- * Return the frames that are currently open or aborted which should be considered invalid for any
- * new frames
- */
-private fun currentInvalid(): BitSet {
-    return openFrames.copy()
-}
-
-private fun BitSet.copy(): BitSet {
-    return BitSet().apply { or(this@copy) }
-}
 
 private fun open(
     readOnly: Boolean,
@@ -203,7 +190,7 @@ private fun open(
     validateNotInFrame()
     synchronized(sync) {
         val id = maxFrameId++
-        val invalid = currentInvalid()
+        val invalid = openFrames
         val frame = Frame(
             id = id,
             invalid = invalid,
@@ -211,7 +198,7 @@ private fun open(
             readObserver = readObserver,
             writeObserver = writeObserver
         )
-        openFrames.set(id)
+        openFrames = openFrames.set(id)
         threadFrame.set(frame)
         return frame
     }
@@ -280,7 +267,7 @@ fun commit(frame: Frame) {
     // no writes occurred.
     val modified = frame.modified
     val listeners = synchronized(sync) {
-        if (!openFrames[frame.id]) throw IllegalStateException("Frame not open")
+        if (!openFrames.get(frame.id)) throw IllegalStateException("Frame not open")
         if (modified == null || modified.size == 0) {
             closeFrame(frame)
             emptyList()
@@ -296,9 +283,9 @@ fun commit(frame: Frame) {
             // to a record are considered atomic. Additionally, if the field values can be merged
             // (e.g. using a conflict-free data type) this could also be allowed here.
 
-            val current = currentInvalid()
+            val current = openFrames
             val nextFrame = maxFrameId
-            val start = frame.invalid.copy().apply { set(frame.id) }
+            val start = frame.invalid.set(frame.id)
             val id = frame.id
             for (framed in frame.modified) {
                 val first = framed.firstFrameRecord
@@ -325,7 +312,7 @@ fun commit(frame: Frame) {
  * Throw an exception if a frame is not open
  */
 private fun validateOpen(frame: Frame) {
-    if (!openFrames[frame.id]) throw IllegalStateException("Frame not open")
+    if (!openFrames.get(frame.id)) throw IllegalStateException("Frame not open")
 }
 
 /**
@@ -357,26 +344,25 @@ fun abortHandler() {
  * Abort the given frame.
  */
 fun abortHandler(frame: Frame) {
-    synchronized(sync) {
-        validateOpen(frame)
+    validateOpen(frame)
 
-        // Reset all state records created in this frame as invalid
-        frame.modified?.let { modified ->
-            val id = frame.id
-            for (framed in modified) {
-                var current: Record? = framed.firstFrameRecord
-                while (current != null) {
-                    if (current.frameId == id) {
-                        current.frameId = INVALID_FRAME
-                    }
-                    current = current.next
+    // Mark all state records created in this frame as invalid
+    frame.modified?.let { modified ->
+        val id = frame.id
+        for (framed in modified) {
+            var current: Record? = framed.firstFrameRecord
+            while (current != null) {
+                if (current.frameId == id) {
+                    current.frameId = INVALID_FRAME
+                    break
                 }
+                current = current.next
             }
         }
-
-        // The frame can now be closed.
-        closeFrame(frame)
     }
+
+    // The frame can now be closed.
+    closeFrame(frame)
 }
 
 /**
@@ -394,25 +380,23 @@ fun suspend(): Frame {
  */
 fun restore(frame: Frame) {
     validateNotInFrame()
-    synchronized(sync) {
-        validateOpen(frame)
-        threadFrame.set(frame)
-    }
+    validateOpen(frame)
+    threadFrame.set(frame)
 }
 
 private fun closeFrame(frame: Frame) {
     synchronized(sync) {
-        openFrames.clear(frame.id)
+        openFrames = openFrames.clear(frame.id)
     }
     threadFrame.set(null)
 }
 
-private fun valid(currentFrame: Int, candidateFrame: Int, invalid: BitSet): Boolean {
+private fun valid(currentFrame: Int, candidateFrame: Int, invalid: FrameIdSet): Boolean {
     // A candidate frame is valid if the it is less than or equal to the current frame
     // and it wasn't specifically marked as invalid when the frame started.
     //
-    // All frames open or aborted at the start of the current frame are considered invalid
-    // for a frame (they have not been committed and therefore are considered invalid).
+    // All frames open at the start of the current frame are considered invalid for a frame (they
+    // have not been committed and therefore are considered invalid).
     //
     // All frames born after the current frame are considered invalid since they occur after the
     // current frame was open.
@@ -423,12 +407,12 @@ private fun valid(currentFrame: Int, candidateFrame: Int, invalid: BitSet): Bool
 }
 
 // Determine if the given data is valid for the frame.
-private fun valid(data: Record, frame: Int, invalid: BitSet): Boolean {
+private fun valid(data: Record, frame: Int, invalid: FrameIdSet): Boolean {
     return valid(frame, data.frameId, invalid)
 }
 
-private fun <T : Record> readable(r: T, id: Int, invalid: BitSet): T {
-    // The readable record valid record with the highest frameId
+private fun <T : Record> readable(r: T, id: Int, invalid: FrameIdSet): T {
+    // The readable record is the valid record with the highest frameId
     var current: Record? = r
     var candidate: Record? = null
     while (current != null) {
@@ -467,7 +451,7 @@ fun <T : Record> T.writable(framed: Framed): T {
  * created in an aborted frame. It is also true if the record is valid in the previous frame and is
  * obscured by another record also valid in the previous frame record.
  */
-private fun used(framed: Framed, id: Int, invalid: BitSet): Record? {
+private fun used(framed: Framed, id: Int, invalid: FrameIdSet): Record? {
     var current: Record? = framed.firstFrameRecord
     var validRecord: Record? = null
     while (current != null) {
@@ -512,10 +496,11 @@ fun <T : Record> T.writable(framed: Framed, frame: Frame): T {
     // The first write to an framed in frame
     frame.writeObserver?.let { it(framed) }
 
-    // Otherwise, make a copy of the readable data and mark it as born in this frame, making it writable.
+    // Otherwise, make a copy of the readable data and mark it as born in this frame, making it
+    // writable.
     val newData = synchronized(framed) {
         // Calling used() on a framed object might return the same record for each thread calling
-        // used() therefore selecting the record to reuse should guarded.
+        // used() therefore selecting the record to reuse should be guarded.
 
         // Note: setting the frameId to Int.MAX_VALUE will make it invalid for all frames. This
         // means we can release the lock on the object as used() will no longer select it. Using id
