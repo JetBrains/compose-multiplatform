@@ -26,6 +26,17 @@ import java.io.File
  */
 private const val CHECK_UNKNOWN_NULLNESS = "checkUnknownNullness"
 
+/**
+ * Setting this property means that lint will update lint-baseline.xml if it exists.
+ */
+private const val UPDATE_LINT_BASELINE = "updateLintBaseline"
+
+/**
+ * Property used by Lint to continue creating baselines without failing lint, normally set by:
+ * -Dlint.baselines.continue=true from command line.
+ */
+private const val LINT_BASELINE_CONTINUE = "lint.baselines.continue"
+
 fun Project.configureNonAndroidProjectForLint(extension: AndroidXExtension) {
     apply(mapOf("plugin" to "com.android.lint"))
 
@@ -43,6 +54,12 @@ fun Project.configureNonAndroidProjectForLint(extension: AndroidXExtension) {
 }
 
 fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension) {
+    // If -PcheckUnknownNullness was set we should fail on UnknownNullness warnings
+    val checkUnknownNullness = hasProperty(CHECK_UNKNOWN_NULLNESS)
+
+    // If -PupdateLintBaseline was set we should update the baseline if it exists
+    val updateLintBaseline = hasProperty(UPDATE_LINT_BASELINE)
+
     // Lint is configured entirely in afterEvaluate so that individual projects cannot easily
     // disable individual checks in the DSL for any reason. That being said, when rolling out a new
     // check as fatal, it can be beneficial to set it to fatal above this comment. This allows you
@@ -67,9 +84,6 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
             isQuiet = true
 
             fatal("VisibleForTests")
-
-            // If -PcheckUnknownNullness was set we should fail on UnknownNullness warnings
-            val checkUnknownNullness = hasProperty(CHECK_UNKNOWN_NULLNESS)
 
             if (extension.compilationTarget != CompilationTarget.HOST) {
                 // Ignore other errors since we are only interested in nullness here
@@ -102,9 +116,6 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
                 }
             }
 
-            // Baseline file for all legacy lint warnings.
-            val baselineFile = lintBaseline
-
             val lintDebugTask = tasks.named("lintDebug")
 
             if (checkUnknownNullness) {
@@ -115,17 +126,26 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
                         )
                     }
                 }
-            } else if (baselineFile.exists()) {
-                // Number of currently ignored UnknownNullness errors
-                val count = baselineFile.readText().split("UnknownNullness").size - 1
-                if (count > 0) {
-                    lintDebugTask.configure {
-                        it.doLast {
-                            logger.warn(getIgnoreNullnessError(count))
+            } else if (lintBaseline.exists()) {
+                if (updateLintBaseline) {
+                    // Continue generating baselines regardless of errors
+                    isAbortOnError = false
+                    // Avoid printing every single lint error to the terminal
+                    textReport = false
+                    lintBaseline.delete()
+                    System.setProperty(LINT_BASELINE_CONTINUE, "true")
+                } else {
+                    // Number of currently ignored UnknownNullness errors
+                    val count = lintBaseline.readText().split("UnknownNullness").size - 1
+                    if (count > 0) {
+                        lintDebugTask.configure {
+                            it.doLast {
+                                logger.warn(getIgnoreNullnessError(count))
+                            }
                         }
                     }
                 }
-                baseline(baselineFile)
+                baseline(lintBaseline)
             }
         }
     }
