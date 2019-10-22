@@ -257,21 +257,6 @@ class AndroidXPlugin : Plugin<Project> {
     }
 
     private fun Project.configureRootProject() {
-        // TODO(b/141930169): Temporarily disable a blocking lint check that cannot be baselined and
-        //  is caused by the webview-support-interfaces project, which is mirrored from an
-        //  external repo. This exception was added as part of the upgrade to AGP 3.6, which
-        //  fixed a bug with source visibility to our linter
-        val webviewProject = findProject("webview-support-interfaces")
-        webviewProject?.plugins?.all { plugin ->
-            if (plugin is LibraryPlugin) {
-                webviewProject.extensions.getByType<LibraryExtension>().apply {
-                    lintOptions.apply {
-                        disable.add("NewApi")
-                    }
-                }
-            }
-        }
-
         if (isRunningOnBuildServer()) {
             gradle.startParameter.showStacktrace = ShowStacktrace.ALWAYS
         }
