@@ -380,6 +380,19 @@ class AndroidXPlugin : Plugin<Project> {
         registerStudioTask()
 
         TaskUpToDateValidator.setup(project)
+
+        project.tasks.register("listTaskOutputs", ListTaskOutputsTask::class.java) { task ->
+            task.setOutput(File(project.getDistributionDirectory(), "task_outputs.txt"))
+            task.removePrefix(File(rootProjectDir, "../../").canonicalFile.path)
+
+            task.doFirst {
+                allprojects { project ->
+                    project.tasks.all { otherTask ->
+                        task.addTask(otherTask)
+                    }
+                }
+            }
+        }
     }
 
     private fun TestedExtension.configureAndroidCommonOptions(
