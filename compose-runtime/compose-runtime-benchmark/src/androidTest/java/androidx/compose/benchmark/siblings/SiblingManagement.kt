@@ -31,13 +31,6 @@ import androidx.ui.text.TextStyle
 import kotlin.random.Random
 
 @Composable
-fun Stack(children: @Composable() () -> Unit) {
-    Column(ExpandedHeight) {
-        children()
-    }
-}
-
-@Composable
 fun PivotalItemRow(@Pivotal item: Item) {
     val color = when (item.id % 3) {
         0 -> Color.Blue
@@ -109,7 +102,7 @@ fun <T> List<T>.update(reorderType: ReorderType, random: Random, factory: (Int) 
 
 @Composable
 fun SiblingManagement(identity: IdentityType, items: List<Item>) {
-    Stack {
+    Column(ExpandedHeight) {
         when (identity) {
             IdentityType.Pivotal -> {
                 for (item in items) {

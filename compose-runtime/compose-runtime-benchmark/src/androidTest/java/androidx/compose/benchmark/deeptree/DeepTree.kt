@@ -23,6 +23,7 @@ import androidx.ui.graphics.Color
 import androidx.ui.layout.Column
 import androidx.ui.layout.ExpandedHeight
 import androidx.ui.layout.ExpandedWidth
+import androidx.ui.layout.FlexScope
 import androidx.ui.layout.Row
 
 @Composable
@@ -36,11 +37,11 @@ fun Terminal(style: Int) {
 }
 
 @Composable
-fun Stack(vertical: Boolean, children: @Composable() () -> Unit) {
+fun Stack(vertical: Boolean, children: @Composable() FlexScope.() -> Unit) {
     if (vertical) {
-        Column(ExpandedHeight) { children() }
+        Column(ExpandedHeight, block = children)
     } else {
-        Row(ExpandedWidth) { children() }
+        Row(ExpandedWidth, block = children)
     }
 }
 

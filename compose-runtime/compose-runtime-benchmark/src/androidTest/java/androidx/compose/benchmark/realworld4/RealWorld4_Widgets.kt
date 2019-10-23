@@ -141,7 +141,7 @@ fun RealWorld4_FancyWidget_001(
                             model = model.f15
                         )
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -151,7 +151,7 @@ fun RealWorld4_FancyWidget_001(
                             model = model.f15
                         )
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -314,8 +314,9 @@ fun RealWorld4_FancyWidget_003(
                             ) {
                                 RealWorld4_FancyWidget_007(
                                     number = 55,
-                                    model = model.f5.f2.f0.f11
-                                ) { children(); }
+                                    model = model.f5.f2.f0.f11,
+                                    children = children
+                                )
                             }
                         }
                     }
@@ -347,8 +348,9 @@ fun RealWorld4_FancyWidget_003(
                             ) {
                                 RealWorld4_FancyWidget_007(
                                     number = 56,
-                                    model = model.f5.f2.f0.f11
-                                ) { children(); }
+                                    model = model.f5.f2.f0.f11,
+                                    children = children
+                                )
                             }
                         }
                     }
@@ -401,8 +403,9 @@ fun RealWorld4_FancyWidget_004(
                             number = 310,
                             s1 = "HelloWorld",
                             model = model.f0,
-                            s2 = "HelloWorld"
-                        ) { children(); }
+                            s2 = "HelloWorld",
+                            children = children
+                        )
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_139(model = model.f2) {
@@ -422,8 +425,9 @@ fun RealWorld4_FancyWidget_004(
                             number = 351,
                             s1 = "HelloWorld",
                             model = model.f0,
-                            s2 = "HelloWorld"
-                        ) { children(); }
+                            s2 = "HelloWorld",
+                            children = children
+                        )
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_139(model = model.f2) {
@@ -488,8 +492,9 @@ fun RealWorld4_FancyWidget_005(
                         RealWorld4_FancyWidget_133(
                             model = model.f0,
                             s1 = "HelloWorld",
-                            s2 = "HelloWorld"
-                        ) { children(); }
+                            s2 = "HelloWorld",
+                            children = children
+                        )
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_075(
@@ -528,8 +533,9 @@ fun RealWorld4_FancyWidget_005(
                         RealWorld4_FancyWidget_133(
                             model = model.f0,
                             s1 = "HelloWorld",
-                            s2 = "HelloWorld"
-                        ) { children(); }
+                            s2 = "HelloWorld",
+                            children = children
+                        )
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_075(
@@ -614,7 +620,7 @@ fun RealWorld4_FancyWidget_006(
                             ) { ColoredRect(model.toColor()); }
                         }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -633,7 +639,7 @@ fun RealWorld4_FancyWidget_006(
                             ) { ColoredRect(model.toColor()); }
                         }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -687,7 +693,7 @@ fun RealWorld4_FancyWidget_007(
                         }
                     }
                     flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_085(model = model.f7) { children(); }
+                        RealWorld4_FancyWidget_085(model = model.f7, children = children)
                     }
                 }
             } else {
@@ -708,7 +714,7 @@ fun RealWorld4_FancyWidget_007(
                         }
                     }
                     flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_085(model = model.f7) { children(); }
+                        RealWorld4_FancyWidget_085(model = model.f7, children = children)
                     }
                 }
             }
@@ -752,7 +758,7 @@ fun RealWorld4_FancyWidget_008(
                             s1 = "HelloWorld"
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -762,7 +768,7 @@ fun RealWorld4_FancyWidget_008(
                             s1 = "HelloWorld"
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -806,7 +812,7 @@ fun RealWorld4_FancyWidget_009(
                             model = model.f5
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -817,7 +823,7 @@ fun RealWorld4_FancyWidget_009(
                             model = model.f5
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -861,12 +867,12 @@ fun RealWorld4_FancyWidget_010(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -945,8 +951,9 @@ fun RealWorld4_FancyWidget_012(
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_091(
                             model = model.f2,
-                            s1 = "HelloWorld"
-                        ) { children(); }
+                            s1 = "HelloWorld",
+                            children = children
+                        )
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_110(
@@ -962,8 +969,9 @@ fun RealWorld4_FancyWidget_012(
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_091(
                             model = model.f2,
-                            s1 = "HelloWorld"
-                        ) { children(); }
+                            s1 = "HelloWorld",
+                            children = children
+                        )
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_110(
@@ -1010,12 +1018,12 @@ fun RealWorld4_FancyWidget_013(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -1053,12 +1061,12 @@ fun RealWorld4_FancyWidget_014(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -1113,7 +1121,7 @@ fun RealWorld4_FancyWidget_015(
                             ) { ColoredRect(model.toColor()); }
                         }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -1129,7 +1137,7 @@ fun RealWorld4_FancyWidget_015(
                             ) { ColoredRect(model.toColor()); }
                         }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -1178,8 +1186,9 @@ fun RealWorld4_FancyWidget_016(
                             number = 915,
                             obj = RealWorld4_UnmemoizablePojo_12(),
                             b = true,
-                            model = model.f5
-                        ) { children(); }
+                            model = model.f5,
+                            children = children
+                        )
                     }
                 }
             } else {
@@ -1196,8 +1205,9 @@ fun RealWorld4_FancyWidget_016(
                             number = 775,
                             obj = RealWorld4_UnmemoizablePojo_12(),
                             b = true,
-                            model = model.f5
-                        ) { children(); }
+                            model = model.f5,
+                            children = children
+                        )
                     }
                 }
             }
@@ -1357,12 +1367,12 @@ fun RealWorld4_FancyWidget_019(model: RealWorld4_DataModel_10, children: @Compos
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -1412,12 +1422,12 @@ fun RealWorld4_FancyWidget_020(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -1446,12 +1456,12 @@ fun RealWorld4_FancyWidget_021(model: RealWorld4_DataModel_10, children: @Compos
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -1505,8 +1515,9 @@ fun RealWorld4_FancyWidget_022(
                         RealWorld4_FancyWidget_015(
                             number = 667,
                             model = model.f5,
-                            s1 = "HelloWorld"
-                        ) { children(); }
+                            s1 = "HelloWorld",
+                            children = children
+                        )
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_045(
@@ -1529,8 +1540,9 @@ fun RealWorld4_FancyWidget_022(
                         RealWorld4_FancyWidget_015(
                             number = 522,
                             model = model.f5,
-                            s1 = "HelloWorld"
-                        ) { children(); }
+                            s1 = "HelloWorld",
+                            children = children
+                        )
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_045(
@@ -1594,7 +1606,7 @@ fun RealWorld4_FancyWidget_023(
                             obj = RealWorld4_UnmemoizablePojo_9()
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -1604,7 +1616,7 @@ fun RealWorld4_FancyWidget_023(
                             obj = RealWorld4_UnmemoizablePojo_9()
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -1653,7 +1665,7 @@ fun RealWorld4_FancyWidget_024(
                             b = true
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -1663,7 +1675,7 @@ fun RealWorld4_FancyWidget_024(
                             b = false
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -1701,7 +1713,7 @@ fun RealWorld4_FancyWidget_025(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_138(model = model.f2) { children(); }
+                        RealWorld4_FancyWidget_138(model = model.f2, children = children)
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_050(
@@ -1713,7 +1725,7 @@ fun RealWorld4_FancyWidget_025(
             } else {
                 FlexRow {
                     flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_138(model = model.f2) { children(); }
+                        RealWorld4_FancyWidget_138(model = model.f2, children = children)
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_050(
@@ -1764,12 +1776,12 @@ fun RealWorld4_FancyWidget_026(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -1807,12 +1819,12 @@ fun RealWorld4_FancyWidget_027(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -1910,7 +1922,7 @@ fun RealWorld4_FancyWidget_029(
                             s2 = "HelloWorld"
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -1920,7 +1932,7 @@ fun RealWorld4_FancyWidget_029(
                             s2 = "HelloWorld"
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -1964,7 +1976,7 @@ fun RealWorld4_FancyWidget_030(
                             model = model.f5
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -1975,7 +1987,7 @@ fun RealWorld4_FancyWidget_030(
                             model = model.f5
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -2056,12 +2068,12 @@ fun RealWorld4_FancyWidget_032(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -2105,7 +2117,7 @@ fun RealWorld4_FancyWidget_033(
                             s2 = "HelloWorld"
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -2116,7 +2128,7 @@ fun RealWorld4_FancyWidget_033(
                             s2 = "HelloWorld"
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -2160,12 +2172,12 @@ fun RealWorld4_FancyWidget_034(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -2209,12 +2221,12 @@ fun RealWorld4_FancyWidget_035(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -2252,12 +2264,12 @@ fun RealWorld4_FancyWidget_036(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -2414,12 +2426,12 @@ fun RealWorld4_FancyWidget_038(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { RealWorld4_FancyWidget_054(model = model.f5); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { RealWorld4_FancyWidget_054(model = model.f5); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -2471,8 +2483,9 @@ fun RealWorld4_FancyWidget_039(
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_040(
                             model = model.f4,
-                            s2 = "HelloWorld"
-                        ) { children(); }
+                            s2 = "HelloWorld",
+                            children = children
+                        )
                     }
                 }
             } else {
@@ -2486,8 +2499,9 @@ fun RealWorld4_FancyWidget_039(
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_040(
                             model = model.f4,
-                            s2 = "HelloWorld"
-                        ) { children(); }
+                            s2 = "HelloWorld",
+                            children = children
+                        )
                     }
                 }
             }
@@ -2531,7 +2545,7 @@ fun RealWorld4_FancyWidget_040(
                             model = model.f2
                         )
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -2541,7 +2555,7 @@ fun RealWorld4_FancyWidget_040(
                             model = model.f2
                         )
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -2581,8 +2595,9 @@ fun RealWorld4_FancyWidget_041(
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_089(
                             model = model.f2,
-                            s2 = "HelloWorld"
-                        ) { children(); }
+                            s2 = "HelloWorld",
+                            children = children
+                        )
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_027(
@@ -2599,8 +2614,9 @@ fun RealWorld4_FancyWidget_041(
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_089(
                             model = model.f2,
-                            s2 = "HelloWorld"
-                        ) { children(); }
+                            s2 = "HelloWorld",
+                            children = children
+                        )
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_027(
@@ -2654,12 +2670,12 @@ fun RealWorld4_FancyWidget_042(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -2722,7 +2738,7 @@ fun RealWorld4_FancyWidget_043(
                             s1 = "HelloWorld"
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -2733,7 +2749,7 @@ fun RealWorld4_FancyWidget_043(
                             s1 = "HelloWorld"
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -2801,8 +2817,9 @@ fun RealWorld4_FancyWidget_044(
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_030(
                             s1 = "HelloWorld",
-                            model = model.f4
-                        ) { children(); }
+                            model = model.f4,
+                            children = children
+                        )
                     }
                 }
             } else {
@@ -2821,8 +2838,9 @@ fun RealWorld4_FancyWidget_044(
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_030(
                             s1 = "HelloWorld",
-                            model = model.f4
-                        ) { children(); }
+                            model = model.f4,
+                            children = children
+                        )
                     }
                 }
             }
@@ -2883,7 +2901,7 @@ fun RealWorld4_FancyWidget_045(
                             number = 744
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -2893,7 +2911,7 @@ fun RealWorld4_FancyWidget_045(
                             number = 709
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -2936,7 +2954,7 @@ fun RealWorld4_FancyWidget_046(
                             s2 = "HelloWorld"
                         )
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -2946,7 +2964,7 @@ fun RealWorld4_FancyWidget_046(
                             s2 = "HelloWorld"
                         )
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -2975,12 +2993,12 @@ fun RealWorld4_FancyWidget_047(model: RealWorld4_DataModel_10, children: @Compos
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -3018,12 +3036,12 @@ fun RealWorld4_FancyWidget_048(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -3064,8 +3082,9 @@ fun RealWorld4_FancyWidget_049(
                         RealWorld4_FancyWidget_107(
                             s2 = "HelloWorld",
                             model = model.f2,
-                            s1 = "HelloWorld"
-                        ) { children(); }
+                            s1 = "HelloWorld",
+                            children = children
+                        )
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_013(
@@ -3080,8 +3099,9 @@ fun RealWorld4_FancyWidget_049(
                         RealWorld4_FancyWidget_107(
                             s2 = "HelloWorld",
                             model = model.f2,
-                            s1 = "HelloWorld"
-                        ) { children(); }
+                            s1 = "HelloWorld",
+                            children = children
+                        )
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_013(
@@ -3126,12 +3146,12 @@ fun RealWorld4_FancyWidget_050(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -3169,12 +3189,12 @@ fun RealWorld4_FancyWidget_051(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -3212,12 +3232,12 @@ fun RealWorld4_FancyWidget_052(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -3368,7 +3388,7 @@ fun RealWorld4_FancyWidget_055(
                             )
                         }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -3379,7 +3399,7 @@ fun RealWorld4_FancyWidget_055(
                             )
                         }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -3429,7 +3449,7 @@ fun RealWorld4_FancyWidget_056(
                             s1 = "HelloWorld"
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -3440,7 +3460,7 @@ fun RealWorld4_FancyWidget_056(
                             s1 = "HelloWorld"
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -3490,12 +3510,12 @@ fun RealWorld4_FancyWidget_057(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -3531,7 +3551,7 @@ fun RealWorld4_FancyWidget_058(model: RealWorld4_DataModel_09, children: @Compos
                             b = false
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -3543,7 +3563,7 @@ fun RealWorld4_FancyWidget_058(model: RealWorld4_DataModel_09, children: @Compos
                             b = true
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -3587,12 +3607,12 @@ fun RealWorld4_FancyWidget_059(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -3708,7 +3728,7 @@ fun RealWorld4_FancyWidget_062(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_019(model = model.f2) { children(); }
+                        RealWorld4_FancyWidget_019(model = model.f2, children = children)
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_064(
@@ -3720,7 +3740,7 @@ fun RealWorld4_FancyWidget_062(
             } else {
                 FlexRow {
                     flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_019(model = model.f2) { children(); }
+                        RealWorld4_FancyWidget_019(model = model.f2, children = children)
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_064(
@@ -3771,12 +3791,12 @@ fun RealWorld4_FancyWidget_063(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -3814,12 +3834,12 @@ fun RealWorld4_FancyWidget_064(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -3907,12 +3927,12 @@ fun RealWorld4_FancyWidget_066(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -3962,12 +3982,12 @@ fun RealWorld4_FancyWidget_067(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -4026,7 +4046,7 @@ fun RealWorld4_FancyWidget_068(
                             )
                         }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -4041,7 +4061,7 @@ fun RealWorld4_FancyWidget_068(
                             )
                         }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -4092,7 +4112,7 @@ fun RealWorld4_FancyWidget_069(
                             model = model.f10
                         ) { RealWorld4_FancyWidget_093(s1 = "HelloWorld", model = model.f10.f7); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -4102,7 +4122,7 @@ fun RealWorld4_FancyWidget_069(
                             model = model.f10
                         ) { RealWorld4_FancyWidget_093(s1 = "HelloWorld", model = model.f10.f7); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -4150,8 +4170,9 @@ fun RealWorld4_FancyWidget_070(
                         RealWorld4_FancyWidget_029(
                             b = true,
                             model = model.f5,
-                            s2 = "HelloWorld"
-                        ) { children(); }
+                            s2 = "HelloWorld",
+                            children = children
+                        )
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_148(
@@ -4166,8 +4187,9 @@ fun RealWorld4_FancyWidget_070(
                         RealWorld4_FancyWidget_029(
                             b = true,
                             model = model.f5,
-                            s2 = "HelloWorld"
-                        ) { children(); }
+                            s2 = "HelloWorld",
+                            children = children
+                        )
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_148(
@@ -4224,8 +4246,9 @@ fun RealWorld4_FancyWidget_071(
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_073(
                             s1 = "HelloWorld",
-                            model = model.f0
-                        ) { children(); }
+                            model = model.f0,
+                            children = children
+                        )
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_072(
@@ -4239,8 +4262,9 @@ fun RealWorld4_FancyWidget_071(
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_073(
                             s1 = "HelloWorld",
-                            model = model.f0
-                        ) { children(); }
+                            model = model.f0,
+                            children = children
+                        )
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_072(
@@ -4290,7 +4314,7 @@ fun RealWorld4_FancyWidget_072(
                             color = Color(red = 0xFF, blue = 0x99, green = 0x11)
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -4300,7 +4324,7 @@ fun RealWorld4_FancyWidget_072(
                             color = Color(red = 0xFF, blue = 0x99, green = 0x11)
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -4343,7 +4367,7 @@ fun RealWorld4_FancyWidget_073(
                             s2 = "HelloWorld"
                         )
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -4353,7 +4377,7 @@ fun RealWorld4_FancyWidget_073(
                             s2 = "HelloWorld"
                         )
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -4439,7 +4463,7 @@ fun RealWorld4_FancyWidget_075(
                             s2 = "HelloWorld"
                         ) { RealWorld4_FancyWidget_078(model = model.f10.f5.f0, b = false); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -4451,7 +4475,7 @@ fun RealWorld4_FancyWidget_075(
                             s2 = "HelloWorld"
                         ) { RealWorld4_FancyWidget_078(model = model.f10.f5.f0, b = true); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -4603,7 +4627,7 @@ fun RealWorld4_FancyWidget_077(
                             ) { ColoredRect(model.toColor()); }
                         }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -4614,7 +4638,7 @@ fun RealWorld4_FancyWidget_077(
                             ) { ColoredRect(model.toColor()); }
                         }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -4711,12 +4735,12 @@ fun RealWorld4_FancyWidget_079(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -4763,7 +4787,7 @@ fun RealWorld4_FancyWidget_080(
                             )
                         }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -4776,7 +4800,7 @@ fun RealWorld4_FancyWidget_080(
                             )
                         }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -4851,8 +4875,9 @@ fun RealWorld4_FancyWidget_081(
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_082(
                             model = model.f4,
-                            s2 = "HelloWorld"
-                        ) { children(); }
+                            s2 = "HelloWorld",
+                            children = children
+                        )
                     }
                 }
             } else {
@@ -4872,8 +4897,9 @@ fun RealWorld4_FancyWidget_081(
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_082(
                             model = model.f4,
-                            s2 = "HelloWorld"
-                        ) { children(); }
+                            s2 = "HelloWorld",
+                            children = children
+                        )
                     }
                 }
             }
@@ -4918,7 +4944,7 @@ fun RealWorld4_FancyWidget_082(
                             )
                         }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -4929,7 +4955,7 @@ fun RealWorld4_FancyWidget_082(
                             )
                         }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -4979,7 +5005,7 @@ fun RealWorld4_FancyWidget_083(
                             model = model.f2
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -4990,7 +5016,7 @@ fun RealWorld4_FancyWidget_083(
                             model = model.f2
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -5019,12 +5045,12 @@ fun RealWorld4_FancyWidget_084(model: RealWorld4_DataModel_10, children: @Compos
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -5064,7 +5090,7 @@ fun RealWorld4_FancyWidget_085(model: RealWorld4_DataModel_08, children: @Compos
                             )
                         }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -5080,7 +5106,7 @@ fun RealWorld4_FancyWidget_085(model: RealWorld4_DataModel_08, children: @Compos
                             )
                         }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -5221,7 +5247,7 @@ fun RealWorld4_FancyWidget_088(
                             number = 151
                         )
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -5231,7 +5257,7 @@ fun RealWorld4_FancyWidget_088(
                             number = 619
                         )
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -5269,12 +5295,12 @@ fun RealWorld4_FancyWidget_089(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -5356,12 +5382,12 @@ fun RealWorld4_FancyWidget_091(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -5411,7 +5437,7 @@ fun RealWorld4_FancyWidget_092(
                             }
                         }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -5427,7 +5453,7 @@ fun RealWorld4_FancyWidget_092(
                             }
                         }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -5542,8 +5568,9 @@ fun RealWorld4_FancyWidget_094(
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_014(
                             s1 = "HelloWorld",
-                            model = model.f2
-                        ) { children(); }
+                            model = model.f2,
+                            children = children
+                        )
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_104(
@@ -5558,8 +5585,9 @@ fun RealWorld4_FancyWidget_094(
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_014(
                             s1 = "HelloWorld",
-                            model = model.f2
-                        ) { children(); }
+                            model = model.f2,
+                            children = children
+                        )
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_104(
@@ -5596,12 +5624,12 @@ fun RealWorld4_FancyWidget_095(model: RealWorld4_DataModel_10, children: @Compos
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -5645,7 +5673,7 @@ fun RealWorld4_FancyWidget_096(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_109(model = model.f2) { children(); }
+                        RealWorld4_FancyWidget_109(model = model.f2, children = children)
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_108(
@@ -5657,7 +5685,7 @@ fun RealWorld4_FancyWidget_096(
             } else {
                 FlexRow {
                     flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_109(model = model.f2) { children(); }
+                        RealWorld4_FancyWidget_109(model = model.f2, children = children)
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_108(
@@ -5710,8 +5738,9 @@ fun RealWorld4_FancyWidget_097(
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_062(
                             model = model.f0,
-                            s2 = "HelloWorld"
-                        ) { children(); }
+                            s2 = "HelloWorld",
+                            children = children
+                        )
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_098(
@@ -5726,8 +5755,9 @@ fun RealWorld4_FancyWidget_097(
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_062(
                             model = model.f0,
-                            s2 = "HelloWorld"
-                        ) { children(); }
+                            s2 = "HelloWorld",
+                            children = children
+                        )
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_098(
@@ -5830,12 +5860,12 @@ fun RealWorld4_FancyWidget_099(model: RealWorld4_DataModel_10, children: @Compos
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -5887,8 +5917,9 @@ fun RealWorld4_FancyWidget_100(
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_046(
                             s2 = "HelloWorld",
-                            model = model.f4
-                        ) { children(); }
+                            model = model.f4,
+                            children = children
+                        )
                     }
                 }
             } else {
@@ -5902,8 +5933,9 @@ fun RealWorld4_FancyWidget_100(
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_046(
                             s2 = "HelloWorld",
-                            model = model.f4
-                        ) { children(); }
+                            model = model.f4,
+                            children = children
+                        )
                     }
                 }
             }
@@ -5948,7 +5980,7 @@ fun RealWorld4_FancyWidget_101(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_047(model = model.f2) { children(); }
+                        RealWorld4_FancyWidget_047(model = model.f2, children = children)
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_102(
@@ -5961,7 +5993,7 @@ fun RealWorld4_FancyWidget_101(
             } else {
                 FlexRow {
                     flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_047(model = model.f2) { children(); }
+                        RealWorld4_FancyWidget_047(model = model.f2, children = children)
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_102(
@@ -6013,12 +6045,12 @@ fun RealWorld4_FancyWidget_102(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -6101,12 +6133,12 @@ fun RealWorld4_FancyWidget_104(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -6147,8 +6179,9 @@ fun RealWorld4_FancyWidget_105(
                         RealWorld4_FancyWidget_026(
                             s2 = "HelloWorld",
                             s1 = "HelloWorld",
-                            model = model.f2
-                        ) { children(); }
+                            model = model.f2,
+                            children = children
+                        )
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_106(model = model.f5) {
@@ -6164,8 +6197,9 @@ fun RealWorld4_FancyWidget_105(
                         RealWorld4_FancyWidget_026(
                             s2 = "HelloWorld",
                             s1 = "HelloWorld",
-                            model = model.f2
-                        ) { children(); }
+                            model = model.f2,
+                            children = children
+                        )
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_106(model = model.f5) {
@@ -6202,12 +6236,12 @@ fun RealWorld4_FancyWidget_106(model: RealWorld4_DataModel_10, children: @Compos
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -6251,12 +6285,12 @@ fun RealWorld4_FancyWidget_107(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -6294,12 +6328,12 @@ fun RealWorld4_FancyWidget_108(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -6328,12 +6362,12 @@ fun RealWorld4_FancyWidget_109(model: RealWorld4_DataModel_10, children: @Compos
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -6383,12 +6417,12 @@ fun RealWorld4_FancyWidget_110(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -6430,12 +6464,12 @@ fun RealWorld4_FancyWidget_111(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -6466,8 +6500,9 @@ fun RealWorld4_FancyWidget_112(model: RealWorld4_DataModel_08, children: @Compos
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_116(
                             model = model.f0,
-                            number = 50
-                        ) { children(); }
+                            number = 50,
+                            children = children
+                        )
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_113(
@@ -6481,8 +6516,9 @@ fun RealWorld4_FancyWidget_112(model: RealWorld4_DataModel_08, children: @Compos
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_116(
                             model = model.f0,
-                            number = 149
-                        ) { children(); }
+                            number = 149,
+                            children = children
+                        )
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_113(
@@ -6538,8 +6574,9 @@ fun RealWorld4_FancyWidget_113(
                             s2 = "HelloWorld",
                             color = Color(red = 0xFF, blue = 0x99, green = 0x11),
                             model = model.f5,
-                            s1 = "HelloWorld"
-                        ) { children(); }
+                            s1 = "HelloWorld",
+                            children = children
+                        )
                     }
                 }
             } else {
@@ -6556,8 +6593,9 @@ fun RealWorld4_FancyWidget_113(
                             s2 = "HelloWorld",
                             color = Color(red = 0xFF, blue = 0x99, green = 0x11),
                             model = model.f5,
-                            s1 = "HelloWorld"
-                        ) { children(); }
+                            s1 = "HelloWorld",
+                            children = children
+                        )
                     }
                 }
             }
@@ -6602,12 +6640,12 @@ fun RealWorld4_FancyWidget_114(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -6657,12 +6695,12 @@ fun RealWorld4_FancyWidget_115(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -6705,7 +6743,7 @@ fun RealWorld4_FancyWidget_116(
                             number = 355
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -6715,7 +6753,7 @@ fun RealWorld4_FancyWidget_116(
                             number = 514
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -6753,12 +6791,12 @@ fun RealWorld4_FancyWidget_117(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -6796,12 +6834,12 @@ fun RealWorld4_FancyWidget_118(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -6845,7 +6883,7 @@ fun RealWorld4_FancyWidget_119(
                             )
                         }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -6856,7 +6894,7 @@ fun RealWorld4_FancyWidget_119(
                             )
                         }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -6885,12 +6923,12 @@ fun RealWorld4_FancyWidget_120(model: RealWorld4_DataModel_10, children: @Compos
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -6934,12 +6972,12 @@ fun RealWorld4_FancyWidget_121(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -6993,12 +7031,12 @@ fun RealWorld4_FancyWidget_122(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -7042,12 +7080,12 @@ fun RealWorld4_FancyWidget_123(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -7096,7 +7134,7 @@ fun RealWorld4_FancyWidget_124(
                             model = model.f2
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -7106,7 +7144,7 @@ fun RealWorld4_FancyWidget_124(
                             model = model.f2
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -7144,12 +7182,12 @@ fun RealWorld4_FancyWidget_125(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -7187,12 +7225,12 @@ fun RealWorld4_FancyWidget_126(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -7221,12 +7259,12 @@ fun RealWorld4_FancyWidget_127(model: RealWorld4_DataModel_10, children: @Compos
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -7270,12 +7308,12 @@ fun RealWorld4_FancyWidget_128(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -7313,12 +7351,12 @@ fun RealWorld4_FancyWidget_129(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -7347,12 +7385,12 @@ fun RealWorld4_FancyWidget_130(model: RealWorld4_DataModel_10, children: @Compos
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -7414,8 +7452,9 @@ fun RealWorld4_FancyWidget_131(
                         RealWorld4_FancyWidget_068(
                             model = model.f2,
                             obj = RealWorld4_UnmemoizablePojo_2(),
-                            s2 = "HelloWorld"
-                        ) { children(); }
+                            s2 = "HelloWorld",
+                            children = children
+                        )
                     }
                 }
             } else {
@@ -7437,8 +7476,9 @@ fun RealWorld4_FancyWidget_131(
                         RealWorld4_FancyWidget_068(
                             model = model.f2,
                             obj = RealWorld4_UnmemoizablePojo_2(),
-                            s2 = "HelloWorld"
-                        ) { children(); }
+                            s2 = "HelloWorld",
+                            children = children
+                        )
                     }
                 }
             }
@@ -7517,8 +7557,9 @@ fun RealWorld4_FancyWidget_132(
                                 ) {
                                     RealWorld4_FancyWidget_009(
                                         model = model.f6.f11.f7.f4,
-                                        number = 623
-                                    ) { children(); }
+                                        number = 623,
+                                        children = children
+                                    )
                                 }
                             }
                         }
@@ -7566,8 +7607,9 @@ fun RealWorld4_FancyWidget_132(
                                 ) {
                                     RealWorld4_FancyWidget_009(
                                         model = model.f6.f11.f7.f4,
-                                        number = 809
-                                    ) { children(); }
+                                        number = 809,
+                                        children = children
+                                    )
                                 }
                             }
                         }
@@ -7627,8 +7669,9 @@ fun RealWorld4_FancyWidget_133(
                         RealWorld4_FancyWidget_143(
                             s2 = "HelloWorld",
                             number = 675,
-                            model = model.f11
-                        ) { children(); }
+                            model = model.f11,
+                            children = children
+                        )
                     }
                 }
             } else {
@@ -7644,8 +7687,9 @@ fun RealWorld4_FancyWidget_133(
                         RealWorld4_FancyWidget_143(
                             s2 = "HelloWorld",
                             number = 903,
-                            model = model.f11
-                        ) { children(); }
+                            model = model.f11,
+                            children = children
+                        )
                     }
                 }
             }
@@ -7679,8 +7723,9 @@ fun RealWorld4_FancyWidget_134(model: RealWorld4_DataModel_07, children: @Compos
                         RealWorld4_FancyWidget_097(
                             s2 = "HelloWorld",
                             model = model.f5,
-                            s1 = "HelloWorld"
-                        ) { children(); }
+                            s1 = "HelloWorld",
+                            children = children
+                        )
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_135(model = model.f7) {
@@ -7697,8 +7742,9 @@ fun RealWorld4_FancyWidget_134(model: RealWorld4_DataModel_07, children: @Compos
                         RealWorld4_FancyWidget_097(
                             s2 = "HelloWorld",
                             model = model.f5,
-                            s1 = "HelloWorld"
-                        ) { children(); }
+                            s1 = "HelloWorld",
+                            children = children
+                        )
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_135(model = model.f7) {
@@ -7741,7 +7787,7 @@ fun RealWorld4_FancyWidget_135(model: RealWorld4_DataModel_08, children: @Compos
                             model = model.f0
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -7751,7 +7797,7 @@ fun RealWorld4_FancyWidget_135(model: RealWorld4_DataModel_08, children: @Compos
                             model = model.f0
                         ) { ColoredRect(model.toColor()); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -7798,8 +7844,9 @@ fun RealWorld4_FancyWidget_136(
                         RealWorld4_FancyWidget_137(
                             s2 = "HelloWorld",
                             s1 = "HelloWorld",
-                            model = model.f5
-                        ) { children(); }
+                            model = model.f5,
+                            children = children
+                        )
                     }
                 }
             } else {
@@ -7814,8 +7861,9 @@ fun RealWorld4_FancyWidget_136(
                         RealWorld4_FancyWidget_137(
                             s2 = "HelloWorld",
                             s1 = "HelloWorld",
-                            model = model.f5
-                        ) { children(); }
+                            model = model.f5,
+                            children = children
+                        )
                     }
                 }
             }
@@ -7860,12 +7908,12 @@ fun RealWorld4_FancyWidget_137(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -7894,12 +7942,12 @@ fun RealWorld4_FancyWidget_138(model: RealWorld4_DataModel_10, children: @Compos
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -7940,7 +7988,7 @@ fun RealWorld4_FancyWidget_139(model: RealWorld4_DataModel_05, children: @Compos
                             )
                         }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -7956,7 +8004,7 @@ fun RealWorld4_FancyWidget_139(model: RealWorld4_DataModel_05, children: @Compos
                             )
                         }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -8011,8 +8059,9 @@ fun RealWorld4_FancyWidget_140(
                                 b = false,
                                 obj = RealWorld4_UnmemoizablePojo_7(),
                                 model = model.f11.f7,
-                                s1 = "HelloWorld"
-                            ) { children(); }
+                                s1 = "HelloWorld",
+                                children = children
+                            )
                         }
                     }
                 }
@@ -8034,8 +8083,9 @@ fun RealWorld4_FancyWidget_140(
                                 b = false,
                                 obj = RealWorld4_UnmemoizablePojo_7(),
                                 model = model.f11.f7,
-                                s1 = "HelloWorld"
-                            ) { children(); }
+                                s1 = "HelloWorld",
+                                children = children
+                            )
                         }
                     }
                 }
@@ -8082,7 +8132,7 @@ fun RealWorld4_FancyWidget_141(
                             model = model.f10
                         ) { RealWorld4_FancyWidget_093(s1 = "HelloWorld", model = model.f10.f7); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -8092,7 +8142,7 @@ fun RealWorld4_FancyWidget_141(
                             model = model.f10
                         ) { RealWorld4_FancyWidget_093(s1 = "HelloWorld", model = model.f10.f7); }
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -8242,8 +8292,9 @@ fun RealWorld4_FancyWidget_143(
                         RealWorld4_FancyWidget_039(
                             model = model.f7,
                             s1 = "HelloWorld",
-                            b = false
-                        ) { children(); }
+                            b = false,
+                            children = children
+                        )
                     }
                 }
             } else {
@@ -8267,8 +8318,9 @@ fun RealWorld4_FancyWidget_143(
                         RealWorld4_FancyWidget_039(
                             model = model.f7,
                             s1 = "HelloWorld",
-                            b = false
-                        ) { children(); }
+                            b = false,
+                            children = children
+                        )
                     }
                 }
             }
@@ -8333,7 +8385,7 @@ fun RealWorld4_FancyWidget_144(
                             b = false
                         )
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -8346,7 +8398,7 @@ fun RealWorld4_FancyWidget_144(
                             b = true
                         )
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -8407,8 +8459,9 @@ fun RealWorld4_FancyWidget_145(
                             number = 626,
                             obj = RealWorld4_UnmemoizablePojo_12(),
                             b = false,
-                            model = model.f5
-                        ) { children(); }
+                            model = model.f5,
+                            children = children
+                        )
                     }
                 }
             } else {
@@ -8425,8 +8478,9 @@ fun RealWorld4_FancyWidget_145(
                             number = 417,
                             obj = RealWorld4_UnmemoizablePojo_12(),
                             b = false,
-                            model = model.f5
-                        ) { children(); }
+                            model = model.f5,
+                            children = children
+                        )
                     }
                 }
             }
@@ -8486,8 +8540,9 @@ fun RealWorld4_FancyWidget_146(
                         RealWorld4_FancyWidget_034(
                             model = model.f2,
                             b = false,
-                            s2 = "HelloWorld"
-                        ) { children(); }
+                            s2 = "HelloWorld",
+                            children = children
+                        )
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_129(
@@ -8502,8 +8557,9 @@ fun RealWorld4_FancyWidget_146(
                         RealWorld4_FancyWidget_034(
                             model = model.f2,
                             b = true,
-                            s2 = "HelloWorld"
-                        ) { children(); }
+                            s2 = "HelloWorld",
+                            children = children
+                        )
                     }
                     flexible(flex = 1f) {
                         RealWorld4_FancyWidget_129(
@@ -8570,12 +8626,12 @@ fun RealWorld4_FancyWidget_147(
             if (constraints.maxHeight > constraints.maxWidth) {
                 FlexColumn {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
                     flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }
@@ -8677,7 +8733,7 @@ fun RealWorld4_FancyWidget_149(
                             color = Color(red = 0xFF, blue = 0x99, green = 0x11)
                         )
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             } else {
                 FlexRow {
@@ -8687,7 +8743,7 @@ fun RealWorld4_FancyWidget_149(
                             color = Color(red = 0xFF, blue = 0x99, green = 0x11)
                         )
                     }
-                    flexible(flex = 1f) { children(); }
+                    flexible(flex = 1f, children = children)
                 }
             }
         }

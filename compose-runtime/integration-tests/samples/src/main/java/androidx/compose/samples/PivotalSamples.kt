@@ -43,7 +43,7 @@ fun incorrectUserOrdering() {
         var user by +state<User?> { null }
         +onActive {
             val dispose = Api.getUserAsync(userId) { user = it }
-            onDispose { dispose() }
+            onDispose(dispose)
         }
 
         if (user == null) {
@@ -63,7 +63,7 @@ fun expensiveApiCalls() {
         var user by +state<User?> { null }
         +onCommit(userId) {
             val dispose = Api.getUserAsync(userId) { user = it }
-            onDispose { dispose() }
+            onDispose(dispose)
         }
 
         if (user == null) {
@@ -83,7 +83,7 @@ fun pivotalUsage() {
         var user by +state<User?> { null }
         +onActive {
             val dispose = Api.getUserAsync(userId) { user = it }
-            onDispose { dispose() }
+            onDispose(dispose)
         }
 
         if (user == null) {

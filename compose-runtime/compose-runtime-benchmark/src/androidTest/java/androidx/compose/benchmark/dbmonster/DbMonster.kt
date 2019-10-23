@@ -44,9 +44,7 @@ class Query(random: Random, var elapsed: Double = random.nextDouble() * MAX_ELAP
 @Model
 class Database(var name: String, val random: Random) {
     var queries: List<Query> = (1..10).map {
-        Query(
-            random
-        )
+        Query(random)
     }
     fun topQueries(n: Int): List<Query> {
         return queries/*.sortedByDescending { it.elapsed }*/.take(n)
@@ -70,11 +68,6 @@ class DatabaseList(n: Int, val random: Random) {
         // update n random databases in the list
         databases.shuffled(random).take(n).forEach { it.update() }
     }
-}
-
-@Composable
-fun Table(children: @Composable() () -> Unit) {
-    Column(ExpandedHeight) { children() }
 }
 
 @Composable

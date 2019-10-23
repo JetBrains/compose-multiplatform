@@ -39,9 +39,7 @@ abstract class ComposeBenchmarkBase {
     fun measureCompose(block: @Composable() () -> Unit) {
         val activity = activityRule.activity
         benchmarkRule.measureRepeated {
-            activity.setContent {
-                block()
-            }
+            activity.setContent(block)
 
             runWithTimingDisabled {
                 activity.setContent { }
