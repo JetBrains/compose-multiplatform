@@ -17,8 +17,10 @@
 package androidx.build.lint
 
 import com.android.tools.lint.client.api.IssueRegistry
+import com.android.tools.lint.detector.api.CURRENT_API
 
 class AndroidXIssueRegistry : IssueRegistry() {
+    override val api = CURRENT_API
     override val issues get() = listOf(
             BanParcelableUsage.ISSUE,
             BanKeepAnnotation.ISSUE,
