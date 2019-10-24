@@ -16,9 +16,6 @@
 
 package androidx.build.dependencies
 
-import androidx.build.SupportConfig
-
-const val ANDROID_GRADLE_PLUGIN = "com.android.tools.build:gradle:3.4.2"
 const val ANDROIDX_TEST_CORE = "androidx.test:core:1.2.0"
 const val ANDROIDX_TEST_EXT_JUNIT = "androidx.test.ext:junit:1.1.1"
 const val ANDROIDX_TEST_EXT_KTX = "androidx.test.ext:junit-ktx:1.1.1"
@@ -55,20 +52,11 @@ const val JUNIT = "junit:junit:4.12"
 const val KOTLINPOET = "com.squareup:kotlinpoet:1.4.0"
 const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.20"
 
-const val COMPOSE_VERSION = "1.3.60-eap-25"
-private val KOTLIN_VERSION = if (SupportConfig.isUiProject()) COMPOSE_VERSION else "1.3.50"
-val KOTLIN_STDLIB = "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
-val KOTLIN_TEST_COMMON = "org.jetbrains.kotlin:kotlin-test:$KOTLIN_VERSION"
-const val KOTLIN_COMPOSE_STDLIB = "org.jetbrains.kotlin:kotlin-stdlib:$COMPOSE_VERSION"
-const val KOTLIN_COMPOSE_REFLECT = "org.jetbrains.kotlin:kotlin-reflect:$COMPOSE_VERSION"
-
 const val KOTLIN_METADATA = "me.eugeniomarletti.kotlin.metadata:kotlin-metadata:1.4.0"
 const val KOTLIN_METADATA_JVM = "org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.0.5"
 
 private const val KOTLIN_COROUTINES_VERSION = "1.3.0"
 const val KOTLIN_COROUTINES_ANDROID =
-    "org.jetbrains.kotlinx:kotlinx-coroutines-android:$KOTLIN_COROUTINES_VERSION"
-const val KOTLIN_COMPOSE_COROUTINES =
     "org.jetbrains.kotlinx:kotlinx-coroutines-android:$KOTLIN_COROUTINES_VERSION"
 const val KOTLIN_COROUTINES_CORE =
     "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLIN_COROUTINES_VERSION"
@@ -81,10 +69,6 @@ const val KOTLIN_COROUTINES_RX2 =
 
 const val LEAKCANARY_INSTRUMENTATION =
     "com.squareup.leakcanary:leakcanary-android-instrumentation:1.6.2"
-const val LINT_API_MIN = "com.android.tools.lint:lint-api:26.3.0"
-const val LINT_API_LATEST = "com.android.tools.lint:lint-api:26.6.0-beta01"
-const val LINT_CORE = "com.android.tools.lint:lint:26.6.0-beta01"
-const val LINT_TESTS = "com.android.tools.lint:lint-tests:26.6.0-beta01"
 const val MATERIAL = "com.google.android.material:material:1.0.0"
 const val MOCKITO_CORE = "org.mockito:mockito-core:2.19.0"
 const val MOCKITO_KOTLIN = "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0"
@@ -104,3 +88,26 @@ const val PROTOBUF = "com.google.protobuf:protobuf-java:3.4.0"
 
 const val FLOGGER = "com.google.flogger:flogger:0.4"
 const val FLOGGER_SYSTEM_BACKEND = "com.google.flogger:flogger-system-backend:0.4"
+
+// The following versions change depending on whether we are in the main or ui project - the
+// specific versions are configured in build_dependencies.gradle as they are needed during
+// buildSrc configuration. They are then set here in AndroidXPlugin when configuring the root
+// project.
+internal lateinit var kotlinVersion: String
+
+val KOTLIN_VERSION get() = kotlinVersion
+val KOTLIN_STDLIB get() = "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+val KOTLIN_TEST get() = "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
+val KOTLIN_REFLECT get() = "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+
+internal lateinit var agpVersion: String
+
+const val AGP_STABLE = "com.android.tools.build:gradle:3.4.2"
+val AGP_LATEST get() = "com.android.tools.build:gradle:$agpVersion"
+
+internal lateinit var lintVersion: String
+
+const val LINT_API_MIN = "com.android.tools.lint:lint-api:26.3.0"
+val LINT_API_LATEST get() = "com.android.tools.lint:lint-api:$lintVersion"
+val LINT_CORE get() = "com.android.tools.lint:lint:$lintVersion"
+val LINT_TESTS get() = "com.android.tools.lint:lint-tests:$lintVersion"
