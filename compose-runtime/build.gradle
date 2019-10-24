@@ -31,7 +31,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(KOTLIN_COMPOSE_STDLIB)
+            implementation(KOTLIN_STDLIB)
         }
         commonTest.dependencies {
             implementation kotlin("test-junit")

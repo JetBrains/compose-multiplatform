@@ -52,18 +52,18 @@ runIde {
 }
 
 dependencies {
-    compileOnly(KOTLIN_COMPOSE_STDLIB)
+    compileOnly(KOTLIN_STDLIB)
     implementation project(":compose:compose-compiler-hosted")
 
-    compileOnly("org.jetbrains.kotlin:kotlin-compiler:$COMPOSE_VERSION")
-    compileOnly("org.jetbrains.kotlin:kotlin-plugin:$COMPOSE_VERSION")
-    compileOnly("org.jetbrains.kotlin:kotlin-intellij-core:$COMPOSE_VERSION")
-    compileOnly("org.jetbrains.kotlin:kotlin-platform-api:$COMPOSE_VERSION")
-    compileOnly("org.jetbrains.kotlin:kotlin-platform-impl:$COMPOSE_VERSION")
-    compileOnly("org.jetbrains.kotlin:kotlin-j2k:$COMPOSE_VERSION")
-    compileOnly("org.jetbrains.kotlin:kotlin-java-impl:$COMPOSE_VERSION")
-    compileOnly("org.jetbrains.kotlin:kotlin-openapi:$COMPOSE_VERSION")
-    compileOnly("org.jetbrains.kotlin:kotlin-jps-common-ide:$COMPOSE_VERSION")
+    compileOnly("org.jetbrains.kotlin:kotlin-compiler:$KOTLIN_VERSION")
+    compileOnly("org.jetbrains.kotlin:kotlin-plugin:$KOTLIN_VERSION")
+    compileOnly("org.jetbrains.kotlin:kotlin-intellij-core:$KOTLIN_VERSION")
+    compileOnly("org.jetbrains.kotlin:kotlin-platform-api:$KOTLIN_VERSION")
+    compileOnly("org.jetbrains.kotlin:kotlin-platform-impl:$KOTLIN_VERSION")
+    compileOnly("org.jetbrains.kotlin:kotlin-j2k:$KOTLIN_VERSION")
+    compileOnly("org.jetbrains.kotlin:kotlin-java-impl:$KOTLIN_VERSION")
+    compileOnly("org.jetbrains.kotlin:kotlin-openapi:$KOTLIN_VERSION")
+    compileOnly("org.jetbrains.kotlin:kotlin-jps-common-ide:$KOTLIN_VERSION")
 
     // Intellij plugins have a bunch of implicit dependencies. The Gradle Intellij Plugin usually
     // adds these automatically, but we are adding them explicitly here.

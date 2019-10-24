@@ -26,7 +26,7 @@ plugins {
 dependencies {
     kotlinPlugin project(path: ":compose:compose-compiler", configuration: "embeddablePlugin")
 
-    implementation(KOTLIN_COMPOSE_STDLIB)
+    implementation(KOTLIN_STDLIB)
 
     implementation project(":annotation:annotation-sampled")
     implementation project(":compose:compose-runtime")
