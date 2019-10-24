@@ -115,34 +115,26 @@ object Dokka {
 
         val docTaskName = generatorTaskNameForType(docsType, language)
 
-        val guavaDocLink = DokkaConfiguration.ExternalDocumentationLink.Builder().apply {
-            this.url = URL("https://guava.dev/releases/$GUAVA_VERSION/api/docs/")
-            // Guava documentation doesn't have the necessary package-list file to provide the packages
-            // to Dokka so we have to host a file internally as a workaround
-            this.packageListUrl = project.projectDir.toPath()
-                .resolve("package-lists/guava/package-list").toUri().toURL()
-        }.build()
-
-        val kotlinLangLink = DokkaConfiguration.ExternalDocumentationLink.Builder().apply {
-            this.url = URL("https://kotlinlang.org/api/latest/jvm/stdlib/")
-
-            this.packageListUrl = project.projectDir.toPath()
-                .resolve("package-lists/kotlin/package-list").toUri().toURL()
-        }.build()
-
-        val coroutinesCoreLink = DokkaConfiguration.ExternalDocumentationLink.Builder().apply {
-            this.url = URL("https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/")
-
-            this.packageListUrl = project.projectDir.toPath()
-                .resolve("package-lists/coroutinesCore/package-list").toUri().toURL()
-        }.build()
-
-        val androidLink = DokkaConfiguration.ExternalDocumentationLink.Builder().apply {
-            this.url = URL("https://developer.android.com/reference/")
-
-            this.packageListUrl = project.projectDir.toPath()
-                .resolve("package-lists/android/package-list").toUri().toURL()
-        }.build()
+        val guavaDocLink = createExternalDocumentationLinkMapping(
+            "package-lists/guava/package-list",
+            "https://guava.dev/releases/$GUAVA_VERSION/api/docs/",
+            project
+        )
+        val kotlinLangLink = createExternalDocumentationLinkMapping(
+            "package-lists/kotlin/package-list",
+            "https://kotlinlang.org/api/latest/jvm/stdlib/",
+            project
+        )
+        val coroutinesCoreLink = createExternalDocumentationLinkMapping(
+            "package-lists/coroutinesCore/package-list",
+            "https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/",
+            project
+        )
+        val androidLink = createExternalDocumentationLinkMapping(
+            "package-lists/android/package-list",
+            "https://developer.android.com/reference/",
+            project
+        )
 
         return project.tasks.register(docTaskName, DokkaAndroidTask::class.java) { task ->
             task.moduleName = project.name
@@ -170,6 +162,27 @@ object Dokka {
 
             LogUtils.turnWarningsIntoInfos(task)
         }
+    }
+
+    /**
+     * Documentation for external projects may live in other websites.
+     * If we want to link to types defined by those projects, we need to tell Dokka which types
+     * are defined in which projects, and where those projects are.
+     * We do this by providing a file named package-list for each such project.
+     * Each package-list file is called an ExternalDocumentationLink by Dokka.
+     * We don't make use of Dokka's ability to automatically download these from the internet because
+     * we want the build process to be as deterministic as possible.
+     */
+    private fun createExternalDocumentationLinkMapping(
+        localMappingFileName: String,
+        externalUrl: String,
+        project: Project
+    ): DokkaConfiguration.ExternalDocumentationLink {
+        return DokkaConfiguration.ExternalDocumentationLink.Builder().apply {
+            this.url = URL(externalUrl)
+            this.packageListUrl = project.projectDir.toPath()
+                .resolve(localMappingFileName).toUri().toURL()
+        }.build()
     }
 
     fun Project.configureAndroidProjectForDokka(
