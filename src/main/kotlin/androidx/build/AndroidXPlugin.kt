@@ -60,6 +60,7 @@ import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.Zip
+import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
@@ -131,6 +132,10 @@ class AndroidXPlugin : Plugin<Project> {
                         targetCompatibility = VERSION_1_8
                     }
 
+                    project.tasks.withType(JavaCompile::class.java) { task ->
+                        project.configureCompilationWarnings(task)
+                    }
+
                     project.hideJavadocTask()
                     val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
                     verifyDependencyVersionsTask?.configure { task ->
@@ -187,11 +192,9 @@ class AndroidXPlugin : Plugin<Project> {
                         verifyDependencyVersionsTask?.configure { task ->
                             task.dependsOn(libraryVariant.javaCompileProvider)
                         }
-                        if (!project.rootProject.hasProperty(USE_MAX_DEP_VERSIONS)) {
-                            libraryVariant.javaCompileProvider.configure { task ->
-                                task.options.compilerArgs.add("-Werror")
-                                task.options.compilerArgs.add("-Xlint:unchecked")
-                            }
+
+                        libraryVariant.javaCompileProvider.configure { task ->
+                            project.configureCompilationWarnings(task)
                         }
                     }
                     project.configureLint(extension.lintOptions, androidXExtension)
@@ -206,11 +209,9 @@ class AndroidXPlugin : Plugin<Project> {
                     }
                 }
                 is KotlinBasePluginWrapper -> {
-                    project.tasks.withType(KotlinCompile::class.java).configureEach { compile ->
-                        compile.kotlinOptions.jvmTarget = "1.8"
-                        project.runIfPartOfBuildOnServer {
-                            compile.kotlinOptions.allWarningsAsErrors = true
-                        }
+                    project.tasks.withType(KotlinCompile::class.java).configureEach { task ->
+                        task.kotlinOptions.jvmTarget = "1.8"
+                        project.configureCompilationWarnings(task)
                     }
                     if (plugin is KotlinMultiplatformPluginWrapper) {
                         project.extensions.findByType<LibraryExtension>()?.apply {
@@ -855,4 +856,21 @@ private val Project.buildOnServerDependentActions: MutableList<() -> Unit> get()
     }
     @Suppress("UNCHECKED_CAST")
     return extraProperties.get(BUILD_ON_SERVER_DEPENDENT_ACTIONS) as MutableList<() -> Unit>
+}
+
+private fun Project.configureCompilationWarnings(task: JavaCompile) {
+    if (!project.rootProject.hasProperty(USE_MAX_DEP_VERSIONS)) {
+        runIfPartOfBuildOnServer {
+            task.options.compilerArgs.add("-Werror")
+            task.options.compilerArgs.add("-Xlint:unchecked")
+        }
+    }
+}
+
+private fun Project.configureCompilationWarnings(task: KotlinCompile) {
+    if (!project.rootProject.hasProperty(USE_MAX_DEP_VERSIONS)) {
+        runIfPartOfBuildOnServer {
+            task.kotlinOptions.allWarningsAsErrors = true
+        }
+    }
 }
