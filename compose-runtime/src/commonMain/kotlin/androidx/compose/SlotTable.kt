@@ -671,6 +671,8 @@ class SlotTable(internal var slots: Array<Any?> = arrayOf()) {
         return SlotWriter(this)
     }
 
+    val size: Int get() = slots.size - gapLen
+
     internal fun close(reader: SlotReader) {
         require(reader.table === this && readers > 0) { "Unexpected reader close()" }
         readers--
