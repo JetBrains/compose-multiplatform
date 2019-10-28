@@ -113,7 +113,7 @@ private class MacOsUtilities(projectRoot: File, studioInstallationDir: File) :
         get() = File(binaryDirectory, "Contents/Resources/build.txt")
 
     override val StudioWrapper.composeIdePluginDirectory: File
-        get() = File(binaryDirectory, "Contents/plugins/compose-ide-plugin")
+        get() = File(binaryDirectory, "Contents/plugins/Compose")
 
     override val StudioWrapper.launchCommandArguments: List<String>
         get() {
@@ -156,7 +156,7 @@ private class LinuxUtilities(projectRoot: File, studioInstallationDir: File) :
         get() = File(binaryDirectory, "build.txt")
 
     override val StudioWrapper.composeIdePluginDirectory: File
-        get() = File(binaryDirectory, "plugins/compose-ide-plugin")
+        get() = File(binaryDirectory, "plugins/Compose")
 
     override val StudioWrapper.launchCommandArguments: List<String>
         get() {

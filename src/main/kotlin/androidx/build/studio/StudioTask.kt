@@ -16,6 +16,7 @@
 
 package androidx.build.studio
 
+import androidx.build.SupportConfig
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
@@ -39,13 +40,12 @@ abstract class StudioTask : DefaultTask() {
         private const val STUDIO_TASK = "studio"
 
         fun Project.registerStudioTask() {
-            tasks.register(STUDIO_TASK, StudioTask::class.java)
-            // TODO: b/142859295 re-enable IDE plugin when we fix circular dependency
-            /*val taskProvider = tasks.register(STUDIO_TASK, StudioTask::class.java)
-            if (SupportConfig.isUiProject()) {
-                // Need to prepare the sandbox before we can run studio
-                taskProvider.dependsOn(":compose:compose-ide-plugin:prepareSandbox")
-            }*/
+            tasks.register(STUDIO_TASK, StudioTask::class.java) {
+                if (SupportConfig.isUiProject()) {
+                    // Need to prepare the sandbox before we can run studio
+                    it.dependsOn(":compose:compose-ide-plugin:prepareSandbox")
+                }
+            }
         }
     }
 }
