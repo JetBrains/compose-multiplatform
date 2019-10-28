@@ -399,20 +399,6 @@ class AndroidXPlugin : Plugin<Project> {
         project: Project,
         androidXExtension: AndroidXExtension
     ) {
-        // Set testBuildType for benchmark modules.
-        // Intentionally using deprecated com.android.builder.model.Version for 3.5 support.
-        @Suppress("DEPRECATION")
-        val agpVersion = com.android.builder.model.Version.ANDROID_GRADLE_PLUGIN_VERSION
-        val agpVersionTokens = agpVersion.split('.')
-        val majorVersion = agpVersionTokens[0].toInt()
-        val minorVersion = agpVersionTokens[1].toInt()
-        project.pluginManager.withPlugin("androidx.benchmark") {
-            if (majorVersion > 3 || (majorVersion == 3 && minorVersion >= 6)) {
-                testBuildType = "release"
-                buildTypes.named("release").configure { it.isDefault.set(true) }
-            }
-        }
-
         compileOptions.apply {
             sourceCompatibility = VERSION_1_8
             targetCompatibility = VERSION_1_8
