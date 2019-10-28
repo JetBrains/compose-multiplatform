@@ -17,6 +17,7 @@
 package androidx.build.studio
 
 import androidx.build.SupportConfig
+import androidx.build.getRootOutDirectory
 import org.gradle.api.Project
 import org.gradle.api.internal.tasks.userinput.UserInputHandler
 import org.gradle.internal.service.ServiceRegistry
@@ -251,8 +252,7 @@ open class UiStudioWrapper(project: Project) : StudioWrapper(project) {
         studioPrebuiltArchive.copyTo(File(studioArchivePath))
     }
 
-    // TODO: b/142859295 re-enable IDE plugin when we fix circular dependency
-    /*override fun preLaunchConfiguration() {
+    override fun preLaunchConfiguration() {
         // Copy the built compose plugin into the studio plugin directory every time to ensure it
         // is up to date
         val builtComposePluginDirectory = File(
@@ -268,14 +268,6 @@ open class UiStudioWrapper(project: Project) : StudioWrapper(project) {
                 target = composeIdePluginDirectory,
                 overwrite = true
             )
-        }
-    }*/
-
-    // TODO: temporarily deleting the directory if it exists for existing installations,
-    //  until b/142859295 is fixed
-    override fun preLaunchConfiguration() {
-        with(platformUtilities) {
-            composeIdePluginDirectory.deleteRecursively()
         }
     }
 
