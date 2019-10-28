@@ -43,6 +43,12 @@ class AndroidXUiPlugin : Plugin<Project> {
                         targetSdkVersion(29)
                     }
 
+                    // TODO: figure out how to apply this to multiplatform modules
+                    project.dependencies.add(
+                        "lintChecks",
+                        project.rootProject.project(":ui:ui-internal-lint-checks")
+                    )
+
                     library.lintOptions.apply {
                         // Too many Kotlin features require synthetic accessors - we want to rely on R8 to
                         // remove these accessors

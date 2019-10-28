@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-apply plugin: 'org.jetbrains.kotlin.jvm'
+apply plugin: 'kotlin'
 
 dependencies {
-    implementation build_libs.lint.core
-    implementation build_libs.lint.api
-    implementation build_libs.kotlin.stdlib
-    api("androidx.annotation:annotation:1.0.0")
+    compileOnly build_libs.lint.api
+    compileOnly build_libs.kotlin.stdlib
+    implementation "androidx.annotation:annotation:1.0.0"
 }
