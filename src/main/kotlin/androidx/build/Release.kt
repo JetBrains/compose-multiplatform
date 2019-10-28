@@ -24,7 +24,6 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.api.tasks.Upload
 import org.gradle.api.tasks.bundling.Zip
 import java.io.File
 import java.util.TreeSet
@@ -86,7 +85,7 @@ open class GMavenZipTask : Zip() {
              */
             var includeMetadata: Boolean,
             /**
-             * The out folder for uploadArchives.
+             * The out folder for publishing libraries.
              */
             val supportRepoOut: File,
             /**
@@ -230,11 +229,11 @@ object Release {
                 projectName = project.name,
                 version = version.toString()
         )
-        val uploadTask = project.tasks.named("uploadArchives", Upload::class.java)
+        val publishTask = project.tasks.named("publish")
         zipTasks.forEach {
             it.configure {
                 it.candidates.add(artifact)
-                it.dependsOn(uploadTask)
+                it.dependsOn(publishTask)
             }
         }
     }
