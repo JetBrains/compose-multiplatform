@@ -80,12 +80,5 @@ object SupportConfig {
     }
 
     @JvmStatic
-    fun getAGPVersion(project: Project): String {
-        val studioProperties = (project.rootProject.property("ext") as ExtraPropertiesExtension)
-            .let { it.get("build_versions") as Map<*, *> }
-        return studioProperties["agp"].toString()
-    }
-
-    @JvmStatic
     fun isUiProject() = System.getenv("DIST_SUBDIR") == "/ui"
 }

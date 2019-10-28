@@ -55,6 +55,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.logging.configuration.ShowStacktrace
+import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.TaskProvider
@@ -258,7 +259,9 @@ class AndroidXPlugin : Plugin<Project> {
     }
 
     private fun Project.configureRootProject() {
+        setDependencyVersions()
         configureKtlintCheckFile()
+
         if (isRunningOnBuildServer()) {
             gradle.startParameter.showStacktrace = ShowStacktrace.ALWAYS
         }
@@ -874,4 +877,17 @@ private fun Project.configureCompilationWarnings(task: KotlinCompile) {
             task.kotlinOptions.allWarningsAsErrors = true
         }
     }
+}
+
+private fun Project.setDependencyVersions() {
+    val buildVersions = (project.rootProject.property("ext") as ExtraPropertiesExtension)
+        .let { it.get("build_versions") as Map<*, *> }
+
+    fun getVersion(key: String) = checkNotNull(buildVersions[key]) {
+            "Could not find a version for `$key`"
+        }.toString()
+
+    androidx.build.dependencies.kotlinVersion = getVersion("kotlin")
+    androidx.build.dependencies.agpVersion = getVersion("agp")
+    androidx.build.dependencies.lintVersion = getVersion("lint")
 }
