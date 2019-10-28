@@ -29,8 +29,10 @@ The Jetpack Compose IDE plugin
     <extensions defaultExtensionNs="org.jetbrains.kotlin">
         <storageComponentContainerContributor implementation="androidx.compose.plugins.idea.IdeComposableAnnotationChecker" />
         <storageComponentContainerContributor implementation="androidx.compose.plugins.idea.IdeUnionAnnotationCheckerProvider" />
+        <diagnosticSuppressor implementation="androidx.compose.plugins.idea.IdeComposeDiagnosticSuppressor"/>
+    </extensions>
+    <extensions defaultExtensionNs="org.jetbrains.kotlin.extensions.internal">
         <callResolutionInterceptorExtension implementation="androidx.compose.plugins.idea.IdeComposeCallResolutionInterceptorExtension"/>
         <typeResolutionInterceptorExtension implementation="androidx.compose.plugins.idea.IdeComposeTypeResolutionInterceptorExtension"/>
-        <diagnosticSuppressor implementation="androidx.compose.plugins.idea.IdeComposeDiagnosticSuppressor"/>
     </extensions>
 </idea-plugin>
