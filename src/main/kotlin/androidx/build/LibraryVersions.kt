@@ -35,7 +35,7 @@ object LibraryVersions {
     val AUTOFILL = Version("1.1.0-alpha01")
     val BENCHMARK = Version("1.1.0-alpha01")
     val BIOMETRIC = Version("1.1.0-alpha01")
-    val BROWSER = Version("1.2.0-alpha09")
+    val BROWSER = Version("1.2.0-alpha10")
     val CAMERA = Version("1.0.0-alpha07")
     val CAMERA_EXTENSIONS = Version("1.0.0-alpha04")
     val CAMERA_VIEW = Version("1.0.0-alpha04")
@@ -72,7 +72,7 @@ object LibraryVersions {
     val LIFECYCLE = Version("2.3.0-alpha01")
     val LIFECYCLE_EXTENSIONS = LIFECYCLE
     val LOADER = Version("1.2.0-alpha01")
-    val MEDIA = Version("1.2.0-alpha01")
+    val MEDIA = Version("1.2.0-alpha02")
     val MEDIA2_COMMON = Version("1.1.0-alpha01")
     val MEDIA2_PLAYER = Version("1.1.0-alpha01")
     val MEDIA2_SESSION = Version("1.1.0-alpha01")
@@ -115,5 +115,5 @@ object LibraryVersions {
     val VIEWPAGER2 = Version("1.1.0-alpha01")
     val WEAR = Version("1.1.0-alpha01")
     val WEBKIT = Version("1.2.0-alpha01")
-    val WORK = Version("2.3.0-alpha03")
+    val WORK = Version("2.3.0-alpha04")
 }
