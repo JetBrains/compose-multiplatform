@@ -84,7 +84,7 @@ object Jacoco {
             Jar::class.java
         ) {
             it.destinationDirectory.set(project.getDistributionDirectory())
-            it.archiveFileName.set("jacoco-report-classes-all.jar")
+            it.archiveFileName.set("jacoco-report-classes.jar")
         }
     }
 
