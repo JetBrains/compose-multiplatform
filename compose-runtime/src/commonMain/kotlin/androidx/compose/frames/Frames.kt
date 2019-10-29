@@ -27,10 +27,12 @@ class FrameAborted(val frame: Frame) : RuntimeException("Frame aborted")
  * This allows framed object to be created in the in static initializers when a
  * frame could not have been created yet.
  *
- * The value 1 was chosen because it must be greater than 0, as 0 is reserved to
- * indicated an invalid frame therefore 1 is the lowest valid frame.
+ * The value 2 was chosen because it must be greater than 0, as 0 is reserved to
+ * indicated an invalid frame (in order to avoid an uninitialized record begin
+ * treated a valid record) and 1 is odd and treated as a speculation frame. That
+ * leaves 2 as the lowest valid frame.
  */
-private const val CREATION_FRAME = 1
+private const val CREATION_FRAME = 2
 
 /**
  * Base implementation of a frame record
@@ -65,20 +67,8 @@ interface Record {
     fun create(): Record
 }
 
-/**
- * Interface implemented by all model objects. Used by this module to maintain the state records
- * of a model object.
- */
 interface Framed {
-    /**
-     * The first state record in a linked list of state records.
-     */
     val firstFrameRecord: Record
-
-    /**
-     * Add a new state record to the beginning of a list. After this call [firstFrameRecord] should
-     * be [value].
-     */
     fun prependFrameRecord(value: Record)
 }
 
@@ -166,11 +156,7 @@ private val sync = Any()
 // The following variables should only be written when sync is taken
 private val openFrames = BitSet()
 private val abortedFrames = BitSet()
-
-// The first frame created must be at least on more than the CREATION_FRAME so objects
-// created ouside a frame (that use the CREATION_FRAME as there id) and modified in the first
-// frame will be seen as modified.
-private var maxFrameId = CREATION_FRAME + 1
+private var maxFrameId = CREATION_FRAME
 
 /**
  * Return the frames that are currently open or aborted which should be considered invalid for any
@@ -189,12 +175,14 @@ private fun BitSet.copy(): BitSet {
 
 private fun open(
     readOnly: Boolean,
+    speculative: Boolean,
     readObserver: FrameReadObserver?,
     writeObserver: FrameWriteObserver?
 ): Frame {
     validateNotInFrame()
     synchronized(sync) {
-        val id = maxFrameId++
+        maxFrameId += 2
+        val id = if (speculative) maxFrameId or 1 else maxFrameId
         val invalid = currentInvalid()
         val frame = Frame(
             id = id,
@@ -216,13 +204,21 @@ private fun open(
  * @return the newly created frame's data
  */
 fun open(readOnly: Boolean = false) =
-    open(readOnly, null, null)
+    open(readOnly, false, null, null)
 
 /**
  * Open a frame with observers
  */
 fun open(readObserver: FrameReadObserver? = null, writeObserver: FrameWriteObserver? = null) =
-    open(false, readObserver, writeObserver)
+    open(false, false, readObserver, writeObserver)
+
+/**
+ * Open a speculative frame. A speculative frame can only be aborted and can be used to
+ * speculate on how a set of framed objects might react to changes. This allows, for example,
+ * expensive calculations to be pre-calculated on a separate thread and later replayed on
+ * the primary thread without affecting the primary thread.
+ */
+fun speculate() = open(false, true, null, null)
 
 /*
  * Commits the pending frame if there one is open. Intended to be used in a `finally` clause
@@ -270,11 +266,14 @@ fun commit(frame: Frame) {
     // should only be done after first determining that there are no colliding writes in the commit.
 
     // A write is considered colliding if any write occurred on the object in a frame committed
-    // since the frame was last opened. There is a trivial cases that can be dismissed immediately,
-    // no writes occurred.
+    // since the frame was last opened. There are two trivial cases that can be dismissed
+    // immediately, first, if the frame is read-only, no writes occurred. Second, if no other frame
+    // was opened while the current frame was open.
     val modified = frame.modified
     val listeners = synchronized(sync) {
         if (!openFrames[frame.id]) throw IllegalStateException("Frame not open")
+        if (frame.id and 1 != 0)
+            throw IllegalStateException("Speculative frames cannot be committed")
         if (modified == null || modified.size == 0) {
             closeFrame(frame)
             emptyList()
@@ -353,7 +352,8 @@ fun abortHandler() {
 fun abortHandler(frame: Frame) {
     synchronized(sync) {
         validateOpen(frame)
-        abortedFrames.set(frame.id)
+        if (frame.id and 1 == 0)
+            abortedFrames.set(frame.id)
         closeFrame(frame)
     }
 }
@@ -386,6 +386,9 @@ private fun closeFrame(frame: Frame) {
     threadFrame.set(null)
 }
 
+private fun speculationFrame(candidateFrame: Int, currentFrame: Int) =
+    candidateFrame != currentFrame && (candidateFrame and 1 == 1)
+
 private fun valid(currentFrame: Int, candidateFrame: Int, invalid: BitSet): Boolean {
     // A candidate frame is valid if the it is less than or equal to the current frame
     // and it wasn't specifically marked as invalid when the frame started.
@@ -395,9 +398,10 @@ private fun valid(currentFrame: Int, candidateFrame: Int, invalid: BitSet): Bool
     //
     // All frames born after the current frame are considered invalid since they occur after the
     // current frame was open.
-    //
-    // Id 0 is reserved as an invalid frame.
-    return candidateFrame != 0 && candidateFrame <= currentFrame && !invalid.get(candidateFrame)
+    return candidateFrame != 0 && candidateFrame <= currentFrame &&
+            !speculationFrame(candidateFrame, currentFrame) && !invalid.get(
+        candidateFrame
+    )
 }
 
 // Determine if the given data is valid for the frame.
@@ -450,7 +454,10 @@ private fun used(framed: Framed, id: Int, invalid: BitSet): Record? {
     var validRecord: Record? = null
     while (current != null) {
         val currentId = current.frameId
-        if (abortedFrames[currentId])
+        if (speculationFrame(
+                currentId,
+                id
+            ) || abortedFrames[currentId])
             return current
         if (valid(current, id - 1, invalid)) {
             if (validRecord == null) {
