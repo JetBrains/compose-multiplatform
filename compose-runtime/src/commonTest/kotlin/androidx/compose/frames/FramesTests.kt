@@ -133,6 +133,60 @@ class FrameTest {
     }
 
     @Test
+    fun testSpeculation() {
+        val address = frame {
+            Address(
+                OLD_STREET,
+                OLD_CITY
+            )
+        }
+        speculation {
+            address.street = NEW_STREET
+            assertEquals(NEW_STREET, address.street)
+        }
+        frame {
+            assertEquals(OLD_STREET, address.street)
+        }
+    }
+
+    @Test
+    fun testSpeculationIsolation() {
+        val address = frame {
+            Address(
+                OLD_STREET,
+                OLD_CITY
+            )
+        }
+        speculate()
+        address.street = NEW_STREET
+        val speculation = suspend()
+        frame {
+            assertEquals(OLD_STREET, address.street)
+        }
+        restore(speculation)
+        assertEquals(NEW_STREET, address.street)
+        abortHandler()
+        frame {
+            assertEquals(OLD_STREET, address.street)
+        }
+    }
+
+    @Test
+    fun testReuseSpeculation() {
+        val address = frame {
+            Address(
+                OLD_STREET,
+                OLD_CITY
+            )
+        }
+        assertEquals(1, address.firstFrameRecord.length)
+        speculation { address.street = NEW_STREET }
+        assertEquals(2, address.firstFrameRecord.length)
+        frame { address.street = "other street" }
+        assertEquals(2, address.firstFrameRecord.length)
+    }
+
+    @Test
     fun testCommitAbortInteraction() {
         val address = frame {
             Address(
@@ -1175,6 +1229,15 @@ inline fun <T> restored(frame: Frame, crossinline block: () -> T): T {
 
 inline fun aborted(crossinline block: () -> Unit) {
     open(false)
+    try {
+        block()
+    } finally {
+        abortHandler()
+    }
+}
+
+inline fun speculation(crossinline block: () -> Unit) {
+    speculate()
     try {
         block()
     } finally {
