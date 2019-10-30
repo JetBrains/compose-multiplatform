@@ -17,198 +17,233 @@
 package androidx.build
 
 import com.android.build.gradle.LibraryPlugin
-import java.io.File
+import groovy.util.Node
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.gradle.api.XmlProvider
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ProjectDependency
-import org.gradle.api.artifacts.maven.MavenDeployer
-import org.gradle.api.artifacts.maven.MavenPom
-import org.gradle.api.tasks.Upload
-import org.gradle.kotlin.dsl.withGroovyBuilder
+import org.gradle.api.component.SoftwareComponent
+import org.gradle.api.publish.PublishingExtension
+import org.gradle.api.publish.maven.MavenPom
+import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.create
+import java.io.File
 
 fun Project.configureMavenArtifactUpload(extension: AndroidXExtension) {
-    afterEvaluate {
-        if (extension.publish.shouldPublish()) {
-            val mavenGroup = extension.mavenGroup?.group
-            if (mavenGroup == null) {
-                throw Exception("You must specify mavenGroup for $name project")
-            }
-            if (extension.mavenVersion == null) {
-                throw Exception("You must specify mavenVersion for $name project")
-            }
-            val strippedGroupId = mavenGroup.substringAfterLast(".")
-            if (mavenGroup.startsWith("androidx") && !name.startsWith(strippedGroupId)) {
-                throw Exception("Your artifactId must start with $strippedGroupId")
-            }
-            group = mavenGroup
-        }
-    }
-
-    apply(mapOf("plugin" to "maven"))
-
-    // Set uploadArchives options.
-    val uploadTask = tasks.getByName("uploadArchives") as Upload
-
-    uploadTask.repositories {
-        it.withGroovyBuilder {
-            "mavenDeployer" {
-                "repository"(mapOf("url" to uri(getRepositoryDirectory())))
-            }
-        }
-    }
+    apply(mapOf("plugin" to "maven-publish"))
 
     afterEvaluate {
-        if (extension.publish.shouldPublish()) {
-            uploadTask.repositories.withType(MavenDeployer::class.java) { mavenDeployer ->
-                mavenDeployer.getPom().project {
-                    it.withGroovyBuilder {
-                        "name"(extension.name)
-                        "description"(extension.description)
-                        "url"(extension.url)
-                        "inceptionYear"(extension.inceptionYear)
-
-                        "licenses" {
-                            "license" {
-                                "name"("The Apache Software License, Version 2.0")
-                                "url"("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                                "distribution"("repo")
-                            }
-                            for (license in extension.getLicenses()) {
-                                "license" {
-                                    "name"(license.name)
-                                    "url"(license.url)
-                                    "distribution"("repo")
-                                }
-                            }
-                        }
-
-                        "scm" {
-                            "url"("http://source.android.com")
-                            "connection"(ANDROID_GIT_URL)
-                        }
-
-                        "developers" {
-                            "developer" {
-                                "name"("The Android Open Source Project")
-                            }
-                        }
-                    }
-                }
-
-                val groupText = extension.mavenGroup!!.group
-
-                uploadTask.outputs.dir(
-                    File(
-                        getRepositoryDirectory(),
-                        "${groupText.replace('.', '/')}/${project.name}/${project.version}"
-                    )
-                )
-
-                uploadTask.doFirst {
-                    // Delete any existing archives, so that developers don't get
-                    // confused/surprised by the presence of old versions.
-                    // Additionally, deleting old versions makes it more convenient to iterate
-                    // over all existing archives without visiting archives having old versions too
-                    removePreviouslyUploadedArchives(groupText)
-
-                    val androidxDeps = HashSet<Dependency>()
-                    collectDependenciesForConfiguration(androidxDeps, this, "api")
-                    collectDependenciesForConfiguration(androidxDeps, this, "implementation")
-                    collectDependenciesForConfiguration(androidxDeps, this, "compile")
-
-                    mavenDeployer.getPom().whenConfigured { pom ->
-                        removeTestDeps(pom)
-                        assignAarTypes(pom, androidxDeps)
-                        val group = extension.mavenGroup
-                        if (group != null) {
-                            if (group.requireSameVersion) {
-                                assignSingleVersionDependenciesInGroup(pom, group.group)
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Register it as part of release so that we create a Zip file for it
-            Release.register(this, extension)
-        } else {
-            uploadTask.enabled = false
+        components.all { component ->
+            configureComponent(extension, component)
         }
     }
 }
 
-// removes dependencies having scope of "test"
-private fun Project.removeTestDeps(pom: MavenPom) {
-    pom.dependencies.removeAll { dep ->
-        if (dep == null) {
-            return@removeAll false
+private fun Project.configureComponent(
+    extension: AndroidXExtension,
+    component: SoftwareComponent
+) {
+    if (extension.publish.shouldPublish() && component.isAndroidOrJavaReleaseComponent()) {
+        val androidxGroup = validateCoordinatesAndGetGroup(extension)
+        group = androidxGroup
+        configure<PublishingExtension> {
+            repositories {
+                it.maven { repo ->
+                    repo.setUrl(getRepositoryDirectory())
+                }
+            }
+            publications {
+                if (appliesJavaGradlePluginPlugin()) {
+                    // The 'java-gradle-plugin' will also add to the 'pluginMaven' publication
+                    it.create<MavenPublication>("pluginMaven").pom { pom ->
+                        addInformativeMetadata(pom, extension)
+                        tweakDependenciesMetadata(extension, pom)
+                    }
+                    tasks.getByName("publishPluginMavenPublicationToMavenRepository").doFirst {
+                        removePreviouslyUploadedArchives(androidxGroup)
+                    }
+                } else {
+                    it.create<MavenPublication>("maven") {
+                        from(component)
+                        pom { pom ->
+                            addInformativeMetadata(pom, extension)
+                            tweakDependenciesMetadata(extension, pom)
+                        }
+                    }
+                    tasks.getByName("publishMavenPublicationToMavenRepository").doFirst {
+                        removePreviouslyUploadedArchives(androidxGroup)
+                    }
+                }
+            }
         }
 
-        val getScopeMethod = dep::class.java.getDeclaredMethod("getScope")
-        getScopeMethod.invoke(dep) as String == "test"
+        // Register it as part of release so that we create a Zip file for it
+        Release.register(this, extension)
     }
 }
 
+private fun SoftwareComponent.isAndroidOrJavaReleaseComponent() =
+    name == "release" || name == "java"
+
+private fun Project.validateCoordinatesAndGetGroup(extension: AndroidXExtension): String {
+    val mavenGroup = extension.mavenGroup?.group
+        ?: throw Exception("You must specify mavenGroup for $name project")
+    val strippedGroupId = mavenGroup.substringAfterLast(".")
+    if (mavenGroup.startsWith("androidx") && !name.startsWith(strippedGroupId)) {
+        throw Exception("Your artifactId must start with $strippedGroupId")
+    }
+    return mavenGroup
+}
+
+/**
+ * Delete any existing archives, so that developers don't get
+ * confused/surprised by the presence of old versions.
+ * Additionally, deleting old versions makes it more convenient to iterate
+ * over all existing archives without visiting archives having old versions too
+ */
 private fun Project.removePreviouslyUploadedArchives(group: String) {
     val projectArchiveDir = File(
-                                getRepositoryDirectory(),
-                                "${group.replace('.', '/')}/${project.name}"
-                            )
+        getRepositoryDirectory(),
+        "${group.replace('.', '/')}/${project.name}"
+    )
     projectArchiveDir.deleteRecursively()
+}
+
+private fun Project.addInformativeMetadata(pom: MavenPom, extension: AndroidXExtension) {
+    pom.name.set(provider { extension.name })
+    pom.description.set(provider { extension.description })
+    pom.url.set(provider { extension.url })
+    pom.inceptionYear.set(provider { extension.inceptionYear })
+    pom.licenses { licenses ->
+        licenses.license { license ->
+            license.name.set("The Apache Software License, Version 2.0")
+            license.url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+            license.distribution.set("repo")
+        }
+        for (extraLicense in extension.getLicenses()) {
+            licenses.license { license ->
+                license.name.set(provider { extraLicense.name })
+                license.url.set(provider { extraLicense.url })
+                license.distribution.set("repo")
+            }
+        }
+    }
+    pom.scm { scm ->
+        scm.url.set("http://source.android.com")
+        scm.connection.set(ANDROID_GIT_URL)
+    }
+    pom.developers { devs ->
+        devs.developer { dev ->
+            dev.name.set("The Android Open Source Project")
+        }
+    }
+}
+
+private fun Project.tweakDependenciesMetadata(extension: AndroidXExtension, pom: MavenPom) {
+    pom.withXml { xml ->
+        // The following code depends on getProjectsMap which is only available late in
+        // configuration at which point Java Library plugin's variants are not allowed to be
+        // modified. TODO remove the use of getProjectsMap and move to earlier configuration.
+        // For more context see:
+        // https://android-review.googlesource.com/c/platform/frameworks/support/+/1144664/8/buildSrc/src/main/kotlin/androidx/build/MavenUploadHelper.kt#177
+        // assignSingleVersionDependenciesInGroupForGradleMetadata(
+        //      configurations.findByName("apiElements"), extension)
+        // assignSingleVersionDependenciesInGroupForGradleMetadata(
+        //      configurations.findByName("runtimeElements"), extension)
+        assignSingleVersionDependenciesInGroupForGradleMetadata(
+            configurations.findByName("releaseApiPublication"), extension)
+        assignSingleVersionDependenciesInGroupForGradleMetadata(
+            configurations.findByName("releaseRuntimePublication"), extension)
+        assignSingleVersionDependenciesInGroupForPom(xml, extension)
+        assignAarTypes(xml)
+    }
 }
 
 // TODO(aurimas): remove this when Gradle bug is fixed.
 // https://github.com/gradle/gradle/issues/3170
-private fun Project.assignAarTypes(pom: MavenPom, androidxDeps: HashSet<Dependency>) {
-    pom.dependencies.forEach { dep ->
-        if (dep == null) {
+private fun Project.assignAarTypes(xml: XmlProvider) {
+    val androidxDependencies = HashSet<Dependency>()
+    collectDependenciesForConfiguration(androidxDependencies, "api")
+    collectDependenciesForConfiguration(androidxDependencies, "implementation")
+    collectDependenciesForConfiguration(androidxDependencies, "compile")
+
+    val dependencies = xml.asNode().children().find { it is Node && it.name().toString()
+        .endsWith("dependencies") } as Node?
+
+    dependencies?.children()?.forEach { dep ->
+        if (dep !is Node) {
             return@forEach
         }
-
-        val getGroupIdMethod =
-                dep::class.java.getDeclaredMethod("getGroupId")
-        val groupId: String = getGroupIdMethod.invoke(dep) as String
-        val getArtifactIdMethod =
-                dep::class.java.getDeclaredMethod("getArtifactId")
-        val artifactId: String = getArtifactIdMethod.invoke(dep) as String
-
-        if (isAndroidProject(groupId, artifactId, androidxDeps)) {
-            val setTypeMethod = dep::class.java.getDeclaredMethod("setType",
-                    java.lang.String::class.java)
-            setTypeMethod.invoke(dep, "aar")
+        val groupId = dep.children().first { it is Node && it.name().toString()
+            .endsWith("groupId") } as Node
+        val artifactId = dep.children().first { it is Node && it.name().toString()
+            .endsWith("artifactId") } as Node
+        if (isAndroidProject(groupId.children()[0] as String,
+                artifactId.children()[0] as String, androidxDependencies)) {
+            dep.appendNode("type", "aar")
         }
     }
 }
 
 /**
- * Specifies that every dependency in <group> refers to a single version and can't be
- * automatically promoted to a new version.
- * This will replace, for example, a version string of "1.0" with a version string of "[1.0]"
+ * Create dependency constraints between projects of a group that require the same versions.
+ * The constraints are published in Gradle Module Metadata and cause all modules to align.
  */
-private fun Project.assignSingleVersionDependenciesInGroup(pom: MavenPom, group: String) {
-    pom.dependencies.forEach { dep ->
-        if (dep == null) {
+fun Project.assignSingleVersionDependenciesInGroupForGradleMetadata(
+    configuration: Configuration?,
+    extension: AndroidXExtension
+) {
+    if (configuration != null && extension.mavenGroup?.requireSameVersion == true) {
+        getProjectsMap().forEach { (id, _) ->
+            val group = id.split(":")[0]
+            val name = id.split(":")[1]
+            if (group == extension.mavenGroup?.group && name != project.name) {
+                configuration.dependencyConstraints.add(
+                    dependencies.constraints.create("$id:${project.version}")
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Modifies the given .pom to specify that every dependency in <group> refers to a single version
+ * and can't be automatically promoted to a new version.
+ * This will replace, for example, a version string of "1.0" with a version string of "[1.0]"
+ *
+ * Note: this is not enforced in Gradle nor in plain Maven (without the Enforcer plugin)
+ * (https://github.com/gradle/gradle/issues/8297)
+ */
+private fun assignSingleVersionDependenciesInGroupForPom(
+    xml: XmlProvider,
+    extension: AndroidXExtension
+) {
+    val group = extension.mavenGroup
+    if (group == null || !group.requireSameVersion) {
+        return
+    }
+
+    val dependencies = xml.asNode().children().find { it is Node && it.name().toString()
+        .endsWith("dependencies") } as Node?
+    dependencies?.children()?.forEach { dep ->
+        if (dep !is Node) {
             return@forEach
         }
-        val getGroupIdMethod =
-                dep::class.java.getDeclaredMethod("getGroupId")
-        val groupId: String = getGroupIdMethod.invoke(dep) as String
-        if (groupId == group) {
-            val getVersionMethod =
-                dep::class.java.getDeclaredMethod("getVersion")
-            val declaredVersion = getVersionMethod.invoke(dep) as String
-
+        val groupId = dep.children().first { it is Node && it.name().toString()
+            .endsWith("groupId") } as Node
+        if (groupId.children()[0].toString() == group.group) {
+            val versionNode = dep.children().first { it is Node && it.name().toString()
+                .endsWith("version") } as Node
+            val declaredVersion = versionNode.children()[0].toString()
             if (isVersionRange(declaredVersion)) {
                 throw GradleException("Unsupported version '$declaredVersion': " +
-                    "already is a version range")
+                        "already is a version range")
             }
-
             val pinnedVersion = "[$declaredVersion]"
-
-            val setVersionMethod = dep::class.java.getDeclaredMethod("setVersion",
-                    java.lang.String::class.java)
-            setVersionMethod.invoke(dep, pinnedVersion)
+            versionNode.setValue(pinnedVersion)
         }
     }
 }
@@ -221,12 +256,11 @@ private fun isVersionRange(text: String): Boolean {
         text.contains(",")
 }
 
-private fun collectDependenciesForConfiguration(
+private fun Project.collectDependenciesForConfiguration(
     androidxDependencies: MutableSet<Dependency>,
-    project: Project,
     name: String
 ) {
-    val config = project.configurations.findByName(name)
+    val config = configurations.findByName(name)
     config?.dependencies?.forEach { dep ->
         if (dep.group?.startsWith("androidx.") == true) {
             androidxDependencies.add(dep)
@@ -252,6 +286,8 @@ private fun Project.isAndroidProject(
     }
     return false
 }
+
+private fun Project.appliesJavaGradlePluginPlugin() = pluginManager.hasPlugin("java-gradle-plugin")
 
 private const val ANDROID_GIT_URL =
         "scm:git:https://android.googlesource.com/platform/frameworks/support"

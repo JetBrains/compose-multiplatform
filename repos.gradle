@@ -37,6 +37,10 @@ def addMavenRepositories(RepositoryHandler handler) {
     repoNames.each { repo ->
         handler.maven {
             url repo
+            metadataSources {
+                mavenPom()
+                artifact()
+            }
         }
     }
     if (System.getenv("ALLOW_PUBLIC_REPOS") != null || (isUnbundledBuild(ext.supportRootFolder))) {
