@@ -64,7 +64,7 @@ object LibraryVersions {
     val HEIFWRITER = Version("1.1.0-alpha01")
     val INSPECTION = Version("1.0.0-alpha01")
     val INTERPOLATOR = Version("1.1.0-alpha01")
-    val JETIFIER = Version("1.0.0-beta08")
+    val JETIFIER = Version("1.0.0-beta09")
     val LEANBACK = Version("1.1.0-alpha03")
     val LEANBACK_PREFERENCE = Version("1.1.0-alpha03")
     val LEGACY = Version("1.1.0-alpha01")
