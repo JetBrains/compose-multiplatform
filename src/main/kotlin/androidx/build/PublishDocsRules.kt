@@ -44,6 +44,7 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.CAMERA.group, "camera-testing")
     ignore(LibraryGroups.CAMERA.group, "camera-extensions-stub")
     ignore(LibraryGroups.CAMERA.group, "camera-testlib-extensions")
+    ignore(LibraryGroups.CAMERA.group, "camera-lifecycle")
     prebuilts(LibraryGroups.CAMERA, "camera-view", "1.0.0-alpha04")
     prebuilts(LibraryGroups.CAMERA, "camera-extensions", "1.0.0-alpha04")
     prebuilts(LibraryGroups.CAMERA, "1.0.0-alpha07")
