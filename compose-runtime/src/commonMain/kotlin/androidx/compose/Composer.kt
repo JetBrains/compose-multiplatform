@@ -1837,8 +1837,8 @@ private fun MutableList<Invalidation>.removeRange(start: Int, end: Int) {
     }
 }
 
-object NullCompitionScope {
+object NullCompilationScope {
     val composer = Unit
 }
 
-inline fun <T> escapeCompose(block: NullCompitionScope.() -> T) = NullCompitionScope.block()
+inline fun <T> escapeCompose(block: NullCompilationScope.() -> T) = NullCompilationScope.block()
