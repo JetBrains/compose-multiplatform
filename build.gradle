@@ -39,7 +39,7 @@ ext.supportRootFolder = project.projectDir.getParentFile()
 apply from: 'repos.gradle'
 apply from: "build_dependencies.gradle"
 apply plugin: "kotlin"
-apply from: "kotlin-dsl-dependency.gradle.kts"
+apply from: "kotlin-dsl-dependency.gradle"
 
 allprojects {
     repos.addMavenRepositories(repositories)
@@ -53,6 +53,7 @@ allprojects {
 }
 
 dependencies {
+    compileOnly(findGradleKotlinDsl())
     implementation build_libs.agp
     implementation build_libs.dex_member_list
     implementation build_libs.error_prone_gradle
