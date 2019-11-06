@@ -892,6 +892,8 @@ class NewCodeGenTests {
         fun then(block: (activity: Activity) -> Unit): ActiveTest {
             val composition = ViewComposition(
                 ViewComposer(activity.root, activity, object : Recomposer() {
+                    override fun recomposeSync() {}
+
                     override fun scheduleChangesDispatch() {}
 
                     override fun hasPendingChanges(): Boolean = false

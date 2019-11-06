@@ -35,6 +35,13 @@ private class AndroidRecomposer : Recomposer() {
     }
 
     override fun hasPendingChanges(): Boolean = frameScheduled
+
+    override fun recomposeSync() {
+        if (frameScheduled) {
+            Choreographer.getInstance().removeFrameCallback(frameCallback)
+            frameCallback.doFrame(0)
+        }
+    }
 }
 
 internal actual fun createRecomposer(): Recomposer {

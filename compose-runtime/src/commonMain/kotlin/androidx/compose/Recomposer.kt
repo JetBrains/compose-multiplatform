@@ -27,7 +27,11 @@ abstract class Recomposer {
          */
         fun hasPendingChanges() = current().hasPendingChanges()
 
-        internal fun current(): Recomposer {
+        /**
+         * Retrieves [Recomposer] for the current thread. Needs to be the main thread.
+         */
+        @TestOnly
+        fun current(): Recomposer {
             require(isMainThread()) {
                 "No Recomposer for this Thread"
             }
@@ -58,12 +62,13 @@ abstract class Recomposer {
                     composer.endGroup()
                     composer.endRoot()
                 }
-                composer.applyChanges()
-                if (!composerWasComposing) {
-                    FrameManager.nextFrame()
-                }
             } finally {
                 composer.isComposing = composerWasComposing
+            }
+            // TODO(b/143755743)
+            composer.applyChanges()
+            if (!composerWasComposing) {
+                FrameManager.nextFrame()
             }
         }
     }
@@ -102,6 +107,14 @@ abstract class Recomposer {
         cs.forEach { performRecompose(it) }
         FrameManager.nextFrame()
     }
+
+    /**
+     * Used to recompose changes from [scheduleChangesDispatch] immediately without waiting.
+     *
+     * This is supposed to be used in tests only.
+     */
+    @TestOnly
+    abstract fun recomposeSync()
 }
 
 internal expect fun createRecomposer(): Recomposer
