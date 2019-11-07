@@ -25,9 +25,13 @@ import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
+import org.gradle.workers.WorkerExecutor
 import java.io.File
+import javax.inject.Inject
 
-abstract class UpdateApiLintBaselineTask : MetalavaTask() {
+abstract class UpdateApiLintBaselineTask @Inject constructor(
+    workerExecutor: WorkerExecutor
+) : MetalavaTask(workerExecutor) {
     init {
         group = "API"
         description = "Updates an API lint baseline file (api/api_lint.ignore) to match the " +
@@ -60,7 +64,9 @@ abstract class UpdateApiLintBaselineTask : MetalavaTask() {
     }
 }
 
-abstract class IgnoreApiChangesTask : MetalavaTask() {
+abstract class IgnoreApiChangesTask @Inject constructor(
+    workerExecutor: WorkerExecutor
+) : MetalavaTask(workerExecutor) {
     init {
         description = "Updates an API tracking baseline file (api/X.Y.Z.ignore) to match the " +
                 "current set of violations"
