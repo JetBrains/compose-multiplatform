@@ -85,12 +85,11 @@ abstract class RegenerateOldApisTask @Inject constructor(
         }
 
         val outputApiLocation = project.getApiLocation(version)
-        val tempDir = File(project.buildDir, "api")
         if (outputApiLocation.publicApiFile.exists()) {
             project.logger.lifecycle("Regenerating $mavenId")
             val generateRestrictedAPIs = outputApiLocation.restrictedApiFile.exists()
             project.generateApi(
-                inputs, outputApiLocation, tempDir, ApiLintMode.Skip, generateRestrictedAPIs,
+                inputs, outputApiLocation, ApiLintMode.Skip, generateRestrictedAPIs,
                 workerExecutor)
         }
     }

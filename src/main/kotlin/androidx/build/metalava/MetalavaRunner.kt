@@ -154,19 +154,18 @@ sealed class ApiLintMode {
 fun Project.generateApi(
     files: JavaCompileInputs,
     apiLocation: ApiLocation,
-    tempDir: File,
     apiLintMode: ApiLintMode,
     includeRestrictedApis: Boolean,
     workerExecutor: WorkerExecutor
 ) {
     generateApi(files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
-        apiLocation.publicApiFile, tempDir, GenerateApiMode.PublicApi, apiLintMode, workerExecutor)
+        apiLocation.publicApiFile, GenerateApiMode.PublicApi, apiLintMode, workerExecutor)
     generateApi(files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
-        apiLocation.experimentalApiFile, tempDir, GenerateApiMode.ExperimentalApi, apiLintMode,
+        apiLocation.experimentalApiFile, GenerateApiMode.ExperimentalApi, apiLintMode,
         workerExecutor)
     if (includeRestrictedApis) {
         generateApi(files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
-            apiLocation.restrictedApiFile, tempDir, GenerateApiMode.RestrictedApi, ApiLintMode.Skip,
+            apiLocation.restrictedApiFile, GenerateApiMode.RestrictedApi, ApiLintMode.Skip,
             workerExecutor)
     }
 }
@@ -177,17 +176,10 @@ fun Project.generateApi(
     dependencyClasspath: FileCollection,
     sourcePaths: Collection<File>,
     outputFile: File,
-    tempDir: File,
     generateApiMode: GenerateApiMode,
     apiLintMode: ApiLintMode,
     workerExecutor: WorkerExecutor
 ) {
-    val tempOutputFile = if (generateApiMode is GenerateApiMode.RestrictedApi) {
-        File(tempDir, outputFile.name + ".tmp")
-    } else {
-        outputFile
-    }
-
     // generate public API txt
     val args = mutableListOf(
         "--classpath",
@@ -197,7 +189,7 @@ fun Project.generateApi(
         sourcePaths.filter { it.exists() }.joinToString(File.pathSeparator),
 
         "--api",
-        tempOutputFile.toString(),
+        outputFile.toString(),
 
         "--format=v3",
         "--output-kotlin-nulls=yes"
@@ -210,7 +202,8 @@ fun Project.generateApi(
         is GenerateApiMode.RestrictedApi -> {
             // Show restricted APIs despite @hide.
             args += listOf(
-                "--show-annotation", "androidx.annotation.RestrictTo",
+                "--show-annotation", "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP)",
+                "--show-annotation", "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX)",
                 "--show-unannotated"
             )
             args += HIDE_EXPERIMENTAL_ARGS
@@ -247,36 +240,5 @@ fun Project.generateApi(
         }
     }
 
-    if (generateApiMode is GenerateApiMode.RestrictedApi) {
-        runMetalavaWithArgs(getMetalavaJar(), args, workerExecutor)
-        // TODO(119617147): when we no longer need to fix Metalava's output, remove this "await"
-        workerExecutor.await()
-        removeRestrictToLibraryLines(tempOutputFile, outputFile)
-    } else {
-        runMetalavaWithArgs(getMetalavaJar(), args, workerExecutor)
-    }
-}
-
-// until b/119617147 is done, remove lines containing "@RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY)"
-private fun removeRestrictToLibraryLines(inputFile: File, outputFile: File) {
-    val outputBuilder = StringBuilder()
-    val lines = inputFile.readLines()
-    var skipScopeUntil: String? = null
-    for (line in lines) {
-        val skip = line.contains("@RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY)")
-        if (skip && line.endsWith("{")) {
-            skipScopeUntil = line.commonPrefixWith("    ") + "}"
-        }
-        if (!skip && skipScopeUntil == null) {
-            outputBuilder.append(line)
-            outputBuilder.append("\n")
-        }
-        if (line == skipScopeUntil) {
-            skipScopeUntil = null
-        }
-    }
-    if (skipScopeUntil != null) {
-        throw GradleException("Skipping until `$skipScopeUntil`, but found EOF")
-    }
-    outputFile.writeText(outputBuilder.toString())
+    runMetalavaWithArgs(getMetalavaJar(), args, workerExecutor)
 }

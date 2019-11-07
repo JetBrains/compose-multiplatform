@@ -73,7 +73,6 @@ abstract class GenerateApiTask @Inject constructor(
         project.generateApi(
             inputs,
             apiLocation.get(),
-            apiLocation.get().publicApiFile.parentFile,
             ApiLintMode.CheckBaseline(baselines.get().apiLintFile),
             generateRestrictedAPIs,
             workerExecutor
