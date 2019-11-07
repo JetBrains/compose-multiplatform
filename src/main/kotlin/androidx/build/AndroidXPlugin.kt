@@ -461,6 +461,17 @@ class AndroidXPlugin : Plugin<Project> {
             buildType.signingConfig = debugSigningConfig
         }
 
+        // Disable generating BuildConfig.java
+        // TODO remove after https://issuetracker.google.com/72050365
+        variants.all { variant ->
+            variant.generateBuildConfigProvider.configure {
+                // TODO: Always disable BuildConfig generation after b/142242084 is resolved.
+                if (!project.hasProperty("android.injected.invoked.from.ide")) {
+                    it.enabled = false
+                }
+            }
+        }
+
         project.configureErrorProneForAndroid(variants)
 
         // Set the officially published version to be the debug version with minimum dependency
@@ -566,15 +577,6 @@ class AndroidXPlugin : Plugin<Project> {
                         }
                     }
                 }
-            }
-        }
-
-        // Disable generating BuildConfig.java for libraries
-        // TODO remove after https://issuetracker.google.com/72050365
-        // TODO(b/142242084): Move back to AndroidCommonOptions
-        variants.all { variant ->
-            variant.generateBuildConfigProvider.configure {
-                it.enabled = false
             }
         }
 
