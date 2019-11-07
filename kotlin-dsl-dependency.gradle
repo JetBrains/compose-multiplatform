@@ -1,0 +1,39 @@
+/*
+ * Copyright 2019 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+def findGradleKotlinDsl() {
+    // TODO(137044144): After we convert this file to Kotlin (build.gradle.kts), we can just
+    // directly call the getGradleKotlinDsl() method.
+    // We're not doing that yet though because Gradle takes more time to process .kts files (at the
+    // time of writing, adding a .kts file adds roughly 10 addition seconds to build startup time).
+    def gradleUserHome = project.gradle.getGradleUserHomeDir()
+    def gradleVersion = project.gradle.getGradleVersion()
+    def containingPath = "" + gradleUserHome + "/wrapper/dists/gradle-" + gradleVersion + "-bin"
+    def subdirs = project.file(containingPath).listFiles()
+    if (subdirs.length != 1) {
+        throw new GradleException("Could not identify Gradle distribution in " + containingPath +
+                                  "; expected 1, found " + subdirs.length + ": " + subdirs)
+    }
+    def gradleHashDir = subdirs[0]
+    def kotlinDsl = "" + gradleHashDir + "/gradle-" + gradleVersion + "/lib/gradle-kotlin-dsl-" +
+                    gradleVersion + ".jar"
+    if (!project.file(kotlinDsl).exists()) {
+        throw new GradleException("Kotlin dsl jar does not exist: " + kotlinDsl)
+    }
+    return project.files(kotlinDsl)
+}
+
+ext.findGradleKotlinDsl = this.&findGradleKotlinDsl
