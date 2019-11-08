@@ -465,10 +465,7 @@ class AndroidXPlugin : Plugin<Project> {
         // TODO remove after https://issuetracker.google.com/72050365
         variants.all { variant ->
             variant.generateBuildConfigProvider.configure {
-                // TODO: Always disable BuildConfig generation after b/142242084 is resolved.
-                if (!project.hasProperty("android.injected.invoked.from.ide")) {
-                    it.enabled = false
-                }
+                it.enabled = false
             }
         }
 
