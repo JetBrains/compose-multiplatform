@@ -76,6 +76,13 @@ enum class CompilationTarget {
     DEVICE
 }
 
+/**
+ * Publish Enum:
+ * Publish.NONE -> Generates no aritfacts; does not generate snapshot artifacts
+ *                 or releasable maven artifacts
+ * Publish.SNAPSHOT_ONLY -> Only generates snapshot artifacts
+ * Publish.SNAPSHOT_AND_RELEASE -> Generates both snapshot artifacts and releasable maven artifact
+*/
 enum class Publish {
     NONE, SNAPSHOT_ONLY, SNAPSHOT_AND_RELEASE;
 
