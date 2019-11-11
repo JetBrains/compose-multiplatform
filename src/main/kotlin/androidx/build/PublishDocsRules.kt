@@ -111,7 +111,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.PREFERENCE, "1.1.0")
     prebuilts(LibraryGroups.PRINT, "1.0.0")
     prebuilts(LibraryGroups.RECOMMENDATION, "1.0.0")
-    prebuilts(LibraryGroups.RECYCLERVIEW, "recyclerview", "1.1.0-rc01")
+    prebuilts(LibraryGroups.RECYCLERVIEW, "recyclerview", "1.1.0")
     prebuilts(LibraryGroups.RECYCLERVIEW, "recyclerview-selection", "1.1.0-alpha06")
     prebuilts(LibraryGroups.REMOTECALLBACK, "1.0.0-alpha02")
     prebuilts(LibraryGroups.ROOM, "2.2.0-beta01")
