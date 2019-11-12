@@ -27,6 +27,8 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ResolveException
 import org.gradle.api.tasks.Copy
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskCollection
 import org.gradle.api.tasks.TaskContainer
@@ -215,14 +217,22 @@ object DokkaPublicDocs {
 // TODO(b/143243490): can this be made to run more quickly, cleanly and clearly via some other
 // approach, such as maybe with an ArtifactTransform?
 open class LocateJarsTask : DefaultTask() {
+    init {
+        // This task does not correctly model inputs and outputs.
+        // Mark it to be never up to date
+        outputs.upToDateWhen { false }
+    }
+
     // dependencies to search for .jar files
+    @get:Input
     val inputDependencies = mutableListOf<String>()
 
     // .jar files found in any dependencies
+    @get:OutputFiles
     val outputJars = mutableListOf<File>()
 
     @TaskAction
-    fun Extract() {
+    fun extract() {
         // setup
         val inputDependencies = checkNotNull(inputDependencies) { "inputDependencies not set" }
         val project = this.project

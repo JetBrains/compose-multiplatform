@@ -28,6 +28,7 @@ import org.gradle.api.component.SoftwareComponent
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPom
 import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.api.publish.tasks.GenerateModuleMetadata
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.create
 import java.io.File
@@ -49,6 +50,9 @@ private fun Project.configureComponent(
     if (extension.publish.shouldPublish() && component.isAndroidOrJavaReleaseComponent()) {
         val androidxGroup = validateCoordinatesAndGetGroup(extension)
         group = androidxGroup
+        tasks.withType(GenerateModuleMetadata::class.java) {
+            it.enabled = false
+        }
         configure<PublishingExtension> {
             repositories {
                 it.maven { repo ->
