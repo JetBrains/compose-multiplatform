@@ -39,9 +39,9 @@ fun Terminal(style: Int) {
 @Composable
 fun Stack(vertical: Boolean, children: @Composable() FlexScope.() -> Unit) {
     if (vertical) {
-        Column(ExpandedHeight, block = children)
+        Column(ExpandedHeight, children = children)
     } else {
-        Row(ExpandedWidth, block = children)
+        Row(ExpandedWidth, children = children)
     }
 }
 
