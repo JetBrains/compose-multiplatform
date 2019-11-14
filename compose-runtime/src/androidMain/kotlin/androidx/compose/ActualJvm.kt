@@ -18,17 +18,20 @@ package androidx.compose
 
 actual typealias BitSet = java.util.BitSet
 
-actual open class ThreadLocal<T> actual constructor() : java.lang.ThreadLocal<T>() {
-    actual override fun get(): T? {
-        return super.get()
+actual open class ThreadLocal<T> actual constructor(
+    private val initialValue: () -> T
+) : java.lang.ThreadLocal<T>() {
+    @Suppress("UNCHECKED_CAST")
+    actual override fun get(): T {
+        return super.get() as T
     }
 
-    actual override fun set(value: T?) {
+    actual override fun set(value: T) {
         super.set(value)
     }
 
-    actual override fun initialValue(): T? {
-        return super.initialValue()
+    override fun initialValue(): T? {
+        return initialValue.invoke()
     }
 }
 

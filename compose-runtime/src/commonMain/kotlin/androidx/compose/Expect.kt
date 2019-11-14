@@ -23,11 +23,12 @@ expect class BitSet() {
     operator fun get(bitIndex: Int): Boolean
 }
 
-expect open class ThreadLocal<T>() {
-    fun get(): T?
-    fun set(value: T?)
-    protected open fun initialValue(): T?
+expect open class ThreadLocal<T>(initialValue: () -> T) {
+    fun get(): T
+    fun set(value: T)
 }
+
+fun <T> ThreadLocal() = ThreadLocal<T?> { null }
 
 expect class WeakHashMap<K, V>() : MutableMap<K, V>
 

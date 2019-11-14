@@ -35,16 +35,13 @@ abstract class Recomposer {
             require(isMainThread()) {
                 "No Recomposer for this Thread"
             }
-            return threadRecomposer.get() ?: error("No Recomposer for this Thread")
+            return threadRecomposer.get()
         }
 
         internal fun recompose(component: Component, composer: Composer<*>) =
             current().recompose(component, composer)
 
-        // TODO delete the explicit type after https://youtrack.jetbrains.com/issue/KT-20996
-        private val threadRecomposer: ThreadLocal<Recomposer> = object : ThreadLocal<Recomposer>() {
-            override fun initialValue(): Recomposer? = createRecomposer()
-        }
+        private val threadRecomposer = ThreadLocal { createRecomposer() }
     }
 
     private val composers = mutableSetOf<Composer<*>>()

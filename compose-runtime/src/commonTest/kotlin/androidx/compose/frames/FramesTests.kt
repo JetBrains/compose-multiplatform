@@ -340,12 +340,11 @@ class FrameTest {
         }
         var read: Address? = null
         var otherRead: Address? = null
-        val frame = open({ obj -> read = obj as Address })
+        open({ obj -> read = obj as Address })
         try {
-            frame.observeReads({ obj -> otherRead = obj as Address }) {
+            observeAllReads({ obj -> otherRead = obj as Address }) {
                 assertEquals(OLD_STREET, address.street)
             }
-            assertEquals(1, frame.readObservers.size)
         } finally {
             commitHandler()
         }
@@ -1099,6 +1098,48 @@ class FrameTest {
             iterator.next()
             iterator.remove()
         }
+    }
+
+    @Test
+    fun testGlobalReadObserverSurvivesFrameSwitch() {
+        val address1 = frame {
+            Address(
+                OLD_STREET,
+                OLD_CITY
+            )
+        }
+        val address2 = frame {
+            Address(
+                NEW_STREET,
+                NEW_CITY
+            )
+        }
+        val address3 = frame {
+            Address(
+                OLD_STREET,
+                NEW_CITY
+            )
+        }
+        val readAddresses = HashSet<Address>()
+
+        observeAllReads({ readAddresses.add(it as Address) }) {
+            frame {
+                // read 1
+                address1.city
+            }
+            frame {
+                // read 2
+                address2.city
+            }
+        }
+        frame {
+            // read 3 outside of observeReads
+            address3.city
+        }
+
+        assertTrue(readAddresses.contains(address1))
+        assertTrue(readAddresses.contains(address2))
+        assertFalse(readAddresses.contains(address3))
     }
 }
 

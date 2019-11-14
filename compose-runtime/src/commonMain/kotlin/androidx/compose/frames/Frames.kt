@@ -121,22 +121,21 @@ class Frame internal constructor(
     /**
      * Observe a frame read
      */
-    readObserver: FrameReadObserver?,
+    internal val readObserver: FrameReadObserver?,
 
     /**
      * Observe a frame write
      */
-    internal val writeObserver: FrameWriteObserver?
+    internal val writeObserver: FrameWriteObserver?,
+
+    /**
+     * The reference to the thread local list of observers from [threadReadObservers].
+     * We store it here to save on an additional ThreadLocal.get() call during
+     * the every model read.
+     */
+    internal var threadReadObservers: MutableList<FrameReadObserver>
 ) {
     internal val modified = if (readOnly) null else HashSet<Framed>()
-
-    internal val readObservers = mutableListOf<FrameReadObserver>()
-
-    init {
-        if (readObserver != null) {
-            readObservers += readObserver
-        }
-    }
 
     /**
      * True if any change to a frame object will throw.
@@ -145,21 +144,29 @@ class Frame internal constructor(
         get() = modified == null
 
     /**
-     * Add a [FrameReadObserver] during execution of the [block].
-     */
-    fun observeReads(readObserver: FrameReadObserver, block: () -> Unit) {
-        try {
-            readObservers += readObserver
-            block()
-        } finally {
-            readObservers -= readObserver
-        }
-    }
-
-    /**
      * Whether there are any pending changes in this frame.
      */
     fun hasPendingChanges(): Boolean = (modified?.size ?: 0) > 0
+}
+
+/**
+ * Holds the thread local list of [FrameReadObserver]s not associated with any specific [Frame].
+ * They survives [Frame]s switch.
+ */
+private val threadReadObservers = ThreadLocal { mutableListOf<FrameReadObserver>() }
+
+/**
+ * [FrameReadObserver] will be called for every frame read happened on the current
+ * thread during execution of the [block].
+ */
+fun observeAllReads(readObserver: FrameReadObserver, block: () -> Unit) {
+    val observers = threadReadObservers.get()
+    try {
+        observers.add(readObserver)
+        block()
+    } finally {
+        observers.remove(readObserver)
+    }
 }
 
 private fun validateNotInFrame() {
@@ -193,6 +200,7 @@ private fun open(
     writeObserver: FrameWriteObserver?
 ): Frame {
     validateNotInFrame()
+    val threadReadObservers = threadReadObservers.get()
     synchronized(sync) {
         val id = maxFrameId++
         val invalid = openFrames
@@ -201,7 +209,8 @@ private fun open(
             invalid = invalid,
             readOnly = readOnly,
             readObserver = readObserver,
-            writeObserver = writeObserver
+            writeObserver = writeObserver,
+            threadReadObservers = threadReadObservers
         )
         openFrames = openFrames.set(id)
         threadFrame.set(frame)
@@ -386,6 +395,7 @@ fun suspend(): Frame {
 fun restore(frame: Frame) {
     validateNotInFrame()
     validateOpen(frame)
+    frame.threadReadObservers = threadReadObservers.get()
     threadFrame.set(frame)
 }
 
@@ -435,11 +445,11 @@ private fun <T : Record> readable(r: T, id: Int, invalid: FrameIdSet): T {
 }
 
 fun <T : Record> T.readable(framed: Framed): T {
-    return this.readable(currentFrame(), framed)
-}
-
-fun <T : Record> T.readable(frame: Frame, framed: Framed): T {
-    frame.readObservers.forEach { it(framed) }
+    val frame = currentFrame()
+    // invoke the observer associated with the current frame.
+    frame.readObserver?.invoke(framed)
+    // invoke the thread local observers.
+    frame.threadReadObservers.forEach { it(framed) }
     return readable(this, frame.id, frame.invalid)
 }
 
