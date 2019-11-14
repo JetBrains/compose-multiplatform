@@ -81,7 +81,6 @@ val API_LINT_ARGS: List<String> = listOf(
         "ParcelableList",
         "NotCloseable",
         "UserHandleName",
-        "MethodNameTense",
         "UseIcu",
         "NoByteOrShort",
         "CommonArgsFirst",
@@ -101,7 +100,8 @@ val API_LINT_ARGS: List<String> = listOf(
         "IllegalStateException",
         "ListenerLast",
         "AbstractInner",
-        "ArrayReturn"
+        "ArrayReturn",
+        "MethodNameTense"
     ).joinToString()
 )
 
