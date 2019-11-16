@@ -110,7 +110,7 @@ val KOTLIN_REFLECT get() = "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
 
 internal lateinit var agpVersion: String
 
-const val AGP_STABLE = "com.android.tools.build:gradle:3.4.2"
+const val AGP_STABLE = "com.android.tools.build:gradle:3.5.2"
 val AGP_LATEST get() = "com.android.tools.build:gradle:$agpVersion"
 
 internal lateinit var lintVersion: String
