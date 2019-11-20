@@ -214,13 +214,13 @@ object DokkaPublicDocs {
     }
 }
 
+// TODO(b/143243490): can this be made to run more quickly, cleanly and clearly via some other
+// approach, such as maybe with an ArtifactTransform?
 open class LocateJarsTask : DefaultTask() {
     // dependencies to search for .jar files
-    @get:Input
     val inputDependencies = mutableListOf<String>()
 
     // .jar files found in any dependencies
-    @get:OutputFiles
     val outputJars = mutableListOf<File>()
 
     @TaskAction
