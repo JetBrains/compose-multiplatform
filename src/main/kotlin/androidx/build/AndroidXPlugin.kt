@@ -114,11 +114,6 @@ class AndroidXPlugin : Plugin<Project> {
         if (project.isRoot) {
             project.configureRootProject()
         }
-        // Compose-compiler can't have the standard library plugins applied to mark it a library
-        // to trigger e.g. build-info generation. See b/142323149.
-        if (project.name == "compose-compiler") {
-            project.addCreateLibraryBuildInfoFileTask(androidXExtension)
-        }
 
         project.configureJacoco()
 
