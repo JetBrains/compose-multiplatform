@@ -40,7 +40,9 @@ fun Project.runMetalavaWithArgs(configuration: Configuration, args: List<String>
         it.args = listOf(
             "--no-banner",
             "--hide",
-            "HiddenSuperclass" // We allow having a hidden parent class
+            "HiddenSuperclass", // We allow having a hidden parent class
+            "--error",
+            "ReferencesDeprecated"
         ) + args
     }
 }
