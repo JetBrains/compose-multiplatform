@@ -27,37 +27,30 @@ buildscript {
 }
 
 plugins {
+    id("java")
     id("AndroidXPlugin")
 }
 
 apply plugin: 'org.anarres.jarjar'
 
-configurations {
-    jarFiles
-}
-
-// This dependency isn't seen by Jetpad because that artifact declares Publish.NONE
-// This dependency doesn't appear in the .pom because the dependency is of type jarFile
 dependencies {
-    jarFiles(project(":compose:compose-compiler-hosted")) {
-        transitive = false
-    }
+    compileOnly(project(":compose:compose-compiler-hosted"))
 }
 
 jarjar.repackage('embeddedPlugin') {
     destinationName "compose-compiler.jar"
-    from configurations.jarFiles
+    from configurations.compileClasspath
     classRename 'com.intellij.**', 'org.jetbrains.kotlin.com.intellij.@1'
 }
 
 configurations {
-    embeddablePlugin
-}
-
-artifacts {
-    embeddablePlugin(embeddedPlugin.destinationPath) {
-        name "compose-compiler"
-        type "jar"
+    // replace the standard jar with the one built by 'jarjar.repackage' in both api and runtime variants
+    apiElements.outgoing.artifacts.clear()
+    apiElements.outgoing.artifact(embeddedPlugin.destinationPath) {
+        builtBy embeddedPlugin
+    }
+    runtimeElements.outgoing.artifacts.clear()
+    runtimeElements.outgoing.artifact(embeddedPlugin.destinationPath) {
         builtBy embeddedPlugin
     }
 }

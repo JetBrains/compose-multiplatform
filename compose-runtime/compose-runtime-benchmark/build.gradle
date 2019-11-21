@@ -45,7 +45,7 @@ android {
 }
 
 dependencies {
-    kotlinPlugin project(path: ":compose:compose-compiler", configuration: "embeddablePlugin")
+    kotlinPlugin project(path: ":compose:compose-compiler")
 
     androidTestImplementation(project(":compose:compose-runtime"))
     androidTestImplementation(project(":ui:ui-core"))
