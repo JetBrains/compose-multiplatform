@@ -24,7 +24,7 @@ if (isUiProject) {
     build_versions.agp = "4.0.0-alpha01"
     build_versions.lint = "27.0.0-alpha01"
 } else {
-    build_versions.kotlin = "1.3.41"
+    build_versions.kotlin = "1.3.60"
     build_versions.agp = '3.6.0-beta04'
     build_versions.lint = '26.6.0-beta04'
 }
