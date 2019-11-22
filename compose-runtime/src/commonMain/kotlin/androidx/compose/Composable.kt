@@ -53,6 +53,10 @@ package androidx.compose
 
     // composable types inside of type signatures
     // foo: (@Composable() () -> Unit) -> Unit
-    AnnotationTarget.TYPE_PARAMETER
+    AnnotationTarget.TYPE_PARAMETER,
+
+    // composable property declarations
+    // @Composable val foo: Int get() { ... }
+    AnnotationTarget.PROPERTY
 )
 annotation class Composable
