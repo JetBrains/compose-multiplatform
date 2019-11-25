@@ -652,10 +652,41 @@ class SlotTable(internal var slots: Array<Any?> = arrayOf()) {
     internal var anchors: ArrayList<Anchor> = arrayListOf()
 
     fun <T> read(block: (reader: SlotReader) -> T): T = openReader().let { reader ->
-        block(reader).also { reader.close() }
+        try {
+            block(reader)
+        } finally {
+            reader.close()
+        }
     }
+
     fun <T> write(block: (writer: SlotWriter) -> T): T = openWriter().let { writer ->
-        block(writer).also { writer.close() }
+        try {
+            block(writer)
+        } finally {
+            writer.close()
+        }
+    }
+
+    fun groupPathTo(location: Int): List<Int> {
+        require(location < slots.size - gapLen)
+        val path = mutableListOf<Int>()
+        read { reader ->
+            var current = 0
+            loop@ while (true) {
+                path.add(current)
+                if (current == location) break
+                current++
+                while (current < location && !reader.isGroup(current)) current++
+                if (current == location && !reader.isGroup(current)) break
+                while (current <= location) {
+                    val end = reader.groupSize(current) + current + 1
+                    if (location < end) continue@loop
+                    current = end
+                }
+                break
+            }
+        }
+        return path
     }
 
     fun openReader(): SlotReader {

@@ -123,11 +123,11 @@ inline fun <reified T : Emittable> ViewComposer.emitEmittable(
 
 @Suppress("PLUGIN_ERROR")
 inline fun <reified T> ViewComposer.provideAmbient(
-    key: Ambient<T>,
+    key: ProvidableAmbient<T>,
     value: T,
     noinline children: @Composable() () -> Unit
 ) = call(
     0,
     { changed(key) + changed(value) + changed(children) },
-    { key.Provider(value, children) }
+    { Providers(key provides value, children = children) }
 )

@@ -30,7 +30,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @Suppress("PLUGIN_WARNING")
-class EffectsTests: BaseComposeTest() {
+class EffectsTests : BaseComposeTest() {
     @After
     fun teardown() {
         Compose.clearRoots()
@@ -603,7 +603,7 @@ class EffectsTests: BaseComposeTest() {
     fun testAmbient1() {
         val tv1Id = 100
 
-        val Foo = Ambient.of<String>()
+        val Foo = ambientOf<String>()
         var current by mutableStateOf("Hello World")
 
         @Composable
@@ -614,7 +614,7 @@ class EffectsTests: BaseComposeTest() {
                 {
                     @Suppress("PLUGIN_ERROR")
                     (Observe {
-                        val foo = ambient(Foo)
+                        val foo = Foo.current
                         composer.emit(
                             168,
                             { context -> TextView(context).apply { id = tv1Id } },
@@ -646,7 +646,7 @@ class EffectsTests: BaseComposeTest() {
     @Test
     @MediumTest
     fun testAmbient2() {
-        val MyAmbient = Ambient.of<Int> { throw Exception("not set") }
+        val MyAmbient = ambientOf<Int> { throw Exception("not set") }
 
         var requestRecompose: (() -> Unit)? = null
         var buttonCreated = false
@@ -655,7 +655,7 @@ class EffectsTests: BaseComposeTest() {
         fun SimpleComposable2() {
             Observe {
                 with(composer) {
-                    val value = ambient(MyAmbient)
+                    val value = MyAmbient.current
                     emit(534, { context -> TextView(context) }, {
                         set("$value") { text = it }
                     })
@@ -703,7 +703,7 @@ class EffectsTests: BaseComposeTest() {
     @Test
     @MediumTest
     fun testAmbient_RecomposeScope() {
-        val MyAmbient = Ambient.of<Int> { throw Exception("not set") }
+        val MyAmbient = ambientOf<Int> { throw Exception("not set") }
 
         var requestRecompose: (() -> Unit)? = null
         var buttonCreated = false
@@ -714,7 +714,7 @@ class EffectsTests: BaseComposeTest() {
             with(composer) {
                 startRestartGroup(712)
                 componentComposed = true
-                val value = ambient(MyAmbient)
+                val value = MyAmbient.current
                 emit(534, { context -> TextView(context) }, {
                     set("$value") { text = it }
                 })

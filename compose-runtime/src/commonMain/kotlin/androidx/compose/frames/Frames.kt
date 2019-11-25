@@ -94,7 +94,7 @@ interface Framed {
 
 typealias FrameReadObserver = (read: Any) -> Unit
 typealias FrameWriteObserver = (write: Any) -> Unit
-typealias FrameCommitObserver = (committed: Set<Any>) -> Unit
+typealias FrameCommitObserver = (committed: Set<Any>, frame: Frame) -> Unit
 
 private val threadFrame = ThreadLocal<Frame>()
 
@@ -280,8 +280,9 @@ fun commit(frame: Frame) {
     // since the frame was last opened. There is a trivial cases that can be dismissed immediately,
     // no writes occurred.
     val modified = frame.modified
+    val id = frame.id
     val listeners = synchronized(sync) {
-        if (!openFrames.get(frame.id)) throw IllegalStateException("Frame not open")
+        if (!openFrames.get(id)) throw IllegalStateException("Frame not open")
         if (modified == null || modified.size == 0) {
             closeFrame(frame)
             emptyList()
@@ -299,8 +300,7 @@ fun commit(frame: Frame) {
 
             val current = openFrames
             val nextFrame = maxFrameId
-            val start = frame.invalid.set(frame.id)
-            val id = frame.id
+            val start = frame.invalid.set(id)
             for (framed in frame.modified) {
                 val first = framed.firstFrameRecord
                 if (readable(
@@ -318,7 +318,7 @@ fun commit(frame: Frame) {
     }
     if (modified != null)
         for (commitListener in listeners) {
-            commitListener(modified)
+            commitListener(modified, frame)
         }
 }
 

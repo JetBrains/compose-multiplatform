@@ -343,10 +343,12 @@ fun onPreCommit(vararg inputs: Any?, callback: CommitScope.() -> Unit) {
  * @see [Ambient]
  */
 @Composable
-fun <T> ambient(key: Ambient<T>): T = currentComposerNonNull.let {
-    it.currentRecomposeScope?.used = true
-    it.consume(key)
-}
+@Deprecated(
+    "Use Ambient<T>.current instead",
+    ReplaceWith("key.current"),
+    DeprecationLevel.WARNING
+)
+fun <T> ambient(key: Ambient<T>): T = key.current
 
 /**
  * An Effect to get the nearest invalidation lambda to the current point of composition. This can be used to

@@ -361,7 +361,7 @@ class FrameTest {
             )
         }
         var committed: Set<Any>? = null
-        observeCommit({ framed: Set<Any> -> committed = framed }) {
+        observeCommit({ framed: Set<Any>, _ -> committed = framed }) {
             frame {
                 address.street = NEW_STREET
             }
@@ -426,7 +426,7 @@ class FrameTest {
             }
         }
         var committedAddresses = null as Set<Any>?
-        observeCommit({ framed -> committedAddresses = framed }) {
+        observeCommit({ framed, _ -> committedAddresses = framed }) {
             frame {
                 for (address in addressToWrite) {
                     address.street = NEW_STREET

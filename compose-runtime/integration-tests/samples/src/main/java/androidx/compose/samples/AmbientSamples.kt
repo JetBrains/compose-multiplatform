@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-@file:Suppress("unused", "UNUSED_PARAMETER", "UNUSED_VARIABLE")
+@file:Suppress("unused", "UNUSED_PARAMETER", "UNUSED_VARIABLE", "LocalVariableName")
 
 package androidx.compose.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.Ambient
 import androidx.compose.Composable
-import androidx.compose.ambient
+import androidx.compose.Providers
+import androidx.compose.ambientOf
 
 @Sampled
 fun createAmbient() {
-    val ActiveUser = Ambient.of<User> { error("No active user found!") }
+    val ActiveUser = ambientOf<User> { error("No active user found!") }
 }
 
 @Sampled
@@ -33,7 +33,7 @@ fun createAmbient() {
 fun ambientProvider() {
     @Composable
     fun App(user: User) {
-        ActiveUser.Provider(value = user) {
+        Providers(ActiveUser provides user) {
             SomeScreen()
         }
     }
@@ -53,12 +53,12 @@ fun someScreenSample() {
 fun consumeAmbient() {
     @Composable
     fun UserPhoto() {
-        val user = ambient(ActiveUser)
+        val user = ActiveUser.current
         ProfileIcon(src = user.profilePhotoUrl)
     }
 }
 
-private val ActiveUser = Ambient.of<User> { error("No active user found!") }
+private val ActiveUser = ambientOf<User> { error("No active user found!") }
 
 @Composable private fun SomeScreen() {}
 

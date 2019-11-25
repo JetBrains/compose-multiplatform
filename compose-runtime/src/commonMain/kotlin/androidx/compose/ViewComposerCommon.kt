@@ -51,6 +51,12 @@ internal val invocation = Any()
 internal val provider = Any()
 
 @PublishedApi
+internal val providerValues = Any()
+
+@PublishedApi
+internal val providerMaps = Any()
+
+@PublishedApi
 internal val consumer = Any()
 
 @PublishedApi

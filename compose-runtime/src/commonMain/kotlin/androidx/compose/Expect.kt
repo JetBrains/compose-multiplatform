@@ -82,6 +82,23 @@ expect interface ChoreographerFrameCallback {
     fun doFrame(frameTimeNanos: Long)
 }
 
+/**
+ * A forwarding interface to a persistent map used internally to represent ambient scopes.
+ */
+interface BuildableMap<K, V> : Map<K, V> {
+    interface Builder<K, V> : MutableMap<K, V> {
+        fun build(): BuildableMap<K, V>
+    }
+    fun builder(): Builder<K, V>
+}
+
+@Suppress("UNCHECKED_CAST")
+internal inline fun <K, V> BuildableMap<K, V>.mutate(
+    mutator: (MutableMap<K, V>) -> Unit
+): BuildableMap<K, V> = builder().apply(mutator).build()
+
+internal expect fun <K, V> buildableMapOf(): BuildableMap<K, V>
+
 expect object Choreographer {
     fun postFrameCallback(callback: ChoreographerFrameCallback)
     fun postFrameCallbackDelayed(delayMillis: Long, callback: ChoreographerFrameCallback)

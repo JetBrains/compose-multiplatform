@@ -19,6 +19,7 @@ package androidx.compose
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
+import kotlin.test.assertTrue
 
 class SlotTableTests {
 
@@ -1030,6 +1031,27 @@ class SlotTableTests {
         slots.read { reader ->
             for (anchor in anchors) {
                 assertEquals(62, reader.get(slots.anchorLocation(anchor)))
+            }
+        }
+    }
+
+    @Test
+    fun testGroupPath() {
+        val table = testItems()
+        repeat(table.size) { location ->
+            val path = table.groupPathTo(location)
+            var previous = Int.MAX_VALUE
+            table.read { reader ->
+                for (group in path) {
+                    assertTrue(group <= location)
+
+                    val size = reader.groupSize(group)
+                    assertTrue(size < previous)
+                    previous = size
+                }
+                if (reader.isGroup(location)) {
+                    assertTrue(path.last() == location)
+                }
             }
         }
     }

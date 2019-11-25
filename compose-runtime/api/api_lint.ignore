@@ -3,6 +3,8 @@ AcronymName: androidx.compose.SlotTable.Companion#getEMPTY():
     Acronyms should not be capitalized in method names: was `getEMPTY`, should this be `getEmpty`?
 
 
+ArrayReturn: androidx.compose.AmbientKt#Providers(androidx.compose.ProvidedValue<?>[], kotlin.jvm.functions.Function0<kotlin.Unit>) parameter #0:
+    Method parameter should be Collection<ProvidedValue> (or subclass) instead of raw array; was `androidx.compose.ProvidedValue<?>[]`
 ArrayReturn: androidx.compose.EffectsKt#onCommit(Object[], kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit>) parameter #0:
     Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
 ArrayReturn: androidx.compose.EffectsKt#onPreCommit(Object[], kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit>) parameter #0:
@@ -43,10 +45,6 @@ DocumentExceptions: androidx.compose.frames.FramesKt#currentFrame():
     Method FramesKt.currentFrame appears to be throwing java.lang.IllegalStateException; this should be listed in the documentation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
 DocumentExceptions: androidx.compose.frames.FramesKt#writable(T, androidx.compose.frames.Framed, androidx.compose.frames.Frame):
     Method FramesKt.writable appears to be throwing java.lang.IllegalStateException; this should be listed in the documentation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
-
-
-EqualsAndHashCode: androidx.compose.Ambient#equals(Object):
-    Must override both equals and hashCode; missing one in androidx.compose.Ambient
 
 
 ExceptionName: androidx.compose.frames.FrameAborted:

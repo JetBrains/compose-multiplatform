@@ -45,6 +45,7 @@ internal class IntStack {
     }
 
     fun pop(): Int = slots[--tos]
+    fun peekOr(default: Int): Int = if (tos > 0) peek() else default
     fun peek() = slots[tos - 1]
     fun peek(index: Int) = slots[index]
     fun isEmpty() = tos == 0

@@ -224,7 +224,7 @@ class ViewComposer(
         block: @Composable() () -> Unit
     ) {
         startGroup(key)
-        if (ViewValidator(this).invalid() || inserting) {
+        if (ViewValidator(this).invalid() || !skipping) {
             startGroup(invocation)
             block()
             endGroup()

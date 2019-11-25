@@ -31,14 +31,14 @@ package androidx.compose
  *
  * One must create an Ambient instance, which can be referenced by the consumers statically. Ambient
  * instances themselves hold no data, and can be thought of as a type-safe identifier for the data
- * being passed down a tree. The Ambient constructor takes a single parameter, a factory to create a
- * default value in cases where an ambient is used without a Provider. If this is a situation you
- * would rather not handle, you can throw an error in this factory
+ * being passed down a tree. Ambient factory functions takes a single parameter, a factory to
+ * create a default value in cases where an ambient is used without a Provider. If this is a
+ * situation you would rather not handle, you can throw an error in this factory
  *
  * @sample androidx.compose.samples.createAmbient
  *
- * Somewhere up the tree, a [Provider] component can be used, which has a required `value`
- * parameter. This would often be at the "root" of a tree, but could be anywhere, and can also be
+ * Somewhere up the tree, a [Providers] component can be used, which provides a value for the
+ * ambient. This would often be at the "root" of a tree, but could be anywhere, and can also be
  * used in multiple places to override the provided value for a sub-tree.
  *
  * @sample androidx.compose.samples.ambientProvider
@@ -48,65 +48,122 @@ package androidx.compose
  *
  * @sample androidx.compose.samples.someScreenSample
  *
- * Finally, a component that wishes to consume the ambient value can use the corresponding
- * [ambient] effect, which returns the current value of the ambient, and subscribes the component
- * to changes of it.
+ * Finally, a component that wishes to consume the ambient value can use the [current]
+ * property of the ambient key which returns the current value of the ambient, and subscribes the
+ * component to changes of it.
  *
  * @sample androidx.compose.samples.consumeAmbient
  */
-class Ambient<T>
-internal constructor(private val defaultFactory: (() -> T)? = null) {
+@Immutable
+sealed class Ambient<T> constructor(private val defaultFactory: (() -> T)? = null) {
     @Suppress("UNCHECKED_CAST")
-    internal val defaultValue by lazy {
-        val fn = defaultFactory
-        if (fn != null) fn()
-        else null as T
-    }
+    internal val defaultValueHolder = LazyValueHolder(defaultFactory)
 
-    companion object {
-        /**
-         * Creates an ambient to be used during composition.
-         *
-         * @param defaultFactory A lambda to run to create a default value of this ambient for when
-         * the ambient is consumed in a composition and there is no provider above the point of
-         * consumption. If no factory is provided, and [T] is not a nullable type, an exception
-         * will be thrown. This factory will not be executed more than once.
-         */
-        fun <T> of(defaultFactory: (() -> T)? = null) = Ambient(defaultFactory)
-    }
-
-    override fun equals(other: Any?) = this === other
-
-    internal class Holder<T>(val ambient: Ambient<T>, var value: T)
+    @Composable
+    internal abstract fun provided(value: T): ValueHolder<T>
 
     /**
-     * The Provider component allows one to provide an ambient value to a section of the tree during
-     * composition. All consumers of the ambient that are underneath this component will receive the
-     * value provided here. Consuming components are guaranteed to be invalidated and recomposed
-     * when this value changes.
+     * Return the value provided by the nearest [Providers] component that invokes, directly or
+     * indirectly, the composable function that uses this property.
      *
-     * @param value The current value of the ambient.
-     * @param children Everything composed inside this block will get [value] when consuming this
-     * ambient
-     *
-     * @see ambient
+     * @sample androidx.compose.samples.consumeAmbient
      */
     @Composable
-    fun Provider(
-        value: T,
-        children: @Composable() () -> Unit
-    ) {
+    inline val current: T get() = currentComposerNonNull.consume(this)
+}
+
+/**
+ * A [ProvidableAmbient] can be used in [Providers] to provide values.
+ *
+ * @see ambientOf
+ * @see Ambient
+ * @see Providers
+ */
+@Immutable
+abstract class ProvidableAmbient<T> internal constructor(defaultFactory: (() -> T)?) :
+    Ambient<T> (defaultFactory) {
+
+    /**
+     * Associates an ambient key to a value in a call to [Providers].
+     *
+     * @see Ambient
+     * @see ProvidableAmbient
+     */
+    @Suppress("UNCHECKED_CAST")
+    infix fun provides(value: T) = ProvidedValue(this, value)
+}
+
+/**
+ * A [DynamicProvidableAmbient] is an ambient backed by a [DynamicValueHolder]. Providing
+ * new values using a [DynamicProvidableAmbient] will provide the same [ValueHolder] with a
+ * different value. Reading the ambient value of a [DynamicProvidableAmbient] will record a
+ * read in the [RecomposeScope] of the composition. Changing the provided value will invalidate
+ * the [RecomposeScope]s.
+ *
+ * @see ambientOf
+ */
+internal class DynamicProvidableAmbient<T> constructor(defaultFactory: (() -> T)?) :
+    ProvidableAmbient<T>(defaultFactory) {
+
+    @Composable
+    override fun provided(value: T): ValueHolder<T> {
         with(currentComposerNonNull) {
-            val holder = remember {
-                Holder(
-                    this@Ambient,
-                    value
-                )
-            }
-            holder.value = value
-            startProvider(holder, value)
-            children()
-            endProvider()
+            val valueHolder = remember { DynamicValueHolder(value) }
+            valueHolder.value = value
+            return valueHolder
         }
+    }
+}
+
+/**
+ * A [StaticProvidableAmbient] is a value that is expected to rarely change.
+ *
+ * @see staticAmbientOf
+ */
+@Immutable
+internal class StaticProvidableAmbient<T>(defaultFactory: (() -> T)?) :
+    ProvidableAmbient<T>(defaultFactory) {
+
+    @Composable
+    override fun provided(value: T): ValueHolder<T> = StaticValueHolder(value)
+}
+
+/**
+ * Create an ambient key that can be provided using [Providers]. Changing the value provided
+ * during recomposition will invalidate the children of [Providers] that read the value using
+ * [current].
+ *
+ * @see Ambient
+ */
+fun <T> ambientOf(defaultFactory: (() -> T)? = null): ProvidableAmbient<T> =
+    DynamicProvidableAmbient(defaultFactory)
+
+/**
+ * Create an ambient key that can be provided using [Providers]. Changing the value provided
+ * will cause the entire tree below [Providers] to be recomposed, disabling skipping of composable
+ * calls.
+ *
+ * A static ambient should be only be used when the value provided is highly unlikely to change.
+ *
+ * @see Ambient
+ */
+fun <T> staticAmbientOf(defaultFactory: (() -> T)? = null): ProvidableAmbient<T> =
+    StaticProvidableAmbient(defaultFactory)
+
+/**
+ * [Providers] binds values to [ProvidableAmbient] keys. Reading the ambient using
+ * [Ambient.current] will return the value provided in [Providers]'s [values] parameter for all
+ * composable functions called directly or indirectly in the [block] lambda.
+ *
+ * @sample androidx.compose.samples.ambientProvider
+ *
+ * @see Ambient
+ */
+@Composable
+fun Providers(vararg values: ProvidedValue<*>, children: @Composable() () -> Unit) {
+    with(currentComposerNonNull) {
+        startProviders(values)
+        children()
+        endProviders()
     }
 }

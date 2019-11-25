@@ -38,6 +38,7 @@ kotlin {
         }
         androidMain.dependencies {
             api "androidx.annotation:annotation:1.0.0"
+            implementation "org.jetbrains.kotlinx:kotlinx-collections-immutable-jvm:0.3"
         }
         androidAndroidTest.dependencies {
             implementation(ANDROIDX_TEST_EXT_JUNIT)

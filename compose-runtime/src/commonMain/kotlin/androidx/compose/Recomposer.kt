@@ -46,18 +46,26 @@ abstract class Recomposer {
 
     private val composers = mutableSetOf<Composer<*>>()
 
-    @Suppress("PLUGIN_WARNING")
+    @Suppress("PLUGIN_WARNING", "PLUGIN_ERROR")
     private fun recompose(composable: @Composable() () -> Unit, composer: Composer<*>) {
         composer.runWithCurrent {
             val composerWasComposing = composer.isComposing
             try {
                 composer.isComposing = true
-                trace("Compose:recompose") {
-                    composer.startRoot()
-                    composer.startGroup(invocation)
-                    composable()
-                    composer.endGroup()
-                    composer.endRoot()
+                FrameManager.composing {
+                    trace("Compose:recompose") {
+                        var complete = false
+                        try {
+                            composer.startRoot()
+                            composer.startGroup(invocation)
+                            composable()
+                            composer.endGroup()
+                            composer.endRoot()
+                            complete = true
+                        } finally {
+                            if (!complete) composer.abortRoot()
+                        }
+                    }
                 }
             } finally {
                 composer.isComposing = composerWasComposing
@@ -76,7 +84,9 @@ abstract class Recomposer {
             var hadChanges: Boolean
             try {
                 composer.isComposing = true
-                hadChanges = composer.recompose()
+                hadChanges = FrameManager.composing {
+                    composer.recompose()
+                }
                 composer.applyChanges()
             } finally {
                 composer.isComposing = false

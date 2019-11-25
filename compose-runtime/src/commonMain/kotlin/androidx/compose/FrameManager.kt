@@ -16,8 +16,10 @@
 
 package androidx.compose
 
+import androidx.compose.frames.Frame
 import androidx.compose.frames.open
 import androidx.compose.frames.commit
+import androidx.compose.frames.currentFrame
 import androidx.compose.frames.suspend
 import androidx.compose.frames.restore
 import androidx.compose.frames.registerCommitObserver
@@ -26,17 +28,22 @@ import androidx.compose.frames.inFrame
 /**
  * The frame manager manages the priority frame in the main thread.
  *
- * Once the FrameManager has started there is always an open frame in the main thread. If a model object is committed in any
- * frame then the frame manager schedules the current frame to commit with the Choreographer and a new frame is open. Any
- * model objects read during composition are recorded in an invalidations map. If they are mutated during a frame the recompose
- * scope that was active during the read is invalidated.
+ * Once the FrameManager has started there is always an open frame in the main thread. If a model
+ * object is committed in any frame then the frame manager schedules the current frame to commit
+ * with the Choreographer and a new frame is open. Any model objects read during composition are
+ * recorded in an invalidations map. If they are mutated during a frame the recompose scope that
+ * was active during the read is invalidated.
  */
 object FrameManager {
     private var started = false
     private var commitPending = false
     private var reclaimPending = false
+    internal var composing = false
     private var invalidations = ObserverMap<Any, RecomposeScope>()
     private var removeCommitObserver: (() -> Unit)? = null
+    private var immediateMap = ObserverMap<Frame, Any>()
+    private var deferredMap = ObserverMap<Frame, Any>()
+    private val lock = Any()
 
     private val handler by lazy { Handler(LooperWrapper.getMainLooper()) }
 
@@ -50,7 +57,7 @@ object FrameManager {
     }
 
     internal fun close() {
-        synchronized(this) {
+        synchronized(lock) {
             invalidations.clear()
         }
         if (inFrame) commit()
@@ -59,6 +66,17 @@ object FrameManager {
         invalidations = ObserverMap()
     }
 
+    internal inline fun <T> composing(block: () -> T): T {
+        val wasComposing = composing
+        composing = true
+        try {
+            return block()
+        } finally {
+            composing = wasComposing
+        }
+    }
+
+    @TestOnly
     fun <T> isolated(block: () -> T): T {
         ensureStarted()
         try {
@@ -68,6 +86,7 @@ object FrameManager {
         }
     }
 
+    @TestOnly
     fun <T> unframed(block: () -> T): T {
         if (inFrame) {
             val frame = suspend()
@@ -81,6 +100,7 @@ object FrameManager {
         } else return block()
     }
 
+    @TestOnly
     fun <T> framed(block: () -> T): T {
         if (inFrame) {
             return block()
@@ -102,7 +122,7 @@ object FrameManager {
     }
 
     internal fun scheduleCleanup() {
-        if (started && !reclaimPending && synchronized(this) {
+        if (started && !reclaimPending && synchronized(lock) {
                 if (!reclaimPending) {
                     reclaimPending = true
                     true
@@ -114,7 +134,7 @@ object FrameManager {
 
     private val readObserver: (read: Any) -> Unit = { read ->
         currentComposer?.currentRecomposeScope?.let {
-            synchronized(this) {
+            synchronized(lock) {
                 it.used = true
                 invalidations.add(read, it)
             }
@@ -129,11 +149,27 @@ object FrameManager {
                 nextFrame()
             }
         }
+        if (composing) {
+            val currentInvalidations = synchronized(lock) {
+                invalidations.getValueOf(it)
+            }
+            val results = currentInvalidations.map { scope -> scope.invalidate() }
+            val frame = currentFrame()
+            if (results.any { it == InvalidationResult.DEFERRED }) deferredMap.add(frame, it)
+            if (results.any { it == InvalidationResult.IMMINENT }) immediateMap.add(frame, it)
+        }
     }
 
-    private val commitObserver: (committed: Set<Any>) -> Unit = { committed ->
+    private val commitObserver: (committed: Set<Any>, frame: Frame) -> Unit = { committed, frame ->
         trace("Model:commitTransaction") {
-            val currentInvalidations = synchronized(this) { invalidations[committed] }
+            val currentInvalidations = synchronized(lock) {
+                val deferred = deferredMap.getValueOf(frame)
+                val immediate = immediateMap.getValueOf(frame)
+                // Ignore the object if its invalidations were all immediate for the frame.
+                invalidations[committed.filter {
+                    !immediate.contains(it) || deferred.contains(it)
+                } ]
+            }
             currentInvalidations.forEach { scope -> scope.invalidate() }
         }
     }
@@ -159,7 +195,7 @@ object FrameManager {
         )
     }
 
-    private inline fun schedule(crossinline block: () -> Unit) {
-        handler.postAtFrontOfQueue { block() }
+    private fun schedule(block: () -> Unit) {
+        handler.postAtFrontOfQueue(block)
     }
 }

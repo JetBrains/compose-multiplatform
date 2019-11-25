@@ -93,8 +93,16 @@ class ObserverMap<K : Any, V : Any> {
             val weakKey = IdentityWeakReference(key)
             keyToValue[weakKey]?.let(set::addAll)
         }
-        @Suppress("UNCHECKED_CAST")
         return set.mapNotNull { it.get() }
+    }
+
+    /**
+     * @return a list of values associated with the provided [key]
+     */
+    fun getValueOf(key: K): List<V> {
+        clearReferences()
+        val weakKey = IdentityWeakReference(key)
+        return keyToValue[weakKey]?.mapNotNull { it.get() }?.toList() ?: emptyList<V>()
     }
 
     /**

@@ -16,6 +16,9 @@
 
 package androidx.compose
 
+import kotlinx.collections.immutable.PersistentMap
+import kotlinx.collections.immutable.persistentHashMapOf
+
 actual typealias BitSet = java.util.BitSet
 
 actual open class ThreadLocal<T> actual constructor(
@@ -56,3 +59,22 @@ actual typealias MainThread = androidx.annotation.MainThread
 actual typealias TestOnly = org.jetbrains.annotations.TestOnly
 
 actual typealias CheckResult = androidx.annotation.CheckResult
+
+private data class BuildableMapWrapper<K, V>(
+    val map: PersistentMap<K, V>
+) : BuildableMap<K, V>, Map<K, V> by map {
+    override fun builder(): BuildableMap.Builder<K, V> {
+        val builder = map.builder()
+        return object : BuildableMap.Builder<K, V>, MutableMap<K, V> by builder {
+            override fun build(): BuildableMap<K, V> {
+                return BuildableMapWrapper(builder.build())
+            }
+        }
+    }
+}
+
+private val emptyPersistentMap = persistentHashMapOf<Any, Any>()
+
+@Suppress("UNCHECKED_CAST")
+internal actual fun <K, V> buildableMapOf(): BuildableMap<K, V> =
+    BuildableMapWrapper<K, V>(emptyPersistentMap as PersistentMap<K, V>)
