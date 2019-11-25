@@ -68,6 +68,7 @@ val API_LINT_ARGS: List<String> = listOf(
         "RethrowRemoteException", // This check is for calls into system_server
         "PackageLayering", // This check is not relevant to androidx.* code.
         "UserHandle", // This check is not relevant to androidx.* code.
+        "ParcelableList", // This check is only relevant to android platform that has managers.
 
         // List of checks that have bugs, but should be enabled once fixed.
         "GetterSetterNames", // b/135498039
@@ -79,7 +80,6 @@ val API_LINT_ARGS: List<String> = listOf(
         "TopLevelBuilder",
         "BuilderSetStyle",
         "ExecutorRegistration",
-        "ParcelableList",
         "NotCloseable",
         "UserHandleName",
         "UseIcu",
