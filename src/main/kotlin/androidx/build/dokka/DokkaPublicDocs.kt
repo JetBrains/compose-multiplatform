@@ -18,24 +18,22 @@
 // TODO: after DiffAndDocs and Doclava are fully obsoleted and removed, rename this from DokkaPublicDocs to just publicDocs
 package androidx.build.dokka
 
-import java.io.File
-import androidx.build.androidJarFile
 import androidx.build.AndroidXExtension
 import androidx.build.RELEASE_RULE
 import androidx.build.Strategy.Ignore
 import androidx.build.Strategy.Prebuilts
-import org.gradle.api.artifacts.ResolveException
+import androidx.build.androidJarFile
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.artifacts.ResolveException
 import org.gradle.api.tasks.Copy
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.OutputFiles
+import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskCollection
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.util.PatternFilterable
 import org.jetbrains.dokka.gradle.DokkaTask
+import java.io.File
 
 object DokkaPublicDocs {
     private const val DOCS_TYPE = "Public"

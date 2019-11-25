@@ -119,8 +119,8 @@ object DokkaSourceDocs {
         dokkaTasks?.filter { it.state.isConfigurable }?.forEach {
             it.sourceDirs += inputs.sourcePaths
 
-            it.classpath = it.classpath.plus(inputs.dependencyClasspath)
-                .plus(inputs.bootClasspath)
+            it.classpath = project.files(it.classpath).plus(project.files(inputs.bootClasspath))
+                .plus(inputs.dependencyClasspath)
             it.dependsOn(inputs.dependencyClasspath)
         }
     }
