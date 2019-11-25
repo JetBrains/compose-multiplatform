@@ -28,7 +28,7 @@ import androidx.build.Strategy.TipOfTree
  * Rule set used to generate public documentation.
  */
 val RELEASE_RULE = docsRules("public", false) {
-    prebuilts(LibraryGroups.ACTIVITY, "1.1.0-rc02")
+    prebuilts(LibraryGroups.ACTIVITY, "1.1.0-rc03")
     prebuilts(LibraryGroups.ADS, "1.0.0-alpha03")
     prebuilts(LibraryGroups.ANNOTATION, "annotation", "1.1.0")
     prebuilts(LibraryGroups.ANNOTATION, "annotation-experimental", "1.0.0")
