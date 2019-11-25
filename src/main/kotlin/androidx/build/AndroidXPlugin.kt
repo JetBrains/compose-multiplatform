@@ -37,7 +37,6 @@ import androidx.build.gradle.isRoot
 import androidx.build.jacoco.Jacoco
 import androidx.build.license.CheckExternalDependencyLicensesTask
 import androidx.build.license.configureExternalDependencyLicenseCheck
-import androidx.build.metalava.CREATE_STUB_API_JAR_TASK
 import androidx.build.metalava.MetalavaTasks.configureAndroidProjectForMetalava
 import androidx.build.metalava.MetalavaTasks.configureJavaProjectForMetalava
 import androidx.build.metalava.UpdateApiTask
@@ -48,6 +47,7 @@ import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.TestedExtension
+import com.android.build.gradle.api.AndroidBasePlugin
 import com.android.build.gradle.api.ApkVariant
 import org.gradle.api.DefaultTask
 import org.gradle.api.JavaVersion.VERSION_1_8
@@ -62,6 +62,7 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
@@ -298,20 +299,20 @@ class AndroidXPlugin : Plugin<Project> {
                 }
                 return@subprojects
             }
-            project.tasks.all { task ->
-                if ("assembleAndroidTest" == task.name ||
-                        "assembleDebug" == task.name ||
-                        ERROR_PRONE_TASK == task.name ||
-                        "jar" == task.name ||
-                        "verifyDependencyVersions" == task.name ||
-                        "reportLibraryMetrics" == task.name ||
-                        CREATE_STUB_API_JAR_TASK == task.name ||
-                        BUILD_ON_SERVER_TASK == task.name ||
-                        ("lintDebug" == task.name &&
-                        !project.rootProject.hasProperty(USE_MAX_DEP_VERSIONS)) ||
-                        task.name == Release.PROJECT_ARCHIVE_ZIP_TASK_NAME) {
-                    buildOnServerTask.dependsOn(task)
+            project.plugins.withType(AndroidBasePlugin::class.java) {
+                buildOnServerTask.dependsOn("${project.path}:assembleDebug")
+                buildOnServerTask.dependsOn("${project.path}:assembleAndroidTest")
+                if (!project.rootProject.hasProperty(USE_MAX_DEP_VERSIONS) &&
+                    project.path != ":docs-fake"
+                ) {
+                    buildOnServerTask.dependsOn("${project.path}:lintDebug")
                 }
+            }
+            project.plugins.withType(LibraryPlugin::class.java) {
+                buildOnServerTask.dependsOn("${project.path}:reportLibraryMetrics")
+            }
+            project.plugins.withType(JavaPlugin::class.java) {
+                buildOnServerTask.dependsOn("${project.path}:jar")
             }
         }
 
@@ -630,8 +631,12 @@ class AndroidXPlugin : Plugin<Project> {
             return null
         }
 
-        return tasks.register("verifyDependencyVersions",
-                VerifyDependencyVersionsTask::class.java)
+        val taskProvider = tasks.register(
+            "verifyDependencyVersions",
+            VerifyDependencyVersionsTask::class.java
+        )
+        addToBuildOnServer(taskProvider)
+        return taskProvider
     }
 
     // Task that creates release notes
@@ -743,9 +748,9 @@ fun Project.hideJavadocTask() {
     // So, few tasks named "javadoc" are interesting to developers
     // So, we don't want "javadoc" to appear in the output of `./gradlew tasks`
     // So, we set the group to null for any task named "javadoc"
-    tasks.all { task ->
-        if (task.name == "javadoc") {
-            task.group = null
+    tasks.withType(Javadoc::class.java).configureEach {
+        if (it.name == "javadoc") {
+            it.group = null
         }
     }
 }

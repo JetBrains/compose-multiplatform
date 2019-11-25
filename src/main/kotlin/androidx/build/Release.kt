@@ -20,6 +20,7 @@ import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.LibraryVariant
 import org.gradle.api.Action
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
@@ -340,7 +341,7 @@ object Release {
         project: Project
     ): TaskProvider<GMavenZipTask> {
         val taskName = "$PROJECT_ARCHIVE_ZIP_TASK_NAME"
-        return project.maybeRegister(
+        val taskProvider: TaskProvider<GMavenZipTask> = project.maybeRegister(
             name = taskName,
             onConfigure = {
                 GMavenZipTask.ConfigAction(
@@ -354,6 +355,10 @@ object Release {
             onRegister = {
             }
         )
+        project.rootProject.tasks.withType(BuildOnServer::class.java).configureEach {
+            it.dependsOn(taskProvider)
+        }
+        return taskProvider
     }
 }
 
