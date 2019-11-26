@@ -20,7 +20,7 @@ def build_versions = [:]
 
 // NOTE: lint versions *must* be kept in sync with agp
 if (isUiProject) {
-    build_versions.kotlin = "1.3.60-eap-25"
+    build_versions.kotlin = "1.3.61"
     build_versions.agp = "4.0.0-alpha01"
     build_versions.lint = "27.0.0-alpha01"
 } else {
