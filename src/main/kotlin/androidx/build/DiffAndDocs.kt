@@ -453,8 +453,8 @@ private fun createGenerateSdkApiTask(
     project: Project,
     doclavaConfig: Configuration,
     annotationConfig: Configuration
-): DoclavaTask =
-        project.tasks.createWithConfig("generateSdkApi", DoclavaTask::class.java) {
+): TaskProvider<DoclavaTask> =
+        project.tasks.registerWithConfig("generateSdkApi", DoclavaTask::class.java) {
             dependsOn(doclavaConfig)
             dependsOn(annotationConfig)
             description = "Generates API files for the current SDK."
@@ -505,7 +505,7 @@ private val GENERATE_DOCS_CONFIG = ChecksConfig(
  */
 private fun createGenerateDocsTask(
     project: Project,
-    generateSdkApiTask: DoclavaTask,
+    generateSdkApiTask: TaskProvider<DoclavaTask>,
     doclavaConfig: Configuration,
     supportRootFolder: File,
     dacOptions: DacOptions,
@@ -536,7 +536,7 @@ private fun createGenerateDocsTask(
                         listOf("Android", "https://developer.android.com")
                     )
                     addMultilineMultiValueOption("federationapi").value = listOf(
-                        listOf("Android", generateSdkApiTask.apiFile?.absolutePath)
+                        listOf("Android", generateSdkApiTask.get().apiFile?.absolutePath)
                     )
                     addMultilineMultiValueOption("hdf").value = listOf(
                         listOf("android.whichdoc", "online"),
@@ -564,14 +564,13 @@ private fun createGenerateDocsTask(
 private fun sdkApiFile(project: Project) = File(project.docsDir(), "release/sdk_current.txt")
 
 /**
- * @return the [taskClass] constructed and configured using the provided [config].
+ * @return the TaskProvider of [taskClass] constructed and configured using the provided [config].
  */
-fun <T : Task> TaskContainer.createWithConfig(
+fun <T : Task> TaskContainer.registerWithConfig(
     name: String,
     taskClass: Class<T>,
     config: T.() -> Unit
-) =
-        create(name, taskClass) { task -> task.config() }
+) = register(name, taskClass) { task -> task.config() }
 
 /**
  * @return the project's Android SDK stub JAR as a File.

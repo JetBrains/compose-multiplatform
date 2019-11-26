@@ -49,7 +49,6 @@ import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.TestedExtension
 import com.android.build.gradle.api.AndroidBasePlugin
 import com.android.build.gradle.api.ApkVariant
-import org.gradle.api.DefaultTask
 import org.gradle.api.JavaVersion.VERSION_1_8
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -772,8 +771,8 @@ fun Project.addToProjectMap(extension: AndroidXExtension) {
 val Project.multiplatformExtension
     get() = extensions.findByType(KotlinMultiplatformExtension::class.java)
 
-private fun Project.createCheckResourceApiTask(): DefaultTask {
-    return tasks.createWithConfig("checkResourceApi",
+private fun Project.createCheckResourceApiTask(): TaskProvider<CheckResourceApiTask> {
+    return tasks.registerWithConfig("checkResourceApi",
             CheckResourceApiTask::class.java) {
         newApiFile = getGenerateResourceApiFile()
         oldApiFile = getApiLocation().resourceFile
@@ -788,8 +787,8 @@ private fun Project.createCheckReleaseReadyTask(taskProviderList: List<TaskProvi
     }
 }
 
-private fun Project.createUpdateResourceApiTask(): DefaultTask {
-    return tasks.createWithConfig("updateResourceApi", UpdateResourceApiTask::class.java) {
+private fun Project.createUpdateResourceApiTask(): TaskProvider<UpdateResourceApiTask> {
+    return tasks.registerWithConfig("updateResourceApi", UpdateResourceApiTask::class.java) {
         newApiFile = getGenerateResourceApiFile()
         oldApiFile = getRequiredCompatibilityApiFileFromDir(File(projectDir, "api/"),
                 version(), ApiType.RESOURCEAPI)
@@ -810,8 +809,8 @@ private fun Project.configureResourceApiChecks(extension: LibraryExtension) {
 
             extension.defaultPublishVariant { libraryVariant ->
                 // Check and update resource api tasks rely compile to generate public.txt
-                checkResourceApiTask.dependsOn(libraryVariant.javaCompileProvider)
-                updateResourceApiTask.dependsOn(libraryVariant.javaCompileProvider)
+                checkResourceApiTask.configure { it.dependsOn(libraryVariant.javaCompileProvider) }
+                updateResourceApiTask.configure { it.dependsOn(libraryVariant.javaCompileProvider) }
             }
             tasks.withType(UpdateApiTask::class.java).configureEach { task ->
                 task.dependsOn(updateResourceApiTask)
