@@ -88,10 +88,9 @@ object DokkaPublicDocs {
         return docsTasks
     }
 
-    fun getUnzipDepsTask(project: Project): LocateJarsTask {
+    fun getUnzipDepsTask(project: Project): TaskProvider<LocateJarsTask> {
         val runnerProject = getRunnerProject(project)
-        val unzipTask = runnerProject.tasks.getByName(UNZIP_DEPS_TASK_NAME) as LocateJarsTask
-        return unzipTask
+        return runnerProject.tasks.named(UNZIP_DEPS_TASK_NAME, LocateJarsTask::class.java)
     }
 
     @Synchronized fun TaskContainer.getOrCreateDocsTask(runnerProject: Project):
@@ -108,7 +107,7 @@ object DokkaPublicDocs {
             dokkaTasks = runnerProject.tasks.withType(DokkaTask::class.java)
                 .matching { it.name.contains(DOCS_TYPE) }
 
-            tasks.create(UNZIP_DEPS_TASK_NAME, LocateJarsTask::class.java) { unzipTask ->
+            tasks.register(UNZIP_DEPS_TASK_NAME, LocateJarsTask::class.java) { unzipTask ->
                 unzipTask.doLast {
                     for (jar in unzipTask.outputJars) {
                         dokkaTasks.forEach {
@@ -167,8 +166,9 @@ object DokkaPublicDocs {
         }
 
         // also make a note to unzip any dependencies too
-        getUnzipDepsTask(runnerProject).inputDependencies.add(dependency)
-
+        getUnzipDepsTask(runnerProject).configure {
+            it.inputDependencies.add(dependency)
+        }
         return unzipTask
     }
 

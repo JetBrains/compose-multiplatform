@@ -20,7 +20,6 @@ import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.LibraryVariant
 import org.gradle.api.Action
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
@@ -355,9 +354,7 @@ object Release {
             onRegister = {
             }
         )
-        project.rootProject.tasks.withType(BuildOnServer::class.java).configureEach {
-            it.dependsOn(taskProvider)
-        }
+        project.addToBuildOnServer(taskProvider)
         return taskProvider
     }
 }
