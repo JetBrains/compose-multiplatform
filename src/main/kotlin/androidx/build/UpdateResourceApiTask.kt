@@ -37,10 +37,10 @@ open class UpdateResourceApiTask : DefaultTask() {
                 return
             }
         }
-        var oldResourceApi: HashSet<String> = HashSet<String>(oldApiFile?.readLines())
-        var newResourceApi: HashSet<String> = HashSet<String>()
+        val oldResourceApi: HashSet<String> = HashSet(oldApiFile?.readLines())
+        var newResourceApi: HashSet<String> = HashSet()
         if (newApiFile != null && newApiFile!!.exists()) {
-            newResourceApi = HashSet<String>(newApiFile?.readLines())
+            newResourceApi = HashSet(newApiFile?.readLines())
         }
         val removedResourceApi = HashSet<String>()
         val addedResourceApi = HashSet<String>(newResourceApi)
@@ -52,21 +52,21 @@ open class UpdateResourceApiTask : DefaultTask() {
             }
         }
         val oldVersion = Version(oldApiFile!!.name.removePrefix("res-").removeSuffix(".txt"))
-        if (oldVersion.major == project.version().major && !removedResourceApi.isEmpty()) {
+        if (oldVersion.major == project.version().major && removedResourceApi.isNotEmpty()) {
             var errorMessage = "Cannot remove public resources within the same major version, " +
                     "the following were removed since version $oldVersion:\n"
             for (e in removedResourceApi) {
-                errorMessage = errorMessage + "$e\n"
+                errorMessage += "$e\n"
             }
             throw GradleException(errorMessage)
         }
         if (oldVersion.major == project.version().major &&
-                oldVersion.minor == project.version().minor && !addedResourceApi.isEmpty() &&
+                oldVersion.minor == project.version().minor && addedResourceApi.isNotEmpty() &&
                 project.version().isFinalApi()) {
             var errorMessage = "Cannot add public resources when api becomes final, " +
                     "the following resources were added since version $oldVersion:\n"
             for (e in addedResourceApi) {
-                errorMessage = errorMessage + "$e\n"
+                errorMessage += "$e\n"
             }
             throw GradleException(errorMessage)
         }

@@ -82,14 +82,14 @@ abstract class CreateAggregateLibraryBuildInfoFileTask : DefaultTask() {
     fun createAndroidxAggregateBuildInfoFile() {
         // Loop through each file in the list of libraryBuildInfoFiles and collect all build info
         // data from each of these $groupId-$artifactId-_build_info.txt files
-        var output = StringBuilder()
+        val output = StringBuilder()
         output.append("{ \"artifacts\": [\n")
-        var artifactList = mutableListOf<String>()
+        val artifactList = mutableListOf<String>()
         for (infoFile in libraryBuildInfoFiles.get()) {
             if ((infoFile.isFile and (infoFile.name != outputFile.name))
                 and (infoFile.name.contains("_build_info.txt"))
             ) {
-                var fileText: String = infoFile.readText(Charsets.UTF_8)
+                val fileText: String = infoFile.readText(Charsets.UTF_8)
                 output.append("$fileText,")
                 artifactList.add(infoFile.name.replace("_build_info.txt", ""))
             }

@@ -79,7 +79,7 @@ private fun findSdkLocation(properties: Properties, rootDir: File): File {
     var sdkDirProp = properties.getProperty("sdk.dir")
     if (sdkDirProp != null) {
         var sdk = File(sdkDirProp)
-        if (!sdk.isAbsolute()) {
+        if (!sdk.isAbsolute) {
             sdk = File(rootDir, sdkDirProp)
         }
         return sdk

@@ -91,7 +91,7 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
                         "output directory: ${project.getBuildInfoDirectory()}")
             }
         }
-        var resolvedOutputFile: File = outputFile.get()
+        val resolvedOutputFile: File = outputFile.get()
         if (!resolvedOutputFile.exists()) {
             if (!resolvedOutputFile.createNewFile()) {
                 throw RuntimeException("Failed to create " +

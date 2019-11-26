@@ -70,7 +70,7 @@ data class Version(
         private fun checkedMatcher(versionString: String): Matcher {
             val matcher = VERSION_REGEX.matcher(versionString)
             if (!matcher.matches()) {
-                throw IllegalArgumentException("Can not parse version: " + versionString)
+                throw IllegalArgumentException("Can not parse version: $versionString")
             }
             return matcher
         }
