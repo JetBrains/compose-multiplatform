@@ -17,7 +17,7 @@
 package androidx.build.metalava
 
 import androidx.build.AndroidXExtension
-import androidx.build.AndroidXPlugin.Companion.BUILD_ON_SERVER_TASK
+import androidx.build.addToBuildOnServer
 import androidx.build.checkapi.ApiLocation
 import androidx.build.checkapi.ApiViolationBaselines
 import androidx.build.checkapi.getApiLocation
@@ -225,9 +225,7 @@ object MetalavaTasks {
         project.tasks.named("check").configure {
             it.dependsOn(checkApi)
         }
-        project.rootProject.tasks.named(BUILD_ON_SERVER_TASK).configure {
-            it.dependsOn(checkApi)
-        }
+        project.addToBuildOnServer(checkApi)
     }
 
     private fun setupStubs(
@@ -267,14 +265,17 @@ object MetalavaTasks {
             task.dependsOn(compileTask)
         }
 
-        project.tasks.register(CREATE_STUB_API_JAR_TASK, Zip::class.java) { task ->
+        val apiStubsJar = project.tasks.register(
+            CREATE_STUB_API_JAR_TASK,
+            Zip::class.java
+        ) { task ->
             task.from(apiStubClassesDirectory)
             task.destinationDirectory.set(project.buildDir)
             task.archiveFileName.set("api.jar")
-
             task.dependsOn(compileStubClasses)
         }
 
+        project.addToBuildOnServer(apiStubsJar)
         /*
             TODO: Enable packaging api.jar inside aars.
             project.tasks.withType(BundleAar::class.java) { task ->

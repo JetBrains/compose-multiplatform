@@ -340,7 +340,7 @@ object Release {
         project: Project
     ): TaskProvider<GMavenZipTask> {
         val taskName = "$PROJECT_ARCHIVE_ZIP_TASK_NAME"
-        return project.maybeRegister(
+        val taskProvider: TaskProvider<GMavenZipTask> = project.maybeRegister(
             name = taskName,
             onConfigure = {
                 GMavenZipTask.ConfigAction(
@@ -354,6 +354,8 @@ object Release {
             onRegister = {
             }
         )
+        project.addToBuildOnServer(taskProvider)
+        return taskProvider
     }
 }
 

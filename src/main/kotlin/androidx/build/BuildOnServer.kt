@@ -17,8 +17,11 @@
 package androidx.build
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.TaskProvider
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -110,5 +113,11 @@ open class BuildOnServer : DefaultTask() {
                 }
             }
         }
+    }
+}
+
+fun <T : Task> Project.addToBuildOnServer(taskProvider: TaskProvider<T>) {
+    rootProject.tasks.named(AndroidXPlugin.BUILD_ON_SERVER_TASK).configure {
+        it.dependsOn(taskProvider)
     }
 }

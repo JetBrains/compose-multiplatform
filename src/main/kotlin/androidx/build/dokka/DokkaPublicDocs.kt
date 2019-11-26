@@ -18,24 +18,22 @@
 // TODO: after DiffAndDocs and Doclava are fully obsoleted and removed, rename this from DokkaPublicDocs to just publicDocs
 package androidx.build.dokka
 
-import java.io.File
-import androidx.build.androidJarFile
 import androidx.build.AndroidXExtension
 import androidx.build.RELEASE_RULE
 import androidx.build.Strategy.Ignore
 import androidx.build.Strategy.Prebuilts
-import org.gradle.api.artifacts.ResolveException
+import androidx.build.androidJarFile
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.artifacts.ResolveException
 import org.gradle.api.tasks.Copy
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.OutputFiles
+import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskCollection
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.util.PatternFilterable
 import org.jetbrains.dokka.gradle.DokkaTask
+import java.io.File
 
 object DokkaPublicDocs {
     private const val DOCS_TYPE = "Public"
@@ -90,10 +88,9 @@ object DokkaPublicDocs {
         return docsTasks
     }
 
-    fun getUnzipDepsTask(project: Project): LocateJarsTask {
+    fun getUnzipDepsTask(project: Project): TaskProvider<LocateJarsTask> {
         val runnerProject = getRunnerProject(project)
-        val unzipTask = runnerProject.tasks.getByName(UNZIP_DEPS_TASK_NAME) as LocateJarsTask
-        return unzipTask
+        return runnerProject.tasks.named(UNZIP_DEPS_TASK_NAME, LocateJarsTask::class.java)
     }
 
     @Synchronized fun TaskContainer.getOrCreateDocsTask(runnerProject: Project):
@@ -110,7 +107,7 @@ object DokkaPublicDocs {
             dokkaTasks = runnerProject.tasks.withType(DokkaTask::class.java)
                 .matching { it.name.contains(DOCS_TYPE) }
 
-            tasks.create(UNZIP_DEPS_TASK_NAME, LocateJarsTask::class.java) { unzipTask ->
+            tasks.register(UNZIP_DEPS_TASK_NAME, LocateJarsTask::class.java) { unzipTask ->
                 unzipTask.doLast {
                     for (jar in unzipTask.outputJars) {
                         dokkaTasks.forEach {
@@ -169,8 +166,9 @@ object DokkaPublicDocs {
         }
 
         // also make a note to unzip any dependencies too
-        getUnzipDepsTask(runnerProject).inputDependencies.add(dependency)
-
+        getUnzipDepsTask(runnerProject).configure {
+            it.inputDependencies.add(dependency)
+        }
         return unzipTask
     }
 

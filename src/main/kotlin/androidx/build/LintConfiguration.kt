@@ -40,7 +40,7 @@ private const val LINT_BASELINE_CONTINUE = "lint.baselines.continue"
 fun Project.configureNonAndroidProjectForLint(extension: AndroidXExtension) {
     apply(mapOf("plugin" to "com.android.lint"))
 
-    // Create fake variant tasks since that is what is invoked on CI and by developers.
+    // Create fake variant tasks since that is what is invoked by developers.
     val lintTask = tasks.named("lint")
     tasks.register("lintDebug") {
         it.dependsOn(lintTask)
@@ -48,6 +48,7 @@ fun Project.configureNonAndroidProjectForLint(extension: AndroidXExtension) {
     tasks.register("lintRelease") {
         it.dependsOn(lintTask)
     }
+    addToBuildOnServer(lintTask)
 
     val lintOptions = extensions.getByType<LintOptions>()
     configureLint(lintOptions, extension)
