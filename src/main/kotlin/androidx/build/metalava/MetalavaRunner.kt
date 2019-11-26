@@ -40,9 +40,7 @@ fun Project.runMetalavaWithArgs(configuration: Configuration, args: List<String>
         it.args = listOf(
             "--no-banner",
             "--hide",
-            "HiddenSuperclass", // We allow having a hidden parent class
-            "--error",
-            "ReferencesDeprecated"
+            "HiddenSuperclass" // We allow having a hidden parent class
         ) + args
     }
 }
@@ -192,7 +190,9 @@ fun Project.generateApi(
             }
             args.addAll(listOf(
                 "--error",
-                "DeprecationMismatch" // Enforce deprecation mismatch
+                "DeprecationMismatch", // Enforce deprecation mismatch
+                "--error",
+                "ReferencesDeprecated"
             ))
         }
         is ApiLintMode.Skip -> {
@@ -202,7 +202,9 @@ fun Project.generateApi(
                 "--hide",
                 "UnhiddenSystemApi",
                 "--hide",
-                "ReferencesHidden"
+                "ReferencesHidden",
+                "--hide",
+                "ReferencesDeprecated"
             ))
         }
     }
