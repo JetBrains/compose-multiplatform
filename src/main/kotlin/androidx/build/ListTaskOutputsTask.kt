@@ -19,6 +19,7 @@ package androidx.build
 import org.gradle.api.DefaultTask
 import org.gradle.api.Task
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import java.io.File
@@ -29,7 +30,9 @@ import java.io.File
 abstract class ListTaskOutputsTask() : DefaultTask() {
     @OutputFile
     val outputFile: Property<File> = project.objects.property(File::class.java)
+    @Input
     val removePrefixes: MutableList<String> = mutableListOf()
+    @Input
     val tasks: MutableList<Task> = mutableListOf()
 
     init {
