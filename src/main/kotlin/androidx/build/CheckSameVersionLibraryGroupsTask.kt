@@ -41,8 +41,8 @@ open class CheckSameVersionLibraryGroupsTask : DefaultTask() {
                 }
                 val group = library.mavenGroup!!.group
                 if (map.contains(group)) {
-                    val existingVersion = map.get(group)!!.first
-                    val libraryInSameGroup = map.get(group)!!.second
+                    val existingVersion = map[group]!!.first
+                    val libraryInSameGroup = map[group]!!.second
                     if (existingVersion != project.version.toString()) {
                         throw GradleException("Library $group:${project.name} with version " +
                                 "${project.version} is part of the $group library group" +

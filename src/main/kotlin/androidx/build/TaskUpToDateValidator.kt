@@ -107,9 +107,9 @@ class TaskUpToDateValidator {
             rootProject.gradle.taskGraph.afterTask { task ->
                 if (task.didWork) {
                     if (!isExemptTask(task)) {
-                        val message = "Error: executed ${task} but " +
+                        val message = "Error: executed $task but " +
                             DISALLOW_TASK_EXECUTION_FLAG_NAME +
-                            " was specified. This indicates that ${task} does not declare" +
+                            " was specified. This indicates that $task does not declare" +
                             " inputs and/or outputs correctly."
                         throw GradleException(message)
                     }

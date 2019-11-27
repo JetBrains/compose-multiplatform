@@ -56,8 +56,7 @@ object SupportConfig {
     @JvmStatic
     fun getSupportRoot(project: Project): File {
         val extension = (project.rootProject.property("ext") as ExtraPropertiesExtension)
-        val file = extension.get("supportRootFolder") as File
-        return file
+        return extension.get("supportRootFolder") as File
     }
 
     @JvmStatic

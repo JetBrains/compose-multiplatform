@@ -53,7 +53,7 @@ open class VerifyDependencyVersionsTask : DefaultTask() {
         }
     }
 
-    fun verifyDependencyVersion(dependency: Dependency) {
+    private fun verifyDependencyVersion(dependency: Dependency) {
         // If the version is unspecified then treat as an alpha version. If the depending project's
         // version is unspecified then it won't matter, and if the dependency's version is
         // unspecified then any non alpha project won't be able to depend on it to ensure safety.
@@ -66,7 +66,8 @@ open class VerifyDependencyVersionsTask : DefaultTask() {
         val projectReleasePhase = releasePhase(projectVersionExtra)
         if (projectReleasePhase < 0) {
             throw GradleException("Project ${project.name} has unexpected release phase " +
-                    "$projectVersionExtra")
+                    projectVersionExtra
+            )
         }
         val dependencyReleasePhase = releasePhase(dependencyVersionExtra)
         if (dependencyReleasePhase < 0) {
@@ -82,18 +83,18 @@ open class VerifyDependencyVersionsTask : DefaultTask() {
         }
     }
 
-    fun releasePhase(versionExtra: String): Int {
-        if (versionExtra == "") {
-            return 4
+    private fun releasePhase(versionExtra: String): Int {
+        return if (versionExtra == "") {
+            4
         } else if (versionExtra.startsWith("-rc")) {
-            return 3
+            3
         } else if (versionExtra.startsWith("-beta")) {
-            return 2
+            2
         } else if (versionExtra.startsWith("-alpha") || versionExtra.startsWith("-qpreview") ||
-                versionExtra.startsWith("-dev")) {
-            return 1
+            versionExtra.startsWith("-dev")) {
+            1
         } else {
-            return -1
+            -1
         }
     }
 }

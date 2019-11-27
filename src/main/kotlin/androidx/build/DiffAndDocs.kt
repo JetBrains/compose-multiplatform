@@ -376,7 +376,7 @@ private fun registerJavaProjectForDocsTask(
 ) {
     docsTaskProvider.configure { docsTask ->
         docsTask.dependsOn(javaCompileTaskProvider)
-        var javaCompileTask = javaCompileTaskProvider.get()
+        val javaCompileTask = javaCompileTaskProvider.get()
         docsTask.source(javaCompileTask.source)
         val project = docsTask.project
         docsTask.classpath += project.files(javaCompileTask.classpath) +
