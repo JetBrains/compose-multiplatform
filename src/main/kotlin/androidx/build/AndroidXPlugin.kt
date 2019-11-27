@@ -281,13 +281,7 @@ class AndroidXPlugin : Plugin<Project> {
 
         val projectModules = ConcurrentHashMap<String, String>()
         extra.set("projects", projectModules)
-        tasks.all { task ->
-            if (task.name.startsWith(Release.DIFF_TASK_PREFIX) ||
-                    "distDocs" == task.name ||
-                    CheckExternalDependencyLicensesTask.TASK_NAME == task.name) {
-                buildOnServerTask.dependsOn(task)
-            }
-        }
+        buildOnServerTask.dependsOn(tasks.named(CheckExternalDependencyLicensesTask.TASK_NAME))
         subprojects { project ->
             if (project.path == ":docs-runner") {
                 project.tasks.all { task ->
