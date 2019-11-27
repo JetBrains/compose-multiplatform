@@ -88,7 +88,8 @@ val EXEMPT_TASK_NAMES = setOf(
     "transformClassesWithDexBuilderForPublicDebug",
     "transformClassesWithDexBuilderForTipOfTreeDebug",
     "unzipDokkaPublicDocsDeps",
-    "verifyDependencyVersions"
+    "verifyDependencyVersions",
+    "zipEcFiles"
 )
 class TaskUpToDateValidator {
     companion object {
