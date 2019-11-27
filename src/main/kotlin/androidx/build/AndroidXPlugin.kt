@@ -175,7 +175,7 @@ class AndroidXPlugin : Plugin<Project> {
                     val reportLibraryMetrics = project.tasks.register(
                         REPORT_LIBRARY_METRICS, ReportLibraryMetricsTask::class.java
                     )
-
+                    project.addToBuildOnServer(reportLibraryMetrics)
                     extension.defaultPublishVariant { libraryVariant ->
                         reportLibraryMetrics.configure {
                             it.jarFiles.from(libraryVariant.packageLibraryProvider.map { zip ->
@@ -258,20 +258,20 @@ class AndroidXPlugin : Plugin<Project> {
         if (isRunningOnBuildServer()) {
             gradle.startParameter.showStacktrace = ShowStacktrace.ALWAYS
         }
-        val createAggregateBuildInfoFilesTask =
-            tasks.register(CREATE_AGGREGATE_BUILD_INFO_FILES_TASK,
-                CreateAggregateLibraryBuildInfoFileTask::class.java)
-        val createLibraryBuildInfoFilesTask =
+        val buildOnServerTask = tasks.create(BUILD_ON_SERVER_TASK, BuildOnServer::class.java)
+        buildOnServerTask.dependsOn(
+            tasks.register(
+                CREATE_AGGREGATE_BUILD_INFO_FILES_TASK,
+                CreateAggregateLibraryBuildInfoFileTask::class.java
+            )
+        )
+        buildOnServerTask.dependsOn(
             tasks.register(CREATE_LIBRARY_BUILD_INFO_FILES_TASK)
+        )
 
         extra.set("versionChecker", GMavenVersionChecker(logger))
         val createArchiveTask = Release.getGlobalFullZipTask(this)
-
-        val buildOnServerTask = tasks.create(BUILD_ON_SERVER_TASK, BuildOnServer::class.java)
         buildOnServerTask.dependsOn(createArchiveTask)
-        buildOnServerTask.dependsOn(createAggregateBuildInfoFilesTask)
-        buildOnServerTask.dependsOn(createLibraryBuildInfoFilesTask)
-
         val partiallyDejetifyArchiveTask = partiallyDejetifyArchiveTask(
             createArchiveTask.get().archiveFile)
         if (partiallyDejetifyArchiveTask != null)
@@ -299,9 +299,6 @@ class AndroidXPlugin : Plugin<Project> {
                     buildOnServerTask.dependsOn("${project.path}:lintDebug")
                 }
             }
-            project.plugins.withType(LibraryPlugin::class.java) {
-                buildOnServerTask.dependsOn("${project.path}:reportLibraryMetrics")
-            }
             project.plugins.withType(JavaPlugin::class.java) {
                 buildOnServerTask.dependsOn("${project.path}:jar")
             }
@@ -319,27 +316,22 @@ class AndroidXPlugin : Plugin<Project> {
         }
 
         val createCoverageJarTask = Jacoco.createCoverageJarTask(this)
-        buildOnServerTask.dependsOn(createCoverageJarTask)
-
-        val createZipEcFilesTask = Jacoco.createZipEcFilesTask(this)
-        buildOnServerTask.dependsOn(createZipEcFilesTask)
-
         tasks.register(BUILD_TEST_APKS) {
             it.dependsOn(createCoverageJarTask)
         }
+        buildOnServerTask.dependsOn(createCoverageJarTask)
+        buildOnServerTask.dependsOn(Jacoco.createZipEcFilesTask(this))
 
         val rootProjectDir = SupportConfig.getSupportRoot(rootProject).canonicalFile
         val allDocsTask = DiffAndDocs.configureDiffAndDocs(this, rootProjectDir,
                 DacOptions("androidx", "ANDROIDX_DATA"),
                 listOf(RELEASE_RULE))
         buildOnServerTask.dependsOn(allDocsTask)
-
-        val jacocoUberJar = Jacoco.createUberJarTask(this)
-        buildOnServerTask.dependsOn(jacocoUberJar)
-        val checkSameVersionLibraryGroupsTask = tasks.register(
+        buildOnServerTask.dependsOn(Jacoco.createUberJarTask(this))
+        buildOnServerTask.dependsOn(tasks.register(
             CHECK_SAME_VERSION_LIBRARY_GROUPS,
             CheckSameVersionLibraryGroupsTask::class.java)
-        buildOnServerTask.dependsOn(checkSameVersionLibraryGroupsTask)
+        )
 
         AffectedModuleDetector.configure(gradle, this)
 
