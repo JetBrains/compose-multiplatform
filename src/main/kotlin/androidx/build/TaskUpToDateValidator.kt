@@ -78,6 +78,7 @@ val EXEMPT_TASK_NAMES = setOf(
     "partiallyDejetifyArchive",
     "postInstrumentCode",
     "publishBenchmarkPluginMarkerMavenPublicationToMavenRepository",
+    "publishKotlinMultiplatformPublicationToMavenRepository",
     "publishMavenPublicationToMavenRepository",
     "publishMetadataPublicationToMavenRepository",
     "publishPluginMavenPublicationToMavenRepository",
