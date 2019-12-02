@@ -87,7 +87,7 @@ const val XERIAL = "org.xerial:sqlite-jdbc:3.25.2"
 const val XPP3 = "xpp3:xpp3:1.1.4c"
 const val XMLPULL = "xmlpull:xmlpull:1.1.3.1"
 
-const val ROBOLECTRIC = "org.robolectric:robolectric:4.1"
+const val ROBOLECTRIC = "org.robolectric:robolectric:4.3"
 
 const val PROTOBUF = "com.google.protobuf:protobuf-java:3.4.0"
 
