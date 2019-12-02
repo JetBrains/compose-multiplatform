@@ -43,6 +43,7 @@ object DokkaPublicDocs {
     private const val UNZIP_DEPS_TASK_NAME = "unzipDokkaPublicDocsDeps"
 
     val hiddenPackages = listOf(
+        "androidx.animation.samples",
         "androidx.camera.camera2.impl",
         "androidx.camera.camera2.impl.compat",
         "androidx.camera.camera2.impl.compat.params",
@@ -51,8 +52,16 @@ object DokkaPublicDocs {
         "androidx.camera.core.impl.utils.executor",
         "androidx.camera.core.impl.utils.futures",
         "androidx.camera.core.impl.utils.futures.internal",
+        "androidx.compose.samples",
         "androidx.core.internal",
         "androidx.preference.internal",
+        "androidx.ui.animation.samples",
+        "androidx.ui.core.samples",
+        "androidx.ui.foundation.samples",
+        "androidx.ui.framework.samples",
+        "androidx.ui.layout.samples",
+        "androidx.ui.material.samples",
+        "androidx.ui.text.samples",
         "androidx.wear.internal.widget.drawer",
         "androidx.webkit.internal",
         "androidx.work.impl",
@@ -66,13 +75,6 @@ object DokkaPublicDocs {
         "androidx.work.impl.utils",
         "androidx.work.impl.utils.futures",
         "androidx.work.impl.utils.taskexecutor",
-        "androidx.compose.samples",
-        "androidx.ui.animation.samples",
-        "androidx.ui.foundation.samples",
-        "androidx.ui.framework.samples",
-        "androidx.ui.layout.samples",
-        "androidx.ui.material.samples",
-        "androidx.ui.text.samples",
         "sample",
         "sample.foo")
 
