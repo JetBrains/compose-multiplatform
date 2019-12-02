@@ -27,8 +27,7 @@ ext.repos = new Properties()
 ext.repos.prebuiltsRoot = "${checkoutRoot}/prebuilts"
 
 ext.repoNames = ["${repos.prebuiltsRoot}/androidx/internal",
-                 "${repos.prebuiltsRoot}/androidx/external",
-                 "${checkoutRoot}/external/dokka/maven",]
+                 "${repos.prebuiltsRoot}/androidx/external"]
 
 /**
  * Adds maven repositories to the given repository handler.
