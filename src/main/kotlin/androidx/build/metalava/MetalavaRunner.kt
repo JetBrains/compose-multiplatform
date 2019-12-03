@@ -22,26 +22,60 @@ import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.FileCollection
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Property
+import org.gradle.process.ExecOperations
+import org.gradle.workers.WorkAction
+import org.gradle.workers.WorkerExecutor
+import org.gradle.workers.WorkParameters
 import java.io.File
+import javax.inject.Inject
 
 // MetalavaRunner stores common configuration for executing Metalava
+
+fun runMetalavaWithArgs(metalavaJar: File, args: List<String>, workerExecutor: WorkerExecutor) {
+    val allArgs = listOf(
+        "--no-banner",
+        "--hide",
+        "HiddenSuperclass" // We allow having a hidden parent class
+    ) + args
+
+    val workQueue = workerExecutor.noIsolation()
+    workQueue.submit(MetalavaWorkAction::class.java) { parameters ->
+        parameters.getArgs().set(allArgs)
+        parameters.getMetalavaJar().set(metalavaJar)
+    }
+}
+
+interface MetalavaParams : WorkParameters {
+    fun getArgs(): ListProperty<String>
+    fun getMetalavaJar(): Property<File>
+}
+
+abstract class MetalavaWorkAction @Inject constructor (
+    private val execOperations: ExecOperations
+) : WorkAction<MetalavaParams> {
+
+    override fun execute() {
+        val allArgs = getParameters().getArgs().get()
+        val metalavaJar = getParameters().getMetalavaJar().get()
+
+        execOperations.javaexec {
+            it.classpath(metalavaJar)
+            it.main = "com.android.tools.metalava.Driver"
+            it.args = allArgs
+        }
+    }
+}
+
+fun Project.getMetalavaJar(): File {
+    return getMetalavaConfiguration().resolvedConfiguration.files.iterator().next()
+}
 
 fun Project.getMetalavaConfiguration(): Configuration {
     return configurations.findByName("metalava") ?: configurations.create("metalava") {
         val dependency = dependencies.create("com.android:metalava:1.3.0:shadow@jar")
         it.dependencies.add(dependency)
-    }
-}
-
-fun Project.runMetalavaWithArgs(configuration: Configuration, args: List<String>) {
-    javaexec {
-        it.classpath = checkNotNull(configuration) { "Configuration not set." }
-        it.main = "com.android.tools.metalava.Driver"
-        it.args = listOf(
-            "--no-banner",
-            "--hide",
-            "HiddenSuperclass" // We allow having a hidden parent class
-        ) + args
     }
 }
 
@@ -122,15 +156,18 @@ fun Project.generateApi(
     apiLocation: ApiLocation,
     tempDir: File,
     apiLintMode: ApiLintMode,
-    includeRestrictedApis: Boolean
+    includeRestrictedApis: Boolean,
+    workerExecutor: WorkerExecutor
 ) {
     generateApi(files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
-        apiLocation.publicApiFile, tempDir, GenerateApiMode.PublicApi, apiLintMode)
+        apiLocation.publicApiFile, tempDir, GenerateApiMode.PublicApi, apiLintMode, workerExecutor)
     generateApi(files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
-        apiLocation.experimentalApiFile, tempDir, GenerateApiMode.ExperimentalApi, apiLintMode)
+        apiLocation.experimentalApiFile, tempDir, GenerateApiMode.ExperimentalApi, apiLintMode,
+        workerExecutor)
     if (includeRestrictedApis) {
         generateApi(files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
-            apiLocation.restrictedApiFile, tempDir, GenerateApiMode.RestrictedApi, ApiLintMode.Skip)
+            apiLocation.restrictedApiFile, tempDir, GenerateApiMode.RestrictedApi, ApiLintMode.Skip,
+            workerExecutor)
     }
 }
 
@@ -142,7 +179,8 @@ fun Project.generateApi(
     outputFile: File,
     tempDir: File,
     generateApiMode: GenerateApiMode,
-    apiLintMode: ApiLintMode
+    apiLintMode: ApiLintMode,
+    workerExecutor: WorkerExecutor
 ) {
     val tempOutputFile = if (generateApiMode is GenerateApiMode.RestrictedApi) {
         File(tempDir, outputFile.name + ".tmp")
@@ -209,11 +247,13 @@ fun Project.generateApi(
         }
     }
 
-    val metalavaConfiguration = getMetalavaConfiguration()
-    runMetalavaWithArgs(metalavaConfiguration, args)
-
     if (generateApiMode is GenerateApiMode.RestrictedApi) {
+        runMetalavaWithArgs(getMetalavaJar(), args, workerExecutor)
+        // TODO(119617147): when we no longer need to fix Metalava's output, remove this "await"
+        workerExecutor.await()
         removeRestrictToLibraryLines(tempOutputFile, outputFile)
+    } else {
+        runMetalavaWithArgs(getMetalavaJar(), args, workerExecutor)
     }
 }
 

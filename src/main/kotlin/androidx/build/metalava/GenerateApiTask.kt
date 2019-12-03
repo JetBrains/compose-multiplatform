@@ -25,10 +25,14 @@ import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
+import org.gradle.workers.WorkerExecutor
 import java.io.File
+import javax.inject.Inject
 
 /** Generate an API signature text file from a set of source files. */
-abstract class GenerateApiTask : MetalavaTask() {
+abstract class GenerateApiTask @Inject constructor(
+    workerExecutor: WorkerExecutor
+) : MetalavaTask(workerExecutor) {
     /** Text file to which API signatures will be written. */
     @get:Input
     abstract val apiLocation: Property<ApiLocation>
@@ -71,7 +75,8 @@ abstract class GenerateApiTask : MetalavaTask() {
             apiLocation.get(),
             apiLocation.get().publicApiFile.parentFile,
             ApiLintMode.CheckBaseline(baselines.get().apiLintFile),
-            generateRestrictedAPIs
+            generateRestrictedAPIs,
+            workerExecutor
         )
     }
 }
