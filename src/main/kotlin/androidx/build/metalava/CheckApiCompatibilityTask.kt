@@ -23,10 +23,14 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
+import org.gradle.workers.WorkerExecutor
 import java.io.File
+import javax.inject.Inject
 
 // Validate that the API described in one signature txt file is compatible with the API in another
-abstract class CheckApiCompatibilityTask : MetalavaTask() {
+abstract class CheckApiCompatibilityTask @Inject constructor(
+    workerExecutor: WorkerExecutor
+) : MetalavaTask(workerExecutor) {
     // Text file from which the API signatures will be obtained.
     @get:Input
     abstract val referenceApi: Property<ApiLocation>

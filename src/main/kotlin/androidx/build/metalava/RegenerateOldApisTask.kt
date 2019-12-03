@@ -27,10 +27,14 @@ import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.artifacts.ivyservice.DefaultLenientConfiguration
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.util.PatternFilterable
+import org.gradle.workers.WorkerExecutor
 import java.io.File
+import javax.inject.Inject
 
 /** Generate API signature text files using previously built .jar/.aar artifacts. */
-abstract class RegenerateOldApisTask : DefaultTask() {
+abstract class RegenerateOldApisTask @Inject constructor(
+    private val workerExecutor: WorkerExecutor
+) : DefaultTask() {
     @TaskAction
     fun exec() {
         val groupId = project.group.toString()
@@ -84,7 +88,8 @@ abstract class RegenerateOldApisTask : DefaultTask() {
             project.logger.lifecycle("Regenerating $mavenId")
             val generateRestrictedAPIs = outputApiLocation.restrictedApiFile.exists()
             project.generateApi(
-                inputs, outputApiLocation, tempDir, ApiLintMode.Skip, generateRestrictedAPIs)
+                inputs, outputApiLocation, tempDir, ApiLintMode.Skip, generateRestrictedAPIs,
+                workerExecutor)
         }
     }
 
