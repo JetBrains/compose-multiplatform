@@ -75,3 +75,8 @@ NoByteOrShort: androidx.compose.Composer#changed(byte) parameter #0:
     Should avoid odd sized primitives; use `int` instead of `byte` in parameter value in androidx.compose.Composer.changed(byte value)
 NoByteOrShort: androidx.compose.Composer#changed(short) parameter #0:
     Should avoid odd sized primitives; use `int` instead of `short` in parameter value in androidx.compose.Composer.changed(short value)
+
+NotCloseable: androidx.compose.SlotReader:
+    Classes that release resources (close()) should implement AutoClosable and CloseGuard: class androidx.compose.SlotReader
+NotCloseable: androidx.compose.SlotWriter:
+    Classes that release resources (close()) should implement AutoClosable and CloseGuard: class androidx.compose.SlotWriter
