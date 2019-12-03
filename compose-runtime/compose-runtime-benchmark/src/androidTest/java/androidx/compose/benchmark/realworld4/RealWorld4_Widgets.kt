@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+// TODO(soboleva) Remove deprecated FlexColumn/FlexRow
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.benchmark.realworld4
 
 /**
