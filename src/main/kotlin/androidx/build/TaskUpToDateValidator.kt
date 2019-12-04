@@ -19,6 +19,8 @@ package androidx.build
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
+import java.io.File
+import java.util.Date
 
 /**
  * Validates that all tasks (except a temporary whitelist) are considered up-to-date.
@@ -112,11 +114,40 @@ class TaskUpToDateValidator {
                         val message = "Error: executed $task but " +
                             DISALLOW_TASK_EXECUTION_FLAG_NAME +
                             " was specified. This indicates that $task does not declare" +
-                            " inputs and/or outputs correctly."
+                            " inputs and/or outputs correctly.\n" + tryToExplainTaskExecution(task)
                         throw GradleException(message)
                     }
                 }
             }
+        }
+        fun tryToExplainTaskExecution(task: Task): String {
+            val numOutputFiles = task.outputs.files.files.size
+            val outputsMessage = if (numOutputFiles > 0) {
+                task.path + " declares " + numOutputFiles + " output files. This seems fine.\n"
+            } else {
+                task.path + " declares " + numOutputFiles + " output files. This is probably " +
+                    "an error.\n"
+            }
+
+            val inputFiles = task.inputs.files.files
+            var lastModifiedFile: File? = null
+            var lastModifiedWhen = Date(0)
+            for (inputFile in inputFiles) {
+                val modifiedWhen = Date(inputFile.lastModified())
+                if (modifiedWhen.compareTo(lastModifiedWhen) > 0) {
+                    lastModifiedFile = inputFile
+                    lastModifiedWhen = modifiedWhen
+                }
+            }
+            val inputsMessage = if (lastModifiedFile != null) {
+                "\n" + task.path + " declares " + inputFiles.size + " input files. The " +
+                    "last modified input file is\n" + lastModifiedFile + "\nmodified at " +
+                    lastModifiedWhen
+            } else {
+                "\n" + task.path + " declares " + inputFiles.size + " input files.\n"
+            }
+
+            return outputsMessage + inputsMessage
         }
     }
 }
