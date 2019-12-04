@@ -24,8 +24,8 @@ import androidx.ui.core.dp
 import androidx.ui.foundation.ColoredRect
 import androidx.ui.graphics.Color
 import androidx.ui.layout.Column
-import androidx.ui.layout.ExpandedHeight
-import androidx.ui.layout.ExpandedWidth
+import androidx.ui.layout.LayoutExpandedHeight
+import androidx.ui.layout.LayoutExpandedWidth
 import androidx.ui.layout.Row
 import androidx.ui.text.TextStyle
 import kotlin.random.Random
@@ -37,7 +37,7 @@ fun PivotalItemRow(@Pivotal item: Item) {
         1 -> Color.Black
         else -> Color.Magenta
     }
-    Row(ExpandedWidth) {
+    Row(LayoutExpandedWidth) {
         ColoredRect(color = color, width = 16.dp, height = 16.dp)
         Text(text = "${item.id}", style = TextStyle(color = color))
     }
@@ -53,7 +53,7 @@ fun ItemRow(item: Item) {
         1 -> Color.Black
         else -> Color.Magenta
     }
-    Row(ExpandedWidth) {
+    Row(LayoutExpandedWidth) {
         ColoredRect(color = color, width = 16.dp, height = 16.dp)
         Text(text = "${item.id}", style = TextStyle(color = color))
     }
@@ -102,7 +102,7 @@ fun <T> List<T>.update(reorderType: ReorderType, random: Random, factory: (Int) 
 
 @Composable
 fun SiblingManagement(identity: IdentityType, items: List<Item>) {
-    Column(ExpandedHeight) {
+    Column(LayoutExpandedHeight) {
         when (identity) {
             IdentityType.Pivotal -> {
                 for (item in items) {

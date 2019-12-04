@@ -22,7 +22,7 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.ui.layout.Column
-import androidx.ui.layout.ExpandedHeight
+import androidx.ui.layout.LayoutExpandedHeight
 import org.junit.FixMethodOrder
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -60,7 +60,7 @@ class DbMonsterBenchmark : ComposeBenchmarkBase() {
         val list = DatabaseList(count, random)
         measureRecompose {
             compose {
-                Column(ExpandedHeight) {
+                Column(LayoutExpandedHeight) {
                     for (db in list.databases) {
                         DatabaseRow(db = db)
                     }

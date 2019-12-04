@@ -21,8 +21,8 @@ import androidx.ui.core.dp
 import androidx.ui.foundation.ColoredRect
 import androidx.ui.graphics.Color
 import androidx.ui.layout.Column
-import androidx.ui.layout.ExpandedHeight
-import androidx.ui.layout.ExpandedWidth
+import androidx.ui.layout.LayoutExpandedHeight
+import androidx.ui.layout.LayoutExpandedWidth
 import androidx.ui.layout.FlexScope
 import androidx.ui.layout.Row
 
@@ -39,9 +39,9 @@ fun Terminal(style: Int) {
 @Composable
 fun Stack(vertical: Boolean, children: @Composable() FlexScope.() -> Unit) {
     if (vertical) {
-        Column(ExpandedHeight, children = children)
+        Column(LayoutExpandedHeight, children = children)
     } else {
-        Row(ExpandedWidth, children = children)
+        Row(LayoutExpandedWidth, children = children)
     }
 }
 
