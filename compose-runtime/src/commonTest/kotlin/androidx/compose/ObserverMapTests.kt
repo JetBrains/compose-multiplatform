@@ -132,6 +132,18 @@ class ObserverMapTests {
         map.assertNodes(listOf(model1, model2), node1)
     }
 
+    @Test
+    fun testRemoveValue() {
+        val model1 = TestModel("Test1")
+        val model2 = TestModel("Test2")
+        map.add(model1, node1)
+        map.add(model2, node1)
+        map.add(model2, node2)
+
+        map.removeValue(node1)
+        map.assertNodes(listOf(model2), node2)
+    }
+
     private data class TestModel(var content: String = "Test")
 
     private fun ObserverMap<TestModel, Int>.assertNodes(

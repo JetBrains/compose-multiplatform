@@ -94,6 +94,24 @@ class ObserverMap<K : Any, V : Any> {
             }
         }
     }
+
+    /**
+     * Removes all values matching [value].
+     */
+    fun removeValue(value: V) {
+        val iterator = map.iterator()
+        val ref = WeakIdentity(value)
+        while (iterator.hasNext()) {
+            val (key, set) = iterator.next()
+            if (key.value == null) {
+                iterator.remove()
+            } else {
+                if (set.remove(ref) && set.isEmpty()) {
+                    iterator.remove()
+                }
+            }
+        }
+    }
 }
 
 /**

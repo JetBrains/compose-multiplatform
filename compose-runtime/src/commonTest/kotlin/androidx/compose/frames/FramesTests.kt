@@ -17,6 +17,7 @@
 package androidx.compose.frames
 
 import androidx.compose.Stack
+import org.junit.Assert.fail
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -344,6 +345,53 @@ class FrameTest {
         try {
             observeAllReads({ obj -> otherRead = obj as Address }) {
                 assertEquals(OLD_STREET, address.street)
+            }
+        } finally {
+            commitHandler()
+        }
+        assertEquals(address, read)
+        assertEquals(address, otherRead)
+    }
+
+    @Test
+    fun testFrameObserver_switchReadObserver_Single() {
+        val address = frame {
+            Address(
+                OLD_STREET,
+                OLD_CITY
+            )
+        }
+        var read: Address? = null
+        var otherRead: Address? = null
+        open({ obj -> read = obj as Address })
+        try {
+            temporaryReadObserver({ obj -> otherRead = obj as Address }, null) {
+                assertEquals(OLD_STREET, address.street)
+            }
+        } finally {
+            commitHandler()
+        }
+        assertEquals(address, read)
+        assertEquals(address, otherRead)
+    }
+
+    @Test
+    fun testFrameObserver_switchReadObserver_Nested() {
+        val address = frame {
+            Address(
+                OLD_STREET,
+                OLD_CITY
+            )
+        }
+        var read: Address? = null
+        var otherRead: Address? = null
+        open({ obj -> read = obj as Address })
+        try {
+            val observer1: FrameReadObserver = { _ -> fail("This shouldn't be called") }
+            observeAllReads(observer1) {
+                temporaryReadObserver({ obj -> otherRead = obj as Address }, observer1) {
+                    assertEquals(OLD_STREET, address.street)
+                }
             }
         } finally {
             commitHandler()

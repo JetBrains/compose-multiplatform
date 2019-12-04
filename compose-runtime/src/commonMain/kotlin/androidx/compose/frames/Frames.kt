@@ -169,6 +169,34 @@ fun observeAllReads(readObserver: FrameReadObserver, block: () -> Unit) {
     }
 }
 
+/**
+ * [newObserver] will be called for every frame read happened on the current
+ * thread during execution of the [block]. The [previousObserver], if non-null, will be removed
+ * for the duration of [block]'s execution.
+ */
+fun temporaryReadObserver(
+    newObserver: FrameReadObserver,
+    previousObserver: FrameReadObserver? = null,
+    block: () -> Unit
+) {
+    val observers = threadReadObservers.get()
+    val oldIndex = if (previousObserver == null) -1 else observers.indexOf(previousObserver)
+    if (oldIndex >= 0) {
+        observers[oldIndex] = newObserver
+    } else {
+        observers.add(newObserver)
+    }
+    try {
+        block()
+    } finally {
+        if (oldIndex >= 0) {
+            observers[oldIndex] = previousObserver!!
+        } else {
+            observers.remove(newObserver)
+        }
+    }
+}
+
 private fun validateNotInFrame() {
     if (threadFrame.get() != null) throw IllegalStateException("In an existing frame")
 }
