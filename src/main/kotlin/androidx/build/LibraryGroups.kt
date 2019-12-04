@@ -66,6 +66,7 @@ object LibraryGroups {
     val MEDIA = LibraryGroup("androidx.media", false)
     val MEDIA2 = LibraryGroup("androidx.media2")
     val MEDIAROUTER = LibraryGroup("androidx.mediarouter")
+    val MESSAGEBROWSER = LibraryGroup("androidx.message.browser")
     val NAVIGATION = LibraryGroup("androidx.navigation")
     val PAGING = LibraryGroup("androidx.paging")
     val PALETTE = LibraryGroup("androidx.palette")
