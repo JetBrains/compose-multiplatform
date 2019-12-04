@@ -146,7 +146,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.WEBKIT, "1.1.0")
     ignore(LibraryGroups.WORK.group, "work-gcm")
     ignore(LibraryGroups.WORK.group, "work-runtime-lint")
-    prebuilts(LibraryGroups.WORK, "2.3.0-rc01")
+    prebuilts(LibraryGroups.WORK, "2.3.0-beta01")
     default(Ignore)
 }
 
