@@ -94,8 +94,8 @@ object Jacoco {
      */
     fun createZipEcFilesTask(project: Project): TaskProvider<Zip> {
         // Examples of the two types of ec file :
-        //"./out/androidx/ads-identifier-common/build/outputs/code_coverage/debugAndroidTest/connected/coverage.ec"
-        //./out/androidx/lifecycle/lifecycle-runtime-ktx-lint/build/jacoco/test.exec
+        // "./out/androidx/ads-identifier-common/build/outputs/code_coverage/debugAndroidTest/connected/coverage.ec"
+        // ./out/androidx/lifecycle/lifecycle-runtime-ktx-lint/build/jacoco/test.exec
         Preconditions.checkArgument(project.isRoot, "Must be root project")
         var ecFilesTree: ConfigurableFileTree = project.fileTree(mapOf("dir" to project
             .getRootOutDirectory(), "include" to listOf("**/jacoco/*.exec", "**/coverage.ec")))
@@ -114,7 +114,7 @@ object Jacoco {
      * Returns the execution-file-zipping-task associated with the root project.
      * This should only be called after the task is created.
      */
-    fun getZipEcFilesTask(project: Project): Task {
-        return project.rootProject.tasks.getByName(EC_FILE_ZIP_TASK_NAME)
+    fun getZipEcFilesTask(project: Project): TaskProvider<Task> {
+        return project.rootProject.tasks.named(EC_FILE_ZIP_TASK_NAME)
     }
 }

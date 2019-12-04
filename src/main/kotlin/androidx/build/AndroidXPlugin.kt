@@ -715,7 +715,7 @@ class AndroidXPlugin : Plugin<Project> {
         val zipEcFilesTask = Jacoco.getZipEcFilesTask(this)
 
         tasks.withType(JacocoReport::class.java).configureEach { task ->
-            zipEcFilesTask.dependsOn(task) // zip follows every jacocoReport task being run
+            zipEcFilesTask.get().dependsOn(task) // zip follows every jacocoReport task being run
             task.reports {
                 it.xml.isEnabled = true
                 it.html.isEnabled = false
