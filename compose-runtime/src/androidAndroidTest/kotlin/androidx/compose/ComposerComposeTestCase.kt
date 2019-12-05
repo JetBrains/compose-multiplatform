@@ -81,5 +81,5 @@ class Counter {
         counts = mutableMapOf()
     }
 
-    operator fun get(key: String) = counts.getOrDefault(key, 0)
+    operator fun get(key: String) = counts[key] ?: 0
 }

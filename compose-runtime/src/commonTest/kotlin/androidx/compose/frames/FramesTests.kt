@@ -830,7 +830,13 @@ class FrameTest {
         }
 
         frame {
-            numbers.removeIf { it % 2 == 0 }
+            val iterator = numbers.iterator()
+            while (iterator.hasNext()) {
+                val current = iterator.next()
+                if (current % 2 == 0) {
+                    iterator.remove()
+                }
+            }
         }
 
         frame {
