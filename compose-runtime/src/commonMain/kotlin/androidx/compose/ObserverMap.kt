@@ -25,15 +25,22 @@ package androidx.compose
  * 2) Objects are stored with WeakReference to prevent leaking them.
 */
 class ObserverMap<K : Any, V : Any> {
-
-    private val map = mutableMapOf<WeakIdentity<K>, MutableSet<WeakIdentity<V>>>()
+    private val keyToValue =
+        mutableMapOf<IdentityWeakReference<K>, MutableSet<IdentityWeakReference<V>>>()
+    private val valueToKey =
+        mutableMapOf<IdentityWeakReference<V>, MutableSet<IdentityWeakReference<K>>>()
+    private val keyQueue = ReferenceQueue<K>()
+    private val valueQueue = ReferenceQueue<V>()
 
     /**
      * Adds a [value] into a set associated with this [key].
      */
     fun add(key: K, value: V) {
-        val models = map.getOrPut(WeakIdentity(key)) { mutableSetOf() }
-        models.add(WeakIdentity(value))
+        clearReferences()
+        val weakKey = IdentityWeakReference(key, keyQueue)
+        val weakValue = IdentityWeakReference(value, valueQueue)
+        addToSet(keyToValue, weakKey, weakValue)
+        addToSet(valueToKey, weakValue, weakKey)
     }
 
     /**
@@ -41,95 +48,140 @@ class ObserverMap<K : Any, V : Any> {
      *
      * @return the list of values removed from the set as a result of this operation.
      */
-    fun remove(key: K): List<V> {
-        return map.remove(WeakIdentity(key))?.mapNotNull { it.value } ?: emptyList()
+    fun remove(key: K) {
+        clearReferences()
+        val weakKey = IdentityWeakReference(key)
+        removeFromSet(keyToValue, valueToKey, weakKey)
     }
 
     /**
      * Removes exact [value] from the set associated with this [key].
      */
     fun remove(key: K, value: V) {
-        map[WeakIdentity(key)]?.remove(WeakIdentity(value))
+        clearReferences()
+        val weakKey = IdentityWeakReference(key)
+        val weakValue = IdentityWeakReference(value)
+        keyToValue[weakKey]?.remove(weakValue)
+        valueToKey[weakValue]?.remove(weakKey)
     }
 
     /**
      * Returns `true` when the map contains the given key and value
      */
     fun contains(key: K, value: V): Boolean {
-        return map[WeakIdentity(key)]?.contains(WeakIdentity(value)) ?: false
+        clearReferences()
+        val set = keyToValue[IdentityWeakReference(key)]
+        return set?.contains(IdentityWeakReference(value)) ?: false
     }
 
     /**
      * Clears all the keys and values from the map.
      */
     fun clear() {
-        map.clear()
+        keyToValue.clear()
+        valueToKey.clear()
+        clearReferences()
     }
 
     /**
      * @return a list of values associated with the provided [keys].
      */
     operator fun get(keys: Iterable<K>): List<V> {
-        val set = mutableSetOf<WeakIdentity<V>>()
+        clearReferences()
+        val set = mutableSetOf<IdentityWeakReference<V>>()
         keys.forEach { key ->
-            map[WeakIdentity(key)]?.let(set::addAll)
+            val weakKey = IdentityWeakReference(key)
+            keyToValue[weakKey]?.let(set::addAll)
         }
-        return set.mapNotNull { it.value }
+        @Suppress("UNCHECKED_CAST")
+        return set.mapNotNull { it.get() }
     }
 
     /**
      * Clears all the values that match the given [predicate] from all the sets.
      */
+    @Suppress("UNCHECKED_CAST")
     fun clearValues(predicate: (V) -> Boolean) {
-        val iterator = map.iterator()
-        while (iterator.hasNext()) {
-            val (key, set) = iterator.next()
-            if (key.value == null) {
-                iterator.remove()
-            } else {
-                set.removeAll { it.value?.let(predicate) ?: true }
-                if (set.isEmpty()) {
-                    iterator.remove()
-                }
+        clearReferences()
+        val matching = mutableListOf<V>()
+        valueToKey.keys.forEach { value ->
+            val v = value.get()
+            if (v != null && predicate(v)) {
+                matching.add(v)
             }
         }
+        matching.forEach { removeValue(it) }
     }
 
     /**
      * Removes all values matching [value].
      */
     fun removeValue(value: V) {
-        val iterator = map.iterator()
-        val ref = WeakIdentity(value)
-        while (iterator.hasNext()) {
-            val (key, set) = iterator.next()
-            if (key.value == null) {
-                iterator.remove()
-            } else {
-                if (set.remove(ref) && set.isEmpty()) {
-                    iterator.remove()
-                }
+        clearReferences()
+        val weakValue = IdentityWeakReference(value)
+        valueToKey.remove(weakValue)?.forEach { key ->
+            val valueSet = keyToValue[key]!!
+            valueSet.remove(weakValue)
+            if (valueSet.isEmpty()) {
+                keyToValue.remove(key)
             }
+        }
+    }
+
+    private fun clearReferences() {
+        pollQueue(keyQueue, keyToValue, valueToKey)
+        pollQueue(valueQueue, valueToKey, keyToValue)
+    }
+
+    private fun <T, U> pollQueue(
+        queue: ReferenceQueue<T>,
+        keyMap: MutableMap<IdentityWeakReference<T>, MutableSet<IdentityWeakReference<U>>>,
+        valueMap: MutableMap<IdentityWeakReference<U>, MutableSet<IdentityWeakReference<T>>>
+    ) {
+        do {
+            val ref = queue.poll()
+            if (ref != null) {
+                @Suppress("UNCHECKED_CAST")
+                val weakKey = ref as IdentityWeakReference<T>
+                removeFromSet(keyMap, valueMap, weakKey)
+            }
+        } while (ref != null)
+    }
+
+    private fun <T, U> addToSet(
+        map: MutableMap<IdentityWeakReference<T>, MutableSet<IdentityWeakReference<U>>>,
+        key: IdentityWeakReference<T>,
+        value: IdentityWeakReference<U>
+    ) {
+        var set = map[key]
+        if (set == null) {
+            set = mutableSetOf()
+            map.put(key, set)
+        }
+        set.add(value)
+    }
+
+    private fun <T, U> removeFromSet(
+        mapFromKey: MutableMap<IdentityWeakReference<T>, MutableSet<IdentityWeakReference<U>>>,
+        mapToKey: MutableMap<IdentityWeakReference<U>, MutableSet<IdentityWeakReference<T>>>,
+        key: IdentityWeakReference<T>
+    ) {
+        mapFromKey.remove(key)?.forEach { value ->
+            mapToKey[value]?.remove(key)
         }
     }
 }
 
-/**
- * Ignore the object's implementation of hashCode and equals as they will change for data classes
- * that are mutated. The read observer needs to track the object identity, not the object value.
- */
-private class WeakIdentity<T : Any>(value: T) {
-    // Save the hash code of value as it might be reclaimed making value.hashCode inaccessible
-    private val myHc = identityHashCode(value)
+private class IdentityWeakReference<T>(value: T, queue: ReferenceQueue<T>? = null) :
+    WeakReference<T>(value, queue) {
+    val hash = identityHashCode(value)
 
-    // Preserve a weak reference to the value to prevent read observers from leaking observed values
-    private val weakValue = WeakReference(value)
+    override fun equals(other: Any?): Boolean {
+        if (other !is IdentityWeakReference<*>) {
+            return false
+        }
+        return hash == other.hash && get() === other.get()
+    }
 
-    // Ignore the equality of value and use object identity instead
-    override fun equals(other: Any?): Boolean =
-        this === other || (other is WeakIdentity<*>) && other.value === value && value !== null
-
-    override fun hashCode(): Int = myHc
-
-    val value: T? get() = weakValue.get()
+    override fun hashCode(): Int = hash
 }

@@ -53,8 +53,17 @@ expect class FrameLayout(context: Context)
 
 expect inline fun <R> synchronized(lock: Any, block: () -> R): R
 
-expect class WeakReference<T>(instance: T) {
-    fun get(): T?
+expect open class WeakReference<T> : Reference<T> {
+    constructor(referent: T)
+    constructor(referent: T, q: ReferenceQueue<in T>?)
+}
+
+expect abstract class Reference<T> {
+    open fun get(): T?
+}
+
+expect open class ReferenceQueue<T>() {
+    open fun poll(): Reference<out T>?
 }
 
 expect class Looper

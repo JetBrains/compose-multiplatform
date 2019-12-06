@@ -308,7 +308,7 @@ package androidx.compose {
     method public void clearValues(kotlin.jvm.functions.Function1<? super V,java.lang.Boolean> predicate);
     method public boolean contains(K key, V value);
     method public operator java.util.List<V> get(Iterable<? extends K> keys);
-    method public java.util.List<V> remove(K key);
+    method public void remove(K key);
     method public void remove(K key, V value);
     method public void removeValue(V value);
   }

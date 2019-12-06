@@ -45,6 +45,10 @@ actual inline fun <R> synchronized(lock: Any, block: () -> R): R {
     }
 }
 
+actual typealias Reference<T> = java.lang.ref.Reference<T>
+
+actual typealias ReferenceQueue<T> = java.lang.ref.ReferenceQueue<T>
+
 actual typealias WeakReference<T> = java.lang.ref.WeakReference<T>
 
 actual typealias MainThread = androidx.annotation.MainThread
