@@ -138,16 +138,6 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
                     textReport = false
                     lintBaseline.delete()
                     System.setProperty(LINT_BASELINE_CONTINUE, "true")
-                } else {
-                    // Number of currently ignored UnknownNullness errors
-                    val count = lintBaseline.readText().split("UnknownNullness").size - 1
-                    if (count > 0) {
-                        lintDebugTask.configure {
-                            it.doLast {
-                                logger.warn(getIgnoreNullnessError(count))
-                            }
-                        }
-                    }
                 }
                 baseline(lintBaseline)
             }
@@ -156,16 +146,3 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
 }
 
 val Project.lintBaseline get() = File(projectDir, "/lint-baseline.xml")
-
-private fun Project.getIgnoreNullnessError(count: Int): String = (
-        "\n${pluralizeMessage(count)} currently whitelisted in " +
-                "$projectDir/lint-baseline.xml - these warnings should ideally be fixed before " +
-                "this library moves to a stable release. Run " +
-                "'./gradlew $name:lintDebug -PcheckUnknownNullness' to fail lint on these warnings."
-        )
-
-private fun pluralizeMessage(count: Int) = if (count > 1) {
-    "$count UnknownNullness issues are"
-} else {
-    " UnknownNullness issue is"
-}
