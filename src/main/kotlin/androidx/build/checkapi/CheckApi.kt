@@ -97,26 +97,36 @@ fun Project.getRequiredCompatibilityApiLocation(): ApiLocation? {
  * @param version the API version, ex. 25.0.0-SNAPSHOT
  * @return the API file of this version
  */
-fun getApiFile(rootDir: File, version: Version): File {
-    if (!isValidApiVersion(version)) {
+fun getApiFile(rootDir: File, artifactVersion: Version): File {
+    val apiDir = File(rootDir, "api")
+    val version = getApiFileVersion(artifactVersion)
+    return File(apiDir, "${version.major}.${version.minor}.0${version.extra}.txt")
+}
+
+/**
+ * Sometimes the version of an API file might be not equal to the version of its artifact.
+ * This is because under certain circumstances, APIs are not allowed to change, and in those
+ * cases we may stop versioning the API.
+ * This functions returns the version of API file to use given the version of an artifact
+ */
+fun getApiFileVersion(version: Version): Version {
+    if (!isValidArtifactVersion(version)) {
         val suggestedVersion = Version("${version.major}.${version.minor}.${version.patch}-rc01")
         throw GradleException("Illegal version $version . It is not allowed to have a nonzero " +
                 "patch number and be alpha or beta at the same time.\n" +
                 "Did you mean $suggestedVersion?")
     }
-
     var extra = ""
     if (version.patch == 0 && version.extra != null) {
         extra = version.extra
     }
-    val apiDir = File(rootDir, "api")
-    return File(apiDir, "${version.major}.${version.minor}.0$extra.txt")
+    return Version(version.major, version.minor, 0, extra)
 }
 
 /**
- * Whether it is allowed to generate an API of the given version
+ * Whether it is allowed for an artifact to have this version
  */
-fun isValidApiVersion(version: Version): Boolean {
+fun isValidArtifactVersion(version: Version): Boolean {
     if (version.patch != 0 && (version.isAlpha() || version.isBeta() || version.isDev())) {
         return false
     }
