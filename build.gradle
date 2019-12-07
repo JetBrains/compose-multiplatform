@@ -30,11 +30,6 @@ buildscript {
 apply from: "out.gradle"
 init.chooseOutDir()
 
-def runningInBuildServer = System.env.DIST_DIR != null
-if (runningInBuildServer) {
-    System.setProperty("kotlin.compiler.execution.strategy", "in-process")
-}
-
 ext.supportRootFolder = project.projectDir.getParentFile()
 apply from: 'repos.gradle'
 apply from: "build_dependencies.gradle"
