@@ -18,8 +18,9 @@ package androidx.build.metalava
 
 import androidx.build.SupportConfig
 import androidx.build.Version
+import androidx.build.checkapi.getApiFileVersion
 import androidx.build.checkapi.getApiLocation
-import androidx.build.checkapi.isValidApiVersion
+import androidx.build.checkapi.isValidArtifactVersion
 import androidx.build.java.JavaCompileInputs
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
@@ -44,36 +45,37 @@ abstract class RegenerateOldApisTask @Inject constructor(
         val projectPrebuiltsDir =
             File(internalPrebuiltsDir, groupId.replace(".", "/") + "/" + artifactId)
 
-        val versions = listVersions(projectPrebuiltsDir)
+        val artifactVersions = listVersions(projectPrebuiltsDir)
 
-        for (version in versions) {
-            if (version != project.version.toString()) {
-                regenerate(project.rootProject, groupId, artifactId, version)
+        var prevApiFileVersion = getApiFileVersion(project.version as Version)
+        for (artifactVersion in artifactVersions.reversed()) {
+            val apiFileVersion = getApiFileVersion(artifactVersion)
+            // If two artifacts correspond to the same API file, don't regenerate the
+            // same api file again
+            if (apiFileVersion != prevApiFileVersion) {
+                regenerate(project.rootProject, groupId, artifactId, artifactVersion)
+                prevApiFileVersion = apiFileVersion
             }
         }
     }
 
-    // Returns the artifact versions that appear to exist in <dir>
-    fun listVersions(dir: File): List<String> {
+    // Returns all (valid) artifact versions that appear to exist in <dir>
+    fun listVersions(dir: File): List<Version> {
         val pathNames: Array<String> = dir.list() ?: arrayOf()
         val files = pathNames.map({ name -> File(dir, name) })
         val subdirs = files.filter({ child -> child.isDirectory() })
-        val versions = subdirs.map({ child -> child.name })
-        return versions.sorted()
+        val versions = subdirs.map({ child -> Version(child.name) })
+        val validVersions = versions.filter({ v -> isValidArtifactVersion(v) })
+        return validVersions.sorted()
     }
 
     fun regenerate(
         runnerProject: Project,
         groupId: String,
         artifactId: String,
-        versionString: String
+        version: Version
     ) {
-        val mavenId = "$groupId:$artifactId:$versionString"
-        val version = Version(versionString)
-        if (!isValidApiVersion(version)) {
-            runnerProject.logger.info("Skipping illegal version $version from $mavenId")
-            return
-        }
+        val mavenId = "$groupId:$artifactId:$version"
         val inputs: JavaCompileInputs?
         try {
             inputs = getFiles(runnerProject, mavenId)
@@ -83,12 +85,11 @@ abstract class RegenerateOldApisTask @Inject constructor(
         }
 
         val outputApiLocation = project.getApiLocation(version)
-        val tempDir = File(project.buildDir, "api")
         if (outputApiLocation.publicApiFile.exists()) {
             project.logger.lifecycle("Regenerating $mavenId")
             val generateRestrictedAPIs = outputApiLocation.restrictedApiFile.exists()
             project.generateApi(
-                inputs, outputApiLocation, tempDir, ApiLintMode.Skip, generateRestrictedAPIs,
+                inputs, outputApiLocation, ApiLintMode.Skip, generateRestrictedAPIs,
                 workerExecutor)
         }
     }

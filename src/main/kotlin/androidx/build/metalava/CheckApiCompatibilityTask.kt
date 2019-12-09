@@ -90,8 +90,9 @@ abstract class CheckApiCompatibilityTask @Inject constructor(
             args = args + listOf("--baseline", baselineFile.toString())
         }
         if (checkRestrictedAPIs) {
-            args = args + listOf("--show-annotation",
-                "androidx.annotation.RestrictTo",
+            args = args + listOf(
+                "--show-annotation", "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP)",
+                "--show-annotation", "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX)",
                 "--show-unannotated"
             )
         }
