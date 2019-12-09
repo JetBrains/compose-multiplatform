@@ -27,8 +27,10 @@ import org.gradle.api.component.AdhocComponentWithVariants
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.getPlugin
 import org.gradle.kotlin.dsl.named
+import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 
 /**
  * Sets up a source jar task for an Android library project.
@@ -40,6 +42,26 @@ fun Project.configureSourceJarForAndroid(extension: LibraryExtension) {
             it.from(extension.sourceSets.getByName("main").java.srcDirs)
         }
         registerSourcesVariant(sourceJar)
+    }
+    project.afterEvaluate {
+        // we can only tell if a project is multiplatform after it is configured
+        if (it.multiplatformExtension != null && it.extra.has("publish")) {
+            extension.defaultPublishVariant { variant ->
+                val kotlinExt = project.extensions.getByName("kotlin") as KotlinProjectExtension
+                val sourceJar =
+                    project.tasks.named("sourceJar${variant.name.capitalize()}", Jar::class.java)
+                // multiplatform projects use different source sets, so we need to modify the task
+                sourceJar.configure { sourceJarTask ->
+                    // use a whitelist of source sets, because that is the preferred policy
+                    sourceJarTask.from(kotlinExt.sourceSets.getByName("commonMain").kotlin.srcDirs)
+                    sourceJarTask.from(kotlinExt.sourceSets.getByName("androidMain").kotlin.srcDirs)
+                }
+            }
+            // Disable the builtin maven-publish for kotlin multiplatform, as it doesn't work
+            // and can't be feasibly modified. It may not be present in MPP samples.
+            project.tasks.findByName("publishKotlinMultiplatformPublicationToMavenRepository")
+                ?.enabled = false
+        }
     }
 }
 
