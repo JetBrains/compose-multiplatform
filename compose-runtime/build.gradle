@@ -65,24 +65,3 @@ androidx {
     inceptionYear = "2019"
     description = "Contains support code for tree composition"
 }
-
-//TODO: figure out the trigger for this logic being needed and move it to AndroidX(UI)Plugin
-// or else decide we *should* be making jars and get other people to not break. b/142408067
-afterEvaluate {
-    configurations.archives.artifacts.each {
-        if (it.file.name.endsWith('jar') && !it.file.name.endsWith('sources.jar')) {
-            configurations.archives.artifacts.remove(it)
-        }
-    }
-}
-
-//TODO: decide whether and how to move this to AndroidX(UI)Plugin
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from kotlin.sourceSets.commonMain.kotlin
-    from kotlin.sourceSets.androidMain.kotlin
-}
-
-artifacts {
-    archives sourcesJar
-}
