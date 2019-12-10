@@ -108,6 +108,7 @@ object LibraryVersions {
     val UI = Version("0.1.0-dev05")
     val VECTORDRAWABLE = Version("1.2.0-alpha01")
     val VECTORDRAWABLE_ANIMATED = Version("1.2.0-alpha01")
+    val VECTORDRAWABLE_SEEKABLE = Version("1.0.0-alpha01")
     val VERSIONED_PARCELABLE = Version("1.2.0-alpha01")
     val VIEWPAGER = Version("1.1.0-alpha01")
     val VIEWPAGER2 = Version("1.1.0-alpha01")
