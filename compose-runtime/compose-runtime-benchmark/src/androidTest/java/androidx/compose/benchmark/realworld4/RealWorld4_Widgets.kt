@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-// TODO(soboleva) Remove deprecated FlexColumn/FlexRow
-@file:Suppress("DEPRECATION")
-
 package androidx.compose.benchmark.realworld4
 
 /**
@@ -26,6 +23,7 @@ package androidx.compose.benchmark.realworld4
 
 import androidx.compose.Composable
 import androidx.ui.core.Draw
+import androidx.ui.core.Modifier
 import androidx.ui.core.WithConstraints
 import androidx.ui.foundation.ColoredRect
 import androidx.ui.core.dp
@@ -33,8 +31,9 @@ import androidx.ui.core.toRect
 import androidx.ui.graphics.SolidColor
 import androidx.ui.graphics.Paint
 import androidx.ui.graphics.Color
-import androidx.ui.layout.FlexColumn
-import androidx.ui.layout.FlexRow
+import androidx.ui.layout.Column
+import androidx.ui.layout.Container
+import androidx.ui.layout.Row
 import androidx.ui.layout.Padding
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.KCallable
@@ -61,38 +60,36 @@ fun RealWorld4_FancyWidget_000(model: RealWorld4_DataModel_00) {
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_001(
-                            s1 = "HelloWorld",
-                            s2 = "HelloWorld",
-                            model = model.f2
-                        ) { RealWorld4_FancyWidget_002(s2 = "HelloWorld", model = model.f2.f0); }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_001(
-                            s1 = "HelloWorld",
-                            s2 = "HelloWorld",
-                            model = model.f3
-                        ) { RealWorld4_FancyWidget_002(s2 = "HelloWorld", model = model.f3.f0); }
-                    }
+                Column {
+                    RealWorld4_FancyWidget_001(
+                        s1 = "HelloWorld",
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2
+                    ) { RealWorld4_FancyWidget_002(s2 = "HelloWorld", model = model.f2.f0) }
+
+                    RealWorld4_FancyWidget_001(
+                        s1 = "HelloWorld",
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f3
+                    ) { RealWorld4_FancyWidget_002(s2 = "HelloWorld", model = model.f3.f0) }
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_001(
-                            s1 = "HelloWorld",
-                            s2 = "HelloWorld",
-                            model = model.f2
-                        ) { RealWorld4_FancyWidget_002(s2 = "HelloWorld", model = model.f2.f0); }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_001(
-                            s1 = "HelloWorld",
-                            s2 = "HelloWorld",
-                            model = model.f3
-                        ) { RealWorld4_FancyWidget_002(s2 = "HelloWorld", model = model.f3.f0); }
-                    }
+                Row {
+                    RealWorld4_FancyWidget_001(
+                        s1 = "HelloWorld",
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2
+                    ) { RealWorld4_FancyWidget_002(s2 = "HelloWorld", model = model.f2.f0) }
+
+                    RealWorld4_FancyWidget_001(
+                        s1 = "HelloWorld",
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f3
+                    ) { RealWorld4_FancyWidget_002(s2 = "HelloWorld", model = model.f3.f0) }
                 }
             }
         }
@@ -103,6 +100,7 @@ fun RealWorld4_FancyWidget_000(model: RealWorld4_DataModel_00) {
 fun RealWorld4_FancyWidget_001(
     s1: String,
     s2: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_01,
     children: @Composable() () -> Unit
 ) {
@@ -129,7 +127,7 @@ fun RealWorld4_FancyWidget_001(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -137,24 +135,22 @@ fun RealWorld4_FancyWidget_001(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_002(
-                            s2 = "HelloWorld",
-                            model = model.f15
-                        )
-                    }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    RealWorld4_FancyWidget_002(
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f15
+                    )
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_002(
-                            s2 = "HelloWorld",
-                            model = model.f15
-                        )
-                    }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    RealWorld4_FancyWidget_002(
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f15
+                    )
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -162,7 +158,11 @@ fun RealWorld4_FancyWidget_001(
 }
 
 @Composable
-fun RealWorld4_FancyWidget_002(s2: String, model: RealWorld4_DataModel_02) {
+fun RealWorld4_FancyWidget_002(
+    s2: String,
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_02
+) {
     val tmp0 =
         "jaleiurhgsei48" + model.f0 + model.f2 + model.f3 + model.f4 + model.f5 + model.f7 +
                 model.f8 + model.f9
@@ -180,7 +180,7 @@ fun RealWorld4_FancyWidget_002(s2: String, model: RealWorld4_DataModel_02) {
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -188,61 +188,59 @@ fun RealWorld4_FancyWidget_002(s2: String, model: RealWorld4_DataModel_02) {
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_003(
-                            model = model.f1,
-                            number = 326,
+                Column {
+                    RealWorld4_FancyWidget_003(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f1,
+                        number = 326,
+                        s1 = "HelloWorld",
+                        s2 = "HelloWorld"
+                    ) {
+                        RealWorld4_FancyWidget_086(
                             s1 = "HelloWorld",
-                            s2 = "HelloWorld"
-                        ) {
-                            RealWorld4_FancyWidget_086(
-                                s1 = "HelloWorld",
-                                model = model.f1.f5.f2.f0.f11.f7.f4
-                            )
-                        }
+                            model = model.f1.f5.f2.f0.f11.f7.f4
+                        )
                     }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_003(
-                            model = model.f6,
-                            number = 279,
+
+                    RealWorld4_FancyWidget_003(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f6,
+                        number = 279,
+                        s1 = "HelloWorld",
+                        s2 = "HelloWorld"
+                    ) {
+                        RealWorld4_FancyWidget_086(
                             s1 = "HelloWorld",
-                            s2 = "HelloWorld"
-                        ) {
-                            RealWorld4_FancyWidget_086(
-                                s1 = "HelloWorld",
-                                model = model.f6.f5.f2.f0.f11.f7.f4
-                            )
-                        }
+                            model = model.f6.f5.f2.f0.f11.f7.f4
+                        )
                     }
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_003(
-                            model = model.f1,
-                            number = 2,
+                Row {
+                    RealWorld4_FancyWidget_003(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f1,
+                        number = 2,
+                        s1 = "HelloWorld",
+                        s2 = "HelloWorld"
+                    ) {
+                        RealWorld4_FancyWidget_086(
                             s1 = "HelloWorld",
-                            s2 = "HelloWorld"
-                        ) {
-                            RealWorld4_FancyWidget_086(
-                                s1 = "HelloWorld",
-                                model = model.f1.f5.f2.f0.f11.f7.f4
-                            )
-                        }
+                            model = model.f1.f5.f2.f0.f11.f7.f4
+                        )
                     }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_003(
-                            model = model.f6,
-                            number = 995,
+
+                    RealWorld4_FancyWidget_003(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f6,
+                        number = 995,
+                        s1 = "HelloWorld",
+                        s2 = "HelloWorld"
+                    ) {
+                        RealWorld4_FancyWidget_086(
                             s1 = "HelloWorld",
-                            s2 = "HelloWorld"
-                        ) {
-                            RealWorld4_FancyWidget_086(
-                                s1 = "HelloWorld",
-                                model = model.f6.f5.f2.f0.f11.f7.f4
-                            )
-                        }
+                            model = model.f6.f5.f2.f0.f11.f7.f4
+                        )
                     }
                 }
             }
@@ -252,6 +250,7 @@ fun RealWorld4_FancyWidget_002(s2: String, model: RealWorld4_DataModel_02) {
 
 @Composable
 fun RealWorld4_FancyWidget_003(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_03,
     number: Int,
     s1: String,
@@ -283,7 +282,7 @@ fun RealWorld4_FancyWidget_003(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -291,70 +290,68 @@ fun RealWorld4_FancyWidget_003(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_004(
-                            number = 938,
-                            model = model.f1,
+                Column {
+                    RealWorld4_FancyWidget_004(
+                        number = 938,
+                        modifier = LayoutFlexible(1f),
+                        model = model.f1,
+                        s1 = "HelloWorld"
+                    ) {
+                        RealWorld4_FancyWidget_087(
+                            model = model.f1.f0.f0.f11.f7.f4.f5,
+                            color = Color(red = 0xFF, blue = 0x99, green = 0x11)
+                        )
+                    }
+
+                    RealWorld4_FancyWidget_131(
+                        s1 = "HelloWorld",
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5
+                    ) {
+                        RealWorld4_FancyWidget_069(
+                            model = model.f5.f2.f0,
+                            s2 = "HelloWorld",
                             s1 = "HelloWorld"
                         ) {
-                            RealWorld4_FancyWidget_087(
-                                model = model.f1.f0.f0.f11.f7.f4.f5,
-                                color = Color(red = 0xFF, blue = 0x99, green = 0x11)
+                            RealWorld4_FancyWidget_007(
+                                number = 55,
+                                model = model.f5.f2.f0.f11,
+                                children = children
                             )
-                        }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_131(
-                            s1 = "HelloWorld",
-                            s2 = "HelloWorld",
-                            model = model.f5
-                        ) {
-                            RealWorld4_FancyWidget_069(
-                                model = model.f5.f2.f0,
-                                s2 = "HelloWorld",
-                                s1 = "HelloWorld"
-                            ) {
-                                RealWorld4_FancyWidget_007(
-                                    number = 55,
-                                    model = model.f5.f2.f0.f11,
-                                    children = children
-                                )
-                            }
                         }
                     }
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_004(
-                            number = 748,
-                            model = model.f1,
+                Row {
+                    RealWorld4_FancyWidget_004(
+                        number = 748,
+                        modifier = LayoutFlexible(1f),
+                        model = model.f1,
+                        s1 = "HelloWorld"
+                    ) {
+                        RealWorld4_FancyWidget_087(
+                            model = model.f1.f0.f0.f11.f7.f4.f5,
+                            color = Color(red = 0xFF, blue = 0x99, green = 0x11)
+                        )
+                    }
+
+                    RealWorld4_FancyWidget_131(
+                        s1 = "HelloWorld",
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5
+                    ) {
+                        RealWorld4_FancyWidget_069(
+                            model = model.f5.f2.f0,
+                            s2 = "HelloWorld",
                             s1 = "HelloWorld"
                         ) {
-                            RealWorld4_FancyWidget_087(
-                                model = model.f1.f0.f0.f11.f7.f4.f5,
-                                color = Color(red = 0xFF, blue = 0x99, green = 0x11)
+                            RealWorld4_FancyWidget_007(
+                                number = 56,
+                                model = model.f5.f2.f0.f11,
+                                children = children
                             )
-                        }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_131(
-                            s1 = "HelloWorld",
-                            s2 = "HelloWorld",
-                            model = model.f5
-                        ) {
-                            RealWorld4_FancyWidget_069(
-                                model = model.f5.f2.f0,
-                                s2 = "HelloWorld",
-                                s1 = "HelloWorld"
-                            ) {
-                                RealWorld4_FancyWidget_007(
-                                    number = 56,
-                                    model = model.f5.f2.f0.f11,
-                                    children = children
-                                )
-                            }
                         }
                     }
                 }
@@ -366,6 +363,7 @@ fun RealWorld4_FancyWidget_003(
 @Composable
 fun RealWorld4_FancyWidget_004(
     number: Int,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_04,
     s1: String,
     children: @Composable() () -> Unit
@@ -392,7 +390,7 @@ fun RealWorld4_FancyWidget_004(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -400,47 +398,49 @@ fun RealWorld4_FancyWidget_004(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_005(
-                            number = 310,
+                Column {
+                    RealWorld4_FancyWidget_005(
+                        number = 310,
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0,
+                        s2 = "HelloWorld",
+                        children = children
+                    )
+
+                    RealWorld4_FancyWidget_139(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2
+                    ) {
+                        RealWorld4_FancyWidget_037(
                             s1 = "HelloWorld",
-                            model = model.f0,
+                            model = model.f2.f6,
                             s2 = "HelloWorld",
-                            children = children
+                            number = 468
                         )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_139(model = model.f2) {
-                            RealWorld4_FancyWidget_037(
-                                s1 = "HelloWorld",
-                                model = model.f2.f6,
-                                s2 = "HelloWorld",
-                                number = 468
-                            )
-                        }
                     }
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_005(
-                            number = 351,
+                Row {
+                    RealWorld4_FancyWidget_005(
+                        number = 351,
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0,
+                        s2 = "HelloWorld",
+                        children = children
+                    )
+
+                    RealWorld4_FancyWidget_139(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2
+                    ) {
+                        RealWorld4_FancyWidget_037(
                             s1 = "HelloWorld",
-                            model = model.f0,
+                            model = model.f2.f6,
                             s2 = "HelloWorld",
-                            children = children
+                            number = 155
                         )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_139(model = model.f2) {
-                            RealWorld4_FancyWidget_037(
-                                s1 = "HelloWorld",
-                                model = model.f2.f6,
-                                s2 = "HelloWorld",
-                                number = 155
-                            )
-                        }
                     }
                 }
             }
@@ -452,6 +452,7 @@ fun RealWorld4_FancyWidget_004(
 fun RealWorld4_FancyWidget_005(
     number: Int,
     s1: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_05,
     s2: String,
     children: @Composable() () -> Unit
@@ -482,7 +483,7 @@ fun RealWorld4_FancyWidget_005(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -490,82 +491,80 @@ fun RealWorld4_FancyWidget_005(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_133(
-                            model = model.f0,
+                Column {
+                    RealWorld4_FancyWidget_133(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0,
+                        s1 = "HelloWorld",
+                        s2 = "HelloWorld",
+                        children = children
+                    )
+
+                    RealWorld4_FancyWidget_075(
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f6
+                    ) {
+                        RealWorld4_FancyWidget_038(
                             s1 = "HelloWorld",
-                            s2 = "HelloWorld",
-                            children = children
-                        )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_075(
-                            s1 = "HelloWorld",
-                            model = model.f6
+                            model = model.f6.f11,
+                            obj = RealWorld4_UnmemoizablePojo_8(),
+                            s2 = "HelloWorld"
                         ) {
-                            RealWorld4_FancyWidget_038(
+                            RealWorld4_FancyWidget_008(
                                 s1 = "HelloWorld",
-                                model = model.f6.f11,
-                                obj = RealWorld4_UnmemoizablePojo_8(),
-                                s2 = "HelloWorld"
+                                model = model.f6.f11.f7
                             ) {
-                                RealWorld4_FancyWidget_008(
-                                    s1 = "HelloWorld",
-                                    model = model.f6.f11.f7
+                                RealWorld4_FancyWidget_009(
+                                    model = model.f6.f11.f7.f4,
+                                    number = 467
                                 ) {
-                                    RealWorld4_FancyWidget_009(
-                                        model = model.f6.f11.f7.f4,
-                                        number = 467
-                                    ) {
-                                        RealWorld4_FancyWidget_028(
-                                            s2 = "HelloWorld",
-                                            b = true,
-                                            s1 = "HelloWorld",
-                                            model = model.f6.f11.f7.f4.f2
-                                        )
-                                    }
+                                    RealWorld4_FancyWidget_028(
+                                        s2 = "HelloWorld",
+                                        b = true,
+                                        s1 = "HelloWorld",
+                                        model = model.f6.f11.f7.f4.f2
+                                    )
                                 }
                             }
                         }
                     }
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_133(
-                            model = model.f0,
+                Row {
+                    RealWorld4_FancyWidget_133(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0,
+                        s1 = "HelloWorld",
+                        s2 = "HelloWorld",
+                        children = children
+                    )
+
+                    RealWorld4_FancyWidget_075(
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f6
+                    ) {
+                        RealWorld4_FancyWidget_038(
                             s1 = "HelloWorld",
-                            s2 = "HelloWorld",
-                            children = children
-                        )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_075(
-                            s1 = "HelloWorld",
-                            model = model.f6
+                            model = model.f6.f11,
+                            obj = RealWorld4_UnmemoizablePojo_8(),
+                            s2 = "HelloWorld"
                         ) {
-                            RealWorld4_FancyWidget_038(
+                            RealWorld4_FancyWidget_008(
                                 s1 = "HelloWorld",
-                                model = model.f6.f11,
-                                obj = RealWorld4_UnmemoizablePojo_8(),
-                                s2 = "HelloWorld"
+                                model = model.f6.f11.f7
                             ) {
-                                RealWorld4_FancyWidget_008(
-                                    s1 = "HelloWorld",
-                                    model = model.f6.f11.f7
+                                RealWorld4_FancyWidget_009(
+                                    model = model.f6.f11.f7.f4,
+                                    number = 981
                                 ) {
-                                    RealWorld4_FancyWidget_009(
-                                        model = model.f6.f11.f7.f4,
-                                        number = 981
-                                    ) {
-                                        RealWorld4_FancyWidget_028(
-                                            s2 = "HelloWorld",
-                                            b = true,
-                                            s1 = "HelloWorld",
-                                            model = model.f6.f11.f7.f4.f2
-                                        )
-                                    }
+                                    RealWorld4_FancyWidget_028(
+                                        s2 = "HelloWorld",
+                                        b = true,
+                                        s1 = "HelloWorld",
+                                        model = model.f6.f11.f7.f4.f2
+                                    )
                                 }
                             }
                         }
@@ -578,6 +577,7 @@ fun RealWorld4_FancyWidget_005(
 
 @Composable
 fun RealWorld4_FancyWidget_006(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_06,
     s1: String,
     children: @Composable() () -> Unit
@@ -599,7 +599,7 @@ fun RealWorld4_FancyWidget_006(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -607,42 +607,40 @@ fun RealWorld4_FancyWidget_006(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_070(
-                            model = model.f11,
+                Column {
+                    RealWorld4_FancyWidget_070(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f11,
+                        s1 = "HelloWorld",
+                        number = 714
+                    ) {
+                        RealWorld4_FancyWidget_146(
                             s1 = "HelloWorld",
-                            number = 714
-                        ) {
-                            RealWorld4_FancyWidget_146(
-                                s1 = "HelloWorld",
-                                s2 = "HelloWorld",
-                                number = 652,
-                                b = true,
-                                model = model.f11.f5.f0
-                            ) { ColoredRect(model.toColor()); }
-                        }
+                            s2 = "HelloWorld",
+                            number = 652,
+                            b = true,
+                            model = model.f11.f5.f0
+                        ) { ColoredRect(model.toColor()) }
                     }
-                    flexible(flex = 1f, children = children)
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_070(
-                            model = model.f11,
+                Row {
+                    RealWorld4_FancyWidget_070(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f11,
+                        s1 = "HelloWorld",
+                        number = 735
+                    ) {
+                        RealWorld4_FancyWidget_146(
                             s1 = "HelloWorld",
-                            number = 735
-                        ) {
-                            RealWorld4_FancyWidget_146(
-                                s1 = "HelloWorld",
-                                s2 = "HelloWorld",
-                                number = 181,
-                                b = true,
-                                model = model.f11.f5.f0
-                            ) { ColoredRect(model.toColor()); }
-                        }
+                            s2 = "HelloWorld",
+                            number = 181,
+                            b = true,
+                            model = model.f11.f5.f0
+                        ) { ColoredRect(model.toColor()) }
                     }
-                    flexible(flex = 1f, children = children)
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -652,6 +650,7 @@ fun RealWorld4_FancyWidget_006(
 @Composable
 fun RealWorld4_FancyWidget_007(
     number: Int,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_07,
     children: @Composable() () -> Unit
 ) {
@@ -671,7 +670,7 @@ fun RealWorld4_FancyWidget_007(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -679,46 +678,54 @@ fun RealWorld4_FancyWidget_007(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_071(
-                            color = Color(
-                                red = 0xFF,
-                                blue = 0x99,
-                                green = 0x11
-                            ), model = model.f5, obj = RealWorld4_UnmemoizablePojo_0()
-                        ) {
-                            RealWorld4_FancyWidget_066(
-                                s2 = "HelloWorld",
-                                model = model.f5.f0.f5,
-                                s1 = "HelloWorld"
-                            ) { ColoredRect(model.toColor()); }
-                        }
+                Column {
+                    RealWorld4_FancyWidget_071(
+                        color = Color(
+                            red = 0xFF,
+                            blue = 0x99,
+                            green = 0x11
+                        ),
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        obj = RealWorld4_UnmemoizablePojo_0()
+                    ) {
+                        RealWorld4_FancyWidget_066(
+                            s2 = "HelloWorld",
+                            model = model.f5.f0.f5,
+                            s1 = "HelloWorld"
+                        ) { ColoredRect(model.toColor()) }
                     }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_085(model = model.f7, children = children)
-                    }
+
+                    RealWorld4_FancyWidget_085(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f7,
+                        children = children
+                    )
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_071(
-                            color = Color(
-                                red = 0xFF,
-                                blue = 0x99,
-                                green = 0x11
-                            ), model = model.f5, obj = RealWorld4_UnmemoizablePojo_0()
-                        ) {
-                            RealWorld4_FancyWidget_066(
-                                s2 = "HelloWorld",
-                                model = model.f5.f0.f5,
-                                s1 = "HelloWorld"
-                            ) { ColoredRect(model.toColor()); }
-                        }
+                Row {
+                    RealWorld4_FancyWidget_071(
+                        color = Color(
+                            red = 0xFF,
+                            blue = 0x99,
+                            green = 0x11
+                        ),
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        obj = RealWorld4_UnmemoizablePojo_0()
+                    ) {
+                        RealWorld4_FancyWidget_066(
+                            s2 = "HelloWorld",
+                            model = model.f5.f0.f5,
+                            s1 = "HelloWorld"
+                        ) { ColoredRect(model.toColor()) }
                     }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_085(model = model.f7, children = children)
-                    }
+
+                    RealWorld4_FancyWidget_085(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f7,
+                        children = children
+                    )
                 }
             }
         }
@@ -728,6 +735,7 @@ fun RealWorld4_FancyWidget_007(
 @Composable
 fun RealWorld4_FancyWidget_008(
     s1: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_08,
     children: @Composable() () -> Unit
 ) {
@@ -746,7 +754,7 @@ fun RealWorld4_FancyWidget_008(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -754,24 +762,22 @@ fun RealWorld4_FancyWidget_008(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_012(
-                            model = model.f0,
-                            s1 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    RealWorld4_FancyWidget_012(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0,
+                        s1 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_012(
-                            model = model.f0,
-                            s1 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    RealWorld4_FancyWidget_012(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0,
+                        s1 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -780,6 +786,7 @@ fun RealWorld4_FancyWidget_008(
 
 @Composable
 fun RealWorld4_FancyWidget_009(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     number: Int,
     children: @Composable() () -> Unit
@@ -799,7 +806,7 @@ fun RealWorld4_FancyWidget_009(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -807,26 +814,24 @@ fun RealWorld4_FancyWidget_009(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_123(
-                            s2 = "HelloWorld",
-                            s1 = "HelloWorld",
-                            model = model.f5
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    RealWorld4_FancyWidget_123(
+                        s2 = "HelloWorld",
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_123(
-                            s2 = "HelloWorld",
-                            s1 = "HelloWorld",
-                            model = model.f5
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    RealWorld4_FancyWidget_123(
+                        s2 = "HelloWorld",
+                        s1 = "HelloWorld",
+                        model = model.f5,
+                        modifier = LayoutFlexible(1f)
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -835,6 +840,7 @@ fun RealWorld4_FancyWidget_009(
 
 @Composable
 fun RealWorld4_FancyWidget_010(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     s2: String,
     s1: String,
@@ -860,7 +866,7 @@ fun RealWorld4_FancyWidget_010(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -868,14 +874,14 @@ fun RealWorld4_FancyWidget_010(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -883,7 +889,11 @@ fun RealWorld4_FancyWidget_010(
 }
 
 @Composable
-fun RealWorld4_FancyWidget_011(model: RealWorld4_DataModel_10, number: Int) {
+fun RealWorld4_FancyWidget_011(
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_10,
+    number: Int
+) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -899,7 +909,7 @@ fun RealWorld4_FancyWidget_011(model: RealWorld4_DataModel_10, number: Int) {
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -907,14 +917,12 @@ fun RealWorld4_FancyWidget_011(model: RealWorld4_DataModel_10, number: Int) {
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
                 }
             }
         }
@@ -923,6 +931,7 @@ fun RealWorld4_FancyWidget_011(model: RealWorld4_DataModel_10, number: Int) {
 
 @Composable
 fun RealWorld4_FancyWidget_012(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     s1: String,
     children: @Composable() () -> Unit
@@ -942,7 +951,7 @@ fun RealWorld4_FancyWidget_012(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -950,40 +959,38 @@ fun RealWorld4_FancyWidget_012(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_091(
-                            model = model.f2,
-                            s1 = "HelloWorld",
-                            children = children
-                        )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_110(
-                            s2 = "HelloWorld",
-                            s1 = "HelloWorld",
-                            color = Color(red = 0xFF, blue = 0x99, green = 0x11),
-                            model = model.f5
-                        ) { ColoredRect(model.toColor()); }
-                    }
+                Column {
+                    RealWorld4_FancyWidget_091(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        s1 = "HelloWorld",
+                        children = children
+                    )
+
+                    RealWorld4_FancyWidget_110(
+                        s2 = "HelloWorld",
+                        s1 = "HelloWorld",
+                        color = Color(red = 0xFF, blue = 0x99, green = 0x11),
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5
+                    ) { ColoredRect(model.toColor()) }
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_091(
-                            model = model.f2,
-                            s1 = "HelloWorld",
-                            children = children
-                        )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_110(
-                            s2 = "HelloWorld",
-                            s1 = "HelloWorld",
-                            color = Color(red = 0xFF, blue = 0x99, green = 0x11),
-                            model = model.f5
-                        ) { ColoredRect(model.toColor()); }
-                    }
+                Row {
+                    RealWorld4_FancyWidget_091(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        s1 = "HelloWorld",
+                        children = children
+                    )
+
+                    RealWorld4_FancyWidget_110(
+                        s2 = "HelloWorld",
+                        s1 = "HelloWorld",
+                        color = Color(red = 0xFF, blue = 0x99, green = 0x11),
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5
+                    ) { ColoredRect(model.toColor()) }
                 }
             }
         }
@@ -992,6 +999,7 @@ fun RealWorld4_FancyWidget_012(
 
 @Composable
 fun RealWorld4_FancyWidget_013(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     s2: String,
     children: @Composable() () -> Unit
@@ -1011,7 +1019,7 @@ fun RealWorld4_FancyWidget_013(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -1019,14 +1027,14 @@ fun RealWorld4_FancyWidget_013(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -1036,6 +1044,7 @@ fun RealWorld4_FancyWidget_013(
 @Composable
 fun RealWorld4_FancyWidget_014(
     s1: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -1054,7 +1063,7 @@ fun RealWorld4_FancyWidget_014(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -1062,14 +1071,14 @@ fun RealWorld4_FancyWidget_014(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -1079,6 +1088,7 @@ fun RealWorld4_FancyWidget_014(
 @Composable
 fun RealWorld4_FancyWidget_015(
     number: Int,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_08,
     s1: String,
     children: @Composable() () -> Unit
@@ -1103,7 +1113,7 @@ fun RealWorld4_FancyWidget_015(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -1111,36 +1121,34 @@ fun RealWorld4_FancyWidget_015(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_119(
-                            s1 = "HelloWorld",
-                            model = model.f4
-                        ) {
-                            RealWorld4_FancyWidget_010(
-                                model = model.f4.f5,
-                                s2 = "HelloWorld",
-                                s1 = "HelloWorld"
-                            ) { ColoredRect(model.toColor()); }
-                        }
+                Column {
+                    RealWorld4_FancyWidget_119(
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f4
+                    ) {
+                        RealWorld4_FancyWidget_010(
+                            model = model.f4.f5,
+                            s2 = "HelloWorld",
+                            s1 = "HelloWorld"
+                        ) { ColoredRect(model.toColor()) }
                     }
-                    flexible(flex = 1f, children = children)
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_119(
-                            s1 = "HelloWorld",
-                            model = model.f4
-                        ) {
-                            RealWorld4_FancyWidget_010(
-                                model = model.f4.f5,
-                                s2 = "HelloWorld",
-                                s1 = "HelloWorld"
-                            ) { ColoredRect(model.toColor()); }
-                        }
+                Row {
+                    RealWorld4_FancyWidget_119(
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f4
+                    ) {
+                        RealWorld4_FancyWidget_010(
+                            model = model.f4.f5,
+                            s2 = "HelloWorld",
+                            s1 = "HelloWorld"
+                        ) { ColoredRect(model.toColor()) }
                     }
-                    flexible(flex = 1f, children = children)
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -1149,6 +1157,7 @@ fun RealWorld4_FancyWidget_015(
 
 @Composable
 fun RealWorld4_FancyWidget_016(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     s2: String,
     children: @Composable() () -> Unit
@@ -1168,7 +1177,7 @@ fun RealWorld4_FancyWidget_016(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -1176,42 +1185,40 @@ fun RealWorld4_FancyWidget_016(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_057(
-                            model = model.f2,
-                            obj = RealWorld4_UnmemoizablePojo_11(),
-                            s1 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_122(
-                            number = 915,
-                            obj = RealWorld4_UnmemoizablePojo_12(),
-                            b = true,
-                            model = model.f5,
-                            children = children
-                        )
-                    }
+                Column {
+                    RealWorld4_FancyWidget_057(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        obj = RealWorld4_UnmemoizablePojo_11(),
+                        s1 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
+
+                    RealWorld4_FancyWidget_122(
+                        number = 915,
+                        obj = RealWorld4_UnmemoizablePojo_12(),
+                        b = true,
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        children = children
+                    )
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_057(
-                            model = model.f2,
-                            obj = RealWorld4_UnmemoizablePojo_11(),
-                            s1 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_122(
-                            number = 775,
-                            obj = RealWorld4_UnmemoizablePojo_12(),
-                            b = true,
-                            model = model.f5,
-                            children = children
-                        )
-                    }
+                Row {
+                    RealWorld4_FancyWidget_057(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        obj = RealWorld4_UnmemoizablePojo_11(),
+                        s1 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
+
+                    RealWorld4_FancyWidget_122(
+                        number = 775,
+                        obj = RealWorld4_UnmemoizablePojo_12(),
+                        b = true,
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        children = children
+                    )
                 }
             }
         }
@@ -1219,7 +1226,12 @@ fun RealWorld4_FancyWidget_016(
 }
 
 @Composable
-fun RealWorld4_FancyWidget_017(s1: String, model: RealWorld4_DataModel_10, number: Int) {
+fun RealWorld4_FancyWidget_017(
+    s1: String,
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_10,
+    number: Int
+) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -1240,7 +1252,7 @@ fun RealWorld4_FancyWidget_017(s1: String, model: RealWorld4_DataModel_10, numbe
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -1248,14 +1260,12 @@ fun RealWorld4_FancyWidget_017(s1: String, model: RealWorld4_DataModel_10, numbe
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
                 }
             }
         }
@@ -1266,6 +1276,7 @@ fun RealWorld4_FancyWidget_017(s1: String, model: RealWorld4_DataModel_10, numbe
 fun RealWorld4_FancyWidget_018(
     number: Int,
     s2: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     s1: String,
     b: Boolean
@@ -1300,7 +1311,7 @@ fun RealWorld4_FancyWidget_018(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -1308,40 +1319,38 @@ fun RealWorld4_FancyWidget_018(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_147(
-                            model = model.f2,
-                            s1 = "HelloWorld",
-                            obj = RealWorld4_UnmemoizablePojo_1(),
-                            b = true,
-                            s2 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_129(
-                            model = model.f5,
-                            s2 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
+                Column {
+                    RealWorld4_FancyWidget_147(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        s1 = "HelloWorld",
+                        obj = RealWorld4_UnmemoizablePojo_1(),
+                        b = true,
+                        s2 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
+
+                    RealWorld4_FancyWidget_129(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        s2 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_147(
-                            model = model.f2,
-                            s1 = "HelloWorld",
-                            obj = RealWorld4_UnmemoizablePojo_1(),
-                            b = false,
-                            s2 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_129(
-                            model = model.f5,
-                            s2 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
+                Row {
+                    RealWorld4_FancyWidget_147(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        s1 = "HelloWorld",
+                        obj = RealWorld4_UnmemoizablePojo_1(),
+                        b = false,
+                        s2 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
+
+                    RealWorld4_FancyWidget_129(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        s2 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
                 }
             }
         }
@@ -1349,7 +1358,11 @@ fun RealWorld4_FancyWidget_018(
 }
 
 @Composable
-fun RealWorld4_FancyWidget_019(model: RealWorld4_DataModel_10, children: @Composable() () -> Unit) {
+fun RealWorld4_FancyWidget_019(
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_10,
+    children: @Composable() () -> Unit
+) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -1360,7 +1373,7 @@ fun RealWorld4_FancyWidget_019(model: RealWorld4_DataModel_10, children: @Compos
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -1368,14 +1381,14 @@ fun RealWorld4_FancyWidget_019(model: RealWorld4_DataModel_10, children: @Compos
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -1387,6 +1400,7 @@ fun RealWorld4_FancyWidget_020(
     color: Color,
     s1: String,
     b: Boolean,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -1415,7 +1429,7 @@ fun RealWorld4_FancyWidget_020(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -1423,14 +1437,14 @@ fun RealWorld4_FancyWidget_020(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -1438,7 +1452,11 @@ fun RealWorld4_FancyWidget_020(
 }
 
 @Composable
-fun RealWorld4_FancyWidget_021(model: RealWorld4_DataModel_10, children: @Composable() () -> Unit) {
+fun RealWorld4_FancyWidget_021(
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_10,
+    children: @Composable() () -> Unit
+) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -1449,7 +1467,7 @@ fun RealWorld4_FancyWidget_021(model: RealWorld4_DataModel_10, children: @Compos
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -1457,14 +1475,14 @@ fun RealWorld4_FancyWidget_021(model: RealWorld4_DataModel_10, children: @Compos
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -1473,6 +1491,7 @@ fun RealWorld4_FancyWidget_021(model: RealWorld4_DataModel_10, children: @Compos
 
 @Composable
 fun RealWorld4_FancyWidget_022(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_07,
     s1: String,
     number: Int,
@@ -1505,7 +1524,7 @@ fun RealWorld4_FancyWidget_022(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -1513,53 +1532,51 @@ fun RealWorld4_FancyWidget_022(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_015(
-                            number = 667,
-                            model = model.f5,
-                            s1 = "HelloWorld",
-                            children = children
-                        )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_045(
-                            obj = RealWorld4_UnmemoizablePojo_6(),
-                            s2 = "HelloWorld",
-                            s1 = "HelloWorld",
-                            model = model.f7
-                        ) {
-                            RealWorld4_FancyWidget_101(
-                                number = 121,
-                                model = model.f7.f4,
-                                s1 = "HelloWorld"
-                            ) { ColoredRect(model.toColor()); }
-                        }
+                Column {
+                    RealWorld4_FancyWidget_015(
+                        number = 667,
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        s1 = "HelloWorld",
+                        children = children
+                    )
+
+                    RealWorld4_FancyWidget_045(
+                        obj = RealWorld4_UnmemoizablePojo_6(),
+                        s2 = "HelloWorld",
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f7
+                    ) {
+                        RealWorld4_FancyWidget_101(
+                            number = 121,
+                            model = model.f7.f4,
+                            s1 = "HelloWorld"
+                        ) { ColoredRect(model.toColor()) }
                     }
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_015(
-                            number = 522,
-                            model = model.f5,
-                            s1 = "HelloWorld",
-                            children = children
-                        )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_045(
-                            obj = RealWorld4_UnmemoizablePojo_6(),
-                            s2 = "HelloWorld",
-                            s1 = "HelloWorld",
-                            model = model.f7
-                        ) {
-                            RealWorld4_FancyWidget_101(
-                                number = 94,
-                                model = model.f7.f4,
-                                s1 = "HelloWorld"
-                            ) { ColoredRect(model.toColor()); }
-                        }
+                Row {
+                    RealWorld4_FancyWidget_015(
+                        number = 522,
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        s1 = "HelloWorld",
+                        children = children
+                    )
+
+                    RealWorld4_FancyWidget_045(
+                        obj = RealWorld4_UnmemoizablePojo_6(),
+                        s2 = "HelloWorld",
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f7
+                    ) {
+                        RealWorld4_FancyWidget_101(
+                            number = 94,
+                            model = model.f7.f4,
+                            s1 = "HelloWorld"
+                        ) { ColoredRect(model.toColor()) }
                     }
                 }
             }
@@ -1569,6 +1586,7 @@ fun RealWorld4_FancyWidget_022(
 
 @Composable
 fun RealWorld4_FancyWidget_023(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_08,
     obj: RealWorld4_UnmemoizablePojo_14,
     children: @Composable() () -> Unit
@@ -1594,7 +1612,7 @@ fun RealWorld4_FancyWidget_023(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -1602,24 +1620,22 @@ fun RealWorld4_FancyWidget_023(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_094(
-                            model = model.f4,
-                            obj = RealWorld4_UnmemoizablePojo_9()
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    RealWorld4_FancyWidget_094(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f4,
+                        obj = RealWorld4_UnmemoizablePojo_9()
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_094(
-                            model = model.f4,
-                            obj = RealWorld4_UnmemoizablePojo_9()
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    RealWorld4_FancyWidget_094(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f4,
+                        obj = RealWorld4_UnmemoizablePojo_9()
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -1629,6 +1645,7 @@ fun RealWorld4_FancyWidget_023(
 @Composable
 fun RealWorld4_FancyWidget_024(
     s1: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     s2: String,
     children: @Composable() () -> Unit
@@ -1653,7 +1670,7 @@ fun RealWorld4_FancyWidget_024(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -1661,24 +1678,22 @@ fun RealWorld4_FancyWidget_024(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_048(
-                            model = model.f5,
-                            b = true
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    RealWorld4_FancyWidget_048(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        b = true
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_048(
-                            model = model.f5,
-                            b = false
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    RealWorld4_FancyWidget_048(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        b = false
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -1688,6 +1703,7 @@ fun RealWorld4_FancyWidget_024(
 @Composable
 fun RealWorld4_FancyWidget_025(
     b: Boolean,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     children: @Composable() () -> Unit
 ) {
@@ -1706,7 +1722,7 @@ fun RealWorld4_FancyWidget_025(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -1714,28 +1730,30 @@ fun RealWorld4_FancyWidget_025(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_138(model = model.f2, children = children)
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_050(
-                            model = model.f5,
-                            s2 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
+                Column {
+                    RealWorld4_FancyWidget_138(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2, children = children
+                    )
+
+                    RealWorld4_FancyWidget_050(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        s2 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_138(model = model.f2, children = children)
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_050(
-                            model = model.f5,
-                            s2 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
+                Row {
+                    RealWorld4_FancyWidget_138(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2, children = children
+                    )
+
+                    RealWorld4_FancyWidget_050(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        s2 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
                 }
             }
         }
@@ -1746,6 +1764,7 @@ fun RealWorld4_FancyWidget_025(
 fun RealWorld4_FancyWidget_026(
     s2: String,
     s1: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -1769,7 +1788,7 @@ fun RealWorld4_FancyWidget_026(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -1777,14 +1796,14 @@ fun RealWorld4_FancyWidget_026(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -1794,6 +1813,7 @@ fun RealWorld4_FancyWidget_026(
 @Composable
 fun RealWorld4_FancyWidget_027(
     color: Color,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -1812,7 +1832,7 @@ fun RealWorld4_FancyWidget_027(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -1820,14 +1840,14 @@ fun RealWorld4_FancyWidget_027(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -1835,7 +1855,13 @@ fun RealWorld4_FancyWidget_027(
 }
 
 @Composable
-fun RealWorld4_FancyWidget_028(s2: String, b: Boolean, s1: String, model: RealWorld4_DataModel_10) {
+fun RealWorld4_FancyWidget_028(
+    s2: String,
+    b: Boolean,
+    s1: String,
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_10
+) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -1861,7 +1887,7 @@ fun RealWorld4_FancyWidget_028(s2: String, b: Boolean, s1: String, model: RealWo
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -1869,14 +1895,12 @@ fun RealWorld4_FancyWidget_028(s2: String, b: Boolean, s1: String, model: RealWo
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
                 }
             }
         }
@@ -1886,6 +1910,7 @@ fun RealWorld4_FancyWidget_028(s2: String, b: Boolean, s1: String, model: RealWo
 @Composable
 fun RealWorld4_FancyWidget_029(
     b: Boolean,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_08,
     s2: String,
     children: @Composable() () -> Unit
@@ -1910,7 +1935,7 @@ fun RealWorld4_FancyWidget_029(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -1918,24 +1943,22 @@ fun RealWorld4_FancyWidget_029(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_016(
-                            model = model.f4,
-                            s2 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    RealWorld4_FancyWidget_016(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f4,
+                        s2 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_016(
-                            model = model.f4,
-                            s2 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    RealWorld4_FancyWidget_016(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f4,
+                        s2 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -1945,6 +1968,7 @@ fun RealWorld4_FancyWidget_029(
 @Composable
 fun RealWorld4_FancyWidget_030(
     s1: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     children: @Composable() () -> Unit
 ) {
@@ -1963,7 +1987,7 @@ fun RealWorld4_FancyWidget_030(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -1971,26 +1995,24 @@ fun RealWorld4_FancyWidget_030(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_121(
-                            s2 = "HelloWorld",
-                            s1 = "HelloWorld",
-                            model = model.f5
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    RealWorld4_FancyWidget_121(
+                        s2 = "HelloWorld",
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_121(
-                            s2 = "HelloWorld",
-                            s1 = "HelloWorld",
-                            model = model.f5
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    RealWorld4_FancyWidget_121(
+                        s2 = "HelloWorld",
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -1998,7 +2020,11 @@ fun RealWorld4_FancyWidget_030(
 }
 
 @Composable
-fun RealWorld4_FancyWidget_031(model: RealWorld4_DataModel_10, s2: String) {
+fun RealWorld4_FancyWidget_031(
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_10,
+    s2: String
+) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -2014,7 +2040,7 @@ fun RealWorld4_FancyWidget_031(model: RealWorld4_DataModel_10, s2: String) {
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -2022,14 +2048,12 @@ fun RealWorld4_FancyWidget_031(model: RealWorld4_DataModel_10, s2: String) {
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
                 }
             }
         }
@@ -2039,6 +2063,7 @@ fun RealWorld4_FancyWidget_031(model: RealWorld4_DataModel_10, s2: String) {
 @Composable
 fun RealWorld4_FancyWidget_032(
     obj: RealWorld4_UnmemoizablePojo_5,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -2061,7 +2086,7 @@ fun RealWorld4_FancyWidget_032(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -2069,14 +2094,14 @@ fun RealWorld4_FancyWidget_032(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -2085,6 +2110,7 @@ fun RealWorld4_FancyWidget_032(
 
 @Composable
 fun RealWorld4_FancyWidget_033(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     s1: String,
     children: @Composable() () -> Unit
@@ -2104,7 +2130,7 @@ fun RealWorld4_FancyWidget_033(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -2112,26 +2138,24 @@ fun RealWorld4_FancyWidget_033(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_063(
-                            model = model.f2,
-                            s1 = "HelloWorld",
-                            s2 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    RealWorld4_FancyWidget_063(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        s1 = "HelloWorld",
+                        s2 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_063(
-                            model = model.f2,
-                            s1 = "HelloWorld",
-                            s2 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    RealWorld4_FancyWidget_063(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        s1 = "HelloWorld",
+                        s2 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -2140,6 +2164,7 @@ fun RealWorld4_FancyWidget_033(
 
 @Composable
 fun RealWorld4_FancyWidget_034(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     b: Boolean,
     s2: String,
@@ -2165,7 +2190,7 @@ fun RealWorld4_FancyWidget_034(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -2173,14 +2198,14 @@ fun RealWorld4_FancyWidget_034(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -2191,6 +2216,7 @@ fun RealWorld4_FancyWidget_034(
 fun RealWorld4_FancyWidget_035(
     s2: String,
     s1: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -2214,7 +2240,7 @@ fun RealWorld4_FancyWidget_035(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -2222,14 +2248,14 @@ fun RealWorld4_FancyWidget_035(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -2239,6 +2265,7 @@ fun RealWorld4_FancyWidget_035(
 @Composable
 fun RealWorld4_FancyWidget_036(
     s1: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -2257,7 +2284,7 @@ fun RealWorld4_FancyWidget_036(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -2265,14 +2292,14 @@ fun RealWorld4_FancyWidget_036(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -2282,6 +2309,7 @@ fun RealWorld4_FancyWidget_036(
 @Composable
 fun RealWorld4_FancyWidget_037(
     s1: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_06,
     s2: String,
     number: Int
@@ -2313,7 +2341,7 @@ fun RealWorld4_FancyWidget_037(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -2321,58 +2349,56 @@ fun RealWorld4_FancyWidget_037(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_076(
-                            model = model.f10,
-                            s2 = "HelloWorld"
-                        )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_080(
-                            model = model.f11,
+                Column {
+                    RealWorld4_FancyWidget_076(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f10,
+                        s2 = "HelloWorld"
+                    )
+
+                    RealWorld4_FancyWidget_080(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f11,
+                        s1 = "HelloWorld"
+                    ) {
+                        RealWorld4_FancyWidget_081(
+                            number = 955,
+                            b = false,
+                            obj = RealWorld4_UnmemoizablePojo_7(),
+                            model = model.f11.f7,
                             s1 = "HelloWorld"
                         ) {
-                            RealWorld4_FancyWidget_081(
-                                number = 955,
-                                b = false,
-                                obj = RealWorld4_UnmemoizablePojo_7(),
-                                model = model.f11.f7,
-                                s1 = "HelloWorld"
-                            ) {
-                                RealWorld4_FancyWidget_061(
-                                    s2 = "HelloWorld",
-                                    model = model.f11.f7.f4.f5
-                                )
-                            }
+                            RealWorld4_FancyWidget_061(
+                                s2 = "HelloWorld",
+                                model = model.f11.f7.f4.f5
+                            )
                         }
                     }
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_076(
-                            model = model.f10,
-                            s2 = "HelloWorld"
-                        )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_080(
-                            model = model.f11,
+                Row {
+                    RealWorld4_FancyWidget_076(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f10,
+                        s2 = "HelloWorld"
+                    )
+
+                    RealWorld4_FancyWidget_080(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f11,
+                        s1 = "HelloWorld"
+                    ) {
+                        RealWorld4_FancyWidget_081(
+                            number = 670,
+                            b = true,
+                            obj = RealWorld4_UnmemoizablePojo_7(),
+                            model = model.f11.f7,
                             s1 = "HelloWorld"
                         ) {
-                            RealWorld4_FancyWidget_081(
-                                number = 670,
-                                b = true,
-                                obj = RealWorld4_UnmemoizablePojo_7(),
-                                model = model.f11.f7,
-                                s1 = "HelloWorld"
-                            ) {
-                                RealWorld4_FancyWidget_061(
-                                    s2 = "HelloWorld",
-                                    model = model.f11.f7.f4.f5
-                                )
-                            }
+                            RealWorld4_FancyWidget_061(
+                                s2 = "HelloWorld",
+                                model = model.f11.f7.f4.f5
+                            )
                         }
                     }
                 }
@@ -2384,6 +2410,7 @@ fun RealWorld4_FancyWidget_037(
 @Composable
 fun RealWorld4_FancyWidget_038(
     s1: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_07,
     obj: RealWorld4_UnmemoizablePojo_8,
     s2: String,
@@ -2419,7 +2446,7 @@ fun RealWorld4_FancyWidget_038(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -2427,14 +2454,20 @@ fun RealWorld4_FancyWidget_038(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { RealWorld4_FancyWidget_054(model = model.f5); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    RealWorld4_FancyWidget_054(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5
+                        )
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { RealWorld4_FancyWidget_054(model = model.f5); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    RealWorld4_FancyWidget_054(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5
+                        )
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -2443,6 +2476,7 @@ fun RealWorld4_FancyWidget_038(
 
 @Composable
 fun RealWorld4_FancyWidget_039(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_08,
     s1: String,
     b: Boolean,
@@ -2468,7 +2502,7 @@ fun RealWorld4_FancyWidget_039(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -2476,36 +2510,34 @@ fun RealWorld4_FancyWidget_039(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_041(
-                            model = model.f0,
-                            s2 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_040(
-                            model = model.f4,
-                            s2 = "HelloWorld",
-                            children = children
-                        )
-                    }
+                Column {
+                    RealWorld4_FancyWidget_041(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0,
+                        s2 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
+
+                    RealWorld4_FancyWidget_040(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f4,
+                        s2 = "HelloWorld",
+                        children = children
+                    )
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_041(
-                            model = model.f0,
-                            s2 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_040(
-                            model = model.f4,
-                            s2 = "HelloWorld",
-                            children = children
-                        )
-                    }
+                Row {
+                    RealWorld4_FancyWidget_041(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0,
+                        s2 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
+
+                    RealWorld4_FancyWidget_040(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f4,
+                        s2 = "HelloWorld",
+                        children = children
+                    )
                 }
             }
         }
@@ -2514,6 +2546,7 @@ fun RealWorld4_FancyWidget_039(
 
 @Composable
 fun RealWorld4_FancyWidget_040(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     s2: String,
     children: @Composable() () -> Unit
@@ -2533,7 +2566,7 @@ fun RealWorld4_FancyWidget_040(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -2541,24 +2574,22 @@ fun RealWorld4_FancyWidget_040(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_053(
-                            s1 = "HelloWorld",
-                            model = model.f2
-                        )
-                    }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    RealWorld4_FancyWidget_053(
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2
+                    )
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_053(
-                            s1 = "HelloWorld",
-                            model = model.f2
-                        )
-                    }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    RealWorld4_FancyWidget_053(
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2
+                    )
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -2567,6 +2598,7 @@ fun RealWorld4_FancyWidget_040(
 
 @Composable
 fun RealWorld4_FancyWidget_041(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     s2: String,
     children: @Composable() () -> Unit
@@ -2586,7 +2618,7 @@ fun RealWorld4_FancyWidget_041(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -2594,42 +2626,41 @@ fun RealWorld4_FancyWidget_041(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_089(
-                            model = model.f2,
-                            s2 = "HelloWorld",
-                            children = children
-                        )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_027(
-                            color = Color(
-                                red = 0xFF,
-                                blue = 0x99,
-                                green = 0x11
-                            ), model = model.f5
-                        ) { ColoredRect(model.toColor()); }
-                    }
+                Column {
+                    RealWorld4_FancyWidget_089(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        s2 = "HelloWorld",
+                        children = children
+                    )
+                    RealWorld4_FancyWidget_027(
+                        color = Color(
+                            red = 0xFF,
+                            blue = 0x99,
+                            green = 0x11
+                        ),
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5
+                    ) { ColoredRect(model.toColor()) }
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_089(
-                            model = model.f2,
-                            s2 = "HelloWorld",
-                            children = children
-                        )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_027(
-                            color = Color(
-                                red = 0xFF,
-                                blue = 0x99,
-                                green = 0x11
-                            ), model = model.f5
-                        ) { ColoredRect(model.toColor()); }
-                    }
+                Row {
+                    RealWorld4_FancyWidget_089(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        s2 = "HelloWorld",
+                        children = children
+                    )
+
+                    RealWorld4_FancyWidget_027(
+                        color = Color(
+                            red = 0xFF,
+                            blue = 0x99,
+                            green = 0x11
+                        ),
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5
+                    ) { ColoredRect(model.toColor()) }
                 }
             }
         }
@@ -2640,6 +2671,7 @@ fun RealWorld4_FancyWidget_041(
 fun RealWorld4_FancyWidget_042(
     s2: String,
     s1: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -2663,7 +2695,7 @@ fun RealWorld4_FancyWidget_042(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -2671,14 +2703,14 @@ fun RealWorld4_FancyWidget_042(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -2688,6 +2720,7 @@ fun RealWorld4_FancyWidget_042(
 @Composable
 fun RealWorld4_FancyWidget_043(
     s2: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_07,
     obj: RealWorld4_UnmemoizablePojo_13,
     s1: String,
@@ -2725,7 +2758,7 @@ fun RealWorld4_FancyWidget_043(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -2733,26 +2766,24 @@ fun RealWorld4_FancyWidget_043(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_097(
-                            s2 = "HelloWorld",
-                            model = model.f5,
-                            s1 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    RealWorld4_FancyWidget_097(
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        s1 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_097(
-                            s2 = "HelloWorld",
-                            model = model.f5,
-                            s1 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    RealWorld4_FancyWidget_097(
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        s1 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -2762,6 +2793,7 @@ fun RealWorld4_FancyWidget_043(
 @Composable
 fun RealWorld4_FancyWidget_044(
     s1: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_08,
     obj: RealWorld4_UnmemoizablePojo_3,
     number: Int,
@@ -2797,7 +2829,7 @@ fun RealWorld4_FancyWidget_044(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -2805,47 +2837,44 @@ fun RealWorld4_FancyWidget_044(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_124(
-                            s2 = "HelloWorld",
-                            model = model.f0,
-                            b = false
-                        ) {
-                            RealWorld4_FancyWidget_127(model = model.f0.f5) {
-                                ColoredRect(model.toColor())
-                            }
+                Column {
+                    RealWorld4_FancyWidget_124(
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0,
+                        b = false
+                    ) {
+                        RealWorld4_FancyWidget_127(model = model.f0.f5) {
+                            ColoredRect(model.toColor())
                         }
                     }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_030(
-                            s1 = "HelloWorld",
-                            model = model.f4,
-                            children = children
-                        )
-                    }
+
+                    RealWorld4_FancyWidget_030(
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f4,
+                        children = children
+                    )
+                } } else {
+                Row {
+            RealWorld4_FancyWidget_124(
+                s2 = "HelloWorld",
+                modifier = LayoutFlexible(1f),
+                model = model.f0,
+                b = true
+            ) {
+                RealWorld4_FancyWidget_127(model = model.f0.f5) {
+                    ColoredRect(model.toColor())
                 }
-            } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_124(
-                            s2 = "HelloWorld",
-                            model = model.f0,
-                            b = true
-                        ) {
-                            RealWorld4_FancyWidget_127(model = model.f0.f5) {
-                                ColoredRect(model.toColor())
-                            }
-                        }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_030(
-                            s1 = "HelloWorld",
-                            model = model.f4,
-                            children = children
-                        )
-                    }
-                }
+            }
+
+            RealWorld4_FancyWidget_030(
+                s1 = "HelloWorld",
+                modifier = LayoutFlexible(1f),
+                model = model.f4,
+                children = children
+            )
+        }
             }
         }
     }
@@ -2856,6 +2885,7 @@ fun RealWorld4_FancyWidget_045(
     obj: RealWorld4_UnmemoizablePojo_6,
     s2: String,
     s1: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_08,
     children: @Composable() () -> Unit
 ) {
@@ -2889,7 +2919,7 @@ fun RealWorld4_FancyWidget_045(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -2897,24 +2927,22 @@ fun RealWorld4_FancyWidget_045(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_105(
-                            model = model.f0,
-                            number = 744
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    RealWorld4_FancyWidget_105(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0,
+                        number = 744
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_105(
-                            model = model.f0,
-                            number = 709
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    RealWorld4_FancyWidget_105(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0,
+                        number = 709
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -2924,6 +2952,7 @@ fun RealWorld4_FancyWidget_045(
 @Composable
 fun RealWorld4_FancyWidget_046(
     s2: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     children: @Composable() () -> Unit
 ) {
@@ -2942,7 +2971,7 @@ fun RealWorld4_FancyWidget_046(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -2950,24 +2979,22 @@ fun RealWorld4_FancyWidget_046(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_103(
-                            model = model.f2,
-                            s2 = "HelloWorld"
-                        )
-                    }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    RealWorld4_FancyWidget_103(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        s2 = "HelloWorld"
+                    )
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_103(
-                            model = model.f2,
-                            s2 = "HelloWorld"
-                        )
-                    }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    RealWorld4_FancyWidget_103(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        s2 = "HelloWorld"
+                    )
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -2975,7 +3002,11 @@ fun RealWorld4_FancyWidget_046(
 }
 
 @Composable
-fun RealWorld4_FancyWidget_047(model: RealWorld4_DataModel_10, children: @Composable() () -> Unit) {
+fun RealWorld4_FancyWidget_047(
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_10,
+    children: @Composable() () -> Unit
+) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -2986,7 +3017,7 @@ fun RealWorld4_FancyWidget_047(model: RealWorld4_DataModel_10, children: @Compos
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -2994,14 +3025,14 @@ fun RealWorld4_FancyWidget_047(model: RealWorld4_DataModel_10, children: @Compos
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -3010,6 +3041,7 @@ fun RealWorld4_FancyWidget_047(model: RealWorld4_DataModel_10, children: @Compos
 
 @Composable
 fun RealWorld4_FancyWidget_048(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     b: Boolean,
     children: @Composable() () -> Unit
@@ -3029,7 +3061,7 @@ fun RealWorld4_FancyWidget_048(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -3037,14 +3069,14 @@ fun RealWorld4_FancyWidget_048(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -3054,6 +3086,7 @@ fun RealWorld4_FancyWidget_048(
 @Composable
 fun RealWorld4_FancyWidget_049(
     s2: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     children: @Composable() () -> Unit
 ) {
@@ -3072,7 +3105,7 @@ fun RealWorld4_FancyWidget_049(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -3080,38 +3113,36 @@ fun RealWorld4_FancyWidget_049(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_107(
-                            s2 = "HelloWorld",
-                            model = model.f2,
-                            s1 = "HelloWorld",
-                            children = children
-                        )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_013(
-                            model = model.f5,
-                            s2 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
+                Column {
+                    RealWorld4_FancyWidget_107(
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        s1 = "HelloWorld",
+                        children = children
+                    )
+
+                    RealWorld4_FancyWidget_013(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        s2 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_107(
-                            s2 = "HelloWorld",
-                            model = model.f2,
-                            s1 = "HelloWorld",
-                            children = children
-                        )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_013(
-                            model = model.f5,
-                            s2 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
+                Row {
+                    RealWorld4_FancyWidget_107(
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        s1 = "HelloWorld",
+                        children = children
+                    )
+
+                    RealWorld4_FancyWidget_013(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        s2 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
                 }
             }
         }
@@ -3120,6 +3151,7 @@ fun RealWorld4_FancyWidget_049(
 
 @Composable
 fun RealWorld4_FancyWidget_050(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     s2: String,
     children: @Composable() () -> Unit
@@ -3139,7 +3171,7 @@ fun RealWorld4_FancyWidget_050(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -3147,14 +3179,14 @@ fun RealWorld4_FancyWidget_050(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -3164,6 +3196,7 @@ fun RealWorld4_FancyWidget_050(
 @Composable
 fun RealWorld4_FancyWidget_051(
     number: Int,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -3182,7 +3215,7 @@ fun RealWorld4_FancyWidget_051(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -3190,14 +3223,14 @@ fun RealWorld4_FancyWidget_051(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -3206,6 +3239,7 @@ fun RealWorld4_FancyWidget_051(
 
 @Composable
 fun RealWorld4_FancyWidget_052(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     s1: String,
     children: @Composable() () -> Unit
@@ -3225,7 +3259,7 @@ fun RealWorld4_FancyWidget_052(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -3233,14 +3267,14 @@ fun RealWorld4_FancyWidget_052(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -3248,7 +3282,11 @@ fun RealWorld4_FancyWidget_052(
 }
 
 @Composable
-fun RealWorld4_FancyWidget_053(s1: String, model: RealWorld4_DataModel_10) {
+fun RealWorld4_FancyWidget_053(
+    s1: String,
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_10
+) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -3264,7 +3302,7 @@ fun RealWorld4_FancyWidget_053(s1: String, model: RealWorld4_DataModel_10) {
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -3272,14 +3310,12 @@ fun RealWorld4_FancyWidget_053(s1: String, model: RealWorld4_DataModel_10) {
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
                 }
             }
         }
@@ -3287,7 +3323,10 @@ fun RealWorld4_FancyWidget_053(s1: String, model: RealWorld4_DataModel_10) {
 }
 
 @Composable
-fun RealWorld4_FancyWidget_054(model: RealWorld4_DataModel_08) {
+fun RealWorld4_FancyWidget_054(
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_08
+) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -3298,7 +3337,7 @@ fun RealWorld4_FancyWidget_054(model: RealWorld4_DataModel_08) {
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -3306,47 +3345,49 @@ fun RealWorld4_FancyWidget_054(model: RealWorld4_DataModel_08) {
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_056(
+                Column {
+                    RealWorld4_FancyWidget_056(
+                        s2 = "HelloWorld",
+                        number = 14,
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0
+                    ) {
+                        RealWorld4_FancyWidget_035(
                             s2 = "HelloWorld",
-                            number = 14,
-                            model = model.f0
-                        ) {
-                            RealWorld4_FancyWidget_035(
-                                s2 = "HelloWorld",
-                                s1 = "HelloWorld",
-                                model = model.f0.f5
-                            ) { ColoredRect(model.toColor()); }
-                        }
+                            s1 = "HelloWorld",
+                            model = model.f0.f5
+                        ) { ColoredRect(model.toColor()) }
                     }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_055(
-                            model = model.f4,
-                            s2 = "HelloWorld"
-                        ) { RealWorld4_FancyWidget_031(model = model.f4.f5, s2 = "HelloWorld"); }
+
+                    RealWorld4_FancyWidget_055(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f4,
+                        s2 = "HelloWorld"
+                    ) {
+                        RealWorld4_FancyWidget_031(model = model.f4.f5, s2 = "HelloWorld")
                     }
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_056(
+                Row {
+                    RealWorld4_FancyWidget_056(
+                        s2 = "HelloWorld",
+                        number = 806,
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0
+                    ) {
+                        RealWorld4_FancyWidget_035(
                             s2 = "HelloWorld",
-                            number = 806,
-                            model = model.f0
-                        ) {
-                            RealWorld4_FancyWidget_035(
-                                s2 = "HelloWorld",
-                                s1 = "HelloWorld",
-                                model = model.f0.f5
-                            ) { ColoredRect(model.toColor()); }
-                        }
+                            s1 = "HelloWorld",
+                            model = model.f0.f5
+                        ) { ColoredRect(model.toColor()) }
                     }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_055(
-                            model = model.f4,
-                            s2 = "HelloWorld"
-                        ) { RealWorld4_FancyWidget_031(model = model.f4.f5, s2 = "HelloWorld"); }
+
+                    RealWorld4_FancyWidget_055(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f4,
+                        s2 = "HelloWorld"
+                    ) {
+                        RealWorld4_FancyWidget_031(model = model.f4.f5, s2 = "HelloWorld")
                     }
                 }
             }
@@ -3356,6 +3397,7 @@ fun RealWorld4_FancyWidget_054(model: RealWorld4_DataModel_08) {
 
 @Composable
 fun RealWorld4_FancyWidget_055(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     s2: String,
     children: @Composable() () -> Unit
@@ -3375,7 +3417,7 @@ fun RealWorld4_FancyWidget_055(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -3383,26 +3425,28 @@ fun RealWorld4_FancyWidget_055(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_021(model = model.f2) {
-                            ColoredRect(
-                                model.toColor()
-                            )
-                        }
+                Column {
+                    RealWorld4_FancyWidget_021(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2
+                    ) {
+                        ColoredRect(
+                            model.toColor()
+                        )
                     }
-                    flexible(flex = 1f, children = children)
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_021(model = model.f2) {
-                            ColoredRect(
-                                model.toColor()
-                            )
-                        }
+                Row {
+                    RealWorld4_FancyWidget_021(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2
+                    ) {
+                        ColoredRect(
+                            model.toColor()
+                        )
                     }
-                    flexible(flex = 1f, children = children)
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -3413,6 +3457,7 @@ fun RealWorld4_FancyWidget_055(
 fun RealWorld4_FancyWidget_056(
     s2: String,
     number: Int,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     children: @Composable() () -> Unit
 ) {
@@ -3436,7 +3481,7 @@ fun RealWorld4_FancyWidget_056(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -3444,26 +3489,24 @@ fun RealWorld4_FancyWidget_056(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_128(
-                            model = model.f2,
-                            s2 = "HelloWorld",
-                            s1 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    RealWorld4_FancyWidget_128(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        s2 = "HelloWorld",
+                        s1 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_128(
-                            model = model.f2,
-                            s2 = "HelloWorld",
-                            s1 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    RealWorld4_FancyWidget_128(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        s2 = "HelloWorld",
+                        s1 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -3472,6 +3515,7 @@ fun RealWorld4_FancyWidget_056(
 
 @Composable
 fun RealWorld4_FancyWidget_057(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     obj: RealWorld4_UnmemoizablePojo_11,
     s1: String,
@@ -3503,7 +3547,7 @@ fun RealWorld4_FancyWidget_057(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -3511,14 +3555,14 @@ fun RealWorld4_FancyWidget_057(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -3526,7 +3570,11 @@ fun RealWorld4_FancyWidget_057(
 }
 
 @Composable
-fun RealWorld4_FancyWidget_058(model: RealWorld4_DataModel_09, children: @Composable() () -> Unit) {
+fun RealWorld4_FancyWidget_058(
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_09,
+    children: @Composable() () -> Unit
+) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -3537,7 +3585,7 @@ fun RealWorld4_FancyWidget_058(model: RealWorld4_DataModel_09, children: @Compos
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -3545,28 +3593,26 @@ fun RealWorld4_FancyWidget_058(model: RealWorld4_DataModel_09, children: @Compos
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_067(
-                            s1 = "HelloWorld",
-                            model = model.f2,
-                            s2 = "HelloWorld",
-                            b = false
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    RealWorld4_FancyWidget_067(
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        s2 = "HelloWorld",
+                        b = false
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_067(
-                            s1 = "HelloWorld",
-                            model = model.f2,
-                            s2 = "HelloWorld",
-                            b = true
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    RealWorld4_FancyWidget_067(
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        s2 = "HelloWorld",
+                        b = true
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -3576,6 +3622,7 @@ fun RealWorld4_FancyWidget_058(model: RealWorld4_DataModel_09, children: @Compos
 @Composable
 fun RealWorld4_FancyWidget_059(
     s2: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     number: Int,
     children: @Composable() () -> Unit
@@ -3600,7 +3647,7 @@ fun RealWorld4_FancyWidget_059(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -3608,14 +3655,14 @@ fun RealWorld4_FancyWidget_059(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -3623,7 +3670,11 @@ fun RealWorld4_FancyWidget_059(
 }
 
 @Composable
-fun RealWorld4_FancyWidget_060(s2: String, model: RealWorld4_DataModel_10) {
+fun RealWorld4_FancyWidget_060(
+    s2: String,
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_10
+) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -3639,7 +3690,7 @@ fun RealWorld4_FancyWidget_060(s2: String, model: RealWorld4_DataModel_10) {
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -3647,14 +3698,12 @@ fun RealWorld4_FancyWidget_060(s2: String, model: RealWorld4_DataModel_10) {
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
                 }
             }
         }
@@ -3662,7 +3711,11 @@ fun RealWorld4_FancyWidget_060(s2: String, model: RealWorld4_DataModel_10) {
 }
 
 @Composable
-fun RealWorld4_FancyWidget_061(s2: String, model: RealWorld4_DataModel_10) {
+fun RealWorld4_FancyWidget_061(
+    s2: String,
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_10
+) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -3678,7 +3731,7 @@ fun RealWorld4_FancyWidget_061(s2: String, model: RealWorld4_DataModel_10) {
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -3686,14 +3739,12 @@ fun RealWorld4_FancyWidget_061(s2: String, model: RealWorld4_DataModel_10) {
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
                 }
             }
         }
@@ -3702,6 +3753,7 @@ fun RealWorld4_FancyWidget_061(s2: String, model: RealWorld4_DataModel_10) {
 
 @Composable
 fun RealWorld4_FancyWidget_062(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     s2: String,
     children: @Composable() () -> Unit
@@ -3721,7 +3773,7 @@ fun RealWorld4_FancyWidget_062(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -3729,28 +3781,30 @@ fun RealWorld4_FancyWidget_062(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_019(model = model.f2, children = children)
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_064(
-                            s2 = "HelloWorld",
-                            model = model.f5
-                        ) { ColoredRect(model.toColor()); }
-                    }
+                Column {
+                    RealWorld4_FancyWidget_019(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2, children = children
+                    )
+
+                    RealWorld4_FancyWidget_064(
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5
+                    ) { ColoredRect(model.toColor()) }
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_019(model = model.f2, children = children)
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_064(
-                            s2 = "HelloWorld",
-                            model = model.f5
-                        ) { ColoredRect(model.toColor()); }
-                    }
+                Row {
+                    RealWorld4_FancyWidget_019(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2, children = children
+                    )
+
+                    RealWorld4_FancyWidget_064(
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5
+                    ) { ColoredRect(model.toColor()) }
                 }
             }
         }
@@ -3759,6 +3813,7 @@ fun RealWorld4_FancyWidget_062(
 
 @Composable
 fun RealWorld4_FancyWidget_063(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     s1: String,
     s2: String,
@@ -3784,7 +3839,7 @@ fun RealWorld4_FancyWidget_063(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -3792,14 +3847,14 @@ fun RealWorld4_FancyWidget_063(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -3809,6 +3864,7 @@ fun RealWorld4_FancyWidget_063(
 @Composable
 fun RealWorld4_FancyWidget_064(
     s2: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -3827,7 +3883,7 @@ fun RealWorld4_FancyWidget_064(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -3835,14 +3891,14 @@ fun RealWorld4_FancyWidget_064(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -3850,7 +3906,12 @@ fun RealWorld4_FancyWidget_064(
 }
 
 @Composable
-fun RealWorld4_FancyWidget_065(number: Int, s1: String, model: RealWorld4_DataModel_10) {
+fun RealWorld4_FancyWidget_065(
+    number: Int,
+    s1: String,
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_10
+) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -3871,7 +3932,7 @@ fun RealWorld4_FancyWidget_065(number: Int, s1: String, model: RealWorld4_DataMo
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -3879,14 +3940,12 @@ fun RealWorld4_FancyWidget_065(number: Int, s1: String, model: RealWorld4_DataMo
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
                 }
             }
         }
@@ -3896,6 +3955,7 @@ fun RealWorld4_FancyWidget_065(number: Int, s1: String, model: RealWorld4_DataMo
 @Composable
 fun RealWorld4_FancyWidget_066(
     s2: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     s1: String,
     children: @Composable() () -> Unit
@@ -3920,7 +3980,7 @@ fun RealWorld4_FancyWidget_066(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -3928,14 +3988,14 @@ fun RealWorld4_FancyWidget_066(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -3945,6 +4005,7 @@ fun RealWorld4_FancyWidget_066(
 @Composable
 fun RealWorld4_FancyWidget_067(
     s1: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     s2: String,
     b: Boolean,
@@ -3975,7 +4036,7 @@ fun RealWorld4_FancyWidget_067(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -3983,14 +4044,14 @@ fun RealWorld4_FancyWidget_067(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -3999,6 +4060,7 @@ fun RealWorld4_FancyWidget_067(
 
 @Composable
 fun RealWorld4_FancyWidget_068(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_05,
     obj: RealWorld4_UnmemoizablePojo_2,
     s2: String,
@@ -4029,7 +4091,7 @@ fun RealWorld4_FancyWidget_068(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -4037,34 +4099,32 @@ fun RealWorld4_FancyWidget_068(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_140(
-                            model = model.f6,
-                            s2 = "HelloWorld"
-                        ) {
-                            RealWorld4_FancyWidget_061(
-                                s2 = "HelloWorld",
-                                model = model.f6.f11.f7.f4.f5
-                            )
-                        }
+                Column {
+                    RealWorld4_FancyWidget_140(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f6,
+                        s2 = "HelloWorld"
+                    ) {
+                        RealWorld4_FancyWidget_061(
+                            s2 = "HelloWorld",
+                            model = model.f6.f11.f7.f4.f5
+                        )
                     }
-                    flexible(flex = 1f, children = children)
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_140(
-                            model = model.f6,
-                            s2 = "HelloWorld"
-                        ) {
-                            RealWorld4_FancyWidget_061(
-                                s2 = "HelloWorld",
-                                model = model.f6.f11.f7.f4.f5
-                            )
-                        }
+                Row {
+                    RealWorld4_FancyWidget_140(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f6,
+                        s2 = "HelloWorld"
+                    ) {
+                        RealWorld4_FancyWidget_061(
+                            s2 = "HelloWorld",
+                            model = model.f6.f11.f7.f4.f5
+                        )
                     }
-                    flexible(flex = 1f, children = children)
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -4073,6 +4133,7 @@ fun RealWorld4_FancyWidget_068(
 
 @Composable
 fun RealWorld4_FancyWidget_069(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_06,
     s2: String,
     s1: String,
@@ -4100,7 +4161,7 @@ fun RealWorld4_FancyWidget_069(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -4108,24 +4169,32 @@ fun RealWorld4_FancyWidget_069(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_092(
+                Column {
+                    RealWorld4_FancyWidget_092(
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f10
+                    ) {
+                        RealWorld4_FancyWidget_093(
                             s1 = "HelloWorld",
-                            model = model.f10
-                        ) { RealWorld4_FancyWidget_093(s1 = "HelloWorld", model = model.f10.f7); }
+                            model = model.f10.f7
+                        )
                     }
-                    flexible(flex = 1f, children = children)
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_092(
+                Row {
+                    RealWorld4_FancyWidget_092(
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f10
+                    ) {
+                        RealWorld4_FancyWidget_093(
                             s1 = "HelloWorld",
-                            model = model.f10
-                        ) { RealWorld4_FancyWidget_093(s1 = "HelloWorld", model = model.f10.f7); }
+                            model = model.f10.f7
+                        )
                     }
-                    flexible(flex = 1f, children = children)
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -4134,6 +4203,7 @@ fun RealWorld4_FancyWidget_069(
 
 @Composable
 fun RealWorld4_FancyWidget_070(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_07,
     s1: String,
     number: Int,
@@ -4160,7 +4230,7 @@ fun RealWorld4_FancyWidget_070(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -4168,38 +4238,36 @@ fun RealWorld4_FancyWidget_070(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_029(
-                            b = true,
-                            model = model.f5,
-                            s2 = "HelloWorld",
-                            children = children
-                        )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_148(
-                            model = model.f7,
-                            s1 = "HelloWorld"
-                        )
-                    }
+                Column {
+                    RealWorld4_FancyWidget_029(
+                        b = true,
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        s2 = "HelloWorld",
+                        children = children
+                    )
+
+                    RealWorld4_FancyWidget_148(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f7,
+                        s1 = "HelloWorld"
+                    )
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_029(
-                            b = true,
-                            model = model.f5,
-                            s2 = "HelloWorld",
-                            children = children
-                        )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_148(
-                            model = model.f7,
-                            s1 = "HelloWorld"
-                        )
-                    }
+                Row {
+                    RealWorld4_FancyWidget_029(
+                        b = true,
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        s2 = "HelloWorld",
+                        children = children
+                    )
+
+                    RealWorld4_FancyWidget_148(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f7,
+                        s1 = "HelloWorld"
+                    )
                 }
             }
         }
@@ -4209,6 +4277,7 @@ fun RealWorld4_FancyWidget_070(
 @Composable
 fun RealWorld4_FancyWidget_071(
     color: Color,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_08,
     obj: RealWorld4_UnmemoizablePojo_0,
     children: @Composable() () -> Unit
@@ -4237,7 +4306,7 @@ fun RealWorld4_FancyWidget_071(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -4245,35 +4314,43 @@ fun RealWorld4_FancyWidget_071(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_073(
-                            s1 = "HelloWorld",
-                            model = model.f0,
-                            children = children
-                        )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_072(
+                Column {
+                    RealWorld4_FancyWidget_073(
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0,
+                        children = children
+                    )
+
+                    RealWorld4_FancyWidget_072(
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f4
+                    ) {
+                        RealWorld4_FancyWidget_060(
                             s2 = "HelloWorld",
-                            model = model.f4
-                        ) { RealWorld4_FancyWidget_060(s2 = "HelloWorld", model = model.f4.f5); }
+                            model = model.f4.f5
+                        )
                     }
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_073(
-                            s1 = "HelloWorld",
-                            model = model.f0,
-                            children = children
-                        )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_072(
+                Row {
+                    RealWorld4_FancyWidget_073(
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0,
+                        children = children
+                    )
+
+                    RealWorld4_FancyWidget_072(
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f4
+                    ) {
+                        RealWorld4_FancyWidget_060(
                             s2 = "HelloWorld",
-                            model = model.f4
-                        ) { RealWorld4_FancyWidget_060(s2 = "HelloWorld", model = model.f4.f5); }
+                            model = model.f4.f5
+                        )
                     }
                 }
             }
@@ -4284,6 +4361,7 @@ fun RealWorld4_FancyWidget_071(
 @Composable
 fun RealWorld4_FancyWidget_072(
     s2: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     children: @Composable() () -> Unit
 ) {
@@ -4302,7 +4380,7 @@ fun RealWorld4_FancyWidget_072(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -4310,24 +4388,22 @@ fun RealWorld4_FancyWidget_072(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_118(
-                            model = model.f2,
-                            color = Color(red = 0xFF, blue = 0x99, green = 0x11)
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    RealWorld4_FancyWidget_118(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        color = Color(red = 0xFF, blue = 0x99, green = 0x11)
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_118(
-                            model = model.f2,
-                            color = Color(red = 0xFF, blue = 0x99, green = 0x11)
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    RealWorld4_FancyWidget_118(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        color = Color(red = 0xFF, blue = 0x99, green = 0x11)
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -4337,6 +4413,7 @@ fun RealWorld4_FancyWidget_072(
 @Composable
 fun RealWorld4_FancyWidget_073(
     s1: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     children: @Composable() () -> Unit
 ) {
@@ -4355,7 +4432,7 @@ fun RealWorld4_FancyWidget_073(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -4363,24 +4440,22 @@ fun RealWorld4_FancyWidget_073(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_074(
-                            model = model.f2,
-                            s2 = "HelloWorld"
-                        )
-                    }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    RealWorld4_FancyWidget_074(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        s2 = "HelloWorld"
+                    )
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_074(
-                            model = model.f2,
-                            s2 = "HelloWorld"
-                        )
-                    }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    RealWorld4_FancyWidget_074(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        s2 = "HelloWorld"
+                    )
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -4388,7 +4463,11 @@ fun RealWorld4_FancyWidget_073(
 }
 
 @Composable
-fun RealWorld4_FancyWidget_074(model: RealWorld4_DataModel_10, s2: String) {
+fun RealWorld4_FancyWidget_074(
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_10,
+    s2: String
+) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -4404,7 +4483,7 @@ fun RealWorld4_FancyWidget_074(model: RealWorld4_DataModel_10, s2: String) {
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -4412,14 +4491,12 @@ fun RealWorld4_FancyWidget_074(model: RealWorld4_DataModel_10, s2: String) {
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
                 }
             }
         }
@@ -4429,6 +4506,7 @@ fun RealWorld4_FancyWidget_074(model: RealWorld4_DataModel_10, s2: String) {
 @Composable
 fun RealWorld4_FancyWidget_075(
     s1: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_06,
     children: @Composable() () -> Unit
 ) {
@@ -4449,7 +4527,7 @@ fun RealWorld4_FancyWidget_075(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -4457,28 +4535,26 @@ fun RealWorld4_FancyWidget_075(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_022(
-                            model = model.f10,
-                            s1 = "HelloWorld",
-                            number = 90,
-                            s2 = "HelloWorld"
-                        ) { RealWorld4_FancyWidget_078(model = model.f10.f5.f0, b = false); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    RealWorld4_FancyWidget_022(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f10,
+                        s1 = "HelloWorld",
+                        number = 90,
+                        s2 = "HelloWorld"
+                    ) { RealWorld4_FancyWidget_078(model = model.f10.f5.f0, b = false) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_022(
-                            model = model.f10,
-                            s1 = "HelloWorld",
-                            number = 430,
-                            s2 = "HelloWorld"
-                        ) { RealWorld4_FancyWidget_078(model = model.f10.f5.f0, b = true); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    RealWorld4_FancyWidget_022(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f10,
+                        s1 = "HelloWorld",
+                        number = 430,
+                        s2 = "HelloWorld"
+                    ) { RealWorld4_FancyWidget_078(model = model.f10.f5.f0, b = true) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -4486,7 +4562,11 @@ fun RealWorld4_FancyWidget_075(
 }
 
 @Composable
-fun RealWorld4_FancyWidget_076(model: RealWorld4_DataModel_07, s2: String) {
+fun RealWorld4_FancyWidget_076(
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_07,
+    s2: String
+) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 +
             model.f6
     val tmp1 = model::class.memberProperties.map { property ->
@@ -4503,7 +4583,7 @@ fun RealWorld4_FancyWidget_076(model: RealWorld4_DataModel_07, s2: String) {
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -4511,75 +4591,75 @@ fun RealWorld4_FancyWidget_076(model: RealWorld4_DataModel_07, s2: String) {
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_077(
-                            s2 = "HelloWorld",
-                            s1 = "HelloWorld",
-                            model = model.f5
-                        ) {
-                            RealWorld4_FancyWidget_033(
-                                model = model.f5.f0,
-                                s1 = "HelloWorld"
-                            ) {
-                                RealWorld4_FancyWidget_020(
-                                    color = Color(
-                                        red = 0xFF,
-                                        blue = 0x99,
-                                        green = 0x11
-                                    ), s1 = "HelloWorld", b = false, model = model.f5.f0.f5
-                                ) { ColoredRect(model.toColor()); }
-                            }
-                        }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_100(
-                            model = model.f7,
-                            s2 = "HelloWorld",
+                Column {
+                    RealWorld4_FancyWidget_077(
+                        s2 = "HelloWorld",
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5
+                    ) {
+                        RealWorld4_FancyWidget_033(
+                            model = model.f5.f0,
                             s1 = "HelloWorld"
                         ) {
-                            RealWorld4_FancyWidget_017(
-                                s1 = "HelloWorld",
-                                model = model.f7.f4.f5,
-                                number = 378
-                            )
+                            RealWorld4_FancyWidget_020(
+                                color = Color(
+                                    red = 0xFF,
+                                    blue = 0x99,
+                                    green = 0x11
+                                ), s1 = "HelloWorld", b = false,
+                                model = model.f5.f0.f5
+                            ) { ColoredRect(model.toColor()) }
                         }
+                    }
+
+                    RealWorld4_FancyWidget_100(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f7,
+                        s2 = "HelloWorld",
+                        s1 = "HelloWorld"
+                    ) {
+                        RealWorld4_FancyWidget_017(
+                            s1 = "HelloWorld",
+                            model = model.f7.f4.f5,
+                            number = 378
+                        )
                     }
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_077(
-                            s2 = "HelloWorld",
-                            s1 = "HelloWorld",
-                            model = model.f5
-                        ) {
-                            RealWorld4_FancyWidget_033(
-                                model = model.f5.f0,
-                                s1 = "HelloWorld"
-                            ) {
-                                RealWorld4_FancyWidget_020(
-                                    color = Color(
-                                        red = 0xFF,
-                                        blue = 0x99,
-                                        green = 0x11
-                                    ), s1 = "HelloWorld", b = true, model = model.f5.f0.f5
-                                ) { ColoredRect(model.toColor()); }
-                            }
-                        }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_100(
-                            model = model.f7,
-                            s2 = "HelloWorld",
+                Row {
+                    RealWorld4_FancyWidget_077(
+                        s2 = "HelloWorld",
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5
+                    ) {
+                        RealWorld4_FancyWidget_033(
+                            model = model.f5.f0,
                             s1 = "HelloWorld"
                         ) {
-                            RealWorld4_FancyWidget_017(
-                                s1 = "HelloWorld",
-                                model = model.f7.f4.f5,
-                                number = 359
-                            )
+                            RealWorld4_FancyWidget_020(
+                                color = Color(
+                                    red = 0xFF,
+                                    blue = 0x99,
+                                    green = 0x11
+                                ), s1 = "HelloWorld", b = true,
+                                model = model.f5.f0.f5
+                            ) { ColoredRect(model.toColor()) }
                         }
+                    }
+
+                    RealWorld4_FancyWidget_100(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f7,
+                        s2 = "HelloWorld",
+                        s1 = "HelloWorld"
+                    ) {
+                        RealWorld4_FancyWidget_017(
+                            s1 = "HelloWorld",
+                            model = model.f7.f4.f5,
+                            number = 359
+                        )
                     }
                 }
             }
@@ -4591,6 +4671,7 @@ fun RealWorld4_FancyWidget_076(model: RealWorld4_DataModel_07, s2: String) {
 fun RealWorld4_FancyWidget_077(
     s2: String,
     s1: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_08,
     children: @Composable() () -> Unit
 ) {
@@ -4614,7 +4695,7 @@ fun RealWorld4_FancyWidget_077(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -4622,26 +4703,28 @@ fun RealWorld4_FancyWidget_077(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_058(model = model.f4) {
-                            RealWorld4_FancyWidget_120(
-                                model = model.f4.f5
-                            ) { ColoredRect(model.toColor()); }
+                Column {
+                    RealWorld4_FancyWidget_058(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f4
+                    ) {
+                        RealWorld4_FancyWidget_120(model = model.f4.f5) {
+                            ColoredRect(model.toColor())
                         }
                     }
-                    flexible(flex = 1f, children = children)
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_058(model = model.f4) {
-                            RealWorld4_FancyWidget_120(
-                                model = model.f4.f5
-                            ) { ColoredRect(model.toColor()); }
+                Row {
+                    RealWorld4_FancyWidget_058(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f4
+                    ) {
+                        RealWorld4_FancyWidget_120(model = model.f4.f5) {
+                            ColoredRect(model.toColor())
                         }
                     }
-                    flexible(flex = 1f, children = children)
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -4649,7 +4732,11 @@ fun RealWorld4_FancyWidget_077(
 }
 
 @Composable
-fun RealWorld4_FancyWidget_078(model: RealWorld4_DataModel_09, b: Boolean) {
+fun RealWorld4_FancyWidget_078(
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_09,
+    b: Boolean
+) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -4665,7 +4752,7 @@ fun RealWorld4_FancyWidget_078(model: RealWorld4_DataModel_09, b: Boolean) {
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -4673,34 +4760,32 @@ fun RealWorld4_FancyWidget_078(model: RealWorld4_DataModel_09, b: Boolean) {
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_126(
-                            s2 = "HelloWorld",
-                            model = model.f2
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_079(
-                            number = 801,
-                            model = model.f5
-                        ) { ColoredRect(model.toColor()); }
-                    }
+                Column {
+                    RealWorld4_FancyWidget_126(
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2
+                    ) { ColoredRect(model.toColor()) }
+
+                    RealWorld4_FancyWidget_079(
+                        number = 801,
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5
+                    ) { ColoredRect(model.toColor()) }
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_126(
-                            s2 = "HelloWorld",
-                            model = model.f2
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_079(
-                            number = 560,
-                            model = model.f5
-                        ) { ColoredRect(model.toColor()); }
-                    }
+                Row {
+                    RealWorld4_FancyWidget_126(
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2
+                    ) { ColoredRect(model.toColor()) }
+
+                    RealWorld4_FancyWidget_079(
+                        number = 560,
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5
+                    ) { ColoredRect(model.toColor()) }
                 }
             }
         }
@@ -4710,6 +4795,7 @@ fun RealWorld4_FancyWidget_078(model: RealWorld4_DataModel_09, b: Boolean) {
 @Composable
 fun RealWorld4_FancyWidget_079(
     number: Int,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -4728,7 +4814,7 @@ fun RealWorld4_FancyWidget_079(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -4736,14 +4822,14 @@ fun RealWorld4_FancyWidget_079(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -4752,6 +4838,7 @@ fun RealWorld4_FancyWidget_079(
 
 @Composable
 fun RealWorld4_FancyWidget_080(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_07,
     s1: String,
     children: @Composable() () -> Unit
@@ -4772,7 +4859,7 @@ fun RealWorld4_FancyWidget_080(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -4780,30 +4867,32 @@ fun RealWorld4_FancyWidget_080(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_112(model = model.f5) {
-                            RealWorld4_FancyWidget_065(
-                                number = 378,
-                                s1 = "HelloWorld",
-                                model = model.f5.f0.f2
-                            )
-                        }
+                Column {
+                    RealWorld4_FancyWidget_112(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5
+                    ) {
+                        RealWorld4_FancyWidget_065(
+                            number = 378,
+                            s1 = "HelloWorld",
+                            model = model.f5.f0.f2
+                        )
                     }
-                    flexible(flex = 1f, children = children)
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_112(model = model.f5) {
-                            RealWorld4_FancyWidget_065(
-                                number = 338,
-                                s1 = "HelloWorld",
-                                model = model.f5.f0.f2
-                            )
-                        }
+                Row {
+                    RealWorld4_FancyWidget_112(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5
+                    ) {
+                        RealWorld4_FancyWidget_065(
+                            number = 338,
+                            s1 = "HelloWorld",
+                            model = model.f5.f0.f2
+                        )
                     }
-                    flexible(flex = 1f, children = children)
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -4815,6 +4904,7 @@ fun RealWorld4_FancyWidget_081(
     number: Int,
     b: Boolean,
     obj: RealWorld4_UnmemoizablePojo_7,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_08,
     s1: String,
     children: @Composable() () -> Unit
@@ -4854,7 +4944,7 @@ fun RealWorld4_FancyWidget_081(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -4862,48 +4952,46 @@ fun RealWorld4_FancyWidget_081(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_083(
-                            s1 = "HelloWorld",
-                            s2 = "HelloWorld",
-                            model = model.f0
-                        ) {
-                            RealWorld4_FancyWidget_052(
-                                model = model.f0.f5,
-                                s1 = "HelloWorld"
-                            ) { ColoredRect(model.toColor()); }
-                        }
+                Column {
+                    RealWorld4_FancyWidget_083(
+                        s1 = "HelloWorld",
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0
+                    ) {
+                        RealWorld4_FancyWidget_052(
+                            model = model.f0.f5,
+                            s1 = "HelloWorld"
+                        ) { ColoredRect(model.toColor()) }
                     }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_082(
-                            model = model.f4,
-                            s2 = "HelloWorld",
-                            children = children
-                        )
-                    }
+
+                    RealWorld4_FancyWidget_082(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f4,
+                        s2 = "HelloWorld",
+                        children = children
+                    )
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_083(
-                            s1 = "HelloWorld",
-                            s2 = "HelloWorld",
-                            model = model.f0
-                        ) {
-                            RealWorld4_FancyWidget_052(
-                                model = model.f0.f5,
-                                s1 = "HelloWorld"
-                            ) { ColoredRect(model.toColor()); }
-                        }
+                Row {
+                    RealWorld4_FancyWidget_083(
+                        s1 = "HelloWorld",
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0
+                    ) {
+                        RealWorld4_FancyWidget_052(
+                            model = model.f0.f5,
+                            s1 = "HelloWorld"
+                        ) { ColoredRect(model.toColor()) }
                     }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_082(
-                            model = model.f4,
-                            s2 = "HelloWorld",
-                            children = children
-                        )
-                    }
+
+                    RealWorld4_FancyWidget_082(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f4,
+                        s2 = "HelloWorld",
+                        children = children
+                    )
                 }
             }
         }
@@ -4912,6 +5000,7 @@ fun RealWorld4_FancyWidget_081(
 
 @Composable
 fun RealWorld4_FancyWidget_082(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     s2: String,
     children: @Composable() () -> Unit
@@ -4931,7 +5020,7 @@ fun RealWorld4_FancyWidget_082(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -4939,26 +5028,28 @@ fun RealWorld4_FancyWidget_082(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_084(model = model.f2) {
-                            ColoredRect(
-                                model.toColor()
-                            )
-                        }
+                Column {
+                    RealWorld4_FancyWidget_084(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2
+                    ) {
+                        ColoredRect(
+                            model.toColor()
+                        )
                     }
-                    flexible(flex = 1f, children = children)
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_084(model = model.f2) {
-                            ColoredRect(
-                                model.toColor()
-                            )
-                        }
+                Row {
+                    RealWorld4_FancyWidget_084(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2
+                    ) {
+                        ColoredRect(
+                            model.toColor()
+                        )
                     }
-                    flexible(flex = 1f, children = children)
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -4969,6 +5060,7 @@ fun RealWorld4_FancyWidget_082(
 fun RealWorld4_FancyWidget_083(
     s1: String,
     s2: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     children: @Composable() () -> Unit
 ) {
@@ -4992,7 +5084,7 @@ fun RealWorld4_FancyWidget_083(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -5000,26 +5092,24 @@ fun RealWorld4_FancyWidget_083(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_042(
-                            s2 = "HelloWorld",
-                            s1 = "HelloWorld",
-                            model = model.f2
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    RealWorld4_FancyWidget_042(
+                        s2 = "HelloWorld",
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_042(
-                            s2 = "HelloWorld",
-                            s1 = "HelloWorld",
-                            model = model.f2
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    RealWorld4_FancyWidget_042(
+                        s2 = "HelloWorld",
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -5027,7 +5117,11 @@ fun RealWorld4_FancyWidget_083(
 }
 
 @Composable
-fun RealWorld4_FancyWidget_084(model: RealWorld4_DataModel_10, children: @Composable() () -> Unit) {
+fun RealWorld4_FancyWidget_084(
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_10,
+    children: @Composable() () -> Unit
+) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -5038,7 +5132,7 @@ fun RealWorld4_FancyWidget_084(model: RealWorld4_DataModel_10, children: @Compos
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -5046,14 +5140,14 @@ fun RealWorld4_FancyWidget_084(model: RealWorld4_DataModel_10, children: @Compos
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -5061,7 +5155,11 @@ fun RealWorld4_FancyWidget_084(model: RealWorld4_DataModel_10, children: @Compos
 }
 
 @Composable
-fun RealWorld4_FancyWidget_085(model: RealWorld4_DataModel_08, children: @Composable() () -> Unit) {
+fun RealWorld4_FancyWidget_085(
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_08,
+    children: @Composable() () -> Unit
+) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -5072,7 +5170,7 @@ fun RealWorld4_FancyWidget_085(model: RealWorld4_DataModel_08, children: @Compos
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -5080,36 +5178,34 @@ fun RealWorld4_FancyWidget_085(model: RealWorld4_DataModel_08, children: @Compos
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_088(
-                            s2 = "HelloWorld",
-                            model = model.f0
-                        ) {
-                            RealWorld4_FancyWidget_090(
-                                model = model.f0.f5,
-                                s1 = "HelloWorld",
-                                s2 = "HelloWorld"
-                            )
-                        }
+                Column {
+                    RealWorld4_FancyWidget_088(
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0
+                    ) {
+                        RealWorld4_FancyWidget_090(
+                            model = model.f0.f5,
+                            s1 = "HelloWorld",
+                            s2 = "HelloWorld"
+                        )
                     }
-                    flexible(flex = 1f, children = children)
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_088(
-                            s2 = "HelloWorld",
-                            model = model.f0
-                        ) {
-                            RealWorld4_FancyWidget_090(
-                                model = model.f0.f5,
-                                s1 = "HelloWorld",
-                                s2 = "HelloWorld"
-                            )
-                        }
+                Row {
+                    RealWorld4_FancyWidget_088(
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0
+                    ) {
+                        RealWorld4_FancyWidget_090(
+                            model = model.f0.f5,
+                            s1 = "HelloWorld",
+                            s2 = "HelloWorld"
+                        )
                     }
-                    flexible(flex = 1f, children = children)
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -5117,7 +5213,11 @@ fun RealWorld4_FancyWidget_085(model: RealWorld4_DataModel_08, children: @Compos
 }
 
 @Composable
-fun RealWorld4_FancyWidget_086(s1: String, model: RealWorld4_DataModel_09) {
+fun RealWorld4_FancyWidget_086(
+    s1: String,
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_09
+) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -5133,7 +5233,7 @@ fun RealWorld4_FancyWidget_086(s1: String, model: RealWorld4_DataModel_09) {
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -5141,34 +5241,32 @@ fun RealWorld4_FancyWidget_086(s1: String, model: RealWorld4_DataModel_09) {
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_111(
-                            model = model.f2,
-                            obj = RealWorld4_UnmemoizablePojo_10()
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_032(
-                            obj = RealWorld4_UnmemoizablePojo_5(),
-                            model = model.f5
-                        ) { ColoredRect(model.toColor()); }
-                    }
+                Column {
+                    RealWorld4_FancyWidget_111(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        obj = RealWorld4_UnmemoizablePojo_10()
+                    ) { ColoredRect(model.toColor()) }
+
+                    RealWorld4_FancyWidget_032(
+                        obj = RealWorld4_UnmemoizablePojo_5(),
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5
+                    ) { ColoredRect(model.toColor()) }
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_111(
-                            model = model.f2,
-                            obj = RealWorld4_UnmemoizablePojo_10()
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_032(
-                            obj = RealWorld4_UnmemoizablePojo_5(),
-                            model = model.f5
-                        ) { ColoredRect(model.toColor()); }
-                    }
+                Row {
+                    RealWorld4_FancyWidget_111(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        obj = RealWorld4_UnmemoizablePojo_10()
+                    ) { ColoredRect(model.toColor()) }
+
+                    RealWorld4_FancyWidget_032(
+                        obj = RealWorld4_UnmemoizablePojo_5(),
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5
+                    ) { ColoredRect(model.toColor()) }
                 }
             }
         }
@@ -5176,7 +5274,11 @@ fun RealWorld4_FancyWidget_086(s1: String, model: RealWorld4_DataModel_09) {
 }
 
 @Composable
-fun RealWorld4_FancyWidget_087(model: RealWorld4_DataModel_10, color: Color) {
+fun RealWorld4_FancyWidget_087(
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_10,
+    color: Color
+) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -5192,7 +5294,7 @@ fun RealWorld4_FancyWidget_087(model: RealWorld4_DataModel_10, color: Color) {
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -5200,14 +5302,12 @@ fun RealWorld4_FancyWidget_087(model: RealWorld4_DataModel_10, color: Color) {
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
                 }
             }
         }
@@ -5217,6 +5317,7 @@ fun RealWorld4_FancyWidget_087(model: RealWorld4_DataModel_10, color: Color) {
 @Composable
 fun RealWorld4_FancyWidget_088(
     s2: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     children: @Composable() () -> Unit
 ) {
@@ -5235,7 +5336,7 @@ fun RealWorld4_FancyWidget_088(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -5243,24 +5344,22 @@ fun RealWorld4_FancyWidget_088(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_011(
-                            model = model.f2,
-                            number = 151
-                        )
-                    }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    RealWorld4_FancyWidget_011(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        number = 151
+                    )
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_011(
-                            model = model.f2,
-                            number = 619
-                        )
-                    }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    RealWorld4_FancyWidget_011(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        number = 619
+                    )
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -5269,6 +5368,7 @@ fun RealWorld4_FancyWidget_088(
 
 @Composable
 fun RealWorld4_FancyWidget_089(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     s2: String,
     children: @Composable() () -> Unit
@@ -5288,7 +5388,7 @@ fun RealWorld4_FancyWidget_089(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -5296,14 +5396,14 @@ fun RealWorld4_FancyWidget_089(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -5311,7 +5411,12 @@ fun RealWorld4_FancyWidget_089(
 }
 
 @Composable
-fun RealWorld4_FancyWidget_090(model: RealWorld4_DataModel_10, s1: String, s2: String) {
+fun RealWorld4_FancyWidget_090(
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_10,
+    s1: String,
+    s2: String
+) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -5332,7 +5437,7 @@ fun RealWorld4_FancyWidget_090(model: RealWorld4_DataModel_10, s1: String, s2: S
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -5340,14 +5445,12 @@ fun RealWorld4_FancyWidget_090(model: RealWorld4_DataModel_10, s1: String, s2: S
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
                 }
             }
         }
@@ -5356,6 +5459,7 @@ fun RealWorld4_FancyWidget_090(model: RealWorld4_DataModel_10, s1: String, s2: S
 
 @Composable
 fun RealWorld4_FancyWidget_091(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     s1: String,
     children: @Composable() () -> Unit
@@ -5375,7 +5479,7 @@ fun RealWorld4_FancyWidget_091(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -5383,14 +5487,14 @@ fun RealWorld4_FancyWidget_091(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -5400,6 +5504,7 @@ fun RealWorld4_FancyWidget_091(
 @Composable
 fun RealWorld4_FancyWidget_092(
     s1: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_07,
     children: @Composable() () -> Unit
 ) {
@@ -5419,7 +5524,7 @@ fun RealWorld4_FancyWidget_092(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -5427,36 +5532,34 @@ fun RealWorld4_FancyWidget_092(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_044(
-                            s1 = "HelloWorld",
-                            model = model.f5,
-                            obj = RealWorld4_UnmemoizablePojo_3(),
-                            number = 804
-                        ) {
-                            RealWorld4_FancyWidget_099(model = model.f5.f4.f2) {
-                                ColoredRect(model.toColor())
-                            }
+                Column {
+                    RealWorld4_FancyWidget_044(
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        obj = RealWorld4_UnmemoizablePojo_3(),
+                        number = 804
+                    ) {
+                        RealWorld4_FancyWidget_099(model = model.f5.f4.f2) {
+                            ColoredRect(model.toColor())
                         }
                     }
-                    flexible(flex = 1f, children = children)
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_044(
-                            s1 = "HelloWorld",
-                            model = model.f5,
-                            obj = RealWorld4_UnmemoizablePojo_3(),
-                            number = 533
-                        ) {
-                            RealWorld4_FancyWidget_099(model = model.f5.f4.f2) {
-                                ColoredRect(model.toColor())
-                            }
+                Row {
+                    RealWorld4_FancyWidget_044(
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        obj = RealWorld4_UnmemoizablePojo_3(),
+                        number = 533
+                    ) {
+                        RealWorld4_FancyWidget_099(model = model.f5.f4.f2) {
+                            ColoredRect(model.toColor())
                         }
                     }
-                    flexible(flex = 1f, children = children)
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -5464,7 +5567,11 @@ fun RealWorld4_FancyWidget_092(
 }
 
 @Composable
-fun RealWorld4_FancyWidget_093(s1: String, model: RealWorld4_DataModel_08) {
+fun RealWorld4_FancyWidget_093(
+    s1: String,
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_08
+) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -5480,7 +5587,7 @@ fun RealWorld4_FancyWidget_093(s1: String, model: RealWorld4_DataModel_08) {
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -5488,44 +5595,42 @@ fun RealWorld4_FancyWidget_093(s1: String, model: RealWorld4_DataModel_08) {
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_096(
-                            s2 = "HelloWorld",
-                            model = model.f0,
-                            s1 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_024(
-                            s1 = "HelloWorld",
-                            model = model.f4,
-                            s2 = "HelloWorld"
-                        ) {
-                            RealWorld4_FancyWidget_095(model = model.f4.f2) {
-                                ColoredRect(model.toColor())
-                            }
+                Column {
+                    RealWorld4_FancyWidget_096(
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0,
+                        s1 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
+
+                    RealWorld4_FancyWidget_024(
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f4,
+                        s2 = "HelloWorld"
+                    ) {
+                        RealWorld4_FancyWidget_095(model = model.f4.f2) {
+                            ColoredRect(model.toColor())
                         }
                     }
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_096(
-                            s2 = "HelloWorld",
-                            model = model.f0,
-                            s1 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_024(
-                            s1 = "HelloWorld",
-                            model = model.f4,
-                            s2 = "HelloWorld"
-                        ) {
-                            RealWorld4_FancyWidget_095(model = model.f4.f2) {
-                                ColoredRect(model.toColor())
-                            }
+                Row {
+                    RealWorld4_FancyWidget_096(
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0,
+                        s1 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
+
+                    RealWorld4_FancyWidget_024(
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f4,
+                        s2 = "HelloWorld"
+                    ) {
+                        RealWorld4_FancyWidget_095(model = model.f4.f2) {
+                            ColoredRect(model.toColor())
                         }
                     }
                 }
@@ -5536,6 +5641,7 @@ fun RealWorld4_FancyWidget_093(s1: String, model: RealWorld4_DataModel_08) {
 
 @Composable
 fun RealWorld4_FancyWidget_094(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     obj: RealWorld4_UnmemoizablePojo_9,
     children: @Composable() () -> Unit
@@ -5559,7 +5665,7 @@ fun RealWorld4_FancyWidget_094(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -5567,38 +5673,34 @@ fun RealWorld4_FancyWidget_094(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_014(
-                            s1 = "HelloWorld",
-                            model = model.f2,
-                            children = children
-                        )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_104(
-                            model = model.f5,
-                            s1 = "HelloWorld",
-                            s2 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
+                Column {
+                    RealWorld4_FancyWidget_014(
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        children = children
+                    )
+                    RealWorld4_FancyWidget_104(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        s1 = "HelloWorld",
+                        s2 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_014(
-                            s1 = "HelloWorld",
-                            model = model.f2,
-                            children = children
-                        )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_104(
-                            model = model.f5,
-                            s1 = "HelloWorld",
-                            s2 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
+                Row {
+                    RealWorld4_FancyWidget_014(
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        children = children
+                    )
+                    RealWorld4_FancyWidget_104(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        s1 = "HelloWorld",
+                        s2 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
                 }
             }
         }
@@ -5606,7 +5708,11 @@ fun RealWorld4_FancyWidget_094(
 }
 
 @Composable
-fun RealWorld4_FancyWidget_095(model: RealWorld4_DataModel_10, children: @Composable() () -> Unit) {
+fun RealWorld4_FancyWidget_095(
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_10,
+    children: @Composable() () -> Unit
+) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -5617,7 +5723,7 @@ fun RealWorld4_FancyWidget_095(model: RealWorld4_DataModel_10, children: @Compos
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -5625,14 +5731,14 @@ fun RealWorld4_FancyWidget_095(model: RealWorld4_DataModel_10, children: @Compos
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -5642,6 +5748,7 @@ fun RealWorld4_FancyWidget_095(model: RealWorld4_DataModel_10, children: @Compos
 @Composable
 fun RealWorld4_FancyWidget_096(
     s2: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     s1: String,
     children: @Composable() () -> Unit
@@ -5666,7 +5773,7 @@ fun RealWorld4_FancyWidget_096(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -5674,28 +5781,30 @@ fun RealWorld4_FancyWidget_096(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_109(model = model.f2, children = children)
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_108(
-                            model = model.f5,
-                            s1 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
+                Column {
+                    RealWorld4_FancyWidget_109(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2, children = children
+                    )
+
+                    RealWorld4_FancyWidget_108(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        s1 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_109(model = model.f2, children = children)
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_108(
-                            model = model.f5,
-                            s1 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
+                Row {
+                    RealWorld4_FancyWidget_109(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2, children = children
+                    )
+
+                    RealWorld4_FancyWidget_108(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        s1 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
                 }
             }
         }
@@ -5705,6 +5814,7 @@ fun RealWorld4_FancyWidget_096(
 @Composable
 fun RealWorld4_FancyWidget_097(
     s2: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_08,
     s1: String,
     children: @Composable() () -> Unit
@@ -5729,7 +5839,7 @@ fun RealWorld4_FancyWidget_097(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -5737,38 +5847,36 @@ fun RealWorld4_FancyWidget_097(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_062(
-                            model = model.f0,
-                            s2 = "HelloWorld",
-                            children = children
-                        )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_098(
-                            s1 = "HelloWorld",
-                            model = model.f4,
-                            s2 = "HelloWorld"
-                        )
-                    }
+                Column {
+                    RealWorld4_FancyWidget_062(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0,
+                        s2 = "HelloWorld",
+                        children = children
+                    )
+
+                    RealWorld4_FancyWidget_098(
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f4,
+                        s2 = "HelloWorld"
+                    )
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_062(
-                            model = model.f0,
-                            s2 = "HelloWorld",
-                            children = children
-                        )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_098(
-                            s1 = "HelloWorld",
-                            model = model.f4,
-                            s2 = "HelloWorld"
-                        )
-                    }
+                Row {
+                    RealWorld4_FancyWidget_062(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0,
+                        s2 = "HelloWorld",
+                        children = children
+                    )
+
+                    RealWorld4_FancyWidget_098(
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f4,
+                        s2 = "HelloWorld"
+                    )
                 }
             }
         }
@@ -5776,7 +5884,12 @@ fun RealWorld4_FancyWidget_097(
 }
 
 @Composable
-fun RealWorld4_FancyWidget_098(s1: String, model: RealWorld4_DataModel_09, s2: String) {
+fun RealWorld4_FancyWidget_098(
+    s1: String,
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_09,
+    s2: String
+) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -5797,7 +5910,7 @@ fun RealWorld4_FancyWidget_098(s1: String, model: RealWorld4_DataModel_09, s2: S
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -5805,36 +5918,34 @@ fun RealWorld4_FancyWidget_098(s1: String, model: RealWorld4_DataModel_09, s2: S
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_036(
-                            s1 = "HelloWorld",
-                            model = model.f2
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_059(
-                            s2 = "HelloWorld",
-                            model = model.f5,
-                            number = 553
-                        ) { ColoredRect(model.toColor()); }
-                    }
+                Column {
+                    RealWorld4_FancyWidget_036(
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2
+                    ) { ColoredRect(model.toColor()) }
+
+                    RealWorld4_FancyWidget_059(
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        number = 553
+                    ) { ColoredRect(model.toColor()) }
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_036(
-                            s1 = "HelloWorld",
-                            model = model.f2
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_059(
-                            s2 = "HelloWorld",
-                            model = model.f5,
-                            number = 769
-                        ) { ColoredRect(model.toColor()); }
-                    }
+                Row {
+                    RealWorld4_FancyWidget_036(
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2
+                    ) { ColoredRect(model.toColor()) }
+
+                    RealWorld4_FancyWidget_059(
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        number = 769
+                    ) { ColoredRect(model.toColor()) }
                 }
             }
         }
@@ -5842,7 +5953,11 @@ fun RealWorld4_FancyWidget_098(s1: String, model: RealWorld4_DataModel_09, s2: S
 }
 
 @Composable
-fun RealWorld4_FancyWidget_099(model: RealWorld4_DataModel_10, children: @Composable() () -> Unit) {
+fun RealWorld4_FancyWidget_099(
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_10,
+    children: @Composable() () -> Unit
+) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -5853,7 +5968,7 @@ fun RealWorld4_FancyWidget_099(model: RealWorld4_DataModel_10, children: @Compos
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -5861,14 +5976,14 @@ fun RealWorld4_FancyWidget_099(model: RealWorld4_DataModel_10, children: @Compos
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -5877,6 +5992,7 @@ fun RealWorld4_FancyWidget_099(model: RealWorld4_DataModel_10, children: @Compos
 
 @Composable
 fun RealWorld4_FancyWidget_100(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_08,
     s2: String,
     s1: String,
@@ -5902,7 +6018,7 @@ fun RealWorld4_FancyWidget_100(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -5910,36 +6026,34 @@ fun RealWorld4_FancyWidget_100(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_049(
-                            s2 = "HelloWorld",
-                            model = model.f0
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_046(
-                            s2 = "HelloWorld",
-                            model = model.f4,
-                            children = children
-                        )
-                    }
+                Column {
+                    RealWorld4_FancyWidget_049(
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0
+                    ) { ColoredRect(model.toColor()) }
+
+                    RealWorld4_FancyWidget_046(
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f4,
+                        children = children
+                    )
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_049(
-                            s2 = "HelloWorld",
-                            model = model.f0
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_046(
-                            s2 = "HelloWorld",
-                            model = model.f4,
-                            children = children
-                        )
-                    }
+                Row {
+                    RealWorld4_FancyWidget_049(
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0
+                    ) { ColoredRect(model.toColor()) }
+
+                    RealWorld4_FancyWidget_046(
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f4,
+                        children = children
+                    )
                 }
             }
         }
@@ -5949,6 +6063,7 @@ fun RealWorld4_FancyWidget_100(
 @Composable
 fun RealWorld4_FancyWidget_101(
     number: Int,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     s1: String,
     children: @Composable() () -> Unit
@@ -5973,7 +6088,7 @@ fun RealWorld4_FancyWidget_101(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -5981,30 +6096,32 @@ fun RealWorld4_FancyWidget_101(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_047(model = model.f2, children = children)
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_102(
-                            model = model.f5,
-                            s1 = "HelloWorld",
-                            s2 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
+                Column {
+                    RealWorld4_FancyWidget_047(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2, children = children
+                    )
+
+                    RealWorld4_FancyWidget_102(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        s1 = "HelloWorld",
+                        s2 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_047(model = model.f2, children = children)
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_102(
-                            model = model.f5,
-                            s1 = "HelloWorld",
-                            s2 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
+                Row {
+                    RealWorld4_FancyWidget_047(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2, children = children
+                    )
+
+                    RealWorld4_FancyWidget_102(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        s1 = "HelloWorld",
+                        s2 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
                 }
             }
         }
@@ -6013,6 +6130,7 @@ fun RealWorld4_FancyWidget_101(
 
 @Composable
 fun RealWorld4_FancyWidget_102(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     s1: String,
     s2: String,
@@ -6038,7 +6156,7 @@ fun RealWorld4_FancyWidget_102(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -6046,14 +6164,14 @@ fun RealWorld4_FancyWidget_102(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -6061,7 +6179,11 @@ fun RealWorld4_FancyWidget_102(
 }
 
 @Composable
-fun RealWorld4_FancyWidget_103(model: RealWorld4_DataModel_10, s2: String) {
+fun RealWorld4_FancyWidget_103(
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_10,
+    s2: String
+) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -6077,7 +6199,7 @@ fun RealWorld4_FancyWidget_103(model: RealWorld4_DataModel_10, s2: String) {
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -6085,14 +6207,12 @@ fun RealWorld4_FancyWidget_103(model: RealWorld4_DataModel_10, s2: String) {
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
                 }
             }
         }
@@ -6101,6 +6221,7 @@ fun RealWorld4_FancyWidget_103(model: RealWorld4_DataModel_10, s2: String) {
 
 @Composable
 fun RealWorld4_FancyWidget_104(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     s1: String,
     s2: String,
@@ -6126,7 +6247,7 @@ fun RealWorld4_FancyWidget_104(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -6134,14 +6255,14 @@ fun RealWorld4_FancyWidget_104(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -6150,6 +6271,7 @@ fun RealWorld4_FancyWidget_104(
 
 @Composable
 fun RealWorld4_FancyWidget_105(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     number: Int,
     children: @Composable() () -> Unit
@@ -6169,7 +6291,7 @@ fun RealWorld4_FancyWidget_105(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -6177,39 +6299,40 @@ fun RealWorld4_FancyWidget_105(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_026(
-                            s2 = "HelloWorld",
-                            s1 = "HelloWorld",
-                            model = model.f2,
-                            children = children
+                Column {
+                    RealWorld4_FancyWidget_026(
+                        s2 = "HelloWorld",
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        children = children
+                    )
+                    RealWorld4_FancyWidget_106(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5
+                    ) {
+                        ColoredRect(
+                            model.toColor()
                         )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_106(model = model.f5) {
-                            ColoredRect(
-                                model.toColor()
-                            )
-                        }
                     }
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_026(
-                            s2 = "HelloWorld",
-                            s1 = "HelloWorld",
-                            model = model.f2,
-                            children = children
+                Row {
+                    RealWorld4_FancyWidget_026(
+                        s2 = "HelloWorld",
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        children = children
+                    )
+
+                    RealWorld4_FancyWidget_106(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5
+                    ) {
+                        ColoredRect(
+                            model.toColor()
                         )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_106(model = model.f5) {
-                            ColoredRect(
-                                model.toColor()
-                            )
-                        }
                     }
                 }
             }
@@ -6218,7 +6341,11 @@ fun RealWorld4_FancyWidget_105(
 }
 
 @Composable
-fun RealWorld4_FancyWidget_106(model: RealWorld4_DataModel_10, children: @Composable() () -> Unit) {
+fun RealWorld4_FancyWidget_106(
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_10,
+    children: @Composable() () -> Unit
+) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -6229,7 +6356,7 @@ fun RealWorld4_FancyWidget_106(model: RealWorld4_DataModel_10, children: @Compos
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -6237,14 +6364,14 @@ fun RealWorld4_FancyWidget_106(model: RealWorld4_DataModel_10, children: @Compos
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -6254,6 +6381,7 @@ fun RealWorld4_FancyWidget_106(model: RealWorld4_DataModel_10, children: @Compos
 @Composable
 fun RealWorld4_FancyWidget_107(
     s2: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     s1: String,
     children: @Composable() () -> Unit
@@ -6278,7 +6406,7 @@ fun RealWorld4_FancyWidget_107(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -6286,14 +6414,14 @@ fun RealWorld4_FancyWidget_107(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -6302,6 +6430,7 @@ fun RealWorld4_FancyWidget_107(
 
 @Composable
 fun RealWorld4_FancyWidget_108(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     s1: String,
     children: @Composable() () -> Unit
@@ -6321,7 +6450,7 @@ fun RealWorld4_FancyWidget_108(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -6329,14 +6458,14 @@ fun RealWorld4_FancyWidget_108(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -6344,7 +6473,11 @@ fun RealWorld4_FancyWidget_108(
 }
 
 @Composable
-fun RealWorld4_FancyWidget_109(model: RealWorld4_DataModel_10, children: @Composable() () -> Unit) {
+fun RealWorld4_FancyWidget_109(
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_10,
+    children: @Composable() () -> Unit
+) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -6355,7 +6488,7 @@ fun RealWorld4_FancyWidget_109(model: RealWorld4_DataModel_10, children: @Compos
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -6363,14 +6496,14 @@ fun RealWorld4_FancyWidget_109(model: RealWorld4_DataModel_10, children: @Compos
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -6382,6 +6515,7 @@ fun RealWorld4_FancyWidget_110(
     s2: String,
     s1: String,
     color: Color,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -6410,7 +6544,7 @@ fun RealWorld4_FancyWidget_110(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -6418,14 +6552,14 @@ fun RealWorld4_FancyWidget_110(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -6434,6 +6568,7 @@ fun RealWorld4_FancyWidget_110(
 
 @Composable
 fun RealWorld4_FancyWidget_111(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     obj: RealWorld4_UnmemoizablePojo_10,
     children: @Composable() () -> Unit
@@ -6457,7 +6592,7 @@ fun RealWorld4_FancyWidget_111(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -6465,14 +6600,14 @@ fun RealWorld4_FancyWidget_111(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -6480,7 +6615,11 @@ fun RealWorld4_FancyWidget_111(
 }
 
 @Composable
-fun RealWorld4_FancyWidget_112(model: RealWorld4_DataModel_08, children: @Composable() () -> Unit) {
+fun RealWorld4_FancyWidget_112(
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_08,
+    children: @Composable() () -> Unit
+) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -6491,7 +6630,7 @@ fun RealWorld4_FancyWidget_112(model: RealWorld4_DataModel_08, children: @Compos
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -6499,36 +6638,34 @@ fun RealWorld4_FancyWidget_112(model: RealWorld4_DataModel_08, children: @Compos
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_116(
-                            model = model.f0,
-                            number = 50,
-                            children = children
-                        )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_113(
-                            number = 181,
-                            model = model.f4
-                        ) { ColoredRect(model.toColor()); }
-                    }
+                Column {
+                    RealWorld4_FancyWidget_116(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0,
+                        number = 50,
+                        children = children
+                    )
+
+                    RealWorld4_FancyWidget_113(
+                        number = 181,
+                        modifier = LayoutFlexible(1f),
+                        model = model.f4
+                    ) { ColoredRect(model.toColor()) }
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_116(
-                            model = model.f0,
-                            number = 149,
-                            children = children
-                        )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_113(
-                            number = 766,
-                            model = model.f4
-                        ) { ColoredRect(model.toColor()); }
-                    }
+                Row {
+                    RealWorld4_FancyWidget_116(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0,
+                        number = 149,
+                        children = children
+                    )
+
+                    RealWorld4_FancyWidget_113(
+                        number = 766,
+                        modifier = LayoutFlexible(1f),
+                        model = model.f4
+                    ) { ColoredRect(model.toColor()) }
                 }
             }
         }
@@ -6538,6 +6675,7 @@ fun RealWorld4_FancyWidget_112(model: RealWorld4_DataModel_08, children: @Compos
 @Composable
 fun RealWorld4_FancyWidget_113(
     number: Int,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     children: @Composable() () -> Unit
 ) {
@@ -6556,7 +6694,7 @@ fun RealWorld4_FancyWidget_113(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -6564,42 +6702,40 @@ fun RealWorld4_FancyWidget_113(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_114(
-                            model = model.f2,
-                            s1 = "HelloWorld",
-                            color = Color(red = 0xFF, blue = 0x99, green = 0x11)
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_115(
-                            s2 = "HelloWorld",
-                            color = Color(red = 0xFF, blue = 0x99, green = 0x11),
-                            model = model.f5,
-                            s1 = "HelloWorld",
-                            children = children
-                        )
-                    }
+                Column {
+                    RealWorld4_FancyWidget_114(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        s1 = "HelloWorld",
+                        color = Color(red = 0xFF, blue = 0x99, green = 0x11)
+                    ) { ColoredRect(model.toColor()) }
+
+                    RealWorld4_FancyWidget_115(
+                        s2 = "HelloWorld",
+                        color = Color(red = 0xFF, blue = 0x99, green = 0x11),
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        s1 = "HelloWorld",
+                        children = children
+                    )
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_114(
-                            model = model.f2,
-                            s1 = "HelloWorld",
-                            color = Color(red = 0xFF, blue = 0x99, green = 0x11)
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_115(
-                            s2 = "HelloWorld",
-                            color = Color(red = 0xFF, blue = 0x99, green = 0x11),
-                            model = model.f5,
-                            s1 = "HelloWorld",
-                            children = children
-                        )
-                    }
+                Row {
+                    RealWorld4_FancyWidget_114(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        s1 = "HelloWorld",
+                        color = Color(red = 0xFF, blue = 0x99, green = 0x11)
+                    ) { ColoredRect(model.toColor()) }
+
+                    RealWorld4_FancyWidget_115(
+                        s2 = "HelloWorld",
+                        color = Color(red = 0xFF, blue = 0x99, green = 0x11),
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        s1 = "HelloWorld",
+                        children = children
+                    )
                 }
             }
         }
@@ -6608,6 +6744,7 @@ fun RealWorld4_FancyWidget_113(
 
 @Composable
 fun RealWorld4_FancyWidget_114(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     s1: String,
     color: Color,
@@ -6633,7 +6770,7 @@ fun RealWorld4_FancyWidget_114(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -6641,14 +6778,14 @@ fun RealWorld4_FancyWidget_114(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -6659,6 +6796,7 @@ fun RealWorld4_FancyWidget_114(
 fun RealWorld4_FancyWidget_115(
     s2: String,
     color: Color,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     s1: String,
     children: @Composable() () -> Unit
@@ -6688,7 +6826,7 @@ fun RealWorld4_FancyWidget_115(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -6696,14 +6834,14 @@ fun RealWorld4_FancyWidget_115(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -6712,6 +6850,7 @@ fun RealWorld4_FancyWidget_115(
 
 @Composable
 fun RealWorld4_FancyWidget_116(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     number: Int,
     children: @Composable() () -> Unit
@@ -6731,7 +6870,7 @@ fun RealWorld4_FancyWidget_116(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -6739,24 +6878,22 @@ fun RealWorld4_FancyWidget_116(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_117(
-                            model = model.f5,
-                            number = 355
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    RealWorld4_FancyWidget_117(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        number = 355
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_117(
-                            model = model.f5,
-                            number = 514
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    RealWorld4_FancyWidget_117(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        number = 514
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -6765,6 +6902,7 @@ fun RealWorld4_FancyWidget_116(
 
 @Composable
 fun RealWorld4_FancyWidget_117(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     number: Int,
     children: @Composable() () -> Unit
@@ -6784,7 +6922,7 @@ fun RealWorld4_FancyWidget_117(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -6792,14 +6930,14 @@ fun RealWorld4_FancyWidget_117(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -6808,6 +6946,7 @@ fun RealWorld4_FancyWidget_117(
 
 @Composable
 fun RealWorld4_FancyWidget_118(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     color: Color,
     children: @Composable() () -> Unit
@@ -6827,7 +6966,7 @@ fun RealWorld4_FancyWidget_118(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -6835,14 +6974,14 @@ fun RealWorld4_FancyWidget_118(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -6852,6 +6991,7 @@ fun RealWorld4_FancyWidget_118(
 @Composable
 fun RealWorld4_FancyWidget_119(
     s1: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     children: @Composable() () -> Unit
 ) {
@@ -6870,7 +7010,7 @@ fun RealWorld4_FancyWidget_119(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -6878,26 +7018,28 @@ fun RealWorld4_FancyWidget_119(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_130(model = model.f2) {
-                            ColoredRect(
-                                model.toColor()
-                            )
-                        }
+                Column {
+                    RealWorld4_FancyWidget_130(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2
+                    ) {
+                        ColoredRect(
+                            model.toColor()
+                        )
                     }
-                    flexible(flex = 1f, children = children)
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_130(model = model.f2) {
-                            ColoredRect(
-                                model.toColor()
-                            )
-                        }
+                Row {
+                    RealWorld4_FancyWidget_130(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2
+                    ) {
+                        ColoredRect(
+                            model.toColor()
+                        )
                     }
-                    flexible(flex = 1f, children = children)
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -6905,7 +7047,11 @@ fun RealWorld4_FancyWidget_119(
 }
 
 @Composable
-fun RealWorld4_FancyWidget_120(model: RealWorld4_DataModel_10, children: @Composable() () -> Unit) {
+fun RealWorld4_FancyWidget_120(
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_10,
+    children: @Composable() () -> Unit
+) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -6916,7 +7062,7 @@ fun RealWorld4_FancyWidget_120(model: RealWorld4_DataModel_10, children: @Compos
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -6924,14 +7070,14 @@ fun RealWorld4_FancyWidget_120(model: RealWorld4_DataModel_10, children: @Compos
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -6942,6 +7088,7 @@ fun RealWorld4_FancyWidget_120(model: RealWorld4_DataModel_10, children: @Compos
 fun RealWorld4_FancyWidget_121(
     s2: String,
     s1: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -6965,7 +7112,7 @@ fun RealWorld4_FancyWidget_121(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -6973,14 +7120,14 @@ fun RealWorld4_FancyWidget_121(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -6992,6 +7139,7 @@ fun RealWorld4_FancyWidget_122(
     number: Int,
     obj: RealWorld4_UnmemoizablePojo_12,
     b: Boolean,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -7024,7 +7172,7 @@ fun RealWorld4_FancyWidget_122(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -7032,14 +7180,14 @@ fun RealWorld4_FancyWidget_122(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -7050,6 +7198,7 @@ fun RealWorld4_FancyWidget_122(
 fun RealWorld4_FancyWidget_123(
     s2: String,
     s1: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -7073,7 +7222,7 @@ fun RealWorld4_FancyWidget_123(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -7081,14 +7230,14 @@ fun RealWorld4_FancyWidget_123(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -7098,6 +7247,7 @@ fun RealWorld4_FancyWidget_123(
 @Composable
 fun RealWorld4_FancyWidget_124(
     s2: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     b: Boolean,
     children: @Composable() () -> Unit
@@ -7122,7 +7272,7 @@ fun RealWorld4_FancyWidget_124(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -7130,24 +7280,22 @@ fun RealWorld4_FancyWidget_124(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_125(
-                            s2 = "HelloWorld",
-                            model = model.f2
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    RealWorld4_FancyWidget_125(
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_125(
-                            s2 = "HelloWorld",
-                            model = model.f2
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    RealWorld4_FancyWidget_125(
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -7157,6 +7305,7 @@ fun RealWorld4_FancyWidget_124(
 @Composable
 fun RealWorld4_FancyWidget_125(
     s2: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -7175,7 +7324,7 @@ fun RealWorld4_FancyWidget_125(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -7183,14 +7332,14 @@ fun RealWorld4_FancyWidget_125(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -7200,6 +7349,7 @@ fun RealWorld4_FancyWidget_125(
 @Composable
 fun RealWorld4_FancyWidget_126(
     s2: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -7218,7 +7368,7 @@ fun RealWorld4_FancyWidget_126(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -7226,14 +7376,14 @@ fun RealWorld4_FancyWidget_126(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -7241,7 +7391,11 @@ fun RealWorld4_FancyWidget_126(
 }
 
 @Composable
-fun RealWorld4_FancyWidget_127(model: RealWorld4_DataModel_10, children: @Composable() () -> Unit) {
+fun RealWorld4_FancyWidget_127(
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_10,
+    children: @Composable() () -> Unit
+) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -7252,7 +7406,7 @@ fun RealWorld4_FancyWidget_127(model: RealWorld4_DataModel_10, children: @Compos
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -7260,14 +7414,14 @@ fun RealWorld4_FancyWidget_127(model: RealWorld4_DataModel_10, children: @Compos
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -7276,6 +7430,7 @@ fun RealWorld4_FancyWidget_127(model: RealWorld4_DataModel_10, children: @Compos
 
 @Composable
 fun RealWorld4_FancyWidget_128(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     s2: String,
     s1: String,
@@ -7301,7 +7456,7 @@ fun RealWorld4_FancyWidget_128(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -7309,14 +7464,14 @@ fun RealWorld4_FancyWidget_128(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -7325,6 +7480,7 @@ fun RealWorld4_FancyWidget_128(
 
 @Composable
 fun RealWorld4_FancyWidget_129(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     s2: String,
     children: @Composable() () -> Unit
@@ -7344,7 +7500,7 @@ fun RealWorld4_FancyWidget_129(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -7352,14 +7508,14 @@ fun RealWorld4_FancyWidget_129(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -7367,7 +7523,11 @@ fun RealWorld4_FancyWidget_129(
 }
 
 @Composable
-fun RealWorld4_FancyWidget_130(model: RealWorld4_DataModel_10, children: @Composable() () -> Unit) {
+fun RealWorld4_FancyWidget_130(
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_10,
+    children: @Composable() () -> Unit
+) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -7378,7 +7538,7 @@ fun RealWorld4_FancyWidget_130(model: RealWorld4_DataModel_10, children: @Compos
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -7386,14 +7546,14 @@ fun RealWorld4_FancyWidget_130(model: RealWorld4_DataModel_10, children: @Compos
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -7404,6 +7564,7 @@ fun RealWorld4_FancyWidget_130(model: RealWorld4_DataModel_10, children: @Compos
 fun RealWorld4_FancyWidget_131(
     s1: String,
     s2: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_04,
     children: @Composable() () -> Unit
 ) {
@@ -7429,7 +7590,7 @@ fun RealWorld4_FancyWidget_131(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -7437,52 +7598,50 @@ fun RealWorld4_FancyWidget_131(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_132(
-                            s1 = "HelloWorld",
-                            model = model.f0
-                        ) {
-                            RealWorld4_FancyWidget_028(
-                                s2 = "HelloWorld",
-                                b = false,
-                                s1 = "HelloWorld",
-                                model = model.f0.f6.f11.f7.f4.f2
-                            )
-                        }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_068(
-                            model = model.f2,
-                            obj = RealWorld4_UnmemoizablePojo_2(),
+                Column {
+                    RealWorld4_FancyWidget_132(
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0
+                    ) {
+                        RealWorld4_FancyWidget_028(
                             s2 = "HelloWorld",
-                            children = children
+                            b = false,
+                            s1 = "HelloWorld",
+                            model = model.f0.f6.f11.f7.f4.f2
                         )
                     }
+
+                    RealWorld4_FancyWidget_068(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        obj = RealWorld4_UnmemoizablePojo_2(),
+                        s2 = "HelloWorld",
+                        children = children
+                    )
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_132(
-                            s1 = "HelloWorld",
-                            model = model.f0
-                        ) {
-                            RealWorld4_FancyWidget_028(
-                                s2 = "HelloWorld",
-                                b = false,
-                                s1 = "HelloWorld",
-                                model = model.f0.f6.f11.f7.f4.f2
-                            )
-                        }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_068(
-                            model = model.f2,
-                            obj = RealWorld4_UnmemoizablePojo_2(),
+                Row {
+                    RealWorld4_FancyWidget_132(
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0
+                    ) {
+                        RealWorld4_FancyWidget_028(
                             s2 = "HelloWorld",
-                            children = children
+                            b = false,
+                            s1 = "HelloWorld",
+                            model = model.f0.f6.f11.f7.f4.f2
                         )
                     }
+
+                    RealWorld4_FancyWidget_068(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        obj = RealWorld4_UnmemoizablePojo_2(),
+                        s2 = "HelloWorld",
+                        children = children
+                    )
                 }
             }
         }
@@ -7492,6 +7651,7 @@ fun RealWorld4_FancyWidget_131(
 @Composable
 fun RealWorld4_FancyWidget_132(
     s1: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_05,
     children: @Composable() () -> Unit
 ) {
@@ -7511,7 +7671,7 @@ fun RealWorld4_FancyWidget_132(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -7519,101 +7679,99 @@ fun RealWorld4_FancyWidget_132(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_006(
-                            model = model.f0,
+                Column {
+                    RealWorld4_FancyWidget_006(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0,
+                        s1 = "HelloWorld"
+                    ) {
+                        RealWorld4_FancyWidget_043(
+                            s2 = "HelloWorld",
+                            model = model.f0.f10,
+                            obj = RealWorld4_UnmemoizablePojo_13(),
                             s1 = "HelloWorld"
                         ) {
-                            RealWorld4_FancyWidget_043(
-                                s2 = "HelloWorld",
-                                model = model.f0.f10,
-                                obj = RealWorld4_UnmemoizablePojo_13(),
-                                s1 = "HelloWorld"
+                            RealWorld4_FancyWidget_023(
+                                model = model.f0.f10.f7,
+                                obj = RealWorld4_UnmemoizablePojo_14()
                             ) {
-                                RealWorld4_FancyWidget_023(
-                                    model = model.f0.f10.f7,
-                                    obj = RealWorld4_UnmemoizablePojo_14()
-                                ) {
-                                    RealWorld4_FancyWidget_025(
-                                        b = false,
-                                        model = model.f0.f10.f7.f0
-                                    ) { ColoredRect(model.toColor()); }
-                                }
+                                RealWorld4_FancyWidget_025(
+                                    b = false,
+                                    model = model.f0.f10.f7.f0
+                                ) { ColoredRect(model.toColor()) }
                             }
                         }
                     }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_075(
+
+                    RealWorld4_FancyWidget_075(
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f6
+                    ) {
+                        RealWorld4_FancyWidget_038(
                             s1 = "HelloWorld",
-                            model = model.f6
+                            model = model.f6.f11,
+                            obj = RealWorld4_UnmemoizablePojo_8(),
+                            s2 = "HelloWorld"
                         ) {
-                            RealWorld4_FancyWidget_038(
+                            RealWorld4_FancyWidget_008(
                                 s1 = "HelloWorld",
-                                model = model.f6.f11,
-                                obj = RealWorld4_UnmemoizablePojo_8(),
-                                s2 = "HelloWorld"
+                                model = model.f6.f11.f7
                             ) {
-                                RealWorld4_FancyWidget_008(
-                                    s1 = "HelloWorld",
-                                    model = model.f6.f11.f7
-                                ) {
-                                    RealWorld4_FancyWidget_009(
-                                        model = model.f6.f11.f7.f4,
-                                        number = 623,
-                                        children = children
-                                    )
-                                }
+                                RealWorld4_FancyWidget_009(
+                                    model = model.f6.f11.f7.f4,
+                                    number = 623,
+                                    children = children
+                                )
                             }
                         }
                     }
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_006(
-                            model = model.f0,
+                Row {
+                    RealWorld4_FancyWidget_006(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0,
+                        s1 = "HelloWorld"
+                    ) {
+                        RealWorld4_FancyWidget_043(
+                            s2 = "HelloWorld",
+                            model = model.f0.f10,
+                            obj = RealWorld4_UnmemoizablePojo_13(),
                             s1 = "HelloWorld"
                         ) {
-                            RealWorld4_FancyWidget_043(
-                                s2 = "HelloWorld",
-                                model = model.f0.f10,
-                                obj = RealWorld4_UnmemoizablePojo_13(),
-                                s1 = "HelloWorld"
+                            RealWorld4_FancyWidget_023(
+                                model = model.f0.f10.f7,
+                                obj = RealWorld4_UnmemoizablePojo_14()
                             ) {
-                                RealWorld4_FancyWidget_023(
-                                    model = model.f0.f10.f7,
-                                    obj = RealWorld4_UnmemoizablePojo_14()
-                                ) {
-                                    RealWorld4_FancyWidget_025(
-                                        b = false,
-                                        model = model.f0.f10.f7.f0
-                                    ) { ColoredRect(model.toColor()); }
-                                }
+                                RealWorld4_FancyWidget_025(
+                                    b = false,
+                                    model = model.f0.f10.f7.f0
+                                ) { ColoredRect(model.toColor()) }
                             }
                         }
                     }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_075(
+
+                    RealWorld4_FancyWidget_075(
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f6
+                    ) {
+                        RealWorld4_FancyWidget_038(
                             s1 = "HelloWorld",
-                            model = model.f6
+                            model = model.f6.f11,
+                            obj = RealWorld4_UnmemoizablePojo_8(),
+                            s2 = "HelloWorld"
                         ) {
-                            RealWorld4_FancyWidget_038(
+                            RealWorld4_FancyWidget_008(
                                 s1 = "HelloWorld",
-                                model = model.f6.f11,
-                                obj = RealWorld4_UnmemoizablePojo_8(),
-                                s2 = "HelloWorld"
+                                model = model.f6.f11.f7
                             ) {
-                                RealWorld4_FancyWidget_008(
-                                    s1 = "HelloWorld",
-                                    model = model.f6.f11.f7
-                                ) {
-                                    RealWorld4_FancyWidget_009(
-                                        model = model.f6.f11.f7.f4,
-                                        number = 809,
-                                        children = children
-                                    )
-                                }
+                                RealWorld4_FancyWidget_009(
+                                    model = model.f6.f11.f7.f4,
+                                    number = 809,
+                                    children = children
+                                )
                             }
                         }
                     }
@@ -7625,6 +7783,7 @@ fun RealWorld4_FancyWidget_132(
 
 @Composable
 fun RealWorld4_FancyWidget_133(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_06,
     s1: String,
     s2: String,
@@ -7652,7 +7811,7 @@ fun RealWorld4_FancyWidget_133(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -7660,40 +7819,42 @@ fun RealWorld4_FancyWidget_133(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_134(model = model.f10) {
-                            ColoredRect(
-                                model.toColor()
-                            )
-                        }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_143(
-                            s2 = "HelloWorld",
-                            number = 675,
-                            model = model.f11,
-                            children = children
+                Column {
+                    RealWorld4_FancyWidget_134(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f10
+                    ) {
+                        ColoredRect(
+                            model.toColor()
                         )
                     }
+
+                    RealWorld4_FancyWidget_143(
+                        s2 = "HelloWorld",
+                        number = 675,
+                        modifier = LayoutFlexible(1f),
+                        model = model.f11,
+                        children = children
+                    )
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_134(model = model.f10) {
-                            ColoredRect(
-                                model.toColor()
-                            )
-                        }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_143(
-                            s2 = "HelloWorld",
-                            number = 903,
-                            model = model.f11,
-                            children = children
+                Row {
+                    RealWorld4_FancyWidget_134(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f10
+                    ) {
+                        ColoredRect(
+                            model.toColor()
                         )
                     }
+
+                    RealWorld4_FancyWidget_143(
+                        s2 = "HelloWorld",
+                        number = 903,
+                        modifier = LayoutFlexible(1f),
+                        model = model.f11,
+                        children = children
+                    )
                 }
             }
         }
@@ -7701,7 +7862,11 @@ fun RealWorld4_FancyWidget_133(
 }
 
 @Composable
-fun RealWorld4_FancyWidget_134(model: RealWorld4_DataModel_07, children: @Composable() () -> Unit) {
+fun RealWorld4_FancyWidget_134(
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_07,
+    children: @Composable() () -> Unit
+) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 +
             model.f6
     val tmp1 = model::class.memberProperties.map { property ->
@@ -7713,7 +7878,7 @@ fun RealWorld4_FancyWidget_134(model: RealWorld4_DataModel_07, children: @Compos
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -7721,41 +7886,43 @@ fun RealWorld4_FancyWidget_134(model: RealWorld4_DataModel_07, children: @Compos
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_097(
-                            s2 = "HelloWorld",
-                            model = model.f5,
-                            s1 = "HelloWorld",
-                            children = children
-                        )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_135(model = model.f7) {
-                            RealWorld4_FancyWidget_094(
-                                model = model.f7.f4,
-                                obj = RealWorld4_UnmemoizablePojo_9()
-                            ) { ColoredRect(model.toColor()); }
-                        }
+                Column {
+                    RealWorld4_FancyWidget_097(
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        s1 = "HelloWorld",
+                        children = children
+                    )
+
+                    RealWorld4_FancyWidget_135(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f7
+                    ) {
+                        RealWorld4_FancyWidget_094(
+                            model = model.f7.f4,
+                            obj = RealWorld4_UnmemoizablePojo_9()
+                        ) { ColoredRect(model.toColor()) }
                     }
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_097(
-                            s2 = "HelloWorld",
-                            model = model.f5,
-                            s1 = "HelloWorld",
-                            children = children
-                        )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_135(model = model.f7) {
-                            RealWorld4_FancyWidget_094(
-                                model = model.f7.f4,
-                                obj = RealWorld4_UnmemoizablePojo_9()
-                            ) { ColoredRect(model.toColor()); }
-                        }
+                Row {
+                    RealWorld4_FancyWidget_097(
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        s1 = "HelloWorld",
+                        children = children
+                    )
+
+                    RealWorld4_FancyWidget_135(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f7
+                    ) {
+                        RealWorld4_FancyWidget_094(
+                            model = model.f7.f4,
+                            obj = RealWorld4_UnmemoizablePojo_9()
+                        ) { ColoredRect(model.toColor()) }
                     }
                 }
             }
@@ -7764,7 +7931,11 @@ fun RealWorld4_FancyWidget_134(model: RealWorld4_DataModel_07, children: @Compos
 }
 
 @Composable
-fun RealWorld4_FancyWidget_135(model: RealWorld4_DataModel_08, children: @Composable() () -> Unit) {
+fun RealWorld4_FancyWidget_135(
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_08,
+    children: @Composable() () -> Unit
+) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -7775,7 +7946,7 @@ fun RealWorld4_FancyWidget_135(model: RealWorld4_DataModel_08, children: @Compos
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -7783,24 +7954,22 @@ fun RealWorld4_FancyWidget_135(model: RealWorld4_DataModel_08, children: @Compos
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_136(
-                            s2 = "HelloWorld",
-                            model = model.f0
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    RealWorld4_FancyWidget_136(
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_136(
-                            s2 = "HelloWorld",
-                            model = model.f0
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    RealWorld4_FancyWidget_136(
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0
+                    ) { ColoredRect(model.toColor()) }
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -7810,6 +7979,7 @@ fun RealWorld4_FancyWidget_135(model: RealWorld4_DataModel_08, children: @Compos
 @Composable
 fun RealWorld4_FancyWidget_136(
     s2: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     children: @Composable() () -> Unit
 ) {
@@ -7828,7 +7998,7 @@ fun RealWorld4_FancyWidget_136(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -7836,38 +8006,36 @@ fun RealWorld4_FancyWidget_136(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_051(
-                            number = 428,
-                            model = model.f2
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_137(
-                            s2 = "HelloWorld",
-                            s1 = "HelloWorld",
-                            model = model.f5,
-                            children = children
-                        )
-                    }
+                Column {
+                    RealWorld4_FancyWidget_051(
+                        number = 428,
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2
+                    ) { ColoredRect(model.toColor()) }
+
+                    RealWorld4_FancyWidget_137(
+                        s2 = "HelloWorld",
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        children = children
+                    )
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_051(
-                            number = 101,
-                            model = model.f2
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_137(
-                            s2 = "HelloWorld",
-                            s1 = "HelloWorld",
-                            model = model.f5,
-                            children = children
-                        )
-                    }
+                Row {
+                    RealWorld4_FancyWidget_051(
+                        number = 101,
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2
+                    ) { ColoredRect(model.toColor()) }
+
+                    RealWorld4_FancyWidget_137(
+                        s2 = "HelloWorld",
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        children = children
+                    )
                 }
             }
         }
@@ -7878,6 +8046,7 @@ fun RealWorld4_FancyWidget_136(
 fun RealWorld4_FancyWidget_137(
     s2: String,
     s1: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -7901,7 +8070,7 @@ fun RealWorld4_FancyWidget_137(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -7909,14 +8078,14 @@ fun RealWorld4_FancyWidget_137(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -7924,7 +8093,11 @@ fun RealWorld4_FancyWidget_137(
 }
 
 @Composable
-fun RealWorld4_FancyWidget_138(model: RealWorld4_DataModel_10, children: @Composable() () -> Unit) {
+fun RealWorld4_FancyWidget_138(
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_10,
+    children: @Composable() () -> Unit
+) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -7935,7 +8108,7 @@ fun RealWorld4_FancyWidget_138(model: RealWorld4_DataModel_10, children: @Compos
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -7943,14 +8116,14 @@ fun RealWorld4_FancyWidget_138(model: RealWorld4_DataModel_10, children: @Compos
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -7958,7 +8131,11 @@ fun RealWorld4_FancyWidget_138(model: RealWorld4_DataModel_10, children: @Compos
 }
 
 @Composable
-fun RealWorld4_FancyWidget_139(model: RealWorld4_DataModel_05, children: @Composable() () -> Unit) {
+fun RealWorld4_FancyWidget_139(
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_05,
+    children: @Composable() () -> Unit
+) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f4 + model.f5 +
             model.f7
     val tmp1 = model::class.memberProperties.map { property ->
@@ -7970,7 +8147,7 @@ fun RealWorld4_FancyWidget_139(model: RealWorld4_DataModel_05, children: @Compos
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -7978,36 +8155,34 @@ fun RealWorld4_FancyWidget_139(model: RealWorld4_DataModel_05, children: @Compos
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_141(
-                            model = model.f0,
+                Column {
+                    RealWorld4_FancyWidget_141(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0,
+                        s2 = "HelloWorld"
+                    ) {
+                        RealWorld4_FancyWidget_142(
+                            model = model.f0.f11,
+                            number = 400,
                             s2 = "HelloWorld"
-                        ) {
-                            RealWorld4_FancyWidget_142(
-                                model = model.f0.f11,
-                                number = 400,
-                                s2 = "HelloWorld"
-                            )
-                        }
+                        )
                     }
-                    flexible(flex = 1f, children = children)
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_141(
-                            model = model.f0,
+                Row {
+                    RealWorld4_FancyWidget_141(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0,
+                        s2 = "HelloWorld"
+                    ) {
+                        RealWorld4_FancyWidget_142(
+                            model = model.f0.f11,
+                            number = 579,
                             s2 = "HelloWorld"
-                        ) {
-                            RealWorld4_FancyWidget_142(
-                                model = model.f0.f11,
-                                number = 579,
-                                s2 = "HelloWorld"
-                            )
-                        }
+                        )
                     }
-                    flexible(flex = 1f, children = children)
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -8016,6 +8191,7 @@ fun RealWorld4_FancyWidget_139(model: RealWorld4_DataModel_05, children: @Compos
 
 @Composable
 fun RealWorld4_FancyWidget_140(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_06,
     s2: String,
     children: @Composable() () -> Unit
@@ -8037,7 +8213,7 @@ fun RealWorld4_FancyWidget_140(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -8045,51 +8221,49 @@ fun RealWorld4_FancyWidget_140(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_076(
-                            model = model.f10,
-                            s2 = "HelloWorld"
+                Column {
+                    RealWorld4_FancyWidget_076(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f10,
+                        s2 = "HelloWorld"
+                    )
+
+                    RealWorld4_FancyWidget_080(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f11,
+                        s1 = "HelloWorld"
+                    ) {
+                        RealWorld4_FancyWidget_081(
+                            number = 291,
+                            b = false,
+                            obj = RealWorld4_UnmemoizablePojo_7(),
+                            model = model.f11.f7,
+                            s1 = "HelloWorld",
+                            children = children
                         )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_080(
-                            model = model.f11,
-                            s1 = "HelloWorld"
-                        ) {
-                            RealWorld4_FancyWidget_081(
-                                number = 291,
-                                b = false,
-                                obj = RealWorld4_UnmemoizablePojo_7(),
-                                model = model.f11.f7,
-                                s1 = "HelloWorld",
-                                children = children
-                            )
-                        }
                     }
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_076(
-                            model = model.f10,
-                            s2 = "HelloWorld"
+                Row {
+                    RealWorld4_FancyWidget_076(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f10,
+                        s2 = "HelloWorld"
+                    )
+
+                    RealWorld4_FancyWidget_080(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f11,
+                        s1 = "HelloWorld"
+                    ) {
+                        RealWorld4_FancyWidget_081(
+                            number = 307,
+                            b = false,
+                            obj = RealWorld4_UnmemoizablePojo_7(),
+                            model = model.f11.f7,
+                            s1 = "HelloWorld",
+                            children = children
                         )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_080(
-                            model = model.f11,
-                            s1 = "HelloWorld"
-                        ) {
-                            RealWorld4_FancyWidget_081(
-                                number = 307,
-                                b = false,
-                                obj = RealWorld4_UnmemoizablePojo_7(),
-                                model = model.f11.f7,
-                                s1 = "HelloWorld",
-                                children = children
-                            )
-                        }
                     }
                 }
             }
@@ -8099,6 +8273,7 @@ fun RealWorld4_FancyWidget_140(
 
 @Composable
 fun RealWorld4_FancyWidget_141(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_06,
     s2: String,
     children: @Composable() () -> Unit
@@ -8120,7 +8295,7 @@ fun RealWorld4_FancyWidget_141(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -8128,24 +8303,32 @@ fun RealWorld4_FancyWidget_141(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_092(
+                Column {
+                    RealWorld4_FancyWidget_092(
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f10
+                    ) {
+                        RealWorld4_FancyWidget_093(
                             s1 = "HelloWorld",
-                            model = model.f10
-                        ) { RealWorld4_FancyWidget_093(s1 = "HelloWorld", model = model.f10.f7); }
+                            model = model.f10.f7
+                        )
                     }
-                    flexible(flex = 1f, children = children)
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_092(
+                Row {
+                    RealWorld4_FancyWidget_092(
+                        s1 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f10
+                    ) {
+                        RealWorld4_FancyWidget_093(
                             s1 = "HelloWorld",
-                            model = model.f10
-                        ) { RealWorld4_FancyWidget_093(s1 = "HelloWorld", model = model.f10.f7); }
+                            model = model.f10.f7
+                        )
                     }
-                    flexible(flex = 1f, children = children)
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -8153,7 +8336,12 @@ fun RealWorld4_FancyWidget_141(
 }
 
 @Composable
-fun RealWorld4_FancyWidget_142(model: RealWorld4_DataModel_07, number: Int, s2: String) {
+fun RealWorld4_FancyWidget_142(
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_07,
+    number: Int,
+    s2: String
+) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 +
             model.f6
     val tmp1 = model::class.memberProperties.map { property ->
@@ -8175,7 +8363,7 @@ fun RealWorld4_FancyWidget_142(model: RealWorld4_DataModel_07, number: Int, s2: 
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -8183,55 +8371,59 @@ fun RealWorld4_FancyWidget_142(model: RealWorld4_DataModel_07, number: Int, s2: 
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_071(
-                            color = Color(
-                                red = 0xFF,
-                                blue = 0x99,
-                                green = 0x11
-                            ), model = model.f5, obj = RealWorld4_UnmemoizablePojo_0()
-                        ) {
-                            RealWorld4_FancyWidget_066(
-                                s2 = "HelloWorld",
-                                model = model.f5.f0.f5,
-                                s1 = "HelloWorld"
-                            ) { ColoredRect(model.toColor()); }
-                        }
+                Column {
+                    RealWorld4_FancyWidget_071(
+                        color = Color(
+                            red = 0xFF,
+                            blue = 0x99,
+                            green = 0x11
+                        ),
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5, obj = RealWorld4_UnmemoizablePojo_0()
+                    ) {
+                        RealWorld4_FancyWidget_066(
+                            s2 = "HelloWorld",
+                            model = model.f5.f0.f5,
+                            s1 = "HelloWorld"
+                        ) { ColoredRect(model.toColor()) }
                     }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_085(model = model.f7) {
-                            RealWorld4_FancyWidget_086(
-                                s1 = "HelloWorld",
-                                model = model.f7.f4
-                            )
-                        }
+
+                    RealWorld4_FancyWidget_085(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f7
+                    ) {
+                        RealWorld4_FancyWidget_086(
+                            s1 = "HelloWorld",
+                            model = model.f7.f4
+                        )
                     }
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_071(
-                            color = Color(
-                                red = 0xFF,
-                                blue = 0x99,
-                                green = 0x11
-                            ), model = model.f5, obj = RealWorld4_UnmemoizablePojo_0()
-                        ) {
-                            RealWorld4_FancyWidget_066(
-                                s2 = "HelloWorld",
-                                model = model.f5.f0.f5,
-                                s1 = "HelloWorld"
-                            ) { ColoredRect(model.toColor()); }
-                        }
+                Row {
+                    RealWorld4_FancyWidget_071(
+                        color = Color(
+                            red = 0xFF,
+                            blue = 0x99,
+                            green = 0x11
+                        ),
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5, obj = RealWorld4_UnmemoizablePojo_0()
+                    ) {
+                        RealWorld4_FancyWidget_066(
+                            s2 = "HelloWorld",
+                            model = model.f5.f0.f5,
+                            s1 = "HelloWorld"
+                        ) { ColoredRect(model.toColor()) }
                     }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_085(model = model.f7) {
-                            RealWorld4_FancyWidget_086(
-                                s1 = "HelloWorld",
-                                model = model.f7.f4
-                            )
-                        }
+
+                    RealWorld4_FancyWidget_085(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f7
+                    ) {
+                        RealWorld4_FancyWidget_086(
+                            s1 = "HelloWorld",
+                            model = model.f7.f4
+                        )
                     }
                 }
             }
@@ -8243,6 +8435,7 @@ fun RealWorld4_FancyWidget_142(model: RealWorld4_DataModel_07, number: Int, s2: 
 fun RealWorld4_FancyWidget_143(
     s2: String,
     number: Int,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_07,
     children: @Composable() () -> Unit
 ) {
@@ -8267,7 +8460,7 @@ fun RealWorld4_FancyWidget_143(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -8275,56 +8468,54 @@ fun RealWorld4_FancyWidget_143(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_144(
+                Column {
+                    RealWorld4_FancyWidget_144(
+                        s1 = "HelloWorld",
+                        obj = RealWorld4_UnmemoizablePojo_4(),
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        number = 329
+                    ) {
+                        RealWorld4_FancyWidget_145(
                             s1 = "HelloWorld",
-                            obj = RealWorld4_UnmemoizablePojo_4(),
-                            model = model.f5,
-                            number = 329
-                        ) {
-                            RealWorld4_FancyWidget_145(
-                                s1 = "HelloWorld",
-                                model = model.f5.f4,
-                                s2 = "HelloWorld",
-                                number = 801
-                            ) { ColoredRect(model.toColor()); }
-                        }
+                            model = model.f5.f4,
+                            s2 = "HelloWorld",
+                            number = 801
+                        ) { ColoredRect(model.toColor()) }
                     }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_039(
-                            model = model.f7,
-                            s1 = "HelloWorld",
-                            b = false,
-                            children = children
-                        )
-                    }
+
+                    RealWorld4_FancyWidget_039(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f7,
+                        s1 = "HelloWorld",
+                        b = false,
+                        children = children
+                    )
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_144(
+                Row {
+                    RealWorld4_FancyWidget_144(
+                        s1 = "HelloWorld",
+                        obj = RealWorld4_UnmemoizablePojo_4(),
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        number = 692
+                    ) {
+                        RealWorld4_FancyWidget_145(
                             s1 = "HelloWorld",
-                            obj = RealWorld4_UnmemoizablePojo_4(),
-                            model = model.f5,
-                            number = 692
-                        ) {
-                            RealWorld4_FancyWidget_145(
-                                s1 = "HelloWorld",
-                                model = model.f5.f4,
-                                s2 = "HelloWorld",
-                                number = 860
-                            ) { ColoredRect(model.toColor()); }
-                        }
+                            model = model.f5.f4,
+                            s2 = "HelloWorld",
+                            number = 860
+                        ) { ColoredRect(model.toColor()) }
                     }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_039(
-                            model = model.f7,
-                            s1 = "HelloWorld",
-                            b = false,
-                            children = children
-                        )
-                    }
+
+                    RealWorld4_FancyWidget_039(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f7,
+                        s1 = "HelloWorld",
+                        b = false,
+                        children = children
+                    )
                 }
             }
         }
@@ -8335,6 +8526,7 @@ fun RealWorld4_FancyWidget_143(
 fun RealWorld4_FancyWidget_144(
     s1: String,
     obj: RealWorld4_UnmemoizablePojo_4,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_08,
     number: Int,
     children: @Composable() () -> Unit
@@ -8370,7 +8562,7 @@ fun RealWorld4_FancyWidget_144(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -8378,30 +8570,28 @@ fun RealWorld4_FancyWidget_144(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_018(
-                            number = 435,
-                            s2 = "HelloWorld",
-                            model = model.f0,
-                            s1 = "HelloWorld",
-                            b = false
-                        )
-                    }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    RealWorld4_FancyWidget_018(
+                        number = 435,
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0,
+                        s1 = "HelloWorld",
+                        b = false
+                    )
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_018(
-                            number = 934,
-                            s2 = "HelloWorld",
-                            model = model.f0,
-                            s1 = "HelloWorld",
-                            b = true
-                        )
-                    }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    RealWorld4_FancyWidget_018(
+                        number = 934,
+                        s2 = "HelloWorld",
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0,
+                        s1 = "HelloWorld",
+                        b = true
+                    )
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -8411,6 +8601,7 @@ fun RealWorld4_FancyWidget_144(
 @Composable
 fun RealWorld4_FancyWidget_145(
     s1: String,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     s2: String,
     number: Int,
@@ -8441,7 +8632,7 @@ fun RealWorld4_FancyWidget_145(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -8449,42 +8640,40 @@ fun RealWorld4_FancyWidget_145(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_057(
-                            model = model.f2,
-                            obj = RealWorld4_UnmemoizablePojo_11(),
-                            s1 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_122(
-                            number = 626,
-                            obj = RealWorld4_UnmemoizablePojo_12(),
-                            b = false,
-                            model = model.f5,
-                            children = children
-                        )
-                    }
+                Column {
+                    RealWorld4_FancyWidget_057(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        obj = RealWorld4_UnmemoizablePojo_11(),
+                        s1 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
+
+                    RealWorld4_FancyWidget_122(
+                        number = 626,
+                        obj = RealWorld4_UnmemoizablePojo_12(),
+                        b = false,
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        children = children
+                    )
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_057(
-                            model = model.f2,
-                            obj = RealWorld4_UnmemoizablePojo_11(),
-                            s1 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_122(
-                            number = 417,
-                            obj = RealWorld4_UnmemoizablePojo_12(),
-                            b = false,
-                            model = model.f5,
-                            children = children
-                        )
-                    }
+                Row {
+                    RealWorld4_FancyWidget_057(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        obj = RealWorld4_UnmemoizablePojo_11(),
+                        s1 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
+
+                    RealWorld4_FancyWidget_122(
+                        number = 417,
+                        obj = RealWorld4_UnmemoizablePojo_12(),
+                        b = false,
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        children = children
+                    )
                 }
             }
         }
@@ -8497,6 +8686,7 @@ fun RealWorld4_FancyWidget_146(
     s2: String,
     number: Int,
     b: Boolean,
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     children: @Composable() () -> Unit
 ) {
@@ -8530,7 +8720,7 @@ fun RealWorld4_FancyWidget_146(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -8538,38 +8728,36 @@ fun RealWorld4_FancyWidget_146(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_034(
-                            model = model.f2,
-                            b = false,
-                            s2 = "HelloWorld",
-                            children = children
-                        )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_129(
-                            model = model.f5,
-                            s2 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
+                Column {
+                    RealWorld4_FancyWidget_034(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        b = false,
+                        s2 = "HelloWorld",
+                        children = children
+                    )
+
+                    RealWorld4_FancyWidget_129(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        s2 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_034(
-                            model = model.f2,
-                            b = true,
-                            s2 = "HelloWorld",
-                            children = children
-                        )
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_129(
-                            model = model.f5,
-                            s2 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
+                Row {
+                    RealWorld4_FancyWidget_034(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f2,
+                        b = true,
+                        s2 = "HelloWorld",
+                        children = children
+                    )
+
+                    RealWorld4_FancyWidget_129(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        s2 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
                 }
             }
         }
@@ -8578,6 +8766,7 @@ fun RealWorld4_FancyWidget_146(
 
 @Composable
 fun RealWorld4_FancyWidget_147(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_10,
     s1: String,
     obj: RealWorld4_UnmemoizablePojo_1,
@@ -8619,7 +8808,7 @@ fun RealWorld4_FancyWidget_147(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -8627,14 +8816,14 @@ fun RealWorld4_FancyWidget_147(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) { ColoredRect(model.toColor()); }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    ColoredRect(model.toColor(), LayoutFlexible(1f))
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
@@ -8642,7 +8831,11 @@ fun RealWorld4_FancyWidget_147(
 }
 
 @Composable
-fun RealWorld4_FancyWidget_148(model: RealWorld4_DataModel_08, s1: String) {
+fun RealWorld4_FancyWidget_148(
+    modifier: Modifier = Modifier.None,
+    model: RealWorld4_DataModel_08,
+    s1: String
+) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
         property.returnType.toString() + property.getter.call(model).hashCode()
@@ -8658,7 +8851,7 @@ fun RealWorld4_FancyWidget_148(model: RealWorld4_DataModel_08, s1: String) {
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -8666,33 +8859,41 @@ fun RealWorld4_FancyWidget_148(model: RealWorld4_DataModel_08, s1: String) {
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_041(
-                            model = model.f0,
-                            s2 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_149(
-                            model = model.f4,
-                            s1 = "HelloWorld"
-                        ) { RealWorld4_FancyWidget_053(s1 = "HelloWorld", model = model.f4.f2); }
+                Column {
+                    RealWorld4_FancyWidget_041(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0,
+                        s2 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
+
+                    RealWorld4_FancyWidget_149(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f4,
+                        s1 = "HelloWorld"
+                    ) {
+                        RealWorld4_FancyWidget_053(
+                            s1 = "HelloWorld",
+                            model = model.f4.f2
+                        )
                     }
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_041(
-                            model = model.f0,
-                            s2 = "HelloWorld"
-                        ) { ColoredRect(model.toColor()); }
-                    }
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_149(
-                            model = model.f4,
-                            s1 = "HelloWorld"
-                        ) { RealWorld4_FancyWidget_053(s1 = "HelloWorld", model = model.f4.f2); }
+                Row {
+                    RealWorld4_FancyWidget_041(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f0,
+                        s2 = "HelloWorld"
+                    ) { ColoredRect(model.toColor()) }
+
+                    RealWorld4_FancyWidget_149(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f4,
+                        s1 = "HelloWorld"
+                    ) {
+                        RealWorld4_FancyWidget_053(
+                            s1 = "HelloWorld",
+                            model = model.f4.f2
+                        )
                     }
                 }
             }
@@ -8702,6 +8903,7 @@ fun RealWorld4_FancyWidget_148(model: RealWorld4_DataModel_08, s1: String) {
 
 @Composable
 fun RealWorld4_FancyWidget_149(
+    modifier: Modifier = Modifier.None,
     model: RealWorld4_DataModel_09,
     s1: String,
     children: @Composable() () -> Unit
@@ -8721,7 +8923,7 @@ fun RealWorld4_FancyWidget_149(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints ->
+    WithConstraints(modifier) { constraints ->
         Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
@@ -8729,24 +8931,22 @@ fun RealWorld4_FancyWidget_149(
                 canvas.drawRect(parentSize.toRect(), paint)
             }
             if (constraints.maxHeight > constraints.maxWidth) {
-                FlexColumn {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_087(
-                            model = model.f5,
-                            color = Color(red = 0xFF, blue = 0x99, green = 0x11)
-                        )
-                    }
-                    flexible(flex = 1f, children = children)
+                Column {
+                    RealWorld4_FancyWidget_087(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        color = Color(red = 0xFF, blue = 0x99, green = 0x11)
+                    )
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             } else {
-                FlexRow {
-                    flexible(flex = 1f) {
-                        RealWorld4_FancyWidget_087(
-                            model = model.f5,
-                            color = Color(red = 0xFF, blue = 0x99, green = 0x11)
-                        )
-                    }
-                    flexible(flex = 1f, children = children)
+                Row {
+                    RealWorld4_FancyWidget_087(
+                        modifier = LayoutFlexible(1f),
+                        model = model.f5,
+                        color = Color(red = 0xFF, blue = 0x99, green = 0x11)
+                    )
+                    Container(modifier = LayoutFlexible(1f), children = children)
                 }
             }
         }
