@@ -40,7 +40,8 @@ import androidx.build.license.configureExternalDependencyLicenseCheck
 import androidx.build.metalava.MetalavaTasks.configureAndroidProjectForMetalava
 import androidx.build.metalava.MetalavaTasks.configureJavaProjectForMetalava
 import androidx.build.metalava.UpdateApiTask
-import androidx.build.releasenotes.GenerateReleaseNotesTask
+import androidx.build.releasenotes.GenerateArtifactReleaseNotesTask
+import androidx.build.releasenotes.GenerateAllReleaseNotesTask
 import androidx.build.studio.StudioTask.Companion.registerStudioTask
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
@@ -76,8 +77,6 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.File
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -139,7 +138,6 @@ class AndroidXPlugin : Plugin<Project> {
                     if (verifyDependencyVersionsTask != null) {
                         project.createCheckReleaseReadyTask(listOf(verifyDependencyVersionsTask))
                     }
-                    project.createGenerateReleaseNotesTask()
                     project.configureNonAndroidProjectForLint(androidXExtension)
                     project.configureJavaProjectForDokka(androidXExtension)
                     project.configureJavaProjectForMetalava(androidXExtension)
@@ -149,6 +147,8 @@ class AndroidXPlugin : Plugin<Project> {
                         }
                     }
                     project.addToProjectMap(androidXExtension)
+                    project.createArtifactIdReleaseNotesTask()
+
                     // workaround for b/120487939
                     project.configurations.all { configuration ->
                         configuration.resolutionStrategy.preferProjectModules()
@@ -171,7 +171,6 @@ class AndroidXPlugin : Plugin<Project> {
                     if (checkReleaseReadyTasks.isNotEmpty()) {
                         project.createCheckReleaseReadyTask(checkReleaseReadyTasks)
                     }
-                    project.createGenerateReleaseNotesTask()
                     val reportLibraryMetrics = project.tasks.register(
                         REPORT_LIBRARY_METRICS, ReportLibraryMetricsTask::class.java
                     )
@@ -195,6 +194,7 @@ class AndroidXPlugin : Plugin<Project> {
                     project.configureAndroidProjectForDokka(extension, androidXExtension)
                     project.configureAndroidProjectForMetalava(extension, androidXExtension)
                     project.addToProjectMap(androidXExtension)
+                    project.createArtifactIdReleaseNotesTask()
                 }
                 is AppPlugin -> {
                     project.extensions.getByType<AppExtension>().apply {
@@ -270,6 +270,9 @@ class AndroidXPlugin : Plugin<Project> {
         buildOnServerTask.dependsOn(
             tasks.register(CREATE_LIBRARY_BUILD_INFO_FILES_TASK)
         )
+        // Create the aggregating release note task in the root project so it can depend on all
+        // release note subproject tasks
+        createGenerateAllReleaseNotesTask()
 
         extra.set("versionChecker", GMavenVersionChecker(logger))
         val createArchiveTask = Release.getGlobalFullZipTask(this)
@@ -637,40 +640,67 @@ class AndroidXPlugin : Plugin<Project> {
         return taskProvider
     }
 
-    // Task that creates release notes
-    private fun Project.createGenerateReleaseNotesTask() {
+    private fun Project.createGenerateAllReleaseNotesTask() {
         tasks.register(
-            GENERATE_RELEASE_NOTES_TASK,
-            GenerateReleaseNotesTask::class.java
+            GENERATE_ALL_RELEASE_NOTES_TASK,
+            GenerateAllReleaseNotesTask::class.java
         ) { task ->
-            if (project.hasProperty("startCommit")) {
-                task.startSHA = project.property("startCommit").toString()
+            val artifactToCommitMapFileName = if (project.hasProperty("artifactToCommitMap")) {
+                project.property("artifactToCommitMap").toString()
             } else {
-                task.startSHA = ""
+                ""
             }
-            if (project.hasProperty("endCommit")) {
-                task.endSHA = project.property("endCommit").toString()
-            } else {
-                task.endSHA = "HEAD"
-            }
-            val formatter = DateTimeFormatter.ofPattern("MM-d-yyyy")
-            if (project.hasProperty("releaseDate")) {
-                task.date = LocalDate.parse(project.property("releaseDate").toString(), formatter)
-            } else {
-                task.date = LocalDate.now()
-            }
-            /* releaseNotesAllCommits: For use during the migration to using release note fields,
-             * or in the case where a team forgot to include a release notes field in their commit
-             * messages
-             */
-            if (project.hasProperty("releaseNotesAllCommits")) {
-                task.includeAllCommits = true
-            }
-            task.outputFile.set(
-                File(
-                    project.getReleaseNotesDirectory(),
-                    "${group}_${name}_release_notes.txt"
-                )
+            task.artifactToCommitMapFile.set(File(artifactToCommitMapFileName))
+        }
+    }
+
+    private fun Project.createArtifactIdReleaseNotesTask() {
+        val generateArtifactReleaseNotesTask: TaskProvider<GenerateArtifactReleaseNotesTask> =
+        tasks.register(
+            GENERATE_ARTIFACT_RELEASE_NOTES_TASK,
+            GenerateArtifactReleaseNotesTask::class.java
+        ) { task ->
+            val artifactToCommitMapFileName = if (project.hasProperty("artifactToCommitMap")) {
+                    project.property("artifactToCommitMap").toString()
+                } else if (rootProject.hasProperty("artifactToCommitMap")) {
+                    rootProject.property("artifactToCommitMap").toString()
+                } else {
+                    ""
+                }
+            task.artifactToCommitMapFile.set(File(artifactToCommitMapFileName))
+
+            val outputDirectory: File = File(project.getReleaseNotesDirectory(), "$group")
+            task.outputDirectory.set(outputDirectory)
+
+            val outputFile = File(
+                project.getReleaseNotesDirectory(),
+                "$group/${group}_${name}_release_notes.txt"
+            )
+            task.outputFile.set(outputFile)
+
+            val outputJsonFile = File(
+                project.getReleaseNotesDirectory(),
+                "$group/${group}_${name}_release_notes.json"
+            )
+            task.outputJsonFile.set(outputJsonFile)
+        }
+
+        addTaskToAggregrateReleaseNotesTask(generateArtifactReleaseNotesTask)
+    }
+
+    private fun Project.addTaskToAggregrateReleaseNotesTask(
+        generateArtifactReleaseNotesTask: TaskProvider<GenerateArtifactReleaseNotesTask>
+    ) {
+
+        rootProject.tasks.named(GENERATE_ALL_RELEASE_NOTES_TASK).configure {
+            val generateAllReleaseNotesTask: GenerateAllReleaseNotesTask = it
+                    as GenerateAllReleaseNotesTask
+            generateAllReleaseNotesTask.dependsOn(generateArtifactReleaseNotesTask)
+            generateAllReleaseNotesTask.artifactReleaseNoteFiles.add(
+                generateArtifactReleaseNotesTask.flatMap { task -> task.outputJsonFile }
+            )
+            generateAllReleaseNotesTask.artifactReleaseNoteOutputDirectories.add(
+                generateArtifactReleaseNotesTask.flatMap { task -> task.outputDirectory }
             )
         }
     }
@@ -736,7 +766,8 @@ class AndroidXPlugin : Plugin<Project> {
         const val CHECK_SAME_VERSION_LIBRARY_GROUPS = "checkSameVersionLibraryGroups"
         const val CREATE_LIBRARY_BUILD_INFO_FILES_TASK = "createLibraryBuildInfoFiles"
         const val CREATE_AGGREGATE_BUILD_INFO_FILES_TASK = "createAggregateBuildInfoFiles"
-        const val GENERATE_RELEASE_NOTES_TASK = "generateReleaseNotes"
+        const val GENERATE_ARTIFACT_RELEASE_NOTES_TASK = "generateReleaseNotes"
+        const val GENERATE_ALL_RELEASE_NOTES_TASK = GENERATE_ARTIFACT_RELEASE_NOTES_TASK
         const val REPORT_LIBRARY_METRICS = "reportLibraryMetrics"
     }
 }
