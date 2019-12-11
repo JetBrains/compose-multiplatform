@@ -59,7 +59,8 @@ object MetalavaTasks {
 
                 val javaInputs = JavaCompileInputs.fromLibraryVariant(library, variant, project)
                 setupProject(this, javaInputs, extension)
-                setupStubs(this, javaInputs, variant)
+                // TODO(aurimas): reenable this when kotlin stubs generation is working.
+                // setupStubs(this, javaInputs, variant)
             }
         }
     }
@@ -228,6 +229,7 @@ object MetalavaTasks {
         project.addToBuildOnServer(checkApi)
     }
 
+    @Suppress("unused")
     private fun setupStubs(
         project: Project,
         javaCompileInputs: JavaCompileInputs,
