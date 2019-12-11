@@ -26,20 +26,20 @@ def checkoutRoot = "${ext.supportRootFolder}/../.."
 ext.repos = new Properties()
 ext.repos.prebuiltsRoot = "${checkoutRoot}/prebuilts"
 
-ext.repoNames = ["${repos.prebuiltsRoot}/androidx/internal",
-                 "${repos.prebuiltsRoot}/androidx/external"]
-
 /**
  * Adds maven repositories to the given repository handler.
  */
 def addMavenRepositories(RepositoryHandler handler) {
-    repoNames.each { repo ->
-        handler.maven {
-            url repo
-            metadataSources {
-                mavenPom()
-                artifact()
-            }
+    handler.maven {
+        url "${repos.prebuiltsRoot}/androidx/internal"
+        metadataSources {
+            mavenPom()
+            artifact()
+        }
+        content {
+            includeGroupByRegex "android.*"
+            includeGroupByRegex "com.android.support.*"
+            excludeGroupByRegex "androidx.databinding.*"
         }
     }
     handler.ivy {
@@ -51,6 +51,16 @@ def addMavenRepositories(RepositoryHandler handler) {
         }
         metadataSources {
             it.artifact()
+        }
+        content {
+            includeGroup ""
+        }
+    }
+    handler.maven {
+        url "${repos.prebuiltsRoot}/androidx/external"
+        metadataSources {
+            mavenPom()
+            artifact()
         }
     }
     if (System.getenv("ALLOW_PUBLIC_REPOS") != null || (isUnbundledBuild(ext.supportRootFolder))) {
