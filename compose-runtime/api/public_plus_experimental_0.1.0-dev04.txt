@@ -2,14 +2,12 @@
 package androidx.compose {
 
   public final class ActualAndroidKt {
-    ctor public ActualAndroidKt();
     method public static android.content.Context getContext(android.view.View);
     method public static android.view.ViewParent getParent(android.view.View);
     method public static boolean isMainThread();
   }
 
   public final class ActualJvmKt {
-    ctor public ActualJvmKt();
     method public static int identityHashCode(Object? instance);
     method public static inline <R> R! synchronized(Object lock, kotlin.jvm.functions.Function0<? extends R> block);
   }
@@ -81,13 +79,11 @@ package androidx.compose {
   }
 
   public final class ComposeAndroidKt {
-    ctor public ComposeAndroidKt();
     method public static void disposeComposition(android.app.Activity);
     method public static androidx.compose.CompositionContext? setViewContent(android.app.Activity, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
   }
 
   public final class ComposeKt {
-    ctor public ComposeKt();
     method public static void disposeComposition(android.view.ViewGroup);
     method public static androidx.compose.CompositionContext? setViewContent(android.view.ViewGroup, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
   }
@@ -128,7 +124,6 @@ package androidx.compose {
   }
 
   public final class ComposerKt {
-    ctor public ComposerKt();
     method public static inline <N, T> T! cache(androidx.compose.Composer<N>, boolean valid = true, kotlin.jvm.functions.Function0<? extends T> block);
     method public static inline <T> T! escapeCompose(kotlin.jvm.functions.Function1<? super androidx.compose.NullCompilationScope,? extends T> block);
     method public static <N> Object? nextValue(androidx.compose.Composer<N>);
@@ -191,7 +186,6 @@ package androidx.compose {
   }
 
   public final class EffectsKt {
-    ctor public EffectsKt();
     method @CheckResult(suggest="+") public static <T> androidx.compose.Effect<T> ambient(androidx.compose.Ambient<T> key);
     method public static androidx.compose.Effect<androidx.compose.CompositionReference> compositionReference();
     method public static <T> androidx.compose.Effect<T> effectOf(kotlin.jvm.functions.Function1<? super androidx.compose.Effect<T>,? extends T> block);
@@ -231,7 +225,6 @@ package androidx.compose {
   }
 
   public final class ExpectKt {
-    ctor public ExpectKt();
     method public static <T> androidx.compose.ThreadLocal<T> ThreadLocal();
   }
 
@@ -258,7 +251,6 @@ package androidx.compose {
   }
 
   public final class JoinedKeyKt {
-    ctor public JoinedKeyKt();
     method public static boolean isJoinedKey(Object? key);
     method public static Object? joinedKeyLeft(Object? key);
     method public static Object? joinedKeyRight(Object? key);
@@ -273,12 +265,10 @@ package androidx.compose {
   }
 
   public final class KeyKt {
-    ctor public KeyKt();
     method @androidx.compose.Composable public static void Key(@androidx.compose.Pivotal Object? key, kotlin.jvm.functions.Function0<kotlin.Unit> children);
   }
 
   public final class KeySourceInfoKt {
-    ctor public KeySourceInfoKt();
     method public static String? keySourceInfoOf(Object key);
   }
 
@@ -297,7 +287,6 @@ package androidx.compose {
   }
 
   public final class ObserveKt {
-    ctor public ObserveKt();
     method @androidx.compose.Composable public static void Observe(kotlin.jvm.functions.Function0<kotlin.Unit> body);
   }
 
@@ -317,7 +306,6 @@ package androidx.compose {
   }
 
   public final class RecomposeKt {
-    ctor public RecomposeKt();
     method @androidx.compose.Composable public static void Recompose(kotlin.jvm.functions.Function1<? super kotlin.jvm.functions.Function0<kotlin.Unit>,kotlin.Unit> body);
   }
 
@@ -335,7 +323,6 @@ package androidx.compose {
   }
 
   public final class RecomposerKt {
-    ctor public RecomposerKt();
   }
 
   public interface ScopeUpdateScope {
@@ -408,7 +395,6 @@ package androidx.compose {
   }
 
   public final class SlotTableKt {
-    ctor public SlotTableKt();
   }
 
   public final class SlotWriter extends androidx.compose.SlotEditor {
@@ -432,7 +418,6 @@ package androidx.compose {
   }
 
   public final class SourceLocationKt {
-    ctor public SourceLocationKt();
     method public static inline int sourceLocation();
   }
 
@@ -463,7 +448,6 @@ package androidx.compose {
   }
 
   public final class TraceKt {
-    ctor public TraceKt();
     method public static inline <T> T! trace(String sectionName, kotlin.jvm.functions.Function0<? extends T> block);
   }
 
@@ -485,11 +469,9 @@ package androidx.compose {
   }
 
   public final class ViewComposerCommonKt {
-    ctor public ViewComposerCommonKt();
   }
 
   public final class ViewComposerKt {
-    ctor public ViewComposerKt();
     method public static androidx.compose.ViewComposition! getComposer();
     method public static Boolean? registerAdapter(androidx.compose.ViewComposition, kotlin.jvm.functions.Function2<java.lang.Object,java.lang.Object,?> adapter);
     method public static <T> T! runWithCurrent(androidx.compose.Composer<?>, kotlin.jvm.functions.Function0<? extends T> block);
@@ -554,7 +536,6 @@ package androidx.compose.adapters {
   }
 
   public final class ViewAdapterKt {
-    ctor public ViewAdapterKt();
     method public static inline <T extends androidx.compose.adapters.ViewAdapter> T getOrAddAdapter(android.view.View, int id, kotlin.jvm.functions.Function0<? extends T> factory);
     method public static androidx.compose.adapters.ComposeViewAdapter getViewAdapter(android.view.View);
   }
@@ -593,7 +574,6 @@ package androidx.compose.frames {
   }
 
   public final class FrameContainersKt {
-    ctor public FrameContainersKt();
     method public static <T> androidx.compose.frames.ModelList<T> modelListOf();
     method public static <T> androidx.compose.frames.ModelList<T> modelListOf(T? element);
     method public static <T> androidx.compose.frames.ModelList<T> modelListOf(T?... elements);
@@ -602,7 +582,6 @@ package androidx.compose.frames {
   }
 
   public final class FrameIdSetKt {
-    ctor public FrameIdSetKt();
   }
 
   public interface Framed {
@@ -612,7 +591,6 @@ package androidx.compose.frames {
   }
 
   public final class FramesKt {
-    ctor public FramesKt();
     method public static kotlin.Unit? _created(androidx.compose.frames.Framed framed);
     method public static androidx.compose.frames.Record _readable(androidx.compose.frames.Record r, androidx.compose.frames.Framed framed);
     method public static androidx.compose.frames.Record _writable(androidx.compose.frames.Record r, androidx.compose.frames.Framed framed);
