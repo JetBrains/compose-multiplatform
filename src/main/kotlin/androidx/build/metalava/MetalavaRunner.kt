@@ -113,7 +113,6 @@ val API_LINT_ARGS: List<String> = listOf(
         "BuilderSetStyle",
         "ExecutorRegistration",
         "NotCloseable",
-        "UserHandleName",
         "UseIcu",
         "NoByteOrShort",
         "CommonArgsFirst",
@@ -122,7 +121,8 @@ val API_LINT_ARGS: List<String> = listOf(
 
         // We should only treat these as warnings
         "IntentBuilderName",
-        "OnNameExpected"
+        "OnNameExpected",
+        "UserHandleName"
     ).joinToString(),
     "--error",
     listOf(
