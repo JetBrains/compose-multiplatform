@@ -27,6 +27,7 @@ val archivesToDejetify = listOf(
     "m2repository/androidx/activity/**",
     "m2repository/androidx/ads/identifier/**",
     "m2repository/androidx/annotation/**",
+    "m2repository/androidx/autofill/**",
     "m2repository/androidx/appcompat/**",
     "m2repository/androidx/arch/**",
     "m2repository/androidx/arch/core/**",
