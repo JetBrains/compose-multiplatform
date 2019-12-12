@@ -130,7 +130,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.SLICE, "slice-view", "1.1.0-alpha01")
     prebuilts(LibraryGroups.SLIDINGPANELAYOUT, "1.0.0")
     ignore(LibraryGroups.INSPECTION_EXTENSIONS.group, "sqlite-inspection")
-    prebuilts(LibraryGroups.SQLITE, "2.1.0-beta01")
+    prebuilts(LibraryGroups.SQLITE, "2.1.0-rc01")
     prebuilts(LibraryGroups.SWIPEREFRESHLAYOUT, "1.1.0-alpha03")
     prebuilts(LibraryGroups.TEXTCLASSIFIER, "1.0.0-alpha02")
     ignore(LibraryGroups.TRANSITION.group, "transition-ktx")
