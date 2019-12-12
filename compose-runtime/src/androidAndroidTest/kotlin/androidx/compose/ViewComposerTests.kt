@@ -29,6 +29,7 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import junit.framework.TestCase.assertEquals
+import org.junit.After
 import org.junit.Rule
 import org.junit.runner.RunWith
 import org.junit.Test
@@ -50,6 +51,11 @@ class TestActivity : Activity() {
 
 @RunWith(AndroidJUnit4::class)
 class NewCodeGenTests {
+
+    @After
+    fun teardown() {
+        Compose.clearRoots()
+    }
 
     @get:Rule
     val activityRule = ActivityTestRule(TestActivity::class.java)
@@ -965,6 +971,11 @@ class NewCodeGenTests {
 @RunWith(AndroidJUnit4::class)
 class DisposeTests {
 
+    @After
+    fun teardown() {
+        Compose.clearRoots()
+    }
+
     @get:Rule
     val disposeActivityRule = ActivityTestRule(DisposeTestActivity::class.java)
 
@@ -983,16 +994,21 @@ class DisposeTests {
         val log = mutableListOf<String>()
 
         val composable = @Composable {
-            +onPreCommit {
-                log.add("onPreCommit")
-                onDispose {
-                    log.add("onPreCommitDispose")
+            val cc = composer
+            cc.call(1, { true }) {
+                onPreCommit {
+                    log.add("onPreCommit")
+                    onDispose {
+                        log.add("onPreCommitDispose")
+                    }
                 }
             }
-            +onActive {
-                log.add("onActive")
-                onDispose {
-                    log.add("onActiveDispose")
+            cc.call(2, { true }) {
+                onActive {
+                    log.add("onActive")
+                    onDispose {
+                        log.add("onActiveDispose")
+                    }
                 }
             }
         }

@@ -35,19 +35,29 @@ object Compose {
             private var emittables = HashMap<Emittable, @Composable() () -> Unit>()
             private var views = HashMap<ViewGroup, @Composable() () -> Unit>()
 
+            @TestOnly
+            fun clearRoots() {
+                EMITTABLE_ROOT_COMPONENT.clear()
+                VIEWGROUP_ROOT_COMPONENT.clear()
+            }
+
             // Called before Dex Code Swap
             private fun saveStateAndDispose(context: Context) {
                 emittables.clear()
                 views.clear()
 
-                for ((emittable, component) in EMITTABLE_ROOT_COMPONENT) {
+                val emittableRoots = EMITTABLE_ROOT_COMPONENT.entries.toSet()
+
+                for ((emittable, component) in emittableRoots) {
                     (component as? Root)?.let {
                         emittables.put(emittable, it.composable)
                         disposeComposition(emittable, context, null)
                     }
                 }
 
-                for ((view, component) in VIEWGROUP_ROOT_COMPONENT) {
+                val viewRoots = VIEWGROUP_ROOT_COMPONENT.entries.toSet()
+
+                for ((view, component) in viewRoots) {
                     (component as? Root)?.let {
                         views.put(view, it.composable)
                         disposeComposition(view)
@@ -116,6 +126,12 @@ object Compose {
             VIEWGROUP_ROOT_COMPONENT[view] = component
     }
 
+    internal fun removeRoot(view: View) {
+        view.setTag(TAG_ROOT_COMPONENT, null)
+        if (view is ViewGroup)
+            VIEWGROUP_ROOT_COMPONENT.remove(view)
+    }
+
     private fun getRootComponent(emittable: Emittable): Component? {
         return EMITTABLE_ROOT_COMPONENT[emittable]
     }
@@ -151,6 +167,12 @@ object Compose {
      */
     @TestOnly
     fun simulateHotReload(context: Context) = HotReloader.simulateHotReload(context)
+
+    /**
+     * @suppress
+     */
+    @TestOnly
+    fun clearRoots() = HotReloader.clearRoots()
 
     /**
      * This method is the way to initiate a composition. The [composable] passed in will be executed
@@ -216,9 +238,11 @@ object Compose {
     fun disposeComposition(container: ViewGroup, parent: CompositionReference? = null) {
         // temporary easy way to call correct lifecycles on everything
         // need to remove compositionContext from context map as well
-        composeInto(container, parent) { }
-        container.setTag(TAG_ROOT_COMPONENT, null)
+        composeInto(container, parent, emptyComposable)
+        removeRoot(container)
     }
+
+    private val emptyComposable: @Composable() () -> Unit = {}
 
     /**
      * This method is the way to initiate a composition. The [composable] passed in will be executed
@@ -316,7 +340,7 @@ object Compose {
         parent: CompositionReference? = null
     ) {
         // temporary easy way to call correct lifecycles on everything
-        composeInto(container, context, parent) {}
+        composeInto(container, context, parent, emptyComposable)
         EMITTABLE_ROOT_COMPONENT.remove(container)
     }
 }

@@ -25,6 +25,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
+import org.junit.After
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -35,6 +36,12 @@ import kotlin.test.assertNotEquals
 
 @RunWith(AndroidJUnit4::class)
 class HotReloadTests {
+
+    @After
+    fun teardown() {
+        Compose.clearRoots()
+    }
+
     @get:Rule
     val activityRule = ActivityTestRule(DisposeTests.DisposeTestActivity::class.java)
 

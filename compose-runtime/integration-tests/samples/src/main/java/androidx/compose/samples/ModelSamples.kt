@@ -18,8 +18,7 @@ package androidx.compose.samples
 
 import androidx.compose.Composable
 import androidx.compose.Model
-import androidx.compose.memo
-import androidx.compose.unaryPlus
+import androidx.compose.remember
 import androidx.ui.core.TextField
 import androidx.ui.material.Button
 
@@ -32,7 +31,7 @@ fun modelSample() {
 
     @Composable
     fun LoginScreen() {
-        val model = +memo { LoginState("user", "pass") }
+        val model = remember { LoginState("user", "pass") }
 
         TextField(
             value = model.username,

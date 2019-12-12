@@ -32,6 +32,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
+import org.junit.After
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -121,6 +122,11 @@ class TestState<T>(value: T) : Framed {
 
 @RunWith(AndroidJUnit4::class)
 class ModelViewTests {
+
+    @After
+    fun teardown() {
+        Compose.clearRoots()
+    }
 
     @get:Rule
     val activityRule = ActivityTestRule(TestActivity::class.java)

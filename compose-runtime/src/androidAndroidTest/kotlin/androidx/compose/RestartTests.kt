@@ -21,6 +21,7 @@ import android.widget.TextView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import junit.framework.TestCase
+import org.junit.After
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,6 +30,12 @@ import kotlin.test.assertNull
 
 @RunWith(AndroidJUnit4::class)
 class RestartTests {
+
+    @After
+    fun teardown() {
+        Compose.clearRoots()
+    }
+
     @get:Rule
     val activityRule = ActivityTestRule(TestActivity::class.java)
 

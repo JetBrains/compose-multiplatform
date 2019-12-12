@@ -17,8 +17,8 @@
 package androidx.compose.benchmark.siblings
 
 import androidx.compose.Composable
-import androidx.compose.Key
 import androidx.compose.Pivotal
+import androidx.compose.key
 import androidx.ui.core.Text
 import androidx.ui.core.dp
 import androidx.ui.foundation.ColoredRect
@@ -116,7 +116,7 @@ fun SiblingManagement(identity: IdentityType, items: List<Item>) {
             }
             IdentityType.Key -> {
                 for (item in items) {
-                    Key(key = item.id) {
+                    key(v1 = item.id) {
                         ItemRow(item = item)
                     }
                 }

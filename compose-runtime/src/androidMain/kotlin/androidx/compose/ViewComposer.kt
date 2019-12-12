@@ -151,11 +151,7 @@ class ViewComposer(
 }
 
 @Suppress("UNCHECKED_CAST")
-@EffectsDsl
 /* inline */ class ViewComposition(val composer: ViewComposer) {
-
-    @Suppress("NOTHING_TO_INLINE")
-    inline operator fun <V> Effect<V>.unaryPlus(): V = resolve(this@ViewComposition.composer)
 
     inline fun <T : View> emit(
         key: Any,
@@ -414,6 +410,7 @@ class ViewComposer(
     }
 }
 
+@PublishedApi
 internal actual val currentComposerNonNull
     get() = currentComposer ?: emptyComposition()
 

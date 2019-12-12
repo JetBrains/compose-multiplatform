@@ -55,7 +55,7 @@ package androidx.compose {
     field public static final androidx.compose.Choreographer! INSTANCE;
   }
 
-  @androidx.compose.EffectsDsl public interface CommitScope {
+  public interface CommitScope {
     method public void onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> callback);
   }
 
@@ -127,12 +127,6 @@ package androidx.compose {
     method public static inline <N, T> T! cache(androidx.compose.Composer<N>, boolean valid = true, kotlin.jvm.functions.Function0<? extends T> block);
     method public static inline <T> T! escapeCompose(kotlin.jvm.functions.Function1<? super androidx.compose.NullCompilationScope,? extends T> block);
     method public static <N> Object? nextValue(androidx.compose.Composer<N>);
-    method public static <N, V> V! remember(androidx.compose.Composer<N>, kotlin.jvm.functions.Function0<? extends V> block);
-    method public static <N, V, P1> V! remember(androidx.compose.Composer<N>, P1? p1, kotlin.jvm.functions.Function0<? extends V> block);
-    method public static <N, V, P1, P2> V! remember(androidx.compose.Composer<N>, P1? p1, P2? p2, kotlin.jvm.functions.Function0<? extends V> block);
-    method public static <N, V, P1, P2, P3> V! remember(androidx.compose.Composer<N>, P1? p1, P2? p2, P3? p3, kotlin.jvm.functions.Function0<? extends V> block);
-    method public static <N, V, P1, P2, P3, P4> V! remember(androidx.compose.Composer<N>, P1? p1, P2? p2, P3? p3, P4? p4, kotlin.jvm.functions.Function0<? extends V> block);
-    method public static <N, V> V! remember(androidx.compose.Composer<N>, Object![]? args, kotlin.jvm.functions.Function0<? extends V> block);
     field public static final int DEFAULT_SLOT_ACTIONS_SIZE = 16; // 0x10
     field public static final int DEFAULT_SLOT_KEYS_SIZE = 8; // 0x8
   }
@@ -172,50 +166,25 @@ package androidx.compose {
     method public <N> void registerComposer(androidx.compose.Composer<N> composer);
   }
 
-  @androidx.compose.EffectsDsl public final class Effect<T> {
-    method @androidx.compose.annotations.Hide public Object constructKey(int key);
-    method public androidx.compose.Composer<?> getContext();
-    method @androidx.compose.annotations.Hide public T! resolve(androidx.compose.Composer<?> composerContext, int key = sourceLocation());
-    method public void setContext(androidx.compose.Composer<?> p);
-    method public operator <V> V! unaryPlus(androidx.compose.Effect<V>);
-    property public final androidx.compose.Composer<?> context;
-    field @androidx.compose.annotations.Hide public androidx.compose.Composer<?> context;
-  }
-
   @kotlin.DslMarker public @interface EffectsDsl {
   }
 
   public final class EffectsKt {
-    method @CheckResult(suggest="+") public static <T> androidx.compose.Effect<T> ambient(androidx.compose.Ambient<T> key);
-    method public static androidx.compose.Effect<androidx.compose.CompositionReference> compositionReference();
-    method public static <T> androidx.compose.Effect<T> effectOf(kotlin.jvm.functions.Function1<? super androidx.compose.Effect<T>,? extends T> block);
-    method public static androidx.compose.Effect<kotlin.jvm.functions.Function0<kotlin.Unit>> getInvalidate();
-    method @CheckResult(suggest="+") public static <T, V1> androidx.compose.Effect<T> key(V1? v1, kotlin.jvm.functions.Function1<? super androidx.compose.Effect<T>,? extends T> block);
-    method @CheckResult(suggest="+") public static <T, V1, V2> androidx.compose.Effect<T> key(V1? v1, V2? v2, kotlin.jvm.functions.Function1<? super androidx.compose.Effect<T>,? extends T> block);
-    method @CheckResult(suggest="+") public static <T> androidx.compose.Effect<T> key(Object![]? inputs, kotlin.jvm.functions.Function1<? super androidx.compose.Effect<T>,? extends T> block);
-    method @CheckResult(suggest="+") public static <T> androidx.compose.Effect<T> memo(kotlin.jvm.functions.Function0<? extends T> calculation);
-    method @CheckResult(suggest="+") public static <T, V1> androidx.compose.Effect<T> memo(V1? v1, kotlin.jvm.functions.Function0<? extends T> calculation);
-    method @CheckResult(suggest="+") public static <T, V1, V2> androidx.compose.Effect<T> memo(V1? v1, V2? v2, kotlin.jvm.functions.Function0<? extends T> calculation);
-    method @CheckResult(suggest="+") public static <T> androidx.compose.Effect<T> memo(Object![]? inputs, kotlin.jvm.functions.Function0<? extends T> calculation);
-    method @CheckResult(suggest="+") public static <T> androidx.compose.Effect<T> model(kotlin.jvm.functions.Function0<? extends T> init);
-    method @CheckResult(suggest="+") public static <T, V1> androidx.compose.Effect<T> modelFor(V1? v1, kotlin.jvm.functions.Function0<? extends T> init);
-    method @CheckResult(suggest="+") public static <T, V1, V2> androidx.compose.Effect<T> modelFor(V1? v1, V2? v2, kotlin.jvm.functions.Function0<? extends T> init);
-    method @CheckResult(suggest="+") public static <T> androidx.compose.Effect<T> modelFor(Object![]? inputs, kotlin.jvm.functions.Function0<? extends T> init);
-    method @CheckResult(suggest="+") public static androidx.compose.Effect<kotlin.Unit> onActive(kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
-    method @CheckResult(suggest="+") public static androidx.compose.Effect<kotlin.Unit> onCommit(kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
-    method @CheckResult(suggest="+") public static <V1> androidx.compose.Effect<kotlin.Unit> onCommit(V1? v1, kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
-    method @CheckResult(suggest="+") public static <V1, V2> androidx.compose.Effect<kotlin.Unit> onCommit(V1? v1, V2? v2, kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
-    method @CheckResult(suggest="+") public static androidx.compose.Effect<kotlin.Unit> onCommit(Object![]? inputs, kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
-    method @CheckResult(suggest="+") public static androidx.compose.Effect<kotlin.Unit> onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> callback);
-    method @CheckResult(suggest="+") public static androidx.compose.Effect<kotlin.Unit> onPreCommit(kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
-    method @CheckResult(suggest="+") public static <V1> androidx.compose.Effect<kotlin.Unit> onPreCommit(V1? v1, kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
-    method @CheckResult(suggest="+") public static <V1, V2> androidx.compose.Effect<kotlin.Unit> onPreCommit(V1? v1, V2? v2, kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
-    method @CheckResult(suggest="+") public static androidx.compose.Effect<kotlin.Unit> onPreCommit(Object![]? inputs, kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
-    method @CheckResult(suggest="+") public static <T> androidx.compose.Effect<androidx.compose.State<T>> state(kotlin.jvm.functions.Function0<? extends T> init);
-    method @CheckResult(suggest="+") public static <T, V1> androidx.compose.Effect<androidx.compose.State<T>> stateFor(V1? v1, kotlin.jvm.functions.Function0<? extends T> init);
-    method @CheckResult(suggest="+") public static <T, V1, V2> androidx.compose.Effect<androidx.compose.State<T>> stateFor(V1? v1, V2? v2, kotlin.jvm.functions.Function0<? extends T> init);
-    method @CheckResult(suggest="+") public static <T> androidx.compose.Effect<androidx.compose.State<T>> stateFor(Object![]? inputs, kotlin.jvm.functions.Function0<? extends T> init);
-    method public static operator <T> T! unaryPlus(androidx.compose.Effect<T>);
+    method @androidx.compose.Composable public static <T> T! ambient(androidx.compose.Ambient<T> key);
+    method @androidx.compose.Composable public static androidx.compose.CompositionReference compositionReference();
+    method @Deprecated @androidx.compose.Composable public static <T> T! effectOf(kotlin.jvm.functions.Function0<? extends T> block);
+    method public static kotlin.jvm.functions.Function0<kotlin.Unit> getInvalidate();
+    method @androidx.compose.Composable public static void onActive(kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
+    method @androidx.compose.Composable public static void onCommit(kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
+    method @androidx.compose.Composable public static <V1> void onCommit(V1? v1, kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
+    method @androidx.compose.Composable public static <V1, V2> void onCommit(V1? v1, V2? v2, kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
+    method @androidx.compose.Composable public static void onCommit(Object![]? inputs, kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
+    method @androidx.compose.Composable public static void onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> callback);
+    method @androidx.compose.Composable public static void onPreCommit(kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
+    method @androidx.compose.Composable public static <V1> void onPreCommit(V1? v1, kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
+    method @androidx.compose.Composable public static <V1, V2> void onPreCommit(V1? v1, V2? v2, kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
+    method @androidx.compose.Composable public static void onPreCommit(Object![]? inputs, kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
+    method @Deprecated public static operator <T> T! unaryPlus(T?);
   }
 
   public interface Emittable {
@@ -265,7 +234,9 @@ package androidx.compose {
   }
 
   public final class KeyKt {
-    method @androidx.compose.Composable public static void Key(@androidx.compose.Pivotal Object? key, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+    method @androidx.compose.Composable public static <T, V1> T! key(@androidx.compose.Pivotal V1? v1, kotlin.jvm.functions.Function0<? extends T> block);
+    method @androidx.compose.Composable public static <T, V1, V2> T! key(@androidx.compose.Pivotal V1? v1, @androidx.compose.Pivotal V2? v2, kotlin.jvm.functions.Function0<? extends T> block);
+    method @androidx.compose.Composable public static <T> T! key(@androidx.compose.Pivotal Object![]? inputs, kotlin.jvm.functions.Function0<? extends T> block);
   }
 
   public final class KeySourceInfoKt {
@@ -323,6 +294,18 @@ package androidx.compose {
   }
 
   public final class RecomposerKt {
+  }
+
+  public final class RememberKt {
+    method @Deprecated @androidx.compose.Composable public static <T> T! memo(kotlin.jvm.functions.Function0<? extends T> calculation);
+    method @Deprecated @androidx.compose.Composable public static <T, V1> T! memo(V1? v1, kotlin.jvm.functions.Function0<? extends T> calculation);
+    method @Deprecated @androidx.compose.Composable public static <T, V1, V2> T! memo(V1? v1, V2? v2, kotlin.jvm.functions.Function0<? extends T> calculation);
+    method @Deprecated @androidx.compose.Composable public static <T> T! memo(Object![]? inputs, kotlin.jvm.functions.Function0<? extends T> calculation);
+    method @androidx.compose.Composable public static <T> T! remember(kotlin.jvm.functions.Function0<? extends T> calculation);
+    method @androidx.compose.Composable public static <T, V1> T! remember(V1? v1, kotlin.jvm.functions.Function0<? extends T> calculation);
+    method @androidx.compose.Composable public static <T, V1, V2> T! remember(V1? v1, V2? v2, kotlin.jvm.functions.Function0<? extends T> calculation);
+    method @androidx.compose.Composable public static <T, V1, V2, V3> T! remember(V1? v1, V2? v2, V3? v3, kotlin.jvm.functions.Function0<? extends T> calculation);
+    method @androidx.compose.Composable public static <V> V! remember(Object![]? inputs, kotlin.jvm.functions.Function0<? extends V> block);
   }
 
   public interface ScopeUpdateScope {
@@ -437,6 +420,13 @@ package androidx.compose {
     property public final T! value;
   }
 
+  public final class StateKt {
+    method @androidx.compose.Composable public static <T> androidx.compose.State<T> state(kotlin.jvm.functions.Function0<? extends T> init);
+    method @androidx.compose.Composable public static <T, V1> androidx.compose.State<T> stateFor(V1? v1, kotlin.jvm.functions.Function0<? extends T> init);
+    method @androidx.compose.Composable public static <T, V1, V2> androidx.compose.State<T> stateFor(V1? v1, V2? v2, kotlin.jvm.functions.Function0<? extends T> init);
+    method @androidx.compose.Composable public static <T> androidx.compose.State<T> stateFor(Object![]? inputs, kotlin.jvm.functions.Function0<? extends T> init);
+  }
+
   public class ThreadLocal<T> extends java.lang.ThreadLocal<T> {
     ctor public ThreadLocal(kotlin.jvm.functions.Function0<? extends T> initialValue);
   }
@@ -477,7 +467,7 @@ package androidx.compose {
     method public static <T> T! runWithCurrent(androidx.compose.Composer<?>, kotlin.jvm.functions.Function0<? extends T> block);
   }
 
-  @androidx.compose.EffectsDsl public final class ViewComposition {
+  public final class ViewComposition {
     ctor public ViewComposition(androidx.compose.ViewComposer composer);
     method public inline void call(Object key, kotlin.jvm.functions.Function1<? super androidx.compose.ViewValidator,java.lang.Boolean> invalid, kotlin.jvm.functions.Function0<kotlin.Unit> block);
     method public inline <T> void call(Object key, kotlin.jvm.functions.Function0<? extends T> ctor, kotlin.jvm.functions.Function2<? super androidx.compose.ViewValidator,? super T,java.lang.Boolean> invalid, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> block);
@@ -491,7 +481,6 @@ package androidx.compose {
     method public inline Object joinKey(Object left, Object? right);
     method public void observe(Object key, kotlin.jvm.functions.Function1<? super kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit>,kotlin.Unit> block);
     method public void startRestartGroup(Object key);
-    method public inline operator <V> V! unaryPlus(androidx.compose.Effect<V>);
   }
 
   public final class ViewValidator {

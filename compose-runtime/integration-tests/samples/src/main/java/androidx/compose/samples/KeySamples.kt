@@ -20,18 +20,17 @@ package androidx.compose.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.Composable
-import androidx.compose.Key
-import androidx.compose.unaryPlus
+import androidx.compose.key
 
 @Sampled
 @Composable
 fun locallyUniqueKeys() {
     for (user in users) {
-        Key(user.id) { UserPreview(user = user) }
+        key(user.id) { UserPreview(user = user) }
     }
 
     for (user in users.filter { isAdmin }) {
-        Key(user.id) { Friend(friend = user) }
+        key(user.id) { Friend(friend = user) }
     }
 }
 
@@ -39,7 +38,7 @@ fun locallyUniqueKeys() {
 @Composable
 fun notAlwaysUniqueKeys() {
     for ((child, parent) in relationships) {
-        Key(parent.id) {
+        key(parent.id) {
             User(user = child)
             User(user = parent)
         }
@@ -50,7 +49,7 @@ fun notAlwaysUniqueKeys() {
 @Composable
 fun moreCorrectUniqueKeys() {
     for ((child, parent) in relationships) {
-        Key(parent.id to child.id) {
+        key(parent.id to child.id) {
             User(user = child)
             User(user = parent)
         }

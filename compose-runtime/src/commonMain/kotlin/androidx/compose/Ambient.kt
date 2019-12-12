@@ -97,7 +97,7 @@ internal constructor(private val defaultFactory: (() -> T)? = null) {
         children: @Composable() () -> Unit
     ) {
         with(currentComposerNonNull) {
-            val holder = +memo {
+            val holder = remember {
                 Holder(
                     this@Ambient,
                     value

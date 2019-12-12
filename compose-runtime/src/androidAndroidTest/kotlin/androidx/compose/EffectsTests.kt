@@ -25,6 +25,7 @@ import androidx.test.rule.ActivityTestRule
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
+import org.junit.After
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -32,6 +33,11 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @Suppress("PLUGIN_WARNING")
 class EffectsTests {
+
+    @After
+    fun teardown() {
+        Compose.clearRoots()
+    }
 
     @get:Rule
     val activityRule = ActivityTestRule(TestActivity::class.java)
@@ -41,7 +47,7 @@ class EffectsTests {
         var inc = 0
 
         compose {
-            +memo { ++inc }
+            remember { ++inc }
         }.then { _ ->
             assertEquals(1, inc)
         }.then { _ ->
@@ -58,7 +64,7 @@ class EffectsTests {
 
         compose {
             compositions++
-            calculation = +memo(key) { 100 * ++calculations }
+            calculation = remember(key) { 100 * ++calculations }
         }.then { _ ->
             assertEquals(1, calculations)
             assertEquals(100, calculation)
@@ -91,7 +97,7 @@ class EffectsTests {
         var local = State("invalid")
 
         compose {
-            local = +state { "Hello world! ${inc++}" }
+            local = state { "Hello world! ${inc++}" }
             composer.emit(
                 168,
                 { context -> TextView(context).apply { id = tv1Id } },
@@ -122,8 +128,8 @@ class EffectsTests {
         var local2 = State("invalid")
 
         compose {
-            local1 = +state { "First" }
-            local2 = +state { "Second" }
+            local1 = state { "First" }
+            local2 = state { "Second" }
             composer.emit(
                 168,
                 { context -> TextView(context).apply { id = tv1Id } },
@@ -170,7 +176,7 @@ class EffectsTests {
         @Composable
         fun Unmountable() {
             log("Unmountable:start")
-            +onPreCommit {
+            onPreCommit {
                 log("onPreCommit")
                 onDispose {
                     log("onDispose")
@@ -229,25 +235,31 @@ class EffectsTests {
 
         @Composable
         fun Unmountable() {
-            +onPreCommit {
-                log("onPreCommit:a2")
-                onDispose {
-                    log("onDispose:a2")
+            composer.call(123, { true }) {
+                onPreCommit {
+                    log("onPreCommit:a2")
+                    onDispose {
+                        log("onDispose:a2")
+                    }
                 }
             }
-            +onPreCommit {
-                log("onPreCommit:b2")
-                onDispose {
-                    log("onDispose:b2")
+            composer.call(234, { true }) {
+                onPreCommit {
+                    log("onPreCommit:b2")
+                    onDispose {
+                        log("onDispose:b2")
+                    }
                 }
             }
         }
 
         compose {
-            +onPreCommit {
-                log("onPreCommit:a1")
-                onDispose {
-                    log("onDispose:a1")
+            composer.call(345, { true }) {
+                onPreCommit {
+                    log("onPreCommit:a1")
+                    onDispose {
+                        log("onDispose:a1")
+                    }
                 }
             }
             if (mount) {
@@ -257,10 +269,12 @@ class EffectsTests {
                     { @Suppress("PLUGIN_ERROR") Unmountable() }
                 )
             }
-            +onPreCommit {
-                log("onPreCommit:b1")
-                onDispose {
-                    log("onDispose:b1")
+            composer.call(456, { true }) {
+                onPreCommit {
+                    log("onPreCommit:b1")
+                    onDispose {
+                        log("onDispose:b1")
+                    }
                 }
             }
         }.then { _ ->
@@ -303,7 +317,7 @@ class EffectsTests {
         fun log(x: String) = logHistory.add(x)
 
         compose {
-            +onPreCommit {
+            onPreCommit {
                 val y = x++
                 log("onPreCommit:$y")
                 onDispose {
@@ -334,14 +348,14 @@ class EffectsTests {
         fun log(x: String) = logHistory.add(x)
 
         compose {
-            +onPreCommit {
+            onPreCommit {
                 val y = a++
                 log("onPreCommit a:$y")
                 onDispose {
                     log("dispose a:$y")
                 }
             }
-            +onPreCommit {
+            onPreCommit {
                 val y = b++
                 log("onPreCommit b:$y")
                 onDispose {
@@ -375,7 +389,7 @@ class EffectsTests {
         fun log(x: String) = logHistory.add(x)
 
         compose {
-            +onPreCommit(key) {
+            onPreCommit(key) {
                 val y = x++
                 log("onPreCommit:$y")
                 onDispose {
@@ -419,7 +433,7 @@ class EffectsTests {
 
         @Composable
         fun Sub() {
-            +onPreCommit {
+            onPreCommit {
                 val y = c++
                 log("onPreCommit c:$y")
                 onDispose {
@@ -429,7 +443,7 @@ class EffectsTests {
         }
 
         compose {
-            +onPreCommit {
+            onPreCommit {
                 val y = a++
                 log("onPreCommit a:$y")
                 onDispose {
@@ -437,7 +451,7 @@ class EffectsTests {
                 }
             }
 
-            +onPreCommit {
+            onPreCommit {
                 val y = b++
                 log("onPreCommit b:$y")
                 onDispose {
@@ -479,7 +493,7 @@ class EffectsTests {
         fun log(x: String) = logHistory.add(x)
 
         fun DisposeLogger(msg: String) {
-            +onDispose { log(msg) }
+            onDispose { log(msg) }
         }
 
         compose {
@@ -522,19 +536,19 @@ class EffectsTests {
         @Composable
         fun Unmountable() {
             log("Unmountable:start")
-            +onCommit {
+            onCommit {
                 log("onCommit 1")
                 onDispose {
                     log("onDispose 1")
                 }
             }
-            +onPreCommit {
+            onPreCommit {
                 log("onPreCommit 2")
                 onDispose {
                     log("onDispose 2")
                 }
             }
-            +onCommit {
+            onCommit {
                 log("onCommit 3")
                 onDispose {
                     log("onDispose 3")
@@ -605,7 +619,7 @@ class EffectsTests {
                 {
                     @Suppress("PLUGIN_ERROR")
                     (Observe {
-                        val foo = +ambient(Foo)
+                        val foo = ambient(Foo)
                         composer.emit(
                             168,
                             { context -> TextView(context).apply { id = tv1Id } },
@@ -648,7 +662,7 @@ class EffectsTests {
         fun SimpleComposable2() {
             Observe {
                 with(composer) {
-                    val value = +ambient(MyAmbient)
+                    val value = ambient(MyAmbient)
                     emit(534, { context -> TextView(context) }, {
                         set("$value") { text = it }
                     })
@@ -709,7 +723,7 @@ class EffectsTests {
             with(composer) {
                 composer.startRestartGroup(712)
                 componentComposed = true
-                val value = +ambient(MyAmbient)
+                val value = ambient(MyAmbient)
                 emit(534, { context -> TextView(context) }, {
                     set("$value") { text = it }
                 })
@@ -765,7 +779,7 @@ class EffectsTests {
         var inc = 0
 
         compose {
-            val local = +state { "Hello world! ${inc++}" }
+            val local = state { "Hello world! ${inc++}" }
             composer.emit(
                 168,
                 { context -> TextView(context).apply { id = tv1Id } },
@@ -803,9 +817,13 @@ class EffectsTests {
 
         fun then(block: (activity: Activity) -> Unit): ActiveTest {
             activity.show {
-                Recompose {
-                    doRecompose = it
-                    composable()
+                composer.call(3193, { true }) {
+                    Recompose {
+                        doRecompose = it
+                        composer.call(9823, { true }) {
+                            composable()
+                        }
+                    }
                 }
             }
             activity.waitForAFrame()

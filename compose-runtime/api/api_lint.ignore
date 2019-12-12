@@ -3,21 +3,19 @@ AcronymName: androidx.compose.SlotTable.Companion#getEMPTY():
     Acronyms should not be capitalized in method names: was `getEMPTY`, should this be `getEmpty`?
 
 
-ArrayReturn: androidx.compose.ComposerKt#remember(androidx.compose.Composer<N>, Object[], kotlin.jvm.functions.Function0<? extends V>) parameter #1:
-    Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
-ArrayReturn: androidx.compose.EffectsKt#key(Object[], kotlin.jvm.functions.Function1<? super androidx.compose.Effect<T>,? extends T>) parameter #0:
-    Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
-ArrayReturn: androidx.compose.EffectsKt#memo(Object[], kotlin.jvm.functions.Function0<? extends T>) parameter #0:
-    Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
-ArrayReturn: androidx.compose.EffectsKt#modelFor(Object[], kotlin.jvm.functions.Function0<? extends T>) parameter #0:
-    Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
 ArrayReturn: androidx.compose.EffectsKt#onCommit(Object[], kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit>) parameter #0:
     Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
 ArrayReturn: androidx.compose.EffectsKt#onPreCommit(Object[], kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit>) parameter #0:
     Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
-ArrayReturn: androidx.compose.EffectsKt#stateFor(Object[], kotlin.jvm.functions.Function0<? extends T>) parameter #0:
+ArrayReturn: androidx.compose.KeyKt#key(Object[], kotlin.jvm.functions.Function0<? extends T>) parameter #0:
+    Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
+ArrayReturn: androidx.compose.RememberKt#memo(Object[], kotlin.jvm.functions.Function0<? extends T>) parameter #0:
+    Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
+ArrayReturn: androidx.compose.RememberKt#remember(Object[], kotlin.jvm.functions.Function0<? extends V>) parameter #0:
     Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
 ArrayReturn: androidx.compose.SlotTable#SlotTable(Object[]) parameter #0:
+    Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
+ArrayReturn: androidx.compose.StateKt#stateFor(Object[], kotlin.jvm.functions.Function0<? extends T>) parameter #0:
     Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
 ArrayReturn: androidx.compose.UnionType#types():
     Method should return Collection<Class> (or subclass) instead of raw array; was `java.lang.Class<?>[]`
@@ -73,10 +71,6 @@ MissingNullability: androidx.compose.SlotReader#getGroupKey():
     Missing nullability on method `getGroupKey` return
 MissingNullability: androidx.compose.ViewComposerKt#getComposer():
     Missing nullability on method `getComposer` return
-
-
-MutableBareField: androidx.compose.Effect#context:
-    Bare field context must be marked final, or moved behind accessors if mutable
 
 
 RegistrationName: androidx.compose.Choreographer#removeFrameCallback(android.view.Choreographer.FrameCallback):

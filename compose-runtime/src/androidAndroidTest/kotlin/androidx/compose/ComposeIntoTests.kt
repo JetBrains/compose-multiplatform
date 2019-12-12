@@ -20,12 +20,18 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.rule.ActivityTestRule
 import org.junit.Assert.assertEquals
+import org.junit.After
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class ComposeIntoTests {
+
+    @After
+    fun teardown() {
+        Compose.clearRoots()
+    }
 
     @get:Rule
     val activityRule = ActivityTestRule(DisposeTests.DisposeTestActivity::class.java)
@@ -38,8 +44,8 @@ class ComposeIntoTests {
         var initializationCount = 0
         var commitCount = 0
         val composable = @Composable {
-            +onActive { initializationCount++ }
-            +onCommit { commitCount++ }
+            onActive { initializationCount++ }
+            onCommit { commitCount++ }
         }
 
         activity.show(composable)

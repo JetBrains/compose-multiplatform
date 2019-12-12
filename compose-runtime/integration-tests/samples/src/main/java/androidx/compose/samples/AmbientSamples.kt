@@ -22,7 +22,6 @@ import androidx.annotation.Sampled
 import androidx.compose.Ambient
 import androidx.compose.Composable
 import androidx.compose.ambient
-import androidx.compose.unaryPlus
 
 @Sampled
 fun createAmbient() {
@@ -54,7 +53,7 @@ fun someScreenSample() {
 fun consumeAmbient() {
     @Composable
     fun UserPhoto() {
-        val user = +ambient(ActiveUser)
+        val user = ambient(ActiveUser)
         ProfileIcon(src = user.profilePhotoUrl)
     }
 }

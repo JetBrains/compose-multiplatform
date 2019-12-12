@@ -33,7 +33,6 @@ import androidx.compose.mock.join
 import androidx.compose.mock.linear
 import androidx.compose.mock.memoize
 import androidx.compose.mock.points
-import androidx.compose.mock.remember
 import androidx.compose.mock.repeat
 import androidx.compose.mock.reportsReport
 import androidx.compose.mock.reportsTo
@@ -43,12 +42,18 @@ import androidx.compose.mock.skip
 import androidx.compose.mock.text
 import androidx.compose.mock.update
 import androidx.compose.mock.validate
+import org.junit.After
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
 class CompositionTests {
+
+    @After
+    fun teardown() {
+        androidx.compose.Compose.clearRoots()
+    }
 
     @Test
     fun testComposeAModel() {
@@ -1872,9 +1877,12 @@ private fun compose(
         MockViewComposer(root)
     }
 
-    myComposer.compose {
-        block()
+    myComposer.runWithCurrent {
+        myComposer.compose {
+            block()
+        }
     }
+
     if (expectChanges) {
         assertNotEquals(0, myComposer.changeCount, "changes were expected")
         myComposer.applyChanges()

@@ -27,12 +27,18 @@ import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertNotSame
 import junit.framework.TestCase.assertTrue
+import org.junit.After
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class ComposerCompositionContextTests : ComposerComposeTestCase() {
+
+    @After
+    fun teardown() {
+        Compose.clearRoots()
+    }
 
     @get:Rule
     val activityRule = ActivityTestRule(TestActivity::class.java)

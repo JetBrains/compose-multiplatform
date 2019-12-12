@@ -23,9 +23,7 @@ import androidx.compose.Composable
 import androidx.compose.Pivotal
 import androidx.compose.onActive
 import androidx.compose.onCommit
-import androidx.compose.onDispose
 import androidx.compose.state
-import androidx.compose.unaryPlus
 import androidx.ui.core.Text
 
 @Sampled
@@ -40,8 +38,8 @@ fun incorrectUserOrdering() {
 
     @Composable
     fun UserRow(userId: Int) {
-        var user by +state<User?> { null }
-        +onActive {
+        var user by state<User?> { null }
+        onActive {
             val dispose = Api.getUserAsync(userId) { user = it }
             onDispose(dispose)
         }
@@ -60,8 +58,8 @@ fun incorrectUserOrdering() {
 fun expensiveApiCalls() {
     @Composable
     fun UserRow(userId: Int) {
-        var user by +state<User?> { null }
-        +onCommit(userId) {
+        var user by state<User?> { null }
+        onCommit(userId) {
             val dispose = Api.getUserAsync(userId) { user = it }
             onDispose(dispose)
         }
@@ -80,8 +78,8 @@ fun expensiveApiCalls() {
 fun pivotalUsage() {
     @Composable
     fun UserRow(@Pivotal userId: Int) {
-        var user by +state<User?> { null }
-        +onActive {
+        var user by state<User?> { null }
+        onActive {
             val dispose = Api.getUserAsync(userId) { user = it }
             onDispose(dispose)
         }

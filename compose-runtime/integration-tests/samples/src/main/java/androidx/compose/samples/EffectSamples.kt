@@ -18,13 +18,10 @@ package androidx.compose.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.Composable
-import androidx.compose.State
-import androidx.compose.effectOf
 import androidx.compose.key
 import androidx.compose.onCommit
 import androidx.compose.state
 import androidx.compose.stateFor
-import androidx.compose.unaryPlus
 import androidx.ui.core.Text
 import androidx.ui.material.Button
 
@@ -32,9 +29,10 @@ import androidx.ui.material.Button
 @Sampled
 @Composable
 fun observeUserSample() {
-    fun observeUser(userId: Int) = effectOf<User?> {
-        val user = +stateFor<User?>(userId) { null }
-        +onCommit(userId) {
+    @Composable
+    fun observeUser(userId: Int): User? {
+        val user = stateFor<User?>(userId) { null }
+        onCommit(userId) {
             val subscription = UserAPI.subscribeToUser(userId) {
                 user.value = it
             }
@@ -42,16 +40,7 @@ fun observeUserSample() {
                 subscription.unsubscribe()
             }
         }
-        user.value
-    }
-}
-
-@Sampled
-@Composable
-fun oneInputKeySample() {
-    for (element in elements) {
-        val selected by +key<State<Boolean>>(element.id) { +state { false } }
-        ListItem(item = element, selected = selected)
+        return user.value
     }
 }
 
@@ -59,7 +48,7 @@ fun oneInputKeySample() {
 @Composable
 fun twoInputsKeySample() {
     for (element in elements) {
-        val selected by +key<State<Boolean>>(element.id, parentId) { +state { false } }
+        val selected by key(element.id, parentId) { state { false } }
         ListItem(item = element, selected = selected)
     }
 }
@@ -67,7 +56,7 @@ fun twoInputsKeySample() {
 @Sampled
 @Composable
 fun SimpleStateSample() {
-    val count = +state { 0 }
+    val count = state { 0 }
 
     Text(text = "You clicked ${count.value} times")
     Button(text = "Click me", onClick = { count.value++ })
@@ -76,7 +65,7 @@ fun SimpleStateSample() {
 @Sampled
 @Composable
 fun DestructuredStateSample() {
-    val (count, setCount) = +state { 0 }
+    val (count, setCount) = state { 0 }
 
     Text(text = "You clicked $count times")
     Button(text = "Click me", onClick = { setCount(count + 1) })
@@ -88,7 +77,7 @@ fun DestructuredStateSample() {
 @Sampled
 @Composable
 fun DelegatedStateSample() {
-    var count by +state { 0 }
+    var count by state { 0 }
 
     Text(text = "You clicked $count times")
     Button(text = "Click me", onClick = { count = count + 1 })
