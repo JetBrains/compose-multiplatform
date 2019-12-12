@@ -19,6 +19,7 @@ package androidx.build.dependencies
 const val ANDROIDX_TEST_CORE = "androidx.test:core:1.2.0"
 const val ANDROIDX_TEST_EXT_JUNIT = "androidx.test.ext:junit:1.1.1"
 const val ANDROIDX_TEST_EXT_KTX = "androidx.test.ext:junit-ktx:1.1.1"
+const val ANDROIDX_TEST_EXT_TRUTH = "androidx.test.ext:truth:1.3.0-alpha03"
 const val ANDROIDX_TEST_MONITOR = "androidx.test:monitor:1.2.0"
 const val ANDROIDX_TEST_RULES = "androidx.test:rules:1.2.0"
 const val ANDROIDX_TEST_RUNNER = "androidx.test:runner:1.2.0"
