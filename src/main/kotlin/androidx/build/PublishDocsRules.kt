@@ -33,6 +33,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.ANNOTATION, "annotation", "1.1.0")
     prebuilts(LibraryGroups.ANNOTATION, "annotation-experimental", "1.0.0")
     prebuilts(LibraryGroups.ANNOTATION, "annotation-experimental-lint", "1.0.0")
+    ignore(LibraryGroups.APPCOMPAT.group, "appcompat-lint")
     prebuilts(LibraryGroups.APPCOMPAT, "1.2.0-alpha01")
     prebuilts(LibraryGroups.ARCH_CORE, "2.1.0")
     prebuilts(LibraryGroups.ASYNCLAYOUTINFLATER, "1.0.0")
