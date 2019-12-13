@@ -19,5 +19,5 @@ apply plugin: 'kotlin'
 dependencies {
     compileOnly build_libs.lint.api
     compileOnly build_libs.kotlin.stdlib
-    implementation "androidx.annotation:annotation:1.0.0"
+    api "androidx.annotation:annotation:1.0.0"
 }
