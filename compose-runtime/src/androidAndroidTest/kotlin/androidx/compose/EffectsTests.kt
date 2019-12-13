@@ -94,7 +94,7 @@ class EffectsTests {
     fun testState1() {
         val tv1Id = 100
         var inc = 0
-        var local = State("invalid")
+        var local = mutableStateOf("invalid")
 
         compose {
             local = state { "Hello world! ${inc++}" }
@@ -124,8 +124,8 @@ class EffectsTests {
     fun testState2() {
         val tv1Id = 100
         val tv2Id = 200
-        var local1 = State("invalid")
-        var local2 = State("invalid")
+        var local1 = mutableStateOf("invalid")
+        var local2 = mutableStateOf("invalid")
 
         compose {
             local1 = state { "First" }

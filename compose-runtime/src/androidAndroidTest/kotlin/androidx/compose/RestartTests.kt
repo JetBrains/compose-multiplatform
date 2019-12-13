@@ -181,7 +181,7 @@ class RestartTests {
     fun restart_State_delete() {
         val tvStateId = 101
         val state = frame {
-            State(true)
+            mutableStateOf(true)
         }
 
         fun ViewComposition.ShowSomething() {

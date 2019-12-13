@@ -251,6 +251,23 @@ package androidx.compose {
   @androidx.compose.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.CLASS) public @interface Model {
   }
 
+  public interface MutableState<T> extends androidx.compose.State<T> {
+    method public operator T! component1();
+    method public operator kotlin.jvm.functions.Function1<T,kotlin.Unit> component2();
+    method public operator T! getValue(Object? thisObj, kotlin.reflect.KProperty<?> property);
+    method public void setValue(T! p);
+    method public operator void setValue(Object? thisObj, kotlin.reflect.KProperty<?> property, T? next);
+    property public abstract T! value;
+  }
+
+  public final class MutableStateKt {
+    method public static <T> androidx.compose.MutableState<T> mutableStateOf(T? value);
+    method @androidx.compose.Composable public static <T> androidx.compose.MutableState<T> state(kotlin.jvm.functions.Function0<? extends T> init);
+    method @androidx.compose.Composable public static <T, V1> androidx.compose.MutableState<T> stateFor(V1? v1, kotlin.jvm.functions.Function0<? extends T> init);
+    method @androidx.compose.Composable public static <T, V1, V2> androidx.compose.MutableState<T> stateFor(V1? v1, V2? v2, kotlin.jvm.functions.Function0<? extends T> init);
+    method @androidx.compose.Composable public static <T> androidx.compose.MutableState<T> stateFor(Object![]? inputs, kotlin.jvm.functions.Function0<? extends T> init);
+  }
+
   public final class NullCompilationScope {
     method public kotlin.Unit getComposer();
     property public final kotlin.Unit composer;
@@ -407,24 +424,9 @@ package androidx.compose {
   @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets={AnnotationTarget.ANNOTATION_CLASS, AnnotationTarget.CLASS}) public @interface StableMarker {
   }
 
-  @androidx.compose.Model public final class State<T> implements androidx.compose.frames.Framed {
-    method public operator T! component1();
-    method public operator kotlin.jvm.functions.Function1<T,kotlin.Unit> component2();
-    method public androidx.compose.frames.Record getFirstFrameRecord();
+  public interface State<T> {
     method public T! getValue();
-    method public operator T! getValue(Object? thisObj, kotlin.reflect.KProperty<?> property);
-    method @androidx.compose.annotations.Hide public void prependFrameRecord(androidx.compose.frames.Record value);
-    method public void setValue(T? value);
-    method public operator void setValue(Object? thisObj, kotlin.reflect.KProperty<?> property, T? next);
-    property public androidx.compose.frames.Record firstFrameRecord;
-    property public final T! value;
-  }
-
-  public final class StateKt {
-    method @androidx.compose.Composable public static <T> androidx.compose.State<T> state(kotlin.jvm.functions.Function0<? extends T> init);
-    method @androidx.compose.Composable public static <T, V1> androidx.compose.State<T> stateFor(V1? v1, kotlin.jvm.functions.Function0<? extends T> init);
-    method @androidx.compose.Composable public static <T, V1, V2> androidx.compose.State<T> stateFor(V1? v1, V2? v2, kotlin.jvm.functions.Function0<? extends T> init);
-    method @androidx.compose.Composable public static <T> androidx.compose.State<T> stateFor(Object![]? inputs, kotlin.jvm.functions.Function0<? extends T> init);
+    property public abstract T! value;
   }
 
   public class ThreadLocal<T> extends java.lang.ThreadLocal<T> {

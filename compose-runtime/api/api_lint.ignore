@@ -9,13 +9,13 @@ ArrayReturn: androidx.compose.EffectsKt#onPreCommit(Object[], kotlin.jvm.functio
     Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
 ArrayReturn: androidx.compose.KeyKt#key(Object[], kotlin.jvm.functions.Function0<? extends T>) parameter #0:
     Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
+ArrayReturn: androidx.compose.MutableStateKt#stateFor(Object[], kotlin.jvm.functions.Function0<? extends T>) parameter #0:
+    Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
 ArrayReturn: androidx.compose.RememberKt#memo(Object[], kotlin.jvm.functions.Function0<? extends T>) parameter #0:
     Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
 ArrayReturn: androidx.compose.RememberKt#remember(Object[], kotlin.jvm.functions.Function0<? extends V>) parameter #0:
     Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
 ArrayReturn: androidx.compose.SlotTable#SlotTable(Object[]) parameter #0:
-    Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
-ArrayReturn: androidx.compose.StateKt#stateFor(Object[], kotlin.jvm.functions.Function0<? extends T>) parameter #0:
     Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
 ArrayReturn: androidx.compose.UnionType#types():
     Method should return Collection<Class> (or subclass) instead of raw array; was `java.lang.Class<?>[]`
