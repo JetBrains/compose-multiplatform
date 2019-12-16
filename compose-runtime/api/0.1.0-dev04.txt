@@ -166,9 +166,6 @@ package androidx.compose {
     method public <N> void registerComposer(androidx.compose.Composer<N> composer);
   }
 
-  @kotlin.DslMarker public @interface EffectsDsl {
-  }
-
   public final class EffectsKt {
     method @androidx.compose.Composable public static <T> T! ambient(androidx.compose.Ambient<T> key);
     method @androidx.compose.Composable public static androidx.compose.CompositionReference compositionReference();
