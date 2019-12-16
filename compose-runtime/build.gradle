@@ -37,7 +37,7 @@ kotlin {
             implementation kotlin("test-junit")
         }
         androidMain.dependencies {
-            implementation "androidx.annotation:annotation:1.0.0"
+            api "androidx.annotation:annotation:1.0.0"
         }
         androidAndroidTest.dependencies {
             implementation(ANDROIDX_TEST_EXT_JUNIT)
