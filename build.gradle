@@ -63,6 +63,10 @@ apply plugin: "java-gradle-plugin"
 sourceSets {
     main.java.srcDirs += "${supportRootFolder}/benchmark/gradle-plugin/src/main/kotlin"
     main.resources.srcDirs += "${supportRootFolder}/benchmark/gradle-plugin/src/main/resources"
+
+    main.java.srcDirs += "${supportRootFolder}/inspection/inspection-gradle-plugin/src/main/kotlin"
+    main.resources.srcDirs += "${supportRootFolder}/inspection/inspection-gradle-plugin/src/main" +
+            "/resources"
 }
 
 gradlePlugin {
@@ -70,6 +74,10 @@ gradlePlugin {
         benchmark {
             id = 'androidx.benchmark'
             implementationClass = 'androidx.benchmark.gradle.BenchmarkPlugin'
+        }
+        inspection {
+            id = 'androidx.inspection'
+            implementationClass = 'androidx.inspection.gradle.InspectionPlugin'
         }
     }
 }
