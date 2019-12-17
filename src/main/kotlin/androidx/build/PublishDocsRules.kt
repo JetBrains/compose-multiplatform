@@ -54,12 +54,7 @@ val RELEASE_RULE = docsRules("public", false) {
             .addStubs("car/stubs/android.car.jar")
     prebuilts(LibraryGroups.CARDVIEW, "1.0.0")
     prebuilts(LibraryGroups.COLLECTION, "1.1.0")
-    // Docs were fixed awhile ago for concurrent-futures, but fix wasn't cherry-picked to release
-    // branch. There is no reason to push a new release for docs only,
-    // so we build docs against the fake prebuilt. This prebuilt is identical
-    // to 1.0.0 release modulo changes in docs.
-    prebuilts(LibraryGroups.CONCURRENT, "concurrent-futures", "1.1.0-alpha01")
-    ignore(LibraryGroups.CONCURRENT.group, "concurrent-futures-ktx")
+    prebuilts(LibraryGroups.CONCURRENT, "1.1.0-alpha01")
     prebuilts(LibraryGroups.CONTENTPAGER, "1.0.0")
     prebuilts(LibraryGroups.COORDINATORLAYOUT, "1.1.0")
     prebuilts(LibraryGroups.CORE, "core", "1.2.0-rc01")
