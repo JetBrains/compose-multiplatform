@@ -109,7 +109,6 @@ val API_LINT_ARGS: List<String> = listOf(
         "StartWithLower", // b/135710527
 
         // The list of checks that are API lint warnings and are yet to be enabled
-        "TopLevelBuilder",
         "BuilderSetStyle",
         "ExecutorRegistration",
         "NotCloseable",
@@ -127,6 +126,7 @@ val API_LINT_ARGS: List<String> = listOf(
     "--error",
     listOf(
         "MinMaxConstant",
+        "TopLevelBuilder",
         "MissingBuild",
         "SetterReturnsThis",
         "OverlappingConstants",
