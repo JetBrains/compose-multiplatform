@@ -418,6 +418,9 @@ package androidx.compose {
     method public static inline int sourceLocation();
   }
 
+  @androidx.compose.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.CLASS) public @interface Stable {
+  }
+
   @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets={AnnotationTarget.ANNOTATION_CLASS, AnnotationTarget.CLASS}) public @interface StableMarker {
   }
 
