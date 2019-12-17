@@ -51,7 +51,7 @@ package androidx.compose
  * @see [Pivotal]
  */
 @Composable
-/*inline*/ fun <T, V1> key(
+inline fun <T, V1> key(
     @Suppress("UNUSED_PARAMETER")
     @Pivotal
     v1: V1,
@@ -97,7 +97,7 @@ package androidx.compose
  * @param block The composable children for this group.
  */
 @Composable
-/*inline*/ fun <T, V1, V2> key(
+inline fun <T, V1, V2> key(
     @Suppress("UNUSED_PARAMETER")
     @Pivotal
     v1: V1,
@@ -140,7 +140,7 @@ package androidx.compose
  * @param block The composable children for this group.
  */
 @Composable
-fun <T> key(
+inline fun <T> key(
     @Suppress("UNUSED_PARAMETER")
     @Pivotal
     vararg inputs: Any?,

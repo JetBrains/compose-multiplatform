@@ -16,7 +16,9 @@
 
 package androidx.compose
 
+@PublishedApi
 internal expect val currentComposerNonNull: Composer<*>
+@PublishedApi
 internal expect var currentComposer: Composer<*>?
 
 internal expect fun createComposer(root: Any, context: Context, recomposer: Recomposer): Composer<*>

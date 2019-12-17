@@ -22,7 +22,7 @@ package androidx.compose
  */
 
 @Composable
-/*inline*/ fun <T> remember(calculation: () -> T): T =
+inline fun <T> remember(calculation: () -> T): T =
     currentComposerNonNull.cache(true, calculation)
 
 /**
@@ -30,7 +30,7 @@ package androidx.compose
  * produce and remember a new value by calling [calculation].
  */
 @Composable
-/*inline*/ fun <T, /*reified*/ V1> remember(v1: V1, calculation: () -> T) = currentComposerNonNull
+inline fun <T, /*reified*/ V1> remember(v1: V1, calculation: () -> T) = currentComposerNonNull
     .let {
         it.cache(!it.changed(v1), calculation)
     }
@@ -40,7 +40,7 @@ package androidx.compose
  * otherwise produce and remember a new value by calling [calculation].
  */
 @Composable
-/*inline*/ fun <T, /*reified*/ V1, /*reified*/ V2> remember(
+inline fun <T, /*reified*/ V1, /*reified*/ V2> remember(
     v1: V1,
     v2: V2,
     calculation: () -> T
@@ -57,7 +57,7 @@ package androidx.compose
  * composition, otherwise produce and remember a new value by calling [calculation].
  */
 @Composable
-/*inline*/ fun <T, /*reified*/ V1, /*reified*/ V2, /*reified*/ V3> remember(
+inline fun <T, /*reified*/ V1, /*reified*/ V2, /*reified*/ V3> remember(
     v1: V1,
     v2: V2,
     v3: V3,
@@ -76,7 +76,7 @@ package androidx.compose
  * composition, otherwise produce and remember a new value by calling [block].
  */
 @Composable
-/*inline*/ fun <V> remember(vararg inputs: Any?, block: () -> V): V {
+inline fun <V> remember(vararg inputs: Any?, block: () -> V): V {
     return currentComposerNonNull.let {
         var valid = true
         for (input in inputs) valid = !it.changed(input) && valid

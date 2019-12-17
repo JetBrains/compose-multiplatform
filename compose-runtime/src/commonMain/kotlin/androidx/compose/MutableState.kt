@@ -52,7 +52,7 @@ import kotlin.reflect.KProperty
  * @see [remember]
  */
 @Composable
-/*inline*/ fun <T> state(init: () -> T) =
+inline fun <T> state(init: () -> T) =
     remember { mutableStateOf(init()) }
 
 /**
@@ -72,7 +72,7 @@ import kotlin.reflect.KProperty
  * @see [remember]
  */
 @Composable
-/*inline*/ fun <T, /*reified*/ V1> stateFor(v1: V1, init: () -> T) =
+inline fun <T, /*reified*/ V1> stateFor(v1: V1, init: () -> T) =
     remember(v1) { mutableStateOf(init()) }
 
 /**
@@ -93,7 +93,7 @@ import kotlin.reflect.KProperty
  * @see [memo]
  */
 @Composable
-/*inline*/ fun <T, /*reified*/ V1, /*reified*/ V2> stateFor(
+inline fun <T, reified V1, reified V2> stateFor(
     v1: V1,
     v2: V2,
     init: () -> T
@@ -116,7 +116,7 @@ import kotlin.reflect.KProperty
  * @see [remember]
  */
 @Composable
-/*inline*/ fun <T> stateFor(vararg inputs: Any?, init: () -> T) =
+inline fun <T> stateFor(vararg inputs: Any?, init: () -> T) =
     remember(*inputs) { mutableStateOf(init()) }
 
 /**
