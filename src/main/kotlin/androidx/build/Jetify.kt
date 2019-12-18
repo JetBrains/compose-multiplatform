@@ -53,6 +53,7 @@ val archivesToDejetify = listOf(
     "m2repository/androidx/exifinterface/**",
     "m2repository/androidx/fragment/fragment/**",
     "m2repository/androidx/fragment/fragment-ktx/**",
+    "m2repository/androidx/fragment/fragment-testing/**",
     "m2repository/androidx/gridlayout/**",
     "m2repository/androidx/heifwriter/**",
     "m2repository/androidx/interpolator/**",
