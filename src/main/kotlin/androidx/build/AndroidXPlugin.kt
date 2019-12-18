@@ -227,6 +227,7 @@ class AndroidXPlugin : Plugin<Project> {
 
         // copy host side test results to DIST
         project.tasks.withType(Test::class.java) { task ->
+            AffectedModuleDetector.configureTaskGuard(task)
             val report = task.reports.junitXml
             if (report.isEnabled) {
                 val zipTask = project.tasks.register(
