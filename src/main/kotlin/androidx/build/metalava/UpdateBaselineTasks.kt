@@ -50,15 +50,11 @@ abstract class UpdateApiLintBaselineTask @Inject constructor(
     @TaskAction
     fun updateBaseline() {
         check(bootClasspath.isNotEmpty()) { "Android boot classpath not set." }
-        val args = getCommonBaselineUpdateArgs(
-            bootClasspath,
-            dependencyClasspath,
-            baselines.get().apiLintFile
-        )
-        args.addAll(API_LINT_ARGS + listOf<String>(
-            "--source-path",
-            sourcePaths.filter { it.exists() }.joinToString(File.pathSeparator)
-        ))
+        val baselineFile = baselines.get().apiLintFile
+        val checkArgs = project.getGenerateApiArgs(bootClasspath, dependencyClasspath,
+            sourcePaths.filter { it.exists() }, null, GenerateApiMode.PublicApi,
+            ApiLintMode.CheckBaseline(baselineFile))
+        val args = checkArgs + getCommonBaselineUpdateArgs(baselineFile)
 
         runWithArgs(args)
     }
@@ -159,18 +155,23 @@ private fun getCommonBaselineUpdateArgs(
     dependencyClasspath: FileCollection,
     baselineFile: File
 ): MutableList<String> {
+    val args = mutableListOf(
+        "--classpath",
+        (bootClasspath + dependencyClasspath.files).joinToString(File.pathSeparator)
+    )
+    args += getCommonBaselineUpdateArgs(baselineFile)
+    return args
+}
+
+private fun getCommonBaselineUpdateArgs(baselineFile: File): List<String> {
     // Create the baseline file if it does exist, as Metalava cannot handle non-existent files.
     baselineFile.createNewFile()
     return mutableListOf(
-        "--classpath",
-        (bootClasspath + dependencyClasspath.files).joinToString(File.pathSeparator),
-
         "--update-baseline",
         baselineFile.toString(),
         "--baseline", baselineFile.toString(),
         "--pass-baseline-updates",
         "--delete-empty-baselines",
-
         "--format=v3",
         "--omit-common-packages=yes"
     )
