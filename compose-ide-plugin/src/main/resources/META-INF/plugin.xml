@@ -33,6 +33,13 @@ The Jetpack Compose IDE plugin
         <storageComponentContainerContributor implementation="androidx.compose.plugins.idea.IdeUnionAnnotationCheckerProvider" />
         <diagnosticSuppressor implementation="androidx.compose.plugins.idea.IdeComposeDiagnosticSuppressor"/>
     </extensions>
+    <extensions defaultExtensionNs="com.intellij">
+        <annotator
+            language="kotlin"
+            implementationClass="androidx.compose.plugins.idea.IdeComposableAnnotator"/>
+        <additionalTextAttributes scheme="Default"
+            file="colorschemes/IdeComposableAnnotatorColorSchemeDefault.xml"/>
+    </extensions>
     <extensions defaultExtensionNs="org.jetbrains.kotlin.extensions.internal">
         <callResolutionInterceptorExtension implementation="androidx.compose.plugins.idea.IdeComposeCallResolutionInterceptorExtension"/>
         <typeResolutionInterceptorExtension implementation="androidx.compose.plugins.idea.IdeComposeTypeResolutionInterceptorExtension"/>
