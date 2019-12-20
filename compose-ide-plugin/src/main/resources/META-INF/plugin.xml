@@ -39,6 +39,8 @@ The Jetpack Compose IDE plugin
             implementationClass="androidx.compose.plugins.idea.IdeComposableAnnotator"/>
         <additionalTextAttributes scheme="Default"
             file="colorschemes/IdeComposableAnnotatorColorSchemeDefault.xml"/>
+        <colorSettingsPage
+            implementation="androidx.compose.plugins.idea.IdeComposeColorSettingsPage"/>
     </extensions>
     <extensions defaultExtensionNs="org.jetbrains.kotlin.extensions.internal">
         <callResolutionInterceptorExtension implementation="androidx.compose.plugins.idea.IdeComposeCallResolutionInterceptorExtension"/>

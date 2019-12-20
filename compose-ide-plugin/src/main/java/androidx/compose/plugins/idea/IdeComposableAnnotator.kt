@@ -36,14 +36,16 @@ import org.jetbrains.kotlin.resolve.calls.callUtil.getResolvedCall
 // Used to apply styles for calls to @Composable functions.
 class IdeComposableAnnotator : Annotator {
     companion object TextAttributeRegistry {
-        private val COMPOSABLE_CALL_TEXT_ATTRIBUTES_KEY: TextAttributesKey
+        val COMPOSABLE_CALL_TEXT_ATTRIBUTES_KEY: TextAttributesKey
+        val COMPOSABLE_CALL_TEXT_ATTRIBUTES_NAME = "ComposableCallTextAttributes"
         private val ANALYSIS_RESULT_KEY = Key<AnalysisResult>(
             "IdeComposableAnnotator.DidAnnotateKey"
         )
 
         init {
             COMPOSABLE_CALL_TEXT_ATTRIBUTES_KEY = TextAttributesKey.createTextAttributesKey(
-                "ComposableCallTextAttributes", DefaultLanguageHighlighterColors.FUNCTION_CALL)
+                COMPOSABLE_CALL_TEXT_ATTRIBUTES_NAME,
+                DefaultLanguageHighlighterColors.FUNCTION_CALL)
         }
     }
 
