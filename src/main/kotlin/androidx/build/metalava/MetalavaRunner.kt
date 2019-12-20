@@ -18,7 +18,6 @@ package androidx.build.metalava
 
 import androidx.build.checkapi.ApiLocation
 import androidx.build.java.JavaCompileInputs
-import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.FileCollection
@@ -170,7 +169,7 @@ fun Project.generateApi(
     }
 }
 
-// Generates the specified api file
+// Gets arguments for generating the specified api file
 fun Project.generateApi(
     bootClasspath: Collection<File>,
     dependencyClasspath: FileCollection,
@@ -180,6 +179,20 @@ fun Project.generateApi(
     apiLintMode: ApiLintMode,
     workerExecutor: WorkerExecutor
 ) {
+    val args = getGenerateApiArgs(bootClasspath, dependencyClasspath, sourcePaths, outputFile,
+        generateApiMode, apiLintMode)
+    runMetalavaWithArgs(getMetalavaJar(), args, workerExecutor)
+}
+
+// Generates the specified api file
+fun Project.getGenerateApiArgs(
+    bootClasspath: Collection<File>,
+    dependencyClasspath: FileCollection,
+    sourcePaths: Collection<File>,
+    outputFile: File?,
+    generateApiMode: GenerateApiMode,
+    apiLintMode: ApiLintMode
+): List<String> {
     // generate public API txt
     val args = mutableListOf(
         "--classpath",
@@ -188,12 +201,13 @@ fun Project.generateApi(
         "--source-path",
         sourcePaths.filter { it.exists() }.joinToString(File.pathSeparator),
 
-        "--api",
-        outputFile.toString(),
-
         "--format=v3",
         "--output-kotlin-nulls=yes"
     )
+
+    if (outputFile != null) {
+        args += listOf("--api", outputFile.toString())
+    }
 
     when (generateApiMode) {
         is GenerateApiMode.PublicApi -> {
@@ -240,5 +254,5 @@ fun Project.generateApi(
         }
     }
 
-    runMetalavaWithArgs(getMetalavaJar(), args, workerExecutor)
+    return args
 }
