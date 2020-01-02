@@ -67,6 +67,9 @@ private fun JavaCompile.configureWithErrorProne(toolChain: ErrorProneToolChain) 
 
     val compilerArgs = this.options.compilerArgs
     compilerArgs += listOf(
+            // Tell error-prone that we are running it on android compatible libraries
+            "-XDandroidCompatible=true",
+
             "-XDcompilePolicy=simple", // Workaround for b/36098770
             "-XepExcludedPaths:.*/(build/generated|build/errorProne|external)/.*",
 
