@@ -21,6 +21,7 @@ import androidx.compose.frames.Framed
 import androidx.compose.frames.Record
 import androidx.compose.frames._created
 import androidx.compose.frames.readable
+import androidx.compose.frames.withCurrent
 import androidx.compose.frames.writable
 import kotlin.reflect.KProperty
 
@@ -44,6 +45,9 @@ import kotlin.reflect.KProperty
  *
  * @sample androidx.compose.samples.DelegatedStateSample
  *
+ * @param areEquivalent a callback to compare the previous and new instance of [T] when
+ * [MutableState.value] is written to. If this returns true, then no recomposition will be
+ * scheduled. See [ReferentiallyEqual] and [StructurallyEqual] for simple implementations.
  * @param init A factory function to create the initial value of this state
  * @return An [Model] instance of [MutableState] that wraps the value.
  *
@@ -51,8 +55,10 @@ import kotlin.reflect.KProperty
  * @see [remember]
  */
 @Composable
-inline fun <T> state(init: () -> T) =
-    remember { mutableStateOf(init()) }
+inline fun <T> state(
+    noinline areEquivalent: (old: T, new: T) -> Boolean = ReferentiallyEqual,
+    init: () -> T
+) = remember { mutableStateOf(init(), areEquivalent) }
 
 /**
  * An effect to introduce a state value of type [T] into a composition that will last as long as the input [v1] does not change.
@@ -119,9 +125,27 @@ inline fun <T> stateFor(vararg inputs: Any?, init: () -> T) =
     remember(*inputs) { mutableStateOf(init()) }
 
 /**
- * Return a new [MutableState] initialized with the passed in value
+ * Return a new [MutableState] initialized with the passed in [value]
+ *
+ * @param value the initial value for the [MutableState]
+ * @param areEquivalent a callback to compare the previous and new instance of [value] when
+ * it is written to. If this returns true, then no recomposition will be scheduled. See
+ * [ReferentiallyEqual] and [StructurallyEqual] for simple implementations.
  */
-fun <T> mutableStateOf(value: T): MutableState<T> = ModelMutableState(value)
+fun <T> mutableStateOf(
+    value: T,
+    areEquivalent: (old: T, new: T) -> Boolean = ReferentiallyEqual
+): MutableState<T> = ModelMutableState(value, areEquivalent)
+
+/**
+ * Simple comparison callback using referential `===` equality
+ */
+val ReferentiallyEqual = fun(old: Any?, new: Any?) = old === new
+
+/**
+ * Simple comparison callback using structural [Any.equals] equality
+ */
+val StructurallyEqual = fun(old: Any?, new: Any?) = old == new
 
 /**
  * A value holder where reads to the [value] property during the execution of a [Composable]
@@ -139,7 +163,8 @@ interface State<T> {
 /**
  * A mutable value holder where reads to the [value] property during the execution of a [Composable]
  * function, the current [RecomposeScope] will be subscribed to changes of that value. When the
- * [value] property is written to, a recomposition of any subscribed [RecomposeScope]s will be
+ * [value] property is written to and changed, a recomposition of any subscribed [RecomposeScope]s
+ * will be scheduled. If [value] is written to with the same value, no recompositions will be
  * scheduled.
  *
  * @see [state]
@@ -160,24 +185,33 @@ interface MutableState<T> : State<T> {
  * `state` and `stateFor` composables.
  *
  * @property value the wrapped value
+ * @property areEquivalent function used for comparing old and new [value]s to determine whether
+ * to trigger a recomposition or not.
  *
  * @see [Model]
  * @see [state]
  * @see [stateFor]
  */
 @Model
-private class ModelMutableState<T>(value: T) : Framed, MutableState<T> {
+private class ModelMutableState<T>(
+    value: T,
+    val areEquivalent: (old: T, new: T) -> Boolean
+) : Framed, MutableState<T> {
     /* NOTE(lmr): When this module is compiled with IR, we will need to remove the below Framed implementation */
 
     @Suppress("UNCHECKED_CAST")
     override var value: T
         get() = next.readable(this).value
-        set(value) {
-            next.writable(this).value = value
+        set(value) = next.withCurrent {
+            // This intentionally deviates from the typical behavior of @Model. When this is
+            // converted to an IR module, this behavior should be preserved with a custom setter
+            // on the property in the @Model class.
+            if (!areEquivalent(it.value, value)) {
+                next.writable(this).value = value
+            }
         }
 
-    private var next: StateRecord<T> =
-        StateRecord(value)
+    private var next: StateRecord<T> = StateRecord(value)
 
     init {
         _created(this)

@@ -538,3 +538,16 @@ fun <T : Record> T.writable(framed: Framed, frame: Frame): T {
 
     return newData
 }
+
+/**
+ * Returns the current record without notifying any [Frame.readObserver]s.
+ */
+@PublishedApi
+internal fun <T : Record> current(r: T, frame: Frame) = readable(r, frame.id, frame.invalid)
+
+/**
+ * Provides a [block] with the current record, without notifying any [Frame.readObserver]s.
+ *
+ * @see [Record.readable]
+ */
+inline fun <T : Record> T.withCurrent(block: (r: T) -> Unit) = block(current(this, currentFrame()))
