@@ -98,6 +98,7 @@ private fun JavaCompile.configureWithErrorProne(toolChain: ErrorProneToolChain) 
             "-Xep:EqualsGetClass:ERROR",
             "-Xep:UnusedVariable:ERROR",
             "-Xep:UnusedMethod:ERROR",
+            "-Xep:FutureReturnValueIgnored:ERROR",
 
             // Nullaway
             "-XepIgnoreUnknownCheckNames", // https://github.com/uber/NullAway/issues/25
