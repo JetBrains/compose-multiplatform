@@ -212,6 +212,10 @@ fun Project.getGenerateApiArgs(
     when (generateApiMode) {
         is GenerateApiMode.PublicApi -> {
             args += HIDE_EXPERIMENTAL_ARGS
+            args += listOf(
+                "--hide-annotation", "androidx.annotation.RestrictTo"
+            )
+            args += listOf("--show-unannotated")
         }
         is GenerateApiMode.RestrictedApi -> {
             // Show restricted APIs despite @hide.
