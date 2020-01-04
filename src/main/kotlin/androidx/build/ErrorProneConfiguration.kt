@@ -105,6 +105,7 @@ private fun JavaCompile.configureWithErrorProne(toolChain: ErrorProneToolChain) 
             "-Xep:HidingField:ERROR",
             "-Xep:AutoValueFinalMethods:ERROR",
             "-Xep:LockNotBeforeTry:ERROR",
+            "-Xep:AmbiguousMethodReference:ERROR",
 
             // Nullaway
             "-XepIgnoreUnknownCheckNames", // https://github.com/uber/NullAway/issues/25
