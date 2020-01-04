@@ -111,6 +111,7 @@ private fun JavaCompile.configureWithErrorProne(toolChain: ErrorProneToolChain) 
             "-Xep:ThreadPriorityCheck:ERROR",
             "-Xep:AutoValueFinalMethods:ERROR",
             "-Xep:LockNotBeforeTry:ERROR",
+            "-Xep:DoubleCheckedLocking:ERROR",
             "-Xep:InconsistentCapitalization:ERROR",
             "-Xep:ModifiedButNotUsed:ERROR",
             "-Xep:AmbiguousMethodReference:ERROR",
