@@ -59,6 +59,9 @@ abstract class SdkResourceGenerator : DefaultTask() {
     val kotlinStdlib: String = KOTLIN_STDLIB
 
     @get:Input
+    val rootProjectPath: String = project.rootProject.rootDir.absolutePath
+
+    @get:Input
     lateinit var gradleVersion: String
 
     @get:OutputFile
@@ -77,6 +80,7 @@ abstract class SdkResourceGenerator : DefaultTask() {
         writer.write("navigationCommon=$navigationCommon\n")
         writer.write("kotlinStdlib=$kotlinStdlib\n")
         writer.write("gradleVersion=$gradleVersion\n")
+        writer.write("rootProjectPath=$rootProjectPath\n")
         writer.close()
     }
 
