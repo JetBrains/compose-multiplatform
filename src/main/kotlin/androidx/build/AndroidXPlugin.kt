@@ -255,6 +255,7 @@ class AndroidXPlugin : Plugin<Project> {
     private fun Project.configureRootProject() {
         setDependencyVersions()
         configureKtlintCheckFile()
+        configureCheckInvalidSuppress()
 
         if (isRunningOnBuildServer()) {
             gradle.startParameter.showStacktrace = ShowStacktrace.ALWAYS
