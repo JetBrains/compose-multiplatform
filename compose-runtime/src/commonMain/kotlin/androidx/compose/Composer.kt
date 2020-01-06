@@ -1748,3 +1748,8 @@ object NullCompilationScope {
 }
 
 inline fun <T> escapeCompose(block: NullCompilationScope.() -> T) = NullCompilationScope.block()
+
+@Composable
+val currentComposerIntrinsic: Composer<*> get() {
+    throw NotImplementedError("Implemented as an intrinsic")
+}

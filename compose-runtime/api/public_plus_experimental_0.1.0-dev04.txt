@@ -126,6 +126,7 @@ package androidx.compose {
   public final class ComposerKt {
     method public static inline <N, T> T! cache(androidx.compose.Composer<N>, boolean valid = true, kotlin.jvm.functions.Function0<? extends T> block);
     method public static inline <T> T! escapeCompose(kotlin.jvm.functions.Function1<? super androidx.compose.NullCompilationScope,? extends T> block);
+    method public static androidx.compose.Composer<?> getCurrentComposerIntrinsic();
     method public static <N> Object? nextValue(androidx.compose.Composer<N>);
     field public static final int DEFAULT_SLOT_ACTIONS_SIZE = 16; // 0x10
     field public static final int DEFAULT_SLOT_KEYS_SIZE = 8; // 0x8
