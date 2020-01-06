@@ -41,7 +41,7 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.BENCHMARK.group, "benchmark-gradle-plugin")
     prebuilts(LibraryGroups.BENCHMARK, "1.0.0")
     prebuilts(LibraryGroups.BIOMETRIC, "biometric", "1.0.1")
-    prebuilts(LibraryGroups.BROWSER, "1.2.0")
+    prebuilts(LibraryGroups.BROWSER, "1.3.0-alpha01")
     ignore(LibraryGroups.CAMERA.group, "camera-testing")
     ignore(LibraryGroups.CAMERA.group, "camera-extensions-stub")
     ignore(LibraryGroups.CAMERA.group, "camera-testlib-extensions")
@@ -73,7 +73,7 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.FRAGMENT.group, "fragment-lint")
     ignore(LibraryGroups.FRAGMENT.group, "fragment-testing-lint")
     ignore(LibraryGroups.FRAGMENT.group, "fragment-truth")
-    prebuilts(LibraryGroups.FRAGMENT, "1.2.0-rc04")
+    prebuilts(LibraryGroups.FRAGMENT, "1.2.0-rc05")
     prebuilts(LibraryGroups.GRIDLAYOUT, "1.0.0")
     prebuilts(LibraryGroups.HEIFWRITER, "1.0.0")
     prebuilts(LibraryGroups.INTERPOLATOR, "1.0.0")
@@ -143,7 +143,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.WEBKIT, "1.2.0-alpha01")
     ignore(LibraryGroups.WORK.group, "work-gcm")
     ignore(LibraryGroups.WORK.group, "work-runtime-lint")
-    prebuilts(LibraryGroups.WORK, "2.3.0-beta02")
+    prebuilts(LibraryGroups.WORK, "2.3.0-rc01")
     default(Ignore)
 }
 
