@@ -103,6 +103,7 @@ private fun JavaCompile.configureWithErrorProne(toolChain: ErrorProneToolChain) 
             "-Xep:UnusedMethod:ERROR",
             "-Xep:FutureReturnValueIgnored:ERROR",
             "-Xep:HidingField:ERROR",
+            "-Xep:ThreadPriorityCheck:ERROR",
             "-Xep:AutoValueFinalMethods:ERROR",
             "-Xep:LockNotBeforeTry:ERROR",
             "-Xep:AmbiguousMethodReference:ERROR",
