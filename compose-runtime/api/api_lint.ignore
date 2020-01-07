@@ -35,6 +35,8 @@ ContextFirst: androidx.compose.ViewComposer#ViewComposer(Object, android.content
     Context is distinct, so it must be the first argument (method `ViewComposer`)
 
 
+DocumentExceptions: androidx.compose.ComposerKt#getCurrentComposerIntrinsic():
+    Method ComposerKt.getCurrentComposerIntrinsic appears to be throwing kotlin.NotImplementedError; this should be listed in the documentation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
 DocumentExceptions: androidx.compose.frames.FramesKt#commit(androidx.compose.frames.Frame):
     Method FramesKt.commit appears to be throwing java.lang.IllegalStateException; this should be listed in the documentation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
 DocumentExceptions: androidx.compose.frames.FramesKt#currentFrame():
