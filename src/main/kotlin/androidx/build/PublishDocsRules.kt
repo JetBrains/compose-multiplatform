@@ -104,7 +104,8 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.PAGING.group, "paging-guava")
     prebuilts(LibraryGroups.PAGING, "2.1.0")
     prebuilts(LibraryGroups.PALETTE, "1.0.0")
-    prebuilts(LibraryGroups.PERCENTLAYOUT, "1.0.0")
+    // 1.0.1 was created to fix reference docs.  It contains no actual source changes from 1.0.0
+    prebuilts(LibraryGroups.PERCENTLAYOUT, "1.0.1")
     prebuilts(LibraryGroups.PREFERENCE, "preference-ktx", "1.1.0")
     prebuilts(LibraryGroups.PREFERENCE, "1.1.0")
     prebuilts(LibraryGroups.PRINT, "1.0.0")
