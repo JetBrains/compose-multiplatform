@@ -105,11 +105,9 @@ private fun JavaCompile.configureWithErrorProne(toolChain: ErrorProneToolChain) 
             "-Xep:FutureReturnValueIgnored:ERROR",
             "-Xep:ArgumentSelectionDefectChecker:ERROR",
             "-Xep:HidingField:ERROR",
+            "-Xep:Finally:ERROR",
             "-Xep:ThreadPriorityCheck:ERROR",
             "-Xep:AutoValueFinalMethods:ERROR",
-            "-Xep:LockNotBeforeTry:ERROR",
-            "-Xep:InconsistentCapitalization:ERROR",
-            "-Xep:AmbiguousMethodReference:ERROR",
 
             // Nullaway
             "-XepIgnoreUnknownCheckNames", // https://github.com/uber/NullAway/issues/25
