@@ -106,6 +106,7 @@ private fun JavaCompile.configureWithErrorProne(toolChain: ErrorProneToolChain) 
             "-Xep:ThreadPriorityCheck:ERROR",
             "-Xep:AutoValueFinalMethods:ERROR",
             "-Xep:LockNotBeforeTry:ERROR",
+            "-Xep:InconsistentCapitalization:ERROR",
             "-Xep:AmbiguousMethodReference:ERROR",
 
             // Nullaway
