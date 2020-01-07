@@ -101,6 +101,7 @@ private fun JavaCompile.configureWithErrorProne(toolChain: ErrorProneToolChain) 
             "-Xep:EqualsGetClass:ERROR",
             "-Xep:UnusedVariable:ERROR",
             "-Xep:UnusedMethod:ERROR",
+            "-Xep:ThreadLocalUsage:ERROR",
             "-Xep:FutureReturnValueIgnored:ERROR",
             "-Xep:HidingField:ERROR",
             "-Xep:ThreadPriorityCheck:ERROR",
