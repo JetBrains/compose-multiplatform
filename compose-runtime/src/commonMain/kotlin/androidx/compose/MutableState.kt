@@ -16,7 +16,6 @@
 
 package androidx.compose
 
-import androidx.compose.annotations.Hide
 import androidx.compose.frames.AbstractRecord
 import androidx.compose.frames.Framed
 import androidx.compose.frames.Record
@@ -132,6 +131,7 @@ fun <T> mutableStateOf(value: T): MutableState<T> = ModelMutableState(value)
  * @see [MutableState]
  * @see [mutableStateOf]
  */
+@Stable
 interface State<T> {
     val value: T
 }
@@ -146,6 +146,7 @@ interface State<T> {
  * @see [State]
  * @see [mutableStateOf]
  */
+@Stable
 interface MutableState<T> : State<T> {
     override var value: T
     operator fun component1(): T
