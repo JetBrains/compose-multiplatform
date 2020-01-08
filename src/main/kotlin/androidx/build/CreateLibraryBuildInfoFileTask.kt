@@ -60,7 +60,7 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
     }
 
     /* Returns whether or not the groupId of the project requires the same version for all
-     * artifactIds.  See CheckSameVersionLibraryGroupsTask.kt
+     * artifactIds.
      */
     private fun requiresSameVersion(): Boolean {
         val library =

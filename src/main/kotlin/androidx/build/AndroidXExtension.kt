@@ -17,6 +17,7 @@
 package androidx.build
 
 import groovy.lang.Closure
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import java.util.ArrayList
 
@@ -27,10 +28,41 @@ open class AndroidXExtension(val project: Project) {
     var name: String? = null
     var mavenVersion: Version? = null
         set(value) {
-            field = if (isSnapshotBuild()) value?.copy(extra = "-SNAPSHOT") else value
-            project.version = field as Any
+            field = value
+            chooseProjectVersion()
         }
     var mavenGroup: LibraryGroup? = null
+        set(value) {
+            field = value
+            chooseProjectVersion()
+        }
+    private fun chooseProjectVersion() {
+        val version: Version
+        val groupVersion: Version? = mavenGroup?.forcedVersion
+        val mavenVersion: Version? = mavenVersion
+        if (mavenVersion != null) {
+            if (groupVersion != null) {
+                throw GradleException("Cannot set mavenVersion (" + mavenVersion +
+                    ") for a project (" + project +
+                    ") whose mavenGroup already specifies forcedVersion (" + groupVersion +
+                ")")
+            } else {
+                version = mavenVersion
+            }
+        } else {
+            if (groupVersion != null) {
+                version = groupVersion
+            } else {
+                return
+            }
+        }
+        project.version = if (isSnapshotBuild()) version.copy(extra = "-SNAPSHOT") else version
+        versionIsSet = true
+    }
+    private var versionIsSet = false
+    fun isVersionSet(): Boolean {
+        return versionIsSet
+    }
     var description: String? = null
     var inceptionYear: String? = null
     var url = SUPPORT_URL

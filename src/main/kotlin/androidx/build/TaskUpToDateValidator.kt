@@ -36,7 +36,6 @@ const val DISALLOW_TASK_EXECUTION_FLAG_NAME = "disallowExecution"
 val EXEMPT_TASK_NAMES = setOf(
     "buildOnServer",
     "checkExternalLicenses",
-    "checkSameVersionLibraryGroups",
     "createArchive",
     "createDiffArchiveForAll",
     "createProjectZip",

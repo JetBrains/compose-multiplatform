@@ -212,9 +212,12 @@ object Release {
         val mavenGroup = extension.mavenGroup?.group ?: throw IllegalArgumentException(
                 "Cannot register a project to release if it does not have a mavenGroup set up"
         )
-        val version = extension.mavenVersion ?: throw IllegalArgumentException(
+        if (!extension.isVersionSet()) {
+            throw IllegalArgumentException(
                 "Cannot register a project to release if it does not have a mavenVersion set up"
-        )
+            )
+        }
+        val version = project.version
 
         var zipTasks: MutableList<TaskProvider<GMavenZipTask>> = mutableListOf()
         if (!extension.mavenGroup!!.requireSameVersion) {
