@@ -92,7 +92,6 @@ object Compose {
 
         lateinit var composable: @Composable() () -> Unit
         lateinit var composer: CompositionContext
-        @Suppress("PLUGIN_ERROR")
         override fun compose() {
             val cc = currentComposerNonNull
             cc.startGroup(0)

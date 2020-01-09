@@ -30,7 +30,6 @@ package androidx.compose
  * @see Recompose
  */
 @Composable
-@Suppress("PLUGIN_ERROR")
 fun Observe(body: @Composable() () -> Unit) {
     currentComposerNonNull.let { composer ->
         trace("Compose:Observe") {

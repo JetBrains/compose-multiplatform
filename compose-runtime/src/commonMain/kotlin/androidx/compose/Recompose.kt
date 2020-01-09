@@ -51,13 +51,11 @@ fun Recompose(body: @Composable() (recompose: () -> Unit) -> Unit) {
     val recomposer = RecomposeHelper()
     val callback = composer.startJoin(0, false) {
         recomposer.isComposing = true
-        @Suppress("PLUGIN_ERROR")
         body(recomposer)
         recomposer.isComposing = false
     }
     recomposer.recompose = { if (!recomposer.isComposing) callback(false) }
     recomposer.isComposing = true
-    @Suppress("PLUGIN_ERROR")
     body(recomposer)
     recomposer.isComposing = false
     composer.doneJoin(false)

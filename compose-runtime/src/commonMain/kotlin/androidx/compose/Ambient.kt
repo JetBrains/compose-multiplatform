@@ -105,7 +105,6 @@ internal constructor(private val defaultFactory: (() -> T)? = null) {
             }
             holder.value = value
             startProvider(holder, value)
-            @Suppress("PLUGIN_ERROR")
             children()
             endProvider()
         }

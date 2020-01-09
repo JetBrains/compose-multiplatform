@@ -51,7 +51,6 @@ package androidx.compose
  *
  * @see Composable
  */
-@Suppress("PLUGIN_ERROR")
 abstract class Component {
     @HiddenAttribute
     internal var recomposeCallback: ((sync: Boolean) -> Unit)? = null
@@ -90,7 +89,6 @@ abstract class Component {
     @Composable
     abstract fun compose()
 
-    @Suppress("PLUGIN_ERROR")
     private fun doCompose() {
         try {
             composing = true
