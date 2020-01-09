@@ -20,8 +20,8 @@ import androidx.compose.Composable
 import androidx.compose.Model
 import androidx.ui.core.Text
 import androidx.ui.layout.Column
-import androidx.ui.layout.LayoutExpandedHeight
-import androidx.ui.layout.LayoutExpandedWidth
+import androidx.ui.layout.LayoutHeight
+import androidx.ui.layout.LayoutWidth
 import androidx.ui.layout.Row
 
 import kotlin.random.Random
@@ -73,7 +73,7 @@ class DatabaseList(n: Int, val random: Random) {
 @Composable
 fun QueryColumn(query: Query) {
     // TODO: we could do some conditional styling here which would make the test better
-    Column(LayoutExpandedHeight) {
+    Column(LayoutHeight.Fill) {
         Text(text = "${query.elapsed}")
         Text(text = query.query)
     }
@@ -84,9 +84,9 @@ fun DatabaseRow(db: Database) {
     println(db)
     val columns = 5
     val topQueries = db.topQueries(columns)
-    Row(LayoutExpandedWidth) {
-        Column(LayoutExpandedHeight) { Text(text = db.name) }
-        Column(LayoutExpandedHeight) { Text(text = "${db.queries.size}") }
+    Row(LayoutWidth.Fill) {
+        Column(LayoutHeight.Fill) { Text(text = db.name) }
+        Column(LayoutHeight.Fill) { Text(text = "${db.queries.size}") }
         topQueries.forEach { query ->
             QueryColumn(query = query)
         }
