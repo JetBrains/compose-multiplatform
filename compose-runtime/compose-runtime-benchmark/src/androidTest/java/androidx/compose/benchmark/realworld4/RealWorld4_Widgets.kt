@@ -26,17 +26,17 @@ import androidx.ui.core.Draw
 import androidx.ui.core.Modifier
 import androidx.ui.core.WithConstraints
 import androidx.ui.foundation.ColoredRect
-import androidx.ui.core.dp
-import androidx.ui.core.toRect
-import androidx.ui.graphics.SolidColor
-import androidx.ui.graphics.Paint
 import androidx.ui.graphics.Color
+import androidx.ui.graphics.Paint
+import androidx.ui.graphics.SolidColor
 import androidx.ui.layout.Column
 import androidx.ui.layout.Container
-import androidx.ui.layout.Row
 import androidx.ui.layout.Padding
-import kotlin.reflect.full.memberProperties
+import androidx.ui.layout.Row
+import androidx.ui.unit.dp
+import androidx.ui.unit.toRect
 import kotlin.reflect.KCallable
+import kotlin.reflect.full.memberProperties
 
 @Composable
 fun RealWorld4_FancyWidget_000(model: RealWorld4_DataModel_00) {

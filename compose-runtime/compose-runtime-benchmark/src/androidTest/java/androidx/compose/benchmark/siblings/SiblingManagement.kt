@@ -20,7 +20,7 @@ import androidx.compose.Composable
 import androidx.compose.Pivotal
 import androidx.compose.key
 import androidx.ui.core.Text
-import androidx.ui.core.dp
+import androidx.ui.unit.dp
 import androidx.ui.foundation.ColoredRect
 import androidx.ui.graphics.Color
 import androidx.ui.layout.Column

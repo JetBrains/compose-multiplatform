@@ -23,7 +23,7 @@ import androidx.compose.benchmark.realworld4.RealWorld4_FancyWidget_000
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.ui.core.dp
+import androidx.ui.unit.dp
 import androidx.ui.foundation.ColoredRect
 import androidx.ui.graphics.Color
 import org.junit.FixMethodOrder
