@@ -24,7 +24,7 @@ abstract class ComposerComposeTestCase {
     fun compose(
         activity: Activity,
         manualRecompose: Boolean,
-        composable: (ViewComposition) -> Unit
+        composable: (ViewComposer) -> Unit
     ) =
         ComposeTest(
             Root(composable),
@@ -65,7 +65,7 @@ abstract class ComposerComposeTestCase {
         }
     }
 
-    private class Root(var composable: (ViewComposition) -> Unit) : Component() {
+    private class Root(var composable: (ViewComposer) -> Unit) : Component() {
         override fun compose() = composable(composer)
     }
 

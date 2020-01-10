@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+@file:Suppress("PLUGIN_ERROR")
 package androidx.compose
 
 import androidx.compose.mock.Compose

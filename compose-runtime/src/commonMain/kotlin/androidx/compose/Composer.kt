@@ -401,6 +401,10 @@ open class Composer<N>(
      */
     fun endGroup() = end(END_GROUP)
 
+    fun startExpr(key: Any) = startGroup(key)
+
+    fun endExpr() = endGroup()
+
     private fun skipGroup() {
         recordSkip(START_GROUP)
         groupNodeCount += slots.skipGroup()

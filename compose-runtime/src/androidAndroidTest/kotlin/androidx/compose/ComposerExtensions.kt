@@ -20,33 +20,33 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 
-inline fun ViewComposition.group(key: Int, block: () -> Unit) {
+inline fun ViewComposer.group(key: Int, block: () -> Unit) {
     try {
-        composer.startGroup(key)
+        startGroup(key)
         block()
     } finally {
-        composer.endGroup()
+        endGroup()
     }
 }
 
-inline fun <reified T : Component> ViewComposition.emitComponent(
+inline fun <reified T : Component> ViewComposer.emitComponent(
     loc: Int,
     ctor: () -> T,
     noinline block: ViewValidator.(f: T) -> Boolean
 ): Unit = emitComponent(loc, null, ctor, block)
 
-inline fun <reified T : Component> ViewComposition.emitComponent(
+inline fun <reified T : Component> ViewComposer.emitComponent(
     loc: Int,
     ctor: () -> T
 ): Unit = emitComponent(loc, null, ctor, { true })
 
-inline fun <reified T : Component> ViewComposition.emitComponent(
+inline fun <reified T : Component> ViewComposer.emitComponent(
     loc: Int,
     key: Int?,
     ctor: () -> T
 ): Unit = emitComponent(loc, key, ctor, { true })
 
-inline fun <reified T : Component> ViewComposition.emitComponent(
+inline fun <reified T : Component> ViewComposer.emitComponent(
     loc: Int,
     key: Int?,
     ctor: () -> T,
@@ -58,24 +58,24 @@ inline fun <reified T : Component> ViewComposition.emitComponent(
     { f -> f() }
 )
 
-inline fun <reified T : View> ViewComposition.emitView(
+inline fun <reified T : View> ViewComposer.emitView(
     loc: Int,
     ctor: (context: Context) -> T,
     noinline updater: ViewUpdater<T>.() -> Unit
 ): Unit = emitView(loc, null, ctor, updater)
 
-inline fun <reified T : View> ViewComposition.emitView(
+inline fun <reified T : View> ViewComposer.emitView(
     loc: Int,
     ctor: (context: Context) -> T
 ): Unit = emitView(loc, null, ctor, {})
 
-inline fun <reified T : View> ViewComposition.emitView(
+inline fun <reified T : View> ViewComposer.emitView(
     loc: Int,
     key: Int?,
     ctor: (context: Context) -> T
 ): Unit = emitView(loc, key, ctor, {})
 
-inline fun <reified T : View> ViewComposition.emitView(
+inline fun <reified T : View> ViewComposer.emitView(
     loc: Int,
     key: Int?,
     ctor: (context: Context) -> T,
@@ -86,14 +86,14 @@ inline fun <reified T : View> ViewComposition.emitView(
     updater
 )
 
-inline fun <reified T : ViewGroup> ViewComposition.emitViewGroup(
+inline fun <reified T : ViewGroup> ViewComposer.emitViewGroup(
     loc: Int,
     ctor: (context: Context) -> T,
     noinline updater: ViewUpdater<T>.() -> Unit,
     block: @Composable() () -> Unit
 ) = emitViewGroup(loc, null, ctor, updater, block)
 
-inline fun <reified T : ViewGroup> ViewComposition.emitViewGroup(
+inline fun <reified T : ViewGroup> ViewComposer.emitViewGroup(
     loc: Int,
     key: Int?,
     ctor: (context: Context) -> T,
@@ -106,20 +106,20 @@ inline fun <reified T : ViewGroup> ViewComposition.emitViewGroup(
     block
 )
 
-inline fun <reified T : Emittable> ViewComposition.emitEmittable(
+inline fun <reified T : Emittable> ViewComposer.emitEmittable(
     loc: Int,
     ctor: () -> T,
     noinline updater: ViewUpdater<T>.() -> Unit
 ) = emitEmittable(loc, null, ctor, updater, {})
 
-inline fun <reified T : Emittable> ViewComposition.emitEmittable(
+inline fun <reified T : Emittable> ViewComposer.emitEmittable(
     loc: Int,
     ctor: () -> T,
     noinline updater: ViewUpdater<T>.() -> Unit,
     block: @Composable() () -> Unit
 ) = emitEmittable(loc, null, ctor, updater, block)
 
-inline fun <reified T : Emittable> ViewComposition.emitEmittable(
+inline fun <reified T : Emittable> ViewComposer.emitEmittable(
     loc: Int,
     key: Int?,
     ctor: () -> T,
@@ -132,12 +132,13 @@ inline fun <reified T : Emittable> ViewComposition.emitEmittable(
     block
 )
 
-inline fun <reified T> ViewComposition.provideAmbient(
+@Suppress("PLUGIN_ERROR")
+inline fun <reified T> ViewComposer.provideAmbient(
     key: Ambient<T>,
     value: T,
     noinline children: @Composable() () -> Unit
 ) = call(
     0,
     { changed(key) + changed(value) + changed(children) },
-    { @Suppress("PLUGIN_ERROR") key.Provider(value, children) }
+    { key.Provider(value, children) }
 )

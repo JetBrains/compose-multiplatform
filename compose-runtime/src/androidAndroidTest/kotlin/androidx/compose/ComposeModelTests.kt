@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+@file:Suppress("PLUGIN_ERROR")
 package androidx.compose
 
 import android.app.Activity
@@ -221,7 +221,7 @@ class ModelViewTests {
         val displayLincoln = frame { TestState(true) }
 
         @Suppress("PLUGIN_WARNING")
-        fun ViewComposition.display(person: Person) {
+        fun ViewComposer.display(person: Person) {
             call(167, { true }) {
                 @Suppress("PLUGIN_ERROR")
                 (Observe {
@@ -266,7 +266,7 @@ class ModelViewTests {
         }
         val tvName = 204
 
-        fun ViewComposition.display(person: Person) {
+        fun ViewComposer.display(person: Person) {
             call(167, { true }) {
                 (Observe {
                     emit(93, { context -> TextView(context).apply { id = tvName } }) {
@@ -314,7 +314,7 @@ class ModelViewTests {
         }
         val tvName = 204
 
-        fun ViewComposition.display(person: Person) {
+        fun ViewComposer.display(person: Person) {
             call(167, { true }) {
                 (Observe {
                     emit(93, { context -> TextView(context).apply { id = tvName } }) {
@@ -356,16 +356,16 @@ class ModelViewTests {
         }
     }
 
-    private class Root(val block: ViewComposition.() -> Unit) : Component() {
+    private class Root(val block: ViewComposer.() -> Unit) : Component() {
         override fun compose() {
-            ViewComposition(composer.composer).block()
+            composer.block()
         }
     }
 
-    fun compose(block: ViewComposition.() -> Unit) =
+    fun compose(block: ViewComposer.() -> Unit) =
         CompositionModelTest(block, activityRule.activity)
 
-    class CompositionModelTest(val composable: ViewComposition.() -> Unit, val activity: Activity) {
+    class CompositionModelTest(val composable: ViewComposer.() -> Unit, val activity: Activity) {
         inner class ActiveTest(val activity: Activity) {
             fun then(block: (activity: Activity) -> Unit): ActiveTest {
                 activity.waitForAFrame()

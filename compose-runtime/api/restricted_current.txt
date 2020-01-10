@@ -100,6 +100,7 @@ package androidx.compose {
     method public final void doneJoin(boolean valid);
     method public final <T extends N> void emitNode(kotlin.jvm.functions.Function0<? extends T> factory);
     method public final void emitNode(N? node);
+    method public final void endExpr();
     method public final void endGroup();
     method public final void endNode();
     method public final androidx.compose.ScopeUpdateScope? endRestartGroup();
@@ -112,6 +113,7 @@ package androidx.compose {
     method public final boolean recompose();
     method public final void skipCurrentGroup();
     method public final void skipValue();
+    method public final void startExpr(Object key);
     method public final void startGroup(Object key);
     method public final kotlin.jvm.functions.Function1<java.lang.Boolean,kotlin.Unit> startJoin(Object key, boolean valid, kotlin.jvm.functions.Function1<? super kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit>,kotlin.Unit> compose);
     method public final void startNode(Object key);
@@ -456,35 +458,25 @@ package androidx.compose {
 
   public final class ViewComposer extends androidx.compose.Composer<java.lang.Object> {
     ctor public ViewComposer(Object root, android.content.Context context, androidx.compose.Recomposer recomposer, androidx.compose.ViewAdapters? adapters);
-    method public androidx.compose.ViewAdapters? getAdapters();
-    method public android.content.Context getContext();
-    method public Object getRoot();
-  }
-
-  public final class ViewComposerCommonKt {
-  }
-
-  public final class ViewComposerKt {
-    method public static androidx.compose.ViewComposition! getComposer();
-    method public static Boolean? registerAdapter(androidx.compose.ViewComposition, kotlin.jvm.functions.Function2<java.lang.Object,java.lang.Object,?> adapter);
-    method public static <T> T! runWithCurrent(androidx.compose.Composer<?>, kotlin.jvm.functions.Function0<? extends T> block);
-  }
-
-  public final class ViewComposition {
-    ctor public ViewComposition(androidx.compose.ViewComposer composer);
     method public inline void call(Object key, kotlin.jvm.functions.Function1<? super androidx.compose.ViewValidator,java.lang.Boolean> invalid, kotlin.jvm.functions.Function0<kotlin.Unit> block);
     method public inline <T> void call(Object key, kotlin.jvm.functions.Function0<? extends T> ctor, kotlin.jvm.functions.Function2<? super androidx.compose.ViewValidator,? super T,java.lang.Boolean> invalid, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> block);
     method public inline <T extends android.view.View> void emit(Object key, kotlin.jvm.functions.Function1<? super android.content.Context,? extends T> ctor, kotlin.jvm.functions.Function1<? super androidx.compose.ComposerUpdater<java.lang.Object,T>,kotlin.Unit> update);
     method public inline <T extends android.view.ViewGroup> void emit(Object key, kotlin.jvm.functions.Function1<? super android.content.Context,? extends T> ctor, kotlin.jvm.functions.Function1<? super androidx.compose.ComposerUpdater<java.lang.Object,T>,kotlin.Unit> update, kotlin.jvm.functions.Function0<kotlin.Unit> children);
     method public inline <T extends androidx.compose.Emittable> void emit(Object key, kotlin.jvm.functions.Function0<? extends T> ctor, kotlin.jvm.functions.Function1<? super androidx.compose.ComposerUpdater<java.lang.Object,T>,kotlin.Unit> update);
     method public inline <T extends androidx.compose.Emittable> void emit(Object key, kotlin.jvm.functions.Function0<? extends T> ctor, kotlin.jvm.functions.Function1<? super androidx.compose.ComposerUpdater<java.lang.Object,T>,kotlin.Unit> update, kotlin.jvm.functions.Function0<kotlin.Unit> children);
-    method public void endExpr();
-    method public androidx.compose.ScopeUpdateScope? endRestartGroup();
-    method public androidx.compose.ViewComposer getComposer();
-    method public inline Object joinKey(Object left, Object? right);
+    method public androidx.compose.ViewAdapters? getAdapters();
+    method public android.content.Context getContext();
+    method public Object getRoot();
     method public void observe(Object key, kotlin.jvm.functions.Function1<? super kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit>,kotlin.Unit> block);
-    method public void startExpr(Object key);
-    method public void startRestartGroup(Object key);
+  }
+
+  public final class ViewComposerCommonKt {
+  }
+
+  public final class ViewComposerKt {
+    method public static androidx.compose.ViewComposer! getComposer();
+    method public static Boolean? registerAdapter(androidx.compose.ViewComposer, kotlin.jvm.functions.Function2<java.lang.Object,java.lang.Object,?> adapter);
+    method public static <T> T! runWithCurrent(androidx.compose.Composer<?>, kotlin.jvm.functions.Function0<? extends T> block);
   }
 
   public final class ViewValidator {

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+@file:Suppress("PLUGIN_ERROR")
 package androidx.compose
 
 import android.app.Activity
@@ -146,7 +146,7 @@ class RestartTests {
             )
         }
 
-        fun ViewComposition.PersonView() {
+        fun ViewComposer.PersonView() {
             startRestartGroup(145)
             emit(93, { context -> TextView(context).apply { id = tvIdName } }) {
                 set(president.name) { text = it }
@@ -184,7 +184,7 @@ class RestartTests {
             mutableStateOf(true)
         }
 
-        fun ViewComposition.ShowSomething() {
+        fun ViewComposer.ShowSomething() {
             startRestartGroup(183)
             emit(181, { context -> TextView(context).apply { id = tvStateId } }) {
                 set("State = ${state.value}") { text = it }
@@ -192,7 +192,7 @@ class RestartTests {
             endRestartGroup()?.updateScope { ShowSomething() }
         }
 
-        fun ViewComposition.View() {
+        fun ViewComposer.View() {
             startRestartGroup(191)
             if (state.value) {
                 // This is not correct code generation as this should be called in a call function, however, this
@@ -232,7 +232,7 @@ class RestartTests {
             )
         }
 
-        fun ViewComposition.PersonView(index: Int) {
+        fun ViewComposer.PersonView(index: Int) {
             startRestartGroup(231)
             emit(93, { context -> TextView(context).apply { id = tvIdNameBase + index } }) {
                 set(president.name) { text = it }
@@ -270,10 +270,10 @@ class RestartTests {
         }
     }
 
-    fun compose(block: ViewComposition.() -> Unit) =
+    fun compose(block: ViewComposer.() -> Unit) =
         CompositionModelTest(block, activityRule.activity)
 
-    class CompositionModelTest(val composable: ViewComposition.() -> Unit, val activity: Activity) {
+    class CompositionModelTest(val composable: ViewComposer.() -> Unit, val activity: Activity) {
         inner class ActiveTest(val activity: Activity) {
             fun then(block: (activity: Activity) -> Unit): ActiveTest {
                 activity.waitForAFrame()

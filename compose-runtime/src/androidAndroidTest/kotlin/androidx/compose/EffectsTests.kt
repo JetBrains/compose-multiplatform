@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+@file:Suppress("PLUGIN_ERROR")
 package androidx.compose
 
 import android.app.Activity
@@ -721,13 +721,13 @@ class EffectsTests {
 
         fun SimpleComposable2() {
             with(composer) {
-                composer.startRestartGroup(712)
+                startRestartGroup(712)
                 componentComposed = true
                 val value = ambient(MyAmbient)
                 emit(534, { context -> TextView(context) }, {
                     set("$value") { text = it }
                 })
-                composer.endRestartGroup()?.updateScope { SimpleComposable2() }
+                endRestartGroup()?.updateScope { SimpleComposable2() }
             }
         }
 

@@ -294,7 +294,7 @@ class NewCodeGenTests {
         compose {
             // TODO: The composition field is a work-around for an IR bug. The IR doesn't support a
             // local class capturing a variable so this make the capture explicit
-            class AddView(val composition: ViewComposition) {
+            class AddView(val composition: ViewComposer) {
                 var left = 0
                 var right = 0
 
@@ -360,7 +360,7 @@ class NewCodeGenTests {
         compose {
             // TODO: The composition field is a work-around for an IR bug. The IR doesn't support a
             // local class capturing a variable so this make the capture explicit
-            class AddView(val composition: ViewComposition) {
+            class AddView(val composition: ViewComposer) {
 
                 operator fun invoke(left: Int, right: Int) {
                     with(composition) {
@@ -422,7 +422,7 @@ class NewCodeGenTests {
         compose {
             // TODO: The composition field is a work-around for an IR bug. The IR doesn't support a
             // local class capturing a variable so this make the capture explicit
-            class AddView(val composition: ViewComposition) {
+            class AddView(val composition: ViewComposer) {
 
                 var left = 0
                 var right = 0
@@ -509,7 +509,7 @@ class NewCodeGenTests {
             // TODO: The composition field is a work-around for an IR bug. The IR doesn't support a
             // local class capturing a variable so this make the capture explicit
             class OffsetAddView(
-                val composition: ViewComposition,
+                val composition: ViewComposer,
                 var offset: Int
             ) {
 
@@ -581,7 +581,7 @@ class NewCodeGenTests {
             // TODO: The composition field is a work-around for an IR bug. The IR doesn't support a
             // local class capturing a variable so this make the capture explicit
             class OffsetAddView(
-                val composition: ViewComposition,
+                val composition: ViewComposer,
                 val offset: Int
             ) {
 
@@ -856,12 +856,12 @@ class NewCodeGenTests {
         var view: View? = null
     }
 
-    fun ViewComposition.adaptable(block: ViewComposition.() -> Unit) {
-        composer.adapters?.register { parent, child ->
+    fun ViewComposer.adaptable(block: ViewComposer.() -> Unit) {
+        adapters?.register { parent, child ->
             when (parent) {
                 is ViewGroup -> when (child) {
                     is View -> child
-                    is Emittable -> ViewEmitWrapper(composer.context).apply { emittable = child }
+                    is Emittable -> ViewEmitWrapper(context).apply { emittable = child }
                     else -> null
                 }
                 is Emittable -> when (child) {
@@ -875,17 +875,17 @@ class NewCodeGenTests {
         block()
     }
 
-    fun compose(block: ViewComposition.() -> Unit) =
+    fun compose(block: ViewComposer.() -> Unit) =
         CompositionTest(activityRule.activity, block)
 
-    class CompositionTest(val activity: Activity, val composable: ViewComposition.() -> Unit) {
+    class CompositionTest(val activity: Activity, val composable: ViewComposer.() -> Unit) {
 
-        inner class ActiveTest(val composition: ViewComposition, val activity: Activity) {
+        inner class ActiveTest(val composer: ViewComposer, val activity: Activity) {
             private fun compose() {
-                composition.composer.startRoot()
-                composition.composable()
-                composition.composer.endRoot()
-                composition.composer.applyChanges()
+                composer.startRoot()
+                composer.composable()
+                composer.endRoot()
+                composer.applyChanges()
             }
 
             fun then(block: (activity: Activity) -> Unit): ActiveTest {
@@ -896,7 +896,7 @@ class NewCodeGenTests {
         }
 
         fun then(block: (activity: Activity) -> Unit): ActiveTest {
-            val composition = ViewComposition(
+            val composer =
                 ViewComposer(activity.root, activity, object : Recomposer() {
                     override fun recomposeSync() {}
 
@@ -904,8 +904,7 @@ class NewCodeGenTests {
 
                     override fun hasPendingChanges(): Boolean = false
                 })
-            )
-            return ActiveTest(composition, activity).then(block)
+            return ActiveTest(composer, activity).then(block)
         }
     }
 

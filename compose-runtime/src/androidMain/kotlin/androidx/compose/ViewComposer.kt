@@ -144,21 +144,17 @@ class ViewComposer(
     SlotTable(),
     Applier(root, ViewApplyAdapter(adapters)), recomposer
 ) {
-
     init {
         FrameManager.ensureStarted()
     }
-}
 
-@Suppress("UNCHECKED_CAST")
-/* inline */ class ViewComposition(val composer: ViewComposer) {
-
+    @Suppress("UNCHECKED_CAST")
     inline fun <T : View> emit(
         key: Any,
         /*crossinline*/
         ctor: (context: Context) -> T,
         update: ViewUpdater<T>.() -> Unit
-    ) = with(composer) {
+    ) {
         startNode(key)
         val node = if (inserting) ctor(context).also { emitNode(it) }
         else useNode() as T
@@ -166,14 +162,14 @@ class ViewComposer(
         endNode()
     }
 
-    @Suppress("PLUGIN_WARNING")
+    @Suppress("PLUGIN_ERROR", "UNCHECKED_CAST")
     inline fun <T : ViewGroup> emit(
         key: Any,
         /*crossinline*/
         ctor: (context: Context) -> T,
         update: ViewUpdater<T>.() -> Unit,
         children: @Composable() () -> Unit
-    ) = with(composer) {
+    ) {
         startNode(key)
         val node = if (inserting) ctor(context).also { emitNode(it) }
         else useNode() as T
@@ -182,12 +178,13 @@ class ViewComposer(
         endNode()
     }
 
+    @Suppress("UNCHECKED_CAST")
     inline fun <T : Emittable> emit(
         key: Any,
         /*crossinline*/
         ctor: () -> T,
         update: ViewUpdater<T>.() -> Unit
-    ) = with(composer) {
+    ) {
         startNode(key)
         val node = if (inserting) ctor().also { emitNode(it) }
         else useNode() as T
@@ -195,14 +192,14 @@ class ViewComposer(
         endNode()
     }
 
-    @Suppress("PLUGIN_WARNING")
+    @Suppress("PLUGIN_ERROR", "UNCHECKED_CAST")
     inline fun <T : Emittable> emit(
         key: Any,
         /*crossinline*/
         ctor: () -> T,
         update: ViewUpdater<T>.() -> Unit,
         children: @Composable() () -> Unit
-    ) = with(composer) {
+    ) {
         startNode(key)
         val node = if (inserting) ctor().also { emitNode(it) }
         else useNode() as T
@@ -211,18 +208,14 @@ class ViewComposer(
         endNode()
     }
 
-    @Suppress("NOTHING_TO_INLINE")
-    inline fun joinKey(left: Any, right: Any?): Any = composer.joinKey(left, right)
-
-    @Suppress("PLUGIN_WARNING")
+    @Suppress("PLUGIN_ERROR")
     inline fun call(
         key: Any,
-        /*crossinline*/
         invalid: ViewValidator.() -> Boolean,
         block: @Composable() () -> Unit
-    ) = with(composer) {
+    ) {
         startGroup(key)
-        if (ViewValidator(composer).invalid() || inserting) {
+        if (ViewValidator(this).invalid() || inserting) {
             startGroup(invocation)
             block()
             endGroup()
@@ -232,17 +225,13 @@ class ViewComposer(
         endGroup()
     }
 
-    fun startExpr(key: Any) = composer.startGroup(key)
-    fun endExpr() = composer.endGroup()
-
     inline fun <T> call(
         key: Any,
         /*crossinline*/
         ctor: () -> T,
-        /*crossinline*/
         invalid: ViewValidator.(f: T) -> Boolean,
         block: (f: T) -> Unit
-    ) = with(composer) {
+    ) {
         startGroup(key)
         val f = cache(true, ctor)
         if (ViewValidator(this).invalid(f) || inserting) {
@@ -259,13 +248,10 @@ class ViewComposer(
         key: Any,
         block: (invalidate: (sync: Boolean) -> Unit) -> Unit
     ) {
-        val invalidate = composer.startJoin(key, false, block)
+        val invalidate = startJoin(key, false, block)
         block(invalidate)
-        composer.doneJoin(false)
+        doneJoin(false)
     }
-
-    fun startRestartGroup(key: Any) = composer.startRestartGroup(key)
-    fun endRestartGroup(): ScopeUpdateScope? = composer.endRestartGroup()
 }
 
 /* inline */ class ViewValidator(val composer: Composer<*>) {
@@ -409,7 +395,7 @@ internal actual val currentComposerNonNull
 private fun emptyComposition(): Nothing =
     error("Composition requires an active composition context")
 
-val composer get() = ViewComposition(currentComposerNonNull as ViewComposer)
+val composer get() = currentComposerNonNull as ViewComposer
 
 internal actual var currentComposer: Composer<*>? = null
     private set
@@ -424,9 +410,9 @@ actual fun <T> Composer<*>.runWithCurrent(block: () -> T): T {
     }
 }
 
-fun ViewComposition.registerAdapter(
+fun ViewComposer.registerAdapter(
     adapter: (parent: Any, child: Any) -> Any?
-) = composer.adapters?.register(adapter)
+) = adapters?.register(adapter)
 
 typealias ViewUpdater<T> = ComposerUpdater<Any, T>
 

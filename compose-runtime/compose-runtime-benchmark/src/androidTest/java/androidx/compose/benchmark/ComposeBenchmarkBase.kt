@@ -56,7 +56,7 @@ abstract class ComposeBenchmarkBase {
         val activity = activityRule.activity
 
         activity.setContent {
-            activeComposer = composer.composer
+            activeComposer = composer
             receiver.composeCb()
         }
 

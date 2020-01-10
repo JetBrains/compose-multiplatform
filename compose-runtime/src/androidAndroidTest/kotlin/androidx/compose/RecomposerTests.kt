@@ -43,7 +43,7 @@ class ComposerCompositionContextTests : ComposerComposeTestCase() {
     @get:Rule
     val activityRule = ActivityTestRule(TestActivity::class.java)
 
-    private fun compose(manualRecompose: Boolean = false, composable: (ViewComposition) -> Unit) =
+    private fun compose(manualRecompose: Boolean = false, composable: (ViewComposer) -> Unit) =
         compose(activityRule.activity, manualRecompose = manualRecompose, composable = composable)
 
     @Test
@@ -389,8 +389,8 @@ class ComposerCompositionContextTests : ComposerComposeTestCase() {
                         set(View.OnClickListener {
                             @Suppress("DEPRECATION")
                             when (listener) {
-                                is ClickAction.Recompose -> recompose()
-                                is ClickAction.RecomposeSync -> recomposeSync()
+                                is ClickAction.Recompose -> this@B.recompose()
+                                is ClickAction.RecomposeSync -> this@B.recomposeSync()
                                 is ClickAction.PerformOnView -> listener.action.invoke(it)
                             }
                         }) { setOnClickListener(it) }
@@ -416,8 +416,8 @@ class ComposerCompositionContextTests : ComposerComposeTestCase() {
                         set(View.OnClickListener {
                             @Suppress("DEPRECATION")
                             when (listener) {
-                                is ClickAction.Recompose -> recompose()
-                                is ClickAction.RecomposeSync -> recomposeSync()
+                                is ClickAction.Recompose -> this@A.recompose()
+                                is ClickAction.RecomposeSync -> this@A.recomposeSync()
                                 is ClickAction.PerformOnView -> listener.action.invoke(it)
                             }
                         }) { setOnClickListener(it) }
