@@ -112,7 +112,6 @@ val API_LINT_ARGS: List<String> = listOf(
         "ExecutorRegistration",
         "NotCloseable",
         "UseIcu",
-        "NoByteOrShort",
         "SamShouldBeLast",
         "MissingJvmStatic",
 
@@ -134,6 +133,7 @@ val API_LINT_ARGS: List<String> = listOf(
         "AbstractInner",
         "ArrayReturn",
         "MethodNameTense",
+        "NoByteOrShort",
         "CommonArgsFirst"
     ).joinToString()
 )
