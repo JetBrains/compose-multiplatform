@@ -28,7 +28,7 @@ import androidx.build.Strategy.TipOfTree
  * Rule set used to generate public documentation.
  */
 val RELEASE_RULE = docsRules("public", false) {
-    prebuilts(LibraryGroups.ACTIVITY, "1.1.0-rc03")
+    prebuilts(LibraryGroups.ACTIVITY, "1.1.0")
     prebuilts(LibraryGroups.ADS, "1.0.0-alpha03")
     prebuilts(LibraryGroups.ANNOTATION, "annotation", "1.1.0")
     prebuilts(LibraryGroups.ANNOTATION, "annotation-experimental", "1.0.0")
@@ -73,7 +73,7 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.FRAGMENT.group, "fragment-lint")
     ignore(LibraryGroups.FRAGMENT.group, "fragment-testing-lint")
     ignore(LibraryGroups.FRAGMENT.group, "fragment-truth")
-    prebuilts(LibraryGroups.FRAGMENT, "1.2.0-rc05")
+    prebuilts(LibraryGroups.FRAGMENT, "1.2.0")
     prebuilts(LibraryGroups.GRIDLAYOUT, "1.0.0")
     prebuilts(LibraryGroups.HEIFWRITER, "1.0.0")
     prebuilts(LibraryGroups.INTERPOLATOR, "1.0.0")
