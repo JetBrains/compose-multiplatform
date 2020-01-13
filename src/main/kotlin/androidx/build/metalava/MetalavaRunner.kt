@@ -113,7 +113,6 @@ val API_LINT_ARGS: List<String> = listOf(
         "NotCloseable",
         "UseIcu",
         "NoByteOrShort",
-        "CommonArgsFirst",
         "SamShouldBeLast",
         "MissingJvmStatic",
 
@@ -134,7 +133,8 @@ val API_LINT_ARGS: List<String> = listOf(
         "StreamFiles",
         "AbstractInner",
         "ArrayReturn",
-        "MethodNameTense"
+        "MethodNameTense",
+        "CommonArgsFirst"
     ).joinToString()
 )
 
