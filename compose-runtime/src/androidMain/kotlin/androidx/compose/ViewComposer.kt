@@ -410,6 +410,16 @@ actual fun <T> Composer<*>.runWithCurrent(block: () -> T): T {
     }
 }
 
+actual fun <T> Composer<*>.runWithComposing(block: () -> T): T {
+    val wasComposing = isComposing
+    try {
+        isComposing = true
+        return block()
+    } finally {
+        isComposing = wasComposing
+    }
+}
+
 fun ViewComposer.registerAdapter(
     adapter: (parent: Any, child: Any) -> Any?
 ) = adapters?.register(adapter)

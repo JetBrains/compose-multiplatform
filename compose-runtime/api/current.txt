@@ -476,6 +476,7 @@ package androidx.compose {
   public final class ViewComposerKt {
     method public static androidx.compose.ViewComposer! getComposer();
     method public static Boolean? registerAdapter(androidx.compose.ViewComposer, kotlin.jvm.functions.Function2<java.lang.Object,java.lang.Object,?> adapter);
+    method public static <T> T! runWithComposing(androidx.compose.Composer<?>, kotlin.jvm.functions.Function0<? extends T> block);
     method public static <T> T! runWithCurrent(androidx.compose.Composer<?>, kotlin.jvm.functions.Function0<? extends T> block);
   }
 
