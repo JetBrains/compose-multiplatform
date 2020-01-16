@@ -127,7 +127,7 @@ internal class FrameIdSet private constructor(
                     newUpperSet,
                     newLowerSet,
                     newLowerBound,
-                    newBelowBound?.toIntArray()
+                    newBelowBound?.toIntArray() ?: belowBound
                 ).set(bit)
             }
         } else {
