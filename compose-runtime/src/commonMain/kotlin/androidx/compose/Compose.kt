@@ -16,7 +16,6 @@
 
 package androidx.compose
 
-// TODO(lmr): consider moving this to the ViewComposer directly
 /**
  * A global namespace to hold some Compose utility methods, such as [Compose.composeInto] and
  * [Compose.disposeComposition].
@@ -30,10 +29,12 @@ object Compose {
      *
      * All these are private as within JVMTI / JNI accessibility is mostly a formality.
      */
+    // NOTE(lmr): right now, this class only takes into account Emittables and Views composed using
+    // compose. In reality, there might be more (ie, Vectors), and we should figure out a more
+    // holistic way to capture those as well.
     private class HotReloader {
         companion object {
-            private var emittables = HashMap<Emittable, @Composable() () -> Unit>()
-            private var views = HashMap<ViewGroup, @Composable() () -> Unit>()
+            private var compositions = mutableListOf<Pair<Composition, @Composable() () -> Unit>>()
 
             @TestOnly
             fun clearRoots() {
@@ -42,41 +43,34 @@ object Compose {
             }
 
             // Called before Dex Code Swap
+            @Suppress("UNUSED_PARAMETER")
             private fun saveStateAndDispose(context: Context) {
-                emittables.clear()
-                views.clear()
+                compositions.clear()
+
 
                 val emittableRoots = EMITTABLE_ROOT_COMPONENT.entries.toSet()
 
-                for ((emittable, component) in emittableRoots) {
-                    (component as? Root)?.let {
-                        emittables.put(emittable, it.composable)
-                        disposeComposition(emittable, context, null)
-                    }
+                for ((_, composition) in emittableRoots) {
+                    compositions.add(composition to composition.composable)
+                    composition.dispose()
                 }
 
                 val viewRoots = VIEWGROUP_ROOT_COMPONENT.entries.toSet()
 
-                for ((view, component) in viewRoots) {
-                    (component as? Root)?.let {
-                        views.put(view, it.composable)
-                        disposeComposition(view)
-                    }
+                for ((_, composition) in viewRoots) {
+                    compositions.add(composition to composition.composable)
+                    composition.dispose()
                 }
             }
 
             // Called after Dex Code Swap
+            @Suppress("UNUSED_PARAMETER")
             private fun loadStateAndCompose(context: Context) {
-                for ((emittable, composable) in emittables) {
-                    composeInto(emittable, context, null, composable)
+                for ((composition, composable) in compositions) {
+                    composition.compose(composable)
                 }
 
-                for ((view, composable) in views) {
-                    view.setViewContent(composable)
-                }
-
-                emittables.clear()
-                views.clear()
+                compositions.clear()
             }
 
             @TestOnly
@@ -87,78 +81,33 @@ object Compose {
         }
     }
 
-    private class Root : Component() {
-        fun update() = composer.compose()
+    private val TAG_COMPOSITION_CONTEXT = "androidx.compose.CompositionContext".hashCode()
+    private val EMITTABLE_ROOT_COMPONENT = WeakHashMap<Emittable, Composition>()
+    private val VIEWGROUP_ROOT_COMPONENT = WeakHashMap<ViewGroup, Composition>()
 
-        lateinit var composable: @Composable() () -> Unit
-        lateinit var composer: CompositionContext
-        override fun compose() {
-            val cc = currentComposerNonNull
-            cc.startGroup(0)
-            composable()
-            cc.endGroup()
-        }
+    private fun findComposition(view: View): Composition? {
+        return view.getTag(TAG_COMPOSITION_CONTEXT) as? Composition
     }
 
-    private val TAG_ROOT_COMPONENT = "composeRootComponent".hashCode()
-    private val EMITTABLE_ROOT_COMPONENT = WeakHashMap<Emittable, Component>()
-    private val VIEWGROUP_ROOT_COMPONENT = WeakHashMap<ViewGroup, Component>()
-
-    private fun getRootComponent(view: View): Component? {
-        return view.getTag(TAG_ROOT_COMPONENT) as? Component
-    }
-
-    // TODO(b/138254844): Make findRoot/setRoot test-only & Android-only
-    fun findRoot(view: View): Component? {
-        var node: View? = view
-        while (node != null) {
-            val cc = node.getTag(TAG_ROOT_COMPONENT) as? Component
-            if (cc != null) return cc
-            node = node.parent as? View
-        }
-        return null
-    }
-
-    internal fun setRoot(view: View, component: Component) {
-        view.setTag(TAG_ROOT_COMPONENT, component)
+    internal fun storeComposition(view: View, composition: Composition) {
+        view.setTag(TAG_COMPOSITION_CONTEXT, composition)
         if (view is ViewGroup)
-            VIEWGROUP_ROOT_COMPONENT[view] = component
+            VIEWGROUP_ROOT_COMPONENT[view] = composition
     }
 
     internal fun removeRoot(view: View) {
-        view.setTag(TAG_ROOT_COMPONENT, null)
+        view.setTag(TAG_COMPOSITION_CONTEXT, null)
         if (view is ViewGroup)
             VIEWGROUP_ROOT_COMPONENT.remove(view)
     }
 
-    private fun getRootComponent(emittable: Emittable): Component? {
+    private fun findComposition(emittable: Emittable): Composition? {
         return EMITTABLE_ROOT_COMPONENT[emittable]
     }
 
     // TODO(b/138254844): Make findRoot/setRoot test-only & Android-only
-    private fun setRoot(emittable: Emittable, component: Component) {
-        EMITTABLE_ROOT_COMPONENT[emittable] = component
-    }
-
-    /**
-     * @suppress
-     */
-    @TestOnly
-    fun createCompositionContext(
-        context: Context,
-        group: Any,
-        component: Component,
-        reference: CompositionReference?
-    ): CompositionContext = CompositionContext.prepare(
-        context,
-        group,
-        component,
-        reference
-    ).also {
-        when (group) {
-            is ViewGroup -> setRoot(group, component)
-            is Emittable -> setRoot(group, component)
-        }
+    private fun storeComposition(emittable: Emittable, context: Composition) {
+        EMITTABLE_ROOT_COMPONENT[emittable] = context
     }
 
     /**
@@ -196,27 +145,13 @@ object Compose {
         container: ViewGroup,
         parent: CompositionReference? = null,
         composable: @Composable() () -> Unit
-    ): CompositionContext? {
-        var root = getRootComponent(container) as? Root
-        if (root == null) {
-            container.removeAllViews()
-            root = Root()
-            root.composable = composable
-            setRoot(container, root)
-            val cc = CompositionContext.prepare(
-                container.context,
-                container,
-                root,
-                parent
-            )
-            root.composer = cc
-            root.update()
-            return cc
-        } else {
-            root.composable = composable
-            root.update()
-        }
-        return null
+    ): Composition {
+        val composition = findComposition(container)
+            ?: UiComposition(container, container.context, parent).also {
+                container.removeAllViews()
+            }
+        composition.compose(composable)
+        return composition
     }
 
     /**
@@ -268,20 +203,26 @@ object Compose {
         context: Context,
         parent: CompositionReference? = null,
         composable: @Composable() () -> Unit
-    ): CompositionContext {
-        var root = getRootComponent(container) as? Root
-        return if (root == null) {
-            root = Root()
-            root.composable = composable
-            setRoot(container, root)
-            val cc = CompositionContext.prepare(context, container, root, parent)
-            root.composer = cc
-            root.update()
-            cc
-        } else {
-            root.composable = composable
-            root.update()
-            root.composer
+    ): Composition {
+        val composition = findComposition(container)
+            ?: UiComposition(container, context, parent)
+        composition.compose(composable)
+        return composition
+    }
+
+    private class UiComposition(
+        private val root: Any,
+        private val context: Context,
+        parent: CompositionReference? = null
+    ): Composition(
+        { slots, recomposer -> UiComposer(context, root, slots, recomposer) },
+        parent
+    ) {
+        init {
+            when (root) {
+                is ViewGroup -> storeComposition(root, this)
+                is Emittable -> storeComposition(root, this)
+            }
         }
     }
 
@@ -294,27 +235,13 @@ object Compose {
         context: Context,
         parent: CompositionReference? = null,
         composable: @Composable() () -> Unit
-    ): CompositionContext {
-        var root = getRootComponent(container) as? Root
-        return if (root == null) {
-            root = Root()
-            root.composable = composable
-            setRoot(container, root)
-            val cc = CompositionContext.prepare(context, container, root, parent)
-            root.composer = cc
-            val wasComposing = cc.composer.isComposing
-            cc.composer.isComposing = true
-            root.update()
-            cc.composer.isComposing = wasComposing
-            cc
-        } else {
-            root.composable = composable
-            val wasComposing = root.composer.composer.isComposing
-            root.composer.composer.isComposing = true
-            root.update()
-            root.composer.composer.isComposing = wasComposing
-            root.composer
+    ): Composition {
+        val composition = findComposition(container)
+            ?: UiComposition(container, context, parent).also { storeComposition(container, it) }
+        composition.composer.runWithComposing {
+            composition.compose(composable)
         }
+        return composition
     }
 
     /**
@@ -351,7 +278,7 @@ object Compose {
  * @see Compose.composeInto
  * @see disposeComposition
  */
-fun ViewGroup.setViewContent(composable: @Composable() () -> Unit): CompositionContext? =
+fun ViewGroup.setViewContent(composable: @Composable() () -> Unit): Composition =
     Compose.composeInto(this, null, composable)
 
 /**
@@ -359,6 +286,6 @@ fun ViewGroup.setViewContent(composable: @Composable() () -> Unit): CompositionC
  * [Compose.disposeComposition].
  *
  * @see Compose.disposeComposition
- * @see compose
+ * @see Compose.composeInto
  */
 fun ViewGroup.disposeComposition() = Compose.disposeComposition(this, null)

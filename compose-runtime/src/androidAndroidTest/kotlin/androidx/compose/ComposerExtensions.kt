@@ -29,34 +29,23 @@ inline fun ViewComposer.group(key: Int, block: () -> Unit) {
     }
 }
 
-inline fun <reified T : Component> ViewComposer.emitComponent(
+fun ViewComposer.emitComponent(
     loc: Int,
-    ctor: () -> T,
-    noinline block: ViewValidator.(f: T) -> Boolean
-): Unit = emitComponent(loc, null, ctor, block)
+    block: @Composable() () -> Unit
+): Unit = emitComponent(loc, null, block)
 
-inline fun <reified T : Component> ViewComposer.emitComponent(
-    loc: Int,
-    ctor: () -> T
-): Unit = emitComponent(loc, null, ctor, { true })
-
-inline fun <reified T : Component> ViewComposer.emitComponent(
+fun ViewComposer.emitComponent(
     loc: Int,
     key: Int?,
-    ctor: () -> T
-): Unit = emitComponent(loc, key, ctor, { true })
+    block: @Composable() () -> Unit
+): Unit = emitComponent(loc, key, { true }, block)
 
-inline fun <reified T : Component> ViewComposer.emitComponent(
+fun ViewComposer.emitComponent(
     loc: Int,
     key: Int?,
-    ctor: () -> T,
-    noinline block: ViewValidator.(f: T) -> Boolean
-): Unit = call(
-    joinKey(loc, key),
-    ctor,
-    block,
-    { f -> f() }
-)
+    invalid: ViewValidator.() -> Boolean,
+    block: @Composable() () -> Unit
+): Unit = call(joinKey(loc, key), invalid, block)
 
 inline fun <reified T : View> ViewComposer.emitView(
     loc: Int,

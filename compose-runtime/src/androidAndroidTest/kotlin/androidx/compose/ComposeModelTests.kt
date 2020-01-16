@@ -16,7 +16,6 @@
 @file:Suppress("PLUGIN_ERROR")
 package androidx.compose
 
-import android.app.Activity
 import android.widget.TextView
 import androidx.compose.frames.AbstractRecord
 import androidx.compose.frames.Framed
@@ -29,7 +28,6 @@ import androidx.compose.frames.currentFrame
 import androidx.compose.frames.inFrame
 import androidx.compose.frames.open
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.rule.ActivityTestRule
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import org.junit.After
@@ -121,15 +119,14 @@ class TestState<T>(value: T) : Framed {
 }
 
 @RunWith(AndroidJUnit4::class)
-class ModelViewTests {
-
+class ModelViewTests: BaseComposeTest() {
     @After
     fun teardown() {
         Compose.clearRoots()
     }
 
     @get:Rule
-    val activityRule = ActivityTestRule(TestActivity::class.java)
+    override val activityRule = makeTestActivityRule()
 
     @Test
     fun testModelView_Simple() {
@@ -353,38 +350,6 @@ class ModelViewTests {
             assertEquals(PRESIDENT_NAME_1, (activity.findViewById(tvName) as TextView).text)
         }.then { activity ->
             assertEquals(PRESIDENT_NAME_16, (activity.findViewById(tvName) as TextView).text)
-        }
-    }
-
-    private class Root(val block: ViewComposer.() -> Unit) : Component() {
-        override fun compose() {
-            composer.block()
-        }
-    }
-
-    fun compose(block: ViewComposer.() -> Unit) =
-        CompositionModelTest(block, activityRule.activity)
-
-    class CompositionModelTest(val composable: ViewComposer.() -> Unit, val activity: Activity) {
-        inner class ActiveTest(val activity: Activity) {
-            fun then(block: (activity: Activity) -> Unit): ActiveTest {
-                activity.waitForAFrame()
-                activity.uiThread {
-                    block(activity)
-                }
-                return this
-            }
-        }
-
-        fun then(block: (activity: Activity) -> Unit): ActiveTest {
-            activity.show {
-                composer.composable()
-            }
-            activity.waitForAFrame()
-            activity.uiThread {
-                block(activity)
-            }
-            return ActiveTest(activity)
         }
     }
 }

@@ -30,8 +30,6 @@ package androidx.compose
  * is called from within another [Composable] function.  This "context" can be used to store
  * information from previous executions of the function that happened at the same logical point of
  * the tree.
- *
- * @see Component
  */
 @MustBeDocumented
 @Retention(AnnotationRetention.BINARY)

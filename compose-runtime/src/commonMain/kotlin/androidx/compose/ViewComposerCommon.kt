@@ -16,13 +16,21 @@
 
 package androidx.compose
 
-@PublishedApi
-internal expect val currentComposerNonNull: Composer<*>
+/**
+ * @suppress
+ */
+expect val currentComposerNonNull: Composer<*>
 @PublishedApi
 internal expect var currentComposer: Composer<*>?
 
-internal expect fun createComposer(root: Any, context: Context, recomposer: Recomposer): Composer<*>
 expect fun <T> Composer<*>.runWithCurrent(block: () -> T): T
+
+internal expect fun UiComposer(
+    context: Context,
+    root: Any,
+    slots: SlotTable,
+    recomposer: Recomposer
+): Composer<*>
 
 // TODO(b/147710889): Once composer param work is complete, this API should be removed and
 //  replaced with an internal API used for invoking composables.

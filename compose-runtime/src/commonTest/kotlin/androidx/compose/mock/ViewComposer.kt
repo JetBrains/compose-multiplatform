@@ -22,13 +22,15 @@ import androidx.compose.Composer
 import androidx.compose.Recomposer
 import androidx.compose.SlotTable
 import androidx.compose.cache
+import androidx.compose.invalidate
+import androidx.compose.runWithCurrent
 
 interface MockViewComposition {
     val cc: Composer<View>
 }
 
 abstract class ViewComponent : MockViewComposition {
-    private var recomposer: ((sync: Boolean) -> Unit)? = null
+    private var recomposer: (() -> Unit)? = null
     private lateinit var composer: Composer<View>
     @PublishedApi
     internal fun setComposer(value: Composer<View>) {
@@ -38,15 +40,15 @@ abstract class ViewComponent : MockViewComposition {
     override val cc: Composer<View> get() = composer
 
     fun recompose() {
-        recomposer?.let { it(false) }
+        recomposer?.invoke()
     }
 
     operator fun invoke() {
         val cc = cc as MockViewComposer
-        val callback = cc.startJoin(0, false) { compose() }
+        cc.startRestartGroup(0)
+        recomposer = invalidate
         compose()
-        cc.doneJoin(false)
-        recomposer = callback
+        cc.endRestartGroup()?.updateScope { invoke() }
     }
 
     abstract fun compose()
@@ -85,6 +87,9 @@ class MockViewComposer(
         composeRoot {
             rootComposer.composition()
         }
+    }
+    fun recomposeWithCurrent() {
+        runWithCurrent { recompose() }
     }
 }
 
@@ -176,12 +181,12 @@ inline fun <T : ViewComponent> MockViewComposition.call(
 
 fun MockViewComposition.join(
     key: Any,
-    block: (invalidate: (sync: Boolean) -> Unit) -> Unit
+    block: (invalidate: () -> Unit) -> Unit
 ) {
     val myCC = cc as MockViewComposer
-    val invalidate = myCC.startJoin(key, false, block)
+    myCC.startRestartGroup(key)
     block(invalidate)
-    myCC.doneJoin(false)
+    myCC.endRestartGroup()?.updateScope { join(key, block) }
 }
 
 interface ComponentUpdater<C> : MockViewComposition {

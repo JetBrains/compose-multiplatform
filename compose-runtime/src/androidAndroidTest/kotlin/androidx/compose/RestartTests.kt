@@ -16,10 +16,8 @@
 @file:Suppress("PLUGIN_ERROR")
 package androidx.compose
 
-import android.app.Activity
 import android.widget.TextView
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.rule.ActivityTestRule
 import junit.framework.TestCase
 import org.junit.After
 import org.junit.Rule
@@ -29,15 +27,14 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 @RunWith(AndroidJUnit4::class)
-class RestartTests {
-
+class RestartTests: BaseComposeTest() {
     @After
     fun teardown() {
         Compose.clearRoots()
     }
 
     @get:Rule
-    val activityRule = ActivityTestRule(TestActivity::class.java)
+    override val activityRule = makeTestActivityRule()
 
     @Test
     fun restart_PersonModel_lambda() {
@@ -267,32 +264,6 @@ class RestartTests {
                 TestCase.assertEquals(PRESIDENT_NAME_16, tvName.text)
                 TestCase.assertEquals(PRESIDENT_AGE_16.toString(), tvAge.text)
             }
-        }
-    }
-
-    fun compose(block: ViewComposer.() -> Unit) =
-        CompositionModelTest(block, activityRule.activity)
-
-    class CompositionModelTest(val composable: ViewComposer.() -> Unit, val activity: Activity) {
-        inner class ActiveTest(val activity: Activity) {
-            fun then(block: (activity: Activity) -> Unit): ActiveTest {
-                activity.waitForAFrame()
-                activity.uiThread {
-                    block(activity)
-                }
-                return this
-            }
-        }
-
-        fun then(block: (activity: Activity) -> Unit): ActiveTest {
-            activity.show {
-                composer.composable()
-            }
-            activity.waitForAFrame()
-            activity.uiThread {
-                block(activity)
-            }
-            return ActiveTest(activity)
         }
     }
 }

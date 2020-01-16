@@ -33,11 +33,9 @@ package androidx.compose
 fun Observe(body: @Composable() () -> Unit) {
     currentComposerNonNull.let { composer ->
         trace("Compose:Observe") {
-            composer.startGroup(observer)
-            composer.startJoin(observer, false) { body() }
+            composer.startRestartGroup(observer)
             body()
-            composer.doneJoin(false)
-            composer.endGroup()
+            composer.endRestartGroup()?.updateScope { Observe(body) }
         }
     }
 }

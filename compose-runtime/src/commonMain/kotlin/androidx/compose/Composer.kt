@@ -166,54 +166,25 @@ interface ScopeUpdateScope {
     fun updateScope(block: () -> Unit)
 }
 
-internal sealed class RecomposeScope {
+internal class RecomposeScope(var composer: Composer<*>) : ScopeUpdateScope {
     var anchor: Anchor? = null
     val valid: Boolean get() = anchor?.valid ?: false
     var used = false
 
-    /**
-     * Callback that will invalidate the recompose scope
-     */
-    abstract fun invalidate()
-
-    /**
-     * Call that will recompose the scope
-     */
-    abstract fun <N> compose(composer: Composer<N>)
-}
-
-internal class JoinScope(
-    var composeCb: (invalidate: (sync: Boolean) -> Unit) -> Unit
-) : RecomposeScope() {
-    var invalidateCallback: ((sync: Boolean) -> Unit)? = null
-
-    override fun <N> compose(composer: Composer<N>) {
-        val invalidate = composer.startJoin(EMPTY, false, composeCb)
-        composeCb(invalidate)
-        composer.doneJoin(false)
-    }
-
-    override fun invalidate() { invalidateCallback?.invoke(false) }
-}
-
-internal class RestartScope(
-    var composer: Composer<*>
-) : RecomposeScope(), ScopeUpdateScope {
     private var block: (() -> Unit)? = null
 
-    override fun <N> compose(composer: Composer<N>) {
+    @Suppress("UNUSED_PARAMETER")
+    fun <N> compose(composer: Composer<N>) {
         block?.invoke() ?: error("Invalid restart scope")
     }
 
-    override fun invalidate() {
-        composer.invalidate(this, false)
+    fun invalidate() {
+        composer.invalidate(this)
     }
 
     // Called caller of endRestartGroup()
     override fun updateScope(block: (() -> Unit)) { this.block = block }
 }
-
-private val IGNORE_RECOMPOSE: (sync: Boolean) -> Unit = {}
 
 // TODO(lmr): this could be named MutableTreeComposer
 /**
@@ -1115,7 +1086,7 @@ open class Composer<N>(
         isComposing = wasComposing
     }
 
-    internal fun invalidate(scope: RecomposeScope, sync: Boolean) {
+    internal fun invalidate(scope: RecomposeScope) {
         val location = scope.anchor?.location(slotTable)
             ?: return // The scope never entered the composition
         if (location < 0)
@@ -1128,13 +1099,9 @@ open class Composer<N>(
             return
         }
         if (parentReference != null) {
-            parentReference?.invalidate(sync)
+            parentReference?.invalidate()
         } else {
-            if (sync) {
-                recomposer.recomposeSync(this)
-            } else {
-                recomposer.scheduleRecompose(this)
-            }
+            recomposer.scheduleRecompose(this)
         }
     }
 
@@ -1160,59 +1127,6 @@ open class Composer<N>(
     }
 
     /**
-     * Start a data join group which can be invalided by calling the lambda returned by this
-     * function.
-     *
-     * @param valid Deprecated must always be true.
-     * @param compose a function that will produce the same composition that produced by this group.
-     * @return a lambda that will schedule recomposition of this group when invoked.
-     */
-    fun startJoin(
-        key: Any,
-        valid: Boolean,
-        compose: (invalidate: (sync: Boolean) -> Unit) -> Unit
-    ): (sync: Boolean) -> Unit {
-        return if (!valid) {
-            val invalidate = if (inserting) {
-                val scope = JoinScope(compose)
-                invalidateStack.push(scope)
-                scope.invalidateCallback = { invalidate(scope, it) }
-                recordStart(key, START_GROUP)
-                scheduleAnchor(scope)
-                updateValue(scope)
-                slots.beginEmpty()
-                scope.invalidateCallback
-            } else {
-                invalidations.removeLocation(slots.current)
-                slots.startGroup(key)
-                @Suppress("UNCHECKED_CAST")
-                val scope = slots.next() as JoinScope
-                scope.composeCb = compose
-                invalidateStack.push(scope)
-                recordStart(key, START_GROUP)
-                skipValue()
-                scope.invalidateCallback
-            }
-            enterGroup(START_GROUP, null, null)
-            invalidate ?: IGNORE_RECOMPOSE
-        } else IGNORE_RECOMPOSE
-    }
-
-    /**
-     * End a join group.
-     *
-     * @param valid Deprecated and must always be true.
-     */
-    fun doneJoin(valid: Boolean) {
-        if (!valid) {
-            end(END_GROUP)
-            invalidateStack.pop()
-        } else {
-            skipCurrentGroup()
-        }
-    }
-
-    /**
      * Start a restart group. A restart group creates a recompose scope and sets it as the current
      * recompose scope of the composition. If the recompose scope is invalidated then this group
      * will be recomposed. A recompose scope can be invalidated by calling the lambda returned by
@@ -1222,12 +1136,12 @@ open class Composer<N>(
         val location = slots.current
         startGroup(key)
         if (inserting) {
-            val scope = RestartScope(this)
+            val scope = RecomposeScope(this)
             invalidateStack.push(scope)
             updateValue(scope)
         } else {
             invalidations.removeLocation(location)
-            val scope = slots.next() as RestartScope
+            val scope = slots.next() as RecomposeScope
             invalidateStack.push(scope)
             skipValue()
         }
@@ -1242,7 +1156,7 @@ open class Composer<N>(
     fun endRestartGroup(): ScopeUpdateScope? {
         // This allows for the invalidate stack to be out of sync since this might be called during exception stack
         // unwinding that might have not called the doneJoin/endRestartGroup in the wrong order.
-        val scope = if (invalidateStack.isNotEmpty()) invalidateStack.pop() as? RestartScope
+        val scope = if (invalidateStack.isNotEmpty()) invalidateStack.pop()
             else null
         val result = if (scope != null && scope.used) {
             if (scope.anchor == null) {
@@ -1479,7 +1393,7 @@ open class Composer<N>(
 
         override fun <T> invalidateConsumers(key: Ambient<T>) {
             // need to mark the recompose scope that created the reference as invalid
-            invalidate(false)
+            invalidate()
 
             // loop through every child composer
             for (composer in composers) {
@@ -1495,11 +1409,11 @@ open class Composer<N>(
             composers.add(composer)
         }
 
-        override fun invalidate(sync: Boolean) {
+        override fun invalidate() {
             // continue invalidating up the spine of AmbientReferences
-            parentReference?.invalidate(sync)
+            parentReference?.invalidate()
 
-            invalidate(scope, sync)
+            invalidate(scope)
         }
 
         override fun <T> getAmbient(key: Ambient<T>): T {

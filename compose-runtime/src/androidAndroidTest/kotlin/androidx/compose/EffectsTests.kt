@@ -16,12 +16,10 @@
 @file:Suppress("PLUGIN_ERROR")
 package androidx.compose
 
-import android.app.Activity
 import android.widget.Button
 import android.widget.TextView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import androidx.test.rule.ActivityTestRule
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
@@ -32,15 +30,14 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @Suppress("PLUGIN_WARNING")
-class EffectsTests {
-
+class EffectsTests: BaseComposeTest() {
     @After
     fun teardown() {
         Compose.clearRoots()
     }
 
     @get:Rule
-    val activityRule = ActivityTestRule(TestActivity::class.java)
+    override val activityRule = makeTestActivityRule()
 
     @Test
     fun testMemoization1() {
@@ -69,21 +66,21 @@ class EffectsTests {
             assertEquals(1, calculations)
             assertEquals(100, calculation)
             assertEquals(1, compositions)
-        }.then { _ ->
+        }.recomposeRoot().then { _ ->
             assertEquals(1, calculations)
             assertEquals(100, calculation)
             assertEquals(2, compositions)
             key++
-        }.then { _ ->
+        }.recomposeRoot().then { _ ->
             assertEquals(2, calculations)
             assertEquals(200, calculation)
             assertEquals(3, compositions)
-        }.then { _ ->
+        }.recomposeRoot().then { _ ->
             assertEquals(2, calculations)
             assertEquals(200, calculation)
             assertEquals(4, compositions)
             key++
-        }.then { _ ->
+        }.recomposeRoot().then { _ ->
             assertEquals(3, calculations)
             assertEquals(300, calculation)
             assertEquals(5, compositions)
@@ -98,7 +95,7 @@ class EffectsTests {
 
         compose {
             local = state { "Hello world! ${inc++}" }
-            composer.emit(
+            emit(
                 168,
                 { context -> TextView(context).apply { id = tv1Id } },
                 { set(local.value) { text = it } }
@@ -130,12 +127,12 @@ class EffectsTests {
         compose {
             local1 = state { "First" }
             local2 = state { "Second" }
-            composer.emit(
+            emit(
                 168,
                 { context -> TextView(context).apply { id = tv1Id } },
                 { set(local1.value) { text = it } }
             )
-            composer.emit(
+            emit(
                 169,
                 { context -> TextView(context).apply { id = tv2Id } },
                 { set(local2.value) { text = it } }
@@ -168,7 +165,7 @@ class EffectsTests {
 
     @Test
     fun testPreCommit1() {
-        var mount = true
+        var mount by mutableStateOf(true)
 
         val logHistory = mutableListOf<String>()
         fun log(x: String) = logHistory.add(x)
@@ -186,17 +183,15 @@ class EffectsTests {
         }
 
         compose {
-            with(composer) {
-                log("compose:start")
-                if (mount) {
-                    call(
-                        168,
-                        { true },
-                        { @Suppress("PLUGIN_ERROR") Unmountable() }
-                    )
-                }
-                log("compose:end")
+            log("compose:start")
+            if (mount) {
+                call(
+                    168,
+                    { true },
+                    { @Suppress("PLUGIN_ERROR") Unmountable() }
+                )
             }
+            log("compose:end")
         }.then { _ ->
             assertArrayEquals(
                 listOf(
@@ -228,7 +223,7 @@ class EffectsTests {
 
     @Test
     fun testPreCommit2() {
-        var mount = true
+        var mount by mutableStateOf(true)
 
         val logHistory = mutableListOf<String>()
         fun log(x: String) = logHistory.add(x)
@@ -254,7 +249,7 @@ class EffectsTests {
         }
 
         compose {
-            composer.call(345, { true }) {
+            call(345, { true }) {
                 onPreCommit {
                     log("onPreCommit:a1")
                     onDispose {
@@ -263,13 +258,13 @@ class EffectsTests {
                 }
             }
             if (mount) {
-                composer.call(
+                call(
                     168,
                     { true },
                     { @Suppress("PLUGIN_ERROR") Unmountable() }
                 )
             }
-            composer.call(456, { true }) {
+            call(456, { true }) {
                 onPreCommit {
                     log("onPreCommit:b1")
                     onDispose {
@@ -326,7 +321,7 @@ class EffectsTests {
             }
         }.then { _ ->
             log("recompose")
-        }.then { _ ->
+        }.recomposeRoot().then { _ ->
             assertArrayEquals(
                 listOf(
                     "onPreCommit:0",
@@ -364,7 +359,7 @@ class EffectsTests {
             }
         }.then { _ ->
             log("recompose")
-        }.then { _ ->
+        }.recomposeRoot().then { _ ->
             assertArrayEquals(
                 listOf(
                     "onPreCommit a:0",
@@ -398,7 +393,7 @@ class EffectsTests {
             }
         }.then { _ ->
             log("recompose")
-        }.then { _ ->
+        }.recomposeRoot().then { _ ->
             assertArrayEquals(
                 listOf(
                     "onPreCommit:0",
@@ -408,7 +403,7 @@ class EffectsTests {
             )
             log("recompose (key -> 345)")
             key = 345
-        }.then { _ ->
+        }.recomposeRoot().then { _ ->
             assertArrayEquals(
                 listOf(
                     "onPreCommit:0",
@@ -459,14 +454,14 @@ class EffectsTests {
                 }
             }
 
-            composer.call(
+            call(
                 1234,
                 { true },
                 { @Suppress("PLUGIN_ERROR") Sub() }
             )
         }.then { _ ->
             log("recompose")
-        }.then { _ ->
+        }.recomposeRoot().then { _ ->
             assertArrayEquals(
                 listOf(
                     "onPreCommit a:0",
@@ -487,7 +482,7 @@ class EffectsTests {
 
     @Test
     fun testOnDispose1() {
-        var mount = true
+        var mount by mutableStateOf(true)
 
         val logHistory = mutableListOf<String>()
         fun log(x: String) = logHistory.add(x)
@@ -528,7 +523,7 @@ class EffectsTests {
 
     @Test
     fun testOnCommit1() {
-        var mount = true
+        var mount by mutableStateOf(true)
 
         val logHistory = mutableListOf<String>()
         fun log(x: String) = logHistory.add(x)
@@ -609,7 +604,7 @@ class EffectsTests {
         val tv1Id = 100
 
         val Foo = Ambient.of<String>()
-        var current = "Hello World"
+        var current by mutableStateOf("Hello World")
 
         @Composable
         fun Bar() {
@@ -631,14 +626,12 @@ class EffectsTests {
         }
 
         compose {
-            with(composer) {
-                provideAmbient(Foo, current) {
-                    call(
-                        123,
-                        { false },
-                        { @Suppress("PLUGIN_ERROR") Bar() }
-                    )
-                }
+            provideAmbient(Foo, current) {
+                call(
+                    123,
+                    { false },
+                    { @Suppress("PLUGIN_ERROR") Bar() }
+                )
             }
         }.then { activity ->
             val helloText = activity.findViewById(tv1Id) as TextView
@@ -657,7 +650,7 @@ class EffectsTests {
 
         var requestRecompose: (() -> Unit)? = null
         var buttonCreated = false
-        var ambientValue = 1
+        val ambientValue = mutableStateOf(1)
 
         fun SimpleComposable2() {
             Observe {
@@ -674,7 +667,7 @@ class EffectsTests {
             composer.call(531, { true }) {
                 Recompose {
                     requestRecompose = it
-                    composer.provideAmbient(MyAmbient, ambientValue++) {
+                    composer.provideAmbient(MyAmbient, ambientValue.value++) {
                         composer.call(523, { false }) { SimpleComposable2() }
                         composer.emitView(525) { context ->
                             Button(context).also {
@@ -694,11 +687,9 @@ class EffectsTests {
             }
         }
 
-        compose(manualRecompose = true) {
-            with(composer) {
-                call(556, { false }) {
-                    Root()
-                }
+        compose {
+            call(556, { false }) {
+                Root()
             }
         }.then {
             assertTrue("Expected button to be created", buttonCreated)
@@ -717,7 +708,7 @@ class EffectsTests {
         var requestRecompose: (() -> Unit)? = null
         var buttonCreated = false
         var componentComposed = false
-        var ambientValue = 1
+        val ambientValue = mutableStateOf(1)
 
         fun SimpleComposable2() {
             with(composer) {
@@ -735,7 +726,7 @@ class EffectsTests {
             composer.call(531, { true }) {
                 Recompose {
                     requestRecompose = it
-                    composer.provideAmbient(MyAmbient, ambientValue++) {
+                    composer.provideAmbient(MyAmbient, ambientValue.value++) {
                         composer.call(523, { false }) { SimpleComposable2() }
                         composer.emitView(525) { context ->
                             Button(context).also {
@@ -755,11 +746,9 @@ class EffectsTests {
             }
         }
 
-        compose(manualRecompose = true) {
-            with(composer) {
-                call(556, { false }) {
-                    Root()
-                }
+        compose {
+            call(556, { false }) {
+                Root()
             }
         }.then {
             assertTrue("Expected component to be composed", componentComposed)
@@ -780,7 +769,7 @@ class EffectsTests {
 
         compose {
             val local = state { "Hello world! ${inc++}" }
-            composer.emit(
+            emit(
                 168,
                 { context -> TextView(context).apply { id = tv1Id } },
                 { set(local.value) { text = it } }
@@ -793,49 +782,6 @@ class EffectsTests {
             assertEquals("Hello world! 0", helloText.text)
         }
     }
-
-    class CompositionTest(
-        val composable: () -> Unit,
-        private val manualRecompose: Boolean,
-        private val activity: Activity
-    ) {
-        lateinit var doRecompose: () -> Unit
-        inner class ActiveTest(private val activity: Activity) {
-            fun then(block: (activity: Activity) -> Unit): ActiveTest {
-                if (!manualRecompose) {
-                    activity.uiThread {
-                        doRecompose()
-                    }
-                }
-                activity.waitForAFrame()
-                activity.uiThread {
-                    block(activity)
-                }
-                return this
-            }
-        }
-
-        fun then(block: (activity: Activity) -> Unit): ActiveTest {
-            activity.show {
-                composer.call(3193, { true }) {
-                    Recompose {
-                        doRecompose = it
-                        composer.call(9823, { true }) {
-                            composable()
-                        }
-                    }
-                }
-            }
-            activity.waitForAFrame()
-            activity.uiThread {
-                block(activity)
-            }
-            return ActiveTest(activity)
-        }
-    }
-
-    fun compose(manualRecompose: Boolean = false, composable: () -> Unit) =
-        CompositionTest(composable, manualRecompose, activityRule.activity)
 }
 
 fun <T> assertArrayEquals(

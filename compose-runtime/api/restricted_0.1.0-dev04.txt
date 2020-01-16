@@ -59,33 +59,26 @@ package androidx.compose {
     method public void onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> callback);
   }
 
-  public abstract class Component {
-    ctor public Component();
-    method @androidx.compose.Composable public abstract void compose();
-    method protected final void recompose();
-  }
-
   @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets={AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER, AnnotationTarget.PROPERTY}) public @interface Composable {
   }
 
   public final class Compose {
-    method @MainThread public androidx.compose.CompositionContext? composeInto(android.view.ViewGroup container, androidx.compose.CompositionReference? parent = null, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
-    method @MainThread public androidx.compose.CompositionContext composeInto(androidx.compose.Emittable container, android.content.Context context, androidx.compose.CompositionReference? parent = null, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
+    method @MainThread public androidx.compose.Composition composeInto(android.view.ViewGroup container, androidx.compose.CompositionReference? parent = null, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
+    method @MainThread public androidx.compose.Composition composeInto(androidx.compose.Emittable container, android.content.Context context, androidx.compose.CompositionReference? parent = null, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
     method @MainThread public void disposeComposition(android.view.ViewGroup container, androidx.compose.CompositionReference? parent = null);
     method @MainThread public void disposeComposition(androidx.compose.Emittable container, android.content.Context context, androidx.compose.CompositionReference? parent = null);
-    method public androidx.compose.Component? findRoot(android.view.View view);
-    method @MainThread public androidx.compose.CompositionContext subcomposeInto(androidx.compose.Emittable container, android.content.Context context, androidx.compose.CompositionReference? parent = null, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
+    method @MainThread public androidx.compose.Composition subcomposeInto(androidx.compose.Emittable container, android.content.Context context, androidx.compose.CompositionReference? parent = null, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
     field public static final androidx.compose.Compose! INSTANCE;
   }
 
   public final class ComposeAndroidKt {
     method public static void disposeComposition(android.app.Activity);
-    method public static androidx.compose.CompositionContext? setViewContent(android.app.Activity, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
+    method public static androidx.compose.Composition? setViewContent(android.app.Activity, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
   }
 
   public final class ComposeKt {
     method public static void disposeComposition(android.view.ViewGroup);
-    method public static androidx.compose.CompositionContext? setViewContent(android.view.ViewGroup, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
+    method public static androidx.compose.Composition setViewContent(android.view.ViewGroup, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
   }
 
   public class Composer<N> {
@@ -97,7 +90,6 @@ package androidx.compose {
     method public final void collectKeySourceInformation();
     method protected final void composeRoot(kotlin.jvm.functions.Function0<kotlin.Unit> block);
     method public final <T extends N> void createNode(kotlin.jvm.functions.Function0<? extends T> factory);
-    method public final void doneJoin(boolean valid);
     method public final <T extends N> void emitNode(kotlin.jvm.functions.Function0<? extends T> factory);
     method public final void emitNode(N? node);
     method public final void endExpr();
@@ -115,7 +107,6 @@ package androidx.compose {
     method public final void skipValue();
     method public final void startExpr(Object key);
     method public final void startGroup(Object key);
-    method public final kotlin.jvm.functions.Function1<java.lang.Boolean,kotlin.Unit> startJoin(Object key, boolean valid, kotlin.jvm.functions.Function1<? super kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit>,kotlin.Unit> compose);
     method public final void startNode(Object key);
     method public final void startRestartGroup(Object key);
     method public final void startRoot();
@@ -144,17 +135,15 @@ package androidx.compose {
     method public inline <reified V> void update(V? value, kotlin.jvm.functions.Function2<? super T,? super V,kotlin.Unit> block);
   }
 
-  public final class CompositionContext {
-    method public void compose();
-    method public androidx.compose.Component getComponent();
-    method public androidx.compose.Composer<?> getComposer();
-    method public boolean recomposeSync();
-    field public static final androidx.compose.CompositionContext.Companion! Companion;
+  public class Composition {
+    ctor public Composition(kotlin.jvm.functions.Function2<? super androidx.compose.SlotTable,? super androidx.compose.Recomposer,? extends androidx.compose.Composer<?>> composerFactory, androidx.compose.CompositionReference? parent);
+    method public final void compose(kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method public final void compose();
+    method public final void dispose();
+    method public final boolean recomposeSync();
   }
 
-  public static final class CompositionContext.Companion {
-    method public androidx.compose.CompositionContext prepare(android.content.Context context, Object root, androidx.compose.Component component, androidx.compose.CompositionReference? compositionReference);
-    method public androidx.compose.CompositionContext prepare(androidx.compose.Component component, androidx.compose.CompositionReference? ambientReference, kotlin.jvm.functions.Function1<? super androidx.compose.Recomposer,? extends androidx.compose.Composer<?>> makeComposer);
+  public final class CompositionKt {
   }
 
   public interface CompositionLifecycleObserver {
@@ -164,7 +153,7 @@ package androidx.compose {
 
   public interface CompositionReference {
     method public <T> T! getAmbient(androidx.compose.Ambient<T> key);
-    method public void invalidate(boolean sync);
+    method public void invalidate();
     method public <T> void invalidateConsumers(androidx.compose.Ambient<T> key);
     method public <N> void registerComposer(androidx.compose.Composer<N> composer);
   }
@@ -211,9 +200,6 @@ package androidx.compose {
     method public android.os.Handler getHandler();
     method public boolean postAtFrontOfQueue(kotlin.jvm.functions.Function0<kotlin.Unit> block);
     property public final android.os.Handler handler;
-  }
-
-  @java.lang.annotation.Retention(java.lang.annotation.RetentionPolicy.RUNTIME) public @interface HiddenAttribute {
   }
 
   @androidx.compose.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.CLASS) public @interface Immutable {
@@ -417,10 +403,6 @@ package androidx.compose {
     method public Object? update(Object? value);
   }
 
-  public final class SourceLocationKt {
-    method public static inline int sourceLocation();
-  }
-
   @androidx.compose.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.CLASS) public @interface Stable {
   }
 
@@ -457,9 +439,8 @@ package androidx.compose {
   }
 
   public final class ViewComposer extends androidx.compose.Composer<java.lang.Object> {
-    ctor public ViewComposer(Object root, android.content.Context context, androidx.compose.Recomposer recomposer, androidx.compose.ViewAdapters? adapters);
+    ctor public ViewComposer(android.content.Context context, Object root, androidx.compose.SlotTable slotTable, androidx.compose.Recomposer recomposer, androidx.compose.ViewAdapters? adapters);
     method public inline void call(Object key, kotlin.jvm.functions.Function1<? super androidx.compose.ViewValidator,java.lang.Boolean> invalid, kotlin.jvm.functions.Function0<kotlin.Unit> block);
-    method public inline <T> void call(Object key, kotlin.jvm.functions.Function0<? extends T> ctor, kotlin.jvm.functions.Function2<? super androidx.compose.ViewValidator,? super T,java.lang.Boolean> invalid, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> block);
     method public inline <T extends android.view.View> void emit(Object key, kotlin.jvm.functions.Function1<? super android.content.Context,? extends T> ctor, kotlin.jvm.functions.Function1<? super androidx.compose.ComposerUpdater<java.lang.Object,T>,kotlin.Unit> update);
     method public inline <T extends android.view.ViewGroup> void emit(Object key, kotlin.jvm.functions.Function1<? super android.content.Context,? extends T> ctor, kotlin.jvm.functions.Function1<? super androidx.compose.ComposerUpdater<java.lang.Object,T>,kotlin.Unit> update, kotlin.jvm.functions.Function0<kotlin.Unit> children);
     method public inline <T extends androidx.compose.Emittable> void emit(Object key, kotlin.jvm.functions.Function0<? extends T> ctor, kotlin.jvm.functions.Function1<? super androidx.compose.ComposerUpdater<java.lang.Object,T>,kotlin.Unit> update);
@@ -467,7 +448,6 @@ package androidx.compose {
     method public androidx.compose.ViewAdapters? getAdapters();
     method public android.content.Context getContext();
     method public Object getRoot();
-    method public void observe(Object key, kotlin.jvm.functions.Function1<? super kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit>,kotlin.Unit> block);
   }
 
   public final class ViewComposerCommonKt {
@@ -475,6 +455,7 @@ package androidx.compose {
 
   public final class ViewComposerKt {
     method public static androidx.compose.ViewComposer! getComposer();
+    method public static androidx.compose.Composer<?> getCurrentComposerNonNull();
     method public static Boolean? registerAdapter(androidx.compose.ViewComposer, kotlin.jvm.functions.Function2<java.lang.Object,java.lang.Object,?> adapter);
     method public static <T> T! runWithComposing(androidx.compose.Composer<?>, kotlin.jvm.functions.Function0<? extends T> block);
     method public static <T> T! runWithCurrent(androidx.compose.Composer<?>, kotlin.jvm.functions.Function0<? extends T> block);

@@ -38,8 +38,8 @@ abstract class Recomposer {
             return threadRecomposer.get()
         }
 
-        internal fun recompose(component: Component, composer: Composer<*>) =
-            current().recompose(component, composer)
+        internal fun recompose(composable: @Composable() () -> Unit, composer: Composer<*>) =
+            current().recompose(composable, composer)
 
         private val threadRecomposer = ThreadLocal { createRecomposer() }
     }
@@ -47,7 +47,7 @@ abstract class Recomposer {
     private val composers = mutableSetOf<Composer<*>>()
 
     @Suppress("PLUGIN_WARNING")
-    private fun recompose(component: Component, composer: Composer<*>) {
+    private fun recompose(composable: @Composable() () -> Unit, composer: Composer<*>) {
         composer.runWithCurrent {
             val composerWasComposing = composer.isComposing
             try {
@@ -55,7 +55,7 @@ abstract class Recomposer {
                 trace("Compose:recompose") {
                     composer.startRoot()
                     composer.startGroup(invocation)
-                    component()
+                    composable()
                     composer.endGroup()
                     composer.endRoot()
                 }

@@ -599,7 +599,7 @@ class CompositionTests {
 
         showThree = true
         recomposeTest()
-        composer.recompose()
+        composer.recomposeWithCurrent()
         composer.applyChanges()
         validate(composer.root, block = validation)
     }
@@ -757,7 +757,7 @@ class CompositionTests {
         // Compose only the Lois report
         recomposeLois?.let { it() }
 
-        composer.recompose()
+        composer.recomposeWithCurrent()
         composer.applyChanges()
 
         validate(composer.root) {
@@ -839,7 +839,7 @@ class CompositionTests {
         // Compose only the Lois report
         recomposeLois?.let { it() }
 
-        composer.recompose()
+        composer.recomposeWithCurrent()
         composer.applyChanges()
 
         validate(composer.root) {
@@ -930,7 +930,7 @@ class CompositionTests {
         // Invalidate Lois which is now removed.
         recomposeLois?.let { it() }
 
-        composer.recompose()
+        composer.recomposeWithCurrent()
         composer.applyChanges()
 
         validate(composer.root) {
@@ -1217,7 +1217,7 @@ class CompositionTests {
         fun MockViewComposition.composition() {
             linear {
                 join(860) { myInvalidate ->
-                    invalidate = { myInvalidate(false) }
+                    invalidate = { myInvalidate() }
                     text(text)
                 }
             }
@@ -1236,7 +1236,7 @@ class CompositionTests {
         text = "Ending"
         invalidate?.let { it() }
 
-        composer.recompose()
+        composer.recomposeWithCurrent()
         composer.applyChanges()
 
         validate(composer.root) { composition() }
@@ -1252,11 +1252,11 @@ class CompositionTests {
         fun MockViewComposition.composition() {
             linear {
                 join(860) { myInvalidate ->
-                    invalidate1 = { myInvalidate(false) }
+                    invalidate1 = { myInvalidate() }
                     text(text)
                     if (includeNested) {
                         join(899) { joinInvalidate ->
-                            invalidate2 = { joinInvalidate(false) }
+                            invalidate2 = { joinInvalidate() }
                             text("Nested in $text")
                         }
                     }
@@ -1282,12 +1282,12 @@ class CompositionTests {
         invalidate1?.invoke()
         invalidate2?.invoke()
 
-        composer.recompose()
+        composer.recomposeWithCurrent()
         composer.applyChanges()
 
         validate(composer.root) { composition() }
 
-        composer.recompose()
+        composer.recomposeWithCurrent()
         composer.applyChanges()
 
         validate(composer.root) { composition() }
@@ -1303,10 +1303,10 @@ class CompositionTests {
         fun MockViewComposition.composition() {
             linear {
                 join(860) { myInvalidate ->
-                    invalidate1 = { myInvalidate(false) }
+                    invalidate1 = { myInvalidate() }
                     if (includeNested) {
                         join(899) { joinInvalidate ->
-                            invalidate2 = { joinInvalidate(false) }
+                            invalidate2 = { joinInvalidate() }
                             text("Nested in $text")
                         }
                     }
@@ -1333,12 +1333,12 @@ class CompositionTests {
         invalidate1?.invoke()
         invalidate2?.invoke()
 
-        composer.recompose()
+        composer.recomposeWithCurrent()
         composer.applyChanges()
 
         validate(composer.root) { composition() }
 
-        composer.recompose()
+        composer.recomposeWithCurrent()
         composer.applyChanges()
 
         validate(composer.root) { composition() }
@@ -1354,7 +1354,7 @@ class CompositionTests {
         fun MockViewComposition.composition() {
             linear {
                 join(1106) { outerInvalidate ->
-                    invalidateOuter = { outerInvalidate(false) }
+                    invalidateOuter = { outerInvalidate() }
                     for (i in 1..texts) {
                         text("Some text")
                     }
@@ -1364,8 +1364,8 @@ class CompositionTests {
                             text("Some text")
 
                             // Force the invalidation to survive the compose
-                            innerInvalidate(false)
-                            invalidateInner = { innerInvalidate(false) }
+                            innerInvalidate()
+                            invalidateInner = { innerInvalidate() }
                         }
                     }
                 }
@@ -1377,12 +1377,12 @@ class CompositionTests {
         texts = 4
         invalidateOuter?.invoke()
         invalidateInner?.invoke()
-        composer.recompose()
+        composer.recomposeWithCurrent()
         composer.applyChanges()
 
         texts = 3
         invalidateOuter?.invoke()
-        composer.recompose()
+        composer.recomposeWithCurrent()
         composer.applyChanges()
     }
 

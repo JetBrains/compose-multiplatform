@@ -25,7 +25,7 @@ import android.app.Activity
  * @see Compose.composeInto
  * @see Activity.setContentView
  */
-fun Activity.setViewContent(composable: @Composable() () -> Unit): CompositionContext? {
+fun Activity.setViewContent(composable: @Composable() () -> Unit): Composition? {
     // If there is already a FrameLayout in the root, we assume we want to compose
     // into it instead of create a new one. This allows for `setContent` to be
     // called multiple times.

@@ -135,14 +135,23 @@ internal class ViewApplyAdapter(private val adapters: ViewAdapters? = null) :
     }
 }
 
+internal actual fun UiComposer(
+    context: Context,
+    root: Any,
+    slots: SlotTable,
+    recomposer: Recomposer
+): Composer<*> = ViewComposer(context, root, slots, recomposer)
+
 class ViewComposer(
-    val root: Any,
     val context: Context,
+    val root: Any,
+    slotTable: SlotTable,
     recomposer: Recomposer,
     val adapters: ViewAdapters? = ViewAdapters()
 ) : Composer<Any>(
-    SlotTable(),
-    Applier(root, ViewApplyAdapter(adapters)), recomposer
+    slotTable,
+    Applier(root, ViewApplyAdapter(adapters)),
+    recomposer
 ) {
     init {
         FrameManager.ensureStarted()
@@ -223,34 +232,6 @@ class ViewComposer(
             skipCurrentGroup()
         }
         endGroup()
-    }
-
-    inline fun <T> call(
-        key: Any,
-        /*crossinline*/
-        ctor: () -> T,
-        invalid: ViewValidator.(f: T) -> Boolean,
-        block: (f: T) -> Unit
-    ) {
-        startGroup(key)
-        val f = cache(true, ctor)
-        if (ViewValidator(this).invalid(f) || inserting) {
-            startGroup(invocation)
-            block(f)
-            endGroup()
-        } else {
-            skipCurrentGroup()
-        }
-        endGroup()
-    }
-
-    /*inline*/ fun observe(
-        key: Any,
-        block: (invalidate: (sync: Boolean) -> Unit) -> Unit
-    ) {
-        val invalidate = startJoin(key, false, block)
-        block(invalidate)
-        doneJoin(false)
     }
 }
 
@@ -388,8 +369,7 @@ class ViewComposer(
     }
 }
 
-@PublishedApi
-internal actual val currentComposerNonNull
+actual val currentComposerNonNull: Composer<*>
     get() = currentComposer ?: emptyComposition()
 
 private fun emptyComposition(): Nothing =
@@ -425,11 +405,3 @@ fun ViewComposer.registerAdapter(
 ) = adapters?.register(adapter)
 
 typealias ViewUpdater<T> = ComposerUpdater<Any, T>
-
-internal actual fun createComposer(
-    root: Any,
-    context: Context,
-    recomposer: Recomposer
-): Composer<*> {
-    return ViewComposer(root, context, recomposer)
-}
