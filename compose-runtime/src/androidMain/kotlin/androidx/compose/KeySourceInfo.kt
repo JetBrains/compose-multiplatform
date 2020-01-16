@@ -57,7 +57,7 @@ internal actual fun recordSourceKeyInfo(key: Any) {
                 else
                     stack[frameNumber]
             }
-            "${frame.fileName}:${frame.lineNumber}"
+            "${frame.className}.${frame.methodName} (${frame.fileName}:${frame.lineNumber})"
         })
     }
 }
