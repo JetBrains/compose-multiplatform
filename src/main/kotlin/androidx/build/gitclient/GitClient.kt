@@ -16,8 +16,8 @@
 
 package androidx.build.gitclient
 
-import androidx.build.releasenotes.getAOSPLink
 import androidx.build.releasenotes.getBuganizerLink
+import androidx.build.releasenotes.getChangeIdAOSPLink
 import org.gradle.api.logging.Logger
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -279,10 +279,7 @@ data class Commit(
     var type: CommitType = CommitType.BUG_FIX
     var releaseNote: String = ""
     private val releaseNoteDelimiters: List<String> = listOf(
-        "Release notes:",
-        "Release Notes:",
-        "release notes:",
-        "Release note:"
+        "Relnote:"
     )
 
     init {
@@ -445,7 +442,7 @@ data class Commit(
 
     fun getReleaseNoteString(): String {
         var releaseNoteString: String = releaseNote
-        releaseNoteString += " ${getAOSPLink(changeId)}"
+        releaseNoteString += " ${getChangeIdAOSPLink(changeId)}"
         bugs.forEach { bug ->
             releaseNoteString += " ${getBuganizerLink(bug)}"
         }
@@ -454,7 +451,7 @@ data class Commit(
 
     override fun toString(): String {
         var commitString: String = summary
-        commitString += " ${getAOSPLink(changeId)}"
+        commitString += " ${getChangeIdAOSPLink(changeId)}"
         bugs.forEach { bug ->
             commitString += " ${getBuganizerLink(bug)}"
         }
