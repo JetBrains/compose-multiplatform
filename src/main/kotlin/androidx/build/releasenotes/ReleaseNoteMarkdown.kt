@@ -27,11 +27,11 @@ import java.time.format.DateTimeFormatter
 
 /**
  * Markdown class for a Library Header in the format:
- * ## Version <version> {:#<version>}
+ * ### Version <version> {:#<version>}
  */
 class LibraryHeader(groupId: String, version: String) : MarkdownHeader() {
     init {
-        markdownType = HeaderType.H2
+        markdownType = HeaderType.H3
         text = "$groupId Version $version {:#$version}"
     }
 }
@@ -41,19 +41,19 @@ class LibraryHeader(groupId: String, version: String) : MarkdownHeader() {
  *
  * **New Features**
  *
- * - <[Commit.summary]> <[getAOSPLink]> <[getBuganizerLink] 1> <[getBuganizerLink] 2>...
+ * - <[Commit.summary]> <[getChangeIdAOSPLink]> <[getBuganizerLink] 1> <[getBuganizerLink] 2>...
  *
  * **API Changes**
  *
- * - <[Commit.summary]> <[getAOSPLink]> <[getBuganizerLink] 1> <[getBuganizerLink] 2>...
+ * - <[Commit.summary]> <[getChangeIdAOSPLink]> <[getBuganizerLink] 1> <[getBuganizerLink] 2>...
  *
  * **Bug Fixes**
  *
- * - <[Commit.summary]> <[getAOSPLink]> <[getBuganizerLink] 1> <[getBuganizerLink] 2>...
+ * - <[Commit.summary]> <[getChangeIdAOSPLink]> <[getBuganizerLink] 1> <[getBuganizerLink] 2>...
  *
  * **External Contribution**
  *
- * - <[Commit.summary]> <[getAOSPLink]> <[getBuganizerLink] 1> <[getBuganizerLink] 2>...
+ * - <[Commit.summary]> <[getChangeIdAOSPLink]> <[getBuganizerLink] 1> <[getBuganizerLink] 2>...
  *
  */
 class CommitMarkdownList(
@@ -144,10 +144,10 @@ fun getGitilesDiffLogLink(startSHA: String, endSHA: String, projectDir: String):
  * @param changeId The Gerrit Change-Id to link to
  * @return A [MarkdownLink] to AOSP Gerrit
  */
-fun getAOSPLink(changeId: String): MarkdownLink {
+fun getChangeIdAOSPLink(changeId: String): MarkdownLink {
     val baseAOSPUrl: String = "https://android-review.googlesource.com/#/q/"
     var aospLink: MarkdownLink = MarkdownLink()
-    aospLink.linkText = "aosp/" + changeId.take(6)
+    aospLink.linkText = changeId.take(6)
     aospLink.linkUrl = "$baseAOSPUrl$changeId"
     return aospLink
 }
@@ -167,6 +167,14 @@ fun getBuganizerLink(bugId: Int): MarkdownLink {
 }
 
 /**
+ * Data class to contain an array of LibraryReleaseNotes when serializing collections of release
+ * notes
+ */
+data class LibraryReleaseNotesList(
+    val list: MutableList<LibraryReleaseNotes> = mutableListOf()
+)
+
+/**
  * Structured release notes class, that connects all parts of the release notes.  Create release
  * notes in the format:
  * <pre>
@@ -183,21 +191,28 @@ fun getBuganizerLink(bugId: Int): MarkdownLink {
  * @property artifactIds List of ArtifactIds included in these release notes.
  * @property version Version of the library, assuming all artifactIds have the same version.
  * @property releaseDate Date the release will go live.  Defaults to the current date.
- * @param startSHA The first SHA to include in the release notes.
- * @param endSHA The last SHA to be included in the release notes.
- * @param projectDir The filepath relative to the parent directory of the .git directory.
+ * @property fromSHA The oldest SHA to include in the release notes.
+ * @property untilSHA The newest SHA to be included in the release notes.
+ * @property projectDir The filepath relative to the parent directory of the .git directory.
+ * @property commitList The initial list of Commits to include in these release notes.  Defaults to an
+ *           empty list.  Users can always add more commits with [LibraryReleaseNotes.addCommit]
+ * @property requiresSameVersion True if the groupId of this module requires the same version for
+ *           all artifactIds in the groupId.  When true, uses the GroupId for the release notes
+ *           header.  When false, uses the list of artifactIds for the header.
  * @param includeAllCommits Set to true to include all commits, both with and without a
  *          release note field in the commit message.  Defaults to false, which means only commits
  *          with a release note field are included in the release notes.
  */
 class LibraryReleaseNotes(
-    private val groupId: String,
-    private val artifactIds: MutableList<String>,
-    private val version: String,
-    private val releaseDate: LocalDate,
-    startSHA: String,
-    endSHA: String,
-    projectDir: String,
+    val groupId: String,
+    val artifactIds: MutableList<String>,
+    val version: String,
+    val releaseDate: LocalDate,
+    val fromSHA: String,
+    val untilSHA: String,
+    val projectDir: String,
+    val commitList: List<Commit> = listOf(),
+    val requiresSameVersion: Boolean,
     includeAllCommits: Boolean = false
 ) {
     private var diffLogLink: MarkdownLink
@@ -212,11 +227,20 @@ class LibraryReleaseNotes(
             throw RuntimeException("Tried to create Library Release Notes Header without setting" +
                     "the groupId or version!")
         }
-        if (startSHA == "" || endSHA == "") {
+        if (fromSHA == "" || untilSHA == "") {
             throw RuntimeException("Tried to create Library Release Notes with an empty SHA!")
         }
-        header = LibraryHeader(groupId, version)
-        diffLogLink = getGitilesDiffLogLink(startSHA, endSHA, projectDir)
+        header = if (requiresSameVersion) {
+                LibraryHeader(groupId, version)
+            } else {
+                LibraryHeader(artifactIds.joinToString(), version)
+            }
+        diffLogLink = getGitilesDiffLogLink(fromSHA, untilSHA, projectDir)
+        if (commitList.isNotEmpty()) {
+            commitList.forEach { commit ->
+                addCommit(commit)
+            }
+        }
     }
 
     fun getFormattedDate(): String {
