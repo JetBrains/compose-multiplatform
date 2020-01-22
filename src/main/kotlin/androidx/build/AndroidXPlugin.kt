@@ -333,10 +333,6 @@ class AndroidXPlugin : Plugin<Project> {
                 listOf(RELEASE_RULE))
         buildOnServerTask.dependsOn(allDocsTask)
         buildOnServerTask.dependsOn(Jacoco.createUberJarTask(this))
-        buildOnServerTask.dependsOn(tasks.register(
-            CHECK_SAME_VERSION_LIBRARY_GROUPS,
-            CheckSameVersionLibraryGroupsTask::class.java)
-        )
 
         AffectedModuleDetector.configure(gradle, this)
 
@@ -763,7 +759,6 @@ class AndroidXPlugin : Plugin<Project> {
         const val BUILD_ON_SERVER_TASK = "buildOnServer"
         const val BUILD_TEST_APKS = "buildTestApks"
         const val CHECK_RELEASE_READY_TASK = "checkReleaseReady"
-        const val CHECK_SAME_VERSION_LIBRARY_GROUPS = "checkSameVersionLibraryGroups"
         const val CREATE_LIBRARY_BUILD_INFO_FILES_TASK = "createLibraryBuildInfoFiles"
         const val CREATE_AGGREGATE_BUILD_INFO_FILES_TASK = "createAggregateBuildInfoFiles"
         const val GENERATE_ARTIFACT_RELEASE_NOTES_TASK = "generateReleaseNotes"
