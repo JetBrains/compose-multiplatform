@@ -95,7 +95,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.MEDIAROUTER, "1.1.0")
     ignore(LibraryGroups.NAVIGATION.group, "navigation-runtime-truth")
     ignore(LibraryGroups.NAVIGATION.group, "navigation-testing")
-    ignore(LibraryGroups.NAVIGATION.group, "navigation-dynamic-features-core")
+    ignore(LibraryGroups.NAVIGATION.group, "navigation-dynamic-features-runtime")
     ignore(LibraryGroups.NAVIGATION.group, "navigation-dynamic-features-fragment")
     ignore(LibraryGroups.NAVIGATION.group, "navigation-safe-args-generator")
     ignore(LibraryGroups.NAVIGATION.group, "navigation-safe-args-gradle-plugin")
