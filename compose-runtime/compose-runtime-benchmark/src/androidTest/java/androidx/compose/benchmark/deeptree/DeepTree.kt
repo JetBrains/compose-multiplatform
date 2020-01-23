@@ -17,23 +17,37 @@
 package androidx.compose.benchmark.deeptree
 
 import androidx.compose.Composable
+import androidx.compose.benchmark.noChildren
 import androidx.ui.unit.dp
-import androidx.ui.foundation.ColoredRect
+import androidx.ui.foundation.background
 import androidx.ui.graphics.Color
 import androidx.ui.layout.Column
+import androidx.ui.layout.Container
 import androidx.ui.layout.FlexScope
 import androidx.ui.layout.LayoutHeight
 import androidx.ui.layout.LayoutWidth
 import androidx.ui.layout.Row
 
+val blueBackground = background(Color.Blue)
+val magentaBackground = background(Color.Magenta)
+val blackBackground = background(Color.Black)
+
+val dp16 = 16.dp
+
 @Composable
 fun Terminal(style: Int) {
-    val color = when (style) {
-        0 -> Color.Blue
-        1 -> Color.Black
-        else -> Color.Magenta
+    val background = when (style) {
+        0 -> blueBackground
+        1 -> blackBackground
+        else -> magentaBackground
     }
-    ColoredRect(color = color, height = 16.dp, width = 16.dp)
+    Container(
+        modifier = background,
+        height = dp16,
+        width = dp16,
+        expanded = true,
+        children = noChildren
+    )
 }
 
 @Composable
@@ -43,12 +57,6 @@ fun Stack(vertical: Boolean, children: @Composable() FlexScope.() -> Unit) {
     } else {
         Row(LayoutWidth.Fill, children = children)
     }
-}
-
-@Composable
-fun Container(children: @Composable() () -> Unit) {
-    // non-layout node component. just adds depth to the composition hierarchy.
-    children()
 }
 
 /**
@@ -81,8 +89,13 @@ fun DeepTree(depth: Int, breadth: Int, wrap: Int, id: Int = 0) {
                 Terminal(style = id % 3)
             } else {
                 repeat(breadth) {
-                    ColoredRect(color = Color.Blue, height = 16.dp, width = 16.dp)
-//                    DeepTree(depth=depth - 1, wrap=wrap, breadth=breadth, id=id)
+                    Container(
+                        modifier = blueBackground,
+                        height = dp16,
+                        width = dp16,
+                        expanded = true,
+                        children = noChildren
+                    )
                 }
             }
         }

@@ -18,28 +18,49 @@ package androidx.compose.benchmark.siblings
 
 import androidx.compose.Composable
 import androidx.compose.Pivotal
+import androidx.compose.benchmark.noChildren
 import androidx.compose.key
 import androidx.ui.core.Text
 import androidx.ui.unit.dp
-import androidx.ui.foundation.ColoredRect
+import androidx.ui.foundation.background
 import androidx.ui.graphics.Color
 import androidx.ui.layout.Column
+import androidx.ui.layout.Container
 import androidx.ui.layout.LayoutHeight
 import androidx.ui.layout.LayoutWidth
 import androidx.ui.layout.Row
 import androidx.ui.text.TextStyle
 import kotlin.random.Random
 
+val blackBackground = background(Color.Black)
+val blueBackground = background(Color.Black)
+val magentaBackground = background(Color.Magenta)
+val blackStyle = TextStyle(color = Color.Black)
+val blueStyle = TextStyle(color = Color.Blue)
+val magentaStyle = TextStyle(color = Color.Magenta)
+val dp16 = 16.dp
+
 @Composable
 fun PivotalItemRow(@Pivotal item: Item) {
-    val color = when (item.id % 3) {
-        0 -> Color.Blue
-        1 -> Color.Black
-        else -> Color.Magenta
+    val background = when (item.id % 3) {
+        0 -> blueBackground
+        1 -> blackBackground
+        else -> magentaBackground
+    }
+    val style = when (item.id % 3) {
+        0 -> blackStyle
+        1 -> blueStyle
+        else -> magentaStyle
     }
     Row(LayoutWidth.Fill) {
-        ColoredRect(color = color, width = 16.dp, height = 16.dp)
-        Text(text = "${item.id}", style = TextStyle(color = color))
+        Container(
+            modifier = background,
+            width = dp16,
+            height = dp16,
+            expanded = true,
+            children = noChildren
+        )
+        Text(text = "${item.id}", style = style)
     }
 }
 
@@ -48,14 +69,25 @@ fun ItemRow(item: Item) {
     // the complexity of this will influence the benchmark a lot because if
     // identity doesn't influence what the component looks like, it's not
     // very important to track it.
-    val color = when (item.id % 3) {
-        0 -> Color.Blue
-        1 -> Color.Black
-        else -> Color.Magenta
+    val background = when (item.id % 3) {
+        0 -> blueBackground
+        1 -> blackBackground
+        else -> magentaBackground
+    }
+    val style = when (item.id % 3) {
+        0 -> blackStyle
+        1 -> blueStyle
+        else -> magentaStyle
     }
     Row(LayoutWidth.Fill) {
-        ColoredRect(color = color, width = 16.dp, height = 16.dp)
-        Text(text = "${item.id}", style = TextStyle(color = color))
+        Container(
+            modifier = background,
+            width = dp16,
+            height = dp16,
+            expanded = true,
+            children = noChildren
+        )
+        Text(text = "${item.id}", style = style)
     }
 }
 

@@ -16,16 +16,11 @@
 
 package androidx.compose.benchmark
 
-import androidx.compose.Composable
 import androidx.compose.benchmark.deeptree.DeepTree
-import androidx.compose.disposeComposition
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.test.rule.ActivityTestRule
-import androidx.ui.core.setContent
 import org.junit.FixMethodOrder
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
