@@ -17,34 +17,15 @@
 package androidx.compose
 
 /**
- * A ValueHolder can produce a single value. How that value is produced depends on which of the
- * decedent classes are used.
- */
-sealed class ValueHolder<out T> {
-    abstract val value: T
-}
-
-/**
  * A StaticValueHolder holds a value that will never change.
  */
-internal data class StaticValueHolder<out T>(override val value: T) : ValueHolder<T>()
-
-/**
- * A DynamicValueHolder holds a value that can be modified but it the value is backed by a State<T>
- * allowing the changes to be observed during composition.
- */
-internal class DynamicValueHolder<T>(initialValue: T) : ValueHolder<T>() {
-    private val current = mutableStateOf(initialValue)
-    override var value: T
-        get() = current.value
-        set(value: T) { current.value = value }
-}
+internal data class StaticValueHolder<T>(override val value: T) : State<T>
 
 /**
  * A lazy value holder is static value holder for which the value is produced by the valueProducer
  * parameter which is called once and the result is remembered for the life of LazyValueHolder.
  */
-internal class LazyValueHolder<out T>(valueProducer: (() -> T)?) : ValueHolder<T>() {
+internal class LazyValueHolder<T>(valueProducer: (() -> T)?) : State<T> {
     @Suppress("UNCHECKED_CAST")
     private val current by lazy {
         val fn = valueProducer

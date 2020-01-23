@@ -216,7 +216,7 @@ internal class RecomposeScope(var composer: Composer<*>) : ScopeUpdateScope {
 
 class ProvidedValue<T> internal constructor(val ambient: Ambient<T>, val value: T)
 
-internal typealias AmbientMap = BuildableMap<Ambient<Any?>, ValueHolder<Any?>>
+internal typealias AmbientMap = BuildableMap<Ambient<Any?>, State<Any?>>
 
 @Suppress("UNCHECKED_CAST")
 internal fun <T> AmbientMap.contains(key: Ambient<T>) = this.containsKey(key as Ambient<Any?>)

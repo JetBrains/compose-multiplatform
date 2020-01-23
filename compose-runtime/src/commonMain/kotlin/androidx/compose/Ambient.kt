@@ -55,12 +55,12 @@ package androidx.compose
  * @sample androidx.compose.samples.consumeAmbient
  */
 @Immutable
-sealed class Ambient<T> constructor(private val defaultFactory: (() -> T)? = null) {
+sealed class Ambient<T> constructor(defaultFactory: (() -> T)? = null) {
     @Suppress("UNCHECKED_CAST")
     internal val defaultValueHolder = LazyValueHolder(defaultFactory)
 
     @Composable
-    internal abstract fun provided(value: T): ValueHolder<T>
+    internal abstract fun provided(value: T): State<T>
 
     /**
      * Return the value provided by the nearest [Providers] component that invokes, directly or
@@ -94,11 +94,11 @@ abstract class ProvidableAmbient<T> internal constructor(defaultFactory: (() -> 
 }
 
 /**
- * A [DynamicProvidableAmbient] is an ambient backed by a [DynamicValueHolder]. Providing
- * new values using a [DynamicProvidableAmbient] will provide the same [ValueHolder] with a
- * different value. Reading the ambient value of a [DynamicProvidableAmbient] will record a
- * read in the [RecomposeScope] of the composition. Changing the provided value will invalidate
- * the [RecomposeScope]s.
+ * A [DynamicProvidableAmbient] is an ambient backed by [mutableStateOf]. Providing new values
+ * using a [DynamicProvidableAmbient] will provide the same [State] with a different value.
+ * Reading the ambient value of a [DynamicProvidableAmbient] will record a read in the
+ * [RecomposeScope] of the composition. Changing the provided value will invalidate the
+ * [RecomposeScope]s.
  *
  * @see ambientOf
  */
@@ -106,13 +106,7 @@ internal class DynamicProvidableAmbient<T> constructor(defaultFactory: (() -> T)
     ProvidableAmbient<T>(defaultFactory) {
 
     @Composable
-    override fun provided(value: T): ValueHolder<T> {
-        with(currentComposerNonNull) {
-            val valueHolder = remember { DynamicValueHolder(value) }
-            valueHolder.value = value
-            return valueHolder
-        }
-    }
+    override fun provided(value: T): State<T> = state { value }.apply { this.value = value }
 }
 
 /**
@@ -125,15 +119,16 @@ internal class StaticProvidableAmbient<T>(defaultFactory: (() -> T)?) :
     ProvidableAmbient<T>(defaultFactory) {
 
     @Composable
-    override fun provided(value: T): ValueHolder<T> = StaticValueHolder(value)
+    override fun provided(value: T): State<T> = StaticValueHolder(value)
 }
 
 /**
  * Create an ambient key that can be provided using [Providers]. Changing the value provided
  * during recomposition will invalidate the children of [Providers] that read the value using
- * [current].
+ * [Ambient.current].
  *
  * @see Ambient
+ * @see staticAmbientOf
  */
 fun <T> ambientOf(defaultFactory: (() -> T)? = null): ProvidableAmbient<T> =
     DynamicProvidableAmbient(defaultFactory)
@@ -146,6 +141,7 @@ fun <T> ambientOf(defaultFactory: (() -> T)? = null): ProvidableAmbient<T> =
  * A static ambient should be only be used when the value provided is highly unlikely to change.
  *
  * @see Ambient
+ * @see ambientOf
  */
 fun <T> staticAmbientOf(defaultFactory: (() -> T)? = null): ProvidableAmbient<T> =
     StaticProvidableAmbient(defaultFactory)
@@ -153,11 +149,13 @@ fun <T> staticAmbientOf(defaultFactory: (() -> T)? = null): ProvidableAmbient<T>
 /**
  * [Providers] binds values to [ProvidableAmbient] keys. Reading the ambient using
  * [Ambient.current] will return the value provided in [Providers]'s [values] parameter for all
- * composable functions called directly or indirectly in the [block] lambda.
+ * composable functions called directly or indirectly in the [children] lambda.
  *
  * @sample androidx.compose.samples.ambientProvider
  *
  * @see Ambient
+ * @see ambientOf
+ * @see staticAmbientOf
  */
 @Composable
 fun Providers(vararg values: ProvidedValue<*>, children: @Composable() () -> Unit) {
