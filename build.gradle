@@ -56,6 +56,8 @@ dependencies {
     implementation build_libs.kotlin.gradle_plugin
     implementation gradleApi()
     implementation project("jetpad-integration")
+    // needed by inspection plugin
+    implementation "com.google.protobuf:protobuf-gradle-plugin:0.8.8"
 }
 
 apply plugin: "java-gradle-plugin"
