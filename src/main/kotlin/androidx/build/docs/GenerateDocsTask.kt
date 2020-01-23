@@ -16,7 +16,6 @@
 
 package androidx.build.docs
 
-import androidx.build.Version
 import androidx.build.doclava.DoclavaTask
 import java.io.File
 
@@ -45,14 +44,6 @@ open class GenerateDocsTask : DoclavaTask() {
                         listOf(artifact.path, artifact.artifact)
                     }
                 }
-            }
-        }
-    }
-
-    fun addSinceFilesFrom(dir: File) {
-        File(dir, "api").listFiles().forEach { file ->
-            Version.parseOrNull(file)?.let { version ->
-                sinces.add(Since(file.absolutePath, version.toString()))
             }
         }
     }
