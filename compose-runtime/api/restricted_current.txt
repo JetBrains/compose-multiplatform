@@ -247,8 +247,10 @@ package androidx.compose {
   }
 
   public final class MutableStateKt {
-    method public static <T> androidx.compose.MutableState<T> mutableStateOf(T? value);
-    method @androidx.compose.Composable public static inline <T> androidx.compose.MutableState<T> state(kotlin.jvm.functions.Function0<? extends T> init);
+    method public static kotlin.jvm.functions.Function2<java.lang.Object,java.lang.Object,java.lang.Boolean> getReferentiallyEqual();
+    method public static kotlin.jvm.functions.Function2<java.lang.Object,java.lang.Object,java.lang.Boolean> getStructurallyEqual();
+    method public static <T> androidx.compose.MutableState<T> mutableStateOf(T? value, kotlin.jvm.functions.Function2<? super T,? super T,java.lang.Boolean> areEquivalent = ReferentiallyEqual);
+    method @androidx.compose.Composable public static inline <T> androidx.compose.MutableState<T> state(kotlin.jvm.functions.Function2<? super T,? super T,java.lang.Boolean> areEquivalent = ReferentiallyEqual, kotlin.jvm.functions.Function0<? extends T> init);
     method @androidx.compose.Composable public static inline <T, V1> androidx.compose.MutableState<T> stateFor(V1? v1, kotlin.jvm.functions.Function0<? extends T> init);
     method @androidx.compose.Composable public static inline <T, reified V1, reified V2> androidx.compose.MutableState<T> stateFor(V1? v1, V2? v2, kotlin.jvm.functions.Function0<? extends T> init);
     method @androidx.compose.Composable public static inline <T> androidx.compose.MutableState<T> stateFor(Object![]? inputs, kotlin.jvm.functions.Function0<? extends T> init);
@@ -578,6 +580,7 @@ package androidx.compose.frames {
     method public static void restore(androidx.compose.frames.Frame frame);
     method public static androidx.compose.frames.Frame suspend();
     method public static boolean wasModified(Object value);
+    method public static inline <T extends androidx.compose.frames.Record> void withCurrent(T, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> block);
     method public static <T extends androidx.compose.frames.Record> T writable(T, androidx.compose.frames.Framed framed);
     method public static <T extends androidx.compose.frames.Record> T writable(T, androidx.compose.frames.Framed framed, androidx.compose.frames.Frame frame);
   }
