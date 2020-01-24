@@ -43,10 +43,6 @@ abstract class UpdateApiTask : DefaultTask() {
     @get:Internal // outputs are declared in getTaskOutputs()
     abstract val outputApiLocations: ListProperty<ApiLocation>
 
-    /** Whether to update restricted API files too */
-    @get:Input
-    var updateRestrictedAPIs = false
-
     @InputFiles
     fun getTaskInputs(): List<File>? {
         return inputApiLocation.get().files()
@@ -54,10 +50,7 @@ abstract class UpdateApiTask : DefaultTask() {
 
     @OutputFiles
     fun getTaskOutputs(): List<File> {
-        if (updateRestrictedAPIs) {
-            return outputApiLocations.get().flatMap { it.files() }
-        }
-        return outputApiLocations.get().flatMap { it.nonRestrictedFiles() }
+        return outputApiLocations.get().flatMap { it.files() }
     }
 
     @TaskAction
@@ -85,14 +78,12 @@ abstract class UpdateApiTask : DefaultTask() {
                 true,
                 project.logger
             )
-            if (updateRestrictedAPIs) {
-                copy(
-                    inputApi.restrictedApiFile,
-                    outputApi.restrictedApiFile,
-                    permitOverwriting,
-                    project.logger
-                )
-            }
+            copy(
+                inputApi.restrictedApiFile,
+                outputApi.restrictedApiFile,
+                permitOverwriting,
+                project.logger
+            )
         }
     }
 

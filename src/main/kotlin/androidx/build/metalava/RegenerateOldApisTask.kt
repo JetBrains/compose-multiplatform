@@ -26,6 +26,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 import org.gradle.api.internal.artifacts.ivyservice.DefaultLenientConfiguration
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.util.PatternFilterable
 import org.gradle.workers.WorkerExecutor
@@ -36,6 +37,10 @@ import javax.inject.Inject
 abstract class RegenerateOldApisTask @Inject constructor(
     private val workerExecutor: WorkerExecutor
 ) : DefaultTask() {
+
+    @Input
+    var generateRestrictToLibraryGroupAPIs = true
+
     @TaskAction
     fun exec() {
         val groupId = project.group.toString()
@@ -87,9 +92,8 @@ abstract class RegenerateOldApisTask @Inject constructor(
         val outputApiLocation = project.getApiLocation(version)
         if (outputApiLocation.publicApiFile.exists()) {
             project.logger.lifecycle("Regenerating $mavenId")
-            val generateRestrictedAPIs = outputApiLocation.restrictedApiFile.exists()
             project.generateApi(
-                inputs, outputApiLocation, ApiLintMode.Skip, generateRestrictedAPIs,
+                inputs, outputApiLocation, ApiLintMode.Skip, generateRestrictToLibraryGroupAPIs,
                 workerExecutor)
         }
     }

@@ -41,16 +41,9 @@ abstract class CheckApiCompatibilityTask @Inject constructor(
     @get:Input
     abstract val baselines: Property<ApiViolationBaselines>
 
-    // Whether to confirm that no restricted APIs were removed since the previous release
-    @get:Input
-    var checkRestrictedAPIs = false
-
     @InputFiles
     fun getTaskInputs(): List<File> {
-        if (checkRestrictedAPIs) {
-            return referenceApi.get().files() + baselines.get().files()
-        }
-        return listOf(referenceApi.get().publicApiFile, baselines.get().publicApiFile)
+        return referenceApi.get().files() + baselines.get().files()
     }
 
     // Declaring outputs prevents Gradle from rerunning this task if the inputs haven't changed
@@ -64,16 +57,15 @@ abstract class CheckApiCompatibilityTask @Inject constructor(
         check(bootClasspath.isNotEmpty()) { "Android boot classpath not set." }
 
         checkApiFile(api.get().publicApiFile, referenceApi.get().publicApiFile,
-            baselines.get().publicApiFile, false)
-        if (checkRestrictedAPIs) {
+            baselines.get().publicApiFile)
+        if (referenceApi.get().restrictedApiFile.exists()) {
             checkApiFile(api.get().restrictedApiFile, referenceApi.get().restrictedApiFile,
-                baselines.get().restrictedApiFile,
-                true)
+                baselines.get().restrictedApiFile)
         }
     }
 
     // Confirms that <api> is compatible with <oldApi> except for any baselines listed in <baselineFile>
-    fun checkApiFile(api: File, oldApi: File, baselineFile: File, checkRestrictedAPIs: Boolean) {
+    fun checkApiFile(api: File, oldApi: File, baselineFile: File) {
         var args = listOf("--classpath",
                 (bootClasspath + dependencyClasspath.files).joinToString(File.pathSeparator),
 
@@ -88,13 +80,6 @@ abstract class CheckApiCompatibilityTask @Inject constructor(
         )
         if (baselineFile.exists()) {
             args = args + listOf("--baseline", baselineFile.toString())
-        }
-        if (checkRestrictedAPIs) {
-            args = args + listOf(
-                "--show-annotation", "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP)",
-                "--show-annotation", "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX)",
-                "--show-unannotated"
-            )
         }
         runWithArgs(args)
     }

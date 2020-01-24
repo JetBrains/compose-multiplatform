@@ -41,7 +41,7 @@ abstract class GenerateApiTask @Inject constructor(
     abstract val baselines: Property<ApiViolationBaselines>
 
     @get:Input
-    var generateRestrictedAPIs = false
+    var generateRestrictToLibraryGroupAPIs = true
 
     @Optional
     @InputFile
@@ -56,7 +56,7 @@ abstract class GenerateApiTask @Inject constructor(
         return listOfNotNull(
             prop.publicApiFile,
             prop.experimentalApiFile,
-            if (generateRestrictedAPIs) prop.restrictedApiFile else null
+            prop.restrictedApiFile
         )
     }
 
@@ -74,7 +74,7 @@ abstract class GenerateApiTask @Inject constructor(
             inputs,
             apiLocation.get(),
             ApiLintMode.CheckBaseline(baselines.get().apiLintFile),
-            generateRestrictedAPIs,
+            generateRestrictToLibraryGroupAPIs,
             workerExecutor
         )
     }

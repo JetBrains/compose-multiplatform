@@ -46,18 +46,9 @@ abstract class CheckApiEquivalenceTask : DefaultTask() {
         return checkedInApis.get() + listOf(builtApi.get())
     }
 
-    /**
-     * Whether to check restricted APIs too
-     */
-    @get:Input
-    var checkRestrictedAPIs = false
-
     @InputFiles
     fun getTaskInputs(): List<File> {
-        if (checkRestrictedAPIs) {
-            return allApiLocations().flatMap { it.files() }
-        }
-        return allApiLocations().flatMap { it.nonRestrictedFiles() }
+        return allApiLocations().flatMap { it.files() }
     }
 
     /**
@@ -110,9 +101,7 @@ abstract class CheckApiEquivalenceTask : DefaultTask() {
         for (checkedInApi in checkedInApis.get()) {
             checkEqual(checkedInApi.publicApiFile, builtApi.get().publicApiFile)
             checkEqual(checkedInApi.experimentalApiFile, builtApi.get().experimentalApiFile)
-            if (checkRestrictedAPIs) {
-                checkEqual(checkedInApi.restrictedApiFile, builtApi.get().restrictedApiFile)
-            }
+            checkEqual(checkedInApi.restrictedApiFile, builtApi.get().restrictedApiFile)
         }
     }
 }

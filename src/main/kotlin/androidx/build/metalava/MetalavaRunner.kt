@@ -140,7 +140,8 @@ val API_LINT_ARGS: List<String> = listOf(
 
 sealed class GenerateApiMode {
     object PublicApi : GenerateApiMode()
-    object RestrictedApi : GenerateApiMode()
+    object AllRestrictedApis : GenerateApiMode()
+    object RestrictToLibraryGroupPrefixApis : GenerateApiMode()
     object ExperimentalApi : GenerateApiMode()
 }
 
@@ -154,7 +155,7 @@ fun Project.generateApi(
     files: JavaCompileInputs,
     apiLocation: ApiLocation,
     apiLintMode: ApiLintMode,
-    includeRestrictedApis: Boolean,
+    includeRestrictToLibraryGroupApis: Boolean,
     workerExecutor: WorkerExecutor
 ) {
     generateApi(files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
@@ -162,11 +163,15 @@ fun Project.generateApi(
     generateApi(files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
         apiLocation.experimentalApiFile, GenerateApiMode.ExperimentalApi, apiLintMode,
         workerExecutor)
-    if (includeRestrictedApis) {
-        generateApi(files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
-            apiLocation.restrictedApiFile, GenerateApiMode.RestrictedApi, ApiLintMode.Skip,
-            workerExecutor)
+
+    val restrictedAPIMode = if (includeRestrictToLibraryGroupApis) {
+        GenerateApiMode.AllRestrictedApis
+    } else {
+        GenerateApiMode.RestrictToLibraryGroupPrefixApis
     }
+    generateApi(files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
+        apiLocation.restrictedApiFile, restrictedAPIMode, ApiLintMode.Skip,
+        workerExecutor)
 }
 
 // Gets arguments for generating the specified api file
@@ -217,13 +222,17 @@ fun Project.getGenerateApiArgs(
             )
             args += listOf("--show-unannotated")
         }
-        is GenerateApiMode.RestrictedApi -> {
+        is GenerateApiMode.AllRestrictedApis, GenerateApiMode.RestrictToLibraryGroupPrefixApis -> {
             // Show restricted APIs despite @hide.
             args += listOf(
-                "--show-annotation", "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP)",
                 "--show-annotation", "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX)",
                 "--show-unannotated"
             )
+            if (generateApiMode is GenerateApiMode.AllRestrictedApis) {
+                args += listOf("--show-annotation", "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP)")
+            } else {
+                args += listOf("--hide-annotation", "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP)")
+            }
             args += HIDE_EXPERIMENTAL_ARGS
         }
         is GenerateApiMode.ExperimentalApi -> {
