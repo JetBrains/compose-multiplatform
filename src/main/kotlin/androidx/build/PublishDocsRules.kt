@@ -73,7 +73,7 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.FRAGMENT.group, "fragment-lint")
     ignore(LibraryGroups.FRAGMENT.group, "fragment-testing-lint")
     ignore(LibraryGroups.FRAGMENT.group, "fragment-truth")
-    prebuilts(LibraryGroups.FRAGMENT, "1.2.0")
+    prebuilts(LibraryGroups.FRAGMENT, "1.2.1")
     prebuilts(LibraryGroups.GRIDLAYOUT, "1.0.0")
     prebuilts(LibraryGroups.HEIFWRITER, "1.1.0-alpha01")
     prebuilts(LibraryGroups.INTERPOLATOR, "1.0.0")
