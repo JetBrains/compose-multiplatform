@@ -20,9 +20,12 @@ import java.io.File
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.FileCollection
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.Classpath
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Optional
 import org.gradle.workers.WorkerExecutor
 import javax.inject.Inject
 
@@ -48,6 +51,10 @@ abstract class MetalavaTask @Inject constructor(
     /** Source files against which API signatures will be validated. */
     @get:InputFiles
     var sourcePaths: Collection<File> = emptyList()
+
+    @get:InputFile
+    @get:Optional
+    abstract val manifestPath: RegularFileProperty
 
     fun runWithArgs(args: List<String>) {
         runMetalavaWithArgs(project.getMetalavaJar(), args, workerExecutor)
