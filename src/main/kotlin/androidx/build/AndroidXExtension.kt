@@ -72,8 +72,6 @@ open class AndroidXExtension(val project: Project) {
 
     var compilationTarget: CompilationTarget = CompilationTarget.DEVICE
 
-    var trackRestrictedAPIs = true
-
     /**
      * It disables docs generation and api tracking for tooling modules like annotation processors.
      * We don't expect such modules to be used by developers as libraries, so we don't guarantee

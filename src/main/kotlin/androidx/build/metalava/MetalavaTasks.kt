@@ -119,13 +119,14 @@ object MetalavaTasks {
 
         val baselines = ApiViolationBaselines.fromApiLocation(libraryVersionApi)
 
+        val generateRestrictToLibraryGroupAPIs = !extension.mavenGroup!!.requireSameVersion
         val generateApi = project.tasks.register("generateApi", GenerateApiTask::class.java) {
                 task ->
             task.group = "API"
             task.description = "Generates API files from source"
             task.apiLocation.set(builtApiLocation)
             task.configuration = metalavaConfiguration
-            task.generateRestrictedAPIs = extension.trackRestrictedAPIs
+            task.generateRestrictToLibraryGroupAPIs = generateRestrictToLibraryGroupAPIs
             task.baselines.set(baselines)
             task.dependsOn(metalavaConfiguration)
             applyInputs(javaCompileInputs, task)
@@ -142,7 +143,6 @@ object MetalavaTasks {
                 task.referenceApi.set(lastReleasedApiFile)
                 task.baselines.set(baselines)
                 task.dependsOn(metalavaConfiguration)
-                task.checkRestrictedAPIs = extension.trackRestrictedAPIs
                 task.api.set(builtApiLocation)
                 task.dependencyClasspath = javaCompileInputs.dependencyClasspath
                 task.bootClasspath = javaCompileInputs.bootClasspath
@@ -153,7 +153,6 @@ object MetalavaTasks {
                 task.configuration = metalavaConfiguration
                 task.referenceApi.set(checkApiRelease!!.flatMap { it.referenceApi })
                 task.baselines.set(checkApiRelease!!.flatMap { it.baselines })
-                task.processRestrictedApis = extension.trackRestrictedAPIs
                 task.api.set(builtApiLocation)
                 task.dependencyClasspath = javaCompileInputs.dependencyClasspath
                 task.bootClasspath = javaCompileInputs.bootClasspath
@@ -177,7 +176,6 @@ object MetalavaTasks {
                         "checked in API file"
                 task.builtApi.set(generateApi.flatMap { it.apiLocation })
                 task.checkedInApis.set(outputApiLocations)
-                task.checkRestrictedAPIs = extension.trackRestrictedAPIs
                 task.dependsOn(generateApi)
                 checkApiRelease?.let {
                     task.dependsOn(checkApiRelease)
@@ -189,6 +187,7 @@ object MetalavaTasks {
             task.group = "API"
             task.description = "Regenerates historic API .txt files using the " +
                 "corresponding prebuilt and the latest Metalava"
+            task.generateRestrictToLibraryGroupAPIs = generateRestrictToLibraryGroupAPIs
             // if checkApiRelease and regenerateOldApis both run, then checkApiRelease must
             // be the second one run of the two (because checkApiRelease validates
             // files modified by regenerateOldApis)
@@ -203,7 +202,6 @@ object MetalavaTasks {
             task.description = "Updates the checked in API files to match source code API"
             task.inputApiLocation.set(generateApi.flatMap { it.apiLocation })
             task.outputApiLocations.set(checkApi.flatMap { it.checkedInApis })
-            task.updateRestrictedAPIs = extension.trackRestrictedAPIs
             task.dependsOn(generateApi)
             if (checkApiRelease != null) {
                 // If a developer (accidentally) makes a non-backwards compatible change to an

@@ -79,25 +79,15 @@ abstract class IgnoreApiChangesTask @Inject constructor(
     @get:Input
     abstract val baselines: Property<ApiViolationBaselines>
 
-    // Whether to update the file having restricted APIs too
-    @get:Input
-    var processRestrictedApis = false
-
     @InputFiles
     fun getTaskInputs(): List<File> {
-        if (processRestrictedApis) {
-            return referenceApi.get().files()
-        }
-        return listOf(referenceApi.get().publicApiFile)
+        return referenceApi.get().files()
     }
 
     // Declaring outputs prevents Gradle from rerunning this task if the inputs haven't changed
     @OutputFiles
     fun getTaskOutputs(): List<File>? {
-        if (processRestrictedApis) {
-            return listOf(baselines.get().publicApiFile, baselines.get().restrictedApiFile)
-        }
-        return listOf(baselines.get().publicApiFile)
+        return listOf(baselines.get().publicApiFile, baselines.get().restrictedApiFile)
     }
 
     @TaskAction
@@ -110,7 +100,7 @@ abstract class IgnoreApiChangesTask @Inject constructor(
             baselines.get().publicApiFile,
             false
         )
-        if (processRestrictedApis && referenceApi.get().restrictedApiFile.exists()) {
+        if (referenceApi.get().restrictedApiFile.exists()) {
             updateBaseline(
                 api.get().restrictedApiFile,
                 referenceApi.get().restrictedApiFile,
