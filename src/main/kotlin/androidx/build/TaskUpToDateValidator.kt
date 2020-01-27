@@ -143,14 +143,16 @@ class TaskUpToDateValidator {
                 }
             }
             val inputsMessage = if (lastModifiedFile != null) {
-                "\n" + task.path + " declares " + inputFiles.size + " input files. The " +
+                task.path + " declares " + inputFiles.size + " input files. The " +
                     "last modified input file is\n" + lastModifiedFile + "\nmodified at " +
                     lastModifiedWhen
             } else {
-                "\n" + task.path + " declares " + inputFiles.size + " input files.\n"
+                task.path + " declares " + inputFiles.size + " input files.\n"
             }
 
-            return outputsMessage + inputsMessage
+            val reproductionMessage = "To reproduce this error you can try running " +
+                "`./gradlew ${task.path} -PverifyUpToDate`\n"
+            return outputsMessage + inputsMessage + reproductionMessage
         }
     }
 }
