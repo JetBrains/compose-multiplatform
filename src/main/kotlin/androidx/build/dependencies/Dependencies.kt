@@ -38,6 +38,7 @@ const val CONSTRAINT_LAYOUT_SOLVER = "androidx.constraintlayout:constraintlayout
 const val DEXMAKER_MOCKITO = "com.linkedin.dexmaker:dexmaker-mockito:2.25.0"
 const val ESPRESSO_CONTRIB = "androidx.test.espresso:espresso-contrib:3.1.0"
 const val ESPRESSO_CORE = "androidx.test.espresso:espresso-core:3.1.0"
+const val ESPRESSO_INTENTS = "androidx.test.espresso:espresso-intents:3.1.0"
 const val ESPRESSO_IDLING_RESOURCE = "androidx.test.espresso:espresso-idling-resource:3.1.0"
 const val ESPRESSO_WEB = "androidx.test.espresso:espresso-web:3.1.0"
 const val FINDBUGS = "com.google.code.findbugs:jsr305:3.0.2"
