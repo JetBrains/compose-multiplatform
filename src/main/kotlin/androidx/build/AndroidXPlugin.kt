@@ -386,6 +386,7 @@ class AndroidXPlugin : Plugin<Project> {
                 }
             }
         }
+        publishInspectionArtifacts()
     }
 
     private fun TestedExtension.configureAndroidCommonOptions(
