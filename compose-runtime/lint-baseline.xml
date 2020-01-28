@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="5" by="lint 4.0.0-alpha01" client="gradle" variant="debug" version="4.0.0-alpha01">
+
+    <issue
+        id="UnnecessaryLambdaCreation"
+        message="Creating an unnecessary lambda to emit a captured lambda"
+        errorLine1="/*inline*/ fun &lt;T> memo(calculation: () -> T) = remember { calculation() }"
+        errorLine2="                                                           ~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/Remember.kt"
+            line="99"
+            column="60"/>
+    </issue>
+
+    <issue
+        id="UnnecessaryLambdaCreation"
+        message="Creating an unnecessary lambda to emit a captured lambda"
+        errorLine1=") = remember(v1) { calculation() }"
+        errorLine2="                   ~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/Remember.kt"
+            line="117"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UnnecessaryLambdaCreation"
+        message="Creating an unnecessary lambda to emit a captured lambda"
+        errorLine1=") = remember(v1, v2) { calculation() }"
+        errorLine2="                       ~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/Remember.kt"
+            line="137"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="UnnecessaryLambdaCreation"
+        message="Creating an unnecessary lambda to emit a captured lambda"
+        errorLine1="fun &lt;T> memo(vararg inputs: Any?, calculation: () -> T) = remember(*inputs) { calculation() }"
+        errorLine2="                                                                              ~~~~~~~~~~~">
+        <location
+            file="src/commonMain/kotlin/androidx/compose/Remember.kt"
+            line="152"
+            column="79"/>
+    </issue>
+
+</issues>

@@ -47,7 +47,6 @@ object Compose {
             private fun saveStateAndDispose(context: Context) {
                 compositions.clear()
 
-
                 val emittableRoots = EMITTABLE_ROOT_COMPONENT.entries.toSet()
 
                 for ((_, composition) in emittableRoots) {
@@ -214,7 +213,7 @@ object Compose {
         private val root: Any,
         private val context: Context,
         parent: CompositionReference? = null
-    ): Composition(
+    ) : Composition(
         { slots, recomposer -> UiComposer(context, root, slots, recomposer) },
         parent
     ) {
