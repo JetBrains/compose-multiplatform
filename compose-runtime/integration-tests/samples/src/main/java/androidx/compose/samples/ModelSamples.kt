@@ -23,6 +23,7 @@ import androidx.ui.core.TextField
 import androidx.ui.material.Button
 
 @Composable
+@Sampled
 fun modelSample() {
     @Model
     class LoginState(var username: String, var password: String) {
