@@ -95,6 +95,7 @@ val EXEMPT_TASK_NAMES = setOf(
     "transformClassesWithDexBuilderForTipOfTreeDebug",
     "unzipDokkaPublicDocsDeps",
     "verifyDependencyVersions",
+    "verifyReleaseResources",
     "zipEcFiles"
 )
 class TaskUpToDateValidator {
