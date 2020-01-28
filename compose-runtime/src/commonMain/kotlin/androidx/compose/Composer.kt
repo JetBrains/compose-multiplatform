@@ -1166,8 +1166,7 @@ open class Composer<N>(
             recordExits(end, enterStackSize)
         } else {
             // No recompositions were requested in the range, skip it.
-            recordSkip(START_GROUP)
-            slots.skipGroup()
+            skipGroup()
         }
         isComposing = wasComposing
     }

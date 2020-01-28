@@ -1210,6 +1210,50 @@ class CompositionTests {
         }
     }
 
+    // b/148273328
+    @Test
+    fun testInsertInGroups() {
+
+        var threeVisible = false
+
+        fun MockViewComposition.composition() {
+            linear {
+                text("one")
+                text("two")
+                if (threeVisible) {
+                    text("three")
+                    text("four")
+                }
+                linear {
+                    text("five")
+                }
+            }
+        }
+
+        fun MockViewValidator.composition() {
+            linear {
+                text("one")
+                text("two")
+                if (threeVisible) {
+                    text("three")
+                    text("four")
+                }
+                linear {
+                    text("five")
+                }
+            }
+        }
+
+        val composer = compose { composition() }
+        validate(composer.root) { composition() }
+
+        threeVisible = true
+
+        compose(composer) { composition() }
+
+        validate(composer.root) { composition() }
+    }
+
     @Test
     fun testStartJoin() {
         var text = "Starting"
