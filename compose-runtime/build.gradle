@@ -39,14 +39,22 @@ kotlin {
 
         jvmMain {
         }
+        // TODO(aelias): Consider using commonTest for unit tests if a usable feature
+        // is added for https://youtrack.jetbrains.com/issue/KT-34662
+        unitTest {
+        }
         androidMain {
             dependsOn jvmMain
         }
-
-        // TODO(aelias): Change to new names when https://github.com/JetBrains/kotlin/pull/2829 rolls in
         androidMain.dependencies {
             api "androidx.annotation:annotation:1.0.0"
             implementation "org.jetbrains.kotlinx:kotlinx-collections-immutable-jvm:0.3"
+        }
+
+        // TODO(aelias): Change to androidLocalTest and androidDeviceTest when
+        // https://github.com/JetBrains/kotlin/pull/2829 rolls in
+        androidTest {
+            dependsOn unitTest
         }
         androidAndroidTest.dependencies {
             implementation(ANDROIDX_TEST_EXT_JUNIT)
@@ -65,10 +73,12 @@ android {
         }
     }
 
-    // b/148416113: AGP doesn't know about commonMain yet, so add it to its
-    // source directories (this fixes lint, and code completion in Android
-    // Studio on versions >= 4.0canary8)
-    sourceSets.main.java.srcDirs = ['src/commonMain/kotlin']
+    // b/148416113: AGP doesn't know about Kotlin-MPP's sourcesets yet, so add
+    // them to its source directories (this fixes lint, and code completion in
+    // Android Studio on versions >= 4.0canary8)
+    sourceSets.main.java.srcDirs = ['src/commonMain/kotlin','src/jvmMain/kotlin','src/androidMain/kotlin']
+    sourceSets.test.java.srcDirs = ['src/unitTest/kotlin']
+    sourceSets.androidTest.java.srcDirs = ['src/androidAndroidTest/kotlin']
 }
 
 androidx {

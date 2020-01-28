@@ -59,7 +59,7 @@ actual class Handler {
         handler = android.os.Handler(looper)
     }
     actual fun postAtFrontOfQueue(block: () -> Unit): Boolean {
-        return handler.postAtFrontOfQueue { block() }
+        return handler.postAtFrontOfQueue(block)
     }
 }
 

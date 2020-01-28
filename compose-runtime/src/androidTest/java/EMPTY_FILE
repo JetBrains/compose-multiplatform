@@ -1,4 +1,0 @@
-This file is needed to work around a problem with the Kotlin-MPP plugin with
-single-Kotlin-module test structure.  Without this file,
-./gradlew :compose:compose-runtime:connectedAndroidTest
-does not do anything.  See b/139385662 for more details.
