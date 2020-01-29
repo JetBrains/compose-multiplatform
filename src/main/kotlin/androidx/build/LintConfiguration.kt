@@ -55,6 +55,11 @@ fun Project.configureNonAndroidProjectForLint(extension: AndroidXExtension) {
 }
 
 fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension) {
+    project.dependencies.add(
+        "lintChecks",
+        project.rootProject.project(":lint-checks")
+    )
+
     // If -PcheckUnknownNullness was set we should fail on UnknownNullness warnings
     val checkUnknownNullness = hasProperty(CHECK_UNKNOWN_NULLNESS)
 

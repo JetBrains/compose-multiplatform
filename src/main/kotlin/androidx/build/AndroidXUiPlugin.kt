@@ -43,10 +43,12 @@ class AndroidXUiPlugin : Plugin<Project> {
                         targetSdkVersion(29)
                     }
 
+                    // TODO(148540713): remove this exclusion when Lint can support using multiple lint jars
+                    project.configurations.getByName("lintChecks").exclude(mapOf("module" to "lint-checks"))
                     // TODO: figure out how to apply this to multiplatform modules
                     project.dependencies.add(
                         "lintChecks",
-                        project.rootProject.project(":ui:ui-internal-lint-checks")
+                        project.dependencies.project(mapOf("path" to ":ui:ui-internal-lint-checks", "configuration" to "shadow"))
                     )
 
                     library.lintOptions.apply {
