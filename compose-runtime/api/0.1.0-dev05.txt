@@ -1,0 +1,676 @@
+// Signature format: 3.0
+package androidx.compose {
+
+  public final class ActualAndroidKt {
+    method public static android.content.Context getContext(android.view.View);
+    method public static android.view.ViewParent getParent(android.view.View);
+    method public static boolean isMainThread();
+  }
+
+  public final class ActualJvmKt {
+    method public static int identityHashCode(Object? instance);
+    method public static inline <R> R! synchronized(Object lock, kotlin.jvm.functions.Function0<? extends R> block);
+  }
+
+  @androidx.compose.Immutable public abstract sealed class Ambient<T> {
+    method public final inline T! getCurrent();
+    property public final inline T! current;
+  }
+
+  public final class AmbientKt {
+    method @androidx.compose.Composable public static void Providers(androidx.compose.ProvidedValue<?>![] values, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+    method public static <T> androidx.compose.ProvidableAmbient<T> ambientOf(kotlin.jvm.functions.Function0<? extends T>? defaultFactory = null);
+    method public static <T> androidx.compose.ProvidableAmbient<T> staticAmbientOf(kotlin.jvm.functions.Function0<? extends T>? defaultFactory = null);
+  }
+
+  public final class Anchor {
+    ctor public Anchor(internal int loc);
+    method public boolean getValid();
+    method public int location(androidx.compose.SlotTable slots);
+    property public final boolean valid;
+  }
+
+  public final class Applier<N> {
+    ctor public Applier(N! root, androidx.compose.ApplyAdapter<N> adapter);
+    method public void down(N? node);
+    method public N! getCurrent();
+    method public void insert(int index, N? instance);
+    method public void move(int from, int to, int count);
+    method public void remove(int index, int count);
+    method public void reset();
+    method public void up();
+    property public final N! current;
+  }
+
+  public interface ApplyAdapter<N> {
+    method public void end(N?, N? instance, N? parent);
+    method public void insertAt(N?, int index, N? instance);
+    method public void move(N?, int from, int to, int count);
+    method public void removeAt(N?, int index, int count);
+    method public void start(N?, N? instance);
+  }
+
+  public interface BuildableMap<K, V> extends java.util.Map<K,V> kotlin.jvm.internal.markers.KMappedMarker {
+    method public androidx.compose.BuildableMap.Builder<K,V> builder();
+  }
+
+  public static interface BuildableMap.Builder<K, V> extends java.util.Map<K,V> kotlin.jvm.internal.markers.KMutableMap {
+    method public androidx.compose.BuildableMap<K,V> build();
+  }
+
+  public final class Choreographer {
+    method public void postFrameCallback(android.view.Choreographer.FrameCallback callback);
+    method public void postFrameCallbackDelayed(long delayMillis, android.view.Choreographer.FrameCallback callback);
+    method public void removeFrameCallback(android.view.Choreographer.FrameCallback callback);
+    field public static final androidx.compose.Choreographer! INSTANCE;
+  }
+
+  public interface CommitScope {
+    method public void onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> callback);
+  }
+
+  @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets={AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER, AnnotationTarget.PROPERTY}) public @interface Composable {
+  }
+
+  public final class Compose {
+    method @MainThread public androidx.compose.Composition composeInto(android.view.ViewGroup container, androidx.compose.CompositionReference? parent = null, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
+    method @MainThread public androidx.compose.Composition composeInto(androidx.compose.Emittable container, android.content.Context context, androidx.compose.CompositionReference? parent = null, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
+    method @MainThread public void disposeComposition(android.view.ViewGroup container, androidx.compose.CompositionReference? parent = null);
+    method @MainThread public void disposeComposition(androidx.compose.Emittable container, android.content.Context context, androidx.compose.CompositionReference? parent = null);
+    method @MainThread public androidx.compose.Composition subcomposeInto(androidx.compose.Emittable container, android.content.Context context, androidx.compose.CompositionReference? parent = null, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
+    field public static final androidx.compose.Compose! INSTANCE;
+  }
+
+  public final class ComposeAndroidKt {
+    method public static void disposeComposition(android.app.Activity);
+    method public static androidx.compose.Composition? setViewContent(android.app.Activity, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
+  }
+
+  public final class ComposeKt {
+    method public static void disposeComposition(android.view.ViewGroup);
+    method public static androidx.compose.Composition setViewContent(android.view.ViewGroup, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
+  }
+
+  public class Composer<N> {
+    ctor public Composer(androidx.compose.SlotTable slotTable, androidx.compose.Applier<N> applier, androidx.compose.Recomposer recomposer);
+    method public final void abortRoot();
+    method public final <V, T> void apply(V? value, kotlin.jvm.functions.Function2<? super T,? super V,kotlin.Unit> block);
+    method public final void applyChanges();
+    method public final androidx.compose.CompositionReference buildReference();
+    method public final <T> boolean changed(T? value);
+    method public final void collectKeySourceInformation();
+    method protected final void composeRoot(kotlin.jvm.functions.Function0<kotlin.Unit> block);
+    method public final <T extends N> void createNode(kotlin.jvm.functions.Function0<? extends T> factory);
+    method public final <T extends N> void emitNode(kotlin.jvm.functions.Function0<? extends T> factory);
+    method public final void emitNode(N? node);
+    method public final void endExpr();
+    method public final void endGroup();
+    method public final void endNode();
+    method public final androidx.compose.ScopeUpdateScope? endRestartGroup();
+    method public final void endRoot();
+    method public final int getChangeCount();
+    method public final boolean getInserting();
+    method public final boolean getSkipping();
+    method public final androidx.compose.SlotTable getSlotTable();
+    method public final Object joinKey(Object? left, Object? right);
+    method public final Object? nextSlot();
+    method public final boolean recompose();
+    method public final void skipCurrentGroup();
+    method public final void skipValue();
+    method public final void startExpr(Object key);
+    method public final void startGroup(Object key);
+    method public final void startNode(Object key);
+    method public final void startRestartGroup(Object key);
+    method public final void startRoot();
+    method public final void updateValue(Object? value);
+    method public final N! useNode();
+    property public final int changeCount;
+    property public final boolean inserting;
+    property public final boolean skipping;
+  }
+
+  public final class ComposerKt {
+    method public static inline <N, T> T! cache(androidx.compose.Composer<N>, boolean valid = true, kotlin.jvm.functions.Function0<? extends T> block);
+    method public static inline <T> T! escapeCompose(kotlin.jvm.functions.Function1<? super androidx.compose.NullCompilationScope,? extends T> block);
+    method public static androidx.compose.Composer<?> getCurrentComposerIntrinsic();
+    method public static <N> Object? nextValue(androidx.compose.Composer<N>);
+    field public static final int DEFAULT_SLOT_ACTIONS_SIZE = 16; // 0x10
+    field public static final int DEFAULT_SLOT_KEYS_SIZE = 8; // 0x8
+  }
+
+  public final class ComposerUpdater<N, T extends N> {
+    ctor public ComposerUpdater(androidx.compose.Composer<N> composer, T! node);
+    method public androidx.compose.Composer<N> getComposer();
+    method public T! getNode();
+    method public inline void set(int value, kotlin.jvm.functions.Function2<? super T,? super java.lang.Integer,kotlin.Unit> block);
+    method public inline <reified V> void set(V? value, kotlin.jvm.functions.Function2<? super T,? super V,kotlin.Unit> block);
+    method public inline void update(int value, kotlin.jvm.functions.Function2<? super T,? super java.lang.Integer,kotlin.Unit> block);
+    method public inline <reified V> void update(V? value, kotlin.jvm.functions.Function2<? super T,? super V,kotlin.Unit> block);
+  }
+
+  public class Composition {
+    ctor public Composition(kotlin.jvm.functions.Function2<? super androidx.compose.SlotTable,? super androidx.compose.Recomposer,? extends androidx.compose.Composer<?>> composerFactory, androidx.compose.CompositionReference? parent);
+    method public final void compose(kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method public final void compose();
+    method public final void dispose();
+    method public final boolean recomposeSync();
+  }
+
+  public final class CompositionKt {
+  }
+
+  public interface CompositionLifecycleObserver {
+    method public void onEnter();
+    method public void onLeave();
+  }
+
+  public interface CompositionReference {
+    method public <T> T! getAmbient(androidx.compose.Ambient<T> key);
+    method public androidx.compose.BuildableMap<androidx.compose.Ambient<java.lang.Object>,androidx.compose.State<java.lang.Object>> getAmbientScope();
+    method public void invalidate();
+    method public <N> void registerComposer(androidx.compose.Composer<N> composer);
+  }
+
+  public final class EffectsKt {
+    method @Deprecated @androidx.compose.Composable public static <T> T! ambient(androidx.compose.Ambient<T> key);
+    method @androidx.compose.Composable public static androidx.compose.CompositionReference compositionReference();
+    method @Deprecated @androidx.compose.Composable public static <T> T! effectOf(kotlin.jvm.functions.Function0<? extends T> block);
+    method public static kotlin.jvm.functions.Function0<kotlin.Unit> getInvalidate();
+    method @androidx.compose.Composable public static void onActive(kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
+    method @androidx.compose.Composable public static void onCommit(kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
+    method @androidx.compose.Composable public static <V1> void onCommit(V1? v1, kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
+    method @androidx.compose.Composable public static <V1, V2> void onCommit(V1? v1, V2? v2, kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
+    method @androidx.compose.Composable public static void onCommit(Object![]? inputs, kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
+    method @androidx.compose.Composable public static void onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> callback);
+    method @androidx.compose.Composable public static void onPreCommit(kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
+    method @androidx.compose.Composable public static <V1> void onPreCommit(V1? v1, kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
+    method @androidx.compose.Composable public static <V1, V2> void onPreCommit(V1? v1, V2? v2, kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
+    method @androidx.compose.Composable public static void onPreCommit(Object![]? inputs, kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
+    method @Deprecated public static operator <T> T! unaryPlus(T?);
+  }
+
+  public interface Emittable {
+    method public void emitInsertAt(int index, androidx.compose.Emittable instance);
+    method public void emitMove(int from, int to, int count);
+    method public void emitRemoveAt(int index, int count);
+  }
+
+  public final class ExpectKt {
+    method public static <T> androidx.compose.ThreadLocal<T> ThreadLocal();
+  }
+
+  public final class FrameManager {
+    method public void ensureStarted();
+    method public <T> T! framed(kotlin.jvm.functions.Function0<? extends T> block);
+    method public <T> T! isolated(kotlin.jvm.functions.Function0<? extends T> block);
+    method public void nextFrame();
+    method public <T> T! unframed(kotlin.jvm.functions.Function0<? extends T> block);
+    field public static final androidx.compose.FrameManager! INSTANCE;
+  }
+
+  public final class Handler {
+    ctor public Handler(android.os.Looper looper);
+    method public android.os.Handler getHandler();
+    method public boolean postAtFrontOfQueue(kotlin.jvm.functions.Function0<kotlin.Unit> block);
+    property public final android.os.Handler handler;
+  }
+
+  @androidx.compose.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.CLASS) public @interface Immutable {
+  }
+
+  public final class JoinedKeyKt {
+    method public static boolean isJoinedKey(Object? key);
+    method public static Object? joinedKeyLeft(Object? key);
+    method public static Object? joinedKeyRight(Object? key);
+  }
+
+  public final class KeyInfo {
+    ctor public KeyInfo(Object key, int location, int nodes, int index);
+    method public int getIndex();
+    method public Object getKey();
+    method public int getLocation();
+    method public int getNodes();
+  }
+
+  public final class KeyKt {
+    method @androidx.compose.Composable public static inline <T, V1> T! key(@androidx.compose.Pivotal V1? v1, kotlin.jvm.functions.Function0<? extends T> block);
+    method @androidx.compose.Composable public static inline <T, V1, V2> T! key(@androidx.compose.Pivotal V1? v1, @androidx.compose.Pivotal V2? v2, kotlin.jvm.functions.Function0<? extends T> block);
+    method @androidx.compose.Composable public static inline <T> T! key(@androidx.compose.Pivotal Object![]? inputs, kotlin.jvm.functions.Function0<? extends T> block);
+  }
+
+  public final class KeySourceInfoKt {
+    method public static String? keySourceInfoOf(Object key);
+  }
+
+  public final class LooperWrapper {
+    method public android.os.Looper getMainLooper();
+    field public static final androidx.compose.LooperWrapper! INSTANCE;
+  }
+
+  @androidx.compose.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.CLASS) public @interface Model {
+  }
+
+  @androidx.compose.Stable public interface MutableState<T> extends androidx.compose.State<T> {
+    method public operator T! component1();
+    method public operator kotlin.jvm.functions.Function1<T,kotlin.Unit> component2();
+    method public operator T! getValue(Object? thisObj, kotlin.reflect.KProperty<?> property);
+    method public void setValue(T! p);
+    method public operator void setValue(Object? thisObj, kotlin.reflect.KProperty<?> property, T? next);
+    property public abstract T! value;
+  }
+
+  public final class MutableStateKt {
+    method public static kotlin.jvm.functions.Function2<java.lang.Object,java.lang.Object,java.lang.Boolean> getReferentiallyEqual();
+    method public static kotlin.jvm.functions.Function2<java.lang.Object,java.lang.Object,java.lang.Boolean> getStructurallyEqual();
+    method public static <T> androidx.compose.MutableState<T> mutableStateOf(T? value, kotlin.jvm.functions.Function2<? super T,? super T,java.lang.Boolean> areEquivalent = ReferentiallyEqual);
+    method @androidx.compose.Composable public static inline <T> androidx.compose.MutableState<T> state(kotlin.jvm.functions.Function2<? super T,? super T,java.lang.Boolean> areEquivalent = ReferentiallyEqual, kotlin.jvm.functions.Function0<? extends T> init);
+    method @androidx.compose.Composable public static inline <T, V1> androidx.compose.MutableState<T> stateFor(V1? v1, kotlin.jvm.functions.Function0<? extends T> init);
+    method @androidx.compose.Composable public static inline <T, reified V1, reified V2> androidx.compose.MutableState<T> stateFor(V1? v1, V2? v2, kotlin.jvm.functions.Function0<? extends T> init);
+    method @androidx.compose.Composable public static inline <T> androidx.compose.MutableState<T> stateFor(Object![]? inputs, kotlin.jvm.functions.Function0<? extends T> init);
+  }
+
+  public final class NullCompilationScope {
+    method public kotlin.Unit getComposer();
+    property public final kotlin.Unit composer;
+    field public static final androidx.compose.NullCompilationScope! INSTANCE;
+  }
+
+  public final class ObserveKt {
+    method @androidx.compose.Composable public static void Observe(kotlin.jvm.functions.Function0<kotlin.Unit> body);
+  }
+
+  public final class ObserverMap<K, V> {
+    ctor public ObserverMap();
+    method public void add(K key, V value);
+    method public void clear();
+    method public void clearValues(kotlin.jvm.functions.Function1<? super V,java.lang.Boolean> predicate);
+    method public boolean contains(K key, V value);
+    method public operator java.util.List<V> get(Iterable<? extends K> keys);
+    method public java.util.List<V> getValueOf(K key);
+    method public void remove(K key);
+    method public void remove(K key, V value);
+    method public void removeValue(V value);
+  }
+
+  @kotlin.annotation.MustBeDocumented @kotlin.annotation.Target(allowedTargets={AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.PROPERTY, AnnotationTarget.FUNCTION}) public @interface Pivotal {
+  }
+
+  @androidx.compose.Immutable public abstract class ProvidableAmbient<T> extends androidx.compose.Ambient<T> {
+    method public final infix androidx.compose.ProvidedValue<T> provides(T? value);
+  }
+
+  public final class ProvidedValue<T> {
+    method public androidx.compose.Ambient<T> getAmbient();
+    method public T! getValue();
+  }
+
+  public final class RecomposeKt {
+    method @androidx.compose.Composable public static void Recompose(kotlin.jvm.functions.Function1<? super kotlin.jvm.functions.Function0<kotlin.Unit>,kotlin.Unit> body);
+  }
+
+  public abstract class Recomposer {
+    ctor public Recomposer();
+    method protected final void dispatchRecomposes();
+    method public abstract void recomposeSync();
+    method protected abstract void scheduleChangesDispatch();
+    field public static final androidx.compose.Recomposer.Companion! Companion;
+  }
+
+  public static final class Recomposer.Companion {
+    method public androidx.compose.Recomposer current();
+    method public boolean hasPendingChanges();
+  }
+
+  public final class RecomposerKt {
+  }
+
+  public final class RememberKt {
+    method @Deprecated @androidx.compose.Composable public static <T> T! memo(kotlin.jvm.functions.Function0<? extends T> calculation);
+    method @Deprecated @androidx.compose.Composable public static <T, V1> T! memo(V1? v1, kotlin.jvm.functions.Function0<? extends T> calculation);
+    method @Deprecated @androidx.compose.Composable public static <T, V1, V2> T! memo(V1? v1, V2? v2, kotlin.jvm.functions.Function0<? extends T> calculation);
+    method @Deprecated @androidx.compose.Composable public static <T> T! memo(Object![]? inputs, kotlin.jvm.functions.Function0<? extends T> calculation);
+    method @androidx.compose.Composable public static inline <T> T! remember(kotlin.jvm.functions.Function0<? extends T> calculation);
+    method @androidx.compose.Composable public static inline <T, V1> T! remember(V1? v1, kotlin.jvm.functions.Function0<? extends T> calculation);
+    method @androidx.compose.Composable public static inline <T, V1, V2> T! remember(V1? v1, V2? v2, kotlin.jvm.functions.Function0<? extends T> calculation);
+    method @androidx.compose.Composable public static inline <T, V1, V2, V3> T! remember(V1? v1, V2? v2, V3? v3, kotlin.jvm.functions.Function0<? extends T> calculation);
+    method @androidx.compose.Composable public static inline <V> V! remember(Object![]? inputs, kotlin.jvm.functions.Function0<? extends V> block);
+  }
+
+  public interface ScopeUpdateScope {
+    method public void updateScope(kotlin.jvm.functions.Function0<kotlin.Unit> block);
+  }
+
+  public class SlotEditor {
+    method public final Object? get(androidx.compose.Anchor anchor);
+    method public final Object? get(int index);
+    method public final int getCurrent();
+    method public final int getGroupSize();
+    method public final int getNodeIndex();
+    method public final int getParentIndex();
+    method public final int getParentNodes();
+    method public final androidx.compose.SlotTable getTable();
+    method public final int groupSize(int index);
+    method public final boolean isGroup();
+    method public final boolean isGroup(int index);
+    method public final boolean isNode();
+    method public final void setCurrent(int p);
+    property public final int current;
+    property public final int groupSize;
+    property public final boolean isGroup;
+    property public final boolean isNode;
+    property public final int nodeIndex;
+    property public final int parentIndex;
+    property public final int parentNodes;
+  }
+
+  public final class SlotReader extends androidx.compose.SlotEditor {
+    method public void beginEmpty();
+    method public void close();
+    method public void endEmpty();
+    method public int endGroup();
+    method public int endNode();
+    method public java.util.List<androidx.compose.KeyInfo> extractKeys();
+    method public Object? get();
+    method public Object! getGroupKey();
+    method public boolean getInEmpty();
+    method public Object groupKey(int index);
+    method public boolean isGroupEnd();
+    method public Object? next();
+    method public void previous();
+    method public void reportUncertainNodeCount();
+    method public int skipEnclosingGroup();
+    method public int skipGroup();
+    method public int skipNode();
+    method public void startGroup(Object key);
+    method public void startNode(Object key);
+    property public final Object! groupKey;
+    property public final boolean inEmpty;
+    property public final boolean isGroupEnd;
+  }
+
+  public final class SlotTable {
+    ctor public SlotTable(internal Object![] slots);
+    ctor public SlotTable();
+    method public int getSize();
+    method public java.util.List<java.lang.Integer> groupPathTo(int location);
+    method public androidx.compose.SlotReader openReader();
+    method public androidx.compose.SlotWriter openWriter();
+    method public <T> T! read(kotlin.jvm.functions.Function1<? super androidx.compose.SlotReader,? extends T> block);
+    method public <T> T! write(kotlin.jvm.functions.Function1<? super androidx.compose.SlotWriter,? extends T> block);
+    property public final int size;
+    field public static final androidx.compose.SlotTable.Companion! Companion;
+  }
+
+  public static final class SlotTable.Companion {
+    method public Object getEMPTY();
+    property public final Object EMPTY;
+  }
+
+  public final class SlotTableKt {
+  }
+
+  public final class SlotWriter extends androidx.compose.SlotEditor {
+    method public androidx.compose.Anchor anchor(int index = current);
+    method public void beginInsert();
+    method public void close();
+    method public int endGroup();
+    method public void endInsert();
+    method public int endNode();
+    method public java.util.Iterator<java.lang.Object> groupSlots();
+    method public void moveGroup(int offset);
+    method public void previous();
+    method public boolean removeGroup();
+    method public void set(Object? value);
+    method public Object? skip();
+    method public int skipGroup();
+    method public int skipNode();
+    method public void startGroup(Object key);
+    method public void startNode(Object key);
+    method public Object? update(Object? value);
+  }
+
+  @androidx.compose.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.CLASS) public @interface Stable {
+  }
+
+  @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets={AnnotationTarget.ANNOTATION_CLASS, AnnotationTarget.CLASS}) public @interface StableMarker {
+  }
+
+  @androidx.compose.Stable public interface State<T> {
+    method public T! getValue();
+    property public abstract T! value;
+  }
+
+  public class ThreadLocal<T> extends java.lang.ThreadLocal<T> {
+    ctor public ThreadLocal(kotlin.jvm.functions.Function0<? extends T> initialValue);
+  }
+
+  public final class Trace {
+    method public void beginSection(String name);
+    method public void endSection();
+    field public static final androidx.compose.Trace! INSTANCE;
+  }
+
+  public final class TraceKt {
+    method public static inline <T> T! trace(String sectionName, kotlin.jvm.functions.Function0<? extends T> block);
+  }
+
+  @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets={AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER}) public @interface UnionType {
+    method public abstract Class<?>[] types();
+  }
+
+  public final class ViewAdapters {
+    ctor public ViewAdapters();
+    method public Object? adapt(Object parent, Object child);
+    method public boolean register(kotlin.jvm.functions.Function2<java.lang.Object,java.lang.Object,?> adapter);
+  }
+
+  public final class ViewComposer extends androidx.compose.Composer<java.lang.Object> {
+    ctor public ViewComposer(android.content.Context context, Object root, androidx.compose.SlotTable slotTable, androidx.compose.Recomposer recomposer, androidx.compose.ViewAdapters? adapters);
+    method public inline void call(Object key, kotlin.jvm.functions.Function1<? super androidx.compose.ViewValidator,java.lang.Boolean> invalid, kotlin.jvm.functions.Function0<kotlin.Unit> block);
+    method public inline <T extends android.view.View> void emit(Object key, kotlin.jvm.functions.Function1<? super android.content.Context,? extends T> ctor, kotlin.jvm.functions.Function1<? super androidx.compose.ComposerUpdater<java.lang.Object,T>,kotlin.Unit> update);
+    method public inline <T extends android.view.ViewGroup> void emit(Object key, kotlin.jvm.functions.Function1<? super android.content.Context,? extends T> ctor, kotlin.jvm.functions.Function1<? super androidx.compose.ComposerUpdater<java.lang.Object,T>,kotlin.Unit> update, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+    method public inline <T extends androidx.compose.Emittable> void emit(Object key, kotlin.jvm.functions.Function0<? extends T> ctor, kotlin.jvm.functions.Function1<? super androidx.compose.ComposerUpdater<java.lang.Object,T>,kotlin.Unit> update);
+    method public inline <T extends androidx.compose.Emittable> void emit(Object key, kotlin.jvm.functions.Function0<? extends T> ctor, kotlin.jvm.functions.Function1<? super androidx.compose.ComposerUpdater<java.lang.Object,T>,kotlin.Unit> update, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+    method public androidx.compose.ViewAdapters? getAdapters();
+    method public android.content.Context getContext();
+    method public Object getRoot();
+  }
+
+  public final class ViewComposerCommonKt {
+  }
+
+  public final class ViewComposerKt {
+    method public static androidx.compose.ViewComposer! getComposer();
+    method public static androidx.compose.Composer<?> getCurrentComposerNonNull();
+    method public static Boolean? registerAdapter(androidx.compose.ViewComposer, kotlin.jvm.functions.Function2<java.lang.Object,java.lang.Object,?> adapter);
+    method public static <T> T! runWithComposing(androidx.compose.Composer<?>, kotlin.jvm.functions.Function0<? extends T> block);
+    method public static <T> T! runWithCurrent(androidx.compose.Composer<?>, kotlin.jvm.functions.Function0<? extends T> block);
+  }
+
+  public final class ViewValidator {
+    ctor public ViewValidator(androidx.compose.Composer<?> composer);
+    method public boolean changed(int value);
+    method public <T> boolean changed(T? value);
+    method public <T> boolean changedUnchecked(T? value);
+    method public androidx.compose.Composer<?> getComposer();
+    method public operator boolean plus(boolean, boolean other);
+    method public inline boolean set(int value, kotlin.jvm.functions.Function1<? super java.lang.Integer,kotlin.Unit> block);
+    method public inline <reified T> boolean set(T? value, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> block);
+    method public inline <T> boolean setUnchecked(T? value, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> block);
+    method public inline boolean update(int value, kotlin.jvm.functions.Function1<? super java.lang.Integer,kotlin.Unit> block);
+    method public inline <reified T> boolean update(T? value, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> block);
+    method public inline <T> boolean updateUnchecked(T? value, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> block);
+    method public boolean updated(int value);
+    method public <T> boolean updated(T? value);
+  }
+
+}
+
+package androidx.compose.adapters {
+
+  public final class ComposeViewAdapter implements androidx.compose.adapters.ViewAdapter {
+    ctor public ComposeViewAdapter();
+    method public void didInsert(android.view.View view, android.view.ViewGroup parent);
+    method public void didUpdate(android.view.View view, android.view.ViewGroup parent);
+    method public inline <T extends androidx.compose.adapters.ViewAdapter> T get(int id, kotlin.jvm.functions.Function0<? extends T> factory);
+    method public java.util.List<androidx.compose.adapters.ViewAdapter> getAdapters();
+    method public int getId();
+    method public void willInsert(android.view.View view, android.view.ViewGroup parent);
+    property public final java.util.List<androidx.compose.adapters.ViewAdapter> adapters;
+    property public int id;
+  }
+
+  public interface ViewAdapter {
+    method public void didInsert(android.view.View view, android.view.ViewGroup parent);
+    method public void didUpdate(android.view.View view, android.view.ViewGroup parent);
+    method public int getId();
+    method public void willInsert(android.view.View view, android.view.ViewGroup parent);
+    property public abstract int id;
+  }
+
+  public final class ViewAdapterKt {
+    method public static inline <T extends androidx.compose.adapters.ViewAdapter> T getOrAddAdapter(android.view.View, int id, kotlin.jvm.functions.Function0<? extends T> factory);
+    method public static androidx.compose.adapters.ComposeViewAdapter getViewAdapter(android.view.View);
+  }
+
+}
+
+package androidx.compose.annotations {
+
+  @java.lang.annotation.Retention(java.lang.annotation.RetentionPolicy.RUNTIME) public @interface Hide {
+  }
+
+}
+
+package androidx.compose.frames {
+
+  public abstract class AbstractRecord implements androidx.compose.frames.Record {
+    ctor public AbstractRecord();
+    method public int getFrameId();
+    method public androidx.compose.frames.Record? getNext();
+    method public void setFrameId(int p);
+    method public void setNext(androidx.compose.frames.Record? p);
+    property public int frameId;
+    property public androidx.compose.frames.Record? next;
+  }
+
+  public final class Frame {
+    method public int getId();
+    method public boolean getReadonly();
+    method public boolean hasPendingChanges();
+    property public final boolean readonly;
+  }
+
+  public final class FrameAborted extends java.lang.RuntimeException {
+    ctor public FrameAborted(androidx.compose.frames.Frame frame);
+    method public androidx.compose.frames.Frame getFrame();
+  }
+
+  public final class FrameContainersKt {
+    method public static <T> androidx.compose.frames.ModelList<T> modelListOf();
+    method public static <T> androidx.compose.frames.ModelList<T> modelListOf(T? element);
+    method public static <T> androidx.compose.frames.ModelList<T> modelListOf(T?... elements);
+    method public static <K, V> androidx.compose.frames.ModelMap<K,V> modelMapOf();
+    method public static <K, V> androidx.compose.frames.ModelMap<K,V> modelMapOf(kotlin.Pair<? extends K,? extends V>... pairs);
+  }
+
+  public final class FrameIdSetKt {
+  }
+
+  public interface Framed {
+    method public androidx.compose.frames.Record getFirstFrameRecord();
+    method public void prependFrameRecord(androidx.compose.frames.Record value);
+    property public abstract androidx.compose.frames.Record firstFrameRecord;
+  }
+
+  public final class FramesKt {
+    method public static kotlin.Unit? _created(androidx.compose.frames.Framed framed);
+    method public static androidx.compose.frames.Record _readable(androidx.compose.frames.Record r, androidx.compose.frames.Framed framed);
+    method public static androidx.compose.frames.Record _writable(androidx.compose.frames.Record r, androidx.compose.frames.Framed framed);
+    method public static void abort();
+    method public static void abort(androidx.compose.frames.Frame frame);
+    method public static void abortHandler();
+    method public static void abortHandler(androidx.compose.frames.Frame frame);
+    method public static void commit();
+    method public static void commit(androidx.compose.frames.Frame frame);
+    method public static kotlin.Unit? commitHandler();
+    method public static androidx.compose.frames.Frame currentFrame();
+    method public static boolean getInFrame();
+    method public static void observeAllReads(kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit> readObserver, kotlin.jvm.functions.Function0<kotlin.Unit> block);
+    method public static androidx.compose.frames.Frame open(boolean readOnly = false);
+    method public static androidx.compose.frames.Frame open(kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? readObserver = null, kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? writeObserver = null);
+    method public static <T extends androidx.compose.frames.Record> T readable(T, androidx.compose.frames.Framed framed);
+    method public static kotlin.jvm.functions.Function0<kotlin.Unit> registerCommitObserver(kotlin.jvm.functions.Function2<? super java.util.Set<?>,? super androidx.compose.frames.Frame,kotlin.Unit> observer);
+    method public static void restore(androidx.compose.frames.Frame frame);
+    method public static androidx.compose.frames.Frame suspend();
+    method public static boolean wasModified(Object value);
+    method public static inline <T extends androidx.compose.frames.Record> void withCurrent(T, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> block);
+    method public static <T extends androidx.compose.frames.Record> T writable(T, androidx.compose.frames.Framed framed);
+    method public static <T extends androidx.compose.frames.Record> T writable(T, androidx.compose.frames.Framed framed, androidx.compose.frames.Frame frame);
+  }
+
+  public final class ModelList<T> implements androidx.compose.frames.Framed kotlin.jvm.internal.markers.KMutableList java.util.List<T> {
+    ctor public ModelList();
+    method public boolean add(T? element);
+    method public void add(int index, T? element);
+    method public boolean addAll(int index, java.util.Collection<? extends T> elements);
+    method public boolean addAll(java.util.Collection<? extends T> elements);
+    method public void clear();
+    method public boolean contains(Object? element);
+    method public boolean containsAll(java.util.Collection<?> elements);
+    method public T! get(int index);
+    method public androidx.compose.frames.Record getFirstFrameRecord();
+    method public int getSize();
+    method public int indexOf(Object? element);
+    method public boolean isEmpty();
+    method public java.util.Iterator<T> iterator();
+    method public int lastIndexOf(Object? element);
+    method public java.util.ListIterator<T> listIterator();
+    method public java.util.ListIterator<T> listIterator(int index);
+    method public void prependFrameRecord(androidx.compose.frames.Record value);
+    method public boolean remove(Object? element);
+    method public boolean removeAll(java.util.Collection<?> elements);
+    method public T! removeAt(int index);
+    method public boolean retainAll(java.util.Collection<?> elements);
+    method public T! set(int index, T? element);
+    method public java.util.List<T> subList(int fromIndex, int toIndex);
+    property public androidx.compose.frames.Record firstFrameRecord;
+    property public int size;
+  }
+
+  public final class ModelMap<K, V> implements androidx.compose.frames.Framed kotlin.jvm.internal.markers.KMutableMap java.util.Map<K,V> {
+    ctor public ModelMap();
+    method public void clear();
+    method public boolean containsKey(Object? key);
+    method public boolean containsValue(Object? value);
+    method public V? get(Object? key);
+    method public java.util.Set<java.util.Map.Entry<K,V>> getEntries();
+    method public androidx.compose.frames.Record getFirstFrameRecord();
+    method public java.util.Set<K> getKeys();
+    method public int getSize();
+    method public java.util.Collection<V> getValues();
+    method public boolean isEmpty();
+    method public void prependFrameRecord(androidx.compose.frames.Record value);
+    method public V? put(K? key, V? value);
+    method public void putAll(java.util.Map<? extends K,? extends V> from);
+    method public V? remove(Object? key);
+    property public java.util.Set<java.util.Map.Entry<K,V>> entries;
+    property public androidx.compose.frames.Record firstFrameRecord;
+    property public java.util.Set<K> keys;
+    property public int size;
+    property public java.util.Collection<V> values;
+  }
+
+  public interface Record {
+    method public void assign(androidx.compose.frames.Record value);
+    method public androidx.compose.frames.Record create();
+    method public int getFrameId();
+    method public androidx.compose.frames.Record? getNext();
+    method public void setFrameId(int p);
+    method public void setNext(androidx.compose.frames.Record? p);
+    property public abstract int frameId;
+    property public abstract androidx.compose.frames.Record? next;
+  }
+
+}
+
