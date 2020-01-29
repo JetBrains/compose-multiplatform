@@ -24,6 +24,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 // Create a normal (dynamic) ambient with a string value
@@ -334,6 +335,41 @@ class AmbientTests : BaseComposeTest() {
         }
     }
 
+    @Test
+    fun providingANewDataClassValueShouldNotRecompose() {
+        val invalidates = mutableListOf<() -> Unit>()
+        fun doInvalidate() = invalidates.forEach { it() }.also { invalidates.clear() }
+        val someDataAmbient = ambientOf(StructurallyEqual) { SomeData() }
+        var composed = false
+
+        fun ViewComposer.ReadSomeDataAmbient(ambient: Ambient<SomeData>, id: Int = 100) {
+            startRestartGroup(316)
+            composed = true
+            Text(value = ambient.current.value, id = id)
+            endRestartGroup()?.updateScope { ReadSomeDataAmbient(ambient = ambient, id = id) }
+        }
+
+        compose {
+            Observe {
+                invalidates.add(invalidate)
+                Providers(
+                    someDataAmbient provides SomeData("provided")
+                ) {
+                    call(354, { false }) {
+                        ReadSomeDataAmbient(someDataAmbient)
+                    }
+                }
+            }
+        }.then {
+            assertTrue(composed)
+            composed = false
+
+            doInvalidate()
+        }.then {
+            assertFalse(composed)
+        }
+    }
+
     @After
     fun ensureNoSubcomposePending() {
         activityRule.activity.uiThread {
@@ -366,6 +402,8 @@ class AmbientTests : BaseComposeTest() {
         }
     }
 }
+
+private data class SomeData(val value: String = "default")
 
 @Suppress("PLUGIN_ERROR")
 @Composable
