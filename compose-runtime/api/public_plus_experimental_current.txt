@@ -152,7 +152,7 @@ package androidx.compose {
     ctor public Composition(kotlin.jvm.functions.Function2<? super androidx.compose.SlotTable,? super androidx.compose.Recomposer,? extends androidx.compose.Composer<?>> composerFactory, androidx.compose.CompositionReference? parent);
     method public final void compose(kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method public final void compose();
-    method public final void dispose();
+    method public void dispose();
     method public final boolean recomposeSync();
   }
 

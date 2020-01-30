@@ -223,6 +223,14 @@ object Compose {
                 is Emittable -> storeComposition(root, this)
             }
         }
+
+        override fun dispose() {
+            super.dispose()
+            when (root) {
+                is ViewGroup -> disposeComposition(root)
+                is Emittable -> disposeComposition(root, context)
+            }
+        }
     }
 
     // TODO(chuckj): This is a temporary work-around until subframes exist so that
