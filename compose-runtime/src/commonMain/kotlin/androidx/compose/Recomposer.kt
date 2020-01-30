@@ -123,5 +123,3 @@ abstract class Recomposer {
     @TestOnly
     abstract fun recomposeSync()
 }
-
-internal expect fun createRecomposer(): Recomposer

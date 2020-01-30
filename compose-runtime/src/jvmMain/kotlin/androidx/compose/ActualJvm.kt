@@ -78,3 +78,7 @@ private val emptyPersistentMap = persistentHashMapOf<Any, Any>()
 @Suppress("UNCHECKED_CAST")
 internal actual fun <K, V> buildableMapOf(): BuildableMap<K, V> =
     BuildableMapWrapper<K, V>(emptyPersistentMap as PersistentMap<K, V>)
+
+internal actual fun createRecomposer(): Recomposer {
+    return AndroidRecomposer()
+}

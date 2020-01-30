@@ -321,9 +321,6 @@ package androidx.compose {
     method public boolean hasPendingChanges();
   }
 
-  public final class RecomposerKt {
-  }
-
   public final class RememberKt {
     method @Deprecated @androidx.compose.Composable public static <T> T! memo(kotlin.jvm.functions.Function0<? extends T> calculation);
     method @Deprecated @androidx.compose.Composable public static <T, V1> T! memo(V1? v1, kotlin.jvm.functions.Function0<? extends T> calculation);

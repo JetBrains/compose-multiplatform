@@ -99,6 +99,8 @@ internal inline fun <K, V> BuildableMap<K, V>.mutate(
 
 internal expect fun <K, V> buildableMapOf(): BuildableMap<K, V>
 
+internal expect fun createRecomposer(): Recomposer
+
 expect object Choreographer {
     fun postFrameCallback(callback: ChoreographerFrameCallback)
     fun postFrameCallbackDelayed(delayMillis: Long, callback: ChoreographerFrameCallback)

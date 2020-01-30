@@ -18,7 +18,7 @@ package androidx.compose
 
 import android.view.Choreographer
 
-private class AndroidRecomposer : Recomposer() {
+internal class AndroidRecomposer : Recomposer() {
 
     private var frameScheduled = false
 
@@ -42,8 +42,4 @@ private class AndroidRecomposer : Recomposer() {
             frameCallback.doFrame(0)
         }
     }
-}
-
-internal actual fun createRecomposer(): Recomposer {
-    return AndroidRecomposer()
 }
