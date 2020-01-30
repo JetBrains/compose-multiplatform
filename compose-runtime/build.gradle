@@ -32,7 +32,6 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(KOTLIN_STDLIB)
-            implementation project(":annotation:annotation-sampled")
         }
         commonTest.dependencies {
             implementation kotlin("test-junit")
