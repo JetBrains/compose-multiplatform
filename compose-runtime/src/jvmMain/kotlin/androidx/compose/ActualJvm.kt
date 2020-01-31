@@ -60,16 +60,19 @@ actual typealias TestOnly = org.jetbrains.annotations.TestOnly
 
 actual typealias CheckResult = androidx.annotation.CheckResult
 
+private class BuildableMapBuilderImpl<K, V>(
+    val builder: PersistentMap.Builder<K, V>
+) : BuildableMap.Builder<K, V>, MutableMap<K, V> by builder {
+    override fun build(): BuildableMap<K, V> {
+        return BuildableMapWrapper(builder.build())
+    }
+}
+
 private data class BuildableMapWrapper<K, V>(
     val map: PersistentMap<K, V>
 ) : BuildableMap<K, V>, Map<K, V> by map {
     override fun builder(): BuildableMap.Builder<K, V> {
-        val builder = map.builder()
-        return object : BuildableMap.Builder<K, V>, MutableMap<K, V> by builder {
-            override fun build(): BuildableMap<K, V> {
-                return BuildableMapWrapper(builder.build())
-            }
-        }
+        return BuildableMapBuilderImpl(map.builder())
     }
 }
 

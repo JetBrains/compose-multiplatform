@@ -183,7 +183,9 @@ fun <K, V> modelMapOf(vararg pairs: Pair<K, V>) = ModelMap<K, V>().apply { putAl
 private fun error(): Nothing =
     error("Model sub-collection, iterators, lists and sets are immutable, use asMutable() first")
 
-private fun <T> immutableSet(set: MutableSet<T>): MutableSet<T> = object : MutableSet<T> by set {
+private class ImmutableSetImpl<T>(
+    private val set: MutableSet<T>
+) : MutableSet<T> by set {
     override fun add(element: T): Boolean = error()
     override fun addAll(elements: Collection<T>): Boolean = error()
     override fun clear() = error()
@@ -194,26 +196,35 @@ private fun <T> immutableSet(set: MutableSet<T>): MutableSet<T> = object : Mutab
     override fun retainAll(elements: Collection<T>): Boolean = error()
 }
 
-// TODO delete the explicit type after https://youtrack.jetbrains.com/issue/KT-20996
-private fun <T> immutableIterator(
-    iterator: MutableIterator<T>
-): MutableIterator<T> = object : MutableIterator<T> by iterator {
+private fun <T> immutableSet(set: MutableSet<T>): MutableSet<T> = ImmutableSetImpl(set)
+
+private class ImmutableIteratorImpl<T>(
+    private val iterator: MutableIterator<T>
+) : MutableIterator<T> by iterator {
     override fun remove() = error()
 }
 
 // TODO delete the explicit type after https://youtrack.jetbrains.com/issue/KT-20996
-private fun <T> immutableListIterator(
-    iterator: MutableListIterator<T>
-): MutableListIterator<T> = object : MutableListIterator<T> by iterator {
+private fun <T> immutableIterator(
+    iterator: MutableIterator<T>
+): MutableIterator<T> = ImmutableIteratorImpl(iterator)
+
+private class ImmutableListIteratorImpl<T>(
+    private val iterator: MutableListIterator<T>
+) : MutableListIterator<T> by iterator {
     override fun add(element: T) = error()
     override fun remove() = error()
     override fun set(element: T) = error()
 }
 
 // TODO delete the explicit type after https://youtrack.jetbrains.com/issue/KT-20996
-private fun <T> immutableCollection(
-    collection: MutableCollection<T>
-): MutableCollection<T> = object : MutableCollection<T> by collection {
+private fun <T> immutableListIterator(
+    iterator: MutableListIterator<T>
+): MutableListIterator<T> = ImmutableListIteratorImpl(iterator)
+
+private class ImmutableCollectionImpl<T>(
+    private val collection: MutableCollection<T>
+) : MutableCollection<T> by collection {
     override fun add(element: T): Boolean = error()
     override fun addAll(elements: Collection<T>): Boolean = error()
     override fun clear() = error()
@@ -223,3 +234,8 @@ private fun <T> immutableCollection(
     override fun removeAll(elements: Collection<T>): Boolean = error()
     override fun retainAll(elements: Collection<T>): Boolean = error()
 }
+
+// TODO delete the explicit type after https://youtrack.jetbrains.com/issue/KT-20996
+private fun <T> immutableCollection(
+    collection: MutableCollection<T>
+): MutableCollection<T> = ImmutableCollectionImpl(collection)
