@@ -59,7 +59,9 @@ fun SimpleStateSample() {
     val count = state { 0 }
 
     Text(text = "You clicked ${count.value} times")
-    Button(text = "Click me", onClick = { count.value++ })
+    Button(onClick = { count.value++ }) {
+        Text("Click me")
+    }
 }
 
 @Sampled
@@ -68,7 +70,9 @@ fun DestructuredStateSample() {
     val (count, setCount) = state { 0 }
 
     Text(text = "You clicked $count times")
-    Button(text = "Click me", onClick = { setCount(count + 1) })
+    Button(onClick = { setCount(count + 1) }) {
+        Text("Click me")
+    }
 }
 
 // TODO: operator assignment for local delegated properties is currently not supported
@@ -80,7 +84,9 @@ fun DelegatedStateSample() {
     var count by state { 0 }
 
     Text(text = "You clicked $count times")
-    Button(text = "Click me", onClick = { count = count + 1 })
+    Button(onClick = { count = count + 1 }) {
+        Text("Click me")
+    }
 }
 
 private class Subscription {
