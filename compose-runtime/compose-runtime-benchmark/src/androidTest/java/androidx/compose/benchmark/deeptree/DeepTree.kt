@@ -18,19 +18,24 @@ package androidx.compose.benchmark.deeptree
 
 import androidx.compose.Composable
 import androidx.compose.benchmark.noChildren
-import androidx.ui.unit.dp
-import androidx.ui.foundation.background
+import androidx.ui.core.draw
 import androidx.ui.graphics.Color
+import androidx.ui.graphics.Paint
 import androidx.ui.layout.Column
 import androidx.ui.layout.Container
 import androidx.ui.layout.FlexScope
 import androidx.ui.layout.LayoutHeight
 import androidx.ui.layout.LayoutWidth
 import androidx.ui.layout.Row
+import androidx.ui.unit.dp
+import androidx.ui.unit.toRect
 
-val blueBackground = background(Color.Blue)
-val magentaBackground = background(Color.Magenta)
-val blackBackground = background(Color.Black)
+private fun background(paint: Paint) =
+    draw { canvas, size -> canvas.drawRect(size.toRect(), paint) }
+
+val blueBackground = background(Paint().also { it.color = Color.Blue })
+val magentaBackground = background(Paint().also { it.color = Color.Magenta })
+val blackBackground = background(Paint().also { it.color = Color.Black })
 
 val dp16 = 16.dp
 
@@ -84,20 +89,20 @@ fun DeepTree(depth: Int, breadth: Int, wrap: Int, id: Int = 0) {
 //            DeepTree(depth=depth, breadth=breadth, wrap=wrap - 1, id=id)
 //        }
 //    } else {
-        Stack(vertical = depth % 2 == 0) {
-            if (depth == 0) {
-                Terminal(style = id % 3)
-            } else {
-                repeat(breadth) {
-                    Container(
-                        modifier = blueBackground,
-                        height = dp16,
-                        width = dp16,
-                        expanded = true,
-                        children = noChildren
-                    )
-                }
+    Stack(vertical = depth % 2 == 0) {
+        if (depth == 0) {
+            Terminal(style = id % 3)
+        } else {
+            repeat(breadth) {
+                Container(
+                    modifier = blueBackground,
+                    height = dp16,
+                    width = dp16,
+                    expanded = true,
+                    children = noChildren
+                )
             }
         }
+    }
 //    }
 }

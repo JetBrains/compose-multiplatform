@@ -23,10 +23,12 @@ import androidx.compose.benchmark.realworld4.RealWorld4_FancyWidget_000
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.ui.unit.dp
-import androidx.ui.foundation.background
+import androidx.ui.core.draw
 import androidx.ui.graphics.Color
+import androidx.ui.graphics.Paint
 import androidx.ui.layout.Container
+import androidx.ui.unit.dp
+import androidx.ui.unit.toRect
 import org.junit.FixMethodOrder
 import org.junit.Ignore
 import org.junit.Test
@@ -151,10 +153,13 @@ class ComposeBenchmark : ComposeBenchmarkBase() {
     }
 }
 
-private val redBackground = background(Color.Red)
-private val blackBackground = background(Color.Black)
-private val yellowBackground = background(Color.Yellow)
-private val background = yellowBackground
+private fun background(paint: Paint) =
+    draw { canvas, size -> canvas.drawRect(size.toRect(), paint) }
+
+private val redBackground = background(Paint().also { it.color = Color.Red })
+private val blackBackground = background(Paint().also { it.color = Color.Black })
+private val yellowBackground = background(Paint().also { it.color = Color.Yellow })
+private val defaultBackground = yellowBackground
 
 private val dp10 = 10.dp
 
@@ -164,12 +169,13 @@ class ColorModel(private var color: Color = Color.Black) {
         color = if (color == Color.Black) Color.Red else Color.Black
     }
 
-    val background get() = when (color) {
-        Color.Red -> redBackground
-        Color.Black -> blackBackground
-        Color.Yellow -> yellowBackground
-        else -> background(color)
-    }
+    val background
+        get() = when (color) {
+            Color.Red -> redBackground
+            Color.Black -> blackBackground
+            Color.Yellow -> yellowBackground
+            else -> background(Paint().also { it.color = color })
+        }
 }
 
 val noChildren = @Composable { }
@@ -207,7 +213,7 @@ fun TenRects(model: ColorModel, narrow: Boolean = false) {
     }
     repeat(9) {
         Container(
-            modifier = background,
+            modifier = defaultBackground,
             width = dp10,
             height = dp10,
             expanded = true,
@@ -241,7 +247,7 @@ fun HundredRects(model: ColorModel, narrow: Boolean = false) {
             }
         else
             Container(
-                modifier = background,
+                modifier = defaultBackground,
                 width = dp10,
                 height = dp10,
                 expanded = true,

@@ -21,20 +21,25 @@ import androidx.compose.Pivotal
 import androidx.compose.benchmark.noChildren
 import androidx.compose.key
 import androidx.ui.core.Text
-import androidx.ui.unit.dp
-import androidx.ui.foundation.background
+import androidx.ui.core.draw
 import androidx.ui.graphics.Color
+import androidx.ui.graphics.Paint
 import androidx.ui.layout.Column
 import androidx.ui.layout.Container
 import androidx.ui.layout.LayoutHeight
 import androidx.ui.layout.LayoutWidth
 import androidx.ui.layout.Row
 import androidx.ui.text.TextStyle
+import androidx.ui.unit.dp
+import androidx.ui.unit.toRect
 import kotlin.random.Random
 
-val blackBackground = background(Color.Black)
-val blueBackground = background(Color.Black)
-val magentaBackground = background(Color.Magenta)
+private fun background(paint: Paint) =
+    draw { canvas, size -> canvas.drawRect(size.toRect(), paint) }
+
+val blackBackground = background(Paint().also { it.color = Color.Black })
+val blueBackground = background(Paint().also { it.color = Color.Black })
+val magentaBackground = background(Paint().also { it.color = Color.Magenta })
 val blackStyle = TextStyle(color = Color.Black)
 val blueStyle = TextStyle(color = Color.Blue)
 val magentaStyle = TextStyle(color = Color.Magenta)
