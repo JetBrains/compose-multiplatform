@@ -58,6 +58,7 @@ dependencies {
     implementation project("jetpad-integration")
     // needed by inspection plugin
     implementation "com.google.protobuf:protobuf-gradle-plugin:0.8.8"
+    implementation "org.anarres.jarjar:jarjar-gradle:1.0.1"
 }
 
 apply plugin: "java-gradle-plugin"
