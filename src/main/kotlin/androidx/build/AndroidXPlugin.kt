@@ -64,6 +64,7 @@ import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.testing.Test
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.extra
@@ -228,6 +229,9 @@ class AndroidXPlugin : Plugin<Project> {
         // copy host side test results to DIST
         project.tasks.withType(Test::class.java) { task ->
             AffectedModuleDetector.configureTaskGuard(task)
+            // Enable tracing to see results in command line
+            task.testLogging.events = hashSetOf(TestLogEvent.FAILED, TestLogEvent.PASSED,
+                TestLogEvent.SKIPPED, TestLogEvent.STANDARD_OUT)
             val report = task.reports.junitXml
             if (report.isEnabled) {
                 val zipTask = project.tasks.register(
