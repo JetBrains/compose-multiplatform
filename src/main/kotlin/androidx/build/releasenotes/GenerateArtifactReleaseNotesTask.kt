@@ -198,7 +198,7 @@ abstract class GenerateArtifactReleaseNotesTask : DefaultTask() {
             artifactReleaseNotesInfo.untilCommit
         }
 
-        val commitList: List<Commit> = GitClientImpl(project.rootDir).getGitLog(
+        val commitList: List<Commit> = GitClientImpl(project.rootDir, logger).getGitLog(
             GitCommitRange(
                 fromExclusive = fromSHA,
                 untilInclusive = untilSHA
