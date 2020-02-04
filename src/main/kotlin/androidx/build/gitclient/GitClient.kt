@@ -59,7 +59,7 @@ class GitClientImpl(
      * The root location for git
      */
     private val workingDir: File,
-    private val logger: Logger? = null,
+    private val logger: Logger?,
     private val commandRunner: GitClient.CommandRunner = RealCommandRunner(
             workingDir = workingDir,
             logger = logger
@@ -174,7 +174,7 @@ class GitClientImpl(
                     "${gitCommitRange.n} -- $fullProjectDir"
         }
         val gitLogString: String = commandRunner.execute(gitLogCmd)
-        return parseCommitLogString(
+        val commits = parseCommitLogString(
             gitLogString,
             commitStartDelimiter,
             commitSHADelimiter,
@@ -182,6 +182,11 @@ class GitClientImpl(
             authorEmailDelimiter,
             localProjectDir
         )
+        if (commits.size < 1) {
+            // Probably an error; log this
+            logger?.warn("No git commits found! Ran this command: '" + gitLogCmd + "' and received this output: '" + gitLogString + "'")
+        }
+        return commits
     }
 
     private class RealCommandRunner(
