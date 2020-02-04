@@ -72,7 +72,7 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
      * of the build that is released.  Thus, we use frameworks/support to get the sha
      */
     private fun getFrameworksSupportCommitShaAtHead(): String {
-        val commitList: List<Commit> = GitClientImpl(project.rootDir).getGitLog(
+        val commitList: List<Commit> = GitClientImpl(project.rootDir, logger).getGitLog(
             GitCommitRange(
                 fromExclusive = "",
                 untilInclusive = "HEAD",
@@ -81,6 +81,9 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
             keepMerges = true,
             fullProjectDir = getSupportRoot(project)
         )
+        if (commitList.size < 1) {
+            throw RuntimeException("Failed to find git commit for HEAD!")
+        }
         return commitList.first().sha
     }
 
