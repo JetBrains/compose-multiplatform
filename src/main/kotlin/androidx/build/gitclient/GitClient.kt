@@ -151,6 +151,7 @@ class GitClientImpl(
         val bodyDelimiter: String = "_Body:"
         val localProjectDir: String = fullProjectDir.toString()
             .removePrefix(gitRoot.toString())
+        val relativeProjectDir: String = fullProjectDir.relativeTo(workingDir).toString()
 
         var gitLogOptions: String =
             "--pretty=format:$commitStartDelimiter%n" +
@@ -168,10 +169,10 @@ class GitClientImpl(
         if (gitCommitRange.fromExclusive != "") {
             gitLogCmd = "$GIT_LOG_CMD_PREFIX $gitLogOptions " +
                     "${gitCommitRange.fromExclusive}..${gitCommitRange.untilInclusive}" +
-                    " -- $fullProjectDir"
+                    " -- ./$relativeProjectDir"
         } else {
             gitLogCmd = "$GIT_LOG_CMD_PREFIX $gitLogOptions ${gitCommitRange.untilInclusive} -n " +
-                    "${gitCommitRange.n} -- $fullProjectDir"
+                    "${gitCommitRange.n} -- ./$relativeProjectDir"
         }
         val gitLogString: String = commandRunner.execute(gitLogCmd)
         val commits = parseCommitLogString(
@@ -203,12 +204,21 @@ class GitClientImpl(
                 .start()
 
             proc.waitFor(1, TimeUnit.MINUTES)
-            val response = proc
+            val stdout = proc
                 .inputStream
                 .bufferedReader()
                 .readText()
-            logger?.info("Response: $response")
-            return response
+            val stderr = proc
+                .errorStream
+                .bufferedReader()
+                .readText()
+            val message = stdout + stderr
+            if (stderr != "") {
+                logger?.error("Response: $message")
+            } else {
+                logger?.info("Response: $message")
+            }
+            return stdout
         }
         override fun executeAndParse(command: String): List<String> {
             val response = execute(command)
