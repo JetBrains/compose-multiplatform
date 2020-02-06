@@ -44,11 +44,7 @@ class RecomposerTests : BaseComposeTest() {
     @Test
     fun testNativeViewWithAttributes() {
         compose {
-            // TextView(id=456 text="some text")
-            emitView(123, ::TextView) {
-                set(456) { id = it }
-                set("some text") { text = it }
-            }
+            TextView(id=456, text="some text")
         }.then { activity ->
             assertEquals(1, activity.root.childCount)
 
@@ -67,10 +63,8 @@ class RecomposerTests : BaseComposeTest() {
             // this should cause the textview to get recreated on every compose
             i++
 
-            // TextView(id=456 text="some text")
-            emitView(i, ::TextView) {
-                set(456) { id = it }
-                set("some text") { text = it }
+            key(i) {
+                TextView(id=456, text="some text")
             }
         }.then { activity ->
             tv1 = activity.findViewById(456) as TextView
@@ -95,20 +89,9 @@ class RecomposerTests : BaseComposeTest() {
     @Test
     fun testViewWithViewChildren() {
         compose {
-            // LinearLayout(id = 345) {>
-            emitViewGroup(100, ::LinearLayout, {
-                set(345) { id = it }
-            }) {
-                // TextView(id = 456, text="some text")
-                emitView(101, ::TextView) {
-                    set(456) { id = it }
-                    set("some text") { text = it }
-                }
-                // TextView(id = 567, text="some text")
-                emitView(102, ::TextView) {
-                    set(567) { id = it }
-                    set("some text") { text = it }
-                }
+            LinearLayout(id = 345) {
+                TextView(id = 456, text="some text")
+                TextView(id = 567, text="some text")
             }
         }.then { activity ->
             val ll = activity.findViewById(345) as LinearLayout
@@ -133,16 +116,9 @@ class RecomposerTests : BaseComposeTest() {
     fun testForLoop() {
         val items = listOf(1, 2, 3, 4, 5, 6)
         compose {
-            // this should cause the TextView to get recreated on every compose
-            emitViewGroup(100, ::LinearLayout, {
-                set(345) { id = it }
-            }) {
+            LinearLayout(id = 345) {
                 for (i in items) {
-                    // TextView(id=456, text="some text")
-                    emitView(101, ::TextView) {
-                        set(456) { id = it }
-                        set("some text $i") { text = it }
-                    }
+                    TextView(id=456, text="some text $i")
                 }
             }
         }.then { activity ->
@@ -165,13 +141,10 @@ class RecomposerTests : BaseComposeTest() {
         val counter = Counter()
 
         compose {
-            // <A />
-            emitComponent(123) {
-                RecomposeTestComponents.A(
-                    counter,
-                    RecomposeTestComponents.ClickAction.Recompose
-                )
-            }
+            RecomposeTestComponents.A(
+                counter,
+                RecomposeTestComponents.ClickAction.Recompose
+            )
         }.then { activity ->
             // everything got rendered once
             assertEquals(1, counter["A"])
@@ -218,13 +191,10 @@ class RecomposerTests : BaseComposeTest() {
             }
 
         compose {
-            // <A />
-            emitComponent(123) {
-                RecomposeTestComponents.A(
-                    counter,
-                    listener
-                )
-            }
+            RecomposeTestComponents.A(
+                counter,
+                listener
+            )
         }.then { activity ->
             invalidate = invalidateRoot
             // everything got rendered once
@@ -269,60 +239,34 @@ class RecomposerTests : BaseComposeTest() {
         }
 
         @Composable fun B(counter: Counter, listener: ClickAction, id: Int = 0) {
-            with(composer) {
-                startRestartGroup(0)
-                counter.inc("$id")
+            counter.inc("$id")
 
-                val recompose = invalidate
+            val recompose = invalidate
 
-                // <TextView id={id} onClickListener={{ clickAction() }} />
-                emitView(24, ::TextView) {
-                    set(id) { this.id = it }
-                    set(View.OnClickListener {
-                        @Suppress("DEPRECATION")
-                        when (listener) {
-                            is ClickAction.Recompose -> recompose()
-                            is ClickAction.PerformOnView -> listener.action.invoke(it)
-                        }
-                    }) { setOnClickListener(it) }
+            TextView(id=id, onClickListener={
+                @Suppress("DEPRECATION")
+                when (listener) {
+                    is ClickAction.Recompose -> recompose()
+                    is ClickAction.PerformOnView -> listener.action.invoke(it)
                 }
-                endRestartGroup()?.updateScope { B(counter, listener, id) }
-            }
+            })
         }
 
         @Composable fun A(counter: Counter, listener: ClickAction) {
-            with(composer) {
-                startRestartGroup(0)
-                counter.inc("A")
-                val recompose = invalidate
-                // LinearLayout(onClickListener={ clickAction() }. id=99) {
-                //     B(id=100)
-                //     B(id=101)
-                //     B(id=102)
-                // }
-
-                // LinearLayout(id=99, onClickListener={ clickAction() }) { />
-                emitViewGroup(897, ::LinearLayout, {
-                    set(99) { id = it }
-                    set(View.OnClickListener {
-                        @Suppress("DEPRECATION")
-                        when (listener) {
-                            is ClickAction.Recompose -> recompose()
-                            is ClickAction.PerformOnView -> listener.action.invoke(it)
-                        }
-                    }) { setOnClickListener(it) }
-                }) {
-                    for (id in 100..102) {
-                        // B(key=id, id=id)
-                        emitComponent(
-                            878983,
-                            id,
-                            { false },
-                            { B(counter, listener, id) }
-                        )
+            counter.inc("A")
+            val recompose = invalidate
+            LinearLayout(id=99, onClickListener={
+                @Suppress("DEPRECATION")
+                when (listener) {
+                    is ClickAction.Recompose -> recompose()
+                    is ClickAction.PerformOnView -> listener.action.invoke(it)
+                }
+            }) {
+                for (id in 100..102) {
+                    key(id) {
+                        B(counter, listener, id)
                     }
                 }
-                endRestartGroup()?.updateScope { A(counter, listener) }
             }
         }
     }
@@ -330,17 +274,11 @@ class RecomposerTests : BaseComposeTest() {
     @Test
     fun testCorrectViewTree() {
         compose {
-            // LinearLayout {
-            //   LinearLayout { }
-            //   LinearLayout { }
-            // }
-            // LinearLayout { }
-
-            emitViewGroup(123, ::LinearLayout, {}) {
-                emitView(123, ::LinearLayout)
-                emitView(123, ::LinearLayout)
-            }
-            emitView(123, ::LinearLayout)
+             LinearLayout {
+               LinearLayout { }
+               LinearLayout { }
+             }
+             LinearLayout { }
         }.then { activity ->
             assertChildHierarchy(activity.root) {
                 """
@@ -358,30 +296,18 @@ class RecomposerTests : BaseComposeTest() {
     fun testCorrectViewTreeWithComponents() {
 
         @Composable fun B() {
-            with(composer) {
-                // TextView()
-                emitView(123, ::TextView)
-            }
+            TextView()
         }
 
         compose {
-            // LinearLayout {
-            //   LinearLayout {
-            //     B()
-            //   }
-            //   LinearLayout {
-            //     B()
-            //   }
-            // }
-
-            emitViewGroup(123, ::LinearLayout, {}) {
-                emitViewGroup(123, ::LinearLayout, {}) {
-                    emitComponent(123, { B() })
-                }
-                emitViewGroup(123, ::LinearLayout, {}) {
-                    emitComponent(123, { B() })
-                }
-            }
+             LinearLayout {
+               LinearLayout {
+                 B()
+               }
+               LinearLayout {
+                 B()
+               }
+             }
         }.then { activity ->
 
             assertChildHierarchy(activity.root) {
@@ -403,32 +329,19 @@ class RecomposerTests : BaseComposeTest() {
     fun testCorrectViewTreeWithComponentWithMultipleRoots() {
 
         @Composable fun B() {
-            with(composer) {
-                // TextView()
-                emitView(123, ::TextView)
-                // TextView()
-                emitView(124, ::TextView)
-            }
+             TextView()
+             TextView()
         }
 
         compose {
-            // LinearLayout {
-            //   LinearLayout {
-            //     B()
-            //   }
-            //   LinearLayout {
-            //     B()
-            //   }
-            // }
-
-            emitViewGroup(123, ::LinearLayout, {}) {
-                emitViewGroup(123, ::LinearLayout, {}) {
-                    emitComponent(123, { B() })
-                }
-                emitViewGroup(123, ::LinearLayout, {}) {
-                    emitComponent(123, { B() })
-                }
-            }
+             LinearLayout {
+               LinearLayout {
+                 B()
+               }
+               LinearLayout {
+                 B()
+               }
+             }
         }.then {
 
             assertChildHierarchy(activity.root) {

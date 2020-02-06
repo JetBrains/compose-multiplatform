@@ -171,13 +171,13 @@ class ViewComposer(
         endNode()
     }
 
-    @Suppress("PLUGIN_ERROR", "UNCHECKED_CAST")
+    @Suppress("UNCHECKED_CAST")
     inline fun <T : ViewGroup> emit(
         key: Any,
         /*crossinline*/
         ctor: (context: Context) -> T,
         update: ViewUpdater<T>.() -> Unit,
-        children: @Composable() () -> Unit
+        children: () -> Unit
     ) {
         startNode(key)
         val node = if (inserting) ctor(context).also { emitNode(it) }
@@ -201,13 +201,13 @@ class ViewComposer(
         endNode()
     }
 
-    @Suppress("PLUGIN_ERROR", "UNCHECKED_CAST")
+    @Suppress("UNCHECKED_CAST")
     inline fun <T : Emittable> emit(
         key: Any,
         /*crossinline*/
         ctor: () -> T,
         update: ViewUpdater<T>.() -> Unit,
-        children: @Composable() () -> Unit
+        children: () -> Unit
     ) {
         startNode(key)
         val node = if (inserting) ctor().also { emitNode(it) }
@@ -216,102 +216,6 @@ class ViewComposer(
         children()
         endNode()
     }
-
-    @Suppress("PLUGIN_ERROR")
-    inline fun call(
-        key: Any,
-        invalid: ViewValidator.() -> Boolean,
-        block: @Composable() () -> Unit
-    ) {
-        startGroup(key)
-        if (ViewValidator(this).invalid() || !skipping) {
-            startGroup(invocation)
-            block()
-            endGroup()
-        } else {
-            skipCurrentGroup()
-        }
-        endGroup()
-    }
-}
-
-/* inline */ class ViewValidator(val composer: Composer<*>) {
-    // TODO: Add more overloads for common primitive types like String and Float etc to avoid boxing
-    // and the immutable check
-    @Suppress("NOTHING_TO_INLINE")
-    fun changed(value: Int) = with(composer) {
-        if ((nextSlot() as? Int)?.let { value != it } ?: true || inserting) {
-            updateValue(value)
-            true
-        } else {
-            skipValue()
-            false
-        }
-    }
-
-    fun <T> changed(value: T) = with(composer) {
-        if (nextSlot() != value || inserting) {
-            updateValue(value)
-            true
-        } else {
-            skipValue()
-            false
-        }
-    }
-
-    @Suppress("NOTHING_TO_INLINE")
-    fun updated(value: Int) = with(composer) {
-        inserting.let { inserting ->
-            if (((nextSlot() as? Int)?.let { it != value } ?: true) || inserting) {
-                updateValue(value)
-                !inserting
-            } else {
-                skipValue()
-                false
-            }
-        }
-    }
-
-    fun <T> updated(value: T) = with(composer) {
-        inserting.let { inserting ->
-            if (nextSlot() != value || inserting) {
-                updateValue(value)
-                !inserting
-            } else {
-                skipValue()
-                false
-            }
-        }
-    }
-
-    inline fun set(value: Int, /*crossinline*/ block: (value: Int) -> Unit): Boolean =
-        changed(value).also { if (it) block(value) }
-
-    inline fun <reified T> set(value: T, /*crossinline*/ block: (value: T) -> Unit): Boolean =
-        changed(value).also { if (it) block(value) }
-
-    inline fun update(value: Int, /*crossinline*/ block: (value: Int) -> Unit): Boolean =
-        updated(value).also { if (it) block(value) }
-
-    inline fun <reified T> update(value: T, /*crossinline*/ block: (value: T) -> Unit): Boolean =
-        updated(value).also { if (it) block(value) }
-
-    @Suppress("UNUSED")
-    fun <T> changedUnchecked(@Suppress("UNUSED_PARAMETER") value: T) = true
-
-    @Suppress("UNUSED")
-    inline fun <T> setUnchecked(value: T, block: (value: T) -> Unit): Boolean {
-        block(value)
-        return true
-    }
-
-    @Suppress("UNUSED")
-    inline fun <T> updateUnchecked(value: T, block: (value: T) -> Unit): Boolean {
-        block(value)
-        return true
-    }
-
-    /*inline*/ operator fun Boolean.plus(other: Boolean) = this || other
 }
 
 @Suppress("UNCHECKED_CAST")

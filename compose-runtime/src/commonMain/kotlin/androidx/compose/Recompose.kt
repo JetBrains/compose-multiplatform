@@ -36,13 +36,4 @@ package androidx.compose
  * @see invalidate
  */
 @Composable
-fun Recompose(body: @Composable() (recompose: () -> Unit) -> Unit) {
-    val composer = currentComposerNonNull
-    composer.startRestartGroup(recompose)
-    body(invalidate)
-    composer.endRestartGroup()?.updateScope {
-        Recompose(body)
-    }
-}
-
-private val recompose = Any()
+fun Recompose(body: @Composable() (recompose: () -> Unit) -> Unit) = body(invalidate)

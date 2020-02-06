@@ -58,7 +58,7 @@ abstract class Recomposer {
                         try {
                             composer.startRoot()
                             composer.startGroup(invocation)
-                            composable()
+                            invokeComposable(composer, composable)
                             composer.endGroup()
                             composer.endRoot()
                             complete = true
@@ -81,7 +81,7 @@ abstract class Recomposer {
     private fun performRecompose(composer: Composer<*>): Boolean {
         if (composer.isComposing) return false
         return composer.runWithCurrent {
-            var hadChanges: Boolean
+            val hadChanges: Boolean
             try {
                 composer.isComposing = true
                 hadChanges = FrameManager.composing {

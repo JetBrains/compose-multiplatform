@@ -16,50 +16,51 @@
 
 package androidx.compose.mock
 
-class SourceLocation(val name: String) {
-    override fun toString(): String = "SL $name"
-}
+import androidx.compose.Composable
+import androidx.compose.currentComposerIntrinsic
+import androidx.compose.key
 
-val repeat = SourceLocation("repeat")
-inline fun <T : Any> MockViewComposition.repeat(
+@Composable
+fun <T : Any> MockComposeScope.repeat(
     of: Iterable<T>,
-    crossinline block: MockViewComposition.(value: T) -> Unit
+    block: @Composable MockComposeScope.(value: T) -> Unit
 ) {
     for (value in of) {
-        cc.startGroup(cc.joinKey(repeat, value))
-        block(value)
-        cc.endGroup()
+        key(value) {
+            block(value)
+        }
     }
 }
 
-val linear = SourceLocation("linear")
-fun MockViewComposition.linear(block: Compose) {
-    emit(linear, { View().apply { name = "linear" } }, block)
+@Composable
+fun MockComposeScope.linear(block: @Composable MockComposeScope.() -> Unit) {
+    val c = currentComposerIntrinsic as MockViewComposer
+    View(name="linear") {
+        c.block()
+    }
 }
 
-fun MockViewComposition.linear(key: Any, block: Compose) {
-    emit(key, { View().apply { name = "linear" } }, block)
+@Composable
+fun MockComposeScope.text(value: String) {
+    View(name="text", text=value)
 }
 
-val text = SourceLocation("text")
-fun MockViewComposition.text(value: String) {
-    emit(text, { View().apply { name = "text" } }, value, { attribute("text", it) })
+@Composable
+fun MockComposeScope.edit(value: String) {
+    View(name="edit", value = value)
 }
 
-val edit = SourceLocation("edit")
-fun MockViewComposition.edit(value: String) {
-    emit(edit, { View().apply { name = "edit" } }, value, { attribute("value", it) })
-}
-
-val box = SourceLocation("box")
-fun MockViewComposition.selectBox(selected: Boolean, block: Compose) {
+@Composable
+fun MockComposeScope.selectBox(selected: Boolean, block: @Composable MockComposeScope.() -> Unit) {
     if (selected) {
-        emit(box, { View().apply { name = "box" } }, block)
+        View(name = "box") {
+            block()
+        }
     } else {
         block()
     }
 }
 
-fun MockViewComposition.skip(key: Any, block: Compose) {
-    call(key, { false }) { block() }
-}
+//fun MockComposeScope.skip(key: Any, block: Compose) {
+//    call(key, { false }) { block() }
+//}

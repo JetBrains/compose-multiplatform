@@ -132,11 +132,7 @@ class ModelViewTests: BaseComposeTest() {
     fun testModelView_Simple() {
         val tvId = 67
         compose {
-            emit(62, { context ->
-                TextView(context).apply {
-                    text = "Hello world!"; id = tvId
-                }
-            }) { }
+            TextView(text = "Hello world!", id = tvId)
         }.then { activity ->
             val tv = activity.root.findViewById(tvId) as TextView
             assertEquals("Hello world!", tv.text)
@@ -147,11 +143,7 @@ class ModelViewTests: BaseComposeTest() {
     fun testModelView_Simple_Recompose() {
         val tvId = 71
         compose {
-            emit(73, { context ->
-                TextView(context).apply {
-                    text = "Hello world!"; id = tvId
-                }
-            }) { }
+            TextView(text = "Hello world!", id = tvId)
         }.then { activity ->
             val tv = activity.root.findViewById(tvId) as TextView
             assertEquals("Hello world!", tv.text)
@@ -172,19 +164,9 @@ class ModelViewTests: BaseComposeTest() {
             )
         }
 
-        @Suppress("PLUGIN_WARNING")
         compose {
-            call(147, { true }) {
-
-                (Observe {
-                    emit(93, { context -> TextView(context).apply { id = tvIdName } }) {
-                        set(president.name) { text = it }
-                    }
-                    emit(94, { context -> TextView(context).apply { id = tvIdAge } }) {
-                        set(president.age) { text = it.toString() }
-                    }
-                })
-            }
+            TextView(id = tvIdName, text = president.name)
+            TextView(id = tvIdAge, text = president.age)
         }.then {
             val tvName = it.findViewById(tvIdName) as TextView
             val tvAge = it.findViewById(tvIdAge) as TextView
@@ -217,30 +199,16 @@ class ModelViewTests: BaseComposeTest() {
         }
         val displayLincoln = frame { TestState(true) }
 
-        @Suppress("PLUGIN_WARNING")
-        fun ViewComposer.display(person: Person) {
-            call(167, { true }) {
-                @Suppress("PLUGIN_ERROR")
-                (Observe {
-        emit(93, { context -> TextView(context) }) {
-            set(person.name) { text = it }
-        }
-        emit(94, { context -> TextView(context) }) {
-            set(person.age) { text = it.toString() }
-        }
-    })
-            }
+        @Composable fun display(person: Person) {
+            TextView(text = person.name)
+            TextView(text = person.age)
         }
 
-        @Suppress("PLUGIN_WARNING")
         compose {
-            call(185, { true }) {
-                @Suppress("PLUGIN_ERROR")
-                (Observe {
-        display(washington)
-        if (displayLincoln.value)
-            display(lincoln)
-    })
+            Observe {
+                display(washington)
+                if (displayLincoln.value)
+                    display(lincoln)
             }
         }.then {
             displayLincoln.value = false
@@ -253,7 +221,6 @@ class ModelViewTests: BaseComposeTest() {
 
     // b/122548164
     @Test
-    @Suppress("PLUGIN_WARNING")
     fun testObserverEntering() {
         val president = frame {
             Person(
@@ -263,35 +230,17 @@ class ModelViewTests: BaseComposeTest() {
         }
         val tvName = 204
 
-        fun ViewComposer.display(person: Person) {
-            call(167, { true }) {
-                (Observe {
-                    emit(93, { context -> TextView(context).apply { id = tvName } }) {
-                        set(person.name) { text = it }
-                    }
-                    emit(94, { context -> TextView(context) }) {
-                        set(person.age) { text = it.toString() }
-                    }
-                })
-                if (person.name == PRESIDENT_NAME_16) {
-                    (Observe {
-                        emit(211, { context -> TextView(context) }) {
-                            set(person.name) { text = it }
-                        }
-                        emit(211, { context -> TextView(context) }) {
-                            set(person.age) { text = it.toString() }
-                        }
-                    })
-                }
+        @Composable fun display(person: Person) {
+            TextView(id = tvName, text = person.name)
+            TextView(text = person.age)
+            if (person.name == PRESIDENT_NAME_16) {
+                TextView(text = person.name)
+                TextView(text = person.age)
             }
         }
 
         compose {
-            call(219, { true }) {
-                (Observe {
-                    display(president)
-                })
-            }
+            display(president)
         }.then { activity ->
             assertEquals(PRESIDENT_NAME_1, (activity.findViewById(tvName) as TextView).text)
             president.name = PRESIDENT_NAME_16
@@ -301,7 +250,6 @@ class ModelViewTests: BaseComposeTest() {
     }
 
     @Test
-    @Suppress("PLUGIN_WARNING")
     fun testModelUpdatesNextFrameVisibility() {
         val president = frame {
             Person(
@@ -311,37 +259,17 @@ class ModelViewTests: BaseComposeTest() {
         }
         val tvName = 204
 
-        fun ViewComposer.display(person: Person) {
-            call(167, { true }) {
-                (Observe {
-                    emit(93, { context -> TextView(context).apply { id = tvName } }) {
-                        set(person.name) { text = it }
-                    }
-                    emit(94, { context -> TextView(context) }) {
-                        set(person.age) {
-                            text = it.toString()
-                        }
-                    }
-                })
-                if (person.name == PRESIDENT_NAME_16) {
-                    (Observe {
-                        emit(211, { context -> TextView(context) }) {
-                            set(person.name) { text = it }
-                        }
-                        emit(211, { context -> TextView(context) }) {
-                            set(person.age) { text = it.toString() }
-                        }
-                    })
-                }
+        @Composable fun display(person: Person) {
+            TextView(id = tvName, text = person.name)
+            TextView(text = person.age)
+            if (person.name == PRESIDENT_NAME_16) {
+                TextView(text = person.name)
+                TextView(text = person.age)
             }
         }
 
         compose {
-            call(219, { true }) {
-                (Observe {
-                    display(president)
-                })
-            }
+            display(president)
         }.then { activity ->
             assertEquals(PRESIDENT_NAME_1, (activity.findViewById(tvName) as TextView).text)
             // schedule commit and recompose by this change, all for next frame

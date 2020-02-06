@@ -43,7 +43,6 @@ val someOtherIntAmbient: Ambient<Int> = someOtherIntProvider
 val someStaticInt = staticAmbientOf { 40 }
 
 @RunWith(AndroidJUnit4::class)
-@Suppress("PLUGIN_ERROR")
 class AmbientTests : BaseComposeTest() {
 
     @get:Rule
@@ -94,9 +93,7 @@ class AmbientTests : BaseComposeTest() {
             Providers(
                 someTextAmbient provides someText
             ) {
-                call(107, { false }) {
-                    ReadStringAmbient(ambient = someTextAmbient, id = tvId)
-                }
+                ReadStringAmbient(ambient = someTextAmbient, id = tvId)
             }
         }.then { activity ->
             assertEquals(someText, activity.findViewById<TextView>(100).text)
@@ -120,9 +117,7 @@ class AmbientTests : BaseComposeTest() {
             Providers(
                 staticStringAmbient provides someText
             ) {
-                call(114, { false }) {
-                    ReadStringAmbient(ambient = staticStringAmbient, id = tvId)
-                }
+                ReadStringAmbient(ambient = staticStringAmbient, id = tvId)
             }
         }.then { activity ->
             assertEquals(someText, activity.findViewById<TextView>(100).text)
@@ -148,10 +143,7 @@ class AmbientTests : BaseComposeTest() {
                 someTextAmbient provides someText,
                 someIntAmbient provides 0
             ) {
-                call(150, { false }) {
-                    ReadStringAmbient(ambient = someTextAmbient, id = tvId)
-                }
-
+                ReadStringAmbient(ambient = someTextAmbient, id = tvId)
                 subCompose {
                     assertEquals(someText, someTextAmbient.current)
                     assertEquals(0, someIntAmbient.current)
@@ -192,9 +184,7 @@ class AmbientTests : BaseComposeTest() {
                 assertEquals(someText, staticSomeTextAmbient.current)
                 assertEquals(0, staticSomeIntAmbient.current)
 
-                call(150, { false }) {
-                    ReadStringAmbient(ambient = staticSomeTextAmbient, id = tvId)
-                }
+                ReadStringAmbient(ambient = staticSomeTextAmbient, id = tvId)
 
                 subCompose {
                     assertEquals(someText, staticSomeTextAmbient.current)
@@ -233,9 +223,7 @@ class AmbientTests : BaseComposeTest() {
                 someTextAmbient provides someText,
                 someIntAmbient provides 0
             ) {
-                call(150, { false }) {
-                    ReadStringAmbient(ambient = someTextAmbient, id = tvId)
-                }
+                ReadStringAmbient(ambient = someTextAmbient, id = tvId)
 
                 doSubCompose = deferredSubCompose {
                     assertEquals(someText, someTextAmbient.current)
@@ -281,9 +269,7 @@ class AmbientTests : BaseComposeTest() {
                 assertEquals(someText, staticSomeTextAmbient.current)
                 assertEquals(0, staticSomeIntAmbient.current)
 
-                call(150, { false }) {
-                    ReadStringAmbient(ambient = staticSomeTextAmbient, id = tvId)
-                }
+                ReadStringAmbient(ambient = staticSomeTextAmbient, id = tvId)
 
                 doSubCompose = deferredSubCompose {
                     assertEquals(someText, staticSomeTextAmbient.current)
@@ -342,11 +328,9 @@ class AmbientTests : BaseComposeTest() {
         val someDataAmbient = ambientOf(StructurallyEqual) { SomeData() }
         var composed = false
 
-        fun ViewComposer.ReadSomeDataAmbient(ambient: Ambient<SomeData>, id: Int = 100) {
-            startRestartGroup(316)
+        @Composable fun ReadSomeDataAmbient(ambient: Ambient<SomeData>, id: Int = 100) {
             composed = true
             Text(value = ambient.current.value, id = id)
-            endRestartGroup()?.updateScope { ReadSomeDataAmbient(ambient = ambient, id = id) }
         }
 
         compose {
@@ -355,9 +339,7 @@ class AmbientTests : BaseComposeTest() {
                 Providers(
                     someDataAmbient provides SomeData("provided")
                 ) {
-                    call(354, { false }) {
-                        ReadSomeDataAmbient(someDataAmbient)
-                    }
+                    ReadSomeDataAmbient(someDataAmbient)
                 }
             }
         }.then {
@@ -380,24 +362,20 @@ class AmbientTests : BaseComposeTest() {
         }
     }
 
-    fun ViewComposer.subCompose(block: ViewComposer.() -> Unit) {
-        startRestartGroup(139)
-        val container = remember { Container() }
-        val reference = composer.buildReference()
+    @Composable fun subCompose(block: @Composable() () -> Unit) {
+        val container = remember { escapeCompose { Container() } }
+        val reference = compositionReference()
         Compose.subcomposeInto(container, activityRule.activity, reference) {
-            (currentComposerNonNull as ViewComposer).block()
+            block()
         }
-        endRestartGroup()?.updateScope { subCompose(block) }
     }
 
-    fun ViewComposer.deferredSubCompose(block: ViewComposer.() -> Unit): () -> Unit {
-        startRestartGroup(234)
-        val container = remember { Container() }
-        val reference = composer.buildReference()
-        endRestartGroup()?.updateScope { deferredSubCompose(block) }
+    @Composable fun deferredSubCompose(block: @Composable() () -> Unit): () -> Unit {
+        val container = remember { escapeCompose { Container() } }
+        val reference = compositionReference()
         return {
             Compose.subcomposeInto(container, activityRule.activity, reference) {
-                (currentComposerNonNull as ViewComposer).block()
+                block()
             }
         }
     }
@@ -405,24 +383,14 @@ class AmbientTests : BaseComposeTest() {
 
 private data class SomeData(val value: String = "default")
 
-@Suppress("PLUGIN_ERROR")
 @Composable
-fun ViewComposer.Text(value: String, id: Int = 100) {
-    startRestartGroup(87)
-    emit(
-        168,
-        { context -> TextView(context).apply { this.id = id } },
-        { set(value) { text = it } }
-    )
-    endRestartGroup()?.updateScope { Text(value, id) }
+fun Text(value: String, id: Int = 100) {
+    TextView(id = id, text = value)
 }
 
-@Suppress("PLUGIN_ERROR")
 @Composable
-fun ViewComposer.ReadStringAmbient(ambient: Ambient<String>, id: Int = 100) {
-    startRestartGroup(80)
+fun ReadStringAmbient(ambient: Ambient<String>, id: Int = 100) {
     Text(value = ambient.current, id = id)
-    endRestartGroup()?.updateScope { ReadStringAmbient(ambient = ambient, id = id) }
 }
 
 class Container : Emittable {

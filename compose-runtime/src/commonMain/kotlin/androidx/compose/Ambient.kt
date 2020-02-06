@@ -69,7 +69,7 @@ sealed class Ambient<T> constructor(defaultFactory: (() -> T)? = null) {
      * @sample androidx.compose.samples.consumeAmbient
      */
     @Composable
-    inline val current: T get() = currentComposerNonNull.consume(this)
+    inline val current: T get() = currentComposerIntrinsic.consume(this)
 }
 
 /**
@@ -165,9 +165,7 @@ fun <T> staticAmbientOf(defaultFactory: (() -> T)? = null): ProvidableAmbient<T>
  */
 @Composable
 fun Providers(vararg values: ProvidedValue<*>, children: @Composable() () -> Unit) {
-    with(currentComposerNonNull) {
-        startProviders(values)
-        children()
-        endProviders()
-    }
+    currentComposerIntrinsic.startProviders(values)
+    children()
+    currentComposerIntrinsic.endProviders()
 }

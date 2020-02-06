@@ -192,7 +192,6 @@ interface MutableState<T> : State<T> {
  * @see [state]
  * @see [stateFor]
  */
-@Model
 private class ModelMutableState<T>(
     value: T,
     val areEquivalent: (old: T, new: T) -> Boolean

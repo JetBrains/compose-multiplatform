@@ -104,48 +104,22 @@ class HotReloadTests: BaseComposeTest() {
     }
 }
 
-fun text(text: String, id: Int = -1) {
-    composer.emit(
-        48,
-        { context ->
-            TextView(context).apply {
-                if (id >= 0) this.id = id
-            }
-        },
-        {
-            set(text) { this.text = it }
-        }
-    )
+@Composable fun text(text: String, id: Int = -1) {
+    TextView(id=id, text=text)
 }
 
-fun column(children: () -> Unit) {
-    composer.emit(
-        key = 59,
-        ctor = { context ->
-            LinearLayout(context)
-        },
-        update = { },
-        children = children as (@Composable() () -> Unit)
-    )
+@Composable fun column(children: @Composable() () -> Unit) {
+    LinearLayout { children() }
 }
 
-fun textNode(text: String) {
-    composer.emit(
-        key = 93,
-        ctor = { Node("Text") } as () -> Node,
-        update = {
-            set(text) { this.value = it }
-        }
-    )
+@Composable fun textNode(text: String) {
+    Node(name="Text", value=text)
 }
 
-fun columnNode(children: () -> Unit) {
-    composer.emit(
-        key = 93,
-        ctor = { Node("Text") } as () -> Node,
-        update = { },
-        children = children as (@Composable() () -> Unit)
-    )
+@Composable fun columnNode(children: @Composable() () -> Unit) {
+    Node(name="Text") {
+        children()
+    }
 }
 
 class Node(val name: String, var value: String = "") : Emittable {
@@ -172,14 +146,14 @@ class Node(val name: String, var value: String = "") : Emittable {
     }
 }
 
-fun Activity.setContent(content: () -> Unit) {
+fun Activity.setContent(content: @Composable() () -> Unit) {
     val composeView = contentView as? ViewEmitWrapper
         ?: ViewEmitWrapper(this).also {
             setContentView(it)
         }
     val root = Node("Root")
     composeView.emittable = root
-    Compose.composeInto(root, this, null, content as (@Composable() () -> Unit))
+    Compose.composeInto(root, this, null, content)
 }
 
 val Activity.contentView: View get() =

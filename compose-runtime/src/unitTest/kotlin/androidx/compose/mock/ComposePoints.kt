@@ -16,7 +16,10 @@
 
 package androidx.compose.mock
 
-fun MockViewComposition.point(point: Point) {
+import androidx.compose.Composable
+
+@Composable
+fun MockComposeScope.point(point: Point) {
     text("X: ${point.x} Y: ${point.y}")
 }
 
@@ -26,7 +29,8 @@ fun MockViewValidator.point(point: Point) {
 
 object SLPoints
 
-fun MockViewComposition.points(points: Iterable<Point>) {
+@Composable
+fun MockComposeScope.points(points: Iterable<Point>) {
     repeat(of = points) {
         memoize(SLPoints, it) { point(it) }
     }

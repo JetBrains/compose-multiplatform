@@ -91,13 +91,15 @@ package androidx.compose {
     method public static androidx.compose.Composition setViewContent(android.view.ViewGroup, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
   }
 
-  public class Composer<N> {
+  public class Composer<N> implements androidx.compose.ComposerValidator {
     ctor public Composer(androidx.compose.SlotTable slotTable, androidx.compose.Applier<N> applier, androidx.compose.Recomposer recomposer);
     method public final void abortRoot();
     method public final <V, T> void apply(V? value, kotlin.jvm.functions.Function2<? super T,? super V,kotlin.Unit> block);
     method public final void applyChanges();
     method public final androidx.compose.CompositionReference buildReference();
-    method public final <T> boolean changed(T? value);
+    method public final inline void call(Object key, kotlin.jvm.functions.Function1<? super androidx.compose.ComposerValidator,java.lang.Boolean> invalid, kotlin.jvm.functions.Function0<kotlin.Unit> block);
+    method public <T> boolean changed(T? value);
+    method public boolean changed(int value);
     method public final void collectKeySourceInformation();
     method protected final void composeRoot(kotlin.jvm.functions.Function0<kotlin.Unit> block);
     method public final <T extends N> void createNode(kotlin.jvm.functions.Function0<? extends T> factory);
@@ -146,6 +148,11 @@ package androidx.compose {
     method public inline <reified V> void set(V? value, kotlin.jvm.functions.Function2<? super T,? super V,kotlin.Unit> block);
     method public inline void update(int value, kotlin.jvm.functions.Function2<? super T,? super java.lang.Integer,kotlin.Unit> block);
     method public inline <reified V> void update(V? value, kotlin.jvm.functions.Function2<? super T,? super V,kotlin.Unit> block);
+  }
+
+  public interface ComposerValidator {
+    method public boolean changed(int value);
+    method public <T> boolean changed(T? value);
   }
 
   public class Composition {
@@ -463,7 +470,6 @@ package androidx.compose {
 
   public final class ViewComposer extends androidx.compose.Composer<java.lang.Object> {
     ctor public ViewComposer(android.content.Context context, Object root, androidx.compose.SlotTable slotTable, androidx.compose.Recomposer recomposer, androidx.compose.ViewAdapters? adapters);
-    method public inline void call(Object key, kotlin.jvm.functions.Function1<? super androidx.compose.ViewValidator,java.lang.Boolean> invalid, kotlin.jvm.functions.Function0<kotlin.Unit> block);
     method public inline <T extends android.view.View> void emit(Object key, kotlin.jvm.functions.Function1<? super android.content.Context,? extends T> ctor, kotlin.jvm.functions.Function1<? super androidx.compose.ComposerUpdater<java.lang.Object,T>,kotlin.Unit> update);
     method public inline <T extends android.view.ViewGroup> void emit(Object key, kotlin.jvm.functions.Function1<? super android.content.Context,? extends T> ctor, kotlin.jvm.functions.Function1<? super androidx.compose.ComposerUpdater<java.lang.Object,T>,kotlin.Unit> update, kotlin.jvm.functions.Function0<kotlin.Unit> children);
     method public inline <T extends androidx.compose.Emittable> void emit(Object key, kotlin.jvm.functions.Function0<? extends T> ctor, kotlin.jvm.functions.Function1<? super androidx.compose.ComposerUpdater<java.lang.Object,T>,kotlin.Unit> update);
@@ -482,23 +488,6 @@ package androidx.compose {
     method public static Boolean? registerAdapter(androidx.compose.ViewComposer, kotlin.jvm.functions.Function2<java.lang.Object,java.lang.Object,?> adapter);
     method public static <T> T! runWithComposing(androidx.compose.Composer<?>, kotlin.jvm.functions.Function0<? extends T> block);
     method public static <T> T! runWithCurrent(androidx.compose.Composer<?>, kotlin.jvm.functions.Function0<? extends T> block);
-  }
-
-  public final class ViewValidator {
-    ctor public ViewValidator(androidx.compose.Composer<?> composer);
-    method public boolean changed(int value);
-    method public <T> boolean changed(T? value);
-    method public <T> boolean changedUnchecked(T? value);
-    method public androidx.compose.Composer<?> getComposer();
-    method public operator boolean plus(boolean, boolean other);
-    method public inline boolean set(int value, kotlin.jvm.functions.Function1<? super java.lang.Integer,kotlin.Unit> block);
-    method public inline <reified T> boolean set(T? value, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> block);
-    method public inline <T> boolean setUnchecked(T? value, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> block);
-    method public inline boolean update(int value, kotlin.jvm.functions.Function1<? super java.lang.Integer,kotlin.Unit> block);
-    method public inline <reified T> boolean update(T? value, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> block);
-    method public inline <T> boolean updateUnchecked(T? value, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> block);
-    method public boolean updated(int value);
-    method public <T> boolean updated(T? value);
   }
 
 }
