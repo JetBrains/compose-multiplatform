@@ -53,5 +53,6 @@ build_libs.dokka_gradle = [
     "org.jetbrains.dokka:dokka-android-gradle-plugin:${build_versions.dokka}",
     "org.jetbrains.dokka:dokka-gradle-plugin:${build_versions.dokka}",
 ]
+build_libs.kotlinpoet = "com.squareup:kotlinpoet:1.4.0"
 
 rootProject.ext['build_libs'] = build_libs
