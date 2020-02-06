@@ -257,21 +257,31 @@ class AffectedModuleDetectorImpl constructor(
 
         // TODO: around Q3 2019, revert to resolve b/132901339
         val isRootProjectUi = rootProject.name.contains("ui")
-        var hasNormalFile = false
+        var hasAndroidXFile = false
         var hasUiFile = false
+        var uiDirectories = listOf("ui", "compose")
+        // should be all directories under frameworks/support that aren't included in
+        // frameworks/support/settings.gradle
+        var rootIndependentDirectories = listOf(
+            "buildSrc", "busytown", "development", "frameworks"
+        )
         changedFiles.forEach {
             val projectBaseDir = it.split(File.separatorChar)[0]
-            if (projectBaseDir == "ui" || projectBaseDir == "compose") {
+            if (uiDirectories.contains(projectBaseDir)) {
                 hasUiFile = true
-            } else {
-                hasNormalFile = true
+            // files in root don't have file separator character in their relative path.
+            // By ruling out root files and directories that aren't associated with any project,
+            // we can make the determination "hasAndroidXFile"
+            } else if (it.contains(File.separatorChar) && !rootIndependentDirectories.contains
+            (projectBaseDir)) {
+                hasAndroidXFile = true
             }
         }
         // if changes in both codebases, continue as usual (will test everything)
-        if (hasUiFile && hasNormalFile) {
+        if (hasUiFile && hasAndroidXFile) {
             // normal file exists in ui build -> don't build anything except the dummy
             // since the "other" build will pick up the appropriate projects.
-        } else if (isRootProjectUi && hasNormalFile) {
+        } else if (isRootProjectUi && hasAndroidXFile) {
             return alwaysBuild
             // ui file exists in normal build -> don't build anything except the dummy
             // since the "other" build will pick up the appropriate projects.
