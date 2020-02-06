@@ -526,7 +526,6 @@ private fun createGenerateDocsTask(
                 destinationDir = File(destDir, if (offline) "offline" else "online")
                 classpath = androidJarFile(project)
                 checksConfig = GENERATE_DOCS_CONFIG
-                addSinceFilesFrom(supportRootFolder)
 
                 coreJavadocOptions {
                     addStringOption("templatedir",
