@@ -50,15 +50,19 @@ object Compose {
                 val emittableRoots = EMITTABLE_ROOT_COMPONENT.entries.toSet()
 
                 for ((_, composition) in emittableRoots) {
-                    compositions.add(composition to composition.composable)
-                    composition.dispose()
+                    if (composition.isRootComposition) {
+                        compositions.add(composition to composition.composable)
+                        composition.dispose()
+                    }
                 }
 
                 val viewRoots = VIEWGROUP_ROOT_COMPONENT.entries.toSet()
 
                 for ((_, composition) in viewRoots) {
-                    compositions.add(composition to composition.composable)
-                    composition.dispose()
+                    if (composition.isRootComposition) {
+                        compositions.add(composition to composition.composable)
+                        composition.dispose()
+                    }
                 }
             }
 
