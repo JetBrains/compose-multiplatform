@@ -76,6 +76,11 @@ open class Composition(
     }
 
     /**
+     * Return true if this is a root (non-sub-) composition
+     */
+    internal val isRootComposition: Boolean get() = parent == null
+
+    /**
      * Recomposes any changes without forcing the [composable] to compose and blocks until
      * composition completes.
      *
