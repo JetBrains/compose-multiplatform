@@ -595,7 +595,7 @@ package androidx.compose.frames {
     method public static boolean getInFrame();
     method public static void observeAllReads(kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit> readObserver, kotlin.jvm.functions.Function0<kotlin.Unit> block);
     method public static androidx.compose.frames.Frame open(boolean readOnly = false);
-    method public static androidx.compose.frames.Frame open(kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? readObserver = null, kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? writeObserver = null);
+    method public static androidx.compose.frames.Frame open(kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? readObserver = null, kotlin.jvm.functions.Function2<java.lang.Object,? super java.lang.Boolean,kotlin.Unit>? writeObserver = null);
     method public static <T extends androidx.compose.frames.Record> T readable(T, androidx.compose.frames.Framed framed);
     method public static kotlin.jvm.functions.Function0<kotlin.Unit> registerCommitObserver(kotlin.jvm.functions.Function2<? super java.util.Set<?>,? super androidx.compose.frames.Frame,kotlin.Unit> observer);
     method public static void restore(androidx.compose.frames.Frame frame);

@@ -93,7 +93,7 @@ interface Framed {
 }
 
 typealias FrameReadObserver = (read: Any) -> Unit
-typealias FrameWriteObserver = (write: Any) -> Unit
+typealias FrameWriteObserver = (write: Any, isNew: Boolean) -> Unit
 typealias FrameCommitObserver = (committed: Set<Any>, frame: Frame) -> Unit
 
 private val threadFrame = ThreadLocal<Frame>()
@@ -455,7 +455,7 @@ fun <T : Record> T.readable(framed: Framed): T {
 
 fun _readable(r: Record, framed: Framed): Record = r.readable(framed)
 fun _writable(r: Record, framed: Framed): Record = r.writable(framed)
-fun _created(framed: Framed) = threadFrame.get()?.writeObserver?.let { it(framed) }
+fun _created(framed: Framed) = threadFrame.get()?.writeObserver?.let { it(framed, true) }
 
 fun <T : Record> T.writable(framed: Framed): T {
     return this.writable(framed, currentFrame())
@@ -509,7 +509,7 @@ fun <T : Record> T.writable(framed: Framed, frame: Frame): T {
     if (readData.frameId == frame.id) return readData
 
     // The first write to an framed in frame
-    frame.writeObserver?.let { it(framed) }
+    frame.writeObserver?.let { it(framed, false) }
 
     // Otherwise, make a copy of the readable data and mark it as born in this frame, making it
     // writable.

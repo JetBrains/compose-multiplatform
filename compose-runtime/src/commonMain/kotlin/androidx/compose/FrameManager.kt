@@ -141,7 +141,7 @@ object FrameManager {
         }
     }
 
-    private val writeObserver: (write: Any) -> Unit = {
+    private val writeObserver: (write: Any, isNew: Boolean) -> Unit = { value, isNew ->
         if (!commitPending) {
             commitPending = true
             schedule {
@@ -149,14 +149,18 @@ object FrameManager {
                 nextFrame()
             }
         }
-        if (composing) {
+        if (!isNew && composing) {
             val currentInvalidations = synchronized(lock) {
-                invalidations.getValueOf(it)
+                invalidations.getValueOf(value)
             }
-            val results = currentInvalidations.map { scope -> scope.invalidate() }
-            val frame = currentFrame()
-            if (results.any { it == InvalidationResult.DEFERRED }) deferredMap.add(frame, it)
-            if (results.any { it == InvalidationResult.IMMINENT }) immediateMap.add(frame, it)
+            if (currentInvalidations.isNotEmpty()) {
+                val results = currentInvalidations.map { scope -> scope.invalidate() }
+                val frame = currentFrame()
+                if (results.any { value == InvalidationResult.DEFERRED })
+                    deferredMap.add(frame, value)
+                if (results.any { value == InvalidationResult.IMMINENT })
+                    immediateMap.add(frame, value)
+            }
         }
     }
 
