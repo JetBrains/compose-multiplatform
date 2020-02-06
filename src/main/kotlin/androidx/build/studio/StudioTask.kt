@@ -19,33 +19,198 @@ package androidx.build.studio
 import androidx.build.SupportConfig
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
+import org.gradle.api.internal.tasks.userinput.UserInputHandler
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
+import org.gradle.internal.service.ServiceRegistry
+import java.io.File
 
 /**
- * Task responsible for updating / installing the Studio version used in the current root project,
- * and launching it.
+ * Base task with common logic for updating and launching studio in both the frameworks/support
+ * project and the frameworks/support/ui project. Project-specific configuration is provided by
+ * [RootStudioTask] and [ComposeStudioTask].
  */
 abstract class StudioTask : DefaultTask() {
 
     // TODO: support -y and --update-only options? Can use @Option for this
     @TaskAction
     fun studiow() {
-        StudioWrapper.create(project).run {
-            update()
-            launch(services)
+        update()
+        launch()
+    }
+
+    private val platformUtilities by lazy {
+        StudioPlatformUtilities.get(projectRoot, studioInstallationDir)
+    }
+
+    @get:Internal
+    protected val projectRoot: File = project.rootDir
+
+    private val studioVersions by lazy { StudioVersions.get() }
+
+    /**
+     * Directory name (not path) that Studio will be unzipped into.
+     */
+    private val studioDirectoryName: String
+        get() {
+            val osName = StudioPlatformUtilities.osName
+            with(studioVersions) {
+                return "android-studio-ide-$ideaMajorVersion.$studioBuildNumber-$osName"
+            }
         }
+
+    /**
+     * Filename (not path) of the Studio archive
+     */
+    private val studioArchiveName: String
+        get() = studioDirectoryName + platformUtilities.archiveExtension
+
+    /**
+     * The install directory containing Studio
+     *
+     * Note: Given that the contents of this directory changes a lot, we don't want to annotate this
+     * property for task avoidance - it's not stable enough for us to get any value out of this.
+     */
+    private val studioInstallationDir by lazy { File(projectRoot, "studio/$studioDirectoryName") }
+
+    /**
+     * Absolute path of the Studio archive
+     */
+    private val studioArchivePath: String by lazy {
+        File(studioInstallationDir.parentFile, studioArchiveName).absolutePath
+    }
+
+    /**
+     * The idea.properties file that we want to tell Studio to use
+     */
+    @get:Internal
+    protected abstract val ideaProperties: File
+
+    /**
+     * [StudioArchiveCreator] that will ensure that an archive is present at [studioArchivePath]
+     */
+    @get:Internal
+    protected abstract val studioArchiveCreator: StudioArchiveCreator
+
+    /**
+     * Updates the Studio installation and removes any old installation files if they exist.
+     */
+    private fun update() {
+        if (!studioInstallationDir.exists()) {
+            // Create installation directory and any needed parent directories
+            studioInstallationDir.mkdirs()
+            // Attempt to remove any old installations in the parent studio/ folder
+            removeOldInstallations()
+            studioArchiveCreator(project, studioVersions, studioArchiveName, studioArchivePath)
+            println("Extracting archive...")
+            extractStudioArchive()
+            with(platformUtilities) { updateJvmHeapSize() }
+        }
+    }
+
+    /**
+     * Launches Studio if the user accepts / has accepted the license agreement.
+     */
+    private fun launch() {
+        if (checkLicenseAgreement(services)) {
+            println("Launching studio...")
+            launchStudio()
+        } else {
+            println("Exiting without launching studio...")
+        }
+    }
+
+    private fun launchStudio() {
+        val supportRootDir = SupportConfig.getSupportRoot(project)
+        val vmOptions = File(supportRootDir, "development/studio/studio.vmoptions")
+
+        ProcessBuilder().apply {
+            inheritIO()
+            with(platformUtilities) { command(launchCommandArguments) }
+
+            // Some environment properties are already set in gradlew, and these by default carry
+            // through here
+            // TODO: idea.properties should be different for main and ui, fix
+            val additionalStudioEnvironmentProperties = mapOf(
+                "STUDIO_PROPERTIES" to ideaProperties.absolutePath,
+                "STUDIO_VM_OPTIONS" to vmOptions.absolutePath,
+                // This environment variable prevents Studio from showing IDE inspection warnings
+                // for nullability issues, if the context is deprecated. This environment variable
+                // is consumed by InteroperabilityDetector.kt
+                "ANDROID_LINT_NULLNESS_IGNORE_DEPRECATED" to "true"
+            )
+
+            environment().putAll(additionalStudioEnvironmentProperties)
+            start()
+        }
+    }
+
+    private fun checkLicenseAgreement(services: ServiceRegistry): Boolean {
+        val licenseAcceptedFile = File("$studioInstallationDir/STUDIOW_LICENSE_ACCEPTED")
+        if (!licenseAcceptedFile.exists()) {
+            val licensePath = with(platformUtilities) { licensePath }
+
+            val userInput = services.get(UserInputHandler::class.java)
+            val acceptAgreement = userInput.askYesNoQuestion(
+                "Do you accept the license agreement at $licensePath?",
+                /* default answer*/ false
+            )
+            if (!acceptAgreement) {
+                return false
+            }
+            licenseAcceptedFile.createNewFile()
+        }
+        return true
+    }
+
+    private fun extractStudioArchive() {
+        val fromPath = studioArchivePath
+        val toPath = studioInstallationDir.absolutePath
+        println("Extracting to $toPath...")
+        project.exec { execSpec -> platformUtilities.extractArchive(fromPath, toPath, execSpec) }
+        // Remove studio archive once done
+        File(studioArchivePath).delete()
+    }
+
+    private fun removeOldInstallations() {
+        val parentFile = studioInstallationDir.parentFile
+        parentFile.walk().maxDepth(1)
+            .filter { file ->
+                // Remove any files that aren't either the directory / archive matching the
+                // current version, and also ignore the parent `studio/` directory
+                !file.name.contains(studioInstallationDir.name) && file != parentFile
+            }
+            .forEach { file ->
+                println("Removing old installation file ${file.absolutePath}")
+                file.deleteRecursively()
+            }
     }
 
     companion object {
         private const val STUDIO_TASK = "studio"
 
         fun Project.registerStudioTask() {
-            tasks.register(STUDIO_TASK, StudioTask::class.java) {
-                if (SupportConfig.isUiProject()) {
-                    // Need to prepare the sandbox before we can run studio
-                    it.dependsOn(":compose:compose-ide-plugin:prepareSandbox")
-                }
+            if (SupportConfig.isUiProject()) {
+                tasks.register(STUDIO_TASK, ComposeStudioTask::class.java)
+            } else {
+                tasks.register(STUDIO_TASK, RootStudioTask::class.java)
             }
         }
     }
+}
+
+/**
+ * Task for launching studio in the frameworks/support project
+ */
+open class RootStudioTask : StudioTask() {
+    override val studioArchiveCreator = UrlArchiveCreator
+    override val ideaProperties get() = projectRoot.resolve("development/studio/idea.properties")
+}
+
+/**
+ * Task for launching studio in the frameworks/support/ui (Compose) project
+ */
+open class ComposeStudioTask : StudioTask() {
+    override val studioArchiveCreator = PrebuiltsArchiveCreator
+    override val ideaProperties get() = projectRoot.resolve("idea.properties")
 }

@@ -35,33 +35,22 @@ sealed class StudioPlatformUtilities(val projectRoot: File, val studioInstallati
     /**
      * The binary directory of the Studio installation.
      */
-    abstract val StudioWrapper.binaryDirectory: File
-
-    /**
-     * The build.txt file of the Studio installation.
-     */
-    abstract val StudioWrapper.buildTxt: File
-
-    /**
-     * The directory to copy the built compose ide plugn into, where it will get automatically
-     * picked up and enabled by Studio.
-     */
-    abstract val StudioWrapper.composeIdePluginDirectory: File
+    abstract val StudioTask.binaryDirectory: File
 
     /**
      * A list of arguments that will be executed in a shell to launch Studio.
      */
-    abstract val StudioWrapper.launchCommandArguments: List<String>
+    abstract val StudioTask.launchCommandArguments: List<String>
 
     /**
      * The lib directory of the Studio installation.
      */
-    abstract val StudioWrapper.libDirectory: File
+    abstract val StudioTask.libDirectory: File
 
     /**
      * The license path for the Studio installation.
      */
-    abstract val StudioWrapper.licensePath: String
+    abstract val StudioTask.licensePath: String
 
     /**
      * Extracts an archive at [fromPath] with [archiveExtension] to [toPath]
@@ -72,7 +61,7 @@ sealed class StudioPlatformUtilities(val projectRoot: File, val studioInstallati
      * Updates the Jvm heap size for this Studio installation.
      * TODO: this is temporary until b/135183535 is fixed
      */
-    abstract fun StudioWrapper.updateJvmHeapSize()
+    abstract fun StudioTask.updateJvmHeapSize()
 
     /**
      * Regex to match '-Xmx512m' or similar, so we can replace it with a larger heap size.
@@ -100,7 +89,7 @@ private class MacOsUtilities(projectRoot: File, studioInstallationDir: File) :
     StudioPlatformUtilities(projectRoot, studioInstallationDir) {
     override val archiveExtension: String get() = ".zip"
 
-    override val StudioWrapper.binaryDirectory: File
+    override val StudioTask.binaryDirectory: File
         get() {
             val file = studioInstallationDir.walk().maxDepth(1).find { file ->
                 file.nameWithoutExtension.startsWith("Android Studio") &&
@@ -109,13 +98,7 @@ private class MacOsUtilities(projectRoot: File, studioInstallationDir: File) :
             return requireNotNull(file) { "Android Studio*.app not found!" }
         }
 
-    override val StudioWrapper.buildTxt: File
-        get() = File(binaryDirectory, "Contents/Resources/build.txt")
-
-    override val StudioWrapper.composeIdePluginDirectory: File
-        get() = File(binaryDirectory, "Contents/plugins/Compose")
-
-    override val StudioWrapper.launchCommandArguments: List<String>
+    override val StudioTask.launchCommandArguments: List<String>
         get() {
             return listOf(
                 "open",
@@ -125,10 +108,10 @@ private class MacOsUtilities(projectRoot: File, studioInstallationDir: File) :
             )
         }
 
-    override val StudioWrapper.libDirectory: File
+    override val StudioTask.libDirectory: File
         get() = File(binaryDirectory, "Contents/lib")
 
-    override val StudioWrapper.licensePath: String
+    override val StudioTask.licensePath: String
         get() = File(binaryDirectory, "Contents/Resources/LICENSE.txt").absolutePath
 
     override fun extractArchive(fromPath: String, toPath: String, execSpec: ExecSpec) {
@@ -138,7 +121,7 @@ private class MacOsUtilities(projectRoot: File, studioInstallationDir: File) :
         }
     }
 
-    override fun StudioWrapper.updateJvmHeapSize() {
+    override fun StudioTask.updateJvmHeapSize() {
         val vmoptions = File(binaryDirectory, "Contents/bin/studio.vmoptions")
         val newText = vmoptions.readText().replace(jvmHeapRegex, "-Xmx8g")
         vmoptions.writeText(newText)
@@ -149,16 +132,10 @@ private class LinuxUtilities(projectRoot: File, studioInstallationDir: File) :
     StudioPlatformUtilities(projectRoot, studioInstallationDir) {
     override val archiveExtension: String get() = ".tar.gz"
 
-    override val StudioWrapper.binaryDirectory: File
+    override val StudioTask.binaryDirectory: File
         get() = File(studioInstallationDir, "android-studio")
 
-    override val StudioWrapper.buildTxt: File
-        get() = File(binaryDirectory, "build.txt")
-
-    override val StudioWrapper.composeIdePluginDirectory: File
-        get() = File(binaryDirectory, "plugins/Compose")
-
-    override val StudioWrapper.launchCommandArguments: List<String>
+    override val StudioTask.launchCommandArguments: List<String>
         get() {
             val studioScript = File(binaryDirectory, "bin/studio.sh")
             return listOf(
@@ -168,10 +145,10 @@ private class LinuxUtilities(projectRoot: File, studioInstallationDir: File) :
             )
         }
 
-    override val StudioWrapper.libDirectory: File
+    override val StudioTask.libDirectory: File
         get() = File(binaryDirectory, "lib")
 
-    override val StudioWrapper.licensePath: String
+    override val StudioTask.licensePath: String
         get() = File(binaryDirectory, "LICENSE.txt").absolutePath
 
     override fun extractArchive(fromPath: String, toPath: String, execSpec: ExecSpec) {
@@ -181,7 +158,7 @@ private class LinuxUtilities(projectRoot: File, studioInstallationDir: File) :
         }
     }
 
-    override fun StudioWrapper.updateJvmHeapSize() {
+    override fun StudioTask.updateJvmHeapSize() {
         val vmoptions =
             File(binaryDirectory, "bin/studio.vmoptions")
         val newText = vmoptions.readText().replace(jvmHeapRegex, "-Xmx4g")
