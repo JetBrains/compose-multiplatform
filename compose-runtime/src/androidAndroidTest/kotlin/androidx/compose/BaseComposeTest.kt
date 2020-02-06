@@ -38,12 +38,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertTrue
 import android.app.Activity
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
-import org.junit.After
-import org.junit.Rule
-import org.junit.runner.RunWith
-
 
 class TestActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -169,5 +164,4 @@ abstract class BaseComposeTest {
             return ActiveTest(activity, composition)
         }
     }
-
 }

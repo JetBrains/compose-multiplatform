@@ -19,7 +19,7 @@ package androidx.compose {
 
   public final class AmbientKt {
     method @androidx.compose.Composable public static void Providers(androidx.compose.ProvidedValue<?>![] values, kotlin.jvm.functions.Function0<kotlin.Unit> children);
-    method public static <T> androidx.compose.ProvidableAmbient<T> ambientOf(kotlin.jvm.functions.Function0<? extends T>? defaultFactory = null);
+    method public static <T> androidx.compose.ProvidableAmbient<T> ambientOf(kotlin.jvm.functions.Function2<? super T,? super T,java.lang.Boolean> areEquivalent = ReferentiallyEqual, kotlin.jvm.functions.Function0<? extends T>? defaultFactory = null);
     method public static <T> androidx.compose.ProvidableAmbient<T> staticAmbientOf(kotlin.jvm.functions.Function0<? extends T>? defaultFactory = null);
   }
 

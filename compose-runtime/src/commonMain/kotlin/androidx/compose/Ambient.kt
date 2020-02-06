@@ -102,11 +102,15 @@ abstract class ProvidableAmbient<T> internal constructor(defaultFactory: (() -> 
  *
  * @see ambientOf
  */
-internal class DynamicProvidableAmbient<T> constructor(defaultFactory: (() -> T)?) :
-    ProvidableAmbient<T>(defaultFactory) {
+internal class DynamicProvidableAmbient<T> constructor(
+    private val areEquivalent: (old: T, new: T) -> Boolean,
+    defaultFactory: (() -> T)?
+) : ProvidableAmbient<T>(defaultFactory) {
 
     @Composable
-    override fun provided(value: T): State<T> = state { value }.apply { this.value = value }
+    override fun provided(value: T): State<T> = state(areEquivalent) { value }.apply {
+        this.value = value
+    }
 }
 
 /**
@@ -130,8 +134,10 @@ internal class StaticProvidableAmbient<T>(defaultFactory: (() -> T)?) :
  * @see Ambient
  * @see staticAmbientOf
  */
-fun <T> ambientOf(defaultFactory: (() -> T)? = null): ProvidableAmbient<T> =
-    DynamicProvidableAmbient(defaultFactory)
+fun <T> ambientOf(
+    areEquivalent: (old: T, new: T) -> Boolean = ReferentiallyEqual,
+    defaultFactory: (() -> T)? = null
+): ProvidableAmbient<T> = DynamicProvidableAmbient(areEquivalent, defaultFactory)
 
 /**
  * Create an ambient key that can be provided using [Providers]. Changing the value provided
