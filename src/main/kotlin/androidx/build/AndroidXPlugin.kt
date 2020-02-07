@@ -43,6 +43,8 @@ import androidx.build.metalava.UpdateApiTask
 import androidx.build.releasenotes.GenerateArtifactReleaseNotesTask
 import androidx.build.releasenotes.GenerateAllReleaseNotesTask
 import androidx.build.studio.StudioTask.Companion.registerStudioTask
+import androidx.build.uptodatedness.cacheEvenIfNoOutputs
+import androidx.build.uptodatedness.TaskUpToDateValidator
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryExtension
@@ -798,6 +800,7 @@ private fun Project.createCheckResourceApiTask(): TaskProvider<CheckResourceApiT
             CheckResourceApiTask::class.java) {
         newApiFile = getGenerateResourceApiFile()
         oldApiFile = getApiLocation().resourceFile
+        cacheEvenIfNoOutputs()
     }
 }
 

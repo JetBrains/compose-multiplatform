@@ -26,6 +26,7 @@ import androidx.build.checkapi.hasApiFolder
 import androidx.build.checkapi.hasApiTasks
 import androidx.build.defaultPublishVariant
 import androidx.build.java.JavaCompileInputs
+import androidx.build.uptodatedness.cacheEvenIfNoOutputs
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.LibraryVariant
 import org.gradle.api.Project
@@ -175,6 +176,7 @@ object MetalavaTasks {
                 task.description = "Checks that the API generated from source code matches the " +
                         "checked in API file"
                 task.builtApi.set(generateApi.flatMap { it.apiLocation })
+                task.cacheEvenIfNoOutputs()
                 task.checkedInApis.set(outputApiLocations)
                 task.dependsOn(generateApi)
                 checkApiRelease?.let {
