@@ -149,14 +149,37 @@ class TaskUpToDateValidator {
             val inputsMessage = if (lastModifiedFile != null) {
                 task.path + " declares " + inputFiles.size + " input files. The " +
                     "last modified input file is\n" + lastModifiedFile + "\nmodified at " +
-                    lastModifiedWhen
+                    lastModifiedWhen + ". " +
+                    tryToExplainFileModification(lastModifiedFile, task)
             } else {
                 task.path + " declares " + inputFiles.size + " input files.\n"
             }
 
-            val reproductionMessage = "To reproduce this error you can try running " +
+            val reproductionMessage = "\nTo reproduce this error you can try running " +
                 "`./gradlew ${task.path} -PverifyUpToDate`\n"
             return outputsMessage + inputsMessage + reproductionMessage
+        }
+
+        fun tryToExplainFileModification(file: File, triggeringTask: Task): String {
+            val taskDependencies = triggeringTask.taskDependencies.getDependencies(triggeringTask)
+            var createdByTask: Task? = null
+            for (otherTask in taskDependencies) {
+                if (otherTask.outputs.files.files.contains(file)) {
+                    createdByTask = otherTask
+                    break
+                }
+            }
+            if (createdByTask == null) {
+                return "This file is not declared as the output of any task."
+            }
+            if (isExemptTask(createdByTask)) {
+                return "This file is declared as an output of " + createdByTask +
+                    ", which is a task that is not yet validated by the TaskUpToDateValidator"
+            } else {
+                return "This file is decared as an output of " + createdByTask +
+                    ", which is a task that is validated by the TaskUpToDateValidator " +
+                    "(and therefore must not have been out-of-date during this build)"
+            }
         }
     }
 }
