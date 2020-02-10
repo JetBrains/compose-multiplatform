@@ -29,7 +29,7 @@ if (isUiProject) {
     build_versions.lint = '26.6.0-beta05'
 }
 
-build_versions.dokka = '0.9.17-g006'
+build_versions.dokka = '0.9.17-g007'
 
 rootProject.ext['build_versions'] = build_versions
 
