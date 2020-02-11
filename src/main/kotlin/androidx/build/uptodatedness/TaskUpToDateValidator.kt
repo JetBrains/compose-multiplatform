@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.build
+package androidx.build.uptodatedness
 
 import org.gradle.api.GradleException
 import org.gradle.api.Project
