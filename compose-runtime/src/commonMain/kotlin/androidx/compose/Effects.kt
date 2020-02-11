@@ -143,8 +143,9 @@ fun onDispose(callback: () -> Unit) {
  * @see [onPreCommit]
  * @see [onActive]
  */
+@Suppress("NOTHING_TO_INLINE")
 @Composable
-fun onCommit(callback: CommitScope.() -> Unit) {
+inline fun onCommit(noinline callback: CommitScope.() -> Unit) {
     currentComposer.changed(PostCommitScopeImpl(callback))
 }
 
@@ -226,8 +227,9 @@ fun onCommit(vararg inputs: Any?, callback: CommitScope.() -> Unit) {
  * @see [onPreCommit]
  * @see [onActive]
  */
+@Suppress("NOTHING_TO_INLINE")
 @Composable
-fun onPreCommit(callback: CommitScope.() -> Unit) {
+inline fun onPreCommit(noinline callback: CommitScope.() -> Unit) {
     currentComposer.changed(PreCommitScopeImpl(callback))
 }
 

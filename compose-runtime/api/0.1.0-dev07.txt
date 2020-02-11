@@ -172,12 +172,12 @@ package androidx.compose {
     method @androidx.compose.Composable public static androidx.compose.CompositionReference compositionReference();
     method public static kotlin.jvm.functions.Function0<kotlin.Unit> getInvalidate();
     method @androidx.compose.Composable public static void onActive(kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
-    method @androidx.compose.Composable public static void onCommit(kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
+    method @androidx.compose.Composable public static inline void onCommit(kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
     method @androidx.compose.Composable public static <V1> void onCommit(V1? v1, kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
     method @androidx.compose.Composable public static <V1, V2> void onCommit(V1? v1, V2? v2, kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
     method @androidx.compose.Composable public static void onCommit(Object![]? inputs, kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
     method @androidx.compose.Composable public static void onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> callback);
-    method @androidx.compose.Composable public static void onPreCommit(kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
+    method @androidx.compose.Composable public static inline void onPreCommit(kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
     method @androidx.compose.Composable public static <V1> void onPreCommit(V1? v1, kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
     method @androidx.compose.Composable public static <V1, V2> void onPreCommit(V1? v1, V2? v2, kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
     method @androidx.compose.Composable public static void onPreCommit(Object![]? inputs, kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
@@ -299,6 +299,7 @@ package androidx.compose {
 
   public static final class Recomposer.Companion {
     method public androidx.compose.Recomposer current();
+    method public boolean hasInvalidations();
     method public boolean hasPendingChanges();
   }
 
@@ -419,6 +420,9 @@ package androidx.compose {
 
   @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets={AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER}) public @interface UnionType {
     method public abstract Class<?>[] types();
+  }
+
+  @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.FUNCTION) public @interface Untracked {
   }
 
   public final class ViewAdapters {

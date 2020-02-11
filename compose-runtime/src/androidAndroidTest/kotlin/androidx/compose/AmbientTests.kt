@@ -162,7 +162,7 @@ class AmbientTests : BaseComposeTest() {
             doInvalidate()
         }.then {
             assertEquals(someText, it.findViewById<TextView>(tvId).text)
-        }
+        }.done()
     }
 
     @Test
@@ -204,7 +204,7 @@ class AmbientTests : BaseComposeTest() {
             doInvalidate()
         }.then {
             assertEquals(someText, it.findViewById<TextView>(tvId).text)
-        }
+        }.done()
     }
 
     @Test
@@ -245,7 +245,7 @@ class AmbientTests : BaseComposeTest() {
             assertEquals(someText, it.findViewById<TextView>(tvId).text)
 
             doSubCompose()
-        }
+        }.done()
     }
 
     @Test
@@ -270,6 +270,7 @@ class AmbientTests : BaseComposeTest() {
                 ReadStringAmbient(ambient = staticSomeTextAmbient, id = tvId)
 
                 doSubCompose = deferredSubCompose {
+
                     assertEquals(someText, staticSomeTextAmbient.current)
                     assertEquals(0, staticSomeIntAmbient.current)
 
@@ -291,7 +292,57 @@ class AmbientTests : BaseComposeTest() {
             assertEquals(someText, it.findViewById<TextView>(tvId).text)
 
             doSubCompose()
-        }
+        }.done()
+    }
+
+    @Test
+    fun deferredSubCompose_Nested_Static() {
+        val tvId = 100
+        val invalidates = mutableListOf<() -> Unit>()
+        fun doInvalidate() = invalidates.forEach { it() }.also { invalidates.clear() }
+        var someText = "Unmodified"
+        var doSubCompose1: () -> Unit = { error("Sub-compose-1 callback not set") }
+        var doSubCompose2: () -> Unit = { error("Sub-compose-2 callback not set") }
+        val staticSomeTextAmbient = staticAmbientOf { "Default" }
+        val staticSomeIntAmbient = staticAmbientOf { -1 }
+        compose {
+            invalidates.add(invalidate)
+
+            Providers(
+                staticSomeTextAmbient provides someText,
+                staticSomeIntAmbient provides 0
+            ) {
+                assertEquals(someText, staticSomeTextAmbient.current)
+                assertEquals(0, staticSomeIntAmbient.current)
+
+                ReadStringAmbient(ambient = staticSomeTextAmbient, id = tvId)
+
+                doSubCompose1 = deferredSubCompose {
+
+                    assertEquals(someText, staticSomeTextAmbient.current)
+                    assertEquals(0, staticSomeIntAmbient.current)
+
+                    doSubCompose2 = deferredSubCompose {
+                        assertEquals(someText, staticSomeTextAmbient.current)
+                        assertEquals(0, staticSomeIntAmbient.current)
+                    }
+                }
+            }
+        }.then {
+            assertEquals(someText, it.findViewById<TextView>(tvId).text)
+            doSubCompose1()
+        }.then {
+            doSubCompose2()
+        }.then {
+            someText = "Modified"
+            doInvalidate()
+        }.then {
+            assertEquals(someText, it.findViewById<TextView>(tvId).text)
+
+            doSubCompose1()
+        }.then {
+            doSubCompose2()
+        }.done()
     }
 
     @Test
@@ -353,10 +404,9 @@ class AmbientTests : BaseComposeTest() {
     @After
     fun ensureNoSubcomposePending() {
         activityRule.activity.uiThread {
-            assertTrue(
-                !Recomposer.hasPendingChanges(),
-                "Pending changes detected after test completed"
-            )
+            val pendingChanges = Recomposer.hasPendingChanges() && Recomposer.hasInvalidations()
+
+            assertTrue(!pendingChanges, "Pending changes detected after test completed")
         }
     }
 

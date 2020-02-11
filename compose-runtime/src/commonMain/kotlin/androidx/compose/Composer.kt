@@ -1313,6 +1313,8 @@ open class Composer<N>(
         return false
     }
 
+    internal fun hasInvalidations() = invalidations.isNotEmpty()
+
     private fun record(change: Change<N>) {
         changes.add(change)
     }

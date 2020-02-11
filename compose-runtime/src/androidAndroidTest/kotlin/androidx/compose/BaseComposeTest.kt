@@ -108,8 +108,7 @@ internal fun Activity.waitForAFrame() {
             override fun doFrame(frameTimeNanos: Long) = latch.countDown()
         })
     }
-    assertTrue(latch.await(1, TimeUnit.MINUTES),
-        "Time-out waiting for choreographer frame")
+    assertTrue(latch.await(1, TimeUnit.MINUTES), "Time-out waiting for choreographer frame")
 }
 
 abstract class BaseComposeTest {
@@ -133,6 +132,10 @@ abstract class BaseComposeTest {
                     block(activity)
                 }
                 return this
+            }
+
+            fun done() {
+                activity.waitForAFrame()
             }
         }
 

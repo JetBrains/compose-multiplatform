@@ -24,8 +24,22 @@ abstract class Recomposer {
          * Check if there's pending changes to be recomposed in this thread
          *
          * @return true if there're pending changes in this thread, false otherwise
+         *
+         * @see hasInvalidations
          */
         fun hasPendingChanges() = current().hasPendingChanges()
+
+        /**
+         * Check if any composer in this thread has invalid ranges . This is more expensive than
+         * [hasPendingChanges] and should only be called when [hasPendingChanges] returns true to
+         * validate that the pending change has work to do.
+         *
+         * @return true if any recomposer has invalid ranges.
+         *
+         * @see hasPendingChanges
+         */
+        @TestOnly
+        fun hasInvalidations() = current().hasInvalidations()
 
         /**
          * Retrieves [Recomposer] for the current thread. Needs to be the main thread.
@@ -101,6 +115,8 @@ abstract class Recomposer {
     }
 
     internal abstract fun hasPendingChanges(): Boolean
+
+    internal fun hasInvalidations() = composers.toTypedArray().any { it.hasInvalidations() }
 
     internal fun scheduleRecompose(composer: Composer<*>) {
         composers.add(composer)
