@@ -54,6 +54,7 @@ dependencies {
     implementation build_libs.error_prone_gradle
     implementation build_libs.dokka_gradle
     implementation build_libs.kotlin.gradle_plugin
+    implementation build_libs.kotlinpoet
     implementation gradleApi()
     implementation project("jetpad-integration")
     // needed by inspection plugin
@@ -69,6 +70,8 @@ sourceSets {
     main.java.srcDirs += "${supportRootFolder}/inspection/inspection-gradle-plugin/src/main/kotlin"
     main.resources.srcDirs += "${supportRootFolder}/inspection/inspection-gradle-plugin/src/main" +
             "/resources"
+
+    main.java.srcDirs += "${supportRootFolder}/ui/ui-material/icons/generator/src/main/kotlin"
 }
 
 gradlePlugin {

@@ -516,6 +516,10 @@ private fun createGenerateDocsTask(
         project.tasks.register(taskName, GenerateDocsTask::class.java) {
             it.apply {
                 exclude("**/R.java")
+                // TODO: b/144249620 means that java generating tasks include kt source files in
+                // JavaCompile source, and since we just get all the source files this will mean we
+                // try to parse Kotlin files, which will break.
+                exclude("**/*.kt")
                 dependsOn(generateSdkApiTask, doclavaConfig)
                 group = JavaBasePlugin.DOCUMENTATION_GROUP
                 description = "Generates Java documentation in the style of d.android.com. To " +
