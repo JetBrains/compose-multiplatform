@@ -17,6 +17,7 @@
 package androidx.build
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.provider.Property
@@ -78,6 +79,27 @@ abstract class ListTaskOutputsTask() : DefaultTask() {
     }
 }
 
+// TODO(149103692): remove all elements of this set
+val taskNamesKnownToDuplicateOutputs = setOf(
+    "buildOnServer",
+    "dist",
+    "generateReleaseNotes",
+    "jarRelease",
+    "jarDebug",
+    "kotlinSourcesJar",
+    "lint",
+    "lintFix",
+    "lintVital",
+    "sourceJar",
+    "zipResultsOfJvmTest",
+    "zipResultsOfTestDebugUnitTest",
+    "zipResultsOfTestReleaseUnitTest",
+    "zipResultsOfTestTipOfTreeDebugUnitTest",
+    "zipResultsOfTestTipOfTreeReleaseUnitTest",
+    "zipResultsOfTestPublicDebugUnitTest",
+    "zipResultsOfTestPublicReleaseUnitTest"
+)
+
 // For this project and all subprojects, collects all tasks and creates a map keyed by their output files
 fun Project.findAllTasksByOutput(): Map<File, Task> {
     // find list of all tasks
@@ -92,6 +114,15 @@ fun Project.findAllTasksByOutput(): Map<File, Task> {
     val tasksByOutput: MutableMap<File, Task> = hashMapOf()
     for (otherTask in allTasks) {
         for (otherTaskOutput in otherTask.outputs.files.files) {
+            val existingTask = tasksByOutput[otherTaskOutput]
+            if (existingTask != null) {
+                if (!taskNamesKnownToDuplicateOutputs.contains(otherTask.name) ||
+                    !taskNamesKnownToDuplicateOutputs.contains(existingTask.name)) {
+                    throw GradleException("Output file " + otherTaskOutput +
+                        " was declared as an output of multiple tasks: " + otherTask + " and " +
+                        existingTask)
+                }
+            }
             tasksByOutput.put(otherTaskOutput, otherTask)
         }
     }

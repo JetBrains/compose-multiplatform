@@ -16,6 +16,7 @@
 
 package androidx.build
 
+import androidx.build.uptodatedness.cacheEvenIfNoOutputs
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.tasks.JavaExec
@@ -38,7 +39,7 @@ fun Project.configureKtlint() {
 
     tasks.register("ktlint", JavaExec::class.java) { task ->
         task.inputs.files(inputFiles)
-        task.outputs.file(outputFile)
+        task.cacheEvenIfNoOutputs()
         task.description = "Check Kotlin code style."
         task.group = "Verification"
         task.classpath = getKtlintConfiguration()
