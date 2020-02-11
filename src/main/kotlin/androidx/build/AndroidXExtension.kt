@@ -36,12 +36,13 @@ open class AndroidXExtension(val project: Project) {
             field = value
             chooseProjectVersion()
         }
+
     private fun chooseProjectVersion() {
         val version: Version
         val groupVersion: Version? = mavenGroup?.forcedVersion
         val mavenVersion: Version? = mavenVersion
         if (mavenVersion != null) {
-            if (groupVersion != null) {
+            if (groupVersion != null && !isGroupVersionOverrideAllowed()) {
                 throw GradleException("Cannot set mavenVersion (" + mavenVersion +
                     ") for a project (" + project +
                     ") whose mavenGroup already specifies forcedVersion (" + groupVersion +
@@ -59,6 +60,15 @@ open class AndroidXExtension(val project: Project) {
         project.version = if (isSnapshotBuild()) version.copy(extra = "-SNAPSHOT") else version
         versionIsSet = true
     }
+
+    private fun isGroupVersionOverrideAllowed(): Boolean {
+        // Grant an exception to the same-version-group policy for artifacts that haven't shipped a
+        // stable API surface, e.g. 1.0.0-alphaXX, to allow for rapid early-stage development.
+        val version = mavenVersion
+        return version != null && version.major == 1 && version.minor == 0 && version.patch == 0 &&
+                version.isAlpha()
+    }
+
     private var versionIsSet = false
     fun isVersionSet(): Boolean {
         return versionIsSet
