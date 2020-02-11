@@ -30,8 +30,9 @@ import androidx.ui.graphics.Color
 import androidx.ui.graphics.Paint
 import androidx.ui.graphics.SolidColor
 import androidx.ui.layout.Column
+import androidx.ui.layout.LayoutPadding
+import androidx.ui.foundation.Box
 import androidx.ui.layout.Container
-import androidx.ui.layout.Padding
 import androidx.ui.layout.Row
 import androidx.ui.unit.dp
 import androidx.ui.unit.toRect
@@ -53,7 +54,7 @@ fun RealWorld4_FancyWidget_000(model: RealWorld4_DataModel_00) {
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -128,7 +129,7 @@ fun RealWorld4_FancyWidget_001(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -181,7 +182,7 @@ fun RealWorld4_FancyWidget_002(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -283,7 +284,7 @@ fun RealWorld4_FancyWidget_003(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -391,7 +392,7 @@ fun RealWorld4_FancyWidget_004(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -484,7 +485,7 @@ fun RealWorld4_FancyWidget_005(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -600,7 +601,7 @@ fun RealWorld4_FancyWidget_006(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -671,7 +672,7 @@ fun RealWorld4_FancyWidget_007(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -755,7 +756,7 @@ fun RealWorld4_FancyWidget_008(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -807,7 +808,7 @@ fun RealWorld4_FancyWidget_009(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -867,7 +868,7 @@ fun RealWorld4_FancyWidget_010(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -910,7 +911,7 @@ fun RealWorld4_FancyWidget_011(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -952,7 +953,7 @@ fun RealWorld4_FancyWidget_012(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -1020,7 +1021,7 @@ fun RealWorld4_FancyWidget_013(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -1064,7 +1065,7 @@ fun RealWorld4_FancyWidget_014(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -1114,7 +1115,7 @@ fun RealWorld4_FancyWidget_015(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -1178,7 +1179,7 @@ fun RealWorld4_FancyWidget_016(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -1253,7 +1254,7 @@ fun RealWorld4_FancyWidget_017(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -1312,7 +1313,7 @@ fun RealWorld4_FancyWidget_018(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -1374,7 +1375,7 @@ fun RealWorld4_FancyWidget_019(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -1430,7 +1431,7 @@ fun RealWorld4_FancyWidget_020(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -1468,7 +1469,7 @@ fun RealWorld4_FancyWidget_021(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -1525,7 +1526,7 @@ fun RealWorld4_FancyWidget_022(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -1613,7 +1614,7 @@ fun RealWorld4_FancyWidget_023(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp5.toColor()).applyTo(paint)
@@ -1671,7 +1672,7 @@ fun RealWorld4_FancyWidget_024(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -1723,7 +1724,7 @@ fun RealWorld4_FancyWidget_025(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -1789,7 +1790,7 @@ fun RealWorld4_FancyWidget_026(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -1833,7 +1834,7 @@ fun RealWorld4_FancyWidget_027(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -1888,7 +1889,7 @@ fun RealWorld4_FancyWidget_028(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -1936,7 +1937,7 @@ fun RealWorld4_FancyWidget_029(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -1988,7 +1989,7 @@ fun RealWorld4_FancyWidget_030(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -2041,7 +2042,7 @@ fun RealWorld4_FancyWidget_031(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -2087,7 +2088,7 @@ fun RealWorld4_FancyWidget_032(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp5.toColor()).applyTo(paint)
@@ -2131,7 +2132,7 @@ fun RealWorld4_FancyWidget_033(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -2191,7 +2192,7 @@ fun RealWorld4_FancyWidget_034(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -2241,7 +2242,7 @@ fun RealWorld4_FancyWidget_035(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -2285,7 +2286,7 @@ fun RealWorld4_FancyWidget_036(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -2342,7 +2343,7 @@ fun RealWorld4_FancyWidget_037(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -2447,7 +2448,7 @@ fun RealWorld4_FancyWidget_038(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp5.toColor()).applyTo(paint)
@@ -2503,7 +2504,7 @@ fun RealWorld4_FancyWidget_039(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -2567,7 +2568,7 @@ fun RealWorld4_FancyWidget_040(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -2619,7 +2620,7 @@ fun RealWorld4_FancyWidget_041(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -2696,7 +2697,7 @@ fun RealWorld4_FancyWidget_042(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -2759,7 +2760,7 @@ fun RealWorld4_FancyWidget_043(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp5.toColor()).applyTo(paint)
@@ -2830,7 +2831,7 @@ fun RealWorld4_FancyWidget_044(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp5.toColor()).applyTo(paint)
@@ -2920,7 +2921,7 @@ fun RealWorld4_FancyWidget_045(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp5.toColor()).applyTo(paint)
@@ -2972,7 +2973,7 @@ fun RealWorld4_FancyWidget_046(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -3018,7 +3019,7 @@ fun RealWorld4_FancyWidget_047(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -3062,7 +3063,7 @@ fun RealWorld4_FancyWidget_048(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -3106,7 +3107,7 @@ fun RealWorld4_FancyWidget_049(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -3172,7 +3173,7 @@ fun RealWorld4_FancyWidget_050(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -3216,7 +3217,7 @@ fun RealWorld4_FancyWidget_051(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -3260,7 +3261,7 @@ fun RealWorld4_FancyWidget_052(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -3303,7 +3304,7 @@ fun RealWorld4_FancyWidget_053(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -3338,7 +3339,7 @@ fun RealWorld4_FancyWidget_054(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -3418,7 +3419,7 @@ fun RealWorld4_FancyWidget_055(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -3482,7 +3483,7 @@ fun RealWorld4_FancyWidget_056(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -3548,7 +3549,7 @@ fun RealWorld4_FancyWidget_057(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp5.toColor()).applyTo(paint)
@@ -3586,7 +3587,7 @@ fun RealWorld4_FancyWidget_058(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -3648,7 +3649,7 @@ fun RealWorld4_FancyWidget_059(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -3691,7 +3692,7 @@ fun RealWorld4_FancyWidget_060(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -3732,7 +3733,7 @@ fun RealWorld4_FancyWidget_061(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -3774,7 +3775,7 @@ fun RealWorld4_FancyWidget_062(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -3840,7 +3841,7 @@ fun RealWorld4_FancyWidget_063(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -3884,7 +3885,7 @@ fun RealWorld4_FancyWidget_064(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -3933,7 +3934,7 @@ fun RealWorld4_FancyWidget_065(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -3981,7 +3982,7 @@ fun RealWorld4_FancyWidget_066(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -4037,7 +4038,7 @@ fun RealWorld4_FancyWidget_067(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -4092,7 +4093,7 @@ fun RealWorld4_FancyWidget_068(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp5.toColor()).applyTo(paint)
@@ -4162,7 +4163,7 @@ fun RealWorld4_FancyWidget_069(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -4231,7 +4232,7 @@ fun RealWorld4_FancyWidget_070(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -4307,7 +4308,7 @@ fun RealWorld4_FancyWidget_071(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp5.toColor()).applyTo(paint)
@@ -4381,7 +4382,7 @@ fun RealWorld4_FancyWidget_072(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -4433,7 +4434,7 @@ fun RealWorld4_FancyWidget_073(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -4484,7 +4485,7 @@ fun RealWorld4_FancyWidget_074(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -4528,7 +4529,7 @@ fun RealWorld4_FancyWidget_075(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -4584,7 +4585,7 @@ fun RealWorld4_FancyWidget_076(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -4696,7 +4697,7 @@ fun RealWorld4_FancyWidget_077(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -4753,7 +4754,7 @@ fun RealWorld4_FancyWidget_078(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -4815,7 +4816,7 @@ fun RealWorld4_FancyWidget_079(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -4860,7 +4861,7 @@ fun RealWorld4_FancyWidget_080(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -4945,7 +4946,7 @@ fun RealWorld4_FancyWidget_081(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp5.toColor()).applyTo(paint)
@@ -5021,7 +5022,7 @@ fun RealWorld4_FancyWidget_082(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -5085,7 +5086,7 @@ fun RealWorld4_FancyWidget_083(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -5133,7 +5134,7 @@ fun RealWorld4_FancyWidget_084(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -5171,7 +5172,7 @@ fun RealWorld4_FancyWidget_085(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -5234,7 +5235,7 @@ fun RealWorld4_FancyWidget_086(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -5295,7 +5296,7 @@ fun RealWorld4_FancyWidget_087(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -5337,7 +5338,7 @@ fun RealWorld4_FancyWidget_088(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -5389,7 +5390,7 @@ fun RealWorld4_FancyWidget_089(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -5438,7 +5439,7 @@ fun RealWorld4_FancyWidget_090(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -5480,7 +5481,7 @@ fun RealWorld4_FancyWidget_091(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -5525,7 +5526,7 @@ fun RealWorld4_FancyWidget_092(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -5588,7 +5589,7 @@ fun RealWorld4_FancyWidget_093(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -5666,7 +5667,7 @@ fun RealWorld4_FancyWidget_094(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp5.toColor()).applyTo(paint)
@@ -5724,7 +5725,7 @@ fun RealWorld4_FancyWidget_095(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -5774,7 +5775,7 @@ fun RealWorld4_FancyWidget_096(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -5840,7 +5841,7 @@ fun RealWorld4_FancyWidget_097(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -5911,7 +5912,7 @@ fun RealWorld4_FancyWidget_098(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -5969,7 +5970,7 @@ fun RealWorld4_FancyWidget_099(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -6019,7 +6020,7 @@ fun RealWorld4_FancyWidget_100(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -6089,7 +6090,7 @@ fun RealWorld4_FancyWidget_101(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -6157,7 +6158,7 @@ fun RealWorld4_FancyWidget_102(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -6200,7 +6201,7 @@ fun RealWorld4_FancyWidget_103(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -6248,7 +6249,7 @@ fun RealWorld4_FancyWidget_104(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -6292,7 +6293,7 @@ fun RealWorld4_FancyWidget_105(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -6357,7 +6358,7 @@ fun RealWorld4_FancyWidget_106(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -6407,7 +6408,7 @@ fun RealWorld4_FancyWidget_107(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -6451,7 +6452,7 @@ fun RealWorld4_FancyWidget_108(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -6489,7 +6490,7 @@ fun RealWorld4_FancyWidget_109(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -6545,7 +6546,7 @@ fun RealWorld4_FancyWidget_110(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -6593,7 +6594,7 @@ fun RealWorld4_FancyWidget_111(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp5.toColor()).applyTo(paint)
@@ -6631,7 +6632,7 @@ fun RealWorld4_FancyWidget_112(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -6695,7 +6696,7 @@ fun RealWorld4_FancyWidget_113(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -6771,7 +6772,7 @@ fun RealWorld4_FancyWidget_114(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -6827,7 +6828,7 @@ fun RealWorld4_FancyWidget_115(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -6871,7 +6872,7 @@ fun RealWorld4_FancyWidget_116(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -6923,7 +6924,7 @@ fun RealWorld4_FancyWidget_117(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -6967,7 +6968,7 @@ fun RealWorld4_FancyWidget_118(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -7011,7 +7012,7 @@ fun RealWorld4_FancyWidget_119(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -7063,7 +7064,7 @@ fun RealWorld4_FancyWidget_120(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -7113,7 +7114,7 @@ fun RealWorld4_FancyWidget_121(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -7173,7 +7174,7 @@ fun RealWorld4_FancyWidget_122(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp5.toColor()).applyTo(paint)
@@ -7223,7 +7224,7 @@ fun RealWorld4_FancyWidget_123(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -7273,7 +7274,7 @@ fun RealWorld4_FancyWidget_124(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -7325,7 +7326,7 @@ fun RealWorld4_FancyWidget_125(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -7369,7 +7370,7 @@ fun RealWorld4_FancyWidget_126(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -7407,7 +7408,7 @@ fun RealWorld4_FancyWidget_127(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -7457,7 +7458,7 @@ fun RealWorld4_FancyWidget_128(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -7501,7 +7502,7 @@ fun RealWorld4_FancyWidget_129(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -7539,7 +7540,7 @@ fun RealWorld4_FancyWidget_130(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -7591,7 +7592,7 @@ fun RealWorld4_FancyWidget_131(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -7672,7 +7673,7 @@ fun RealWorld4_FancyWidget_132(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -7812,7 +7813,7 @@ fun RealWorld4_FancyWidget_133(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -7879,7 +7880,7 @@ fun RealWorld4_FancyWidget_134(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -7947,7 +7948,7 @@ fun RealWorld4_FancyWidget_135(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -7999,7 +8000,7 @@ fun RealWorld4_FancyWidget_136(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -8071,7 +8072,7 @@ fun RealWorld4_FancyWidget_137(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -8109,7 +8110,7 @@ fun RealWorld4_FancyWidget_138(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -8148,7 +8149,7 @@ fun RealWorld4_FancyWidget_139(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -8214,7 +8215,7 @@ fun RealWorld4_FancyWidget_140(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -8296,7 +8297,7 @@ fun RealWorld4_FancyWidget_141(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -8364,7 +8365,7 @@ fun RealWorld4_FancyWidget_142(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -8461,7 +8462,7 @@ fun RealWorld4_FancyWidget_143(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -8563,7 +8564,7 @@ fun RealWorld4_FancyWidget_144(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp5.toColor()).applyTo(paint)
@@ -8633,7 +8634,7 @@ fun RealWorld4_FancyWidget_145(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -8721,7 +8722,7 @@ fun RealWorld4_FancyWidget_146(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -8809,7 +8810,7 @@ fun RealWorld4_FancyWidget_147(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp5.toColor()).applyTo(paint)
@@ -8852,7 +8853,7 @@ fun RealWorld4_FancyWidget_148(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
@@ -8924,7 +8925,7 @@ fun RealWorld4_FancyWidget_149(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) { constraints ->
-        Padding(top = 1.dp, bottom = 1.dp, left = 1.dp, right = 1.dp) {
+        Box(LayoutPadding(1.dp)) {
             Draw { canvas, parentSize ->
                 val paint = Paint()
                 SolidColor(tmp3.toColor()).applyTo(paint)
