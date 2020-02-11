@@ -82,7 +82,13 @@ abstract class ListTaskOutputsTask() : DefaultTask() {
 // TODO(149103692): remove all elements of this set
 val taskNamesKnownToDuplicateOutputs = setOf(
     "buildOnServer",
+    "copyIconsDebugAndroidTest",
     "dist",
+    "generateAllIconsDebugAndroidTest",
+    "generateCoreIconsDebug",
+    "generateCoreIconsRelease",
+    "generateExtendedIconsDebug",
+    "generateExtendedIconsRelease",
     "generateReleaseNotes",
     "jarRelease",
     "jarDebug",
