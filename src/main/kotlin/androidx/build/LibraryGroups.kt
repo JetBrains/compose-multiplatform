@@ -33,7 +33,7 @@ object LibraryGroups {
     val BIOMETRIC = LibraryGroup("androidx.biometric", LibraryVersions.BIOMETRIC)
     val BROWSER = LibraryGroup("androidx.browser", LibraryVersions.BROWSER)
     val BENCHMARK = LibraryGroup("androidx.benchmark", LibraryVersions.BENCHMARK)
-    val CAMERA = LibraryGroup("androidx.camera", null)
+    val CAMERA = LibraryGroup("androidx.camera", LibraryVersions.CAMERA)
     val CAR = LibraryGroup("androidx.car", null)
     val CAR_APP = LibraryGroup("androidx.car.app", LibraryVersions.CAR)
     val CARDVIEW = LibraryGroup("androidx.cardview", LibraryVersions.CARDVIEW)
