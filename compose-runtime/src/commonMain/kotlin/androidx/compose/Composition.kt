@@ -25,8 +25,6 @@ private fun makeComposer(
     parent?.registerComposer(it)
 }
 
-private val EmptyComposable: @Composable() () -> Unit = {}
-
 /**
  * A Composition is an object that is used to manage the UI created from a Composable from the
  * top level. A composition object is usually constructed for you, and returned from an API that
@@ -47,7 +45,7 @@ open class Composition(
 ) {
     private val slotTable: SlotTable = SlotTable()
     internal val composer: Composer<*> = makeComposer(composerFactory, parent, slotTable)
-    internal var composable: @Composable() () -> Unit = EmptyComposable
+    internal var composable: @Composable() () -> Unit = emptyContent()
 
     /**
      * Update the composition with the content described by the [content] composable
@@ -71,7 +69,7 @@ open class Composition(
      * Clear the hierarchy that was created from the composition.
      */
     open fun dispose() {
-        composable = EmptyComposable
+        composable = emptyContent()
         compose()
     }
 

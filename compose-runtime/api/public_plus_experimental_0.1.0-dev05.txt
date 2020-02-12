@@ -88,6 +88,8 @@ package androidx.compose {
 
   public final class ComposeKt {
     method public static void disposeComposition(android.view.ViewGroup);
+    method public static kotlin.jvm.functions.Function0<kotlin.Unit> emptyContent();
+    method public static inline kotlin.jvm.functions.Function0<kotlin.Unit> orEmpty(kotlin.jvm.functions.Function0<kotlin.Unit>?);
     method public static androidx.compose.Composition setViewContent(android.view.ViewGroup, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
   }
 

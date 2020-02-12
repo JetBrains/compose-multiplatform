@@ -175,11 +175,9 @@ object Compose {
     fun disposeComposition(container: ViewGroup, parent: CompositionReference? = null) {
         // temporary easy way to call correct lifecycles on everything
         // need to remove compositionContext from context map as well
-        composeInto(container, parent, emptyComposable)
+        composeInto(container, parent, emptyContent())
         removeRoot(container)
     }
-
-    private val emptyComposable: @Composable() () -> Unit = {}
 
     /**
      * This method is the way to initiate a composition. The [composable] passed in will be executed
@@ -277,7 +275,7 @@ object Compose {
         parent: CompositionReference? = null
     ) {
         // temporary easy way to call correct lifecycles on everything
-        composeInto(container, context, parent, emptyComposable)
+        composeInto(container, context, parent, emptyContent())
         EMITTABLE_ROOT_COMPONENT.remove(container)
     }
 }
@@ -300,3 +298,18 @@ fun ViewGroup.setViewContent(composable: @Composable() () -> Unit): Composition 
  * @see Compose.composeInto
  */
 fun ViewGroup.disposeComposition() = Compose.disposeComposition(this, null)
+
+private val EmptyComposable: @Composable() () -> Unit = {}
+
+/**
+ * Represents empty content for a Composable function.
+ *
+ * See [orEmpty] for handling nullable Composable lambdas using empty content.
+ */
+fun emptyContent() = EmptyComposable
+
+/**
+ * @return this Composable if not null, else [emptyContent].
+ */
+@Suppress("NOTHING_TO_INLINE")
+inline fun @Composable() (() -> Unit)?.orEmpty() = this ?: emptyContent()
