@@ -81,8 +81,6 @@ abstract class ListTaskOutputsTask() : DefaultTask() {
 
 // TODO(149103692): remove all elements of this set
 val taskNamesKnownToDuplicateOutputs = setOf(
-    "buildOnServer",
-    "dist",
     "generateReleaseNotes",
     "jarRelease",
     "jarDebug",
