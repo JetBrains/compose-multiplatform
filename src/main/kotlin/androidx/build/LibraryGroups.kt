@@ -47,6 +47,7 @@ object LibraryGroups {
     val CORE = LibraryGroup("androidx.core", null)
     val CURSORADAPTER = LibraryGroup("androidx.cursoradapter", LibraryVersions.CURSORADAPTER)
     val CUSTOMVIEW = LibraryGroup("androidx.customview", LibraryVersions.CUSTOMVIEW)
+    val DATASTORE = LibraryGroup("androidx.datastore", LibraryVersions.DATASTORE)
     val DOCUMENTFILE = LibraryGroup("androidx.documentfile", LibraryVersions.DOCUMENTFILE)
     val DRAWERLAYOUT = LibraryGroup("androidx.drawerlayout", LibraryVersions.DRAWERLAYOUT)
     val DYNAMICANIMATION = LibraryGroup("androidx.dynamicanimation", null)
