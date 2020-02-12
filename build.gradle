@@ -2,13 +2,9 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
     def supportRootFolder = project.projectDir.getParentFile()
-    apply from: "unbundled_check.gradle"
     repositories {
         maven {
             url "${supportRootFolder}/../../prebuilts/androidx/external"
-        }
-        if (isUnbundledBuild(supportRootFolder)) {
-            jcenter()
         }
     }
 
