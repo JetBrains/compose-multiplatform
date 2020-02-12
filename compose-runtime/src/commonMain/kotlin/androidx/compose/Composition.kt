@@ -70,7 +70,7 @@ open class Composition(
     /**
      * Clear the hierarchy that was created from the composition.
      */
-    fun dispose() {
+    open fun dispose() {
         composable = EmptyComposable
         compose()
     }
