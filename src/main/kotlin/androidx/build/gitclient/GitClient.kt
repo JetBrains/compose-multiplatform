@@ -149,8 +149,7 @@ class GitClientImpl(
         val authorEmailDelimiter: String = "_Author:"
         val dateDelimiter: String = "_Date:"
         val bodyDelimiter: String = "_Body:"
-        val localProjectDir: String = fullProjectDir.toString()
-            .removePrefix(gitRoot.toString())
+        val localProjectDir: String = fullProjectDir.relativeTo(gitRoot).toString()
         val relativeProjectDir: String = fullProjectDir.relativeTo(workingDir).toString()
 
         var gitLogOptions: String =
@@ -300,35 +299,46 @@ data class Commit(
     init {
         val listedCommit: List<String> = gitCommit.split('\n')
         listedCommit.filter { line -> line.trim() != "" }.forEach { line ->
-            if (commitSHADelimiter in line) {
-                getSHAFromGitLine(line)
-            }
-            if (subjectDelimiter in line) {
-                getSummary(line)
-            }
-            if (changeIdDelimiter in line) {
-                getChangeIdFromGitLine(line)
-            }
-            if (authorEmailDelimiter in line) {
-                getAuthorEmailFromGitLine(line)
-            }
-            if ("Bug:" in line ||
-                "b/" in line ||
-                "bug:" in line ||
-                "Fixes:" in line ||
-                "fixes b/" in line
-            ) {
-                getBugsFromGitLine(line)
-            }
-            releaseNoteDelimiters.forEach { delimiter ->
-                if (delimiter in line) {
-                    getReleaseNotesFromGitLine(line, gitCommit)
-                }
-            }
-            if (projectDir.trim('/') in line) {
-                getFileFromGitLine(line)
-            }
+            processCommitLine(line)
         }
+    }
+
+    private fun processCommitLine(line: String) {
+          if (commitSHADelimiter in line) {
+              getSHAFromGitLine(line)
+              return
+          }
+          if (subjectDelimiter in line) {
+              getSummary(line)
+              return
+          }
+          if (changeIdDelimiter in line) {
+              getChangeIdFromGitLine(line)
+              return
+          }
+          if (authorEmailDelimiter in line) {
+              getAuthorEmailFromGitLine(line)
+              return
+          }
+          if ("Bug:" in line ||
+              "b/" in line ||
+              "bug:" in line ||
+              "Fixes:" in line ||
+              "fixes b/" in line
+          ) {
+              getBugsFromGitLine(line)
+              return
+          }
+          releaseNoteDelimiters.forEach { delimiter ->
+              if (delimiter in line) {
+                  getReleaseNotesFromGitLine(line, gitCommit)
+                  return
+              }
+          }
+          if (projectDir.trim('/') in line) {
+              getFileFromGitLine(line)
+              return
+          }
     }
 
     private fun isExternalAuthorEmail(authorEmail: String): Boolean {
