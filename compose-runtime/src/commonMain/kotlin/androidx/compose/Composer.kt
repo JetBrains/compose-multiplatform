@@ -163,7 +163,7 @@ private class Invalidation(
 )
 
 interface ScopeUpdateScope {
-    fun updateScope(block: () -> Unit)
+    fun updateScope(block: (Composer<*>) -> Unit)
 }
 
 internal enum class InvalidationResult {
@@ -201,17 +201,17 @@ internal class RecomposeScope(var composer: Composer<*>) : ScopeUpdateScope {
     val valid: Boolean get() = anchor?.valid ?: false
     var used = false
 
-    private var block: (() -> Unit)? = null
+    private var block: ((Composer<*>) -> Unit)? = null
 
     @Suppress("UNUSED_PARAMETER")
     fun <N> compose(composer: Composer<N>) {
-        block?.invoke() ?: error("Invalid restart scope")
+        block?.invoke(composer) ?: error("Invalid restart scope")
     }
 
     fun invalidate(): InvalidationResult = composer.invalidate(this)
 
     // Called caller of endRestartGroup()
-    override fun updateScope(block: (() -> Unit)) { this.block = block }
+    override fun updateScope(block: (Composer<*>) -> Unit) { this.block = block }
 }
 
 class ProvidedValue<T> internal constructor(val ambient: Ambient<T>, val value: T)

@@ -343,7 +343,7 @@ package androidx.compose {
   }
 
   public interface ScopeUpdateScope {
-    method public void updateScope(kotlin.jvm.functions.Function0<kotlin.Unit> block);
+    method public void updateScope(kotlin.jvm.functions.Function1<? super androidx.compose.Composer<?>,kotlin.Unit> block);
   }
 
   public class SlotEditor {
