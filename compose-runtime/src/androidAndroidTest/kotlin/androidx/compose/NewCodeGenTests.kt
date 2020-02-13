@@ -42,22 +42,9 @@ class NewCodeGenTests: BaseComposeTest() {
         val tv2Id = 200
 
         compose {
-            emit(168, { context ->
-                TextView(context).apply {
-                    text = "Hello world!"; id = tv1Id
-                }
-            }) { }
-
-            emit(170, { context ->
-                LinearLayout(context).apply {
-                    orientation = LinearLayout.HORIZONTAL
-                }
-            }, { }) {
-                emit(171, { context ->
-                    TextView(context).apply {
-                        text = "Yellow world"; id = tv2Id
-                    }
-                }) { }
+            TextView(id=tv1Id, text="Hello world!")
+            LinearLayout(orientation = LinearLayout.HORIZONTAL) {
+                TextView(id=tv2Id, text="Yellow world")
             }
         }.then { activity ->
             val helloText = activity.findViewById(tv1Id) as TextView
@@ -79,19 +66,9 @@ class NewCodeGenTests: BaseComposeTest() {
         var text2 by mutableStateOf("Yellow world")
 
         compose {
-            emit(168, { context -> TextView(context)
-                .apply { id = tv1Id } }) {
-                set(text1) { text = it }
-            }
-            emit(170, { context ->
-                LinearLayout(context).apply {
-                    orientation = LinearLayout.HORIZONTAL
-                }
-            }, { }) {
-                emit(171, { context -> TextView(context)
-                    .apply { id = tv2Id } }) {
-                    set(text2) { text = it }
-                }
+            TextView(id=tv1Id, text=text1)
+            LinearLayout(orientation = LinearLayout.HORIZONTAL) {
+                TextView(id=tv2Id, text=text2)
             }
         }.then { activity ->
             val helloText = activity.findViewById(tv1Id) as TextView
@@ -117,10 +94,7 @@ class NewCodeGenTests: BaseComposeTest() {
 
         compose {
             // <TextView text id=tvId />
-            emit(242, { context -> TextView(context)
-                .apply { id = tvId } }) {
-                set(text) { this.text = it }
-            }
+            TextView(id=tvId, text=text)
         }.then { activity ->
             val tv = activity.findViewById(tvId) as TextView
             TestCase.assertEquals("Hello world", tv.text)
@@ -143,15 +117,8 @@ class NewCodeGenTests: BaseComposeTest() {
             // <LinearLayout>
             //  <TextView text />
             // </LinearLayout
-            emit(264, { context: Context -> LinearLayout(
-                context
-            ).apply { id = llId } }, {
-                set(orientation) { this.orientation = it }
-            }) {
-                emit(265, { context -> TextView(context)
-                    .apply { id = tvId } }) {
-                    set(text) { this.text = it }
-                }
+            LinearLayout(id = llId, orientation=orientation) {
+                TextView(id=tvId, text=text)
             }
         }.then { activity ->
             val tv = activity.findViewById(tvId) as TextView
@@ -185,20 +152,16 @@ class NewCodeGenTests: BaseComposeTest() {
             //    phoneCalled++
             //   TextView(text="...")
             //  }
-            fun PhoneView(phone: Phone) {
+            @Composable fun PhoneView(phone: Phone) {
                 phoneCalled++
-                emit(225, { context -> TextView(context) }) {
-                    set(
-                        "${if (phone.area.isBlank()) ""
-                        else "(${phone.area}) "}${phone.prefix}-${phone.number}"
-                    ) { text = it }
-                }
+                TextView(
+                    text="${if (phone.area.isBlank()) ""
+                    else "(${phone.area}) "}${phone.prefix}-${phone.number}"
+                )
             }
 
             // <PhoneView phone />
-            call(453, { changed(phone) }) {
-                PhoneView(phone)
-            }
+            PhoneView(phone)
         }.then { _ ->
             TestCase.assertEquals(1, phoneCalled)
         }.recomposeRoot().then { _ ->
@@ -224,92 +187,13 @@ class NewCodeGenTests: BaseComposeTest() {
             //    addCalled++
             //   <TextView text="$left + $right = ${left + right}" />
             //  }
-            fun AddView(left: Int, right: Int) {
+            @Composable fun AddView(left: Int, right: Int) {
                 addCalled++
-                emit(292, { context -> TextView(context)
-                    .apply { id = tvId } }) {
-                    set("$left + $right = ${left + right}") { text = it }
-                }
+                TextView(id=tvId, text="$left + $right = ${left + right}")
             }
 
             // <AddView left right />
-            call(491, { changed(left) + changed(right) }) {
-                AddView(left, right)
-            }
-        }.then { activity ->
-            TestCase.assertEquals(1, addCalled)
-            val tv = activity.findViewById(tvId) as TextView
-            TestCase.assertEquals(
-                "$left + $right = ${left + right}",
-                tv.text
-            )
-        }.recomposeRoot().then { activity ->
-            TestCase.assertEquals(1, addCalled)
-            val tv = activity.findViewById(tvId) as TextView
-            TestCase.assertEquals(
-                "$left + $right = ${left + right}",
-                tv.text
-            )
-
-            left = 1
-        }.then { activity ->
-            TestCase.assertEquals(2, addCalled)
-
-            val tv = activity.findViewById(tvId) as TextView
-            TestCase.assertEquals(
-                "$left + $right = ${left + right}",
-                tv.text
-            )
-        }.recomposeRoot().then { activity ->
-            TestCase.assertEquals(2, addCalled)
-
-            val tv = activity.findViewById(tvId) as TextView
-            TestCase.assertEquals(
-                "$left + $right = ${left + right}",
-                tv.text
-            )
-
-            right = 41
-        }.then { activity ->
-            TestCase.assertEquals(3, addCalled)
-
-            val tv = activity.findViewById(tvId) as TextView
-            TestCase.assertEquals(
-                "$left + $right = ${left + right}",
-                tv.text
-            )
-        }
-    }
-
-    @Test
-    fun testStatelessComposableClassInvocationParameters() {
-        val tvId = 338
-        var addCalled = 0
-
-        var left by mutableStateOf(0)
-        var right by mutableStateOf(0)
-
-        compose {
-            // TODO: The composition field is a work-around for an IR bug. The IR doesn't support a
-            // local class capturing a variable so this make the capture explicit
-            class AddView(val composition: ViewComposer) {
-
-                operator fun invoke(left: Int, right: Int) {
-                    with(composition) {
-                        // <TextView "$left + $right = ${left + right}" />
-                        emit(350, { context -> TextView(context)
-                            .apply { id = tvId } }) {
-                            addCalled++
-                            set("$left + $right = ${left + right}") { text = it }
-                        }
-                    }
-                }
-            }
-
-            // <AddView left right />
-            call(612, { changed(left) + changed(right) }) {
-                AddView(this@compose)(left, right)
-            }
+            AddView(left, right)
         }.then { activity ->
             TestCase.assertEquals(1, addCalled)
             val tv = activity.findViewById(tvId) as TextView
@@ -360,9 +244,9 @@ class NewCodeGenTests: BaseComposeTest() {
         val data = mutableListOf(1, 2, 3, 4, 5)
         compose {
             for (item in data) {
-                emit(joinKey(560, item), { context ->
-                    TextView(context).apply { text = "$item View" }
-                }) { }
+                key(item) {
+                    TextView(text="$item View")
+                }
             }
         }.then {
             data.add(data.removeAt(0))
@@ -391,9 +275,9 @@ class NewCodeGenTests: BaseComposeTest() {
         var hello by mutableStateOf("Hello world!")
         compose {
             // <MyTextView someText=hello />
-            emit(joinKey(760, hello), { context ->
-                MyTextView(context, hello).apply { id = tvId }
-            }) { }
+            key(hello) {
+                MyTextView(id=tvId, someText=hello)
+            }
         }.then { activity ->
             val tv = activity.findViewById(tvId) as TextView
             TestCase.assertEquals("Hello world!", tv.text)
@@ -415,10 +299,7 @@ class NewCodeGenTests: BaseComposeTest() {
         var value by mutableStateOf("Unmodified")
         compose {
             // <MyTextView someText=hello />
-            emit(760, { context -> MyTextView(context, value).apply { id = tvId } }) {
-                update(value) { someValue = it }
-                set(hello) { this.text = it }
-            }
+            MyTextView(id=tvId, someValue=value, text=hello)
         }.then { activity ->
             val tv = activity.findViewById(tvId) as MyTextView
             TestCase.assertEquals("Hello world!", tv.text)

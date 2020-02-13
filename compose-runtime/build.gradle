@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 import static androidx.build.dependencies.DependenciesKt.*
 import androidx.build.LibraryGroups
 import androidx.build.LibraryVersions
@@ -25,7 +28,9 @@ plugins {
     id("com.android.library")
     id("kotlin-multiplatform")
 }
-
+dependencies {
+    kotlinPlugin project(path: ":compose:compose-compiler")
+}
 kotlin {
     android()
 
@@ -88,4 +93,10 @@ androidx {
     mavenGroup = LibraryGroups.COMPOSE
     inceptionYear = "2019"
     description = "Contains support code for tree composition"
+}
+
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions {
+        useIR = true
+    }
 }

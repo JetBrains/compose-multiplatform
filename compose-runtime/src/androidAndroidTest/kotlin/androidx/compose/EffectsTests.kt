@@ -29,7 +29,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-@Suppress("PLUGIN_WARNING")
 class EffectsTests : BaseComposeTest() {
     @After
     fun teardown() {
@@ -95,11 +94,7 @@ class EffectsTests : BaseComposeTest() {
 
         compose {
             local = state { "Hello world! ${inc++}" }
-            emit(
-                168,
-                { context -> TextView(context).apply { id = tv1Id } },
-                { set(local.value) { text = it } }
-            )
+            TextView(id=tv1Id, text = local.value)
         }.then { activity ->
             val helloText = activity.findViewById(tv1Id) as TextView
             assertEquals("Hello world! 0", helloText.text)
@@ -127,16 +122,8 @@ class EffectsTests : BaseComposeTest() {
         compose {
             local1 = state { "First" }
             local2 = state { "Second" }
-            emit(
-                168,
-                { context -> TextView(context).apply { id = tv1Id } },
-                { set(local1.value) { text = it } }
-            )
-            emit(
-                169,
-                { context -> TextView(context).apply { id = tv2Id } },
-                { set(local2.value) { text = it } }
-            )
+            TextView(id=tv1Id, text = local1.value)
+            TextView(id=tv2Id, text = local2.value)
         }.then { activity ->
             val tv1 = activity.findViewById(tv1Id) as TextView
             val tv2 = activity.findViewById(tv2Id) as TextView
@@ -185,11 +172,7 @@ class EffectsTests : BaseComposeTest() {
         compose {
             log("compose:start")
             if (mount) {
-                call(
-                    168,
-                    { true },
-                    { @Suppress("PLUGIN_ERROR") Unmountable() }
-                )
+                Unmountable()
             }
             log("compose:end")
         }.then { _ ->
@@ -230,46 +213,34 @@ class EffectsTests : BaseComposeTest() {
 
         @Composable
         fun Unmountable() {
-            composer.call(123, { true }) {
-                onPreCommit {
-                    log("onPreCommit:a2")
-                    onDispose {
-                        log("onDispose:a2")
-                    }
+            onPreCommit {
+                log("onPreCommit:a2")
+                onDispose {
+                    log("onDispose:a2")
                 }
             }
-            composer.call(234, { true }) {
-                onPreCommit {
-                    log("onPreCommit:b2")
-                    onDispose {
-                        log("onDispose:b2")
-                    }
+            onPreCommit {
+                log("onPreCommit:b2")
+                onDispose {
+                    log("onDispose:b2")
                 }
             }
         }
 
         compose {
-            call(345, { true }) {
-                onPreCommit {
-                    log("onPreCommit:a1")
-                    onDispose {
-                        log("onDispose:a1")
-                    }
+            onPreCommit {
+                log("onPreCommit:a1")
+                onDispose {
+                    log("onDispose:a1")
                 }
             }
             if (mount) {
-                call(
-                    168,
-                    { true },
-                    { @Suppress("PLUGIN_ERROR") Unmountable() }
-                )
+                Unmountable()
             }
-            call(456, { true }) {
-                onPreCommit {
-                    log("onPreCommit:b1")
-                    onDispose {
-                        log("onDispose:b1")
-                    }
+            onPreCommit {
+                log("onPreCommit:b1")
+                onDispose {
+                    log("onDispose:b1")
                 }
             }
         }.then { _ ->
@@ -454,11 +425,7 @@ class EffectsTests : BaseComposeTest() {
                 }
             }
 
-            call(
-                1234,
-                { true },
-                { @Suppress("PLUGIN_ERROR") Sub() }
-            )
+            Sub()
         }.then { _ ->
             log("recompose")
         }.recomposeRoot().then { _ ->
@@ -487,24 +454,14 @@ class EffectsTests : BaseComposeTest() {
         val logHistory = mutableListOf<String>()
         fun log(x: String) = logHistory.add(x)
 
-        fun DisposeLogger(msg: String) {
+        @Composable fun DisposeLogger(msg: String) {
             onDispose { log(msg) }
         }
 
         compose {
-            with(composer) {
-                call(
-                    168,
-                    { true },
-                    { @Suppress("PLUGIN_ERROR") DisposeLogger(msg = "onDispose:1") }
-                )
-                if (mount) {
-                    call(
-                        169,
-                        { true },
-                        { @Suppress("PLUGIN_ERROR") DisposeLogger(msg = "onDispose:2") }
-                    )
-                }
+            DisposeLogger(msg = "onDispose:1")
+            if (mount) {
+                DisposeLogger(msg = "onDispose:2")
             }
         }.then { _ ->
             assertArrayEquals(
@@ -553,17 +510,11 @@ class EffectsTests : BaseComposeTest() {
         }
 
         compose {
-            with(composer) {
                 log("compose:start")
                 if (mount) {
-                    call(
-                        168,
-                        { true },
-                        { @Suppress("PLUGIN_ERROR") Unmountable() }
-                    )
+                    Unmountable()
                 }
                 log("compose:end")
-            }
         }.then { _ ->
             assertArrayEquals(
                 listOf(
@@ -608,30 +559,13 @@ class EffectsTests : BaseComposeTest() {
 
         @Composable
         fun Bar() {
-            composer.call(
-                21323,
-                { true },
-                {
-                    @Suppress("PLUGIN_ERROR")
-                    (Observe {
-                        val foo = Foo.current
-                        composer.emit(
-                            168,
-                            { context -> TextView(context).apply { id = tv1Id } },
-                            { set(foo) { text = it } }
-                        )
-                    })
-                }
-            )
+            val foo = Foo.current
+            TextView(id = tv1Id, text = foo)
         }
 
         compose {
-            provideAmbient(Foo, current) {
-                call(
-                    123,
-                    { false },
-                    { @Suppress("PLUGIN_ERROR") Bar() }
-                )
+            Providers(Foo provides current) {
+                Bar()
             }
         }.then { activity ->
             val helloText = activity.findViewById(tv1Id) as TextView
@@ -649,54 +583,41 @@ class EffectsTests : BaseComposeTest() {
         val MyAmbient = ambientOf<Int> { throw Exception("not set") }
 
         var requestRecompose: (() -> Unit)? = null
-        var buttonCreated = false
         val ambientValue = mutableStateOf(1)
 
-        fun SimpleComposable2() {
-            Observe {
-                with(composer) {
-                    val value = MyAmbient.current
-                    emit(534, { context -> TextView(context) }, {
-                        set("$value") { text = it }
-                    })
+        @Composable fun SimpleComposable2() {
+            val value = MyAmbient.current
+            TextView(text = "$value")
+        }
+
+        @Composable fun SimpleComposable() {
+            Recompose {
+                requestRecompose = it
+                Providers(MyAmbient provides ambientValue.value++) {
+                    SimpleComposable2()
+                    Button(id=123)
                 }
             }
         }
 
-        fun SimpleComposable() {
-            composer.call(531, { true }) {
-                Recompose {
-                    requestRecompose = it
-                    composer.provideAmbient(MyAmbient, ambientValue.value++) {
-                        composer.call(523, { false }) { SimpleComposable2() }
-                        composer.emitView(525) { context ->
-                            Button(context).also {
-                                buttonCreated = true
-                            }
-                        }
-                    }
-                }
-            }
+        @Composable fun Root() {
+            SimpleComposable()
         }
 
-        fun Root() {
-            with(composer) {
-                call(547, { false }) {
-                    SimpleComposable()
-                }
-            }
-        }
+        var firstButton: Button? = null
 
         compose {
-            call(556, { false }) {
-                Root()
-            }
+            Root()
         }.then {
-            assertTrue("Expected button to be created", buttonCreated)
-            buttonCreated = false
+            firstButton = it.findViewById<Button>(123)
+            assertTrue("Expected button to be created", firstButton != null)
             requestRecompose?.invoke()
         }.then {
-            assertFalse("Expected button to not be recreated", buttonCreated)
+            assertEquals(
+                "Expected button to not be recreated",
+                it.findViewById<Button>(123),
+                firstButton
+            )
         }
     }
 
@@ -706,59 +627,45 @@ class EffectsTests : BaseComposeTest() {
         val MyAmbient = ambientOf<Int> { throw Exception("not set") }
 
         var requestRecompose: (() -> Unit)? = null
-        var buttonCreated = false
         var componentComposed = false
         val ambientValue = mutableStateOf(1)
 
-        fun SimpleComposable2() {
-            with(composer) {
-                startRestartGroup(712)
-                componentComposed = true
-                val value = MyAmbient.current
-                emit(534, { context -> TextView(context) }, {
-                    set("$value") { text = it }
-                })
-                endRestartGroup()?.updateScope { SimpleComposable2() }
+        @Composable fun SimpleComposable2() {
+            componentComposed = true
+            val value = MyAmbient.current
+            TextView(text="$value")
+        }
+
+        @Composable fun SimpleComposable() {
+            requestRecompose = invalidate
+            Providers(MyAmbient provides ambientValue.value++) {
+                SimpleComposable2()
+                Button(id=123)
             }
         }
 
-        fun SimpleComposable() {
-            composer.call(531, { true }) {
-                Recompose {
-                    requestRecompose = it
-                    composer.provideAmbient(MyAmbient, ambientValue.value++) {
-                        composer.call(523, { false }) { SimpleComposable2() }
-                        composer.emitView(525) { context ->
-                            Button(context).also {
-                                buttonCreated = true
-                            }
-                        }
-                    }
-                }
-            }
+        @Composable fun Root() {
+            SimpleComposable()
         }
 
-        fun Root() {
-            with(composer) {
-                call(547, { false }) {
-                    SimpleComposable()
-                }
-            }
-        }
+        var firstButton: Button? = null
 
         compose {
-            call(556, { false }) {
-                Root()
-            }
+            Root()
         }.then {
             assertTrue("Expected component to be composed", componentComposed)
-            assertTrue("Expected button to be created", buttonCreated)
-            buttonCreated = false
+            firstButton = it.findViewById<Button>(123)
+            assertTrue("Expected button to be created", firstButton != null)
             componentComposed = false
             requestRecompose?.invoke()
         }.then {
             assertTrue("Expected component to be composed", componentComposed)
-            assertFalse("Expected button to not be recreated", buttonCreated)
+
+            assertEquals(
+                "Expected button to not be recreated",
+                firstButton,
+                it.findViewById<Button>(123)
+            )
         }
     }
 
@@ -769,11 +676,7 @@ class EffectsTests : BaseComposeTest() {
 
         compose {
             val local = state { "Hello world! ${inc++}" }
-            emit(
-                168,
-                { context -> TextView(context).apply { id = tv1Id } },
-                { set(local.value) { text = it } }
-            )
+            TextView(id = tv1Id, text=local.value)
         }.then { activity ->
             val helloText = activity.findViewById(tv1Id) as TextView
             assertEquals("Hello world! 0", helloText.text)

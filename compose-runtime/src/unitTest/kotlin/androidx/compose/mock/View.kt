@@ -63,6 +63,26 @@ open class View {
 
     fun attribute(name: String, value: Any) { attributes[name] = value }
 
+    var value: String?
+        get() = attributes["value"] as? String
+        set(value) {
+            if (value != null) {
+                attributes["value"] = value
+            } else {
+                attributes.remove("value")
+            }
+        }
+
+    var text: String?
+        get() = attributes["text"] as? String
+        set(value) {
+            if (value != null) {
+                attributes["text"] = value
+            } else {
+                attributes.remove("text")
+            }
+        }
+
     private val attributesAsString get() =
         if (attributes.isEmpty()) ""
         else attributes.map { " ${it.key}='${it.value}'" }.joinToString()

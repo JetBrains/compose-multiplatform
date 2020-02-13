@@ -38,21 +38,16 @@ class DisposeTests: BaseComposeTest() {
         val log = mutableListOf<String>()
 
         val composable = @Composable {
-            val cc = composer
-            cc.call(1, { true }) {
-                onPreCommit {
-                    log.add("onPreCommit")
-                    onDispose {
-                        log.add("onPreCommitDispose")
-                    }
+            onPreCommit {
+                log.add("onPreCommit")
+                onDispose {
+                    log.add("onPreCommitDispose")
                 }
             }
-            cc.call(2, { true }) {
-                onActive {
-                    log.add("onActive")
-                    onDispose {
-                        log.add("onActiveDispose")
-                    }
+            onActive {
+                log.add("onActive")
+                onDispose {
+                    log.add("onActiveDispose")
                 }
             }
         }

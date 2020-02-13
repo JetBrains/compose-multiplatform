@@ -119,13 +119,13 @@ abstract class BaseComposeTest {
     val activity get() = activityRule.activity
 
     fun compose(
-        composable: ViewComposer.() -> Unit
+        composable: @Composable() () -> Unit
     ) = ComposeTester(
         activity,
         composable
     )
 
-    class ComposeTester(val activity: Activity, val composable: ViewComposer.() -> Unit) {
+    class ComposeTester(val activity: Activity, val composable: @Composable() () -> Unit) {
         lateinit var invalidateRoot: () -> Unit
         inner class ActiveTest(val activity: Activity, val composition: Composition) {
             fun recomposeRoot(): ActiveTest {
@@ -145,17 +145,11 @@ abstract class BaseComposeTest {
         }
 
         fun then(block: ComposeTester.(activity: Activity) -> Unit): ActiveTest {
-            var realComposable: () -> Unit = {}
-            realComposable = {
-                with(composer) {
-                    startRestartGroup(0)
-                    invalidateRoot = invalidate
-                    composable()
-                    endRestartGroup()?.updateScope { realComposable() }
-                }
-            }
             val composition = activity.show {
-                realComposable()
+                Recompose {
+                    invalidateRoot = it
+                    composable()
+                }
             }
             activity.waitForAFrame()
             activity.uiThread {

@@ -224,6 +224,7 @@ internal fun <T> AmbientMap.contains(key: Ambient<T>) = this.containsKey(key as 
 @Suppress("UNCHECKED_CAST")
 internal fun <T> AmbientMap.getValueOf(key: Ambient<T>) = this[key as Ambient<Any?>]?.value as T
 
+@Composable
 private fun ambientMapOf(values: Array<out ProvidedValue<*>>): AmbientMap {
     val result: AmbientMap = buildableMapOf()
     return result.mutate {
@@ -232,6 +233,11 @@ private fun ambientMapOf(values: Array<out ProvidedValue<*>>): AmbientMap {
             it[provided.ambient as Ambient<Any?>] = provided.ambient.provided(provided.value)
         }
     }
+}
+
+interface ComposerValidator {
+    fun changed(value: Int): Boolean
+    fun <T> changed(value: T): Boolean
 }
 
 // TODO(lmr): this could be named MutableTreeComposer
@@ -253,7 +259,7 @@ open class Composer<N>(
      * Manager for scheduling recompositions.
      */
     private val recomposer: Recomposer
-) {
+) : ComposerValidator {
     private val changes = mutableListOf<Change<N>>()
     private val lifecycleObservers = mutableMapOf<
             CompositionLifecycleObserverHolder,
@@ -308,6 +314,22 @@ open class Composer<N>(
         startRoot()
         block()
         endRoot()
+    }
+
+    inline fun call(
+        key: Any,
+        invalid: ComposerValidator.() -> Boolean,
+        block: () -> Unit
+    ) {
+        startGroup(key)
+        if (this.invalid() || !skipping) {
+            startGroup(invocation)
+            block()
+            endGroup()
+        } else {
+            skipCurrentGroup()
+        }
+        endGroup()
     }
 
     /**
@@ -587,7 +609,18 @@ open class Composer<N>(
      *
      * @param value the value to be compared.
      */
-    fun <T> changed(value: T): Boolean {
+    override fun <T> changed(value: T): Boolean {
+        return if (nextSlot() != value || inserting) {
+            updateValue(value)
+            true
+        } else {
+            skipValue()
+            false
+        }
+    }
+
+    // TODO: Add more overloads for common primitive types like String and Float etc to avoid boxing
+    override fun changed(value: Int): Boolean {
         return if (nextSlot() != value || inserting) {
             updateValue(value)
             true
@@ -687,7 +720,7 @@ open class Composer<N>(
         // slots consumed depending on the content of values to remember, for example, the value
         // holders used last time.
         startGroup(providerValues)
-        val currentProviders = ambientMapOf(values)
+        val currentProviders = invokeComposableForResult(this) { ambientMapOf(values) }
         endGroup()
         val providersStackSize = providersStack.size
         val invalid = if (inserting) {
@@ -1761,7 +1794,21 @@ object NullCompilationScope {
 inline fun <T> escapeCompose(block: NullCompilationScope.() -> T) = NullCompilationScope.block()
 
 @Composable
-@Suppress("UNUSED")
 val currentComposerIntrinsic: Composer<*> get() {
     throw NotImplementedError("Implemented as an intrinsic")
+}
+
+internal fun invokeComposable(composer: Composer<*>, composable: @Composable() () -> Unit) {
+    @Suppress("UNCHECKED_CAST")
+    val realFn = composable as Function1<Composer<*>, Unit>
+    realFn(composer)
+}
+
+internal fun <T> invokeComposableForResult(
+    composer: Composer<*>,
+    composable: @Composable() () -> T
+): T {
+    @Suppress("UNCHECKED_CAST")
+    val realFn = composable as Function1<Composer<*>, T>
+    return realFn(composer)
 }

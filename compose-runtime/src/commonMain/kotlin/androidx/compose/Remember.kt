@@ -23,17 +23,16 @@ package androidx.compose
 
 @Composable
 inline fun <T> remember(calculation: () -> T): T =
-    currentComposerNonNull.cache(true, calculation)
+    currentComposerIntrinsic.cache(true, calculation)
 
 /**
  * Remember the value returned by [calculation] if [v1] is equal to the previous composition, otherwise
  * produce and remember a new value by calling [calculation].
  */
 @Composable
-inline fun <T, /*reified*/ V1> remember(v1: V1, calculation: () -> T) = currentComposerNonNull
-    .let {
-        it.cache(!it.changed(v1), calculation)
-    }
+inline fun <T, /*reified*/ V1> remember(v1: V1, calculation: () -> T): T {
+    return currentComposerIntrinsic.cache(!currentComposerIntrinsic.changed(v1), calculation)
+}
 
 /**
  * Remember the value returned by [calculation] if [v1] and [v2] are equal to the previous composition,
@@ -45,11 +44,9 @@ inline fun <T, /*reified*/ V1, /*reified*/ V2> remember(
     v2: V2,
     calculation: () -> T
 ): T {
-    return currentComposerNonNull.let {
-        var valid = !it.changed(v1)
-        valid = !it.changed(v2) && valid
-        it.cache(valid, calculation)
-    }
+    var valid = !currentComposerIntrinsic.changed(v1)
+    valid = !currentComposerIntrinsic.changed(v2) && valid
+    return currentComposerIntrinsic.cache(valid, calculation)
 }
 
 /**
@@ -63,12 +60,10 @@ inline fun <T, /*reified*/ V1, /*reified*/ V2, /*reified*/ V3> remember(
     v3: V3,
     calculation: () -> T
 ): T {
-    return currentComposerNonNull.let {
-        var valid = !it.changed(v1)
-        valid = !it.changed(v2) && valid
-        valid = !it.changed(v3) && valid
-        it.cache(valid, calculation)
-    }
+    var valid = !currentComposerIntrinsic.changed(v1)
+    valid = !currentComposerIntrinsic.changed(v2) && valid
+    valid = !currentComposerIntrinsic.changed(v3) && valid
+    return currentComposerIntrinsic.cache(valid, calculation)
 }
 
 /**
@@ -77,11 +72,9 @@ inline fun <T, /*reified*/ V1, /*reified*/ V2, /*reified*/ V3> remember(
  */
 @Composable
 inline fun <V> remember(vararg inputs: Any?, block: () -> V): V {
-    return currentComposerNonNull.let {
-        var valid = true
-        for (input in inputs) valid = !it.changed(input) && valid
-        it.cache(valid, block)
-    }
+    var valid = true
+    for (input in inputs) valid = !currentComposerIntrinsic.changed(input) && valid
+    return currentComposerIntrinsic.cache(valid, block)
 }
 
 /**

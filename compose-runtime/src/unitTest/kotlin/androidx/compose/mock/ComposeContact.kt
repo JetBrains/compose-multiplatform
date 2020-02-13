@@ -16,11 +16,14 @@
 
 package androidx.compose.mock
 
+import androidx.compose.Composable
+
 // <linear>
 //  <text text="Name: ${contact.name}" />
 //  <text text="email: ${contact.email" />
 // </linear>
-fun MockViewComposition.contact(contact: Contact) {
+@Composable
+fun MockComposeScope.contact(contact: Contact) {
     linear {
         text(value = "Name: ${contact.name}")
         text(value = "email: ${contact.email}")
@@ -41,7 +44,8 @@ fun MockViewValidator.contact(contact: Contact) {
 //    <selectBox>
 //   </repeat>
 // </linear>
-fun MockViewComposition.contacts(contacts: Collection<Contact>, selected: Contact?) {
+@Composable
+fun MockComposeScope.contacts(contacts: Collection<Contact>, selected: Contact?) {
     linear {
         repeat(of = contacts) {
             selectBox(it == selected) {
@@ -71,7 +75,8 @@ fun MockViewValidator.contacts(contacts: Collection<Contact>, selected: Contact?
 //     <contacts contacts=model.filtered selected=model.selected />
 //   </linear>
 // </linear>
-fun MockViewComposition.selectContact(model: ContactModel) {
+@Composable
+fun MockComposeScope.selectContact(model: ContactModel) {
     linear {
         linear {
             text(value = "Filter:")

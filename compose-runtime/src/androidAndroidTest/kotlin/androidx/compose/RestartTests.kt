@@ -47,22 +47,10 @@ class RestartTests: BaseComposeTest() {
             )
         }
 
-        @Suppress("PLUGIN_WARNING")
         compose {
-            call(147, { true }) {
-
-                RestartGroup(object : Function0<Unit> {
-                    override fun invoke() {
-                        startRestartGroup(54)
-                        emit(93, { context -> TextView(context).apply { id = tvIdName } }) {
-                            set(president.name) { text = it }
-                        }
-                        emit(94, { context -> TextView(context).apply { id = tvIdAge } }) {
-                            set(president.age) { text = it.toString() }
-                        }
-                        endRestartGroup()?.updateScope(this)
-                    }
-                })
+            RestartGroup {
+                TextView(id=tvIdName, text=president.name)
+                TextView(id=tvIdAge, text=president.age)
             }
         }.then {
             val tvName = it.findViewById(tvIdName) as TextView
@@ -91,26 +79,10 @@ class RestartTests: BaseComposeTest() {
             )
         }
 
-        @Suppress("PLUGIN_WARNING")
         compose {
-            call(147, { true }) {
-
-                Repeat(5, object : Function1<Int, Unit> {
-                    override fun invoke(index: Int) {
-                        startRestartGroup(98)
-                        emit(93, { context -> TextView(context).apply {
-                            id = tvIdNameBase + index
-                        } }) {
-                            set(president.name) { text = it }
-                        }
-                        emit(94, { context -> TextView(context).apply {
-                            id = tvIdAgeBase + index
-                        } }) {
-                            set(president.age) { text = it.toString() }
-                        }
-                        endRestartGroup()?.updateScope { this(index) }
-                    }
-                })
+            Repeat(5) { index ->
+                TextView(id=tvIdNameBase + index, text=president.name)
+                TextView(id=tvIdAgeBase + index, text=president.age.toString())
             }
         }.then { activity ->
             repeat(5) { index ->
@@ -143,21 +115,13 @@ class RestartTests: BaseComposeTest() {
             )
         }
 
-        fun ViewComposer.PersonView() {
-            startRestartGroup(145)
-            emit(93, { context -> TextView(context).apply { id = tvIdName } }) {
-                set(president.name) { text = it }
-            }
-            emit(94, { context -> TextView(context).apply { id = tvIdAge } }) {
-                set(president.age) { text = it.toString() }
-            }
-            endRestartGroup()?.updateScope { PersonView() }
+        @Composable fun PersonView() {
+            TextView(id=tvIdName, text=president.name)
+            TextView(id=tvIdAge, text=president.age.toString())
         }
 
         compose {
-            call(145, { true }) {
-                PersonView()
-            }
+            PersonView()
         }.then {
             val tvName = it.findViewById(tvIdName) as TextView
             val tvAge = it.findViewById(tvIdAge) as TextView
@@ -181,22 +145,16 @@ class RestartTests: BaseComposeTest() {
             mutableStateOf(true)
         }
 
-        fun ViewComposer.ShowSomething() {
-            startRestartGroup(183)
-            emit(181, { context -> TextView(context).apply { id = tvStateId } }) {
-                set("State = ${state.value}") { text = it }
-            }
-            endRestartGroup()?.updateScope { ShowSomething() }
+        @Composable fun ShowSomething() {
+            TextView(id=tvStateId, text="State = ${state.value}")
         }
 
-        fun ViewComposer.View() {
-            startRestartGroup(191)
+        @Composable fun View() {
             if (state.value) {
                 // This is not correct code generation as this should be called in a call function, however, this
                 // tests the assumption that calling a function should produce an item (a key followed by a group).
                 ShowSomething()
             }
-            endRestartGroup()?.updateScope { View() }
         }
 
         compose {
@@ -229,23 +187,14 @@ class RestartTests: BaseComposeTest() {
             )
         }
 
-        fun ViewComposer.PersonView(index: Int) {
-            startRestartGroup(231)
-            emit(93, { context -> TextView(context).apply { id = tvIdNameBase + index } }) {
-                set(president.name) { text = it }
-            }
-            emit(94, { context -> TextView(context).apply { id = tvIdAgeBase + index } }) {
-                set(president.age) { text = it.toString() }
-            }
-            endRestartGroup()?.updateScope { PersonView(index) }
+        @Composable fun PersonView(index: Int) {
+            TextView(id=tvIdNameBase + index, text=president.name)
+            TextView(id=tvIdAgeBase + index, text=president.age.toString())
         }
 
-        @Suppress("PLUGIN_WARNING")
         compose {
-            call(147, { true }) {
-                Repeat(5) { index ->
-                    PersonView(index)
-                }
+            Repeat(5) { index ->
+                PersonView(index)
             }
         }.then { activity ->
             repeat(5) { index ->
@@ -269,12 +218,12 @@ class RestartTests: BaseComposeTest() {
 }
 
 @Composable
-fun RestartGroup(block: () -> Unit) {
+fun RestartGroup(block: @Composable() () -> Unit) {
     block()
 }
 
 @Composable
-fun Repeat(count: Int, block: (index: Int) -> Unit) {
+fun Repeat(count: Int, block: @Composable() (index: Int) -> Unit) {
     for (i in 0 until count) {
         block(i)
     }
