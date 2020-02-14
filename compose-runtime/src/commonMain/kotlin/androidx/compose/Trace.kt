@@ -16,7 +16,7 @@
 
 package androidx.compose
 
-expect object Trace {
+internal expect object Trace {
     fun beginSection(name: String)
     fun endSection()
 }
@@ -25,7 +25,7 @@ expect object Trace {
  * Wrap the specified [block] in calls to [Trace.beginSection] (with the supplied [sectionName])
  * and [Trace.endSection].
  */
-inline fun <T> trace(sectionName: String, block: () -> T): T {
+internal inline fun <T> trace(sectionName: String, block: () -> T): T {
     Trace.beginSection(sectionName)
     try {
         return block()

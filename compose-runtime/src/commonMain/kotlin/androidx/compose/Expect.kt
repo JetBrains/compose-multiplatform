@@ -16,6 +16,9 @@
 
 package androidx.compose
 
+// TODO(aelias): Mark the typealiases internal when https://youtrack.jetbrains.com/issue/KT-36695 is fixed.
+// Currently, they behave as internal because the actual is internal, even though the expect is public.
+
 expect class BitSet() {
     fun set(bitIndex: Int)
     fun or(set: BitSet)
@@ -23,16 +26,16 @@ expect class BitSet() {
     operator fun get(bitIndex: Int): Boolean
 }
 
-expect open class ThreadLocal<T>(initialValue: () -> T) {
+internal expect open class ThreadLocal<T>(initialValue: () -> T) {
     fun get(): T
     fun set(value: T)
 }
 
-fun <T> ThreadLocal() = ThreadLocal<T?> { null }
+internal fun <T> ThreadLocal() = ThreadLocal<T?> { null }
 
 expect class WeakHashMap<K, V>() : MutableMap<K, V>
 
-expect fun identityHashCode(instance: Any?): Int
+internal expect fun identityHashCode(instance: Any?): Int
 
 expect interface ViewParent
 
@@ -40,8 +43,8 @@ expect open class View {
     fun getTag(key: Int): Any
     fun setTag(key: Int, tag: Any?)
 }
-expect val View.parent: ViewParent
-expect val View.context: Context
+internal expect val View.parent: ViewParent
+internal expect val View.context: Context
 
 expect abstract class ViewGroup : View {
     fun removeAllViews()
@@ -51,7 +54,7 @@ expect abstract class Context
 
 expect class FrameLayout(context: Context)
 
-expect inline fun <R> synchronized(lock: Any, block: () -> R): R
+internal expect inline fun <R> synchronized(lock: Any, block: () -> R): R
 
 expect open class WeakReference<T> : Reference<T> {
     constructor(referent: T)
@@ -68,13 +71,13 @@ expect open class ReferenceQueue<T>() {
 
 expect class Looper
 
-expect fun isMainThread(): Boolean
+internal expect fun isMainThread(): Boolean
 
-expect object LooperWrapper {
+internal expect object LooperWrapper {
     fun getMainLooper(): Looper
 }
 
-expect class Handler(looper: Looper) {
+internal expect class Handler(looper: Looper) {
     fun postAtFrontOfQueue(block: () -> Unit): Boolean
 }
 
@@ -101,7 +104,7 @@ internal expect fun <K, V> buildableMapOf(): BuildableMap<K, V>
 
 internal expect fun createRecomposer(): Recomposer
 
-expect object Choreographer {
+internal expect object Choreographer {
     fun postFrameCallback(callback: ChoreographerFrameCallback)
     fun postFrameCallbackDelayed(delayMillis: Long, callback: ChoreographerFrameCallback)
     fun removeFrameCallback(callback: ChoreographerFrameCallback)

@@ -19,9 +19,9 @@ package androidx.compose
 import kotlinx.collections.immutable.PersistentMap
 import kotlinx.collections.immutable.persistentHashMapOf
 
-actual typealias BitSet = java.util.BitSet
+internal actual typealias BitSet = java.util.BitSet
 
-actual open class ThreadLocal<T> actual constructor(
+internal actual open class ThreadLocal<T> actual constructor(
     private val initialValue: () -> T
 ) : java.lang.ThreadLocal<T>() {
     @Suppress("UNCHECKED_CAST")
@@ -38,27 +38,27 @@ actual open class ThreadLocal<T> actual constructor(
     }
 }
 
-actual typealias WeakHashMap<K, V> = java.util.WeakHashMap<K, V>
+internal actual typealias WeakHashMap<K, V> = java.util.WeakHashMap<K, V>
 
-actual fun identityHashCode(instance: Any?): Int = System.identityHashCode(instance)
+internal actual fun identityHashCode(instance: Any?): Int = System.identityHashCode(instance)
 
-actual inline fun <R> synchronized(lock: Any, block: () -> R): R {
+internal actual inline fun <R> synchronized(lock: Any, block: () -> R): R {
     kotlin.synchronized(lock) {
         return block()
     }
 }
 
-actual typealias Reference<T> = java.lang.ref.Reference<T>
+internal actual typealias Reference<T> = java.lang.ref.Reference<T>
 
-actual typealias ReferenceQueue<T> = java.lang.ref.ReferenceQueue<T>
+internal actual typealias ReferenceQueue<T> = java.lang.ref.ReferenceQueue<T>
 
-actual typealias WeakReference<T> = java.lang.ref.WeakReference<T>
+internal actual typealias WeakReference<T> = java.lang.ref.WeakReference<T>
 
-actual typealias MainThread = androidx.annotation.MainThread
+internal actual typealias MainThread = androidx.annotation.MainThread
 
-actual typealias TestOnly = org.jetbrains.annotations.TestOnly
+internal actual typealias TestOnly = org.jetbrains.annotations.TestOnly
 
-actual typealias CheckResult = androidx.annotation.CheckResult
+internal actual typealias CheckResult = androidx.annotation.CheckResult
 
 private class BuildableMapBuilderImpl<K, V>(
     val builder: PersistentMap.Builder<K, V>

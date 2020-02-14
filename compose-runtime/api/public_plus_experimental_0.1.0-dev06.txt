@@ -2,14 +2,9 @@
 package androidx.compose {
 
   public final class ActualAndroidKt {
-    method public static android.content.Context getContext(android.view.View);
-    method public static android.view.ViewParent getParent(android.view.View);
-    method public static boolean isMainThread();
   }
 
   public final class ActualJvmKt {
-    method public static int identityHashCode(Object? instance);
-    method public static inline <R> R! synchronized(Object lock, kotlin.jvm.functions.Function0<? extends R> block);
   }
 
   @androidx.compose.Immutable public abstract sealed class Ambient<T> {
@@ -56,13 +51,6 @@ package androidx.compose {
 
   public static interface BuildableMap.Builder<K, V> extends java.util.Map<K,V> kotlin.jvm.internal.markers.KMutableMap {
     method public androidx.compose.BuildableMap<K,V> build();
-  }
-
-  public final class Choreographer {
-    method public void postFrameCallback(android.view.Choreographer.FrameCallback callback);
-    method public void postFrameCallbackDelayed(long delayMillis, android.view.Choreographer.FrameCallback callback);
-    method public void removeFrameCallback(android.view.Choreographer.FrameCallback callback);
-    field public static final androidx.compose.Choreographer! INSTANCE;
   }
 
   public interface CommitScope {
@@ -202,7 +190,6 @@ package androidx.compose {
   }
 
   public final class ExpectKt {
-    method public static <T> androidx.compose.ThreadLocal<T> ThreadLocal();
   }
 
   public final class FrameManager {
@@ -212,13 +199,6 @@ package androidx.compose {
     method public void nextFrame();
     method public <T> T! unframed(kotlin.jvm.functions.Function0<? extends T> block);
     field public static final androidx.compose.FrameManager! INSTANCE;
-  }
-
-  public final class Handler {
-    ctor public Handler(android.os.Looper looper);
-    method public android.os.Handler getHandler();
-    method public boolean postAtFrontOfQueue(kotlin.jvm.functions.Function0<kotlin.Unit> block);
-    property public final android.os.Handler handler;
   }
 
   @androidx.compose.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.CLASS) public @interface Immutable {
@@ -246,11 +226,6 @@ package androidx.compose {
 
   public final class KeySourceInfoKt {
     method public static String? keySourceInfoOf(Object key);
-  }
-
-  public final class LooperWrapper {
-    method public android.os.Looper getMainLooper();
-    field public static final androidx.compose.LooperWrapper! INSTANCE;
   }
 
   @androidx.compose.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.CLASS) public @interface Model {
@@ -439,18 +414,7 @@ package androidx.compose {
     property public abstract T! value;
   }
 
-  public class ThreadLocal<T> extends java.lang.ThreadLocal<T> {
-    ctor public ThreadLocal(kotlin.jvm.functions.Function0<? extends T> initialValue);
-  }
-
-  public final class Trace {
-    method public void beginSection(String name);
-    method public void endSection();
-    field public static final androidx.compose.Trace! INSTANCE;
-  }
-
   public final class TraceKt {
-    method public static inline <T> T! trace(String sectionName, kotlin.jvm.functions.Function0<? extends T> block);
   }
 
   @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets={AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER}) public @interface UnionType {

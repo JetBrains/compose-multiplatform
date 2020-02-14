@@ -91,10 +91,11 @@ fun Activity.uiThread(block: () -> Unit) {
 
 fun Activity.onNextFrame(block: () -> Unit) {
     uiThread {
-        Choreographer.postFrameCallback(object : ChoreographerFrameCallback {
-            override fun doFrame(frameTimeNanos: Long) {
-                block()
-            }
+        android.view.Choreographer.getInstance().postFrameCallback(
+            object : android.view.Choreographer.FrameCallback {
+                override fun doFrame(frameTimeNanos: Long) {
+                    block()
+                }
         })
     }
 }
