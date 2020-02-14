@@ -19,23 +19,6 @@
 package androidx.compose
 
 /**
- * This is the public version of the Effect constructor. It is meant to be used to compose effects together to create custom effects.
- *
- * For example, a custom `observeUser` Effect might look something like this:
- *
- * @sample androidx.compose.samples.observeUserSample
- *
- * @param block the executable block of code that returns the value of the effect, run in the context of the Effect
- */
-@Deprecated(
-    "Effects have been removed. Use @Composable functions instead.",
-    ReplaceWith(""),
-    DeprecationLevel.ERROR
-)
-@Composable
-fun <T> effectOf(block: () -> T): T = block()
-
-/**
  * A CommitScope represents an object that executes some code and has a cleanup in the context of the Composition lifecycle.
  * It has an "onDispose" operation to cleanup anything that it created whenever it leaves the composition.
  */
@@ -335,22 +318,6 @@ fun onPreCommit(vararg inputs: Any?, callback: CommitScope.() -> Unit) {
  */
 
 /**
- * An Effect used to get the value of an ambient at a specific position during composition.
- *
- * @param key The Ambient that you want to consume the value of
- * @return An Effect that resolves to the current value of the Ambient
- *
- * @see [Ambient]
- */
-@Composable
-@Deprecated(
-    "Use Ambient<T>.current instead",
-    ReplaceWith("key.current"),
-    DeprecationLevel.WARNING
-)
-fun <T> ambient(key: Ambient<T>): T = key.current
-
-/**
  * An Effect to get the nearest invalidation lambda to the current point of composition. This can be used to
  * trigger an invalidation on the composition locally to cause a recompose.
  */
@@ -370,17 +337,3 @@ val invalidate: () -> Unit get() {
 fun compositionReference(): CompositionReference {
     return currentComposerIntrinsic.buildReference()
 }
-
-/**
- * IMPORTANT:
- * This global operator is TEMPORARY, and should be removed whenever an answer for contextual composers is reached. At that time, the
- * unaryPlus operator on the composer itself is the one that should be used.
- *
- * Resolves the effect and returns the result.
- */
-@Deprecated(
-    "The unary plus for effects is no longer needed. Remove it.",
-    ReplaceWith(""),
-    DeprecationLevel.ERROR
-)
-operator fun <T : Any?> T.unaryPlus(): T = this

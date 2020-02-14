@@ -181,9 +181,7 @@ package androidx.compose {
   }
 
   public final class EffectsKt {
-    method @Deprecated @androidx.compose.Composable public static <T> T! ambient(androidx.compose.Ambient<T> key);
     method @androidx.compose.Composable public static androidx.compose.CompositionReference compositionReference();
-    method @Deprecated @androidx.compose.Composable public static <T> T! effectOf(kotlin.jvm.functions.Function0<? extends T> block);
     method public static kotlin.jvm.functions.Function0<kotlin.Unit> getInvalidate();
     method @androidx.compose.Composable public static void onActive(kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
     method @androidx.compose.Composable public static void onCommit(kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
@@ -195,7 +193,6 @@ package androidx.compose {
     method @androidx.compose.Composable public static <V1> void onPreCommit(V1? v1, kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
     method @androidx.compose.Composable public static <V1, V2> void onPreCommit(V1? v1, V2? v2, kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
     method @androidx.compose.Composable public static void onPreCommit(Object![]? inputs, kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
-    method @Deprecated public static operator <T> T! unaryPlus(T?);
   }
 
   public interface Emittable {
@@ -331,10 +328,6 @@ package androidx.compose {
   }
 
   public final class RememberKt {
-    method @Deprecated @androidx.compose.Composable public static <T> T! memo(kotlin.jvm.functions.Function0<? extends T> calculation);
-    method @Deprecated @androidx.compose.Composable public static <T, V1> T! memo(V1? v1, kotlin.jvm.functions.Function0<? extends T> calculation);
-    method @Deprecated @androidx.compose.Composable public static <T, V1, V2> T! memo(V1? v1, V2? v2, kotlin.jvm.functions.Function0<? extends T> calculation);
-    method @Deprecated @androidx.compose.Composable public static <T> T! memo(Object![]? inputs, kotlin.jvm.functions.Function0<? extends T> calculation);
     method @androidx.compose.Composable public static inline <T> T! remember(kotlin.jvm.functions.Function0<? extends T> calculation);
     method @androidx.compose.Composable public static inline <T, V1> T! remember(V1? v1, kotlin.jvm.functions.Function0<? extends T> calculation);
     method @androidx.compose.Composable public static inline <T, V1, V2> T! remember(V1? v1, V2? v2, kotlin.jvm.functions.Function0<? extends T> calculation);

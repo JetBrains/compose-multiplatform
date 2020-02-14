@@ -73,6 +73,8 @@ inline fun <T> state(
  * @param init A factory function to create the initial value of this state
  * @return An [Model] instance of [MutableState] that wraps the value.
  *
+ * @sample androidx.compose.samples.observeUserSample
+ *
  * @see [state]
  * @see [remember]
  */
@@ -95,7 +97,7 @@ inline fun <T, /*reified*/ V1> stateFor(v1: V1, init: () -> T) =
  * @return An [Model] instance of [MutableState] that wraps the value.
  *
  * @see [state]
- * @see [memo]
+ * @see [remember]
  */
 @Composable
 inline fun <T, reified V1, reified V2> stateFor(
