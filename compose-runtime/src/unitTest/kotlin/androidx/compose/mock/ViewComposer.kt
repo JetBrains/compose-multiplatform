@@ -23,7 +23,7 @@ import androidx.compose.Composer
 import androidx.compose.ComposerUpdater
 import androidx.compose.Recomposer
 import androidx.compose.SlotTable
-import androidx.compose.currentComposerIntrinsic
+import androidx.compose.currentComposer
 import androidx.compose.invokeComposable
 
 
@@ -59,7 +59,7 @@ class MockViewComposer(
     fun compose(composable: @Composable  MockComposeScope.() -> Unit) {
         composeRoot {
             invokeComposable(this) {
-                val c = currentComposerIntrinsic as MockViewComposer
+                val c = currentComposer as MockViewComposer
                 c.composable()
             }
         }
@@ -99,7 +99,7 @@ fun <P1> MockComposeScope.memoize(
     p1: P1,
     block: @Composable() (p1: P1) -> Unit
 ) {
-    with (currentComposerIntrinsic as MockViewComposer) {
+    with (currentComposer as MockViewComposer) {
         startGroup(key)
         if (!changed(p1)) {
             skipCurrentGroup()

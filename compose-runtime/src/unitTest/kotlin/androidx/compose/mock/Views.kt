@@ -17,7 +17,7 @@
 package androidx.compose.mock
 
 import androidx.compose.Composable
-import androidx.compose.currentComposerIntrinsic
+import androidx.compose.currentComposer
 import androidx.compose.key
 
 @Composable
@@ -34,7 +34,7 @@ fun <T : Any> MockComposeScope.repeat(
 
 @Composable
 fun MockComposeScope.linear(block: @Composable MockComposeScope.() -> Unit) {
-    val c = currentComposerIntrinsic as MockViewComposer
+    val c = currentComposer as MockViewComposer
     View(name="linear") {
         c.block()
     }

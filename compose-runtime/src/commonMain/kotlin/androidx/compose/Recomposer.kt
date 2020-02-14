@@ -49,11 +49,11 @@ abstract class Recomposer {
     @Suppress("PLUGIN_WARNING", "PLUGIN_ERROR")
     private fun recompose(composable: @Composable() () -> Unit, composer: Composer<*>) {
         val composerWasComposing = composer.isComposing
-        val prevComposer = currentComposer
+        val prevComposer = currentComposerInternal
         try {
             try {
                 composer.isComposing = true
-                currentComposer = composer
+                currentComposerInternal = composer
                 FrameManager.composing {
                     trace("Compose:recompose") {
                         var complete = false
@@ -78,16 +78,16 @@ abstract class Recomposer {
                 FrameManager.nextFrame()
             }
         } finally {
-            currentComposer = prevComposer
+            currentComposerInternal = prevComposer
         }
     }
 
     private fun performRecompose(composer: Composer<*>): Boolean {
         if (composer.isComposing) return false
-        val prevComposer = currentComposer
+        val prevComposer = currentComposerInternal
         val hadChanges: Boolean
         try {
-            currentComposer = composer
+            currentComposerInternal = composer
             composer.isComposing = true
             hadChanges = FrameManager.composing {
                 composer.recompose()
@@ -95,7 +95,7 @@ abstract class Recomposer {
             composer.applyChanges()
         } finally {
             composer.isComposing = false
-            currentComposer = prevComposer
+            currentComposerInternal = prevComposer
         }
         return hadChanges
     }

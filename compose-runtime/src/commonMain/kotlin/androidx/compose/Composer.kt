@@ -1794,9 +1794,12 @@ object NullCompilationScope {
 inline fun <T> escapeCompose(block: NullCompilationScope.() -> T) = NullCompilationScope.block()
 
 @Composable
-val currentComposerIntrinsic: Composer<*> get() {
+val currentComposer: Composer<*> get() {
     throw NotImplementedError("Implemented as an intrinsic")
 }
+
+// TODO: git rid of the need for this when we merge FrameManager and Recomposer together!
+internal var currentComposerInternal: Composer<*>? = null
 
 internal fun invokeComposable(composer: Composer<*>, composable: @Composable() () -> Unit) {
     @Suppress("UNCHECKED_CAST")

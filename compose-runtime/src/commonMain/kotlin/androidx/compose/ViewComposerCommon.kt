@@ -16,9 +16,6 @@
 
 package androidx.compose
 
-@PublishedApi
-internal expect var currentComposer: Composer<*>?
-
 internal expect fun UiComposer(
     context: Context,
     root: Any,
