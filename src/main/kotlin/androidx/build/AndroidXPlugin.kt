@@ -260,6 +260,14 @@ class AndroidXPlugin : Plugin<Project> {
                     }
                 }
             }
+            task.systemProperty("robolectric.offline", "true")
+            val robolectricDependencies =
+                File(SupportConfig.getPrebuiltsRootPath(project) +
+                        "/androidx/external/org/robolectric/android-all")
+            task.systemProperty(
+                "robolectric.dependency.dir",
+                robolectricDependencies.absolutePath
+            )
         }
     }
 
