@@ -100,7 +100,7 @@ object LibraryVersions {
     val STARTUP = Version("1.0.0-alpha01")
     val SQLITE = Version("2.1.0-rc01")
     val SQLITE_INSPECTOR = Version("2.1.0-alpha01")
-    val SWIPEREFRESHLAYOUT = Version("1.1.0-alpha04")
+    val SWIPEREFRESHLAYOUT = Version("1.1.0-beta01")
     val TESTSCREENSHOT = Version("1.0.0-alpha01")
     val TEXTCLASSIFIER = Version("1.0.0-alpha03")
     val TRANSITION = Version("1.4.0-alpha01")
