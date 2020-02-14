@@ -273,26 +273,20 @@ class ViewComposer(
     }
 }
 
-actual val currentComposerNonNull: Composer<*>
-    get() = currentComposer ?: emptyComposition()
-
-private fun emptyComposition(): Nothing =
-    error("Composition requires an active composition context")
-
-val composer get() = currentComposerNonNull as ViewComposer
-
 internal actual var currentComposer: Composer<*>? = null
-    private set
+    internal set
 
-actual fun <T> Composer<*>.runWithCurrent(block: () -> T): T {
-    val prev = currentComposer
-    try {
-        currentComposer = this
-        return block()
-    } finally {
-        currentComposer = prev
-    }
-}
+// NOTE(lmr): This API is no longer needed in any way by the compiler, but we still need this API
+// to be here to support versions of Android Studio that are still looking for it. Without it,
+// valid composable code will look broken in the IDE. Remove this after we have left some time to
+// get all versions of Studio upgraded.
+@Deprecated(
+    "This property should not be called directly. It is only used by the compiler.",
+    replaceWith = ReplaceWith("currentComposerIntrinsic")
+)
+val composer: ViewComposer get() = error(
+    "This property should not be called directly. It is only used by the compiler."
+)
 
 actual fun <T> Composer<*>.runWithComposing(block: () -> T): T {
     val wasComposing = isComposing

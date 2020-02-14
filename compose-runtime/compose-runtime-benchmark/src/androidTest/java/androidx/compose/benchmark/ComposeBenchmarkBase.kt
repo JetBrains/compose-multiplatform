@@ -23,7 +23,6 @@ import androidx.compose.Composer
 import androidx.compose.FrameManager
 import androidx.compose.currentComposerIntrinsic
 import androidx.compose.disposeComposition
-import androidx.compose.runWithCurrent
 import androidx.test.rule.ActivityTestRule
 import androidx.ui.core.setContent
 import org.junit.Assert.assertTrue
@@ -67,9 +66,7 @@ abstract class ComposeBenchmarkBase {
             }
 
             val didSomething = activeComposer?.let { composer ->
-                composer.runWithCurrent {
-                    composer.recompose().also { composer.applyChanges() }
-                }
+                composer.recompose().also { composer.applyChanges() }
             } ?: false
             assertTrue(didSomething)
         }

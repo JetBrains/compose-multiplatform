@@ -532,7 +532,7 @@ class CompositionTests {
 
         showThree = true
         recomposeTest()
-        myComposer.recomposeWithCurrent()
+        myComposer.recompose()
         myComposer.applyChanges()
         validate(myComposer.root, block = validation)
     }
@@ -664,7 +664,7 @@ class CompositionTests {
         // Compose only the Lois report
         recomposeLois?.let { it() }
 
-        myComposer.recomposeWithCurrent()
+        myComposer.recompose()
         myComposer.applyChanges()
 
         validate(myComposer.root) {
@@ -738,7 +738,7 @@ class CompositionTests {
         // Compose only the Lois report
         recomposeLois?.let { it() }
 
-        myComposer.recomposeWithCurrent()
+        myComposer.recompose()
         myComposer.applyChanges()
 
         validate(myComposer.root) {
@@ -820,7 +820,7 @@ class CompositionTests {
         // Invalidate Lois which is now removed.
         recomposeLois?.let { it() }
 
-        myComposer.recomposeWithCurrent()
+        myComposer.recompose()
         myComposer.applyChanges()
 
         validate(myComposer.root) {
@@ -1174,7 +1174,7 @@ class CompositionTests {
         text = "Ending"
         myInvalidate?.let { it() }
 
-        myComposer.recomposeWithCurrent()
+        myComposer.recompose()
         myComposer.applyChanges()
 
         validate(myComposer.root) { composition() }
@@ -1216,12 +1216,12 @@ class CompositionTests {
         invalidate1?.invoke()
         invalidate2?.invoke()
 
-        myComposer.recomposeWithCurrent()
+        myComposer.recompose()
         myComposer.applyChanges()
 
         validate(myComposer.root) { composition() }
 
-        myComposer.recomposeWithCurrent()
+        myComposer.recompose()
         myComposer.applyChanges()
 
         validate(myComposer.root) { composition() }
@@ -1263,12 +1263,12 @@ class CompositionTests {
         invalidate1?.invoke()
         invalidate2?.invoke()
 
-        myComposer.recomposeWithCurrent()
+        myComposer.recompose()
         myComposer.applyChanges()
 
         validate(myComposer.root) { composition() }
 
-        myComposer.recomposeWithCurrent()
+        myComposer.recompose()
         myComposer.applyChanges()
 
         validate(myComposer.root) { composition() }
@@ -1304,12 +1304,12 @@ class CompositionTests {
         texts = 4
         invalidateOuter?.invoke()
         invalidateInner?.invoke()
-        myComposer.recomposeWithCurrent()
+        myComposer.recompose()
         myComposer.applyChanges()
 
         texts = 3
         invalidateOuter?.invoke()
-        myComposer.recomposeWithCurrent()
+        myComposer.recompose()
         myComposer.applyChanges()
     }
 
@@ -1808,10 +1808,8 @@ private fun compose(
         MockViewComposer(root)
     }
 
-    myComposer.runWithCurrent {
-        myComposer.compose {
-            block()
-        }
+    myComposer.compose {
+        block()
     }
 
     if (expectChanges) {

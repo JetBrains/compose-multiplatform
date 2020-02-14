@@ -25,7 +25,6 @@ import androidx.compose.Recomposer
 import androidx.compose.SlotTable
 import androidx.compose.currentComposerIntrinsic
 import androidx.compose.invokeComposable
-import androidx.compose.runWithCurrent
 
 
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
@@ -64,9 +63,6 @@ class MockViewComposer(
                 c.composable()
             }
         }
-    }
-    fun recomposeWithCurrent() {
-        runWithCurrent { recompose() }
     }
 
     inline fun <V : View> emit(

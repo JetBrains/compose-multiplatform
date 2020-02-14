@@ -16,14 +16,8 @@
 
 package androidx.compose
 
-/**
- * @suppress
- */
-expect val currentComposerNonNull: Composer<*>
 @PublishedApi
 internal expect var currentComposer: Composer<*>?
-
-expect fun <T> Composer<*>.runWithCurrent(block: () -> T): T
 
 internal expect fun UiComposer(
     context: Context,
