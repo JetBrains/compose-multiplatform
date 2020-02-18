@@ -195,7 +195,7 @@ class GitClientImpl(
     ) : GitClient.CommandRunner {
         override fun execute(command: String): String {
             val parts = command.split("\\s".toRegex())
-            logger?.info("running command $command")
+            logger?.info("running command $command in $workingDir")
             val proc = ProcessBuilder(*parts.toTypedArray())
                 .directory(workingDir)
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
