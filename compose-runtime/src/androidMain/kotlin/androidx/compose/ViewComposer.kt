@@ -273,16 +273,13 @@ class ViewComposer(
     }
 }
 
-internal actual var currentComposer: Composer<*>? = null
-    internal set
-
 // NOTE(lmr): This API is no longer needed in any way by the compiler, but we still need this API
 // to be here to support versions of Android Studio that are still looking for it. Without it,
 // valid composable code will look broken in the IDE. Remove this after we have left some time to
 // get all versions of Studio upgraded.
 @Deprecated(
     "This property should not be called directly. It is only used by the compiler.",
-    replaceWith = ReplaceWith("currentComposerIntrinsic")
+    replaceWith = ReplaceWith("currentComposer")
 )
 val composer: ViewComposer get() = error(
     "This property should not be called directly. It is only used by the compiler."

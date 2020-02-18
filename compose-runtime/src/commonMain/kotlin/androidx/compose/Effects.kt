@@ -145,7 +145,7 @@ fun onDispose(callback: () -> Unit) {
  */
 @Composable
 fun onCommit(callback: CommitScope.() -> Unit) {
-    currentComposerIntrinsic.changed(PostCommitScopeImpl(callback))
+    currentComposer.changed(PostCommitScopeImpl(callback))
 }
 
 /**
@@ -228,7 +228,7 @@ fun onCommit(vararg inputs: Any?, callback: CommitScope.() -> Unit) {
  */
 @Composable
 fun onPreCommit(callback: CommitScope.() -> Unit) {
-    currentComposerIntrinsic.changed(PreCommitScopeImpl(callback))
+    currentComposer.changed(PreCommitScopeImpl(callback))
 }
 
 /**
@@ -323,7 +323,7 @@ fun onPreCommit(vararg inputs: Any?, callback: CommitScope.() -> Unit) {
  */
 @Composable
 val invalidate: () -> Unit get() {
-    val scope = currentComposerIntrinsic.currentRecomposeScope ?: error("no recompose scope found")
+    val scope = currentComposer.currentRecomposeScope ?: error("no recompose scope found")
     scope.used = true
     return { scope.invalidate() }
 }
@@ -335,5 +335,5 @@ val invalidate: () -> Unit get() {
  */
 @Composable
 fun compositionReference(): CompositionReference {
-    return currentComposerIntrinsic.buildReference()
+    return currentComposer.buildReference()
 }

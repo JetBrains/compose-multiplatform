@@ -21,7 +21,7 @@ import androidx.benchmark.junit4.measureRepeated
 import androidx.compose.Composable
 import androidx.compose.Composer
 import androidx.compose.FrameManager
-import androidx.compose.currentComposerIntrinsic
+import androidx.compose.currentComposer
 import androidx.compose.disposeComposition
 import androidx.test.rule.ActivityTestRule
 import androidx.ui.core.setContent
@@ -55,7 +55,7 @@ abstract class ComposeBenchmarkBase {
         val activity = activityRule.activity
 
         activity.setContent {
-            activeComposer = currentComposerIntrinsic
+            activeComposer = currentComposer
             receiver.composeCb()
         }
 

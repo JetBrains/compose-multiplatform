@@ -23,7 +23,7 @@ package androidx.compose
 
 @Composable
 inline fun <T> remember(calculation: () -> T): T =
-    currentComposerIntrinsic.cache(true, calculation)
+    currentComposer.cache(true, calculation)
 
 /**
  * Remember the value returned by [calculation] if [v1] is equal to the previous composition, otherwise
@@ -31,7 +31,7 @@ inline fun <T> remember(calculation: () -> T): T =
  */
 @Composable
 inline fun <T, /*reified*/ V1> remember(v1: V1, calculation: () -> T): T {
-    return currentComposerIntrinsic.cache(!currentComposerIntrinsic.changed(v1), calculation)
+    return currentComposer.cache(!currentComposer.changed(v1), calculation)
 }
 
 /**
@@ -44,9 +44,9 @@ inline fun <T, /*reified*/ V1, /*reified*/ V2> remember(
     v2: V2,
     calculation: () -> T
 ): T {
-    var valid = !currentComposerIntrinsic.changed(v1)
-    valid = !currentComposerIntrinsic.changed(v2) && valid
-    return currentComposerIntrinsic.cache(valid, calculation)
+    var valid = !currentComposer.changed(v1)
+    valid = !currentComposer.changed(v2) && valid
+    return currentComposer.cache(valid, calculation)
 }
 
 /**
@@ -60,10 +60,10 @@ inline fun <T, /*reified*/ V1, /*reified*/ V2, /*reified*/ V3> remember(
     v3: V3,
     calculation: () -> T
 ): T {
-    var valid = !currentComposerIntrinsic.changed(v1)
-    valid = !currentComposerIntrinsic.changed(v2) && valid
-    valid = !currentComposerIntrinsic.changed(v3) && valid
-    return currentComposerIntrinsic.cache(valid, calculation)
+    var valid = !currentComposer.changed(v1)
+    valid = !currentComposer.changed(v2) && valid
+    valid = !currentComposer.changed(v3) && valid
+    return currentComposer.cache(valid, calculation)
 }
 
 /**
@@ -73,6 +73,6 @@ inline fun <T, /*reified*/ V1, /*reified*/ V2, /*reified*/ V3> remember(
 @Composable
 inline fun <V> remember(vararg inputs: Any?, block: () -> V): V {
     var valid = true
-    for (input in inputs) valid = !currentComposerIntrinsic.changed(input) && valid
-    return currentComposerIntrinsic.cache(valid, block)
+    for (input in inputs) valid = !currentComposer.changed(input) && valid
+    return currentComposer.cache(valid, block)
 }

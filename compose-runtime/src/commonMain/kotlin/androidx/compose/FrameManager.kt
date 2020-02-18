@@ -133,7 +133,7 @@ object FrameManager {
     }
 
     private val readObserver: (read: Any) -> Unit = { read ->
-        currentComposer?.currentRecomposeScope?.let {
+        currentComposerInternal?.currentRecomposeScope?.let {
             synchronized(lock) {
                 it.used = true
                 invalidations.add(read, it)

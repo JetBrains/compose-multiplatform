@@ -13,8 +13,6 @@ ArrayReturn: androidx.compose.KeyKt#key(Object[], kotlin.jvm.functions.Function0
     Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
 ArrayReturn: androidx.compose.MutableStateKt#stateFor(Object[], kotlin.jvm.functions.Function0<? extends T>) parameter #0:
     Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
-ArrayReturn: androidx.compose.RememberKt#memo(Object[], kotlin.jvm.functions.Function0<? extends T>) parameter #0:
-    Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
 ArrayReturn: androidx.compose.RememberKt#remember(Object[], kotlin.jvm.functions.Function0<? extends V>) parameter #0:
     Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
 ArrayReturn: androidx.compose.SlotTable#SlotTable(Object[]) parameter #0:
@@ -33,12 +31,10 @@ ContextFirst: androidx.compose.Compose#disposeComposition(androidx.compose.Emitt
     Context is distinct, so it must be the first argument (method `disposeComposition`)
 ContextFirst: androidx.compose.Compose#subcomposeInto(androidx.compose.Emittable, android.content.Context, androidx.compose.CompositionReference, kotlin.jvm.functions.Function0<kotlin.Unit>) parameter #1:
     Context is distinct, so it must be the first argument (method `subcomposeInto`)
-ContextFirst: androidx.compose.ViewComposer#ViewComposer(Object, android.content.Context, androidx.compose.Recomposer, androidx.compose.ViewAdapters) parameter #1:
-    Context is distinct, so it must be the first argument (method `ViewComposer`)
 
 
-DocumentExceptions: androidx.compose.ComposerKt#getCurrentComposerIntrinsic():
-    Method ComposerKt.getCurrentComposerIntrinsic appears to be throwing kotlin.NotImplementedError; this should be listed in the documentation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
+DocumentExceptions: androidx.compose.ComposerKt#getCurrentComposer():
+    Method ComposerKt.getCurrentComposer appears to be throwing kotlin.NotImplementedError; this should be listed in the documentation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
 DocumentExceptions: androidx.compose.frames.FramesKt#commit(androidx.compose.frames.Frame):
     Method FramesKt.commit appears to be throwing java.lang.IllegalStateException; this should be listed in the documentation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
 DocumentExceptions: androidx.compose.frames.FramesKt#currentFrame():
@@ -59,18 +55,12 @@ KotlinOperator: androidx.compose.SlotEditor#get(androidx.compose.Anchor):
     Note that adding the `operator` keyword would allow calling this method using operator syntax
 KotlinOperator: androidx.compose.SlotEditor#get(int):
     Note that adding the `operator` keyword would allow calling this method using operator syntax
-KotlinOperator: androidx.compose.ViewValidator#set(T, kotlin.jvm.functions.Function1<? super T,kotlin.Unit>):
-    Note that adding the `operator` keyword would allow calling this method using operator syntax
-KotlinOperator: androidx.compose.ViewValidator#set(int, kotlin.jvm.functions.Function1<? super java.lang.Integer,kotlin.Unit>):
-    Note that adding the `operator` keyword would allow calling this method using operator syntax
 KotlinOperator: androidx.compose.adapters.ComposeViewAdapter#get(int, kotlin.jvm.functions.Function0<? extends T>):
     Note that adding the `operator` keyword would allow calling this method using operator syntax
 
 
 MissingNullability: androidx.compose.SlotReader#getGroupKey():
     Missing nullability on method `getGroupKey` return
-MissingNullability: androidx.compose.ViewComposerKt#getComposer():
-    Missing nullability on method `getComposer` return
 
 
 RegistrationName: androidx.compose.Choreographer#removeFrameCallback(android.view.Choreographer.FrameCallback):
