@@ -115,7 +115,6 @@ fun Project.getApiLintArgs(): List<String> {
             "StartWithLower", // b/135710527
 
             // The list of checks that are API lint warnings and are yet to be enabled
-            "ExecutorRegistration",
             "SamShouldBeLast",
             "CallbackMethodName",
             "GetterOnBuilder",
@@ -137,6 +136,7 @@ fun Project.getApiLintArgs(): List<String> {
             "OverlappingConstants",
             "IllegalStateException",
             "ListenerLast",
+            "ExecutorRegistration",
             "StreamFiles",
             "AbstractInner",
             "NotCloseable",
