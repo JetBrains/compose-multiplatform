@@ -131,7 +131,7 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.TRANSITION.group, "transition-ktx")
     prebuilts(LibraryGroups.TRANSITION, "1.3.1")
     prebuilts(LibraryGroups.TVPROVIDER, "1.0.0")
-    prebuilts(LibraryGroups.VECTORDRAWABLE, "1.1.0")
+    prebuilts(LibraryGroups.VECTORDRAWABLE, "vectordrawable", "1.1.0")
     prebuilts(LibraryGroups.VECTORDRAWABLE, "vectordrawable-animated", "1.1.0")
     prebuilts(LibraryGroups.VERSIONEDPARCELABLE, "1.1.0")
     prebuilts(LibraryGroups.VIEWPAGER, "1.0.0")
