@@ -78,7 +78,7 @@ class GitClientImpl(
     ): List<String> {
         // use this if we don't want local changes
         return commandRunner.executeAndParse(if (includeUncommitted) {
-            "$CHANGED_FILES_CMD_PREFIX $sha"
+            "$CHANGED_FILES_CMD_PREFIX HEAD..$sha"
         } else {
             "$CHANGED_FILES_CMD_PREFIX $top $sha"
         })
@@ -182,9 +182,10 @@ class GitClientImpl(
             authorEmailDelimiter,
             localProjectDir
         )
-        if (commits.size < 1) {
+        if (commits.isEmpty()) {
             // Probably an error; log this
-            logger?.warn("No git commits found! Ran this command: '" + gitLogCmd + "' and received this output: '" + gitLogString + "'")
+            logger?.warn("No git commits found! Ran this command: '" +
+                    gitLogCmd + "' and received this output: '" + gitLogString + "'")
         }
         return commits
     }
@@ -217,6 +218,7 @@ class GitClientImpl(
             } else {
                 logger?.info("Response: $message")
             }
+            check(proc.exitValue() == 0) { "Nonzero exit value running git command." }
             return stdout
         }
         override fun executeAndParse(command: String): List<String> {
@@ -304,41 +306,41 @@ data class Commit(
     }
 
     private fun processCommitLine(line: String) {
-          if (commitSHADelimiter in line) {
-              getSHAFromGitLine(line)
-              return
-          }
-          if (subjectDelimiter in line) {
-              getSummary(line)
-              return
-          }
-          if (changeIdDelimiter in line) {
-              getChangeIdFromGitLine(line)
-              return
-          }
-          if (authorEmailDelimiter in line) {
-              getAuthorEmailFromGitLine(line)
-              return
-          }
-          if ("Bug:" in line ||
-              "b/" in line ||
-              "bug:" in line ||
-              "Fixes:" in line ||
-              "fixes b/" in line
-          ) {
-              getBugsFromGitLine(line)
-              return
-          }
-          releaseNoteDelimiters.forEach { delimiter ->
-              if (delimiter in line) {
-                  getReleaseNotesFromGitLine(line, gitCommit)
-                  return
-              }
-          }
-          if (projectDir.trim('/') in line) {
-              getFileFromGitLine(line)
-              return
-          }
+        if (commitSHADelimiter in line) {
+            getSHAFromGitLine(line)
+            return
+        }
+        if (subjectDelimiter in line) {
+            getSummary(line)
+            return
+        }
+        if (changeIdDelimiter in line) {
+            getChangeIdFromGitLine(line)
+            return
+        }
+        if (authorEmailDelimiter in line) {
+            getAuthorEmailFromGitLine(line)
+            return
+        }
+        if ("Bug:" in line ||
+            "b/" in line ||
+            "bug:" in line ||
+            "Fixes:" in line ||
+            "fixes b/" in line
+        ) {
+            getBugsFromGitLine(line)
+            return
+        }
+        releaseNoteDelimiters.forEach { delimiter ->
+            if (delimiter in line) {
+                getReleaseNotesFromGitLine(line, gitCommit)
+                return
+            }
+        }
+        if (projectDir.trim('/') in line) {
+            getFileFromGitLine(line)
+            return
+        }
     }
 
     private fun isExternalAuthorEmail(authorEmail: String): Boolean {
