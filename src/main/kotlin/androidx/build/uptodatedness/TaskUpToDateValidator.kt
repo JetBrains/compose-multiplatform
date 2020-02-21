@@ -41,7 +41,6 @@ val EXEMPT_TASK_NAMES = setOf(
     "createProjectZip",
     "desugarPublicDebugFileDependencies",
     "desugarTipOfTreeDebugFileDependencies",
-    "dist",
     "distPublicDokkaDocs",
     "dokkaJavaPublicDocs",
     "dokkaKotlinPublicDocs",
