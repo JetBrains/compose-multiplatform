@@ -17,42 +17,42 @@
 package androidx.compose
 
 // TODO(b/137794549): Remove View System-related expect/actuals
-actual typealias ViewParent = android.view.ViewParent
+internal actual typealias ViewParent = android.view.ViewParent
 
 // TODO(b/137794549): Remove View System-related expect/actuals
-actual typealias View = android.view.View
+internal actual typealias View = android.view.View
 
 // TODO(b/137794549): Remove View System-related expect/actuals
-actual val View.parent: ViewParent
+internal actual val View.parent: ViewParent
     get() = parent
 
 // TODO(b/137794549): Remove View System-related expect/actuals
-actual val View.context: Context
+internal actual val View.context: Context
     get() = context
 
 // TODO(b/137794549): Remove View System-related expect/actuals
-actual typealias ViewGroup = android.view.ViewGroup
+internal actual typealias ViewGroup = android.view.ViewGroup
 
 // TODO(b/137794549): Remove View System-related expect/actuals
-actual typealias Context = android.content.Context
+internal actual typealias Context = android.content.Context
 
 // TODO(b/137794549): Remove View System-related expect/actuals
-actual typealias FrameLayout = android.widget.FrameLayout
+internal actual typealias FrameLayout = android.widget.FrameLayout
 
 // TODO(b/137794558): Create portable abstraction for scheduling
-actual typealias Looper = android.os.Looper
+internal actual typealias Looper = android.os.Looper
 
 // TODO(b/137794558): Create portable abstraction for scheduling
-actual object LooperWrapper {
+internal actual object LooperWrapper {
     actual fun getMainLooper(): Looper = android.os.Looper.getMainLooper()
 }
 
-actual fun isMainThread(): Boolean {
+internal actual fun isMainThread(): Boolean {
     return android.os.Looper.myLooper() == android.os.Looper.getMainLooper()
 }
 
 // TODO(b/137794558): Create portable abstraction for scheduling
-actual class Handler {
+internal actual class Handler {
     val handler: android.os.Handler
 
     actual constructor(looper: Looper) {
@@ -64,9 +64,9 @@ actual class Handler {
 }
 
 // TODO(b/137794558): Create portable abstraction for scheduling
-actual typealias ChoreographerFrameCallback = android.view.Choreographer.FrameCallback
+internal actual typealias ChoreographerFrameCallback = android.view.Choreographer.FrameCallback
 
-actual object Choreographer {
+internal actual object Choreographer {
     actual fun postFrameCallback(callback: ChoreographerFrameCallback) {
         android.view.Choreographer.getInstance().postFrameCallback(callback)
     }
@@ -78,7 +78,7 @@ actual object Choreographer {
     }
 }
 
-actual object Trace {
+internal actual object Trace {
     actual fun beginSection(name: String) = android.os.Trace.beginSection(name)
     actual fun endSection() = android.os.Trace.endSection()
 }
