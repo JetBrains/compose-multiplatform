@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import org.junit.After
 import org.junit.Rule
 import org.junit.Test
@@ -31,6 +32,7 @@ import org.junit.runner.RunWith
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 class HotReloadTests: BaseComposeTest() {
     @After

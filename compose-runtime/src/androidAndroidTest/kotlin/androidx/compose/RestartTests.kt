@@ -18,6 +18,7 @@ package androidx.compose
 
 import android.widget.TextView
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import junit.framework.TestCase
 import org.junit.After
 import org.junit.Rule
@@ -26,6 +27,7 @@ import org.junit.runner.RunWith
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 class RestartTests: BaseComposeTest() {
     @After

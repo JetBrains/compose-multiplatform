@@ -18,6 +18,7 @@ package androidx.compose
 
 import android.widget.TextView
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import org.junit.After
 import org.junit.Ignore
 import org.junit.Rule
@@ -42,6 +43,7 @@ val someOtherIntAmbient: Ambient<Int> = someOtherIntProvider
 // Create a static ambient with an int value
 val someStaticInt = staticAmbientOf { 40 }
 
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 class AmbientTests : BaseComposeTest() {
 
