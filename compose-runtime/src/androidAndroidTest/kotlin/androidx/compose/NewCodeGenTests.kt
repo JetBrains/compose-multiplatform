@@ -20,12 +20,14 @@ import android.content.Context
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import junit.framework.TestCase
 import org.junit.After
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 class NewCodeGenTests: BaseComposeTest() {
     @After

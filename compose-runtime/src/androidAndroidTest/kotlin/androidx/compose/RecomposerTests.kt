@@ -22,6 +22,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.compose.frames.currentFrame
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertNotSame
@@ -31,6 +32,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 class RecomposerTests : BaseComposeTest() {
     @After

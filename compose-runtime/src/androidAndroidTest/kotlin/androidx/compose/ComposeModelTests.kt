@@ -28,6 +28,7 @@ import androidx.compose.frames.currentFrame
 import androidx.compose.frames.inFrame
 import androidx.compose.frames.open
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import org.junit.After
@@ -118,6 +119,7 @@ class TestState<T>(value: T) : Framed {
     }
 }
 
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 class ModelViewTests: BaseComposeTest() {
     @After
