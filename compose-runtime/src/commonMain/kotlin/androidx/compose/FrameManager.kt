@@ -156,9 +156,9 @@ object FrameManager {
             if (currentInvalidations.isNotEmpty()) {
                 val results = currentInvalidations.map { scope -> scope.invalidate() }
                 val frame = currentFrame()
-                if (results.any { value == InvalidationResult.DEFERRED })
+                if (results.any { result -> result == InvalidationResult.DEFERRED })
                     deferredMap.add(frame, value)
-                if (results.any { value == InvalidationResult.IMMINENT })
+                if (results.any { result -> result == InvalidationResult.IMMINENT })
                     immediateMap.add(frame, value)
             }
         }
