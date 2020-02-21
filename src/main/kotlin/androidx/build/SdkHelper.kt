@@ -17,7 +17,6 @@
 package androidx.build
 
 import java.io.File
-import java.util.Properties
 
 /**
  * Writes the appropriate SDK path to local.properties file.
@@ -55,53 +54,10 @@ fun setSdkInLocalPropertiesFile(supportRoot: File, propertiesFile: File) {
  * Returns the appropriate SDK path.
  */
 fun getSdkPath(supportRoot: File): File {
-    if (isUnbundledBuild(supportRoot)) {
-        val properties = Properties()
-        val propertiesFile = File(supportRoot, "local.properties")
-        if (propertiesFile.exists()) {
-            propertiesFile.inputStream().use(properties::load)
-        }
-        return findSdkLocation(properties, supportRoot)
-    } else {
-        val osName = System.getProperty("os.name").toLowerCase()
-        val isMacOsX = osName.contains("mac os x") || osName.contains("darwin") ||
-                osName.contains("osx")
-        val platform = if (isMacOsX) "darwin" else "linux"
-        // Making an assumption that prebuilts directory is in ../../prebuilts/
-        return File(supportRoot.parentFile.parentFile, "prebuilts/fullsdk-$platform")
-    }
-}
-
-/**
- * Adapted from com.android.build.gradle.internal.SdkHandler
- */
-private fun findSdkLocation(properties: Properties, rootDir: File): File {
-    var sdkDirProp = properties.getProperty("sdk.dir")
-    if (sdkDirProp != null) {
-        var sdk = File(sdkDirProp)
-        if (!sdk.isAbsolute) {
-            sdk = File(rootDir, sdkDirProp)
-        }
-        return sdk
-    }
-
-    sdkDirProp = properties.getProperty("android.dir")
-    if (sdkDirProp != null) {
-        return File(rootDir, sdkDirProp)
-    }
-
-    val envVar = System.getenv("ANDROID_HOME")
-    if (envVar != null) {
-        return File(envVar)
-    }
-
-    val property = System.getProperty("android.home")
-    if (property != null) {
-        return File(property)
-    }
-    throw Exception("Could not find your SDK")
-}
-
-private fun isUnbundledBuild(supportRoot: File): Boolean {
-    return (File(supportRoot, "unbundled-build")).exists()
+    val osName = System.getProperty("os.name").toLowerCase()
+    val isMacOsX = osName.contains("mac os x") || osName.contains("darwin") ||
+            osName.contains("osx")
+    val platform = if (isMacOsX) "darwin" else "linux"
+    // Making an assumption that prebuilts directory is in $supportRoot/../../prebuilts/
+    return File(supportRoot.parentFile.parentFile, "prebuilts/fullsdk-$platform")
 }
