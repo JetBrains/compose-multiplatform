@@ -35,19 +35,19 @@ fun <T : Any> MockComposeScope.repeat(
 @Composable
 fun MockComposeScope.linear(block: @Composable MockComposeScope.() -> Unit) {
     val c = currentComposer as MockViewComposer
-    View(name="linear") {
+    View(name = "linear") {
         c.block()
     }
 }
 
 @Composable
 fun MockComposeScope.text(value: String) {
-    View(name="text", text=value)
+    View(name = "text", text = value)
 }
 
 @Composable
 fun MockComposeScope.edit(value: String) {
-    View(name="edit", value = value)
+    View(name = "edit", value = value)
 }
 
 @Composable
@@ -60,7 +60,3 @@ fun MockComposeScope.selectBox(selected: Boolean, block: @Composable MockCompose
         block()
     }
 }
-
-//fun MockComposeScope.skip(key: Any, block: Compose) {
-//    call(key, { false }) { block() }
-//}

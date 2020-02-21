@@ -34,7 +34,7 @@ import kotlin.test.assertNotEquals
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-class HotReloadTests: BaseComposeTest() {
+class HotReloadTests : BaseComposeTest() {
     @After
     fun teardown() {
         Compose.clearRoots()
@@ -107,7 +107,7 @@ class HotReloadTests: BaseComposeTest() {
 }
 
 @Composable fun text(text: String, id: Int = -1) {
-    TextView(id=id, text=text)
+    TextView(id = id, text = text)
 }
 
 @Composable fun column(children: @Composable() () -> Unit) {
@@ -115,11 +115,11 @@ class HotReloadTests: BaseComposeTest() {
 }
 
 @Composable fun textNode(text: String) {
-    Node(name="Text", value=text)
+    Node(name = "Text", value = text)
 }
 
 @Composable fun columnNode(children: @Composable() () -> Unit) {
-    Node(name="Text") {
+    Node(name = "Text") {
         children()
     }
 }

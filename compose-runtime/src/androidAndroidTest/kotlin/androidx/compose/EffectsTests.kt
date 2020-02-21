@@ -21,7 +21,6 @@ import android.widget.TextView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import org.junit.After
 import org.junit.Rule
@@ -101,7 +100,7 @@ class EffectsTests : BaseComposeTest() {
 
         compose {
             local = state { "Hello world! ${inc++}" }
-            TextView(id=tv1Id, text = local.value)
+            TextView(id = tv1Id, text = local.value)
         }.then { activity ->
             val helloText = activity.findViewById(tv1Id) as TextView
             assertEquals("Hello world! 0", helloText.text)
@@ -129,8 +128,8 @@ class EffectsTests : BaseComposeTest() {
         compose {
             local1 = state { "First" }
             local2 = state { "Second" }
-            TextView(id=tv1Id, text = local1.value)
-            TextView(id=tv2Id, text = local2.value)
+            TextView(id = tv1Id, text = local1.value)
+            TextView(id = tv2Id, text = local2.value)
         }.then { activity ->
             val tv1 = activity.findViewById(tv1Id) as TextView
             val tv2 = activity.findViewById(tv2Id) as TextView
@@ -615,7 +614,7 @@ class EffectsTests : BaseComposeTest() {
                 requestRecompose = it
                 Providers(MyAmbient provides ambientValue.value++) {
                     SimpleComposable2()
-                    Button(id=123)
+                    Button(id = 123)
                 }
             }
         }
@@ -652,14 +651,14 @@ class EffectsTests : BaseComposeTest() {
         @Composable fun SimpleComposable2() {
             componentComposed = true
             val value = MyAmbient.current
-            TextView(text="$value")
+            TextView(text = "$value")
         }
 
         @Composable fun SimpleComposable() {
             requestRecompose = invalidate
             Providers(MyAmbient provides ambientValue.value++) {
                 SimpleComposable2()
-                Button(id=123)
+                Button(id = 123)
             }
         }
 
@@ -695,7 +694,7 @@ class EffectsTests : BaseComposeTest() {
 
         compose {
             val local = state { "Hello world! ${inc++}" }
-            TextView(id = tv1Id, text=local.value)
+            TextView(id = tv1Id, text = local.value)
         }.then { activity ->
             val helloText = activity.findViewById(tv1Id) as TextView
             assertEquals("Hello world! 0", helloText.text)

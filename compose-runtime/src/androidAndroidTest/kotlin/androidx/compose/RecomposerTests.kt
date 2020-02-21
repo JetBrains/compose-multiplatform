@@ -46,7 +46,7 @@ class RecomposerTests : BaseComposeTest() {
     @Test
     fun testNativeViewWithAttributes() {
         compose {
-            TextView(id=456, text="some text")
+            TextView(id = 456, text = "some text")
         }.then { activity ->
             assertEquals(1, activity.root.childCount)
 
@@ -68,7 +68,7 @@ class RecomposerTests : BaseComposeTest() {
             i++
 
             key(i) {
-                TextView(id=456, text="some text")
+                TextView(id = 456, text = "some text")
             }
         }.then { activity ->
             tv1 = activity.findViewById(456) as TextView
@@ -95,8 +95,8 @@ class RecomposerTests : BaseComposeTest() {
     fun testViewWithViewChildren() {
         compose {
             LinearLayout(id = 345) {
-                TextView(id = 456, text="some text")
-                TextView(id = 567, text="some text")
+                TextView(id = 456, text = "some text")
+                TextView(id = 567, text = "some text")
             }
         }.then { activity ->
             val ll = activity.findViewById(345) as LinearLayout
@@ -123,7 +123,7 @@ class RecomposerTests : BaseComposeTest() {
         compose {
             LinearLayout(id = 345) {
                 for (i in items) {
-                    TextView(id=456, text="some text $i")
+                    TextView(id = 456, text = "some text $i")
                 }
             }
         }.then { activity ->
@@ -247,7 +247,7 @@ class RecomposerTests : BaseComposeTest() {
 
             val recompose = invalidate
 
-            TextView(id=id, onClickListener=View.OnClickListener {
+            TextView(id = id, onClickListener = View.OnClickListener {
                 @Suppress("DEPRECATION")
                 when (listener) {
                     is ClickAction.Recompose -> recompose()
@@ -259,7 +259,7 @@ class RecomposerTests : BaseComposeTest() {
         @Composable fun A(counter: Counter, listener: ClickAction) {
             counter.inc("A")
             val recompose = invalidate
-            LinearLayout(id=99, onClickListener=View.OnClickListener {
+            LinearLayout(id = 99, onClickListener = View.OnClickListener {
                 @Suppress("DEPRECATION")
                 when (listener) {
                     is ClickAction.Recompose -> recompose()
@@ -278,11 +278,11 @@ class RecomposerTests : BaseComposeTest() {
     @Test
     fun testCorrectViewTree() {
         compose {
-             LinearLayout {
-               LinearLayout { }
-               LinearLayout { }
-             }
-             LinearLayout { }
+            LinearLayout {
+                LinearLayout { }
+                LinearLayout { }
+            }
+            LinearLayout { }
         }.then { activity ->
             assertChildHierarchy(activity.root) {
                 """
@@ -304,14 +304,14 @@ class RecomposerTests : BaseComposeTest() {
         }
 
         compose {
-             LinearLayout {
-               LinearLayout {
-                 B()
-               }
-               LinearLayout {
-                 B()
-               }
-             }
+            LinearLayout {
+                LinearLayout {
+                    B()
+                }
+                LinearLayout {
+                    B()
+                }
+            }
         }.then { activity ->
 
             assertChildHierarchy(activity.root) {
@@ -333,19 +333,19 @@ class RecomposerTests : BaseComposeTest() {
     fun testCorrectViewTreeWithComponentWithMultipleRoots() {
 
         @Composable fun B() {
-             TextView()
-             TextView()
+            TextView()
+            TextView()
         }
 
         compose {
-             LinearLayout {
-               LinearLayout {
-                 B()
-               }
-               LinearLayout {
-                 B()
-               }
-             }
+            LinearLayout {
+                LinearLayout {
+                    B()
+                }
+                LinearLayout {
+                    B()
+                }
+            }
         }.then {
 
             assertChildHierarchy(activity.root) {

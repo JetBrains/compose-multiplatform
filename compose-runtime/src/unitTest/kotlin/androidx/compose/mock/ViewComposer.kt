@@ -26,7 +26,6 @@ import androidx.compose.SlotTable
 import androidx.compose.currentComposer
 import androidx.compose.invokeComposable
 
-
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 object ViewApplierAdapter :
     ApplyAdapter<View> {
@@ -56,7 +55,7 @@ class MockViewComposer(
     }), MockComposeScope {
     override val composer: MockViewComposer get() = this
 
-    fun compose(composable: @Composable  MockComposeScope.() -> Unit) {
+    fun compose(composable: @Composable MockComposeScope.() -> Unit) {
         composeRoot {
             invokeComposable(this) {
                 val c = currentComposer as MockViewComposer
@@ -99,7 +98,7 @@ fun <P1> MockComposeScope.memoize(
     p1: P1,
     block: @Composable() (p1: P1) -> Unit
 ) {
-    with (currentComposer as MockViewComposer) {
+    with(currentComposer as MockViewComposer) {
         startGroup(key)
         if (!changed(p1)) {
             skipCurrentGroup()

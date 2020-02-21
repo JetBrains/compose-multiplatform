@@ -121,7 +121,7 @@ class TestState<T>(value: T) : Framed {
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-class ModelViewTests: BaseComposeTest() {
+class ModelViewTests : BaseComposeTest() {
     @After
     fun teardown() {
         Compose.clearRoots()
