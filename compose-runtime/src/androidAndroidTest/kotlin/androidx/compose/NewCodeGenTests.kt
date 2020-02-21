@@ -164,7 +164,7 @@ class NewCodeGenTests: BaseComposeTest() {
             PhoneView(phone)
         }.then { _ ->
             TestCase.assertEquals(1, phoneCalled)
-        }.recomposeRoot().then { _ ->
+        }.then { _ ->
             TestCase.assertEquals(1, phoneCalled)
 
             phone = Phone("124", "456", "7890")
@@ -201,7 +201,7 @@ class NewCodeGenTests: BaseComposeTest() {
                 "$left + $right = ${left + right}",
                 tv.text
             )
-        }.recomposeRoot().then { activity ->
+        }.then { activity ->
             TestCase.assertEquals(1, addCalled)
             val tv = activity.findViewById(tvId) as TextView
             TestCase.assertEquals(
@@ -218,7 +218,7 @@ class NewCodeGenTests: BaseComposeTest() {
                 "$left + $right = ${left + right}",
                 tv.text
             )
-        }.recomposeRoot().then { activity ->
+        }.then { activity ->
             TestCase.assertEquals(2, addCalled)
 
             val tv = activity.findViewById(tvId) as TextView
@@ -241,7 +241,7 @@ class NewCodeGenTests: BaseComposeTest() {
 
     @Test
     fun testMoveComponents() {
-        val data = mutableListOf(1, 2, 3, 4, 5)
+        var data by mutableStateOf(listOf(1, 2, 3, 4, 5))
         compose {
             for (item in data) {
                 key(item) {
@@ -249,8 +249,8 @@ class NewCodeGenTests: BaseComposeTest() {
                 }
             }
         }.then {
-            data.add(data.removeAt(0))
-        }.recomposeRoot().then { activity ->
+            data = data.toMutableList().also { it.add(it.removeAt(0)) }
+        }.then { activity ->
             val root = activity.root
             for (index in 0 until data.size) {
                 val textView = root.getChildAt(index) as TextView

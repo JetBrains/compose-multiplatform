@@ -166,7 +166,7 @@ class ModelViewTests: BaseComposeTest() {
 
         compose {
             TextView(id = tvIdName, text = president.name)
-            TextView(id = tvIdAge, text = president.age)
+            TextView(id = tvIdAge, text = "${president.age}")
         }.then {
             val tvName = it.findViewById(tvIdName) as TextView
             val tvAge = it.findViewById(tvIdAge) as TextView
@@ -201,7 +201,7 @@ class ModelViewTests: BaseComposeTest() {
 
         @Composable fun display(person: Person) {
             TextView(text = person.name)
-            TextView(text = person.age)
+            TextView(text = "${person.age}")
         }
 
         compose {
@@ -232,10 +232,10 @@ class ModelViewTests: BaseComposeTest() {
 
         @Composable fun display(person: Person) {
             TextView(id = tvName, text = person.name)
-            TextView(text = person.age)
+            TextView(text = "${person.age}")
             if (person.name == PRESIDENT_NAME_16) {
                 TextView(text = person.name)
-                TextView(text = person.age)
+                TextView(text = "${person.age}")
             }
         }
 
@@ -261,10 +261,10 @@ class ModelViewTests: BaseComposeTest() {
 
         @Composable fun display(person: Person) {
             TextView(id = tvName, text = person.name)
-            TextView(text = person.age)
+            TextView(text = "${person.age}")
             if (person.name == PRESIDENT_NAME_16) {
                 TextView(text = person.name)
-                TextView(text = person.age)
+                TextView(text = "${person.age}")
             }
         }
 

@@ -50,7 +50,7 @@ class RestartTests: BaseComposeTest() {
         compose {
             RestartGroup {
                 TextView(id=tvIdName, text=president.name)
-                TextView(id=tvIdAge, text=president.age)
+                TextView(id=tvIdAge, text="${president.age}")
             }
         }.then {
             val tvName = it.findViewById(tvIdName) as TextView
