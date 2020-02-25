@@ -78,7 +78,7 @@ open class AndroidXExtension(val project: Project) {
     var url = SUPPORT_URL
     private var licenses: MutableCollection<License> = ArrayList()
     var publish: Publish = Publish.NONE
-    var failOnDeprecationWarnings = true
+    var failOnDeprecationWarnings = false // TODO: Set back to true before upstreaming to AOSP
 
     var compilationTarget: CompilationTarget = CompilationTarget.DEVICE
 
