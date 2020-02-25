@@ -83,6 +83,7 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.LIFECYCLE.group, "lifecycle-livedata-core-truth")
     ignore(LibraryGroups.LIFECYCLE.group, "lifecycle-runtime-ktx-lint")
     prebuilts(LibraryGroups.LIFECYCLE, "lifecycle-extensions", "2.2.0") // No longer published
+    ignore(LibraryGroups.LIFECYCLE.group, "lifecycle-runtime-testing")
     prebuilts(LibraryGroups.LIFECYCLE, "2.2.0")
     ignore(LibraryGroups.LOADER.group, "loader-ktx")
     prebuilts(LibraryGroups.LOADER, "1.1.0")
