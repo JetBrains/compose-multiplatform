@@ -83,6 +83,7 @@ data class JavaCompileInputs(
             // collection of all the source files inside '*main' source sets. I.e, given a module
             // with a common and Android source set, this will look inside commonMain and
             // androidMain.
+            val taskDependencies = mutableListOf<Any>(variant.javaCompileProvider)
             val sourceFiles = project.multiplatformExtension?.run {
                 sourceSets
                     .filter { it.name.contains("main", ignoreCase = true) }
@@ -90,15 +91,17 @@ data class JavaCompileInputs(
                     .also { require(it.isNotEmpty()) }
             } ?: variant
                 .getSourceFolders(SourceKind.JAVA)
-                .map { folder -> folder.dir }
+                .map { folder ->
+                    for (builtBy in folder.builtBy) {
+                        taskDependencies.add(builtBy)
+                    }
+                    folder.dir
+                }
 
             val sourceCollection = project.files(sourceFiles)
-            // Inform Gradle which task must be run for all of the sources to exist
-            // For the moment, aidlCompileProvider is sufficient, but if in the future there
-            // are other tasks that generate sources used by our java compile tasks then we will
-            // need to either add those tasks too or switch this back to javaCompileProvider
-            // (which runs more slowly because it will also compile the generated .java files too)
-            sourceCollection.builtBy(variant.aidlCompileProvider)
+            for (dep in taskDependencies) {
+                sourceCollection.builtBy(dep)
+            }
             return sourceCollection
         }
     }
