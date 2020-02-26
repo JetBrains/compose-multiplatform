@@ -239,73 +239,59 @@ class AffectedModuleDetectorImpl constructor(
     private fun findLocallyAffectedProjects(): Set<Project> {
         val lastMergeSha = git.findPreviousMergeCL() ?: return allProjects
         val changedFiles = git.findChangedFilesSince(
-                sha = lastMergeSha,
-                includeUncommitted = true)
+            sha = lastMergeSha,
+            includeUncommitted = true
+        )
 
         val alwaysBuild = ALWAYS_BUILD.map { path ->
             rootProject.project(path)
-        }.toSet()
+        }
 
-        if (changedFiles.isEmpty()) {
-            logger?.info("Cannot find any changed files after last merge, will run all")
-            return when (projectSubset) {
-                ProjectSubset.DEPENDENT_PROJECTS -> allProjects
-                ProjectSubset.CHANGED_PROJECTS -> alwaysBuild
-                ProjectSubset.ALL_AFFECTED_PROJECTS -> allProjects
+        val unknownFiles: MutableList<String> = mutableListOf()
+        val changedProjects: MutableSet<Project> = alwaysBuild.toMutableSet()
+        for (file in changedFiles) {
+            val containingProject = findContainingProject(file)
+            if (containingProject == null) {
+                unknownFiles.add(file)
+                logger?.info("Couldn't find containing project for file $file. " +
+                        "Adding to unknownFiles.")
+            } else {
+                changedProjects.add(containingProject)
+                logger?.info("For file $file containing project is $containingProject. " +
+                        "Adding to containingProjects.")
             }
         }
+        val cobuiltTestProjects = lookupProjectSetsFromPaths(cobuiltTestPaths)
 
-        // TODO: around Q3 2019, revert to resolve b/132901339
-        val isRootProjectUi = rootProject.name.contains("ui")
-        var hasAndroidXFile = false
-        var hasUiFile = false
-        var uiDirectories = listOf("ui", "compose")
-        // should be all directories under frameworks/support that aren't included in
-        // frameworks/support/settings.gradle
-        var rootIndependentDirectories = listOf(
-            "buildSrc", "busytown", "development", "frameworks"
-        )
-        changedFiles.forEach {
-            val projectBaseDir = it.split(File.separatorChar)[0]
-            if (uiDirectories.contains(projectBaseDir)) {
-                hasUiFile = true
-            // files in root don't have file separator character in their relative path.
-            // By ruling out root files and directories that aren't associated with any project,
-            // we can make the determination "hasAndroidXFile"
-            } else if (it.contains(File.separatorChar) && !rootIndependentDirectories.contains
-            (projectBaseDir)) {
-                hasAndroidXFile = true
+        if (projectSubset == ProjectSubset.CHANGED_PROJECTS) {
+            return changedProjects +
+                    getAffectedCobuiltProjects(changedProjects, cobuiltTestProjects)
+        }
+        var buildAll = false
+
+        unknownFiles.forEach {
+            if (affectsAllOfThisBuild(it) || affectsAllOfBothBuilds(it)) {
+                buildAll = true
             }
         }
-        // if changes in both codebases, continue as usual (will test everything)
-        if (hasUiFile && hasAndroidXFile) {
-            // normal file exists in ui build -> don't build anything except the dummy
-            // since the "other" build will pick up the appropriate projects.
-        } else if (isRootProjectUi && hasAndroidXFile) {
-            return alwaysBuild
-            // ui file exists in normal build -> don't build anything except the dummy
-            // since the "other" build will pick up the appropriate projects.
-        } else if (!isRootProjectUi && hasUiFile) {
-            return alwaysBuild
-        }
+        if (unknownFiles.isEmpty() && changedProjects.size == alwaysBuild.size) buildAll = true
+        logger?.info("unknownFiles: $unknownFiles, changedProjects: $changedProjects, buildAll: " +
+                "$buildAll")
 
-        val containingProjects = changedFiles
-                .map(::findContainingProject)
-                .let {
-                    if (ignoreUnknownProjects) {
-                        it.filterNotNull()
-                    } else {
-                        it
-                    }
-                }
-        if (containingProjects.any { it == null }) {
-            logger?.info("couldn't find containing file for some projects, returning all projects")
-            logger?.info(
+        if (buildAll) {
+            logger?.info("Building all projects")
+            if (unknownFiles.isEmpty()) {
+                logger?.info("because no changed files were detected")
+            } else {
+                logger?.info("because one of the unknown files affects everything in the build")
+                logger?.info(
                     """
-                        if i was going to check for what i've found, i would've returned
-                        ${expandToDependents(containingProjects.filterNotNull())}
+                        The modules detected as affected by changed files are
+                        ${expandToDependents(changedProjects)}
                     """.trimIndent()
-            )
+                )
+            }
+
             when (projectSubset) {
                 ProjectSubset.DEPENDENT_PROJECTS -> return allProjects
                 ProjectSubset.ALL_AFFECTED_PROJECTS -> return allProjects
@@ -313,19 +299,29 @@ class AffectedModuleDetectorImpl constructor(
             }
         }
 
-        val cobuiltTestProjects = lookupProjectSetsFromPaths(cobuiltTestPaths)
-
         val affectedProjects = when (projectSubset) {
-            ProjectSubset.DEPENDENT_PROJECTS
-                -> expandToDependents(containingProjects) - containingProjects.filterNotNull()
-            ProjectSubset.CHANGED_PROJECTS
-                -> containingProjects.filterNotNull().toSet()
-            else -> expandToDependents(containingProjects)
+            ProjectSubset.ALL_AFFECTED_PROJECTS -> expandToDependents(changedProjects)
+            ProjectSubset.CHANGED_PROJECTS -> changedProjects
+            else -> expandToDependents(changedProjects) - changedProjects + alwaysBuild
         }
 
-        return alwaysBuild + affectedProjects +
-                getAffectedCobuiltProjects(affectedProjects, cobuiltTestProjects)
+        return affectedProjects + getAffectedCobuiltProjects(affectedProjects, cobuiltTestProjects)
     }
+    // TODO: simplify when resolving b/132901339 when there are no longer two builds
+    private val ROOT_FILES_OR_FOLDERS_AFFECTING_ALL_OF_BOTH_BUILDS = listOf(
+        "buildSrc", "busytown", "development", "frameworks", "gradlew" // paths from root
+    ) // there are no non-root objects affecting both builds that aren't projects (benchmark)
+    private val NON_ROOT_NON_PROJECTS_AFFECTING_ALL_OF_ONE_BUILD = listOf(
+        "gradle/wrapper"
+    )
+    private fun affectsAllOfThisBuild(file: String): Boolean {
+        return !file.contains(File.separatorChar) ||
+                NON_ROOT_NON_PROJECTS_AFFECTING_ALL_OF_ONE_BUILD.any { file.startsWith(it) }
+    } // objects in root are assumed to affect all projects in the build
+    private fun affectsAllOfBothBuilds(file: String): Boolean {
+        return ROOT_FILES_OR_FOLDERS_AFFECTING_ALL_OF_BOTH_BUILDS.any {
+            file.startsWith("../$it") || file.startsWith(it) }
+    } // if you are in the ui build, the path is e.g. ../busytown
 
     private fun lookupProjectSetsFromPaths(allSets: Set<Set<String>>): Set<Set<Project>> {
         return allSets.map { setPaths ->
@@ -365,9 +361,9 @@ class AffectedModuleDetectorImpl constructor(
         return cobuilts
     }
 
-    private fun expandToDependents(containingProjects: List<Project?>): Set<Project> {
+    private fun expandToDependents(containingProjects: Set<Project>): Set<Project> {
         return containingProjects.flatMapTo(mutableSetOf()) {
-            dependencyTracker.findAllDependents(it!!)
+            dependencyTracker.findAllDependents(it)
         }
     }
 
