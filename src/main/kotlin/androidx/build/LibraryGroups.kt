@@ -105,6 +105,7 @@ object LibraryGroups {
     val VIEWPAGER2 = LibraryGroup("androidx.viewpager2", LibraryVersions.VIEWPAGER2)
     val WEAR = LibraryGroup("androidx.wear", LibraryVersions.WEAR)
     val WEBKIT = LibraryGroup("androidx.webkit", LibraryVersions.WEBKIT)
+    val WINDOW = LibraryGroup("androidx.window", LibraryVersions.WINDOW)
     val WORK = LibraryGroup("androidx.work", LibraryVersions.WORK)
 }
 
