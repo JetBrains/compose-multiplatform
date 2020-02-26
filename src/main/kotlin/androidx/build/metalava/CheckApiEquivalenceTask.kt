@@ -52,10 +52,10 @@ abstract class CheckApiEquivalenceTask : DefaultTask() {
 
     fun summarizeDiff(a: File, b: File): String {
         if (!a.exists()) {
-            return "${a.toString()} does not exist"
+            return "$a does not exist"
         }
         if (!b.exists()) {
-            return "${b.toString()} does not exist"
+            return "$b does not exist"
         }
         val process = ProcessBuilder(listOf("diff", a.toString(), b.toString()))
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
@@ -75,8 +75,8 @@ abstract class CheckApiEquivalenceTask : DefaultTask() {
             val diff = summarizeDiff(expected, actual)
             val message = """API definition has changed
 
-                    Declared definition is ${expected}
-                    True     definition is ${actual}
+                    Declared definition is $expected
+                    True     definition is $actual
 
                     Please run `./gradlew updateApi` to confirm these changes are
                     intentional by updating the API definition.
