@@ -122,6 +122,7 @@ object DokkaSourceDocs {
             it.classpath = project.files(it.classpath).plus(project.files(inputs.bootClasspath))
                 .plus(inputs.dependencyClasspath)
             it.dependsOn(inputs.dependencyClasspath)
+            it.dependsOn(inputs.sourcePaths)
         }
     }
 }
