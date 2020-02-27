@@ -141,6 +141,15 @@ object FrameManager {
         }
     }
 
+    /**
+     * Records that [value], or one of its fields, read while composing and its values were
+     * used during composition.
+     *
+     * This is the underlying mechanism used by [Model] objects to allow composition to observe
+     * changes made to model objects.
+     */
+    internal fun recordRead(value: Any) = readObserver(value)
+
     private val writeObserver: (write: Any, isNew: Boolean) -> Unit = { value, isNew ->
         if (!commitPending) {
             commitPending = true
@@ -149,6 +158,17 @@ object FrameManager {
                 nextFrame()
             }
         }
+        recordWrite(value, isNew)
+    }
+
+    /**
+     * Records that [value], or one of its fields, was changed and the reads recorded by
+     * [recordRead] might have changed value.
+     *
+     * Calling this method outside of composition is ignored. This is only intended for
+     * invaliding composable lambdas while composing.
+     */
+    internal fun recordWrite(value: Any, isNew: Boolean) {
         if (!isNew && composing) {
             val currentInvalidations = synchronized(lock) {
                 invalidations.getValueOf(value)
