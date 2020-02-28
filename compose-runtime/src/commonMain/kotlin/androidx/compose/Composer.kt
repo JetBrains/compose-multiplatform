@@ -267,13 +267,12 @@ open class Composer<N>(
             >()
     private val pendingStack = Stack<Pending?>()
     private var pending: Pending? = null
-    private val keyStack = Stack<KeyInfo?>()
-    private var parentKeyInfo: KeyInfo? = null
     private var nodeIndex: Int = 0
     private var nodeIndexStack = IntStack()
     private var groupNodeCount: Int = 0
     private var groupNodeCountStack = IntStack()
     private var collectKeySources = false
+    private val keyHashesStack = IntStack()
 
     private var childrenAllowed = true
     private var invalidations: MutableList<Invalidation> = mutableListOf()
@@ -365,13 +364,14 @@ open class Composer<N>(
     fun abortRoot() {
         cleanUpCompose()
         pendingStack.clear()
-        keyStack.clear()
+        keyHashesStack.clear()
         nodeIndexStack.clear()
         groupNodeCountStack.clear()
         entersStack.clear()
         providersInvalidStack.clear()
         invalidateStack.clear()
         slots.close()
+        currentCompoundKeyHash = 0
     }
 
     /**
@@ -385,6 +385,13 @@ open class Composer<N>(
      * True if the composition should be checking if the composable functions can be skipped.
      */
     val skipping: Boolean get() = !inserting && !providersInvalidStack.peekOr(0).asBool()
+
+    /**
+     * Returns the hash of the compound key calculated as a combination of the keys of all the
+     * currently started groups via [startGroup].
+     */
+    var currentCompoundKeyHash: Int = 0
+        private set
 
     /**
      * Start collecting key source information. This enables enables the tool API to be able to
@@ -832,6 +839,10 @@ open class Composer<N>(
     private fun start(key: Any, action: SlotAction) {
         require(childrenAllowed) { "A call to createNode(), emitNode() or useNode() expected" }
 
+        if (action == START_GROUP || action == START_GROUP_SAME_KEY) {
+            updateCompoundKeyWhenWeEnterGroup(key)
+        }
+
         // Check for the insert fast path. If we are already inserting (creating nodes) then
         // there is no need to track insert, deletes and moves with a pending changes object.
         if (inserting) {
@@ -846,7 +857,7 @@ open class Composer<N>(
                 pending.registerInsert(insertKeyInfo, nodeIndex - pending.startIndex)
                 pending.recordUsed(insertKeyInfo)
             }
-            enterGroup(action, null, null)
+            enterGroup(action, null)
             return
         }
 
@@ -867,7 +878,6 @@ open class Composer<N>(
         }
 
         val pending = pending
-        var newKeyInfo: KeyInfo? = null
         var newPending: Pending? = null
         if (pending != null) {
             // Check to see if the key was generated last time from the keys collected above.
@@ -903,7 +913,6 @@ open class Composer<N>(
                     // and need not be moved.
                     recordStart(key, action)
                 }
-                newKeyInfo = keyInfo
             } else {
                 // The group is new, go into insert mode. All child groups will be inserted until
                 // this group is complete.
@@ -926,17 +935,15 @@ open class Composer<N>(
             }
         }
 
-        enterGroup(action, newPending, newKeyInfo)
+        enterGroup(action, newPending)
     }
 
-    private fun enterGroup(action: SlotAction, newPending: Pending?, newKeyInfo: KeyInfo?) {
+    private fun enterGroup(action: SlotAction, newPending: Pending?) {
         // When entering a group all the information about the parent should be saved, to be
         // restored when end() is called, and all the tracking counters set to initial state for the
         // group.
         pendingStack.push(pending)
         this.pending = newPending
-        this.keyStack.push(parentKeyInfo)
-        parentKeyInfo = newKeyInfo
         this.nodeIndexStack.push(nodeIndex)
         if (action == START_NODE) nodeIndex = 0
         this.groupNodeCountStack.push(groupNodeCount)
@@ -947,7 +954,9 @@ open class Composer<N>(
         // All the changes to the group (or node) have been recorded. All new nodes have been
         // inserted but it has yet to determine which need to be removed or moved. Note that the
         // changes are relative to the first change in the list of nodes that are changing.
-
+        if (action == END_GROUP) {
+            updateCompoundKeyWhenWeExitGroup()
+        }
         var expectedNodeCount = groupNodeCount
         val pending = pending
         if (pending != null && pending.keyInfos.size > 0) {
@@ -1079,7 +1088,6 @@ open class Composer<N>(
                 previous.groupIndex++
         }
         this.pending = previousPending
-        this.parentKeyInfo = keyStack.pop()
         this.nodeIndex = nodeIndexStack.pop() + expectedNodeCount
         this.groupNodeCount = this.groupNodeCountStack.pop() + expectedNodeCount
     }
@@ -1121,7 +1129,7 @@ open class Composer<N>(
                 } else {
                     enterGroup(
                         if (slots.isNode) START_NODE
-                        else START_GROUP, null, null
+                        else START_GROUP, null
                     )
                     if (slots.isNode) {
                         recordStart(EMPTY, START_NODE)
@@ -1131,6 +1139,7 @@ open class Composer<N>(
                         slots.next() // skip navigation slot
                         nodeIndex = 0
                     } else {
+                        updateCompoundKeyWhenWeEnterGroup(slots.groupKey)
                         // If the current group is an ambient provider, add the map to the ambient
                         // scope stack
                         if (slots.groupKey == provider) {
@@ -1549,6 +1558,19 @@ open class Composer<N>(
         override fun getAmbientScope(): AmbientMap {
             return ambientScopeAt(scope.anchor?.location(slotTable) ?: 0)
         }
+    }
+
+    @UseExperimental(ExperimentalStdlibApi::class)
+    private fun updateCompoundKeyWhenWeEnterGroup(groupKey: Any) {
+        val keyHash = groupKey.hashCode()
+        keyHashesStack.push(keyHash)
+        currentCompoundKeyHash = currentCompoundKeyHash.rotateLeft(3) xor keyHash
+    }
+
+    @UseExperimental(ExperimentalStdlibApi::class)
+    private fun updateCompoundKeyWhenWeExitGroup() {
+        val keyHash = keyHashesStack.pop()
+        currentCompoundKeyHash = (currentCompoundKeyHash xor keyHash).rotateRight(3)
     }
 }
 

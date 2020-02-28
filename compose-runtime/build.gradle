@@ -65,6 +65,9 @@ kotlin {
             implementation(ANDROIDX_TEST_EXT_JUNIT)
             implementation(ANDROIDX_TEST_RULES)
         }
+        all {
+            languageSettings.useExperimentalAnnotation("kotlin.Experimental")
+        }
     }
 }
 

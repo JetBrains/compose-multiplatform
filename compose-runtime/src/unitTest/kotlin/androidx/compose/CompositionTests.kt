@@ -1784,6 +1784,55 @@ class CompositionTests {
             }.toTypedArray()
         )
     }
+
+    @Test
+    fun testCompoundKeyHashStaysTheSameAfterRecompositions() {
+        val outerKeys = mutableListOf<Int>()
+        val innerKeys = mutableListOf<Int>()
+        var previousOuterKeysSize = 0
+        var previousInnerKeysSize = 0
+        var outerInvalidate: (() -> Unit) = {}
+        var innerInvalidate: (() -> Unit) = {}
+
+        @Composable
+        fun MockComposeScope.test() {
+            outerInvalidate = invalidate
+            outerKeys.add(composer.currentCompoundKeyHash)
+            Observe {
+                innerInvalidate = invalidate
+                innerKeys.add(composer.currentCompoundKeyHash)
+            }
+            // asserts that the key is correctly rolled back after start and end of Observe
+            assertEquals(outerKeys.last(), composer.currentCompoundKeyHash)
+        }
+
+        val myComposer = compose {
+            test()
+        }
+
+        assertNotEquals(previousOuterKeysSize, outerKeys.size)
+        assertNotEquals(previousInnerKeysSize, innerKeys.size)
+
+        previousOuterKeysSize = outerKeys.size
+        outerInvalidate()
+        myComposer.recompose()
+        myComposer.applyChanges()
+        assertNotEquals(previousOuterKeysSize, outerKeys.size)
+
+        previousInnerKeysSize = innerKeys.size
+        innerInvalidate()
+        myComposer.recompose()
+        myComposer.applyChanges()
+        assertNotEquals(previousInnerKeysSize, innerKeys.size)
+
+        assertNotEquals(innerKeys[0], outerKeys[0])
+        innerKeys.forEach {
+            assertEquals(innerKeys[0], it)
+        }
+        outerKeys.forEach {
+            assertEquals(outerKeys[0], it)
+        }
+    }
 }
 
 private fun <T> assertArrayEquals(message: String, expected: Array<T>, received: Array<T>) {

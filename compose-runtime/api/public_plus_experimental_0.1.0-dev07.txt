@@ -101,6 +101,7 @@ package androidx.compose {
     method public final androidx.compose.ScopeUpdateScope? endRestartGroup();
     method public final void endRoot();
     method public final int getChangeCount();
+    method public final int getCurrentCompoundKeyHash();
     method public final boolean getInserting();
     method public final boolean getSkipping();
     method public final androidx.compose.SlotTable getSlotTable();
@@ -117,6 +118,7 @@ package androidx.compose {
     method public final void updateValue(Object? value);
     method public final N! useNode();
     property public final int changeCount;
+    property public final int currentCompoundKeyHash;
     property public final boolean inserting;
     property public final boolean skipping;
   }
