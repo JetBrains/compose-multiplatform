@@ -225,13 +225,19 @@ fun Project.getGenerateApiArgs(
         is GenerateApiMode.AllRestrictedApis, GenerateApiMode.RestrictToLibraryGroupPrefixApis -> {
             // Show restricted APIs despite @hide.
             args += listOf(
-                "--show-annotation", "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX)",
+                "--show-annotation",
+                "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope." +
+                    "LIBRARY_GROUP_PREFIX)",
                 "--show-unannotated"
             )
             if (generateApiMode is GenerateApiMode.AllRestrictedApis) {
-                args += listOf("--show-annotation", "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP)")
+                args += listOf("--show-annotation",
+                "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope." +
+                    "LIBRARY_GROUP)")
             } else {
-                args += listOf("--hide-annotation", "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP)")
+                args += listOf("--hide-annotation",
+                "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope." +
+                    "LIBRARY_GROUP)")
             }
             args += HIDE_EXPERIMENTAL_ARGS
         }
