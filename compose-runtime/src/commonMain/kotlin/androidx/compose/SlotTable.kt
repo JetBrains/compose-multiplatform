@@ -821,7 +821,11 @@ class SlotTable(internal var slots: Array<Any?> = arrayOf()) {
     }
 
     companion object {
-        val EMPTY = object {}
+        val EMPTY = object : Any() {
+            override fun toString(): String {
+                return "EMPTY"
+            }
+        }
     }
 }
 
