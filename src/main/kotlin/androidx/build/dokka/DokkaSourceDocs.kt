@@ -119,8 +119,16 @@ object DokkaSourceDocs {
         dokkaTasks?.filter { it.state.isConfigurable }?.forEach {
             it.sourceDirs += inputs.sourcePaths
 
-            it.classpath = project.files(it.classpath).plus(project.files(inputs.bootClasspath))
-                .plus(inputs.dependencyClasspath)
+            // DokkaTask tries to resolve DokkaTask#classpath right away for jars that might not
+            // be there yet. Delay the setting of this property to before we run the task.
+            it.inputs.files(inputs.bootClasspath, inputs.dependencyClasspath)
+            it.doFirst { dokkaTask ->
+                dokkaTask as DokkaTask
+                dokkaTask.classpath = project.files(dokkaTask.classpath)
+                    .plus(project.files(inputs.bootClasspath))
+                    .plus(inputs.dependencyClasspath)
+            }
+
             it.dependsOn(inputs.dependencyClasspath)
             it.dependsOn(inputs.sourcePaths)
         }
