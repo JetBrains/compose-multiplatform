@@ -84,17 +84,5 @@ fun Project.configureKtlintCheckFile() {
         task.group = "Verification"
         task.classpath = getKtlintConfiguration()
         task.main = "com.pinterest.ktlint.Main"
-
-        task.doFirst {
-            var files = task.args?.filter { file -> file.endsWith(".kt") || file.endsWith(".ktx") }
-            if (files == null) {
-                files = emptyList()
-            }
-            task.args = listOf(
-                "--android",
-                "--disabled_rules",
-                "no-unused-imports,import-ordering,final-newline"
-            ) + files
-        }
     }
 }
