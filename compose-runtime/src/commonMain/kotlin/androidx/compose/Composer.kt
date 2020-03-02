@@ -155,7 +155,7 @@ private class Pending(
     fun updatedNodeCountOf(keyInfo: KeyInfo) = groupInfos[keyInfo]?.nodeCount ?: keyInfo.nodes
 }
 
-private val RootKey = Any()
+private val RootKey = OpaqueKey("root")
 
 private class Invalidation(
     val scope: RecomposeScope,

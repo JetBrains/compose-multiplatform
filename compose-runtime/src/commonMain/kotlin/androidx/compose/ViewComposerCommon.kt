@@ -36,19 +36,19 @@ internal expect fun UiComposer(
 expect fun <T> Composer<*>.runWithComposing(block: () -> T): T
 
 @PublishedApi
-internal val invocation = Any()
+internal val invocation = OpaqueKey("invocation")
 
 @PublishedApi
-internal val provider = Any()
+internal val provider = OpaqueKey("provider")
 
 @PublishedApi
-internal val providerValues = Any()
+internal val providerValues = OpaqueKey("providerValues")
 
 @PublishedApi
-internal val providerMaps = Any()
+internal val providerMaps = OpaqueKey("providerMaps")
 
 @PublishedApi
-internal val consumer = Any()
+internal val consumer = OpaqueKey("consumer")
 
 @PublishedApi
-internal val reference = Any()
+internal val reference = OpaqueKey("reference")
