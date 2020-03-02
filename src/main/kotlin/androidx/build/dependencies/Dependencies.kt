@@ -74,8 +74,9 @@ const val KOTLIN_COROUTINES_TEST =
 const val KOTLIN_COROUTINES_RX2 =
     "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$KOTLIN_COROUTINES_VERSION"
 
+const val LEAKCANARY = "com.squareup.leakcanary:leakcanary-android:2.2"
 const val LEAKCANARY_INSTRUMENTATION =
-    "com.squareup.leakcanary:leakcanary-android-instrumentation:1.6.2"
+    "com.squareup.leakcanary:leakcanary-android-instrumentation:2.2"
 const val MATERIAL = "com.google.android.material:material:1.0.0"
 const val MOCKITO_CORE = "org.mockito:mockito-core:2.25.0"
 const val MOCKITO_KOTLIN = "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0"
