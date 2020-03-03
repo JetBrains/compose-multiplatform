@@ -55,7 +55,7 @@ class HotReloadIntegrationTests {
         activity.uiThread {
             activity.setContent {
                 Column {
-                    WithConstraints {
+                    WithConstraints { _, _ ->
                         val state = state { DrawerState.Closed }
                         ModalDrawerLayout(
                             drawerState = state.value,
