@@ -43,7 +43,8 @@ fun Project.configureErrorProneForJava() {
 fun Project.configureErrorProneForAndroid(variants: DomainObjectSet<out BaseVariant>) {
     val toolChain = createErrorProneToolChain()
     variants.all { variant ->
-        if (variant.buildType.name == BuilderConstants.DEBUG) {
+        // Using getName() instead of name due to b/150427408
+        if (variant.buildType.getName() == BuilderConstants.DEBUG) {
             val task = variant.javaCompileProvider
 
             log.info("Configuring error-prone for ${variant.name}'s java compile")

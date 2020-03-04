@@ -428,7 +428,7 @@ class AndroidXPlugin : Plugin<Project> {
 
         defaultConfig.minSdkVersion(DEFAULT_MIN_SDK_VERSION)
         project.afterEvaluate {
-            val minSdkVersion = defaultConfig.minSdkVersion.apiLevel
+            val minSdkVersion = defaultConfig.minSdkVersion!!.apiLevel
             check(minSdkVersion >= DEFAULT_MIN_SDK_VERSION) {
                 "minSdkVersion $minSdkVersion lower than the default of $DEFAULT_MIN_SDK_VERSION"
             }
@@ -498,7 +498,8 @@ class AndroidXPlugin : Plugin<Project> {
     private fun hasAndroidTestSourceCode(project: Project, extension: TestedExtension): Boolean {
         // check Java androidTest source set
         extension.sourceSets.findByName("androidTest")?.let { sourceSet ->
-            if (!sourceSet.java.sourceFiles.isEmpty) return true
+            // using getSourceFiles() instead of sourceFiles due to b/150800094
+            if (!sourceSet.java.getSourceFiles().isEmpty) return true
         }
 
         // check kotlin-android androidTest source set
@@ -616,7 +617,8 @@ class AndroidXPlugin : Plugin<Project> {
 
         val buildTestApksTask = project.rootProject.tasks.named(BUILD_TEST_APKS)
         applicationVariants.all { variant ->
-            if (variant.buildType.name == "debug") {
+            // Using getName() instead of name due to b/150427408
+            if (variant.buildType.getName() == "debug") {
                 buildTestApksTask.configure {
                     it.dependsOn(variant.assembleProvider)
                 }
