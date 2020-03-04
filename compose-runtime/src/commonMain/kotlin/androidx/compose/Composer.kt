@@ -1081,11 +1081,12 @@ open class Composer<N>(
         // increment the node index and the group's node count. If the parent is tracking structural
         // changes in pending then restore that too.
         val previousPending = pendingStack.pop()
-        previousPending?.let { previous ->
+        if (previousPending != null) {
             // Update the parent count of nodes
-            previous.updateNodeCount(pending?.parentKeyInfo, expectedNodeCount)
-            if (!inserting)
-                previous.groupIndex++
+            previousPending.updateNodeCount(pending?.parentKeyInfo, expectedNodeCount)
+            if (!inserting) {
+                previousPending.groupIndex++
+            }
         }
         this.pending = previousPending
         this.nodeIndex = nodeIndexStack.pop() + expectedNodeCount
