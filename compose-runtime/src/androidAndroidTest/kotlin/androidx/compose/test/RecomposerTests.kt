@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2020 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-package androidx.compose
+package androidx.compose.test
 
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.compose.Composable
 import androidx.compose.frames.currentFrame
+import androidx.compose.invalidate
+import androidx.compose.key
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.ui.node.UiComposer
+import androidx.ui.core.clearRoots
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertNotSame
@@ -35,9 +40,11 @@ import org.junit.runner.RunWith
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class RecomposerTests : BaseComposeTest() {
+    val composer: UiComposer get() = error("should not be called")
+
     @After
     fun teardown() {
-        Compose.clearRoots()
+        clearRoots()
     }
 
     @get:Rule
@@ -146,9 +153,9 @@ class RecomposerTests : BaseComposeTest() {
         val counter = Counter()
 
         compose {
-            RecomposeTestComponents.A(
+            RecomposeTestComponentsA(
                 counter,
-                RecomposeTestComponents.ClickAction.Recompose
+                ClickAction.Recompose
             )
         }.then { activity ->
             // everything got rendered once
@@ -191,13 +198,13 @@ class RecomposerTests : BaseComposeTest() {
         val trigger = Trigger()
 
         val listener =
-            RecomposeTestComponents.ClickAction.PerformOnView {
+            ClickAction.PerformOnView {
                 trigger.recompose()
             }
 
         compose {
             trigger.subscribe()
-            RecomposeTestComponents.A(
+            RecomposeTestComponentsA(
                 counter,
                 listener
             )
@@ -236,29 +243,28 @@ class RecomposerTests : BaseComposeTest() {
     }
 
     // components for testing recompose behavior above
-    private object RecomposeTestComponents {
-        sealed class ClickAction {
-            object Recompose : ClickAction()
-            class PerformOnView(val action: (View) -> Unit) : ClickAction()
-        }
+    sealed class ClickAction {
+        object Recompose : ClickAction()
+        class PerformOnView(val action: (View) -> Unit) : ClickAction()
+    }
 
-        @Composable fun B(counter: Counter, listener: ClickAction, id: Int = 0) {
-            counter.inc("$id")
+    @Composable fun RecomposeTestComponentsB(counter: Counter, listener: ClickAction, id: Int = 0) {
+        counter.inc("$id")
 
-            val recompose = invalidate
+        val recompose = invalidate
 
-            TextView(id = id, onClickListener = View.OnClickListener {
-                @Suppress("DEPRECATION")
-                when (listener) {
-                    is ClickAction.Recompose -> recompose()
-                    is ClickAction.PerformOnView -> listener.action.invoke(it)
-                }
-            })
-        }
+        TextView(id = id, onClickListener = View.OnClickListener {
+            @Suppress("DEPRECATION")
+            when (listener) {
+                is ClickAction.Recompose -> recompose()
+                is ClickAction.PerformOnView -> listener.action.invoke(it)
+            }
+        })
+    }
 
-        @Composable fun A(counter: Counter, listener: ClickAction) {
-            counter.inc("A")
-            val recompose = invalidate
+    @Composable fun RecomposeTestComponentsA(counter: Counter, listener: ClickAction) {
+        counter.inc("A")
+        val recompose = invalidate
             LinearLayout(id = 99, onClickListener = View.OnClickListener {
                 @Suppress("DEPRECATION")
                 when (listener) {
@@ -268,11 +274,14 @@ class RecomposerTests : BaseComposeTest() {
             }) {
                 for (id in 100..102) {
                     key(id) {
-                        B(counter, listener, id)
+                        RecomposeTestComponentsB(
+                            counter,
+                            listener,
+                            id
+                        )
                     }
                 }
             }
-        }
     }
 
     @Test

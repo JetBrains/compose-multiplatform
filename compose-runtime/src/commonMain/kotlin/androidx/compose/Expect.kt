@@ -37,23 +37,6 @@ expect class WeakHashMap<K, V>() : MutableMap<K, V>
 
 internal expect fun identityHashCode(instance: Any?): Int
 
-expect interface ViewParent
-
-expect open class View {
-    fun getTag(key: Int): Any
-    fun setTag(key: Int, tag: Any?)
-}
-internal expect val View.parent: ViewParent
-internal expect val View.context: Context
-
-expect abstract class ViewGroup : View {
-    fun removeAllViews()
-}
-
-expect abstract class Context
-
-expect class FrameLayout(context: Context)
-
 internal expect inline fun <R> synchronized(lock: Any, block: () -> R): R
 
 expect open class WeakReference<T> : Reference<T> {

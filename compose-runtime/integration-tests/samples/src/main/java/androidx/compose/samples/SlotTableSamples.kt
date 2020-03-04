@@ -18,15 +18,13 @@
 
 package androidx.compose.samples
 
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.annotation.Sampled
 import androidx.compose.Composable
 
 @Sampled
 @Composable
 fun initialGroup() {
-    LinearLayout {
+    Column {
         Contact(contact = jim)
         Contact(contact = bob)
     }
@@ -35,7 +33,7 @@ fun initialGroup() {
 @Sampled
 @Composable
 fun reorderedGroup() {
-    LinearLayout {
+    Column {
         Contact(contact = bob)
         Contact(contact = jim)
     }
@@ -46,14 +44,22 @@ fun reorderedGroup() {
 private fun contactSample() {
     @Composable
     fun Contact(contact: Contact) {
-        TextView(text = contact.name)
-        TextView(text = contact.email)
+        Text(text = contact.name)
+        Text(text = contact.email)
     }
 }
 
 @Suppress("UNUSED_PARAMETER")
 @Composable
 private fun Contact(contact: Contact) {}
+
+@Suppress("UNUSED_PARAMETER")
+@Composable
+private fun Column(children: @Composable() () -> Unit) {}
+
+@Suppress("UNUSED_PARAMETER")
+@Composable
+private fun Text(text: String) {}
 
 private data class Contact(val name: String, val email: String)
 

@@ -40,6 +40,7 @@ kotlin {
         }
         commonTest.dependencies {
             implementation kotlin("test-junit")
+            implementation project(":ui:ui-framework")
         }
 
         jvmMain {
@@ -64,6 +65,8 @@ kotlin {
         androidAndroidTest.dependencies {
             implementation(ANDROIDX_TEST_EXT_JUNIT)
             implementation(ANDROIDX_TEST_RULES)
+            implementation project(":ui:ui-framework")
+            implementation project(":ui:ui-platform")
         }
         all {
             languageSettings.useExperimentalAnnotation("kotlin.Experimental")

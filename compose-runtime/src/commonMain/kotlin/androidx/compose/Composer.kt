@@ -1575,6 +1575,61 @@ open class Composer<N>(
     }
 }
 
+@Suppress("UNCHECKED_CAST")
+/*inline */ class ComposerUpdater<N, T : N>(val composer: Composer<N>, val node: T) {
+    inline fun set(
+        value: Int,
+        /*crossinline*/
+        block: T.(value: Int) -> Unit
+    ) = with(composer) {
+        if (inserting || nextSlot() != value) {
+            updateValue(value)
+            node.block(value)
+//            val appliedBlock: T.(value: Int) -> Unit = { block(it) }
+//            composer.apply(value, appliedBlock)
+        } else skipValue()
+    }
+
+    inline fun <reified V> set(
+        value: V,
+        /*crossinline*/
+        block: T.(value: V) -> Unit
+    ) = with(composer) {
+        if (inserting || nextSlot() != value) {
+            updateValue(value)
+            node.block(value)
+//            val appliedBlock: T.(value: V) -> Unit = { block(it) }
+//            composer.apply(value, appliedBlock)
+        } else skipValue()
+    }
+
+    inline fun update(
+        value: Int,
+        /*crossinline*/
+        block: T.(value: Int) -> Unit
+    ) = with(composer) {
+        if (inserting || nextSlot() != value) {
+            updateValue(value)
+            node.block(value)
+//            val appliedBlock: T.(value: Int) -> Unit = { block(it) }
+//            if (!inserting) composer.apply(value, appliedBlock)
+        } else skipValue()
+    }
+
+    inline fun <reified V> update(
+        value: V,
+        /*crossinline*/
+        block: T.(value: V) -> Unit
+    ) = with(composer) {
+        if (inserting || nextSlot() != value) {
+            updateValue(value)
+            node.block(value)
+//            val appliedBlock: T.(value: V) -> Unit = { block(it) }
+//            if (!inserting) composer.apply(value, appliedBlock)
+        } else skipValue()
+    }
+}
+
 /**
  * Get the next value of the slot table. This will unwrap lifecycle observer holders to return
  * lifecycle observer and should be used instead of [Composer.nextSlot].
@@ -1823,7 +1878,7 @@ val currentComposer: Composer<*> get() {
     throw NotImplementedError("Implemented as an intrinsic")
 }
 
-// TODO: git rid of the need for this when we merge FrameManager and Recomposer together!
+// TODO: get rid of the need for this when we merge FrameManager and Recomposer together!
 internal var currentComposerInternal: Composer<*>? = null
 
 internal fun invokeComposable(composer: Composer<*>, composable: @Composable() () -> Unit) {
@@ -1840,3 +1895,21 @@ internal fun <T> invokeComposableForResult(
     val realFn = composable as Function1<Composer<*>, T>
     return realFn(composer)
 }
+
+@PublishedApi
+internal val invocation = Any()
+
+@PublishedApi
+internal val provider = Any()
+
+@PublishedApi
+internal val providerValues = Any()
+
+@PublishedApi
+internal val providerMaps = Any()
+
+@PublishedApi
+internal val consumer = Any()
+
+@PublishedApi
+internal val reference = Any()

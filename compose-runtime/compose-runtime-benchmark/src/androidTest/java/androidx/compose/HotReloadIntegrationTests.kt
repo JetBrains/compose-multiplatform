@@ -24,6 +24,7 @@ import androidx.test.rule.ActivityTestRule
 import androidx.ui.core.Text
 import androidx.ui.core.WithConstraints
 import androidx.ui.core.setContent
+import androidx.ui.core.simulateHotReload
 import androidx.ui.layout.Column
 import androidx.ui.material.DrawerState
 import androidx.ui.material.ModalDrawerLayout
@@ -69,7 +70,7 @@ class HotReloadIntegrationTests {
         }
 
         activity.onNextFrame {
-            Compose.simulateHotReload(activity)
+            simulateHotReload(activity)
         }
     }
 }

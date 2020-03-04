@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2020 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,25 @@
  * limitations under the License.
  */
 @file:Suppress("PLUGIN_ERROR")
-package androidx.compose
+package androidx.compose.test
 
 import android.widget.Button
 import android.widget.TextView
+import androidx.compose.Composable
+import androidx.compose.Providers
+import androidx.compose.Recompose
+import androidx.compose.ambientOf
+import androidx.compose.invalidate
+import androidx.compose.mutableStateOf
+import androidx.compose.onCommit
+import androidx.compose.onDispose
+import androidx.compose.onPreCommit
+import androidx.compose.remember
+import androidx.compose.state
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.ui.node.UiComposer
+import androidx.ui.core.clearRoots
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import org.junit.After
@@ -30,9 +43,12 @@ import org.junit.runner.RunWith
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class EffectsTests : BaseComposeTest() {
+
+    val composer: UiComposer get() = error("should not be called")
+
     @After
     fun teardown() {
-        Compose.clearRoots()
+        clearRoots()
     }
 
     @get:Rule
@@ -474,7 +490,8 @@ class EffectsTests : BaseComposeTest() {
         val logHistory = mutableListOf<String>()
         fun log(x: String) = logHistory.add(x)
 
-        @Composable fun DisposeLogger(msg: String) {
+        @Composable
+        fun DisposeLogger(msg: String) {
             onDispose { log(msg) }
         }
 

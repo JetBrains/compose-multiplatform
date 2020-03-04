@@ -16,11 +16,9 @@
 
 package androidx.compose
 
-import kotlin.jvm.JvmField
-
 internal data class JoinedKey(
-    @JvmField val left: Any?,
-    @JvmField val right: Any?
+    val left: Any?,
+    val right: Any?
 )
 
 fun isJoinedKey(key: Any?) = key is JoinedKey

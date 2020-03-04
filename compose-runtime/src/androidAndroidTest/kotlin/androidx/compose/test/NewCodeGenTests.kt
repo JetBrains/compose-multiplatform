@@ -13,14 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:Suppress("UNUSED_PARAMETER", "UNUSED_VARIABLE", "ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
 
-package androidx.compose
+package androidx.compose.test
 
 import android.content.Context
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.compose.Composable
+import androidx.compose.key
+import androidx.compose.mutableStateOf
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.ui.node.UiComposer
+import androidx.ui.core.clearRoots
 import junit.framework.TestCase
 import org.junit.After
 import org.junit.Rule
@@ -30,9 +36,12 @@ import org.junit.runner.RunWith
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class NewCodeGenTests : BaseComposeTest() {
+
+    val composer: UiComposer get() = error("should not be called")
+
     @After
     fun teardown() {
-        Compose.clearRoots()
+        clearRoots()
     }
 
     @get:Rule
@@ -154,7 +163,8 @@ class NewCodeGenTests : BaseComposeTest() {
             //    phoneCalled++
             //   TextView(text = "...")
             //  }
-            @Composable fun PhoneView(phone: Phone) {
+            @Composable
+            fun PhoneView(phone: Phone) {
                 phoneCalled++
                 TextView(
                     text = "${if (phone.area.isBlank()) ""
@@ -189,7 +199,8 @@ class NewCodeGenTests : BaseComposeTest() {
             //    addCalled++
             //   <TextView text = "$left + $right = ${left + right}" />
             //  }
-            @Composable fun AddView(left: Int, right: Int) {
+            @Composable
+            fun AddView(left: Int, right: Int) {
                 addCalled++
                 TextView(id = tvId, text = "$left + $right = ${left + right}")
             }

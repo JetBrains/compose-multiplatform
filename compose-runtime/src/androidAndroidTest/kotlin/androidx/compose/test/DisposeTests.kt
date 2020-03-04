@@ -14,10 +14,15 @@
  * limitations under the License.
  */
 
-package androidx.compose
+package androidx.compose.test
 
+import androidx.compose.Composable
+import androidx.compose.Composition
+import androidx.compose.onActive
+import androidx.compose.onPreCommit
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.ui.core.clearRoots
 import junit.framework.TestCase
 import org.junit.After
 import org.junit.Rule
@@ -29,7 +34,7 @@ import org.junit.runner.RunWith
 class DisposeTests : BaseComposeTest() {
     @After
     fun teardown() {
-        Compose.clearRoots()
+        clearRoots()
     }
 
     @get:Rule
@@ -60,8 +65,10 @@ class DisposeTests : BaseComposeTest() {
             TestCase.assertEquals(expected, log.joinToString())
         }
 
+        var composition: Composition? = null
+
         assertLog("onPreCommit, onActive") {
-            activity.show(composable)
+            composition = activity.show(composable)
             activity.waitForAFrame()
         }
 
@@ -71,7 +78,9 @@ class DisposeTests : BaseComposeTest() {
         }
 
         assertLog("onActiveDispose, onPreCommitDispose") {
-            activity.disposeTestComposition()
+            activity.uiThread {
+                composition?.dispose()
+            }
             activity.waitForAFrame()
         }
 
