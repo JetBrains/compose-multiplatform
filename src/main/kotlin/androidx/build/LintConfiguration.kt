@@ -54,6 +54,14 @@ fun Project.configureNonAndroidProjectForLint(extension: AndroidXExtension) {
     configureLint(lintOptions, extension)
 }
 
+fun Project.configureAndroidProjectForLint(lintOptions: LintOptions, extension: AndroidXExtension) {
+    configureLint(lintOptions, extension)
+    tasks.named("lint").configure({ task ->
+        // We already run lintDebug, we don't need to run lint which lints the release variant
+        task.enabled = false
+    })
+}
+
 fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension) {
     project.dependencies.add(
         "lintChecks",
