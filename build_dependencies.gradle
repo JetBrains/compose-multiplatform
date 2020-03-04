@@ -29,6 +29,11 @@ if (isUiProject) {
     build_versions.lint = '26.6.1'
 }
 
+if (System.getenv("GRADLE_PLUGIN_VERSION") != null) {
+    logger.warn("Using custom version of AGP due to GRADLE_PLUGIN_VERSION being set.")
+    build_versions.agp = System.getenv("GRADLE_PLUGIN_VERSION")
+}
+
 build_versions.dokka = '0.9.17-g007'
 
 rootProject.ext['build_versions'] = build_versions
