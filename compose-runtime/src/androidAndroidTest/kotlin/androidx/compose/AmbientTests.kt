@@ -143,6 +143,7 @@ class AmbientTests : BaseComposeTest() {
                 someIntAmbient provides 0
             ) {
                 ReadStringAmbient(ambient = someTextAmbient, id = tvId)
+
                 subCompose {
                     assertEquals(someText, someTextAmbient.current)
                     assertEquals(0, someIntAmbient.current)
@@ -413,16 +414,27 @@ class AmbientTests : BaseComposeTest() {
     @Composable fun subCompose(block: @Composable() () -> Unit) {
         val container = remember { escapeCompose { Container() } }
         val reference = compositionReference()
-        Compose.subcomposeInto(container, activityRule.activity, reference) {
+        // TODO(b/150390669): Review use of @Untracked
+        Compose.subcomposeInto(container, activityRule.activity, reference) @Untracked {
             block()
         }
     }
 
+    class Ref<T : Any> {
+        lateinit var value: T
+    }
+
+    @Composable fun narrowInvalidateForReference(ref: Ref<CompositionReference>) {
+        ref.value = compositionReference()
+    }
+
     @Composable fun deferredSubCompose(block: @Composable() () -> Unit): () -> Unit {
         val container = remember { escapeCompose { Container() } }
-        val reference = compositionReference()
+        val ref = Ref<CompositionReference>()
+        narrowInvalidateForReference(ref = ref)
         return {
-            Compose.subcomposeInto(container, activityRule.activity, reference) {
+            // TODO(b/150390669): Review use of @Untracked
+            Compose.subcomposeInto(container, activityRule.activity, ref.value) @Untracked {
                 block()
             }
         }
