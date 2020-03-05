@@ -174,12 +174,23 @@ object FrameManager {
                 invalidations.getValueOf(value)
             }
             if (currentInvalidations.isNotEmpty()) {
-                val results = currentInvalidations.map { scope -> scope.invalidate() }
-                val frame = currentFrame()
-                if (results.any { result -> result == InvalidationResult.DEFERRED })
-                    deferredMap.add(frame, value)
-                if (results.any { result -> result == InvalidationResult.IMMINENT })
-                    immediateMap.add(frame, value)
+                var hasDeferred = false
+                var hasImminent = false
+                for (index in 0 until currentInvalidations.size) {
+                    val scope = currentInvalidations[index]
+                    when (scope.invalidate()) {
+                        InvalidationResult.DEFERRED -> hasDeferred = true
+                        InvalidationResult.IMMINENT -> hasImminent = true
+                        else -> { } // Nothing to do
+                    }
+                }
+                if (hasDeferred || hasImminent) {
+                    val frame = currentFrame()
+                    if (hasDeferred)
+                        deferredMap.add(frame, value)
+                    if (hasImminent)
+                        immediateMap.add(frame, value)
+                }
             }
         }
     }

@@ -449,7 +449,12 @@ fun <T : Record> T.readable(framed: Framed): T {
     // invoke the observer associated with the current frame.
     frame.readObserver?.invoke(framed)
     // invoke the thread local observers.
-    frame.threadReadObservers.forEach { it(framed) }
+    val observers = frame.threadReadObservers
+    if (observers.isNotEmpty()) {
+        for (observer in observers) {
+            observer(framed)
+        }
+    }
     return readable(this, frame.id, frame.invalid)
 }
 

@@ -26,9 +26,9 @@ package androidx.compose
 */
 class ObserverMap<K : Any, V : Any> {
     private val keyToValue =
-        mutableMapOf<IdentityWeakReference<K>, MutableSet<IdentityWeakReference<V>>>()
+        hashMapOf<IdentityWeakReference<K>, MutableSet<IdentityWeakReference<V>>>()
     private val valueToKey =
-        mutableMapOf<IdentityWeakReference<V>, MutableSet<IdentityWeakReference<K>>>()
+        hashMapOf<IdentityWeakReference<V>, MutableSet<IdentityWeakReference<K>>>()
     private val keyQueue = ReferenceQueue<K>()
     private val valueQueue = ReferenceQueue<V>()
 
@@ -163,7 +163,7 @@ class ObserverMap<K : Any, V : Any> {
     ) {
         var set = map[key]
         if (set == null) {
-            set = mutableSetOf()
+            set = hashSetOf()
             map.put(key, set)
         }
         set.add(value)

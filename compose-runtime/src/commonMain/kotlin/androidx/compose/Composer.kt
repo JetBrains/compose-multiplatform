@@ -65,11 +65,13 @@ private class Pending(
     private val usedKeys = mutableListOf<KeyInfo>()
     private val groupInfos = run {
         var runningNodeIndex = 0
-        keyInfos.withIndex().associateTo(mutableMapOf()) { (index, key) ->
-            Pair(key, GroupInfo(index, runningNodeIndex, key.nodes)).also {
-                runningNodeIndex += key.nodes
-            }
+        val result = hashMapOf<Any?, GroupInfo>()
+        for (index in 0 until keyInfos.size) {
+            val key = keyInfos[index]
+            result[key] = GroupInfo(index, runningNodeIndex, key.nodes)
+            runningNodeIndex += key.nodes
         }
+        result
     }
 
     /**
@@ -78,7 +80,8 @@ private class Pending(
      */
     val keyMap by lazy {
         multiMap<Any, KeyInfo>().also {
-            for (keyInfo in keyInfos) {
+            for (index in 0 until keyInfos.size) {
+                val keyInfo = keyInfos[index]
                 @Suppress("ReplacePutWithAssignment")
                 it.put(keyInfo.key, keyInfo)
             }
@@ -434,25 +437,31 @@ open class Composer<N>(
                 changes.clear()
             }
 
-            for ((anchor, invalidation) in invalidationAnchors) {
+            @Suppress("ReplaceManualRangeWithIndicesCalls") // Avoids allocation of an iterator
+            for (index in 0 until invalidationAnchors.size) {
+                val (anchor, invalidation) = invalidationAnchors[index]
                 invalidation.location = slotTable.anchorLocation(anchor)
             }
 
             trace("Compose:lifecycles") {
                 // Send lifecycle leaves
-                for (holder in leaves.reversed()) {
-                    // The count of the holder might be greater than 0 here as it might leave one
-                    // part of the composition and reappear in another. Only send a leave if the
-                    // count is still 0 after all changes have been applied.
-                    if (holder.count == 0) {
-                        holder.instance.onLeave()
-                        lifecycleObservers.remove(holder)
+                if (leaves.isNotEmpty()) {
+                    for (holder in leaves.reversed()) {
+                        // The count of the holder might be greater than 0 here as it might leave one
+                        // part of the composition and reappear in another. Only send a leave if the
+                        // count is still 0 after all changes have been applied.
+                        if (holder.count == 0) {
+                            holder.instance.onLeave()
+                            lifecycleObservers.remove(holder)
+                        }
                     }
                 }
 
                 // Send lifecycle enters
-                for (holder in enters) {
-                    holder.instance.onEnter()
+                if (enters.isNotEmpty()) {
+                    for (holder in enters) {
+                        holder.instance.onEnter()
+                    }
                 }
             }
 
@@ -1372,7 +1381,8 @@ open class Composer<N>(
                 slotsActionStartStack.clear()
                 record { applier, slots, _ ->
                     var currentKey = 0
-                    actions.forEach { action ->
+                    for (index in 0 until actions.actionSize) {
+                        val action = actions.actions[index]
                         when (action) {
                             START_GROUP -> slots.startGroup(actions.getKey(currentKey++))
                             START_GROUP_SAME_KEY -> slots.startGroup(EMPTY)
@@ -1734,11 +1744,6 @@ private class SlotActions(
 
     fun first(): SlotAction = actions[0]
     fun last(): SlotAction = actions[actionSize - 1]
-}
-
-// SlotActions helper
-private inline fun SlotActions.forEach(block: (SlotAction) -> Unit) {
-    for (index in 0 until actionSize) block(actions[index])
 }
 
 // Mutable list
