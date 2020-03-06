@@ -20,6 +20,7 @@ import androidx.build.uptodatedness.cacheEvenIfNoOutputs
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.tasks.JavaExec
+import org.gradle.api.tasks.StopExecutionException
 
 private fun Project.getKtlintConfiguration(): Configuration {
     return configurations.findByName("ktlint") ?: configurations.create("ktlint") {
@@ -86,5 +87,17 @@ fun Project.configureKtlintCheckFile() {
         task.group = "Verification"
         task.classpath = getKtlintConfiguration()
         task.main = "com.pinterest.ktlint.Main"
+
+        task.doFirst {
+            var files = task.args?.filter { file -> file.endsWith(".kt") || file.endsWith(".ktx") }
+            if (files.isNullOrEmpty()) {
+                throw StopExecutionException()
+            }
+            task.args = listOf(
+                "--android",
+                "--disabled_rules",
+                "no-unused-imports,import-ordering,final-newline"
+            ) + files
+        }
     }
 }
