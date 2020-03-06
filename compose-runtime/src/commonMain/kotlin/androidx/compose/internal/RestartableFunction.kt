@@ -20,7 +20,7 @@ package androidx.compose.internal
 
 import androidx.compose.Composable
 import androidx.compose.Composer
-import androidx.compose.FrameManager
+import androidx.compose.RecomposeScope
 import androidx.compose.Stable
 import androidx.compose.remember
 
@@ -63,16 +63,38 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
     Function22<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18,
             P19, P20, P21, Composer<*>, R> {
     private var _block: Any? = null
+    private var scope: RecomposeScope? = null
+    private var scopes: MutableList<RecomposeScope>? = null
 
     private fun trackWrite() {
         if (tracked) {
-            FrameManager.recordWrite(this, false)
+            val scope = this.scope
+            if (scope != null) {
+                scope.invalidate()
+                this.scope = null
+            }
+            val scopes = this.scopes
+            if (scopes != null) {
+                for (index in 0 until scopes.size) {
+                    val item = scopes[index]
+                    item.invalidate()
+                }
+                scopes.clear()
+            }
         }
     }
 
-    private fun trackRead() {
+    private fun trackRead(composer: Composer<*>) {
         if (tracked) {
-            FrameManager.recordRead(this)
+            val scope = composer.currentRecomposeScope
+            if (scope != null) {
+                if (this.scope == null) {
+                    this.scope = scope
+                } else {
+                    (scopes ?: (mutableListOf<RecomposeScope>().also { scopes = it })).add(scope)
+                }
+                scope.used = true
+            }
         }
     }
 
@@ -87,7 +109,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
 
     override fun invoke(c: Composer<*>): R {
         c.startRestartGroup(key)
-        trackRead()
+        trackRead(c)
         val result = (_block as (c: Composer<*>) -> R)(c)
         c.endRestartGroup()?.updateScope(this as (Composer<*>) -> Unit)
         return result
@@ -95,7 +117,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
 
     override fun invoke(p1: P1, c: Composer<*>): R {
         c.startRestartGroup(key)
-        trackRead()
+        trackRead(c)
         val result = (_block as (p1: P1, c: Composer<*>) -> R)(p1, c)
         c.endRestartGroup()?.updateScope { nc -> this(p1, nc) }
         return result
@@ -103,7 +125,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
 
     override fun invoke(p1: P1, p2: P2, c: Composer<*>): R {
         c.startRestartGroup(key)
-        trackRead()
+        trackRead(c)
         val result = (_block as (p1: P1, p2: P2, c: Composer<*>) -> R)(p1, p2, c)
         c.endRestartGroup()?.updateScope { nc -> this(p1, p2, nc) }
         return result
@@ -111,7 +133,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
 
     override fun invoke(p1: P1, p2: P2, p3: P3, c: Composer<*>): R {
         c.startRestartGroup(key)
-        trackRead()
+        trackRead(c)
         val result = (_block as (p1: P1, p2: P2, p3: P3, c: Composer<*>) -> R)(p1, p2, p3, c)
         c.endRestartGroup()?.updateScope { nc -> this(p1, p2, p3, nc) }
         return result
@@ -119,7 +141,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
 
     override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, c: Composer<*>): R {
         c.startRestartGroup(key)
-        trackRead()
+        trackRead(c)
         val result = (_block as (p1: P1, p2: P2, p3: P3, p4: P4, c: Composer<*>) -> R)(
             p1,
             p2,
@@ -133,7 +155,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
 
     override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, c: Composer<*>): R {
         c.startRestartGroup(key)
-        trackRead()
+        trackRead(c)
         val result = (_block as (p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, c: Composer<*>) -> R)(
             p1,
             p2,
@@ -149,7 +171,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
 
     override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, c: Composer<*>): R {
         c.startRestartGroup(key)
-        trackRead()
+        trackRead(c)
         val result = (_block as (
             p1: P1,
             p2: P2,
@@ -184,7 +206,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         c: Composer<*>
     ): R {
         c.startRestartGroup(key)
-        trackRead()
+        trackRead(c)
         val result = (_block as (
             p1: P1,
             p2: P2,
@@ -222,7 +244,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         c: Composer<*>
     ): R {
         c.startRestartGroup(key)
-        trackRead()
+        trackRead(c)
         val result = (_block as (
             p1: P1,
             p2: P2,
@@ -263,7 +285,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         c: Composer<*>
     ): R {
         c.startRestartGroup(key)
-        trackRead()
+        trackRead(c)
         val result = (_block as (
             p1: P1,
             p2: P2,
@@ -307,7 +329,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         c: Composer<*>
     ): R {
         c.startRestartGroup(key)
-        trackRead()
+        trackRead(c)
         val result = (_block as (
             p1: P1,
             p2: P2,
@@ -354,7 +376,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         c: Composer<*>
     ): R {
         c.startRestartGroup(key)
-        trackRead()
+        trackRead(c)
         val result = (_block as (
             p1: P1,
             p2: P2,
@@ -404,7 +426,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         c: Composer<*>
     ): R {
         c.startRestartGroup(key)
-        trackRead()
+        trackRead(c)
         val result = (_block as (
             p1: P1,
             p2: P2,
@@ -457,7 +479,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         c: Composer<*>
     ): R {
         c.startRestartGroup(key)
-        trackRead()
+        trackRead(c)
         val result = (_block as (
             p1: P1,
             p2: P2,
@@ -513,7 +535,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         c: Composer<*>
     ): R {
         c.startRestartGroup(key)
-        trackRead()
+        trackRead(c)
         val result = (_block as (
             p1: P1,
             p2: P2,
@@ -572,7 +594,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         c: Composer<*>
     ): R {
         c.startRestartGroup(key)
-        trackRead()
+        trackRead(c)
         val result = (_block as (
             p1: P1,
             p2: P2,
@@ -634,7 +656,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         c: Composer<*>
     ): R {
         c.startRestartGroup(key)
-        trackRead()
+        trackRead(c)
         val result = (_block as (
             p1: P1,
             p2: P2,
@@ -699,7 +721,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         c: Composer<*>
     ): R {
         c.startRestartGroup(key)
-        trackRead()
+        trackRead(c)
         val result = (_block as (
             p1: P1,
             p2: P2,
@@ -767,7 +789,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         c: Composer<*>
     ): R {
         c.startRestartGroup(key)
-        trackRead()
+        trackRead(c)
         val result = (_block as (
             p1: P1,
             p2: P2,
@@ -858,7 +880,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         c: Composer<*>
     ): R {
         c.startRestartGroup(key)
-        trackRead()
+        trackRead(c)
         val result = (_block as (
             p1: P1,
             p2: P2,
@@ -953,7 +975,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         c: Composer<*>
     ): R {
         c.startRestartGroup(key)
-        trackRead()
+        trackRead(c)
         val result = (_block as (
             p1: P1,
             p2: P2,
@@ -1052,7 +1074,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         c: Composer<*>
     ): R {
         c.startRestartGroup(key)
-        trackRead()
+        trackRead(c)
         val result = (_block as (
             p1: P1,
             p2: P2,
