@@ -131,8 +131,12 @@ abstract class IgnoreApiChangesTask @Inject constructor(
         )
         if (processRestrictedApis) {
             args += listOf(
-                "--show-annotation", "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP)",
-                "--show-annotation", "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP_PREFIX)",
+                "--show-annotation",
+                "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope." +
+                    "LIBRARY_GROUP)",
+                "--show-annotation",
+                "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope." +
+                    "LIBRARY_GROUP_PREFIX)",
                 "--show-unannotated"
             )
         }

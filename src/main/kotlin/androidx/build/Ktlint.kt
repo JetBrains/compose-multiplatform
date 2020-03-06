@@ -37,7 +37,8 @@ fun Project.configureKtlint() {
         "exclude" to excludeFiles))
     val outputFile = "${outputDir}ktlint-checkstyle-report.xml"
 
-    tasks.register("ktlint", JavaExec::class.java) { task ->
+    val lintProvider = tasks.register("ktlint", JavaExec::class.java) { task ->
+        project.tasks.findByName("check")?.dependsOn(task)
         task.inputs.files(inputFiles)
         task.cacheEvenIfNoOutputs()
         task.description = "Check Kotlin code style."
@@ -57,6 +58,7 @@ fun Project.configureKtlint() {
             "!$inputDir/$excludeFiles"
         )
     }
+    addToBuildOnServer(lintProvider)
 
     tasks.register("ktlintFormat", JavaExec::class.java) { task ->
         task.inputs.files(inputFiles)
