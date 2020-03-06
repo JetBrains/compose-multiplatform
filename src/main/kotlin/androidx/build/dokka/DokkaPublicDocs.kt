@@ -62,6 +62,7 @@ object DokkaPublicDocs {
         "androidx.ui.layout.samples",
         "androidx.ui.material.samples",
         "androidx.ui.text.samples",
+        "androidx.ui.unit.samples",
         "androidx.wear.internal.widget.drawer",
         "androidx.webkit.internal",
         "androidx.work.impl",
