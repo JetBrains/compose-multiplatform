@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2020 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,28 @@
  * limitations under the License.
  */
 
-package androidx.compose
+package androidx.compose.test
 
 import android.widget.TextView
+import androidx.compose.Ambient
+import androidx.compose.Composable
+import androidx.compose.CompositionReference
+import androidx.compose.Observe
+import androidx.compose.Providers
+import androidx.compose.Recomposer
+import androidx.compose.StructurallyEqual
+import androidx.compose.Untracked
+import androidx.compose.ambientOf
+import androidx.compose.compositionReference
+import androidx.compose.escapeCompose
+import androidx.compose.invalidate
+import androidx.compose.remember
+import androidx.compose.staticAmbientOf
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.ui.core.LayoutNode
+import androidx.ui.node.UiComposer
+import androidx.ui.core.subcomposeInto
 import org.junit.After
 import org.junit.Rule
 import org.junit.Test
@@ -37,7 +54,8 @@ val someIntAmbient = ambientOf { 1 }
 private val someOtherIntProvider = ambientOf { 1 }
 
 // Make public the consumer key.
-val someOtherIntAmbient: Ambient<Int> = someOtherIntProvider
+val someOtherIntAmbient: Ambient<Int> =
+    someOtherIntProvider
 
 // Create a static ambient with an int value
 val someStaticInt = staticAmbientOf { 40 }
@@ -45,6 +63,18 @@ val someStaticInt = staticAmbientOf { 40 }
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class AmbientTests : BaseComposeTest() {
+
+    val composer: UiComposer get() = error("should not be called")
+
+    @Composable
+    fun Text(value: String, id: Int = 100) {
+        TextView(id = id, text = value)
+    }
+
+    @Composable
+    fun ReadStringAmbient(ambient: Ambient<String>, id: Int = 100) {
+        Text(value = ambient.current, id = id)
+    }
 
     @get:Rule
     override val activityRule = makeTestActivityRule()
@@ -60,19 +90,43 @@ class AmbientTests : BaseComposeTest() {
                 someOtherIntProvider provides 42,
                 someStaticInt provides 50
             ) {
-                assertEquals("Test1", someTextAmbient.current)
+                assertEquals(
+                    "Test1",
+                    someTextAmbient.current
+                )
                 assertEquals(12, someIntAmbient.current)
-                assertEquals(42, someOtherIntAmbient.current)
+                assertEquals(
+                    42,
+                    someOtherIntAmbient.current
+                )
                 assertEquals(50, someStaticInt.current)
-                Providers(someTextAmbient provides "Test2", someStaticInt provides 60) {
-                    assertEquals("Test2", someTextAmbient.current)
-                    assertEquals(12, someIntAmbient.current)
-                    assertEquals(42, someOtherIntAmbient.current)
+                Providers(
+                    someTextAmbient provides "Test2",
+                    someStaticInt provides 60
+                ) {
+                    assertEquals(
+                        "Test2",
+                        someTextAmbient.current
+                    )
+                    assertEquals(
+                        12,
+                        someIntAmbient.current
+                    )
+                    assertEquals(
+                        42,
+                        someOtherIntAmbient.current
+                    )
                     assertEquals(60, someStaticInt.current)
                 }
-                assertEquals("Test1", someTextAmbient.current)
+                assertEquals(
+                    "Test1",
+                    someTextAmbient.current
+                )
                 assertEquals(12, someIntAmbient.current)
-                assertEquals(42, someOtherIntAmbient.current)
+                assertEquals(
+                    42,
+                    someOtherIntAmbient.current
+                )
                 assertEquals(50, someStaticInt.current)
             }
             assertEquals("Default", someTextAmbient.current)
@@ -93,7 +147,10 @@ class AmbientTests : BaseComposeTest() {
             Providers(
                 someTextAmbient provides someText
             ) {
-                ReadStringAmbient(ambient = someTextAmbient, id = tvId)
+                ReadStringAmbient(
+                    ambient = someTextAmbient,
+                    id = tvId
+                )
             }
         }.then { activity ->
             assertEquals(someText, activity.findViewById<TextView>(100).text)
@@ -117,7 +174,10 @@ class AmbientTests : BaseComposeTest() {
             Providers(
                 staticStringAmbient provides someText
             ) {
-                ReadStringAmbient(ambient = staticStringAmbient, id = tvId)
+                ReadStringAmbient(
+                    ambient = staticStringAmbient,
+                    id = tvId
+                )
             }
         }.then { activity ->
             assertEquals(someText, activity.findViewById<TextView>(100).text)
@@ -145,14 +205,23 @@ class AmbientTests : BaseComposeTest() {
                 ReadStringAmbient(ambient = someTextAmbient, id = tvId)
 
                 subCompose {
-                    assertEquals(someText, someTextAmbient.current)
+                    assertEquals(
+                        someText,
+                        someTextAmbient.current
+                    )
                     assertEquals(0, someIntAmbient.current)
 
                     Providers(
                         someIntAmbient provides 42
                     ) {
-                        assertEquals(someText, someTextAmbient.current)
-                        assertEquals(42, someIntAmbient.current)
+                        assertEquals(
+                            someText,
+                            someTextAmbient.current
+                        )
+                        assertEquals(
+                            42,
+                            someIntAmbient.current
+                        )
                     }
                 }
             }
@@ -171,7 +240,8 @@ class AmbientTests : BaseComposeTest() {
         val tvId = 100
         val invalidates = mutableListOf<() -> Unit>()
         fun doInvalidate() = invalidates.forEach { it() }.also { invalidates.clear() }
-        val staticSomeTextAmbient = staticAmbientOf { "Default" }
+        val staticSomeTextAmbient =
+            staticAmbientOf { "Default" }
         val staticSomeIntAmbient = staticAmbientOf { -1 }
         var someText = "Unmodified"
         compose {
@@ -184,7 +254,10 @@ class AmbientTests : BaseComposeTest() {
                 assertEquals(someText, staticSomeTextAmbient.current)
                 assertEquals(0, staticSomeIntAmbient.current)
 
-                ReadStringAmbient(ambient = staticSomeTextAmbient, id = tvId)
+                ReadStringAmbient(
+                    ambient = staticSomeTextAmbient,
+                    id = tvId
+                )
 
                 subCompose {
                     assertEquals(someText, staticSomeTextAmbient.current)
@@ -222,17 +295,29 @@ class AmbientTests : BaseComposeTest() {
                 someTextAmbient provides someText,
                 someIntAmbient provides 0
             ) {
-                ReadStringAmbient(ambient = someTextAmbient, id = tvId)
+                ReadStringAmbient(
+                    ambient = someTextAmbient,
+                    id = tvId
+                )
 
                 doSubCompose = deferredSubCompose {
-                    assertEquals(someText, someTextAmbient.current)
+                    assertEquals(
+                        someText,
+                        someTextAmbient.current
+                    )
                     assertEquals(0, someIntAmbient.current)
 
                     Providers(
                         someIntAmbient provides 42
                     ) {
-                        assertEquals(someText, someTextAmbient.current)
-                        assertEquals(42, someIntAmbient.current)
+                        assertEquals(
+                            someText,
+                            someTextAmbient.current
+                        )
+                        assertEquals(
+                            42,
+                            someIntAmbient.current
+                        )
                     }
                 }
             }
@@ -256,7 +341,8 @@ class AmbientTests : BaseComposeTest() {
         fun doInvalidate() = invalidates.forEach { it() }.also { invalidates.clear() }
         var someText = "Unmodified"
         var doSubCompose: () -> Unit = { error("Sub-compose callback not set") }
-        val staticSomeTextAmbient = staticAmbientOf { "Default" }
+        val staticSomeTextAmbient =
+            staticAmbientOf { "Default" }
         val staticSomeIntAmbient = staticAmbientOf { -1 }
         compose {
             invalidates.add(invalidate)
@@ -268,7 +354,10 @@ class AmbientTests : BaseComposeTest() {
                 assertEquals(someText, staticSomeTextAmbient.current)
                 assertEquals(0, staticSomeIntAmbient.current)
 
-                ReadStringAmbient(ambient = staticSomeTextAmbient, id = tvId)
+                ReadStringAmbient(
+                    ambient = staticSomeTextAmbient,
+                    id = tvId
+                )
 
                 doSubCompose = deferredSubCompose {
 
@@ -350,7 +439,8 @@ class AmbientTests : BaseComposeTest() {
     fun insertShouldSeePreviouslyProvidedValues() {
         val invalidates = mutableListOf<() -> Unit>()
         fun doInvalidate() = invalidates.forEach { it() }.also { invalidates.clear() }
-        val someStaticString = staticAmbientOf<String> { "Default" }
+        val someStaticString =
+            staticAmbientOf { "Default" }
         var shouldRead = false
         compose {
             Providers(
@@ -375,10 +465,12 @@ class AmbientTests : BaseComposeTest() {
     fun providingANewDataClassValueShouldNotRecompose() {
         val invalidates = mutableListOf<() -> Unit>()
         fun doInvalidate() = invalidates.forEach { it() }.also { invalidates.clear() }
-        val someDataAmbient = ambientOf(StructurallyEqual) { SomeData() }
+        val someDataAmbient =
+            ambientOf(StructurallyEqual) { SomeData() }
         var composed = false
 
-        @Composable fun ReadSomeDataAmbient(ambient: Ambient<SomeData>, id: Int = 100) {
+        @Composable
+        fun ReadSomeDataAmbient(ambient: Ambient<SomeData>, id: Int = 100) {
             composed = true
             Text(value = ambient.current.value, id = id)
         }
@@ -411,11 +503,13 @@ class AmbientTests : BaseComposeTest() {
         }
     }
 
-    @Composable fun subCompose(block: @Composable() () -> Unit) {
-        val container = remember { escapeCompose { Container() } }
+    @Composable
+    fun subCompose(block: @Composable() () -> Unit) {
+        val container =
+            remember { escapeCompose { LayoutNode() } }
         val reference = compositionReference()
         // TODO(b/150390669): Review use of @Untracked
-        Compose.subcomposeInto(container, activityRule.activity, reference) @Untracked {
+        subcomposeInto(container, activityRule.activity, reference) @Untracked {
             block()
         }
     }
@@ -429,12 +523,12 @@ class AmbientTests : BaseComposeTest() {
     }
 
     @Composable fun deferredSubCompose(block: @Composable() () -> Unit): () -> Unit {
-        val container = remember { escapeCompose { Container() } }
+        val container = remember { escapeCompose { LayoutNode() } }
         val ref = Ref<CompositionReference>()
         narrowInvalidateForReference(ref = ref)
         return {
             // TODO(b/150390669): Review use of @Untracked
-            Compose.subcomposeInto(container, activityRule.activity, ref.value) @Untracked {
+            subcomposeInto(container, activityRule.activity, ref.value) @Untracked {
                 block()
             }
         }
@@ -442,33 +536,3 @@ class AmbientTests : BaseComposeTest() {
 }
 
 private data class SomeData(val value: String = "default")
-
-@Composable
-fun Text(value: String, id: Int = 100) {
-    TextView(id = id, text = value)
-}
-
-@Composable
-fun ReadStringAmbient(ambient: Ambient<String>, id: Int = 100) {
-    Text(value = ambient.current, id = id)
-}
-
-class Container : Emittable {
-    val children = mutableListOf<Emittable>()
-
-    override fun emitInsertAt(index: Int, instance: Emittable) {
-        children.add(index, instance)
-    }
-
-    override fun emitRemoveAt(index: Int, count: Int) {
-        children.subList(index, index + count).clear()
-    }
-
-    override fun emitMove(from: Int, to: Int, count: Int) {
-        val toMove = children.subList(from, from + count)
-        val nodes = toMove.toMutableList()
-        toMove.clear()
-        if (from < to) children.addAll(to - count, nodes)
-        else children.addAll(to, nodes)
-    }
-}

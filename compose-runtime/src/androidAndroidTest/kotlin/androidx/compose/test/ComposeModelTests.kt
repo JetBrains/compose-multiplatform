@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2020 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 @file:Suppress("PLUGIN_ERROR")
-package androidx.compose
+package androidx.compose.test
 
 import android.widget.TextView
+import androidx.compose.Composable
+import androidx.compose.Observe
 import androidx.compose.frames.AbstractRecord
 import androidx.compose.frames.Framed
 import androidx.compose.frames.Record
@@ -29,6 +31,8 @@ import androidx.compose.frames.inFrame
 import androidx.compose.frames.open
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.ui.node.UiComposer
+import androidx.ui.core.clearRoots
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import org.junit.After
@@ -122,9 +126,12 @@ class TestState<T>(value: T) : Framed {
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class ModelViewTests : BaseComposeTest() {
+
+    val composer: UiComposer get() = error("should not be called")
+
     @After
     fun teardown() {
-        Compose.clearRoots()
+        clearRoots()
     }
 
     @get:Rule

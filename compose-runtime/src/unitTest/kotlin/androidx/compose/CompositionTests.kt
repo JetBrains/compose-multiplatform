@@ -35,6 +35,7 @@ import androidx.compose.mock.selectContact
 import androidx.compose.mock.skip
 import androidx.compose.mock.text
 import androidx.compose.mock.validate
+import androidx.ui.core.clearRoots
 import org.junit.After
 import org.junit.Ignore
 import kotlin.test.Test
@@ -46,7 +47,7 @@ class CompositionTests {
 
     @After
     fun teardown() {
-        Compose.clearRoots()
+        clearRoots()
     }
 
     @Test
@@ -358,8 +359,6 @@ class CompositionTests {
     @Ignore("b/148896187")
     @Test
     fun testComponent() {
-        val slReportReports = object {}
-
         @Composable fun MockComposeScope.Reporter(report: Report? = null) {
             if (report != null) {
                 text(report.from)
@@ -613,7 +612,6 @@ class CompositionTests {
     @Ignore("b/148896187")
     @Test
     fun testComposePartOfTree() {
-        val slReportReports = object {}
         var recomposeLois: (() -> Unit)? = null
 
         @Composable fun MockComposeScope.Reporter(report: Report? = null) {
@@ -680,18 +678,16 @@ class CompositionTests {
     @Ignore("b/148896187")
     @Test
     fun testRecomposeWithReplace() {
-        val slReportReports = object {}
         var recomposeLois: (() -> Unit)? = null
         var key = 0
 
         @Composable fun MockComposeScope.Reporter(report: Report? = null) {
-            val r = report
-            if (r != null) {
-                if (r.from == "Lois" || r.to == "Lois") recomposeLois = invalidate
+            if (report != null) {
+                if (report.from == "Lois" || report.to == "Lois") recomposeLois = invalidate
                 key(key) {
-                    text(r.from)
+                    text(report.from)
                     text("reports to")
-                    text(r.to)
+                    text(report.to)
                 }
             } else {
                 text("no report to report")
@@ -753,7 +749,6 @@ class CompositionTests {
 
     @Test
     fun testInvalidationAfterRemoval() {
-        val slReportReports = object {}
         var recomposeLois: (() -> Unit)? = null
         val key = 0
 
@@ -1852,23 +1847,23 @@ private fun compose(
     expectChanges: Boolean = true,
     block: @Composable MockComposeScope.() -> Unit
 ): MockViewComposer {
-    val myComposer = myComposer ?: run {
+    val myRealComposer = myComposer ?: run {
         val root = View().apply { name = "root" }
         MockViewComposer(root)
     }
 
-    myComposer.compose {
+    myRealComposer.compose {
         block()
     }
 
     if (expectChanges) {
-        assertNotEquals(0, myComposer.changeCount, "changes were expected")
-        myComposer.applyChanges()
+        assertNotEquals(0, myRealComposer.changeCount, "changes were expected")
+        myRealComposer.applyChanges()
     } else {
-        assertEquals(0, myComposer.changeCount, "no changes were expected")
+        assertEquals(0, myRealComposer.changeCount, "no changes were expected")
     }
 
-    return myComposer
+    return myRealComposer
 }
 
 private fun compose(

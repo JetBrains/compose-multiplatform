@@ -17,8 +17,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="androidx.compose">
      <application>
           <activity
-              android:name="androidx.compose.TestActivity"/>
+              android:name="androidx.compose.test.TestActivity"/>
           <activity
-              android:name="androidx.compose.DisposeTests$DisposeTestActivity"/>
+              android:name="androidx.compose.test.DisposeTests$DisposeTestActivity"/>
      </application>
 </manifest>

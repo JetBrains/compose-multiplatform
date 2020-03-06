@@ -20,9 +20,9 @@ import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
 import androidx.compose.Composable
 import androidx.compose.Composer
+import androidx.compose.Composition
 import androidx.compose.FrameManager
 import androidx.compose.currentComposer
-import androidx.compose.disposeComposition
 import androidx.test.rule.ActivityTestRule
 import androidx.ui.core.setContent
 import org.junit.Assert.assertTrue
@@ -37,14 +37,15 @@ abstract class ComposeBenchmarkBase {
 
     fun measureCompose(block: @Composable() () -> Unit) {
         val activity = activityRule.activity
+        var composition: Composition? = null
         benchmarkRule.measureRepeated {
-            activity.setContent(block)
+            composition = activity.setContent(block)
 
             runWithTimingDisabled {
-                activity.setContent { }
+                composition = activity.setContent { }
             }
         }
-        activity.disposeComposition()
+        composition?.dispose()
     }
 
     fun measureRecompose(block: RecomposeReceiver.() -> Unit) {
@@ -54,7 +55,7 @@ abstract class ComposeBenchmarkBase {
 
         val activity = activityRule.activity
 
-        activity.setContent {
+        val composition = activity.setContent {
             activeComposer = currentComposer
             receiver.composeCb()
         }
@@ -71,7 +72,7 @@ abstract class ComposeBenchmarkBase {
             assertTrue(didSomething)
         }
 
-        activity.disposeComposition()
+        composition.dispose()
     }
 }
 

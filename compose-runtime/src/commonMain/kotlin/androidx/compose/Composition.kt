@@ -28,7 +28,7 @@ private fun makeComposer(
 /**
  * A Composition is an object that is used to manage the UI created from a Composable from the
  * top level. A composition object is usually constructed for you, and returned from an API that
- * is used to initially compose a UI. For instance, [Compose.composeInto] returns a Composition.
+ * is used to initially compose a UI. For instance, [composeInto] returns a Composition.
  *
  * The Composition object can be used to update the composition by calling the [compose] methods.
  * Similarly, the [dispose] method should be used when you would like to dispose of the UI and
@@ -37,7 +37,7 @@ private fun makeComposer(
  * @param composerFactory A function to create a composer object, for use during composition
  * @param parent An optional reference to the parent composition.
  *
- * @see Compose.composeInto
+ * @see composeInto
  */
 open class Composition(
     private val composerFactory: (SlotTable, Recomposer) -> Composer<*>,
@@ -45,7 +45,7 @@ open class Composition(
 ) {
     private val slotTable: SlotTable = SlotTable()
     internal val composer: Composer<*> = makeComposer(composerFactory, parent, slotTable)
-    internal var composable: @Composable() () -> Unit = emptyContent()
+    var composable: @Composable() () -> Unit = emptyContent()
 
     /**
      * Update the composition with the content described by the [content] composable
@@ -76,7 +76,7 @@ open class Composition(
     /**
      * Return true if this is a root (non-sub-) composition
      */
-    internal val isRootComposition: Boolean get() = parent == null
+    val isRoot: Boolean get() = parent == null
 
     /**
      * Recomposes any changes without forcing the [composable] to compose and blocks until

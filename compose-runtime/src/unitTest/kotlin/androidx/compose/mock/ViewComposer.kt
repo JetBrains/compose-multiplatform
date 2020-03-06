@@ -64,6 +64,7 @@ class MockViewComposer(
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     inline fun <V : View> emit(
         key: Any,
         ctor: () -> V,

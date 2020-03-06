@@ -25,14 +25,6 @@ CallbackName: androidx.compose.CompositionLifecycleObserver:
     Class should be named CompositionLifecycleCallback
 
 
-ContextFirst: androidx.compose.Compose#composeInto(androidx.compose.Emittable, android.content.Context, androidx.compose.CompositionReference, kotlin.jvm.functions.Function0<kotlin.Unit>) parameter #1:
-    Context is distinct, so it must be the first argument (method `composeInto`)
-ContextFirst: androidx.compose.Compose#disposeComposition(androidx.compose.Emittable, android.content.Context, androidx.compose.CompositionReference) parameter #1:
-    Context is distinct, so it must be the first argument (method `disposeComposition`)
-ContextFirst: androidx.compose.Compose#subcomposeInto(androidx.compose.Emittable, android.content.Context, androidx.compose.CompositionReference, kotlin.jvm.functions.Function0<kotlin.Unit>) parameter #1:
-    Context is distinct, so it must be the first argument (method `subcomposeInto`)
-
-
 DocumentExceptions: androidx.compose.ComposerKt#getCurrentComposer():
     Method ComposerKt.getCurrentComposer appears to be throwing kotlin.NotImplementedError; this should be listed in the documentation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
 DocumentExceptions: androidx.compose.frames.FramesKt#commit(androidx.compose.frames.Frame):
@@ -55,13 +47,7 @@ KotlinOperator: androidx.compose.SlotEditor#get(androidx.compose.Anchor):
     Note that adding the `operator` keyword would allow calling this method using operator syntax
 KotlinOperator: androidx.compose.SlotEditor#get(int):
     Note that adding the `operator` keyword would allow calling this method using operator syntax
-KotlinOperator: androidx.compose.adapters.ComposeViewAdapter#get(int, kotlin.jvm.functions.Function0<? extends T>):
-    Note that adding the `operator` keyword would allow calling this method using operator syntax
 
 
 MissingNullability: androidx.compose.SlotReader#getGroupKey():
     Missing nullability on method `getGroupKey` return
-
-
-RegistrationName: androidx.compose.Choreographer#removeFrameCallback(android.view.Choreographer.FrameCallback):
-    Callback methods should be named register/unregister; was removeFrameCallback

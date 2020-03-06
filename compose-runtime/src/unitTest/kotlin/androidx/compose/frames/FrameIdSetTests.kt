@@ -16,7 +16,7 @@
 
 package androidx.compose.frames
 
-import androidx.compose.BitSet
+import java.util.BitSet
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
