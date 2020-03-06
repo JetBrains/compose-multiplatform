@@ -118,6 +118,7 @@ private fun JavaCompile.configureWithErrorProne(toolChain: ErrorProneToolChain) 
             "-Xep:InconsistentCapitalization:ERROR",
             "-Xep:ModifiedButNotUsed:ERROR",
             "-Xep:AmbiguousMethodReference:ERROR",
+            "-Xep:EqualsIncompatibleType:ERROR",
 
             // Nullaway
             "-XepIgnoreUnknownCheckNames", // https://github.com/uber/NullAway/issues/25
