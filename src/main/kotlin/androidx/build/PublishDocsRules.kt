@@ -140,6 +140,8 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.WEAR, "1.0.0")
             .addStubs("wear/wear_stubs/com.google.android.wearable-stubs.jar")
     prebuilts(LibraryGroups.WEBKIT, "1.2.0-rc01")
+    ignore(LibraryGroups.WINDOW.group, "window-sidecar")
+    prebuilts(LibraryGroups.WINDOW, "1.0.0-alpha01")
     ignore(LibraryGroups.WORK.group, "work-gcm")
     ignore(LibraryGroups.WORK.group, "work-runtime-lint")
     prebuilts(LibraryGroups.WORK, "2.3.2")
