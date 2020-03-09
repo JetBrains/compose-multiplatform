@@ -88,12 +88,28 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         if (tracked) {
             val scope = composer.currentRecomposeScope
             if (scope != null) {
-                if (this.scope == null) {
+                // Find the first invalid scope and replace it or record it if no scopes are invalid
+                scope.used = true
+                val lastScope = this.scope
+                if (lastScope == null || !lastScope.valid) {
                     this.scope = scope
                 } else {
-                    (scopes ?: (mutableListOf<RecomposeScope>().also { scopes = it })).add(scope)
+                    val lastScopes = scopes
+                    if (lastScopes == null) {
+                        val newScopes = mutableListOf<RecomposeScope>()
+                        scopes = newScopes
+                        newScopes.add(scope)
+                    } else {
+                        for (index in 0 until lastScopes.size) {
+                            val scopeAtIndex = lastScopes[index]
+                            if (!scopeAtIndex.valid || scopeAtIndex == scope) {
+                                lastScopes[index] = scope
+                                return
+                            }
+                        }
+                        lastScopes.add(scope)
+                    }
                 }
-                scope.used = true
             }
         }
     }
