@@ -96,6 +96,7 @@ object LibraryGroups {
         LibraryVersions.SWIPEREFRESHLAYOUT)
     val TESTSCREENSHOT = LibraryGroup("androidx.test.screenshot", LibraryVersions.TESTSCREENSHOT)
     val TEXTCLASSIFIER = LibraryGroup("androidx.textclassifier", LibraryVersions.TEXTCLASSIFIER)
+    val TRACING = LibraryGroup("androidx.tracing", LibraryVersions.TRACING)
     val TRANSITION = LibraryGroup("androidx.transition", LibraryVersions.TRANSITION)
     val TVPROVIDER = LibraryGroup("androidx.tvprovider", LibraryVersions.TVPROVIDER)
     val UI = LibraryGroup("androidx.ui", null)
