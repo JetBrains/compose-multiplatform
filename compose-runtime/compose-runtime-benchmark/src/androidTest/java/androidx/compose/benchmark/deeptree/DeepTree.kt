@@ -23,10 +23,10 @@ import androidx.ui.graphics.Color
 import androidx.ui.graphics.Paint
 import androidx.ui.layout.Column
 import androidx.ui.layout.Container
-import androidx.ui.layout.FlexScope
 import androidx.ui.layout.LayoutHeight
 import androidx.ui.layout.LayoutWidth
 import androidx.ui.layout.Row
+import androidx.ui.layout.RowColumnScope
 import androidx.ui.unit.dp
 import androidx.ui.unit.toRect
 
@@ -56,7 +56,7 @@ fun Terminal(style: Int) {
 }
 
 @Composable
-fun Stack(vertical: Boolean, children: @Composable() FlexScope.() -> Unit) {
+fun Stack(vertical: Boolean, children: @Composable() RowColumnScope.() -> Unit) {
     if (vertical) {
         Column(LayoutHeight.Fill, children = children)
     } else {
