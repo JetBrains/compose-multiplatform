@@ -242,7 +242,8 @@ class DiffAndDocs private constructor(
 
             appExtension.applicationVariants.all { appVariant ->
                 val taskProvider = docsTasks[appVariant.flavorName]
-                if (appVariant.buildType.name == "release" && taskProvider != null) {
+                // Using getName() instead of name due to b/150427408
+                if (appVariant.buildType.getName() == "release" && taskProvider != null) {
                     registerAndroidProjectForDocsTask(taskProvider, appVariant)
 
                     // Exclude the R.java file from documentation.

@@ -113,7 +113,7 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
 
                     // Only override if not set explicitly.
                     // Some Kotlin projects may wish to disable this.
-                    if (lintOptions.severityOverrides["SyntheticAccessor"] == null) {
+                    if (severityOverrides!!["SyntheticAccessor"] == null) {
                         fatal("SyntheticAccessor")
                     }
 
