@@ -89,6 +89,9 @@ def addMavenRepositories(RepositoryHandler handler) {
         handler.maven {
             url androidPluginRepoOverride
         }
+        handler.maven {
+            url "${repos.prebuiltsRoot}/tools/common/m2/repository"
+        }
     }
 }
 
