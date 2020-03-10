@@ -22,7 +22,6 @@ import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.BaseVariant
 import com.android.build.gradle.api.SourceKind
 import org.gradle.api.Project
-import org.gradle.api.attributes.Attribute
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.SourceSet
 import java.io.File
@@ -48,11 +47,9 @@ data class JavaCompileInputs(
         ): JavaCompileInputs {
             val sourceCollection = getSourceCollection(variant, project)
 
-            val dependencyClasspath = variant.compileConfiguration.incoming.artifactView { config ->
-                config.attributes { container ->
-                    container.attribute(Attribute.of("artifactType", String::class.java), "jar")
-                }
-            }.artifacts.artifactFiles
+            val dependencyClasspath = variant.getCompileClasspath(null).filter {
+                it.exists()
+            }
 
             return JavaCompileInputs(
                 sourceCollection,
