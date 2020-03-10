@@ -130,7 +130,6 @@ class AndroidXPlugin : Plugin<Project> {
 
                     project.tasks.withType(JavaCompile::class.java) { task ->
                         project.configureCompilationWarnings(task)
-                        project.configureCompilationVerbosity(task)
                     }
 
                     project.hideJavadocTask()
@@ -192,7 +191,6 @@ class AndroidXPlugin : Plugin<Project> {
 
                         libraryVariant.javaCompileProvider.configure { task ->
                             project.configureCompilationWarnings(task)
-                            project.configureCompilationVerbosity(task)
                         }
                     }
                     project.configureLint(extension.lintOptions, androidXExtension)
@@ -205,9 +203,6 @@ class AndroidXPlugin : Plugin<Project> {
                     project.extensions.getByType<AppExtension>().apply {
                         configureAndroidCommonOptions(project, androidXExtension)
                         configureAndroidApplicationOptions(project)
-                    }
-                    project.tasks.withType(JavaCompile::class.java) { task ->
-                        project.configureCompilationVerbosity(task)
                     }
                 }
                 is KotlinBasePluginWrapper -> {
@@ -898,16 +893,6 @@ private fun Project.configureCompilationWarnings(task: KotlinCompile) {
     if (!project.rootProject.hasProperty(USE_MAX_DEP_VERSIONS)) {
         runIfPartOfBuildOnServer {
             task.kotlinOptions.allWarningsAsErrors = true
-        }
-    }
-}
-
-// TODO(146217083): remove this when the gradle daemons stop dying intermittently
-private fun Project.configureCompilationVerbosity(task: JavaCompile) {
-    if (isRunningOnBuildServer()) {
-        if (project.name.contains("room")) {
-            var compilerArgs = task.options.compilerArgs
-            compilerArgs.plusAssign(listOf("-verbose"))
         }
     }
 }
