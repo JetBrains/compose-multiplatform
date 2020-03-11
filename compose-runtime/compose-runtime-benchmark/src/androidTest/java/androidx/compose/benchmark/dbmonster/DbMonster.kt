@@ -18,12 +18,12 @@ package androidx.compose.benchmark.dbmonster
 
 import androidx.compose.Composable
 import androidx.compose.Model
+import androidx.ui.core.Modifier
 import androidx.ui.foundation.Text
 import androidx.ui.layout.Column
-import androidx.ui.layout.LayoutHeight
-import androidx.ui.layout.LayoutWidth
 import androidx.ui.layout.Row
-
+import androidx.ui.layout.fillMaxHeight
+import androidx.ui.layout.fillMaxWidth
 import kotlin.random.Random
 
 private fun randomQuery(random: Random): String = random.nextDouble().let {
@@ -72,7 +72,7 @@ class DatabaseList(n: Int, val random: Random) {
 @Composable
 fun QueryColumn(query: Query) {
     // TODO: we could do some conditional styling here which would make the test better
-    Column(LayoutHeight.Fill) {
+    Column(Modifier.fillMaxHeight()) {
         Text(text = "${query.elapsed}")
         Text(text = query.query)
     }
@@ -83,9 +83,9 @@ fun DatabaseRow(db: Database) {
     println(db)
     val columns = 5
     val topQueries = db.topQueries(columns)
-    Row(LayoutWidth.Fill) {
-        Column(LayoutHeight.Fill) { Text(text = db.name) }
-        Column(LayoutHeight.Fill) { Text(text = "${db.queries.size}") }
+    Row(Modifier.fillMaxWidth()) {
+        Column(Modifier.fillMaxHeight()) { Text(text = db.name) }
+        Column(Modifier.fillMaxHeight()) { Text(text = "${db.queries.size}") }
         topQueries.forEach { query ->
             QueryColumn(query = query)
         }

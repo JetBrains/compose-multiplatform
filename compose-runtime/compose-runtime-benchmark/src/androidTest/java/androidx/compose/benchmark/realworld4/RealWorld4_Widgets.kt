@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+// TODO remove this after converting this file's use of legacy modifier construction
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.benchmark.realworld4
 
 /**

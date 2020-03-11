@@ -19,22 +19,23 @@ package androidx.compose.benchmark.siblings
 import androidx.compose.Composable
 import androidx.compose.Pivotal
 import androidx.compose.key
-import androidx.ui.core.draw
+import androidx.ui.core.Modifier
+import androidx.ui.core.drawBehind
 import androidx.ui.foundation.Box
 import androidx.ui.foundation.Text
 import androidx.ui.graphics.Color
 import androidx.ui.graphics.Paint
 import androidx.ui.layout.Column
-import androidx.ui.layout.LayoutHeight
-import androidx.ui.layout.LayoutSize
-import androidx.ui.layout.LayoutWidth
 import androidx.ui.layout.Row
+import androidx.ui.layout.fillMaxHeight
+import androidx.ui.layout.fillMaxSize
+import androidx.ui.layout.fillMaxWidth
 import androidx.ui.text.TextStyle
 import androidx.ui.unit.toRect
 import kotlin.random.Random
 
 private fun background(paint: Paint) =
-    draw { canvas, size -> canvas.drawRect(size.toRect(), paint) }
+    Modifier.drawBehind { canvas, size -> canvas.drawRect(size.toRect(), paint) }
 
 val blackBackground = background(Paint().also { it.color = Color.Black })
 val blueBackground = background(Paint().also { it.color = Color.Black })
@@ -55,8 +56,8 @@ fun PivotalItemRow(@Pivotal item: Item) {
         1 -> blueStyle
         else -> magentaStyle
     }
-    Row(LayoutWidth.Fill) {
-        Box(LayoutSize.Fill + background)
+    Row(Modifier.fillMaxWidth()) {
+        Box(Modifier.fillMaxSize() + background)
         Text(text = "${item.id}", style = style)
     }
 }
@@ -76,8 +77,8 @@ fun ItemRow(item: Item) {
         1 -> blueStyle
         else -> magentaStyle
     }
-    Row(LayoutWidth.Fill) {
-        Box(LayoutSize.Fill + background)
+    Row(Modifier.fillMaxWidth()) {
+        Box(Modifier.fillMaxSize() + background)
         Text(text = "${item.id}", style = style)
     }
 }
@@ -125,7 +126,7 @@ fun <T> List<T>.update(reorderType: ReorderType, random: Random, factory: (Int) 
 
 @Composable
 fun SiblingManagement(identity: IdentityType, items: List<Item>) {
-    Column(LayoutHeight.Fill) {
+    Column(Modifier.fillMaxHeight()) {
         when (identity) {
             IdentityType.Pivotal -> {
                 for (item in items) {

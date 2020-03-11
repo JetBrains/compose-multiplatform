@@ -17,20 +17,20 @@
 package androidx.compose.benchmark.deeptree
 
 import androidx.compose.Composable
-import androidx.ui.core.draw
+import androidx.ui.core.Modifier
+import androidx.ui.core.drawBehind
 import androidx.ui.foundation.Box
 import androidx.ui.graphics.Color
 import androidx.ui.graphics.Paint
 import androidx.ui.layout.Column
-import androidx.ui.layout.LayoutHeight
-import androidx.ui.layout.LayoutSize
-import androidx.ui.layout.LayoutWidth
 import androidx.ui.layout.Row
-import androidx.ui.layout.RowScope
+import androidx.ui.layout.fillMaxHeight
+import androidx.ui.layout.fillMaxSize
+import androidx.ui.layout.fillMaxWidth
 import androidx.ui.unit.toRect
 
 private fun background(paint: Paint) =
-    draw { canvas, size -> canvas.drawRect(size.toRect(), paint) }
+    Modifier.drawBehind { canvas, size -> canvas.drawRect(size.toRect(), paint) }
 
 val blueBackground = background(Paint().also { it.color = Color.Blue })
 val magentaBackground = background(Paint().also { it.color = Color.Magenta })
@@ -43,15 +43,15 @@ fun Terminal(style: Int) {
         1 -> blackBackground
         else -> magentaBackground
     }
-    Box(modifier = LayoutSize.Fill + background)
+    Box(modifier = Modifier.fillMaxSize() + background)
 }
 
 @Composable
 fun Stack(vertical: Boolean, children: @Composable() () -> Unit) {
     if (vertical) {
-        Column(LayoutHeight.Fill) { children() }
+        Column(Modifier.fillMaxHeight()) { children() }
     } else {
-        Row(LayoutWidth.Fill) { children() }
+        Row(Modifier.fillMaxWidth()) { children() }
     }
 }
 
@@ -85,7 +85,7 @@ fun DeepTree(depth: Int, breadth: Int, wrap: Int, id: Int = 0) {
             Terminal(style = id % 3)
         } else {
             repeat(breadth) {
-                Box(LayoutSize.Fill + blueBackground)
+                Box(Modifier.fillMaxSize() + blueBackground)
             }
         }
     }

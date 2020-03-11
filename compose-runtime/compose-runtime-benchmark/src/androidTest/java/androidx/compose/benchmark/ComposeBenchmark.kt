@@ -23,11 +23,12 @@ import androidx.compose.benchmark.realworld4.RealWorld4_FancyWidget_000
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.ui.core.draw
+import androidx.ui.core.Modifier
+import androidx.ui.core.drawBehind
 import androidx.ui.foundation.Box
 import androidx.ui.graphics.Color
 import androidx.ui.graphics.Paint
-import androidx.ui.layout.LayoutSize
+import androidx.ui.layout.fillMaxSize
 import androidx.ui.unit.toRect
 import org.junit.FixMethodOrder
 import org.junit.Ignore
@@ -154,7 +155,7 @@ class ComposeBenchmark : ComposeBenchmarkBase() {
 }
 
 private fun background(paint: Paint) =
-    draw { canvas, size -> canvas.drawRect(size.toRect(), paint) }
+    Modifier.drawBehind { canvas, size -> canvas.drawRect(size.toRect(), paint) }
 
 private val redBackground = background(Paint().also { it.color = Color.Red })
 private val blackBackground = background(Paint().also { it.color = Color.Black })
@@ -178,20 +179,20 @@ class ColorModel(private var color: Color = Color.Black) {
 
 @Composable
 fun OneRect(model: ColorModel) {
-    Box(modifier = LayoutSize.Fill + model.background)
+    Box(modifier = Modifier.fillMaxSize() + model.background)
 }
 
 @Composable
 fun TenRects(model: ColorModel, narrow: Boolean = false) {
     if (narrow) {
         Observe {
-            Box(modifier = LayoutSize.Fill + model.background)
+            Box(modifier = Modifier.fillMaxSize() + model.background)
         }
     } else {
-        Box(modifier = LayoutSize.Fill + model.background)
+        Box(modifier = Modifier.fillMaxSize() + model.background)
     }
     repeat(9) {
-        Box(modifier = LayoutSize.Fill + defaultBackground)
+        Box(modifier = Modifier.fillMaxSize() + defaultBackground)
     }
 }
 
@@ -201,12 +202,12 @@ fun HundredRects(model: ColorModel, narrow: Boolean = false) {
         if (it % 10 == 0)
             if (narrow) {
                 Observe {
-                    Box(modifier = LayoutSize.Fill + model.background)
+                    Box(modifier = Modifier.fillMaxSize() + model.background)
                 }
             } else {
-                Box(modifier = LayoutSize.Fill + model.background)
+                Box(modifier = Modifier.fillMaxSize() + model.background)
             }
         else
-            Box(modifier = LayoutSize.Fill + defaultBackground)
+            Box(modifier = Modifier.fillMaxSize() + defaultBackground)
     }
 }
