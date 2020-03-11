@@ -232,6 +232,7 @@ package androidx.compose {
   }
 
   public final class MutableStateKt {
+    method public static kotlin.jvm.functions.Function2<java.lang.Object,java.lang.Object,java.lang.Boolean> getNeverEqual();
     method public static kotlin.jvm.functions.Function2<java.lang.Object,java.lang.Object,java.lang.Boolean> getReferentiallyEqual();
     method public static kotlin.jvm.functions.Function2<java.lang.Object,java.lang.Object,java.lang.Boolean> getStructurallyEqual();
     method public static <T> androidx.compose.MutableState<T> mutableStateOf(T? value, kotlin.jvm.functions.Function2<? super T,? super T,java.lang.Boolean> areEquivalent = ReferentiallyEqual);
