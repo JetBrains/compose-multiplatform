@@ -79,9 +79,12 @@ package androidx.compose {
     method public final <T extends N> void createNode(kotlin.jvm.functions.Function0<? extends T> factory);
     method public final <T extends N> void emitNode(kotlin.jvm.functions.Function0<? extends T> factory);
     method public final void emitNode(N? node);
+    method public final void endContainerGroup();
     method public final void endExpr();
     method public final void endGroup();
+    method public final void endMovableGroup();
     method public final void endNode();
+    method public final void endReplaceableGroup();
     method public final androidx.compose.ScopeUpdateScope? endRestartGroup();
     method public final void endRoot();
     method public final int getChangeCount();
@@ -94,9 +97,12 @@ package androidx.compose {
     method public final boolean recompose();
     method public final void skipCurrentGroup();
     method public final void skipValue();
+    method public final void startContainerGroup();
     method public final void startExpr(Object key);
     method public final void startGroup(Object key);
+    method public final void startMovableGroup(Object key);
     method public final void startNode(Object key);
+    method public final void startReplaceableGroup(int key);
     method public final void startRestartGroup(Object key);
     method public final void startRoot();
     method public final void updateValue(Object? value);
