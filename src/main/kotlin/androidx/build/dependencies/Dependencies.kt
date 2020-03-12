@@ -62,7 +62,7 @@ const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.
 const val KOTLIN_METADATA = "me.eugeniomarletti.kotlin.metadata:kotlin-metadata:1.4.0"
 const val KOTLIN_METADATA_JVM = "org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.1.0"
 
-private const val KOTLIN_COROUTINES_VERSION = "1.3.0"
+private const val KOTLIN_COROUTINES_VERSION = "1.3.4"
 const val KOTLIN_COROUTINES_ANDROID =
     "org.jetbrains.kotlinx:kotlinx-coroutines-android:$KOTLIN_COROUTINES_VERSION"
 const val KOTLIN_COROUTINES_CORE =
