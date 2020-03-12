@@ -52,7 +52,7 @@ open class Composition(
      *
      * @param content A composable function that describes the UI
      */
-    fun compose(content: @Composable() () -> Unit) {
+    open fun compose(content: @Composable() () -> Unit) {
         composable = content
         compose()
     }
