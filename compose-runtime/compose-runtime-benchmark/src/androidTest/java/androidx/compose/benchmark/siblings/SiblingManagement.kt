@@ -18,19 +18,18 @@ package androidx.compose.benchmark.siblings
 
 import androidx.compose.Composable
 import androidx.compose.Pivotal
-import androidx.compose.benchmark.noChildren
 import androidx.compose.key
 import androidx.ui.core.Text
 import androidx.ui.core.draw
+import androidx.ui.foundation.Box
 import androidx.ui.graphics.Color
 import androidx.ui.graphics.Paint
 import androidx.ui.layout.Column
-import androidx.ui.layout.Container
 import androidx.ui.layout.LayoutHeight
+import androidx.ui.layout.LayoutSize
 import androidx.ui.layout.LayoutWidth
 import androidx.ui.layout.Row
 import androidx.ui.text.TextStyle
-import androidx.ui.unit.dp
 import androidx.ui.unit.toRect
 import kotlin.random.Random
 
@@ -43,7 +42,6 @@ val magentaBackground = background(Paint().also { it.color = Color.Magenta })
 val blackStyle = TextStyle(color = Color.Black)
 val blueStyle = TextStyle(color = Color.Blue)
 val magentaStyle = TextStyle(color = Color.Magenta)
-val dp16 = 16.dp
 
 @Composable
 fun PivotalItemRow(@Pivotal item: Item) {
@@ -58,13 +56,7 @@ fun PivotalItemRow(@Pivotal item: Item) {
         else -> magentaStyle
     }
     Row(LayoutWidth.Fill) {
-        Container(
-            modifier = background,
-            width = dp16,
-            height = dp16,
-            expanded = true,
-            children = noChildren
-        )
+        Box(LayoutSize.Fill + background)
         Text(text = "${item.id}", style = style)
     }
 }
@@ -85,13 +77,7 @@ fun ItemRow(item: Item) {
         else -> magentaStyle
     }
     Row(LayoutWidth.Fill) {
-        Container(
-            modifier = background,
-            width = dp16,
-            height = dp16,
-            expanded = true,
-            children = noChildren
-        )
+        Box(LayoutSize.Fill + background)
         Text(text = "${item.id}", style = style)
     }
 }
