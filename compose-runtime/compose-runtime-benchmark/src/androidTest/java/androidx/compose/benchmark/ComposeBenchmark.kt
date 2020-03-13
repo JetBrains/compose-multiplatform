@@ -24,10 +24,10 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.ui.core.draw
+import androidx.ui.foundation.Box
 import androidx.ui.graphics.Color
 import androidx.ui.graphics.Paint
-import androidx.ui.layout.Container
-import androidx.ui.unit.dp
+import androidx.ui.layout.LayoutSize
 import androidx.ui.unit.toRect
 import org.junit.FixMethodOrder
 import org.junit.Ignore
@@ -161,8 +161,6 @@ private val blackBackground = background(Paint().also { it.color = Color.Black }
 private val yellowBackground = background(Paint().also { it.color = Color.Yellow })
 private val defaultBackground = yellowBackground
 
-private val dp10 = 10.dp
-
 @Model
 class ColorModel(private var color: Color = Color.Black) {
     fun toggle() {
@@ -178,47 +176,22 @@ class ColorModel(private var color: Color = Color.Black) {
         }
 }
 
-val noChildren = @Composable { }
 @Composable
 fun OneRect(model: ColorModel) {
-    Container(
-        modifier = model.background,
-        width = dp10,
-        height = dp10,
-        expanded = true,
-        children = noChildren
-    )
+    Box(modifier = LayoutSize.Fill + model.background)
 }
 
 @Composable
 fun TenRects(model: ColorModel, narrow: Boolean = false) {
     if (narrow) {
         Observe {
-            Container(
-                modifier = model.background,
-                width = dp10,
-                height = dp10,
-                expanded = true,
-                children = noChildren
-            )
+            Box(modifier = LayoutSize.Fill + model.background)
         }
     } else {
-        Container(
-            modifier = model.background,
-            width = dp10,
-            height = dp10,
-            expanded = true,
-            children = noChildren
-        )
+        Box(modifier = LayoutSize.Fill + model.background)
     }
     repeat(9) {
-        Container(
-            modifier = defaultBackground,
-            width = dp10,
-            height = dp10,
-            expanded = true,
-            children = noChildren
-        )
+        Box(modifier = LayoutSize.Fill + defaultBackground)
     }
 }
 
@@ -228,30 +201,12 @@ fun HundredRects(model: ColorModel, narrow: Boolean = false) {
         if (it % 10 == 0)
             if (narrow) {
                 Observe {
-                    Container(
-                        modifier = model.background,
-                        width = dp10,
-                        height = dp10,
-                        expanded = true,
-                        children = noChildren
-                    )
+                    Box(modifier = LayoutSize.Fill + model.background)
                 }
             } else {
-                Container(
-                    modifier = model.background,
-                    width = dp10,
-                    height = dp10,
-                    expanded = true,
-                    children = noChildren
-                )
+                Box(modifier = LayoutSize.Fill + model.background)
             }
         else
-            Container(
-                modifier = defaultBackground,
-                width = dp10,
-                height = dp10,
-                expanded = true,
-                children = noChildren
-            )
+            Box(modifier = LayoutSize.Fill + defaultBackground)
     }
 }

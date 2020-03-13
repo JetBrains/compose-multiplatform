@@ -30,7 +30,6 @@ import androidx.ui.layout.Column
 import androidx.ui.layout.LayoutPadding
 import androidx.ui.foundation.Box
 import androidx.ui.foundation.DrawBackground
-import androidx.ui.layout.Container
 import androidx.ui.layout.Row
 import androidx.ui.unit.dp
 import kotlin.reflect.KCallable
@@ -129,7 +128,7 @@ fun RealWorld4_FancyWidget_001(
                         modifier = LayoutWeight(1f),
                         model = model.f15
                     )
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -138,7 +137,7 @@ fun RealWorld4_FancyWidget_001(
                         modifier = LayoutWeight(1f),
                         model = model.f15
                     )
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -585,7 +584,7 @@ fun RealWorld4_FancyWidget_006(
                             model = model.f11.f5.f0
                         ) { ColoredRect(model.toColor()) }
                     }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -603,7 +602,7 @@ fun RealWorld4_FancyWidget_006(
                             model = model.f11.f5.f0
                         ) { ColoredRect(model.toColor()) }
                     }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -721,7 +720,7 @@ fun RealWorld4_FancyWidget_008(
                         model = model.f0,
                         s1 = "HelloWorld"
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -730,7 +729,7 @@ fun RealWorld4_FancyWidget_008(
                         model = model.f0,
                         s1 = "HelloWorld"
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -769,7 +768,7 @@ fun RealWorld4_FancyWidget_009(
                         modifier = LayoutWeight(1f),
                         model = model.f5
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -779,7 +778,7 @@ fun RealWorld4_FancyWidget_009(
                         model = model.f5,
                         modifier = LayoutWeight(1f)
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -819,12 +818,12 @@ fun RealWorld4_FancyWidget_010(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -957,12 +956,12 @@ fun RealWorld4_FancyWidget_013(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -996,12 +995,12 @@ fun RealWorld4_FancyWidget_014(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -1051,7 +1050,7 @@ fun RealWorld4_FancyWidget_015(
                             s1 = "HelloWorld"
                         ) { ColoredRect(model.toColor()) }
                     }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -1066,7 +1065,7 @@ fun RealWorld4_FancyWidget_015(
                             s1 = "HelloWorld"
                         ) { ColoredRect(model.toColor()) }
                     }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -1281,12 +1280,12 @@ fun RealWorld4_FancyWidget_019(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -1332,12 +1331,12 @@ fun RealWorld4_FancyWidget_020(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -1365,12 +1364,12 @@ fun RealWorld4_FancyWidget_021(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -1504,7 +1503,7 @@ fun RealWorld4_FancyWidget_023(
                         model = model.f4,
                         obj = RealWorld4_UnmemoizablePojo_9()
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -1513,7 +1512,7 @@ fun RealWorld4_FancyWidget_023(
                         model = model.f4,
                         obj = RealWorld4_UnmemoizablePojo_9()
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -1557,7 +1556,7 @@ fun RealWorld4_FancyWidget_024(
                         model = model.f5,
                         b = true
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -1566,7 +1565,7 @@ fun RealWorld4_FancyWidget_024(
                         model = model.f5,
                         b = false
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -1661,12 +1660,12 @@ fun RealWorld4_FancyWidget_026(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -1700,12 +1699,12 @@ fun RealWorld4_FancyWidget_027(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -1797,7 +1796,7 @@ fun RealWorld4_FancyWidget_029(
                         model = model.f4,
                         s2 = "HelloWorld"
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -1806,7 +1805,7 @@ fun RealWorld4_FancyWidget_029(
                         model = model.f4,
                         s2 = "HelloWorld"
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -1845,7 +1844,7 @@ fun RealWorld4_FancyWidget_030(
                         modifier = LayoutWeight(1f),
                         model = model.f5
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -1855,7 +1854,7 @@ fun RealWorld4_FancyWidget_030(
                         modifier = LayoutWeight(1f),
                         model = model.f5
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -1929,12 +1928,12 @@ fun RealWorld4_FancyWidget_032(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -1973,7 +1972,7 @@ fun RealWorld4_FancyWidget_033(
                         s1 = "HelloWorld",
                         s2 = "HelloWorld"
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -1983,7 +1982,7 @@ fun RealWorld4_FancyWidget_033(
                         s1 = "HelloWorld",
                         s2 = "HelloWorld"
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -2023,12 +2022,12 @@ fun RealWorld4_FancyWidget_034(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -2068,12 +2067,12 @@ fun RealWorld4_FancyWidget_035(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -2107,12 +2106,12 @@ fun RealWorld4_FancyWidget_036(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -2262,7 +2261,7 @@ fun RealWorld4_FancyWidget_038(
                         modifier = LayoutWeight(1f),
                         model = model.f5
                     )
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -2270,7 +2269,7 @@ fun RealWorld4_FancyWidget_038(
                         modifier = LayoutWeight(1f),
                         model = model.f5
                     )
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -2373,7 +2372,7 @@ fun RealWorld4_FancyWidget_040(
                         modifier = LayoutWeight(1f),
                         model = model.f2
                     )
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -2382,7 +2381,7 @@ fun RealWorld4_FancyWidget_040(
                         modifier = LayoutWeight(1f),
                         model = model.f2
                     )
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -2488,12 +2487,12 @@ fun RealWorld4_FancyWidget_042(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -2551,7 +2550,7 @@ fun RealWorld4_FancyWidget_043(
                         model = model.f5,
                         s1 = "HelloWorld"
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -2561,7 +2560,7 @@ fun RealWorld4_FancyWidget_043(
                         model = model.f5,
                         s1 = "HelloWorld"
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -2702,7 +2701,7 @@ fun RealWorld4_FancyWidget_045(
                         model = model.f0,
                         number = 744
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -2711,7 +2710,7 @@ fun RealWorld4_FancyWidget_045(
                         model = model.f0,
                         number = 709
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -2749,7 +2748,7 @@ fun RealWorld4_FancyWidget_046(
                         model = model.f2,
                         s2 = "HelloWorld"
                     )
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -2758,7 +2757,7 @@ fun RealWorld4_FancyWidget_046(
                         model = model.f2,
                         s2 = "HelloWorld"
                     )
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -2786,12 +2785,12 @@ fun RealWorld4_FancyWidget_047(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -2825,12 +2824,12 @@ fun RealWorld4_FancyWidget_048(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -2925,12 +2924,12 @@ fun RealWorld4_FancyWidget_050(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -2964,12 +2963,12 @@ fun RealWorld4_FancyWidget_051(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -3003,12 +3002,12 @@ fun RealWorld4_FancyWidget_052(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -3153,7 +3152,7 @@ fun RealWorld4_FancyWidget_055(
                             model.toColor()
                         )
                     }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -3165,7 +3164,7 @@ fun RealWorld4_FancyWidget_055(
                             model.toColor()
                         )
                     }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -3210,7 +3209,7 @@ fun RealWorld4_FancyWidget_056(
                         s2 = "HelloWorld",
                         s1 = "HelloWorld"
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -3220,7 +3219,7 @@ fun RealWorld4_FancyWidget_056(
                         s2 = "HelloWorld",
                         s1 = "HelloWorld"
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -3266,12 +3265,12 @@ fun RealWorld4_FancyWidget_057(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -3305,7 +3304,7 @@ fun RealWorld4_FancyWidget_058(
                         s2 = "HelloWorld",
                         b = false
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -3316,7 +3315,7 @@ fun RealWorld4_FancyWidget_058(
                         s2 = "HelloWorld",
                         b = true
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -3356,12 +3355,12 @@ fun RealWorld4_FancyWidget_059(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -3528,12 +3527,12 @@ fun RealWorld4_FancyWidget_063(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -3567,12 +3566,12 @@ fun RealWorld4_FancyWidget_064(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -3654,12 +3653,12 @@ fun RealWorld4_FancyWidget_066(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -3705,12 +3704,12 @@ fun RealWorld4_FancyWidget_067(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -3764,7 +3763,7 @@ fun RealWorld4_FancyWidget_068(
                             model = model.f6.f11.f7.f4.f5
                         )
                     }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -3778,7 +3777,7 @@ fun RealWorld4_FancyWidget_068(
                             model = model.f6.f11.f7.f4.f5
                         )
                     }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -3829,7 +3828,7 @@ fun RealWorld4_FancyWidget_069(
                             model = model.f10.f7
                         )
                     }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -3843,7 +3842,7 @@ fun RealWorld4_FancyWidget_069(
                             model = model.f10.f7
                         )
                     }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -4028,7 +4027,7 @@ fun RealWorld4_FancyWidget_072(
                         model = model.f2,
                         color = Color(red = 0xFF, blue = 0x99, green = 0x11)
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -4037,7 +4036,7 @@ fun RealWorld4_FancyWidget_072(
                         model = model.f2,
                         color = Color(red = 0xFF, blue = 0x99, green = 0x11)
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -4075,7 +4074,7 @@ fun RealWorld4_FancyWidget_073(
                         model = model.f2,
                         s2 = "HelloWorld"
                     )
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -4084,7 +4083,7 @@ fun RealWorld4_FancyWidget_073(
                         model = model.f2,
                         s2 = "HelloWorld"
                     )
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -4162,7 +4161,7 @@ fun RealWorld4_FancyWidget_075(
                         number = 90,
                         s2 = "HelloWorld"
                     ) { RealWorld4_FancyWidget_078(model = model.f10.f5.f0, b = false) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -4173,7 +4172,7 @@ fun RealWorld4_FancyWidget_075(
                         number = 430,
                         s2 = "HelloWorld"
                     ) { RealWorld4_FancyWidget_078(model = model.f10.f5.f0, b = true) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -4321,7 +4320,7 @@ fun RealWorld4_FancyWidget_077(
                             ColoredRect(model.toColor())
                         }
                     }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -4333,7 +4332,7 @@ fun RealWorld4_FancyWidget_077(
                             ColoredRect(model.toColor())
                         }
                     }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -4423,12 +4422,12 @@ fun RealWorld4_FancyWidget_079(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -4472,7 +4471,7 @@ fun RealWorld4_FancyWidget_080(
                             model = model.f5.f0.f2
                         )
                     }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -4486,7 +4485,7 @@ fun RealWorld4_FancyWidget_080(
                             model = model.f5.f0.f2
                         )
                     }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -4621,7 +4620,7 @@ fun RealWorld4_FancyWidget_082(
                             model.toColor()
                         )
                     }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -4633,7 +4632,7 @@ fun RealWorld4_FancyWidget_082(
                             model.toColor()
                         )
                     }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -4678,7 +4677,7 @@ fun RealWorld4_FancyWidget_083(
                         modifier = LayoutWeight(1f),
                         model = model.f2
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -4688,7 +4687,7 @@ fun RealWorld4_FancyWidget_083(
                         modifier = LayoutWeight(1f),
                         model = model.f2
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -4716,12 +4715,12 @@ fun RealWorld4_FancyWidget_084(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -4759,7 +4758,7 @@ fun RealWorld4_FancyWidget_085(
                             s2 = "HelloWorld"
                         )
                     }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -4774,7 +4773,7 @@ fun RealWorld4_FancyWidget_085(
                             s2 = "HelloWorld"
                         )
                     }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -4904,7 +4903,7 @@ fun RealWorld4_FancyWidget_088(
                         model = model.f2,
                         number = 151
                     )
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -4913,7 +4912,7 @@ fun RealWorld4_FancyWidget_088(
                         model = model.f2,
                         number = 619
                     )
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -4947,12 +4946,12 @@ fun RealWorld4_FancyWidget_089(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -5028,12 +5027,12 @@ fun RealWorld4_FancyWidget_091(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -5078,7 +5077,7 @@ fun RealWorld4_FancyWidget_092(
                             ColoredRect(model.toColor())
                         }
                     }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -5093,7 +5092,7 @@ fun RealWorld4_FancyWidget_092(
                             ColoredRect(model.toColor())
                         }
                     }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -5252,12 +5251,12 @@ fun RealWorld4_FancyWidget_095(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -5477,12 +5476,12 @@ fun RealWorld4_FancyWidget_099(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -5650,12 +5649,12 @@ fun RealWorld4_FancyWidget_102(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -5731,12 +5730,12 @@ fun RealWorld4_FancyWidget_104(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -5830,12 +5829,12 @@ fun RealWorld4_FancyWidget_106(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -5875,12 +5874,12 @@ fun RealWorld4_FancyWidget_107(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -5914,12 +5913,12 @@ fun RealWorld4_FancyWidget_108(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -5947,12 +5946,12 @@ fun RealWorld4_FancyWidget_109(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -5998,12 +5997,12 @@ fun RealWorld4_FancyWidget_110(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -6041,12 +6040,12 @@ fun RealWorld4_FancyWidget_111(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -6204,12 +6203,12 @@ fun RealWorld4_FancyWidget_114(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -6255,12 +6254,12 @@ fun RealWorld4_FancyWidget_115(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -6298,7 +6297,7 @@ fun RealWorld4_FancyWidget_116(
                         model = model.f5,
                         number = 355
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -6307,7 +6306,7 @@ fun RealWorld4_FancyWidget_116(
                         model = model.f5,
                         number = 514
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -6341,12 +6340,12 @@ fun RealWorld4_FancyWidget_117(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -6380,12 +6379,12 @@ fun RealWorld4_FancyWidget_118(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -6426,7 +6425,7 @@ fun RealWorld4_FancyWidget_119(
                             model.toColor()
                         )
                     }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -6438,7 +6437,7 @@ fun RealWorld4_FancyWidget_119(
                             model.toColor()
                         )
                     }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -6466,12 +6465,12 @@ fun RealWorld4_FancyWidget_120(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -6511,12 +6510,12 @@ fun RealWorld4_FancyWidget_121(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -6566,12 +6565,12 @@ fun RealWorld4_FancyWidget_122(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -6611,12 +6610,12 @@ fun RealWorld4_FancyWidget_123(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -6660,7 +6659,7 @@ fun RealWorld4_FancyWidget_124(
                         modifier = LayoutWeight(1f),
                         model = model.f2
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -6669,7 +6668,7 @@ fun RealWorld4_FancyWidget_124(
                         modifier = LayoutWeight(1f),
                         model = model.f2
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -6703,12 +6702,12 @@ fun RealWorld4_FancyWidget_125(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -6742,12 +6741,12 @@ fun RealWorld4_FancyWidget_126(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -6775,12 +6774,12 @@ fun RealWorld4_FancyWidget_127(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -6820,12 +6819,12 @@ fun RealWorld4_FancyWidget_128(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -6859,12 +6858,12 @@ fun RealWorld4_FancyWidget_129(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -6892,12 +6891,12 @@ fun RealWorld4_FancyWidget_130(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -7279,7 +7278,7 @@ fun RealWorld4_FancyWidget_135(
                         modifier = LayoutWeight(1f),
                         model = model.f0
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -7288,7 +7287,7 @@ fun RealWorld4_FancyWidget_135(
                         modifier = LayoutWeight(1f),
                         model = model.f0
                     ) { ColoredRect(model.toColor()) }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -7389,12 +7388,12 @@ fun RealWorld4_FancyWidget_137(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -7422,12 +7421,12 @@ fun RealWorld4_FancyWidget_138(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -7466,7 +7465,7 @@ fun RealWorld4_FancyWidget_139(
                             s2 = "HelloWorld"
                         )
                     }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -7481,7 +7480,7 @@ fun RealWorld4_FancyWidget_139(
                             s2 = "HelloWorld"
                         )
                     }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -7603,7 +7602,7 @@ fun RealWorld4_FancyWidget_141(
                             model = model.f10.f7
                         )
                     }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -7617,7 +7616,7 @@ fun RealWorld4_FancyWidget_141(
                             model = model.f10.f7
                         )
                     }
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -7853,7 +7852,7 @@ fun RealWorld4_FancyWidget_144(
                         s1 = "HelloWorld",
                         b = false
                     )
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -7865,7 +7864,7 @@ fun RealWorld4_FancyWidget_144(
                         s1 = "HelloWorld",
                         b = true
                     )
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -8077,12 +8076,12 @@ fun RealWorld4_FancyWidget_147(
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
                     ColoredRect(model.toColor(), LayoutWeight(1f))
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }
@@ -8186,7 +8185,7 @@ fun RealWorld4_FancyWidget_149(
                         model = model.f5,
                         color = Color(red = 0xFF, blue = 0x99, green = 0x11)
                     )
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             } else {
                 Row {
@@ -8195,7 +8194,7 @@ fun RealWorld4_FancyWidget_149(
                         model = model.f5,
                         color = Color(red = 0xFF, blue = 0x99, green = 0x11)
                     )
-                    Container(modifier = LayoutWeight(1f), children = children)
+                    Box(modifier = LayoutWeight(1f), children = children)
                 }
             }
         }

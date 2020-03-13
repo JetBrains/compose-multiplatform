@@ -17,17 +17,16 @@
 package androidx.compose.benchmark.deeptree
 
 import androidx.compose.Composable
-import androidx.compose.benchmark.noChildren
 import androidx.ui.core.draw
+import androidx.ui.foundation.Box
 import androidx.ui.graphics.Color
 import androidx.ui.graphics.Paint
 import androidx.ui.layout.Column
-import androidx.ui.layout.Container
 import androidx.ui.layout.LayoutHeight
+import androidx.ui.layout.LayoutSize
 import androidx.ui.layout.LayoutWidth
 import androidx.ui.layout.Row
 import androidx.ui.layout.RowColumnScope
-import androidx.ui.unit.dp
 import androidx.ui.unit.toRect
 
 private fun background(paint: Paint) =
@@ -37,8 +36,6 @@ val blueBackground = background(Paint().also { it.color = Color.Blue })
 val magentaBackground = background(Paint().also { it.color = Color.Magenta })
 val blackBackground = background(Paint().also { it.color = Color.Black })
 
-val dp16 = 16.dp
-
 @Composable
 fun Terminal(style: Int) {
     val background = when (style) {
@@ -46,13 +43,7 @@ fun Terminal(style: Int) {
         1 -> blackBackground
         else -> magentaBackground
     }
-    Container(
-        modifier = background,
-        height = dp16,
-        width = dp16,
-        expanded = true,
-        children = noChildren
-    )
+    Box(modifier = LayoutSize.Fill + background)
 }
 
 @Composable
@@ -94,13 +85,7 @@ fun DeepTree(depth: Int, breadth: Int, wrap: Int, id: Int = 0) {
             Terminal(style = id % 3)
         } else {
             repeat(breadth) {
-                Container(
-                    modifier = blueBackground,
-                    height = dp16,
-                    width = dp16,
-                    expanded = true,
-                    children = noChildren
-                )
+                Box(LayoutSize.Fill + blueBackground)
             }
         }
     }
