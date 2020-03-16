@@ -1444,7 +1444,7 @@ open class Composer<N>(
                 }
                 finalizeCompose()
             }
-            return true
+            return changes.isNotEmpty()
         }
         return false
     }
