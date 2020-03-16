@@ -18,11 +18,11 @@ package androidx.compose.test
 
 import androidx.compose.Composable
 import androidx.compose.Composition
+import androidx.compose.clearRoots
 import androidx.compose.onActive
 import androidx.compose.onPreCommit
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import androidx.ui.core.clearRoots
 import junit.framework.TestCase
 import org.junit.After
 import org.junit.Rule

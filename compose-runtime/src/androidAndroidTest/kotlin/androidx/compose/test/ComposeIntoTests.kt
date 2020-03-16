@@ -17,11 +17,11 @@
 package androidx.compose.test
 
 import androidx.compose.Composable
+import androidx.compose.clearRoots
 import androidx.compose.onActive
 import androidx.compose.onCommit
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import androidx.ui.core.clearRoots
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Rule

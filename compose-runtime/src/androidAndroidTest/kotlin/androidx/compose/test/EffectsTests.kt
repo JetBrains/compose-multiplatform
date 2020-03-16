@@ -22,6 +22,7 @@ import androidx.compose.Composable
 import androidx.compose.Providers
 import androidx.compose.Recompose
 import androidx.compose.ambientOf
+import androidx.compose.clearRoots
 import androidx.compose.invalidate
 import androidx.compose.mutableStateOf
 import androidx.compose.onCommit
@@ -32,7 +33,6 @@ import androidx.compose.state
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.ui.node.UiComposer
-import androidx.ui.core.clearRoots
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import org.junit.After

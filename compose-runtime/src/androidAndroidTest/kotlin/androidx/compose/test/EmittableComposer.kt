@@ -29,6 +29,7 @@ import androidx.compose.Composition
 import androidx.compose.FrameManager
 import androidx.compose.Recomposer
 import androidx.compose.SlotTable
+import androidx.compose.compositionFor
 import androidx.ui.node.UiComposer
 
 interface Emittable {
@@ -195,14 +196,14 @@ class Node(val name: String, var value: String = "") : Emittable {
 
 fun Activity.setEmittableContent(content: @Composable() () -> Unit): Composition {
     val root = Node("Root")
-    val composition = Composition({ slotTable, recomposer ->
+    val composition = compositionFor(root) { slotTable, recomposer ->
         EmittableComposer(
             this,
             root,
             slotTable,
             recomposer
         )
-    })
-    composition.compose(content)
+    }
+    composition.setContent(content)
     return composition
 }

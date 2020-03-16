@@ -35,7 +35,6 @@ import androidx.compose.mock.selectContact
 import androidx.compose.mock.skip
 import androidx.compose.mock.text
 import androidx.compose.mock.validate
-import androidx.ui.core.clearRoots
 import org.junit.After
 import kotlin.test.Test
 import kotlin.test.assertEquals

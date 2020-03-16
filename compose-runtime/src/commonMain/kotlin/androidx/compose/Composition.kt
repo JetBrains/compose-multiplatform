@@ -16,76 +16,169 @@
 
 package androidx.compose
 
-private fun makeComposer(
-    factory: (SlotTable, Recomposer) -> Composer<*>,
-    parent: CompositionReference?,
-    slotTable: SlotTable
-): Composer<*> = factory(slotTable, Recomposer.current()).also {
-    it.parentReference = parent
-    parent?.registerComposer(it)
-}
-
 /**
- * A Composition is an object that is used to manage the UI created from a Composable from the
- * top level. A composition object is usually constructed for you, and returned from an API that
- * is used to initially compose a UI. For instance, [composeInto] returns a Composition.
+ * A composition object is usually constructed for you, and returned from an API that
+ * is used to initially compose a UI. For instance, [setContent] returns a Composition.
  *
- * The Composition object can be used to update the composition by calling the [compose] methods.
- * Similarly, the [dispose] method should be used when you would like to dispose of the UI and
+ * The [dispose] method should be used when you would like to dispose of the UI and
  * the Composition.
- *
- * @param composerFactory A function to create a composer object, for use during composition
- * @param parent An optional reference to the parent composition.
- *
- * @see composeInto
  */
-open class Composition(
-    private val composerFactory: (SlotTable, Recomposer) -> Composer<*>,
-    private val parent: CompositionReference? = null
-) {
-    private val slotTable: SlotTable = SlotTable()
-    internal val composer: Composer<*> = makeComposer(composerFactory, parent, slotTable)
-    var composable: @Composable() () -> Unit = emptyContent()
-
+interface Composition {
     /**
      * Update the composition with the content described by the [content] composable
      *
      * @param content A composable function that describes the UI
      */
-    open fun compose(content: @Composable() () -> Unit) {
-        composable = content
-        compose()
-    }
-
-    /**
-     * Recompose the composition with the same composable that the Composition was last composed
-     * with
-     */
-    fun compose() {
-        Recomposer.recompose(composable, composer)
-    }
+    fun setContent(content: @Composable() () -> Unit)
 
     /**
      * Clear the hierarchy that was created from the composition.
      */
-    open fun dispose() {
-        composable = emptyContent()
-        compose()
-    }
+    fun dispose()
+}
 
-    /**
-     * Return true if this is a root (non-sub-) composition
-     */
-    val isRoot: Boolean get() = parent == null
-
-    /**
-     * Recomposes any changes without forcing the [composable] to compose and blocks until
-     * composition completes.
-     *
-     * @return true if there were pending changes, false otherwise.
-     */
-    @TestOnly
-    fun recomposeSync(): Boolean {
-        return Recomposer.current().recomposeSync(composer)
+/**
+ * This method is the way to initiate a composition. Optionally, a [parent]
+ * [CompositionReference] can be provided to make the composition behave as a sub-composition of
+ * the parent.  The children of [container] will be updated and maintained by the time this
+ * method returns.
+ *
+ * It is important to call [Composition.dispose] whenever this [container] is no longer needed in
+ * order to release resources.
+ *
+ * @param container The container whose content is being composed.
+ * @param parent The parent composition reference, if applicable. Default is null.
+ * @param composerFactory The factory used to created a [Composer] to be used by the composition.
+ */
+fun compositionFor(
+    container: Any,
+    parent: CompositionReference? = null,
+    composerFactory: (SlotTable, Recomposer) -> Composer<*>
+): Composition = Compositions.findOrCreate(container) {
+    CompositionImpl(parent, composerFactory) {
+        Compositions.onDisposed(container)
     }
 }
+
+/**
+ * @param parent An optional reference to the parent composition.
+ * @param composerFactory A function to create a composer object, for use during composition
+ * @param onDispose A callback to be triggered when [dispose] is called.
+ */
+private class CompositionImpl(
+    parent: CompositionReference? = null,
+    composerFactory: (SlotTable, Recomposer) -> Composer<*>,
+    private val onDispose: (() -> Unit)
+) : Composition {
+    private val slotTable: SlotTable = SlotTable()
+    private val composer: Composer<*> = composerFactory(slotTable, Recomposer.current()).also {
+        it.parentReference = parent
+        parent?.registerComposer(it)
+    }
+
+    /**
+     * Return true if this is a root (non-sub-) composition.
+     */
+    val isRoot: Boolean = parent == null
+
+    private var disposed = false
+
+    var composable: @Composable() () -> Unit = emptyContent()
+
+    override fun setContent(content: @Composable() () -> Unit) {
+        check(!disposed) { "The composition is disposed" }
+        this.composable = content
+        Recomposer.recompose(composable, composer)
+    }
+
+    override fun dispose() {
+        if (!disposed) {
+            setContent(emptyContent())
+            onDispose()
+            disposed = true
+        }
+    }
+}
+
+/**
+ * Keeps all the active compositions.
+ */
+private object Compositions {
+    private val holdersMap = WeakHashMap<Any, CompositionImpl>()
+
+    fun findOrCreate(root: Any, create: () -> CompositionImpl): CompositionImpl {
+        return holdersMap[root] ?: create().also { holdersMap[root] = it }
+    }
+
+    fun onDisposed(root: Any) {
+        holdersMap.remove(root)
+    }
+
+    fun clear() {
+        holdersMap.clear()
+    }
+
+    fun collectAll(): List<CompositionImpl> {
+        return holdersMap.values.toList()
+    }
+}
+
+/**
+ * Apply Code Changes will invoke the two functions before and after a code swap.
+ *
+ * This forces the whole view hierarchy to be redrawn to invoke any code change that was
+ * introduce in the code swap.
+ *
+ * All these are private as within JVMTI / JNI accessibility is mostly a formality.
+ */
+private class HotReloader {
+    companion object {
+        private var state = mutableListOf<Pair<CompositionImpl, @Composable() () -> Unit>>()
+
+        @TestOnly
+        fun clearRoots() {
+            Compositions.clear()
+        }
+
+        // Called before Dex Code Swap
+        @Suppress("UNUSED_PARAMETER")
+        private fun saveStateAndDispose(context: Any) {
+            state.clear()
+            val holders = Compositions.collectAll()
+            holders.mapTo(state) { it to it.composable }
+            holders.filter { it.isRoot }.forEach { it.setContent(emptyContent()) }
+        }
+
+        // Called after Dex Code Swap
+        @Suppress("UNUSED_PARAMETER")
+        private fun loadStateAndCompose(context: Any) {
+            val roots = mutableListOf<CompositionImpl>()
+            state.forEach { (composition, composable) ->
+                composition.composable = composable
+                if (composition.isRoot) {
+                    roots.add(composition)
+                }
+            }
+            roots.forEach { it.setContent(it.composable) }
+            state.clear()
+        }
+
+        @TestOnly
+        internal fun simulateHotReload(context: Any) {
+            saveStateAndDispose(context)
+            loadStateAndCompose(context)
+        }
+    }
+}
+
+/**
+ * @suppress
+ */
+@TestOnly
+fun simulateHotReload(context: Any) = HotReloader.simulateHotReload(context)
+
+/**
+ * @suppress
+ */
+@TestOnly
+fun clearRoots() = HotReloader.clearRoots()

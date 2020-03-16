@@ -135,20 +135,13 @@ package androidx.compose {
     method public <T> boolean changed(T? value);
   }
 
-  public class Composition {
-    ctor public Composition(kotlin.jvm.functions.Function2<? super androidx.compose.SlotTable,? super androidx.compose.Recomposer,? extends androidx.compose.Composer<?>> composerFactory, androidx.compose.CompositionReference? parent);
-    method public void compose(kotlin.jvm.functions.Function0<kotlin.Unit> content);
-    method public final void compose();
+  public interface Composition {
     method public void dispose();
-    method public final kotlin.jvm.functions.Function0<kotlin.Unit> getComposable();
-    method public final boolean isRoot();
-    method public final boolean recomposeSync();
-    method public final void setComposable(kotlin.jvm.functions.Function0<kotlin.Unit> p);
-    property public final kotlin.jvm.functions.Function0<kotlin.Unit> composable;
-    property public final boolean isRoot;
+    method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
   public final class CompositionKt {
+    method public static androidx.compose.Composition compositionFor(Object container, androidx.compose.CompositionReference? parent = null, kotlin.jvm.functions.Function2<? super androidx.compose.SlotTable,? super androidx.compose.Recomposer,? extends androidx.compose.Composer<?>> composerFactory);
   }
 
   public interface CompositionLifecycleObserver {

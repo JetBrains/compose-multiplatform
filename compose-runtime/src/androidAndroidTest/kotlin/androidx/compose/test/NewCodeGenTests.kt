@@ -21,12 +21,12 @@ import android.content.Context
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.compose.Composable
+import androidx.compose.clearRoots
 import androidx.compose.key
 import androidx.compose.mutableStateOf
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.ui.node.UiComposer
-import androidx.ui.core.clearRoots
 import junit.framework.TestCase
 import org.junit.After
 import org.junit.Rule

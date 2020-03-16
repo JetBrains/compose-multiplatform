@@ -21,13 +21,13 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.compose.Composable
+import androidx.compose.clearRoots
 import androidx.compose.frames.currentFrame
 import androidx.compose.invalidate
 import androidx.compose.key
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.ui.node.UiComposer
-import androidx.ui.core.clearRoots
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertNotSame

@@ -19,6 +19,7 @@ package androidx.compose.test
 import android.widget.TextView
 import androidx.compose.Composable
 import androidx.compose.Observe
+import androidx.compose.clearRoots
 import androidx.compose.frames.AbstractRecord
 import androidx.compose.frames.Framed
 import androidx.compose.frames.Record
@@ -32,7 +33,6 @@ import androidx.compose.frames.open
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.ui.node.UiComposer
-import androidx.ui.core.clearRoots
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import org.junit.After
