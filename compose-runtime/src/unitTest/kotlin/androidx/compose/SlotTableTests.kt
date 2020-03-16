@@ -53,23 +53,6 @@ class SlotTableTests {
     }
 
     @Test
-    fun testPrevious() {
-        val slots = testSlotsNumbered()
-        slots.read { reader ->
-            for (i in 0 until 100) {
-                assertEquals(i, reader.next())
-                reader.previous()
-                assertEquals(i, reader.next())
-            }
-            for (i in 99 downTo 0) {
-                reader.previous()
-                assertEquals(i, reader.next())
-                reader.previous()
-            }
-        }
-    }
-
-    @Test
     fun testInsertAtTheStart() {
         val slots = testSlotsNumbered()
         slots.write { writer ->
@@ -417,6 +400,15 @@ class SlotTableTests {
     // Semantic tests (testing groups and nodes)
 
     @Test
+    fun testEmptySlotTable() {
+        val slotTable = SlotTable()
+
+        slotTable.read { reader ->
+            assertEquals(EMPTY, reader.groupKey)
+        }
+    }
+
+    @Test
     fun testExtractKeys() {
         val slots = testItems()
         slots.read { reader ->
@@ -759,12 +751,6 @@ class SlotTableTests {
     }
 
     @Test
-    fun testReportUncertainNodeCount() {
-        val slots = SlotTable()
-        slots.read { reader -> reader.reportUncertainNodeCount() }
-    }
-
-    @Test
     fun testMoveGroup() {
         val slots = SlotTable()
 
@@ -1058,11 +1044,15 @@ class SlotTableTests {
 }
 
 fun testSlotsNumbered(): SlotTable {
-    val items = arrayOfNulls<Any?>(100)
-    repeat(100) {
-        items[it] = it
+    val slotTable = SlotTable()
+    slotTable.write { writer ->
+        writer.beginInsert()
+        repeat(100) {
+            writer.update(it)
+        }
+        writer.endInsert()
     }
-    return SlotTable(items)
+    return slotTable
 }
 
 private val rootKey = object {}

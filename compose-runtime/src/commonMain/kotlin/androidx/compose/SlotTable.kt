@@ -16,53 +16,230 @@
 
 package androidx.compose
 
-/**
- * A gap buffer implementation of the composition slot space. A slot space can be thought of as
- * a custom List<Any?> that optimizes around inserts and removes.
- *
- * Slots stores slots, groups, and nodes.
- *
- *   Slot  - A slot is the primitive base type of the slot space. It is of type Any? and can hold
- *           any value.
- *   Group - A group is a keyed group of slots. The group counts the number of slots and nodes it
- *           contains.
- *   Node  - A node is a special group that is counted by the containing groups.
- *
- * All groups and nodes are just grouping of slots and use slots to describe the groups. At
- * the root of a slot space is a group. Groups count the number nodes that are in the group. A node
- * only counts as one node in its group regardless of the number of nodes it contains.
- *
- * ASIDE:
- * The intent is that groups represent memoized function calls and nodes represent views. For
- * example:
- *
- * @sample androidx.compose.samples.initialGroup
- *
- * the `LinearLayout` here would be a node (the linear layout view). The node contains the
- * groups for the child views of the linear layout.
- *
- * If contact's composition looks like:
- *
- * @sample androidx.compose.samples.contactSample
- *
- * then composing contact into the linear layout would add two views to the linear layout's
- * children. The composition of contact creates groups, one for each text view. The groups for each
- * contact would be able to report that it produces two views (that is the group created for
- * Contact has two nodes). Summing the nodes in the group produces the number of views (as
- * each node corresponds to a view).
- *
- * If the order of jim and bob change:
- *
- * @sample androidx.compose.samples.reorderedGroup
- *
- * the previous result can be reused by moving the views generated bob's group before jim's (or vis
- * versa). A composition algorithm could use the key information for each group to determine if they
- * can be switched. For example, since the first contact's group has two nodes the composition
- * algorithm can infer that the beginning of jim's views starts at 2 and contains 2 view. To move
- * jim in front of bob, move the 2 views from offset 2 to offset 0. If contact is immutable, for
- * example, Contact would only need to be recomposed if the value of jim or bob change.
- */
-open class SlotEditor internal constructor(val table: SlotTable) {
+class SlotReader(val table: SlotTable) {
+    var current = 0
+        private set
+    var currentEnd = table.size
+        private set
+    var nodeIndex: Int = 0
+        private set
+
+    internal val startStack = IntStack()
+    private val slots = table.slots
+    private var currentGroup: GroupStart? = null
+    private var emptyCount = 0
+    private val nodeIndexStack = IntStack()
+
+    init {
+        require(table.gapStart == currentEnd) { "Gap is not at the end of the slot table" }
+    }
+
+    /**
+     * Determine the slot at [current] is the start of a group and not at the end of the current
+     * group.
+     */
+    val isGroup get() = current < currentEnd && calculateCurrentGroup() != null
+
+    /**
+     * Determine if the slot at [index] is the start of a group
+     */
+    fun isGroup(index: Int) = slots[index] is GroupStart
+
+    /**
+     * Determine if the slot is start of a node.
+     */
+    val isNode get() = calculateCurrentGroup()?.isNode ?: false
+
+    /**
+     * Determine if the reader is at the end of a group and an [endGroup] or [endNode] is expected.
+     */
+    val isGroupEnd get() = inEmpty || current == currentEnd
+
+    /**
+     * Determine if a [beginEmpty] has been called.
+     */
+    val inEmpty get() = emptyCount > 0
+
+    /**
+     * Get the size of the group at [current]. Will throw an exception if the [isGroup] is `false`.
+     */
+    val groupSize get() = assumeGroup().slots
+
+    /**
+     * Get the size of the group at [index]. Will throw an exception if [index] is not a group
+     * start.
+     */
+    fun groupSize(index: Int) = slots[index].asGroupStart.slots
+
+    /**
+     * Get the key of the current group. Returns [EMPTY] if the [current] is not a group.
+     */
+    val groupKey get() = if (current < currentEnd) calculateCurrentGroup()?.key ?: EMPTY else EMPTY
+
+    /**
+     * Get the key of the group at [index]. Will throw an exception if [index] is not a group
+     * start.
+     */
+    fun groupKey(index: Int) = slots[index].asGroupStart.key
+
+    /**
+     * Return the number of nodes where emitted into the current group.
+     */
+    val parentNodes: Int get() =
+        if (startStack.isEmpty()) 0 else slots[startStack.peek()].asGroupStart.nodes
+
+    /**
+     * Get the value stored at [anchor].
+     */
+    @Suppress("KotlinOperator")
+    fun get(anchor: Anchor) = if (anchor.loc >= 0) slots[anchor.loc] else EMPTY
+
+    /**
+     * Get the value stored at [index].
+     */
+    @Suppress("KotlinOperator")
+    fun get(index: Int) = if (emptyCount > 0) EMPTY else slots[index]
+
+    /**
+     * Get the value of the slot at [current] or [EMPTY] if at then end of a group. During empty
+     * mode this value is  always [EMPTY] which is the value a newly inserted slot.
+     */
+    fun next(): Any? {
+        if (emptyCount > 0) return EMPTY
+        currentGroup = null
+        return if (current < currentEnd) slots[current++] else EMPTY
+    }
+
+    /**
+     * Begin reporting empty for all calls to next() or get(). beginEmpty() can be nested and must
+     * be called with a balanced number of endEmpty()
+     */
+    fun beginEmpty() { emptyCount++ }
+
+    /**
+     * End reporting [EMPTY] for calls to [next] and [get],
+     */
+    fun endEmpty() {
+        require(emptyCount > 0) { "Unbalanced begin/end empty" }
+        emptyCount--
+    }
+
+    /**
+     * Close the slot reader. After all [SlotReader]s have been closed the [SlotTable] a
+     * [SlotWriter] can be created.
+     */
+    fun close() = table.close(this)
+
+    /**
+     * Start a group. Passing an EMPTY as the key will enter the group without validating the key.
+     */
+    fun startGroup(key: Any) = startGroup(key, GROUP)
+
+    /**
+     * Start a node.
+     */
+    fun startNode(key: Any) = startGroup(key, NODE)
+
+    /**
+     *  Skip a group. Must be called at the start of a group.
+     */
+    fun skipGroup(): Int {
+        require(emptyCount == 0) { "Cannot skip while in an empty region" }
+        val group = assumeGroup()
+        current += group.slots + 1
+        currentGroup = null
+        val count = if (group.isNode) 1 else group.nodes
+        nodeIndex += count
+        return count
+    }
+
+    /**
+     * Start a node.
+     */
+    fun skipNode() = skipGroup()
+
+    /**
+     * Skip to the end of the current group.
+     */
+    fun skipToGroupEnd() {
+        require(emptyCount == 0) { "Cannot skip the enclosing group while in an empty region" }
+        require(startStack.isNotEmpty()) { "No enclosing group to skip" }
+        nodeIndex = slots[startStack.peek()].asGroupStart.nodes + nodeIndexStack.peek()
+        currentGroup = null
+        current = currentEnd
+    }
+
+    fun reposition(value: Int) {
+        current = value
+        currentGroup = null
+    }
+    /**
+     * End the current group. Must be called after the corresponding [startGroup].
+     */
+    fun endGroup() {
+        if (emptyCount == 0) {
+            require(current == currentEnd)
+            val startLocation = startStack.pop()
+            if (startStack.isEmpty()) return
+            val parentLocation = startStack.peekOr(0)
+            val group = slots[startLocation].asGroupStart
+            val parentGroup = slots[parentLocation].asGroupStart
+            nodeIndex = nodeIndexStack.pop() + if (group.key == NODE) 1 else nodeIndex
+            currentEnd = parentGroup.slots + parentLocation + 1
+            currentGroup = null
+        }
+    }
+
+    /**
+     * End a node
+     */
+    fun endNode() = endGroup()
+
+    /**
+     * Extract the keys from this point to the end of the group. The current is left unaffected.
+     * Must be called inside a group.
+     */
+    fun extractKeys(): MutableList<KeyInfo> {
+        val result = mutableListOf<KeyInfo>()
+        if (emptyCount > 0) return result
+        val oldCurrent = current
+        val oldNodeIndex = nodeIndex
+        var index = 0
+        while (current < currentEnd) {
+            val location = current
+            val key = slots[location].asGroupStart.key
+            result.add(KeyInfo(key, location, skipGroup(), index++))
+        }
+        current = oldCurrent
+        this.nodeIndex = oldNodeIndex
+        return result
+    }
+
+    override fun toString(): String = "SlotReader(current=$current, emptyCount=$emptyCount)"
+
+    private fun startGroup(key: Any, kind: GroupKind) {
+        if (emptyCount <= 0) {
+            startStack.push(current)
+            nodeIndexStack.push(nodeIndex)
+            val group = assumeGroup()
+            currentEnd = current + group.slots + 1
+            require(group.kind == kind) { "Group kind changed" }
+            require(key == EMPTY || key == group.key) { "Group key changed" }
+            current++
+            currentGroup = null
+        }
+    }
+
+    private fun calculateCurrentGroup(): GroupStart? =
+        (currentGroup ?: slots[current] as? GroupStart)?.also { currentGroup = it }
+    private fun assumeGroup(): GroupStart = calculateCurrentGroup()
+        ?: error("Expected a group start")
+}
+
+@PublishedApi
+internal val EMPTY = SlotTable.EMPTY
+
+class SlotWriter internal constructor(val table: SlotTable) {
     var current = 0
     internal val slots get() = table.slots
     internal fun effectiveIndex(index: Int) = table.effectiveIndex(index)
@@ -73,6 +250,8 @@ open class SlotEditor internal constructor(val table: SlotTable) {
     internal val nodeCountStack = IntStack()
     internal val endStack = IntStack()
     internal val keyStack = Stack<Any>()
+    private var insertCount = 0
+    private var pendingClear = false
 
     /**
      * Return true if the current slot starts a group
@@ -119,249 +298,22 @@ open class SlotEditor internal constructor(val table: SlotTable) {
     /**
      * Get the value at an Anchor
      */
+    @Suppress("KotlinOperator")
     fun get(anchor: Anchor) = if (anchor.loc >= 0) slots[anchor.loc] else SlotTable.EMPTY
 
     /**
      * Get the value at the index'th slot.
      */
+    @Suppress("KotlinOperator")
     fun get(index: Int) = effectiveIndex(index).let {
         if (it < slots.size) slots[it] else SlotTable.EMPTY
     }
 
-    internal fun advance(): Any? {
-        if (current >= currentEnd) {
-            return SlotTable.EMPTY
-        }
-        val index = current++
-        return slots[effectiveIndex(index)]
+    fun close() {
+        table.close(this)
+        // Ensure, for readers, there is no gap
+        moveGapTo(table.size)
     }
-
-    internal fun recordStartGroup(key: Any, kind: GroupKind, validate: Boolean) {
-        startStack.push(current)
-        groupKindStack.push(kind)
-        nodeCountStack.push(nodeCount)
-        keyStack.push(if (key == SlotTable.EMPTY) get(current).asGroupStart.key else key)
-        // Record the end location as relative to the end of the slot table so when we pop it back
-        // off again all inserts and removes that happened while a child group was open are already
-        // reflected into its value.
-        endStack.push(slots.size - table.gapLen - currentEnd)
-        nodeCount = 0
-        if (validate) {
-            val groupStart = advance().asGroupStart
-            require(groupStart.kind == kind) { "Group kind changed" }
-            require(key == SlotTable.EMPTY || groupStart.key == key) { "Group key changed" }
-            currentEnd = current + groupStart.slots
-        }
-    }
-
-    internal fun advanceToNextGroup(): Int {
-        val groupStart = advance().asGroupStart
-        current += groupStart.slots
-
-        val count = if (groupStart.isNode) 1 else groupStart.nodes
-        nodeCount += count
-
-        return count
-    }
-
-    internal fun recordEndGroup(writing: Boolean, inserting: Boolean, uncertain: Boolean): Int {
-        var count = nodeCount
-        require(startStack.isNotEmpty()) {
-            "Invalid state. Unbalanced calls to startGroup() and endGroup()"
-        }
-        require(inserting || current == currentEnd) { "Expected to be at the end of a group" }
-
-        // Update group length
-        val startLocation = startStack.pop()
-        val groupKind = groupKindStack.pop()
-        val effectiveStartLocation = effectiveIndex(startLocation)
-        val key = keyStack.pop()
-        require(slots[effectiveStartLocation] === SlotTable.EMPTY ||
-                slots[effectiveStartLocation] is GroupStart
-        ) {
-            "Invalid state. Start location stack doesn't refer to a start location"
-        }
-
-        val len = current - startLocation - 1
-        if (writing) {
-            slots[effectiveStartLocation] = GroupStart(groupKind, key, len, nodeCount)
-        } else {
-            val start = slots[effectiveStartLocation].asGroupStart
-            // A node count < 0 means that it was reported as uncertain while reading
-            require(start.slots == len && (nodeCount == start.nodes || uncertain)) {
-                "Invalid endGroup call, expected ${start.slots} slots and ${
-                start.nodes} nodes but received, $len slots and $nodeCount nodes"
-            }
-            count = start.nodes
-        }
-        nodeCount = nodeCountStack.pop() + if (groupKind == NODE) 1 else nodeCount
-        currentEnd = (slots.size - table.gapLen) - endStack.pop()
-        if (writing && nodeCountStack.isEmpty()) table.clearGap()
-        return count
-    }
-}
-
-class SlotReader internal constructor(table: SlotTable) : SlotEditor(table) {
-    private var emptyCount = 0
-    private var uncertainCount = false
-
-    /**
-     * Return true if the current location is at the end of a group
-     */
-    val isGroupEnd get() = inEmpty || current == currentEnd
-
-    /**
-     * Get the value at the current slot
-     */
-    fun get() = if (emptyCount > 0) SlotTable.EMPTY else slots[effectiveIndex(current - 1)]
-
-    /**
-     * Return the key for the current group or EMPTY
-     */
-    val groupKey get() = (get(current) as? GroupStart)?.key ?: SlotTable.EMPTY
-
-    /**
-     * Return the group key at index. isGroup(index) must be true or this will throw.
-     */
-    fun groupKey(index: Int) = get(index).asGroupStart.key
-
-    /**
-     * Get the value of the next slot. During empty mode this value is always EMPTY which is the
-     * value a newly inserted slot.
-     */
-    fun next(): Any? {
-        if (emptyCount > 0) {
-            return SlotTable.EMPTY
-        }
-        return advance()
-    }
-
-    /**
-     * Backup one slot. For example, we ran into a key of a keyed group we don't want, this backs up
-     * current to be before the key.
-     */
-    fun previous() {
-        if (emptyCount <= 0) {
-            require(current > 0) { "Invalid call to previous" }
-            current--
-        }
-    }
-
-    /**
-     * Begin reporting empty for all calls to next() or get(). beginEmpty() can be nested and must
-     * be called with a balanced number of endEmpty()
-     */
-    fun beginEmpty() {
-        emptyCount++
-    }
-
-    val inEmpty get() = emptyCount > 0
-
-    /**
-     * End reporting empty for calls to net() and get().
-     */
-    fun endEmpty() {
-        require(emptyCount > 0) { "Unbalanced begin/end empty" }
-        emptyCount--
-    }
-
-    fun close() = table.close(this)
-
-    /**
-     * Start a group. Passing an EMPTY as the key will enter the group without validating the key.
-     */
-    fun startGroup(key: Any) = startGroup(key, GROUP)
-
-    private fun startGroup(key: Any, kind: GroupKind) {
-        if (emptyCount <= 0) {
-            recordStartGroup(key, kind, validate = true)
-        }
-    }
-
-    /**
-     *  Skip a group. Must be called at the start of a group.
-     */
-    fun skipGroup(): Int {
-        require(emptyCount == 0) { "Cannot skip while in an empty region" }
-        return advanceToNextGroup()
-    }
-
-    /**
-     * Skip the to the end of the group.
-     */
-    fun skipEnclosingGroup(): Int {
-        require(emptyCount == 0) { "Cannot skip the enclosing group while in an empty region" }
-        require(startStack.isNotEmpty()) { "No enclosing group to skip" }
-        val startLocation = startStack.peek()
-        val start = get(startLocation).asGroupStart
-        current = currentEnd
-        uncertainCount = true
-        return start.nodes
-    }
-
-    /**
-     * End the current group. Must be called after the corresponding startGroup().
-     */
-    fun endGroup(): Int {
-        if (emptyCount <= 0) {
-            return recordEndGroup(writing = false, inserting = false, uncertain = uncertainCount)
-        } else return 0
-    }
-
-    /**
-     * Start a node.
-     */
-    fun startNode(key: Any) = startGroup(key, NODE)
-
-    /**
-     * End a node
-     */
-    fun endNode() = endGroup()
-
-    /**
-     * Skip a node
-     */
-    fun skipNode() = skipGroup()
-
-    fun reportUncertainNodeCount() {
-        uncertainCount = true
-    }
-
-    /**
-     * Extract the keys from this point to the end of the group. The current is left unaffected.
-     * Must be called inside a group.
-     */
-    fun extractKeys(): MutableList<KeyInfo> {
-        val result = mutableListOf<KeyInfo>()
-        if (emptyCount > 0) return result
-        val oldCurrent = current
-        val oldNodeCount = nodeCount
-        var index = 0
-        while (current < currentEnd) {
-            val location = current
-            val key = get(location).asGroupStart.key
-            result.add(KeyInfo(key, location, skipGroup(), index++))
-        }
-        current = oldCurrent
-        this.nodeCount = oldNodeCount
-        return result
-    }
-
-    override fun toString(): String {
-        return "SlotReader" +
-                "(current=$current, " +
-                "size=${slots.size - table.gapLen}, " +
-                "gap=${
-        if (table.gapLen > 0) "$table.gapStart-${table.gapStart + table.gapLen - 1}" else "none"}${
-        if (inEmpty) ", in empty" else ""})"
-    }
-}
-
-class SlotWriter internal constructor(table: SlotTable) : SlotEditor(table) {
-    private var insertCount = 0
-    private var pendingClear = false
-
-    fun close() = table.close(this)
 
     /**
      * Set the value of the next slot.
@@ -538,6 +490,78 @@ class SlotWriter internal constructor(table: SlotTable) : SlotEditor(table) {
      */
     fun anchor(index: Int = current): Anchor = table.anchor(index)
 
+    private fun advance(): Any? {
+        if (current >= currentEnd) {
+            return SlotTable.EMPTY
+        }
+        val index = current++
+        return slots[effectiveIndex(index)]
+    }
+
+    private fun recordStartGroup(key: Any, kind: GroupKind, validate: Boolean) {
+        startStack.push(current)
+        groupKindStack.push(kind)
+        nodeCountStack.push(nodeCount)
+        keyStack.push(if (key == SlotTable.EMPTY) get(current).asGroupStart.key else key)
+        // Record the end location as relative to the end of the slot table so when we pop it back
+        // off again all inserts and removes that happened while a child group was open are already
+        // reflected into its value.
+        endStack.push(slots.size - table.gapLen - currentEnd)
+        nodeCount = 0
+        if (validate) {
+            val groupStart = advance().asGroupStart
+            require(groupStart.kind == kind) { "Group kind changed" }
+            require(key == SlotTable.EMPTY || groupStart.key == key) { "Group key changed" }
+            currentEnd = current + groupStart.slots
+        }
+    }
+
+    internal fun advanceToNextGroup(): Int {
+        val groupStart = advance().asGroupStart
+        current += groupStart.slots
+
+        val count = if (groupStart.isNode) 1 else groupStart.nodes
+        nodeCount += count
+
+        return count
+    }
+
+    internal fun recordEndGroup(writing: Boolean, inserting: Boolean, uncertain: Boolean): Int {
+        var count = nodeCount
+        require(startStack.isNotEmpty()) {
+            "Invalid state. Unbalanced calls to startGroup() and endGroup()"
+        }
+        require(inserting || current == currentEnd) { "Expected to be at the end of a group" }
+
+        // Update group length
+        val startLocation = startStack.pop()
+        val groupKind = groupKindStack.pop()
+        val effectiveStartLocation = effectiveIndex(startLocation)
+        val key = keyStack.pop()
+        require(slots[effectiveStartLocation] === SlotTable.EMPTY ||
+                slots[effectiveStartLocation] is GroupStart
+        ) {
+            "Invalid state. Start location stack doesn't refer to a start location"
+        }
+
+        val len = current - startLocation - 1
+        if (writing) {
+            slots[effectiveStartLocation] = GroupStart(groupKind, key, len, nodeCount)
+        } else {
+            val start = slots[effectiveStartLocation].asGroupStart
+            // A node count < 0 means that it was reported as uncertain while reading
+            require(start.slots == len && (nodeCount == start.nodes || uncertain)) {
+                "Invalid endGroup call, expected ${start.slots} slots and ${
+                start.nodes} nodes but received, $len slots and $nodeCount nodes"
+            }
+            count = start.nodes
+        }
+        nodeCount = nodeCountStack.pop() + if (groupKind == NODE) 1 else nodeCount
+        currentEnd = (slots.size - table.gapLen) - endStack.pop()
+        if (writing && nodeCountStack.isEmpty()) table.clearGap()
+        return count
+    }
+
     private fun moveGapTo(index: Int) {
         if (table.gapLen > 0 && table.gapStart != index) {
             trace("SlotTable:moveGap") {
@@ -644,6 +668,52 @@ internal data class GroupStart(val kind: GroupKind, val key: Any, val slots: Int
     val isNode get() = kind == NODE
 }
 
+/**
+ * A gap buffer implementation of the composition slot space. A slot space can be thought of as
+ * a custom List<Any?> that optimizes around inserts and removes.
+ *
+ * Slots stores slots, groups, and nodes.
+ *
+ *   Slot  - A slot is the primitive base type of the slot space. It is of type Any? and can hold
+ *           any value.
+ *   Group - A group is a keyed group of slots. The group counts the number of slots and nodes it
+ *           contains.
+ *   Node  - A node is a special group that is counted by the containing groups.
+ *
+ * All groups and nodes are just grouping of slots and use slots to describe the groups. At
+ * the root of a slot space is a group. Groups count the number nodes that are in the group. A node
+ * only counts as one node in its group regardless of the number of nodes it contains.
+ *
+ * ASIDE:
+ * The intent is that groups represent memoized function calls and nodes represent views. For
+ * example:
+ *
+ * @sample androidx.compose.samples.initialGroup
+ *
+ * the `LinearLayout` here would be a node (the linear layout view). The node contains the
+ * groups for the child views of the linear layout.
+ *
+ * If contact's composition looks like:
+ *
+ * @sample androidx.compose.samples.contactSample
+ *
+ * then composing contact into the linear layout would add two views to the linear layout's
+ * children. The composition of contact creates groups, one for each text view. The groups for each
+ * contact would be able to report that it produces two views (that is the group created for
+ * Contact has two nodes). Summing the nodes in the group produces the number of views (as
+ * each node corresponds to a view).
+ *
+ * If the order of jim and bob change:
+ *
+ * @sample androidx.compose.samples.reorderedGroup
+ *
+ * the previous result can be reused by moving the views generated bob's group before jim's (or vis
+ * versa). A composition algorithm could use the key information for each group to determine if they
+ * can be switched. For example, since the first contact's group has two nodes the composition
+ * algorithm can infer that the beginning of jim's views starts at 2 and contains 2 view. To move
+ * jim in front of bob, move the 2 views from offset 2 to offset 0. If contact is immutable, for
+ * example, Contact would only need to be recomposed if the value of jim or bob change.
+ */
 class SlotTable(internal var slots: Array<Any?> = arrayOf()) {
     private var readers = 0
     private var writer = false
@@ -668,7 +738,7 @@ class SlotTable(internal var slots: Array<Any?> = arrayOf()) {
     }
 
     fun groupPathTo(location: Int): List<Int> {
-        require(location < slots.size - gapLen)
+        require(location < size)
         val path = mutableListOf<Int>()
         read { reader ->
             var current = 0
