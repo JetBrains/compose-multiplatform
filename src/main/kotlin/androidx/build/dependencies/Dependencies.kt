@@ -87,6 +87,8 @@ const val OKHTTP_MOCKWEBSERVER = "com.squareup.okhttp3:mockwebserver:3.14.7"
 
 const val ROBOLECTRIC = "org.robolectric:robolectric:4.3.1"
 
+const val SHADOW_PLUGIN = "com.github.jengelman.gradle.plugins:shadow:5.2.0"
+
 const val PROTOBUF = "com.google.protobuf:protobuf-java:3.4.0"
 
 const val FLOGGER = "com.google.flogger:flogger:0.4"

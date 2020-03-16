@@ -91,6 +91,11 @@ val EXEMPT_TASK_NAMES = setOf(
     "publishPluginMavenPublicationToMavenRepository",
     "publishSafeargsJavaPluginMarkerMavenPublicationToMavenRepository",
     "publishSafeargsKotlinPluginMarkerMavenPublicationToMavenRepository",
+    /**
+     * relocateShadowJar is used to configure the ShadowJar hence it does not have any outputs.
+     * https://github.com/johnrengelman/shadow/issues/561
+     */
+    "relocateShadowJar",
     "reportLibraryMetrics",
     "stripArchiveForPartialDejetification",
     "transformClassesWithDexBuilderForPublicDebug",
