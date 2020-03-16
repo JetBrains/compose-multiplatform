@@ -26,7 +26,7 @@ import androidx.ui.layout.LayoutHeight
 import androidx.ui.layout.LayoutSize
 import androidx.ui.layout.LayoutWidth
 import androidx.ui.layout.Row
-import androidx.ui.layout.RowColumnScope
+import androidx.ui.layout.RowScope
 import androidx.ui.unit.toRect
 
 private fun background(paint: Paint) =
@@ -47,11 +47,11 @@ fun Terminal(style: Int) {
 }
 
 @Composable
-fun Stack(vertical: Boolean, children: @Composable() RowColumnScope.() -> Unit) {
+fun Stack(vertical: Boolean, children: @Composable() () -> Unit) {
     if (vertical) {
-        Column(LayoutHeight.Fill, children = children)
+        Column(LayoutHeight.Fill) { children() }
     } else {
-        Row(LayoutWidth.Fill, children = children)
+        Row(LayoutWidth.Fill) { children() }
     }
 }
 
