@@ -336,7 +336,6 @@ open class Composer<N>(
      *
      * @see [endReplaceableGroup]
      * @see [startMovableGroup]
-     * @see [startContainerGroup]
      * @see [startRestartGroup]
      */
     fun startReplaceableGroup(key: Int) = startGroup(key)
@@ -358,8 +357,7 @@ open class Composer<N>(
     /**
      * Inserts a "Movable Group" starting marker in the slot table at the current execution
      * position. A Movable Group is a group which can be moved or reordered between its siblings
-     * and retain slot table state, in addition to being removed or inserted. These groups are
-     * only valid when they are inserted as direct children of Container Groups. Movable Groups
+     * and retain slot table state, in addition to being removed or inserted. Movable Groups
      * are more expensive than other groups because when they are encountered with a mismatched
      * key in the slot table, they must be held on to temporarily until the entire parent group
      * finishes execution in case it moved to a later position in the group. Movable groups are
@@ -379,7 +377,6 @@ open class Composer<N>(
      * @see [key]
      * @see [joinKey]
      * @see [startReplaceableGroup]
-     * @see [startContainerGroup]
      * @see [startRestartGroup]
      */
     fun startMovableGroup(key: Any) = startGroup(key)
@@ -400,40 +397,6 @@ open class Composer<N>(
      * @see [startMovableGroup]
      */
     fun endMovableGroup() = endGroup()
-
-    /**
-     * Inserts a "Container Group" starting marker in the slot table at the current execution
-     * position. A Container Group is a group whose children can be moved or reordered.
-     * Container groups can only have Movable Groups or Replaceable Groups as children. Moveable
-     * Groups are inserted by the compiler around control flow such as for loops, while loops,
-     * and in some cases when expressions.
-     *
-     * A call to [startContainerGroup] must be matched with a corresponding call to
-     * [endContainerGroup].
-     *
-     * Warning: This is expected to be executed by the compiler only and should not be called
-     * directly from source code. Call this API at your own risk.
-     *
-     * @see [endContainerGroup]
-     * @see [startReplaceableGroup]
-     * @see [startMovableGroup]
-     * @see [startRestartGroup]
-     */
-    fun startContainerGroup() = startGroup(0)
-
-    /**
-     * Indicates the end of a "Container Group" at the current execution position. A Container Group
-     * is a group whose children can be moved or reordered. Container groups can only have
-     * Movable Groups or Replaceable Groups as children. Moveable Groups are inserted by the
-     * compiler around control flow such as for loops, while loops, and in some cases when
-     * expressions.
-     *
-     * Warning: This is expected to be executed by the compiler only and should not be called
-     * directly from source code. Call this API at your own risk.
-     *
-     * @see [startContainerGroup]
-     */
-    fun endContainerGroup() = endGroup()
 
     inline fun call(
         key: Any,
