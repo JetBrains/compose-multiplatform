@@ -104,6 +104,7 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
                 if (checkUnknownNullness) {
                     fatal("UnknownNullness")
                 } else {
+                    fatal("Assert")
                     fatal("NewApi")
                     fatal("ObsoleteSdkInt")
                     fatal("NoHardKeywords")
