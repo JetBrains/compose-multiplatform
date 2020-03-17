@@ -193,7 +193,7 @@ class AndroidXPlugin : Plugin<Project> {
                             project.configureCompilationWarnings(task)
                         }
                     }
-                    project.configureLint(extension.lintOptions, androidXExtension)
+                    project.configureAndroidProjectForLint(extension.lintOptions, androidXExtension)
                     project.configureAndroidProjectForDokka(extension, androidXExtension)
                     project.configureAndroidProjectForMetalava(extension, androidXExtension)
                     project.addToProjectMap(androidXExtension)
