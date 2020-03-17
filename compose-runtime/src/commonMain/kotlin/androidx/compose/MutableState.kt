@@ -150,6 +150,15 @@ val ReferentiallyEqual = fun(old: Any?, new: Any?) = old === new
 val StructurallyEqual = fun(old: Any?, new: Any?) = old == new
 
 /**
+ * Simple comparison callback that always returns false, for mutable objects that will be
+ * compared with the same reference.
+ *
+ * In this case we cannot correctly compare for equality, and so we trust that something else
+ * correctly triggered a recomposition.
+ */
+val NeverEqual = fun(_: Any?, _: Any?) = false
+
+/**
  * A value holder where reads to the [value] property during the execution of a [Composable]
  * function, the current [RecomposeScope] will be subscribed to changes of that value.
  *
