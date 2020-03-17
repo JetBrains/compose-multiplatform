@@ -24,7 +24,7 @@ import androidx.compose.Pivotal
 import androidx.compose.onActive
 import androidx.compose.onCommit
 import androidx.compose.state
-import androidx.ui.core.Text
+import androidx.ui.foundation.Text
 
 @Sampled
 @Composable

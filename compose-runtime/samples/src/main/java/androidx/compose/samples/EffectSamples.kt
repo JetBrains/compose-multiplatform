@@ -22,7 +22,7 @@ import androidx.compose.key
 import androidx.compose.onCommit
 import androidx.compose.state
 import androidx.compose.stateFor
-import androidx.ui.core.Text
+import androidx.ui.foundation.Text
 import androidx.ui.material.Button
 
 @Suppress("unused")

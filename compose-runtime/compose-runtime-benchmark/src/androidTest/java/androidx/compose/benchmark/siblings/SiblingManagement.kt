@@ -19,9 +19,9 @@ package androidx.compose.benchmark.siblings
 import androidx.compose.Composable
 import androidx.compose.Pivotal
 import androidx.compose.key
-import androidx.ui.core.Text
 import androidx.ui.core.draw
 import androidx.ui.foundation.Box
+import androidx.ui.foundation.Text
 import androidx.ui.graphics.Color
 import androidx.ui.graphics.Paint
 import androidx.ui.layout.Column

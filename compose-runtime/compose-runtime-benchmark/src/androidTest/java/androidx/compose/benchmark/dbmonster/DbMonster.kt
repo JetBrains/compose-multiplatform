@@ -18,7 +18,7 @@ package androidx.compose.benchmark.dbmonster
 
 import androidx.compose.Composable
 import androidx.compose.Model
-import androidx.ui.core.Text
+import androidx.ui.foundation.Text
 import androidx.ui.layout.Column
 import androidx.ui.layout.LayoutHeight
 import androidx.ui.layout.LayoutWidth
