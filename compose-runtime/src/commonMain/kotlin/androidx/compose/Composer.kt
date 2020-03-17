@@ -750,12 +750,12 @@ open class Composer<N>(
     /**
      * Return the provider scope provided at [location]
      */
-    private fun providedScopeAt(location: Int): AmbientMap {
-        require(slots.groupKey(location) == provider)
-        val valuesGroupSize = slots.groupSize(location + 1)
+    private fun providedScopeAt(location: Int, reader: SlotReader): AmbientMap {
+        require(reader.groupKey(location) == provider)
+        val valuesGroupSize = reader.groupSize(location + 1)
         val mapLocation = location + valuesGroupSize + 3 // one for each group slot
         @Suppress("UNCHECKED_CAST")
-        return slots.get(mapLocation) as AmbientMap
+        return reader.get(mapLocation) as AmbientMap
     }
 
     /**
@@ -780,7 +780,7 @@ open class Composer<N>(
         val groupPath = slotTable.groupPathTo(location)
         return slotTable.read { reader ->
             groupPath.lastOrNull { reader.groupKey(it) == provider }?.let {
-                providedScopeAt(it)
+                providedScopeAt(it, reader)
             } ?: buildableMapOf()
         }
     }
@@ -978,7 +978,7 @@ open class Composer<N>(
                 // Move the slot table to the location where the information about this group is
                 // stored. The slot information will move once the changes are applied so moving the
                 // current of the slot table is sufficient.
-                slots.current = keyInfo.location
+                slots.reposition(keyInfo.location)
                 slots.start(key, action)
 
                 // Determine what index this group is in. This is used for inserting nodes into the
@@ -1131,8 +1131,7 @@ open class Composer<N>(
             // We have now processed the entire list so move the slot table to the end of the list
             // by moving to the last key and skipping it.
             if (previous.size > 0) {
-                slots.reportUncertainNodeCount()
-                slots.current = previous[previous.size - 1].location
+                slots.reposition(previous[previous.size - 1].location)
                 slots.skipGroup()
             }
         }
@@ -1148,7 +1147,6 @@ open class Composer<N>(
                 removeCurrentGroup(slots, lifeCycleManager)
             }
             invalidations.removeRange(startSlot, slots.current)
-            slots.reportUncertainNodeCount()
         }
 
         if (action == END_GROUP) slots.endGroup() else {
@@ -1234,7 +1232,7 @@ open class Composer<N>(
                         // scope stack
                         if (slots.groupKey == provider) {
                             val current = slots.current
-                            providersStack.push(current to providedScopeAt(current))
+                            providersStack.push(current to providedScopeAt(current, slots))
                         }
                         recordStart(EMPTY, START_GROUP)
                         entersStack.push(END_GROUP)
