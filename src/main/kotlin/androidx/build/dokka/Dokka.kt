@@ -23,6 +23,7 @@ import androidx.build.DiffAndDocs
 import androidx.build.dependencies.GUAVA_VERSION
 import androidx.build.getBuildId
 import androidx.build.getDistributionDirectory
+import androidx.build.logging.LogUtils
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaBasePlugin
