@@ -84,6 +84,8 @@ data class JavaCompileInputs(
             val sourceFiles = project.multiplatformExtension?.run {
                 sourceSets
                     .filter { it.name.contains("main", ignoreCase = true) }
+                    // TODO(igotti): come up with better filtering for non-Android sources.
+                    .filterNot { it.name == "desktopMain" }
                     .flatMap { it.kotlin.sourceDirectories }
                     .also { require(it.isNotEmpty()) }
             } ?: variant
