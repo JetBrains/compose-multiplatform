@@ -31,6 +31,7 @@ import java.util.Date
  */
 
 const val DISALLOW_TASK_EXECUTION_FLAG_NAME = "disallowExecution"
+const val RECORD_FLAG_NAME = "verifyUpToDate"
 
 // Temporary whitelist of tasks that are known to still be out-of-date after running once
 val EXEMPT_TASK_NAMES = setOf(
@@ -99,7 +100,12 @@ val EXEMPT_TASK_NAMES = setOf(
 )
 class TaskUpToDateValidator {
     companion object {
-        private fun shouldEnable(project: Project): Boolean {
+
+        private fun shouldRecord(project: Project): Boolean {
+            return project.hasProperty(RECORD_FLAG_NAME) && !shouldValidate(project)
+        }
+
+        private fun shouldValidate(project: Project): Boolean {
             return project.hasProperty(DISALLOW_TASK_EXECUTION_FLAG_NAME)
         }
 
@@ -108,20 +114,59 @@ class TaskUpToDateValidator {
         }
 
         fun setup(rootProject: Project) {
-            if (!shouldEnable(rootProject)) {
-                return
-            }
-            rootProject.gradle.taskGraph.afterTask { task ->
-                if (task.didWork) {
-                    if (!isExemptTask(task)) {
-                        val message = "Error: executed $task but " +
-                            DISALLOW_TASK_EXECUTION_FLAG_NAME +
-                            " was specified. This indicates that $task does not declare" +
-                            " inputs and/or outputs correctly.\n" + tryToExplainTaskExecution(task)
-                        throw GradleException(message)
+            if (shouldValidate(rootProject)) {
+                rootProject.gradle.taskGraph.afterTask { task ->
+                    if (task.didWork) {
+                        if (!isExemptTask(task)) {
+                            val message = "Error: executed $task but " +
+                                DISALLOW_TASK_EXECUTION_FLAG_NAME +
+                                " was specified. This indicates that $task does not declare" +
+                                " inputs and/or outputs correctly.\n" +
+                                tryToExplainTaskExecution(task)
+                            throw GradleException(message)
+                        }
                     }
                 }
             }
+            if (shouldRecord(rootProject)) {
+                rootProject.gradle.taskGraph.afterTask { task ->
+                    if (!isExemptTask(task)) {
+                        recordTaskInputs(task)
+                    }
+                }
+            }
+        }
+        fun recordTaskInputs(task: Task) {
+            val text = task.inputs.files.files.joinToString("\n")
+            val destFile = getTaskInputListPath(task)
+            destFile.parentFile.mkdirs()
+            destFile.writeText(text)
+        }
+        fun getTaskInputListPath(task: Task): File {
+            return File(getTasksInputListPath(task.project), task.name)
+        }
+        fun getTasksInputListPath(project: Project): File {
+            return File(project.buildDir, "TaskUpToDateValidator/inputs")
+        }
+        fun checkForChangingSetOfInputs(task: Task): String {
+            val previousInputsFile = getTaskInputListPath(task)
+            val previousInputs = previousInputsFile.readLines()
+            val currentInputs = task.inputs.files.files.map { f -> f.toString() }
+            val addedInputs = currentInputs.minus(previousInputs)
+            val removedInputs = previousInputs.minus(currentInputs)
+            val addedMessage = if (addedInputs.size > 0) {
+                "Added these " + addedInputs.size + " inputs: " +
+                    addedInputs.joinToString("\n") + "\n"
+            } else {
+                ""
+            }
+            val removedMessage = if (removedInputs.size > 0) {
+                "Removed these " + removedInputs.size + " inputs: " +
+                    removedInputs.joinToString("\n") + "\n"
+            } else {
+                ""
+            }
+            return addedMessage + removedMessage
         }
         fun tryToExplainTaskExecution(task: Task): String {
             val numOutputFiles = task.outputs.files.files.size
@@ -142,13 +187,19 @@ class TaskUpToDateValidator {
                     lastModifiedWhen = modifiedWhen
                 }
             }
-            val inputsMessage = if (lastModifiedFile != null) {
-                task.path + " declares " + inputFiles.size + " input files. The " +
-                    "last modified input file is\n" + lastModifiedFile + "\nmodified at " +
-                    lastModifiedWhen + ". " +
-                    tryToExplainFileModification(lastModifiedFile, task)
+
+            val inputSetModifiedMessage = checkForChangingSetOfInputs(task)
+            val inputsMessage = if (inputSetModifiedMessage != "") {
+                inputSetModifiedMessage
             } else {
-                task.path + " declares " + inputFiles.size + " input files.\n"
+                if (lastModifiedFile != null) {
+                    task.path + " declares " + inputFiles.size + " input files. The " +
+                        "last modified input file is\n" + lastModifiedFile + "\nmodified at " +
+                        lastModifiedWhen + ". " +
+                        tryToExplainFileModification(lastModifiedFile, task)
+                } else {
+                    task.path + " declares " + inputFiles.size + " input files.\n"
+                }
             }
 
             val reproductionMessage = "\nTo reproduce this error you can try running " +
