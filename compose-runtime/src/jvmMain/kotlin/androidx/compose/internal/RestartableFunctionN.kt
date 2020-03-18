@@ -25,7 +25,7 @@ import kotlin.jvm.functions.FunctionN
 
 @Stable
 class RestartableFunctionN<R>(
-    val key: Any,
+    val key: Int,
     private val tracked: Boolean,
     override val arity: Int
 ) : FunctionN<R> {

@@ -33,7 +33,7 @@ import androidx.compose.remember
  */
 @Stable
 class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16,
-        P17, P18, P19, P20, P21, R>(val key: Any, private val tracked: Boolean) : Function0<R>,
+        P17, P18, P19, P20, P21, R>(val key: Int, private val tracked: Boolean) : Function0<R>,
     Function1<Composer<*>, R>,
     Function2<P1, Composer<*>, R>,
     Function3<P1, P2, Composer<*>, R>,
