@@ -16,6 +16,8 @@
 
 package androidx.compose
 
+internal actual typealias EmbeddingUIContext = android.content.Context
+
 // TODO(b/137794558): Create portable abstraction for scheduling
 internal actual typealias Looper = android.os.Looper
 
@@ -59,3 +61,11 @@ internal actual object Trace {
     actual fun beginSection(name: String) = android.os.Trace.beginSection(name)
     actual fun endSection() = android.os.Trace.endSection()
 }
+
+internal actual fun createRecomposer(): Recomposer {
+    return AndroidRecomposer()
+}
+
+internal actual typealias MainThread = androidx.annotation.MainThread
+
+internal actual typealias CheckResult = androidx.annotation.CheckResult

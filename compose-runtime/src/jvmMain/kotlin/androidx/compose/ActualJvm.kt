@@ -54,11 +54,7 @@ internal actual typealias ReferenceQueue<T> = java.lang.ref.ReferenceQueue<T>
 
 internal actual typealias WeakReference<T> = java.lang.ref.WeakReference<T>
 
-internal actual typealias MainThread = androidx.annotation.MainThread
-
 internal actual typealias TestOnly = org.jetbrains.annotations.TestOnly
-
-internal actual typealias CheckResult = androidx.annotation.CheckResult
 
 private class BuildableMapBuilderImpl<K, V>(
     val builder: PersistentMap.Builder<K, V>
@@ -81,7 +77,3 @@ private val emptyPersistentMap = persistentHashMapOf<Any, Any>()
 @Suppress("UNCHECKED_CAST")
 internal actual fun <K, V> buildableMapOf(): BuildableMap<K, V> =
     BuildableMapWrapper<K, V>(emptyPersistentMap as PersistentMap<K, V>)
-
-internal actual fun createRecomposer(): Recomposer {
-    return AndroidRecomposer()
-}
