@@ -211,6 +211,6 @@ open class RootStudioTask : StudioTask() {
  * Task for launching studio in the frameworks/support/ui (Compose) project
  */
 open class ComposeStudioTask : StudioTask() {
-    override val studioArchiveCreator = PrebuiltsArchiveCreator
+    override val studioArchiveCreator = UrlArchiveCreator
     override val ideaProperties get() = projectRoot.resolve("idea.properties")
 }

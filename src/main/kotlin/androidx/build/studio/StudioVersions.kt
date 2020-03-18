@@ -57,7 +57,7 @@ private object RootStudioVersions : StudioVersions() {
 }
 
 private object UiStudioVersions : StudioVersions() {
-    override val studioVersion = "4.0.0.0"
-    override val ideaMajorVersion = "192"
-    override val studioBuildNumber = "5959023"
+    override val studioVersion = "4.1.0.3"
+    override val ideaMajorVersion = "193"
+    override val studioBuildNumber = "6297379"
 }
