@@ -89,6 +89,18 @@ open class AndroidXExtension(val project: Project) {
      */
     var toolingProject = false
 
+    /**
+     * Disables just docs generation for modules that are published and should have their API
+     * tracked to ensure intra-library versioning compatibility, but are not expected to be
+     * directly used by developers.
+     */
+    var generateDocs = true
+        get() {
+            if (toolingProject) return false
+            if (!publish.shouldRelease()) return false
+            return field
+        }
+
     fun license(closure: Closure<*>): License {
         val license = project.configure(License(), closure) as License
         licenses.add(license)
