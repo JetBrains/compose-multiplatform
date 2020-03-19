@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.build.dokka
+package androidx.build.logging
 
 import org.gradle.api.logging.LogLevel
 import org.gradle.api.DefaultTask
