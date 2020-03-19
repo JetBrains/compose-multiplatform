@@ -94,6 +94,14 @@ private class CompositionImpl(
     override fun dispose() {
         if (!disposed) {
             setContent(emptyContent())
+            slotTable.read { reader ->
+                for (index in 0 until slotTable.size) {
+                    val value = reader.get(index)
+                    if (value is RecomposeScope) {
+                        value.inTable = false
+                    }
+                }
+            }
             onDispose()
             disposed = true
         }

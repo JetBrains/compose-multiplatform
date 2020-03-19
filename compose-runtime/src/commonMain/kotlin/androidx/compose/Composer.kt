@@ -218,7 +218,7 @@ internal class RecomposeScope(var composer: Composer<*>) : ScopeUpdateScope {
      * removed from the slot table. For example, if the scope is in the then clause of an if
      * statement that later becomes false.
      */
-    val valid: Boolean get() = anchor?.valid ?: false
+    val valid: Boolean get() = inTable && anchor?.valid ?: false
 
     /**
      * Used is set when the [RecomposeScope] is used by, for example, [invalidate]. This is used
@@ -226,6 +226,11 @@ internal class RecomposeScope(var composer: Composer<*>) : ScopeUpdateScope {
      * in [block] will be used.
      */
     var used = false
+
+    /**
+     * True when the recompose scope is in an slot in the slot table
+     */
+    var inTable = true
 
     /**
      * The lambda to call to restart the scopes composition.
@@ -787,8 +792,11 @@ open class Composer<N>(
                 )
                 slots.update(slotValue)
             } else slots.update(value)
-            if (previous is CompositionLifecycleObserverHolder) {
-                lifecycleManager.leaving(previous)
+            when (previous) {
+                is CompositionLifecycleObserverHolder ->
+                    lifecycleManager.leaving(previous)
+                is RecomposeScope ->
+                    previous.inTable = false
             }
         }
     }
@@ -1837,6 +1845,8 @@ private fun removeCurrentGroup(slots: SlotWriter, lifecycleManager: LifeCycleMan
                 groupEndStack.push(groupEnd)
                 groupEnd = index + slot.slots
             }
+            is RecomposeScope ->
+                slot.inTable = false
         }
 
         index++
