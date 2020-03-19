@@ -43,7 +43,6 @@ object DokkaPublicDocs {
     private const val UNZIP_DEPS_TASK_NAME = "unzipDokkaPublicDocsDeps"
 
     val hiddenPackages = listOf(
-        "androidx.animation.samples",
         "androidx.camera.camera2.impl",
         "androidx.camera.camera2.internal",
         "androidx.camera.camera2.internal.compat",
@@ -55,17 +54,8 @@ object DokkaPublicDocs {
         "androidx.camera.core.impl.utils.futures",
         "androidx.camera.core.internal",
         "androidx.camera.core.internal.utils",
-        "androidx.compose.samples",
         "androidx.core.internal",
         "androidx.preference.internal",
-        "androidx.ui.animation.samples",
-        "androidx.ui.core.samples",
-        "androidx.ui.foundation.samples",
-        "androidx.ui.framework.samples",
-        "androidx.ui.layout.samples",
-        "androidx.ui.material.samples",
-        "androidx.ui.text.samples",
-        "androidx.ui.unit.samples",
         "androidx.wear.internal.widget.drawer",
         "androidx.webkit.internal",
         "androidx.work.impl",
@@ -141,6 +131,12 @@ object DokkaPublicDocs {
         extension: AndroidXExtension
     ) {
         if (tryGetRunnerProject(project) == null) {
+            return
+        }
+        if (!extension.generateDocs) {
+            project.logger.info(
+                "Project ${project.name} has docs generation disabled, ignoring docs tasks."
+            )
             return
         }
         val projectSourcesLocationType = RELEASE_RULE.resolve(extension)?.strategy
