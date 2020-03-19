@@ -91,7 +91,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
                 // Find the first invalid scope and replace it or record it if no scopes are invalid
                 scope.used = true
                 val lastScope = this.scope
-                if (lastScope == null || !lastScope.valid) {
+                if (lastScope.replacableWith(scope)) {
                     this.scope = scope
                 } else {
                     val lastScopes = scopes
@@ -102,7 +102,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
                     } else {
                         for (index in 0 until lastScopes.size) {
                             val scopeAtIndex = lastScopes[index]
-                            if (!scopeAtIndex.valid || scopeAtIndex == scope) {
+                            if (scopeAtIndex.replacableWith(scope)) {
                                 lastScopes[index] = scope
                                 return
                             }
@@ -1170,6 +1170,9 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         return result
     }
 }
+
+private fun RecomposeScope?.replacableWith(other: RecomposeScope) =
+    this == null || !this.valid || this == other || this.anchor == other.anchor
 
 @Suppress("unused")
 @Composable
