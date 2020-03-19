@@ -79,8 +79,10 @@ object DokkaSourceDocs {
         if (tryGetRunnerProject(project) == null) {
             return
         }
-        if (extension.toolingProject) {
-            project.logger.info("Project ${project.name} is tooling project; ignoring API tasks.")
+        if (!extension.generateDocs) {
+            project.logger.info(
+                "Project ${project.name} has docs generation disabled, ignoring docs tasks."
+            )
             return
         }
         library.defaultPublishVariant { variant ->
@@ -98,8 +100,10 @@ object DokkaSourceDocs {
         if (tryGetRunnerProject(project) == null) {
             return
         }
-        if (extension.toolingProject) {
-            project.logger.info("Project ${project.name} is tooling project; ignoring API tasks.")
+        if (!extension.generateDocs) {
+            project.logger.info(
+                "Project ${project.name} has docs generation disabled, ignoring docs tasks."
+            )
             return
         }
         val javaPluginConvention = project.convention.getPlugin<JavaPluginConvention>()
