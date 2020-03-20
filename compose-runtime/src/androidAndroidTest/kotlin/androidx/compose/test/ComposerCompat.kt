@@ -20,6 +20,7 @@ package androidx.compose.test
 // to be here to support versions of Android Studio that are still looking for it. Without it,
 // valid composable code will look broken in the IDE. Remove this after we have left some time to
 // get all versions of Studio upgraded.
+// b/152059242
 @Deprecated(
     "This property should not be called directly. It is only used by the compiler.",
     replaceWith = ReplaceWith("currentComposer")
