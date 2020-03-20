@@ -48,6 +48,7 @@ dependencies {
     compileOnly(findGradleKotlinDsl())
     implementation build_libs.agp
     implementation build_libs.dex_member_list
+    implementation build_libs.error_prone_gradle
     implementation build_libs.dokka_gradle
     implementation build_libs.kotlin.gradle_plugin
     implementation build_libs.kotlinpoet

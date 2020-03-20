@@ -80,7 +80,4 @@ object SupportConfig {
 
     @JvmStatic
     fun isUiProject() = System.getenv("DIST_SUBDIR") == "/ui"
-
-    @JvmStatic
-    fun getJavaToolsJarPath() = System.getenv("JAVA_TOOLS_JAR")
 }
