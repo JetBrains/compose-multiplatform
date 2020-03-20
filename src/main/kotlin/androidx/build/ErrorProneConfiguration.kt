@@ -18,74 +18,60 @@ package androidx.build
 
 import com.android.build.gradle.api.BaseVariant
 import com.android.builder.core.BuilderConstants
+import net.ltgt.gradle.errorprone.ErrorProneBasePlugin
+import net.ltgt.gradle.errorprone.ErrorProneToolChain
 import org.gradle.api.DomainObjectSet
 import org.gradle.api.Project
-import org.gradle.api.artifacts.Configuration
 import org.gradle.api.logging.Logging
 import org.gradle.api.plugins.JavaPlugin.COMPILE_JAVA_TASK_NAME
-import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.compile.JavaCompile
-import org.gradle.kotlin.dsl.exclude
-import org.gradle.kotlin.dsl.get
-import org.gradle.kotlin.dsl.getByName
+import org.gradle.kotlin.dsl.apply
 
 const val ERROR_PRONE_TASK = "runErrorProne"
 
-private const val ERROR_PRONE_CONFIGURATION = "errorprone"
 private const val ERROR_PRONE_VERSION = "com.google.errorprone:error_prone_core:2.3.3"
 private val log = Logging.getLogger("ErrorProneConfiguration")
 
 fun Project.configureErrorProneForJava() {
-    val errorProneConfiguration = createErrorProneConfiguration()
-    project.extensions.getByName<SourceSetContainer>("sourceSets").configureEach {
-        project.configurations[it.annotationProcessorConfigurationName].extendsFrom(
-            errorProneConfiguration
-        )
-    }
+    val toolChain = createErrorProneToolChain()
     val javaCompileProvider = project.tasks.named(COMPILE_JAVA_TASK_NAME, JavaCompile::class.java)
     log.info("Configuring error-prone for ${project.path}")
-    makeErrorProneTask(javaCompileProvider)
+    makeErrorProneTask(javaCompileProvider, toolChain)
 }
 
 fun Project.configureErrorProneForAndroid(variants: DomainObjectSet<out BaseVariant>) {
-    val errorProneConfiguration = createErrorProneConfiguration()
+    val toolChain = createErrorProneToolChain()
     variants.all { variant ->
         // Using getName() instead of name due to b/150427408
         if (variant.buildType.getName() == BuilderConstants.DEBUG) {
             val task = variant.javaCompileProvider
-            (variant as BaseVariant).annotationProcessorConfiguration.extendsFrom(
-                errorProneConfiguration
-            )
 
             log.info("Configuring error-prone for ${variant.name}'s java compile")
-            makeErrorProneTask(task)
+            makeErrorProneTask(task, toolChain)
         }
     }
 }
 
-private fun Project.createErrorProneConfiguration(): Configuration {
-    val errorProneConfiguration = configurations.create(ERROR_PRONE_CONFIGURATION) {
-        it.isVisible = false
-        it.isCanBeConsumed = false
-        it.isCanBeResolved = true
-        it.exclude(group = "com.google.errorprone", module = "javac")
-    }
-    dependencies.add(ERROR_PRONE_CONFIGURATION, ERROR_PRONE_VERSION)
-    return errorProneConfiguration
+private fun Project.createErrorProneToolChain(): ErrorProneToolChain {
+    apply<ErrorProneBasePlugin>()
+
+    val toolChain = ErrorProneToolChain.create(this)
+    // Pin a specific version of the compiler. By default a dependency wildcard is used.
+    dependencies.add(ErrorProneBasePlugin.CONFIGURATION_NAME, ERROR_PRONE_VERSION)
+    return toolChain
 }
 
-// Given an existing JavaCompile task, reconfigures the task to use the ErrorProne compiler plugin
-private fun JavaCompile.configureWithErrorProne() {
+// Given an existing JavaCompile task, reconfigures the task to use the ErrorProne compiler
+private fun JavaCompile.configureWithErrorProne(toolChain: ErrorProneToolChain) {
+    this.toolChain = toolChain
+
     val compilerArgs = this.options.compilerArgs
     compilerArgs += listOf(
-        // Tell error-prone that we are running it on android compatible libraries
-        "-XDandroidCompatible=true",
+            // Tell error-prone that we are running it on android compatible libraries
+            "-XDandroidCompatible=true",
 
-        "-XDcompilePolicy=simple", // Workaround for b/36098770
-        listOf(
-            "-Xplugin:ErrorProne",
-
+            "-XDcompilePolicy=simple", // Workaround for b/36098770
             "-XepExcludedPaths:.*/(build/generated|build/errorProne|external)/.*",
 
             // Disable the following checks.
@@ -138,7 +124,6 @@ private fun JavaCompile.configureWithErrorProne() {
             "-XepIgnoreUnknownCheckNames", // https://github.com/uber/NullAway/issues/25
             "-Xep:NullAway:ERROR",
             "-XepOpt:NullAway:AnnotatedPackages=android.arch,android.support,androidx"
-        ).joinToString(" ")
     )
 }
 
@@ -147,7 +132,8 @@ private fun JavaCompile.configureWithErrorProne() {
  * settings.
  */
 private fun Project.makeErrorProneTask(
-    compileTaskProvider: TaskProvider<JavaCompile>
+    compileTaskProvider: TaskProvider<JavaCompile>,
+    toolChain: ErrorProneToolChain
 ) {
     val errorProneTaskProvider = maybeRegister<JavaCompile>(
         name = ERROR_PRONE_TASK,
@@ -162,7 +148,7 @@ private fun Project.makeErrorProneTask(
             it.options.bootstrapClasspath = compileTask.options.bootstrapClasspath
             it.sourceCompatibility = compileTask.sourceCompatibility
             it.targetCompatibility = compileTask.targetCompatibility
-            it.configureWithErrorProne()
+            it.configureWithErrorProne(toolChain)
             it.dependsOn(compileTask.dependsOn)
         },
         onRegister = { errorProneProvider ->
