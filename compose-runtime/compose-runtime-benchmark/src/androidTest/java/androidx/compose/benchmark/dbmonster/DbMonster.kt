@@ -37,22 +37,21 @@ private fun randomQuery(random: Random): String = random.nextDouble().let {
 private const val MAX_ELAPSED = 15.0
 
 @Model
-class Query(random: Random, var elapsed: Double = random.nextDouble() * MAX_ELAPSED) {
-    var query = randomQuery(random)
-}
+class Query(var query: String, var elapsed: Double)
 
 @Model
-class Database(var name: String, val random: Random) {
+class Database(var name: String, random: Random) {
+    private val myRandom = random
     var queries: List<Query> = (1..10).map {
-        Query(random)
+        Query(randomQuery(random), random.nextDouble() * MAX_ELAPSED)
     }
     fun topQueries(n: Int): List<Query> {
         return queries/*.sortedByDescending { it.elapsed }*/.take(n)
     }
     fun update() {
-        val r = random.nextInt(queries.size)
+        val r = myRandom.nextInt(queries.size)
         (0..r).forEach {
-            queries[it].elapsed = random.nextDouble() * MAX_ELAPSED
+            queries[it].elapsed = myRandom.nextDouble() * MAX_ELAPSED
         }
     }
 }

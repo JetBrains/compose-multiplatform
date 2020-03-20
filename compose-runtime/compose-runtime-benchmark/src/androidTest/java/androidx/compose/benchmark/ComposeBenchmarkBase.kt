@@ -16,6 +16,10 @@
 
 package androidx.compose.benchmark
 
+import android.app.Activity
+import android.util.SparseArray
+import android.view.View
+import android.view.ViewGroup
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
 import androidx.compose.Composable
@@ -24,6 +28,7 @@ import androidx.compose.Composition
 import androidx.compose.FrameManager
 import androidx.compose.currentComposer
 import androidx.test.rule.ActivityTestRule
+import androidx.ui.core.Owner
 import androidx.ui.core.setContent
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -60,6 +65,11 @@ abstract class ComposeBenchmarkBase {
             receiver.composeCb()
         }
 
+        // AndroidComposeView is postponing the composition till the saved state will be restored.
+        // We will emulate the restoration of the empty state to trigger the real composition.
+        val composeView = (findComposeView(activity) as ViewGroup?)!!
+        composeView.restoreHierarchyState(SparseArray())
+
         benchmarkRule.measureRepeated {
             runWithTimingDisabled {
                 receiver.updateModelCb()
@@ -87,4 +97,26 @@ class RecomposeReceiver {
     fun update(block: () -> Unit) {
         updateModelCb = block
     }
+}
+
+// TODO(chuckj): Consider refacgtoring to use AndroidTestCaseRunner from UI
+// This code is copied from AndroidTestCaseRunner.kt
+private fun findComposeView(activity: Activity): Owner? {
+    return findComposeView(activity.findViewById(android.R.id.content) as ViewGroup)
+}
+
+private fun findComposeView(view: View): Owner? {
+    if (view is Owner) {
+        return view
+    }
+
+    if (view is ViewGroup) {
+        for (i in 0 until view.childCount) {
+            val composeView = findComposeView(view.getChildAt(i))
+            if (composeView != null) {
+                return composeView
+            }
+        }
+    }
+    return null
 }
