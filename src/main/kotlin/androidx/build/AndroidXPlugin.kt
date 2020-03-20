@@ -422,12 +422,8 @@ class AndroidXPlugin : Plugin<Project> {
         // instrumentation runner argument is passed raw to the `am instrument` command.
         // NOTE - instrumentation args aren't respected by CI - window animations are
         // disabled there separately
-        // We use --no-isolated-storage as a remedy against file system access restrictions that
-        // were introduced in API 29. Without this we couldn't dump screenshot test results into
-        // a predefined directory. This should be gone after engprod adds support for collecting
-        // files from apk specific directories.
         defaultConfig.testInstrumentationRunnerArgument("thisisignored",
-            "thisisignored --no-window-animation --no-isolated-storage")
+            "thisisignored --no-window-animation")
         testOptions.unitTests.isReturnDefaultValues = true
 
         defaultConfig.minSdkVersion(DEFAULT_MIN_SDK_VERSION)
