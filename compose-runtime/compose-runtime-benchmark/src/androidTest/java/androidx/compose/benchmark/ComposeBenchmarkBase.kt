@@ -46,6 +46,11 @@ abstract class ComposeBenchmarkBase {
         benchmarkRule.measureRepeated {
             composition = activity.setContent(block)
 
+            // AndroidComposeView is postponing the composition till the saved state will be restored.
+            // We will emulate the restoration of the empty state to trigger the real composition.
+            val composeView = (findComposeView(activity) as ViewGroup?)!!
+            composeView.restoreHierarchyState(SparseArray())
+
             runWithTimingDisabled {
                 composition = activity.setContent { }
             }
