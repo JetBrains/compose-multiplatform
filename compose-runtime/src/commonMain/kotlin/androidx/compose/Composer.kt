@@ -1482,7 +1482,7 @@ open class Composer<N>(
                 }
                 finalizeCompose()
             }
-            return changes.isNotEmpty()
+            return true
         }
         return false
     }

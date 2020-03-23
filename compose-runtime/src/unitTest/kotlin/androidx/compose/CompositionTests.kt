@@ -1903,12 +1903,12 @@ private fun compose(
 }
 
 private fun MockViewComposer.expectNoChanges() {
-    val changes = recompose()
+    val changes = recompose() && changeCount > 0
     assertFalse(changes)
 }
 
 private fun MockViewComposer.expectChanges() {
-    val changes = recompose()
+    val changes = recompose() && changeCount > 0
     assertTrue(changes, "Expected changes")
     applyChanges()
 }
