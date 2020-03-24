@@ -22,7 +22,7 @@ package androidx.build
 object LibraryGroups {
     val ACTIVITY = LibraryGroup("androidx.activity", LibraryVersions.ACTIVITY)
     val ADS = LibraryGroup("androidx.ads", null)
-    val ANIMATION = LibraryGroup("androidx.animation", null)
+    val ANIMATOR = LibraryGroup("androidx.animator", null)
     val ANNOTATION = LibraryGroup("androidx.annotation", null)
     val APPCOMPAT = LibraryGroup("androidx.appcompat", null)
     val APPSEARCH = LibraryGroup("androidx.appsearch", LibraryVersions.APPSEARCH)
