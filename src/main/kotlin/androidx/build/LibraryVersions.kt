@@ -53,7 +53,7 @@ object LibraryVersions {
     val CUSTOMVIEW = Version("1.1.0-beta01")
     val DATASTORE = Version("1.0.0-alpha01")
     val DOCUMENTFILE = Version("1.1.0-alpha01")
-    val DRAWERLAYOUT = Version("1.1.0-alpha05")
+    val DRAWERLAYOUT = Version("1.1.0-beta01")
     val DYNAMICANIMATION = Version("1.1.0-alpha04")
     val DYNAMICANIMATION_KTX = Version("1.0.0-alpha04")
     val EMOJI = Version("1.1.0-beta01")
