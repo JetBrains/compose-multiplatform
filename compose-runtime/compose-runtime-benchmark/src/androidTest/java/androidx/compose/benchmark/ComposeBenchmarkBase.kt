@@ -28,7 +28,7 @@ import androidx.compose.Composition
 import androidx.compose.FrameManager
 import androidx.compose.currentComposer
 import androidx.test.rule.ActivityTestRule
-import androidx.ui.core.Owner
+import androidx.ui.core.AndroidOwner
 import androidx.ui.core.setContent
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -70,10 +70,10 @@ abstract class ComposeBenchmarkBase {
             receiver.composeCb()
         }
 
-        // AndroidComposeView is postponing the composition till the saved state will be restored.
+        // AndroidOwner is postponing the composition till the saved state will be restored.
         // We will emulate the restoration of the empty state to trigger the real composition.
-        val composeView = (findComposeView(activity) as ViewGroup?)!!
-        composeView.restoreHierarchyState(SparseArray())
+        val ownerView = findComposeView(activity)!!.view
+        ownerView.restoreHierarchyState(SparseArray())
 
         benchmarkRule.measureRepeated {
             runWithTimingDisabled {
@@ -106,12 +106,12 @@ class RecomposeReceiver {
 
 // TODO(chuckj): Consider refacgtoring to use AndroidTestCaseRunner from UI
 // This code is copied from AndroidTestCaseRunner.kt
-private fun findComposeView(activity: Activity): Owner? {
+private fun findComposeView(activity: Activity): AndroidOwner? {
     return findComposeView(activity.findViewById(android.R.id.content) as ViewGroup)
 }
 
-private fun findComposeView(view: View): Owner? {
-    if (view is Owner) {
+private fun findComposeView(view: View): AndroidOwner? {
+    if (view is AndroidOwner) {
         return view
     }
 
