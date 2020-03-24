@@ -44,8 +44,6 @@ import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.util.PatternSet
 import java.io.File
-import java.net.URLClassLoader
-import javax.tools.ToolProvider
 import kotlin.collections.set
 
 private const val DOCLAVA_DEPENDENCY = "com.android:doclava:1.0.6"
@@ -90,7 +88,7 @@ class DiffAndDocs private constructor(
         val doclavaConfiguration = root.configurations.create("doclava")
         doclavaConfiguration.dependencies.add(root.dependencies.create(DOCLAVA_DEPENDENCY))
         doclavaConfiguration.dependencies.add(root.dependencies.create(root.files(
-                (ToolProvider.getSystemToolClassLoader() as URLClassLoader).urLs)))
+            SupportConfig.getJavaToolsJarPath())))
 
         // Pulls in the :fakeannotations project, which provides modified annotations required to
         // generate SDK API stubs in Doclava from Metalava-generated platform SDK stubs.

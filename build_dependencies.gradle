@@ -49,7 +49,6 @@ build_libs.lint = [
     tests: "com.android.tools.lint:lint-tests:${build_versions.lint}"
 ]
 
-build_libs.error_prone_gradle = 'net.ltgt.gradle:gradle-errorprone-plugin:0.0.13'
 build_libs.kotlin = [
     stdlib: "org.jetbrains.kotlin:kotlin-stdlib:${build_versions.kotlin}",
     gradle_plugin: "org.jetbrains.kotlin:kotlin-gradle-plugin:${build_versions.kotlin}"
