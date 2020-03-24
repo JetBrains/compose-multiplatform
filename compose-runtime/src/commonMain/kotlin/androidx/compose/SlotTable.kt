@@ -184,7 +184,7 @@ class SlotReader(val table: SlotTable) {
             val parentLocation = startStack.peekOr(0)
             val group = slots[startLocation].asGroupStart
             val parentGroup = slots[parentLocation].asGroupStart
-            nodeIndex = nodeIndexStack.pop() + if (group.key == NODE) 1 else nodeIndex
+            nodeIndex = nodeIndexStack.pop() + if (group.kind == NODE) 1 else nodeIndex
             currentEnd = parentGroup.slots + parentLocation + 1
             currentGroup = null
         }
@@ -221,6 +221,7 @@ class SlotReader(val table: SlotTable) {
         if (emptyCount <= 0) {
             startStack.push(current)
             nodeIndexStack.push(nodeIndex)
+            nodeIndex = 0
             val group = assumeGroup()
             currentEnd = current + group.slots + 1
             require(group.kind == kind) { "Group kind changed" }
