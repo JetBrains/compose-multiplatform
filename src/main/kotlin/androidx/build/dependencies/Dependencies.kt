@@ -67,18 +67,6 @@ const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.
 const val KOTLIN_METADATA = "me.eugeniomarletti.kotlin.metadata:kotlin-metadata:1.4.0"
 const val KOTLIN_METADATA_JVM = "org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.1.0"
 
-private const val KOTLIN_COROUTINES_VERSION = "1.3.4"
-const val KOTLIN_COROUTINES_ANDROID =
-    "org.jetbrains.kotlinx:kotlinx-coroutines-android:$KOTLIN_COROUTINES_VERSION"
-const val KOTLIN_COROUTINES_CORE =
-    "org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLIN_COROUTINES_VERSION"
-const val KOTLIN_COROUTINES_GUAVA =
-    "org.jetbrains.kotlinx:kotlinx-coroutines-guava:$KOTLIN_COROUTINES_VERSION"
-const val KOTLIN_COROUTINES_TEST =
-    "org.jetbrains.kotlinx:kotlinx-coroutines-test:$KOTLIN_COROUTINES_VERSION"
-const val KOTLIN_COROUTINES_RX2 =
-    "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$KOTLIN_COROUTINES_VERSION"
-
 const val LEAKCANARY = "com.squareup.leakcanary:leakcanary-android:2.2"
 const val LEAKCANARY_INSTRUMENTATION =
     "com.squareup.leakcanary:leakcanary-android-instrumentation:2.2"
@@ -122,6 +110,19 @@ val KOTLIN_TEST_ANNOTATIONS_COMMON get() =
 val KOTLIN_TEST_JUNIT get() = "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion"
 val KOTLIN_TEST_JS get() = "org.jetbrains.kotlin:kotlin-test-js:$kotlinVersion"
 val KOTLIN_REFLECT get() = "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+
+internal lateinit var kotlinCoroutinesVersion: String
+
+val KOTLIN_COROUTINES_ANDROID
+    get() = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinCoroutinesVersion"
+val KOTLIN_COROUTINES_CORE
+    get() = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion"
+val KOTLIN_COROUTINES_GUAVA
+    get() = "org.jetbrains.kotlinx:kotlinx-coroutines-guava:$kotlinCoroutinesVersion"
+val KOTLIN_COROUTINES_TEST
+    get() = "org.jetbrains.kotlinx:kotlinx-coroutines-test:$kotlinCoroutinesVersion"
+val KOTLIN_COROUTINES_RX2
+    get() = "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$kotlinCoroutinesVersion"
 
 internal lateinit var agpVersion: String
 
