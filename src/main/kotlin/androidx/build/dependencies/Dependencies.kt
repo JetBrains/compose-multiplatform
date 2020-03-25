@@ -97,7 +97,7 @@ const val XMLPULL = "xmlpull:xmlpull:1.1.3.1"
 const val RETROFIT = "com.squareup.retrofit2:retrofit:2.7.2"
 const val OKHTTP_MOCKWEBSERVER = "com.squareup.okhttp3:mockwebserver:3.14.7"
 
-const val ROBOLECTRIC = "org.robolectric:robolectric:4.3"
+const val ROBOLECTRIC = "org.robolectric:robolectric:4.3.1"
 
 const val PROTOBUF = "com.google.protobuf:protobuf-java:3.4.0"
 
