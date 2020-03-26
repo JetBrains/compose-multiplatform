@@ -159,6 +159,9 @@ package androidx.compose {
     method public <N> void registerComposer(androidx.compose.Composer<N> composer);
   }
 
+  @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.FUNCTION) public @interface Direct {
+  }
+
   public final class EffectsKt {
     method @androidx.compose.Composable public static androidx.compose.CompositionReference compositionReference();
     method public static kotlin.jvm.functions.Function0<kotlin.Unit> getInvalidate();
