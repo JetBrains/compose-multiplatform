@@ -589,7 +589,7 @@ package androidx.compose.internal {
   }
 
   public final class RestartableFunctionKt {
-    method @androidx.compose.Composable public static androidx.compose.internal.RestartableFunction<java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object> restartableFunction(int key, boolean tracked, Object block);
+    method public static androidx.compose.internal.RestartableFunction<java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object> restartableFunction(androidx.compose.Composer<?> composer, int key, boolean tracked, Object block);
     method public static androidx.compose.internal.RestartableFunction<java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object> restartableFunctionInstance(int key, boolean tracked, Object block);
   }
 
@@ -602,7 +602,7 @@ package androidx.compose.internal {
   }
 
   public final class RestartableFunctionNKt {
-    method @androidx.compose.Composable public static androidx.compose.internal.RestartableFunctionN<?> restartableFunctionN(int key, boolean tracked, int arity, Object block);
+    method public static androidx.compose.internal.RestartableFunctionN<?> restartableFunctionN(androidx.compose.Composer<?> composer, int key, boolean tracked, int arity, Object block);
     method public static androidx.compose.internal.RestartableFunctionN<?> restartableFunctionNInstance(int key, boolean tracked, int arity, Object block);
   }
 
