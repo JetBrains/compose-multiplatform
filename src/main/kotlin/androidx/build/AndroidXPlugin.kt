@@ -908,6 +908,7 @@ private fun Project.setDependencyVersions() {
         }.toString()
 
     androidx.build.dependencies.kotlinVersion = getVersion("kotlin")
+    androidx.build.dependencies.kotlinCoroutinesVersion = getVersion("kotlin_coroutines")
     androidx.build.dependencies.agpVersion = getVersion("agp")
     androidx.build.dependencies.lintVersion = getVersion("lint")
 }
