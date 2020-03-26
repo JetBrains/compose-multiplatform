@@ -156,13 +156,15 @@ fun Project.generateApi(
     apiLocation: ApiLocation,
     apiLintMode: ApiLintMode,
     includeRestrictToLibraryGroupApis: Boolean,
-    workerExecutor: WorkerExecutor
+    workerExecutor: WorkerExecutor,
+    pathToManifest: String? = null
 ) {
     generateApi(files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
-        apiLocation.publicApiFile, GenerateApiMode.PublicApi, apiLintMode, workerExecutor)
+        apiLocation.publicApiFile, GenerateApiMode.PublicApi, apiLintMode, workerExecutor,
+        pathToManifest)
     generateApi(files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
         apiLocation.experimentalApiFile, GenerateApiMode.ExperimentalApi, apiLintMode,
-        workerExecutor)
+        workerExecutor, pathToManifest)
 
     val restrictedAPIMode = if (includeRestrictToLibraryGroupApis) {
         GenerateApiMode.AllRestrictedApis
@@ -182,10 +184,11 @@ fun Project.generateApi(
     outputFile: File,
     generateApiMode: GenerateApiMode,
     apiLintMode: ApiLintMode,
-    workerExecutor: WorkerExecutor
+    workerExecutor: WorkerExecutor,
+    pathToManifest: String? = null
 ) {
     val args = getGenerateApiArgs(bootClasspath, dependencyClasspath, sourcePaths, outputFile,
-        generateApiMode, apiLintMode)
+        generateApiMode, apiLintMode, pathToManifest)
     runMetalavaWithArgs(getMetalavaJar(), args, workerExecutor)
 }
 
@@ -196,7 +199,8 @@ fun Project.getGenerateApiArgs(
     sourcePaths: Collection<File>,
     outputFile: File?,
     generateApiMode: GenerateApiMode,
-    apiLintMode: ApiLintMode
+    apiLintMode: ApiLintMode,
+    pathToManifest: String? = null
 ): List<String> {
     // generate public API txt
     val args = mutableListOf(
@@ -209,6 +213,10 @@ fun Project.getGenerateApiArgs(
         "--format=v3",
         "--output-kotlin-nulls=yes"
     )
+
+    pathToManifest?.let {
+        args += listOf("--manifest", pathToManifest)
+    }
 
     if (outputFile != null) {
         args += listOf("--api", outputFile.toString())
