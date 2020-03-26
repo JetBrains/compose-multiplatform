@@ -75,7 +75,8 @@ abstract class GenerateApiTask @Inject constructor(
             apiLocation.get(),
             ApiLintMode.CheckBaseline(baselines.get().apiLintFile),
             generateRestrictToLibraryGroupAPIs,
-            workerExecutor
+            workerExecutor,
+            manifestPath.orNull?.asFile?.absolutePath
         )
     }
 }

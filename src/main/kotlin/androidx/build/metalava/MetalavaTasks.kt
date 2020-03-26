@@ -29,6 +29,7 @@ import androidx.build.java.JavaCompileInputs
 import androidx.build.uptodatedness.cacheEvenIfNoOutputs
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.LibraryVariant
+import com.android.build.gradle.tasks.ProcessLibraryManifest
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.TaskProvider
@@ -59,7 +60,9 @@ object MetalavaTasks {
                 }
 
                 val javaInputs = JavaCompileInputs.fromLibraryVariant(library, variant, project)
-                setupProject(this, javaInputs, extension)
+                val processManifest = library.buildOutputs.getByName(variant.name)
+                    .processManifestProvider.get() as ProcessLibraryManifest
+                setupProject(this, javaInputs, extension, processManifest)
                 // TODO(aurimas): reenable this when kotlin stubs generation is working.
                 // setupStubs(this, javaInputs, variant)
             }
@@ -97,7 +100,8 @@ object MetalavaTasks {
     fun setupProject(
         project: Project,
         javaCompileInputs: JavaCompileInputs,
-        extension: AndroidXExtension
+        extension: AndroidXExtension,
+        processManifest: ProcessLibraryManifest? = null
     ) {
         val metalavaConfiguration = project.getMetalavaConfiguration()
 
@@ -130,6 +134,9 @@ object MetalavaTasks {
             task.generateRestrictToLibraryGroupAPIs = generateRestrictToLibraryGroupAPIs
             task.baselines.set(baselines)
             task.dependsOn(metalavaConfiguration)
+            processManifest?.let {
+                task.manifestPath.set(processManifest.manifestOutputFile)
+            }
             applyInputs(javaCompileInputs, task)
         }
 
@@ -167,6 +174,9 @@ object MetalavaTasks {
         ) { task ->
             task.configuration = metalavaConfiguration
             task.baselines.set(baselines)
+            processManifest?.let {
+                task.manifestPath.set(processManifest.manifestOutputFile)
+            }
             applyInputs(javaCompileInputs, task)
         }
 
