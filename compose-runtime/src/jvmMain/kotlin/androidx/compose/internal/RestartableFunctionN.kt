@@ -16,11 +16,11 @@
 
 package androidx.compose.internal
 
-import androidx.compose.Composable
 import androidx.compose.Composer
 import androidx.compose.FrameManager
+import androidx.compose.SlotTable
 import androidx.compose.Stable
-import androidx.compose.remember
+import androidx.compose.nextValue
 import kotlin.jvm.functions.FunctionN
 
 @Stable
@@ -56,15 +56,28 @@ class RestartableFunctionN<R>(
 }
 
 @Suppress("unused")
-@Composable
 fun restartableFunctionN(
+    composer: Composer<*>,
     key: Int,
     tracked: Boolean,
     arity: Int,
     block: Any
-): RestartableFunctionN<*> = remember {
-    RestartableFunctionN<Any>(key, tracked, arity)
-}.apply { update(block) }
+): RestartableFunctionN<*> {
+    composer.startReplaceableGroup(0)
+    val slot = composer.nextValue()
+    val result = if (slot === SlotTable.EMPTY) {
+        val value = RestartableFunctionN<Any>(key, tracked, arity)
+        composer.updateValue(value)
+        value
+    } else {
+        composer.skipValue()
+        @Suppress("UNCHECKED_CAST")
+        slot as RestartableFunctionN<Any>
+    }
+    result.update(block)
+    composer.endReplaceableGroup()
+    return result
+}
 
 @Suppress("unused")
 fun restartableFunctionNInstance(

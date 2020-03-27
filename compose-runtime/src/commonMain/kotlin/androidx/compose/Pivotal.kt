@@ -61,7 +61,7 @@ package androidx.compose
  */
 @MustBeDocumented
 @Target(
-    // composable function paramters
+    // composable function parameters
     AnnotationTarget.VALUE_PARAMETER,
     // component class properties
     AnnotationTarget.PROPERTY,

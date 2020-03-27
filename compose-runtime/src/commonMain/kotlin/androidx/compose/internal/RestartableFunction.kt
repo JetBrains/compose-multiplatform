@@ -18,11 +18,11 @@
 
 package androidx.compose.internal
 
-import androidx.compose.Composable
 import androidx.compose.Composer
 import androidx.compose.RecomposeScope
+import androidx.compose.SlotTable
 import androidx.compose.Stable
-import androidx.compose.remember
+import androidx.compose.nextValue
 
 /**
  * A Restart is created to hold composable lambdas to track when they are invoked allowing
@@ -1174,15 +1174,26 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
 private fun RecomposeScope?.replacableWith(other: RecomposeScope) =
     this == null || !this.valid || this == other || this.anchor == other.anchor
 
+private typealias RFunction = RestartableFunction<Any, Any, Any, Any, Any, Any, Any, Any, Any, Any,
+        Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any>
+
 @Suppress("unused")
-@Composable
-fun restartableFunction(key: Int, tracked: Boolean, block: Any) =
-    remember {
-        RestartableFunction<Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any,
-            Any, Any, Any, Any, Any, Any, Any, Any>(key, tracked)
-    }.apply { update(block) }
+fun restartableFunction(composer: Composer<*>, key: Int, tracked: Boolean, block: Any): RFunction {
+    composer.startReplaceableGroup(0)
+    val slot = composer.nextValue()
+    val result = if (slot === SlotTable.EMPTY) {
+        val value = RFunction(key, tracked)
+        composer.updateValue(value)
+        value
+    } else {
+        composer.skipValue()
+        slot as RFunction
+    }
+    result.update(block)
+    composer.endReplaceableGroup()
+    return result
+}
 
 @Suppress("unused")
 fun restartableFunctionInstance(key: Int, tracked: Boolean, block: Any) =
-    RestartableFunction<Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any,
-            Any, Any, Any, Any, Any, Any, Any, Any>(key, tracked).apply { update(block) }
+    RFunction(key, tracked).apply { update(block) }
