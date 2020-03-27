@@ -23,17 +23,21 @@ import androidx.compose.remember
 import androidx.ui.foundation.TextField
 import androidx.ui.foundation.Text
 import androidx.ui.material.Button
+import androidx.ui.foundation.TextFieldValue
 
 @Composable
 @Sampled
 fun recomposeSample() {
-    class LoginState(var username: String, var password: String) {
-        fun login() = Api.login(username, password)
+    class LoginState(var username: TextFieldValue, var password: TextFieldValue) {
+        fun login() = Api.login(username.text, password.text)
     }
 
     @Composable
     fun LoginScreen() {
-        val model = remember { LoginState("user", "pass") }
+        val model = remember { LoginState(
+            TextFieldValue("user"),
+            TextFieldValue("pass")
+        ) }
 
         Recompose { recompose ->
             TextField(
