@@ -32,6 +32,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ResolveException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTree
@@ -195,9 +196,9 @@ class DiffAndDocs private constructor(
         originName: String,
         originRule: DocsRule
     ): FileTree {
-        val configName = "docs-temp_${mavenId.replace(":", "-")}"
-        val configuration = root.configurations.create(configName)
-        root.dependencies.add(configName, mavenId)
+        val configuration = root.configurations.detachedConfiguration(
+            root.dependencyWithScope(mavenId, "runtime")
+        )
 
         val artifacts = try {
             configuration.resolvedConfiguration.resolvedArtifacts
@@ -280,10 +281,12 @@ class DiffAndDocs private constructor(
                 val resolvedRule = rule.resolve(extension)
                 val strategy = resolvedRule?.strategy
                 if (strategy is Prebuilts) {
-                    // Add the library's prebuilt JAR to the documentation generation project's
-                    // implementation dependencies as a Maven spec. Note there is no requirement to
+                    // Add the library's prebuilt JAR (and any dependencies) to the
+                    // documentation generation project's implementation dependencies as
+                    // a Maven spec. Note there is no requirement to
                     // use the Maven spec here -- this could also be a direct reference to the AAR.
-                    val dependency = strategy.dependency(extension)
+                    val dependencyText = strategy.dependency(extension)
+                    val dependency = root.dependencyWithScope(dependencyText, "runtime")
                     depHandler.add("${rule.name}Implementation", dependency)
 
                     // Optionally add the library's stub JAR dependencies (ex. sidecar JARs) to the
@@ -297,7 +300,11 @@ class DiffAndDocs private constructor(
                     // Add the library's prebuilt source JAR to the GenerateDocsTask associated
                     // with this rule.
                     docsTasks[rule.name]!!.configure {
-                        it.source(prebuiltSources(root, dependency, rule.name, resolvedRule))
+                        it.source(
+                            docs.provider({
+                                prebuiltSources(docs, dependencyText, rule.name, resolvedRule)
+                            })
+                        )
                     }
                 }
             }
@@ -618,3 +625,21 @@ fun Project.processProperty(name: String) =
         } else {
             null
         }
+
+/**
+ * Creates a dependency referring to the given dependency scope of the given artifact
+ * For example, you can ask for the runtime dependencies of an artifact
+ */
+fun Project.dependencyWithScope(mavenId: String, scope: String): Dependency {
+    val components = mavenId.split(":")
+    val properties = mutableMapOf(
+        "group" to components[0],
+        "name" to components[1],
+        "version" to components[2],
+        "configuration" to scope
+    )
+    if (components.size > 3) {
+        properties.put("classifier", components[3])
+    }
+    return project.dependencies.create(properties)
+}
