@@ -19,6 +19,24 @@ package androidx.compose
 import androidx.compose.SlotTable.Companion.EMPTY
 import kotlin.collections.isNotEmpty
 
+/**
+ * This is here because outdated versions of the compose IDE plugin expect to find it.
+ * Without it, calls to [remember] are seen as errors, which breaks inference of [state] and more.
+ *
+ * This API is no longer needed in any way by the compiler, but we still need this API
+ * to be here to support versions of Android Studio that are still looking for it. Without it,
+ * valid composable code will look broken in the IDE. Remove this after we have left some time to
+ * get all versions of Studio upgraded.
+ * TODO b/152059242
+ */
+@Deprecated(
+    "This property should not be called directly. It is only used by the compiler.",
+    replaceWith = ReplaceWith("currentComposer")
+)
+internal val composer: Composer<*> get() = error(
+    "This property should not be called directly. It is only used by the compiler."
+)
+
 internal typealias Change<N> = (
     applier: Applier<N>,
     slots: SlotWriter,
