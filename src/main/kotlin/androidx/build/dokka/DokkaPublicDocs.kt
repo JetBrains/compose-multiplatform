@@ -23,6 +23,7 @@ import androidx.build.RELEASE_RULE
 import androidx.build.Strategy.Ignore
 import androidx.build.Strategy.Prebuilts
 import androidx.build.androidJarFile
+import androidx.build.dependencyWithScope
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ResolveException
@@ -181,35 +182,43 @@ object DokkaPublicDocs {
         runnerProject: Project,
         mavenId: String
     ): TaskProvider<Copy> {
-        val configuration = runnerProject.configurations.detachedConfiguration(
-            runnerProject.dependencies.create(mavenId)
-        )
-        configuration.isTransitive = false
-        try {
-            configuration.resolvedConfiguration.resolvedArtifacts
-        } catch (e: ResolveException) {
-            runnerProject.logger.error("DokkaPublicDocs failed to find prebuilts for $mavenId. " +
-                    "specified in PublishDocsRules.kt ." +
-                    "You should either add a prebuilt sources jar, " +
-                    "or add an overriding \"ignore\" rule into PublishDocsRules.kt")
-            throw e
-        }
-
         val sanitizedMavenId = mavenId.replace(":", "-")
         val buildDir = runnerProject.buildDir
         val destDir = runnerProject.file("$buildDir/sources-unzipped/$sanitizedMavenId")
-        return runnerProject.tasks.register("unzip$sanitizedMavenId", Copy::class.java) {
-            it.from(runnerProject.zipTree(configuration.singleFile)
-                .matching {
-                    it.exclude("**/*.MF")
-                    it.exclude("**/*.aidl")
-                    it.exclude("**/META-INF/**")
-                }
+
+        return runnerProject.tasks.register("unzip$sanitizedMavenId", Copy::class.java) { task ->
+            task.from(
+                // Create a provider that will resolve mavenId
+                runnerProject.provider({
+                    val configuration =
+                        runnerProject.configurations.detachedConfiguration(
+                            runnerProject.dependencies.create(mavenId)
+                        )
+                    configuration.isTransitive = false
+
+                    try {
+                        configuration.resolvedConfiguration.resolvedArtifacts
+                    } catch (e: ResolveException) {
+                        runnerProject.logger.error("DokkaPublicDocs failed to find prebuilts for " +
+                                "$mavenId. specified in PublishDocsRules.kt ." +
+                                "You should either add a prebuilt sources jar, " +
+                                "or add an overriding \"ignore\" rule into PublishDocsRules.kt")
+                        throw e
+                    }
+
+                    runnerProject.zipTree(configuration.singleFile)
+                        .matching {
+                            it.exclude("**/*.MF")
+                            it.exclude("**/*.aidl")
+                            it.exclude("**/META-INF/**")
+                        }
+                })
             )
-            it.destinationDir = destDir
+
+            task.destinationDir = destDir
             // TODO(123020809) remove this filter once it is no longer necessary to prevent Dokka from failing
             val regex = Regex("@attr ref ([^*]*)styleable#([^_*]*)_([^*]*)$")
-            it.filter { line ->
+            task.filter { line ->
                 regex.replace(line, "{@link $1attr#$3}")
             }
         }
@@ -241,7 +250,7 @@ open class LocateJarsTask : DefaultTask() {
 
         // resolve the dependencies
         val dependenciesArray = inputDependencies.map {
-            project.dependencies.create(it)
+            project.dependencyWithScope(it, "runtime")
         }.toTypedArray()
         val artifacts = project.configurations.detachedConfiguration(*dependenciesArray)
                         .resolvedConfiguration.resolvedArtifacts
