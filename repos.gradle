@@ -83,6 +83,7 @@ def addMavenRepositories(RepositoryHandler handler) {
         handler.maven {
             url "https://plugins.gradle.org/m2/"
         }
+        handler.mavenLocal()
     }
     def androidPluginRepoOverride = System.getenv("GRADLE_PLUGIN_REPO")
     if (androidPluginRepoOverride != null) {
