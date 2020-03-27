@@ -241,9 +241,7 @@ class AndroidXPlugin : Plugin<Project> {
                     Zip::class.java
                 ) {
                     it.destinationDirectory.set(project.getHostTestResultDirectory())
-                    // first one is always :, drop it.
-                    it.archiveFileName.set(
-                        "${project.path.split(":").joinToString("_").substring(1)}.zip")
+                    it.archiveFileName.set("${project.asFilenamePrefix()}_${task.name}.zip")
                 }
                 if (isRunningOnBuildServer()) {
                     task.ignoreFailures = true
@@ -543,11 +541,7 @@ class AndroidXPlugin : Plugin<Project> {
                             // Exclude '-benchmark' modules from correctness tests
                             fileName.replace("-androidTest", "-androidBenchmark")
                         } else {
-                            // multiple modules may have the same name so prefix the name with
-                            // the module's path to ensure it is unique.
-                            // e.g. palette-v7-debug-androidTest.apk becomes
-                            // support-palette-v7_palette-v7-debug-androidTest.apk
-                            "${project.path.replace(':', '-').substring(1)}_$fileName"
+                            "${project.asFilenamePrefix()}_$fileName"
                         }
                     }
                 }
@@ -759,7 +753,7 @@ class AndroidXPlugin : Plugin<Project> {
                 it.csv.isEnabled = false
 
                 it.xml.destination = File(getHostTestCoverageDirectory(),
-                    "${path.replace(':', '-').substring(1)}.xml")
+                    "${project.asFilenamePrefix()}.xml")
             }
         }
     }
@@ -911,4 +905,12 @@ private fun Project.setDependencyVersions() {
     androidx.build.dependencies.kotlinCoroutinesVersion = getVersion("kotlin_coroutines")
     androidx.build.dependencies.agpVersion = getVersion("agp")
     androidx.build.dependencies.lintVersion = getVersion("lint")
+}
+
+/**
+ * Returns a string that is a valid filename and loosely based on the project name
+ * The value returned for each project will be distinct
+ */
+private fun Project.asFilenamePrefix(): String {
+    return project.path.substring(1).replace(':', '-')
 }

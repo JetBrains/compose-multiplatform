@@ -88,15 +88,7 @@ val taskNamesKnownToDuplicateOutputs = setOf(
     "lint",
     "lintFix",
     "lintVital",
-    "sourceJar",
-    "zipResultsOfDesktopTest",
-    "zipResultsOfJvmTest",
-    "zipResultsOfTestDebugUnitTest",
-    "zipResultsOfTestReleaseUnitTest",
-    "zipResultsOfTestTipOfTreeDebugUnitTest",
-    "zipResultsOfTestTipOfTreeReleaseUnitTest",
-    "zipResultsOfTestPublicDebugUnitTest",
-    "zipResultsOfTestPublicReleaseUnitTest"
+    "sourceJar"
 )
 
 // For this project and all subprojects, collects all tasks and creates a map keyed by their output files
