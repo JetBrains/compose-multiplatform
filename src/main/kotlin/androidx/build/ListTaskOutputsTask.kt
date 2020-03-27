@@ -89,6 +89,7 @@ val taskNamesKnownToDuplicateOutputs = setOf(
     "lintFix",
     "lintVital",
     "sourceJar",
+    "zipResultsOfDesktopTest",
     "zipResultsOfJvmTest",
     "zipResultsOfTestDebugUnitTest",
     "zipResultsOfTestReleaseUnitTest",
