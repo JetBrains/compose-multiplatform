@@ -22,8 +22,10 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.compose.Composable
 import androidx.compose.clearRoots
+import androidx.compose.getValue
 import androidx.compose.key
 import androidx.compose.mutableStateOf
+import androidx.compose.setValue
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.ui.node.UiComposer

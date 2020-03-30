@@ -172,6 +172,14 @@ interface State<T> {
 }
 
 /**
+ * Permits property delegation of `val`s using `by` for [State].
+ *
+ * @sample androidx.compose.samples.DelegatedReadOnlyStateSample
+ */
+@Suppress("NOTHING_TO_INLINE")
+inline operator fun <T> State<T>.getValue(thisObj: Any?, property: KProperty<*>): T = value
+
+/**
  * A mutable value holder where reads to the [value] property during the execution of a [Composable]
  * function, the current [RecomposeScope] will be subscribed to changes of that value. When the
  * [value] property is written to and changed, a recomposition of any subscribed [RecomposeScope]s
@@ -187,8 +195,16 @@ interface MutableState<T> : State<T> {
     override var value: T
     operator fun component1(): T
     operator fun component2(): (T) -> Unit
-    operator fun getValue(thisObj: Any?, property: KProperty<*>): T
-    operator fun setValue(thisObj: Any?, property: KProperty<*>, next: T)
+}
+
+/**
+ * Permits property delegation of `var`s using `by` for [MutableState].
+ *
+ * @sample androidx.compose.samples.DelegatedStateSample
+ */
+@Suppress("NOTHING_TO_INLINE")
+inline operator fun <T> MutableState<T>.setValue(thisObj: Any?, property: KProperty<*>, value: T) {
+    this.value = value
 }
 
 /**
@@ -258,17 +274,4 @@ private class ModelMutableState<T>(
     override operator fun component1(): T = value
 
     override operator fun component2(): (T) -> Unit = { value = it }
-
-    /**
-     * The getValue/setValue operators allow State to be used as a local variable with a delegate:
-     *
-     * var foo by state { 0 }
-     * foo += 123 // uses setValue(...)
-     * foo == 123 // uses getValue(...)
-     */
-    override operator fun getValue(thisObj: Any?, property: KProperty<*>): T = value
-
-    override operator fun setValue(thisObj: Any?, property: KProperty<*>, next: T) {
-        value = next
-    }
 }

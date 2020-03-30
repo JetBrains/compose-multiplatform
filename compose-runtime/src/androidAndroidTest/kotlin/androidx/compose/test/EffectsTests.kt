@@ -21,14 +21,17 @@ import android.widget.TextView
 import androidx.compose.Composable
 import androidx.compose.Providers
 import androidx.compose.Recompose
+import androidx.compose.State
 import androidx.compose.ambientOf
 import androidx.compose.clearRoots
+import androidx.compose.getValue
 import androidx.compose.invalidate
 import androidx.compose.mutableStateOf
 import androidx.compose.onCommit
 import androidx.compose.onDispose
 import androidx.compose.onPreCommit
 import androidx.compose.remember
+import androidx.compose.setValue
 import androidx.compose.state
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -169,6 +172,25 @@ class EffectsTests : BaseComposeTest() {
             assertEquals("Second", tv2.text)
             assertEquals(local1.value, tv1.text)
             assertEquals(local2.value, tv2.text)
+        }
+    }
+
+    @Test
+    fun testState3() {
+        // Test property delegation for State/MutableState
+        val initial = "initial"
+        val expected = "expected"
+        val myState = mutableStateOf(initial)
+        val readonly: State<String> = myState
+        val reader by readonly
+        var writer by myState
+
+        frame {
+            writer = expected
+
+            assertEquals("state object after write", expected, myState.value)
+            assertEquals("reader after write", expected, reader)
+            assertEquals("writer after write", expected, writer)
         }
     }
 

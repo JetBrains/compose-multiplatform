@@ -18,11 +18,15 @@ package androidx.compose.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.Composable
+import androidx.compose.State
+import androidx.compose.getValue
 import androidx.compose.key
 import androidx.compose.onCommit
+import androidx.compose.setValue
 import androidx.compose.state
 import androidx.compose.stateFor
 import androidx.ui.foundation.Text
+import androidx.ui.layout.Row
 import androidx.ui.material.Button
 
 @Suppress("unused")
@@ -72,6 +76,22 @@ fun DestructuredStateSample() {
     Text(text = "You clicked $count times")
     Button(onClick = { setCount(count + 1) }) {
         Text("Click me")
+    }
+}
+
+@Sampled
+@Composable
+fun DelegatedReadOnlyStateSample() {
+    // Composable function that manages a subscription to a data source, returning it as State
+    @Composable
+    fun observeSampleData(): State<String> = TODO()
+
+    // Subscription is managed here, but currentValue is not read yet
+    val currentValue by observeSampleData()
+
+    Row {
+        // This scope will recompose when currentValue changes
+        Text("Data: $currentValue")
     }
 }
 

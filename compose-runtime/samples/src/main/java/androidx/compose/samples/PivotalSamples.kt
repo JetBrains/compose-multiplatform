@@ -21,8 +21,10 @@ package androidx.compose.samples
 import androidx.annotation.Sampled
 import androidx.compose.Composable
 import androidx.compose.Pivotal
+import androidx.compose.getValue
 import androidx.compose.onActive
 import androidx.compose.onCommit
+import androidx.compose.setValue
 import androidx.compose.state
 import androidx.ui.foundation.Text
 
