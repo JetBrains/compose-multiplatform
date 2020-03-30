@@ -16,6 +16,7 @@
 
 package androidx.compose
 
+import java.util.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
@@ -40,6 +41,7 @@ class SlotTableTests {
             writer.endGroup()
             writer.endInsert()
         }
+        slots.verifyWellFormed()
     }
 
     @Test
@@ -225,6 +227,19 @@ class SlotTableTests {
     }
 
     @Test
+    fun testEmptySlotTableAnchorAtNegativeOneStaysNegativeOne() {
+        val slots = SlotTable()
+        val anchor = slots.anchor(-1)
+        assertEquals(-1, slots.anchorLocation(anchor))
+        slots.write { writer ->
+            writer.beginInsert()
+            writer.skip()
+            writer.endInsert()
+        }
+        assertEquals(-1, slots.anchorLocation(anchor))
+    }
+
+    @Test
     fun testAnchorTracksExactRemovesUpwards() {
         val slots = testSlotsNumbered()
         val anchors = slots.write { writer -> (1..7).map { writer.anchor(it * 10) } }
@@ -324,10 +339,12 @@ class SlotTableTests {
                 }
                 writer.endInsert()
             }
+            slots.verifyWellFormed()
             return anchors.toMap()
         }
 
         fun validate(anchors: Map<Anchor, Any?>) {
+            slots.verifyWellFormed()
             slots.read { reader ->
                 for (anchor in anchors) {
                     assertEquals(anchor.value, reader.get(slots.anchorLocation(anchor.key)))
@@ -402,6 +419,7 @@ class SlotTableTests {
     @Test
     fun testEmptySlotTable() {
         val slotTable = SlotTable()
+        slotTable.verifyWellFormed()
 
         slotTable.read { reader ->
             assertEquals(EMPTY, reader.groupKey)
@@ -411,6 +429,7 @@ class SlotTableTests {
     @Test
     fun testExtractKeys() {
         val slots = testItems()
+        slots.verifyWellFormed()
         slots.read { reader ->
             reader.startGroup(rootKey)
             val keys = reader.extractKeys()
@@ -428,6 +447,7 @@ class SlotTableTests {
             writer.startGroup(rootKey)
             writer.moveGroup(5)
         }
+        slots.verifyWellFormed()
         slots.read { reader ->
             reader.startGroup(rootKey)
             reader.expectGroup(5)
@@ -455,6 +475,7 @@ class SlotTableTests {
             }
             writer.endGroup()
         }
+        slots.verifyWellFormed()
 
         slots.read { reader ->
             reader.startGroup(rootKey)
@@ -500,6 +521,7 @@ class SlotTableTests {
             writer.endGroup()
             writer.endInsert()
         }
+        slots.verifyWellFormed()
 
         slots.read { reader ->
             reader.startGroup(rootKey)
@@ -529,6 +551,7 @@ class SlotTableTests {
             writer.endGroup()
             writer.endInsert()
         }
+        slots.verifyWellFormed()
 
         slots.write { writer ->
             writer.startGroup(rootKey)
@@ -557,6 +580,7 @@ class SlotTableTests {
             assertEquals(32, writer.endGroup())
             writer.endGroup()
         }
+        slots.verifyWellFormed()
     }
 
     @Test
@@ -580,6 +604,7 @@ class SlotTableTests {
             writer.endGroup()
             writer.endInsert()
         }
+        slots.verifyWellFormed()
 
         slots.write { writer ->
             writer.startGroup(rootKey)
@@ -603,6 +628,7 @@ class SlotTableTests {
 
             writer.endGroup()
         }
+        slots.verifyWellFormed()
     }
 
     @Test
@@ -628,6 +654,7 @@ class SlotTableTests {
             writer.endGroup()
             writer.endInsert()
         }
+        slots.verifyWellFormed()
     }
 
     @Test
@@ -653,6 +680,7 @@ class SlotTableTests {
             writer.endGroup()
             writer.endInsert()
         }
+        slots.verifyWellFormed()
 
         slots.read { reader ->
             reader.startGroup(rootKey)
@@ -688,10 +716,13 @@ class SlotTableTests {
                 writer.endNode()
             }
             writer.endGroup()
+            writer.startGroup(705)
             writer.update(42)
+            writer.endGroup()
             writer.endGroup()
             writer.endInsert()
         }
+        slots.verifyWellFormed()
 
         slots.read { reader ->
             reader.startGroup(rootKey)
@@ -700,8 +731,12 @@ class SlotTableTests {
             val savedCurrent = reader.current
             reader.skipGroup()
             assertEquals(size, reader.current - savedCurrent - 1)
+            assertTrue(reader.isGroup)
+            reader.startGroup(705)
             assertEquals(42, reader.next())
-            assertEquals(true, reader.isGroupEnd)
+            assertTrue(reader.isGroupEnd)
+            reader.endGroup()
+            assertTrue(reader.isGroupEnd)
             reader.endGroup()
         }
     }
@@ -719,6 +754,7 @@ class SlotTableTests {
             writer.endGroup()
             writer.endInsert()
         }
+        slots.verifyWellFormed()
 
         slots.read { reader ->
             reader.startGroup(0)
@@ -748,6 +784,7 @@ class SlotTableTests {
             writer.endNode()
             writer.endGroup()
         }
+        slots.verifyWellFormed()
     }
 
     @Test
@@ -859,6 +896,7 @@ class SlotTableTests {
         }
 
         fun validateSlots(range: List<Int>) {
+            slots.verifyWellFormed()
             slots.read { reader ->
                 fun value(value: Any?) {
                     assertEquals(value, reader.next())
@@ -1045,7 +1083,114 @@ class SlotTableTests {
     @Test
     fun testValidateSlotTableIndexes() {
         val (slots, _) = narrowTrees()
-        validate(slots)
+        slots.verifyWellFormed()
+    }
+
+    @Test
+    fun testRemoveRandomGroup() {
+        val (slots, anchors) = narrowTrees()
+        val random = Random(1000)
+        val slotsToRemove = anchors.shuffled(random)
+        slotsToRemove.forEachIndexed { index, anchor ->
+            if (anchor.valid) {
+                try {
+                    slots.write { writer ->
+                        writer.startGroup(rootKey)
+
+                        // Seek to the group's parent
+                        writer.skip(writer.parentIndex(anchor) - writer.current)
+                        if (writer.isNode) writer.startNode(EMPTY) else writer.startGroup(EMPTY)
+
+                        // Skip to the group location
+                        writer.skip(slots.anchorLocation(anchor) - writer.current)
+                        writer.removeGroup()
+
+                        // Close the parent
+                        writer.skipToGroupEnd()
+                        writer.endGroup()
+
+                        // Close the root
+                        writer.skipToGroupEnd()
+                        writer.endGroup()
+                    }
+                    slots.verifyWellFormed()
+                } catch (e: Throwable) {
+                    throw Exception(
+                        "Error removing group at ${slots.anchorLocation(anchor)} (index=$index)",
+                        e
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun testMovingGroups() {
+        val random = Random(1116)
+        val (sourceTable, sourceAnchors) = narrowTrees()
+        val destTable = SlotTable()
+
+        destTable.write { writer ->
+            writer.beginInsert()
+            writer.startGroup(rootKey)
+
+            writer.startGroup(1122)
+            writer.endGroup()
+
+            writer.endGroup()
+            writer.endInsert()
+        }
+
+        val slotsToMove = sourceAnchors.shuffled(random)
+        val slotKeys = sourceTable.read { reader ->
+            slotsToMove.map { anchor ->
+                val location = sourceTable.anchorLocation(anchor)
+                reader.groupKey(location)
+            }
+        }
+
+        val movedAnchors = mutableSetOf<Anchor>()
+        slotsToMove.forEachIndexed() { index, anchor ->
+            try {
+                if (anchor !in movedAnchors) {
+                    destTable.write { writer ->
+                        writer.startGroup(rootKey)
+                        writer.startGroup(1122)
+
+                        writer.skipToGroupEnd()
+                        writer.beginInsert()
+                        movedAnchors += writer.moveFrom(sourceTable, anchor.location(sourceTable))
+                        writer.endInsert()
+
+                        writer.endGroup()
+                        writer.endGroup()
+                    }
+
+                    // Both the source and destinations should be well-formed.
+                    destTable.verifyWellFormed()
+                    sourceTable.verifyWellFormed()
+                }
+            } catch (e: Throwable) {
+                throw Exception(
+                    "Error removing group at ${anchor.loc} (index=$index)",
+                    e
+                )
+            }
+        }
+
+        // Verify the anchors still point to the correct groups
+        val movedKeys = destTable.read { reader ->
+            slotsToMove.map { anchor ->
+                val location = destTable.anchorLocation(anchor)
+                reader.groupKey(location)
+            }
+        }
+        assertEquals(slotKeys.size, movedKeys.size, "slot keys changed")
+        for (index in slotKeys.indices) {
+            val sourceKey = slotKeys[index]
+            val movedKey = movedKeys[index]
+            assertEquals(sourceKey, movedKey, "Key at $index changed")
+        }
     }
 }
 
@@ -1121,8 +1266,8 @@ fun narrowTrees(): Pair<SlotTable, List<Anchor>> {
         }
 
         fun tree(key: Int, width: Int, depth: Int) {
-            anchors.add(writer.anchor())
             item(key) {
+                anchors.add(writer.anchor(writer.current - 1))
                 if (width > 0)
                     for (childKey in 1..width) {
                         tree(childKey, width - 1, depth + 1)
@@ -1137,32 +1282,14 @@ fun narrowTrees(): Pair<SlotTable, List<Anchor>> {
             }
         }
 
-        tree(0, 5, 5)
+        element(1000) {
+            tree(0, 5, 5)
+        }
         writer.endGroup()
         writer.endInsert()
     }
 
     return slots to anchors
-}
-
-fun validate(slots: SlotTable) {
-    slots.read { reader ->
-        fun processGroup(): Int {
-            require(reader.isGroup) { "Group expected at ${reader.current}" }
-            var nodeCount = 0
-            val r = reader
-            val isNode = r.isNode
-            if (isNode) r.startNode(EMPTY) else r.startGroup(EMPTY)
-            while (!r.isGroupEnd) {
-                nodeCount += processGroup()
-            }
-            require(r.nodeIndex == nodeCount) { "Node index off at ${reader.current}" }
-            if (isNode) r.endNode() else r.endGroup()
-            return if (isNode) 1 else nodeCount
-        }
-
-        processGroup()
-    }
 }
 
 fun SlotReader.expectGroup(key: Any): Int {

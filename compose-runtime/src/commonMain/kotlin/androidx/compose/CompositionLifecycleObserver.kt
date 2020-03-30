@@ -41,7 +41,6 @@ interface CompositionLifecycleObserver {
 internal class CompositionLifecycleObserverHolder(val instance: CompositionLifecycleObserver) {
     var count: Int = 0
     override fun equals(other: Any?): Boolean =
-        other === instance || other is CompositionLifecycleObserverHolder &&
-                instance === other.instance
+        other is CompositionLifecycleObserverHolder && instance === other.instance
     override fun hashCode(): Int = identityHashCode(instance)
 }
