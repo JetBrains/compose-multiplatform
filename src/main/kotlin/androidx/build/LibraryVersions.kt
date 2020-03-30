@@ -22,8 +22,6 @@ package androidx.build
 object LibraryVersions {
     val ACTIVITY = Version("1.2.0-alpha03")
     val ADS_IDENTIFIER = Version("1.0.0-alpha04")
-    val ANIMATOR = Version("1.0.0-alpha01")
-    val ANIMATOR_TESTING = Version("1.0.0-alpha01")
     val ANNOTATION = Version("1.2.0-alpha01")
     val ANNOTATION_EXPERIMENTAL = Version("1.1.0-alpha01")
     val APPCOMPAT = Version("1.2.0-beta01")
@@ -48,6 +46,8 @@ object LibraryVersions {
     val CONTENTACCESS = Version("1.0.0-alpha01")
     val COORDINATORLAYOUT = Version("1.2.0-alpha01")
     val CORE = Version("1.3.0-beta01")
+    val CORE_ANIMATION = Version("1.0.0-alpha01")
+    val CORE_ANIMATION_TESTING = Version("1.0.0-alpha01")
     val CORE_ROLE = Version("1.1.0-alpha01")
     val CURSORADAPTER = Version("1.1.0-alpha01")
     val CUSTOMVIEW = Version("1.1.0-beta01")
