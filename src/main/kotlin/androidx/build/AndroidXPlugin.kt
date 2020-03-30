@@ -325,10 +325,7 @@ class AndroidXPlugin : Plugin<Project> {
 
         defaultConfig.testInstrumentationRunner = INSTRUMENTATION_RUNNER
 
-        // Enable code coverage for debug builds only if we are not running inside the IDE, since
-        // enabling coverage reports breaks the method parameter resolution in the IDE debugger.
-        buildTypes.getByName("debug").isTestCoverageEnabled =
-            !project.hasProperty("android.injected.invoked.from.ide")
+        buildTypes.getByName("debug").isTestCoverageEnabled = project.isCoverageEnabled()
 
         testOptions.animationsDisabled = true
         testOptions.unitTests.isReturnDefaultValues = true
