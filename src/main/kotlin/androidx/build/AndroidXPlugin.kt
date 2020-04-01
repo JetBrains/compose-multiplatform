@@ -40,8 +40,6 @@ import androidx.build.license.configureExternalDependencyLicenseCheck
 import androidx.build.metalava.MetalavaTasks.configureAndroidProjectForMetalava
 import androidx.build.metalava.MetalavaTasks.configureJavaProjectForMetalava
 import androidx.build.metalava.UpdateApiTask
-import androidx.build.releasenotes.GenerateArtifactReleaseNotesTask
-import androidx.build.releasenotes.GenerateAllReleaseNotesTask
 import androidx.build.studio.StudioTask.Companion.registerStudioTask
 import androidx.build.uptodatedness.cacheEvenIfNoOutputs
 import androidx.build.uptodatedness.TaskUpToDateValidator
@@ -150,7 +148,6 @@ class AndroidXPlugin : Plugin<Project> {
                         }
                     }
                     project.addToProjectMap(androidXExtension)
-                    project.createArtifactIdReleaseNotesTask()
 
                     // workaround for b/120487939
                     project.configurations.all { configuration ->
@@ -197,7 +194,6 @@ class AndroidXPlugin : Plugin<Project> {
                     project.configureAndroidProjectForDokka(extension, androidXExtension)
                     project.configureAndroidProjectForMetalava(extension, androidXExtension)
                     project.addToProjectMap(androidXExtension)
-                    project.createArtifactIdReleaseNotesTask()
                 }
                 is AppPlugin -> {
                     project.extensions.getByType<AppExtension>().apply {
@@ -282,9 +278,6 @@ class AndroidXPlugin : Plugin<Project> {
         buildOnServerTask.dependsOn(
             tasks.register(CREATE_LIBRARY_BUILD_INFO_FILES_TASK)
         )
-        // Create the aggregating release note task in the root project so it can depend on all
-        // release note subproject tasks
-        createGenerateAllReleaseNotesTask()
 
         extra.set("versionChecker", GMavenVersionChecker(logger))
         val createArchiveTask = Release.getGlobalFullZipTask(this)
@@ -631,71 +624,6 @@ class AndroidXPlugin : Plugin<Project> {
         )
         addToBuildOnServer(taskProvider)
         return taskProvider
-    }
-
-    private fun Project.createGenerateAllReleaseNotesTask() {
-        tasks.register(
-            GENERATE_ALL_RELEASE_NOTES_TASK,
-            GenerateAllReleaseNotesTask::class.java
-        ) { task ->
-            val artifactToCommitMapFileName = if (project.hasProperty("artifactToCommitMap")) {
-                project.property("artifactToCommitMap").toString()
-            } else {
-                ""
-            }
-            task.artifactToCommitMapFile.set(File(artifactToCommitMapFileName))
-        }
-    }
-
-    private fun Project.createArtifactIdReleaseNotesTask() {
-        val generateArtifactReleaseNotesTask: TaskProvider<GenerateArtifactReleaseNotesTask> =
-        tasks.register(
-            GENERATE_ARTIFACT_RELEASE_NOTES_TASK,
-            GenerateArtifactReleaseNotesTask::class.java
-        ) { task ->
-            val artifactToCommitMapFileName = if (project.hasProperty("artifactToCommitMap")) {
-                    project.property("artifactToCommitMap").toString()
-                } else if (rootProject.hasProperty("artifactToCommitMap")) {
-                    rootProject.property("artifactToCommitMap").toString()
-                } else {
-                    ""
-                }
-            task.artifactToCommitMapFile.set(File(artifactToCommitMapFileName))
-
-            val outputDirectory: File = File(project.getReleaseNotesDirectory(), "$group")
-            task.outputDirectory.set(outputDirectory)
-
-            val outputFile = File(
-                project.getReleaseNotesDirectory(),
-                "$group/${group}_${name}_release_notes.txt"
-            )
-            task.outputFile.set(outputFile)
-
-            val outputJsonFile = File(
-                project.getReleaseNotesDirectory(),
-                "$group/${group}_${name}_release_notes.json"
-            )
-            task.outputJsonFile.set(outputJsonFile)
-        }
-
-        addTaskToAggregrateReleaseNotesTask(generateArtifactReleaseNotesTask)
-    }
-
-    private fun Project.addTaskToAggregrateReleaseNotesTask(
-        generateArtifactReleaseNotesTask: TaskProvider<GenerateArtifactReleaseNotesTask>
-    ) {
-
-        rootProject.tasks.named(GENERATE_ALL_RELEASE_NOTES_TASK).configure {
-            val generateAllReleaseNotesTask: GenerateAllReleaseNotesTask = it
-                    as GenerateAllReleaseNotesTask
-            generateAllReleaseNotesTask.dependsOn(generateArtifactReleaseNotesTask)
-            generateAllReleaseNotesTask.artifactReleaseNoteFiles.add(
-                generateArtifactReleaseNotesTask.flatMap { task -> task.outputJsonFile }
-            )
-            generateAllReleaseNotesTask.artifactReleaseNoteOutputDirectories.add(
-                generateArtifactReleaseNotesTask.flatMap { task -> task.outputDirectory }
-            )
-        }
     }
 
     // Task that creates a json file of a project's dependencies
