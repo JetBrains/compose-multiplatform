@@ -155,7 +155,7 @@ class ComposeBenchmark : ComposeBenchmarkBase() {
 }
 
 private fun background(paint: Paint) =
-    Modifier.drawBehind { canvas, size -> canvas.drawRect(size.toRect(), paint) }
+    Modifier.drawBehind { drawRect(size.toRect(), paint) }
 
 private val redBackground = background(Paint().also { it.color = Color.Red })
 private val blackBackground = background(Paint().also { it.color = Color.Black })

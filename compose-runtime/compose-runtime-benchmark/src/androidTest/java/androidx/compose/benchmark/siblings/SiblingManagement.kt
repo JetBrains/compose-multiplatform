@@ -35,7 +35,7 @@ import androidx.ui.unit.toRect
 import kotlin.random.Random
 
 private fun background(paint: Paint) =
-    Modifier.drawBehind { canvas, size -> canvas.drawRect(size.toRect(), paint) }
+    Modifier.drawBehind { drawRect(size.toRect(), paint) }
 
 val blackBackground = background(Paint().also { it.color = Color.Black })
 val blueBackground = background(Paint().also { it.color = Color.Black })

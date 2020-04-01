@@ -30,7 +30,7 @@ import androidx.ui.layout.fillMaxWidth
 import androidx.ui.unit.toRect
 
 private fun background(paint: Paint) =
-    Modifier.drawBehind { canvas, size -> canvas.drawRect(size.toRect(), paint) }
+    Modifier.drawBehind { drawRect(size.toRect(), paint) }
 
 val blueBackground = background(Paint().also { it.color = Color.Blue })
 val magentaBackground = background(Paint().also { it.color = Color.Magenta })
