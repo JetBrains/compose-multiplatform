@@ -41,8 +41,8 @@ import androidx.build.metalava.MetalavaTasks.configureAndroidProjectForMetalava
 import androidx.build.metalava.MetalavaTasks.configureJavaProjectForMetalava
 import androidx.build.metalava.UpdateApiTask
 import androidx.build.studio.StudioTask.Companion.registerStudioTask
-import androidx.build.uptodatedness.cacheEvenIfNoOutputs
 import androidx.build.uptodatedness.TaskUpToDateValidator
+import androidx.build.uptodatedness.cacheEvenIfNoOutputs
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryExtension
@@ -239,7 +239,7 @@ class AndroidXPlugin : Plugin<Project> {
                     it.destinationDirectory.set(project.getHostTestResultDirectory())
                     it.archiveFileName.set("${project.asFilenamePrefix()}_${task.name}.zip")
                 }
-                if (isRunningOnBuildServer()) {
+                if (project.hasProperty(TEST_FAILURES_DO_NOT_FAIL_TEST_TASK)) {
                     task.ignoreFailures = true
                 }
                 task.finalizedBy(zipTask)
