@@ -54,7 +54,6 @@ import org.gradle.api.JavaVersion.VERSION_1_8
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.api.logging.configuration.ShowStacktrace
 import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPluginConvention
@@ -265,9 +264,6 @@ class AndroidXPlugin : Plugin<Project> {
         configureKtlintCheckFile()
         configureCheckInvalidSuppress()
 
-        if (isRunningOnBuildServer()) {
-            gradle.startParameter.showStacktrace = ShowStacktrace.ALWAYS
-        }
         val buildOnServerTask = tasks.create(BUILD_ON_SERVER_TASK, BuildOnServer::class.java)
         buildOnServerTask.dependsOn(
             tasks.register(
