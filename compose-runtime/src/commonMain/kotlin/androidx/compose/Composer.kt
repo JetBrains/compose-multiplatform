@@ -1154,7 +1154,7 @@ open class Composer<N>(
             // doesn't exist in this set, it needs to be removed.
             val usedKeys = current.toSet()
 
-            val movedKeys = mutableSetOf<KeyInfo>()
+            val placedKeys = mutableSetOf<KeyInfo>()
             var currentIndex = 0
             val currentEnd = current.size
             var previousIndex = 0
@@ -1188,8 +1188,8 @@ open class Composer<N>(
                     continue
                 }
 
-                if (previousInfo in movedKeys) {
-                    // If the group was already moved to the correct location, skip it.
+                if (previousInfo in placedKeys) {
+                    // If the group was already placed in the correct location, skip it.
                     previousIndex++
                     continue
                 }
@@ -1200,6 +1200,7 @@ open class Composer<N>(
                     val currentInfo = current[currentIndex]
                     if (currentInfo !== previousInfo) {
                         val nodePosition = pending.nodePositionOf(currentInfo)
+                        placedKeys.add(currentInfo)
                         if (nodePosition != nodeOffset) {
                             val updatedCount = pending.updatedNodeCountOf(currentInfo)
                             recordMoveNode(
@@ -1207,7 +1208,6 @@ open class Composer<N>(
                                 nodeOffset + pending.startIndex, updatedCount
                             )
                             pending.registerMoveNode(nodePosition, nodeOffset, updatedCount)
-                            movedKeys.add(currentInfo)
                         } // else the nodes are already in the correct position
                     } else {
                         // The correct nodes are in the right location

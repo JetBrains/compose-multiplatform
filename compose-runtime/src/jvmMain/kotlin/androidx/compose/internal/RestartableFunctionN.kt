@@ -63,7 +63,7 @@ fun restartableFunctionN(
     arity: Int,
     block: Any
 ): RestartableFunctionN<*> {
-    composer.startReplaceableGroup(0)
+    composer.startReplaceableGroup(key)
     val slot = composer.nextValue()
     val result = if (slot === SlotTable.EMPTY) {
         val value = RestartableFunctionN<Any>(key, tracked, arity)

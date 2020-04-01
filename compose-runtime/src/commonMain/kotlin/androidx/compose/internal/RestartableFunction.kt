@@ -1179,7 +1179,7 @@ private typealias RFunction = RestartableFunction<Any, Any, Any, Any, Any, Any, 
 
 @Suppress("unused")
 fun restartableFunction(composer: Composer<*>, key: Int, tracked: Boolean, block: Any): RFunction {
-    composer.startReplaceableGroup(0)
+    composer.startReplaceableGroup(key)
     val slot = composer.nextValue()
     val result = if (slot === SlotTable.EMPTY) {
         val value = RFunction(key, tracked)
