@@ -1872,6 +1872,36 @@ class CompositionTests {
             assertEquals(outerKeys[0], it)
         }
     }
+
+    @Test // b/152753046
+    fun testSwappingGroups() {
+        val items = mutableListOf(0, 1, 2, 3, 4)
+        var invalidateComposition = {}
+
+        @Composable
+        fun MockComposeScope.noNodes() { }
+
+        @Composable
+        fun MockComposeScope.test() {
+            invalidateComposition = invalidate
+            for (item in items) {
+                key(item) {
+                    noNodes()
+                }
+            }
+        }
+
+        val myComposer = compose {
+            test()
+        }
+
+        // Swap 2 and 3
+        items[2] = 3
+        items[3] = 2
+        invalidateComposition()
+
+        myComposer.expectChanges()
+    }
 }
 
 private fun <T> assertArrayEquals(message: String, expected: Array<T>, received: Array<T>) {
