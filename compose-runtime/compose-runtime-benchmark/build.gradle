@@ -49,7 +49,7 @@ dependencies {
 
     androidTestImplementation(project(":compose:compose-runtime"))
     androidTestImplementation(project(":ui:ui-core"))
-    androidTestImplementation(project(":ui:ui-text"))
+    androidTestImplementation(project(":ui:ui-text-core"))
     androidTestImplementation(project(":ui:ui-framework"))
     androidTestImplementation(project(":ui:ui-layout"))
     androidTestImplementation(project(":ui:ui-material"))
