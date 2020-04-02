@@ -96,7 +96,7 @@ fun RealWorld4_FancyWidget_000(model: RealWorld4_DataModel_00) {
 fun RealWorld4_FancyWidget_001(
     s1: String,
     s2: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_01,
     children: @Composable() () -> Unit
 ) {
@@ -151,7 +151,7 @@ fun RealWorld4_FancyWidget_001(
 @Composable
 fun RealWorld4_FancyWidget_002(
     s2: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_02
 ) {
     val tmp0 =
@@ -236,7 +236,7 @@ fun RealWorld4_FancyWidget_002(
 
 @Composable
 fun RealWorld4_FancyWidget_003(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_03,
     number: Int,
     s1: String,
@@ -344,7 +344,7 @@ fun RealWorld4_FancyWidget_003(
 @Composable
 fun RealWorld4_FancyWidget_004(
     number: Int,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_04,
     s1: String,
     children: @Composable() () -> Unit
@@ -428,7 +428,7 @@ fun RealWorld4_FancyWidget_004(
 fun RealWorld4_FancyWidget_005(
     number: Int,
     s1: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_05,
     s2: String,
     children: @Composable() () -> Unit
@@ -548,7 +548,7 @@ fun RealWorld4_FancyWidget_005(
 
 @Composable
 fun RealWorld4_FancyWidget_006(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_06,
     s1: String,
     children: @Composable() () -> Unit
@@ -616,7 +616,7 @@ fun RealWorld4_FancyWidget_006(
 @Composable
 fun RealWorld4_FancyWidget_007(
     number: Int,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_07,
     children: @Composable() () -> Unit
 ) {
@@ -696,7 +696,7 @@ fun RealWorld4_FancyWidget_007(
 @Composable
 fun RealWorld4_FancyWidget_008(
     s1: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
     children: @Composable() () -> Unit
 ) {
@@ -742,7 +742,7 @@ fun RealWorld4_FancyWidget_008(
 
 @Composable
 fun RealWorld4_FancyWidget_009(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     number: Int,
     children: @Composable() () -> Unit
@@ -791,7 +791,7 @@ fun RealWorld4_FancyWidget_009(
 
 @Composable
 fun RealWorld4_FancyWidget_010(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s2: String,
     s1: String,
@@ -836,7 +836,7 @@ fun RealWorld4_FancyWidget_010(
 
 @Composable
 fun RealWorld4_FancyWidget_011(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     number: Int
 ) {
@@ -872,7 +872,7 @@ fun RealWorld4_FancyWidget_011(
 
 @Composable
 fun RealWorld4_FancyWidget_012(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s1: String,
     children: @Composable() () -> Unit
@@ -935,7 +935,7 @@ fun RealWorld4_FancyWidget_012(
 
 @Composable
 fun RealWorld4_FancyWidget_013(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s2: String,
     children: @Composable() () -> Unit
@@ -975,7 +975,7 @@ fun RealWorld4_FancyWidget_013(
 @Composable
 fun RealWorld4_FancyWidget_014(
     s1: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -1014,7 +1014,7 @@ fun RealWorld4_FancyWidget_014(
 @Composable
 fun RealWorld4_FancyWidget_015(
     number: Int,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
     s1: String,
     children: @Composable() () -> Unit
@@ -1078,7 +1078,7 @@ fun RealWorld4_FancyWidget_015(
 
 @Composable
 fun RealWorld4_FancyWidget_016(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s2: String,
     children: @Composable() () -> Unit
@@ -1144,7 +1144,7 @@ fun RealWorld4_FancyWidget_016(
 @Composable
 fun RealWorld4_FancyWidget_017(
     s1: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     number: Int
 ) {
@@ -1187,7 +1187,7 @@ fun RealWorld4_FancyWidget_017(
 fun RealWorld4_FancyWidget_018(
     number: Int,
     s2: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s1: String,
     b: Boolean
@@ -1265,7 +1265,7 @@ fun RealWorld4_FancyWidget_018(
 
 @Composable
 fun RealWorld4_FancyWidget_019(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -1301,7 +1301,7 @@ fun RealWorld4_FancyWidget_020(
     color: Color,
     s1: String,
     b: Boolean,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -1349,7 +1349,7 @@ fun RealWorld4_FancyWidget_020(
 
 @Composable
 fun RealWorld4_FancyWidget_021(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -1382,7 +1382,7 @@ fun RealWorld4_FancyWidget_021(
 
 @Composable
 fun RealWorld4_FancyWidget_022(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_07,
     s1: String,
     number: Int,
@@ -1472,7 +1472,7 @@ fun RealWorld4_FancyWidget_022(
 
 @Composable
 fun RealWorld4_FancyWidget_023(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
     obj: RealWorld4_UnmemoizablePojo_14,
     children: @Composable() () -> Unit
@@ -1526,7 +1526,7 @@ fun RealWorld4_FancyWidget_023(
 @Composable
 fun RealWorld4_FancyWidget_024(
     s1: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s2: String,
     children: @Composable() () -> Unit
@@ -1579,7 +1579,7 @@ fun RealWorld4_FancyWidget_024(
 @Composable
 fun RealWorld4_FancyWidget_025(
     b: Boolean,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     children: @Composable() () -> Unit
 ) {
@@ -1635,7 +1635,7 @@ fun RealWorld4_FancyWidget_025(
 fun RealWorld4_FancyWidget_026(
     s2: String,
     s1: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -1679,7 +1679,7 @@ fun RealWorld4_FancyWidget_026(
 @Composable
 fun RealWorld4_FancyWidget_027(
     color: Color,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -1720,7 +1720,7 @@ fun RealWorld4_FancyWidget_028(
     s2: String,
     b: Boolean,
     s1: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
@@ -1766,7 +1766,7 @@ fun RealWorld4_FancyWidget_028(
 @Composable
 fun RealWorld4_FancyWidget_029(
     b: Boolean,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
     s2: String,
     children: @Composable() () -> Unit
@@ -1819,7 +1819,7 @@ fun RealWorld4_FancyWidget_029(
 @Composable
 fun RealWorld4_FancyWidget_030(
     s1: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     children: @Composable() () -> Unit
 ) {
@@ -1867,7 +1867,7 @@ fun RealWorld4_FancyWidget_030(
 
 @Composable
 fun RealWorld4_FancyWidget_031(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s2: String
 ) {
@@ -1904,7 +1904,7 @@ fun RealWorld4_FancyWidget_031(
 @Composable
 fun RealWorld4_FancyWidget_032(
     obj: RealWorld4_UnmemoizablePojo_5,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -1946,7 +1946,7 @@ fun RealWorld4_FancyWidget_032(
 
 @Composable
 fun RealWorld4_FancyWidget_033(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s1: String,
     children: @Composable() () -> Unit
@@ -1995,7 +1995,7 @@ fun RealWorld4_FancyWidget_033(
 
 @Composable
 fun RealWorld4_FancyWidget_034(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     b: Boolean,
     s2: String,
@@ -2042,7 +2042,7 @@ fun RealWorld4_FancyWidget_034(
 fun RealWorld4_FancyWidget_035(
     s2: String,
     s1: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -2086,7 +2086,7 @@ fun RealWorld4_FancyWidget_035(
 @Composable
 fun RealWorld4_FancyWidget_036(
     s1: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -2125,7 +2125,7 @@ fun RealWorld4_FancyWidget_036(
 @Composable
 fun RealWorld4_FancyWidget_037(
     s1: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_06,
     s2: String,
     number: Int
@@ -2221,7 +2221,7 @@ fun RealWorld4_FancyWidget_037(
 @Composable
 fun RealWorld4_FancyWidget_038(
     s1: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_07,
     obj: RealWorld4_UnmemoizablePojo_8,
     s2: String,
@@ -2282,7 +2282,7 @@ fun RealWorld4_FancyWidget_038(
 
 @Composable
 fun RealWorld4_FancyWidget_039(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
     s1: String,
     b: Boolean,
@@ -2347,7 +2347,7 @@ fun RealWorld4_FancyWidget_039(
 
 @Composable
 fun RealWorld4_FancyWidget_040(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s2: String,
     children: @Composable() () -> Unit
@@ -2394,7 +2394,7 @@ fun RealWorld4_FancyWidget_040(
 
 @Composable
 fun RealWorld4_FancyWidget_041(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s2: String,
     children: @Composable() () -> Unit
@@ -2462,7 +2462,7 @@ fun RealWorld4_FancyWidget_041(
 fun RealWorld4_FancyWidget_042(
     s2: String,
     s1: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -2506,7 +2506,7 @@ fun RealWorld4_FancyWidget_042(
 @Composable
 fun RealWorld4_FancyWidget_043(
     s2: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_07,
     obj: RealWorld4_UnmemoizablePojo_13,
     s1: String,
@@ -2574,7 +2574,7 @@ fun RealWorld4_FancyWidget_043(
 @Composable
 fun RealWorld4_FancyWidget_044(
     s1: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
     obj: RealWorld4_UnmemoizablePojo_3,
     number: Int,
@@ -2662,7 +2662,7 @@ fun RealWorld4_FancyWidget_045(
     obj: RealWorld4_UnmemoizablePojo_6,
     s2: String,
     s1: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
     children: @Composable() () -> Unit
 ) {
@@ -2724,7 +2724,7 @@ fun RealWorld4_FancyWidget_045(
 @Composable
 fun RealWorld4_FancyWidget_046(
     s2: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     children: @Composable() () -> Unit
 ) {
@@ -2770,7 +2770,7 @@ fun RealWorld4_FancyWidget_046(
 
 @Composable
 fun RealWorld4_FancyWidget_047(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -2803,7 +2803,7 @@ fun RealWorld4_FancyWidget_047(
 
 @Composable
 fun RealWorld4_FancyWidget_048(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     b: Boolean,
     children: @Composable() () -> Unit
@@ -2843,7 +2843,7 @@ fun RealWorld4_FancyWidget_048(
 @Composable
 fun RealWorld4_FancyWidget_049(
     s2: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     children: @Composable() () -> Unit
 ) {
@@ -2903,7 +2903,7 @@ fun RealWorld4_FancyWidget_049(
 
 @Composable
 fun RealWorld4_FancyWidget_050(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s2: String,
     children: @Composable() () -> Unit
@@ -2943,7 +2943,7 @@ fun RealWorld4_FancyWidget_050(
 @Composable
 fun RealWorld4_FancyWidget_051(
     number: Int,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -2981,7 +2981,7 @@ fun RealWorld4_FancyWidget_051(
 
 @Composable
 fun RealWorld4_FancyWidget_052(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s1: String,
     children: @Composable() () -> Unit
@@ -3021,7 +3021,7 @@ fun RealWorld4_FancyWidget_052(
 @Composable
 fun RealWorld4_FancyWidget_053(
     s1: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
@@ -3056,7 +3056,7 @@ fun RealWorld4_FancyWidget_053(
 
 @Composable
 fun RealWorld4_FancyWidget_054(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
@@ -3124,7 +3124,7 @@ fun RealWorld4_FancyWidget_054(
 
 @Composable
 fun RealWorld4_FancyWidget_055(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s2: String,
     children: @Composable() () -> Unit
@@ -3175,7 +3175,7 @@ fun RealWorld4_FancyWidget_055(
 fun RealWorld4_FancyWidget_056(
     s2: String,
     number: Int,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     children: @Composable() () -> Unit
 ) {
@@ -3228,7 +3228,7 @@ fun RealWorld4_FancyWidget_056(
 
 @Composable
 fun RealWorld4_FancyWidget_057(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     obj: RealWorld4_UnmemoizablePojo_11,
     s1: String,
@@ -3279,7 +3279,7 @@ fun RealWorld4_FancyWidget_057(
 
 @Composable
 fun RealWorld4_FancyWidget_058(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     children: @Composable() () -> Unit
 ) {
@@ -3325,7 +3325,7 @@ fun RealWorld4_FancyWidget_058(
 @Composable
 fun RealWorld4_FancyWidget_059(
     s2: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     number: Int,
     children: @Composable() () -> Unit
@@ -3370,7 +3370,7 @@ fun RealWorld4_FancyWidget_059(
 @Composable
 fun RealWorld4_FancyWidget_060(
     s2: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
@@ -3406,7 +3406,7 @@ fun RealWorld4_FancyWidget_060(
 @Composable
 fun RealWorld4_FancyWidget_061(
     s2: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
@@ -3441,7 +3441,7 @@ fun RealWorld4_FancyWidget_061(
 
 @Composable
 fun RealWorld4_FancyWidget_062(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s2: String,
     children: @Composable() () -> Unit
@@ -3496,7 +3496,7 @@ fun RealWorld4_FancyWidget_062(
 
 @Composable
 fun RealWorld4_FancyWidget_063(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s1: String,
     s2: String,
@@ -3542,7 +3542,7 @@ fun RealWorld4_FancyWidget_063(
 @Composable
 fun RealWorld4_FancyWidget_064(
     s2: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -3582,7 +3582,7 @@ fun RealWorld4_FancyWidget_064(
 fun RealWorld4_FancyWidget_065(
     number: Int,
     s1: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
@@ -3623,7 +3623,7 @@ fun RealWorld4_FancyWidget_065(
 @Composable
 fun RealWorld4_FancyWidget_066(
     s2: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s1: String,
     children: @Composable() () -> Unit
@@ -3668,7 +3668,7 @@ fun RealWorld4_FancyWidget_066(
 @Composable
 fun RealWorld4_FancyWidget_067(
     s1: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s2: String,
     b: Boolean,
@@ -3718,7 +3718,7 @@ fun RealWorld4_FancyWidget_067(
 
 @Composable
 fun RealWorld4_FancyWidget_068(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_05,
     obj: RealWorld4_UnmemoizablePojo_2,
     s2: String,
@@ -3786,7 +3786,7 @@ fun RealWorld4_FancyWidget_068(
 
 @Composable
 fun RealWorld4_FancyWidget_069(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_06,
     s2: String,
     s1: String,
@@ -3851,7 +3851,7 @@ fun RealWorld4_FancyWidget_069(
 
 @Composable
 fun RealWorld4_FancyWidget_070(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_07,
     s1: String,
     number: Int,
@@ -3920,7 +3920,7 @@ fun RealWorld4_FancyWidget_070(
 @Composable
 fun RealWorld4_FancyWidget_071(
     color: Color,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
     obj: RealWorld4_UnmemoizablePojo_0,
     children: @Composable() () -> Unit
@@ -3999,7 +3999,7 @@ fun RealWorld4_FancyWidget_071(
 @Composable
 fun RealWorld4_FancyWidget_072(
     s2: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     children: @Composable() () -> Unit
 ) {
@@ -4046,7 +4046,7 @@ fun RealWorld4_FancyWidget_072(
 @Composable
 fun RealWorld4_FancyWidget_073(
     s1: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     children: @Composable() () -> Unit
 ) {
@@ -4092,7 +4092,7 @@ fun RealWorld4_FancyWidget_073(
 
 @Composable
 fun RealWorld4_FancyWidget_074(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s2: String
 ) {
@@ -4129,7 +4129,7 @@ fun RealWorld4_FancyWidget_074(
 @Composable
 fun RealWorld4_FancyWidget_075(
     s1: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_06,
     children: @Composable() () -> Unit
 ) {
@@ -4181,7 +4181,7 @@ fun RealWorld4_FancyWidget_075(
 
 @Composable
 fun RealWorld4_FancyWidget_076(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_07,
     s2: String
 ) {
@@ -4284,7 +4284,7 @@ fun RealWorld4_FancyWidget_076(
 fun RealWorld4_FancyWidget_077(
     s2: String,
     s1: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
     children: @Composable() () -> Unit
 ) {
@@ -4341,7 +4341,7 @@ fun RealWorld4_FancyWidget_077(
 
 @Composable
 fun RealWorld4_FancyWidget_078(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     b: Boolean
 ) {
@@ -4398,7 +4398,7 @@ fun RealWorld4_FancyWidget_078(
 @Composable
 fun RealWorld4_FancyWidget_079(
     number: Int,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -4436,7 +4436,7 @@ fun RealWorld4_FancyWidget_079(
 
 @Composable
 fun RealWorld4_FancyWidget_080(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_07,
     s1: String,
     children: @Composable() () -> Unit
@@ -4497,7 +4497,7 @@ fun RealWorld4_FancyWidget_081(
     number: Int,
     b: Boolean,
     obj: RealWorld4_UnmemoizablePojo_7,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
     s1: String,
     children: @Composable() () -> Unit
@@ -4588,7 +4588,7 @@ fun RealWorld4_FancyWidget_081(
 
 @Composable
 fun RealWorld4_FancyWidget_082(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s2: String,
     children: @Composable() () -> Unit
@@ -4639,7 +4639,7 @@ fun RealWorld4_FancyWidget_082(
 fun RealWorld4_FancyWidget_083(
     s1: String,
     s2: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     children: @Composable() () -> Unit
 ) {
@@ -4692,7 +4692,7 @@ fun RealWorld4_FancyWidget_083(
 
 @Composable
 fun RealWorld4_FancyWidget_084(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -4725,7 +4725,7 @@ fun RealWorld4_FancyWidget_084(
 
 @Composable
 fun RealWorld4_FancyWidget_085(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
     children: @Composable() () -> Unit
 ) {
@@ -4779,7 +4779,7 @@ fun RealWorld4_FancyWidget_085(
 @Composable
 fun RealWorld4_FancyWidget_086(
     s1: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
@@ -4834,7 +4834,7 @@ fun RealWorld4_FancyWidget_086(
 
 @Composable
 fun RealWorld4_FancyWidget_087(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     color: Color
 ) {
@@ -4871,7 +4871,7 @@ fun RealWorld4_FancyWidget_087(
 @Composable
 fun RealWorld4_FancyWidget_088(
     s2: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     children: @Composable() () -> Unit
 ) {
@@ -4917,7 +4917,7 @@ fun RealWorld4_FancyWidget_088(
 
 @Composable
 fun RealWorld4_FancyWidget_089(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s2: String,
     children: @Composable() () -> Unit
@@ -4956,7 +4956,7 @@ fun RealWorld4_FancyWidget_089(
 
 @Composable
 fun RealWorld4_FancyWidget_090(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s1: String,
     s2: String
@@ -4998,7 +4998,7 @@ fun RealWorld4_FancyWidget_090(
 
 @Composable
 fun RealWorld4_FancyWidget_091(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s1: String,
     children: @Composable() () -> Unit
@@ -5038,7 +5038,7 @@ fun RealWorld4_FancyWidget_091(
 @Composable
 fun RealWorld4_FancyWidget_092(
     s1: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_07,
     children: @Composable() () -> Unit
 ) {
@@ -5098,7 +5098,7 @@ fun RealWorld4_FancyWidget_092(
 @Composable
 fun RealWorld4_FancyWidget_093(
     s1: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
@@ -5165,7 +5165,7 @@ fun RealWorld4_FancyWidget_093(
 
 @Composable
 fun RealWorld4_FancyWidget_094(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     obj: RealWorld4_UnmemoizablePojo_9,
     children: @Composable() () -> Unit
@@ -5228,7 +5228,7 @@ fun RealWorld4_FancyWidget_094(
 
 @Composable
 fun RealWorld4_FancyWidget_095(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -5262,7 +5262,7 @@ fun RealWorld4_FancyWidget_095(
 @Composable
 fun RealWorld4_FancyWidget_096(
     s2: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s1: String,
     children: @Composable() () -> Unit
@@ -5323,7 +5323,7 @@ fun RealWorld4_FancyWidget_096(
 @Composable
 fun RealWorld4_FancyWidget_097(
     s2: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
     s1: String,
     children: @Composable() () -> Unit
@@ -5390,7 +5390,7 @@ fun RealWorld4_FancyWidget_097(
 @Composable
 fun RealWorld4_FancyWidget_098(
     s1: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s2: String
 ) {
@@ -5453,7 +5453,7 @@ fun RealWorld4_FancyWidget_098(
 
 @Composable
 fun RealWorld4_FancyWidget_099(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -5486,7 +5486,7 @@ fun RealWorld4_FancyWidget_099(
 
 @Composable
 fun RealWorld4_FancyWidget_100(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
     s2: String,
     s1: String,
@@ -5552,7 +5552,7 @@ fun RealWorld4_FancyWidget_100(
 @Composable
 fun RealWorld4_FancyWidget_101(
     number: Int,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s1: String,
     children: @Composable() () -> Unit
@@ -5614,7 +5614,7 @@ fun RealWorld4_FancyWidget_101(
 
 @Composable
 fun RealWorld4_FancyWidget_102(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s1: String,
     s2: String,
@@ -5659,7 +5659,7 @@ fun RealWorld4_FancyWidget_102(
 
 @Composable
 fun RealWorld4_FancyWidget_103(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s2: String
 ) {
@@ -5695,7 +5695,7 @@ fun RealWorld4_FancyWidget_103(
 
 @Composable
 fun RealWorld4_FancyWidget_104(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s1: String,
     s2: String,
@@ -5740,7 +5740,7 @@ fun RealWorld4_FancyWidget_104(
 
 @Composable
 fun RealWorld4_FancyWidget_105(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     number: Int,
     children: @Composable() () -> Unit
@@ -5802,7 +5802,7 @@ fun RealWorld4_FancyWidget_105(
 
 @Composable
 fun RealWorld4_FancyWidget_106(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -5836,7 +5836,7 @@ fun RealWorld4_FancyWidget_106(
 @Composable
 fun RealWorld4_FancyWidget_107(
     s2: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s1: String,
     children: @Composable() () -> Unit
@@ -5880,7 +5880,7 @@ fun RealWorld4_FancyWidget_107(
 
 @Composable
 fun RealWorld4_FancyWidget_108(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s1: String,
     children: @Composable() () -> Unit
@@ -5919,7 +5919,7 @@ fun RealWorld4_FancyWidget_108(
 
 @Composable
 fun RealWorld4_FancyWidget_109(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -5955,7 +5955,7 @@ fun RealWorld4_FancyWidget_110(
     s2: String,
     s1: String,
     color: Color,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -6003,7 +6003,7 @@ fun RealWorld4_FancyWidget_110(
 
 @Composable
 fun RealWorld4_FancyWidget_111(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     obj: RealWorld4_UnmemoizablePojo_10,
     children: @Composable() () -> Unit
@@ -6046,7 +6046,7 @@ fun RealWorld4_FancyWidget_111(
 
 @Composable
 fun RealWorld4_FancyWidget_112(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
     children: @Composable() () -> Unit
 ) {
@@ -6100,7 +6100,7 @@ fun RealWorld4_FancyWidget_112(
 @Composable
 fun RealWorld4_FancyWidget_113(
     number: Int,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     children: @Composable() () -> Unit
 ) {
@@ -6164,7 +6164,7 @@ fun RealWorld4_FancyWidget_113(
 
 @Composable
 fun RealWorld4_FancyWidget_114(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s1: String,
     color: Color,
@@ -6211,7 +6211,7 @@ fun RealWorld4_FancyWidget_114(
 fun RealWorld4_FancyWidget_115(
     s2: String,
     color: Color,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s1: String,
     children: @Composable() () -> Unit
@@ -6260,7 +6260,7 @@ fun RealWorld4_FancyWidget_115(
 
 @Composable
 fun RealWorld4_FancyWidget_116(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     number: Int,
     children: @Composable() () -> Unit
@@ -6307,7 +6307,7 @@ fun RealWorld4_FancyWidget_116(
 
 @Composable
 fun RealWorld4_FancyWidget_117(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     number: Int,
     children: @Composable() () -> Unit
@@ -6346,7 +6346,7 @@ fun RealWorld4_FancyWidget_117(
 
 @Composable
 fun RealWorld4_FancyWidget_118(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     color: Color,
     children: @Composable() () -> Unit
@@ -6386,7 +6386,7 @@ fun RealWorld4_FancyWidget_118(
 @Composable
 fun RealWorld4_FancyWidget_119(
     s1: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     children: @Composable() () -> Unit
 ) {
@@ -6434,7 +6434,7 @@ fun RealWorld4_FancyWidget_119(
 
 @Composable
 fun RealWorld4_FancyWidget_120(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -6469,7 +6469,7 @@ fun RealWorld4_FancyWidget_120(
 fun RealWorld4_FancyWidget_121(
     s2: String,
     s1: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -6515,7 +6515,7 @@ fun RealWorld4_FancyWidget_122(
     number: Int,
     obj: RealWorld4_UnmemoizablePojo_12,
     b: Boolean,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -6569,7 +6569,7 @@ fun RealWorld4_FancyWidget_122(
 fun RealWorld4_FancyWidget_123(
     s2: String,
     s1: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -6613,7 +6613,7 @@ fun RealWorld4_FancyWidget_123(
 @Composable
 fun RealWorld4_FancyWidget_124(
     s2: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     b: Boolean,
     children: @Composable() () -> Unit
@@ -6666,7 +6666,7 @@ fun RealWorld4_FancyWidget_124(
 @Composable
 fun RealWorld4_FancyWidget_125(
     s2: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -6705,7 +6705,7 @@ fun RealWorld4_FancyWidget_125(
 @Composable
 fun RealWorld4_FancyWidget_126(
     s2: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -6743,7 +6743,7 @@ fun RealWorld4_FancyWidget_126(
 
 @Composable
 fun RealWorld4_FancyWidget_127(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -6776,7 +6776,7 @@ fun RealWorld4_FancyWidget_127(
 
 @Composable
 fun RealWorld4_FancyWidget_128(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s2: String,
     s1: String,
@@ -6821,7 +6821,7 @@ fun RealWorld4_FancyWidget_128(
 
 @Composable
 fun RealWorld4_FancyWidget_129(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s2: String,
     children: @Composable() () -> Unit
@@ -6860,7 +6860,7 @@ fun RealWorld4_FancyWidget_129(
 
 @Composable
 fun RealWorld4_FancyWidget_130(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -6895,7 +6895,7 @@ fun RealWorld4_FancyWidget_130(
 fun RealWorld4_FancyWidget_131(
     s1: String,
     s2: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_04,
     children: @Composable() () -> Unit
 ) {
@@ -6977,7 +6977,7 @@ fun RealWorld4_FancyWidget_131(
 @Composable
 fun RealWorld4_FancyWidget_132(
     s1: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_05,
     children: @Composable() () -> Unit
 ) {
@@ -7104,7 +7104,7 @@ fun RealWorld4_FancyWidget_132(
 
 @Composable
 fun RealWorld4_FancyWidget_133(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_06,
     s1: String,
     s2: String,
@@ -7175,7 +7175,7 @@ fun RealWorld4_FancyWidget_133(
 
 @Composable
 fun RealWorld4_FancyWidget_134(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_07,
     children: @Composable() () -> Unit
 ) {
@@ -7239,7 +7239,7 @@ fun RealWorld4_FancyWidget_134(
 
 @Composable
 fun RealWorld4_FancyWidget_135(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
     children: @Composable() () -> Unit
 ) {
@@ -7281,7 +7281,7 @@ fun RealWorld4_FancyWidget_135(
 @Composable
 fun RealWorld4_FancyWidget_136(
     s2: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     children: @Composable() () -> Unit
 ) {
@@ -7343,7 +7343,7 @@ fun RealWorld4_FancyWidget_136(
 fun RealWorld4_FancyWidget_137(
     s2: String,
     s1: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -7386,7 +7386,7 @@ fun RealWorld4_FancyWidget_137(
 
 @Composable
 fun RealWorld4_FancyWidget_138(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     children: @Composable() () -> Unit
 ) {
@@ -7419,7 +7419,7 @@ fun RealWorld4_FancyWidget_138(
 
 @Composable
 fun RealWorld4_FancyWidget_139(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_05,
     children: @Composable() () -> Unit
 ) {
@@ -7473,7 +7473,7 @@ fun RealWorld4_FancyWidget_139(
 
 @Composable
 fun RealWorld4_FancyWidget_140(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_06,
     s2: String,
     children: @Composable() () -> Unit
@@ -7550,7 +7550,7 @@ fun RealWorld4_FancyWidget_140(
 
 @Composable
 fun RealWorld4_FancyWidget_141(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_06,
     s2: String,
     children: @Composable() () -> Unit
@@ -7609,7 +7609,7 @@ fun RealWorld4_FancyWidget_141(
 
 @Composable
 fun RealWorld4_FancyWidget_142(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_07,
     number: Int,
     s2: String
@@ -7702,7 +7702,7 @@ fun RealWorld4_FancyWidget_142(
 fun RealWorld4_FancyWidget_143(
     s2: String,
     number: Int,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_07,
     children: @Composable() () -> Unit
 ) {
@@ -7788,7 +7788,7 @@ fun RealWorld4_FancyWidget_143(
 fun RealWorld4_FancyWidget_144(
     s1: String,
     obj: RealWorld4_UnmemoizablePojo_4,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
     number: Int,
     children: @Composable() () -> Unit
@@ -7858,7 +7858,7 @@ fun RealWorld4_FancyWidget_144(
 @Composable
 fun RealWorld4_FancyWidget_145(
     s1: String,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s2: String,
     number: Int,
@@ -7938,7 +7938,7 @@ fun RealWorld4_FancyWidget_146(
     s2: String,
     number: Int,
     b: Boolean,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     children: @Composable() () -> Unit
 ) {
@@ -8013,7 +8013,7 @@ fun RealWorld4_FancyWidget_146(
 
 @Composable
 fun RealWorld4_FancyWidget_147(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s1: String,
     obj: RealWorld4_UnmemoizablePojo_1,
@@ -8074,7 +8074,7 @@ fun RealWorld4_FancyWidget_147(
 
 @Composable
 fun RealWorld4_FancyWidget_148(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
     s1: String
 ) {
@@ -8140,7 +8140,7 @@ fun RealWorld4_FancyWidget_148(
 
 @Composable
 fun RealWorld4_FancyWidget_149(
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s1: String,
     children: @Composable() () -> Unit
