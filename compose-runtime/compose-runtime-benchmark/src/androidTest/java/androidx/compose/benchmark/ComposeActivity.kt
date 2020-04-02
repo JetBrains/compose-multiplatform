@@ -16,10 +16,10 @@
 
 package androidx.compose.benchmark
 
-import android.app.Activity
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 
-class ComposeActivity : Activity() {
+class ComposeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }

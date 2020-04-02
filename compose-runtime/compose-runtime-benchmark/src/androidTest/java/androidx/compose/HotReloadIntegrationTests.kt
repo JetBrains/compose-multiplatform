@@ -17,7 +17,7 @@
 package androidx.compose
 
 import android.app.Activity
-import androidx.compose.benchmark.ComposeActivity
+import androidx.activity.ComponentActivity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
@@ -47,7 +47,7 @@ import java.util.concurrent.TimeUnit
 @LargeTest
 class HotReloadIntegrationTests {
     @get:Rule
-    val activityRule = ActivityTestRule(ComposeActivity::class.java)
+    val activityRule = ActivityTestRule(ComponentActivity::class.java)
 
     @Test
     fun testSubComposition() {
