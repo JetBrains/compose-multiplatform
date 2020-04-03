@@ -20,8 +20,6 @@ import androidx.build.gradle.isRoot
 import org.gradle.api.Project
 import java.io.File
 
-fun isRunningOnBuildServer() = System.getenv("DIST_DIR") != null
-
 /**
  * @return build id string for current build
  *

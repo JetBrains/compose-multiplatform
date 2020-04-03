@@ -23,14 +23,13 @@ import androidx.build.getDistributionDirectory
 import androidx.build.gitclient.GitClient
 import androidx.build.gitclient.GitClientImpl
 import androidx.build.gradle.isRoot
-import androidx.build.isRunningOnBuildServer
-import java.io.File
 import org.gradle.BuildAdapter
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.invocation.Gradle
 import org.gradle.api.logging.Logger
+import java.io.File
 
 /**
  * The subsets we allow the projects to be partitioned into.
@@ -91,8 +90,7 @@ abstract class AffectedModuleDetector {
                     -> ProjectSubset.CHANGED_PROJECTS
                 else -> ProjectSubset.ALL_AFFECTED_PROJECTS
             }
-            val inBuildServer = isRunningOnBuildServer()
-            if (!enabled && !inBuildServer) {
+            if (!enabled) {
                 setInstance(rootProject, AcceptAll())
                 return
             }
@@ -104,7 +102,7 @@ abstract class AffectedModuleDetector {
                     println("wrote dependency log to ${outputFile.absolutePath}")
                 }
             }
-            logger.info("setup: enabled: $enabled, inBuildServer: $inBuildServer")
+            logger.info("setup: enabled: $enabled")
             gradle.addBuildListener(object : BuildAdapter() {
                 override fun projectsEvaluated(gradle: Gradle?) {
                     logger.lifecycle("projects evaluated")
