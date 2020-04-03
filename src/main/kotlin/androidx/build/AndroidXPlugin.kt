@@ -343,19 +343,19 @@ class AndroidXPlugin : Plugin<Project> {
             // This requires evaluating all sub-projects to create the module:project map
             // and project dependencies.
             evaluationDependsOnChildren()
-            subprojects { project ->
-                project.configurations.all { configuration ->
-                    project.afterEvaluate {
-                        // Substitute only for debug configurations/tasks only because we can not
-                        // change release dependencies after evaluation. Test hooks, buildOnServer
-                        // and buildTestApks use the debug configurations as well.
-                        if (project.extra.has("publish") &&
-                            configuration.name.toLowerCase().contains("debug")
-                        ) {
-                            configuration.resolutionStrategy.dependencySubstitution.apply {
-                                for (e in projectModules) {
-                                    substitute(module(e.key)).with(project(e.value))
-                                }
+            subprojects { subproject ->
+                // TODO(153485458) remove most of these exceptions
+                if (subproject.name != "docs-fake" &&
+                    !subproject.name.contains("hilt") &&
+                    subproject.name != "camera-testapp-timing" &&
+                    subproject.name != "room-testapp" &&
+                    subproject.name != "support-media2-test-client-previous" &&
+                    subproject.name != "support-media2-test-service-previous") {
+
+                    subproject.configurations.all { configuration ->
+                        configuration.resolutionStrategy.dependencySubstitution.apply {
+                            for (e in projectModules) {
+                                substitute(module(e.key)).with(project(e.value))
                             }
                         }
                     }
