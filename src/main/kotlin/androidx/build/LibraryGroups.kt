@@ -56,6 +56,7 @@ object LibraryGroups {
     val FRAGMENT = LibraryGroup("androidx.fragment", LibraryVersions.FRAGMENT)
     val GRIDLAYOUT = LibraryGroup("androidx.gridlayout", LibraryVersions.GRIDLAYOUT)
     val HEIFWRITER = LibraryGroup("androidx.heifwriter", LibraryVersions.HEIFWRITER)
+    val HILT = LibraryGroup("androidx.hilt", null)
     val INSPECTION = LibraryGroup("androidx.inspection", LibraryVersions.INSPECTION)
     val INSPECTION_EXTENSIONS = LibraryGroup("androidx.inspection.extensions",
         LibraryVersions.SQLITE_INSPECTOR)
