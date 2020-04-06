@@ -63,6 +63,7 @@ object LibraryVersions {
     val FUTURES = Version("1.1.0-beta01")
     val GRIDLAYOUT = Version("1.1.0-alpha01")
     val HEIFWRITER = Version("1.1.0-alpha01")
+    val HILT = Version("1.0.0-alpha01")
     val INSPECTION = Version("1.0.0-alpha01")
     val INTERPOLATOR = Version("1.1.0-alpha01")
     val JETIFIER = Version("1.0.0-beta09")
