@@ -17,8 +17,13 @@
 package androidx.build
 
 /**
- * Setting this property to true makes Test tasks succeed even if there
+ * Setting this property makes Test tasks succeed even if there
  * are some failing tests. Useful when running tests in CI where build
  * passes test results as XML to test reporter.
  */
 const val TEST_FAILURES_DO_NOT_FAIL_TEST_TASK = "androidx.ignoreTestFailures"
+
+/**
+ * Setting this property turns javac and kotlinc warnings into errors that fail the build.
+ */
+const val ALL_WARNINGS_AS_ERRORS = "androidx.allWarningsAsErrors"
