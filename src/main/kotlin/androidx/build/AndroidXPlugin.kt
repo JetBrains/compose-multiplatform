@@ -362,14 +362,6 @@ class AndroidXPlugin : Plugin<Project> {
                 }
             }
         }
-        // If we are running buildOnServer, run all actions in buildOnServerDependentActions after
-        // the task graph has been resolved, before we are in the execution phase.
-        project.gradle.taskGraph.whenReady { taskExecutionGraph ->
-            // hasTask requires the task path, so we are looking for the root :buildOnServer task
-            if (taskExecutionGraph.hasTask(":$BUILD_ON_SERVER_TASK")) {
-                buildOnServerDependentActions.forEach { it() }
-            }
-        }
 
         registerStudioTask()
 
@@ -773,41 +765,16 @@ private fun Project.getGenerateResourceApiFile(): File {
     return File(buildDir, "intermediates/public_res/release/public.txt")
 }
 
-/**
- * Delays execution of the given [action] until the task graph is ready, and we know whether
- * we are running buildOnServer
- */
-private fun Project.runIfPartOfBuildOnServer(action: () -> Unit) {
-    buildOnServerDependentActions.add(action)
-}
-
-/**
- * A list of configuration actions that will only be applied if buildOnServer is part of
- * the task graph, essentially when we are running ./gradlew buildOnServer
- */
-private val Project.buildOnServerDependentActions: MutableList<() -> Unit> get() {
-    val extraProperties = rootProject.extensions.extraProperties
-    if (!extraProperties.has(BUILD_ON_SERVER_DEPENDENT_ACTIONS)) {
-        extraProperties.set(BUILD_ON_SERVER_DEPENDENT_ACTIONS, mutableListOf<() -> Unit>())
-    }
-    @Suppress("UNCHECKED_CAST")
-    return extraProperties.get(BUILD_ON_SERVER_DEPENDENT_ACTIONS) as MutableList<() -> Unit>
-}
-
 private fun Project.configureCompilationWarnings(task: JavaCompile) {
-    if (!project.rootProject.hasProperty(USE_MAX_DEP_VERSIONS)) {
-        runIfPartOfBuildOnServer {
+    if (hasProperty(ALL_WARNINGS_AS_ERRORS)) {
             task.options.compilerArgs.add("-Werror")
             task.options.compilerArgs.add("-Xlint:unchecked")
-        }
     }
 }
 
 private fun Project.configureCompilationWarnings(task: KotlinCompile) {
-    if (!project.rootProject.hasProperty(USE_MAX_DEP_VERSIONS)) {
-        runIfPartOfBuildOnServer {
-            task.kotlinOptions.allWarningsAsErrors = true
-        }
+    if (hasProperty(ALL_WARNINGS_AS_ERRORS)) {
+        task.kotlinOptions.allWarningsAsErrors = true
     }
 }
 
