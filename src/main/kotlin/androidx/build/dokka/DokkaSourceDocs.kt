@@ -28,6 +28,7 @@ import org.gradle.api.tasks.TaskCollection
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.kotlin.dsl.getPlugin
 import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.dokka.gradle.PackageOptions
 
 object DokkaSourceDocs {
     private const val DOCS_TYPE = "TipOfTree"
@@ -79,7 +80,7 @@ object DokkaSourceDocs {
         if (tryGetRunnerProject(project) == null) {
             return
         }
-        if (!extension.generateDocs) {
+        if (!project.isSamplesProject && !extension.generateDocs) {
             project.logger.info(
                 "Project ${project.name} has docs generation disabled, ignoring docs tasks."
             )
@@ -123,6 +124,28 @@ object DokkaSourceDocs {
         dokkaTasks?.filter { it.state.isConfigurable }?.forEach {
             it.sourceDirs += inputs.sourcePaths
 
+            // Filter out sample packages from the generated documentation, we only need them in
+            // Dokka to resolve @sample links
+            if (project.isSamplesProject) {
+                val sourceFiles = inputs.sourcePaths.asFileTree.files.filter { file ->
+                    file.extension == "kt"
+                }
+
+                val packages = sourceFiles.mapNotNull { file ->
+                    val lines = file.readLines()
+                    lines.find { line ->
+                        line.startsWith("package ")
+                    }?.replace("package ", "")
+                }.distinct()
+
+                packages.forEach { packageName ->
+                    val opts = PackageOptions()
+                    opts.prefix = packageName
+                    opts.suppress = true
+                    it.perPackageOptions.add(opts)
+                }
+            }
+
             // DokkaTask tries to resolve DokkaTask#classpath right away for jars that might not
             // be there yet. Delay the setting of this property to before we run the task.
             it.inputs.files(inputs.bootClasspath, inputs.dependencyClasspath)
@@ -138,3 +161,7 @@ object DokkaSourceDocs {
         }
     }
 }
+
+// TODO: b/145500705 figure out better strategy for handling samples, for now let's just include
+// samples in doc generation as they are needed to resolve @sample links in KDoc
+private val Project.isSamplesProject get() = name == "samples"
