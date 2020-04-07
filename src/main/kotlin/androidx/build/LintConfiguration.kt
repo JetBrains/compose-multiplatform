@@ -134,9 +134,8 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
                 }
             }
 
-            val lintDebugTask = tasks.named("lintDebug")
-
             if (checkUnknownNullness) {
+                val lintDebugTask = tasks.named("lintDebug")
                 lintDebugTask.configure {
                     it.doFirst {
                         logger.warn(
