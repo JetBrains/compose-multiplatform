@@ -52,7 +52,7 @@ abstract class ComposeBenchmarkBase {
             composeView.restoreHierarchyState(SparseArray())
 
             runWithTimingDisabled {
-                composition = activity.setContent { }
+                composition?.dispose()
             }
         }
         composition?.dispose()
