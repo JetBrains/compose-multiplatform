@@ -37,7 +37,7 @@ if (agpOverride != null) {
     build_versions.agp = agpOverride
 }
 
-build_versions.dokka = '0.9.17-g009'
+build_versions.dokka = '0.9.17-g010'
 
 rootProject.ext['build_versions'] = build_versions
 
