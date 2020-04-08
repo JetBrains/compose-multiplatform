@@ -53,5 +53,11 @@ KotlinOperator: androidx.compose.SlotWriter#get(int):
     Note that adding the `operator` keyword would allow calling this method using operator syntax
 
 
+MissingNullability: androidx.compose.BuildableMap#containsKey(Object) parameter #0:
+    Missing nullability on parameter `key` in method `containsKey`
+MissingNullability: androidx.compose.BuildableMap#containsValue(Object) parameter #0:
+    Missing nullability on parameter `value` in method `containsValue`
+MissingNullability: androidx.compose.BuildableMap#get(Object) parameter #0:
+    Missing nullability on parameter `key` in method `get`
 MissingNullability: androidx.compose.SlotReader#getGroupKey():
     Missing nullability on method `getGroupKey` return

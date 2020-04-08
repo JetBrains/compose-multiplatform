@@ -45,12 +45,19 @@ package androidx.compose {
     method public void start(N?, N? instance);
   }
 
-  public interface BuildableMap<K, V> extends java.util.Map<K,V> kotlin.jvm.internal.markers.KMappedMarker {
-    method public androidx.compose.BuildableMap.Builder<K,V> builder();
-  }
-
-  public static interface BuildableMap.Builder<K, V> extends java.util.Map<K,V> kotlin.jvm.internal.markers.KMutableMap {
-    method public androidx.compose.BuildableMap<K,V> build();
+  public final class BuildableMap<K, V> implements kotlin.jvm.internal.markers.KMappedMarker java.util.Map<K,V> {
+    ctor public BuildableMap(kotlinx.collections.immutable.PersistentMap<K,? extends V> map);
+    method public kotlinx.collections.immutable.PersistentMap<K,V> component1();
+    method public boolean containsKey(Object! key);
+    method public boolean containsValue(Object! value);
+    method public androidx.compose.BuildableMap<K,V> copy(kotlinx.collections.immutable.PersistentMap<K,? extends V> map);
+    method public V? get(Object! key);
+    method public java.util.Set<java.util.Map.Entry<K,V>> getEntries();
+    method public java.util.Set<K> getKeys();
+    method public kotlinx.collections.immutable.PersistentMap<K,V> getMap();
+    method public int getSize();
+    method public java.util.Collection<V> getValues();
+    method public boolean isEmpty();
   }
 
   public interface CommitScope {
