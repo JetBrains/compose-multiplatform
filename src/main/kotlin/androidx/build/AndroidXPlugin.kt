@@ -77,6 +77,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.File
+import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -257,6 +258,8 @@ class AndroidXPlugin : Plugin<Project> {
                 robolectricDependencies.absolutePath
             )
         }
+
+        project.configureTaskTimeouts()
     }
 
     private fun Project.configureRootProject() {
@@ -758,6 +761,13 @@ private fun Project.configureResourceApiChecks(extension: LibraryExtension) {
                 task.dependsOn(checkResourceApiTask)
             }
         }
+    }
+}
+
+// b/153193718 : builds are timing out
+private fun Project.configureTaskTimeouts() {
+    tasks.configureEach { t ->
+        t.timeout.set(Duration.ofMinutes(10))
     }
 }
 
