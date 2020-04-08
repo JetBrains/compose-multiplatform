@@ -26,6 +26,7 @@ import androidx.compose.Composable
 import androidx.compose.Composer
 import androidx.compose.Composition
 import androidx.compose.FrameManager
+import androidx.compose.Recomposer
 import androidx.compose.currentComposer
 import androidx.test.rule.ActivityTestRule
 import androidx.ui.core.AndroidOwner
@@ -44,7 +45,7 @@ abstract class ComposeBenchmarkBase {
         val activity = activityRule.activity
         var composition: Composition? = null
         benchmarkRule.measureRepeated {
-            composition = activity.setContent(block)
+            composition = activity.setContent(Recomposer.current(), block)
 
             // AndroidComposeView is postponing the composition till the saved state will be restored.
             // We will emulate the restoration of the empty state to trigger the real composition.

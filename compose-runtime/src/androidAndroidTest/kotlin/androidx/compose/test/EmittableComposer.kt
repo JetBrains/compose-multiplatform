@@ -196,7 +196,7 @@ class Node(val name: String, var value: String = "") : Emittable {
 
 fun Activity.setEmittableContent(content: @Composable() () -> Unit): Composition {
     val root = Node("Root")
-    val composition = compositionFor(root) { slotTable, recomposer ->
+    val composition = compositionFor(root, Recomposer.current()) { slotTable, recomposer ->
         EmittableComposer(
             this,
             root,

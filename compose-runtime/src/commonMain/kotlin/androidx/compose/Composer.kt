@@ -330,7 +330,7 @@ open class Composer<N>(
     /**
      * Manager for scheduling recompositions.
      */
-    private val recomposer: Recomposer
+    val recomposer: Recomposer
 ) : ComposerValidator {
     private val changes = mutableListOf<Change<N>>()
     private val lifecycleObservers = HashMap<

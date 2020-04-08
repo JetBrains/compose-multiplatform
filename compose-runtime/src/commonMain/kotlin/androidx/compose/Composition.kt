@@ -47,18 +47,46 @@ interface Composition {
  * order to release resources.
  *
  * @param container The container whose content is being composed.
+ * @param recomposer The [Recomposer] to coordinate scheduling of composition updates.
  * @param parent The parent composition reference, if applicable. Default is null.
  * @param composerFactory The factory used to created a [Composer] to be used by the composition.
  */
 fun compositionFor(
     container: Any,
+    recomposer: Recomposer,
     parent: CompositionReference? = null,
     composerFactory: (SlotTable, Recomposer) -> Composer<*>
 ): Composition = Compositions.findOrCreate(container) {
-    CompositionImpl(parent, composerFactory) {
+    CompositionImpl(recomposer, parent, composerFactory) {
         Compositions.onDisposed(container)
     }
 }
+
+/**
+ * This method is the way to initiate a composition. Optionally, a [parent]
+ * [CompositionReference] can be provided to make the composition behave as a sub-composition of
+ * the parent.  The children of [container] will be updated and maintained by the time this
+ * method returns.
+ *
+ * It is important to call [Composition.dispose] whenever this [container] is no longer needed in
+ * order to release resources.
+ *
+ * @param container The container whose content is being composed.
+ * @param parent The parent composition reference, if applicable. Default is null.
+ * @param composerFactory The factory used to created a [Composer] to be used by the composition.
+ */
+@Deprecated(
+    "Specify the Recomposer explicitly",
+    ReplaceWith(
+        "compositionFor(container, Recomposer.current(), parent, composerFactory)",
+        "androidx.compose.Recomposer"
+    )
+)
+fun compositionFor(
+    container: Any,
+    parent: CompositionReference? = null,
+    composerFactory: (SlotTable, Recomposer) -> Composer<*>
+): Composition = compositionFor(container, Recomposer.current(), parent, composerFactory)
 
 /**
  * @param parent An optional reference to the parent composition.
@@ -66,12 +94,13 @@ fun compositionFor(
  * @param onDispose A callback to be triggered when [dispose] is called.
  */
 private class CompositionImpl(
-    parent: CompositionReference? = null,
+    private val recomposer: Recomposer,
+    parent: CompositionReference?,
     composerFactory: (SlotTable, Recomposer) -> Composer<*>,
     private val onDispose: (() -> Unit)
 ) : Composition {
     private val slotTable: SlotTable = SlotTable()
-    private val composer: Composer<*> = composerFactory(slotTable, Recomposer.current()).also {
+    private val composer: Composer<*> = composerFactory(slotTable, recomposer).also {
         it.parentReference = parent
         parent?.registerComposer(it)
     }
@@ -88,7 +117,7 @@ private class CompositionImpl(
     override fun setContent(content: @Composable() () -> Unit) {
         check(!disposed) { "The composition is disposed" }
         this.composable = content
-        Recomposer.recompose(composable, composer)
+        recomposer.recompose(composable, composer)
     }
 
     override fun dispose() {
@@ -110,24 +139,30 @@ private class CompositionImpl(
 
 /**
  * Keeps all the active compositions.
+ * This object is thread-safe.
  */
 private object Compositions {
     private val holdersMap = WeakHashMap<Any, CompositionImpl>()
 
-    fun findOrCreate(root: Any, create: () -> CompositionImpl): CompositionImpl {
-        return holdersMap[root] ?: create().also { holdersMap[root] = it }
-    }
+    fun findOrCreate(root: Any, create: () -> CompositionImpl): CompositionImpl =
+        synchronized(holdersMap) {
+            holdersMap[root] ?: create().also { holdersMap[root] = it }
+        }
 
     fun onDisposed(root: Any) {
-        holdersMap.remove(root)
+        synchronized(holdersMap) {
+            holdersMap.remove(root)
+        }
     }
 
     fun clear() {
-        holdersMap.clear()
+        synchronized(holdersMap) {
+            holdersMap.clear()
+        }
     }
 
-    fun collectAll(): List<CompositionImpl> {
-        return holdersMap.values.toList()
+    fun collectAll(): List<CompositionImpl> = synchronized(holdersMap) {
+        holdersMap.values.toList()
     }
 }
 

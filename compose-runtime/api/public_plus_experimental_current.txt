@@ -96,6 +96,7 @@ package androidx.compose {
     method public final int getChangeCount();
     method public final int getCurrentCompoundKeyHash();
     method public final boolean getInserting();
+    method public final androidx.compose.Recomposer getRecomposer();
     method public final boolean getSkipping();
     method public final androidx.compose.SlotTable getSlotTable();
     method public final Object joinKey(Object? left, Object? right);
@@ -144,7 +145,8 @@ package androidx.compose {
   }
 
   public final class CompositionKt {
-    method public static androidx.compose.Composition compositionFor(Object container, androidx.compose.CompositionReference? parent = null, kotlin.jvm.functions.Function2<? super androidx.compose.SlotTable,? super androidx.compose.Recomposer,? extends androidx.compose.Composer<?>> composerFactory);
+    method public static androidx.compose.Composition compositionFor(Object container, androidx.compose.Recomposer recomposer, androidx.compose.CompositionReference? parent = null, kotlin.jvm.functions.Function2<? super androidx.compose.SlotTable,? super androidx.compose.Recomposer,? extends androidx.compose.Composer<?>> composerFactory);
+    method @Deprecated public static androidx.compose.Composition compositionFor(Object container, androidx.compose.CompositionReference? parent = null, kotlin.jvm.functions.Function2<? super androidx.compose.SlotTable,? super androidx.compose.Recomposer,? extends androidx.compose.Composer<?>> composerFactory);
   }
 
   public interface CompositionLifecycleObserver {
@@ -281,6 +283,7 @@ package androidx.compose {
   public abstract class Recomposer {
     ctor public Recomposer();
     method protected final void dispatchRecomposes();
+    method public abstract boolean hasPendingChanges();
     method public abstract void recomposeSync();
     method protected abstract void scheduleChangesDispatch();
     field public static final androidx.compose.Recomposer.Companion! Companion;
@@ -288,8 +291,7 @@ package androidx.compose {
 
   public static final class Recomposer.Companion {
     method public androidx.compose.Recomposer current();
-    method public boolean hasInvalidations();
-    method public boolean hasPendingChanges();
+    method @Deprecated public boolean hasPendingChanges();
   }
 
   public final class RememberKt {
