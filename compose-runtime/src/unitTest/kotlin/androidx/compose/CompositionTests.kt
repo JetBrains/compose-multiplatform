@@ -42,6 +42,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
+@Stable
 class CompositionTests {
 
     @After
@@ -1901,6 +1902,65 @@ class CompositionTests {
         invalidateComposition()
 
         myComposer.expectChanges()
+    }
+
+    @Test
+    fun testInsertingAfterSkipping() {
+        val items = mutableListOf(
+            1 to listOf(0, 1, 2, 3, 4)
+        )
+
+        val invalidates = mutableListOf<() -> Unit>()
+        fun invalidateComposition() {
+            invalidates.forEach { it() }
+            invalidates.clear()
+        }
+
+        @Composable
+        fun MockComposeScope.test() {
+            invalidates.add(invalidate)
+
+            linear {
+                for ((item, numbers) in items) {
+                    text(item.toString())
+                    linear {
+                        invalidates.add(invalidate)
+                        for (number in numbers) {
+                            text(number.toString())
+                        }
+                    }
+                }
+            }
+        }
+
+        fun MockViewValidator.test() {
+            linear {
+                for ((item, numbers) in items) {
+                    text(item.toString())
+                    linear {
+                        for (number in numbers) {
+                            text(number.toString())
+                        }
+                    }
+                }
+            }
+        }
+
+        val myComposition = compose {
+            test()
+        }
+
+        validate(myComposition.root) {
+            test()
+        }
+
+        items.add(2 to listOf(3, 4, 5, 6))
+        invalidateComposition()
+
+        myComposition.expectChanges()
+        validate(myComposition.root) {
+            test()
+        }
     }
 }
 

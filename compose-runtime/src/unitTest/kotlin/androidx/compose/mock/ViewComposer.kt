@@ -23,6 +23,7 @@ import androidx.compose.Composer
 import androidx.compose.ComposerUpdater
 import androidx.compose.Recomposer
 import androidx.compose.SlotTable
+import androidx.compose.Stable
 import androidx.compose.currentComposer
 import androidx.compose.invokeComposable
 
@@ -38,6 +39,7 @@ object ViewApplierAdapter :
 
 typealias Updater<T> = ComposerUpdater<View, T>
 
+@Stable
 interface MockComposeScope {
     val composer: MockViewComposer
 }

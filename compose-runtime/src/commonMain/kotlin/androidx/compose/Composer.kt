@@ -1358,12 +1358,13 @@ open class Composer<N>(
                     currentProviderScope = providersStack.peek().first
                 }
 
-                if (reader.isNode(startLocation)) recordUp()
+                val isNode = reader.isNode(startLocation)
+                if (isNode) recordUp()
                 else updateCompoundKeyWhenWeExitGroup()
                 recordEndGroup()
                 reader.endGroup()
                 currentLevel--
-                exitGroup(groupNodeCount, false)
+                exitGroup(if (isNode) 1 else groupNodeCount, false)
             } else break
         }
         return currentLevel
