@@ -134,6 +134,7 @@ private fun JavaCompile.configureWithErrorProne() {
             "-Xep:AmbiguousMethodReference:ERROR",
             "-Xep:EqualsIncompatibleType:ERROR",
             "-Xep:ParameterName:ERROR",
+            "-Xep:RxReturnValueIgnored:ERROR",
 
             // Nullaway
             "-XepIgnoreUnknownCheckNames", // https://github.com/uber/NullAway/issues/25
