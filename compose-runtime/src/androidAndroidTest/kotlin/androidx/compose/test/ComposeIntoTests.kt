@@ -16,8 +16,12 @@
 
 package androidx.compose.test
 
+import android.os.HandlerThread
 import androidx.compose.Composable
+import androidx.compose.FrameManager
+import androidx.compose.Handler
 import androidx.compose.clearRoots
+import androidx.compose.mutableStateOf
 import androidx.compose.onActive
 import androidx.compose.onCommit
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -27,6 +31,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import kotlin.test.assertTrue
 
 @RunWith(AndroidJUnit4::class)
 class ComposeIntoTests : BaseComposeTest() {
@@ -64,4 +71,36 @@ class ComposeIntoTests : BaseComposeTest() {
         assertEquals(1, initializationCount)
         assertEquals(2, commitCount)
     }
+
+    @Test // b/153355487
+    @MediumTest
+    fun testCommittingFromASeparateThread() {
+        val model = mutableStateOf(0)
+        var composed = 0
+        var compositionLatch = CountDownLatch(1)
+        val threadLatch = CountDownLatch(1)
+        val composition = activity.show {
+            composed = model.value
+            compositionLatch.countDown()
+        }
+        try {
+            compositionLatch.wait()
+            val thread = HandlerThread("")
+            thread.start()
+            Handler(thread.looper).postAtFrontOfQueue {
+                FrameManager.framed {
+                    model.value = 1
+                }
+                threadLatch.countDown()
+            }
+            compositionLatch = CountDownLatch(1)
+            threadLatch.wait()
+            compositionLatch.wait()
+            assertEquals(1, composed)
+        } finally {
+            activity.runOnUiThread { composition.dispose() }
+        }
+    }
 }
+
+fun CountDownLatch.wait() = assertTrue(await(1, TimeUnit.SECONDS))
