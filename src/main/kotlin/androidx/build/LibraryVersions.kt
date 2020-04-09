@@ -117,7 +117,7 @@ object LibraryVersions {
     val VERSIONED_PARCELABLE = Version("1.2.0-alpha01")
     val VIEWPAGER = Version("1.1.0-alpha01")
     val VIEWPAGER2 = Version("1.1.0-alpha01")
-    val WEAR = Version("1.1.0-alpha01")
+    val WEAR = Version("1.1.0-beta01")
     val WEBKIT = Version("1.3.0-alpha01")
     val WINDOW = Version("1.0.0-alpha02")
     val WINDOW_SIDECAR = Version("0.1.0-alpha01")
