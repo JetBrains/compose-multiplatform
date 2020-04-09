@@ -45,12 +45,23 @@ abstract class UpdateApiTask : DefaultTask() {
 
     @InputFiles
     fun getTaskInputs(): List<File>? {
-        return inputApiLocation.get().files()
+        val inputApi = inputApiLocation.get()
+        return listOf(
+            inputApi.publicApiFile,
+            inputApi.restrictedApiFile,
+            inputApi.experimentalApiFile
+        )
     }
 
     @OutputFiles
     fun getTaskOutputs(): List<File> {
-        return outputApiLocations.get().flatMap { it.files() }
+        return outputApiLocations.get().flatMap { outputApiLocation ->
+            listOf(
+                outputApiLocation.publicApiFile,
+                outputApiLocation.restrictedApiFile,
+                outputApiLocation.experimentalApiFile
+            )
+        }
     }
 
     @TaskAction
@@ -75,6 +86,8 @@ abstract class UpdateApiTask : DefaultTask() {
             copy(
                 inputApi.experimentalApiFile,
                 outputApi.experimentalApiFile,
+                // Experimental APIs are never locked down,
+                // so it's always okay to overwrite them.
                 true,
                 project.logger
             )

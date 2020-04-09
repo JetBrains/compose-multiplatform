@@ -18,6 +18,7 @@ package androidx.build.checkapi
 
 import androidx.build.AndroidXExtension
 import androidx.build.Version
+import androidx.build.checkapi.ApiLocation.Companion.isResourceApiFile
 import androidx.build.version
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -28,15 +29,13 @@ enum class ApiType {
     RESOURCEAPI
 }
 
-fun Project.hasApiFolder() = File(projectDir, "api").exists()
-
 fun hasApiTasks(project: Project, extension: AndroidXExtension): Boolean {
     if (extension.toolingProject) {
         project.logger.info("Project ${project.name} is tooling project ignoring API tasks.")
         return false
     }
 
-    if (project.hasApiFolder()) {
+    if (project.hasApiFileDirectory()) {
         return true
     }
 
@@ -55,30 +54,17 @@ fun hasApiTasks(project: Project, extension: AndroidXExtension): Boolean {
 }
 
 /**
- * Returns the API file whose contents match the project's source code.
- * This is the API file that the updateApi task will write to.
- * Note that in many cases the filename will be current.txt but not always (such as for release versions).
- *
- * @param project the project to query
- * @return the current api file for that project
- */
-fun Project.getCurrentApiFile() = getApiFile(project.projectDir, project.version())
-
-/**
- * Returns an ApiLocation with the given version
- */
-fun Project.getApiLocation(version: Version = project.version()): ApiLocation {
-    return ApiLocation.fromPublicApiFile(getApiFile(project.projectDir, version))
-}
-
-/**
  * Returns the API file containing the public API that this library promises to support
  * This is API file that checkApiRelease validates against
  * @return the API file
  */
-fun Project.getRequiredCompatibilityApiFile() =
-        getRequiredCompatibilityApiFileFromDir(File(project.projectDir, "api"), project.version(),
-            ApiType.CLASSAPI)
+fun Project.getRequiredCompatibilityApiFile(): File? {
+    return getRequiredCompatibilityApiFileFromDir(
+        project.getApiFileDirectory(),
+        project.version(),
+        ApiType.CLASSAPI
+    )
+}
 
 /*
  * Same as getRequiredCompatibilityApiFile but also contains a restricted API file
@@ -89,18 +75,6 @@ fun Project.getRequiredCompatibilityApiLocation(): ApiLocation? {
         return null
     }
     return ApiLocation.fromPublicApiFile(publicFile)
-}
-
-/**
- * Returns the API file for the API of the specified version.
- *
- * @param version the API version, ex. 25.0.0-SNAPSHOT
- * @return the API file of this version
- */
-fun getApiFile(rootDir: File, artifactVersion: Version): File {
-    val apiDir = File(rootDir, "api")
-    val version = getApiFileVersion(artifactVersion)
-    return File(apiDir, "${version.major}.${version.minor}.0${version.extra}.txt")
 }
 
 /**
@@ -145,20 +119,22 @@ fun getRequiredCompatibilityApiFileFromDir(
 ): File? {
     var lastFile: File? = null
     var lastVersion: Version? = null
-    var apiFiles = apiDir.listFiles().toList()
-    apiFiles = apiFiles.filter { (apiType == ApiType.RESOURCEAPI && it.name.startsWith("res")) ||
-            (apiType == ApiType.CLASSAPI && !it.name.startsWith("res")) }
-    apiFiles.forEach { file ->
-        val parsed = Version.parseOrNull(file)
-        parsed?.let { otherVersion ->
-            if ((lastFile == null || lastVersion!! < otherVersion) &&
-                    (otherVersion < version) &&
-                    (otherVersion.isFinalApi()) &&
-                    (otherVersion.major == version.major)) {
-                lastFile = file
-                lastVersion = otherVersion
+    apiDir.listFiles()
+        ?.filter { file ->
+            (apiType == ApiType.RESOURCEAPI && isResourceApiFile(file)) ||
+                    (apiType == ApiType.CLASSAPI && !isResourceApiFile(file))
+        }
+        ?.forEach { file ->
+            val parsed = Version.parseOrNull(file)
+            parsed?.let { otherVersion ->
+                if ((lastFile == null || lastVersion!! < otherVersion) &&
+                        (otherVersion < version) &&
+                        (otherVersion.isFinalApi()) &&
+                        (otherVersion.major == version.major)) {
+                    lastFile = file
+                    lastVersion = otherVersion
+                }
             }
         }
-    }
     return lastFile
 }

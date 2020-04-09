@@ -19,10 +19,22 @@ package androidx.build.checkapi
 import java.io.File
 
 import androidx.build.Version
+import androidx.build.version
+import org.gradle.api.Project
 import java.io.Serializable
 
 /**
- * An ApiLocation contains information about the files used to record a library's API surfaces.
+ * Contains information about the files used to record a library's API surfaces. This class may
+ * represent a versioned API txt file or the "current" API txt file.
+ * <p>
+ * This class is responsible for understanding the naming pattern used by various types of API
+ * files:
+ * <ul>
+ * <li>public
+ * <li>restricted
+ * <li>experimental
+ * <li>resource
+ * </ul>
  */
 data class ApiLocation(
     // Directory where the library's API files are stored
@@ -38,52 +50,161 @@ data class ApiLocation(
     val resourceFile: File
 ) : Serializable {
 
-    // all files known to this api location
-    fun files() = listOf(publicApiFile, restrictedApiFile, experimentalApiFile)
-
+    /**
+     * Returns the library version represented by this API location, or {@code null} if this is a
+     * current API file.
+     */
     fun version(): Version? {
-        val text = publicApiFile.name.removeSuffix(".txt")
-        if (text == "current") {
+        val baseName = publicApiFile.nameWithoutExtension
+        if (baseName == CURRENT) {
             return null
         }
-        return Version(text)
+        return Version(baseName)
     }
 
     companion object {
         fun fromPublicApiFile(f: File): ApiLocation {
+            return fromBaseName(f.parentFile, f.nameWithoutExtension)
+        }
+
+        fun fromVersion(apiFileDir: File, version: Version): ApiLocation {
+            return fromBaseName(apiFileDir, version.toApiFileBaseName())
+        }
+
+        fun fromCurrent(apiFileDir: File): ApiLocation {
+            return fromBaseName(apiFileDir, CURRENT)
+        }
+
+        fun isResourceApiFile(apiFile: File): Boolean {
+            return apiFile.name.startsWith(PREFIX_RESOURCE)
+        }
+
+        private fun fromBaseName(apiFileDir: File, baseName: String): ApiLocation {
             return ApiLocation(
-                f.parentFile,
-                f,
-                File(f.parentFile, "restricted_" + f.name),
-                File(f.parentFile, "public_plus_experimental_" + f.name),
-                File(f.parentFile, "res-" + f.name)
+                apiFileDirectory = apiFileDir,
+                publicApiFile = File(apiFileDir, "$baseName$EXTENSION"),
+                restrictedApiFile = File(apiFileDir, "$PREFIX_RESTRICTED$baseName$EXTENSION"),
+                experimentalApiFile = File(apiFileDir, "$PREFIX_EXPERIMENTAL$baseName$EXTENSION"),
+                resourceFile = File(apiFileDir, "$PREFIX_RESOURCE$baseName$EXTENSION")
             )
         }
+
+        /**
+         * File name extension used by API files.
+         */
+        private const val EXTENSION = ".txt"
+
+        /**
+         * Base file name used by current API files.
+         */
+        private const val CURRENT = "current"
+
+        /**
+         * Prefix used for restricted API surface files.
+         */
+        private const val PREFIX_RESTRICTED = "restricted_"
+
+        /**
+         * Prefix used for experimental API surface files.
+         */
+        private const val PREFIX_EXPERIMENTAL = "public_plus_experimental_"
+
+        /**
+         * Prefix used for resource-type API files.
+         */
+        private const val PREFIX_RESOURCE = "res-"
     }
 }
 
-// An ApiViolationBaselines contains the paths of the API baselines files for an API
-data class ApiViolationBaselines(
+/**
+ * Converts the version to a valid API file base name.
+ */
+private fun Version.toApiFileBaseName(): String {
+    return getApiFileVersion(this).toString()
+}
+
+/**
+ * Returns the directory containing the project's versioned and current API files.
+ */
+fun Project.getApiFileDirectory(): File {
+    return File(project.projectDir, "api")
+}
+
+/**
+ * Returns whether the project's API file directory exists.
+ */
+fun Project.hasApiFileDirectory(): Boolean {
+    return project.getApiFileDirectory().exists()
+}
+
+/**
+ * Returns the directory containing the project's built current API file.
+ */
+private fun Project.getBuiltApiFileDirectory(): File {
+    return File(project.buildDir, "api")
+}
+
+/**
+ * Returns an ApiLocation with the given version, or with the project's current version if not
+ * specified. This method is guaranteed to return an ApiLocation that represents a versioned API txt
+ * and not a current API txt.
+ *
+ * @param version the project version for which an API file should be returned
+ * @return an ApiLocation representing a versioned API file
+ */
+fun Project.getVersionedApiLocation(version: Version = project.version()): ApiLocation {
+    return ApiLocation.fromVersion(project.getApiFileDirectory(), version)
+}
+
+/**
+ * Returns an ApiLocation for the current version. This method is guaranteed to return an
+ * ApiLocation that represents a current API txt and not a versioned API txt.
+ */
+fun Project.getCurrentApiLocation(): ApiLocation {
+    return ApiLocation.fromCurrent(project.getApiFileDirectory())
+}
+
+/**
+ * Returns an ApiLocation for the "work-in-progress" current version which is built from
+ * tip-of-tree and lives in the build output directory.
+ */
+fun Project.getBuiltApiLocation(): ApiLocation {
+    return ApiLocation.fromCurrent(project.getBuiltApiFileDirectory())
+}
+
+/**
+ * Contains information about the files used to record a library's API compatibility and lint
+ * violation baselines.
+ * <p>
+ * This class is responsible for understanding the naming pattern used by various types of
+ * API compatibility and linting violation baseline files:
+ * <ul>
+ * <li>public API compatibility
+ * <li>restricted API compatibility
+ * <li>API lint
+ * </ul>
+ */
+data class ApiBaselinesLocation(
+    val ignoreFileDirectory: File,
     val publicApiFile: File,
     val restrictedApiFile: File,
     val apiLintFile: File
 ) : Serializable {
 
-    fun files() = listOf(publicApiFile, restrictedApiFile)
-
     companion object {
-        fun fromApiLocation(apiLocation: ApiLocation): ApiViolationBaselines {
-            val publicBaselineFile =
-                File(apiLocation.publicApiFile.toString().removeSuffix(".txt") + ".ignore")
-            val restrictedBaselineFile =
-                File(apiLocation.restrictedApiFile.toString().removeSuffix(".txt") + ".ignore")
-            val apiLintBaselineFile =
-                File(apiLocation.apiFileDirectory, "api_lint.ignore")
-            return ApiViolationBaselines(
-                publicBaselineFile,
-                restrictedBaselineFile,
-                apiLintBaselineFile
+        fun fromApiLocation(apiLocation: ApiLocation): ApiBaselinesLocation {
+            val ignoreFileDirectory = apiLocation.apiFileDirectory
+            return ApiBaselinesLocation(
+                ignoreFileDirectory = ignoreFileDirectory,
+                publicApiFile = File(ignoreFileDirectory,
+                    apiLocation.publicApiFile.nameWithoutExtension + EXTENSION),
+                restrictedApiFile = File(ignoreFileDirectory,
+                    apiLocation.restrictedApiFile.nameWithoutExtension + EXTENSION),
+                apiLintFile = File(ignoreFileDirectory,
+                    "api_lint$EXTENSION")
             )
         }
+
+        private const val EXTENSION = ".ignore"
     }
 }

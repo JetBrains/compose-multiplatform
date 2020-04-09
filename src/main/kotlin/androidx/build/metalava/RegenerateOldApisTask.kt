@@ -19,7 +19,7 @@ package androidx.build.metalava
 import androidx.build.SupportConfig
 import androidx.build.Version
 import androidx.build.checkapi.getApiFileVersion
-import androidx.build.checkapi.getApiLocation
+import androidx.build.checkapi.getVersionedApiLocation
 import androidx.build.checkapi.isValidArtifactVersion
 import androidx.build.java.JavaCompileInputs
 import org.gradle.api.DefaultTask
@@ -89,7 +89,7 @@ abstract class RegenerateOldApisTask @Inject constructor(
             return
         }
 
-        val outputApiLocation = project.getApiLocation(version)
+        val outputApiLocation = project.getVersionedApiLocation(version)
         if (outputApiLocation.publicApiFile.exists()) {
             project.logger.lifecycle("Regenerating $mavenId")
             project.generateApi(
