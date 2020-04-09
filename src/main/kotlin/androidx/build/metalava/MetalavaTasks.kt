@@ -18,11 +18,12 @@ package androidx.build.metalava
 
 import androidx.build.AndroidXExtension
 import androidx.build.addToBuildOnServer
-import androidx.build.checkapi.ApiLocation
-import androidx.build.checkapi.ApiViolationBaselines
-import androidx.build.checkapi.getApiLocation
+import androidx.build.checkapi.ApiBaselinesLocation
+import androidx.build.checkapi.getBuiltApiLocation
+import androidx.build.checkapi.getVersionedApiLocation
+import androidx.build.checkapi.getCurrentApiLocation
 import androidx.build.checkapi.getRequiredCompatibilityApiLocation
-import androidx.build.checkapi.hasApiFolder
+import androidx.build.checkapi.hasApiFileDirectory
 import androidx.build.checkapi.hasApiTasks
 import androidx.build.defaultPublishVariant
 import androidx.build.java.JavaCompileInputs
@@ -52,7 +53,7 @@ object MetalavaTasks {
             }
 
             library.defaultPublishVariant { variant ->
-                if (!hasApiFolder()) {
+                if (!project.hasApiFileDirectory()) {
                     logger.info(
                         "Project $name doesn't have an api folder, ignoring API tasks."
                     )
@@ -76,7 +77,7 @@ object MetalavaTasks {
             if (!hasApiTasks(this, extension)) {
                 return@afterEvaluate
             }
-            if (!hasApiFolder()) {
+            if (!project.hasApiFileDirectory()) {
                 logger.info(
                     "Project $name doesn't have an api folder, ignoring API tasks."
                 )
@@ -104,26 +105,20 @@ object MetalavaTasks {
         processManifest: ProcessLibraryManifest? = null
     ) {
         val metalavaConfiguration = project.getMetalavaConfiguration()
+        val versionedApiLocation = project.getVersionedApiLocation()
+        val currentApiLocation = project.getCurrentApiLocation()
+        val builtApiLocation = project.getBuiltApiLocation()
 
-        // the api files whose file names contain the version of the library
-        val libraryVersionApi = project.getApiLocation()
-        // the api files whose file names contain "current.txt"
-        val currentTxtApi = ApiLocation.fromPublicApiFile(File(
-            libraryVersionApi.publicApiFile.parentFile, "current.txt"))
+        val outputApiLocations = listOf(
+            versionedApiLocation,
+            currentApiLocation
+        )
 
-        // make sure to update current.txt if it wasn't previously planned to be updated
-        val outputApiLocations =
-            if (libraryVersionApi.publicApiFile.path.equals(currentTxtApi.publicApiFile.path)) {
-                listOf(libraryVersionApi)
-            } else {
-                listOf(libraryVersionApi, currentTxtApi)
-            }
+        val baselines = ApiBaselinesLocation.fromApiLocation(versionedApiLocation)
 
-        val builtApiLocation = ApiLocation.fromPublicApiFile(
-            File(project.buildDir, "api/current.txt"))
-
-        val baselines = ApiViolationBaselines.fromApiLocation(libraryVersionApi)
-
+        // Policy: If the artifact belongs to an atomic (e.g. same-version) group, we don't enforce
+        // binary compatibility for APIs annotated with @RestrictTo(LIBRARY_GROUP). This is
+        // implemented by excluding APIs with this annotation from the restricted API file.
         val generateRestrictToLibraryGroupAPIs = !extension.mavenGroup!!.requireSameVersion
         val generateApi = project.tasks.register("generateApi", GenerateApiTask::class.java) {
                 task ->
@@ -140,8 +135,10 @@ object MetalavaTasks {
             applyInputs(javaCompileInputs, task)
         }
 
+        // Policy: If the artifact has previously been released, e.g. has a beta or later API file
+        // checked in, then we must verify "release compatibility" against the work-in-progress
+        // API file.
         var checkApiRelease: TaskProvider<CheckApiCompatibilityTask>? = null
-
         project.getRequiredCompatibilityApiLocation()?.let { lastReleasedApiFile ->
             checkApiRelease = project.tasks.register(
                 "checkApiRelease",
@@ -180,6 +177,9 @@ object MetalavaTasks {
             applyInputs(javaCompileInputs, task)
         }
 
+        // Policy: All changes to API surfaces for which compatibility is enforced must be
+        // explicitly confirmed by running the updateApi task. To enforce this, the implementation
+        // checks the "work-in-progress" built API file against the checked in current API file.
         val checkApi =
             project.tasks.register("checkApi", CheckApiEquivalenceTask::class.java) { task ->
                 task.group = "API"

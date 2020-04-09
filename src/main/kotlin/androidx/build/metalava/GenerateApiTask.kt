@@ -17,7 +17,7 @@
 package androidx.build.metalava
 
 import androidx.build.checkapi.ApiLocation
-import androidx.build.checkapi.ApiViolationBaselines
+import androidx.build.checkapi.ApiBaselinesLocation
 import androidx.build.java.JavaCompileInputs
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
@@ -38,7 +38,7 @@ abstract class GenerateApiTask @Inject constructor(
     abstract val apiLocation: Property<ApiLocation>
 
     @get:Input
-    abstract val baselines: Property<ApiViolationBaselines>
+    abstract val baselines: Property<ApiBaselinesLocation>
 
     @get:Input
     var generateRestrictToLibraryGroupAPIs = true

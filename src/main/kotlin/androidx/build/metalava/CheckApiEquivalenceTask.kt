@@ -41,13 +41,25 @@ abstract class CheckApiEquivalenceTask : DefaultTask() {
     @get:Input
     abstract val checkedInApis: ListProperty<ApiLocation>
 
-    private fun allApiLocations(): List<ApiLocation> {
-        return checkedInApis.get() + listOf(builtApi.get())
-    }
-
     @InputFiles
     fun getTaskInputs(): List<File> {
-        return allApiLocations().flatMap { it.files() }
+        val checkedInApiLocations = checkedInApis.get()
+        val checkedInApiFiles = checkedInApiLocations.flatMap { checkedInApiLocation ->
+            listOf(
+                checkedInApiLocation.publicApiFile,
+                checkedInApiLocation.experimentalApiFile,
+                checkedInApiLocation.restrictedApiFile
+            )
+        }
+
+        val builtApiLocation = builtApi.get()
+        val builtApiFiles = listOf(
+            builtApiLocation.publicApiFile,
+            builtApiLocation.experimentalApiFile,
+            builtApiLocation.restrictedApiFile
+        )
+
+        return checkedInApiFiles + builtApiFiles
     }
 
     fun summarizeDiff(a: File, b: File): String {
@@ -89,10 +101,11 @@ abstract class CheckApiEquivalenceTask : DefaultTask() {
 
     @TaskAction
     fun exec() {
+        val builtApiLocation = builtApi.get()
         for (checkedInApi in checkedInApis.get()) {
-            checkEqual(checkedInApi.publicApiFile, builtApi.get().publicApiFile)
-            checkEqual(checkedInApi.experimentalApiFile, builtApi.get().experimentalApiFile)
-            checkEqual(checkedInApi.restrictedApiFile, builtApi.get().restrictedApiFile)
+            checkEqual(checkedInApi.publicApiFile, builtApiLocation.publicApiFile)
+            checkEqual(checkedInApi.experimentalApiFile, builtApiLocation.experimentalApiFile)
+            checkEqual(checkedInApi.restrictedApiFile, builtApiLocation.restrictedApiFile)
         }
     }
 }
