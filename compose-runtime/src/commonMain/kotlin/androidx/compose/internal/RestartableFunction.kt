@@ -22,7 +22,6 @@ import androidx.compose.Composer
 import androidx.compose.RecomposeScope
 import androidx.compose.SlotTable
 import androidx.compose.Stable
-import androidx.compose.nextValue
 
 /**
  * A Restart is created to hold composable lambdas to track when they are invoked allowing
@@ -1180,13 +1179,12 @@ private typealias RFunction = RestartableFunction<Any, Any, Any, Any, Any, Any, 
 @Suppress("unused")
 fun restartableFunction(composer: Composer<*>, key: Int, tracked: Boolean, block: Any): RFunction {
     composer.startReplaceableGroup(key)
-    val slot = composer.nextValue()
+    val slot = composer.nextSlot()
     val result = if (slot === SlotTable.EMPTY) {
         val value = RFunction(key, tracked)
         composer.updateValue(value)
         value
     } else {
-        composer.skipValue()
         slot as RFunction
     }
     result.update(block)

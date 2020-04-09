@@ -20,7 +20,6 @@ import androidx.compose.Composer
 import androidx.compose.FrameManager
 import androidx.compose.SlotTable
 import androidx.compose.Stable
-import androidx.compose.nextValue
 import kotlin.jvm.functions.FunctionN
 
 @Stable
@@ -64,13 +63,12 @@ fun restartableFunctionN(
     block: Any
 ): RestartableFunctionN<*> {
     composer.startReplaceableGroup(key)
-    val slot = composer.nextValue()
+    val slot = composer.nextSlot()
     val result = if (slot === SlotTable.EMPTY) {
         val value = RestartableFunctionN<Any>(key, tracked, arity)
         composer.updateValue(value)
         value
     } else {
-        composer.skipValue()
         @Suppress("UNCHECKED_CAST")
         slot as RestartableFunctionN<Any>
     }
