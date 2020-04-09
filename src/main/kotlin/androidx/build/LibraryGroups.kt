@@ -31,6 +31,7 @@ object LibraryGroups {
     val AUTOFILL = LibraryGroup("androidx.autofill", LibraryVersions.AUTOFILL)
     val BIOMETRIC = LibraryGroup("androidx.biometric", LibraryVersions.BIOMETRIC)
     val BROWSER = LibraryGroup("androidx.browser", LibraryVersions.BROWSER)
+    val BUILDSRC_TESTS = LibraryGroup("androidx.buildSrc-tests", LibraryVersions.BUILDSRC_TESTS)
     val BENCHMARK = LibraryGroup("androidx.benchmark", LibraryVersions.BENCHMARK)
     val CAMERA = LibraryGroup("androidx.camera", LibraryVersions.CAMERA)
     val CAR = LibraryGroup("androidx.car", null)
