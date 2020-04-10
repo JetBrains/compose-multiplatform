@@ -132,7 +132,13 @@ abstract class Recomposer {
     protected fun dispatchRecomposes() {
         val cs = composers.toTypedArray()
         composers.clear()
+
+        // Ensure any committed frames in other threads are visible.
+        FrameManager.nextFrame()
+
         cs.forEach { performRecompose(it) }
+
+        // Ensure any changes made during composition are now visible to other threads.
         FrameManager.nextFrame()
     }
 

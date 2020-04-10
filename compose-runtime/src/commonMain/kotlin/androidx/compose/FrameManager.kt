@@ -17,8 +17,10 @@
 package androidx.compose
 
 import androidx.compose.frames.Frame
+import androidx.compose.frames.abortHandler
 import androidx.compose.frames.open
 import androidx.compose.frames.commit
+import androidx.compose.frames.commitHandler
 import androidx.compose.frames.currentFrame
 import androidx.compose.frames.suspend
 import androidx.compose.frames.restore
@@ -100,16 +102,22 @@ object FrameManager {
         } else return block()
     }
 
-    @TestOnly
+    /**
+     * Ensure that [block] is executed in a frame. If the code is not in a frame create one for the
+     * code to run in that is committed when [block] commits.
+     */
     fun <T> framed(block: () -> T): T {
-        if (inFrame) {
-            return block()
+        return if (inFrame) {
+            block()
         } else {
-            open()
+            open(false)
             try {
-                return block()
+                block()
+            } catch (e: Throwable) {
+                abortHandler()
+                throw e
             } finally {
-                commit()
+                commitHandler()
             }
         }
     }
@@ -205,7 +213,15 @@ object FrameManager {
                     !immediate.contains(it) || deferred.contains(it)
                 } ]
             }
-            currentInvalidations.forEach { scope -> scope.invalidate() }
+            if (currentInvalidations.isNotEmpty()) {
+                if (!isMainThread()) {
+                    schedule {
+                        currentInvalidations.forEach { scope -> scope.invalidate() }
+                    }
+                } else {
+                    currentInvalidations.forEach { scope -> scope.invalidate() }
+                }
+            }
         }
     }
 
