@@ -23,9 +23,9 @@ import androidx.build.SupportConfig.DEFAULT_MIN_SDK_VERSION
 import androidx.build.SupportConfig.INSTRUMENTATION_RUNNER
 import androidx.build.SupportConfig.TARGET_SDK_VERSION
 import androidx.build.checkapi.ApiType
-import androidx.build.checkapi.getApiLocation
+import androidx.build.checkapi.getVersionedApiLocation
 import androidx.build.checkapi.getRequiredCompatibilityApiFileFromDir
-import androidx.build.checkapi.hasApiFolder
+import androidx.build.checkapi.hasApiFileDirectory
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.dokka.Dokka.configureAndroidProjectForDokka
 import androidx.build.dokka.Dokka.configureJavaProjectForDokka
@@ -716,7 +716,7 @@ private fun Project.createCheckResourceApiTask(): TaskProvider<CheckResourceApiT
     return tasks.registerWithConfig("checkResourceApi",
             CheckResourceApiTask::class.java) {
         newApiFile = getGenerateResourceApiFile()
-        oldApiFile = getApiLocation().resourceFile
+        oldApiFile = getVersionedApiLocation().resourceFile
         cacheEvenIfNoOutputs()
     }
 }
@@ -734,7 +734,7 @@ private fun Project.createUpdateResourceApiTask(): TaskProvider<UpdateResourceAp
         newApiFile = getGenerateResourceApiFile()
         oldApiFile = getRequiredCompatibilityApiFileFromDir(File(projectDir, "api/"),
                 version(), ApiType.RESOURCEAPI)
-        destApiFile = getApiLocation().resourceFile
+        destApiFile = getVersionedApiLocation().resourceFile
     }
 }
 
@@ -745,7 +745,7 @@ fun Project.getProjectsMap(): ConcurrentHashMap<String, String> {
 
 private fun Project.configureResourceApiChecks(extension: LibraryExtension) {
     afterEvaluate {
-        if (hasApiFolder()) {
+        if (project.hasApiFileDirectory()) {
             val checkResourceApiTask = createCheckResourceApiTask()
             val updateResourceApiTask = createUpdateResourceApiTask()
 

@@ -17,7 +17,7 @@
 package androidx.build.metalava
 
 import androidx.build.checkapi.ApiLocation
-import androidx.build.checkapi.ApiViolationBaselines
+import androidx.build.checkapi.ApiBaselinesLocation
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
@@ -42,7 +42,7 @@ abstract class UpdateApiLintBaselineTask @Inject constructor(
     }
 
     @get:Input
-    abstract val baselines: Property<ApiViolationBaselines>
+    abstract val baselines: Property<ApiBaselinesLocation>
 
     @OutputFile
     fun getApiLintBaseline(): File = baselines.get().apiLintFile
@@ -77,17 +77,25 @@ abstract class IgnoreApiChangesTask @Inject constructor(
 
     // The baseline files (api/*.*.*.ignore) to update
     @get:Input
-    abstract val baselines: Property<ApiViolationBaselines>
+    abstract val baselines: Property<ApiBaselinesLocation>
 
     @InputFiles
     fun getTaskInputs(): List<File> {
-        return referenceApi.get().files()
+        val referenceApiLocation = referenceApi.get()
+        return listOf(
+            referenceApiLocation.publicApiFile,
+            referenceApiLocation.restrictedApiFile
+        )
     }
 
     // Declaring outputs prevents Gradle from rerunning this task if the inputs haven't changed
     @OutputFiles
     fun getTaskOutputs(): List<File>? {
-        return listOf(baselines.get().publicApiFile, baselines.get().restrictedApiFile)
+        val apiBaselinesLocation = baselines.get()
+        return listOf(
+            apiBaselinesLocation.publicApiFile,
+            apiBaselinesLocation.restrictedApiFile
+        )
     }
 
     @TaskAction

@@ -17,7 +17,7 @@
 package androidx.build.metalava
 
 import androidx.build.checkapi.ApiLocation
-import androidx.build.checkapi.ApiViolationBaselines
+import androidx.build.checkapi.ApiBaselinesLocation
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
@@ -27,7 +27,10 @@ import org.gradle.workers.WorkerExecutor
 import java.io.File
 import javax.inject.Inject
 
-// Validate that the API described in one signature txt file is compatible with the API in another
+/**
+ * This task validates that the API described in one signature txt file is compatible with the API
+ * in another.
+ */
 abstract class CheckApiCompatibilityTask @Inject constructor(
     workerExecutor: WorkerExecutor
 ) : MetalavaTask(workerExecutor) {
@@ -35,15 +38,27 @@ abstract class CheckApiCompatibilityTask @Inject constructor(
     @get:Input
     abstract val referenceApi: Property<ApiLocation>
 
+    // Text file representing the current API surface to check.
     @get:Input
     abstract val api: Property<ApiLocation>
-    // Text file listing violations that should be ignored
+
+    // Text file listing violations that should be ignored.
     @get:Input
-    abstract val baselines: Property<ApiViolationBaselines>
+    abstract val baselines: Property<ApiBaselinesLocation>
 
     @InputFiles
     fun getTaskInputs(): List<File> {
-        return referenceApi.get().files() + baselines.get().files()
+        val apiLocation = api.get()
+        val referenceApiLocation = referenceApi.get()
+        val baselineApiLocation = baselines.get()
+        return listOf(
+            apiLocation.publicApiFile,
+            apiLocation.restrictedApiFile,
+            referenceApiLocation.publicApiFile,
+            referenceApiLocation.restrictedApiFile,
+            baselineApiLocation.publicApiFile,
+            baselineApiLocation.restrictedApiFile
+        )
     }
 
     // Declaring outputs prevents Gradle from rerunning this task if the inputs haven't changed
@@ -56,27 +71,39 @@ abstract class CheckApiCompatibilityTask @Inject constructor(
     fun exec() {
         check(bootClasspath.isNotEmpty()) { "Android boot classpath not set." }
 
-        checkApiFile(api.get().publicApiFile, referenceApi.get().publicApiFile,
-            baselines.get().publicApiFile)
-        if (referenceApi.get().restrictedApiFile.exists()) {
-            checkApiFile(api.get().restrictedApiFile, referenceApi.get().restrictedApiFile,
-                baselines.get().restrictedApiFile)
+        val apiLocation = api.get()
+        val referenceApiLocation = referenceApi.get()
+        val baselineApiLocation = baselines.get()
+
+        checkApiFile(
+            apiLocation.publicApiFile,
+            referenceApiLocation.publicApiFile,
+            baselineApiLocation.publicApiFile
+        )
+
+        if (referenceApiLocation.restrictedApiFile.exists()) {
+            checkApiFile(
+                apiLocation.restrictedApiFile,
+                referenceApiLocation.restrictedApiFile,
+                baselineApiLocation.restrictedApiFile
+            )
         }
     }
 
     // Confirms that <api> is compatible with <oldApi> except for any baselines listed in <baselineFile>
     fun checkApiFile(api: File, oldApi: File, baselineFile: File) {
-        var args = listOf("--classpath",
-                (bootClasspath + dependencyClasspath.files).joinToString(File.pathSeparator),
+        var args = listOf(
+            "--classpath",
+            (bootClasspath + dependencyClasspath.files).joinToString(File.pathSeparator),
 
-                "--source-files",
-                api.toString(),
+            "--source-files",
+            api.toString(),
 
-                "--check-compatibility:api:released",
-                oldApi.toString(),
+            "--check-compatibility:api:released",
+            oldApi.toString(),
 
-                "--warnings-as-errors",
-                "--format=v3"
+            "--warnings-as-errors",
+            "--format=v3"
         )
         if (baselineFile.exists()) {
             args = args + listOf("--baseline", baselineFile.toString())
