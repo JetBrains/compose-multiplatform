@@ -21,7 +21,6 @@ import groovy.util.Node
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.XmlProvider
-import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.component.SoftwareComponent
@@ -50,9 +49,6 @@ private fun Project.configureComponent(
     if (extension.publish.shouldPublish() && component.isAndroidOrJavaReleaseComponent()) {
         val androidxGroup = validateCoordinatesAndGetGroup(extension)
         group = androidxGroup
-        tasks.withType(GenerateModuleMetadata::class.java) {
-            it.enabled = false
-        }
         configure<PublishingExtension> {
             repositories {
                 it.maven { repo ->
@@ -86,6 +82,19 @@ private fun Project.configureComponent(
 
         // Register it as part of release so that we create a Zip file for it
         Release.register(this, extension)
+
+        // Workaround for https://github.com/gradle/gradle/issues/11717
+        project.tasks.withType(GenerateModuleMetadata::class.java).configureEach { task ->
+            task.doLast {
+                val metadata = task.outputFile.asFile.get()
+                var text = metadata.readText()
+                metadata.writeText(
+                    text.replace(
+                        "\"buildId\": .*".toRegex(),
+                        "\"buildId:\": \"${getBuildId()}\"")
+                )
+            }
+        }
     }
 }
 
@@ -153,14 +162,6 @@ private fun Project.tweakDependenciesMetadata(extension: AndroidXExtension, pom:
         // modified. TODO remove the use of getProjectsMap and move to earlier configuration.
         // For more context see:
         // https://android-review.googlesource.com/c/platform/frameworks/support/+/1144664/8/buildSrc/src/main/kotlin/androidx/build/MavenUploadHelper.kt#177
-        // assignSingleVersionDependenciesInGroupForGradleMetadata(
-        //      configurations.findByName("apiElements"), extension)
-        // assignSingleVersionDependenciesInGroupForGradleMetadata(
-        //      configurations.findByName("runtimeElements"), extension)
-        assignSingleVersionDependenciesInGroupForGradleMetadata(
-            configurations.findByName("releaseApiPublication"), extension)
-        assignSingleVersionDependenciesInGroupForGradleMetadata(
-            configurations.findByName("releaseRuntimePublication"), extension)
         assignSingleVersionDependenciesInGroupForPom(xml, extension)
         assignAarTypes(xml)
     }
@@ -188,27 +189,6 @@ private fun Project.assignAarTypes(xml: XmlProvider) {
         if (isAndroidProject(groupId.children()[0] as String,
                 artifactId.children()[0] as String, androidxDependencies)) {
             dep.appendNode("type", "aar")
-        }
-    }
-}
-
-/**
- * Create dependency constraints between projects of a group that require the same versions.
- * The constraints are published in Gradle Module Metadata and cause all modules to align.
- */
-fun Project.assignSingleVersionDependenciesInGroupForGradleMetadata(
-    configuration: Configuration?,
-    extension: AndroidXExtension
-) {
-    if (configuration != null && extension.mavenGroup?.requireSameVersion == true) {
-        getProjectsMap().forEach { (id, _) ->
-            val group = id.split(":")[0]
-            val name = id.split(":")[1]
-            if (group == extension.mavenGroup?.group && name != project.name) {
-                configuration.dependencyConstraints.add(
-                    dependencies.constraints.create("$id:${project.version}")
-                )
-            }
         }
     }
 }
