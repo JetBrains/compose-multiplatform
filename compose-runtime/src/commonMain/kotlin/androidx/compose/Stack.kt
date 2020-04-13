@@ -29,6 +29,8 @@ internal class Stack<T> {
     fun isEmpty() = backing.isEmpty()
     fun isNotEmpty() = !isEmpty()
     fun clear() = backing.clear()
+    @Suppress("UNCHECKED_CAST")
+    fun toArray(): Array<T> = Array<Any?>(backing.size) { backing[it] } as Array<T>
 }
 
 internal class IntStack {

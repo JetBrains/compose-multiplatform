@@ -59,5 +59,9 @@ MissingNullability: androidx.compose.BuildableMap#containsValue(Object) paramete
     Missing nullability on parameter `value` in method `containsValue`
 MissingNullability: androidx.compose.BuildableMap#get(Object) parameter #0:
     Missing nullability on parameter `key` in method `get`
+MissingNullability: androidx.compose.SlotReader#getGroupData():
+    Missing nullability on method `getGroupData` return
 MissingNullability: androidx.compose.SlotReader#getGroupKey():
     Missing nullability on method `getGroupKey` return
+MissingNullability: androidx.compose.SlotReader#getGroupNode():
+    Missing nullability on method `getGroupNode` return

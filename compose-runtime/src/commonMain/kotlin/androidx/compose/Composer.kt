@@ -44,16 +44,20 @@ internal typealias Change<N> = (
 ) -> Unit
 
 private class GroupInfo(
-    /** The current location of the slot relative to the start location of the pending slot changes
+    /**
+     * The current location of the slot relative to the start location of the pending slot changes
      */
     var slotIndex: Int,
 
-    /** The current location of the first node relative the start location of the pending node
+    /**
+     * The current location of the first node relative the start location of the pending node
      * changes
      */
     var nodeIndex: Int,
 
-    /** The current number of nodes the group contains after changes have been applied */
+    /**
+     * The current number of nodes the group contains after changes have been applied
+     */
     var nodeCount: Int
 )
 
@@ -68,7 +72,6 @@ internal interface LifeCycleManager {
  * structure of the tree is detected.
  */
 private class Pending(
-    val parentKeyInfo: KeyInfo,
     val keyInfos: MutableList<KeyInfo>,
     val startIndex: Int
 ) {
@@ -78,16 +81,14 @@ private class Pending(
         require(startIndex >= 0) { "Invalid start index" }
     }
 
-    var nodeCount = parentKeyInfo.nodes
-
     private val usedKeys = mutableListOf<KeyInfo>()
     private val groupInfos = run {
         var runningNodeIndex = 0
-        val result = hashMapOf<Any?, GroupInfo>()
+        val result = hashMapOf<Group, GroupInfo>()
         for (index in 0 until keyInfos.size) {
-            val key = keyInfos[index]
-            result[key] = GroupInfo(index, runningNodeIndex, key.nodes)
-            runningNodeIndex += key.nodes
+            val keyInfo = keyInfos[index]
+            result[keyInfo.group] = GroupInfo(index, runningNodeIndex, keyInfo.nodes)
+            runningNodeIndex += keyInfo.nodes
         }
         result
     }
@@ -153,27 +154,29 @@ private class Pending(
     }
 
     fun registerInsert(keyInfo: KeyInfo, insertIndex: Int) {
-        groupInfos[keyInfo] = GroupInfo(-1, insertIndex, 0)
+        groupInfos[keyInfo.group] = GroupInfo(-1, insertIndex, 0)
     }
 
-    fun updateNodeCount(keyInfo: KeyInfo?, newCount: Int) {
-        groupInfos[keyInfo]?.let {
-            val index = it.nodeIndex
-            val difference = newCount - it.nodeCount
-            it.nodeCount = newCount
+    fun updateNodeCount(group: Group, newCount: Int): Boolean {
+        val groupInfo = groupInfos[group]
+        if (groupInfo != null) {
+            val index = groupInfo.nodeIndex
+            val difference = newCount - groupInfo.nodeCount
+            groupInfo.nodeCount = newCount
             if (difference != 0) {
-                nodeCount += difference
-                groupInfos.values.forEach { group ->
-                    if (group.nodeIndex >= index && group != it)
-                        group.nodeIndex += difference
+                groupInfos.values.forEach { childGroupInfo ->
+                    if (childGroupInfo.nodeIndex >= index && childGroupInfo != groupInfo)
+                        childGroupInfo.nodeIndex += difference
                 }
             }
+            return true
         }
+        return false
     }
 
-    fun slotPositionOf(keyInfo: KeyInfo) = groupInfos[keyInfo]?.slotIndex ?: -1
-    fun nodePositionOf(keyInfo: KeyInfo) = groupInfos[keyInfo]?.nodeIndex ?: -1
-    fun updatedNodeCountOf(keyInfo: KeyInfo) = groupInfos[keyInfo]?.nodeCount ?: keyInfo.nodes
+    fun slotPositionOf(keyInfo: KeyInfo) = groupInfos[keyInfo.group]?.slotIndex ?: -1
+    fun nodePositionOf(keyInfo: KeyInfo) = groupInfos[keyInfo.group]?.nodeIndex ?: -1
+    fun updatedNodeCountOf(keyInfo: KeyInfo) = groupInfos[keyInfo.group]?.nodeCount ?: keyInfo.nodes
 }
 
 private val RootKey = OpaqueKey("root")
@@ -343,15 +346,14 @@ open class Composer<N>(
     private var nodeIndexStack = IntStack()
     private var groupNodeCount: Int = 0
     private var groupNodeCountStack = IntStack()
+    private val nodeCountOverrides = HashMap<Group, Int>()
     private var collectKeySources = false
-    private val keyHashesStack = IntStack()
 
-    private var childrenAllowed = true
+    private var nodeExpected = false
     private var invalidations: MutableList<Invalidation> = mutableListOf()
     private val entersStack = IntStack()
-    private val providersStack = Stack<Pair<Int, AmbientMap>>().apply {
-        push(-1 to buildableMapOf())
-    }
+    private var parentProvider: AmbientMap = buildableMapOf()
+    private val providerUpdates = HashMap<Group, AmbientMap>()
     private var providersInvalid = false
     private val providersInvalidStack = IntStack()
 
@@ -382,12 +384,15 @@ open class Composer<N>(
 
     private val insertTable = SlotTable()
     private var writer: SlotWriter = insertTable.openWriter().also { it.close() }
+    private var hasProvider = false
     private var insertAnchor: Anchor = insertTable.anchor(0)
     private val insertFixups = mutableListOf<Change<N>>()
 
     protected fun composeRoot(block: () -> Unit) {
         startRoot()
+        startGroup(invocation)
         block()
+        endGroup()
         endRoot()
     }
 
@@ -411,7 +416,7 @@ open class Composer<N>(
      * @see [startMovableGroup]
      * @see [startRestartGroup]
      */
-    fun startReplaceableGroup(key: Int) = start(key, false)
+    fun startReplaceableGroup(key: Int) = start(key, false, null)
 
     /**
      * Indicates the end of a "Replaceable Group" at the current execution position. A
@@ -452,7 +457,7 @@ open class Composer<N>(
      * @see [startReplaceableGroup]
      * @see [startRestartGroup]
      */
-    fun startMovableGroup(key: Any) = start(key, false)
+    fun startMovableGroup(key: Any) = start(key, false, null)
 
     /**
      * Indicates the end of a "Movable Group" at the current execution position. A Movable Group is
@@ -493,10 +498,9 @@ open class Composer<N>(
         reader = slotTable.openReader()
         startGroup(RootKey)
         parentReference?.let { parentRef ->
-            val parentScope = parentRef.getAmbientScope()
+            parentProvider = parentRef.getAmbientScope()
             providersInvalidStack.push(providersInvalid.asInt())
-            providersInvalid = changed(parentScope)
-            providersStack.push(0 to parentScope)
+            providersInvalid = changed(parentProvider)
         }
     }
 
@@ -507,9 +511,6 @@ open class Composer<N>(
     fun endRoot() {
         endGroup()
         recordEndRoot()
-        if (parentReference != null) {
-            providersStack.pop()
-        }
         finalizeCompose()
         reader.close()
     }
@@ -520,7 +521,6 @@ open class Composer<N>(
     fun abortRoot() {
         cleanUpCompose()
         pendingStack.clear()
-        keyHashesStack.clear()
         nodeIndexStack.clear()
         groupNodeCountStack.clear()
         entersStack.clear()
@@ -528,6 +528,7 @@ open class Composer<N>(
         invalidateStack.clear()
         reader.close()
         currentCompoundKeyHash = 0
+        nodeExpected = false
     }
 
     /**
@@ -595,6 +596,8 @@ open class Composer<N>(
                 changes.clear()
             }
 
+            providerUpdates.clear()
+
             @Suppress("ReplaceManualRangeWithIndicesCalls") // Avoids allocation of an iterator
             for (index in 0 until invalidationAnchors.size) {
                 val (anchor, invalidation) = invalidationAnchors[index]
@@ -637,7 +640,7 @@ open class Composer<N>(
      *
      *  @param key The key for the group
      */
-    fun startGroup(key: Any) = start(key, false)
+    fun startGroup(key: Any) = start(key, false, null)
 
     /**
      * End the current group.
@@ -662,29 +665,27 @@ open class Composer<N>(
      * @param key the key for the node.
      */
     fun startNode(key: Any) {
-        start(key, true)
-        childrenAllowed = false
+        start(key, true, null)
+        nodeExpected = true
     }
 
     // Deprecated
     fun <T : N> emitNode(factory: () -> T) {
+        validateNodeExpected()
         if (inserting) {
             val insertIndex = nodeIndexStack.peek()
             // The pending is the pending information for where the node is being inserted.
             // pending will be null here when the parent was inserted too.
-            pending?.let { it.nodeCount++ }
             groupNodeCount++
             recordFixup { applier, slots, _ ->
                 val node = factory()
-                slots.update(node)
+                slots.node = node
                 applier.insert(insertIndex, node)
                 applier.down(node)
             }
         } else {
-            recordDown()
-            reader.next() // Skip node slot
+            recordDown(reader.node)
         }
-        childrenAllowed = true
     }
 
     /**
@@ -693,20 +694,19 @@ open class Composer<N>(
      */
     @Suppress("UNUSED")
     fun <T : N> createNode(factory: () -> T) {
+        validateNodeExpected()
         require(inserting) { "createNode() can only be called when inserting" }
         val insertIndex = nodeIndexStack.peek()
         // see emitNode
-        pending?.let { it.nodeCount++ }
         groupNodeCount++
         recordFixup { applier, slots, _ ->
             val node = factory()
-            slots.update(node)
+            slots.node = node
             applier.insert(insertIndex, node)
             applier.down(node)
         }
         // Allocate a slot that will be fixed-up by the above operation.
         writer.skip()
-        childrenAllowed = true
     }
 
     /**
@@ -714,17 +714,16 @@ open class Composer<N>(
      * inserting.
      */
     fun emitNode(node: N) {
+        validateNodeExpected()
         require(inserting) { "emitNode() called when not inserting" }
         val insertIndex = nodeIndexStack.peek()
         // see emitNode
-        pending?.let { it.nodeCount++ }
         groupNodeCount++
-        writer.update(node)
+        writer.node = node
         recordApplierOperation { applier, _, _ ->
             applier.insert(insertIndex, node)
             applier.down(node)
         }
-        childrenAllowed = true
     }
 
     /**
@@ -733,12 +732,11 @@ open class Composer<N>(
      * location as [emitNode] or [createNode] as called even if the value is unused.
      */
     fun useNode(): N {
+        validateNodeExpected()
         require(!inserting) { "useNode() called while inserting" }
-        recordDown()
-        val result = reader.next()
-        childrenAllowed = true
-        @Suppress("UNCHECKED_CAST")
-        return result as N
+        val result = reader.node
+        recordDown(result)
+        return result
     }
 
     /**
@@ -768,7 +766,10 @@ open class Composer<N>(
     /**
      * Return the next value in the slot table and advance the current location.
      */
-    fun nextSlot(): Any? = if (inserting) EMPTY else reader.next()
+    fun nextSlot(): Any? = if (inserting) {
+        validateNodeNotExpected()
+        EMPTY
+    } else reader.next()
 
     /**
      * Determine if the current slot table value is equal to the given value, if true, the value
@@ -812,8 +813,7 @@ open class Composer<N>(
             recordSlotTableOperation(-1) { _, slots, lifecycleManager ->
                 if (value is CompositionLifecycleObserver)
                     lifecycleManager.entering(value)
-                val previous = slots.update(value)
-                when (previous) {
+                when (val previous = slots.update(value)) {
                     is CompositionLifecycleObserver ->
                         lifecycleManager.leaving(previous)
                     is RecomposeScope ->
@@ -826,20 +826,31 @@ open class Composer<N>(
     }
 
     /**
-     * Return the provider scope provided at [location]
-     */
-    private fun providedScopeAt(location: Int, reader: SlotReader): AmbientMap {
-        require(reader.groupKey(location) == provider)
-        val valuesGroupSize = reader.groupSize(location + 1)
-        val mapLocation = location + valuesGroupSize + 3 // one for each group slot
-        @Suppress("UNCHECKED_CAST")
-        return reader.get(mapLocation) as AmbientMap
-    }
-
-    /**
      * Return the current ambient scope which was provided by a parent group.
      */
-    private fun currentAmbientScope(): AmbientMap = providersStack.peek().second
+    private fun currentAmbientScope(): AmbientMap {
+        if (inserting && hasProvider) {
+            var group: Group? = writer.group(writer.parentLocation)
+            while (group != null) {
+                if (group.key === ambientMap) {
+                    @Suppress("UNCHECKED_CAST")
+                    return group.data as AmbientMap
+                }
+                group = group.parent
+            }
+        }
+        if (slotTable.size > 0) {
+            var group: Group? = reader.group(reader.parentLocation)
+            while (group != null) {
+                if (group.key === ambientMap) {
+                    @Suppress("UNCHECKED_CAST")
+                    return providerUpdates[group] ?: group.data as AmbientMap
+                }
+                group = group.parent
+            }
+        }
+        return parentProvider
+    }
 
     /**
      * Return the ambient scope for the location provided. If this is while the composer is
@@ -854,20 +865,17 @@ open class Composer<N>(
             return currentAmbientScope()
         }
 
-        // Find the nearest provider group to location and return the scope recorded there.
-        val groupPath = slotTable.groupPathTo(location)
-        return slotTable.read { reader ->
-            groupPath.lastOrNull { reader.groupKey(it) == provider }?.let {
-                providedScopeAt(it, reader)
-            } ?: buildableMapOf()
+        if (location >= 0) {
+            var group: Group? = slotTable.read { it.group(location) }
+            while (group != null) {
+                if (group.key == ambientMap) {
+                    @Suppress("UNCHECKED_CAST")
+                    return providerUpdates[group] ?: group.data as AmbientMap
+                }
+                group = group.parent
+            }
         }
-    }
-
-    /**
-     * Record [scope] as the current scope provided by the current group.
-     */
-    private fun pushProviderScope(scope: AmbientMap) {
-        providersStack.push(reader.startStack.peekOr(0) to scope)
+        return parentProvider
     }
 
     /**
@@ -896,11 +904,12 @@ open class Composer<N>(
         startGroup(providerValues)
         val currentProviders = invokeComposableForResult(this) { ambientMapOf(values) }
         endGroup()
-        val providersStackSize = providersStack.size
-        val invalid = if (inserting) {
-            val providers = updateProviderMapGroup(parentScope, currentProviders)
-            pushProviderScope(providers)
-            false
+        val providers: AmbientMap
+        val invalid: Boolean
+        if (inserting) {
+            providers = updateProviderMapGroup(parentScope, currentProviders)
+            invalid = false
+            hasProvider = true
         } else {
             val current = reader.current
 
@@ -912,8 +921,7 @@ open class Composer<N>(
 
             // skipping is true iff parentScope has not changed.
             if (!skipping || oldValues != currentProviders) {
-                val providers = updateProviderMapGroup(parentScope, currentProviders)
-                pushProviderScope(providers)
+                providers = updateProviderMapGroup(parentScope, currentProviders)
 
                 // Compare against the old scope as currentProviders might have modified the scope
                 // back to the previous value. This could happen, for example, if currentProviders
@@ -921,33 +929,26 @@ open class Composer<N>(
                 // currentProviders for that key. If the scope has not changed, because these
                 // providers obscure a change in the parent as described above, re-enable skipping
                 // for the child region.
-                providers != oldScope
+                invalid = providers != oldScope
             } else {
                 // Nothing has changed
                 skipGroup()
-                pushProviderScope(oldScope)
-                false
+                providers = oldScope
+                invalid = false
             }
         }
 
-        // If the provider scope has changed then we need prevent skipping until endProviders()
-        // is called.
+        if (invalid && !inserting) {
+            providerUpdates[reader.group] = providers
+        }
         providersInvalidStack.push(providersInvalid.asInt())
         providersInvalid = invalid
-
-        require(providersStackSize + 1 == providersStack.size) {
-            "The provider stack was not updated correctly"
-        }
-
-        startGroup(invocation)
+        start(ambientMap, false, providers)
     }
 
     internal fun endProviders() {
         endGroup()
-        val group = reader.startStack.peekOr(0)
         endGroup()
-        val (topGroup, _) = providersStack.pop()
-        require(group == topGroup)
         providersInvalid = providersInvalidStack.pop().asBool()
     }
 
@@ -1004,6 +1005,23 @@ open class Composer<N>(
     private fun ensureWriter() {
         if (writer.closed) {
             writer = insertTable.openWriter()
+            hasProvider = false
+        }
+    }
+
+    /**
+     * Start the reader group updating the data of the group if necessary
+     */
+    private fun startReaderGroup(isNode: Boolean, data: Any?) {
+        if (isNode) {
+            reader.startNode(EMPTY)
+        } else {
+            if (data != null && reader.groupData !== data) {
+                recordSlotEditingOperation { _, slots, _ ->
+                    slots.updateData(data)
+                }
+            }
+            reader.startGroup(EMPTY)
         }
     }
 
@@ -1011,30 +1029,25 @@ open class Composer<N>(
      * Important: This is a short-cut for the full version of [start] and should be kept in sync
      * with its implementation. This version avoids boxing for [Int] keys.
      */
-    private fun start(key: Int, isNode: Boolean) {
+    private fun start(key: Int, isNode: Boolean, data: Any?) {
         if (!inserting && pending == null && key == reader.groupKey) {
-            require(childrenAllowed) { "A call to createNode(), emitNode() or useNode() expected" }
+            validateNodeNotExpected()
 
-            if (!isNode) {
-                updateCompoundKeyWhenWeEnterGroupKeyHash(key)
-            }
-            if (isNode) reader.startNode(EMPTY) else reader.startGroup(EMPTY)
-
+            updateCompoundKeyWhenWeEnterGroupKeyHash(key)
+            startReaderGroup(isNode, data)
             enterGroup(isNode, null)
         } else {
-            start(key as Any, isNode)
+            start(key as Any, isNode, data)
         }
     }
 
-    private fun start(key: Any, isNode: Boolean) {
+    private fun start(key: Any, isNode: Boolean, data: Any?) {
         // !! IMPORTANT !! If there are changes to this method there might need to be
         // corresponding changes to the Int short cut method above.
 
-        require(childrenAllowed) { "A call to createNode(), emitNode() or useNode() expected" }
+        validateNodeNotExpected()
 
-        if (!isNode) {
-            updateCompoundKeyWhenWeEnterGroup(key)
-        }
+        updateCompoundKeyWhenWeEnterGroup(key)
 
         // Check for the insert fast path. If we are already inserting (creating nodes) then
         // there is no need to track insert, deletes and moves with a pending changes object.
@@ -1042,9 +1055,13 @@ open class Composer<N>(
             reader.beginEmpty()
             if (collectKeySources)
                 recordSourceKeyInfo(key)
-            if (isNode) writer.startNode(key) else writer.startGroup(key)
+            when {
+                isNode -> writer.startNode(key)
+                data != null -> writer.startData(key, data)
+                else -> writer.startGroup(key)
+            }
             pending?.let { pending ->
-                val insertKeyInfo = KeyInfo(key, -1, 0, -1)
+                val insertKeyInfo = KeyInfo(key, -1, 0, -1, writer.parentGroup)
                 pending.registerInsert(insertKeyInfo, nodeIndex - pending.startIndex)
                 pending.recordUsed(insertKeyInfo)
             }
@@ -1056,11 +1073,9 @@ open class Composer<N>(
             val slotKey = reader.groupKey
             if (slotKey == key) {
                 // The group is the same as what was generated last time.
-                if (isNode) reader.startNode(key) else reader.startGroup(key)
+                startReaderGroup(isNode, data)
             } else {
-                val nodes = reader.parentNodes - reader.nodeIndex
                 pending = Pending(
-                    KeyInfo(0, -1, nodes, -1),
                     reader.extractKeys(),
                     nodeIndex
                 )
@@ -1097,7 +1112,7 @@ open class Composer<N>(
                         slots.moveGroup(currentRelativePosition)
                     }
                 }
-                if (isNode) reader.startNode(key) else reader.startGroup(key)
+                startReaderGroup(isNode, data)
             } else {
                 // The group is new, go into insert mode. All child groups will written to the
                 // insertTable until the group is complete which will schedule the groups to be
@@ -1110,13 +1125,13 @@ open class Composer<N>(
                 ensureWriter()
                 writer.beginInsert()
                 val insertLocation = writer.current
-                writer.startGroup(key)
+                if (isNode) writer.startNode(key) else writer.startGroup(key)
                 insertAnchor = writer.anchor(insertLocation)
-                val insertKeyInfo = KeyInfo(key, -1, 0, -1)
+                val insertKeyInfo = KeyInfo(key, -1, 0, -1, writer.parentGroup)
                 pending.registerInsert(insertKeyInfo, nodeIndex - pending.startIndex)
                 pending.recordUsed(insertKeyInfo)
                 newPending = Pending(
-                    insertKeyInfo, mutableListOf(),
+                    mutableListOf(),
                     if (isNode) 0 else nodeIndex
                 )
             }
@@ -1143,12 +1158,8 @@ open class Composer<N>(
         // increment the node index and the group's node count. If the parent is tracking structural
         // changes in pending then restore that too.
         val previousPending = pendingStack.pop()
-        if (previousPending != null) {
-            // Update the parent count of nodes
-            previousPending.updateNodeCount(pending?.parentKeyInfo, expectedNodeCount)
-            if (!inserting) {
-                previousPending.groupIndex++
-            }
+        if (previousPending != null && !inserting) {
+            previousPending.groupIndex++
         }
         this.pending = previousPending
         this.nodeIndex = nodeIndexStack.pop() + expectedNodeCount
@@ -1159,9 +1170,13 @@ open class Composer<N>(
         // All the changes to the group (or node) have been recorded. All new nodes have been
         // inserted but it has yet to determine which need to be removed or moved. Note that the
         // changes are relative to the first change in the list of nodes that are changing.
-        if (!isNode) {
-            updateCompoundKeyWhenWeExitGroup()
-        }
+
+        updateCompoundKeyWhenWeExitGroup(
+            if (inserting)
+                writer.group(writer.parentLocation).key
+            else
+                reader.group(reader.parentLocation).key
+        )
         var expectedNodeCount = groupNodeCount
         val pending = pending
         if (pending != null && pending.keyInfos.size > 0) {
@@ -1190,7 +1205,7 @@ open class Composer<N>(
                     // group
                     val deleteOffset = pending.nodePositionOf(previousInfo)
                     recordRemoveNode(deleteOffset + pending.startIndex, previousInfo.nodes)
-                    pending.updateNodeCount(previousInfo, 0)
+                    pending.updateNodeCount(previousInfo.group, 0)
                     recordReaderMoving(previousInfo.location)
                     reader.reposition(previousInfo.location)
                     recordDelete()
@@ -1260,7 +1275,6 @@ open class Composer<N>(
             invalidations.removeRange(startSlot, reader.current)
         }
 
-        // Cache the current [inserting] state for the pending update below.
         val inserting = inserting
         if (inserting) {
             if (isNode) {
@@ -1268,16 +1282,23 @@ open class Composer<N>(
                 expectedNodeCount = 1
             }
             reader.endEmpty()
+            val group = writer.parentGroup
             writer.endGroup()
             if (!reader.inEmpty) {
                 writer.endInsert()
                 writer.close()
                 recordInsert(insertAnchor)
                 this.inserting = false
+                nodeCountOverrides[group] = 0
+                updateNodeCountOverrides(group, expectedNodeCount)
             }
         } else {
             if (isNode) recordUp()
             recordEndGroup()
+            val group = reader.parentGroup
+            if (expectedNodeCount != group.nodes) {
+                updateNodeCountOverrides(group, expectedNodeCount)
+            }
             if (isNode) {
                 expectedNodeCount = 1
                 reader.endNode()
@@ -1290,106 +1311,58 @@ open class Composer<N>(
     }
 
     /**
-     * Skip to a sibling group that contains location given. This also ensures the nodeIndex is
-     * correctly updated to reflect any groups skipped.
+     * Recompose any invalidate child groups of the current parent group. This should be called
+     * after the group is started but on or before the first child group. It is intended to be
+     * called instead of [skipReaderToGroupEnd] if any child groups are invalid. If no children
+     * are invalid it will call [skipReaderToGroupEnd].
      */
-    private fun skipToGroupContaining(location: Int) {
-        val reader = reader
-        while (reader.current < location) {
-            if (reader.isGroupEnd) return
-            if (reader.isGroup) {
-                if (location < reader.groupSize + reader.current) return
-                nodeIndex += reader.skipGroup()
-            } else {
-                reader.next()
-            }
-        }
-    }
-
-    /**
-     * Enter a group that contains the location. This updates the composer state as if the group was
-     * generated with no changes.
-     */
-    private fun enterGroups(location: Int, level: Int): Int {
-        val reader = reader
-        var currentLevel = level
-        while (true) {
-            skipToGroupContaining(location)
-            if (reader.current == location) {
-                break
-            } else {
-                enterGroup(reader.isNode, null)
-                currentLevel++
-                if (reader.isNode) {
-                    reader.startNode(EMPTY)
-                    recordDown()
-                    reader.next() // skip navigation slot
-                    nodeIndex = 0
-                } else {
-                    updateCompoundKeyWhenWeEnterGroup(reader.groupKey)
-                    // If the current group is an ambient provider, add the map to the ambient
-                    // scope stack
-                    if (reader.groupKey === provider) {
-                        val current = reader.current
-                        providersStack.push(current to providedScopeAt(current, reader))
-                    }
-                    reader.startGroup(EMPTY)
-                }
-            }
-        }
-        return currentLevel
-    }
-
-    /**
-     * Exit any groups that were entered until a sibling of maxLocation is reached.
-     */
-    private fun exitGroups(location: Int, level: Int): Int {
-        val reader = reader
-        var currentProviderScope = providersStack.peek().first
-        var currentLevel = level
-        while (currentLevel > 0) {
-            skipToGroupContaining(location)
-            if (reader.isGroupEnd) {
-                val startLocation = reader.parentLocation
-
-                // If the current group is a provider scope, pop it off the stack as this
-                // exits the scope.
-                if (reader.startStack.peekOr(0) == currentProviderScope) {
-                    providersStack.pop()
-                    currentProviderScope = providersStack.peek().first
-                }
-
-                val isNode = reader.isNode(startLocation)
-                if (isNode) recordUp()
-                else updateCompoundKeyWhenWeExitGroup()
-                recordEndGroup()
-                reader.endGroup()
-                currentLevel--
-                exitGroup(if (isNode) 1 else groupNodeCount, false)
-            } else break
-        }
-        return currentLevel
-    }
-
-    private fun recomposeComponentRange(start: Int, end: Int) {
+    private fun recomposeToGroupEnd() {
         val wasComposing = isComposing
         isComposing = true
         var recomposed = false
 
+        val start = reader.parentLocation
+        val end = start + reader.groupSize(start) + 1
+        val recomposeGroup = reader.group(start)
+        val recomposeIndex = nodeIndex
+        val recomposeCompoundKey = currentCompoundKeyHash
+        val oldGroupNodeCount = groupNodeCount
+        var oldGroup = recomposeGroup
+
         var firstInRange = invalidations.firstInRange(start, end)
-        var level = 0
-        val previousParent = reader.parentLocation
         while (firstInRange != null) {
             val location = firstInRange.location
 
             invalidations.removeLocation(location)
 
-            level = exitGroups(location, level)
-            level = enterGroups(location, level)
+            recomposed = true
+
+            reader.reposition(location)
+            val newGroup = reader.group
+
+            // Record the changes to the applier location
+            recordUpsAndDowns(oldGroup, newGroup, recomposeGroup)
+            oldGroup = newGroup
+
+            // Calculate the node index (the distance index in the node this groups nodes are
+            // located in the parent node).
+            nodeIndex = nodeIndexOf(
+                location,
+                newGroup,
+                start,
+                recomposeGroup,
+                recomposeIndex
+            )
+
+            // Calculate the compound hash code (a semi-unique code for every group in the
+            // composition used to restore saved state).
+            currentCompoundKeyHash = compoundKeyOf(
+                newGroup.parent,
+                recomposeGroup,
+                recomposeCompoundKey
+            )
 
             firstInRange.scope.compose(this)
-
-            recomposed = true
 
             // Using slots.current here ensures composition always walks forward even if a component
             // before the current composition is invalidated when performing this composition. Any
@@ -1401,13 +1374,153 @@ open class Composer<N>(
         }
 
         if (recomposed) {
-            exitGroups(end, level)
-            require(reader.parentLocation == previousParent) { "Group enter mismatch" }
+            recordUpsAndDowns(oldGroup, recomposeGroup, recomposeGroup)
+            val parentGroup = reader.parentGroup
+            reader.skipToGroupEnd()
+            val parentGroupNodes = (nodeCountOverrides[parentGroup] ?: parentGroup.nodes)
+            nodeIndex = recomposeIndex + parentGroupNodes
+            groupNodeCount = oldGroupNodeCount + parentGroupNodes
         } else {
             // No recompositions were requested in the range, skip it.
             skipReaderToGroupEnd()
         }
+        currentCompoundKeyHash = recomposeCompoundKey
+
         isComposing = wasComposing
+    }
+
+    /**
+     * As operations to insert and remove nodes are recorded, the number of nodes that will be in
+     * the group after changes are applied is maintained in a side overrides table. This method
+     * updates that count and then updates any parent groups that include the nodes this group
+     * emits.
+     */
+    private fun updateNodeCountOverrides(group: Group, newCount: Int) {
+        val currentCount = nodeCountOverrides[group] ?: group.nodes
+        if (currentCount != newCount) {
+            // Update the overrides
+            val delta = newCount - currentCount
+            var current: Group? = group
+
+            var minPending = pendingStack.size - 1
+            while (current != null) {
+                val newCurrentNodes = (nodeCountOverrides[current] ?: current.nodes) + delta
+                nodeCountOverrides[current] = newCurrentNodes
+                for (pendingIndex in minPending downTo 0) {
+                    val pending = pendingStack.peek(pendingIndex)
+                    if (pending != null && pending.updateNodeCount(current, newCurrentNodes)) {
+                        minPending = pendingIndex - 1
+                        break
+                    }
+                }
+                if (current.isNode) break
+                current = current.parent
+            }
+        }
+    }
+
+    /**
+     * Calculates the node index (the index in the child list of a node will appear in the
+     * resulting tree) for [group]. Passing in [recomposeGroup] and its node index in
+     * [recomposeIndex] allows the calculation to exit early if there is no node group between
+     * [group] and [recomposeGroup].
+     */
+    private fun nodeIndexOf(
+        groupLocation: Int,
+        group: Group,
+        recomposeLocation: Int,
+        recomposeGroup: Group,
+        recomposeIndex: Int
+    ): Int {
+        // Find the anchor group which is either the recomposeGroup or the first parent node
+        var anchorGroup = group.parent ?: error("Invalid group")
+        while (anchorGroup != recomposeGroup) {
+            if (anchorGroup.isNode) break
+            anchorGroup = anchorGroup.parent ?: error("group not contained in recompose group")
+        }
+
+        var index = if (anchorGroup.isNode) 0 else recomposeIndex
+
+        // An early out if the group and anchor sizes are the same as the index must then be index
+        if (anchorGroup.slots == group.slots) return index
+
+        // Find the location of the anchor group
+        val anchorLocation =
+            if (anchorGroup == recomposeGroup) {
+                recomposeLocation
+            } else {
+                // anchor node must be between recomposeLocation and groupLocation but no farther
+                // back than anchorGroup.size - group.size + 1 because anchorGroup contains group
+                var location = recomposeLocation
+                val anchorLimit = groupLocation - (anchorGroup.slots - group.slots + 1)
+                if (location < anchorLimit) location = anchorLimit
+                while (reader.get(location) !== anchorGroup)
+                    location++
+                location
+            }
+
+        // Walk down from the anchor group counting nodes of siblings in front of this group
+        var current = anchorLocation
+        val nodeIndexLimit = index + ((nodeCountOverrides[anchorGroup] ?: anchorGroup.nodes) -
+                group.nodes)
+        loop@ while (index < nodeIndexLimit) {
+            if (current == groupLocation) break
+            current++
+            while (!reader.isGroup(current)) current++
+            while (current < groupLocation) {
+                val currentGroup = reader.group(current)
+                val end = currentGroup.slots + current + 1
+                if (groupLocation < end) continue@loop
+                index += nodeCountOverrides[currentGroup] ?: currentGroup.nodes
+
+                current = end
+            }
+            break
+        }
+        return index
+    }
+
+    /**
+     * Records the operations necessary to move the applier the node affected by the previous
+     * group to the new group.
+     */
+    private fun recordUpsAndDowns(oldGroup: Group, newGroup: Group, commonRoot: Group) {
+        val nearestCommonRoot = nearestCommonRootOf(
+            oldGroup,
+            newGroup,
+            commonRoot
+        ) ?: commonRoot
+
+        // Record ups for the nodes between oldGroup and nearestCommonRoot
+        var current: Group? = oldGroup
+        while (current != null && current != nearestCommonRoot) {
+            if (current.isNode) recordUp()
+            current = current.parent
+        }
+
+        // Record downs from nearestCommonRoot to newGroup
+        doRecordDownsFor(newGroup, nearestCommonRoot)
+    }
+
+    private fun doRecordDownsFor(group: Group?, nearestCommonRoot: Group?) {
+        if (group != null && group != nearestCommonRoot) {
+            doRecordDownsFor(group.parent, nearestCommonRoot)
+            @Suppress("UNCHECKED_CAST")
+            if (group.isNode) recordDown(group.node as N)
+        }
+    }
+
+    /**
+     * Calculate the compound key (a semi-unique key produced for every group in the composition)
+     * for [group]. Passing in the [recomposeGroup] and [recomposeKey] allows this method to exit
+     * early.
+     */
+    private fun compoundKeyOf(group: Group?, recomposeGroup: Group, recomposeKey: Int): Int {
+        return if (group == recomposeGroup) recomposeKey else (compoundKeyOf(
+            (group ?: error("Detached group")).parent,
+            recomposeGroup,
+            recomposeKey
+        ) rol 3) xor group.key.hashCode()
     }
 
     internal fun invalidate(scope: RecomposeScope): InvalidationResult {
@@ -1439,8 +1552,12 @@ open class Composer<N>(
             skipGroup()
         } else {
             val reader = reader
-            val current = reader.current
-            recomposeComponentRange(current, current + reader.groupSize)
+            val key = reader.groupKey
+            updateCompoundKeyWhenWeEnterGroup(key)
+            startReaderGroup(reader.isNode, reader.groupData)
+            recomposeToGroupEnd()
+            reader.endGroup()
+            updateCompoundKeyWhenWeExitGroup(key)
         }
     }
 
@@ -1457,8 +1574,7 @@ open class Composer<N>(
         if (invalidations.isEmpty()) {
             skipReaderToGroupEnd()
         } else {
-            val parentLocation = reader.parentLocation
-            recomposeComponentRange(parentLocation, parentLocation + reader.parentSlots + 1)
+            recomposeToGroupEnd()
         }
     }
 
@@ -1470,7 +1586,7 @@ open class Composer<N>(
      */
     fun startRestartGroup(key: Int) {
         val location = reader.current
-        start(key, false)
+        start(key, false, null)
         if (inserting) {
             val scope = RecomposeScope(this)
             invalidateStack.push(scope)
@@ -1534,8 +1650,35 @@ open class Composer<N>(
 
     internal fun hasInvalidations() = invalidations.isNotEmpty()
 
+    @Suppress("UNCHECKED_CAST")
+    private var SlotWriter.node
+        get() = nodeGroup.node as N
+        set(value) { nodeGroup.node = value }
+    private val SlotWriter.nodeGroup get() = get(current - 1) as NodeGroup
+    private fun SlotWriter.nodeGroupAt(location: Int) = get(location) as NodeGroup
+    private fun SlotWriter.nodeAt(location: Int) = nodeGroupAt(location).node
+    @Suppress("UNCHECKED_CAST")
+    private val SlotReader.node get() = nodeGroupAt(current - 1).node as N
+    private fun SlotReader.nodeGroupAt(location: Int) = get(location) as NodeGroup
+    @Suppress("UNCHECKED_CAST")
+    private fun SlotReader.nodeAt(location: Int) = nodeGroupAt(location).node as N
+
+    private fun validateNodeExpected() {
+        require(nodeExpected) {
+            "A call to createNode(), emitNode() or useNode() expected was not expected"
+        }
+        nodeExpected = false
+    }
+
+    private fun validateNodeNotExpected() {
+        require(!nodeExpected) { "A call to createNode(), emitNode() or useNode() expected" }
+    }
+
     /**
-     * Add a raw change to the change list.
+     * Add a raw change to the change list. Once [record] is called, the operation is realized
+     * into the change list. The helper routines below reduce the number of operations that must
+     * be realized to change the previous tree to the new tree as well as update the slot table
+     * to prepare for the next composition.
      */
     private fun record(change: Change<N>) {
         changes.add(change)
@@ -1547,6 +1690,7 @@ open class Composer<N>(
      * and the slot table writer slot is the same as the current reader's slot.
      */
     private fun recordOperation(change: Change<N>) {
+        realizeInsertUps()
         realizeUps()
         realizeDowns()
         realizeOperationLocation(0)
@@ -1558,17 +1702,23 @@ open class Composer<N>(
      * node.
      */
     private fun recordApplierOperation(change: Change<N>) {
-        realizeInsertApplier()
+        realizeInsertUps()
         realizeUps()
         realizeDowns()
         record(change)
     }
 
+    /**
+     * Record a change that will insert, remove or move a slot table group. This ensures the slot
+     * table is prepared for the change be ensuring the parent group is started and then ended
+     * as the group is left.
+     */
     private fun recordSlotEditingOperation(offset: Int = 0, change: Change<N>) {
         realizeOperationLocation(offset)
         recordSlotEditing()
         record(change)
     }
+
     /**
      * Record a change ensuring, when it is applied, the write matches the current slot in the
      * reader.
@@ -1579,19 +1729,14 @@ open class Composer<N>(
     }
 
     // Navigation of the node tree is performed by recording all the locations of the nodes as
-    // they are traversed by the reader and recording them in the downNodes array with the
-    // corresponding location of the start node for the location. When the node navigation is
-    // realized all the downs in the down nodes is played to the applier and recording their
-    // locations in the realizedDowns stack. Downing the applier, the current realized downs
-    // are checked if they still apply and a corresponding up is called if they are not.
+    // they are traversed by the reader and recording them in the downNodes array. When the node
+    // navigation is realized all the downs in the down nodes is played to the applier.
     //
     // If an up is recorded before the corresponding down is realized then it is simply removed
     // from the downNodes stack.
 
-    private var realizedDowns = IntStack()
     private var pendingUps = 0
     private var downNodes = Stack<N>()
-    private var downLocations = IntStack()
 
     private fun realizeUps() {
         val count = pendingUps
@@ -1601,39 +1746,32 @@ open class Composer<N>(
         }
     }
 
-    private fun realizeDowns() {
-        if (downNodes.isNotEmpty()) {
-            for (index in 0 until downLocations.size) {
-                realizedDowns.push(downLocations.peek(index))
+    private fun realizeDowns(nodes: Array<N>) {
+        record { applier, _, _ ->
+            for (index in nodes.indices) {
+                applier.down(nodes[index])
             }
-            @Suppress("UNCHECKED_CAST")
-            val nodes = Array(downNodes.size) { index -> downNodes.peek(index) as Any } as Array<N>
-            record { applier, _, _ ->
-                for (index in nodes.indices) {
-                    applier.down(nodes[index])
-                }
-            }
-            downNodes.clear()
-            downLocations.clear()
         }
     }
 
-    private fun recordDown() {
+    private fun realizeDowns() {
+        if (downNodes.isNotEmpty()) {
+            @Suppress("UNCHECKED_CAST")
+            realizeDowns(downNodes.toArray())
+            downNodes.clear()
+        }
+    }
+
+    private fun recordDown(node: N) {
         @Suppress("UNCHECKED_CAST")
-        downNodes.push(reader.get(reader.current) as N)
-        downLocations.push(reader.parentLocation)
+        downNodes.push(node)
     }
 
     private fun recordUp() {
         if (downNodes.isNotEmpty()) {
             downNodes.pop()
-            downLocations.pop()
         } else {
-            val parentLocation = reader.parentLocation
-            if (realizedDowns.peekOr(-1) == parentLocation) {
-                pendingUps++
-                realizedDowns.pop()
-            }
+            pendingUps++
         }
     }
 
@@ -1643,7 +1781,7 @@ open class Composer<N>(
         pendingInsertUps++
     }
 
-    private fun realizeInsertApplier() {
+    private fun realizeInsertUps() {
         if (pendingInsertUps > 0) {
             val count = pendingInsertUps
             record { applier, _, _ -> repeat(count) { applier.up() } }
@@ -1657,7 +1795,7 @@ open class Composer<N>(
     // writersReaderDelta tracks the difference between reader's current slot the current of
     // the writer must be before the recorded change is applied. Moving the writer to a location
     // is performed by advancing the writer the same the number of slots traversed by the reader
-    // since the last write change. This works transparently for inserts. For deletes the  number
+    // since the last write change. This works transparently for inserts. For deletes the number
     // of nodes deleted needs to be added to writersReaderDelta. When slots move the delta is
     // updated as if the move has already taken place. The delta is updated again once the group
     // begin edited is complete.
@@ -1668,8 +1806,23 @@ open class Composer<N>(
     // recorded correctly in its internal data structures. The startedGroups stack maintains the
     // groups that must be closed before we can move past the started group.
 
+    /**
+     * The skew or delta between where the writer will be and where the reader is now. This can
+     * be thought of as the unrealized distance the writer must move to match the current slot in
+     * the reader. When an operation affects the slot table the writer location must be realized
+     * by moving the writer slot table the unrealized distance.
+     */
     private var writersReaderDelta = 0
+
+    /**
+     * Record whether any groups were stared. If no groups were started then the root group
+     * doesn't need to be started or ended either.
+     */
     private var startedGroup = false
+
+    /**
+     * A stack of the location of the groups that were started.
+     */
     private val startedGroups = IntStack()
 
     private fun realizeOperationLocation(offset: Int) {
@@ -1707,7 +1860,7 @@ open class Composer<N>(
     }
 
     private fun recordFixup(change: Change<N>) {
-        realizeInsertApplier()
+        realizeInsertUps()
         val anchor = insertAnchor
         val start = insertTable.anchorLocation(anchor)
         val location = writer.current - start
@@ -1715,10 +1868,6 @@ open class Composer<N>(
             slots.current = location + insertTable.anchorLocation(anchor)
         }
         insertFixups.add(change)
-    }
-
-    private val removeCurrentGroupInstance: Change<N> = { _, slots, lifecycleManager ->
-        removeCurrentGroup(slots, lifecycleManager)
     }
 
     /**
@@ -1756,13 +1905,11 @@ open class Composer<N>(
         }
     }
 
-    private val skipToEndGroupInstance: Change<N> = { _, slots, _ -> slots.skipToGroupEnd() }
     private fun recordSkipToGroupEnd() {
         recordSlotTableOperation(change = skipToEndGroupInstance)
         writersReaderDelta = reader.current
     }
 
-    private val endGroupInstance: Change<N> = { _, slots, _ -> slots.endGroup() }
     private fun recordEndGroup() {
         val location = reader.parentLocation
         val currentStartedGroup = startedGroups.peekOr(-1)
@@ -1781,13 +1928,10 @@ open class Composer<N>(
     }
 
     private fun finalizeCompose() {
-        realizeInsertApplier()
+        realizeInsertUps()
         realizeUps()
         require(pendingStack.isEmpty()) { "Start/end imbalance" }
         require(startedGroups.isEmpty()) { "Missed recording an endGroup()" }
-        require(providersStack.size == 1) {
-            "Provider stack imbalance, stack size ${providersStack.size}"
-        }
         cleanUpCompose()
     }
 
@@ -1796,10 +1940,11 @@ open class Composer<N>(
         nodeIndex = 0
         groupNodeCount = 0
         writersReaderDelta = 0
-        startedGroups.clear()
+        currentCompoundKeyHash = 0
+        nodeExpected = false
         startedGroup = false
-        providersStack.clear()
-        providersStack.push(-1 to buildableMapOf())
+        startedGroups.clear()
+        nodeCountOverrides.clear()
     }
 
     private var previousRemove = -1
@@ -1896,16 +2041,12 @@ open class Composer<N>(
         updateCompoundKeyWhenWeEnterGroupKeyHash(groupKey.hashCode())
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
     private fun updateCompoundKeyWhenWeEnterGroupKeyHash(keyHash: Int) {
-        keyHashesStack.push(keyHash)
-        currentCompoundKeyHash = currentCompoundKeyHash.rotateLeft(3) xor keyHash
+        currentCompoundKeyHash = (currentCompoundKeyHash rol 3) xor keyHash
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
-    private fun updateCompoundKeyWhenWeExitGroup() {
-        val keyHash = keyHashesStack.pop()
-        currentCompoundKeyHash = (currentCompoundKeyHash xor keyHash).rotateRight(3)
+    private fun updateCompoundKeyWhenWeExitGroup(groupKey: Any) {
+        currentCompoundKeyHash = (currentCompoundKeyHash xor groupKey.hashCode()) ror 3
     }
 }
 
@@ -1999,7 +2140,7 @@ private fun removeCurrentGroup(slots: SlotWriter, lifecycleManager: LifeCycleMan
             is CompositionLifecycleObserver -> {
                 lifecycleManager.leaving(slot)
             }
-            is GroupStart -> {
+            is Group -> {
                 groupEndStack.push(groupEnd)
                 groupEnd = index + slot.slots
             }
@@ -2115,11 +2256,58 @@ internal fun <T> invokeComposableForResult(
     return realFn(composer)
 }
 
+private fun Group.distanceFrom(root: Group): Int {
+    var count = 0
+    var current: Group? = this
+    while (current != null && current != root) {
+        current = current.parent
+        count++
+    }
+    return count
+}
+
+// find the nearest common root
+private fun nearestCommonRootOf(a: Group, b: Group, common: Group): Group? {
+    // Early outs, to avoid calling distanceFrom in trivial cases
+    if (a == b) return a // A group is the nearest common root of itself
+    if (a == common || b == common) return common // If either is common then common is nearest
+    if (a.parent == b) return b // if b is a's parent b is the nearest common root
+    if (b.parent == a) return a // if a is b's parent a is the nearest common root
+    if (a.parent == b.parent) return a.parent // if a an b share a parent it is the nearest common
+
+    // Find the nearest using distance from common
+    var currentA: Group? = a
+    var currentB: Group? = b
+    val aDistance = a.distanceFrom(common)
+    val bDistance = b.distanceFrom(common)
+    repeat(aDistance - bDistance) { currentA = currentA?.parent }
+    repeat(bDistance - aDistance) { currentB = currentB?.parent }
+
+    // Both ca and cb are now the same distance from a known common root,
+    // therefore, the first parent that is the same is the lowest common root.
+    while (currentA != currentB) {
+        currentA = currentA?.parent
+        currentB = currentB?.parent
+    }
+
+    // ca == cb so it doesn't matter which is returned
+    return currentA
+}
+
+private val removeCurrentGroupInstance: Change<*> = { _, slots, lifecycleManager ->
+    removeCurrentGroup(slots, lifecycleManager)
+}
+private val skipToEndGroupInstance: Change<*> = { _, slots, _ -> slots.skipToGroupEnd() }
+private val endGroupInstance: Change<*> = { _, slots, _ -> slots.endGroup() }
+
 @PublishedApi
 internal val invocation = OpaqueKey("invocation")
 
 @PublishedApi
 internal val provider = OpaqueKey("provider")
+
+@PublishedApi
+internal val ambientMap = OpaqueKey("ambientMap")
 
 @PublishedApi
 internal val providerValues = OpaqueKey("providerValues")

@@ -2060,6 +2060,269 @@ class CompositionTests {
             test()
         }
     }
+
+    @Test
+    fun evenOddRecomposeGroup() {
+        var includeEven = true
+        var includeOdd = true
+        val invalidates = mutableListOf<() -> Unit>()
+
+        fun invalidateComposition() {
+            for (invalidate in invalidates) {
+                invalidate()
+            }
+            invalidates.clear()
+        }
+
+        @Composable
+        fun MockComposeScope.wrapper(children: @Composable() () -> Unit) {
+            children()
+        }
+
+        @Composable
+        fun MockComposeScope.emitText() {
+            invalidates.add(invalidate)
+            if (includeOdd) {
+                key(1) {
+                    text("odd 1")
+                }
+            }
+            if (includeEven) {
+                key(2) {
+                    text("even 2")
+                }
+            }
+            if (includeOdd) {
+                key(3) {
+                    text("odd 3")
+                }
+            }
+            if (includeEven) {
+                key(4) {
+                    text("even 4")
+                }
+            }
+        }
+
+        @Composable
+        fun MockComposeScope.test() {
+            linear {
+                wrapper {
+                    emitText()
+                }
+                emitText()
+                wrapper {
+                    emitText()
+                }
+                emitText()
+            }
+        }
+
+        fun MockViewValidator.wrapper(children: () -> Unit) {
+            children()
+        }
+
+        fun MockViewValidator.emitText() {
+            if (includeOdd) {
+                text("odd 1")
+            }
+            if (includeEven) {
+                text("even 2")
+            }
+            if (includeOdd) {
+                text("odd 3")
+            }
+            if (includeEven) {
+                text("even 4")
+            }
+        }
+
+        fun MockViewValidator.test() {
+            linear {
+                wrapper {
+                    emitText()
+                }
+                emitText()
+                wrapper {
+                    emitText()
+                }
+                emitText()
+            }
+        }
+
+        val myComposition = compose {
+            test()
+        }
+
+        fun validate() {
+            validate(myComposition.root) {
+                test()
+            }
+        }
+        validate()
+
+        includeEven = false
+        invalidateComposition()
+        myComposition.expectChanges()
+        validate()
+
+        includeEven = true
+        includeOdd = false
+        invalidateComposition()
+        myComposition.expectChanges()
+        validate()
+
+        includeEven = false
+        includeOdd = false
+        invalidateComposition()
+        myComposition.expectChanges()
+        validate()
+
+        includeEven = true
+        invalidateComposition()
+        myComposition.expectChanges()
+        validate()
+
+        includeOdd = true
+        invalidateComposition()
+        myComposition.expectChanges()
+        validate()
+    }
+
+    @Test
+    fun evenOddWithMovement() {
+        var includeEven = true
+        var includeOdd = true
+        var order = listOf(1, 2, 3, 4)
+        val invalidates = mutableListOf<() -> Unit>()
+
+        fun invalidateComposition() {
+            for (invalidate in invalidates) {
+                invalidate()
+            }
+            invalidates.clear()
+        }
+
+        @Composable
+        fun MockComposeScope.wrapper(children: @Composable() () -> Unit) {
+            children()
+        }
+
+        @Composable
+        fun MockComposeScope.emitText(all: Boolean) {
+            invalidates.add(invalidate)
+            for (i in order) {
+                if (i % 2 == 1 && (all || includeOdd)) {
+                    key(i) {
+                        text("odd $i")
+                    }
+                }
+                if (i % 2 == 0 && (all || includeEven)) {
+                    key(i) {
+                        text("even $i")
+                    }
+                }
+            }
+        }
+
+        @Composable
+        fun MockComposeScope.test() {
+            linear {
+                invalidates.add(invalidate)
+                for (i in order) {
+                    key(i) {
+                        text("group $i")
+                        if (i == 2 || (includeEven && includeOdd)) {
+                            text("including everything")
+                        } else {
+                            if (includeEven) {
+                                text("including evens")
+                            }
+                            if (includeOdd) {
+                                text("including odds")
+                            }
+                        }
+                        emitText(i == 2)
+                    }
+                }
+                emitText(false)
+            }
+        }
+
+        fun MockViewValidator.emitText(all: Boolean) {
+            for (i in order) {
+                if (i % 2 == 1 && (includeOdd || all)) {
+                    text("odd $i")
+                }
+                if (i % 2 == 0 && (includeEven || all)) {
+                    text("even $i")
+                }
+            }
+        }
+
+        fun MockViewValidator.test() {
+            linear {
+                for (i in order) {
+                    text("group $i")
+                    if (i == 2 || (includeEven && includeOdd)) {
+                        text("including everything")
+                    } else {
+                        if (includeEven) {
+                            text("including evens")
+                        }
+                        if (includeOdd) {
+                            text("including odds")
+                        }
+                    }
+                    emitText(i == 2)
+                }
+                emitText(false)
+            }
+        }
+
+        val myComposition = compose {
+            test()
+        }
+
+        fun validate() {
+            validate(myComposition.root) {
+                test()
+            }
+        }
+        validate()
+
+        order = listOf(1, 2, 4, 3)
+        includeEven = false
+        invalidateComposition()
+        myComposition.expectChanges()
+        validate()
+
+        order = listOf(1, 4, 2, 3)
+        includeEven = true
+        includeOdd = false
+        invalidateComposition()
+        myComposition.expectChanges()
+        validate()
+
+        order = listOf(3, 4, 2, 1)
+        includeEven = false
+        includeOdd = false
+        invalidateComposition()
+        myComposition.expectChanges()
+        validate()
+
+        order = listOf(4, 3, 2, 1)
+        includeEven = true
+        invalidateComposition()
+        myComposition.expectChanges()
+        validate()
+
+        order = listOf(1, 2, 3, 4)
+        includeOdd = true
+        invalidateComposition()
+        myComposition.expectChanges()
+        validate()
+    }
 }
 
 private fun <T> assertArrayEquals(message: String, expected: Array<T>, received: Array<T>) {
