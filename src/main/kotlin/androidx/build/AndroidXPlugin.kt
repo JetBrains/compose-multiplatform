@@ -782,8 +782,8 @@ private fun Project.getGenerateResourceApiFile(): File {
 
 private fun Project.configureCompilationWarnings(task: JavaCompile) {
     if (hasProperty(ALL_WARNINGS_AS_ERRORS)) {
-            task.options.compilerArgs.add("-Werror")
-            task.options.compilerArgs.add("-Xlint:unchecked")
+        task.options.compilerArgs.add("-Werror")
+        task.options.compilerArgs.add("-Xlint:unchecked")
     }
 }
 
@@ -791,6 +791,7 @@ private fun Project.configureCompilationWarnings(task: KotlinCompile) {
     if (hasProperty(ALL_WARNINGS_AS_ERRORS)) {
         task.kotlinOptions.allWarningsAsErrors = true
     }
+    task.kotlinOptions.freeCompilerArgs += listOf("-Xskip-runtime-version-check")
 }
 
 private fun Project.setDependencyVersions() {
