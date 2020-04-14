@@ -771,7 +771,7 @@ private fun Project.configureTaskTimeouts() {
         // skip adding a timeout for some tasks that both take a long time and
         // that we can count on the user to monitor
         if (t !is StudioTask) {
-            t.timeout.set(Duration.ofMinutes(10))
+            t.timeout.set(Duration.ofMinutes(30))
         }
     }
 }
