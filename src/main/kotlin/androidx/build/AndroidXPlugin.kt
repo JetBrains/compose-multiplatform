@@ -40,6 +40,7 @@ import androidx.build.license.configureExternalDependencyLicenseCheck
 import androidx.build.metalava.MetalavaTasks.configureAndroidProjectForMetalava
 import androidx.build.metalava.MetalavaTasks.configureJavaProjectForMetalava
 import androidx.build.metalava.UpdateApiTask
+import androidx.build.studio.StudioTask
 import androidx.build.studio.StudioTask.Companion.registerStudioTask
 import androidx.build.uptodatedness.TaskUpToDateValidator
 import androidx.build.uptodatedness.cacheEvenIfNoOutputs
@@ -767,7 +768,11 @@ private fun Project.configureResourceApiChecks(extension: LibraryExtension) {
 // b/153193718 : builds are timing out
 private fun Project.configureTaskTimeouts() {
     tasks.configureEach { t ->
-        t.timeout.set(Duration.ofMinutes(10))
+        // skip adding a timeout for some tasks that both take a long time and
+        // that we can count on the user to monitor
+        if (t !is StudioTask) {
+            t.timeout.set(Duration.ofMinutes(10))
+        }
     }
 }
 
