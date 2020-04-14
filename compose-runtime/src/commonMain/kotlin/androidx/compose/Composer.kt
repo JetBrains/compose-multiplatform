@@ -1875,13 +1875,13 @@ open class Composer<N>(
         updateCompoundKeyWhenWeEnterGroupKeyHash(groupKey.hashCode())
     }
 
-    @UseExperimental(ExperimentalStdlibApi::class)
+    @OptIn(ExperimentalStdlibApi::class)
     private fun updateCompoundKeyWhenWeEnterGroupKeyHash(keyHash: Int) {
         keyHashesStack.push(keyHash)
         currentCompoundKeyHash = currentCompoundKeyHash.rotateLeft(3) xor keyHash
     }
 
-    @UseExperimental(ExperimentalStdlibApi::class)
+    @OptIn(ExperimentalStdlibApi::class)
     private fun updateCompoundKeyWhenWeExitGroup() {
         val keyHash = keyHashesStack.pop()
         currentCompoundKeyHash = (currentCompoundKeyHash xor keyHash).rotateRight(3)
