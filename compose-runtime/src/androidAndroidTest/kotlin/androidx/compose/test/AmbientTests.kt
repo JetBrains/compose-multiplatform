@@ -34,8 +34,8 @@ import androidx.compose.staticAmbientOf
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.ui.core.LayoutNode
-import androidx.ui.node.UiComposer
 import androidx.ui.core.subcomposeInto
+import androidx.ui.node.UiComposer
 import org.junit.After
 import org.junit.Rule
 import org.junit.Test
@@ -497,7 +497,9 @@ class AmbientTests : BaseComposeTest() {
     @After
     fun ensureNoSubcomposePending() {
         activityRule.activity.uiThread {
-            val pendingChanges = Recomposer.hasPendingChanges() && Recomposer.hasInvalidations()
+            val pendingChanges = with(Recomposer.current()) {
+                hasPendingChanges() && hasInvalidations()
+            }
 
             assertTrue(!pendingChanges, "Pending changes detected after test completed")
         }
@@ -509,7 +511,12 @@ class AmbientTests : BaseComposeTest() {
             remember { escapeCompose { LayoutNode() } }
         val reference = compositionReference()
         // TODO(b/150390669): Review use of @Untracked
-        subcomposeInto(container, activityRule.activity, reference) @Untracked {
+        subcomposeInto(
+            activityRule.activity,
+            container,
+            Recomposer.current(),
+            reference
+        ) @Untracked {
             block()
         }
     }
@@ -528,7 +535,12 @@ class AmbientTests : BaseComposeTest() {
         narrowInvalidateForReference(ref = ref)
         return {
             // TODO(b/150390669): Review use of @Untracked
-            subcomposeInto(container, activityRule.activity, ref.value) @Untracked {
+            subcomposeInto(
+                activityRule.activity,
+                container,
+                Recomposer.current(),
+                ref.value
+            ) @Untracked {
                 block()
             }
         }
