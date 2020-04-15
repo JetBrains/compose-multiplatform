@@ -47,40 +47,22 @@ object SupportConfig {
     const val TARGET_SDK_VERSION = 29
 
     @JvmStatic
-    fun getKeystore(project: Project): File {
-        val supportRoot = (project.rootProject.property("ext") as ExtraPropertiesExtension)
-                .get("supportRootFolder") as File
-        return File(supportRoot, "development/keystore/debug.keystore")
-    }
-
-    @JvmStatic
-    fun getSupportRoot(project: Project): File {
-        val extension = (project.rootProject.property("ext") as ExtraPropertiesExtension)
-        return extension.get("supportRootFolder") as File
-    }
-
-    @JvmStatic
-    fun getExternalProjectPath(project: Project): File {
-        val extension = (project.rootProject.property("ext") as ExtraPropertiesExtension)
-        val file = extension.get("supportRootFolder") as File
-        return File(file.parentFile.parentFile, "external")
-    }
-
-    @JvmStatic
-    fun getPrebuiltsRootPath(project: Project): String {
-        val reposProperties = (project.rootProject.property("ext") as ExtraPropertiesExtension)
-            .get("repos") as Map<*, *>
-        return reposProperties["prebuiltsRoot"].toString()
-    }
-
-    @JvmStatic
-    fun getSupportRepoPath(project: Project): String {
-        return project.getRepositoryDirectory().absolutePath
-    }
-
-    @JvmStatic
     fun isUiProject() = System.getenv("DIST_SUBDIR") == "/ui"
 
     @JvmStatic
     fun getJavaToolsJarPath() = System.getenv("JAVA_TOOLS_JAR")
+}
+
+fun Project.getExternalProjectPath(): File {
+    return File(project.getCheckoutRoot(), "external")
+}
+
+fun Project.getKeystore(): File {
+    return File(project.getSupportRootFolder(), "development/keystore/debug.keystore")
+}
+
+fun Project.getPrebuiltsRoot(): File {
+    val ext = project.rootProject.property("ext") as ExtraPropertiesExtension
+    val reposProperties = ext.get("repos") as Map<*, *>
+    return File(reposProperties["prebuiltsRoot"].toString())
 }

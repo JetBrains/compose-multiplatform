@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-def supportRoot = ext.supportRootFolder
-if (supportRoot == null) {
-    throw new RuntimeException("variable supportRootFolder is not set. you must set it before" +
-            " including this script")
+def supportRootFolder = ext.supportRootFolder
+if (supportRootFolder == null) {
+    throw new RuntimeException("Canonical root project directory is not set. You must specify " +
+            "ext.supportRootFolder before including this script")
 }
+// Makes strong assumptions about the project structure.
+def checkoutRoot = supportRootFolder.parentFile.parentFile
 
-def checkoutRoot = "${ext.supportRootFolder}/../.."
 ext.repos = new Properties()
-ext.repos.checkoutRoot = checkoutRoot
-ext.repos.prebuiltsRoot = "${checkoutRoot}/prebuilts"
+ext.repos.checkoutRoot = checkoutRoot.absolutePath
+ext.repos.prebuiltsRoot = new File(checkoutRoot, "prebuilts").absolutePath
 
 /**
  * Adds maven repositories to the given repository handler.

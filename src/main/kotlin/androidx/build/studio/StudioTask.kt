@@ -17,6 +17,7 @@
 package androidx.build.studio
 
 import androidx.build.SupportConfig
+import androidx.build.getSupportRootFolder
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.internal.tasks.userinput.UserInputHandler
@@ -121,8 +122,7 @@ abstract class StudioTask : DefaultTask() {
     }
 
     private fun launchStudio() {
-        val supportRootDir = SupportConfig.getSupportRoot(project)
-        val vmOptions = File(supportRootDir, "development/studio/studio.vmoptions")
+        val vmOptions = File(project.getSupportRootFolder(), "development/studio/studio.vmoptions")
 
         ProcessBuilder().apply {
             inheritIO()

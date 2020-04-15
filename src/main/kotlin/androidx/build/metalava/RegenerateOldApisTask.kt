@@ -16,11 +16,11 @@
 
 package androidx.build.metalava
 
-import androidx.build.SupportConfig
 import androidx.build.Version
 import androidx.build.checkapi.getApiFileVersion
 import androidx.build.checkapi.getVersionedApiLocation
 import androidx.build.checkapi.isValidArtifactVersion
+import androidx.build.getCheckoutRoot
 import androidx.build.java.JavaCompileInputs
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
@@ -45,8 +45,7 @@ abstract class RegenerateOldApisTask @Inject constructor(
     fun exec() {
         val groupId = project.group.toString()
         val artifactId = project.name
-        val internalPrebuiltsDir =
-            File(SupportConfig.getSupportRoot(project), "../../prebuilts/androidx/internal")
+        val internalPrebuiltsDir = File(project.getCheckoutRoot(), "prebuilts/androidx/internal")
         val projectPrebuiltsDir =
             File(internalPrebuiltsDir, groupId.replace(".", "/") + "/" + artifactId)
 

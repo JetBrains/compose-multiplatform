@@ -252,8 +252,7 @@ class AndroidXPlugin : Plugin<Project> {
             }
             task.systemProperty("robolectric.offline", "true")
             val robolectricDependencies =
-                File(SupportConfig.getPrebuiltsRootPath(project) +
-                        "/androidx/external/org/robolectric/android-all")
+                File(project.getPrebuiltsRoot(), "androidx/external/org/robolectric/android-all")
             task.systemProperty(
                 "robolectric.dependency.dir",
                 robolectricDependencies.absolutePath
@@ -332,8 +331,7 @@ class AndroidXPlugin : Plugin<Project> {
         buildOnServerTask.dependsOn(createCoverageJarTask)
         buildOnServerTask.dependsOn(Jacoco.createZipEcFilesTask(this))
 
-        val rootProjectDir = SupportConfig.getSupportRoot(rootProject).canonicalFile
-        val allDocsTask = DiffAndDocs.configureDiffAndDocs(this, rootProjectDir,
+        val allDocsTask = DiffAndDocs.configureDiffAndDocs(this,
                 DacOptions("androidx", "ANDROIDX_DATA"),
                 listOf(RELEASE_RULE))
         buildOnServerTask.dependsOn(allDocsTask)
@@ -373,7 +371,7 @@ class AndroidXPlugin : Plugin<Project> {
 
         project.tasks.register("listTaskOutputs", ListTaskOutputsTask::class.java) { task ->
             task.setOutput(File(project.getDistributionDirectory(), "task_outputs.txt"))
-            task.removePrefix(File(rootProjectDir, "../../").canonicalFile.path)
+            task.removePrefix(project.getCheckoutRoot().path)
         }
         publishInspectionArtifacts()
     }
@@ -432,7 +430,7 @@ class AndroidXPlugin : Plugin<Project> {
 
         val debugSigningConfig = signingConfigs.getByName("debug")
         // Use a local debug keystore to avoid build server issues.
-        debugSigningConfig.storeFile = SupportConfig.getKeystore(project)
+        debugSigningConfig.storeFile = project.getKeystore()
         buildTypes.all { buildType ->
             // Sign all the builds (including release) with debug key
             buildType.signingConfig = debugSigningConfig

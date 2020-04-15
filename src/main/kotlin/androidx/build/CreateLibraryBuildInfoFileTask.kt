@@ -16,7 +16,6 @@
 
 package androidx.build
 
-import androidx.build.SupportConfig.getSupportRoot
 import androidx.build.gitclient.Commit
 import androidx.build.gitclient.GitClientImpl
 import androidx.build.gitclient.GitCommitRange
@@ -46,25 +45,23 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
     @OutputFile
     val outputFile: Property<File> = project.objects.property(File::class.java)
 
-    private fun getLibraryBuildInfoFilename(): String {
-        return "${project.group}_${project.name}_build_info.txt"
-    }
-
-    /* Returns the local project directory without the full framework/support root directory path
-    * Note: `project.projectDir.toString().removePrefix(project.rootDir.toString())` does not work
-    * because the project rootDir is not guaranteed to be a substring of the projectDir
-    */
+    /**
+     * Returns the local project directory without the full framework/support root directory path
+     * <p>
+     * Note: `project.projectDir.toString().removePrefix(project.rootDir.toString())` does not work
+     * because the project rootDir is not guaranteed to be a substring of the projectDir
+     */
     private fun getProjectSpecificDirectory(): String {
-        return project.projectDir.toString().removePrefix(
-            getSupportRoot(project).toString())
+        return project.projectDir.absolutePath.removePrefix(
+            project.getSupportRootFolder().absolutePath)
     }
 
-    /* Returns whether or not the groupId of the project requires the same version for all
+    /**
+     * Returns whether or not the groupId of the project requires the same version for all
      * artifactIds.
      */
     private fun requiresSameVersion(): Boolean {
-        val library =
-            project.extensions.findByType(AndroidXExtension::class.java)
+        val library = project.extensions.findByType(AndroidXExtension::class.java)
         return library?.mavenGroup?.requireSameVersion ?: false
     }
 
@@ -72,17 +69,17 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
      * of the build that is released.  Thus, we use frameworks/support to get the sha
      */
     private fun getFrameworksSupportCommitShaAtHead(): String {
-        val supportRoot = getSupportRoot(project)
-        val commitList: List<Commit> = GitClientImpl(supportRoot, logger).getGitLog(
-            GitCommitRange(
-                fromExclusive = "",
-                untilInclusive = "HEAD",
-                n = 1
-            ),
-            keepMerges = true,
-            fullProjectDir = supportRoot
-        )
-        if (commitList.size < 1) {
+        val commitList: List<Commit> = GitClientImpl(project.getSupportRootFolder(), logger)
+            .getGitLog(
+                GitCommitRange(
+                    fromExclusive = "",
+                    untilInclusive = "HEAD",
+                    n = 1
+                ),
+                keepMerges = true,
+                fullProjectDir = project.getSupportRootFolder()
+            )
+        if (commitList.isEmpty()) {
             throw RuntimeException("Failed to find git commit for HEAD!")
         }
         return commitList.first().sha
