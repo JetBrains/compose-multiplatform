@@ -78,11 +78,6 @@ fun Project.getHostTestResultDirectory(): File =
 fun Project.getHostTestCoverageDirectory(): File =
     File(getDistributionDirectory(), "host-test-coverage")
 
-private fun getRootDirectory(project: Project): File {
-    val actualRootProject = if (project.isRoot) project else project.rootProject
-    return actualRootProject.extensions.extraProperties.get("supportRootFolder") as File
-}
-
 /**
  * Whether the build should force all versions to be snapshots.
  */

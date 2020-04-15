@@ -15,12 +15,12 @@
  */
 package androidx.build.license
 
+import androidx.build.getCheckoutRoot
 import androidx.build.gradle.isRoot
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ExternalDependency
-import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
@@ -33,10 +33,7 @@ import java.io.File
 open class CheckExternalDependencyLicensesTask : DefaultTask() {
     @TaskAction
     fun checkDependencies() {
-        val supportRoot = (project.rootProject.property("ext") as ExtraPropertiesExtension)
-                .get("supportRootFolder") as File
-        val prebuiltsRoot = File(supportRoot, "../../prebuilts").canonicalFile
-
+        val prebuiltsRoot = File(project.getCheckoutRoot(), "prebuilts")
         val checkerConfig = project.configurations.getByName(CONFIGURATION_NAME)
 
         project

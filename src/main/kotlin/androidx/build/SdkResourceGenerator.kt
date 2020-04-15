@@ -92,9 +92,9 @@ abstract class SdkResourceGenerator : DefaultTask() {
                 "generateSdkResource",
                 SdkResourceGenerator::class.java
             ) {
-                it.prebuiltsRoot = (File(SupportConfig.getPrebuiltsRootPath(project))).canonicalPath
-                it.debugKeystore.set(SupportConfig.getKeystore(project))
-                it.localSupportRepo = SupportConfig.getSupportRepoPath(project)
+                it.prebuiltsRoot = project.getPrebuiltsRoot().canonicalPath
+                it.debugKeystore.set(project.getKeystore())
+                it.localSupportRepo = project.getRepositoryDirectory().canonicalPath
                 it.gradleVersion = project.gradle.gradleVersion
                 it.outputFile.set(File(generatedDirectory, "sdk.prop"))
             }

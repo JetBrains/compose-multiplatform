@@ -16,7 +16,7 @@
 
 package androidx.build.studio
 
-import androidx.build.SupportConfig
+import androidx.build.getPrebuiltsRoot
 import org.gradle.api.Project
 import java.io.File
 import java.nio.file.Files
@@ -68,8 +68,8 @@ val PrebuiltsArchiveCreator: StudioArchiveCreator = fun (
     filename: String,
     destinationPath: String
 ) {
-    val prebuiltsDir = SupportConfig.getPrebuiltsRootPath(project)
-    val prebuiltsFile = File("$prebuiltsDir/androidx/studio/$filename")
+    val prebuiltsRoot = project.getPrebuiltsRoot()
+    val prebuiltsFile = File(prebuiltsRoot, "androidx/studio/$filename")
 
     // Copy archive from prebuilts to the parent directory of the install directory
     println("Copying prebuilt studio archive to $destinationPath")

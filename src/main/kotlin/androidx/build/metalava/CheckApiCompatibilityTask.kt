@@ -16,8 +16,8 @@
 
 package androidx.build.metalava
 
-import androidx.build.checkapi.ApiLocation
 import androidx.build.checkapi.ApiBaselinesLocation
+import androidx.build.checkapi.ApiLocation
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles

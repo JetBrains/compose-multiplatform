@@ -36,7 +36,6 @@ import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ResolveException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTree
-import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
@@ -55,14 +54,12 @@ data class DacOptions(val libraryroot: String, val dataname: String)
  * Object used to manage configuration of documentation generation tasks.
  *
  * @property root the top-level AndroidX project.
- * @property supportRootFolder the directory in which the top-level AndroidX project lives.
  * @property dacOptions additional options for generating output compatible with d.android.com.
  * @property additionalRules optional list of rule sets used to generate documentation.
  * @constructor Creates a DiffAndDocs object and immediately creates related documentation tasks.
  */
 class DiffAndDocs private constructor(
     root: Project,
-    supportRootFolder: File,
     dacOptions: DacOptions,
     additionalRules: List<PublishDocsRules> = emptyList()
 ) {
@@ -113,9 +110,10 @@ class DiffAndDocs private constructor(
             }
 
             val generateDocsTask = createGenerateDocsTask(
-                project = root, generateSdkApiTask = generateSdkApiTask,
+                project = root,
+                generateSdkApiTask = generateSdkApiTask,
                 doclavaConfig = doclavaConfiguration,
-                supportRootFolder = supportRootFolder, dacOptions = dacOptions,
+                dacOptions = dacOptions,
                 destDir = File(root.docsDir(), rule.name),
                 taskName = "${rule.name}DocsTask",
                 offline = offline)
@@ -150,7 +148,6 @@ class DiffAndDocs private constructor(
          * This should happen only once (and on the root project).
          *
          * @property root the top-level AndroidX project.
-         * @property supportRootFolder the directory in which the top-level AndroidX project lives.
          * @property dacOptions additional options for generating output compatible with
          *           d.android.com.
          * @property additionalRules optional list of rule sets used to generate documentation.
@@ -158,7 +155,6 @@ class DiffAndDocs private constructor(
          */
         fun configureDiffAndDocs(
             root: Project,
-            supportRootFolder: File,
             dacOptions: DacOptions,
             additionalRules: List<PublishDocsRules> = emptyList()
         ): TaskProvider<Task> {
@@ -167,7 +163,6 @@ class DiffAndDocs private constructor(
                 "Cannot initialize DiffAndDocs twice")
             val instance = DiffAndDocs(
                 root = root,
-                supportRootFolder = supportRootFolder,
                 dacOptions = dacOptions,
                 additionalRules = additionalRules
             )
@@ -503,7 +498,6 @@ private val GENERATE_DOCS_CONFIG = ChecksConfig(
  * @param project the project from which source files and JARs will be used to generate docs.
  * @param generateSdkApiTask the task that provides the Android SDK's API txt file.
  * @param doclavaConfig command-line options to pass to the Doclava javadoc tool.
- * @param supportRootFolder the directory in which the top-level AndroidX project lives.
  * @param dacOptions additional options for generating output compatible with d.android.com.
  * @param destDir the directory into which generated documentation should be output.
  * @param taskName the name to give the resulting task.
@@ -513,7 +507,6 @@ private fun createGenerateDocsTask(
     project: Project,
     generateSdkApiTask: TaskProvider<DoclavaTask>,
     doclavaConfig: Configuration,
-    supportRootFolder: File,
     dacOptions: DacOptions,
     destDir: File,
     taskName: String = "generateDocs",
@@ -539,8 +532,10 @@ private fun createGenerateDocsTask(
 
                 coreJavadocOptions {
                     addStringOption("templatedir",
-                        "$supportRootFolder/../../external/doclava/res/assets/templates-sdk")
-                    addStringOption("samplesdir", "$supportRootFolder/samples")
+                        "${project.getCheckoutRoot()}/external/doclava/res/assets/templates-sdk")
+                    // Note this is using the project's real root directory, e.g. `fw/support/ui`.
+                    addStringOption("samplesdir",
+                        "${project.rootDir}/samples")
                     addMultilineMultiValueOption("federate").value = listOf(
                         listOf("Android", "https://developer.android.com")
                     )
@@ -585,13 +580,13 @@ fun <T : Task> TaskContainer.registerWithConfig(
  * @return the project's Android SDK stub JAR as a File.
  */
 fun androidJarFile(project: Project): FileCollection =
-        project.files(arrayOf(File(project.sdkPath(),
+        project.files(arrayOf(File(project.getSdkPath(),
                 "platforms/${SupportConfig.COMPILE_SDK_VERSION}/android.jar")))
 
 /**
  * @return the project's Android SDK stub source JAR as a File.
  */
-private fun androidSrcJarFile(project: Project): File = File(project.sdkPath(),
+private fun androidSrcJarFile(project: Project): File = File(project.getSdkPath(),
         "platforms/${SupportConfig.COMPILE_SDK_VERSION}/android-stubs-src.jar")
 
 /**
@@ -605,15 +600,6 @@ private fun BaseVariant.rFile() = "${applicationId.replace('.', '/')}/R.java"
 fun Project.docsDir(): File {
     val actualRootProject = if (project.isRoot) project else project.rootProject
     return File(actualRootProject.buildDir, "javadoc")
-}
-
-/**
- * @return the root project's SDK path as a File.
- */
-private fun Project.sdkPath(): File {
-    val supportRoot = (project.rootProject.property("ext") as ExtraPropertiesExtension)
-        .get("supportRootFolder") as File
-    return getSdkPath(supportRoot)
 }
 
 /**

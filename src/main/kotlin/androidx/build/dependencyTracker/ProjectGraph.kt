@@ -16,7 +16,7 @@
 
 package androidx.build.dependencyTracker
 
-import androidx.build.SupportConfig
+import androidx.build.getSupportRootFolder
 import org.gradle.api.Project
 import java.io.File
 
@@ -25,15 +25,15 @@ import org.gradle.api.logging.Logger
 /**
  * Creates a project graph for fast lookup by file path
  */
-class ProjectGraph(rootProject: Project, val logger: Logger? = null) {
+class ProjectGraph(project: Project, val logger: Logger? = null) {
     private val rootNode: Node
 
     init {
         // always use cannonical file: b/112205561
         logger?.info("initializing ProjectGraph")
         rootNode = Node(logger)
-        val rootProjectDir = SupportConfig.getSupportRoot(rootProject).canonicalFile
-        rootProject.subprojects.forEach {
+        val rootProjectDir = project.getSupportRootFolder().canonicalFile
+        project.subprojects.forEach {
             logger?.info("creating node for ${it.path}")
             val relativePath = it.projectDir.canonicalFile.toRelativeString(rootProjectDir)
             val sections = relativePath.split(File.separatorChar)
