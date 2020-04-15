@@ -16,6 +16,8 @@
 
 package androidx.compose
 
+import kotlinx.coroutines.CoroutineDispatcher
+
 // TODO(aelias): Mark the typealiases internal when https://youtrack.jetbrains.com/issue/KT-36695 is fixed.
 // Currently, they behave as internal because the actual is internal, even though the expect is public.
 
@@ -52,6 +54,13 @@ expect open class ReferenceQueue<T>() {
     open fun poll(): Reference<out T>?
 }
 
+expect class AtomicReference<V>(value: V) {
+    fun get(): V
+    fun set(value: V)
+    fun getAndSet(value: V): V
+    fun compareAndSet(expect: V, newValue: V): Boolean
+}
+
 expect class Looper
 
 internal expect fun isMainThread(): Boolean
@@ -61,7 +70,7 @@ internal expect object LooperWrapper {
 }
 
 internal expect class Handler(looper: Looper) {
-    fun postAtFrontOfQueue(block: () -> Unit): Boolean
+    fun post(block: () -> Unit): Boolean
 }
 
 expect interface ChoreographerFrameCallback {
@@ -83,13 +92,14 @@ internal inline fun <K, V> BuildableMap<K, V>.mutate(
 
 internal expect fun <K, V> buildableMapOf(): BuildableMap<K, V>
 
-internal expect fun createRecomposer(): Recomposer
-
 internal expect object Choreographer {
     fun postFrameCallback(callback: ChoreographerFrameCallback)
     fun postFrameCallbackDelayed(delayMillis: Long, callback: ChoreographerFrameCallback)
     fun removeFrameCallback(callback: ChoreographerFrameCallback)
 }
+
+internal expect fun mainThreadCompositionDispatcher(): CoroutineDispatcher
+internal expect fun mainThreadCompositionFrameClock(): CompositionFrameClock
 
 @MustBeDocumented
 @Retention(AnnotationRetention.BINARY)

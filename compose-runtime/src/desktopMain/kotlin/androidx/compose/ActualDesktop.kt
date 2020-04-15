@@ -18,9 +18,8 @@ package androidx.compose
 
 import javax.swing.JComponent
 import javax.swing.SwingUtilities
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.withContext
 
 actual abstract class EmbeddingUIContext
@@ -38,7 +37,7 @@ internal actual object LooperWrapper {
 
 internal actual class Handler {
     actual constructor(looper: Looper) {}
-    actual fun postAtFrontOfQueue(block: () -> Unit): Boolean {
+    actual fun post(block: () -> Unit): Boolean {
         SwingUtilities.invokeLater(block)
         return true
     }
@@ -127,60 +126,18 @@ internal actual fun recordSourceKeyInfo(key: Any) {
 
 actual fun keySourceInfoOf(key: Any): String? = keyInfo[key]
 
-// TODO placeholder; this should be used to await the next drawing frame for animation purposes
-internal class DesktopCompositionFrameClock : CompositionFrameClock {
+private object MainCompositionFrameClock : CompositionFrameClock {
     override suspend fun <R> awaitFrameNanos(onFrame: (frameTimeNanos: Long) -> R): R =
         withContext(Dispatchers.Main) {
-            onFrame(System.nanoTime())
+            onFrame(java.lang.System.nanoTime())
         }
 }
 
-@OptIn(InternalComposeApi::class)
-internal class DesktopRecomposer : Recomposer() {
+internal actual fun mainThreadCompositionFrameClock(): CompositionFrameClock =
+    MainCompositionFrameClock
 
-    private var frameScheduled = false
-
-    inner class Callback : Runnable {
-            @Volatile var cancelled: Boolean = false
-
-            override fun run() {
-                if (cancelled) return
-                frameScheduled = false
-                dispatchRecomposes()
-            }
-    }
-
-    private val frameCallback = Callback()
-
-    init {
-        SwingUtilities.invokeLater(Callback())
-    }
-
-    override val effectCoroutineScope: CoroutineScope =
-        CoroutineScope(SupervisorJob() + Dispatchers.Main)
-
-    override val compositionFrameClock: CompositionFrameClock = DesktopCompositionFrameClock()
-
-    override fun scheduleChangesDispatch() {
-        if (!frameScheduled) {
-            frameScheduled = true
-            SwingUtilities.invokeLater(Callback())
-        }
-    }
-
-    override fun hasPendingChanges(): Boolean = frameScheduled
-
-    override fun recomposeSync() {
-        if (frameScheduled) {
-            frameCallback.cancelled = true
-            frameCallback.run()
-        }
-    }
-}
-
-internal actual fun createRecomposer(): Recomposer {
-    return DesktopRecomposer()
-}
+internal actual fun mainThreadCompositionDispatcher(): CoroutineDispatcher =
+    Dispatchers.Main
 
 // TODO(igotti): do we need actual processing for those?
 actual annotation class MainThread()

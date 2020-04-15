@@ -16,6 +16,11 @@
 
 package androidx.compose
 
+import androidx.core.os.HandlerCompat
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
 internal actual typealias EmbeddingUIContext = android.content.Context
 
 // TODO(b/137794558): Create portable abstraction for scheduling
@@ -35,10 +40,10 @@ internal actual class Handler {
     val handler: android.os.Handler
 
     actual constructor(looper: Looper) {
-        handler = android.os.Handler(looper)
+        handler = HandlerCompat.createAsync(looper)
     }
-    actual fun postAtFrontOfQueue(block: () -> Unit): Boolean {
-        return handler.postAtFrontOfQueue(block)
+    actual fun post(block: () -> Unit): Boolean {
+        return handler.post(block)
     }
 }
 
@@ -57,13 +62,34 @@ internal actual object Choreographer {
     }
 }
 
+// TODO: Our host-side tests still grab the Android actuals based on SDK stubs that return null.
+// Satisfy their dependencies.
+private val MainAndroidUiDispatcher by lazy {
+    if (Looper.getMainLooper() != null) AndroidUiDispatcher.Main
+    else Dispatchers.Main
+}
+
+private object MainDispatcherCompositionFrameClock : CompositionFrameClock {
+    override suspend fun <R> awaitFrameNanos(onFrame: (frameTimeNanos: Long) -> R): R =
+        withContext(Dispatchers.Main) {
+            onFrame(System.nanoTime())
+        }
+}
+
+private val MainAndroidCompositionFrameClock by lazy {
+    if (Looper.getMainLooper() != null) AndroidUiDispatcher.Main.compositionFrameClock
+    else MainDispatcherCompositionFrameClock
+}
+
+internal actual fun mainThreadCompositionDispatcher(): CoroutineDispatcher =
+    MainAndroidUiDispatcher
+
+internal actual fun mainThreadCompositionFrameClock(): CompositionFrameClock =
+    MainAndroidCompositionFrameClock
+
 internal actual object Trace {
     actual fun beginSection(name: String) = android.os.Trace.beginSection(name)
     actual fun endSection() = android.os.Trace.endSection()
-}
-
-internal actual fun createRecomposer(): Recomposer {
-    return AndroidRecomposer()
 }
 
 internal actual typealias MainThread = androidx.annotation.MainThread

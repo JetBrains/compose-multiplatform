@@ -35,6 +35,10 @@ import androidx.compose.mock.selectContact
 import androidx.compose.mock.skip
 import androidx.compose.mock.text
 import androidx.compose.mock.validate
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import org.junit.After
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -2344,7 +2348,20 @@ private fun compose(
 ): MockViewComposer {
     val composer = run {
         val root = View().apply { name = "root" }
-        MockViewComposer(root)
+
+        val scope = CoroutineScope(Job())
+        val clock = object : CompositionFrameClock {
+            override suspend fun <R> awaitFrameNanos(onFrame: (Long) -> R): R {
+                // The original version of this test used a mock Recomposer
+                // that never successfully scheduled a frame.
+                suspendCancellableCoroutine<Unit> {}
+                return onFrame(0)
+            }
+        }
+        val recomposer = Recomposer().apply {
+            scope.launch { runRecomposeAndApplyChanges(clock) }
+        }
+        MockViewComposer(root, recomposer)
     }
 
     composer.compose {

@@ -87,7 +87,7 @@ class ComposeIntoTests : BaseComposeTest() {
             compositionLatch.wait()
             val thread = HandlerThread("")
             thread.start()
-            Handler(thread.looper).postAtFrontOfQueue {
+            Handler(thread.looper).post {
                 FrameManager.framed {
                     model.value = 1
                 }

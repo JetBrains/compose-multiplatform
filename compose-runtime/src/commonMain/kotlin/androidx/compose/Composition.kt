@@ -117,7 +117,7 @@ private class CompositionImpl(
     override fun setContent(content: @Composable () -> Unit) {
         check(!disposed) { "The composition is disposed" }
         this.composable = content
-        recomposer.recompose(composable, composer)
+        recomposer.composeInitial(composable, composer)
     }
 
     override fun dispose() {

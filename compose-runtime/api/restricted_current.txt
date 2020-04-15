@@ -25,7 +25,25 @@ package androidx.compose {
     property public final boolean valid;
   }
 
-  public final class AndroidRecomposerKt {
+  public final class AndroidUiCompositionFrameClock implements androidx.compose.CompositionFrameClock {
+    ctor public AndroidUiCompositionFrameClock(android.view.Choreographer choreographer);
+    method public suspend <R> Object? awaitFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
+    method public android.view.Choreographer getChoreographer();
+  }
+
+  public final class AndroidUiDispatcher extends kotlinx.coroutines.CoroutineDispatcher {
+    method public void dispatch(kotlin.coroutines.CoroutineContext context, Runnable block);
+    method public android.view.Choreographer getChoreographer();
+    method public androidx.compose.CompositionFrameClock getCompositionFrameClock();
+    property public final androidx.compose.CompositionFrameClock compositionFrameClock;
+    field public static final androidx.compose.AndroidUiDispatcher.Companion! Companion;
+  }
+
+  public static final class AndroidUiDispatcher.Companion {
+    method public androidx.compose.AndroidUiDispatcher getCurrentThread();
+    method public androidx.compose.AndroidUiDispatcher getMain();
+    property public final androidx.compose.AndroidUiDispatcher CurrentThread;
+    property public final androidx.compose.AndroidUiDispatcher Main;
   }
 
   public final class Applier<N> {
@@ -64,12 +82,6 @@ package androidx.compose {
     method public int getSize();
     method public java.util.Collection<V> getValues();
     method public boolean isEmpty();
-  }
-
-  public final class ChoreographerCompositionFrameClock implements androidx.compose.CompositionFrameClock {
-    ctor public ChoreographerCompositionFrameClock(android.view.Choreographer choreographer);
-    method public suspend <R> Object? awaitFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
-    method public android.view.Choreographer getChoreographer();
   }
 
   public interface CommitScope {
@@ -352,22 +364,24 @@ package androidx.compose {
     method @Deprecated @androidx.compose.Composable public static void Recompose(kotlin.jvm.functions.Function1<? super kotlin.jvm.functions.Function0<kotlin.Unit>,kotlin.Unit> body);
   }
 
-  public abstract class Recomposer {
+  public final class Recomposer {
     ctor public Recomposer();
-    method protected final void dispatchRecomposes();
-    method public abstract androidx.compose.CompositionFrameClock getCompositionFrameClock();
-    method public abstract kotlinx.coroutines.CoroutineScope getEffectCoroutineScope();
-    method public abstract boolean hasPendingChanges();
-    method @org.jetbrains.annotations.TestOnly public abstract void recomposeSync();
-    method protected abstract void scheduleChangesDispatch();
-    property public abstract androidx.compose.CompositionFrameClock compositionFrameClock;
-    property public abstract kotlinx.coroutines.CoroutineScope effectCoroutineScope;
+    method public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public androidx.compose.CompositionFrameClock getFrameClock();
+    method public boolean hasPendingChanges();
+    method public suspend Object? recomposeAndApplyChanges(kotlinx.coroutines.CoroutineScope applyCoroutineScope, androidx.compose.CompositionFrameClock frameClock, long frameCount, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? runRecomposeAndApplyChanges(androidx.compose.CompositionFrameClock frameClock, kotlin.coroutines.Continuation<?> p);
+    property public final androidx.compose.CompositionFrameClock frameClock;
     field public static final androidx.compose.Recomposer.Companion! Companion;
   }
 
   public static final class Recomposer.Companion {
     method @org.jetbrains.annotations.TestOnly public androidx.compose.Recomposer current();
     method @Deprecated public boolean hasPendingChanges();
+  }
+
+  public final class RecomposerKt {
+    method public static suspend Object? withRunningRecomposer(androidx.compose.CompositionFrameClock frameClock, kotlin.jvm.functions.Function3<? super kotlinx.coroutines.CoroutineScope,? super androidx.compose.Recomposer,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
   }
 
   public final class RememberKt {

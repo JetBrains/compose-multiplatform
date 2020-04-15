@@ -19,38 +19,18 @@ package androidx.compose
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.coroutines.CoroutineContext
 
 private class SuspendingEffect(
-    private val baseCoroutineScope: CoroutineScope,
-    private val compositionFrameClock: CompositionFrameClock,
+    private val recomposer: Recomposer,
     private val block: suspend CompositionCoroutineScope.() -> Unit
 ) : CompositionLifecycleObserver {
-
-    @OptIn(InternalComposeApi::class)
-    constructor(
-        recomposer: Recomposer,
-        block: suspend CompositionCoroutineScope.() -> Unit
-    ) : this(
-        recomposer.effectCoroutineScope,
-        recomposer.compositionFrameClock,
-        block
-    )
-
-    private class SuspendingEffectScope(
-        override val coroutineContext: CoroutineContext,
-        compositionFrameClock: CompositionFrameClock
-    ) : CompositionCoroutineScope(), CompositionFrameClock by compositionFrameClock
 
     private var job: Job? = null
 
     override fun onEnter() {
         job?.cancel("Old job was still running!")
-        job = baseCoroutineScope.launch {
-            SuspendingEffectScope(coroutineContext, compositionFrameClock).block()
-        }
+        job = recomposer.launchEffect(block)
     }
 
     override fun onLeave() {

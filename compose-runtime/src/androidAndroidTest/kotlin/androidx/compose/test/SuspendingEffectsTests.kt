@@ -32,6 +32,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -88,6 +89,8 @@ class SuspendingEffectsTests : BaseComposeTest() {
                 })
             }
         }.then {
+            assertNotEquals(choreographerTime, Long.MIN_VALUE, "Choreographer callback never ran")
+            assertNotEquals(awaitFrameTime, Long.MIN_VALUE, "awaitFrameNanos callback never ran")
             assertEquals(choreographerTime, awaitFrameTime,
                 "expected same values from choreographer post and awaitFrameNanos")
         }
