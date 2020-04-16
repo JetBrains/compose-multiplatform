@@ -378,11 +378,11 @@ open class Composer<N>(
         changesAppliedObservers.remove(l)
     }
 
-    private lateinit var reader: SlotReader
+    private var reader: SlotReader = slotTable.openReader().also { it.close() }
 
     private val insertTable = SlotTable()
     private var writer: SlotWriter = insertTable.openWriter().also { it.close() }
-    private lateinit var insertAnchor: Anchor
+    private var insertAnchor: Anchor = insertTable.anchor(0)
     private val insertFixups = mutableListOf<Change<N>>()
 
     protected fun composeRoot(block: () -> Unit) {
@@ -1296,6 +1296,7 @@ open class Composer<N>(
      * correctly updated to reflect any groups skipped.
      */
     private fun skipToGroupContaining(location: Int) {
+        val reader = reader
         while (reader.current < location) {
             if (reader.isGroupEnd) return
             if (reader.isGroup) {
@@ -1312,6 +1313,7 @@ open class Composer<N>(
      * generated with no changes.
      */
     private fun enterGroups(location: Int, level: Int): Int {
+        val reader = reader
         var currentLevel = level
         while (true) {
             skipToGroupContaining(location)
@@ -1344,6 +1346,7 @@ open class Composer<N>(
      * Exit any groups that were entered until a sibling of maxLocation is reached.
      */
     private fun exitGroups(location: Int, level: Int): Int {
+        val reader = reader
         var currentProviderScope = providersStack.peek().first
         var currentLevel = level
         while (currentLevel > 0) {
