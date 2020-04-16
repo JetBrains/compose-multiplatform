@@ -121,7 +121,10 @@ open class CreateLibraryBuildInfoFileTask : DefaultTask() {
         val versionChecker = project.property("versionChecker") as GMavenVersionChecker
         project.configurations.filter {
             /* Ignore test configuration dependencies */
-            !it.name.contains("test", ignoreCase = true)
+            !it.name.contains("test", ignoreCase = true) &&
+            /* Ignore compile configuration dependencies */
+            !it.name.contains("compileClasspath", ignoreCase = true) &&
+            !it.name.contains("compileOnly", ignoreCase = true)
         }.forEach { configuration ->
             configuration.allDependencies.forEach { dep ->
                 // Only consider androidx dependencies
