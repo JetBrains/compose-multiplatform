@@ -641,7 +641,7 @@ class EffectsTests : BaseComposeTest() {
         val MyAmbient = ambientOf<Int> { throw Exception("not set") }
 
         var requestRecompose: (() -> Unit)? = null
-        val ambientValue = mutableStateOf(1)
+        var ambientValue = 1
 
         @Composable fun SimpleComposable2() {
             val value = MyAmbient.current
@@ -651,7 +651,7 @@ class EffectsTests : BaseComposeTest() {
         @Composable fun SimpleComposable() {
             Recompose {
                 requestRecompose = it
-                Providers(MyAmbient provides ambientValue.value++) {
+                Providers(MyAmbient provides ambientValue++) {
                     SimpleComposable2()
                     Button(id = 123)
                 }
@@ -685,7 +685,7 @@ class EffectsTests : BaseComposeTest() {
 
         var requestRecompose: (() -> Unit)? = null
         var componentComposed = false
-        val ambientValue = mutableStateOf(1)
+        var ambientValue = 1
 
         @Composable fun SimpleComposable2() {
             componentComposed = true
@@ -695,7 +695,7 @@ class EffectsTests : BaseComposeTest() {
 
         @Composable fun SimpleComposable() {
             requestRecompose = invalidate
-            Providers(MyAmbient provides ambientValue.value++) {
+            Providers(MyAmbient provides ambientValue++) {
                 SimpleComposable2()
                 Button(id = 123)
             }
