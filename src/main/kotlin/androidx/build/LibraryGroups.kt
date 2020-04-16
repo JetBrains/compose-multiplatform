@@ -34,8 +34,6 @@ object LibraryGroups {
     val BUILDSRC_TESTS = LibraryGroup("androidx.buildSrc-tests", LibraryVersions.BUILDSRC_TESTS)
     val BENCHMARK = LibraryGroup("androidx.benchmark", LibraryVersions.BENCHMARK)
     val CAMERA = LibraryGroup("androidx.camera", LibraryVersions.CAMERA)
-    val CAR = LibraryGroup("androidx.car", null)
-    val CAR_APP = LibraryGroup("androidx.car.app", LibraryVersions.CAR)
     val CARDVIEW = LibraryGroup("androidx.cardview", LibraryVersions.CARDVIEW)
     val COLLECTION = LibraryGroup("androidx.collection", LibraryVersions.COLLECTION)
     val CONCURRENT = LibraryGroup("androidx.concurrent", LibraryVersions.FUTURES)
