@@ -116,6 +116,9 @@ open class BuildOnServer : DefaultTask() {
     }
 }
 
+/**
+ * Configures the root project's buildOnServer task to run the specified task.
+ */
 fun <T : Task> Project.addToBuildOnServer(taskProvider: TaskProvider<T>) {
     rootProject.tasks.named(AndroidXPlugin.BUILD_ON_SERVER_TASK).configure {
         it.dependsOn(taskProvider)
