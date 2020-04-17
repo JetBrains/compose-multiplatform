@@ -22,7 +22,7 @@ import org.gradle.api.Project
 import java.util.ArrayList
 
 /**
- * Extension for [AndroidXPlugin].
+ * Extension for [AndroidXPlugin] that's responsible for holding configuration options.
  */
 open class AndroidXExtension(val project: Project) {
     var name: String? = null
