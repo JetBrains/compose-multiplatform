@@ -37,7 +37,6 @@ import org.gradle.api.artifacts.ResolveException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTree
 import org.gradle.api.plugins.JavaBasePlugin
-import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.compile.JavaCompile
@@ -455,23 +454,27 @@ private fun createGenerateSdkApiTask(
     doclavaConfig: Configuration,
     annotationConfig: Configuration
 ): TaskProvider<DoclavaTask> =
-        project.tasks.registerWithConfig("generateSdkApi", DoclavaTask::class.java) {
-            dependsOn(doclavaConfig)
-            dependsOn(annotationConfig)
-            description = "Generates API files for the current SDK."
-            setDocletpath(doclavaConfig.resolve())
-            destinationDir = project.docsDir()
-            // Strip the androidx.annotation classes injected by Metalava. They are not accessible.
-            classpath = androidJarFile(project)
-                .filter { it.path.contains("androidx/annotation") }
-                .plus(project.files(annotationConfig.resolve()))
-            source(project.zipTree(androidSrcJarFile(project))
-                .matching(PatternSet().include("**/*.java")))
-            exclude("**/overview.html") // TODO https://issuetracker.google.com/issues/116699307
-            apiFile = sdkApiFile(project)
-            generateDocs = false
-            coreJavadocOptions {
-                addStringOption("stubpackages", "android.*")
+        project.tasks.register("generateSdkApi", DoclavaTask::class.java) { task ->
+            task.apply {
+                dependsOn(doclavaConfig)
+                dependsOn(annotationConfig)
+                description = "Generates API files for the current SDK."
+                setDocletpath(doclavaConfig.resolve())
+                destinationDir = project.docsDir()
+                // Strip the androidx.annotation classes injected by Metalava. They are not accessible.
+                classpath = androidJarFile(project)
+                    .filter { it.path.contains("androidx/annotation") }
+                    .plus(project.files(annotationConfig.resolve()))
+                source(
+                    project.zipTree(androidSrcJarFile(project))
+                        .matching(PatternSet().include("**/*.java"))
+                )
+                exclude("**/overview.html") // TODO https://issuetracker.google.com/issues/116699307
+                apiFile = sdkApiFile(project)
+                generateDocs = false
+                coreJavadocOptions {
+                    addStringOption("stubpackages", "android.*")
+                }
             }
         }
 
@@ -566,15 +569,6 @@ private fun createGenerateDocsTask(
  * @return the project's Android SDK API txt as a File.
  */
 private fun sdkApiFile(project: Project) = File(project.docsDir(), "release/sdk_current.txt")
-
-/**
- * @return the TaskProvider of [taskClass] constructed and configured using the provided [config].
- */
-fun <T : Task> TaskContainer.registerWithConfig(
-    name: String,
-    taskClass: Class<T>,
-    config: T.() -> Unit
-) = register(name, taskClass) { task -> task.config() }
 
 /**
  * @return the project's Android SDK stub JAR as a File.
