@@ -478,11 +478,9 @@ open class Composer<N>(
     ) {
         startGroup(key)
         if (this.invalid() || !skipping) {
-            startGroup(invocation)
             block()
-            endGroup()
         } else {
-            skipCurrentGroup()
+            skipToGroupEnd()
         }
         endGroup()
     }
@@ -1407,7 +1405,7 @@ open class Composer<N>(
             require(reader.parentLocation == previousParent) { "Group enter mismatch" }
         } else {
             // No recompositions were requested in the range, skip it.
-            skipGroup()
+            skipReaderToGroupEnd()
         }
         isComposing = wasComposing
     }
@@ -1433,7 +1431,8 @@ open class Composer<N>(
     }
 
     /**
-     * Skip a group. This is only valid to call if the composition is not inserting.
+     * Skip a group. Skips the group at the current location. This is only valid to call if the
+     * composition is not inserting.
      */
     fun skipCurrentGroup() {
         if (invalidations.isEmpty()) {
@@ -1442,6 +1441,24 @@ open class Composer<N>(
             val reader = reader
             val current = reader.current
             recomposeComponentRange(current, current + reader.groupSize)
+        }
+    }
+
+    private fun skipReaderToGroupEnd() {
+        groupNodeCount = reader.parentNodes
+        reader.skipToGroupEnd()
+    }
+
+    /**
+     * Skip to the end of the group opened by [startGroup].
+     */
+    fun skipToGroupEnd() {
+        require(groupNodeCount == 0) { "No nodes can be emitted before calling skipAndEndGroup" }
+        if (invalidations.isEmpty()) {
+            skipReaderToGroupEnd()
+        } else {
+            val parentLocation = reader.parentLocation
+            recomposeComponentRange(parentLocation, parentLocation + reader.parentSlots + 1)
         }
     }
 

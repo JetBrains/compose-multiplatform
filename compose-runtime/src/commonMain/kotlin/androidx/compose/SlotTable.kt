@@ -110,6 +110,12 @@ class SlotReader(val table: SlotTable) {
         if (startStack.isEmpty()) 0 else slots[startStack.peek()].asGroupStart.nodes
 
     /**
+     * Return the number of slots are in the current group.
+     */
+    val parentSlots: Int get() =
+        if (startStack.isEmpty()) 0 else slots[startStack.peek()].asGroupStart.slots
+
+    /**
      * Get the value stored at [anchor].
      */
     @Suppress("KotlinOperator")
