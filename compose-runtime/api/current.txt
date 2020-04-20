@@ -103,6 +103,7 @@ package androidx.compose {
     method public final Object? nextSlot();
     method public final boolean recompose();
     method public final void skipCurrentGroup();
+    method public final void skipToGroupEnd();
     method public final void startExpr(Object key);
     method public final void startGroup(Object key);
     method public final void startMovableGroup(Object key);
@@ -325,6 +326,7 @@ package androidx.compose {
     method public int getNodeIndex();
     method public int getParentLocation();
     method public int getParentNodes();
+    method public int getParentSlots();
     method public androidx.compose.SlotTable getTable();
     method public int groupEnd(int index);
     method public Object groupKey(int index);
@@ -353,6 +355,7 @@ package androidx.compose {
     property public final int nodeIndex;
     property public final int parentLocation;
     property public final int parentNodes;
+    property public final int parentSlots;
   }
 
   public final class SlotTable {

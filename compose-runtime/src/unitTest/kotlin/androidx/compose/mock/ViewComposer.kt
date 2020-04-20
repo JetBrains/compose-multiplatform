@@ -104,11 +104,9 @@ fun <P1> MockComposeScope.memoize(
     with(currentComposer as MockViewComposer) {
         startGroup(key)
         if (!changed(p1)) {
-            skipCurrentGroup()
+            skipToGroupEnd()
         } else {
-            startGroup(key)
             block(p1)
-            endGroup()
         }
         endGroup()
     }
