@@ -27,7 +27,7 @@ import androidx.build.checkapi.hasApiFileDirectory
 import androidx.build.checkapi.hasApiTasks
 import androidx.build.defaultPublishVariant
 import androidx.build.java.JavaCompileInputs
-import androidx.build.shouldGenerateVersionedApiFiles
+import androidx.build.isVersionedApiFileWritingEnabled
 import androidx.build.uptodatedness.cacheEvenIfNoOutputs
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.LibraryVariant
@@ -110,7 +110,7 @@ object MetalavaTasks {
         val currentApiLocation = project.getCurrentApiLocation()
         val builtApiLocation = project.getBuiltApiLocation()
 
-        val outputApiLocations = if (project.shouldGenerateVersionedApiFiles()) {
+        val outputApiLocations = if (project.isVersionedApiFileWritingEnabled()) {
             listOf(
                 versionedApiLocation,
                 currentApiLocation
