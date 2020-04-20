@@ -28,39 +28,31 @@ import androidx.build.SupportConfig.INSTRUMENTATION_RUNNER
 import androidx.build.SupportConfig.TARGET_SDK_VERSION
 import androidx.build.checkapi.ApiType
 import androidx.build.checkapi.getApiFileDirectory
-import androidx.build.checkapi.getVersionedApiLocation
 import androidx.build.checkapi.getRequiredCompatibilityApiFileFromDir
+import androidx.build.checkapi.getVersionedApiLocation
 import androidx.build.checkapi.hasApiFileDirectory
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.dokka.Dokka.configureAndroidProjectForDokka
 import androidx.build.dokka.Dokka.configureJavaProjectForDokka
-import androidx.build.dokka.DokkaPublicDocs
-import androidx.build.dokka.DokkaSourceDocs
-import androidx.build.gmaven.GMavenVersionChecker
 import androidx.build.gradle.getByType
 import androidx.build.gradle.isRoot
 import androidx.build.jacoco.Jacoco
-import androidx.build.license.CheckExternalDependencyLicensesTask
 import androidx.build.license.configureExternalDependencyLicenseCheck
 import androidx.build.metalava.MetalavaTasks.configureAndroidProjectForMetalava
 import androidx.build.metalava.MetalavaTasks.configureJavaProjectForMetalava
 import androidx.build.metalava.UpdateApiTask
 import androidx.build.studio.StudioTask
-import androidx.build.studio.StudioTask.Companion.registerStudioTask
-import androidx.build.uptodatedness.TaskUpToDateValidator
 import androidx.build.uptodatedness.cacheEvenIfNoOutputs
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.TestedExtension
-import com.android.build.gradle.api.AndroidBasePlugin
 import com.android.build.gradle.api.ApkVariant
 import org.gradle.api.JavaVersion.VERSION_1_8
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.TaskProvider
@@ -94,6 +86,7 @@ import java.util.concurrent.ConcurrentHashMap
  */
 class AndroidXPlugin : Plugin<Project> {
     override fun apply(project: Project) {
+        if (project.isRoot) throw Exception("Root project should use AndroidXRootPlugin instead")
         // This has to be first due to bad behavior by DiffAndDocs which is triggered on the root
         // project. It calls evaluationDependsOn on each subproject. This eagerly causes evaluation
         // *during* the root build.gradle evaluation. The subproject then applies this plugin (while
@@ -108,11 +101,6 @@ class AndroidXPlugin : Plugin<Project> {
         // This has to be first due to bad behavior by DiffAndDocs. It fails if this configuration
         // is called after DiffAndDocs.configureDiffAndDocs. b/129762955
         project.configureMavenArtifactUpload(extension)
-
-        // TODO(alanv): Split this plugin into root- and module-specific plugins.
-        if (project.isRoot) {
-            project.configureRootProject()
-        }
 
         project.configureJacoco()
 
@@ -298,120 +286,6 @@ class AndroidXPlugin : Plugin<Project> {
         }
 
         project.addToProjectMap(extension)
-    }
-
-    private fun Project.configureRootProject() {
-        setDependencyVersions()
-        configureKtlintCheckFile()
-        configureCheckInvalidSuppress()
-
-        val buildOnServerTask = tasks.create(BUILD_ON_SERVER_TASK, BuildOnServer::class.java)
-        buildOnServerTask.dependsOn(
-            tasks.register(
-                CREATE_AGGREGATE_BUILD_INFO_FILES_TASK,
-                CreateAggregateLibraryBuildInfoFileTask::class.java
-            )
-        )
-        buildOnServerTask.dependsOn(
-            tasks.register(CREATE_LIBRARY_BUILD_INFO_FILES_TASK)
-        )
-
-        extra.set("versionChecker", GMavenVersionChecker(logger))
-        val createArchiveTask = Release.getGlobalFullZipTask(this)
-        buildOnServerTask.dependsOn(createArchiveTask)
-        val partiallyDejetifyArchiveTask = partiallyDejetifyArchiveTask(
-            createArchiveTask.get().archiveFile)
-        if (partiallyDejetifyArchiveTask != null)
-            buildOnServerTask.dependsOn(partiallyDejetifyArchiveTask)
-
-        val projectModules = ConcurrentHashMap<String, String>()
-        extra.set("projects", projectModules)
-        buildOnServerTask.dependsOn(tasks.named(CheckExternalDependencyLicensesTask.TASK_NAME))
-        subprojects { project ->
-            if (project.path == ":docs-runner") {
-                project.tasks.all { task ->
-                    if (DokkaPublicDocs.ARCHIVE_TASK_NAME == task.name ||
-                        DokkaSourceDocs.ARCHIVE_TASK_NAME == task.name) {
-                        buildOnServerTask.dependsOn(task)
-                    }
-                }
-                return@subprojects
-            }
-            project.plugins.withType(AndroidBasePlugin::class.java) {
-                buildOnServerTask.dependsOn("${project.path}:assembleDebug")
-                buildOnServerTask.dependsOn("${project.path}:assembleAndroidTest")
-                if (!project.rootProject.hasProperty(USE_MAX_DEP_VERSIONS) &&
-                    project.path != ":docs-fake"
-                ) {
-                    buildOnServerTask.dependsOn("${project.path}:lintDebug")
-                }
-            }
-            project.plugins.withType(JavaPlugin::class.java) {
-                buildOnServerTask.dependsOn("${project.path}:jar")
-            }
-        }
-
-        if (partiallyDejetifyArchiveTask != null) {
-            project(":jetifier-standalone").afterEvaluate { standAloneProject ->
-                partiallyDejetifyArchiveTask.configure {
-                    it.dependsOn(standAloneProject.tasks.named("installDist"))
-                }
-                createArchiveTask.configure {
-                    it.dependsOn(standAloneProject.tasks.named("dist"))
-                }
-            }
-        }
-
-        val createCoverageJarTask = Jacoco.createCoverageJarTask(this)
-        tasks.register(BUILD_TEST_APKS_TASK) {
-            it.dependsOn(createCoverageJarTask)
-        }
-        buildOnServerTask.dependsOn(createCoverageJarTask)
-        buildOnServerTask.dependsOn(Jacoco.createZipEcFilesTask(this))
-
-        val allDocsTask = DiffAndDocs.configureDiffAndDocs(this,
-                DacOptions("androidx", "ANDROIDX_DATA"),
-                listOf(RELEASE_RULE))
-        buildOnServerTask.dependsOn(allDocsTask)
-        buildOnServerTask.dependsOn(Jacoco.createUberJarTask(this))
-
-        AffectedModuleDetector.configure(gradle, this)
-
-        // If useMaxDepVersions is set, iterate through all the project and substitute any androidx
-        // artifact dependency with the local tip of tree version of the library.
-        if (hasProperty(USE_MAX_DEP_VERSIONS)) {
-            // This requires evaluating all sub-projects to create the module:project map
-            // and project dependencies.
-            evaluationDependsOnChildren()
-            subprojects { subproject ->
-                // TODO(153485458) remove most of these exceptions
-                if (subproject.name != "docs-fake" &&
-                    !subproject.name.contains("hilt") &&
-                    subproject.name != "camera-testapp-timing" &&
-                    subproject.name != "room-testapp" &&
-                    subproject.name != "support-media2-test-client-previous" &&
-                    subproject.name != "support-media2-test-service-previous") {
-
-                    subproject.configurations.all { configuration ->
-                        configuration.resolutionStrategy.dependencySubstitution.apply {
-                            for (e in projectModules) {
-                                substitute(module(e.key)).with(project(e.value))
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        registerStudioTask()
-
-        TaskUpToDateValidator.setup(project)
-
-        project.tasks.register("listTaskOutputs", ListTaskOutputsTask::class.java) { task ->
-            task.setOutput(File(project.getDistributionDirectory(), "task_outputs.txt"))
-            task.removePrefix(project.getCheckoutRoot().path)
-        }
-        publishInspectionArtifacts()
     }
 
     private fun TestedExtension.configureAndroidCommonOptions(
@@ -740,7 +614,7 @@ class AndroidXPlugin : Plugin<Project> {
  * AndroidX projects do not use the Javadoc task for docs generation, so we don't want them
  * cluttering up the task overview.
  */
-fun Project.hideJavadocTask() {
+private fun Project.hideJavadocTask() {
     tasks.withType(Javadoc::class.java).configureEach {
         if (it.name == "javadoc") {
             it.group = null
@@ -748,7 +622,7 @@ fun Project.hideJavadocTask() {
     }
 }
 
-fun Project.addToProjectMap(extension: AndroidXExtension) {
+private fun Project.addToProjectMap(extension: AndroidXExtension) {
     // TODO(alanv): Move this out of afterEvaluate
     afterEvaluate {
         if (extension.publish.shouldRelease()) {
@@ -782,7 +656,7 @@ private fun Project.createCheckResourceApiTask(): TaskProvider<CheckResourceApiT
  * Creates the [CHECK_RELEASE_READY_TASK], which aggregates tasks that must pass for a
  * project to be considered ready for public release.
  */
-internal fun Project.createCheckReleaseReadyTask(taskProviderList: List<TaskProvider<out Task>>) {
+private fun Project.createCheckReleaseReadyTask(taskProviderList: List<TaskProvider<out Task>>) {
     tasks.register(CHECK_RELEASE_READY_TASK) {
         for (taskProvider in taskProviderList) {
             it.dependsOn(taskProvider)
@@ -812,7 +686,7 @@ fun Project.getProjectsMap(): ConcurrentHashMap<String, String> {
 /**
  * Configures an Android library project to track and validate its public resource API surface.
  */
-internal fun Project.configureResourceApiChecks(extension: LibraryExtension) {
+private fun Project.configureResourceApiChecks(extension: LibraryExtension) {
     // TODO(alanv): Fix this to occur during normal configuration.
     afterEvaluate { project ->
         // Only configure resource API checks for projects that are already tracking APIs.
@@ -842,7 +716,7 @@ internal fun Project.configureResourceApiChecks(extension: LibraryExtension) {
  * Configures all non-Studio tasks in a project (see b/153193718 for background) to time out after
  * [TASK_TIMEOUT_MINUTES].
  */
-internal fun Project.configureTaskTimeouts() {
+private fun Project.configureTaskTimeouts() {
     tasks.configureEach { t ->
         // skip adding a timeout for some tasks that both take a long time and
         // that we can count on the user to monitor
@@ -852,38 +726,24 @@ internal fun Project.configureTaskTimeouts() {
     }
 }
 
-internal fun Project.configureCompilationWarnings(task: JavaCompile) {
+private fun Project.configureCompilationWarnings(task: JavaCompile) {
     if (hasProperty(ALL_WARNINGS_AS_ERRORS)) {
         task.options.compilerArgs.add("-Werror")
         task.options.compilerArgs.add("-Xlint:unchecked")
     }
 }
 
-internal fun Project.configureCompilationWarnings(task: KotlinCompile) {
+private fun Project.configureCompilationWarnings(task: KotlinCompile) {
     if (hasProperty(ALL_WARNINGS_AS_ERRORS)) {
         task.kotlinOptions.allWarningsAsErrors = true
     }
     task.kotlinOptions.freeCompilerArgs += listOf("-Xskip-runtime-version-check")
 }
 
-internal fun Project.setDependencyVersions() {
-    val buildVersions = (project.rootProject.property("ext") as ExtraPropertiesExtension)
-        .let { it.get("build_versions") as Map<*, *> }
-
-    fun getVersion(key: String) = checkNotNull(buildVersions[key]) {
-            "Could not find a version for `$key`"
-        }.toString()
-
-    androidx.build.dependencies.kotlinVersion = getVersion("kotlin")
-    androidx.build.dependencies.kotlinCoroutinesVersion = getVersion("kotlin_coroutines")
-    androidx.build.dependencies.agpVersion = getVersion("agp")
-    androidx.build.dependencies.lintVersion = getVersion("lint")
-}
-
 /**
  * Returns a string that is a valid filename and loosely based on the project name
  * The value returned for each project will be distinct
  */
-internal fun Project.asFilenamePrefix(): String {
+private fun Project.asFilenamePrefix(): String {
     return project.path.substring(1).replace(':', '-')
 }
