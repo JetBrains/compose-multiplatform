@@ -1558,9 +1558,9 @@ open class Composer<N>(
      * node.
      */
     private fun recordApplierOperation(change: Change<N>) {
+        realizeInsertApplier()
         realizeUps()
         realizeDowns()
-        realizeInsertApplier()
         record(change)
     }
 
@@ -1632,6 +1632,7 @@ open class Composer<N>(
             val parentLocation = reader.parentLocation
             if (realizedDowns.peekOr(-1) == parentLocation) {
                 pendingUps++
+                realizedDowns.pop()
             }
         }
     }
