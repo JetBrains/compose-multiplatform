@@ -1904,6 +1904,104 @@ class CompositionTests {
         myComposer.expectChanges()
     }
 
+    @Test // b/154650546
+    fun testInsertOnMultipleLevels() {
+        val items = mutableListOf(
+            1 to mutableListOf(
+                0, 1, 2, 3, 4),
+            3 to mutableListOf(
+                0, 1, 2, 3, 4)
+        )
+
+        val invalidates = mutableListOf<() -> Unit>()
+        fun invalidateComposition() {
+            invalidates.forEach { it() }
+            invalidates.clear()
+        }
+
+        @Composable
+        fun MockComposeScope.numbers(numbers: List<Int>) {
+            linear {
+                linear {
+                    invalidates.add(invalidate)
+                    for (number in numbers) {
+                        text("$number")
+                    }
+                }
+            }
+        }
+
+        @Composable
+        fun MockComposeScope.item(number: Int, numbers: List<Int>) {
+            linear {
+                invalidates.add(invalidate)
+                text("$number")
+                numbers(numbers)
+            }
+        }
+
+        @Composable
+        fun MockComposeScope.test() {
+            invalidates.add(invalidate)
+
+            linear {
+                invalidates.add(invalidate)
+                for ((number, numbers) in items) {
+                    item(number, numbers)
+                }
+            }
+        }
+
+        fun MockViewValidator.numbers(numbers: List<Int>) {
+            linear {
+                linear {
+                    for (number in numbers) {
+                        text("$number")
+                    }
+                }
+            }
+        }
+
+        fun MockViewValidator.item(number: Int, numbers: List<Int>) {
+            linear {
+                text("$number")
+                numbers(numbers)
+            }
+        }
+
+        fun MockViewValidator.test() {
+            linear {
+                for ((number, numbers) in items) {
+                    item(number, numbers)
+                }
+            }
+        }
+
+        val myComposition = compose {
+            test()
+        }
+
+        fun validate() {
+            validate(myComposition.root) {
+                test()
+            }
+        }
+
+        validate()
+
+        // Add numbers to the list at 0 and 1
+        items[0].second.add(2, 100)
+        items[1].second.add(3, 200)
+
+        // Add a list to the root.
+        items.add(1, 2 to mutableListOf(0, 1, 2))
+
+        invalidateComposition()
+
+        myComposition.expectChanges()
+        validate()
+    }
+
     @Test
     fun testInsertingAfterSkipping() {
         val items = mutableListOf(
