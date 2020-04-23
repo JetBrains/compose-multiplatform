@@ -66,7 +66,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.DRAWERLAYOUT, "1.1.0-beta01")
     prebuilts(LibraryGroups.DYNAMICANIMATION, "dynamicanimation-ktx", "1.0.0-alpha03")
     prebuilts(LibraryGroups.DYNAMICANIMATION, "1.1.0-alpha02")
-    prebuilts(LibraryGroups.EMOJI, "1.1.0-beta01")
+    prebuilts(LibraryGroups.EMOJI, "1.1.0-rc01")
     prebuilts(LibraryGroups.ENTERPRISE, "1.0.0")
     prebuilts(LibraryGroups.EXIFINTERFACE, "1.3.0-alpha01")
     ignore(LibraryGroups.FRAGMENT.group, "fragment-lint")
