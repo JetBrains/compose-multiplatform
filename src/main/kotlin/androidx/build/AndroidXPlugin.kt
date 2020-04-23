@@ -28,6 +28,7 @@ import androidx.build.SupportConfig.INSTRUMENTATION_RUNNER
 import androidx.build.SupportConfig.TARGET_SDK_VERSION
 import androidx.build.checkapi.ApiType
 import androidx.build.checkapi.getApiFileDirectory
+import androidx.build.checkapi.getCurrentApiLocation
 import androidx.build.checkapi.getRequiredCompatibilityApiFileFromDir
 import androidx.build.checkapi.getVersionedApiLocation
 import androidx.build.checkapi.hasApiFileDirectory
@@ -646,7 +647,7 @@ val Project.multiplatformExtension
  */
 private fun Project.createCheckResourceApiTask(): TaskProvider<CheckResourceApiTask> {
     return tasks.register(CHECK_RESOURCE_API_TASK, CheckResourceApiTask::class.java) { task ->
-        task.newApiFile = getGenerateResourceApiFile()
+        task.newApiFile = getGeneratedResourceApiFile()
         task.oldApiFile = getVersionedApiLocation().resourceFile
         task.cacheEvenIfNoOutputs()
     }
@@ -665,16 +666,30 @@ private fun Project.createCheckReleaseReadyTask(taskProviderList: List<TaskProvi
 }
 
 private fun Project.createUpdateResourceApiTask(): TaskProvider<UpdateResourceApiTask> {
+    val versionedApiLocation = project.getVersionedApiLocation()
+    val currentApiLocation = project.getCurrentApiLocation()
+
+    val outputApiLocations = if (project.isVersionedApiFileWritingEnabled()) {
+        listOf(
+            versionedApiLocation,
+            currentApiLocation
+        )
+    } else {
+        listOf(
+            currentApiLocation
+        )
+    }
+
     return tasks.register(UPDATE_RESOURCE_API_TASK, UpdateResourceApiTask::class.java) { task ->
-        task.newApiFile = getGenerateResourceApiFile()
-        task.oldApiFile = getRequiredCompatibilityApiFileFromDir(project.getApiFileDirectory(),
-                version(), ApiType.RESOURCEAPI)
-        task.destApiFile = getVersionedApiLocation().resourceFile
+        task.inputApiFile.set(getGeneratedResourceApiFile())
+        task.referenceResourceApiFile.set(getRequiredCompatibilityApiFileFromDir(
+            getApiFileDirectory(), version(), ApiType.RESOURCEAPI))
+        task.outputApiLocations.set(outputApiLocations)
     }
 }
 
-private fun Project.getGenerateResourceApiFile(): File {
-    // TODO(alanv): Find a stable API contract to use when referencing this file.
+private fun Project.getGeneratedResourceApiFile(): File {
+    // TODO(alanv): Follow up when b/154626581 gets resolved and AGP provides a stable API contract
     return File(buildDir, "intermediates/public_res/release/public.txt")
 }
 
