@@ -28,7 +28,7 @@ import androidx.build.Strategy.TipOfTree
  * Rule set used to generate public documentation.
  */
 val RELEASE_RULE = docsRules("public", false) {
-    prebuilts(LibraryGroups.ACTIVITY, "1.2.0-alpha03")
+    prebuilts(LibraryGroups.ACTIVITY, "1.2.0-alpha04")
     prebuilts(LibraryGroups.ADS, "1.0.0-alpha04")
     prebuilts(LibraryGroups.ANNOTATION, "annotation", "1.1.0")
     prebuilts(LibraryGroups.ANNOTATION, "annotation-experimental", "1.0.0")
@@ -72,7 +72,7 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.FRAGMENT.group, "fragment-lint")
     ignore(LibraryGroups.FRAGMENT.group, "fragment-testing-lint")
     ignore(LibraryGroups.FRAGMENT.group, "fragment-truth")
-    prebuilts(LibraryGroups.FRAGMENT, "1.3.0-alpha03")
+    prebuilts(LibraryGroups.FRAGMENT, "1.3.0-alpha04")
     prebuilts(LibraryGroups.GRIDLAYOUT, "1.0.0")
     prebuilts(LibraryGroups.HEIFWRITER, "1.1.0-alpha01")
     prebuilts(LibraryGroups.INTERPOLATOR, "1.0.0")
@@ -84,7 +84,7 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.LIFECYCLE.group, "lifecycle-runtime-ktx-lint")
     prebuilts(LibraryGroups.LIFECYCLE, "lifecycle-extensions", "2.2.0") // No longer published
     ignore(LibraryGroups.LIFECYCLE.group, "lifecycle-runtime-testing")
-    prebuilts(LibraryGroups.LIFECYCLE, "2.3.0-alpha01")
+    prebuilts(LibraryGroups.LIFECYCLE, "2.3.0-alpha02")
     ignore(LibraryGroups.LOADER.group, "loader-ktx")
     prebuilts(LibraryGroups.LOADER, "1.1.0")
     prebuilts(LibraryGroups.LOCALBROADCASTMANAGER, "1.1.0-alpha01")
@@ -96,7 +96,7 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.NAVIGATION.group, "navigation-runtime-truth")
     ignore(LibraryGroups.NAVIGATION.group, "navigation-safe-args-generator")
     ignore(LibraryGroups.NAVIGATION.group, "navigation-safe-args-gradle-plugin")
-    prebuilts(LibraryGroups.NAVIGATION, "2.3.0-alpha05")
+    prebuilts(LibraryGroups.NAVIGATION, "2.3.0-alpha06")
     ignore(LibraryGroups.PAGING.group, "paging-guava")
     prebuilts(LibraryGroups.PAGING, "2.1.0")
     prebuilts(LibraryGroups.PALETTE, "1.0.0")
@@ -106,7 +106,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.PREFERENCE, "1.1.1")
     prebuilts(LibraryGroups.PRINT, "1.0.0")
     prebuilts(LibraryGroups.RECOMMENDATION, "1.0.0")
-    prebuilts(LibraryGroups.RECYCLERVIEW, "recyclerview", "1.2.0-alpha02")
+    prebuilts(LibraryGroups.RECYCLERVIEW, "recyclerview", "1.2.0-alpha03")
     prebuilts(LibraryGroups.RECYCLERVIEW, "recyclerview-selection", "2.0.0-alpha01")
     ignore(LibraryGroups.RECYCLERVIEW.group, "recyclerview-lint")
     prebuilts(LibraryGroups.REMOTECALLBACK, "1.0.0-alpha02")
@@ -140,15 +140,15 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.VERSIONEDPARCELABLE, "1.1.1")
     prebuilts(LibraryGroups.VIEWPAGER, "1.0.0")
     prebuilts(LibraryGroups.VIEWPAGER2, "1.1.0-alpha01")
-    prebuilts(LibraryGroups.WEAR, "1.1.0-alpha01")
+    prebuilts(LibraryGroups.WEAR, "1.1.0-beta01")
             .addStubs("wear/wear_stubs/com.google.android.wearable-stubs.jar")
-    prebuilts(LibraryGroups.WEBKIT, "1.3.0-alpha01")
+    prebuilts(LibraryGroups.WEBKIT, "1.3.0-alpha02")
     ignore(LibraryGroups.WINDOW.group, "window-sidecar")
     prebuilts(LibraryGroups.WINDOW, "1.0.0-alpha01")
     ignore(LibraryGroups.WORK.group, "work-gcm")
     ignore(LibraryGroups.WORK.group, "work-runtime-lint")
     ignore(LibraryGroups.WORK.group, "work-rxjava3")
-    prebuilts(LibraryGroups.WORK, "2.4.0-alpha02")
+    prebuilts(LibraryGroups.WORK, "2.4.0-alpha03")
     default(Ignore)
 }
 
