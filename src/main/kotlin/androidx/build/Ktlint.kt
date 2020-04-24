@@ -17,9 +17,14 @@
 package androidx.build
 
 import androidx.build.uptodatedness.cacheEvenIfNoOutputs
+import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.JavaExec
+import org.gradle.api.tasks.StopExecutionException
+import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.options.Option
 
 private fun Project.getKtlintConfiguration(): Configuration {
     return configurations.findByName("ktlint") ?: configurations.create("ktlint") {
@@ -80,11 +85,49 @@ fun Project.configureKtlint() {
     }
 }
 
+open class KtlintCheckFileTask : JavaExec() {
+    @get:Input
+    @set:Option(
+        option = "file",
+        description = "File to check. This option can be used multiple times: --file file1.kt " +
+                "--file file2.kt")
+    var files: List<String> = emptyList()
+
+    @get:Input
+    @set:Option(
+        option = "format",
+        description = "Use --format to auto-correct style violations (if some errors cannot be " +
+                "fixed automatically they will be printed to stderr)"
+    )
+    var format = false
+}
+
 fun Project.configureKtlintCheckFile() {
-    tasks.register("ktlintCheckFile", JavaExec::class.java) { task ->
+    tasks.register("ktlintCheckFile", KtlintCheckFileTask::class.java) { task ->
         task.description = "Check Kotlin code style."
         task.group = "Verification"
         task.classpath = getKtlintConfiguration()
         task.main = "com.pinterest.ktlint.Main"
+
+        task.doFirst {
+            if (task.files.isEmpty()) {
+                throw StopExecutionException()
+            }
+            var kotlinFiles = task.files.filter { file ->
+                file.endsWith(".kt") || file.endsWith(".ktx") }
+            if (kotlinFiles.isNullOrEmpty()) {
+                throw StopExecutionException()
+            }
+            val args = mutableListOf<String>(
+                "--android",
+                "--disabled_rules",
+                "no-unused-imports,import-ordering,final-newline"
+            )
+            args.addAll(kotlinFiles)
+            if (task.format) {
+                args.add("-F")
+            }
+            task.args = args
+        }
     }
 }
