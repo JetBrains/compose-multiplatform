@@ -39,6 +39,13 @@ kotlin {
         commonMain.dependencies {
             implementation(KOTLIN_STDLIB)
         }
+        commonTest.dependencies {
+            implementation kotlin("test-junit")
+            implementation project(":ui:ui-core")
+        }
+
+        jvmMain {
+        }
         jvmMain.dependencies {
             api(KOTLIN_COROUTINES_CORE)
             implementation "org.jetbrains.kotlinx:kotlinx-collections-immutable-jvm:0.3"
@@ -56,15 +63,15 @@ kotlin {
 
         commonTest.dependencies {
             implementation kotlin("test-junit")
-            implementation project(":ui:ui-framework")
+            implementation project(":ui:ui-core")
         }
         androidAndroidTest.dependencies {
             implementation(ANDROIDX_TEST_EXT_JUNIT)
             implementation(ANDROIDX_TEST_RULES)
             implementation(ANDROIDX_TEST_RUNNER)
             implementation(TRUTH)
-            implementation project(":ui:ui-platform")
             implementation project(':ui:ui-test')
+            implementation project(':ui:ui-core')
         }
     }
 }
