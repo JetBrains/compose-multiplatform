@@ -44,21 +44,88 @@ allprojects {
     }
 }
 
+configurations {
+    // Dependencies added to these configurations get copied into the corresponding configuration
+    // (cacheableApi gets copied into api, etc).
+    // Because we cache the resolutions of these configurations, performance is faster when
+    // artifacts are put into these configurations than when those artifacts are put into their
+    // corresponding configuration.
+    cacheableApi
+    cacheableImplementation {
+        extendsFrom(project.configurations.cacheableApi)
+    }
+    cacheableRuntime {
+        extendsFrom(project.configurations.cacheableImplementation)
+    }
+}
+
 dependencies {
-    compileOnly(findGradleKotlinDsl())
-    implementation build_libs.agp
-    implementation build_libs.dex_member_list
-    implementation build_libs.dokka_gradle
-    implementation build_libs.kotlin.gradle_plugin
-    implementation build_libs.kotlinpoet
-    implementation gradleApi()
-    implementation project("jetpad-integration")
+    cacheableApi build_libs.agp
+    cacheableImplementation build_libs.dex_member_list
+    cacheableApi build_libs.kotlin.gradle_plugin
+    cacheableImplementation build_libs.kotlinpoet
+    cacheableImplementation gradleApi()
+    cacheableApi build_libs.dokka_gradle
     // needed by inspection plugin
-    implementation "com.google.protobuf:protobuf-gradle-plugin:0.8.8"
-    implementation "org.anarres.jarjar:jarjar-gradle:1.0.1"
+    cacheableImplementation "com.google.protobuf:protobuf-gradle-plugin:0.8.8"
+    cacheableImplementation "org.anarres.jarjar:jarjar-gradle:1.0.1"
+    // dependencies that aren't used by buildSrc directly but that we resolve here so that the
+    // root project doesn't need to re-resolve them and their dependencies on every build
+    cacheableRuntime "com.google.dagger:hilt-android-gradle-plugin:DEV-SNAPSHOT"
+    // dependencies whose resolutions we don't need to cache
+    compileOnly(findGradleKotlinDsl()) // Only one file in this configuration, no need to cache it
+    implementation project("jetpad-integration") // Doesn't have a .pom, so not slow to load
+}
+
+// Saves configuration into destFile
+// Each line of destFile will be the absolute filepath of one of the fies in configuration
+def saveConfigurationResolution(configuration, destFile) {
+    def resolvedConfiguration = configuration.resolvedConfiguration
+    def files = resolvedConfiguration.files
+    def paths = files.collect { f -> f.toString() }
+    def serialized = paths.join("\n")
+    destFile.text = serialized
+}
+
+def parseConfigurationResolution(savedFile, destConfiguration) {
+    def savedText = savedFile.text
+    def filenames = savedText.split("\n")
+    def configurationName = destConfiguration.name
+    for (filename in filenames) {
+        project.dependencies.add(configurationName, project.files(filename))
+    }
+}
+
+def implementationDepsFile = new File(project.buildDir, "impl-deps.txt")
+def apiDepsFile = new File(project.buildDir, "api-deps.txt")
+def runtimeDepsFile = new File(project.buildDir, "runtime-deps.txt")
+
+task resolveCompilationDeps {
+    inputs.file(project.file("build.gradle"))
+    inputs.property("build_libs", build_libs)
+    outputs.file(implementationDepsFile)
+    outputs.file(apiDepsFile)
+    outputs.file(runtimeDepsFile)
+    doLast {
+        saveConfigurationResolution(project.configurations.cacheableImplementation, implementationDepsFile)
+        saveConfigurationResolution(project.configurations.cacheableApi, apiDepsFile)
+        saveConfigurationResolution(project.configurations.cacheableRuntime, runtimeDepsFile)
+    }
+
+}
+
+task parseCompilationDeps {
+    dependsOn(resolveCompilationDeps)
+    doLast {
+        parseConfigurationResolution(runtimeDepsFile, configurations.runtime)
+        parseConfigurationResolution(apiDepsFile, configurations.api)
+        parseConfigurationResolution(implementationDepsFile, configurations.implementation)
+    }
 }
 
 apply plugin: "java-gradle-plugin"
+
+tasks["compileKotlin"].dependsOn(parseCompilationDeps)
 
 sourceSets {
     main.java.srcDirs += "${supportRootFolder}/benchmark/gradle-plugin/src/main/kotlin"
