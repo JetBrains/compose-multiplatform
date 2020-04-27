@@ -47,6 +47,9 @@ kotlin {
 
         jvmMain {
         }
+        jvmMain.dependencies {
+            api(KOTLIN_COROUTINES_CORE)
+        }
         // TODO(aelias): Consider using commonTest for unit tests if a usable feature
         // is added for https://youtrack.jetbrains.com/issue/KT-34662
         unitTest {
@@ -56,6 +59,7 @@ kotlin {
         }
         androidMain.dependencies {
             api "androidx.annotation:annotation:1.0.0"
+            api(KOTLIN_COROUTINES_ANDROID)
             implementation "org.jetbrains.kotlinx:kotlinx-collections-immutable-jvm:0.3"
         }
 
@@ -75,8 +79,11 @@ kotlin {
         androidAndroidTest.dependencies {
             implementation(ANDROIDX_TEST_EXT_JUNIT)
             implementation(ANDROIDX_TEST_RULES)
+            implementation(ANDROIDX_TEST_RUNNER)
+            implementation(TRUTH)
             implementation project(":ui:ui-framework")
             implementation project(":ui:ui-platform")
+            implementation project(':ui:ui-test')
         }
         all {
             languageSettings.useExperimentalAnnotation("kotlin.Experimental")
