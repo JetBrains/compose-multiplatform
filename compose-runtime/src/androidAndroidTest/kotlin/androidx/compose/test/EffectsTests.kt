@@ -506,6 +506,26 @@ class EffectsTests : BaseComposeTest() {
     }
 
     @Test
+    fun testPreCommit6() {
+        var readValue = 0
+
+        @Composable
+        fun UpdateStateInPreCommit() {
+            var value by state { 1 }
+            readValue = value
+            onPreCommit {
+                value = 2
+            }
+        }
+
+        compose {
+            UpdateStateInPreCommit()
+        }.then { _ ->
+            assertEquals(2, readValue)
+        }
+    }
+
+    @Test
     fun testOnDispose1() {
         var mount by mutableStateOf(true)
 

@@ -77,6 +77,9 @@ abstract class Recomposer {
                 composer.isComposing = composerWasComposing
             }
             // TODO(b/143755743)
+            if (!composerWasComposing) {
+                FrameManager.nextFrame()
+            }
             composer.applyChanges()
             if (!composerWasComposing) {
                 FrameManager.nextFrame()
