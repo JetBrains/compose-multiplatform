@@ -110,7 +110,6 @@ val API_LINT_ARGS: List<String> = listOf(
         // The list of checks that are API lint warnings and are yet to be enabled
         "ExecutorRegistration",
         "NotCloseable",
-        "UseIcu",
         "SamShouldBeLast",
         "MissingJvmStatic",
 
@@ -133,6 +132,7 @@ val API_LINT_ARGS: List<String> = listOf(
         "AbstractInner",
         "ArrayReturn",
         "MethodNameTense",
+        "UseIcu",
         "NoByteOrShort",
         "CommonArgsFirst"
     ).joinToString()
