@@ -39,7 +39,7 @@ ExceptionName: androidx.compose.frames.FrameAborted:
     Exceptions must be named `FooException`, was `FrameAborted`
 
 
-KotlinOperator: androidx.compose.ComposerUpdater#set(V, kotlin.jvm.functions.Function2<? super T,? super V,kotlin.Unit>):
+KotlinOperator: androidx.compose.ComposerUpdater#set(V, kotlin.jvm.functions.Function2<? super T,? super V,? extends kotlin.Unit>):
     Note that adding the `operator` keyword would allow calling this method using operator syntax
 KotlinOperator: androidx.compose.ComposerUpdater#set(int, kotlin.jvm.functions.Function2<? super T,? super java.lang.Integer,kotlin.Unit>):
     Note that adding the `operator` keyword would allow calling this method using operator syntax
@@ -59,5 +59,7 @@ MissingNullability: androidx.compose.BuildableMap#containsValue(Object) paramete
     Missing nullability on parameter `value` in method `containsValue`
 MissingNullability: androidx.compose.BuildableMap#get(Object) parameter #0:
     Missing nullability on parameter `key` in method `get`
+MissingNullability: androidx.compose.MutableStateKt#stateFor(V1, V2, kotlin.jvm.functions.Function0<? extends T>):
+    Missing nullability on method `stateFor` return
 MissingNullability: androidx.compose.SlotReader#getGroupKey():
     Missing nullability on method `getGroupKey` return
