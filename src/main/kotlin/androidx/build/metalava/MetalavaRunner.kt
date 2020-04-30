@@ -112,7 +112,7 @@ val API_LINT_ARGS: List<String> = listOf(
         "NotCloseable",
         "UseIcu",
         "SamShouldBeLast",
-        "MissingJvmStatic",
+        "MissingJvmstatic",
 
         // We should only treat these as warnings
         "IntentBuilderName",
@@ -124,7 +124,7 @@ val API_LINT_ARGS: List<String> = listOf(
         "MinMaxConstant",
         "TopLevelBuilder",
         "BuilderSetStyle",
-        "MissingBuild",
+        "MissingBuildMethod",
         "SetterReturnsThis",
         "OverlappingConstants",
         "IllegalStateException",
