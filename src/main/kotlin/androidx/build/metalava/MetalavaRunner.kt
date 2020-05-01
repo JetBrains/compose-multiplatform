@@ -22,17 +22,21 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.ListProperty
-import org.gradle.api.provider.Property
+import org.gradle.api.provider.SetProperty
 import org.gradle.process.ExecOperations
 import org.gradle.workers.WorkAction
-import org.gradle.workers.WorkerExecutor
 import org.gradle.workers.WorkParameters
+import org.gradle.workers.WorkerExecutor
 import java.io.File
 import javax.inject.Inject
 
 // MetalavaRunner stores common configuration for executing Metalava
 
-fun runMetalavaWithArgs(metalavaJar: File, args: List<String>, workerExecutor: WorkerExecutor) {
+fun runMetalavaWithArgs(
+    metalavaConfiguration: Configuration,
+    args: List<String>,
+    workerExecutor: WorkerExecutor
+) {
     val allArgs = listOf(
         "--no-banner",
         "--hide",
@@ -42,13 +46,13 @@ fun runMetalavaWithArgs(metalavaJar: File, args: List<String>, workerExecutor: W
     val workQueue = workerExecutor.noIsolation()
     workQueue.submit(MetalavaWorkAction::class.java) { parameters ->
         parameters.getArgs().set(allArgs)
-        parameters.getMetalavaJar().set(metalavaJar)
+        parameters.getMetalavaClasspath().set(metalavaConfiguration.files)
     }
 }
 
 interface MetalavaParams : WorkParameters {
     fun getArgs(): ListProperty<String>
-    fun getMetalavaJar(): Property<File>
+    fun getMetalavaClasspath(): SetProperty<File>
 }
 
 abstract class MetalavaWorkAction @Inject constructor (
@@ -57,7 +61,7 @@ abstract class MetalavaWorkAction @Inject constructor (
 
     override fun execute() {
         val allArgs = getParameters().getArgs().get()
-        val metalavaJar = getParameters().getMetalavaJar().get()
+        val metalavaJar = getParameters().getMetalavaClasspath().get()
 
         execOperations.javaexec {
             it.classpath(metalavaJar)
@@ -67,13 +71,9 @@ abstract class MetalavaWorkAction @Inject constructor (
     }
 }
 
-fun Project.getMetalavaJar(): File {
-    return getMetalavaConfiguration().resolvedConfiguration.files.iterator().next()
-}
-
 fun Project.getMetalavaConfiguration(): Configuration {
     return configurations.findByName("metalava") ?: configurations.create("metalava") {
-        val dependency = dependencies.create("com.android:metalava:1.3.0:shadow@jar")
+        val dependency = dependencies.create("com.android:metalava:1.3.0")
         it.dependencies.add(dependency)
     }
 }
@@ -189,7 +189,7 @@ fun Project.generateApi(
 ) {
     val args = getGenerateApiArgs(bootClasspath, dependencyClasspath, sourcePaths, outputFile,
         generateApiMode, apiLintMode, pathToManifest)
-    runMetalavaWithArgs(getMetalavaJar(), args, workerExecutor)
+    runMetalavaWithArgs(getMetalavaConfiguration(), args, workerExecutor)
 }
 
 // Generates the specified api file
