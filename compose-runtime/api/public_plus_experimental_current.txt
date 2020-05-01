@@ -45,6 +45,9 @@ package androidx.compose {
     method public void start(N?, N? instance);
   }
 
+  public final class BitwiseOperatorsKt {
+  }
+
   public final class BuildableMap<K, V> implements kotlin.jvm.internal.markers.KMappedMarker java.util.Map<K,V> {
     ctor public BuildableMap(kotlinx.collections.immutable.PersistentMap<K,? extends V> map);
     method public kotlinx.collections.immutable.PersistentMap<K,V> component1();
@@ -207,7 +210,6 @@ package androidx.compose {
   }
 
   public final class KeyInfo {
-    ctor public KeyInfo(Object key, int location, int nodes, int index);
     method public int getIndex();
     method public Object getKey();
     method public int getLocation();
@@ -324,8 +326,10 @@ package androidx.compose {
     method public Object? get(int index);
     method public int getCurrent();
     method public int getCurrentEnd();
+    method public Object! getGroupData();
     method public int getGroupEnd();
     method public Object! getGroupKey();
+    method public Object! getGroupNode();
     method public int getGroupSize();
     method public boolean getInEmpty();
     method public int getNodeIndex();
@@ -350,8 +354,10 @@ package androidx.compose {
     method public void startNode(Object key);
     property public final int current;
     property public final int currentEnd;
+    property public final Object! groupData;
     property public final int groupEnd;
     property public final Object! groupKey;
+    property public final Object! groupNode;
     property public final int groupSize;
     property public final boolean inEmpty;
     property public final boolean isGroup;
@@ -389,6 +395,7 @@ package androidx.compose {
     method public androidx.compose.Anchor anchor(int index = current);
     method public void beginInsert();
     method public void close();
+    method public int endData();
     method public int endGroup();
     method public void endInsert();
     method public int endNode();
@@ -419,9 +426,12 @@ package androidx.compose {
     method public int skipGroup();
     method public int skipNode();
     method public void skipToGroupEnd();
+    method public void startData(Object key, Object? data);
     method public void startGroup(Object key);
     method public void startNode(Object key);
+    method public void startNode(Object key, Object? node);
     method public Object? update(Object? value);
+    method public void updateData(Object? value);
     property public final boolean closed;
     property public final int current;
     property public final int groupSize;

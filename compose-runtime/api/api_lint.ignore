@@ -61,5 +61,9 @@ MissingNullability: androidx.compose.BuildableMap#get(Object) parameter #0:
     Missing nullability on parameter `key` in method `get`
 MissingNullability: androidx.compose.MutableStateKt#stateFor(V1, V2, kotlin.jvm.functions.Function0<? extends T>):
     Missing nullability on method `stateFor` return
+MissingNullability: androidx.compose.SlotReader#getGroupData():
+    Missing nullability on method `getGroupData` return
 MissingNullability: androidx.compose.SlotReader#getGroupKey():
     Missing nullability on method `getGroupKey` return
+MissingNullability: androidx.compose.SlotReader#getGroupNode():
+    Missing nullability on method `getGroupNode` return

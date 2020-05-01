@@ -16,8 +16,8 @@
 
 package androidx.compose.mock
 
-fun indent(indent: Int) {
-    repeat(indent) { print(' ') }
+fun indent(indent: Int, builder: StringBuilder) {
+    repeat(indent) { builder.append(' ') }
 }
 
 open class View {
@@ -25,20 +25,23 @@ open class View {
     val children = mutableListOf<View>()
     val attributes = mutableMapOf<String, Any>()
 
-    fun render(indent: Int = 0) {
-        indent(indent)
-        print("<$name$attributesAsString")
+    private fun render(indent: Int = 0, builder: StringBuilder) {
+        indent(indent, builder)
+        builder.append("<$name$attributesAsString")
         if (children.size > 0) {
-            println(">")
-            children.forEach { it.render(indent + 2) }
-            indent(indent)
-            println("</$name>")
+            builder.appendln(">")
+            children.forEach { it.render(indent + 2, builder) }
+            indent(indent, builder)
+            builder.appendln("</$name>")
         } else {
-            println(" />")
+            builder.appendln(" />")
         }
     }
 
-    fun addAt(index: Int, view: View) { children.add(index, view) }
+    fun addAt(index: Int, view: View) {
+        children.add(index, view)
+    }
+
     fun removeAt(index: Int, count: Int) {
         if (index < children.count()) {
             if (count == 1) {
@@ -48,6 +51,7 @@ open class View {
             }
         }
     }
+
     fun moveAt(from: Int, to: Int, count: Int) {
         if (count == 1) {
             val insertLocation = if (from > to) to else (to - 1)
@@ -90,4 +94,9 @@ open class View {
         children.map { it.toString() }.joinToString(" ")
 
     override fun toString() = "<$name$attributesAsString>$childrenAsString</$name>"
+
+    fun toFmtString() = StringBuilder().let {
+        render(0, it)
+        it.toString()
+    }
 }

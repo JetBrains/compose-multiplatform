@@ -26,7 +26,7 @@ class SlotReader(val table: SlotTable) {
 
     internal val startStack = IntStack()
     private val slots = table.slots
-    private var currentGroup: GroupStart? = null
+    private var currentGroup: Group? = null
     private var emptyCount = 0
     private val nodeIndexStack = IntStack()
 
@@ -40,10 +40,14 @@ class SlotReader(val table: SlotTable) {
      */
     val isGroup get() = current < currentEnd && calculateCurrentGroup() != null
 
+    internal val group get() = assumeGroup()
+    internal fun group(location: Int) = slots[location].asGroup
+    internal val parentGroup get() = slots[parentLocation].asGroup
+
     /**
      * Determine if the slot at [index] is the start of a group
      */
-    fun isGroup(index: Int) = slots[index] is GroupStart
+    fun isGroup(index: Int) = slots[index] is Group
 
     /**
      * Determine if the slot is start of a node.
@@ -54,7 +58,7 @@ class SlotReader(val table: SlotTable) {
      * Determine if the slot at [location] is a node group. This will throw if the slot at
      * [location] is not a node.
      */
-    fun isNode(location: Int) = slots[location].asGroupStart.isNode
+    fun isNode(location: Int) = slots[location].asGroup.isNode
 
     /**
      * Determine if the reader is at the end of a group and an [endGroup] or [endNode] is expected.
@@ -75,7 +79,7 @@ class SlotReader(val table: SlotTable) {
      * Get the size of the group at [index]. Will throw an exception if [index] is not a group
      * start.
      */
-    fun groupSize(index: Int) = slots[index].asGroupStart.slots
+    fun groupSize(index: Int) = slots[index].asGroup.slots
 
     /**
      * Get location the end of the currently started group.
@@ -85,7 +89,12 @@ class SlotReader(val table: SlotTable) {
     /**
      * Get location of the end of the group at [index].
      */
-    fun groupEnd(index: Int) = index + slots[index].asGroupStart.slots + 1
+    fun groupEnd(index: Int) = index + slots[index].asGroup.slots + 1
+
+    /**
+     * Get the data for the current group. Returns null if [current] is not a group
+     */
+    val groupData get() = if (current < currentEnd) calculateCurrentGroup()?.data else null
 
     /**
      * Get the key of the current group. Returns [EMPTY] if the [current] is not a group.
@@ -93,10 +102,15 @@ class SlotReader(val table: SlotTable) {
     val groupKey get() = if (current < currentEnd) calculateCurrentGroup()?.key ?: EMPTY else EMPTY
 
     /**
+     * Get the node associated with the group if there is one.
+     */
+    val groupNode get() = (assumeGroup() as? NodeGroup)?.node
+
+    /**
      * Get the key of the group at [index]. Will throw an exception if [index] is not a group
      * start.
      */
-    fun groupKey(index: Int) = slots[index].asGroupStart.key
+    fun groupKey(index: Int) = slots[index].asGroup.key
 
     /**
      * Return the location of the parent group of the [current]
@@ -107,13 +121,13 @@ class SlotReader(val table: SlotTable) {
      * Return the number of nodes where emitted into the current group.
      */
     val parentNodes: Int get() =
-        if (startStack.isEmpty()) 0 else slots[startStack.peek()].asGroupStart.nodes
+        if (startStack.isEmpty()) 0 else slots[startStack.peek()].asGroup.nodes
 
     /**
      * Return the number of slots are in the current group.
      */
     val parentSlots: Int get() =
-        if (startStack.isEmpty()) 0 else slots[startStack.peek()].asGroupStart.slots
+        if (startStack.isEmpty()) 0 else slots[startStack.peek()].asGroup.slots
 
     /**
      * Get the value stored at [anchor].
@@ -191,7 +205,7 @@ class SlotReader(val table: SlotTable) {
     fun skipToGroupEnd() {
         require(emptyCount == 0) { "Cannot skip the enclosing group while in an empty region" }
         require(startStack.isNotEmpty()) { "No enclosing group to skip" }
-        nodeIndex = slots[startStack.peek()].asGroupStart.nodes + nodeIndexStack.peek()
+        nodeIndex = slots[startStack.peek()].asGroup.nodes + nodeIndexStack.peek()
         currentGroup = null
         current = currentEnd
     }
@@ -209,8 +223,8 @@ class SlotReader(val table: SlotTable) {
             val startLocation = startStack.pop()
             if (startStack.isEmpty()) return
             val parentLocation = startStack.peekOr(0)
-            val group = slots[startLocation].asGroupStart
-            val parentGroup = slots[parentLocation].asGroupStart
+            val group = slots[startLocation].asGroup
+            val parentGroup = slots[parentLocation].asGroup
             nodeIndex = nodeIndexStack.pop() + if (group.isNode) 1 else nodeIndex
             currentEnd = parentGroup.slots + parentLocation + 1
             currentGroup = null
@@ -234,8 +248,8 @@ class SlotReader(val table: SlotTable) {
         var index = 0
         while (current < currentEnd) {
             val location = current
-            val key = slots[location].asGroupStart.key
-            result.add(KeyInfo(key, location, skipGroup(), index++))
+            val group = slots[location].asGroup
+            result.add(KeyInfo(group.key, location, skipGroup(), index++, group))
         }
         current = oldCurrent
         this.nodeIndex = oldNodeIndex
@@ -251,16 +265,16 @@ class SlotReader(val table: SlotTable) {
             nodeIndex = 0
             val group = assumeGroup()
             currentEnd = current + group.slots + 1
-            require(group.kind == kind) { "Group kind changed" }
+            require(group.kind == kind || key == EMPTY) { "Group kind changed" }
             require(key == EMPTY || key == group.key) { "Group key changed" }
             current++
             currentGroup = null
         }
     }
 
-    private fun calculateCurrentGroup(): GroupStart? =
-        (currentGroup ?: slots[current] as? GroupStart)?.also { currentGroup = it }
-    private fun assumeGroup(): GroupStart = calculateCurrentGroup()
+    private fun calculateCurrentGroup(): Group? =
+        (currentGroup ?: slots[current] as? Group)?.also { currentGroup = it }
+    private fun assumeGroup(): Group = calculateCurrentGroup()
         ?: error("Expected a group start")
 }
 
@@ -284,28 +298,32 @@ class SlotWriter internal constructor(val table: SlotTable) {
     /**
      * Return true if the current slot starts a group
      */
-    val isGroup get() = current < currentEnd && get(current) is GroupStart
+    val isGroup get() = current < currentEnd && get(current) is Group
 
     /**
      * Return true if the slot at index starts a gorup
      */
-    fun isGroup(index: Int) = get(index) is GroupStart
+    fun isGroup(index: Int) = get(index) is Group
+
+    internal fun group(location: Int) = slots[effectiveIndex(location)].asGroup
+
+    internal val parentGroup: Group get() = group(parentLocation)
 
     /**
      * Return true if the current slot starts a node. A node is a kind of group so this will
      * return true for isGroup as well.
      */
-    val isNode get() = current < currentEnd && (get(current) as? GroupStart)?.isNode ?: false
+    val isNode get() = current < currentEnd && (get(current) as? Group)?.isNode ?: false
 
     /**
      * Return the number of nodes in the group. isGroup must be true or this will throw.
      */
-    val groupSize get() = get(current).asGroupStart.slots
+    val groupSize get() = get(current).asGroup.slots
 
     /**
      * Return the size of the group at index. isGroup(index) must be true of this will throw.
      */
-    fun groupSize(index: Int): Int = get(index).asGroupStart.slots
+    fun groupSize(index: Int): Int = get(index).asGroup.slots
 
     /**
      * Get the number of nodes emitted to the group prior to the current slot.
@@ -318,7 +336,7 @@ class SlotWriter internal constructor(val table: SlotTable) {
     val parentNodes: Int
         get() {
             return if (startStack.isEmpty()) 0
-            else slots[effectiveIndex(startStack.peek())].asGroupStart.nodes
+            else slots[effectiveIndex(startStack.peek())].asGroup.nodes
         }
 
     /**
@@ -336,7 +354,7 @@ class SlotWriter internal constructor(val table: SlotTable) {
      * Return the start location of the nearest group that contains the slot at [anchor].
      */
     fun parentIndex(anchor: Anchor): Int {
-        val group = get(anchor).asGroupStart
+        val group = get(anchor).asGroup
         val location = table.anchorLocation(anchor)
         val parent = group.parent
         if (parent != null) {
@@ -381,7 +399,14 @@ class SlotWriter internal constructor(val table: SlotTable) {
     }
 
     /**
-     * Set the value at the current slot.
+     * Updates the data for a data group
+     */
+    fun updateData(value: Any?) {
+        (get(current) as? DataGroup ?: error("Expected a data group")).data = value
+    }
+
+    /**
+     * Set the value at the slot previous to current.
      */
     fun set(value: Any?) {
         slots[effectiveIndex(current - 1)] = value
@@ -438,8 +463,8 @@ class SlotWriter internal constructor(val table: SlotTable) {
         val parentLoc = parentLocation
         if (parentLoc != location) {
             if (startStack.isEmpty() && location > 0) ensureStarted(0)
-            val currentParent = if (parentLoc >= 0) get(parentLocation).asGroupStart else null
-            val newParent = get(location).asGroupStart
+            val currentParent = if (parentLoc >= 0) get(parentLocation).asGroup else null
+            val newParent = get(location).asGroup
 
             // The new parent must be a (possibly indirect) child of the current parent
             require(newParent.isDecendentOf(currentParent)) {
@@ -448,7 +473,7 @@ class SlotWriter internal constructor(val table: SlotTable) {
 
             val oldCurrent = current
             current = location
-            startGroup(newParent.key, newParent.kind)
+            startGroup(newParent.key, newParent.kind, newParent.data)
             current = oldCurrent
         }
     }
@@ -477,11 +502,11 @@ class SlotWriter internal constructor(val table: SlotTable) {
      * @param key The group key. Passing EMPTY will retain as was written last time.
      *            An EMPTY key is not valid when inserting groups.
      */
-    fun startGroup(key: Any) = startGroup(key, GROUP)
+    fun startGroup(key: Any) = startGroup(key, GROUP, null)
 
-    private fun startGroup(key: Any, kind: GroupKind) {
+    private fun startGroup(key: Any, kind: GroupKind, data: Any?) {
         val inserting = insertCount > 0
-        val parent = if (startStack.isEmpty()) null else get(startStack.peek()).asGroupStart
+        val parent = if (startStack.isEmpty()) null else get(startStack.peek()).asGroup
         startStack.push(current)
         nodeCountStack.push(nodeCount)
 
@@ -491,13 +516,18 @@ class SlotWriter internal constructor(val table: SlotTable) {
         endStack.push(slots.size - table.gapLen - currentEnd)
         currentEnd = if (inserting) {
             require(key != SlotTable.EMPTY) { "Inserting an EMPTY key" }
-            update(GroupStart(kind, key, parent))
+            update(Group(kind, key, parent, data))
             nodeCount = 0
             current
         } else {
-            val group = advance().asGroupStart
+            val group = advance().asGroup
             require(group.kind == kind) { "Group kind changed" }
             require(key == SlotTable.EMPTY || group.key == key) { "Group key changed" }
+            if (kind == DATA) {
+                (group as? DataGroup ?: error("Expected a data group")).data = data
+            } else if (kind == NODE && data != null) {
+                (group as? NodeGroup ?: error("Expected a node group")).node = data
+            }
             nodeCount = group.nodes
             current + group.slots
         }
@@ -523,7 +553,7 @@ class SlotWriter internal constructor(val table: SlotTable) {
 
         // Update group length
         val startLocation = startStack.pop()
-        val group = get(startLocation).asGroupStart
+        val group = get(startLocation).asGroup
         val cur = current
         val oldSlots = group.slots
         val oldNodes = group.nodes
@@ -536,7 +566,7 @@ class SlotWriter internal constructor(val table: SlotTable) {
             table.clearGap()
         } else if (startStack.isNotEmpty()) {
             nodeCount = nodeCountStack.pop()
-            val parent = get(startStack.peek()).asGroupStart
+            val parent = get(startStack.peek()).asGroup
             if (group.parent == parent) {
                 nodeCount += if (inserting) {
                     if (group.isNode) 1 else newNodes
@@ -639,12 +669,27 @@ class SlotWriter internal constructor(val table: SlotTable) {
     /**
      * Start a node.
      */
-    fun startNode(key: Any) = startGroup(key, NODE)
+    fun startNode(key: Any) = startGroup(key, NODE, null)
+
+    /**
+     * Start a node
+     */
+    fun startNode(key: Any, node: Any?) = startGroup(key, NODE, node)
 
     /**
      * End a node
      */
     fun endNode() = endGroup()
+
+    /**
+     * Start a data node.
+     */
+    fun startData(key: Any, data: Any?) = startGroup(key, DATA, data)
+
+    /**
+     * End a data node
+     */
+    fun endData() = endGroup()
 
     /**
      * Skip a node
@@ -702,7 +747,7 @@ class SlotWriter internal constructor(val table: SlotTable) {
             tableWriter.moveGapTo(sourceEnd)
             sourceSlots.copyInto(destSlots, current, sourceStart, sourceEnd)
 
-            val group = get(destStart).asGroupStart
+            val group = get(destStart).asGroup
 
             // Update the sizes of the parents of the group that was moved.
             var currentGroup = group.parent
@@ -716,7 +761,7 @@ class SlotWriter internal constructor(val table: SlotTable) {
             }
 
             // Update the parent of the group moved.
-            group.parent = get(startStack.peek()).asGroupStart
+            group.parent = get(startStack.peek()).asGroup
 
             // Extract the anchors in range
             val startAnchors = table.anchors.locationOf(sourceStart)
@@ -773,7 +818,7 @@ class SlotWriter internal constructor(val table: SlotTable) {
     }
 
     private fun advanceToNextGroup(): Int {
-        val groupStart = advance().asGroupStart
+        val groupStart = advance().asGroup
         current += groupStart.slots
 
         return if (groupStart.isNode) 1 else groupStart.nodes
@@ -878,7 +923,7 @@ class SlotWriter internal constructor(val table: SlotTable) {
     }
 }
 
-private fun GroupStart.isDecendentOf(parent: GroupStart?): Boolean {
+private fun Group.isDecendentOf(parent: Group?): Boolean {
     if (parent == null) return true
     var current = this.parent
     while (current != null) {
@@ -888,17 +933,43 @@ private fun GroupStart.isDecendentOf(parent: GroupStart?): Boolean {
     return false
 }
 
-private val Any?.asGroupStart: GroupStart
-    get() = this as? GroupStart ?: error("Expected a group start")
+private val Any?.asGroup: Group
+    get() = this as? Group ?: error("Expected a group")
 
-internal class GroupStart(
-    val kind: GroupKind,
+internal fun Group(kind: GroupKind, key: Any, parent: Group?, data: Any?) =
+    when (kind) {
+        NODE -> NodeGroup(key, parent).also { it.node = data }
+        DATA -> DataGroup(key, parent, data)
+        else -> Group(key, parent)
+    }
+
+internal open class Group(
     val key: Any,
-    var parent: GroupStart?
+    var parent: Group?
 ) {
     var slots: Int = 0
     var nodes: Int = 0
-    val isNode get() = kind == NODE
+    open val kind: GroupKind get() = GROUP
+    open val isNode get() = false
+    open val node: Any? get() = null
+    open val data: Any? get() = null
+}
+
+internal class NodeGroup(
+    key: Any,
+    parent: Group?
+) : Group(key, parent) {
+    override val kind: GroupKind get() = NODE
+    override val isNode get() = true
+    override var node: Any? = null
+}
+
+internal class DataGroup(
+    key: Any,
+    parent: Group?,
+    override var data: Any?
+) : Group(key, parent) {
+    override val kind: GroupKind get() = DATA
 }
 
 /**
@@ -1047,17 +1118,20 @@ class SlotTable(internal var slots: Array<Any?> = arrayOf()) {
     fun verifyWellFormed() {
         var current = 0
 
-        fun validateGroup(parentLocation: Int, parent: GroupStart?): Int {
+        fun validateGroup(parentLocation: Int, parent: Group?): Int {
             val location = current++
-            val group = slots[location].asGroupStart
+            val group = slots[location].asGroup
             require(group.parent == parent) { "Incorrect parent for group at $location" }
             val end = location + group.slots + 1
             val parentEnd = parentLocation + (parent?.slots?.let { it + 1 } ?: size)
             require(end <= size) { "Group extends past then end of its table at $location" }
             require(end <= parentEnd) { "Group extends past its parent at $location" }
+            require(!group.isNode || group.node != null) {
+                "Node groups must have a node at $location"
+            }
 
             // Find the first child
-            while (current < end && slots[current] !is GroupStart) current++
+            while (current < end && slots[current] !is Group) current++
 
             // Validate the child groups
             var nodeCount = 0
@@ -1225,11 +1299,12 @@ private fun ArrayList<Anchor>.search(index: Int) = binarySearch { it.loc.compare
 /**
  * Information about groups and their keys.
  */
-class KeyInfo(
+class KeyInfo internal constructor(
     /**
      * The group key.
      */
     val key: Any,
+
     /**
      * The location of the group.
      */
@@ -1243,7 +1318,12 @@ class KeyInfo(
     /**
      * The index of the key info in the list returned by extractKeys
      */
-    val index: Int
+    val index: Int,
+
+    /**
+     * The group
+     */
+    internal val group: Group
 )
 
 class Anchor(internal var loc: Int) {
@@ -1255,5 +1335,6 @@ private typealias GroupKind = Int
 
 private const val GROUP: GroupKind = 0
 private const val NODE: GroupKind = 1
+private const val DATA: GroupKind = 2
 
 private const val MIN_GROWTH_SIZE = 128
