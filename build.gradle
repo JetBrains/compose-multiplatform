@@ -77,55 +77,9 @@ dependencies {
     implementation project("jetpad-integration") // Doesn't have a .pom, so not slow to load
 }
 
-// Saves configuration into destFile
-// Each line of destFile will be the absolute filepath of one of the fies in configuration
-def saveConfigurationResolution(configuration, destFile) {
-    def resolvedConfiguration = configuration.resolvedConfiguration
-    def files = resolvedConfiguration.files
-    def paths = files.collect { f -> f.toString() }
-    def serialized = paths.join("\n")
-    destFile.text = serialized
-}
 
-def parseConfigurationResolution(savedFile, destConfiguration) {
-    def savedText = savedFile.text
-    def filenames = savedText.split("\n")
-    def configurationName = destConfiguration.name
-    for (filename in filenames) {
-        project.dependencies.add(configurationName, project.files(filename))
-    }
-}
-
-def implementationDepsFile = new File(project.buildDir, "impl-deps.txt")
-def apiDepsFile = new File(project.buildDir, "api-deps.txt")
-def runtimeDepsFile = new File(project.buildDir, "runtime-deps.txt")
-
-task resolveCompilationDeps {
-    inputs.file(project.file("build.gradle"))
-    inputs.property("build_libs", build_libs)
-    outputs.file(implementationDepsFile)
-    outputs.file(apiDepsFile)
-    outputs.file(runtimeDepsFile)
-    doLast {
-        saveConfigurationResolution(project.configurations.cacheableImplementation, implementationDepsFile)
-        saveConfigurationResolution(project.configurations.cacheableApi, apiDepsFile)
-        saveConfigurationResolution(project.configurations.cacheableRuntime, runtimeDepsFile)
-    }
-
-}
-
-task parseCompilationDeps {
-    dependsOn(resolveCompilationDeps)
-    doLast {
-        parseConfigurationResolution(runtimeDepsFile, configurations.runtime)
-        parseConfigurationResolution(apiDepsFile, configurations.api)
-        parseConfigurationResolution(implementationDepsFile, configurations.implementation)
-    }
-}
 
 apply plugin: "java-gradle-plugin"
-
-tasks["compileKotlin"].dependsOn(parseCompilationDeps)
 
 sourceSets {
     main.java.srcDirs += "${supportRootFolder}/benchmark/gradle-plugin/src/main/kotlin"
@@ -150,3 +104,61 @@ gradlePlugin {
         }
     }
 }
+
+// Saves configuration into destFile
+// Each line of destFile will be the absolute filepath of one of the files in configuration
+def saveConfigurationResolution(configuration, destFile) {
+    def resolvedConfiguration = configuration.resolvedConfiguration
+    def files = resolvedConfiguration.files
+    def paths = files.collect { f -> f.toString() }
+    def serialized = paths.join("\n")
+    destFile.text = serialized
+}
+
+// Parses a file into a list of Dependency objects representing a ResolvedConfiguration
+def parseConfigurationResolution(savedFile) {
+    def savedText = savedFile.text
+    def filenames = savedText.split("\n")
+    def dependencies = filenames.collect { filename ->
+        project.dependencies.create(project.files(filename))
+    }
+    return dependencies
+}
+
+// Resolves a Configuration into a list of Dependency objects
+def resolveConfiguration(configuration) {
+    def resolvedName = configuration.name
+    def cacheDir = new File(project.buildDir, "/" + resolvedName)
+    def inputsFile = new File(cacheDir, "/deps")
+    def outputsFile = new File(cacheDir, "/result")
+
+    def inputText = fingerprintConfiguration(configuration)
+    if (!inputsFile.exists() || inputsFile.text != inputText) {
+        cacheDir.mkdirs()
+        saveConfigurationResolution(configuration, outputsFile)
+        inputsFile.text = inputText
+    }
+    def result = parseConfigurationResolution(outputsFile)
+    return result
+}
+
+// Computes a unique string from a Configuration based on its dependencies
+// This is used for up-to-date checks
+def fingerprintConfiguration(configuration) {
+    def dependencies = configuration.allDependencies
+    def dependencyTexts = dependencies.collect { dep -> dep.group + ":" + dep.name + ":" + dep.version }
+    return dependencyTexts.join("\n")
+}
+
+// Imports the contents of fromConf into toConf
+// Uses caching to often short-circuit the resolution of fromConf
+def loadConfigurationQuicklyInto(fromConf, toConf) {
+    def resolved = resolveConfiguration(fromConf)
+    resolved.each { dep ->
+        project.dependencies.add(toConf.name, dep)
+    }
+}
+
+loadConfigurationQuicklyInto(configurations.cacheableApi, configurations.api)
+loadConfigurationQuicklyInto(configurations.cacheableImplementation, configurations.implementation)
+loadConfigurationQuicklyInto(configurations.cacheableRuntime, configurations.runtime)
