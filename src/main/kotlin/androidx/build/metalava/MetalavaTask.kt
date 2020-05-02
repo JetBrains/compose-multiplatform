@@ -57,6 +57,6 @@ abstract class MetalavaTask @Inject constructor(
     abstract val manifestPath: RegularFileProperty
 
     fun runWithArgs(args: List<String>) {
-        runMetalavaWithArgs(project.getMetalavaJar(), args, workerExecutor)
+        runMetalavaWithArgs(configuration, args, workerExecutor)
     }
 }
