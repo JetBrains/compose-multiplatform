@@ -51,11 +51,14 @@ open class BuildOnServer : DefaultTask() {
         // TODO: re-add after merge to compose merge to master
         // "androidx-public-docs-$buildId.zip",
         // "dokkaPublicDocs-$buildId.zip",
-        "androidx-tipOfTree-docs-$buildId.zip",
-        "dokkaTipOfTreeDocs-$buildId.zip",
         "androidx_aggregate_build_info.txt",
         "gmaven-diff-all-$buildId.zip",
         "top-of-tree-m2repository-all-$buildId.zip")
+
+        if (project.isDocumentationEnabled()) {
+            filesNames.add("androidx-tipOfTree-docs-$buildId.zip")
+            filesNames.add("dokkaTipOfTreeDocs-$buildId.zip")
+        }
 
         if (project.findProject(":jetifier-standalone") != null) {
             filesNames.add("jetifier-standalone.zip")

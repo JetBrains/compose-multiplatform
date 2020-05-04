@@ -118,18 +118,25 @@ class AndroidXRootPlugin : Plugin<Project> {
             }
         }
 
-        val createCoverageJarTask = Jacoco.createCoverageJarTask(this)
-        tasks.register(AndroidXPlugin.BUILD_TEST_APKS_TASK) {
-            it.dependsOn(createCoverageJarTask)
+        val buildTestApks = tasks.register(AndroidXPlugin.BUILD_TEST_APKS_TASK)
+        if (project.isCoverageEnabled()) {
+            val createCoverageJarTask = Jacoco.createCoverageJarTask(this)
+            buildTestApks.configure {
+                it.dependsOn(createCoverageJarTask)
+            }
+            buildOnServerTask.dependsOn(createCoverageJarTask)
+            buildOnServerTask.dependsOn(Jacoco.createZipEcFilesTask(this))
+            buildOnServerTask.dependsOn(Jacoco.createUberJarTask(this))
         }
-        buildOnServerTask.dependsOn(createCoverageJarTask)
-        buildOnServerTask.dependsOn(Jacoco.createZipEcFilesTask(this))
 
-        val allDocsTask = DiffAndDocs.configureDiffAndDocs(this,
-            DacOptions("androidx", "ANDROIDX_DATA"),
-            listOf(RELEASE_RULE))
-        buildOnServerTask.dependsOn(allDocsTask)
-        buildOnServerTask.dependsOn(Jacoco.createUberJarTask(this))
+        if (project.isDocumentationEnabled()) {
+            val allDocsTask = DiffAndDocs.configureDiffAndDocs(
+                this,
+                DacOptions("androidx", "ANDROIDX_DATA"),
+                listOf(RELEASE_RULE)
+            )
+            buildOnServerTask.dependsOn(allDocsTask)
+        }
 
         AffectedModuleDetector.configure(gradle, this)
 

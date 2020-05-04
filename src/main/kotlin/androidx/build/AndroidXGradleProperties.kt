@@ -39,3 +39,15 @@ const val ALL_WARNINGS_AS_ERRORS = "androidx.allWarningsAsErrors"
  */
 fun Project.isVersionedApiFileWritingEnabled(): Boolean =
     (project.findProperty("androidx.writeVersionedApiFiles") as? String)?.toBoolean() ?: true
+
+/**
+ * Returns whether the project should generate documentation.
+ */
+fun Project.isDocumentationEnabled(): Boolean =
+    (project.findProperty("androidx.enableDocumentation") as? String)?.toBoolean() ?: true
+
+/**
+ * Returns whether the project has coverage enabled.
+ */
+fun Project.isCoverageEnabled(): Boolean =
+    (project.findProperty("androidx.coverageEnabled") as? String)?.toBoolean() ?: true

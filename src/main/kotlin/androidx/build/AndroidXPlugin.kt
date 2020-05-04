@@ -103,7 +103,9 @@ class AndroidXPlugin : Plugin<Project> {
         // is called after DiffAndDocs.configureDiffAndDocs. b/129762955
         project.configureMavenArtifactUpload(extension)
 
-        project.configureJacoco()
+        if (project.isCoverageEnabled()) {
+            project.configureJacoco()
+        }
 
         // Perform different actions based on which plugins have been applied to the project.
         // Many of the actions overlap, ex. API tracking and documentation.
@@ -236,7 +238,9 @@ class AndroidXPlugin : Plugin<Project> {
 
         // Standard lint, docs, and Metalava configuration for AndroidX projects.
         project.configureAndroidProjectForLint(libraryExtension.lintOptions, androidXExtension)
-        project.configureAndroidProjectForDokka(libraryExtension, androidXExtension)
+        if (project.isDocumentationEnabled()) {
+            project.configureAndroidProjectForDokka(libraryExtension, androidXExtension)
+        }
         project.configureAndroidProjectForMetalava(libraryExtension, androidXExtension)
 
         project.addToProjectMap(androidXExtension)
@@ -271,7 +275,9 @@ class AndroidXPlugin : Plugin<Project> {
 
         // Standard lint, docs, and Metalava configuration for AndroidX projects.
         project.configureNonAndroidProjectForLint(extension)
-        project.configureJavaProjectForDokka(extension)
+        if (project.isDocumentationEnabled()) {
+            project.configureJavaProjectForDokka(extension)
+        }
         project.configureJavaProjectForMetalava(extension)
 
         project.afterEvaluate {
@@ -372,7 +378,9 @@ class AndroidXPlugin : Plugin<Project> {
             }
         }
 
-        Jacoco.registerClassFilesTask(project, this)
+        if (project.isCoverageEnabled()) {
+            Jacoco.registerClassFilesTask(project, this)
+        }
 
         val buildTestApksTask = project.rootProject.tasks.named(BUILD_TEST_APKS_TASK)
         testVariants.all { variant ->
