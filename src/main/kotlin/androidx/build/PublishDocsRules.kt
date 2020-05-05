@@ -43,6 +43,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.BIOMETRIC, "biometric", "1.0.1")
     prebuilts(LibraryGroups.BROWSER, "1.3.0-alpha01")
     ignore(LibraryGroups.CAMERA.group, "camera-camera2-pipe")
+    ignore(LibraryGroups.CAMERA.group, "camera-camera2-pipe-integration")
     ignore(LibraryGroups.CAMERA.group, "camera-testing")
     ignore(LibraryGroups.CAMERA.group, "camera-extensions-stub")
     ignore(LibraryGroups.CAMERA.group, "camera-testlib-extensions")
