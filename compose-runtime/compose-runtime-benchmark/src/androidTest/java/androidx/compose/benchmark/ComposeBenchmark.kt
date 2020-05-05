@@ -26,10 +26,10 @@ import androidx.test.filters.LargeTest
 import androidx.ui.core.Modifier
 import androidx.ui.core.drawBehind
 import androidx.ui.foundation.Box
+import androidx.ui.geometry.toRect
 import androidx.ui.graphics.Color
 import androidx.ui.graphics.Paint
 import androidx.ui.layout.fillMaxSize
-import androidx.ui.unit.toRect
 import org.junit.FixMethodOrder
 import org.junit.Ignore
 import org.junit.Test
