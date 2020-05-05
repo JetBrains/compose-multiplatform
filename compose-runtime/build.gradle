@@ -33,60 +33,38 @@ dependencies {
 }
 kotlin {
     android()
-    jvm("desktop") {
-    }
+    jvm("desktop")
 
     sourceSets {
         commonMain.dependencies {
             implementation(KOTLIN_STDLIB)
         }
-        commonTest.dependencies {
-            implementation kotlin("test-junit")
-            implementation project(":ui:ui-framework")
-        }
-
-        jvmMain {
-        }
         jvmMain.dependencies {
             api(KOTLIN_COROUTINES_CORE)
-        }
-        // TODO(aelias): Consider using commonTest for unit tests if a usable feature
-        // is added for https://youtrack.jetbrains.com/issue/KT-34662
-        unitTest {
-        }
-        androidMain {
-            dependsOn jvmMain
-        }
-        androidMain.dependencies {
-            api "androidx.annotation:annotation:1.0.0"
-            api(KOTLIN_COROUTINES_ANDROID)
             implementation "org.jetbrains.kotlinx:kotlinx-collections-immutable-jvm:0.3"
         }
-
+        androidMain {
+            dependencies {
+                api(KOTLIN_COROUTINES_ANDROID)
+                api "androidx.annotation:annotation:1.1.0"
+            }
+            dependsOn jvmMain
+        }
         desktopMain {
             dependsOn jvmMain
         }
 
-        desktopMain.dependencies {
-            implementation "org.jetbrains.kotlinx:kotlinx-collections-immutable-jvm:0.3"
-        }
-
-        // TODO(aelias): Change to androidLocalTest and androidDeviceTest when
-        // https://github.com/JetBrains/kotlin/pull/2829 rolls in
-        androidTest {
-            dependsOn unitTest
+        commonTest.dependencies {
+            implementation kotlin("test-junit")
+            implementation project(":ui:ui-framework")
         }
         androidAndroidTest.dependencies {
             implementation(ANDROIDX_TEST_EXT_JUNIT)
             implementation(ANDROIDX_TEST_RULES)
             implementation(ANDROIDX_TEST_RUNNER)
             implementation(TRUTH)
-            implementation project(":ui:ui-framework")
             implementation project(":ui:ui-platform")
             implementation project(':ui:ui-test')
-        }
-        all {
-            languageSettings.useExperimentalAnnotation("kotlin.Experimental")
         }
     }
 }
@@ -100,13 +78,6 @@ android {
             testCoverageEnabled = false
         }
     }
-
-    // b/148416113: AGP doesn't know about Kotlin-MPP's sourcesets yet, so add
-    // them to its source directories (this fixes lint, and code completion in
-    // Android Studio on versions >= 4.0canary8)
-    sourceSets.main.java.srcDirs = ['src/commonMain/kotlin','src/jvmMain/kotlin','src/androidMain/kotlin']
-    sourceSets.test.java.srcDirs = ['src/unitTest/kotlin']
-    sourceSets.androidTest.java.srcDirs = ['src/androidAndroidTest/kotlin']
 }
 
 androidx {
