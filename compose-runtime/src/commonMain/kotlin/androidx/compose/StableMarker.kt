@@ -17,15 +17,37 @@
 package androidx.compose
 
 /**
- * [StableMarker] marks an annotation as indicating a type as having a stable
- * equals comparision that can be used during composition. When all types passed
- * as parameters to a [Composable] function are marked as stable then then the
- * parameter values are compared for equality based on positional memoization and
- * the call is skipped if all the values are the equal to the previous call.
+ * [StableMarker] marks an annotation as indicating a type is stable. A stable type obeys the
+ * following assumptions,
  *
- * Primitive value types (such as Int, Float, etc), String and enum types are
- * considered, a priori, stable.
-*
+ *   1) The result of [equals] will always return the same result for the same two instances.
+ *   2) When a public property of the type changes, composition will be notified.
+ *   3) All public property types are stable.
+ *
+ * A type that is immutable obeys the above assumptions because the public values will never
+ * change. The [Immutable] annotation is provided to mark immutable types as stable.
+ *
+ * An object whose public properties do not change but is not immutable (for example, it has
+ * private mutable state or uses property delegation to a [Model] object, such as a
+ * [MutableState] instance, but is otherwise immutable), should use the [Stable] annotation.
+ *
+ * [Model] types are mutable but obeys the above assumptions because any change to a public
+ * property of a [Model] type notifies composition when the change is committed; therefore the
+ * [Model] annotation is annotated [StableMarker] and all type annotated with [Model] are assumed
+ * to be stable.
+ *
+ * Mutable object that do not notify composition when they changed should not be marked as stable.
+ *
+ * When all types passed as parameters to a [Composable] function are marked as stable then the
+ * parameter values are compared for equality based on positional memoization and the call is
+ * skipped if all the values are the equal to the previous call.
+ *
+ * Primitive value types (such as Int, Float, etc), String and enum types are considered, a
+ * priori, stable.
+ *
+ * @see Immutable
+ * @see Stable
+ * @see Model
  */
 @MustBeDocumented
 @Target(AnnotationTarget.ANNOTATION_CLASS, AnnotationTarget.CLASS)
