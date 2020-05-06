@@ -23,7 +23,6 @@ import androidx.build.RELEASE_RULE
 import androidx.build.Strategy.Ignore
 import androidx.build.Strategy.Prebuilts
 import androidx.build.androidJarFile
-import androidx.build.dependencyWithScope
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ResolveException
@@ -250,7 +249,7 @@ open class LocateJarsTask : DefaultTask() {
 
         // resolve the dependencies
         val dependenciesArray = inputDependencies.map {
-            project.dependencyWithScope(it, "runtime")
+            project.dependencies.create(it)
         }.toTypedArray()
         val artifacts = project.configurations.detachedConfiguration(*dependenciesArray)
                         .resolvedConfiguration.resolvedArtifacts
