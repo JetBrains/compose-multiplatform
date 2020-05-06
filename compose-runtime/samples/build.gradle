@@ -33,7 +33,7 @@ dependencies {
 
     implementation project(":annotation:annotation-sampled")
     implementation project(":compose:compose-runtime")
-    implementation project(":ui:ui-framework")
+    implementation project(":ui:ui-core")
     implementation project(":ui:ui-layout")
     implementation project(":ui:ui-material")
 }
