@@ -53,7 +53,7 @@ fun RealWorld4_FancyWidget_000(model: RealWorld4_DataModel_00) {
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints { constraints, _ ->
+    WithConstraints {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -123,7 +123,7 @@ fun RealWorld4_FancyWidget_001(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -171,7 +171,7 @@ fun RealWorld4_FancyWidget_002(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -268,7 +268,7 @@ fun RealWorld4_FancyWidget_003(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -371,7 +371,7 @@ fun RealWorld4_FancyWidget_004(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -459,7 +459,7 @@ fun RealWorld4_FancyWidget_005(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -570,7 +570,7 @@ fun RealWorld4_FancyWidget_006(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -636,7 +636,7 @@ fun RealWorld4_FancyWidget_007(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -715,7 +715,7 @@ fun RealWorld4_FancyWidget_008(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -762,7 +762,7 @@ fun RealWorld4_FancyWidget_009(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -817,7 +817,7 @@ fun RealWorld4_FancyWidget_010(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -855,7 +855,7 @@ fun RealWorld4_FancyWidget_011(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -892,7 +892,7 @@ fun RealWorld4_FancyWidget_012(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -955,7 +955,7 @@ fun RealWorld4_FancyWidget_013(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -994,7 +994,7 @@ fun RealWorld4_FancyWidget_014(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -1039,7 +1039,7 @@ fun RealWorld4_FancyWidget_015(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -1098,7 +1098,7 @@ fun RealWorld4_FancyWidget_016(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -1168,7 +1168,7 @@ fun RealWorld4_FancyWidget_017(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -1222,7 +1222,7 @@ fun RealWorld4_FancyWidget_018(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -1279,7 +1279,7 @@ fun RealWorld4_FancyWidget_019(
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -1330,7 +1330,7 @@ fun RealWorld4_FancyWidget_020(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -1363,7 +1363,7 @@ fun RealWorld4_FancyWidget_021(
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -1415,7 +1415,7 @@ fun RealWorld4_FancyWidget_022(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -1498,7 +1498,7 @@ fun RealWorld4_FancyWidget_023(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp5.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -1551,7 +1551,7 @@ fun RealWorld4_FancyWidget_024(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -1598,7 +1598,7 @@ fun RealWorld4_FancyWidget_025(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -1659,7 +1659,7 @@ fun RealWorld4_FancyWidget_026(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -1698,7 +1698,7 @@ fun RealWorld4_FancyWidget_027(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -1748,7 +1748,7 @@ fun RealWorld4_FancyWidget_028(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -1791,7 +1791,7 @@ fun RealWorld4_FancyWidget_029(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -1838,7 +1838,7 @@ fun RealWorld4_FancyWidget_030(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -1886,7 +1886,7 @@ fun RealWorld4_FancyWidget_031(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -1927,7 +1927,7 @@ fun RealWorld4_FancyWidget_032(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp5.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -1966,7 +1966,7 @@ fun RealWorld4_FancyWidget_033(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -2021,7 +2021,7 @@ fun RealWorld4_FancyWidget_034(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -2066,7 +2066,7 @@ fun RealWorld4_FancyWidget_035(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -2105,7 +2105,7 @@ fun RealWorld4_FancyWidget_036(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -2157,7 +2157,7 @@ fun RealWorld4_FancyWidget_037(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -2257,7 +2257,7 @@ fun RealWorld4_FancyWidget_038(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp5.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -2308,7 +2308,7 @@ fun RealWorld4_FancyWidget_039(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -2367,7 +2367,7 @@ fun RealWorld4_FancyWidget_040(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -2414,7 +2414,7 @@ fun RealWorld4_FancyWidget_041(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -2486,7 +2486,7 @@ fun RealWorld4_FancyWidget_042(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -2544,7 +2544,7 @@ fun RealWorld4_FancyWidget_043(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp5.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -2610,7 +2610,7 @@ fun RealWorld4_FancyWidget_044(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp5.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -2696,7 +2696,7 @@ fun RealWorld4_FancyWidget_045(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp5.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -2743,7 +2743,7 @@ fun RealWorld4_FancyWidget_046(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -2784,7 +2784,7 @@ fun RealWorld4_FancyWidget_047(
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -2823,7 +2823,7 @@ fun RealWorld4_FancyWidget_048(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -2862,7 +2862,7 @@ fun RealWorld4_FancyWidget_049(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -2923,7 +2923,7 @@ fun RealWorld4_FancyWidget_050(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -2962,7 +2962,7 @@ fun RealWorld4_FancyWidget_051(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -3001,7 +3001,7 @@ fun RealWorld4_FancyWidget_052(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -3039,7 +3039,7 @@ fun RealWorld4_FancyWidget_053(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -3069,7 +3069,7 @@ fun RealWorld4_FancyWidget_054(
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -3144,7 +3144,7 @@ fun RealWorld4_FancyWidget_055(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -3199,7 +3199,7 @@ fun RealWorld4_FancyWidget_056(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -3260,7 +3260,7 @@ fun RealWorld4_FancyWidget_057(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp5.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -3293,7 +3293,7 @@ fun RealWorld4_FancyWidget_058(
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -3350,7 +3350,7 @@ fun RealWorld4_FancyWidget_059(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -3388,7 +3388,7 @@ fun RealWorld4_FancyWidget_060(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -3424,7 +3424,7 @@ fun RealWorld4_FancyWidget_061(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -3461,7 +3461,7 @@ fun RealWorld4_FancyWidget_062(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -3522,7 +3522,7 @@ fun RealWorld4_FancyWidget_063(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -3561,7 +3561,7 @@ fun RealWorld4_FancyWidget_064(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -3605,7 +3605,7 @@ fun RealWorld4_FancyWidget_065(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -3648,7 +3648,7 @@ fun RealWorld4_FancyWidget_066(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -3699,7 +3699,7 @@ fun RealWorld4_FancyWidget_067(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -3749,7 +3749,7 @@ fun RealWorld4_FancyWidget_068(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp5.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -3814,7 +3814,7 @@ fun RealWorld4_FancyWidget_069(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -3878,7 +3878,7 @@ fun RealWorld4_FancyWidget_070(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -3949,7 +3949,7 @@ fun RealWorld4_FancyWidget_071(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp5.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -4018,7 +4018,7 @@ fun RealWorld4_FancyWidget_072(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -4065,7 +4065,7 @@ fun RealWorld4_FancyWidget_073(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -4111,7 +4111,7 @@ fun RealWorld4_FancyWidget_074(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -4150,7 +4150,7 @@ fun RealWorld4_FancyWidget_075(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -4201,7 +4201,7 @@ fun RealWorld4_FancyWidget_076(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -4308,7 +4308,7 @@ fun RealWorld4_FancyWidget_077(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -4360,7 +4360,7 @@ fun RealWorld4_FancyWidget_078(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -4417,7 +4417,7 @@ fun RealWorld4_FancyWidget_079(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -4457,7 +4457,7 @@ fun RealWorld4_FancyWidget_080(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -4537,7 +4537,7 @@ fun RealWorld4_FancyWidget_081(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp5.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -4608,7 +4608,7 @@ fun RealWorld4_FancyWidget_082(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -4663,7 +4663,7 @@ fun RealWorld4_FancyWidget_083(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -4706,7 +4706,7 @@ fun RealWorld4_FancyWidget_084(
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -4739,7 +4739,7 @@ fun RealWorld4_FancyWidget_085(
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -4797,7 +4797,7 @@ fun RealWorld4_FancyWidget_086(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -4853,7 +4853,7 @@ fun RealWorld4_FancyWidget_087(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -4890,7 +4890,7 @@ fun RealWorld4_FancyWidget_088(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -4937,7 +4937,7 @@ fun RealWorld4_FancyWidget_089(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -4981,7 +4981,7 @@ fun RealWorld4_FancyWidget_090(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -5018,7 +5018,7 @@ fun RealWorld4_FancyWidget_091(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -5058,7 +5058,7 @@ fun RealWorld4_FancyWidget_092(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -5116,7 +5116,7 @@ fun RealWorld4_FancyWidget_093(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -5189,7 +5189,7 @@ fun RealWorld4_FancyWidget_094(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp5.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -5242,7 +5242,7 @@ fun RealWorld4_FancyWidget_095(
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -5287,7 +5287,7 @@ fun RealWorld4_FancyWidget_096(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -5348,7 +5348,7 @@ fun RealWorld4_FancyWidget_097(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -5414,7 +5414,7 @@ fun RealWorld4_FancyWidget_098(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -5467,7 +5467,7 @@ fun RealWorld4_FancyWidget_099(
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -5512,7 +5512,7 @@ fun RealWorld4_FancyWidget_100(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -5577,7 +5577,7 @@ fun RealWorld4_FancyWidget_101(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -5640,7 +5640,7 @@ fun RealWorld4_FancyWidget_102(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -5678,7 +5678,7 @@ fun RealWorld4_FancyWidget_103(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -5721,7 +5721,7 @@ fun RealWorld4_FancyWidget_104(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -5760,7 +5760,7 @@ fun RealWorld4_FancyWidget_105(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -5816,7 +5816,7 @@ fun RealWorld4_FancyWidget_106(
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -5861,7 +5861,7 @@ fun RealWorld4_FancyWidget_107(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -5900,7 +5900,7 @@ fun RealWorld4_FancyWidget_108(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -5933,7 +5933,7 @@ fun RealWorld4_FancyWidget_109(
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -5984,7 +5984,7 @@ fun RealWorld4_FancyWidget_110(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -6027,7 +6027,7 @@ fun RealWorld4_FancyWidget_111(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp5.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -6060,7 +6060,7 @@ fun RealWorld4_FancyWidget_112(
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -6119,7 +6119,7 @@ fun RealWorld4_FancyWidget_113(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -6190,7 +6190,7 @@ fun RealWorld4_FancyWidget_114(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -6241,7 +6241,7 @@ fun RealWorld4_FancyWidget_115(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -6280,7 +6280,7 @@ fun RealWorld4_FancyWidget_116(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -6327,7 +6327,7 @@ fun RealWorld4_FancyWidget_117(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -6366,7 +6366,7 @@ fun RealWorld4_FancyWidget_118(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -6405,7 +6405,7 @@ fun RealWorld4_FancyWidget_119(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -6448,7 +6448,7 @@ fun RealWorld4_FancyWidget_120(
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -6493,7 +6493,7 @@ fun RealWorld4_FancyWidget_121(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -6548,7 +6548,7 @@ fun RealWorld4_FancyWidget_122(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp5.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -6593,7 +6593,7 @@ fun RealWorld4_FancyWidget_123(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -6638,7 +6638,7 @@ fun RealWorld4_FancyWidget_124(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -6685,7 +6685,7 @@ fun RealWorld4_FancyWidget_125(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -6724,7 +6724,7 @@ fun RealWorld4_FancyWidget_126(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -6757,7 +6757,7 @@ fun RealWorld4_FancyWidget_127(
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -6802,7 +6802,7 @@ fun RealWorld4_FancyWidget_128(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -6841,7 +6841,7 @@ fun RealWorld4_FancyWidget_129(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -6874,7 +6874,7 @@ fun RealWorld4_FancyWidget_130(
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -6921,7 +6921,7 @@ fun RealWorld4_FancyWidget_131(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -6997,7 +6997,7 @@ fun RealWorld4_FancyWidget_132(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -7132,7 +7132,7 @@ fun RealWorld4_FancyWidget_133(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -7190,7 +7190,7 @@ fun RealWorld4_FancyWidget_134(
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -7253,7 +7253,7 @@ fun RealWorld4_FancyWidget_135(
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -7300,7 +7300,7 @@ fun RealWorld4_FancyWidget_136(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -7367,7 +7367,7 @@ fun RealWorld4_FancyWidget_137(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -7400,7 +7400,7 @@ fun RealWorld4_FancyWidget_138(
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -7434,7 +7434,7 @@ fun RealWorld4_FancyWidget_139(
         emptyList<Collection<KCallable<*>>>()
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -7495,7 +7495,7 @@ fun RealWorld4_FancyWidget_140(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -7572,7 +7572,7 @@ fun RealWorld4_FancyWidget_141(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -7635,7 +7635,7 @@ fun RealWorld4_FancyWidget_142(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -7727,7 +7727,7 @@ fun RealWorld4_FancyWidget_143(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -7824,7 +7824,7 @@ fun RealWorld4_FancyWidget_144(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp5.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -7889,7 +7889,7 @@ fun RealWorld4_FancyWidget_145(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -7972,7 +7972,7 @@ fun RealWorld4_FancyWidget_146(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -8055,7 +8055,7 @@ fun RealWorld4_FancyWidget_147(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp5.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -8093,7 +8093,7 @@ fun RealWorld4_FancyWidget_148(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
@@ -8160,7 +8160,7 @@ fun RealWorld4_FancyWidget_149(
                 emptyList<Collection<KCallable<*>>>()
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
-    WithConstraints(modifier) { constraints, _ ->
+    WithConstraints(modifier) {
         Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
