@@ -24,11 +24,9 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.ui.core.Modifier
-import androidx.ui.core.drawBehind
 import androidx.ui.foundation.Box
-import androidx.ui.geometry.toRect
+import androidx.ui.foundation.drawBackground
 import androidx.ui.graphics.Color
-import androidx.ui.graphics.Paint
 import androidx.ui.layout.fillMaxSize
 import org.junit.FixMethodOrder
 import org.junit.Ignore
@@ -154,12 +152,9 @@ class ComposeBenchmark : ComposeBenchmarkBase() {
     }
 }
 
-private fun background(paint: Paint) =
-    Modifier.drawBehind { drawRect(size.toRect(), paint) }
-
-private val redBackground = background(Paint().also { it.color = Color.Red })
-private val blackBackground = background(Paint().also { it.color = Color.Black })
-private val yellowBackground = background(Paint().also { it.color = Color.Yellow })
+private val redBackground = Modifier.drawBackground(Color.Red)
+private val blackBackground = Modifier.drawBackground(Color.Black)
+private val yellowBackground = Modifier.drawBackground(Color.Yellow)
 private val defaultBackground = yellowBackground
 
 @Model
@@ -173,7 +168,7 @@ class ColorModel(private var color: Color = Color.Black) {
             Color.Red -> redBackground
             Color.Black -> blackBackground
             Color.Yellow -> yellowBackground
-            else -> background(Paint().also { it.color = color })
+            else -> Modifier.drawBackground(color)
         }
 }
 
