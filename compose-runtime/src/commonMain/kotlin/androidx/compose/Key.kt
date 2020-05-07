@@ -55,7 +55,7 @@ inline fun <T, V1> key(
     @Suppress("UNUSED_PARAMETER")
     @Pivotal
     v1: V1,
-    block: @Composable() () -> T
+    block: @Composable () -> T
 ): T = block()
 
 /**
@@ -104,7 +104,7 @@ inline fun <T, V1, V2> key(
     @Suppress("UNUSED_PARAMETER")
     @Pivotal
     v2: V2,
-    block: @Composable() () -> T
+    block: @Composable () -> T
 ) = block()
 
 /**
@@ -144,5 +144,5 @@ inline fun <T> key(
     @Suppress("UNUSED_PARAMETER")
     @Pivotal
     vararg inputs: Any?,
-    block: @Composable() () -> T
+    block: @Composable () -> T
 ) = block()

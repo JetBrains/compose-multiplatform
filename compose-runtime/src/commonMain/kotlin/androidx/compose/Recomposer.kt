@@ -51,7 +51,7 @@ abstract class Recomposer {
     private val composers = mutableSetOf<Composer<*>>()
 
     @Suppress("PLUGIN_WARNING", "PLUGIN_ERROR")
-    internal fun recompose(composable: @Composable() () -> Unit, composer: Composer<*>) {
+    internal fun recompose(composable: @Composable () -> Unit, composer: Composer<*>) {
         val composerWasComposing = composer.isComposing
         val prevComposer = currentComposerInternal
         try {

@@ -98,7 +98,7 @@ fun RealWorld4_FancyWidget_001(
     s2: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_01,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 =
         "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f4 + model.f5 + model.f6 +
@@ -241,7 +241,7 @@ fun RealWorld4_FancyWidget_003(
     number: Int,
     s1: String,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f2 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -347,7 +347,7 @@ fun RealWorld4_FancyWidget_004(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_04,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 =
         "jaleiurhgsei48" + model.f1_modified + model.f3 + model.f4 + model.f5 + model.f6 +
@@ -431,7 +431,7 @@ fun RealWorld4_FancyWidget_005(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_05,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f4 + model.f5 +
             model.f7
@@ -551,7 +551,7 @@ fun RealWorld4_FancyWidget_006(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_06,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 =
         "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 + model.f5 +
@@ -618,7 +618,7 @@ fun RealWorld4_FancyWidget_007(
     number: Int,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_07,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 +
             model.f6
@@ -698,7 +698,7 @@ fun RealWorld4_FancyWidget_008(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
@@ -745,7 +745,7 @@ fun RealWorld4_FancyWidget_009(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     number: Int,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -795,7 +795,7 @@ fun RealWorld4_FancyWidget_010(
     model: RealWorld4_DataModel_10,
     s2: String,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -875,7 +875,7 @@ fun RealWorld4_FancyWidget_012(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -938,7 +938,7 @@ fun RealWorld4_FancyWidget_013(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -977,7 +977,7 @@ fun RealWorld4_FancyWidget_014(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -1017,7 +1017,7 @@ fun RealWorld4_FancyWidget_015(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
@@ -1081,7 +1081,7 @@ fun RealWorld4_FancyWidget_016(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -1267,7 +1267,7 @@ fun RealWorld4_FancyWidget_018(
 fun RealWorld4_FancyWidget_019(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -1303,7 +1303,7 @@ fun RealWorld4_FancyWidget_020(
     b: Boolean,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -1351,7 +1351,7 @@ fun RealWorld4_FancyWidget_020(
 fun RealWorld4_FancyWidget_021(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -1387,7 +1387,7 @@ fun RealWorld4_FancyWidget_022(
     s1: String,
     number: Int,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 +
             model.f6
@@ -1475,7 +1475,7 @@ fun RealWorld4_FancyWidget_023(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
     obj: RealWorld4_UnmemoizablePojo_14,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
@@ -1529,7 +1529,7 @@ fun RealWorld4_FancyWidget_024(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -1581,7 +1581,7 @@ fun RealWorld4_FancyWidget_025(
     b: Boolean,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -1637,7 +1637,7 @@ fun RealWorld4_FancyWidget_026(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -1681,7 +1681,7 @@ fun RealWorld4_FancyWidget_027(
     color: Color,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -1769,7 +1769,7 @@ fun RealWorld4_FancyWidget_029(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
@@ -1821,7 +1821,7 @@ fun RealWorld4_FancyWidget_030(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -1906,7 +1906,7 @@ fun RealWorld4_FancyWidget_032(
     obj: RealWorld4_UnmemoizablePojo_5,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "nbeksu48gsl89k" + obj.f1 + obj.f2 + obj.f3 + obj.f4 + obj.f5
     val tmp1 = obj::class.memberProperties.map { property ->
@@ -1949,7 +1949,7 @@ fun RealWorld4_FancyWidget_033(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -1999,7 +1999,7 @@ fun RealWorld4_FancyWidget_034(
     model: RealWorld4_DataModel_10,
     b: Boolean,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -2044,7 +2044,7 @@ fun RealWorld4_FancyWidget_035(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -2088,7 +2088,7 @@ fun RealWorld4_FancyWidget_036(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -2225,7 +2225,7 @@ fun RealWorld4_FancyWidget_038(
     model: RealWorld4_DataModel_07,
     obj: RealWorld4_UnmemoizablePojo_8,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 +
             model.f6
@@ -2286,7 +2286,7 @@ fun RealWorld4_FancyWidget_039(
     model: RealWorld4_DataModel_08,
     s1: String,
     b: Boolean,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
@@ -2350,7 +2350,7 @@ fun RealWorld4_FancyWidget_040(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -2397,7 +2397,7 @@ fun RealWorld4_FancyWidget_041(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -2464,7 +2464,7 @@ fun RealWorld4_FancyWidget_042(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -2510,7 +2510,7 @@ fun RealWorld4_FancyWidget_043(
     model: RealWorld4_DataModel_07,
     obj: RealWorld4_UnmemoizablePojo_13,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 +
             model.f6
@@ -2578,7 +2578,7 @@ fun RealWorld4_FancyWidget_044(
     model: RealWorld4_DataModel_08,
     obj: RealWorld4_UnmemoizablePojo_3,
     number: Int,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
@@ -2664,7 +2664,7 @@ fun RealWorld4_FancyWidget_045(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "nbeksu48gsl89k" + obj.f1 + obj.f2 + obj.f3 + obj.f4 + obj.f5 + obj.f6 +
             obj.f7
@@ -2726,7 +2726,7 @@ fun RealWorld4_FancyWidget_046(
     s2: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -2772,7 +2772,7 @@ fun RealWorld4_FancyWidget_046(
 fun RealWorld4_FancyWidget_047(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -2806,7 +2806,7 @@ fun RealWorld4_FancyWidget_048(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     b: Boolean,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -2845,7 +2845,7 @@ fun RealWorld4_FancyWidget_049(
     s2: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -2906,7 +2906,7 @@ fun RealWorld4_FancyWidget_050(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -2945,7 +2945,7 @@ fun RealWorld4_FancyWidget_051(
     number: Int,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -2984,7 +2984,7 @@ fun RealWorld4_FancyWidget_052(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -3127,7 +3127,7 @@ fun RealWorld4_FancyWidget_055(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -3177,7 +3177,7 @@ fun RealWorld4_FancyWidget_056(
     number: Int,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -3232,7 +3232,7 @@ fun RealWorld4_FancyWidget_057(
     model: RealWorld4_DataModel_10,
     obj: RealWorld4_UnmemoizablePojo_11,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -3281,7 +3281,7 @@ fun RealWorld4_FancyWidget_057(
 fun RealWorld4_FancyWidget_058(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -3328,7 +3328,7 @@ fun RealWorld4_FancyWidget_059(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     number: Int,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -3444,7 +3444,7 @@ fun RealWorld4_FancyWidget_062(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -3500,7 +3500,7 @@ fun RealWorld4_FancyWidget_063(
     model: RealWorld4_DataModel_10,
     s1: String,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -3544,7 +3544,7 @@ fun RealWorld4_FancyWidget_064(
     s2: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -3626,7 +3626,7 @@ fun RealWorld4_FancyWidget_066(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -3672,7 +3672,7 @@ fun RealWorld4_FancyWidget_067(
     model: RealWorld4_DataModel_10,
     s2: String,
     b: Boolean,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -3722,7 +3722,7 @@ fun RealWorld4_FancyWidget_068(
     model: RealWorld4_DataModel_05,
     obj: RealWorld4_UnmemoizablePojo_2,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f4 + model.f5 +
             model.f7
@@ -3790,7 +3790,7 @@ fun RealWorld4_FancyWidget_069(
     model: RealWorld4_DataModel_06,
     s2: String,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 =
         "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 + model.f5 +
@@ -3855,7 +3855,7 @@ fun RealWorld4_FancyWidget_070(
     model: RealWorld4_DataModel_07,
     s1: String,
     number: Int,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 +
             model.f6
@@ -3923,7 +3923,7 @@ fun RealWorld4_FancyWidget_071(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
     obj: RealWorld4_UnmemoizablePojo_0,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
@@ -4001,7 +4001,7 @@ fun RealWorld4_FancyWidget_072(
     s2: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -4048,7 +4048,7 @@ fun RealWorld4_FancyWidget_073(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -4131,7 +4131,7 @@ fun RealWorld4_FancyWidget_075(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_06,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 =
         "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 + model.f5 +
@@ -4286,7 +4286,7 @@ fun RealWorld4_FancyWidget_077(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
@@ -4400,7 +4400,7 @@ fun RealWorld4_FancyWidget_079(
     number: Int,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -4439,7 +4439,7 @@ fun RealWorld4_FancyWidget_080(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_07,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 +
             model.f6
@@ -4500,7 +4500,7 @@ fun RealWorld4_FancyWidget_081(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 =
         "nbeksu48gsl89k" + obj.f1 + obj.f2 + obj.f3 + obj.f4 + obj.f5 + obj.f6 + obj.f7 + obj.f8
@@ -4591,7 +4591,7 @@ fun RealWorld4_FancyWidget_082(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -4641,7 +4641,7 @@ fun RealWorld4_FancyWidget_083(
     s2: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -4694,7 +4694,7 @@ fun RealWorld4_FancyWidget_083(
 fun RealWorld4_FancyWidget_084(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -4727,7 +4727,7 @@ fun RealWorld4_FancyWidget_084(
 fun RealWorld4_FancyWidget_085(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
@@ -4873,7 +4873,7 @@ fun RealWorld4_FancyWidget_088(
     s2: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -4920,7 +4920,7 @@ fun RealWorld4_FancyWidget_089(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5001,7 +5001,7 @@ fun RealWorld4_FancyWidget_091(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5040,7 +5040,7 @@ fun RealWorld4_FancyWidget_092(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_07,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 +
             model.f6
@@ -5168,7 +5168,7 @@ fun RealWorld4_FancyWidget_094(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     obj: RealWorld4_UnmemoizablePojo_9,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5230,7 +5230,7 @@ fun RealWorld4_FancyWidget_094(
 fun RealWorld4_FancyWidget_095(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5265,7 +5265,7 @@ fun RealWorld4_FancyWidget_096(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5326,7 +5326,7 @@ fun RealWorld4_FancyWidget_097(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5455,7 +5455,7 @@ fun RealWorld4_FancyWidget_098(
 fun RealWorld4_FancyWidget_099(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5490,7 +5490,7 @@ fun RealWorld4_FancyWidget_100(
     model: RealWorld4_DataModel_08,
     s2: String,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5555,7 +5555,7 @@ fun RealWorld4_FancyWidget_101(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5618,7 +5618,7 @@ fun RealWorld4_FancyWidget_102(
     model: RealWorld4_DataModel_10,
     s1: String,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5699,7 +5699,7 @@ fun RealWorld4_FancyWidget_104(
     model: RealWorld4_DataModel_10,
     s1: String,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5743,7 +5743,7 @@ fun RealWorld4_FancyWidget_105(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     number: Int,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5804,7 +5804,7 @@ fun RealWorld4_FancyWidget_105(
 fun RealWorld4_FancyWidget_106(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5839,7 +5839,7 @@ fun RealWorld4_FancyWidget_107(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5883,7 +5883,7 @@ fun RealWorld4_FancyWidget_108(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5921,7 +5921,7 @@ fun RealWorld4_FancyWidget_108(
 fun RealWorld4_FancyWidget_109(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5957,7 +5957,7 @@ fun RealWorld4_FancyWidget_110(
     color: Color,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6006,7 +6006,7 @@ fun RealWorld4_FancyWidget_111(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     obj: RealWorld4_UnmemoizablePojo_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6048,7 +6048,7 @@ fun RealWorld4_FancyWidget_111(
 fun RealWorld4_FancyWidget_112(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6102,7 +6102,7 @@ fun RealWorld4_FancyWidget_113(
     number: Int,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6168,7 +6168,7 @@ fun RealWorld4_FancyWidget_114(
     model: RealWorld4_DataModel_10,
     s1: String,
     color: Color,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6214,7 +6214,7 @@ fun RealWorld4_FancyWidget_115(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6263,7 +6263,7 @@ fun RealWorld4_FancyWidget_116(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     number: Int,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6310,7 +6310,7 @@ fun RealWorld4_FancyWidget_117(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     number: Int,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6349,7 +6349,7 @@ fun RealWorld4_FancyWidget_118(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     color: Color,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6388,7 +6388,7 @@ fun RealWorld4_FancyWidget_119(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6436,7 +6436,7 @@ fun RealWorld4_FancyWidget_119(
 fun RealWorld4_FancyWidget_120(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6471,7 +6471,7 @@ fun RealWorld4_FancyWidget_121(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6517,7 +6517,7 @@ fun RealWorld4_FancyWidget_122(
     b: Boolean,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "nbeksu48gsl89k" + obj.f1 + obj.f2 + obj.f3 + obj.f4 + obj.f5 + obj.f6
     val tmp1 = obj::class.memberProperties.map { property ->
@@ -6571,7 +6571,7 @@ fun RealWorld4_FancyWidget_123(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6616,7 +6616,7 @@ fun RealWorld4_FancyWidget_124(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     b: Boolean,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6668,7 +6668,7 @@ fun RealWorld4_FancyWidget_125(
     s2: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6707,7 +6707,7 @@ fun RealWorld4_FancyWidget_126(
     s2: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6745,7 +6745,7 @@ fun RealWorld4_FancyWidget_126(
 fun RealWorld4_FancyWidget_127(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6780,7 +6780,7 @@ fun RealWorld4_FancyWidget_128(
     model: RealWorld4_DataModel_10,
     s2: String,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6824,7 +6824,7 @@ fun RealWorld4_FancyWidget_129(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6862,7 +6862,7 @@ fun RealWorld4_FancyWidget_129(
 fun RealWorld4_FancyWidget_130(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6897,7 +6897,7 @@ fun RealWorld4_FancyWidget_131(
     s2: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_04,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 =
         "jaleiurhgsei48" + model.f1_modified + model.f3 + model.f4 + model.f5 + model.f6 +
@@ -6979,7 +6979,7 @@ fun RealWorld4_FancyWidget_132(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_05,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f4 + model.f5 +
             model.f7
@@ -7108,7 +7108,7 @@ fun RealWorld4_FancyWidget_133(
     model: RealWorld4_DataModel_06,
     s1: String,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 =
         "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 + model.f5 +
@@ -7177,7 +7177,7 @@ fun RealWorld4_FancyWidget_133(
 fun RealWorld4_FancyWidget_134(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_07,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 +
             model.f6
@@ -7241,7 +7241,7 @@ fun RealWorld4_FancyWidget_134(
 fun RealWorld4_FancyWidget_135(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
@@ -7283,7 +7283,7 @@ fun RealWorld4_FancyWidget_136(
     s2: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -7345,7 +7345,7 @@ fun RealWorld4_FancyWidget_137(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -7388,7 +7388,7 @@ fun RealWorld4_FancyWidget_137(
 fun RealWorld4_FancyWidget_138(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -7421,7 +7421,7 @@ fun RealWorld4_FancyWidget_138(
 fun RealWorld4_FancyWidget_139(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_05,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f4 + model.f5 +
             model.f7
@@ -7476,7 +7476,7 @@ fun RealWorld4_FancyWidget_140(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_06,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 =
         "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 + model.f5 +
@@ -7553,7 +7553,7 @@ fun RealWorld4_FancyWidget_141(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_06,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 =
         "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 + model.f5 +
@@ -7704,7 +7704,7 @@ fun RealWorld4_FancyWidget_143(
     number: Int,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_07,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 +
             model.f6
@@ -7791,7 +7791,7 @@ fun RealWorld4_FancyWidget_144(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
     number: Int,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 =
         "nbeksu48gsl89k" + obj.f1 + obj.f2 + obj.f3 + obj.f4 + obj.f5 + obj.f6 + obj.f7 + obj.f8 +
@@ -7862,7 +7862,7 @@ fun RealWorld4_FancyWidget_145(
     model: RealWorld4_DataModel_09,
     s2: String,
     number: Int,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -7940,7 +7940,7 @@ fun RealWorld4_FancyWidget_146(
     b: Boolean,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -8019,7 +8019,7 @@ fun RealWorld4_FancyWidget_147(
     obj: RealWorld4_UnmemoizablePojo_1,
     b: Boolean,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -8143,7 +8143,7 @@ fun RealWorld4_FancyWidget_149(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
