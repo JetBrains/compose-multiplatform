@@ -21,9 +21,7 @@ package androidx.compose.benchmark.realworld4
  * large scale (eg. gmail-sized application).
  */
 
-import androidx.compose.Model
 import androidx.ui.graphics.Color
-import java.util.Random
 
 class RealWorld4_UnmemoizablePojo_0() {
     var f1: Int = random.nextInt()

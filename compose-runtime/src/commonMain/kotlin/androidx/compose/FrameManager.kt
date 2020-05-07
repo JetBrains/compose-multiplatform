@@ -211,7 +211,7 @@ object FrameManager {
                 // Ignore the object if its invalidations were all immediate for the frame.
                 invalidations[committed.filter {
                     !immediate.contains(it) || deferred.contains(it)
-                } ]
+                }]
             }
             if (currentInvalidations.isNotEmpty()) {
                 if (!isMainThread()) {
