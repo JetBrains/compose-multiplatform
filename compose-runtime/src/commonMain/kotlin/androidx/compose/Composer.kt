@@ -1030,7 +1030,13 @@ open class Composer<N>(
      * with its implementation. This version avoids boxing for [Int] keys.
      */
     private fun start(key: Int, isNode: Boolean, data: Any?) {
-        if (!inserting && pending == null && key == reader.groupKey) {
+        if (!inserting && pending == null && run {
+                val slot = reader.groupKey
+                if (slot is Int) {
+                    val slotInt: Int = slot
+                    key == slotInt
+                } else false
+            }) {
             validateNodeNotExpected()
 
             updateCompoundKeyWhenWeEnterGroupKeyHash(key)
