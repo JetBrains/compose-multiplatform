@@ -34,8 +34,11 @@ private fun Project.getKtlintConfiguration(): Configuration {
 /**
  * Import ordering check does not match IJ default ordering.
  * New line check at the end of file is not useful for our project.
+ * TODO: https://github.com/pinterest/ktlint/issues/737
+ * Paren spacing doesn't understand @Composable () -> Unit, as it thinks the () is part of the
+ * annotation and not the function type of the lambda, so disabling this for now.
  */
-private const val DisabledRules = "import-ordering,final-newline"
+private const val DisabledRules = "import-ordering,final-newline,paren-spacing"
 
 fun Project.configureKtlint() {
     val outputDir = "${project.buildDir}/reports/ktlint/"

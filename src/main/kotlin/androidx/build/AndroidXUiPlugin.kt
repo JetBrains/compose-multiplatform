@@ -66,6 +66,9 @@ class AndroidXUiPlugin : Plugin<Project> {
                     val conf = project.configurations.create("kotlinPlugin")
 
                     project.tasks.withType(KotlinCompile::class.java).configureEach { compile ->
+                        // TODO: remove when this is enabled by default in Kotlin 1.4
+                        compile.kotlinOptions.freeCompilerArgs +=
+                            "-XXLanguage:+NonParenthesizedAnnotationsOnFunctionalTypes"
                         compile.kotlinOptions.freeCompilerArgs +=
                             listOf("-P", "plugin:androidx.compose.plugins.idea:enabled=true")
                         compile.dependsOn(conf)
