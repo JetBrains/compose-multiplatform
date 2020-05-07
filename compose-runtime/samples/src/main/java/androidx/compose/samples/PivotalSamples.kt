@@ -20,7 +20,6 @@ package androidx.compose.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.Composable
-import androidx.compose.Pivotal
 import androidx.compose.getValue
 import androidx.compose.onActive
 import androidx.compose.onCommit
@@ -62,26 +61,6 @@ fun expensiveApiCalls() {
     fun UserRow(userId: Int) {
         var user by state<User?> { null }
         onCommit(userId) {
-            val dispose = Api.getUserAsync(userId) { user = it }
-            onDispose(dispose)
-        }
-
-        if (user == null) {
-            LoadingIndicator()
-            return
-        }
-        ProfileIcon(src = user!!.profilePhotoUrl)
-        Text(text = user!!.name)
-    }
-}
-
-@Sampled
-@Composable
-fun pivotalUsage() {
-    @Composable
-    fun UserRow(@Pivotal userId: Int) {
-        var user by state<User?> { null }
-        onActive {
             val dispose = Api.getUserAsync(userId) { user = it }
             onDispose(dispose)
         }

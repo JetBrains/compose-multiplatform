@@ -54,9 +54,6 @@ package androidx.compose
  *
  * The ideal and correct implementation of the above `UserRow` component is thus as follows:
  *
- * @sample androidx.compose.samples.pivotalUsage
- *
- * @see Key
  * @see key
  */
 @MustBeDocumented
@@ -67,5 +64,9 @@ package androidx.compose
     AnnotationTarget.PROPERTY,
     // component class setter functions
     AnnotationTarget.FUNCTION
+)
+@Deprecated(
+    "Use the key composable function with all pivotal parameters passed in as inputs.",
+    level = DeprecationLevel.ERROR
 )
 annotation class Pivotal

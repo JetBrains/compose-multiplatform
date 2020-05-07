@@ -32,35 +32,34 @@ import androidx.compose.Stable
  */
 @Stable
 class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16,
-        P17, P18, P19, P20, P21, R>(val key: Int, private val tracked: Boolean) : Function0<R>,
-    Function1<Composer<*>, R>,
-    Function2<P1, Composer<*>, R>,
-    Function3<P1, P2, Composer<*>, R>,
-    Function4<P1, P2, P3, Composer<*>, R>,
-    Function5<P1, P2, P3, P4, Composer<*>, R>,
-    Function6<P1, P2, P3, P4, P5, Composer<*>, R>,
-    Function7<P1, P2, P3, P4, P5, P6, Composer<*>, R>,
-    Function8<P1, P2, P3, P4, P5, P6, P7, Composer<*>, R>,
-    Function9<P1, P2, P3, P4, P5, P6, P7, P8, Composer<*>, R>,
-    Function10<P1, P2, P3, P4, P5, P6, P7, P8, P9, Composer<*>, R>,
-    Function11<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, Composer<*>, R>,
-    Function12<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, Composer<*>, R>,
-    Function13<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, Composer<*>, R>,
-    Function14<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, Composer<*>, R>,
-    Function15<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, Composer<*>, R>,
-    Function16<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, Composer<*>, R>,
-    Function17<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16,
-            Composer<*>, R>,
-    Function18<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17,
-            Composer<*>, R>,
-    Function19<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18,
-            Composer<*>, R>,
-    Function20<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18,
-            P19, Composer<*>, R>,
-    Function21<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18,
-            P19, P20, Composer<*>, R>,
+        P17, P18, R>(
+            val key: Int,
+            private val tracked: Boolean
+        ) :
+    Function3<Composer<*>, Int, Int, R>,
+    Function4<P1, Composer<*>, Int, Int, R>,
+    Function5<P1, P2, Composer<*>, Int, Int, R>,
+    Function6<P1, P2, P3, Composer<*>, Int, Int, R>,
+    Function7<P1, P2, P3, P4, Composer<*>, Int, Int, R>,
+    Function8<P1, P2, P3, P4, P5, Composer<*>, Int, Int, R>,
+    Function9<P1, P2, P3, P4, P5, P6, Composer<*>, Int, Int, R>,
+    Function10<P1, P2, P3, P4, P5, P6, P7, Composer<*>, Int, Int, R>,
+    Function11<P1, P2, P3, P4, P5, P6, P7, P8, Composer<*>, Int, Int, R>,
+    Function12<P1, P2, P3, P4, P5, P6, P7, P8, P9, Composer<*>, Int, Int, R>,
+    Function13<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, Composer<*>, Int, Int, R>,
+    Function14<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, Composer<*>, Int, Int, R>,
+    Function15<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, Composer<*>, Int, Int, R>,
+    Function16<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, Composer<*>, Int, Int, R>,
+    Function17<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, Composer<*>, Int,
+            Int, R>,
+    Function18<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15,
+            Composer<*>, Int, Int, R>,
+    Function20<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16,
+            Composer<*>, Int, Int, Int, R>,
+    Function21<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17,
+            Composer<*>, Int, Int, Int, R>,
     Function22<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18,
-            P19, P20, P21, Composer<*>, R> {
+            Composer<*>, Int, Int, Int, R> {
     private var _block: Any? = null
     private var scope: RecomposeScope? = null
     private var scopes: MutableList<RecomposeScope>? = null
@@ -123,71 +122,141 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         }
     }
 
-    override fun invoke(): R = error("Expected a composer")
-
-    override fun invoke(c: Composer<*>): R {
+    override operator fun invoke(c: Composer<*>, k: Int, changed: Int): R {
         c.startRestartGroup(key)
         trackRead(c)
-        val result = (_block as (c: Composer<*>) -> R)(c)
-        c.endRestartGroup()?.updateScope(this as (Composer<*>) -> Unit)
+        val result = (_block as (c: Composer<*>, k: Int, changed: Int) -> R)(c, key, changed)
+        c.endRestartGroup()?.updateScope(this as (Composer<*>, Int, Int) -> Unit)
         return result
     }
 
-    override fun invoke(p1: P1, c: Composer<*>): R {
+    override operator fun invoke(p1: P1, c: Composer<*>, k: Int, changed: Int): R {
         c.startRestartGroup(key)
         trackRead(c)
-        val result = (_block as (p1: P1, c: Composer<*>) -> R)(p1, c)
-        c.endRestartGroup()?.updateScope { nc -> this(p1, nc) }
+        val result = (_block as (p1: P1, c: Composer<*>, k: Int, changed: Int) -> R)(p1, c, key,
+            changed)
+        c.endRestartGroup()?.updateScope { nc, nk, _ -> this(p1, nc, nk, changed or 0b1) }
         return result
     }
 
-    override fun invoke(p1: P1, p2: P2, c: Composer<*>): R {
+    override operator fun invoke(p1: P1, p2: P2, c: Composer<*>, k: Int, changed: Int): R {
         c.startRestartGroup(key)
         trackRead(c)
-        val result = (_block as (p1: P1, p2: P2, c: Composer<*>) -> R)(p1, p2, c)
-        c.endRestartGroup()?.updateScope { nc -> this(p1, p2, nc) }
+        val result = (_block as (p1: P1, p2: P2, c: Composer<*>, k: Int, changed: Int) -> R)(
+            p1,
+            p2,
+            c,
+            key,
+            changed
+        )
+        c.endRestartGroup()?.updateScope { nc, nk, _ -> this(p1, p2, nc, nk, changed or 0b1) }
         return result
     }
 
-    override fun invoke(p1: P1, p2: P2, p3: P3, c: Composer<*>): R {
+    override operator fun invoke(p1: P1, p2: P2, p3: P3, c: Composer<*>, k: Int, changed: Int): R {
         c.startRestartGroup(key)
         trackRead(c)
-        val result = (_block as (p1: P1, p2: P2, p3: P3, c: Composer<*>) -> R)(p1, p2, p3, c)
-        c.endRestartGroup()?.updateScope { nc -> this(p1, p2, p3, nc) }
+        val result = (_block as (
+            p1: P1,
+            p2: P2,
+            p3: P3,
+            c: Composer<*>,
+            k: Int,
+            changed: Int
+        ) -> R)(
+            p1,
+            p2,
+            p3,
+            c,
+            key,
+            changed
+        )
+        c.endRestartGroup()?.updateScope { nc, nk, _ -> this(p1, p2, p3, nc, nk, changed or 0b1) }
         return result
     }
 
-    override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, c: Composer<*>): R {
+    override operator fun invoke(
+        p1: P1,
+        p2: P2,
+        p3: P3,
+        p4: P4,
+        c: Composer<*>,
+        k: Int,
+        changed: Int
+    ): R {
         c.startRestartGroup(key)
         trackRead(c)
-        val result = (_block as (p1: P1, p2: P2, p3: P3, p4: P4, c: Composer<*>) -> R)(
+        val result = (_block as (
+            p1: P1,
+            p2: P2,
+            p3: P3,
+            p4: P4,
+            c: Composer<*>,
+            k: Int,
+            changed: Int
+        ) -> R)(
             p1,
             p2,
             p3,
             p4,
-            c
+            c,
+            key,
+            changed
         )
-        c.endRestartGroup()?.updateScope { nc -> this(p1, p2, p3, p4, nc) }
+        c.endRestartGroup()?.updateScope { nc, nk, _ ->
+            this(p1, p2, p3, p4, nc, nk, changed or 0b1)
+        }
         return result
     }
 
-    override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, c: Composer<*>): R {
+    override operator fun invoke(
+        p1: P1,
+        p2: P2,
+        p3: P3,
+        p4: P4,
+        p5: P5,
+        c: Composer<*>,
+        k: Int,
+        changed: Int
+    ): R {
         c.startRestartGroup(key)
         trackRead(c)
-        val result = (_block as (p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, c: Composer<*>) -> R)(
+        val result = (_block as (
+            p1: P1,
+            p2: P2,
+            p3: P3,
+            p4: P4,
+            p5: P5,
+            c: Composer<*>,
+            k: Int,
+            changed: Int
+        ) -> R)(
             p1,
             p2,
             p3,
             p4,
             p5,
-            c
+            c,
+            key,
+            changed
         )
-        c.endRestartGroup()?.updateScope { nc -> this(p1, p2, p3, p4, p5,
-            nc) }
+        c.endRestartGroup()?.updateScope { nc, nk, _ ->
+            this(p1, p2, p3, p4, p5, nc, nk, changed or 0b1)
+        }
         return result
     }
 
-    override fun invoke(p1: P1, p2: P2, p3: P3, p4: P4, p5: P5, p6: P6, c: Composer<*>): R {
+    override operator fun invoke(
+        p1: P1,
+        p2: P2,
+        p3: P3,
+        p4: P4,
+        p5: P5,
+        p6: P6,
+        c: Composer<*>,
+        k: Int,
+        changed: Int
+    ): R {
         c.startRestartGroup(key)
         trackRead(c)
         val result = (_block as (
@@ -197,7 +266,9 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p4: P4,
             p5: P5,
             p6: P6,
-            c: Composer<*>
+            c: Composer<*>,
+            k: Int,
+            changed: Int
         ) -> R)(
             p1,
             p2,
@@ -205,15 +276,17 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p4,
             p5,
             p6,
-            c
+            c,
+            key,
+            changed
         )
-        c.endRestartGroup()?.updateScope { nc ->
-            this(p1, p2, p3, p4, p5, p6, nc)
+        c.endRestartGroup()?.updateScope { nc, nk, _ ->
+            this(p1, p2, p3, p4, p5, p6, nc, nk, changed or 0b1)
         }
         return result
     }
 
-    override fun invoke(
+    override operator fun invoke(
         p1: P1,
         p2: P2,
         p3: P3,
@@ -221,7 +294,9 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         p5: P5,
         p6: P6,
         p7: P7,
-        c: Composer<*>
+        c: Composer<*>,
+        k: Int,
+        changed: Int
     ): R {
         c.startRestartGroup(key)
         trackRead(c)
@@ -233,7 +308,9 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p5: P5,
             p6: P6,
             p7: P7,
-            c: Composer<*>
+            c: Composer<*>,
+            k: Int,
+            changed: Int
         ) -> R)(
             p1,
             p2,
@@ -242,15 +319,17 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p5,
             p6,
             p7,
-            c
+            c,
+            key,
+            changed
         )
-        c.endRestartGroup()?.updateScope { nc ->
-            this(p1, p2, p3, p4, p5, p6, p7, nc)
+        c.endRestartGroup()?.updateScope { nc, nk, _ ->
+            this(p1, p2, p3, p4, p5, p6, p7, nc, nk, changed or 0b1)
         }
         return result
     }
 
-    override fun invoke(
+    override operator fun invoke(
         p1: P1,
         p2: P2,
         p3: P3,
@@ -259,7 +338,9 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         p6: P6,
         p7: P7,
         p8: P8,
-        c: Composer<*>
+        c: Composer<*>,
+        k: Int,
+        changed: Int
     ): R {
         c.startRestartGroup(key)
         trackRead(c)
@@ -272,7 +353,9 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p6: P6,
             p7: P7,
             p8: P8,
-            c: Composer<*>
+            c: Composer<*>,
+            k: Int,
+            changed: Int
         ) -> R) (
             p1,
             p2,
@@ -282,15 +365,17 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p6,
             p7,
             p8,
-            c
+            c,
+            key,
+            changed
         )
-        c.endRestartGroup()?.updateScope { nc ->
-            this(p1, p2, p3, p4, p5, p6, p7, p8, nc)
+        c.endRestartGroup()?.updateScope { nc, nk, _ ->
+            this(p1, p2, p3, p4, p5, p6, p7, p8, nc, nk, changed or 0b1)
         }
         return result
     }
 
-    override fun invoke(
+    override operator fun invoke(
         p1: P1,
         p2: P2,
         p3: P3,
@@ -300,7 +385,9 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         p7: P7,
         p8: P8,
         p9: P9,
-        c: Composer<*>
+        c: Composer<*>,
+        k: Int,
+        changed: Int
     ): R {
         c.startRestartGroup(key)
         trackRead(c)
@@ -314,7 +401,9 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p7: P7,
             p8: P8,
             p9: P9,
-            c: Composer<*>
+            c: Composer<*>,
+            k: Int,
+            changed: Int
         ) -> R)(
             p1,
             p2,
@@ -325,15 +414,17 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p7,
             p8,
             p9,
-            c
+            c,
+            key,
+            changed
         )
-        c.endRestartGroup()?.updateScope { nc ->
-            this(p1, p2, p3, p4, p5, p6, p7, p8, p9, nc)
+        c.endRestartGroup()?.updateScope { nc, nk, _ ->
+            this(p1, p2, p3, p4, p5, p6, p7, p8, p9, nc, nk, changed or 0b1)
         }
         return result
     }
 
-    override fun invoke(
+    override operator fun invoke(
         p1: P1,
         p2: P2,
         p3: P3,
@@ -344,7 +435,9 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         p8: P8,
         p9: P9,
         p10: P10,
-        c: Composer<*>
+        c: Composer<*>,
+        k: Int,
+        changed: Int
     ): R {
         c.startRestartGroup(key)
         trackRead(c)
@@ -359,7 +452,9 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p8: P8,
             p9: P9,
             p10: P10,
-            c: Composer<*>
+            c: Composer<*>,
+            k: Int,
+            changed: Int
         ) -> R)(
             p1,
             p2,
@@ -371,15 +466,17 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p8,
             p9,
             p10,
-            c
+            c,
+            key,
+            changed
         )
-        c.endRestartGroup()?.updateScope { nc ->
-            this(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, nc)
+        c.endRestartGroup()?.updateScope { nc, nk, _ ->
+            this(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, nc, nk, changed or 0b1)
         }
         return result
     }
 
-    override fun invoke(
+    override operator fun invoke(
         p1: P1,
         p2: P2,
         p3: P3,
@@ -391,7 +488,9 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         p9: P9,
         p10: P10,
         p11: P11,
-        c: Composer<*>
+        c: Composer<*>,
+        k: Int,
+        changed: Int
     ): R {
         c.startRestartGroup(key)
         trackRead(c)
@@ -407,7 +506,9 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p9: P9,
             p10: P10,
             p11: P11,
-            c: Composer<*>
+            c: Composer<*>,
+            k: Int,
+            changed: Int
         ) -> R)(
             p1,
             p2,
@@ -420,15 +521,17 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p9,
             p10,
             p11,
-            c
+            c,
+            key,
+            changed
         )
-        c.endRestartGroup()?.updateScope { nc ->
-            this(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, nc)
+        c.endRestartGroup()?.updateScope { nc, nk, _ ->
+            this(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, nc, nk, changed or 0b1)
         }
         return result
     }
 
-    override fun invoke(
+    override operator fun invoke(
         p1: P1,
         p2: P2,
         p3: P3,
@@ -441,7 +544,9 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         p10: P10,
         p11: P11,
         p12: P12,
-        c: Composer<*>
+        c: Composer<*>,
+        k: Int,
+        changed: Int
     ): R {
         c.startRestartGroup(key)
         trackRead(c)
@@ -458,7 +563,9 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p10: P10,
             p11: P11,
             p12: P12,
-            c: Composer<*>
+            c: Composer<*>,
+            k: Int,
+            changed: Int
         ) -> R)(
             p1,
             p2,
@@ -472,15 +579,17 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p10,
             p11,
             p12,
-            c
+            c,
+            key,
+            changed
         )
-        c.endRestartGroup()?.updateScope { nc ->
-            this(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, nc)
+        c.endRestartGroup()?.updateScope { nc, nk, _ ->
+            this(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, nc, nk, changed or 0b1)
         }
         return result
     }
 
-    override fun invoke(
+    override operator fun invoke(
         p1: P1,
         p2: P2,
         p3: P3,
@@ -494,7 +603,9 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         p11: P11,
         p12: P12,
         p13: P13,
-        c: Composer<*>
+        c: Composer<*>,
+        k: Int,
+        changed: Int
     ): R {
         c.startRestartGroup(key)
         trackRead(c)
@@ -512,7 +623,9 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p11: P11,
             p12: P12,
             p13: P13,
-            c: Composer<*>
+            c: Composer<*>,
+            k: Int,
+            changed: Int
         ) -> R)(
             p1,
             p2,
@@ -527,15 +640,17 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p11,
             p12,
             p13,
-            c
+            c,
+            key,
+            changed
         )
-        c.endRestartGroup()?.updateScope { nc ->
-            this(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, nc)
+        c.endRestartGroup()?.updateScope { nc, nk, _ ->
+            this(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, nc, nk, changed or 0b1)
         }
         return result
     }
 
-    override fun invoke(
+    override operator fun invoke(
         p1: P1,
         p2: P2,
         p3: P3,
@@ -550,7 +665,9 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         p12: P12,
         p13: P13,
         p14: P14,
-        c: Composer<*>
+        c: Composer<*>,
+        k: Int,
+        changed: Int
     ): R {
         c.startRestartGroup(key)
         trackRead(c)
@@ -569,7 +686,9 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p12: P12,
             p13: P13,
             p14: P14,
-            c: Composer<*>
+            c: Composer<*>,
+            k: Int,
+            changed: Int
         ) -> R)(
             p1,
             p2,
@@ -585,15 +704,18 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p12,
             p13,
             p14,
-            c
+            c,
+            key,
+            changed
         )
-        c.endRestartGroup()?.updateScope { nc ->
-            this(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, nc)
+        c.endRestartGroup()?.updateScope { nc, nk, _ ->
+            this(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, nc, nk, changed or
+                    0b1)
         }
         return result
     }
 
-    override fun invoke(
+    override operator fun invoke(
         p1: P1,
         p2: P2,
         p3: P3,
@@ -609,7 +731,9 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         p13: P13,
         p14: P14,
         p15: P15,
-        c: Composer<*>
+        c: Composer<*>,
+        k: Int,
+        changed: Int
     ): R {
         c.startRestartGroup(key)
         trackRead(c)
@@ -629,7 +753,9 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p13: P13,
             p14: P14,
             p15: P15,
-            c: Composer<*>
+            c: Composer<*>,
+            k: Int,
+            changed: Int
         ) -> R)(
             p1,
             p2,
@@ -646,210 +772,11 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p13,
             p14,
             p15,
-            c
+            c,
+            key,
+            changed
         )
-        c.endRestartGroup()?.updateScope { nc ->
-            this(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, nc)
-        }
-        return result
-    }
-
-    override fun invoke(
-        p1: P1,
-        p2: P2,
-        p3: P3,
-        p4: P4,
-        p5: P5,
-        p6: P6,
-        p7: P7,
-        p8: P8,
-        p9: P9,
-        p10: P10,
-        p11: P11,
-        p12: P12,
-        p13: P13,
-        p14: P14,
-        p15: P15,
-        p16: P16,
-        c: Composer<*>
-    ): R {
-        c.startRestartGroup(key)
-        trackRead(c)
-        val result = (_block as (
-            p1: P1,
-            p2: P2,
-            p3: P3,
-            p4: P4,
-            p5: P5,
-            p6: P6,
-            p7: P7,
-            p8: P8,
-            p9: P9,
-            p10: P10,
-            p11: P11,
-            p12: P12,
-            p13: P13,
-            p14: P14,
-            p15: P15,
-            p16: P16,
-            c: Composer<*>
-        ) -> R)(
-            p1,
-            p2,
-            p3,
-            p4,
-            p5,
-            p6,
-            p7,
-            p8,
-            p9,
-            p10,
-            p11,
-            p12,
-            p13,
-            p14,
-            p15,
-            p16,
-            c
-        )
-        c.endRestartGroup()?.updateScope { nc ->
-            this(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, nc)
-        }
-        return result
-    }
-
-    override fun invoke(
-        p1: P1,
-        p2: P2,
-        p3: P3,
-        p4: P4,
-        p5: P5,
-        p6: P6,
-        p7: P7,
-        p8: P8,
-        p9: P9,
-        p10: P10,
-        p11: P11,
-        p12: P12,
-        p13: P13,
-        p14: P14,
-        p15: P15,
-        p16: P16,
-        p17: P17,
-        c: Composer<*>
-    ): R {
-        c.startRestartGroup(key)
-        trackRead(c)
-        val result = (_block as (
-            p1: P1,
-            p2: P2,
-            p3: P3,
-            p4: P4,
-            p5: P5,
-            p6: P6,
-            p7: P7,
-            p8: P8,
-            p9: P9,
-            p10: P10,
-            p11: P11,
-            p12: P12,
-            p13: P13,
-            p14: P14,
-            p15: P15,
-            p16: P16,
-            p17: P17,
-            c: Composer<*>
-        ) -> R)(
-            p1,
-            p2,
-            p3,
-            p4,
-            p5,
-            p6,
-            p7,
-            p8,
-            p9,
-            p10,
-            p11,
-            p12,
-            p13,
-            p14,
-            p15,
-            p16,
-            p17,
-            c
-        )
-        c.endRestartGroup()?.updateScope { nc ->
-            this(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, nc)
-        }
-        return result
-    }
-
-    override fun invoke(
-        p1: P1,
-        p2: P2,
-        p3: P3,
-        p4: P4,
-        p5: P5,
-        p6: P6,
-        p7: P7,
-        p8: P8,
-        p9: P9,
-        p10: P10,
-        p11: P11,
-        p12: P12,
-        p13: P13,
-        p14: P14,
-        p15: P15,
-        p16: P16,
-        p17: P17,
-        p18: P18,
-        c: Composer<*>
-    ): R {
-        c.startRestartGroup(key)
-        trackRead(c)
-        val result = (_block as (
-            p1: P1,
-            p2: P2,
-            p3: P3,
-            p4: P4,
-            p5: P5,
-            p6: P6,
-            p7: P7,
-            p8: P8,
-            p9: P9,
-            p10: P10,
-            p11: P11,
-            p12: P12,
-            p13: P13,
-            p14: P14,
-            p15: P15,
-            p16: P16,
-            p17: P17,
-            p18: P18,
-            c: Composer<*>
-        ) -> R)(
-            p1,
-            p2,
-            p3,
-            p4,
-            p5,
-            p6,
-            p7,
-            p8,
-            p9,
-            p10,
-            p11,
-            p12,
-            p13,
-            p14,
-            p15,
-            p16,
-            p17,
-            p18,
-            c
-        )
-        c.endRestartGroup()?.updateScope { nc ->
+        c.endRestartGroup()?.updateScope { nc, nk, _ ->
             this(
                 p1,
                 p2,
@@ -866,16 +793,15 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
                 p13,
                 p14,
                 p15,
-                p16,
-                p17,
-                p18,
-                nc
+                nc,
+                nk,
+                changed or 0b1
             )
         }
         return result
     }
 
-    override fun invoke(
+    override operator fun invoke(
         p1: P1,
         p2: P2,
         p3: P3,
@@ -892,10 +818,10 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         p14: P14,
         p15: P15,
         p16: P16,
-        p17: P17,
-        p18: P18,
-        p19: P19,
-        c: Composer<*>
+        c: Composer<*>,
+        k: Int,
+        changed: Int,
+        changed1: Int
     ): R {
         c.startRestartGroup(key)
         trackRead(c)
@@ -916,10 +842,10 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p14: P14,
             p15: P15,
             p16: P16,
-            p17: P17,
-            p18: P18,
-            p19: P19,
-            c: Composer<*>
+            c: Composer<*>,
+            k: Int,
+            changed: Int,
+            changed1: Int
         ) -> R)(
             p1,
             p2,
@@ -937,12 +863,12 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p14,
             p15,
             p16,
-            p17,
-            p18,
-            p19,
-            c
+            c,
+            key,
+            changed,
+            changed1
         )
-        c.endRestartGroup()?.updateScope { nc ->
+        c.endRestartGroup()?.updateScope { nc, nk, _ ->
             this(
                 p1,
                 p2,
@@ -960,16 +886,16 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
                 p14,
                 p15,
                 p16,
-                p17,
-                p18,
-                p19,
-                nc
+                nc,
+                nk,
+                changed or 0b1,
+                changed1
             )
         }
         return result
     }
 
-    override fun invoke(
+    override operator fun invoke(
         p1: P1,
         p2: P2,
         p3: P3,
@@ -987,10 +913,10 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         p15: P15,
         p16: P16,
         p17: P17,
-        p18: P18,
-        p19: P19,
-        p20: P20,
-        c: Composer<*>
+        c: Composer<*>,
+        k: Int,
+        changed: Int,
+        changed1: Int
     ): R {
         c.startRestartGroup(key)
         trackRead(c)
@@ -1012,10 +938,10 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p15: P15,
             p16: P16,
             p17: P17,
-            p18: P18,
-            p19: P19,
-            p20: P20,
-            c: Composer<*>
+            c: Composer<*>,
+            k: Int,
+            changed: Int,
+            changed1: Int
         ) -> R)(
             p1,
             p2,
@@ -1034,12 +960,12 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p15,
             p16,
             p17,
-            p18,
-            p19,
-            p20,
-            c
+            c,
+            key,
+            changed,
+            changed1
         )
-        c.endRestartGroup()?.updateScope { nc ->
+        c.endRestartGroup()?.updateScope { nc, nk, _ ->
             this(
                 p1,
                 p2,
@@ -1058,16 +984,15 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
                 p15,
                 p16,
                 p17,
-                p18,
-                p19,
-                p20,
-                nc
-            )
+                nc,
+                nk,
+                changed or 0b1,
+                changed1)
         }
         return result
     }
 
-    override fun invoke(
+    override operator fun invoke(
         p1: P1,
         p2: P2,
         p3: P3,
@@ -1086,10 +1011,10 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
         p16: P16,
         p17: P17,
         p18: P18,
-        p19: P19,
-        p20: P20,
-        p21: P21,
-        c: Composer<*>
+        c: Composer<*>,
+        k: Int,
+        changed: Int,
+        changed1: Int
     ): R {
         c.startRestartGroup(key)
         trackRead(c)
@@ -1112,10 +1037,10 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p16: P16,
             p17: P17,
             p18: P18,
-            p19: P19,
-            p20: P20,
-            p21: P21,
-            c: Composer<*>
+            c: Composer<*>,
+            k: Int,
+            changed: Int,
+            changed1: Int
         ) -> R)(
             p1,
             p2,
@@ -1135,12 +1060,12 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p16,
             p17,
             p18,
-            p19,
-            p20,
-            p21,
-            c
+            c,
+            key,
+            changed,
+            changed1
         )
-        c.endRestartGroup()?.updateScope { nc ->
+        c.endRestartGroup()?.updateScope { nc, nk, _ ->
             this(
                 p1,
                 p2,
@@ -1160,10 +1085,10 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
                 p16,
                 p17,
                 p18,
-                p19,
-                p20,
-                p21,
-                nc
+                nc,
+                nk,
+                changed or 0b1,
+                changed1
             )
         }
         return result
@@ -1174,7 +1099,7 @@ private fun RecomposeScope?.replacableWith(other: RecomposeScope) =
     this == null || !this.valid || this == other || this.anchor == other.anchor
 
 private typealias RFunction = RestartableFunction<Any, Any, Any, Any, Any, Any, Any, Any, Any, Any,
-        Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any, Any>
+        Any, Any, Any, Any, Any, Any, Any, Any, Any>
 
 @Suppress("unused")
 fun restartableFunction(composer: Composer<*>, key: Int, tracked: Boolean, block: Any): RFunction {
