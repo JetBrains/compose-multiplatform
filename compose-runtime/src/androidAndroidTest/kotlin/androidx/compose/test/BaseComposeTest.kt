@@ -76,7 +76,7 @@ internal fun Activity.uiThread(block: () -> Unit) {
     }
 }
 
-internal fun Activity.show(block: @Composable() () -> Unit): Composition {
+internal fun Activity.show(block: @Composable () -> Unit): Composition {
     var composition: Composition? = null
     uiThread {
         FrameManager.nextFrame()
@@ -106,21 +106,21 @@ abstract class BaseComposeTest {
     val activity get() = activityRule.activity
 
     fun compose(
-        composable: @Composable() () -> Unit
+        composable: @Composable () -> Unit
     ) = UiTester(
         activity,
         composable
     )
 
     fun composeEmittables(
-        composable: @Composable() () -> Unit
+        composable: @Composable () -> Unit
     ) = EmittableTester(
         activity,
         composable
     )
 }
 
-sealed class ComposeTester(val activity: Activity, val composable: @Composable() () -> Unit) {
+sealed class ComposeTester(val activity: Activity, val composable: @Composable () -> Unit) {
     inner class ActiveTest(val activity: Activity, val composition: Composition) {
         fun then(block: ActiveTest.(activity: Activity) -> Unit): ActiveTest {
             activity.waitForAFrame()
@@ -135,7 +135,7 @@ sealed class ComposeTester(val activity: Activity, val composable: @Composable()
         }
     }
 
-    abstract fun initialComposition(composable: @Composable() () -> Unit): Composition
+    abstract fun initialComposition(composable: @Composable () -> Unit): Composition
 
     fun then(block: ComposeTester.(activity: Activity) -> Unit): ActiveTest {
         val composition = initialComposition(composable)
@@ -147,9 +147,9 @@ sealed class ComposeTester(val activity: Activity, val composable: @Composable()
     }
 }
 
-class EmittableTester(activity: Activity, composable: @Composable() () -> Unit) :
+class EmittableTester(activity: Activity, composable: @Composable () -> Unit) :
     ComposeTester(activity, composable) {
-    override fun initialComposition(composable: @Composable() () -> Unit): Composition {
+    override fun initialComposition(composable: @Composable () -> Unit): Composition {
         var composition: Composition? = null
         activity.uiThread {
             FrameManager.nextFrame()
@@ -159,9 +159,9 @@ class EmittableTester(activity: Activity, composable: @Composable() () -> Unit) 
     }
 }
 
-class UiTester(activity: Activity, composable: @Composable() () -> Unit) :
+class UiTester(activity: Activity, composable: @Composable () -> Unit) :
     ComposeTester(activity, composable) {
-    override fun initialComposition(composable: @Composable() () -> Unit): Composition {
+    override fun initialComposition(composable: @Composable () -> Unit): Composition {
         return activity.show {
             composable()
         }
