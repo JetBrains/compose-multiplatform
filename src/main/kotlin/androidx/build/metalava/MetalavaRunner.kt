@@ -116,8 +116,6 @@ val API_LINT_ARGS: List<String> = listOf(
         "GetterOnBuilder",
         "StaticFinalBuilder",
         "MissingGetterMatchingBuilder",
-        "SetterReturnsThis",
-        "BuilderSetStyle",
 
         // We should only treat these as warnings
         "IntentBuilderName",
@@ -128,7 +126,9 @@ val API_LINT_ARGS: List<String> = listOf(
     listOf(
         "MinMaxConstant",
         "TopLevelBuilder",
+        "BuilderSetStyle",
         "MissingBuildMethod",
+        "SetterReturnsThis",
         "OverlappingConstants",
         "IllegalStateException",
         "ListenerLast",
