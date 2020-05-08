@@ -97,7 +97,7 @@ class MockViewComposer(
 
 @Composable
 fun <P1> MockComposeScope.memoize(
-    key: Any,
+    key: Int,
     p1: P1,
     block: @Composable (p1: P1) -> Unit
 ) {

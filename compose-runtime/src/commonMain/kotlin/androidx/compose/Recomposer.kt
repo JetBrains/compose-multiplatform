@@ -63,7 +63,7 @@ abstract class Recomposer {
                         var complete = false
                         try {
                             composer.startRoot()
-                            composer.startGroup(invocation)
+                            composer.startGroup(invocationKey, invocation)
                             invokeComposable(composer, composable)
                             composer.endGroup()
                             composer.endRoot()

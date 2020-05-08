@@ -63,7 +63,7 @@ MissingNullability: androidx.compose.MutableStateKt#stateFor(V1, V2, kotlin.jvm.
     Missing nullability on method `stateFor` return
 MissingNullability: androidx.compose.SlotReader#getGroupData():
     Missing nullability on method `getGroupData` return
-MissingNullability: androidx.compose.SlotReader#getGroupKey():
-    Missing nullability on method `getGroupKey` return
+MissingNullability: androidx.compose.SlotReader#getGroupDataKey():
+    Missing nullability on method `getGroupDataKey` return
 MissingNullability: androidx.compose.SlotReader#getGroupNode():
     Missing nullability on method `getGroupNode` return

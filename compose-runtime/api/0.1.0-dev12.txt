@@ -109,8 +109,9 @@ package androidx.compose {
     method public final void skipCurrentGroup();
     method public final void skipToGroupEnd();
     method public final void startDefaults();
-    method public final void startGroup(Object key);
-    method public final void startMovableGroup(int key, Object? joinedData);
+    method public final void startGroup(int key);
+    method public final void startGroup(int key, Object? dataKey);
+    method public final void startMovableGroup(int key, Object? dataKey);
     method public final void startNode(Object key);
     method public final void startReplaceableGroup(int key);
     method public final void startRestartGroup(int key);
@@ -213,8 +214,9 @@ package androidx.compose {
   }
 
   public final class KeyInfo {
+    method public Object? getDataKey();
     method public int getIndex();
-    method public Object getKey();
+    method public int getKey();
     method public int getLocation();
     method public int getNodes();
   }
@@ -328,8 +330,9 @@ package androidx.compose {
     method public int getCurrent();
     method public int getCurrentEnd();
     method public Object! getGroupData();
+    method public Object! getGroupDataKey();
     method public int getGroupEnd();
-    method public Object! getGroupKey();
+    method public int getGroupKey();
     method public Object! getGroupNode();
     method public int getGroupSize();
     method public boolean getInEmpty();
@@ -339,7 +342,7 @@ package androidx.compose {
     method public int getParentSlots();
     method public androidx.compose.SlotTable getTable();
     method public int groupEnd(int index);
-    method public Object groupKey(int index);
+    method public int groupKey(int index);
     method public int groupSize(int index);
     method public boolean isGroup();
     method public boolean isGroup(int index);
@@ -351,13 +354,15 @@ package androidx.compose {
     method public int skipGroup();
     method public int skipNode();
     method public void skipToGroupEnd();
-    method public void startGroup(Object key);
-    method public void startNode(Object key);
+    method public void startDataGroup();
+    method public void startGroup();
+    method public void startNode();
     property public final int current;
     property public final int currentEnd;
     property public final Object! groupData;
+    property public final Object! groupDataKey;
     property public final int groupEnd;
-    property public final Object! groupKey;
+    property public final int groupKey;
     property public final Object! groupNode;
     property public final int groupSize;
     property public final boolean inEmpty;
@@ -427,10 +432,13 @@ package androidx.compose {
     method public int skipGroup();
     method public int skipNode();
     method public void skipToGroupEnd();
-    method public void startData(Object key, Object? data);
-    method public void startGroup(Object key);
-    method public void startNode(Object key);
-    method public void startNode(Object key, Object? node);
+    method public void startData(int key, Object? dataKey, Object? data);
+    method public void startGroup();
+    method public void startGroup(int key);
+    method public void startGroup(int key, Object? dataKey);
+    method public void startNode();
+    method public void startNode(Object? key);
+    method public void startNode(Object? key, Object? node);
     method public Object? update(Object? value);
     method public void updateData(Object? value);
     property public final boolean closed;
