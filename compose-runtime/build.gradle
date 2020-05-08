@@ -37,16 +37,10 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(KOTLIN_STDLIB)
-        }
-        commonTest.dependencies {
-            implementation kotlin("test-junit")
-            implementation project(":ui:ui-core")
-        }
-
-        jvmMain {
+            implementation(KOTLIN_STDLIB_COMMON)
         }
         jvmMain.dependencies {
+            implementation(KOTLIN_STDLIB)
             api(KOTLIN_COROUTINES_CORE)
             implementation "org.jetbrains.kotlinx:kotlinx-collections-immutable-jvm:0.3"
         }
