@@ -63,7 +63,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.CURSORADAPTER, "1.0.0")
     prebuilts(LibraryGroups.CUSTOMVIEW, "1.1.0-rc01")
     prebuilts(LibraryGroups.DOCUMENTFILE, "1.0.0")
-    prebuilts(LibraryGroups.DRAWERLAYOUT, "1.1.0-beta01")
+    prebuilts(LibraryGroups.DRAWERLAYOUT, "1.1.0-rc01")
     prebuilts(LibraryGroups.DYNAMICANIMATION, "dynamicanimation-ktx", "1.0.0-alpha03")
     prebuilts(LibraryGroups.DYNAMICANIMATION, "1.1.0-alpha02")
     prebuilts(LibraryGroups.EMOJI, "1.1.0-beta01")
