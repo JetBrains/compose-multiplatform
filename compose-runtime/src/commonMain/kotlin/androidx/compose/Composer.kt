@@ -2197,8 +2197,24 @@ private fun getKey(value: Any?, left: Any?, right: Any?): Any? = (value as? Join
 }
 
 // Invalidation helpers
-private fun MutableList<Invalidation>.findLocation(location: Int): Int =
-    binarySearch { it.location.compareTo(location) }
+private fun MutableList<Invalidation>.findLocation(location: Int): Int {
+    var low = 0
+    var high = size - 1
+
+    while (low <= high) {
+        val mid = (low + high).ushr(1) // safe from overflows
+        val midVal = get(mid)
+        val cmp = midVal.location.compareTo(location)
+
+        if (cmp < 0)
+            low = mid + 1
+        else if (cmp > 0)
+            high = mid - 1
+        else
+            return mid // key found
+    }
+    return -(low + 1) // key not found
+}
 
 private fun MutableList<Invalidation>.insertIfMissing(location: Int, scope: RecomposeScope) {
     val index = findLocation(location)
