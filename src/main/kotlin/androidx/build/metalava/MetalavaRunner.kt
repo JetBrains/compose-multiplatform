@@ -112,6 +112,10 @@ val API_LINT_ARGS: List<String> = listOf(
         "NotCloseable",
         "SamShouldBeLast",
         "MissingJvmstatic",
+        "CallbackMethodName",
+        "GetterOnBuilder",
+        "StaticFinalBuilder",
+        "MissingGetterMatchingBuilder",
 
         // We should only treat these as warnings
         "IntentBuilderName",
