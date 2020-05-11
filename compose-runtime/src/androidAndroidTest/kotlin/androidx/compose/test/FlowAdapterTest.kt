@@ -28,6 +28,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BroadcastChannel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
 import org.junit.Rule
 import org.junit.Test
@@ -270,6 +271,36 @@ class FlowAdapterTest {
 
         runOnIdleCompose {
             assertThat(realValue).isEqualTo("value")
+        }
+    }
+
+    @Test
+    fun testInitialValueOfStateFlow() {
+        val flow = MutableStateFlow("initial")
+        var realValue = "to-be-updated"
+        rule.setContent {
+            realValue = flow.collectAsState().value
+        }
+
+        runOnIdleCompose {
+            assertThat(realValue).isEqualTo("initial")
+        }
+    }
+
+    @Test
+    fun updatingValueOfStateFlow() {
+        val flow = MutableStateFlow("initial")
+        var realValue = "to-be-updated"
+        rule.setContent {
+            realValue = flow.collectAsState().value
+        }
+
+        runOnIdleCompose {
+            flow.value = "updated"
+        }
+
+        runOnIdleCompose {
+            assertThat(realValue).isEqualTo("updated")
         }
     }
 }

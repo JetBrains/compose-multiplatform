@@ -187,6 +187,7 @@ package androidx.compose {
   }
 
   public final class FlowAdapterKt {
+    method @androidx.compose.Composable public static inline <T> androidx.compose.State<T> collectAsState(kotlinx.coroutines.flow.StateFlow<? extends T>, kotlin.coroutines.CoroutineContext context = Dispatchers.Main);
     method @androidx.compose.Composable public static inline <T> androidx.compose.State<T> collectAsState(kotlinx.coroutines.flow.Flow<? extends T>, kotlin.coroutines.CoroutineContext context = Dispatchers.Main);
     method @androidx.compose.Composable public static <T> androidx.compose.State<T> collectAsState(kotlinx.coroutines.flow.Flow<? extends T>, T? initial, kotlin.coroutines.CoroutineContext context = Dispatchers.Main);
   }
