@@ -51,7 +51,8 @@ abstract class ListTaskOutputsTask() : DefaultTask() {
         removePrefixes.add(prefix + "/")
     }
 
-    fun format(tasksByOutput: Map<File, Task>): String {
+    // Given a map from output file to Task, formats into a String
+    fun formatTasks(tasksByOutput: Map<File, Task>): String {
         val messages: MutableList<String> = mutableListOf()
         for ((output, task) in tasksByOutput) {
             var filePath = output.path
@@ -59,20 +60,41 @@ abstract class ListTaskOutputsTask() : DefaultTask() {
                 filePath = filePath.removePrefix(prefix)
             }
 
-            val keyLength = filePath.length.toInt()
-            val roundedKeyLength = ((keyLength / 32) + 1) * 32
-            val extraSpaces = " ".repeat(roundedKeyLength - keyLength)
-            messages.add("$filePath $extraSpaces - ${task.path}")
+            messages.add(
+                formatInColumns(
+                    listOf(filePath, " - " + task.path + " (" + task::class.qualifiedName + ")")
+                )
+            )
         }
         messages.sort()
         val text = messages.joinToString("\n")
         return text
     }
 
+    // Given a list of columns, indents and joins them to be easy to read
+    fun formatInColumns(columns: List<String>): String {
+        val components = mutableListOf<String>()
+        var textLength = 0
+        for (column in columns) {
+            val roundedTextLength = if (textLength == 0) {
+                textLength
+            } else {
+                ((textLength / 32) + 1) * 32
+            }
+            val extraSpaces = " ".repeat(roundedTextLength - textLength)
+            components.add(extraSpaces)
+            textLength = roundedTextLength
+            components.add(column)
+            textLength += column.length.toInt()
+        }
+        return components.joinToString("")
+    }
+
     @TaskAction
     fun exec() {
         val tasksByOutput = project.rootProject.findAllTasksByOutput()
-        val text = format(tasksByOutput)
+        val text = formatTasks(tasksByOutput)
+
         val outputFile = outputFile.get()
         outputFile.writeText(text)
         logger.lifecycle("Wrote ${outputFile.path}")
