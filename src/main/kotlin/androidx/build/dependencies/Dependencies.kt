@@ -94,6 +94,8 @@ const val ROBOLECTRIC = "org.robolectric:robolectric:4.3.1"
 const val SHADOW_PLUGIN = "com.github.jengelman.gradle.plugins:shadow:5.2.0"
 
 const val PROTOBUF = "com.google.protobuf:protobuf-java:3.4.0"
+const val PROTOBUF_COMPILER = "com.google.protobuf:protoc:3.10.0"
+const val PROTOBUF_LITE = "com.google.protobuf:protobuf-javalite:3.10.0"
 
 const val FLOGGER = "com.google.flogger:flogger:0.4"
 const val FLOGGER_SYSTEM_BACKEND = "com.google.flogger:flogger-system-backend:0.4"
