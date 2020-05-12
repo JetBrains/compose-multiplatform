@@ -121,6 +121,8 @@ internal lateinit var kotlinCoroutinesVersion: String
 
 val KOTLIN_COROUTINES_ANDROID
     get() = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinCoroutinesVersion"
+val KOTLIN_COROUTINES_SWING
+    get() = "org.jetbrains.kotlinx:kotlinx-coroutines-swing:$kotlinCoroutinesVersion"
 val KOTLIN_COROUTINES_CORE
     get() = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion"
 val KOTLIN_COROUTINES_GUAVA
