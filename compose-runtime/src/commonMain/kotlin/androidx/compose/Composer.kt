@@ -187,7 +187,7 @@ private class Invalidation(
 )
 
 interface ScopeUpdateScope {
-    fun updateScope(block: (Composer<*>) -> Unit)
+    fun updateScope(block: (Composer<*>, Int, Int) -> Unit)
 }
 
 internal enum class InvalidationResult {
@@ -226,7 +226,7 @@ internal enum class InvalidationResult {
  * stored in [anchor] and call [block] when recomposition is requested. It is created by
  * [Composer.startRestartGroup] and is used to track how to restart the group.
  */
-internal class RecomposeScope(var composer: Composer<*>) : ScopeUpdateScope {
+internal class RecomposeScope(var composer: Composer<*>, val key: Int) : ScopeUpdateScope {
     /**
      * An anchor to the location in the slot table that start the group associated with this
      * recompose scope. This value is set by [composer] when the scope is committed to the slot
@@ -248,15 +248,20 @@ internal class RecomposeScope(var composer: Composer<*>) : ScopeUpdateScope {
      */
     var used = false
 
+    var defaultsInScope = false
+    var defaultsInvalid = false
+
     /**
      * True when the recompose scope is in an slot in the slot table
      */
     var inTable = true
 
+    var requiresRecompose = false
+
     /**
      * The lambda to call to restart the scopes composition.
      */
-    private var block: ((Composer<*>) -> Unit)? = null
+    private var block: ((Composer<*>, Int, Int) -> Unit)? = null
 
     /**
      * Restart the scope's composition. It is an error if [block] was not updated. The code
@@ -265,7 +270,7 @@ internal class RecomposeScope(var composer: Composer<*>) : ScopeUpdateScope {
      * incorrect direct calls to [Composer.startRestartGroup] and [Composer.endRestartGroup].
      */
     fun <N> compose(composer: Composer<N>) {
-        block?.invoke(composer) ?: error("Invalid restart scope")
+        block?.invoke(composer, key, 1) ?: error("Invalid restart scope")
     }
 
     /**
@@ -277,7 +282,7 @@ internal class RecomposeScope(var composer: Composer<*>) : ScopeUpdateScope {
      * Update [block]. The scope is returned by [Composer.endRestartGroup] when [used] is true
      * and implements [ScopeUpdateScope].
      */
-    override fun updateScope(block: (Composer<*>) -> Unit) { this.block = block }
+    override fun updateScope(block: (Composer<*>, Int, Int) -> Unit) { this.block = block }
 }
 
 /**
@@ -433,6 +438,34 @@ open class Composer<N>(
     fun endReplaceableGroup() = endGroup()
 
     /**
+     *
+     * Warning: This is expected to be executed by the compiler only and should not be called
+     * directly from source code. Call this API at your own risk.
+     *
+     */
+    fun startDefaults() = start(0, false, null)
+
+    /**
+     *
+     * Warning: This is expected to be executed by the compiler only and should not be called
+     * directly from source code. Call this API at your own risk.
+     *
+     * @see [startReplaceableGroup]
+     */
+    fun endDefaults() {
+        endGroup()
+        val scope = currentRecomposeScope
+        if (scope != null && scope.used) {
+            scope.defaultsInScope = true
+        }
+    }
+
+    val defaultsInvalid: Boolean
+        get() {
+            return providersInvalid || currentRecomposeScope?.defaultsInvalid == true
+        }
+
+    /**
      * Inserts a "Movable Group" starting marker in the slot table at the current execution
      * position. A Movable Group is a group which can be moved or reordered between its siblings
      * and retain slot table state, in addition to being removed or inserted. Movable Groups
@@ -446,10 +479,12 @@ open class Composer<N>(
      * Warning: This is expected to be executed by the compiler only and should not be called
      * directly from source code. Call this API at your own risk.
      *
-     * @param key The key for the group. This is expected to be the result of [joinKey] which
-     * will create a compound key of a source-location-based key and an arbitrary externally
-     * provided piece of data. Whatever object is passed in here is expected to have a meaningful
-     * [equals] and [hashCode] implementation.
+     * @param key The source-location-based key for the group. Expected to be unique among its
+     * siblings.
+     *
+     * @param joinedData Additional identifying information to compound with [key]. If there are
+     * multiple values, this is expected to be compounded together with [joinKey]. Whatever value
+     * is passed in here is expected to have a meaningful [equals] and [hashCode] implementation.
      *
      * @see [endMovableGroup]
      * @see [key]
@@ -457,7 +492,7 @@ open class Composer<N>(
      * @see [startReplaceableGroup]
      * @see [startRestartGroup]
      */
-    fun startMovableGroup(key: Any) = start(key, false, null)
+    fun startMovableGroup(key: Int, joinedData: Any?) = start(joinKey(key, joinedData), false, null)
 
     /**
      * Indicates the end of a "Movable Group" at the current execution position. A Movable Group is
@@ -476,18 +511,19 @@ open class Composer<N>(
      */
     fun endMovableGroup() = endGroup()
 
+    @Suppress("UNUSED_PARAMETER", "DeprecatedCallableAddReplaceWith")
+    @Deprecated(
+        "This method is only left here for backwards compatibility with the Compose IDE Plugin"
+    )
     inline fun call(
         key: Any,
         invalid: ComposerValidator.() -> Boolean,
         block: () -> Unit
     ) {
-        startGroup(key)
-        if (this.invalid() || !skipping) {
-            block()
-        } else {
-            skipToGroupEnd()
-        }
-        endGroup()
+        error(
+            "This method should not be executed unless you are using an out of date Compose " +
+                    "Compiler Plugin"
+        )
     }
 
     /**
@@ -542,7 +578,11 @@ open class Composer<N>(
     /**
      * True if the composition should be checking if the composable functions can be skipped.
      */
-    val skipping: Boolean get() = !inserting && !providersInvalid
+    val skipping: Boolean get() {
+        return !inserting &&
+                !providersInvalid &&
+                currentRecomposeScope?.requiresRecompose == false
+    }
 
     /**
      * Returns the hash of the compound key calculated as a combination of the keys of all the
@@ -646,10 +686,6 @@ open class Composer<N>(
      * End the current group.
      */
     fun endGroup() = end(false)
-
-    fun startExpr(key: Any) = startGroup(key)
-
-    fun endExpr() = endGroup()
 
     private fun skipGroup() {
         groupNodeCount += reader.skipGroup()
@@ -1327,15 +1363,15 @@ open class Composer<N>(
         isComposing = true
         var recomposed = false
 
-        val start = reader.parentLocation
-        val end = start + reader.groupSize(start) + 1
-        val recomposeGroup = reader.group(start)
+        val parent = reader.parentLocation
+        val end = parent + reader.groupSize(parent)
+        val recomposeGroup = reader.group(parent)
         val recomposeIndex = nodeIndex
         val recomposeCompoundKey = currentCompoundKeyHash
         val oldGroupNodeCount = groupNodeCount
         var oldGroup = recomposeGroup
 
-        var firstInRange = invalidations.firstInRange(start, end)
+        var firstInRange = invalidations.firstInRange(reader.current, end)
         while (firstInRange != null) {
             val location = firstInRange.location
 
@@ -1355,7 +1391,7 @@ open class Composer<N>(
             nodeIndex = nodeIndexOf(
                 location,
                 newGroup,
-                start,
+                parent,
                 recomposeGroup,
                 recomposeIndex
             )
@@ -1530,13 +1566,16 @@ open class Composer<N>(
     }
 
     internal fun invalidate(scope: RecomposeScope): InvalidationResult {
+        if (scope.defaultsInScope) {
+            scope.defaultsInvalid = true
+        }
         val location = scope.anchor?.location(slotTable)
             ?: return InvalidationResult.IGNORED // The scope never entered the composition
         if (location < 0)
             return InvalidationResult.IGNORED // The scope was removed from the composition
 
         invalidations.insertIfMissing(location, scope)
-        if (isComposing && location > reader.current) {
+        if (isComposing && location >= reader.current) {
             // if we are invalidating a scope that is going to be traversed during this
             // composition.
             return InvalidationResult.IMMINENT
@@ -1591,15 +1630,15 @@ open class Composer<N>(
      * [androidx.compose.invalidate].
      */
     fun startRestartGroup(key: Int) {
-        val location = reader.current
         start(key, false, null)
         if (inserting) {
-            val scope = RecomposeScope(this)
+            val scope = RecomposeScope(this, key)
             invalidateStack.push(scope)
             updateValue(scope)
         } else {
-            invalidations.removeLocation(location)
+            val invalidation = invalidations.removeLocation(reader.parentLocation)
             val scope = reader.next() as RecomposeScope
+            scope.requiresRecompose = invalidation != null
             invalidateStack.push(scope)
         }
     }
@@ -1622,6 +1661,7 @@ open class Composer<N>(
                 else
                     slotTable.anchor(reader.parentLocation)
             }
+            scope.defaultsInvalid = false
             scope
         } else {
             null
@@ -2232,9 +2272,9 @@ private fun MutableList<Invalidation>.firstInRange(start: Int, end: Int): Invali
     return null
 }
 
-private fun MutableList<Invalidation>.removeLocation(location: Int) {
+private fun MutableList<Invalidation>.removeLocation(location: Int): Invalidation? {
     val index = findLocation(location)
-    if (index >= 0) removeAt(index)
+    return if (index >= 0) removeAt(index) else null
 }
 
 private fun MutableList<Invalidation>.removeRange(start: Int, end: Int) {
@@ -2265,8 +2305,8 @@ internal var currentComposerInternal: Composer<*>? = null
 
 internal fun invokeComposable(composer: Composer<*>, composable: @Composable () -> Unit) {
     @Suppress("UNCHECKED_CAST")
-    val realFn = composable as Function1<Composer<*>, Unit>
-    realFn(composer)
+    val realFn = composable as Function3<Composer<*>, Int, Int, Unit>
+    realFn(composer, 0, 1)
 }
 
 internal fun <T> invokeComposableForResult(
@@ -2274,8 +2314,8 @@ internal fun <T> invokeComposableForResult(
     composable: @Composable () -> T
 ): T {
     @Suppress("UNCHECKED_CAST")
-    val realFn = composable as Function1<Composer<*>, T>
-    return realFn(composer)
+    val realFn = composable as Function3<Composer<*>, Int, Int, T>
+    return realFn(composer, 0, 1)
 }
 
 private fun Group.distanceFrom(root: Group): Int {

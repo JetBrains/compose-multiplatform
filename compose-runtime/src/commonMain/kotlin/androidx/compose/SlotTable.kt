@@ -914,12 +914,14 @@ class SlotWriter internal constructor(val table: SlotTable) {
             pendingClear = false
             table.clearGap()
         }
+        val gap = if (table.gapLen > 0)
+            "${table.gapStart}-${table.gapStart + table.gapLen - 1}"
+        else
+            "none"
         return "SlotWriter" +
                 "(current=$current, " +
                 "size=${slots.size - table.gapLen}, " +
-                "gap=${
-        if (table.gapLen > 0) "$table.gapStart-${table.gapStart + table.gapLen - 1}" else "none"}${
-        if (insertCount > 0) ", inserting" else ""})"
+                "gap=${gap}${if (insertCount > 0) ", inserting" else ""})"
     }
 }
 

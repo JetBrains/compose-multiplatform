@@ -35,11 +35,11 @@ internal actual fun recordSourceKeyInfo(key: Any) {
             // On Android the frames looks like:
             //  0: getThreadStackTrace() (native method)
             //  1: getStackTrace()
-            //  2: recordSourceKey()
+            //  2: recordSourceKeyInfo()
             //  3: start()
-            //  4: startGroup() or startNode()
-            //  5: non-inline call/emit?
-            //  5 or 6: <calling method>
+            //  4: start()
+            //  5: startRestartGroup() or startReplaceableGroup() or startNode()
+            //  6: <calling method>
             // On a desktop VM this looks like:
             //  0: getStackTrace()
             //  1: recordSourceKey()
@@ -48,14 +48,13 @@ internal actual fun recordSourceKeyInfo(key: Any) {
             //  4: non-inline call/emit?
             //  4 or 5: <calling method>
             // If the stack method at 4 is startGroup assume we want 5 instead.
-            val frameNumber = stack[4].let {
-                if (it.methodName == "startGroup" || it.methodName == "startNode") 5 else 4
-            }
-            val frame = stack[frameNumber].let {
-                if (it.methodName == "call" || it.methodName == "emit")
-                    stack[frameNumber + 1]
-                else
-                    stack[frameNumber]
+            val frame = if (stack[0].methodName == "getThreadStackTrace") {
+                when {
+                    stack[4].methodName == "startNode" -> stack[5]
+                    else -> stack[7]
+                }
+            } else {
+                stack[8]
             }
             "${frame.className}.${frame.methodName} (${frame.fileName}:${frame.lineNumber})"
         })
