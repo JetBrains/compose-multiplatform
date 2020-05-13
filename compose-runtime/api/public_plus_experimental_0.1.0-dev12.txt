@@ -227,7 +227,7 @@ package androidx.compose {
     method public static String? keySourceInfoOf(Object key);
   }
 
-  @androidx.compose.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.CLASS) public @interface Model {
+  @Deprecated @androidx.compose.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.CLASS) public @interface Model {
   }
 
   @androidx.compose.Stable public interface MutableState<T> extends androidx.compose.State<T> {

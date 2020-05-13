@@ -17,9 +17,11 @@
 package androidx.compose.benchmark
 
 import androidx.compose.Composable
-import androidx.compose.Model
 import androidx.compose.Observe
 import androidx.compose.benchmark.realworld4.RealWorld4_FancyWidget_000
+import androidx.compose.getValue
+import androidx.compose.mutableStateOf
+import androidx.compose.setValue
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -163,8 +165,8 @@ private val blackModifier = Modifier.fillMaxSize() + blackBackground
 private val yellowModifier = Modifier.fillMaxSize() + yellowBackground
 private val defaultModifier = yellowModifier
 
-@Model
-class ColorModel(private var color: Color = Color.Black) {
+class ColorModel(color: Color = Color.Black) {
+    private var color: Color by mutableStateOf(color)
     fun toggle() {
         color = if (color == Color.Black) Color.Red else Color.Black
     }

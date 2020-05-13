@@ -17,7 +17,9 @@
 package androidx.compose.benchmark.dbmonster
 
 import androidx.compose.Composable
-import androidx.compose.Model
+import androidx.compose.getValue
+import androidx.compose.mutableStateOf
+import androidx.compose.setValue
 import androidx.ui.core.Modifier
 import androidx.ui.foundation.Text
 import androidx.ui.layout.Column
@@ -36,11 +38,13 @@ private fun randomQuery(random: Random): String = random.nextDouble().let {
 
 private const val MAX_ELAPSED = 15.0
 
-@Model
-class Query(var query: String, var elapsed: Double)
+class Query(query: String, elapsed: Double) {
+    var query by mutableStateOf(query)
+    var elapsed by mutableStateOf(elapsed)
+}
 
-@Model
-class Database(var name: String, random: Random) {
+class Database(name: String, random: Random) {
+    var name: String by mutableStateOf(name)
     private val myRandom = random
     var queries: List<Query> = (1..10).map {
         Query(randomQuery(random), random.nextDouble() * MAX_ELAPSED)

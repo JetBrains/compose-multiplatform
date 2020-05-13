@@ -26,19 +26,16 @@ package androidx.compose
  *
  * [Model] also adds an MVCC transaction system to ensure data consistency across threads.
  *
- * Consider the following example:
- *
- * @sample androidx.compose.samples.modelSample
- *
- * In this example, `LoginScreen` is recomposed every time the username and password of the
- * model updates, keeping the UI synchronized with the model. There is no need to call
- * [androidx.compose.Recompose] manually.
- *
  * @see FrameManager
  * @see Observe
+ * @see state
+ * @see mutableStateOf
+ * @see State
+ * @see MutableState
  */
 @MustBeDocumented
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.BINARY)
 @StableMarker
+@Deprecated("Use mutableStateOf and associated State<T> variants")
 annotation class Model
