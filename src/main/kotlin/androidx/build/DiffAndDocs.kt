@@ -32,6 +32,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ResolveException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileTree
@@ -190,7 +191,7 @@ class DiffAndDocs private constructor(
         originRule: DocsRule
     ): FileTree {
         val configuration = root.configurations.detachedConfiguration(
-            root.dependencies.create(mavenId)
+            root.dependencyWithScope(mavenId, "runtime")
         )
 
         val artifacts = try {
@@ -238,19 +239,6 @@ class DiffAndDocs private constructor(
                 if (appVariant.buildType.getName() == "release" && taskProvider != null) {
                     registerAndroidProjectForDocsTask(taskProvider, appVariant)
 
-                    // Add runtime dependencies too
-                    val runtimeConfiguration = appVariant.runtimeConfiguration
-                    taskProvider.configure({ task ->
-                        task.dependsOn(runtimeConfiguration)
-                        task.classpath += docsProject.files(
-                            // Create a Provider so that this doesn't need to be resolved before
-                            // the task executes
-                            docsProject.provider({
-                                docsProject.files(runtimeConfiguration.resolvedConfiguration.files)
-                            })
-                        )
-                    })
-
                     // Exclude the R.java file from documentation.
                     taskProvider.configure {
                         it.exclude { fileTreeElement ->
@@ -292,7 +280,7 @@ class DiffAndDocs private constructor(
                     // a Maven spec. Note there is no requirement to
                     // use the Maven spec here -- this could also be a direct reference to the AAR.
                     val dependencyText = strategy.dependency(extension)
-                    val dependency = root.dependencies.create(dependencyText)
+                    val dependency = root.dependencyWithScope(dependencyText, "runtime")
                     depHandler.add("${rule.name}Implementation", dependency)
 
                     // Optionally add the library's stub JAR dependencies (ex. sidecar JARs) to the
@@ -402,31 +390,23 @@ private fun registerJavaProjectForDocsTask(
  * @see #registerJavaProjectForDocsTask
  */
 private fun registerAndroidProjectForDocsTask(
-    taskProvider: TaskProvider<out Javadoc>,
+    task: TaskProvider<out Javadoc>,
     releaseVariant: BaseVariant
 ) {
-    taskProvider.configure { task ->
-        val javaCompileProvider = releaseVariant.javaCompileProvider
-        val project = task.project
-
-        task.dependsOn(javaCompileProvider)
-
-        // sources
-        task.include { fileTreeElement ->
+    // This code makes a number of unsafe assumptions about Android Gradle Plugin,
+    // and there's a good chance that this will break in the near future.
+    val javaCompileProvider = releaseVariant.javaCompileProvider
+    task.configure {
+        it.dependsOn(javaCompileProvider)
+        it.include { fileTreeElement ->
             fileTreeElement.name != "R.java" ||
                     fileTreeElement.path.endsWith(releaseVariant.rFile())
         }
         releaseVariant.getSourceFolders(SourceKind.JAVA).forEach { sourceSet ->
-            task.source(sourceSet)
+            it.source(sourceSet)
         }
-
-        task.classpath += project.files(
-            // Create a Provider so that this doesn't need to be resolved before the task executes
-            project.provider({
-                releaseVariant.getCompileClasspath(null) +
-                    task.project.files(javaCompileProvider.get().destinationDir)
-            })
-        )
+        it.classpath += releaseVariant.getCompileClasspath(null) +
+                it.project.files(javaCompileProvider.get().destinationDir)
     }
 }
 
@@ -629,3 +609,21 @@ fun Project.processProperty(name: String) =
         } else {
             null
         }
+
+/**
+ * Creates a dependency referring to the given dependency scope of the given artifact
+ * For example, you can ask for the runtime dependencies of an artifact
+ */
+fun Project.dependencyWithScope(mavenId: String, scope: String): Dependency {
+    val components = mavenId.split(":")
+    val properties = mutableMapOf(
+        "group" to components[0],
+        "name" to components[1],
+        "version" to components[2],
+        "configuration" to scope
+    )
+    if (components.size > 3) {
+        properties.put("classifier", components[3])
+    }
+    return project.dependencies.create(properties)
+}
