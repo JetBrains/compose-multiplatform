@@ -36,4 +36,4 @@ package androidx.compose
  * @see invalidate
  */
 @Composable
-fun Recompose(body: @Composable (recompose: () -> Unit) -> Unit) = body(invalidate)
+fun Recompose(body: @Composable() (recompose: () -> Unit) -> Unit) = body(invalidate)

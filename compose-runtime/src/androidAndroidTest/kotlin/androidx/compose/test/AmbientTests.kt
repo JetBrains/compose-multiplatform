@@ -506,7 +506,7 @@ class AmbientTests : BaseComposeTest() {
     }
 
     @Composable
-    fun subCompose(block: @Composable () -> Unit) {
+    fun subCompose(block: @Composable() () -> Unit) {
         val container =
             remember { escapeCompose { LayoutNode() } }
         val reference = compositionReference()
@@ -529,7 +529,7 @@ class AmbientTests : BaseComposeTest() {
         ref.value = compositionReference()
     }
 
-    @Composable fun deferredSubCompose(block: @Composable () -> Unit): () -> Unit {
+    @Composable fun deferredSubCompose(block: @Composable() () -> Unit): () -> Unit {
         val container = remember { escapeCompose { LayoutNode() } }
         val ref = Ref<CompositionReference>()
         narrowInvalidateForReference(ref = ref)

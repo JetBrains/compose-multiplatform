@@ -1030,13 +1030,7 @@ open class Composer<N>(
      * with its implementation. This version avoids boxing for [Int] keys.
      */
     private fun start(key: Int, isNode: Boolean, data: Any?) {
-        if (!inserting && pending == null && run {
-                val slot = reader.groupKey
-                if (slot is Int) {
-                    val slotInt: Int = slot
-                    key == slotInt
-                } else false
-            }) {
+        if (!inserting && pending == null && key == reader.groupKey) {
             validateNodeNotExpected()
 
             updateCompoundKeyWhenWeEnterGroupKeyHash(key)
@@ -2247,7 +2241,7 @@ val currentComposer: Composer<*> get() {
 // TODO: get rid of the need for this when we merge FrameManager and Recomposer together!
 internal var currentComposerInternal: Composer<*>? = null
 
-internal fun invokeComposable(composer: Composer<*>, composable: @Composable () -> Unit) {
+internal fun invokeComposable(composer: Composer<*>, composable: @Composable() () -> Unit) {
     @Suppress("UNCHECKED_CAST")
     val realFn = composable as Function1<Composer<*>, Unit>
     realFn(composer)
@@ -2255,7 +2249,7 @@ internal fun invokeComposable(composer: Composer<*>, composable: @Composable () 
 
 internal fun <T> invokeComposableForResult(
     composer: Composer<*>,
-    composable: @Composable () -> T
+    composable: @Composable() () -> T
 ): T {
     @Suppress("UNCHECKED_CAST")
     val realFn = composable as Function1<Composer<*>, T>

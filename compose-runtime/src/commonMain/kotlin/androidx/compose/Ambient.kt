@@ -164,7 +164,7 @@ fun <T> staticAmbientOf(defaultFactory: (() -> T)? = null): ProvidableAmbient<T>
  * @see staticAmbientOf
  */
 @Composable
-fun Providers(vararg values: ProvidedValue<*>, children: @Composable () -> Unit) {
+fun Providers(vararg values: ProvidedValue<*>, children: @Composable() () -> Unit) {
     currentComposer.startProviders(values)
     children()
     currentComposer.endProviders()

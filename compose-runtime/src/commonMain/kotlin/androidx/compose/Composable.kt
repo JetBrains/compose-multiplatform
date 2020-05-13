@@ -44,13 +44,13 @@ package androidx.compose
     AnnotationTarget.FUNCTION,
 
     // type declarations
-    // var foo: @Composable () -> Unit = { ... }
+    // var foo: @Composable() () -> Unit = { ... }
     // parameter types
-    // foo: @Composable () -> Unit
+    // foo: @Composable() () -> Unit
     AnnotationTarget.TYPE,
 
     // composable types inside of type signatures
-    // foo: (@Composable () -> Unit) -> Unit
+    // foo: (@Composable() () -> Unit) -> Unit
     AnnotationTarget.TYPE_PARAMETER,
 
     // composable property declarations

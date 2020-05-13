@@ -30,4 +30,4 @@ package androidx.compose
  * @see Recompose
  */
 @Composable
-fun Observe(body: @Composable () -> Unit) = body()
+fun Observe(body: @Composable() () -> Unit) = body()

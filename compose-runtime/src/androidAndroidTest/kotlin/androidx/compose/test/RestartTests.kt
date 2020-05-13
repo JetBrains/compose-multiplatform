@@ -227,12 +227,12 @@ class RestartTests : BaseComposeTest() {
 }
 
 @Composable
-fun RestartGroup(block: @Composable () -> Unit) {
+fun RestartGroup(block: @Composable() () -> Unit) {
     block()
 }
 
 @Composable
-fun Repeat(count: Int, block: @Composable (index: Int) -> Unit) {
+fun Repeat(count: Int, block: @Composable() (index: Int) -> Unit) {
     for (i in 0 until count) {
         block(i)
     }

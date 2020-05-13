@@ -24,7 +24,6 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.ui.core.Modifier
-import androidx.ui.core.drawBehind
 import androidx.ui.foundation.Box
 import androidx.ui.foundation.drawBackground
 import androidx.ui.graphics.Color
@@ -153,10 +152,9 @@ class ComposeBenchmark : ComposeBenchmarkBase() {
     }
 }
 
-private fun background(color: Color) = Modifier.drawBehind { drawRect(color) }
-private val redBackground = background(Color.Red)
-private val blackBackground = background(Color.Black)
-private val yellowBackground = background(Color.Yellow)
+private val redBackground = Modifier.drawBackground(Color.Red)
+private val blackBackground = Modifier.drawBackground(Color.Black)
+private val yellowBackground = Modifier.drawBackground(Color.Yellow)
 private val defaultBackground = yellowBackground
 
 @Model

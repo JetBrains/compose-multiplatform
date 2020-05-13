@@ -2075,7 +2075,7 @@ class CompositionTests {
         }
 
         @Composable
-        fun MockComposeScope.wrapper(children: @Composable () -> Unit) {
+        fun MockComposeScope.wrapper(children: @Composable() () -> Unit) {
             children()
         }
 
@@ -2204,7 +2204,7 @@ class CompositionTests {
         }
 
         @Composable
-        fun MockComposeScope.wrapper(children: @Composable () -> Unit) {
+        fun MockComposeScope.wrapper(children: @Composable() () -> Unit) {
             children()
         }
 

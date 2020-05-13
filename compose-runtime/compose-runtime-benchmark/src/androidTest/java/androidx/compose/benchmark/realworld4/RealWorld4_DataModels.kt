@@ -23,6 +23,7 @@ package androidx.compose.benchmark.realworld4
 
 import androidx.compose.Model
 import androidx.ui.graphics.Color
+import java.util.Random
 
 @Model
 class RealWorld4_DataModel_09() {

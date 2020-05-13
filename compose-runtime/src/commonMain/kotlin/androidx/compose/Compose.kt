@@ -16,7 +16,7 @@
 
 package androidx.compose
 
-private val EmptyComposable: @Composable () -> Unit = {}
+private val EmptyComposable: @Composable() () -> Unit = {}
 
 /**
  * Represents empty content for a Composable function.
@@ -29,4 +29,4 @@ fun emptyContent() = EmptyComposable
  * @return this Composable if not null, else [emptyContent].
  */
 @Suppress("NOTHING_TO_INLINE")
-inline fun (@Composable (() -> Unit))?.orEmpty() = this ?: emptyContent()
+inline fun @Composable() (() -> Unit)?.orEmpty() = this ?: emptyContent()

@@ -41,7 +41,7 @@ abstract class ComposeBenchmarkBase {
     @get:Rule
     val activityRule = ActivityTestRule(ComposeActivity::class.java)
 
-    fun measureCompose(block: @Composable () -> Unit) {
+    fun measureCompose(block: @Composable() () -> Unit) {
         val activity = activityRule.activity
         var composition: Composition? = null
         benchmarkRule.measureRepeated {
@@ -93,10 +93,10 @@ abstract class ComposeBenchmarkBase {
 }
 
 class RecomposeReceiver {
-    var composeCb: @Composable () -> Unit = @Composable { }
+    var composeCb: @Composable() () -> Unit = @Composable { }
     var updateModelCb: () -> Unit = { }
 
-    fun compose(block: @Composable () -> Unit) {
+    fun compose(block: @Composable() () -> Unit) {
         composeCb = block
     }
 
