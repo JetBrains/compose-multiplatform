@@ -16,12 +16,12 @@
 
 package androidx.compose.benchmark
 
-import androidx.compose.Model
 import androidx.compose.benchmark.siblings.IdentityType
 import androidx.compose.benchmark.siblings.Item
 import androidx.compose.benchmark.siblings.ReorderType
 import androidx.compose.benchmark.siblings.SiblingManagement
 import androidx.compose.benchmark.siblings.update
+import androidx.compose.mutableStateOf
 import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
@@ -83,7 +83,7 @@ class SiblingBenchmark(
     @Test
     fun runBenchmark() {
         activityRule.runUiRunnable {
-            val items = ValueHolder((0..count).map { Item(it) })
+            val items = mutableStateOf((0..count).map { Item(it) })
             val random = Random(0)
             measureRecompose {
                 compose {
@@ -105,5 +105,3 @@ fun ActivityTestRule<ComposeActivity>.runUiRunnable(block: () -> Unit) {
         }
     })
 }
-
-@Model private class ValueHolder<T>(var value: T)

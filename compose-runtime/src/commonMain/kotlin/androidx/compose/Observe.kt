@@ -18,14 +18,14 @@ package androidx.compose
 
 /**
  * This component creates a scope which will be the root of recomposition for any reads or writes to
- * [Model] classes that happen inside of it. This can be used to improve performance in situations
- * where you know that a specific [Model] object will need to change at high frequencies, and you
+ * state instances that happen inside of it. This can be used to improve performance in situations
+ * where you know that a specific state object will need to change at high frequencies, and you
  * want to reduce the burden of recomposition.  It is recommended that you not introduce [Observe]
  * into the composition until it is clear that is necessary to improve performance.
  *
  * @param body The composable content to observe
  *
- * @see Model
+ * @see state
  * @see invalidate
  * @see Recompose
  */

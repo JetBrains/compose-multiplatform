@@ -29,13 +29,18 @@ import kotlin.reflect.KProperty
  * A composable used to introduce a state value of type [T] into a composition.
  *
  * This is useful when you have a value that you would like to locally mutate and use in the context of a composition. Since
- * the returned [MutableState] instance implements [Model], changes to the [MutableState.value] property will be automatically tracked in
- * composition and schedule a recompose.
+ * the returned [MutableState] instance implements [Framed], changes to the [MutableState.value]
+ * property will be automatically tracked in composition and schedule a recompose.
  *
  * The [MutableState] class can be used several different ways. For example, the most basic way is to store the returned state
  * value into a local immutable variable, and then set the [MutableState.value] property on it.
  *
  * @sample androidx.compose.samples.SimpleStateSample
+ *
+ * @sample androidx.compose.samples.stateSample
+ *
+ * In this example, `LoginScreen` is recomposed every time the username and password of the
+ * model updates, keeping the UI synchronized with the state.
  *
  * Additionally, you can destructure the [MutableState] object into a value and a "setter" function.
  *
@@ -49,7 +54,7 @@ import kotlin.reflect.KProperty
  * [MutableState.value] is written to. If this returns true, then no recomposition will be
  * scheduled. See [ReferentiallyEqual] and [StructurallyEqual] for simple implementations.
  * @param init A factory function to create the initial value of this state
- * @return An [Model] instance of [MutableState] that wraps the value.
+ * @return An instance of [MutableState] that wraps the value.
  *
  * @see [stateFor]
  * @see [remember]
@@ -66,12 +71,13 @@ inline fun <T> state(
  * This is useful when you have a value that you would like to locally mutate and use in the context of a composition, and its
  * value is scoped to another value and you want it to be reset every time the other value changes.
  *
- * The returned [MutableState] instance implements [Model] so that changes to the [MutableState.value] property will be automatically tracked in
- * composition and schedule a recompose.
+ * The returned [MutableState] instance implements [Framed] so that changes to the
+ * [MutableState.value] property will be automatically tracked in composition and schedule a
+ * recompose.
  *
  * @param v1 An input value that, when changed, will cause the state to reset and [init] to be rerun
  * @param init A factory function to create the initial value of this state
- * @return An [Model] instance of [MutableState] that wraps the value.
+ * @return An instance of [MutableState] that wraps the value.
  *
  * @sample androidx.compose.samples.observeUserSample
  *
@@ -88,13 +94,14 @@ inline fun <T, /*reified*/ V1> stateFor(v1: V1, init: () -> T) =
  * This is useful when you have a value that you would like to locally mutate and use in the context of a composition, and its
  * value is scoped to another value and you want it to be reset every time the other value changes.
  *
- * The returned [MutableState] instance implements [Model] so that changes to the [MutableState.value] property will be automatically tracked in
- * composition and schedule a recompose.
+ * The returned [MutableState] instance implements [Framed] such that changes to the
+ * [MutableState.value] property will be automatically tracked in composition and schedule a
+ * recompose.
  *
  * @param v1 An input value that, when changed, will cause the state to reset and [init] to be rerun
  * @param v2 An input value that, when changed, will cause the state to reset and [init] to be rerun
  * @param init A factory function to create the initial value of this state
- * @return An [Model] instance of [MutableState] that wraps the value.
+ * @return An instance of [MutableState] that wraps the value.
  *
  * @see [state]
  * @see [remember]
@@ -112,12 +119,13 @@ inline fun <T, reified V1, reified V2> stateFor(
  * This is useful when you have a value that you would like to locally mutate and use in the context of a composition, and its
  * value is scoped to another value and you want it to be reset every time the other value changes.
  *
- * The returned [MutableState] instance implements [Model] so that changes to the [MutableState.value] property will be automatically tracked in
- * composition and schedule a recompose.
+ * The returned [MutableState] instance implements [Framed] so that changes to the
+ * [MutableState.value] property will be automatically tracked in composition and schedule a
+ * recompose.
  *
  * @param inputs A set of inputs such that, when any of them have changed, will cause the state to reset and [init] to be rerun
  * @param init A factory function to create the initial value of this state
- * @return An [Model] instance of [MutableState] that wraps the value.
+ * @return An instance of [MutableState] that wraps the value.
  *
  * @see [state]
  * @see [remember]
@@ -129,15 +137,25 @@ inline fun <T> stateFor(vararg inputs: Any?, init: () -> T) =
 /**
  * Return a new [MutableState] initialized with the passed in [value]
  *
+ * The MutableState class is a single value holder whose reads and writes are observed by
+ * Compose. Additionally, writes to it are transacted as part of the [Framed] transaction system.
+ * During composition, you will likely want to use the `state` and `stateFor` composables instead
+ * of this factory function.
+ *
  * @param value the initial value for the [MutableState]
  * @param areEquivalent a callback to compare the previous and new instance of [value] when
  * it is written to. If this returns true, then no recomposition will be scheduled. See
  * [ReferentiallyEqual] and [StructurallyEqual] for simple implementations.
+ *
+ * @see state
+ * @see stateFor
+ * @see State
+ * @see MutableState
  */
 fun <T> mutableStateOf(
     value: T,
     areEquivalent: (old: T, new: T) -> Boolean = ReferentiallyEqual
-): MutableState<T> = ModelMutableState(value, areEquivalent)
+): MutableState<T> = FramedMutableState(value, areEquivalent)
 
 /**
  * Simple comparison callback using referential `===` equality
@@ -208,18 +226,20 @@ inline operator fun <T> MutableState<T>.setValue(thisObj: Any?, property: KPrope
 }
 
 /**
- * The State class is an @Model class meant to wrap around a single value. It is used in the
+ * The ModelMutableState class is a single value holder whose reads and writes are observed by
+ * Compose.
+ * Additionally, writes to it are transacted as part of the [Framed] transaction system.
  * `state` and `stateFor` composables.
  *
  * @property value the wrapped value
  * @property areEquivalent function used for comparing old and new [value]s to determine whether
  * to trigger a recomposition or not.
  *
- * @see [Model]
  * @see [state]
  * @see [stateFor]
+ * @see [mutableStateOf]
  */
-private class ModelMutableState<T>(
+private class FramedMutableState<T>(
     value: T,
     val areEquivalent: (old: T, new: T) -> Boolean
 ) : Framed, MutableState<T> {
@@ -229,9 +249,6 @@ private class ModelMutableState<T>(
     override var value: T
         get() = next.readable(this).value
         set(value) = next.withCurrent {
-            // This intentionally deviates from the typical behavior of @Model. When this is
-            // converted to an IR module, this behavior should be preserved with a custom setter
-            // on the property in the @Model class.
             if (!areEquivalent(it.value, value)) {
                 next.writable(this).value = value
             }
