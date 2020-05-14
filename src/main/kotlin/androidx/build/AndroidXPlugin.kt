@@ -202,6 +202,13 @@ class AndroidXPlugin : Plugin<Project> {
             configureAndroidCommonOptions(project, androidXExtension)
             configureAndroidLibraryOptions(project, androidXExtension)
         }
+        libraryExtension.packagingOptions.apply {
+            // We need this as a work-around for b/155721209
+            // It can be removed when we have a newer plugin version
+            excludes = excludes.also {
+                it.remove("/META-INF/*.kotlin_module")
+            }
+        }
 
         project.configureSourceJarForAndroid(libraryExtension)
         project.configureVersionFileWriter(libraryExtension, androidXExtension)
