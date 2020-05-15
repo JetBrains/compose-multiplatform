@@ -240,6 +240,8 @@ fun Project.getGenerateApiArgs(
                 "--show-annotation",
                 "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope." +
                     "LIBRARY_GROUP_PREFIX)",
+                "--show-annotation",
+                "kotlin.PublishedApi",
                 "--show-unannotated"
             )
             if (generateApiMode is GenerateApiMode.AllRestrictedApis) {
