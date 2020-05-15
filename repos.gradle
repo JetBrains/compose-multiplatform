@@ -88,11 +88,10 @@ def addMavenRepositories(RepositoryHandler handler) {
     }
     def androidPluginRepoOverride = System.getenv("GRADLE_PLUGIN_REPO")
     if (androidPluginRepoOverride != null) {
-        handler.maven {
-            url androidPluginRepoOverride
-        }
-        handler.maven {
-            url "${repos.prebuiltsRoot}/tools/common/m2/repository"
+        for(extraRepo in androidPluginRepoOverride.split(File.pathSeparator)) {
+            handler.maven {
+                url extraRepo
+            }
         }
     }
 }
