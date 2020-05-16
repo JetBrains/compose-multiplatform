@@ -59,6 +59,7 @@ object LibraryGroups {
     val INSPECTION = LibraryGroup("androidx.inspection", LibraryVersions.INSPECTION)
     val INSPECTION_EXTENSIONS = LibraryGroup("androidx.inspection.extensions",
         LibraryVersions.SQLITE_INSPECTOR)
+    val IPC = LibraryGroup("androidx.ipc", LibraryVersions.IPC)
     val INTERPOLATOR = LibraryGroup("androidx.interpolator", LibraryVersions.INTERPOLATOR)
     val JETIFIER = LibraryGroup("com.android.tools.build.jetifier", null)
     val LEANBACK = LibraryGroup("androidx.leanback", null)
