@@ -17,6 +17,10 @@ BuilderSetStyle: androidx.compose.ui.graphics.vector.VectorAssetBuilder#pushGrou
     Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.graphics.vector.VectorAssetBuilder.pushGroup(String,float,float,float,float,float,float,float,java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode>)
 
 
+CallbackMethodName: androidx.compose.ui.gesture.ScrollCallback#onStart-k-4lQ0M(long):
+    Callback method names must follow the on<Something> style: onStart-k-4lQ0M
+
+
 CallbackName: androidx.compose.ui.gesture.DragObserver:
     Class should be named DragCallback
 CallbackName: androidx.compose.ui.gesture.LongPressDragObserver:
