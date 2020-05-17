@@ -21,6 +21,10 @@ BuilderSetStyle: androidx.compose.ui.text.AnnotatedString.Builder#toString():
     Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.text.AnnotatedString.Builder.toString()
 
 
+GetterOnBuilder: androidx.compose.ui.text.AnnotatedString.Builder#getLength():
+    Getter should be on the built object, not the builder: method androidx.compose.ui.text.AnnotatedString.Builder.getLength()
+
+
 KotlinOperator: androidx.compose.ui.text.font.FontListFontFamily#contains(androidx.compose.ui.text.font.Font):
     Note that adding the `operator` keyword would allow calling this method using operator syntax
 
