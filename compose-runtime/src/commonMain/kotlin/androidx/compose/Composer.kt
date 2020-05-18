@@ -1635,6 +1635,7 @@ open class Composer<N>(
         // unwinding that might have not called the doneJoin/endRestartGroup in the wrong order.
         val scope = if (invalidateStack.isNotEmpty()) invalidateStack.pop()
             else null
+        scope?.requiresRecompose = false
         val result = if (scope != null && (scope.used || collectKeySources)) {
             if (scope.anchor == null) {
                 scope.anchor = if (inserting)
