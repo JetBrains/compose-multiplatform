@@ -495,6 +495,9 @@ private fun createGenerateSdkApiTask(
                 coreJavadocOptions {
                     addStringOption("stubpackages", "android.*")
                 }
+                coreJavadocOptions {
+                    addStringOption("-release", "8")
+                }
             }
         }
 
