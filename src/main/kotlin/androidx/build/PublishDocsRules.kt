@@ -118,7 +118,7 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.SECURITY.group, "security-biometric")
     // TODO: Remove this ignore once androidx.security:security-identity-credential:1.0.0-alpha01 is released
     ignore(LibraryGroups.SECURITY.group, "security-identity-credential")
-    prebuilts(LibraryGroups.SECURITY, "1.0.0-rc01")
+    prebuilts(LibraryGroups.SECURITY, "1.0.0-rc02")
     prebuilts(LibraryGroups.SHARETARGET, "1.0.0")
     prebuilts(LibraryGroups.SLICE, "slice-builders", "1.1.0-alpha01")
     prebuilts(LibraryGroups.SLICE, "slice-builders-ktx", "1.0.0-alpha07")
