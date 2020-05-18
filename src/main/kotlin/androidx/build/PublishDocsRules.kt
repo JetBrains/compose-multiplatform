@@ -116,6 +116,8 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.SAVEDSTATE, "1.1.0-alpha01")
     // TODO: Remove this ignore once androidx.security:security-biometric:1.0.0-alpha01 is released
     ignore(LibraryGroups.SECURITY.group, "security-biometric")
+    // TODO: Remove this ignore once androidx.security:security-crypto-ktx:1.0.0-alpha01 is release
+    ignore(LibraryGroups.SECURITY.group, "security-crypto-ktx")
     // TODO: Remove this ignore once androidx.security:security-identity-credential:1.0.0-alpha01 is released
     ignore(LibraryGroups.SECURITY.group, "security-identity-credential")
     prebuilts(LibraryGroups.SECURITY, "1.0.0-rc01")
