@@ -112,7 +112,6 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.RECYCLERVIEW.group, "recyclerview-lint")
     prebuilts(LibraryGroups.REMOTECALLBACK, "1.0.0-alpha02")
     prebuilts(LibraryGroups.ROOM, "2.2.4")
-    ignore(LibraryGroups.SAVEDSTATE.group, "savedstate-ktx")
     prebuilts(LibraryGroups.SAVEDSTATE, "1.1.0-alpha01")
     // TODO: Remove this ignore once androidx.security:security-biometric:1.0.0-alpha01 is released
     ignore(LibraryGroups.SECURITY.group, "security-biometric")
