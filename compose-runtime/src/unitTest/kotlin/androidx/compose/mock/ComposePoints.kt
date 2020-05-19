@@ -27,7 +27,7 @@ fun MockViewValidator.point(point: Point) {
     text("X: ${point.x} Y: ${point.y}")
 }
 
-object SLPoints
+private const val SLPoints = 100
 
 @Composable
 fun MockComposeScope.points(points: Iterable<Point>) {
