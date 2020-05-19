@@ -23,6 +23,16 @@ import androidx.compose.RecomposeScope
 import androidx.compose.SlotTable
 import androidx.compose.Stable
 
+private const val SLOTS_PER_INT = 15
+
+internal fun bitsForSlot(bits: Int, slot: Int): Int {
+    val realSlot = slot.rem(SLOTS_PER_INT)
+    return bits shl (realSlot * 2 + 1)
+}
+
+internal fun sameBits(slot: Int): Int = bitsForSlot(0b01, slot)
+internal fun differentBits(slot: Int): Int = bitsForSlot(0b10, slot)
+
 /**
  * A Restart is created to hold composable lambdas to track when they are invoked allowing
  * the invocations to be invalidated when a new composable lambda is created during composition.
@@ -125,7 +135,8 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
     override operator fun invoke(c: Composer<*>, k: Int, changed: Int): R {
         c.startRestartGroup(key)
         trackRead(c)
-        val result = (_block as (c: Composer<*>, k: Int, changed: Int) -> R)(c, key, changed)
+        val dirty = changed or if (c.changed(this)) differentBits(0) else sameBits(0)
+        val result = (_block as (c: Composer<*>, k: Int, changed: Int) -> R)(c, key, dirty)
         c.endRestartGroup()?.updateScope(this as (Composer<*>, Int, Int) -> Unit)
         return result
     }
@@ -133,8 +144,18 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
     override operator fun invoke(p1: P1, c: Composer<*>, k: Int, changed: Int): R {
         c.startRestartGroup(key)
         trackRead(c)
-        val result = (_block as (p1: P1, c: Composer<*>, k: Int, changed: Int) -> R)(p1, c, key,
-            changed)
+        val dirty = changed or if (c.changed(this)) differentBits(1) else sameBits(1)
+        val result = (_block as (
+            p1: P1,
+            c: Composer<*>,
+            k: Int,
+            changed: Int
+        ) -> R)(
+            p1,
+            c,
+            key,
+            dirty
+        )
         c.endRestartGroup()?.updateScope { nc, nk, _ -> this(p1, nc, nk, changed or 0b1) }
         return result
     }
@@ -142,12 +163,13 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
     override operator fun invoke(p1: P1, p2: P2, c: Composer<*>, k: Int, changed: Int): R {
         c.startRestartGroup(key)
         trackRead(c)
+        val dirty = changed or if (c.changed(this)) differentBits(2) else sameBits(2)
         val result = (_block as (p1: P1, p2: P2, c: Composer<*>, k: Int, changed: Int) -> R)(
             p1,
             p2,
             c,
             key,
-            changed
+            dirty
         )
         c.endRestartGroup()?.updateScope { nc, nk, _ -> this(p1, p2, nc, nk, changed or 0b1) }
         return result
@@ -156,6 +178,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
     override operator fun invoke(p1: P1, p2: P2, p3: P3, c: Composer<*>, k: Int, changed: Int): R {
         c.startRestartGroup(key)
         trackRead(c)
+        val dirty = changed or if (c.changed(this)) differentBits(3) else sameBits(3)
         val result = (_block as (
             p1: P1,
             p2: P2,
@@ -169,7 +192,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p3,
             c,
             key,
-            changed
+            dirty
         )
         c.endRestartGroup()?.updateScope { nc, nk, _ -> this(p1, p2, p3, nc, nk, changed or 0b1) }
         return result
@@ -186,6 +209,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
     ): R {
         c.startRestartGroup(key)
         trackRead(c)
+        val dirty = changed or if (c.changed(this)) differentBits(4) else sameBits(4)
         val result = (_block as (
             p1: P1,
             p2: P2,
@@ -201,7 +225,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p4,
             c,
             key,
-            changed
+            dirty
         )
         c.endRestartGroup()?.updateScope { nc, nk, _ ->
             this(p1, p2, p3, p4, nc, nk, changed or 0b1)
@@ -221,6 +245,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
     ): R {
         c.startRestartGroup(key)
         trackRead(c)
+        val dirty = changed or if (c.changed(this)) differentBits(5) else sameBits(5)
         val result = (_block as (
             p1: P1,
             p2: P2,
@@ -238,7 +263,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p5,
             c,
             key,
-            changed
+            dirty
         )
         c.endRestartGroup()?.updateScope { nc, nk, _ ->
             this(p1, p2, p3, p4, p5, nc, nk, changed or 0b1)
@@ -259,6 +284,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
     ): R {
         c.startRestartGroup(key)
         trackRead(c)
+        val dirty = changed or if (c.changed(this)) differentBits(6) else sameBits(6)
         val result = (_block as (
             p1: P1,
             p2: P2,
@@ -278,7 +304,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p6,
             c,
             key,
-            changed
+            dirty
         )
         c.endRestartGroup()?.updateScope { nc, nk, _ ->
             this(p1, p2, p3, p4, p5, p6, nc, nk, changed or 0b1)
@@ -300,6 +326,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
     ): R {
         c.startRestartGroup(key)
         trackRead(c)
+        val dirty = changed or if (c.changed(this)) differentBits(7) else sameBits(7)
         val result = (_block as (
             p1: P1,
             p2: P2,
@@ -321,7 +348,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p7,
             c,
             key,
-            changed
+            dirty
         )
         c.endRestartGroup()?.updateScope { nc, nk, _ ->
             this(p1, p2, p3, p4, p5, p6, p7, nc, nk, changed or 0b1)
@@ -344,6 +371,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
     ): R {
         c.startRestartGroup(key)
         trackRead(c)
+        val dirty = changed or if (c.changed(this)) differentBits(8) else sameBits(8)
         val result = (_block as (
             p1: P1,
             p2: P2,
@@ -367,7 +395,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p8,
             c,
             key,
-            changed
+            dirty
         )
         c.endRestartGroup()?.updateScope { nc, nk, _ ->
             this(p1, p2, p3, p4, p5, p6, p7, p8, nc, nk, changed or 0b1)
@@ -391,6 +419,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
     ): R {
         c.startRestartGroup(key)
         trackRead(c)
+        val dirty = changed or if (c.changed(this)) differentBits(9) else sameBits(9)
         val result = (_block as (
             p1: P1,
             p2: P2,
@@ -416,7 +445,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p9,
             c,
             key,
-            changed
+            dirty
         )
         c.endRestartGroup()?.updateScope { nc, nk, _ ->
             this(p1, p2, p3, p4, p5, p6, p7, p8, p9, nc, nk, changed or 0b1)
@@ -441,6 +470,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
     ): R {
         c.startRestartGroup(key)
         trackRead(c)
+        val dirty = changed or if (c.changed(this)) differentBits(10) else sameBits(10)
         val result = (_block as (
             p1: P1,
             p2: P2,
@@ -468,7 +498,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p10,
             c,
             key,
-            changed
+            dirty
         )
         c.endRestartGroup()?.updateScope { nc, nk, _ ->
             this(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, nc, nk, changed or 0b1)
@@ -494,6 +524,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
     ): R {
         c.startRestartGroup(key)
         trackRead(c)
+        val dirty = changed or if (c.changed(this)) differentBits(11) else sameBits(11)
         val result = (_block as (
             p1: P1,
             p2: P2,
@@ -523,7 +554,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p11,
             c,
             key,
-            changed
+            dirty
         )
         c.endRestartGroup()?.updateScope { nc, nk, _ ->
             this(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, nc, nk, changed or 0b1)
@@ -550,6 +581,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
     ): R {
         c.startRestartGroup(key)
         trackRead(c)
+        val dirty = changed or if (c.changed(this)) differentBits(12) else sameBits(12)
         val result = (_block as (
             p1: P1,
             p2: P2,
@@ -581,7 +613,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p12,
             c,
             key,
-            changed
+            dirty
         )
         c.endRestartGroup()?.updateScope { nc, nk, _ ->
             this(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, nc, nk, changed or 0b1)
@@ -609,6 +641,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
     ): R {
         c.startRestartGroup(key)
         trackRead(c)
+        val dirty = changed or if (c.changed(this)) differentBits(13) else sameBits(13)
         val result = (_block as (
             p1: P1,
             p2: P2,
@@ -642,7 +675,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p13,
             c,
             key,
-            changed
+            dirty
         )
         c.endRestartGroup()?.updateScope { nc, nk, _ ->
             this(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, nc, nk, changed or 0b1)
@@ -671,6 +704,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
     ): R {
         c.startRestartGroup(key)
         trackRead(c)
+        val dirty = changed or if (c.changed(this)) differentBits(14) else sameBits(14)
         val result = (_block as (
             p1: P1,
             p2: P2,
@@ -706,7 +740,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p14,
             c,
             key,
-            changed
+            dirty
         )
         c.endRestartGroup()?.updateScope { nc, nk, _ ->
             this(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, nc, nk, changed or
@@ -737,6 +771,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
     ): R {
         c.startRestartGroup(key)
         trackRead(c)
+        val dirty = changed or if (c.changed(this)) differentBits(15) else sameBits(15)
         val result = (_block as (
             p1: P1,
             p2: P2,
@@ -774,7 +809,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             p15,
             c,
             key,
-            changed
+            dirty
         )
         c.endRestartGroup()?.updateScope { nc, nk, _ ->
             this(
@@ -825,6 +860,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
     ): R {
         c.startRestartGroup(key)
         trackRead(c)
+        val dirty = changed1 or if (c.changed(this)) differentBits(16) else sameBits(16)
         val result = (_block as (
             p1: P1,
             p2: P2,
@@ -866,7 +902,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             c,
             key,
             changed,
-            changed1
+            dirty
         )
         c.endRestartGroup()?.updateScope { nc, nk, _ ->
             this(
@@ -920,6 +956,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
     ): R {
         c.startRestartGroup(key)
         trackRead(c)
+        val dirty = changed1 or if (c.changed(this)) differentBits(17) else sameBits(17)
         val result = (_block as (
             p1: P1,
             p2: P2,
@@ -963,7 +1000,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             c,
             key,
             changed,
-            changed1
+            dirty
         )
         c.endRestartGroup()?.updateScope { nc, nk, _ ->
             this(
@@ -1018,6 +1055,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
     ): R {
         c.startRestartGroup(key)
         trackRead(c)
+        val dirty = changed1 or if (c.changed(this)) differentBits(18) else sameBits(18)
         val result = (_block as (
             p1: P1,
             p2: P2,
@@ -1063,7 +1101,7 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
             c,
             key,
             changed,
-            changed1
+            dirty
         )
         c.endRestartGroup()?.updateScope { nc, nk, _ ->
             this(

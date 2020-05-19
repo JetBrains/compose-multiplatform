@@ -57,12 +57,18 @@ class RestartableFunctionN<R>(
     override fun invoke(vararg args: Any?): R {
         val realParams = realParamCount(args.size)
         val c = args[realParams] as Composer<*>
+        val allArgsButLast = args.slice(0 until args.size - 1).toTypedArray()
+        val lastChanged = args[args.size - 1] as Int
         c.startRestartGroup(key)
+        val dirty = lastChanged or if (c.changed(this))
+            differentBits(realParams)
+        else
+            sameBits(realParams)
         if (tracked) {
             FrameManager.recordRead(this)
         }
         @Suppress("UNCHECKED_CAST")
-        val result = (_block as FunctionN<*>)(*args) as R
+        val result = (_block as FunctionN<*>)(*allArgsButLast, dirty) as R
         c.endRestartGroup()?.updateScope { nc, nk, _ ->
             val params = args.slice(0 until realParams).toTypedArray()
             @Suppress("UNUSED_VARIABLE")
