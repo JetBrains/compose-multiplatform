@@ -17,6 +17,8 @@ ArrayReturn: androidx.compose.RememberKt#remember(Object[], kotlin.jvm.functions
     Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
 ArrayReturn: androidx.compose.SlotTable#SlotTable(Object[]) parameter #0:
     Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
+ArrayReturn: androidx.compose.SuspendingEffectsKt#launchInComposition(Object[], kotlin.jvm.functions.Function2<? super androidx.compose.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?>) parameter #0:
+    Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
 ArrayReturn: androidx.compose.UnionType#types():
     Method should return Collection<Class> (or subclass) instead of raw array; was `java.lang.Class<?>[]`
 

@@ -18,6 +18,10 @@ package androidx.compose
 
 import javax.swing.JComponent
 import javax.swing.SwingUtilities
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.withContext
 
 actual abstract class EmbeddingUIContext
 
@@ -123,6 +127,15 @@ internal actual fun recordSourceKeyInfo(key: Any) {
 
 actual fun keySourceInfoOf(key: Any): String? = keyInfo[key]
 
+// TODO placeholder; this should be used to await the next drawing frame for animation purposes
+internal class DesktopCompositionFrameClock : CompositionFrameClock {
+    override suspend fun <R> awaitFrameNanos(onFrame: (frameTimeNanos: Long) -> R): R =
+        withContext(Dispatchers.Main) {
+            onFrame(System.nanoTime())
+        }
+}
+
+@OptIn(InternalComposeApi::class)
 internal class DesktopRecomposer : Recomposer() {
 
     private var frameScheduled = false
@@ -142,6 +155,11 @@ internal class DesktopRecomposer : Recomposer() {
     init {
         SwingUtilities.invokeLater(Callback())
     }
+
+    override val effectCoroutineScope: CoroutineScope =
+        CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
+    override val compositionFrameClock: CompositionFrameClock = DesktopCompositionFrameClock()
 
     override fun scheduleChangesDispatch() {
         if (!frameScheduled) {

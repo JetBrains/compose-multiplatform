@@ -25,6 +25,9 @@ package androidx.compose {
     property public final boolean valid;
   }
 
+  public final class AndroidRecomposerKt {
+  }
+
   public final class Applier<N> {
     ctor public Applier(N! root, androidx.compose.ApplyAdapter<N> adapter);
     method public void down(N? node);
@@ -61,6 +64,12 @@ package androidx.compose {
     method public int getSize();
     method public java.util.Collection<V> getValues();
     method public boolean isEmpty();
+  }
+
+  public final class ChoreographerCompositionFrameClock implements androidx.compose.CompositionFrameClock {
+    ctor public ChoreographerCompositionFrameClock(android.view.Choreographer choreographer);
+    method public suspend <R> Object? awaitFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
+    method public android.view.Choreographer getChoreographer();
   }
 
   public interface CommitScope {
@@ -164,6 +173,21 @@ package androidx.compose {
     method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
+  public abstract class CompositionCoroutineScope implements androidx.compose.CompositionFrameClock kotlinx.coroutines.CoroutineScope {
+    ctor public CompositionCoroutineScope();
+    method @Deprecated public final suspend Object? awaitFrame(kotlin.coroutines.Continuation<? super java.lang.Long> p);
+  }
+
+  public interface CompositionFrameClock {
+    method public suspend <R> Object? awaitFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
+  }
+
+  public final class CompositionFrameClockKt {
+    method public static suspend inline <R> Object? awaitFrameMillis(androidx.compose.CompositionFrameClock, kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
+    method public static suspend Object? awaitFrameMillis(androidx.compose.CompositionFrameClock, kotlin.coroutines.Continuation<? super java.lang.Long> p);
+    method public static suspend Object? awaitFrameNanos(androidx.compose.CompositionFrameClock, kotlin.coroutines.Continuation<? super java.lang.Long> p);
+  }
+
   public final class CompositionKt {
     method public static androidx.compose.Composition compositionFor(Object container, androidx.compose.Recomposer recomposer, androidx.compose.CompositionReference? parent = null, kotlin.jvm.functions.Function2<? super androidx.compose.SlotTable,? super androidx.compose.Recomposer,? extends androidx.compose.Composer<?>> composerFactory);
     method @Deprecated public static androidx.compose.Composition compositionFor(Object container, androidx.compose.CompositionReference? parent = null, kotlin.jvm.functions.Function2<? super androidx.compose.SlotTable,? super androidx.compose.Recomposer,? extends androidx.compose.Composer<?>> composerFactory);
@@ -218,6 +242,9 @@ package androidx.compose {
   }
 
   @androidx.compose.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.CLASS) public @interface Immutable {
+  }
+
+  @kotlin.annotation.Target(allowedTargets={AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY}) public @interface InternalComposeApi {
   }
 
   public final class JoinedKeyKt {
@@ -322,9 +349,13 @@ package androidx.compose {
   public abstract class Recomposer {
     ctor public Recomposer();
     method protected final void dispatchRecomposes();
+    method public abstract androidx.compose.CompositionFrameClock getCompositionFrameClock();
+    method public abstract kotlinx.coroutines.CoroutineScope getEffectCoroutineScope();
     method public abstract boolean hasPendingChanges();
     method public abstract void recomposeSync();
     method protected abstract void scheduleChangesDispatch();
+    property public abstract androidx.compose.CompositionFrameClock compositionFrameClock;
+    property public abstract kotlinx.coroutines.CoroutineScope effectCoroutineScope;
     field public static final androidx.compose.Recomposer.Companion! Companion;
   }
 
@@ -489,6 +520,15 @@ package androidx.compose {
   @androidx.compose.Stable public interface State<T> {
     method public T! getValue();
     property public abstract T! value;
+  }
+
+  public final class SuspendingEffectsKt {
+    method public static suspend Object? awaitDispose(androidx.compose.CompositionCoroutineScope, kotlin.jvm.functions.Function0<kotlin.Unit> onDispose = {}, kotlin.coroutines.Continuation<?> p = {});
+    method @androidx.compose.Composable public static void launchInComposition(kotlin.jvm.functions.Function2<? super androidx.compose.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+    method @androidx.compose.Composable public static void launchInComposition(Object? v1, kotlin.jvm.functions.Function2<? super androidx.compose.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+    method @androidx.compose.Composable public static void launchInComposition(Object? v1, Object? v2, kotlin.jvm.functions.Function2<? super androidx.compose.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+    method @androidx.compose.Composable public static void launchInComposition(Object? v1, Object? v2, Object? v3, kotlin.jvm.functions.Function2<? super androidx.compose.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+    method @androidx.compose.Composable public static void launchInComposition(Object![]? keys, kotlin.jvm.functions.Function2<? super androidx.compose.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
   }
 
   public final class TraceKt {

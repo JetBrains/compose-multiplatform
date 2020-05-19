@@ -17,7 +17,19 @@
 package androidx.compose
 
 import android.view.Choreographer
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.runBlocking
 
+private val MainThreadCompositionFrameClock by lazy {
+    ChoreographerCompositionFrameClock(
+        if (Looper.myLooper() === Looper.getMainLooper()) Choreographer.getInstance()
+        else runBlocking(Dispatchers.Main) { Choreographer.getInstance() }
+    )
+}
+
+@OptIn(InternalComposeApi::class)
 internal class AndroidRecomposer : Recomposer() {
 
     private var frameScheduled = false
@@ -26,6 +38,11 @@ internal class AndroidRecomposer : Recomposer() {
         frameScheduled = false
         dispatchRecomposes()
     }
+
+    override val effectCoroutineScope: CoroutineScope =
+        CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
+    override val compositionFrameClock: CompositionFrameClock = MainThreadCompositionFrameClock
 
     override fun scheduleChangesDispatch() {
         if (!frameScheduled) {
