@@ -127,6 +127,8 @@ val KOTLIN_COROUTINES_SWING
     get() = "org.jetbrains.kotlinx:kotlinx-coroutines-swing:$kotlinCoroutinesVersion"
 val KOTLIN_COROUTINES_CORE
     get() = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion"
+val KOTLIN_COROUTINES_CORE_COMMON
+    get() = "org.jetbrains.kotlinx:kotlinx-coroutines-core-common:$kotlinCoroutinesVersion"
 val KOTLIN_COROUTINES_GUAVA
     get() = "org.jetbrains.kotlinx:kotlinx-coroutines-guava:$kotlinCoroutinesVersion"
 val KOTLIN_COROUTINES_TEST
