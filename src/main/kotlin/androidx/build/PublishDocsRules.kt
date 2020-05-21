@@ -148,6 +148,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.WEBKIT, "1.3.0-alpha03")
     ignore(LibraryGroups.WINDOW.group, "window-sidecar")
     prebuilts(LibraryGroups.WINDOW, "1.0.0-alpha01")
+            .addStubs("window/stubs/window-sidecar-release-0.1.0-alpha01.aar")
     ignore(LibraryGroups.WORK.group, "work-gcm")
     ignore(LibraryGroups.WORK.group, "work-runtime-lint")
     ignore(LibraryGroups.WORK.group, "work-rxjava3")
