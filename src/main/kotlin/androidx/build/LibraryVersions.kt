@@ -75,7 +75,7 @@ object LibraryVersions {
     val LIFECYCLE = Version("2.3.0-alpha03")
     val LIFECYCLE_EXTENSIONS = Version("2.2.0")
     val LOADER = Version("1.2.0-alpha01")
-    val MEDIA = Version("1.2.0-alpha02")
+    val MEDIA = Version("1.2.0-alpha03")
     val MEDIA2 = Version("1.1.0-alpha01")
     val MEDIAROUTER = Version("1.2.0-alpha01")
     val NAVIGATION = Version("2.3.0-beta01")
