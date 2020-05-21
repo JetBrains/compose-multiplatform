@@ -49,12 +49,10 @@ class RestartTests : BaseComposeTest() {
     fun restart_PersonModel_lambda() {
         val tvIdName = 90
         val tvIdAge = 91
-        val president = frame {
-            Person(
-                PRESIDENT_NAME_1,
-                PRESIDENT_AGE_1
-            )
-        }
+        val president = Person(
+            PRESIDENT_NAME_1,
+            PRESIDENT_AGE_1
+        )
 
         compose {
             RestartGroup {
@@ -81,12 +79,10 @@ class RestartTests : BaseComposeTest() {
     fun restart_PersonModel_lambda_parameters() {
         val tvIdNameBase = 90
         val tvIdAgeBase = 100
-        val president = frame {
-            Person(
-                PRESIDENT_NAME_1,
-                PRESIDENT_AGE_1
-            )
-        }
+        val president = Person(
+            PRESIDENT_NAME_1,
+            PRESIDENT_AGE_1
+        )
 
         compose {
             Repeat(5) { index ->
@@ -117,12 +113,10 @@ class RestartTests : BaseComposeTest() {
     fun restart_PersonModel_function() {
         val tvIdName = 90
         val tvIdAge = 91
-        val president = frame {
-            Person(
-                PRESIDENT_NAME_1,
-                PRESIDENT_AGE_1
-            )
-        }
+        val president = Person(
+            PRESIDENT_NAME_1,
+            PRESIDENT_AGE_1
+        )
 
         @Composable fun PersonView() {
             TextView(id = tvIdName, text = president.name)
@@ -167,9 +161,7 @@ class RestartTests : BaseComposeTest() {
     @Test
     fun restart_State_delete() {
         val tvStateId = 101
-        val state = frame {
-            mutableStateOf(true)
-        }
+        val state = mutableStateOf(true)
 
         @Composable fun ShowSomething() {
             TextView(id = tvStateId, text = "State = ${state.value}")
@@ -206,12 +198,10 @@ class RestartTests : BaseComposeTest() {
     fun restart_PersonModel_function_parameters() {
         val tvIdNameBase = 90
         val tvIdAgeBase = 100
-        val president = frame {
-            Person(
-                PRESIDENT_NAME_1,
-                PRESIDENT_AGE_1
-            )
-        }
+        val president = Person(
+            PRESIDENT_NAME_1,
+            PRESIDENT_AGE_1
+        )
 
         @Composable fun PersonView(index: Int) {
             TextView(id = tvIdNameBase + index, text = president.name)

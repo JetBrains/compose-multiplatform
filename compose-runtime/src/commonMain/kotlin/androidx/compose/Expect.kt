@@ -93,6 +93,27 @@ internal inline fun <K, V> BuildableMap<K, V>.mutate(
 
 internal expect fun <K, V> buildableMapOf(): BuildableMap<K, V>
 
+internal expect class BuildableListBuilder<T> : MutableList<T> {
+    fun build(): BuildableList<T>
+}
+
+internal expect class BuildableList<T> : List<T> {
+    internal fun builder(): BuildableListBuilder<T>
+    internal fun add(element: T): BuildableList<T>
+    internal fun add(index: Int, element: T): BuildableList<T>
+    internal fun addAll(elements: Collection<T>): BuildableList<T>
+    internal fun remove(element: T): BuildableList<T>
+    internal fun removeAll(elements: Collection<T>): BuildableList<T>
+    internal fun removeAt(index: Int): BuildableList<T>
+    internal fun set(index: Int, element: T): BuildableList<T>
+}
+
+internal expect fun <T> buildableListOf(): BuildableList<T>
+
+internal inline fun <T> BuildableList<T>.mutate(
+    mutator: (MutableList<T>) -> Unit
+): BuildableList<T> = builder().apply(mutator).build()
+
 internal expect object Choreographer {
     fun postFrameCallback(callback: ChoreographerFrameCallback)
     fun postFrameCallbackDelayed(delayMillis: Long, callback: ChoreographerFrameCallback)
@@ -101,6 +122,8 @@ internal expect object Choreographer {
 
 internal expect fun mainThreadCompositionDispatcher(): CoroutineDispatcher
 internal expect fun mainThreadFrameClock(): MonotonicFrameClock
+
+expect class UnsupportedOperationException
 
 @MustBeDocumented
 @Retention(AnnotationRetention.BINARY)

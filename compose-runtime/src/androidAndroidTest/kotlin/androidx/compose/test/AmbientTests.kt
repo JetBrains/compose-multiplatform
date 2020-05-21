@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalComposeApi::class)
 package androidx.compose.test
 
 import android.widget.TextView
@@ -24,12 +25,12 @@ import androidx.compose.CompositionReference
 import androidx.compose.ExperimentalComposeApi
 import androidx.compose.Providers
 import androidx.compose.Recomposer
-import androidx.compose.StructurallyEqual
 import androidx.compose.ambientOf
 import androidx.compose.compositionReference
 import androidx.compose.invalidate
 import androidx.compose.remember
 import androidx.compose.staticAmbientOf
+import androidx.compose.structuralEqualityPolicy
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.ui.core.LayoutNode
@@ -462,8 +463,7 @@ class AmbientTests : BaseComposeTest() {
     fun providingANewDataClassValueShouldNotRecompose() {
         val invalidates = mutableListOf<() -> Unit>()
         fun doInvalidate() = invalidates.forEach { it() }.also { invalidates.clear() }
-        val someDataAmbient =
-            ambientOf(StructurallyEqual) { SomeData() }
+        val someDataAmbient = ambientOf(structuralEqualityPolicy()) { SomeData() }
         var composed = false
 
         @Composable

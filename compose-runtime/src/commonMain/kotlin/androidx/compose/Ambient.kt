@@ -104,12 +104,12 @@ abstract class ProvidableAmbient<T> internal constructor(defaultFactory: (() -> 
  * @see ambientOf
  */
 internal class DynamicProvidableAmbient<T> constructor(
-    private val areEquivalent: (old: T, new: T) -> Boolean,
+    private val policy: SnapshotMutationPolicy<T>,
     defaultFactory: (() -> T)?
 ) : ProvidableAmbient<T>(defaultFactory) {
 
     @Composable
-    override fun provided(value: T): State<T> = state(areEquivalent) { value }.apply {
+    override fun provided(value: T): State<T> = state(policy) { value }.apply {
         this.value = value
     }
 }
@@ -131,13 +131,19 @@ internal class StaticProvidableAmbient<T>(defaultFactory: (() -> T)?) :
  * during recomposition will invalidate the children of [Providers] that read the value using
  * [Ambient.current].
  *
+ * @param policy a policy to determine when an ambient is considered changed. See
+ * [SnapshotMutationPolicy] for details.
+ *
  * @see Ambient
  * @see staticAmbientOf
+ * @see mutableStateOf
  */
 fun <T> ambientOf(
-    areEquivalent: (old: T, new: T) -> Boolean = ReferentiallyEqual,
+    policy: SnapshotMutationPolicy<T> =
+        @OptIn(ExperimentalComposeApi::class)
+        referentialEqualityPolicy(),
     defaultFactory: (() -> T)? = null
-): ProvidableAmbient<T> = DynamicProvidableAmbient(areEquivalent, defaultFactory)
+): ProvidableAmbient<T> = DynamicProvidableAmbient(policy, defaultFactory)
 
 /**
  * Create an ambient key that can be provided using [Providers]. Changing the value provided

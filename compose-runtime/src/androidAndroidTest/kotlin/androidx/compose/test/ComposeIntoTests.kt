@@ -22,7 +22,6 @@ import androidx.compose.ComposableContract
 import androidx.compose.Composer
 import androidx.compose.Composition
 import androidx.compose.ExperimentalComposeApi
-import androidx.compose.FrameManager
 import androidx.compose.Handler
 import androidx.compose.clearRoots
 import androidx.compose.currentComposer
@@ -99,9 +98,7 @@ class ComposeIntoTests : BaseComposeTest() {
             val thread = HandlerThread("")
             thread.start()
             Handler(thread.looper).post {
-                FrameManager.framed {
-                    model.value = 1
-                }
+                model.value = 1
                 threadLatch.countDown()
             }
             compositionLatch = CountDownLatch(1)

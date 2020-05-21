@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
-@file:OptIn(InternalComposeApi::class)
+@file:OptIn(
+    ExperimentalComposeApi::class,
+    InternalComposeApi::class
+)
 package androidx.compose
 
 import androidx.compose.dispatch.MonotonicFrameClock
+import androidx.compose.snapshots.Snapshot
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -165,15 +169,15 @@ class Recomposer {
                         // recomposer clock.
                         broadcastFrameClock.sendFrame(frameTime)
 
-                        // Ensure any committed frames in other threads are visible
-                        FrameManager.nextFrame()
+                        // Ensure any global changes are observed
+                        Snapshot.sendApplyNotifications()
 
                         // ...and make sure we know about any pending invalidations the commit
                         // may have caused before recomposing - Handler messages can't run between
                         // input processing and the frame clock pulse!
                         FrameManager.synchronize()
 
-                        // ...and pick up any stragglers as a result of the above frame sync
+                        // ...and pick up any stragglers as a result of the above snapshot sync
                         synchronized(invalidComposers) {
                             toRecompose.addAll(invalidComposers)
                             invalidComposers.clear()
@@ -185,10 +189,6 @@ class Recomposer {
                             }
                             toRecompose.clear()
                         }
-
-                        // Ensure any changes made during composition are now visible to other
-                        // threads.
-                        FrameManager.nextFrame()
                     }
                 }
             }
@@ -248,11 +248,14 @@ class Recomposer {
             }
             // TODO(b/143755743)
             if (!composerWasComposing) {
-                FrameManager.nextFrame()
+                Snapshot.notifyObjectsInitialized()
             }
             composer.applyChanges()
+
             if (!composerWasComposing) {
-                FrameManager.nextFrame()
+                // Ensure that any state objects created during applyChanges are seen as changed
+                // if modified after this call.
+                Snapshot.notifyObjectsInitialized()
             }
         } finally {
             currentComposerInternal = prevComposer

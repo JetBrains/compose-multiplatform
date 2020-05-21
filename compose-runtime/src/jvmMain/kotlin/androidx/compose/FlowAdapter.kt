@@ -60,9 +60,7 @@ fun <T : R, R> Flow<T>.collectAsState(
     onPreCommit(this, context) {
         val job = CoroutineScope(context).launch {
             collect {
-                FrameManager.framed {
-                    state.value = it
-                }
+                state.value = it
             }
         }
         onDispose { job.cancel() }

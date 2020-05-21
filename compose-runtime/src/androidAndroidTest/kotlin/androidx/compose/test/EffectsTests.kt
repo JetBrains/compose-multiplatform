@@ -181,13 +181,11 @@ class EffectsTests : BaseComposeTest() {
         val reader by readonly
         var writer by myState
 
-        frame {
-            writer = expected
+        writer = expected
 
-            assertEquals("state object after write", expected, myState.value)
-            assertEquals("reader after write", expected, reader)
-            assertEquals("writer after write", expected, writer)
-        }
+        assertEquals("state object after write", expected, myState.value)
+        assertEquals("reader after write", expected, reader)
+        assertEquals("writer after write", expected, writer)
     }
 
     @Test

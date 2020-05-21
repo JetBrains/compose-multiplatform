@@ -21,14 +21,15 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.compose.Composable
+import androidx.compose.ExperimentalComposeApi
 import androidx.compose.clearRoots
-import androidx.compose.frames.currentFrame
 import androidx.compose.getValue
 import androidx.compose.invalidate
 import androidx.compose.key
 import androidx.compose.mutableStateOf
 import androidx.compose.remember
 import androidx.compose.setValue
+import androidx.compose.snapshots.currentSnapshot
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import junit.framework.TestCase.assertEquals
@@ -422,12 +423,13 @@ class RecomposerTests : BaseComposeTest() {
     }
 
     @Test
+    @OptIn(ExperimentalComposeApi::class)
     fun testFrameTransition() {
-        var frameId: Int? = null
+        var snapshotId: Int? = null
         compose {
-            frameId = currentFrame().id
+            snapshotId = currentSnapshot().id
         }.then {
-            assertNotSame(frameId, currentFrame().id)
+            assertNotSame(snapshotId, currentSnapshot().id)
         }
     }
 }

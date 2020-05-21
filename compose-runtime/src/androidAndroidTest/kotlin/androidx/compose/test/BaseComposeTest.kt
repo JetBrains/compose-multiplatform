@@ -30,12 +30,12 @@ import androidx.compose.Composable
 import androidx.compose.ComposableContract
 import androidx.compose.Composition
 import androidx.compose.ExperimentalComposeApi
-import androidx.compose.FrameManager
 import androidx.compose.Looper
 import androidx.compose.Providers
 import androidx.compose.Recomposer
 import androidx.compose.compositionReference
 import androidx.compose.remember
+import androidx.compose.snapshots.Snapshot
 import androidx.ui.core.ContextAmbient
 import androidx.ui.core.LayoutNode
 import androidx.ui.core.setViewContent
@@ -88,7 +88,8 @@ internal fun Activity.uiThread(block: () -> Unit) {
 internal fun Activity.show(block: @Composable () -> Unit): Composition {
     var composition: Composition? = null
     uiThread {
-        FrameManager.nextFrame()
+        @OptIn(ExperimentalComposeApi::class)
+        Snapshot.sendApplyNotifications()
         composition = setViewContent(block)
     }
     return composition!!
@@ -105,7 +106,7 @@ internal fun Activity.waitForAFrame() {
             override fun doFrame(frameTimeNanos: Long) = latch.countDown()
         })
     }
-    assertTrue(latch.await(1, TimeUnit.MINUTES), "Time-out waiting for choreographer frame")
+    assertTrue(latch.await(1, TimeUnit.HOURS), "Time-out waiting for choreographer frame")
 }
 
 abstract class BaseComposeTest {
