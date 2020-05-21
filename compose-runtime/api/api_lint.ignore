@@ -17,6 +17,8 @@ ArrayReturn: androidx.compose.RememberKt#remember(Object[], kotlin.jvm.functions
     Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
 ArrayReturn: androidx.compose.SlotTable#SlotTable(Object[]) parameter #0:
     Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
+ArrayReturn: androidx.compose.SuspendingEffectsKt#launchInComposition(Object[], kotlin.jvm.functions.Function2<? super androidx.compose.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?>) parameter #0:
+    Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
 ArrayReturn: androidx.compose.UnionType#types():
     Method should return Collection<Class> (or subclass) instead of raw array; was `java.lang.Class<?>[]`
 
@@ -63,7 +65,7 @@ MissingNullability: androidx.compose.MutableStateKt#stateFor(V1, V2, kotlin.jvm.
     Missing nullability on method `stateFor` return
 MissingNullability: androidx.compose.SlotReader#getGroupData():
     Missing nullability on method `getGroupData` return
-MissingNullability: androidx.compose.SlotReader#getGroupKey():
-    Missing nullability on method `getGroupKey` return
+MissingNullability: androidx.compose.SlotReader#getGroupDataKey():
+    Missing nullability on method `getGroupDataKey` return
 MissingNullability: androidx.compose.SlotReader#getGroupNode():
     Missing nullability on method `getGroupNode` return

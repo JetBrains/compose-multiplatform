@@ -97,9 +97,18 @@ class SlotReader(val table: SlotTable) {
     val groupData get() = if (current < currentEnd) calculateCurrentGroup()?.data else null
 
     /**
-     * Get the key of the current group. Returns [EMPTY] if the [current] is not a group.
+     * Get the key of the current group. Returns 0 if the [current] is not a group.
      */
-    val groupKey get() = if (current < currentEnd) calculateCurrentGroup()?.key ?: EMPTY else EMPTY
+    val groupKey get() = if (current < currentEnd) {
+        val group = calculateCurrentGroup()
+        if (group != null) group.key else 0
+    } else 0
+
+    /**
+     * Get the data key for the current group. Returns null if the [current] is not a group.
+     */
+    val groupDataKey get() =
+        if (current < currentEnd) calculateCurrentGroup()?.dataKey else null
 
     /**
      * Get the node associated with the group if there is one.
@@ -174,12 +183,17 @@ class SlotReader(val table: SlotTable) {
     /**
      * Start a group. Passing an EMPTY as the key will enter the group without validating the key.
      */
-    fun startGroup(key: Any) = startGroup(key, GROUP)
+    fun startGroup() = startGroup(GROUP)
 
     /**
      * Start a node.
      */
-    fun startNode(key: Any) = startGroup(key, NODE)
+    fun startNode() = startGroup(NODE)
+
+    /**
+     * Start a data group.
+     */
+    fun startDataGroup() = startGroup(DATA)
 
     /**
      *  Skip a group. Must be called at the start of a group.
@@ -249,7 +263,14 @@ class SlotReader(val table: SlotTable) {
         while (current < currentEnd) {
             val location = current
             val group = slots[location].asGroup
-            result.add(KeyInfo(group.key, location, skipGroup(), index++, group))
+            result.add(KeyInfo(
+                group.key,
+                group.dataKey,
+                location,
+                skipGroup(),
+                index++,
+                group
+            ))
         }
         current = oldCurrent
         this.nodeIndex = oldNodeIndex
@@ -258,15 +279,14 @@ class SlotReader(val table: SlotTable) {
 
     override fun toString(): String = "SlotReader(current=$current, emptyCount=$emptyCount)"
 
-    private fun startGroup(key: Any, kind: GroupKind) {
+    private fun startGroup(kind: GroupKind) {
         if (emptyCount <= 0) {
             startStack.push(current)
             nodeIndexStack.push(nodeIndex)
             nodeIndex = 0
             val group = assumeGroup()
             currentEnd = current + group.slots + 1
-            require(group.kind == kind || key == EMPTY) { "Group kind changed" }
-            require(key == EMPTY || key == group.key) { "Group key changed" }
+            require(group.kind == kind) { "Group kind changed" }
             current++
             currentGroup = null
         }
@@ -473,7 +493,7 @@ class SlotWriter internal constructor(val table: SlotTable) {
 
             val oldCurrent = current
             current = location
-            startGroup(newParent.key, newParent.kind, newParent.data)
+            startGroup(newParent.key, newParent.dataKey, newParent.kind, newParent.data)
             current = oldCurrent
         }
     }
@@ -497,14 +517,24 @@ class SlotWriter internal constructor(val table: SlotTable) {
     }
 
     /**
-     * Start a group.
-     *
-     * @param key The group key. Passing EMPTY will retain as was written last time.
-     *            An EMPTY key is not valid when inserting groups.
+     * Enter the group at current without changing it. Requires not currently inserting.
      */
-    fun startGroup(key: Any) = startGroup(key, GROUP, null)
+    fun startGroup() {
+        require(insertCount == 0) { "Key must be supplied when inserting" }
+        startGroup(0, null, GROUP, null)
+    }
 
-    private fun startGroup(key: Any, kind: GroupKind, data: Any?) {
+    /**
+     * Start a group with a integer key
+     */
+    fun startGroup(key: Int) = startGroup(key, null, GROUP, null)
+
+    /**
+     * Start a group with a data key
+     */
+    fun startGroup(key: Int, dataKey: Any?) = startGroup(key, dataKey, GROUP, null)
+
+    private fun startGroup(key: Int, dataKey: Any?, kind: GroupKind, data: Any?) {
         val inserting = insertCount > 0
         val parent = if (startStack.isEmpty()) null else get(startStack.peek()).asGroup
         startStack.push(current)
@@ -515,14 +545,14 @@ class SlotWriter internal constructor(val table: SlotTable) {
         // reflected into its value.
         endStack.push(slots.size - table.gapLen - currentEnd)
         currentEnd = if (inserting) {
-            require(key != SlotTable.EMPTY) { "Inserting an EMPTY key" }
-            update(Group(kind, key, parent, data))
+            update(Group(kind, key, dataKey, parent, data))
             nodeCount = 0
             current
         } else {
             val group = advance().asGroup
             require(group.kind == kind) { "Group kind changed" }
-            require(key == SlotTable.EMPTY || group.key == key) { "Group key changed" }
+            require(key == 0 || group.key == key) { "Group key changed" }
+            require(key == 0 || group.dataKey == dataKey) { "Group dataKey changed" }
             if (kind == DATA) {
                 (group as? DataGroup ?: error("Expected a data group")).data = data
             } else if (kind == NODE && data != null) {
@@ -667,14 +697,22 @@ class SlotWriter internal constructor(val table: SlotTable) {
     }
 
     /**
+     * Enter an existing node
+     */
+    fun startNode() {
+        require(insertCount == 0) { "Key must be supplied when inserting" }
+        startGroup(0, null, NODE, null)
+    }
+
+    /**
      * Start a node.
      */
-    fun startNode(key: Any) = startGroup(key, NODE, null)
+    fun startNode(key: Any?) = startGroup(125, key, NODE, null)
 
     /**
      * Start a node
      */
-    fun startNode(key: Any, node: Any?) = startGroup(key, NODE, node)
+    fun startNode(key: Any?, node: Any?) = startGroup(125, key, NODE, node)
 
     /**
      * End a node
@@ -684,7 +722,7 @@ class SlotWriter internal constructor(val table: SlotTable) {
     /**
      * Start a data node.
      */
-    fun startData(key: Any, data: Any?) = startGroup(key, DATA, data)
+    fun startData(key: Int, dataKey: Any?, data: Any?) = startGroup(key, dataKey, DATA, data)
 
     /**
      * End a data node
@@ -914,12 +952,14 @@ class SlotWriter internal constructor(val table: SlotTable) {
             pendingClear = false
             table.clearGap()
         }
+        val gap = if (table.gapLen > 0)
+            "${table.gapStart}-${table.gapStart + table.gapLen - 1}"
+        else
+            "none"
         return "SlotWriter" +
                 "(current=$current, " +
                 "size=${slots.size - table.gapLen}, " +
-                "gap=${
-        if (table.gapLen > 0) "$table.gapStart-${table.gapStart + table.gapLen - 1}" else "none"}${
-        if (insertCount > 0) ", inserting" else ""})"
+                "gap=${gap}${if (insertCount > 0) ", inserting" else ""})"
     }
 }
 
@@ -936,27 +976,43 @@ private fun Group.isDecendentOf(parent: Group?): Boolean {
 private val Any?.asGroup: Group
     get() = this as? Group ?: error("Expected a group")
 
-internal fun Group(kind: GroupKind, key: Any, parent: Group?, data: Any?) =
+internal fun Group(kind: GroupKind, key: Int, dataKey: Any?, parent: Group?, data: Any?) =
     when (kind) {
-        NODE -> NodeGroup(key, parent).also { it.node = data }
-        DATA -> DataGroup(key, parent, data)
-        else -> Group(key, parent)
+        NODE -> {
+            NodeGroup(key, dataKey, parent).also { it.node = data }
+        }
+        DATA -> {
+            DataGroup(key, dataKey, parent, data)
+        }
+        else ->
+            if (dataKey != null)
+                DataKeyGroup(key, dataKey, parent)
+            else
+                Group(key, parent)
     }
 
 internal open class Group(
-    val key: Any,
+    val key: Int,
     var parent: Group?
 ) {
     var slots: Int = 0
     var nodes: Int = 0
     open val kind: GroupKind get() = GROUP
+    open val dataKey: Any? get() = null
     open val isNode get() = false
     open val node: Any? get() = null
     open val data: Any? get() = null
 }
 
+internal class DataKeyGroup(
+    key: Int,
+    override val dataKey: Any?,
+    parent: Group?
+) : Group(key, parent)
+
 internal class NodeGroup(
-    key: Any,
+    key: Int,
+    override val dataKey: Any?,
     parent: Group?
 ) : Group(key, parent) {
     override val kind: GroupKind get() = NODE
@@ -965,7 +1021,8 @@ internal class NodeGroup(
 }
 
 internal class DataGroup(
-    key: Any,
+    key: Int,
+    override val dataKey: Any?,
     parent: Group?,
     override var data: Any?
 ) : Group(key, parent) {
@@ -1303,7 +1360,12 @@ class KeyInfo internal constructor(
     /**
      * The group key.
      */
-    val key: Any,
+    val key: Int,
+
+    /**
+     * The data key for the group
+     */
+    val dataKey: Any?,
 
     /**
      * The location of the group.

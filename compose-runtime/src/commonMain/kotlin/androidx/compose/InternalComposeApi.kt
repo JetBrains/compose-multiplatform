@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2020 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,14 @@
 
 package androidx.compose
 
-private val EmptyComposable: @Composable () -> Unit = {}
-
-/**
- * Represents empty content for a Composable function.
- *
- * See [orEmpty] for handling nullable Composable lambdas using empty content.
- */
-fun emptyContent() = EmptyComposable
-
-/**
- * @return this Composable if not null, else [emptyContent].
- */
-@Suppress("NOTHING_TO_INLINE")
-inline fun (@Composable (() -> Unit))?.orEmpty() = this ?: emptyContent()
+@RequiresOptIn(
+    level = RequiresOptIn.Level.ERROR,
+    message = "This is internal API for Compose modules that may change frequently " +
+        "and without warning."
+)
+@Target(
+    AnnotationTarget.CLASS,
+    AnnotationTarget.FUNCTION,
+    AnnotationTarget.PROPERTY
+)
+annotation class InternalComposeApi

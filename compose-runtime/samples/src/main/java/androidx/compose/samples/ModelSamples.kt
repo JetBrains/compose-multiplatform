@@ -18,8 +18,9 @@ package androidx.compose.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.Composable
-import androidx.compose.Model
-import androidx.compose.remember
+import androidx.compose.getValue
+import androidx.compose.setValue
+import androidx.compose.state
 import androidx.ui.foundation.TextField
 import androidx.ui.foundation.Text
 import androidx.ui.material.Button
@@ -27,28 +28,23 @@ import androidx.ui.foundation.TextFieldValue
 
 @Composable
 @Sampled
-fun modelSample() {
-    @Model
-    class LoginState(var username: TextFieldValue, var password: TextFieldValue) {
-        fun login() = Api.login(username.text, password.text)
-    }
-
+fun stateSample() {
     @Composable
     fun LoginScreen() {
-        val model = remember { LoginState(
-            TextFieldValue("user"),
-            TextFieldValue("pass")
-        ) }
+        var username by state { TextFieldValue("user") }
+        var password by state { TextFieldValue("pass") }
+
+        fun login() = Api.login(username.text, password.text)
 
         TextField(
-            value = model.username,
-            onValueChange = { model.username = it }
+            value = username,
+            onValueChange = { username = it }
         )
         TextField(
-            value = model.password,
-            onValueChange = { model.password = it }
+            value = password,
+            onValueChange = { password = it }
         )
-        Button(onClick = { model.login() }) {
+        Button(onClick = { login() }) {
             Text("Login")
         }
     }

@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:Suppress("PLUGIN_ERROR")
+@file:Suppress("PLUGIN_ERROR", "DEPRECATION")
 package androidx.compose.test
 
+import android.os.Debug
 import android.widget.TextView
 import androidx.compose.Composable
+import androidx.compose.Direct
 import androidx.compose.clearRoots
 import androidx.compose.mutableStateOf
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -30,6 +32,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -148,6 +151,23 @@ class RestartTests : BaseComposeTest() {
     }
 
     @Test
+    fun allocation_Test() {
+        allocationCounting {
+            compose {
+                Nothing()
+                limitAllocations(2) {
+                    Nothing()
+                }
+                limitAllocations(1) {
+                    DirectNothing()
+                }
+            }.then {
+                // Nothing to do
+            }
+        }
+    }
+
+    @Test
     fun restart_State_delete() {
         val tvStateId = 101
         val state = frame {
@@ -227,13 +247,43 @@ class RestartTests : BaseComposeTest() {
 }
 
 @Composable
-fun RestartGroup(block: @Composable() () -> Unit) {
+fun RestartGroup(block: @Composable () -> Unit) {
     block()
 }
 
 @Composable
-fun Repeat(count: Int, block: @Composable() (index: Int) -> Unit) {
+fun Repeat(count: Int, block: @Composable (index: Int) -> Unit) {
     for (i in 0 until count) {
         block(i)
     }
+}
+
+@Composable
+fun Nothing() {
+}
+
+@Composable
+@Direct
+fun DirectNothing() {
+}
+
+inline fun <T> allocationCounting(block: () -> T): T {
+    Debug.startAllocCounting()
+    try {
+        return block()
+    } finally {
+        Debug.stopAllocCounting()
+    }
+}
+
+inline fun countAllocations(block: () -> Unit): Int {
+    val start = Debug.getGlobalAllocCount()
+    block()
+    val end = Debug.getGlobalAllocCount()
+    return end - start
+}
+
+inline fun limitAllocations(limit: Int, block: () -> Unit) {
+    val count = countAllocations(block)
+    assertTrue(count <= limit, "Exceeded allocation limit of $limit by allocation $count")
 }

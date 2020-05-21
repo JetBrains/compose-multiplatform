@@ -21,7 +21,7 @@ package androidx.compose
  * invoked, will cause its children to recompose. This is useful if you are updating local state
  * and need to cause a recomposition manually.
  *
- * In most cases we recommend using [Model] classes or [state] with immutable types in order to
+ * In most cases we recommend using [state] with immutable types in order to
  * maintain local state inside of composables. For cases where this is impractical, Recompose can
  * help you.
  *
@@ -29,11 +29,11 @@ package androidx.compose
  *
  * @sample androidx.compose.samples.recomposeSample
  *
- * Note: The above example can be done without [Recompose] by annotating `LoginState` with [Model].
+ * Note: The above example can be done without [Recompose] by using [state].
  *
- * @see Model
+ * @see state
  * @see Observe
  * @see invalidate
  */
 @Composable
-fun Recompose(body: @Composable() (recompose: () -> Unit) -> Unit) = body(invalidate)
+fun Recompose(body: @Composable (recompose: () -> Unit) -> Unit) = body(invalidate)

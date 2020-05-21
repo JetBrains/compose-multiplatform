@@ -16,8 +16,6 @@
 
 package androidx.compose.plugins.kotlin
 
-import android.app.Activity
-import android.view.ViewGroup
 import android.widget.TextView
 import org.junit.Before
 import org.junit.Test
@@ -349,7 +347,7 @@ class FcsModelCodeGenTests : AbstractCodegenTest() {
 
         val instanceOfClass = instanceClass.newInstance()
 
-        return composeMulti({
+        return composeMulti({ _, _, _ ->
             val composeMethod = instanceClass.getMethod("compose")
             composeMethod.invoke(instanceOfClass)
         }) {

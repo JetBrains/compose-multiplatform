@@ -21,11 +21,17 @@ import androidx.compose.ApplyAdapter
 import androidx.compose.Composable
 import androidx.compose.Composer
 import androidx.compose.ComposerUpdater
+import androidx.compose.CompositionFrameClock
+import androidx.compose.InternalComposeApi
 import androidx.compose.Recomposer
 import androidx.compose.SlotTable
 import androidx.compose.Stable
 import androidx.compose.currentComposer
 import androidx.compose.invokeComposable
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 object ViewApplierAdapter :
@@ -44,6 +50,7 @@ interface MockComposeScope {
     val composer: MockViewComposer
 }
 
+@OptIn(InternalComposeApi::class)
 class MockViewComposer(
     val root: View
 ) : Composer<View>(
@@ -54,6 +61,18 @@ class MockViewComposer(
         override fun scheduleChangesDispatch() {}
 
         override fun hasPendingChanges(): Boolean = false
+
+        override val effectCoroutineScope = CoroutineScope(SupervisorJob())
+
+        override val compositionFrameClock = object : CompositionFrameClock {
+            override suspend fun <R> awaitFrameNanos(onFrame: (frameTimeNanos: Long) -> R): R {
+                return withContext(effectCoroutineScope.coroutineContext) {
+                    suspendCancellableCoroutine<R> {
+                        // Never resume
+                    }
+                }
+            }
+        }
     }), MockComposeScope {
     override val composer: MockViewComposer get() = this
 
@@ -97,9 +116,9 @@ class MockViewComposer(
 
 @Composable
 fun <P1> MockComposeScope.memoize(
-    key: Any,
+    key: Int,
     p1: P1,
-    block: @Composable() (p1: P1) -> Unit
+    block: @Composable (p1: P1) -> Unit
 ) {
     with(currentComposer as MockViewComposer) {
         startGroup(key)

@@ -28,8 +28,6 @@ import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtPropertyAccessor
 import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.kotlin.resolve.BindingContext
-import org.jetbrains.kotlin.resolve.calls.model.ResolvedCall
-import org.junit.Ignore
 
 class ScopeComposabilityTests : AbstractCodegenTest() {
 
@@ -102,7 +100,7 @@ class ScopeComposabilityTests : AbstractCodegenTest() {
         """
             import androidx.compose.*
 
-            @Composable fun Wrap(block: @Composable() () -> Unit) { block() }
+            @Composable fun Wrap(block: @Composable () -> Unit) { block() }
 
             @Composable
             fun Bar() {
@@ -137,7 +135,7 @@ class ScopeComposabilityTests : AbstractCodegenTest() {
         """
             import androidx.compose.*
 
-            fun kickOff(block: @Composable() () -> Unit) {  }
+            fun kickOff(block: @Composable () -> Unit) {  }
 
             fun Bar() {
                 <normal>

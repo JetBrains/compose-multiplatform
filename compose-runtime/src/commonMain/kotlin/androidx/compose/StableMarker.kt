@@ -28,13 +28,8 @@ package androidx.compose
  * change. The [Immutable] annotation is provided to mark immutable types as stable.
  *
  * An object whose public properties do not change but is not immutable (for example, it has
- * private mutable state or uses property delegation to a [Model] object, such as a
- * [MutableState] instance, but is otherwise immutable), should use the [Stable] annotation.
- *
- * [Model] types are mutable but obeys the above assumptions because any change to a public
- * property of a [Model] type notifies composition when the change is committed; therefore the
- * [Model] annotation is annotated [StableMarker] and all type annotated with [Model] are assumed
- * to be stable.
+ * private mutable state or uses property delegation to a [MutableState] object, but is otherwise
+ * immutable), should use the [Stable] annotation.
  *
  * Mutable object that do not notify composition when they changed should not be marked as stable.
  *

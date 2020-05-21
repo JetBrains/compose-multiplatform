@@ -17,23 +17,12 @@
 package androidx.compose.plugins.kotlin
 
 import androidx.compose.plugins.kotlin.compiler.lower.dumpSrc
-import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.ir.createParameterDeclarations
-import org.jetbrains.kotlin.backend.common.phaser.PhaseConfig
-import org.jetbrains.kotlin.backend.jvm.jvmPhases
-import org.jetbrains.kotlin.backend.jvm.JvmBackendContext
-import org.jetbrains.kotlin.backend.jvm.JvmBackendFacade
 import org.jetbrains.kotlin.backend.jvm.JvmGeneratorExtensions
-import org.jetbrains.kotlin.backend.jvm.JvmIrCodegenFactory
-import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.cli.jvm.config.addJvmClasspathRoots
-import org.jetbrains.kotlin.codegen.ClassBuilderFactories
-import org.jetbrains.kotlin.codegen.DefaultCodegenFactory
-import org.jetbrains.kotlin.codegen.state.GenerationState
-import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.config.JvmTarget
 import org.jetbrains.kotlin.config.languageVersionSettings
@@ -42,7 +31,6 @@ import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.util.ExternalDependenciesGenerator
-import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.dump
 import org.jetbrains.kotlin.ir.util.generateTypicalIrProviderList
 import org.jetbrains.kotlin.load.kotlin.JvmPackagePartSource
@@ -65,7 +53,6 @@ abstract class AbstractIrTransformTest : AbstractCompilerTest() {
     protected open val additionalPaths = emptyList<File>()
 
     fun verifyComposeIrTransform(
-        transforms: Int,
         source: String,
         expectedTransformed: String,
         extra: String = "",
@@ -75,14 +62,51 @@ abstract class AbstractIrTransformTest : AbstractCompilerTest() {
             sourceFile("Test.kt", source.replace('%', '$')),
             sourceFile("Extra.kt", extra.replace('%', '$'))
         )
-        val irModule = generateIrModuleWithJvmResolve(
-            files,
-            transforms
-        )
+        val irModule = generateIrModuleWithJvmResolve(files)
         val actualTransformed = irModule
             .files[0]
             .dumpSrc()
             .replace('$', '%')
+            // replace source keys for start group calls
+            .replace(
+                Regex(
+                    "(%composer\\.start(Restart|Movable|Replaceable)Group\\()([-\\d]+)"
+                )
+            ) {
+                "${it.groupValues[1]}<>"
+            }
+            // replace source keys for joinKey calls
+            .replace(
+                Regex(
+                    "(%composer\\.joinKey\\()([-\\d]+)"
+                )
+            ) {
+                "${it.groupValues[1]}<>"
+            }
+            // restartableFunctionInstance(<>, true)
+            .replace(
+                Regex(
+                    "(restartableFunctionInstance\\()([-\\d]+)"
+                )
+            ) {
+                "${it.groupValues[1]}<>"
+            }
+            // restartableFunction(%composer, <>, true)
+            .replace(
+                Regex(
+                    "(restartableFunction\\(%composer,\\s)([-\\d]+)"
+                )
+            ) {
+                "${it.groupValues[1]}<>"
+            }
+                // %composer, -1234,
+            .replace(
+                Regex(
+                    "%composer,\\s([-\\d]+),"
+                )
+            ) {
+                "%composer, <>,"
+            }
             .trimIndent()
             .trimTrailingWhitespacesAndAddNewlineAtEOF()
         if (dumpTree) {
@@ -96,10 +120,7 @@ abstract class AbstractIrTransformTest : AbstractCompilerTest() {
         )
     }
 
-    private fun generateIrModuleWithJvmResolve(
-        files: List<KtFile>,
-        transforms: Int
-    ): IrModuleFragment {
+    private fun generateIrModuleWithJvmResolve(files: List<KtFile>): IrModuleFragment {
         val classPath = createClasspath() + additionalPaths
         val configuration = newConfiguration()
         configuration.addJvmClasspathRoots(classPath)
@@ -152,8 +173,7 @@ abstract class AbstractIrTransformTest : AbstractCompilerTest() {
                     generatorContext.typeTranslator,
                     generatorContext.irBuiltIns,
                     irProviders = irProviders
-                ),
-                transforms = transforms
+                )
             )
         }
 

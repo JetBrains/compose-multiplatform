@@ -21,7 +21,9 @@ import androidx.compose.Composable
 import androidx.compose.collectAsState
 import androidx.compose.getValue
 import androidx.ui.foundation.Text
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 @Sampled
 @Composable
@@ -34,5 +36,13 @@ fun FlowSample(flow: Flow<String>) {
 @Composable
 fun FlowWithInitialSample(flow: Flow<String>) {
     val value: String by flow.collectAsState("initial")
+    Text("Value is $value")
+}
+
+@Sampled
+@Composable
+@ExperimentalCoroutinesApi
+fun StateFlowSample(stateFlow: StateFlow<String>) {
+    val value: String by stateFlow.collectAsState()
     Text("Value is $value")
 }

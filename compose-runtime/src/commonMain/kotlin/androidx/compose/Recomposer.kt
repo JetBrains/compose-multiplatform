@@ -16,6 +16,8 @@
 
 package androidx.compose
 
+import kotlinx.coroutines.CoroutineScope
+
 abstract class Recomposer {
 
     companion object {
@@ -50,8 +52,16 @@ abstract class Recomposer {
 
     private val composers = mutableSetOf<Composer<*>>()
 
+    // TODO: This will be provided differently once the recomposer is driven via coroutine dispatch
+    @InternalComposeApi
+    abstract val effectCoroutineScope: CoroutineScope
+
+    // TODO: This will be provided differently once the recomposer is driven via coroutine dispatch
+    @InternalComposeApi
+    abstract val compositionFrameClock: CompositionFrameClock
+
     @Suppress("PLUGIN_WARNING", "PLUGIN_ERROR")
-    internal fun recompose(composable: @Composable() () -> Unit, composer: Composer<*>) {
+    internal fun recompose(composable: @Composable () -> Unit, composer: Composer<*>) {
         val composerWasComposing = composer.isComposing
         val prevComposer = currentComposerInternal
         try {
@@ -63,7 +73,7 @@ abstract class Recomposer {
                         var complete = false
                         try {
                             composer.startRoot()
-                            composer.startGroup(invocation)
+                            composer.startGroup(invocationKey, invocation)
                             invokeComposable(composer, composable)
                             composer.endGroup()
                             composer.endRoot()

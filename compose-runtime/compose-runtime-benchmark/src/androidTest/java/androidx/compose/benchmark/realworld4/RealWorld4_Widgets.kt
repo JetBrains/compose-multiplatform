@@ -31,7 +31,7 @@ import androidx.ui.graphics.Color
 import androidx.ui.layout.Column
 import androidx.ui.layout.padding
 import androidx.ui.foundation.Box
-import androidx.ui.foundation.DrawBackground
+import androidx.ui.foundation.drawBackground
 import androidx.ui.layout.Row
 import androidx.ui.layout.fillMaxSize
 import androidx.ui.layout.fillMaxWidth
@@ -54,7 +54,7 @@ fun RealWorld4_FancyWidget_000(model: RealWorld4_DataModel_00) {
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_001(
@@ -98,7 +98,7 @@ fun RealWorld4_FancyWidget_001(
     s2: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_01,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 =
         "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f4 + model.f5 + model.f6 +
@@ -124,7 +124,7 @@ fun RealWorld4_FancyWidget_001(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_002(
@@ -172,7 +172,7 @@ fun RealWorld4_FancyWidget_002(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_003(
@@ -241,7 +241,7 @@ fun RealWorld4_FancyWidget_003(
     number: Int,
     s1: String,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f2 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -269,7 +269,7 @@ fun RealWorld4_FancyWidget_003(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_004(
@@ -347,7 +347,7 @@ fun RealWorld4_FancyWidget_004(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_04,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 =
         "jaleiurhgsei48" + model.f1_modified + model.f3 + model.f4 + model.f5 + model.f6 +
@@ -372,7 +372,7 @@ fun RealWorld4_FancyWidget_004(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_005(
@@ -431,7 +431,7 @@ fun RealWorld4_FancyWidget_005(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_05,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f4 + model.f5 +
             model.f7
@@ -460,7 +460,7 @@ fun RealWorld4_FancyWidget_005(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_133(
@@ -551,7 +551,7 @@ fun RealWorld4_FancyWidget_006(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_06,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 =
         "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 + model.f5 +
@@ -571,7 +571,7 @@ fun RealWorld4_FancyWidget_006(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_070(
@@ -618,7 +618,7 @@ fun RealWorld4_FancyWidget_007(
     number: Int,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_07,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 +
             model.f6
@@ -637,7 +637,7 @@ fun RealWorld4_FancyWidget_007(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_071(
@@ -698,7 +698,7 @@ fun RealWorld4_FancyWidget_008(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
@@ -716,7 +716,7 @@ fun RealWorld4_FancyWidget_008(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_012(
@@ -745,7 +745,7 @@ fun RealWorld4_FancyWidget_009(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     number: Int,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -763,7 +763,7 @@ fun RealWorld4_FancyWidget_009(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_123(
@@ -795,7 +795,7 @@ fun RealWorld4_FancyWidget_010(
     model: RealWorld4_DataModel_10,
     s2: String,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -818,7 +818,7 @@ fun RealWorld4_FancyWidget_010(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -856,7 +856,7 @@ fun RealWorld4_FancyWidget_011(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -875,7 +875,7 @@ fun RealWorld4_FancyWidget_012(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -893,7 +893,7 @@ fun RealWorld4_FancyWidget_012(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_091(
@@ -938,7 +938,7 @@ fun RealWorld4_FancyWidget_013(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -956,7 +956,7 @@ fun RealWorld4_FancyWidget_013(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -977,7 +977,7 @@ fun RealWorld4_FancyWidget_014(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -995,7 +995,7 @@ fun RealWorld4_FancyWidget_014(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -1017,7 +1017,7 @@ fun RealWorld4_FancyWidget_015(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
@@ -1040,7 +1040,7 @@ fun RealWorld4_FancyWidget_015(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_119(
@@ -1081,7 +1081,7 @@ fun RealWorld4_FancyWidget_016(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -1099,7 +1099,7 @@ fun RealWorld4_FancyWidget_016(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_057(
@@ -1169,7 +1169,7 @@ fun RealWorld4_FancyWidget_017(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -1223,7 +1223,7 @@ fun RealWorld4_FancyWidget_018(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_147(
@@ -1267,7 +1267,7 @@ fun RealWorld4_FancyWidget_018(
 fun RealWorld4_FancyWidget_019(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -1280,7 +1280,7 @@ fun RealWorld4_FancyWidget_019(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -1303,7 +1303,7 @@ fun RealWorld4_FancyWidget_020(
     b: Boolean,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -1331,7 +1331,7 @@ fun RealWorld4_FancyWidget_020(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -1351,7 +1351,7 @@ fun RealWorld4_FancyWidget_020(
 fun RealWorld4_FancyWidget_021(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -1364,7 +1364,7 @@ fun RealWorld4_FancyWidget_021(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -1387,7 +1387,7 @@ fun RealWorld4_FancyWidget_022(
     s1: String,
     number: Int,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 +
             model.f6
@@ -1416,7 +1416,7 @@ fun RealWorld4_FancyWidget_022(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_015(
@@ -1475,7 +1475,7 @@ fun RealWorld4_FancyWidget_023(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
     obj: RealWorld4_UnmemoizablePojo_14,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
@@ -1499,7 +1499,7 @@ fun RealWorld4_FancyWidget_023(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp5.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp5.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_094(
@@ -1529,7 +1529,7 @@ fun RealWorld4_FancyWidget_024(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -1552,7 +1552,7 @@ fun RealWorld4_FancyWidget_024(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_048(
@@ -1581,7 +1581,7 @@ fun RealWorld4_FancyWidget_025(
     b: Boolean,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -1599,7 +1599,7 @@ fun RealWorld4_FancyWidget_025(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_138(
@@ -1637,7 +1637,7 @@ fun RealWorld4_FancyWidget_026(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -1660,7 +1660,7 @@ fun RealWorld4_FancyWidget_026(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -1681,7 +1681,7 @@ fun RealWorld4_FancyWidget_027(
     color: Color,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -1699,7 +1699,7 @@ fun RealWorld4_FancyWidget_027(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -1749,7 +1749,7 @@ fun RealWorld4_FancyWidget_028(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -1769,7 +1769,7 @@ fun RealWorld4_FancyWidget_029(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
@@ -1792,7 +1792,7 @@ fun RealWorld4_FancyWidget_029(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_016(
@@ -1821,7 +1821,7 @@ fun RealWorld4_FancyWidget_030(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -1839,7 +1839,7 @@ fun RealWorld4_FancyWidget_030(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_121(
@@ -1887,7 +1887,7 @@ fun RealWorld4_FancyWidget_031(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -1906,7 +1906,7 @@ fun RealWorld4_FancyWidget_032(
     obj: RealWorld4_UnmemoizablePojo_5,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "nbeksu48gsl89k" + obj.f1 + obj.f2 + obj.f3 + obj.f4 + obj.f5
     val tmp1 = obj::class.memberProperties.map { property ->
@@ -1928,7 +1928,7 @@ fun RealWorld4_FancyWidget_032(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp5.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp5.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -1949,7 +1949,7 @@ fun RealWorld4_FancyWidget_033(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -1967,7 +1967,7 @@ fun RealWorld4_FancyWidget_033(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_063(
@@ -1999,7 +1999,7 @@ fun RealWorld4_FancyWidget_034(
     model: RealWorld4_DataModel_10,
     b: Boolean,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -2022,7 +2022,7 @@ fun RealWorld4_FancyWidget_034(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -2044,7 +2044,7 @@ fun RealWorld4_FancyWidget_035(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -2067,7 +2067,7 @@ fun RealWorld4_FancyWidget_035(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -2088,7 +2088,7 @@ fun RealWorld4_FancyWidget_036(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -2106,7 +2106,7 @@ fun RealWorld4_FancyWidget_036(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -2158,7 +2158,7 @@ fun RealWorld4_FancyWidget_037(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_076(
@@ -2225,7 +2225,7 @@ fun RealWorld4_FancyWidget_038(
     model: RealWorld4_DataModel_07,
     obj: RealWorld4_UnmemoizablePojo_8,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 +
             model.f6
@@ -2258,7 +2258,7 @@ fun RealWorld4_FancyWidget_038(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp5.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp5.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_054(
@@ -2286,7 +2286,7 @@ fun RealWorld4_FancyWidget_039(
     model: RealWorld4_DataModel_08,
     s1: String,
     b: Boolean,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
@@ -2309,7 +2309,7 @@ fun RealWorld4_FancyWidget_039(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_041(
@@ -2350,7 +2350,7 @@ fun RealWorld4_FancyWidget_040(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -2368,7 +2368,7 @@ fun RealWorld4_FancyWidget_040(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_053(
@@ -2397,7 +2397,7 @@ fun RealWorld4_FancyWidget_041(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -2415,7 +2415,7 @@ fun RealWorld4_FancyWidget_041(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_089(
@@ -2464,7 +2464,7 @@ fun RealWorld4_FancyWidget_042(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -2487,7 +2487,7 @@ fun RealWorld4_FancyWidget_042(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -2510,7 +2510,7 @@ fun RealWorld4_FancyWidget_043(
     model: RealWorld4_DataModel_07,
     obj: RealWorld4_UnmemoizablePojo_13,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 +
             model.f6
@@ -2545,7 +2545,7 @@ fun RealWorld4_FancyWidget_043(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp5.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp5.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_097(
@@ -2578,7 +2578,7 @@ fun RealWorld4_FancyWidget_044(
     model: RealWorld4_DataModel_08,
     obj: RealWorld4_UnmemoizablePojo_3,
     number: Int,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
@@ -2611,7 +2611,7 @@ fun RealWorld4_FancyWidget_044(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp5.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp5.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_124(
@@ -2664,7 +2664,7 @@ fun RealWorld4_FancyWidget_045(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "nbeksu48gsl89k" + obj.f1 + obj.f2 + obj.f3 + obj.f4 + obj.f5 + obj.f6 +
             obj.f7
@@ -2697,7 +2697,7 @@ fun RealWorld4_FancyWidget_045(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp5.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp5.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_105(
@@ -2726,7 +2726,7 @@ fun RealWorld4_FancyWidget_046(
     s2: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -2744,7 +2744,7 @@ fun RealWorld4_FancyWidget_046(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_103(
@@ -2772,7 +2772,7 @@ fun RealWorld4_FancyWidget_046(
 fun RealWorld4_FancyWidget_047(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -2785,7 +2785,7 @@ fun RealWorld4_FancyWidget_047(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -2806,7 +2806,7 @@ fun RealWorld4_FancyWidget_048(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     b: Boolean,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -2824,7 +2824,7 @@ fun RealWorld4_FancyWidget_048(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -2845,7 +2845,7 @@ fun RealWorld4_FancyWidget_049(
     s2: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -2863,7 +2863,7 @@ fun RealWorld4_FancyWidget_049(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_107(
@@ -2906,7 +2906,7 @@ fun RealWorld4_FancyWidget_050(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -2924,7 +2924,7 @@ fun RealWorld4_FancyWidget_050(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -2945,7 +2945,7 @@ fun RealWorld4_FancyWidget_051(
     number: Int,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -2963,7 +2963,7 @@ fun RealWorld4_FancyWidget_051(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -2984,7 +2984,7 @@ fun RealWorld4_FancyWidget_052(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -3002,7 +3002,7 @@ fun RealWorld4_FancyWidget_052(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -3040,7 +3040,7 @@ fun RealWorld4_FancyWidget_053(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -3070,7 +3070,7 @@ fun RealWorld4_FancyWidget_054(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_056(
@@ -3127,7 +3127,7 @@ fun RealWorld4_FancyWidget_055(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -3145,7 +3145,7 @@ fun RealWorld4_FancyWidget_055(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_021(
@@ -3177,7 +3177,7 @@ fun RealWorld4_FancyWidget_056(
     number: Int,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -3200,7 +3200,7 @@ fun RealWorld4_FancyWidget_056(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_128(
@@ -3232,7 +3232,7 @@ fun RealWorld4_FancyWidget_057(
     model: RealWorld4_DataModel_10,
     obj: RealWorld4_UnmemoizablePojo_11,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -3261,7 +3261,7 @@ fun RealWorld4_FancyWidget_057(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp5.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp5.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -3281,7 +3281,7 @@ fun RealWorld4_FancyWidget_057(
 fun RealWorld4_FancyWidget_058(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -3294,7 +3294,7 @@ fun RealWorld4_FancyWidget_058(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_067(
@@ -3328,7 +3328,7 @@ fun RealWorld4_FancyWidget_059(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     number: Int,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -3351,7 +3351,7 @@ fun RealWorld4_FancyWidget_059(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -3389,7 +3389,7 @@ fun RealWorld4_FancyWidget_060(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -3425,7 +3425,7 @@ fun RealWorld4_FancyWidget_061(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -3444,7 +3444,7 @@ fun RealWorld4_FancyWidget_062(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -3462,7 +3462,7 @@ fun RealWorld4_FancyWidget_062(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_019(
@@ -3500,7 +3500,7 @@ fun RealWorld4_FancyWidget_063(
     model: RealWorld4_DataModel_10,
     s1: String,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -3523,7 +3523,7 @@ fun RealWorld4_FancyWidget_063(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -3544,7 +3544,7 @@ fun RealWorld4_FancyWidget_064(
     s2: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -3562,7 +3562,7 @@ fun RealWorld4_FancyWidget_064(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -3606,7 +3606,7 @@ fun RealWorld4_FancyWidget_065(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -3626,7 +3626,7 @@ fun RealWorld4_FancyWidget_066(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -3649,7 +3649,7 @@ fun RealWorld4_FancyWidget_066(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -3672,7 +3672,7 @@ fun RealWorld4_FancyWidget_067(
     model: RealWorld4_DataModel_10,
     s2: String,
     b: Boolean,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -3700,7 +3700,7 @@ fun RealWorld4_FancyWidget_067(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -3722,7 +3722,7 @@ fun RealWorld4_FancyWidget_068(
     model: RealWorld4_DataModel_05,
     obj: RealWorld4_UnmemoizablePojo_2,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f4 + model.f5 +
             model.f7
@@ -3750,7 +3750,7 @@ fun RealWorld4_FancyWidget_068(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp5.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp5.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_140(
@@ -3790,7 +3790,7 @@ fun RealWorld4_FancyWidget_069(
     model: RealWorld4_DataModel_06,
     s2: String,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 =
         "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 + model.f5 +
@@ -3815,7 +3815,7 @@ fun RealWorld4_FancyWidget_069(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_092(
@@ -3855,7 +3855,7 @@ fun RealWorld4_FancyWidget_070(
     model: RealWorld4_DataModel_07,
     s1: String,
     number: Int,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 +
             model.f6
@@ -3879,7 +3879,7 @@ fun RealWorld4_FancyWidget_070(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_029(
@@ -3923,7 +3923,7 @@ fun RealWorld4_FancyWidget_071(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
     obj: RealWorld4_UnmemoizablePojo_0,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
@@ -3950,7 +3950,7 @@ fun RealWorld4_FancyWidget_071(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp5.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp5.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_073(
@@ -4001,7 +4001,7 @@ fun RealWorld4_FancyWidget_072(
     s2: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -4019,7 +4019,7 @@ fun RealWorld4_FancyWidget_072(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_118(
@@ -4048,7 +4048,7 @@ fun RealWorld4_FancyWidget_073(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -4066,7 +4066,7 @@ fun RealWorld4_FancyWidget_073(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_074(
@@ -4112,7 +4112,7 @@ fun RealWorld4_FancyWidget_074(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -4131,7 +4131,7 @@ fun RealWorld4_FancyWidget_075(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_06,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 =
         "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 + model.f5 +
@@ -4151,7 +4151,7 @@ fun RealWorld4_FancyWidget_075(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_022(
@@ -4202,7 +4202,7 @@ fun RealWorld4_FancyWidget_076(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_077(
@@ -4286,7 +4286,7 @@ fun RealWorld4_FancyWidget_077(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
@@ -4309,7 +4309,7 @@ fun RealWorld4_FancyWidget_077(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_058(
@@ -4361,7 +4361,7 @@ fun RealWorld4_FancyWidget_078(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_126(
@@ -4400,7 +4400,7 @@ fun RealWorld4_FancyWidget_079(
     number: Int,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -4418,7 +4418,7 @@ fun RealWorld4_FancyWidget_079(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -4439,7 +4439,7 @@ fun RealWorld4_FancyWidget_080(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_07,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 +
             model.f6
@@ -4458,7 +4458,7 @@ fun RealWorld4_FancyWidget_080(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_112(
@@ -4500,7 +4500,7 @@ fun RealWorld4_FancyWidget_081(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 =
         "nbeksu48gsl89k" + obj.f1 + obj.f2 + obj.f3 + obj.f4 + obj.f5 + obj.f6 + obj.f7 + obj.f8
@@ -4538,7 +4538,7 @@ fun RealWorld4_FancyWidget_081(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp5.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp5.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_083(
@@ -4591,7 +4591,7 @@ fun RealWorld4_FancyWidget_082(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -4609,7 +4609,7 @@ fun RealWorld4_FancyWidget_082(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_084(
@@ -4641,7 +4641,7 @@ fun RealWorld4_FancyWidget_083(
     s2: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -4664,7 +4664,7 @@ fun RealWorld4_FancyWidget_083(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_042(
@@ -4694,7 +4694,7 @@ fun RealWorld4_FancyWidget_083(
 fun RealWorld4_FancyWidget_084(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -4707,7 +4707,7 @@ fun RealWorld4_FancyWidget_084(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -4727,7 +4727,7 @@ fun RealWorld4_FancyWidget_084(
 fun RealWorld4_FancyWidget_085(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
@@ -4740,7 +4740,7 @@ fun RealWorld4_FancyWidget_085(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_088(
@@ -4798,7 +4798,7 @@ fun RealWorld4_FancyWidget_086(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_111(
@@ -4854,7 +4854,7 @@ fun RealWorld4_FancyWidget_087(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -4873,7 +4873,7 @@ fun RealWorld4_FancyWidget_088(
     s2: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -4891,7 +4891,7 @@ fun RealWorld4_FancyWidget_088(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_011(
@@ -4920,7 +4920,7 @@ fun RealWorld4_FancyWidget_089(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -4938,7 +4938,7 @@ fun RealWorld4_FancyWidget_089(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -4982,7 +4982,7 @@ fun RealWorld4_FancyWidget_090(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -5001,7 +5001,7 @@ fun RealWorld4_FancyWidget_091(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5019,7 +5019,7 @@ fun RealWorld4_FancyWidget_091(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -5040,7 +5040,7 @@ fun RealWorld4_FancyWidget_092(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_07,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 +
             model.f6
@@ -5059,7 +5059,7 @@ fun RealWorld4_FancyWidget_092(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_044(
@@ -5117,7 +5117,7 @@ fun RealWorld4_FancyWidget_093(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_096(
@@ -5168,7 +5168,7 @@ fun RealWorld4_FancyWidget_094(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     obj: RealWorld4_UnmemoizablePojo_9,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5190,7 +5190,7 @@ fun RealWorld4_FancyWidget_094(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp5.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp5.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_014(
@@ -5230,7 +5230,7 @@ fun RealWorld4_FancyWidget_094(
 fun RealWorld4_FancyWidget_095(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5243,7 +5243,7 @@ fun RealWorld4_FancyWidget_095(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -5265,7 +5265,7 @@ fun RealWorld4_FancyWidget_096(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5288,7 +5288,7 @@ fun RealWorld4_FancyWidget_096(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_109(
@@ -5326,7 +5326,7 @@ fun RealWorld4_FancyWidget_097(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5349,7 +5349,7 @@ fun RealWorld4_FancyWidget_097(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_062(
@@ -5415,7 +5415,7 @@ fun RealWorld4_FancyWidget_098(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_036(
@@ -5455,7 +5455,7 @@ fun RealWorld4_FancyWidget_098(
 fun RealWorld4_FancyWidget_099(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5468,7 +5468,7 @@ fun RealWorld4_FancyWidget_099(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -5490,7 +5490,7 @@ fun RealWorld4_FancyWidget_100(
     model: RealWorld4_DataModel_08,
     s2: String,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5513,7 +5513,7 @@ fun RealWorld4_FancyWidget_100(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_049(
@@ -5555,7 +5555,7 @@ fun RealWorld4_FancyWidget_101(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5578,7 +5578,7 @@ fun RealWorld4_FancyWidget_101(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_047(
@@ -5618,7 +5618,7 @@ fun RealWorld4_FancyWidget_102(
     model: RealWorld4_DataModel_10,
     s1: String,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5641,7 +5641,7 @@ fun RealWorld4_FancyWidget_102(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -5679,7 +5679,7 @@ fun RealWorld4_FancyWidget_103(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -5699,7 +5699,7 @@ fun RealWorld4_FancyWidget_104(
     model: RealWorld4_DataModel_10,
     s1: String,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5722,7 +5722,7 @@ fun RealWorld4_FancyWidget_104(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -5743,7 +5743,7 @@ fun RealWorld4_FancyWidget_105(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     number: Int,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5761,7 +5761,7 @@ fun RealWorld4_FancyWidget_105(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_026(
@@ -5804,7 +5804,7 @@ fun RealWorld4_FancyWidget_105(
 fun RealWorld4_FancyWidget_106(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5817,7 +5817,7 @@ fun RealWorld4_FancyWidget_106(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -5839,7 +5839,7 @@ fun RealWorld4_FancyWidget_107(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5862,7 +5862,7 @@ fun RealWorld4_FancyWidget_107(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -5883,7 +5883,7 @@ fun RealWorld4_FancyWidget_108(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5901,7 +5901,7 @@ fun RealWorld4_FancyWidget_108(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -5921,7 +5921,7 @@ fun RealWorld4_FancyWidget_108(
 fun RealWorld4_FancyWidget_109(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5934,7 +5934,7 @@ fun RealWorld4_FancyWidget_109(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -5957,7 +5957,7 @@ fun RealWorld4_FancyWidget_110(
     color: Color,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -5985,7 +5985,7 @@ fun RealWorld4_FancyWidget_110(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -6006,7 +6006,7 @@ fun RealWorld4_FancyWidget_111(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     obj: RealWorld4_UnmemoizablePojo_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6028,7 +6028,7 @@ fun RealWorld4_FancyWidget_111(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp5.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp5.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -6048,7 +6048,7 @@ fun RealWorld4_FancyWidget_111(
 fun RealWorld4_FancyWidget_112(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6061,7 +6061,7 @@ fun RealWorld4_FancyWidget_112(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_116(
@@ -6102,7 +6102,7 @@ fun RealWorld4_FancyWidget_113(
     number: Int,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6120,7 +6120,7 @@ fun RealWorld4_FancyWidget_113(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_114(
@@ -6168,7 +6168,7 @@ fun RealWorld4_FancyWidget_114(
     model: RealWorld4_DataModel_10,
     s1: String,
     color: Color,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6191,7 +6191,7 @@ fun RealWorld4_FancyWidget_114(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -6214,7 +6214,7 @@ fun RealWorld4_FancyWidget_115(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6242,7 +6242,7 @@ fun RealWorld4_FancyWidget_115(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -6263,7 +6263,7 @@ fun RealWorld4_FancyWidget_116(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     number: Int,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6281,7 +6281,7 @@ fun RealWorld4_FancyWidget_116(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_117(
@@ -6310,7 +6310,7 @@ fun RealWorld4_FancyWidget_117(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     number: Int,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6328,7 +6328,7 @@ fun RealWorld4_FancyWidget_117(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -6349,7 +6349,7 @@ fun RealWorld4_FancyWidget_118(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     color: Color,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6367,7 +6367,7 @@ fun RealWorld4_FancyWidget_118(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -6388,7 +6388,7 @@ fun RealWorld4_FancyWidget_119(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6406,7 +6406,7 @@ fun RealWorld4_FancyWidget_119(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_130(
@@ -6436,7 +6436,7 @@ fun RealWorld4_FancyWidget_119(
 fun RealWorld4_FancyWidget_120(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6449,7 +6449,7 @@ fun RealWorld4_FancyWidget_120(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -6471,7 +6471,7 @@ fun RealWorld4_FancyWidget_121(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6494,7 +6494,7 @@ fun RealWorld4_FancyWidget_121(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -6517,7 +6517,7 @@ fun RealWorld4_FancyWidget_122(
     b: Boolean,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "nbeksu48gsl89k" + obj.f1 + obj.f2 + obj.f3 + obj.f4 + obj.f5 + obj.f6
     val tmp1 = obj::class.memberProperties.map { property ->
@@ -6549,7 +6549,7 @@ fun RealWorld4_FancyWidget_122(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp5.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp5.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -6571,7 +6571,7 @@ fun RealWorld4_FancyWidget_123(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6594,7 +6594,7 @@ fun RealWorld4_FancyWidget_123(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -6616,7 +6616,7 @@ fun RealWorld4_FancyWidget_124(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     b: Boolean,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6639,7 +6639,7 @@ fun RealWorld4_FancyWidget_124(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_125(
@@ -6668,7 +6668,7 @@ fun RealWorld4_FancyWidget_125(
     s2: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6686,7 +6686,7 @@ fun RealWorld4_FancyWidget_125(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -6707,7 +6707,7 @@ fun RealWorld4_FancyWidget_126(
     s2: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6725,7 +6725,7 @@ fun RealWorld4_FancyWidget_126(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -6745,7 +6745,7 @@ fun RealWorld4_FancyWidget_126(
 fun RealWorld4_FancyWidget_127(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6758,7 +6758,7 @@ fun RealWorld4_FancyWidget_127(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -6780,7 +6780,7 @@ fun RealWorld4_FancyWidget_128(
     model: RealWorld4_DataModel_10,
     s2: String,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6803,7 +6803,7 @@ fun RealWorld4_FancyWidget_128(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -6824,7 +6824,7 @@ fun RealWorld4_FancyWidget_129(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6842,7 +6842,7 @@ fun RealWorld4_FancyWidget_129(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -6862,7 +6862,7 @@ fun RealWorld4_FancyWidget_129(
 fun RealWorld4_FancyWidget_130(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -6875,7 +6875,7 @@ fun RealWorld4_FancyWidget_130(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -6897,7 +6897,7 @@ fun RealWorld4_FancyWidget_131(
     s2: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_04,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 =
         "jaleiurhgsei48" + model.f1_modified + model.f3 + model.f4 + model.f5 + model.f6 +
@@ -6922,7 +6922,7 @@ fun RealWorld4_FancyWidget_131(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_132(
@@ -6979,7 +6979,7 @@ fun RealWorld4_FancyWidget_132(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_05,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f4 + model.f5 +
             model.f7
@@ -6998,7 +6998,7 @@ fun RealWorld4_FancyWidget_132(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_006(
@@ -7108,7 +7108,7 @@ fun RealWorld4_FancyWidget_133(
     model: RealWorld4_DataModel_06,
     s1: String,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 =
         "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 + model.f5 +
@@ -7133,7 +7133,7 @@ fun RealWorld4_FancyWidget_133(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_134(
@@ -7177,7 +7177,7 @@ fun RealWorld4_FancyWidget_133(
 fun RealWorld4_FancyWidget_134(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_07,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 +
             model.f6
@@ -7191,7 +7191,7 @@ fun RealWorld4_FancyWidget_134(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_097(
@@ -7241,7 +7241,7 @@ fun RealWorld4_FancyWidget_134(
 fun RealWorld4_FancyWidget_135(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f5
     val tmp1 = model::class.memberProperties.map { property ->
@@ -7254,7 +7254,7 @@ fun RealWorld4_FancyWidget_135(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_136(
@@ -7283,7 +7283,7 @@ fun RealWorld4_FancyWidget_136(
     s2: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -7301,7 +7301,7 @@ fun RealWorld4_FancyWidget_136(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_051(
@@ -7345,7 +7345,7 @@ fun RealWorld4_FancyWidget_137(
     s1: String,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -7368,7 +7368,7 @@ fun RealWorld4_FancyWidget_137(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -7388,7 +7388,7 @@ fun RealWorld4_FancyWidget_137(
 fun RealWorld4_FancyWidget_138(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_10,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -7401,7 +7401,7 @@ fun RealWorld4_FancyWidget_138(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -7421,7 +7421,7 @@ fun RealWorld4_FancyWidget_138(
 fun RealWorld4_FancyWidget_139(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_05,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f1 + model.f2 + model.f3 + model.f4 + model.f5 +
             model.f7
@@ -7435,7 +7435,7 @@ fun RealWorld4_FancyWidget_139(
     }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_141(
@@ -7476,7 +7476,7 @@ fun RealWorld4_FancyWidget_140(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_06,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 =
         "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 + model.f5 +
@@ -7496,7 +7496,7 @@ fun RealWorld4_FancyWidget_140(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_076(
@@ -7553,7 +7553,7 @@ fun RealWorld4_FancyWidget_141(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_06,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 =
         "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 + model.f5 +
@@ -7573,7 +7573,7 @@ fun RealWorld4_FancyWidget_141(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_092(
@@ -7636,7 +7636,7 @@ fun RealWorld4_FancyWidget_142(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_071(
@@ -7704,7 +7704,7 @@ fun RealWorld4_FancyWidget_143(
     number: Int,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_07,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3 + model.f4 +
             model.f6
@@ -7728,7 +7728,7 @@ fun RealWorld4_FancyWidget_143(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_144(
@@ -7791,7 +7791,7 @@ fun RealWorld4_FancyWidget_144(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_08,
     number: Int,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 =
         "nbeksu48gsl89k" + obj.f1 + obj.f2 + obj.f3 + obj.f4 + obj.f5 + obj.f6 + obj.f7 + obj.f8 +
@@ -7825,7 +7825,7 @@ fun RealWorld4_FancyWidget_144(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp5.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp5.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_018(
@@ -7862,7 +7862,7 @@ fun RealWorld4_FancyWidget_145(
     model: RealWorld4_DataModel_09,
     s2: String,
     number: Int,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -7890,7 +7890,7 @@ fun RealWorld4_FancyWidget_145(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_057(
@@ -7940,7 +7940,7 @@ fun RealWorld4_FancyWidget_146(
     b: Boolean,
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -7973,7 +7973,7 @@ fun RealWorld4_FancyWidget_146(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_034(
@@ -8019,7 +8019,7 @@ fun RealWorld4_FancyWidget_147(
     obj: RealWorld4_UnmemoizablePojo_1,
     b: Boolean,
     s2: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f2 + model.f3
     val tmp1 = model::class.memberProperties.map { property ->
@@ -8056,7 +8056,7 @@ fun RealWorld4_FancyWidget_147(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp5 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2 + tmp3 + tmp4
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp5.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp5.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     Box(Modifier.fillMaxWidth().weight(1f), backgroundColor = model.toColor())
@@ -8094,7 +8094,7 @@ fun RealWorld4_FancyWidget_148(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_041(
@@ -8143,7 +8143,7 @@ fun RealWorld4_FancyWidget_149(
     modifier: Modifier = Modifier,
     model: RealWorld4_DataModel_09,
     s1: String,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val tmp0 = "jaleiurhgsei48" + model.f0 + model.f1 + model.f3 + model.f4
     val tmp1 = model::class.memberProperties.map { property ->
@@ -8161,7 +8161,7 @@ fun RealWorld4_FancyWidget_149(
             }.map { it.toString().reversed() }.joinToString("-"))
     val tmp3 = "lkjzndgke84ts" + tmp0 + tmp1 + tmp2
     WithConstraints(modifier) {
-        Box(Modifier.padding(1.dp) + DrawBackground(color = tmp3.toColor())) {
+        Box(Modifier.padding(1.dp).drawBackground(color = tmp3.toColor())) {
             if (constraints.maxHeight > constraints.maxWidth) {
                 Column {
                     RealWorld4_FancyWidget_087(

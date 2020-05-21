@@ -29,7 +29,7 @@ interface Composition {
      *
      * @param content A composable function that describes the UI
      */
-    fun setContent(content: @Composable() () -> Unit)
+    fun setContent(content: @Composable () -> Unit)
 
     /**
      * Clear the hierarchy that was created from the composition.
@@ -112,9 +112,9 @@ private class CompositionImpl(
 
     private var disposed = false
 
-    var composable: @Composable() () -> Unit = emptyContent()
+    var composable: @Composable () -> Unit = emptyContent()
 
-    override fun setContent(content: @Composable() () -> Unit) {
+    override fun setContent(content: @Composable () -> Unit) {
         check(!disposed) { "The composition is disposed" }
         this.composable = content
         recomposer.recompose(composable, composer)
@@ -176,7 +176,7 @@ private object Compositions {
  */
 private class HotReloader {
     companion object {
-        private var state = mutableListOf<Pair<CompositionImpl, @Composable() () -> Unit>>()
+        private var state = mutableListOf<Pair<CompositionImpl, @Composable () -> Unit>>()
 
         @TestOnly
         fun clearRoots() {

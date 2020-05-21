@@ -22,6 +22,8 @@ import androidx.compose.SlotTable
 import androidx.compose.Stable
 import kotlin.jvm.functions.FunctionN
 
+private const val SLOTS_PER_INT = 15
+
 @Stable
 class RestartableFunctionN<R>(
     val key: Int,
@@ -39,16 +41,47 @@ class RestartableFunctionN<R>(
         }
     }
 
+    private fun realParamCount(params: Int): Int {
+        var realParams = params
+        realParams-- // composer parameter
+        realParams-- // key parameter
+        realParams-- // changed parameter
+        var changedParams = 1
+        while (changedParams * SLOTS_PER_INT < realParams) {
+            realParams--
+            changedParams++
+        }
+        return realParams
+    }
+
     override fun invoke(vararg args: Any?): R {
-        val c = args.last() as Composer<*>
+        val realParams = realParamCount(args.size)
+        val c = args[realParams] as Composer<*>
+        val allArgsButLast = args.slice(0 until args.size - 1).toTypedArray()
+        val lastChanged = args[args.size - 1] as Int
         c.startRestartGroup(key)
+        val dirty = lastChanged or if (c.changed(this))
+            differentBits(realParams)
+        else
+            sameBits(realParams)
         if (tracked) {
             FrameManager.recordRead(this)
         }
         @Suppress("UNCHECKED_CAST")
-        val result = (_block as FunctionN<*>)(*args) as R
-        c.endRestartGroup()?.updateScope { nc ->
-            this(*(args.slice(0 until args.size - 1) + nc).toTypedArray())
+        val result = (_block as FunctionN<*>)(*allArgsButLast, dirty) as R
+        c.endRestartGroup()?.updateScope { nc, nk, _ ->
+            val params = args.slice(0 until realParams).toTypedArray()
+            @Suppress("UNUSED_VARIABLE")
+            val key = args[realParams + 1] as Int
+            val changed = args[realParams + 2] as Int
+            val changedN = args.slice(realParams + 3 until args.size).toTypedArray()
+            this(
+                *params,
+                nc,
+                nk,
+                changed or 0b1,
+                *changedN
+            )
         }
         return result
     }

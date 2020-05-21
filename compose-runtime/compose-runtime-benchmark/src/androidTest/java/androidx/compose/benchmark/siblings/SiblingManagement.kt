@@ -17,7 +17,6 @@
 package androidx.compose.benchmark.siblings
 
 import androidx.compose.Composable
-import androidx.compose.Pivotal
 import androidx.compose.key
 import androidx.ui.core.Modifier
 import androidx.ui.foundation.Box
@@ -38,24 +37,6 @@ val magentaBackground = Modifier.drawBackground(Color.Magenta)
 val blackStyle = TextStyle(color = Color.Black)
 val blueStyle = TextStyle(color = Color.Blue)
 val magentaStyle = TextStyle(color = Color.Magenta)
-
-@Composable
-fun PivotalItemRow(@Pivotal item: Item) {
-    val background = when (item.id % 3) {
-        0 -> blueBackground
-        1 -> blackBackground
-        else -> magentaBackground
-    }
-    val style = when (item.id % 3) {
-        0 -> blackStyle
-        1 -> blueStyle
-        else -> magentaStyle
-    }
-    Row(Modifier.fillMaxWidth()) {
-        Box(Modifier.fillMaxSize() + background)
-        Text(text = "${item.id}", style = style)
-    }
-}
 
 @Composable
 fun ItemRow(item: Item) {
@@ -80,7 +61,7 @@ fun ItemRow(item: Item) {
 
 data class Item(val id: Int)
 
-enum class IdentityType { Pivotal, Index, Key }
+enum class IdentityType { Index, Key }
 
 enum class ReorderType {
     Shuffle, ShiftRight, ShiftLeft, Swap,
@@ -123,11 +104,6 @@ fun <T> List<T>.update(reorderType: ReorderType, random: Random, factory: (Int) 
 fun SiblingManagement(identity: IdentityType, items: List<Item>) {
     Column(Modifier.fillMaxHeight()) {
         when (identity) {
-            IdentityType.Pivotal -> {
-                for (item in items) {
-                    PivotalItemRow(item = item)
-                }
-            }
             IdentityType.Index -> {
                 for (item in items) {
                     ItemRow(item = item)
@@ -135,7 +111,7 @@ fun SiblingManagement(identity: IdentityType, items: List<Item>) {
             }
             IdentityType.Key -> {
                 for (item in items) {
-                    key(v1 = item.id) {
+                    key(item.id) {
                         ItemRow(item = item)
                     }
                 }

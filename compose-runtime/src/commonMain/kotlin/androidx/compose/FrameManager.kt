@@ -153,7 +153,7 @@ object FrameManager {
      * Records that [value], or one of its fields, read while composing and its values were
      * used during composition.
      *
-     * This is the underlying mechanism used by [Model] objects to allow composition to observe
+     * This is the underlying mechanism used by [State] objects to allow composition to observe
      * changes made to model objects.
      */
     internal fun recordRead(value: Any) = readObserver(value)
@@ -211,7 +211,7 @@ object FrameManager {
                 // Ignore the object if its invalidations were all immediate for the frame.
                 invalidations[committed.filter {
                     !immediate.contains(it) || deferred.contains(it)
-                } ]
+                }]
             }
             if (currentInvalidations.isNotEmpty()) {
                 if (!isMainThread()) {

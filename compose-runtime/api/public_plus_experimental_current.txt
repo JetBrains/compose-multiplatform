@@ -25,6 +25,9 @@ package androidx.compose {
     property public final boolean valid;
   }
 
+  public final class AndroidRecomposerKt {
+  }
+
   public final class Applier<N> {
     ctor public Applier(N! root, androidx.compose.ApplyAdapter<N> adapter);
     method public void down(N? node);
@@ -63,6 +66,12 @@ package androidx.compose {
     method public boolean isEmpty();
   }
 
+  public final class ChoreographerCompositionFrameClock implements androidx.compose.CompositionFrameClock {
+    ctor public ChoreographerCompositionFrameClock(android.view.Choreographer choreographer);
+    method public suspend <R> Object? awaitFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
+    method public android.view.Choreographer getChoreographer();
+  }
+
   public interface CommitScope {
     method public void onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> callback);
   }
@@ -81,7 +90,7 @@ package androidx.compose {
     method public final <V, T> void apply(V? value, kotlin.jvm.functions.Function2<? super T,? super V,kotlin.Unit> block);
     method public final void applyChanges();
     method public final androidx.compose.CompositionReference buildReference();
-    method public final inline void call(Object key, kotlin.jvm.functions.Function1<? super androidx.compose.ComposerValidator,java.lang.Boolean> invalid, kotlin.jvm.functions.Function0<kotlin.Unit> block);
+    method @Deprecated public final inline void call(Object key, kotlin.jvm.functions.Function1<? super androidx.compose.ComposerValidator,java.lang.Boolean> invalid, kotlin.jvm.functions.Function0<kotlin.Unit> block);
     method public <T> boolean changed(T? value);
     method public boolean changed(int value);
     method public final void collectKeySourceInformation();
@@ -89,7 +98,7 @@ package androidx.compose {
     method public final <T extends N> void createNode(kotlin.jvm.functions.Function0<? extends T> factory);
     method public final <T extends N> void emitNode(kotlin.jvm.functions.Function0<? extends T> factory);
     method public final void emitNode(N? node);
-    method public final void endExpr();
+    method public final void endDefaults();
     method public final void endGroup();
     method public final void endMovableGroup();
     method public final void endNode();
@@ -98,6 +107,7 @@ package androidx.compose {
     method public final void endRoot();
     method public final int getChangeCount();
     method public final int getCurrentCompoundKeyHash();
+    method public final boolean getDefaultsInvalid();
     method public final boolean getInserting();
     method public final androidx.compose.Recomposer getRecomposer();
     method public final boolean getSkipping();
@@ -107,9 +117,10 @@ package androidx.compose {
     method public final boolean recompose();
     method public final void skipCurrentGroup();
     method public final void skipToGroupEnd();
-    method public final void startExpr(Object key);
-    method public final void startGroup(Object key);
-    method public final void startMovableGroup(Object key);
+    method public final void startDefaults();
+    method public final void startGroup(int key);
+    method public final void startGroup(int key, Object? dataKey);
+    method public final void startMovableGroup(int key, Object? dataKey);
     method public final void startNode(Object key);
     method public final void startReplaceableGroup(int key);
     method public final void startRestartGroup(int key);
@@ -118,6 +129,7 @@ package androidx.compose {
     method public final N! useNode();
     property public final int changeCount;
     property public final int currentCompoundKeyHash;
+    property public final boolean defaultsInvalid;
     property public final boolean inserting;
     property public final boolean skipping;
   }
@@ -146,6 +158,21 @@ package androidx.compose {
   public interface Composition {
     method public void dispose();
     method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> content);
+  }
+
+  public abstract class CompositionCoroutineScope implements androidx.compose.CompositionFrameClock kotlinx.coroutines.CoroutineScope {
+    ctor public CompositionCoroutineScope();
+    method @Deprecated public final suspend Object? awaitFrame(kotlin.coroutines.Continuation<? super java.lang.Long> p);
+  }
+
+  public interface CompositionFrameClock {
+    method public suspend <R> Object? awaitFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
+  }
+
+  public final class CompositionFrameClockKt {
+    method public static suspend inline <R> Object? awaitFrameMillis(androidx.compose.CompositionFrameClock, kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
+    method public static suspend Object? awaitFrameMillis(androidx.compose.CompositionFrameClock, kotlin.coroutines.Continuation<? super java.lang.Long> p);
+    method public static suspend Object? awaitFrameNanos(androidx.compose.CompositionFrameClock, kotlin.coroutines.Continuation<? super java.lang.Long> p);
   }
 
   public final class CompositionKt {
@@ -187,6 +214,7 @@ package androidx.compose {
   }
 
   public final class FlowAdapterKt {
+    method @androidx.compose.Composable public static inline <T> androidx.compose.State<T> collectAsState(kotlinx.coroutines.flow.StateFlow<? extends T>, kotlin.coroutines.CoroutineContext context = Dispatchers.Main);
     method @androidx.compose.Composable public static inline <T> androidx.compose.State<T> collectAsState(kotlinx.coroutines.flow.Flow<? extends T>, kotlin.coroutines.CoroutineContext context = Dispatchers.Main);
     method @androidx.compose.Composable public static <T> androidx.compose.State<T> collectAsState(kotlinx.coroutines.flow.Flow<? extends T>, T? initial, kotlin.coroutines.CoroutineContext context = Dispatchers.Main);
   }
@@ -203,6 +231,9 @@ package androidx.compose {
   @androidx.compose.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.CLASS) public @interface Immutable {
   }
 
+  @kotlin.annotation.Target(allowedTargets={AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY}) public @interface InternalComposeApi {
+  }
+
   public final class JoinedKeyKt {
     method public static boolean isJoinedKey(Object? key);
     method public static Object? joinedKeyLeft(Object? key);
@@ -210,23 +241,22 @@ package androidx.compose {
   }
 
   public final class KeyInfo {
+    method public Object? getDataKey();
     method public int getIndex();
-    method public Object getKey();
+    method public int getKey();
     method public int getLocation();
     method public int getNodes();
   }
 
   public final class KeyKt {
-    method @androidx.compose.Composable public static inline <T, V1> T! key(@androidx.compose.Pivotal V1? v1, kotlin.jvm.functions.Function0<? extends T> block);
-    method @androidx.compose.Composable public static inline <T, V1, V2> T! key(@androidx.compose.Pivotal V1? v1, @androidx.compose.Pivotal V2? v2, kotlin.jvm.functions.Function0<? extends T> block);
-    method @androidx.compose.Composable public static inline <T> T! key(@androidx.compose.Pivotal Object![]? inputs, kotlin.jvm.functions.Function0<? extends T> block);
+    method @androidx.compose.Composable public static inline <T> T! key(Object![]? inputs, kotlin.jvm.functions.Function0<? extends T> block);
   }
 
   public final class KeySourceInfoKt {
     method public static String? keySourceInfoOf(Object key);
   }
 
-  @androidx.compose.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.CLASS) public @interface Model {
+  @Deprecated @androidx.compose.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.CLASS) public @interface Model {
   }
 
   @androidx.compose.Stable public interface MutableState<T> extends androidx.compose.State<T> {
@@ -272,7 +302,7 @@ package androidx.compose {
     method public void removeValue(V value);
   }
 
-  @kotlin.annotation.MustBeDocumented @kotlin.annotation.Target(allowedTargets={AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.PROPERTY, AnnotationTarget.FUNCTION}) public @interface Pivotal {
+  @Deprecated @kotlin.annotation.MustBeDocumented @kotlin.annotation.Target(allowedTargets={AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.PROPERTY, AnnotationTarget.FUNCTION}) public @interface Pivotal {
   }
 
   @androidx.compose.Immutable public abstract class ProvidableAmbient<T> extends androidx.compose.Ambient<T> {
@@ -291,9 +321,13 @@ package androidx.compose {
   public abstract class Recomposer {
     ctor public Recomposer();
     method protected final void dispatchRecomposes();
+    method public abstract androidx.compose.CompositionFrameClock getCompositionFrameClock();
+    method public abstract kotlinx.coroutines.CoroutineScope getEffectCoroutineScope();
     method public abstract boolean hasPendingChanges();
     method public abstract void recomposeSync();
     method protected abstract void scheduleChangesDispatch();
+    property public abstract androidx.compose.CompositionFrameClock compositionFrameClock;
+    property public abstract kotlinx.coroutines.CoroutineScope effectCoroutineScope;
     field public static final androidx.compose.Recomposer.Companion! Companion;
   }
 
@@ -311,7 +345,7 @@ package androidx.compose {
   }
 
   public interface ScopeUpdateScope {
-    method public void updateScope(kotlin.jvm.functions.Function1<? super androidx.compose.Composer<?>,kotlin.Unit> block);
+    method public void updateScope(kotlin.jvm.functions.Function3<? super androidx.compose.Composer<?>,? super java.lang.Integer,? super java.lang.Integer,kotlin.Unit> block);
   }
 
   public final class SlotReader {
@@ -327,8 +361,9 @@ package androidx.compose {
     method public int getCurrent();
     method public int getCurrentEnd();
     method public Object! getGroupData();
+    method public Object! getGroupDataKey();
     method public int getGroupEnd();
-    method public Object! getGroupKey();
+    method public int getGroupKey();
     method public Object! getGroupNode();
     method public int getGroupSize();
     method public boolean getInEmpty();
@@ -338,7 +373,7 @@ package androidx.compose {
     method public int getParentSlots();
     method public androidx.compose.SlotTable getTable();
     method public int groupEnd(int index);
-    method public Object groupKey(int index);
+    method public int groupKey(int index);
     method public int groupSize(int index);
     method public boolean isGroup();
     method public boolean isGroup(int index);
@@ -350,13 +385,15 @@ package androidx.compose {
     method public int skipGroup();
     method public int skipNode();
     method public void skipToGroupEnd();
-    method public void startGroup(Object key);
-    method public void startNode(Object key);
+    method public void startDataGroup();
+    method public void startGroup();
+    method public void startNode();
     property public final int current;
     property public final int currentEnd;
     property public final Object! groupData;
+    property public final Object! groupDataKey;
     property public final int groupEnd;
-    property public final Object! groupKey;
+    property public final int groupKey;
     property public final Object! groupNode;
     property public final int groupSize;
     property public final boolean inEmpty;
@@ -426,10 +463,13 @@ package androidx.compose {
     method public int skipGroup();
     method public int skipNode();
     method public void skipToGroupEnd();
-    method public void startData(Object key, Object? data);
-    method public void startGroup(Object key);
-    method public void startNode(Object key);
-    method public void startNode(Object key, Object? node);
+    method public void startData(int key, Object? dataKey, Object? data);
+    method public void startGroup();
+    method public void startGroup(int key);
+    method public void startGroup(int key, Object? dataKey);
+    method public void startNode();
+    method public void startNode(Object? key);
+    method public void startNode(Object? key, Object? node);
     method public Object? update(Object? value);
     method public void updateData(Object? value);
     property public final boolean closed;
@@ -451,6 +491,15 @@ package androidx.compose {
   @androidx.compose.Stable public interface State<T> {
     method public T! getValue();
     property public abstract T! value;
+  }
+
+  public final class SuspendingEffectsKt {
+    method public static suspend Object? awaitDispose(androidx.compose.CompositionCoroutineScope, kotlin.jvm.functions.Function0<kotlin.Unit> onDispose = {}, kotlin.coroutines.Continuation<?> p = {});
+    method @androidx.compose.Composable public static void launchInComposition(kotlin.jvm.functions.Function2<? super androidx.compose.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+    method @androidx.compose.Composable public static void launchInComposition(Object? v1, kotlin.jvm.functions.Function2<? super androidx.compose.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+    method @androidx.compose.Composable public static void launchInComposition(Object? v1, Object? v2, kotlin.jvm.functions.Function2<? super androidx.compose.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+    method @androidx.compose.Composable public static void launchInComposition(Object? v1, Object? v2, Object? v3, kotlin.jvm.functions.Function2<? super androidx.compose.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
+    method @androidx.compose.Composable public static void launchInComposition(Object![]? keys, kotlin.jvm.functions.Function2<? super androidx.compose.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
   }
 
   public final class TraceKt {
@@ -599,38 +648,34 @@ package androidx.compose.frames {
 
 package androidx.compose.internal {
 
-  @androidx.compose.Stable public final class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, P19, P20, P21, R> implements kotlin.jvm.functions.Function0<R> kotlin.jvm.functions.Function1<androidx.compose.Composer<?>,R> kotlin.jvm.functions.Function10<P1,P2,P3,P4,P5,P6,P7,P8,P9,androidx.compose.Composer<?>,R> kotlin.jvm.functions.Function11<P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,androidx.compose.Composer<?>,R> kotlin.jvm.functions.Function12<P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,P11,androidx.compose.Composer<?>,R> kotlin.jvm.functions.Function13<P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,P11,P12,androidx.compose.Composer<?>,R> kotlin.jvm.functions.Function14<P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,P11,P12,P13,androidx.compose.Composer<?>,R> kotlin.jvm.functions.Function15<P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,P11,P12,P13,P14,androidx.compose.Composer<?>,R> kotlin.jvm.functions.Function16<P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,P11,P12,P13,P14,P15,androidx.compose.Composer<?>,R> kotlin.jvm.functions.Function17<P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,P11,P12,P13,P14,P15,P16,androidx.compose.Composer<?>,R> kotlin.jvm.functions.Function18<P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,P11,P12,P13,P14,P15,P16,P17,androidx.compose.Composer<?>,R> kotlin.jvm.functions.Function19<P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,P11,P12,P13,P14,P15,P16,P17,P18,androidx.compose.Composer<?>,R> kotlin.jvm.functions.Function2<P1,androidx.compose.Composer<?>,R> kotlin.jvm.functions.Function20<P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,P11,P12,P13,P14,P15,P16,P17,P18,P19,androidx.compose.Composer<?>,R> kotlin.jvm.functions.Function21<P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,P11,P12,P13,P14,P15,P16,P17,P18,P19,P20,androidx.compose.Composer<?>,R> kotlin.jvm.functions.Function22<P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,P11,P12,P13,P14,P15,P16,P17,P18,P19,P20,P21,androidx.compose.Composer<?>,R> kotlin.jvm.functions.Function3<P1,P2,androidx.compose.Composer<?>,R> kotlin.jvm.functions.Function4<P1,P2,P3,androidx.compose.Composer<?>,R> kotlin.jvm.functions.Function5<P1,P2,P3,P4,androidx.compose.Composer<?>,R> kotlin.jvm.functions.Function6<P1,P2,P3,P4,P5,androidx.compose.Composer<?>,R> kotlin.jvm.functions.Function7<P1,P2,P3,P4,P5,P6,androidx.compose.Composer<?>,R> kotlin.jvm.functions.Function8<P1,P2,P3,P4,P5,P6,P7,androidx.compose.Composer<?>,R> kotlin.jvm.functions.Function9<P1,P2,P3,P4,P5,P6,P7,P8,androidx.compose.Composer<?>,R> {
+  @androidx.compose.Stable public final class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18, R> implements kotlin.jvm.functions.Function10<P1,P2,P3,P4,P5,P6,P7,androidx.compose.Composer<?>,java.lang.Integer,java.lang.Integer,R> kotlin.jvm.functions.Function11<P1,P2,P3,P4,P5,P6,P7,P8,androidx.compose.Composer<?>,java.lang.Integer,java.lang.Integer,R> kotlin.jvm.functions.Function12<P1,P2,P3,P4,P5,P6,P7,P8,P9,androidx.compose.Composer<?>,java.lang.Integer,java.lang.Integer,R> kotlin.jvm.functions.Function13<P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,androidx.compose.Composer<?>,java.lang.Integer,java.lang.Integer,R> kotlin.jvm.functions.Function14<P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,P11,androidx.compose.Composer<?>,java.lang.Integer,java.lang.Integer,R> kotlin.jvm.functions.Function15<P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,P11,P12,androidx.compose.Composer<?>,java.lang.Integer,java.lang.Integer,R> kotlin.jvm.functions.Function16<P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,P11,P12,P13,androidx.compose.Composer<?>,java.lang.Integer,java.lang.Integer,R> kotlin.jvm.functions.Function17<P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,P11,P12,P13,P14,androidx.compose.Composer<?>,java.lang.Integer,java.lang.Integer,R> kotlin.jvm.functions.Function18<P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,P11,P12,P13,P14,P15,androidx.compose.Composer<?>,java.lang.Integer,java.lang.Integer,R> kotlin.jvm.functions.Function20<P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,P11,P12,P13,P14,P15,P16,androidx.compose.Composer<?>,java.lang.Integer,java.lang.Integer,java.lang.Integer,R> kotlin.jvm.functions.Function21<P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,P11,P12,P13,P14,P15,P16,P17,androidx.compose.Composer<?>,java.lang.Integer,java.lang.Integer,java.lang.Integer,R> kotlin.jvm.functions.Function22<P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,P11,P12,P13,P14,P15,P16,P17,P18,androidx.compose.Composer<?>,java.lang.Integer,java.lang.Integer,java.lang.Integer,R> kotlin.jvm.functions.Function3<androidx.compose.Composer<?>,java.lang.Integer,java.lang.Integer,R> kotlin.jvm.functions.Function4<P1,androidx.compose.Composer<?>,java.lang.Integer,java.lang.Integer,R> kotlin.jvm.functions.Function5<P1,P2,androidx.compose.Composer<?>,java.lang.Integer,java.lang.Integer,R> kotlin.jvm.functions.Function6<P1,P2,P3,androidx.compose.Composer<?>,java.lang.Integer,java.lang.Integer,R> kotlin.jvm.functions.Function7<P1,P2,P3,P4,androidx.compose.Composer<?>,java.lang.Integer,java.lang.Integer,R> kotlin.jvm.functions.Function8<P1,P2,P3,P4,P5,androidx.compose.Composer<?>,java.lang.Integer,java.lang.Integer,R> kotlin.jvm.functions.Function9<P1,P2,P3,P4,P5,P6,androidx.compose.Composer<?>,java.lang.Integer,java.lang.Integer,R> {
     ctor public RestartableFunction(int key, boolean tracked);
     method public int getKey();
-    method public R! invoke();
-    method public R! invoke(androidx.compose.Composer<?> c);
-    method public R! invoke(P1? p1, androidx.compose.Composer<?> c);
-    method public R! invoke(P1? p1, P2? p2, androidx.compose.Composer<?> c);
-    method public R! invoke(P1? p1, P2? p2, P3? p3, androidx.compose.Composer<?> c);
-    method public R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, androidx.compose.Composer<?> c);
-    method public R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, P5? p5, androidx.compose.Composer<?> c);
-    method public R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, P5? p5, P6? p6, androidx.compose.Composer<?> c);
-    method public R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, P5? p5, P6? p6, P7? p7, androidx.compose.Composer<?> c);
-    method public R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, P5? p5, P6? p6, P7? p7, P8? p8, androidx.compose.Composer<?> c);
-    method public R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, P5? p5, P6? p6, P7? p7, P8? p8, P9? p9, androidx.compose.Composer<?> c);
-    method public R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, P5? p5, P6? p6, P7? p7, P8? p8, P9? p9, P10? p10, androidx.compose.Composer<?> c);
-    method public R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, P5? p5, P6? p6, P7? p7, P8? p8, P9? p9, P10? p10, P11? p11, androidx.compose.Composer<?> c);
-    method public R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, P5? p5, P6? p6, P7? p7, P8? p8, P9? p9, P10? p10, P11? p11, P12? p12, androidx.compose.Composer<?> c);
-    method public R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, P5? p5, P6? p6, P7? p7, P8? p8, P9? p9, P10? p10, P11? p11, P12? p12, P13? p13, androidx.compose.Composer<?> c);
-    method public R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, P5? p5, P6? p6, P7? p7, P8? p8, P9? p9, P10? p10, P11? p11, P12? p12, P13? p13, P14? p14, androidx.compose.Composer<?> c);
-    method public R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, P5? p5, P6? p6, P7? p7, P8? p8, P9? p9, P10? p10, P11? p11, P12? p12, P13? p13, P14? p14, P15? p15, androidx.compose.Composer<?> c);
-    method public R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, P5? p5, P6? p6, P7? p7, P8? p8, P9? p9, P10? p10, P11? p11, P12? p12, P13? p13, P14? p14, P15? p15, P16? p16, androidx.compose.Composer<?> c);
-    method public R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, P5? p5, P6? p6, P7? p7, P8? p8, P9? p9, P10? p10, P11? p11, P12? p12, P13? p13, P14? p14, P15? p15, P16? p16, P17? p17, androidx.compose.Composer<?> c);
-    method public R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, P5? p5, P6? p6, P7? p7, P8? p8, P9? p9, P10? p10, P11? p11, P12? p12, P13? p13, P14? p14, P15? p15, P16? p16, P17? p17, P18? p18, androidx.compose.Composer<?> c);
-    method public R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, P5? p5, P6? p6, P7? p7, P8? p8, P9? p9, P10? p10, P11? p11, P12? p12, P13? p13, P14? p14, P15? p15, P16? p16, P17? p17, P18? p18, P19? p19, androidx.compose.Composer<?> c);
-    method public R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, P5? p5, P6? p6, P7? p7, P8? p8, P9? p9, P10? p10, P11? p11, P12? p12, P13? p13, P14? p14, P15? p15, P16? p16, P17? p17, P18? p18, P19? p19, P20? p20, androidx.compose.Composer<?> c);
-    method public R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, P5? p5, P6? p6, P7? p7, P8? p8, P9? p9, P10? p10, P11? p11, P12? p12, P13? p13, P14? p14, P15? p15, P16? p16, P17? p17, P18? p18, P19? p19, P20? p20, P21? p21, androidx.compose.Composer<?> c);
+    method public operator R! invoke(androidx.compose.Composer<?> c, int k, int changed);
+    method public operator R! invoke(P1? p1, androidx.compose.Composer<?> c, int k, int changed);
+    method public operator R! invoke(P1? p1, P2? p2, androidx.compose.Composer<?> c, int k, int changed);
+    method public operator R! invoke(P1? p1, P2? p2, P3? p3, androidx.compose.Composer<?> c, int k, int changed);
+    method public operator R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, androidx.compose.Composer<?> c, int k, int changed);
+    method public operator R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, P5? p5, androidx.compose.Composer<?> c, int k, int changed);
+    method public operator R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, P5? p5, P6? p6, androidx.compose.Composer<?> c, int k, int changed);
+    method public operator R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, P5? p5, P6? p6, P7? p7, androidx.compose.Composer<?> c, int k, int changed);
+    method public operator R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, P5? p5, P6? p6, P7? p7, P8? p8, androidx.compose.Composer<?> c, int k, int changed);
+    method public operator R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, P5? p5, P6? p6, P7? p7, P8? p8, P9? p9, androidx.compose.Composer<?> c, int k, int changed);
+    method public operator R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, P5? p5, P6? p6, P7? p7, P8? p8, P9? p9, P10? p10, androidx.compose.Composer<?> c, int k, int changed);
+    method public operator R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, P5? p5, P6? p6, P7? p7, P8? p8, P9? p9, P10? p10, P11? p11, androidx.compose.Composer<?> c, int k, int changed);
+    method public operator R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, P5? p5, P6? p6, P7? p7, P8? p8, P9? p9, P10? p10, P11? p11, P12? p12, androidx.compose.Composer<?> c, int k, int changed);
+    method public operator R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, P5? p5, P6? p6, P7? p7, P8? p8, P9? p9, P10? p10, P11? p11, P12? p12, P13? p13, androidx.compose.Composer<?> c, int k, int changed);
+    method public operator R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, P5? p5, P6? p6, P7? p7, P8? p8, P9? p9, P10? p10, P11? p11, P12? p12, P13? p13, P14? p14, androidx.compose.Composer<?> c, int k, int changed);
+    method public operator R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, P5? p5, P6? p6, P7? p7, P8? p8, P9? p9, P10? p10, P11? p11, P12? p12, P13? p13, P14? p14, P15? p15, androidx.compose.Composer<?> c, int k, int changed);
+    method public operator R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, P5? p5, P6? p6, P7? p7, P8? p8, P9? p9, P10? p10, P11? p11, P12? p12, P13? p13, P14? p14, P15? p15, P16? p16, androidx.compose.Composer<?> c, int k, int changed, int changed1);
+    method public operator R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, P5? p5, P6? p6, P7? p7, P8? p8, P9? p9, P10? p10, P11? p11, P12? p12, P13? p13, P14? p14, P15? p15, P16? p16, P17? p17, androidx.compose.Composer<?> c, int k, int changed, int changed1);
+    method public operator R! invoke(P1? p1, P2? p2, P3? p3, P4? p4, P5? p5, P6? p6, P7? p7, P8? p8, P9? p9, P10? p10, P11? p11, P12? p12, P13? p13, P14? p14, P15? p15, P16? p16, P17? p17, P18? p18, androidx.compose.Composer<?> c, int k, int changed, int changed1);
     method public void update(Object block);
   }
 
   public final class RestartableFunctionKt {
-    method public static androidx.compose.internal.RestartableFunction<java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object> restartableFunction(androidx.compose.Composer<?> composer, int key, boolean tracked, Object block);
-    method public static androidx.compose.internal.RestartableFunction<java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object> restartableFunctionInstance(int key, boolean tracked, Object block);
+    method public static androidx.compose.internal.RestartableFunction<java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object> restartableFunction(androidx.compose.Composer<?> composer, int key, boolean tracked, Object block);
+    method public static androidx.compose.internal.RestartableFunction<java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object,java.lang.Object> restartableFunctionInstance(int key, boolean tracked, Object block);
   }
 
   @androidx.compose.Stable public final class RestartableFunctionN<R> implements kotlin.jvm.functions.FunctionN<R> {
