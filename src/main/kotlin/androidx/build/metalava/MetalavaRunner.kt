@@ -112,6 +112,10 @@ val API_LINT_ARGS: List<String> = listOf(
         "NotCloseable",
         "SamShouldBeLast",
         "MissingJvmstatic",
+        "CallbackMethodName",
+        "GetterOnBuilder",
+        "StaticFinalBuilder",
+        "MissingGetterMatchingBuilder",
 
         // We should only treat these as warnings
         "IntentBuilderName",
@@ -236,6 +240,8 @@ fun Project.getGenerateApiArgs(
                 "--show-annotation",
                 "androidx.annotation.RestrictTo(androidx.annotation.RestrictTo.Scope." +
                     "LIBRARY_GROUP_PREFIX)",
+                "--show-annotation",
+                "kotlin.PublishedApi",
                 "--show-unannotated"
             )
             if (generateApiMode is GenerateApiMode.AllRestrictedApis) {

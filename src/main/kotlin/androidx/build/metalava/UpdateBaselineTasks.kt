@@ -132,6 +132,8 @@ abstract class IgnoreApiChangesTask @Inject constructor(
             baselineFile
         )
         args += listOf(
+            "--baseline",
+            baselineFile.toString(),
             "--check-compatibility:api:released",
             prevApi.toString(),
             "--source-files",
@@ -171,7 +173,6 @@ private fun getCommonBaselineUpdateArgs(baselineFile: File): List<String> {
     return mutableListOf(
         "--update-baseline",
         baselineFile.toString(),
-        "--baseline", baselineFile.toString(),
         "--pass-baseline-updates",
         "--delete-empty-baselines",
         "--format=v3",

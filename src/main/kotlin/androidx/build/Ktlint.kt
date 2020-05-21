@@ -17,21 +17,28 @@
 package androidx.build
 
 import androidx.build.uptodatedness.cacheEvenIfNoOutputs
-import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.StopExecutionException
-import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
 
 private fun Project.getKtlintConfiguration(): Configuration {
     return configurations.findByName("ktlint") ?: configurations.create("ktlint") {
-        val dependency = dependencies.create("com.pinterest:ktlint:0.34.2")
+        val dependency = dependencies.create("com.pinterest:ktlint:0.36.0")
         it.dependencies.add(dependency)
     }
 }
+
+/**
+ * Import ordering check does not match IJ default ordering.
+ * New line check at the end of file is not useful for our project.
+ * TODO: https://github.com/pinterest/ktlint/issues/737
+ * Paren spacing doesn't understand @Composable () -> Unit, as it thinks the () is part of the
+ * annotation and not the function type of the lambda, so disabling this for now.
+ */
+private const val DisabledRules = "import-ordering,final-newline,paren-spacing"
 
 fun Project.configureKtlint() {
     val outputDir = "${project.buildDir}/reports/ktlint/"
@@ -53,10 +60,7 @@ fun Project.configureKtlint() {
         task.args = listOf(
             "--android",
             "--disabled_rules",
-            // Unused imports check fails on compose. b/135698036
-            // Import ordering check does not match IJ default ordering.
-            // New line check at the end of file is not useful for our project.
-            "no-unused-imports,import-ordering,final-newline",
+            DisabledRules,
             "--reporter=plain",
             "--reporter=checkstyle,output=$outputFile",
             "$inputDir/$includeFiles",
@@ -76,7 +80,7 @@ fun Project.configureKtlint() {
             "--android",
             "-F",
             "--disabled_rules",
-            "no-unused-imports,import-ordering,final-newline",
+            DisabledRules,
             "--reporter=plain",
             "--reporter=checkstyle,output=$outputFile",
             "$inputDir/$includeFiles",
@@ -113,15 +117,15 @@ fun Project.configureKtlintCheckFile() {
             if (task.files.isEmpty()) {
                 throw StopExecutionException()
             }
-            var kotlinFiles = task.files.filter { file ->
+            val kotlinFiles = task.files.filter { file ->
                 file.endsWith(".kt") || file.endsWith(".ktx") }
             if (kotlinFiles.isNullOrEmpty()) {
                 throw StopExecutionException()
             }
-            val args = mutableListOf<String>(
+            val args = mutableListOf(
                 "--android",
                 "--disabled_rules",
-                "no-unused-imports,import-ordering,final-newline"
+                DisabledRules
             )
             args.addAll(kotlinFiles)
             if (task.format) {
