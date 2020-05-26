@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
-    def supportRootFolder = project.projectDir.getParentFile()
+    project.ext.supportRootFolder = project.projectDir.getParentFile()
     repositories {
         maven {
             url "${supportRootFolder}/../../prebuilts/androidx/external"
