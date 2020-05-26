@@ -139,8 +139,7 @@ object Dokka {
 
         return project.tasks.register(docTaskName, DokkaAndroidTask::class.java) { task ->
             task.moduleName = project.name
-            task.outputDirectory =
-                File(project.getDistributionDirectory(), docTaskName).absolutePath
+            task.outputDirectory = File(project.buildDir, docTaskName).absolutePath
             task.description = "Generates $docsType $language documentation in the style of " +
                     "d.android.com.  Places docs in ${task.outputDirectory}"
             task.outputFormat = outputFormat
