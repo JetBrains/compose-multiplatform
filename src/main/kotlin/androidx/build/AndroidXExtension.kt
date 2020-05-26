@@ -76,6 +76,25 @@ open class AndroidXExtension(val project: Project) {
     var description: String? = null
     var inceptionYear: String? = null
     var url = SUPPORT_URL
+    /**
+     * targetsJavaConsumers = true, if project is intended to be accessed from Java-language
+     * source code.
+     */
+    var targetsJavaConsumers = true
+        get() {
+            when (project.path) {
+                // add per-project overrides here
+                // for example
+                // the following project is intended to be accessed from Java
+                // ":ui:ui-internal-lint-checks" -> return true
+                // the following project is not intended to be accessed from Java
+                // ":annotation:annotation" -> return false
+            }
+            if (project.path.contains("-ktx")) return false
+            if (project.path.startsWith(":compose")) return false
+            if (project.path.startsWith(":ui")) return false
+            return field
+        }
     private var licenses: MutableCollection<License> = ArrayList()
     var publish: Publish = Publish.NONE
     var failOnDeprecationWarnings = true
