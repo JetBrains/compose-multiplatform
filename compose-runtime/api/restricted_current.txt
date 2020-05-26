@@ -269,9 +269,6 @@ package androidx.compose {
     method public static String? keySourceInfoOf(Object key);
   }
 
-  @Deprecated @androidx.compose.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.CLASS) public @interface Model {
-  }
-
   @androidx.compose.Stable public interface MutableState<T> extends androidx.compose.State<T> {
     method public operator T! component1();
     method public operator kotlin.jvm.functions.Function1<T,kotlin.Unit> component2();
@@ -313,9 +310,6 @@ package androidx.compose {
     method public void remove(K key);
     method public void remove(K key, V value);
     method public void removeValue(V value);
-  }
-
-  @Deprecated @kotlin.annotation.MustBeDocumented @kotlin.annotation.Target(allowedTargets={AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.PROPERTY, AnnotationTarget.FUNCTION}) public @interface Pivotal {
   }
 
   @kotlin.PublishedApi internal final class PostCommitScopeImpl implements android.view.Choreographer.FrameCallback androidx.compose.CommitScope androidx.compose.CompositionLifecycleObserver {
