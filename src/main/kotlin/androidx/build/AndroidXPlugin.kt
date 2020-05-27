@@ -202,12 +202,18 @@ class AndroidXPlugin : Plugin<Project> {
             configureAndroidCommonOptions(project, androidXExtension)
             configureAndroidLibraryOptions(project, androidXExtension)
         }
-        libraryExtension.packagingOptions.apply {
+        libraryExtension.packagingOptions {
             // We need this as a work-around for b/155721209
             // It can be removed when we have a newer plugin version
-            excludes = excludes.also {
+            // 2nd workaround - this DSL was made saner in a breaking way which hasn't landed
+            // yes in AGP 4.1, that will allow just excludes -= "...".
+            // This reflection enables us to be source compatible with both for now.
+
+            javaClass.getMethod("setExcludes", Set::class.java).invoke(this, excludes.also {
                 it.remove("/META-INF/*.kotlin_module")
-            }
+            })
+
+            check(!excludes.contains("/META-INF/*.kotlin_module"))
         }
 
         project.configureSourceJarForAndroid(libraryExtension)
