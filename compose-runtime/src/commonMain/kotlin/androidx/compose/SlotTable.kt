@@ -1340,6 +1340,15 @@ class SlotTable(internal var slots: Array<Any?> = arrayOf()) {
         if (it > gapStart) it - gapLen else it
     }
 
+    internal fun ownsAnchor(anchor: Anchor?): Boolean {
+        if (anchor == null) return false
+        val loc = anchor.loc
+        if (loc < 0) return false
+        val location = anchors.search(loc)
+        if (location < 0) return false
+        return anchors[location] === anchor
+    }
+
     companion object {
         val EMPTY = object : Any() {
             override fun toString(): String {
