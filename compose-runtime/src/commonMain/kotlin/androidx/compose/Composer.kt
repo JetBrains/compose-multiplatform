@@ -1361,7 +1361,6 @@ open class Composer<N>(
 
             reader.reposition(location)
             val newGroup = reader.group
-
             // Record the changes to the applier location
             recordUpsAndDowns(oldGroup, newGroup, recomposeGroup)
             oldGroup = newGroup
@@ -1549,8 +1548,10 @@ open class Composer<N>(
         if (scope.defaultsInScope) {
             scope.defaultsInvalid = true
         }
-        val location = scope.anchor?.location(slotTable)
-            ?: return InvalidationResult.IGNORED // The scope never entered the composition
+        val anchor = scope.anchor
+        if (anchor == null || insertTable.ownsAnchor(anchor))
+            return InvalidationResult.IGNORED // The scope has not yet entered the composition
+        val location = anchor.location(slotTable)
         if (location < 0)
             return InvalidationResult.IGNORED // The scope was removed from the composition
 
