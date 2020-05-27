@@ -15,9 +15,15 @@
  */
 
 if (System.getenv("BUILD_DOKKA") != null) {
+    def ourJavaHome = System.getenv("JAVA_HOME")
+    def theirJavaHome = null
+    if (ourJavaHome != null) {
+        theirJavaHome = ourJavaHome.replace("jdk11", "jdk8")
+    }
     project.exec {
         workingDir "${supportRootFolder}/../../external/dokka"
         commandLine "./gradlew", "publish"
+        environment("JAVA_HOME", theirJavaHome)
     }
     println("\nUSING LOCALLY-BUILT DOKKA\n")
 }
