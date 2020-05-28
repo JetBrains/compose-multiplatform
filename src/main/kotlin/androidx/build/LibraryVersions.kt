@@ -45,7 +45,7 @@ object LibraryVersions {
     val COMPOSE = Version("0.1.0-dev14")
     val CONTENTACCESS = Version("1.0.0-alpha01")
     val COORDINATORLAYOUT = Version("1.2.0-alpha01")
-    val CORE = Version("1.4.0-alpha01")
+    val CORE = Version("1.5.0-alpha01")
     val CORE_ANIMATION = Version("1.0.0-alpha02")
     val CORE_ANIMATION_TESTING = Version("1.0.0-alpha02")
     val CORE_ROLE = Version("1.1.0-alpha02")
