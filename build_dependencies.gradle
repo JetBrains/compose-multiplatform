@@ -37,7 +37,21 @@ if (agpOverride != null) {
     build_versions.agp = agpOverride
 }
 
-build_versions.dokka = '0.9.17-g010'
+// gets the version of Dokka defined in source
+def getSourceDokkaVersion() {
+    def dokkaProps = new Properties()
+    FileInputStream f = new FileInputStream(project.file("${project.ext.supportRootFolder}/../../external/dokka/gradle.properties"))
+    dokkaProps.load(f)
+    f.close()
+
+    return dokkaProps["dokka_version"]
+}
+
+if (System.getenv("BUILD_DOKKA") != null) {
+    build_versions.dokka = getSourceDokkaVersion()
+} else {
+    build_versions.dokka = '0.9.17-g010'
+}
 
 rootProject.ext['build_versions'] = build_versions
 
