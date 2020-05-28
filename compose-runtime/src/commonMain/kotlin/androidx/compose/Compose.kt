@@ -23,6 +23,7 @@ private val EmptyComposable: @Composable () -> Unit = {}
  *
  * See [orEmpty] for handling nullable Composable lambdas using empty content.
  */
+@Stable
 fun emptyContent() = EmptyComposable
 
 /**

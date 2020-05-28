@@ -80,7 +80,7 @@ package androidx.compose {
   }
 
   public final class ComposeKt {
-    method public static kotlin.jvm.functions.Function0<kotlin.Unit> emptyContent();
+    method @androidx.compose.Stable public static kotlin.jvm.functions.Function0<kotlin.Unit> emptyContent();
     method public static inline kotlin.jvm.functions.Function0<kotlin.Unit> orEmpty(kotlin.jvm.functions.Function0<kotlin.Unit>?);
   }
 
@@ -511,7 +511,7 @@ package androidx.compose {
     property public final int parentNodes;
   }
 
-  @androidx.compose.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.CLASS) public @interface Stable {
+  @androidx.compose.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets={AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY}) public @interface Stable {
   }
 
   @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets={AnnotationTarget.ANNOTATION_CLASS, AnnotationTarget.CLASS}) public @interface StableMarker {
