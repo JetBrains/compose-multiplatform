@@ -21,12 +21,22 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.compose.Composable
+import androidx.compose.Recomposer
+import androidx.compose.Untracked
 import androidx.compose.clearRoots
+import androidx.compose.compositionReference
+import androidx.compose.escapeCompose
 import androidx.compose.frames.currentFrame
+import androidx.compose.getValue
 import androidx.compose.invalidate
 import androidx.compose.key
+import androidx.compose.mutableStateOf
+import androidx.compose.remember
+import androidx.compose.setValue
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.ui.core.LayoutNode
+import androidx.ui.core.subcomposeInto
 import androidx.ui.node.UiComposer
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
@@ -374,6 +384,52 @@ class RecomposerTests : BaseComposeTest() {
         }
     }
 
+    @Test // regression b/157111271
+    fun testInsertDuringRecomposition() {
+        var includeA by mutableStateOf(false)
+        var someState by mutableStateOf(0)
+        var someOtherState by mutableStateOf(1)
+
+        @Composable fun B(@Suppress("UNUSED_PARAMETER") value: Int) {
+            // empty
+        }
+
+        @Composable fun A() {
+            B(someState)
+            someState++
+        }
+
+        @Composable fun T() {
+            subCompose {
+                // Take up some slot space
+                // This makes it more likely to reproduce bug 157111271.
+                remember(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15) {
+                    1
+                }
+                if (includeA) {
+                    Wrapper {
+                        B(0)
+                        B(someOtherState)
+                        B(2)
+                        B(3)
+                        B(4)
+                        A()
+                    }
+                }
+            }
+        }
+
+        compose {
+            T()
+        }.then {
+            includeA = true
+        }.then {
+            someOtherState = 10
+        }.then {
+            // force recompose
+        }
+    }
+
     @Test
     fun testFrameTransition() {
         var frameId: Int? = null
@@ -383,6 +439,27 @@ class RecomposerTests : BaseComposeTest() {
             assertNotSame(frameId, currentFrame().id)
         }
     }
+
+    @Composable
+    fun subCompose(block: @Composable () -> Unit) {
+        val container =
+            remember { escapeCompose { LayoutNode() } }
+        val reference = compositionReference()
+        // TODO(b/150390669): Review use of @Untracked
+        subcomposeInto(
+            activityRule.activity,
+            container,
+            Recomposer.current(),
+            reference
+        ) @Untracked {
+            block()
+        }
+    }
+}
+
+@Composable
+fun Wrapper(children: @Composable () -> Unit) {
+    children()
 }
 
 fun assertChildHierarchy(root: ViewGroup, getHierarchy: () -> String) {
