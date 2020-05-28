@@ -197,7 +197,9 @@ class TaskUpToDateValidator {
 
             val reproductionMessage = "\nTo reproduce this error you can try running " +
                 "`./gradlew ${task.path} -PverifyUpToDate`\n"
-            return outputsMessage + inputsMessage + reproductionMessage
+            val readLogsMessage = "\nTo see why Gradle executed this task, search for output " +
+                "generated immediately before the task began to execute.\n"
+            return readLogsMessage + outputsMessage + inputsMessage + reproductionMessage
         }
 
         fun tryToExplainFileModification(file: File, triggeringTask: Task): String {
