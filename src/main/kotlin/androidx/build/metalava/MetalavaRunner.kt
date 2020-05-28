@@ -16,7 +16,6 @@
 
 package androidx.build.metalava
 
-import androidx.build.AndroidXExtension
 import androidx.build.checkapi.ApiLocation
 import androidx.build.java.JavaCompileInputs
 import org.gradle.api.Project
@@ -26,8 +25,8 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.SetProperty
 import org.gradle.process.ExecOperations
 import org.gradle.workers.WorkAction
-import org.gradle.workers.WorkerExecutor
 import org.gradle.workers.WorkParameters
+import org.gradle.workers.WorkerExecutor
 import java.io.File
 import javax.inject.Inject
 
@@ -87,72 +86,61 @@ val HIDE_EXPERIMENTAL_ARGS: List<String> = listOf(
     "--hide-meta-annotation", "kotlin.Experimental"
 )
 
-fun Project.getApiLintArgs(): List<String> {
-    val args = mutableListOf(
-        "--api-lint",
-        "--hide",
-        listOf(
-            // The list of checks that are hidden as they are not useful in androidx
-            "Enum", // Enums are allowed to be use in androidx
-            "CallbackInterface", // With target Java 8, we have default methods
-            "ProtectedMember", // We allow using protected members in androidx
-            "ManagerLookup", // Managers in androidx are not the same as platform services
-            "ManagerConstructor",
-            "RethrowRemoteException", // This check is for calls into system_server
-            "PackageLayering", // This check is not relevant to androidx.* code.
-            "UserHandle", // This check is not relevant to androidx.* code.
-            "ParcelableList", // This check is only relevant to android platform that has managers.
+val API_LINT_ARGS: List<String> = listOf(
+    "--api-lint",
+    "--hide",
+    listOf(
+        // The list of checks that are hidden as they are not useful in androidx
+        "Enum", // Enums are allowed to be use in androidx
+        "CallbackInterface", // With target Java 8, we have default methods
+        "ProtectedMember", // We allow using protected members in androidx
+        "ManagerLookup", // Managers in androidx are not the same as platfrom services
+        "ManagerConstructor",
+        "RethrowRemoteException", // This check is for calls into system_server
+        "PackageLayering", // This check is not relevant to androidx.* code.
+        "UserHandle", // This check is not relevant to androidx.* code.
+        "ParcelableList", // This check is only relevant to android platform that has managers.
 
-            // List of checks that have bugs, but should be enabled once fixed.
-            "GetterSetterNames", // b/135498039
-            "StaticUtils", // b/135489083
-            "AllUpper", // b/135708486
-            "StartWithLower", // b/135710527
+        // List of checks that have bugs, but should be enabled once fixed.
+        "GetterSetterNames", // b/135498039
+        "StaticUtils", // b/135489083
+        "AllUpper", // b/135708486
+        "StartWithLower", // b/135710527
 
-            // The list of checks that are API lint warnings and are yet to be enabled
-            "ExecutorRegistration",
-            "NotCloseable",
-            "SamShouldBeLast",
-            "CallbackMethodName",
-            "GetterOnBuilder",
-            "StaticFinalBuilder",
-            "MissingGetterMatchingBuilder",
+        // The list of checks that are API lint warnings and are yet to be enabled
+        "ExecutorRegistration",
+        "NotCloseable",
+        "SamShouldBeLast",
+        "MissingJvmstatic",
+        "CallbackMethodName",
+        "GetterOnBuilder",
+        "StaticFinalBuilder",
+        "MissingGetterMatchingBuilder",
 
-            // We should only treat these as warnings
-            "IntentBuilderName",
-            "OnNameExpected",
-            "UserHandleName"
-        ).joinToString(),
-        "--error",
-        listOf(
-            "MinMaxConstant",
-            "TopLevelBuilder",
-            "BuilderSetStyle",
-            "MissingBuildMethod",
-            "SetterReturnsThis",
-            "OverlappingConstants",
-            "IllegalStateException",
-            "ListenerLast",
-            "StreamFiles",
-            "AbstractInner",
-            "ArrayReturn",
-            "MethodNameTense",
-            "UseIcu",
-            "NoByteOrShort",
-            "CommonArgsFirst"
-        ).joinToString()
-    )
-
-    val androidXExtension = project.extensions.findByType(AndroidXExtension::class.java)
-
-    if (!androidXExtension!!.targetsJavaConsumers) {
-        args.addAll(listOf("--hide", "MissingJvmstatic"))
-    } else {
-        args.addAll(listOf("--error", "MissingJvmstatic"))
-    }
-
-    return args
-}
+        // We should only treat these as warnings
+        "IntentBuilderName",
+        "OnNameExpected",
+        "UserHandleName"
+    ).joinToString(),
+    "--error",
+    listOf(
+        "MinMaxConstant",
+        "TopLevelBuilder",
+        "BuilderSetStyle",
+        "MissingBuildMethod",
+        "SetterReturnsThis",
+        "OverlappingConstants",
+        "IllegalStateException",
+        "ListenerLast",
+        "StreamFiles",
+        "AbstractInner",
+        "ArrayReturn",
+        "MethodNameTense",
+        "UseIcu",
+        "NoByteOrShort",
+        "CommonArgsFirst"
+    ).joinToString()
+)
 
 sealed class GenerateApiMode {
     object PublicApi : GenerateApiMode()
@@ -274,7 +262,7 @@ fun Project.getGenerateApiArgs(
 
     when (apiLintMode) {
         is ApiLintMode.CheckBaseline -> {
-            args += getApiLintArgs()
+            args += API_LINT_ARGS
             if (apiLintMode.apiLintBaseline.exists()) {
                 args += listOf("--baseline", apiLintMode.apiLintBaseline.toString())
             }
