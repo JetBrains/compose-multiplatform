@@ -57,6 +57,7 @@ class FlowAdapterTest {
         val stream = FlowChannel<String>()
         var realValue: String? = "to-be-updated"
         rule.setContent {
+            @Suppress("DEPRECATION")
             realValue = stream.flow.collectAsState().value
         }
 
@@ -71,7 +72,7 @@ class FlowAdapterTest {
 
         var realValue: String? = null
         rule.setContent {
-            realValue = stream.flow.collectAsState().value
+            realValue = stream.flow.collectAsState(initial = null).value
         }
 
         runOnIdleCompose {
@@ -89,7 +90,7 @@ class FlowAdapterTest {
 
         var realValue: String? = null
         rule.setContent {
-            realValue = stream.flow.collectAsState().value
+            realValue = stream.flow.collectAsState(initial = null).value
         }
 
         runOnIdleCompose {
@@ -113,7 +114,7 @@ class FlowAdapterTest {
         var realValue: String? = "to-be-updated"
         rule.setContent {
             if (emit) {
-                realValue = stream.flow.collectAsState().value
+                realValue = stream.flow.collectAsState(initial = null).value
             }
         }
 
@@ -183,7 +184,7 @@ class FlowAdapterTest {
 
         var realValue: String? = null
         rule.setContent {
-            realValue = stream.flow.collectAsState().value
+            realValue = stream.flow.collectAsState(initial = null).value
         }
 
         runOnIdleCompose {
@@ -211,7 +212,7 @@ class FlowAdapterTest {
 
         var realValue: String? = null
         rule.setContent {
-            realValue = stream.flow.collectAsState().value
+            realValue = stream.flow.collectAsState(initial = null).value
         }
 
         runOnIdleCompose {
@@ -234,7 +235,7 @@ class FlowAdapterTest {
 
         var realValue: String? = null
         rule.setContent {
-            realValue = stream.flow.collectAsState(Dispatchers.Default).value
+            realValue = stream.flow.collectAsState(null, Dispatchers.Default).value
             if (realValue != null) {
                 latch.countDown()
             }
@@ -258,7 +259,7 @@ class FlowAdapterTest {
 
         var realValue: String? = null
         rule.setContent {
-            realValue = stream.flow.collectAsState(context).value
+            realValue = stream.flow.collectAsState(null, context).value
         }
 
         runOnIdleCompose {
@@ -284,6 +285,19 @@ class FlowAdapterTest {
 
         runOnIdleCompose {
             assertThat(realValue).isEqualTo("initial")
+        }
+    }
+
+    @Test
+    fun stateFlowHandlesNullValue() {
+        val flow = MutableStateFlow<String?>(null)
+        var realValue: String? = "to-be-updated"
+        rule.setContent {
+            realValue = flow.collectAsState().value
+        }
+
+        runOnIdleCompose {
+            assertThat(realValue).isNull()
         }
     }
 

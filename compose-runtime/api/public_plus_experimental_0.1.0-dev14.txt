@@ -215,8 +215,8 @@ package androidx.compose {
 
   public final class FlowAdapterKt {
     method @androidx.compose.Composable @kotlinx.coroutines.ExperimentalCoroutinesApi public static inline <T> androidx.compose.State<T> collectAsState(kotlinx.coroutines.flow.StateFlow<? extends T>, kotlin.coroutines.CoroutineContext context = Dispatchers.Main);
-    method @androidx.compose.Composable public static inline <T> androidx.compose.State<T> collectAsState(kotlinx.coroutines.flow.Flow<? extends T>, kotlin.coroutines.CoroutineContext context = Dispatchers.Main);
-    method @androidx.compose.Composable public static <T> androidx.compose.State<T> collectAsState(kotlinx.coroutines.flow.Flow<? extends T>, T? initial, kotlin.coroutines.CoroutineContext context = Dispatchers.Main);
+    method @Deprecated @androidx.compose.Composable public static inline <T> androidx.compose.State<T> collectAsState(kotlinx.coroutines.flow.Flow<? extends T>, kotlin.coroutines.CoroutineContext context = Dispatchers.Main);
+    method @androidx.compose.Composable public static <T extends R, R> androidx.compose.State<R> collectAsState(kotlinx.coroutines.flow.Flow<? extends T>, R? initial, kotlin.coroutines.CoroutineContext context = Dispatchers.Main);
   }
 
   public final class FrameManager {
