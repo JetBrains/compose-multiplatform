@@ -518,7 +518,12 @@ class ComposableFunctionBodyTransformer(
         get() {
             loop@ for (scope in scopeStack.asReversed()) {
                 return when (scope) {
-                    is Scope.FunctionScope -> scope.isComposable
+                    is Scope.FunctionScope -> {
+                        if (scope.isInlinedLambda) {
+                            continue@loop
+                        }
+                        scope.isComposable
+                    }
                     is Scope.BlockScope -> continue@loop
                     else -> false
                 }
@@ -548,6 +553,9 @@ class ComposableFunctionBodyTransformer(
         } finally {
             val popped = scopeStack.pop()
             require(popped == scope) { "Unbalanced scope stack" }
+            if (scope.isInlinedLambda && !scope.isComposable && scope.hasComposableCalls) {
+                encounteredCapturedComposableCall()
+            }
         }
     }
 
@@ -1884,6 +1892,22 @@ class ComposableFunctionBodyTransformer(
         }
     }
 
+    private fun IrExpression.wrapDeferred(
+        before: List<IrExpression> = emptyList(),
+        after: List<IrExpression> = emptyList()
+    ): IrExpression {
+        return if (type.isNothing() || type.isUnitOrNullableUnit()) {
+            wrap(type, before, after)
+        } else {
+            val tmpVar = irTemporary(this, nameHint = "group")
+            tmpVar.wrap(
+                type,
+                before,
+                after + irGet(tmpVar)
+            )
+        }
+    }
+
     private fun IrStatement.wrap(
         type: IrType,
         before: List<IrExpression> = emptyList(),
@@ -1913,8 +1937,7 @@ class ComposableFunctionBodyTransformer(
             },
             makeEnd = ::irEndReplaceableGroup
         )
-        return wrap(
-            type,
+        return wrapDeferred(
             listOf(before),
             listOf(after)
         )
@@ -1935,12 +1958,26 @@ class ComposableFunctionBodyTransformer(
             when (scope) {
                 is Scope.FunctionScope -> {
                     scope.markComposableCall()
+                    if (scope.isInlinedLambda) {
+                        continue@loop
+                    }
                     break@loop
                 }
                 is Scope.BlockScope -> {
                     scope.markComposableCall()
                 }
                 is Scope.ClassScope -> {
+                    break@loop
+                }
+            }
+        }
+    }
+
+    private fun encounteredCapturedComposableCall() {
+        loop@ for (scope in scopeStack.asReversed()) {
+            when (scope) {
+                is Scope.CaptureScope -> {
+                    scope.markCapturedComposableCall()
                     break@loop
                 }
             }
@@ -1954,6 +1991,13 @@ class ComposableFunctionBodyTransformer(
     ) {
         loop@ for (scope in scopeStack.asReversed()) {
             when (scope) {
+                is Scope.FunctionScope -> {
+                    scope.markCoalescableGroup(coalescableScope, realizeGroup, makeEnd)
+                    if (scope.isInlinedLambda) {
+                        continue@loop
+                    }
+                    break@loop
+                }
                 is Scope.BlockScope -> {
                     scope.markCoalescableGroup(coalescableScope, realizeGroup, makeEnd)
                     break@loop
@@ -1970,11 +2014,11 @@ class ComposableFunctionBodyTransformer(
         loop@ for (scope in scopeStack.asReversed()) {
             when (scope) {
                 is Scope.FunctionScope -> {
-                    scope.markReturn(extraEndLocation)
                     if (scope.function == symbol.owner) {
+                        scope.markReturn(extraEndLocation)
                         break@loop
                     } else {
-                        TODO("Need to handle nested returns!")
+                        continue@loop
                     }
                 }
                 is Scope.BlockScope -> {
@@ -1987,8 +2031,13 @@ class ComposableFunctionBodyTransformer(
     private fun encounteredJump(jump: IrBreakContinue, extraEndLocation: (IrExpression) -> Unit) {
         loop@ for (scope in scopeStack.asReversed()) {
             when (scope) {
-                is Scope.FunctionScope -> error("Unexpected Function Scope encountered")
-                is Scope.ClassScope -> error("Unexpected Function Scope encountered")
+                is Scope.ClassScope -> error("Unexpected Class Scope encountered")
+                is Scope.FunctionScope -> {
+                    if (scope.isInlinedLambda) {
+                        continue@loop
+                    }
+                    error("Unexpected Function Scope encountered")
+                }
                 is Scope.LoopScope -> {
                     if (jump.loop == scope.loop) {
                         break@loop
@@ -2138,7 +2187,23 @@ class ComposableFunctionBodyTransformer(
         if (expression.isTransformedComposableCall() || expression.isSyntheticComposableCall()) {
             return visitComposableCall(expression)
         }
-        return super.visitCall(expression)
+        if (expression.symbol.owner.isInline) {
+            // if it is not a composable call but it is an inline function, then we allow
+            // composable calls to happen inside of the inlined lambdas. This means that we have
+            // some control flow analysis to handle there as well. We wrap the call in a
+            // CallScope and coalescable group if the call has any composable invocations inside
+            // of it..
+            val captureScope = withScope(Scope.CaptureScope()) {
+                expression.transformChildrenVoid()
+            }
+            return if (captureScope.hasCapturedComposableCall) {
+                expression.asCoalescableGroup(captureScope)
+            } else {
+                expression
+            }
+        } else {
+            return super.visitCall(expression)
+        }
     }
 
     private fun visitComposableCall(expression: IrCall): IrExpression {
@@ -2672,6 +2737,7 @@ class ComposableFunctionBodyTransformer(
         ) : BlockScope("fun ${function.name.asString()}") {
             val remappedParams = mutableMapOf<IrValueDeclaration, IrValueDeclaration>()
             val paramsToSlots = mutableMapOf<IrValueDeclaration, Int>()
+            val isInlinedLambda = with(transformer) { function.isInlinedLambda() }
 
             private var lastTemporaryIndex: Int = 0
 
@@ -2836,6 +2902,14 @@ class ComposableFunctionBodyTransformer(
         class LoopScope(val loop: IrLoop) : BlockScope("loop")
         class WhenScope : BlockScope("when")
         class BranchScope : BlockScope("branch")
+        class CaptureScope : BlockScope("capture") {
+            var hasCapturedComposableCall = false
+                private set
+
+            fun markCapturedComposableCall() {
+                hasCapturedComposableCall = true
+            }
+        }
     }
 
     inner class IrDefaultBitMaskValueImpl(
