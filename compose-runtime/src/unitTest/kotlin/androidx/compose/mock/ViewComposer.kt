@@ -114,6 +114,7 @@ class MockViewComposer(
     }
 }
 
+@Suppress("UNCHECKED_CAST")
 @Composable
 fun <P1> MockComposeScope.memoize(
     key: Int,
@@ -125,7 +126,8 @@ fun <P1> MockComposeScope.memoize(
         if (!changed(p1)) {
             skipToGroupEnd()
         } else {
-            block(p1)
+            val realFn = block as Function4<P1, Composer<*>, Int, Int, Unit>
+            realFn(p1, this, 0, 0)
         }
         endGroup()
     }
