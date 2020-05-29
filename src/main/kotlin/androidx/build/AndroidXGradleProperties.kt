@@ -51,3 +51,9 @@ fun Project.isDocumentationEnabled(): Boolean =
  */
 fun Project.isCoverageEnabled(): Boolean =
     (project.findProperty("androidx.coverageEnabled") as? String)?.toBoolean() ?: true
+
+/**
+ * Returns the path to the Android SDK to be used.
+ */
+fun Project.androidxSdkPath(): String? =
+    project.findProperty("androidx.sdkPath") as? String
