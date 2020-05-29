@@ -12,15 +12,13 @@ package androidx.compose {
     method public static inline <R> R! synchronized(Object lock, kotlin.jvm.functions.Function0<? extends R> block);
   }
 
-  @androidx.compose.Immutable public abstract sealed class Ambient<T> {
-    method public final inline T! getCurrent();
-    property public final inline T! current;
+  public final class Ambient<T> {
+    method @androidx.compose.Composable public void Provider(T? value, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+    field public static final androidx.compose.Ambient.Companion! Companion;
   }
 
-  public final class AmbientKt {
-    method @androidx.compose.Composable public static void Providers(androidx.compose.ProvidedValue<?>![] values, kotlin.jvm.functions.Function0<kotlin.Unit> children);
-    method public static <T> androidx.compose.ProvidableAmbient<T> ambientOf(kotlin.jvm.functions.Function2<? super T,? super T,java.lang.Boolean> areEquivalent = ReferentiallyEqual, kotlin.jvm.functions.Function0<? extends T>? defaultFactory = null);
-    method public static <T> androidx.compose.ProvidableAmbient<T> staticAmbientOf(kotlin.jvm.functions.Function0<? extends T>? defaultFactory = null);
+  public static final class Ambient.Companion {
+    method public <T> androidx.compose.Ambient<T> of(kotlin.jvm.functions.Function0<? extends T>? defaultFactory = null);
   }
 
   public final class Anchor {
@@ -48,14 +46,6 @@ package androidx.compose {
     method public void move(N?, int from, int to, int count);
     method public void removeAt(N?, int index, int count);
     method public void start(N?, N? instance);
-  }
-
-  public interface BuildableMap<K, V> extends java.util.Map<K,V> kotlin.jvm.internal.markers.KMappedMarker {
-    method public androidx.compose.BuildableMap.Builder<K,V> builder();
-  }
-
-  public static interface BuildableMap.Builder<K, V> extends java.util.Map<K,V> kotlin.jvm.internal.markers.KMutableMap {
-    method public androidx.compose.BuildableMap<K,V> build();
   }
 
   public final class Choreographer {
@@ -93,7 +83,6 @@ package androidx.compose {
 
   public class Composer<N> {
     ctor public Composer(androidx.compose.SlotTable slotTable, androidx.compose.Applier<N> applier, androidx.compose.Recomposer recomposer);
-    method public final void abortRoot();
     method public final <V, T> void apply(V? value, kotlin.jvm.functions.Function2<? super T,? super V,kotlin.Unit> block);
     method public final void applyChanges();
     method public final androidx.compose.CompositionReference buildReference();
@@ -110,7 +99,6 @@ package androidx.compose {
     method public final void endRoot();
     method public final int getChangeCount();
     method public final boolean getInserting();
-    method public final boolean getSkipping();
     method public final androidx.compose.SlotTable getSlotTable();
     method public final Object joinKey(Object? left, Object? right);
     method public final Object? nextSlot();
@@ -126,7 +114,6 @@ package androidx.compose {
     method public final N! useNode();
     property public final int changeCount;
     property public final boolean inserting;
-    property public final boolean skipping;
   }
 
   public final class ComposerKt {
@@ -143,9 +130,9 @@ package androidx.compose {
     method public androidx.compose.Composer<N> getComposer();
     method public T! getNode();
     method public inline void set(int value, kotlin.jvm.functions.Function2<? super T,? super java.lang.Integer,kotlin.Unit> block);
-    method public inline <reified V> void set(V? value, kotlin.jvm.functions.Function2<? super T,? super V,kotlin.Unit> block);
+    method public inline <reified V> void set(V? value, kotlin.jvm.functions.Function2<? super T,? super V,? extends kotlin.Unit> block);
     method public inline void update(int value, kotlin.jvm.functions.Function2<? super T,? super java.lang.Integer,kotlin.Unit> block);
-    method public inline <reified V> void update(V? value, kotlin.jvm.functions.Function2<? super T,? super V,kotlin.Unit> block);
+    method public inline <reified V> void update(V? value, kotlin.jvm.functions.Function2<? super T,? super V,? extends kotlin.Unit> block);
   }
 
   public class Composition {
@@ -153,7 +140,7 @@ package androidx.compose {
     method public final void compose(kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method public final void compose();
     method public final void dispose();
-    method public final boolean recomposeSync();
+    method @org.jetbrains.annotations.TestOnly public final boolean recomposeSync();
   }
 
   public final class CompositionKt {
@@ -166,13 +153,13 @@ package androidx.compose {
 
   public interface CompositionReference {
     method public <T> T! getAmbient(androidx.compose.Ambient<T> key);
-    method public androidx.compose.BuildableMap<androidx.compose.Ambient<java.lang.Object>,androidx.compose.State<java.lang.Object>> getAmbientScope();
     method public void invalidate();
+    method public <T> void invalidateConsumers(androidx.compose.Ambient<T> key);
     method public <N> void registerComposer(androidx.compose.Composer<N> composer);
   }
 
   public final class EffectsKt {
-    method @Deprecated @androidx.compose.Composable public static <T> T! ambient(androidx.compose.Ambient<T> key);
+    method @androidx.compose.Composable public static <T> T! ambient(androidx.compose.Ambient<T> key);
     method @androidx.compose.Composable public static androidx.compose.CompositionReference compositionReference();
     method @Deprecated @androidx.compose.Composable public static <T> T! effectOf(kotlin.jvm.functions.Function0<? extends T> block);
     method public static kotlin.jvm.functions.Function0<kotlin.Unit> getInvalidate();
@@ -265,8 +252,8 @@ package androidx.compose {
     method public static <T> androidx.compose.MutableState<T> mutableStateOf(T? value, kotlin.jvm.functions.Function2<? super T,? super T,java.lang.Boolean> areEquivalent = ReferentiallyEqual);
     method @androidx.compose.Composable public static inline <T> androidx.compose.MutableState<T> state(kotlin.jvm.functions.Function2<? super T,? super T,java.lang.Boolean> areEquivalent = ReferentiallyEqual, kotlin.jvm.functions.Function0<? extends T> init);
     method @androidx.compose.Composable public static inline <T, V1> androidx.compose.MutableState<T> stateFor(V1? v1, kotlin.jvm.functions.Function0<? extends T> init);
-    method @androidx.compose.Composable public static inline <T, reified V1, reified V2> androidx.compose.MutableState<T> stateFor(V1? v1, V2? v2, kotlin.jvm.functions.Function0<? extends T> init);
     method @androidx.compose.Composable public static inline <T> androidx.compose.MutableState<T> stateFor(Object![]? inputs, kotlin.jvm.functions.Function0<? extends T> init);
+    method @androidx.compose.Composable public static inline <T, reified V1, reified V2> androidx.compose.MutableState<T>! stateFor(V1? v1, V2? v2, kotlin.jvm.functions.Function0<? extends T> init);
   }
 
   public final class NullCompilationScope {
@@ -286,7 +273,6 @@ package androidx.compose {
     method public void clearValues(kotlin.jvm.functions.Function1<? super V,java.lang.Boolean> predicate);
     method public boolean contains(K key, V value);
     method public operator java.util.List<V> get(Iterable<? extends K> keys);
-    method public java.util.List<V> getValueOf(K key);
     method public void remove(K key);
     method public void remove(K key, V value);
     method public void removeValue(V value);
@@ -295,30 +281,8 @@ package androidx.compose {
   @kotlin.annotation.MustBeDocumented @kotlin.annotation.Target(allowedTargets={AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.PROPERTY, AnnotationTarget.FUNCTION}) public @interface Pivotal {
   }
 
-  @androidx.compose.Immutable public abstract class ProvidableAmbient<T> extends androidx.compose.Ambient<T> {
-    method public final infix androidx.compose.ProvidedValue<T> provides(T? value);
-  }
-
-  public final class ProvidedValue<T> {
-    method public androidx.compose.Ambient<T> getAmbient();
-    method public T! getValue();
-  }
-
   public final class RecomposeKt {
     method @androidx.compose.Composable public static void Recompose(kotlin.jvm.functions.Function1<? super kotlin.jvm.functions.Function0<kotlin.Unit>,kotlin.Unit> body);
-  }
-
-  public abstract class Recomposer {
-    ctor public Recomposer();
-    method protected final void dispatchRecomposes();
-    method public abstract void recomposeSync();
-    method protected abstract void scheduleChangesDispatch();
-    field public static final androidx.compose.Recomposer.Companion! Companion;
-  }
-
-  public static final class Recomposer.Companion {
-    method public androidx.compose.Recomposer current();
-    method public boolean hasPendingChanges();
   }
 
   public final class RecomposerKt {
@@ -392,7 +356,6 @@ package androidx.compose {
     ctor public SlotTable(internal Object![] slots);
     ctor public SlotTable();
     method public int getSize();
-    method public java.util.List<java.lang.Integer> groupPathTo(int location);
     method public androidx.compose.SlotReader openReader();
     method public androidx.compose.SlotWriter openWriter();
     method public <T> T! read(kotlin.jvm.functions.Function1<? super androidx.compose.SlotReader,? extends T> block);
@@ -495,10 +458,10 @@ package androidx.compose {
     method public androidx.compose.Composer<?> getComposer();
     method public operator boolean plus(boolean, boolean other);
     method public inline boolean set(int value, kotlin.jvm.functions.Function1<? super java.lang.Integer,kotlin.Unit> block);
-    method public inline <reified T> boolean set(T? value, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> block);
+    method public inline <reified T> boolean set(T? value, kotlin.jvm.functions.Function1<? super T,? extends kotlin.Unit> block);
     method public inline <T> boolean setUnchecked(T? value, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> block);
     method public inline boolean update(int value, kotlin.jvm.functions.Function1<? super java.lang.Integer,kotlin.Unit> block);
-    method public inline <reified T> boolean update(T? value, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> block);
+    method public inline <reified T> boolean update(T? value, kotlin.jvm.functions.Function1<? super T,? extends kotlin.Unit> block);
     method public inline <T> boolean updateUnchecked(T? value, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> block);
     method public boolean updated(int value);
     method public <T> boolean updated(T? value);
@@ -600,7 +563,7 @@ package androidx.compose.frames {
     method public static androidx.compose.frames.Frame open(boolean readOnly = false);
     method public static androidx.compose.frames.Frame open(kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? readObserver = null, kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? writeObserver = null);
     method public static <T extends androidx.compose.frames.Record> T readable(T, androidx.compose.frames.Framed framed);
-    method public static kotlin.jvm.functions.Function0<kotlin.Unit> registerCommitObserver(kotlin.jvm.functions.Function2<? super java.util.Set<?>,? super androidx.compose.frames.Frame,kotlin.Unit> observer);
+    method public static kotlin.jvm.functions.Function0<kotlin.Unit> registerCommitObserver(kotlin.jvm.functions.Function1<? super java.util.Set<?>,kotlin.Unit> observer);
     method public static void restore(androidx.compose.frames.Frame frame);
     method public static androidx.compose.frames.Frame suspend();
     method public static boolean wasModified(Object value);

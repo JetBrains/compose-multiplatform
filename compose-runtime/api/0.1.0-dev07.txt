@@ -81,9 +81,7 @@ package androidx.compose {
     method public final void emitNode(N? node);
     method public final void endExpr();
     method public final void endGroup();
-    method public final void endMovableGroup();
     method public final void endNode();
-    method public final void endReplaceableGroup();
     method public final androidx.compose.ScopeUpdateScope? endRestartGroup();
     method public final void endRoot();
     method public final int getChangeCount();
@@ -98,9 +96,7 @@ package androidx.compose {
     method public final void skipValue();
     method public final void startExpr(Object key);
     method public final void startGroup(Object key);
-    method public final void startMovableGroup(Object key);
     method public final void startNode(Object key);
-    method public final void startReplaceableGroup(int key);
     method public final void startRestartGroup(Object key);
     method public final void startRoot();
     method public final void updateValue(Object? value);
@@ -125,9 +121,9 @@ package androidx.compose {
     method public androidx.compose.Composer<N> getComposer();
     method public T! getNode();
     method public inline void set(int value, kotlin.jvm.functions.Function2<? super T,? super java.lang.Integer,kotlin.Unit> block);
-    method public inline <reified V> void set(V? value, kotlin.jvm.functions.Function2<? super T,? super V,kotlin.Unit> block);
+    method public inline <reified V> void set(V? value, kotlin.jvm.functions.Function2<? super T,? super V,? extends kotlin.Unit> block);
     method public inline void update(int value, kotlin.jvm.functions.Function2<? super T,? super java.lang.Integer,kotlin.Unit> block);
-    method public inline <reified V> void update(V? value, kotlin.jvm.functions.Function2<? super T,? super V,kotlin.Unit> block);
+    method public inline <reified V> void update(V? value, kotlin.jvm.functions.Function2<? super T,? super V,? extends kotlin.Unit> block);
   }
 
   public interface ComposerValidator {
@@ -137,12 +133,12 @@ package androidx.compose {
 
   public class Composition {
     ctor public Composition(kotlin.jvm.functions.Function2<? super androidx.compose.SlotTable,? super androidx.compose.Recomposer,? extends androidx.compose.Composer<?>> composerFactory, androidx.compose.CompositionReference? parent);
-    method public void compose(kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method public final void compose(kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method public final void compose();
     method public void dispose();
     method public final kotlin.jvm.functions.Function0<kotlin.Unit> getComposable();
     method public final boolean isRoot();
-    method public final boolean recomposeSync();
+    method @org.jetbrains.annotations.TestOnly public final boolean recomposeSync();
     method public final void setComposable(kotlin.jvm.functions.Function0<kotlin.Unit> p);
     property public final kotlin.jvm.functions.Function0<kotlin.Unit> composable;
     property public final boolean isRoot;
@@ -183,10 +179,10 @@ package androidx.compose {
 
   public final class FrameManager {
     method public void ensureStarted();
-    method public <T> T! framed(kotlin.jvm.functions.Function0<? extends T> block);
-    method public <T> T! isolated(kotlin.jvm.functions.Function0<? extends T> block);
+    method @org.jetbrains.annotations.TestOnly public <T> T! framed(kotlin.jvm.functions.Function0<? extends T> block);
+    method @org.jetbrains.annotations.TestOnly public <T> T! isolated(kotlin.jvm.functions.Function0<? extends T> block);
     method public void nextFrame();
-    method public <T> T! unframed(kotlin.jvm.functions.Function0<? extends T> block);
+    method @org.jetbrains.annotations.TestOnly public <T> T! unframed(kotlin.jvm.functions.Function0<? extends T> block);
     field public static final androidx.compose.FrameManager! INSTANCE;
   }
 
@@ -230,14 +226,13 @@ package androidx.compose {
   }
 
   public final class MutableStateKt {
-    method public static kotlin.jvm.functions.Function2<java.lang.Object,java.lang.Object,java.lang.Boolean> getNeverEqual();
     method public static kotlin.jvm.functions.Function2<java.lang.Object,java.lang.Object,java.lang.Boolean> getReferentiallyEqual();
     method public static kotlin.jvm.functions.Function2<java.lang.Object,java.lang.Object,java.lang.Boolean> getStructurallyEqual();
     method public static <T> androidx.compose.MutableState<T> mutableStateOf(T? value, kotlin.jvm.functions.Function2<? super T,? super T,java.lang.Boolean> areEquivalent = ReferentiallyEqual);
     method @androidx.compose.Composable public static inline <T> androidx.compose.MutableState<T> state(kotlin.jvm.functions.Function2<? super T,? super T,java.lang.Boolean> areEquivalent = ReferentiallyEqual, kotlin.jvm.functions.Function0<? extends T> init);
     method @androidx.compose.Composable public static inline <T, V1> androidx.compose.MutableState<T> stateFor(V1? v1, kotlin.jvm.functions.Function0<? extends T> init);
-    method @androidx.compose.Composable public static inline <T, reified V1, reified V2> androidx.compose.MutableState<T> stateFor(V1? v1, V2? v2, kotlin.jvm.functions.Function0<? extends T> init);
     method @androidx.compose.Composable public static inline <T> androidx.compose.MutableState<T> stateFor(Object![]? inputs, kotlin.jvm.functions.Function0<? extends T> init);
+    method @androidx.compose.Composable public static inline <T, reified V1, reified V2> androidx.compose.MutableState<T>! stateFor(V1? v1, V2? v2, kotlin.jvm.functions.Function0<? extends T> init);
   }
 
   public final class NullCompilationScope {
@@ -282,14 +277,14 @@ package androidx.compose {
   public abstract class Recomposer {
     ctor public Recomposer();
     method protected final void dispatchRecomposes();
-    method public abstract void recomposeSync();
+    method @org.jetbrains.annotations.TestOnly public abstract void recomposeSync();
     method protected abstract void scheduleChangesDispatch();
     field public static final androidx.compose.Recomposer.Companion! Companion;
   }
 
   public static final class Recomposer.Companion {
-    method public androidx.compose.Recomposer current();
-    method public boolean hasInvalidations();
+    method @org.jetbrains.annotations.TestOnly public androidx.compose.Recomposer current();
+    method @org.jetbrains.annotations.TestOnly public boolean hasInvalidations();
     method public boolean hasPendingChanges();
   }
 
@@ -305,47 +300,52 @@ package androidx.compose {
     method public void updateScope(kotlin.jvm.functions.Function1<? super androidx.compose.Composer<?>,kotlin.Unit> block);
   }
 
-  public final class SlotReader {
-    ctor public SlotReader(androidx.compose.SlotTable table);
+  public class SlotEditor {
+    method public final Object? get(androidx.compose.Anchor anchor);
+    method public final Object? get(int index);
+    method public final int getCurrent();
+    method public final int getGroupSize();
+    method public final int getNodeIndex();
+    method public final int getParentIndex();
+    method public final int getParentNodes();
+    method public final androidx.compose.SlotTable getTable();
+    method public final int groupSize(int index);
+    method public final boolean isGroup();
+    method public final boolean isGroup(int index);
+    method public final boolean isNode();
+    method public final void setCurrent(int p);
+    property public final int current;
+    property public final int groupSize;
+    property public final boolean isGroup;
+    property public final boolean isNode;
+    property public final int nodeIndex;
+    property public final int parentIndex;
+    property public final int parentNodes;
+  }
+
+  public final class SlotReader extends androidx.compose.SlotEditor {
     method public void beginEmpty();
     method public void close();
     method public void endEmpty();
-    method public void endGroup();
-    method public void endNode();
+    method public int endGroup();
+    method public int endNode();
     method public java.util.List<androidx.compose.KeyInfo> extractKeys();
-    method public Object? get(androidx.compose.Anchor anchor);
-    method public Object? get(int index);
-    method public int getCurrent();
-    method public int getCurrentEnd();
+    method public Object? get();
     method public Object! getGroupKey();
-    method public int getGroupSize();
     method public boolean getInEmpty();
-    method public int getNodeIndex();
-    method public int getParentNodes();
-    method public androidx.compose.SlotTable getTable();
     method public Object groupKey(int index);
-    method public int groupSize(int index);
-    method public boolean isGroup();
-    method public boolean isGroup(int index);
     method public boolean isGroupEnd();
-    method public boolean isNode();
     method public Object? next();
-    method public void reposition(int value);
+    method public void previous();
+    method public void reportUncertainNodeCount();
+    method public int skipEnclosingGroup();
     method public int skipGroup();
     method public int skipNode();
-    method public void skipToGroupEnd();
     method public void startGroup(Object key);
     method public void startNode(Object key);
-    property public final int current;
-    property public final int currentEnd;
     property public final Object! groupKey;
-    property public final int groupSize;
     property public final boolean inEmpty;
-    property public final boolean isGroup;
     property public final boolean isGroupEnd;
-    property public final boolean isNode;
-    property public final int nodeIndex;
-    property public final int parentNodes;
   }
 
   public final class SlotTable {
@@ -369,44 +369,24 @@ package androidx.compose {
   public final class SlotTableKt {
   }
 
-  public final class SlotWriter {
+  public final class SlotWriter extends androidx.compose.SlotEditor {
     method public androidx.compose.Anchor anchor(int index = current);
     method public void beginInsert();
     method public void close();
     method public int endGroup();
     method public void endInsert();
     method public int endNode();
-    method public Object? get(androidx.compose.Anchor anchor);
-    method public Object? get(int index);
-    method public int getCurrent();
-    method public int getGroupSize();
-    method public int getNodeIndex();
-    method public int getParentIndex();
-    method public int getParentNodes();
-    method public androidx.compose.SlotTable getTable();
-    method public int groupSize(int index);
     method public java.util.Iterator<java.lang.Object> groupSlots();
-    method public boolean isGroup();
-    method public boolean isGroup(int index);
-    method public boolean isNode();
     method public void moveGroup(int offset);
     method public void previous();
     method public boolean removeGroup();
     method public void set(Object? value);
-    method public void setCurrent(int p);
     method public Object? skip();
     method public int skipGroup();
     method public int skipNode();
     method public void startGroup(Object key);
     method public void startNode(Object key);
     method public Object? update(Object? value);
-    property public final int current;
-    property public final int groupSize;
-    property public final boolean isGroup;
-    property public final boolean isNode;
-    property public final int nodeIndex;
-    property public final int parentIndex;
-    property public final int parentNodes;
   }
 
   @androidx.compose.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.CLASS) public @interface Stable {

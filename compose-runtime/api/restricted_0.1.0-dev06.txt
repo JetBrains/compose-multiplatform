@@ -92,6 +92,7 @@ package androidx.compose {
     method public boolean changed(int value);
     method public final void collectKeySourceInformation();
     method protected final void composeRoot(kotlin.jvm.functions.Function0<kotlin.Unit> block);
+    method @kotlin.PublishedApi internal final <T> T! consume(androidx.compose.Ambient<T> key);
     method public final <T extends N> void createNode(kotlin.jvm.functions.Function0<? extends T> factory);
     method public final <T extends N> void emitNode(kotlin.jvm.functions.Function0<? extends T> factory);
     method public final void emitNode(N? node);
@@ -135,9 +136,9 @@ package androidx.compose {
     method public androidx.compose.Composer<N> getComposer();
     method public T! getNode();
     method public inline void set(int value, kotlin.jvm.functions.Function2<? super T,? super java.lang.Integer,kotlin.Unit> block);
-    method public inline <reified V> void set(V? value, kotlin.jvm.functions.Function2<? super T,? super V,kotlin.Unit> block);
+    method public inline <reified V> void set(V? value, kotlin.jvm.functions.Function2<? super T,? super V,? extends kotlin.Unit> block);
     method public inline void update(int value, kotlin.jvm.functions.Function2<? super T,? super java.lang.Integer,kotlin.Unit> block);
-    method public inline <reified V> void update(V? value, kotlin.jvm.functions.Function2<? super T,? super V,kotlin.Unit> block);
+    method public inline <reified V> void update(V? value, kotlin.jvm.functions.Function2<? super T,? super V,? extends kotlin.Unit> block);
   }
 
   public interface ComposerValidator {
@@ -150,7 +151,7 @@ package androidx.compose {
     method public final void compose(kotlin.jvm.functions.Function0<kotlin.Unit> content);
     method public final void compose();
     method public void dispose();
-    method public final boolean recomposeSync();
+    method @org.jetbrains.annotations.TestOnly public final boolean recomposeSync();
   }
 
   public final class CompositionKt {
@@ -194,10 +195,10 @@ package androidx.compose {
 
   public final class FrameManager {
     method public void ensureStarted();
-    method public <T> T! framed(kotlin.jvm.functions.Function0<? extends T> block);
-    method public <T> T! isolated(kotlin.jvm.functions.Function0<? extends T> block);
+    method @org.jetbrains.annotations.TestOnly public <T> T! framed(kotlin.jvm.functions.Function0<? extends T> block);
+    method @org.jetbrains.annotations.TestOnly public <T> T! isolated(kotlin.jvm.functions.Function0<? extends T> block);
     method public void nextFrame();
-    method public <T> T! unframed(kotlin.jvm.functions.Function0<? extends T> block);
+    method @org.jetbrains.annotations.TestOnly public <T> T! unframed(kotlin.jvm.functions.Function0<? extends T> block);
     field public static final androidx.compose.FrameManager! INSTANCE;
   }
 
@@ -246,8 +247,8 @@ package androidx.compose {
     method public static <T> androidx.compose.MutableState<T> mutableStateOf(T? value, kotlin.jvm.functions.Function2<? super T,? super T,java.lang.Boolean> areEquivalent = ReferentiallyEqual);
     method @androidx.compose.Composable public static inline <T> androidx.compose.MutableState<T> state(kotlin.jvm.functions.Function2<? super T,? super T,java.lang.Boolean> areEquivalent = ReferentiallyEqual, kotlin.jvm.functions.Function0<? extends T> init);
     method @androidx.compose.Composable public static inline <T, V1> androidx.compose.MutableState<T> stateFor(V1? v1, kotlin.jvm.functions.Function0<? extends T> init);
-    method @androidx.compose.Composable public static inline <T, reified V1, reified V2> androidx.compose.MutableState<T> stateFor(V1? v1, V2? v2, kotlin.jvm.functions.Function0<? extends T> init);
     method @androidx.compose.Composable public static inline <T> androidx.compose.MutableState<T> stateFor(Object![]? inputs, kotlin.jvm.functions.Function0<? extends T> init);
+    method @androidx.compose.Composable public static inline <T, reified V1, reified V2> androidx.compose.MutableState<T>! stateFor(V1? v1, V2? v2, kotlin.jvm.functions.Function0<? extends T> init);
   }
 
   public final class NullCompilationScope {
@@ -276,6 +277,21 @@ package androidx.compose {
   @kotlin.annotation.MustBeDocumented @kotlin.annotation.Target(allowedTargets={AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.PROPERTY, AnnotationTarget.FUNCTION}) public @interface Pivotal {
   }
 
+  @kotlin.PublishedApi internal final class PostCommitScopeImpl implements android.view.Choreographer.FrameCallback androidx.compose.CommitScope androidx.compose.CompositionLifecycleObserver {
+    ctor public PostCommitScopeImpl(internal kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> onCommit);
+    method public void doFrame(long frameTimeNanos);
+    method public void onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> callback);
+    method public void onEnter();
+    method public void onLeave();
+  }
+
+  @kotlin.PublishedApi internal final class PreCommitScopeImpl implements androidx.compose.CommitScope androidx.compose.CompositionLifecycleObserver {
+    ctor public PreCommitScopeImpl(internal kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> onCommit);
+    method public void onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> callback);
+    method public void onEnter();
+    method public void onLeave();
+  }
+
   @androidx.compose.Immutable public abstract class ProvidableAmbient<T> extends androidx.compose.Ambient<T> {
     method public final infix androidx.compose.ProvidedValue<T> provides(T? value);
   }
@@ -292,13 +308,13 @@ package androidx.compose {
   public abstract class Recomposer {
     ctor public Recomposer();
     method protected final void dispatchRecomposes();
-    method public abstract void recomposeSync();
+    method @org.jetbrains.annotations.TestOnly public abstract void recomposeSync();
     method protected abstract void scheduleChangesDispatch();
     field public static final androidx.compose.Recomposer.Companion! Companion;
   }
 
   public static final class Recomposer.Companion {
-    method public androidx.compose.Recomposer current();
+    method @org.jetbrains.annotations.TestOnly public androidx.compose.Recomposer current();
     method public boolean hasPendingChanges();
   }
 
@@ -439,6 +455,12 @@ package androidx.compose {
   }
 
   public final class ViewComposerCommonKt {
+    field @kotlin.PublishedApi internal static final Object consumer;
+    field @kotlin.PublishedApi internal static final Object invocation;
+    field @kotlin.PublishedApi internal static final Object provider;
+    field @kotlin.PublishedApi internal static final Object providerMaps;
+    field @kotlin.PublishedApi internal static final Object providerValues;
+    field @kotlin.PublishedApi internal static final Object reference;
   }
 
   public final class ViewComposerKt {
@@ -537,6 +559,7 @@ package androidx.compose.frames {
     method public static void commit();
     method public static void commit(androidx.compose.frames.Frame frame);
     method public static kotlin.Unit? commitHandler();
+    method @kotlin.PublishedApi internal static <T extends androidx.compose.frames.Record> T current(T r, androidx.compose.frames.Frame frame);
     method public static androidx.compose.frames.Frame currentFrame();
     method public static boolean getInFrame();
     method public static void observeAllReads(kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit> readObserver, kotlin.jvm.functions.Function0<kotlin.Unit> block);
