@@ -214,7 +214,7 @@ package androidx.compose {
   }
 
   public final class FlowAdapterKt {
-    method @androidx.compose.Composable public static inline <T> androidx.compose.State<T> collectAsState(kotlinx.coroutines.flow.StateFlow<? extends T>, kotlin.coroutines.CoroutineContext context = Dispatchers.Main);
+    method @androidx.compose.Composable @kotlinx.coroutines.ExperimentalCoroutinesApi public static inline <T> androidx.compose.State<T> collectAsState(kotlinx.coroutines.flow.StateFlow<? extends T>, kotlin.coroutines.CoroutineContext context = Dispatchers.Main);
     method @androidx.compose.Composable public static inline <T> androidx.compose.State<T> collectAsState(kotlinx.coroutines.flow.Flow<? extends T>, kotlin.coroutines.CoroutineContext context = Dispatchers.Main);
     method @androidx.compose.Composable public static <T> androidx.compose.State<T> collectAsState(kotlinx.coroutines.flow.Flow<? extends T>, T? initial, kotlin.coroutines.CoroutineContext context = Dispatchers.Main);
   }
@@ -222,16 +222,16 @@ package androidx.compose {
   public final class FrameManager {
     method public void ensureStarted();
     method public <T> T! framed(kotlin.jvm.functions.Function0<? extends T> block);
-    method public <T> T! isolated(kotlin.jvm.functions.Function0<? extends T> block);
+    method @org.jetbrains.annotations.TestOnly public <T> T! isolated(kotlin.jvm.functions.Function0<? extends T> block);
     method public void nextFrame();
-    method public <T> T! unframed(kotlin.jvm.functions.Function0<? extends T> block);
+    method @org.jetbrains.annotations.TestOnly public <T> T! unframed(kotlin.jvm.functions.Function0<? extends T> block);
     field public static final androidx.compose.FrameManager! INSTANCE;
   }
 
   @androidx.compose.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.CLASS) public @interface Immutable {
   }
 
-  @kotlin.annotation.Target(allowedTargets={AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY}) public @interface InternalComposeApi {
+  @kotlin.RequiresOptIn(level=RequiresOptIn.Level.ERROR, message="This is internal API for Compose modules that may change frequently " + "and without warning.") @kotlin.annotation.Target(allowedTargets={AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY}) public @interface InternalComposeApi {
   }
 
   public final class JoinedKeyKt {
@@ -250,10 +250,6 @@ package androidx.compose {
 
   public final class KeyKt {
     method @androidx.compose.Composable public static inline <T> T! key(Object![]? inputs, kotlin.jvm.functions.Function0<? extends T> block);
-  }
-
-  public final class KeySourceInfoKt {
-    method public static String? keySourceInfoOf(Object key);
   }
 
   @Deprecated @androidx.compose.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.CLASS) public @interface Model {
@@ -324,7 +320,7 @@ package androidx.compose {
     method public abstract androidx.compose.CompositionFrameClock getCompositionFrameClock();
     method public abstract kotlinx.coroutines.CoroutineScope getEffectCoroutineScope();
     method public abstract boolean hasPendingChanges();
-    method public abstract void recomposeSync();
+    method @org.jetbrains.annotations.TestOnly public abstract void recomposeSync();
     method protected abstract void scheduleChangesDispatch();
     property public abstract androidx.compose.CompositionFrameClock compositionFrameClock;
     property public abstract kotlinx.coroutines.CoroutineScope effectCoroutineScope;
@@ -332,7 +328,7 @@ package androidx.compose {
   }
 
   public static final class Recomposer.Companion {
-    method public androidx.compose.Recomposer current();
+    method @org.jetbrains.annotations.TestOnly public androidx.compose.Recomposer current();
     method @Deprecated public boolean hasPendingChanges();
   }
 
@@ -414,7 +410,7 @@ package androidx.compose {
     method public androidx.compose.SlotReader openReader();
     method public androidx.compose.SlotWriter openWriter();
     method public <T> T! read(kotlin.jvm.functions.Function1<? super androidx.compose.SlotReader,? extends T> block);
-    method public void verifyWellFormed();
+    method @org.jetbrains.annotations.TestOnly public void verifyWellFormed();
     method public <T> T! write(kotlin.jvm.functions.Function1<? super androidx.compose.SlotWriter,? extends T> block);
     property public final int size;
     field public static final androidx.compose.SlotTable.Companion! Companion;

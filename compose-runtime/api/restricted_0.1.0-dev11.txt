@@ -86,6 +86,7 @@ package androidx.compose {
     method public boolean changed(int value);
     method public final void collectKeySourceInformation();
     method protected final void composeRoot(kotlin.jvm.functions.Function0<kotlin.Unit> block);
+    method @kotlin.PublishedApi internal final <T> T! consume(androidx.compose.Ambient<T> key);
     method public final <T extends N> void createNode(kotlin.jvm.functions.Function0<? extends T> factory);
     method public final <T extends N> void emitNode(kotlin.jvm.functions.Function0<? extends T> factory);
     method public final void emitNode(N? node);
@@ -126,6 +127,13 @@ package androidx.compose {
     method public static inline <N, T> T! cache(androidx.compose.Composer<N>, boolean valid = true, kotlin.jvm.functions.Function0<? extends T> block);
     method public static inline <T> T! escapeCompose(kotlin.jvm.functions.Function1<? super androidx.compose.NullCompilationScope,? extends T> block);
     method public static androidx.compose.Composer<?> getCurrentComposer();
+    field @kotlin.PublishedApi internal static final androidx.compose.OpaqueKey ambientMap;
+    field @kotlin.PublishedApi internal static final androidx.compose.OpaqueKey consumer;
+    field @kotlin.PublishedApi internal static final androidx.compose.OpaqueKey invocation;
+    field @kotlin.PublishedApi internal static final androidx.compose.OpaqueKey provider;
+    field @kotlin.PublishedApi internal static final androidx.compose.OpaqueKey providerMaps;
+    field @kotlin.PublishedApi internal static final androidx.compose.OpaqueKey providerValues;
+    field @kotlin.PublishedApi internal static final androidx.compose.OpaqueKey reference;
   }
 
   public final class ComposerUpdater<N, T extends N> {
@@ -194,9 +202,9 @@ package androidx.compose {
   public final class FrameManager {
     method public void ensureStarted();
     method public <T> T! framed(kotlin.jvm.functions.Function0<? extends T> block);
-    method public <T> T! isolated(kotlin.jvm.functions.Function0<? extends T> block);
+    method @org.jetbrains.annotations.TestOnly public <T> T! isolated(kotlin.jvm.functions.Function0<? extends T> block);
     method public void nextFrame();
-    method public <T> T! unframed(kotlin.jvm.functions.Function0<? extends T> block);
+    method @org.jetbrains.annotations.TestOnly public <T> T! unframed(kotlin.jvm.functions.Function0<? extends T> block);
     field public static final androidx.compose.FrameManager! INSTANCE;
   }
 
@@ -220,10 +228,6 @@ package androidx.compose {
     method @androidx.compose.Composable public static inline <T, V1> T! key(@androidx.compose.Pivotal V1? v1, kotlin.jvm.functions.Function0<? extends T> block);
     method @androidx.compose.Composable public static inline <T, V1, V2> T! key(@androidx.compose.Pivotal V1? v1, @androidx.compose.Pivotal V2? v2, kotlin.jvm.functions.Function0<? extends T> block);
     method @androidx.compose.Composable public static inline <T> T! key(@androidx.compose.Pivotal Object![]? inputs, kotlin.jvm.functions.Function0<? extends T> block);
-  }
-
-  public final class KeySourceInfoKt {
-    method public static String? keySourceInfoOf(Object key);
   }
 
   @androidx.compose.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.CLASS) public @interface Model {
@@ -275,6 +279,21 @@ package androidx.compose {
   @kotlin.annotation.MustBeDocumented @kotlin.annotation.Target(allowedTargets={AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.PROPERTY, AnnotationTarget.FUNCTION}) public @interface Pivotal {
   }
 
+  @kotlin.PublishedApi internal final class PostCommitScopeImpl implements android.view.Choreographer.FrameCallback androidx.compose.CommitScope androidx.compose.CompositionLifecycleObserver {
+    ctor public PostCommitScopeImpl(internal kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> onCommit);
+    method public void doFrame(long frameTimeNanos);
+    method public void onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> callback);
+    method public void onEnter();
+    method public void onLeave();
+  }
+
+  @kotlin.PublishedApi internal final class PreCommitScopeImpl implements androidx.compose.CommitScope androidx.compose.CompositionLifecycleObserver {
+    ctor public PreCommitScopeImpl(internal kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> onCommit);
+    method public void onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> callback);
+    method public void onEnter();
+    method public void onLeave();
+  }
+
   @androidx.compose.Immutable public abstract class ProvidableAmbient<T> extends androidx.compose.Ambient<T> {
     method public final infix androidx.compose.ProvidedValue<T> provides(T? value);
   }
@@ -292,13 +311,13 @@ package androidx.compose {
     ctor public Recomposer();
     method protected final void dispatchRecomposes();
     method public abstract boolean hasPendingChanges();
-    method public abstract void recomposeSync();
+    method @org.jetbrains.annotations.TestOnly public abstract void recomposeSync();
     method protected abstract void scheduleChangesDispatch();
     field public static final androidx.compose.Recomposer.Companion! Companion;
   }
 
   public static final class Recomposer.Companion {
-    method public androidx.compose.Recomposer current();
+    method @org.jetbrains.annotations.TestOnly public androidx.compose.Recomposer current();
     method @Deprecated public boolean hasPendingChanges();
   }
 
@@ -377,7 +396,7 @@ package androidx.compose {
     method public androidx.compose.SlotReader openReader();
     method public androidx.compose.SlotWriter openWriter();
     method public <T> T! read(kotlin.jvm.functions.Function1<? super androidx.compose.SlotReader,? extends T> block);
-    method public void verifyWellFormed();
+    method @org.jetbrains.annotations.TestOnly public void verifyWellFormed();
     method public <T> T! write(kotlin.jvm.functions.Function1<? super androidx.compose.SlotWriter,? extends T> block);
     property public final int size;
     field public static final androidx.compose.SlotTable.Companion! Companion;
@@ -389,6 +408,7 @@ package androidx.compose {
   }
 
   public final class SlotTableKt {
+    field @kotlin.PublishedApi internal static final Object EMPTY;
   }
 
   public final class SlotWriter {
@@ -517,6 +537,7 @@ package androidx.compose.frames {
     method public static void commit();
     method public static void commit(androidx.compose.frames.Frame frame);
     method public static kotlin.Unit? commitHandler();
+    method @kotlin.PublishedApi internal static <T extends androidx.compose.frames.Record> T current(T r, androidx.compose.frames.Frame frame);
     method public static androidx.compose.frames.Frame currentFrame();
     method public static boolean getInFrame();
     method public static void observeAllReads(kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit> readObserver, kotlin.jvm.functions.Function0<kotlin.Unit> block);
