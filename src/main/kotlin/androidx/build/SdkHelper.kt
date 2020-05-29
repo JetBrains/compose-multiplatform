@@ -52,6 +52,11 @@ fun Project.writeSdkPathToLocalPropertiesFile() {
  * Returns the root project's platform-specific SDK path as a file.
  */
 fun Project.getSdkPath(): File {
+    val sdkPath = androidxSdkPath()
+    if (sdkPath != null) {
+        return File(sdkPath)
+    }
+
     val osName = System.getProperty("os.name").toLowerCase(Locale.US)
     val isMacOsX = osName.contains("mac os x") ||
             osName.contains("darwin") ||
