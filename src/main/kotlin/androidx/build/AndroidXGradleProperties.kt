@@ -57,3 +57,25 @@ fun Project.isCoverageEnabled(): Boolean =
  */
 fun Project.androidxSdkPath(): String? =
     project.findProperty("androidx.sdkPath") as? String
+
+/**
+ * Returns the Studio type for the project's studio task
+ */
+fun Project.studioType() = StudioType.findType(
+    findProperty("androidx.studio.type")?.toString()
+)
+
+enum class StudioType {
+    ANDROIDX,
+    PLAYGROUND,
+    COMPOSE;
+
+    companion object {
+        fun findType(value: String?) = when (value) {
+            "playground" -> PLAYGROUND
+            "compose" -> COMPOSE
+            null, "androidx" -> ANDROIDX
+            else -> error("Invalid project type $value")
+        }
+    }
+}

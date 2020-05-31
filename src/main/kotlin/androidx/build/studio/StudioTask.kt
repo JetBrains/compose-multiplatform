@@ -16,8 +16,9 @@
 
 package androidx.build.studio
 
-import androidx.build.SupportConfig
+import androidx.build.StudioType
 import androidx.build.getSupportRootFolder
+import androidx.build.studioType
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.internal.tasks.userinput.UserInputHandler
@@ -47,6 +48,9 @@ abstract class StudioTask : DefaultTask() {
     @get:Internal
     protected val projectRoot: File = project.rootDir
 
+    @get:Internal
+    protected open val installParentDir: File = project.rootDir
+
     private val studioVersions by lazy { StudioVersions.get() }
 
     /**
@@ -72,7 +76,9 @@ abstract class StudioTask : DefaultTask() {
      * Note: Given that the contents of this directory changes a lot, we don't want to annotate this
      * property for task avoidance - it's not stable enough for us to get any value out of this.
      */
-    private val studioInstallationDir by lazy { File(projectRoot, "studio/$studioDirectoryName") }
+    private val studioInstallationDir by lazy {
+        File(installParentDir, "studio/$studioDirectoryName")
+    }
 
     /**
      * Absolute path of the Studio archive
@@ -190,11 +196,12 @@ abstract class StudioTask : DefaultTask() {
         private const val STUDIO_TASK = "studio"
 
         fun Project.registerStudioTask() {
-            if (SupportConfig.isUiProject()) {
-                tasks.register(STUDIO_TASK, ComposeStudioTask::class.java)
-            } else {
-                tasks.register(STUDIO_TASK, RootStudioTask::class.java)
+            val studioTask = when (studioType()) {
+                StudioType.ANDROIDX -> RootStudioTask::class.java
+                StudioType.COMPOSE -> ComposeStudioTask::class.java
+                StudioType.PLAYGROUND -> PlaygroundStudioTask::class.java
             }
+            tasks.register(STUDIO_TASK, studioTask)
         }
     }
 }
@@ -213,4 +220,11 @@ open class RootStudioTask : StudioTask() {
 open class ComposeStudioTask : StudioTask() {
     override val studioArchiveCreator = UrlArchiveCreator
     override val ideaProperties get() = projectRoot.resolve("idea.properties")
+}
+
+/**
+ * Task for launching studio in a playground project
+ */
+open class PlaygroundStudioTask : RootStudioTask() {
+    override val installParentDir get() = project.rootProject.projectDir.resolve("..")
 }

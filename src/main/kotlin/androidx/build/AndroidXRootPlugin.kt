@@ -33,6 +33,7 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Zip
+import org.gradle.kotlin.dsl.KotlinClosure1
 import org.gradle.kotlin.dsl.extra
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
@@ -88,6 +89,17 @@ class AndroidXRootPlugin : Plugin<Project> {
         extra.set("projects", projectModules)
         buildOnServerTask.dependsOn(tasks.named(CheckExternalDependencyLicensesTask.TASK_NAME))
         subprojects { project ->
+            // Add a method for each sub project where they can declare an optional
+            // dependency on a project or its latest snapshot artifact.
+            // In AndroidX build, this is always enforsed to the project while in Playground
+            // builds, they are converted to the latest SNAPSHOT artifact if the project is
+            // not included in that playground. see: AndroidXPlaygroundRootPlugin
+            project.extra.set(PROJECT_OR_ARTIFACT_EXT_NAME, KotlinClosure1<String, Project>(
+                function = {
+                    // this refers to the first parameter of the closure.
+                    project.project(this)
+                }
+            ))
             if (project.path == ":docs-runner") {
                 project.tasks.all { task ->
                     if (DokkaPublicDocs.ARCHIVE_TASK_NAME == task.name ||
@@ -211,5 +223,9 @@ class AndroidXRootPlugin : Plugin<Project> {
         androidx.build.dependencies.kotlinCoroutinesVersion = getVersion("kotlin_coroutines")
         androidx.build.dependencies.agpVersion = getVersion("agp")
         androidx.build.dependencies.lintVersion = getVersion("lint")
+    }
+
+    companion object {
+        const val PROJECT_OR_ARTIFACT_EXT_NAME = "projectOrArtifact"
     }
 }
