@@ -340,7 +340,7 @@ open class Composer<N>(
      * Manager for scheduling recompositions.
      */
     val recomposer: Recomposer
-) : ComposerValidator {
+) {
     private val changes = mutableListOf<Change<N>>()
     private val lifecycleObservers = HashMap<
         CompositionLifecycleObserverHolder,
@@ -818,8 +818,8 @@ open class Composer<N>(
      *
      * @param value the value to be compared.
      */
-    override fun <T> changed(value: T): Boolean {
-        return if (nextSlot() != value || inserting) {
+    fun changed(value: Any?): Boolean {
+        return if (nextSlot() != value) {
             updateValue(value)
             true
         } else {
@@ -827,14 +827,84 @@ open class Composer<N>(
         }
     }
 
-    // TODO: Add more overloads for common primitive types like String and Float etc to avoid boxing
-    override fun changed(value: Int): Boolean {
-        return if (nextSlot() != value || inserting) {
-            updateValue(value)
-            true
-        } else {
-            false
+    fun changed(value: Char): Boolean {
+        val next = nextSlot()
+        if (next is Char) {
+            val nextPrimitive: Char = next
+            if (value == nextPrimitive) return false
         }
+        updateValue(value)
+        return true
+    }
+
+    fun changed(value: Byte): Boolean {
+        val next = nextSlot()
+        if (next is Byte) {
+            val nextPrimitive: Byte = next
+            if (value == nextPrimitive) return false
+        }
+        updateValue(value)
+        return true
+    }
+
+    fun changed(value: Short): Boolean {
+        val next = nextSlot()
+        if (next is Short) {
+            val nextPrimitive: Short = next
+            if (value == nextPrimitive) return false
+        }
+        updateValue(value)
+        return true
+    }
+
+    fun changed(value: Boolean): Boolean {
+        val next = nextSlot()
+        if (next is Boolean) {
+            val nextPrimitive: Boolean = next
+            if (value == nextPrimitive) return false
+        }
+        updateValue(value)
+        return true
+    }
+
+    fun changed(value: Float): Boolean {
+        val next = nextSlot()
+        if (next is Float) {
+            val nextPrimitive: Float = next
+            if (value == nextPrimitive) return false
+        }
+        updateValue(value)
+        return true
+    }
+
+    fun changed(value: Long): Boolean {
+        val next = nextSlot()
+        if (next is Long) {
+            val nextPrimitive: Long = next
+            if (value == nextPrimitive) return false
+        }
+        updateValue(value)
+        return true
+    }
+
+    fun changed(value: Double): Boolean {
+        val next = nextSlot()
+        if (next is Double) {
+            val nextPrimitive: Double = next
+            if (value == nextPrimitive) return false
+        }
+        updateValue(value)
+        return true
+    }
+
+    fun changed(value: Int): Boolean {
+        val next = nextSlot()
+        if (next is Int) {
+            val nextPrimitive: Int = next
+            if (value == nextPrimitive) return false
+        }
+        updateValue(value)
+        return true
     }
 
     /**
