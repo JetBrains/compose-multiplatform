@@ -27,13 +27,6 @@ import kotlinx.coroutines.flow.StateFlow
 
 @Sampled
 @Composable
-fun FlowSample(flow: Flow<String>) {
-    val value: String? by flow.collectAsState()
-    Text("Value is $value")
-}
-
-@Sampled
-@Composable
 fun FlowWithInitialSample(flow: Flow<String>) {
     val value: String by flow.collectAsState("initial")
     Text("Value is $value")
