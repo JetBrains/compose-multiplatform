@@ -17,22 +17,29 @@
 package androidx.compose
 
 /**
- * When applied to a composable function [Direct] will prevent code from being generated which
+ * This annotation can be applied to [Composable] functions and provide metadata to the compiler
+ * that imply compose-specific contracts that the author of the function is guaranteeing the
+ * function complies with. This metadata can be used to generate more efficient code.
+ *
+ * Caution: Use of this annotation means that the annotated declaration *MUST* comply with those
+ * contracts, or else the resulting code's behavior will be undefined.
+ *
+ * @param restartable When false,this will prevent code from being generated which
  * allow this function's execution to be skipped or restarted. This may be desirable for small
  * functions which just directly call another composable function and have very little machinery
  * in them directly.
+ *
+ * @param readonly if false, no group will be generated around the body of the function it annotates
+ * . This is not safe unless the body of the function only executes "read" operations on the
+ * passed in composer..
  */
 @MustBeDocumented
 @Retention(AnnotationRetention.BINARY)
 @Target(
-    AnnotationTarget.FUNCTION
+    AnnotationTarget.FUNCTION,
+    AnnotationTarget.PROPERTY
 )
-@Deprecated(
-    "Use ComposableContract instead",
-    replaceWith = ReplaceWith(
-        "ComposableContract(restartable = false)",
-        "androidx.compose.ComposableContract"
-    ),
-    level = DeprecationLevel.ERROR
+annotation class ComposableContract(
+    val restartable: Boolean = true,
+    val readonly: Boolean = false
 )
-annotation class Direct

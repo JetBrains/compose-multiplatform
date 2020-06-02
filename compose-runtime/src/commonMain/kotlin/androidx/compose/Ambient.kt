@@ -68,6 +68,7 @@ sealed class Ambient<T> constructor(defaultFactory: (() -> T)? = null) {
      *
      * @sample androidx.compose.samples.consumeAmbient
      */
+    @ComposableContract(readonly = true)
     @Composable
     inline val current: T get() = currentComposer.consume(this)
 }

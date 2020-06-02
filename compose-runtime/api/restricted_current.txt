@@ -79,6 +79,11 @@ package androidx.compose {
   @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets={AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER, AnnotationTarget.PROPERTY}) public @interface Composable {
   }
 
+  @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets={AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY}) public @interface ComposableContract {
+    method public abstract boolean readonly() default false;
+    method public abstract boolean restartable() default true;
+  }
+
   public final class ComposeKt {
     method @androidx.compose.Stable public static kotlin.jvm.functions.Function0<kotlin.Unit> emptyContent();
     method public static inline kotlin.jvm.functions.Function0<kotlin.Unit> orEmpty(kotlin.jvm.functions.Function0<kotlin.Unit>?);
@@ -212,7 +217,7 @@ package androidx.compose {
     method public <N> void registerComposer(androidx.compose.Composer<N> composer);
   }
 
-  @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.FUNCTION) public @interface Direct {
+  @Deprecated @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.FUNCTION) public @interface Direct {
   }
 
   public final class EffectsKt {
