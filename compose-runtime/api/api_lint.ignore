@@ -69,3 +69,9 @@ MissingNullability: androidx.compose.SlotReader#getGroupDataKey():
     Missing nullability on method `getGroupDataKey` return
 MissingNullability: androidx.compose.SlotReader#getGroupNode():
     Missing nullability on method `getGroupNode` return
+
+
+NoByteOrShort: androidx.compose.Composer#changed(byte) parameter #0:
+    Should avoid odd sized primitives; use `int` instead of `byte` in parameter value in androidx.compose.Composer.changed(byte value)
+NoByteOrShort: androidx.compose.Composer#changed(short) parameter #0:
+    Should avoid odd sized primitives; use `int` instead of `short` in parameter value in androidx.compose.Composer.changed(short value)
