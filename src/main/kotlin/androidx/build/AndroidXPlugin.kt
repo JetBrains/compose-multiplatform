@@ -18,20 +18,12 @@ package androidx.build
 
 import androidx.benchmark.gradle.BenchmarkPlugin
 import androidx.build.AndroidXPlugin.Companion.CHECK_RELEASE_READY_TASK
-import androidx.build.AndroidXPlugin.Companion.CHECK_RESOURCE_API_TASK
 import androidx.build.AndroidXPlugin.Companion.TASK_TIMEOUT_MINUTES
-import androidx.build.AndroidXPlugin.Companion.UPDATE_RESOURCE_API_TASK
 import androidx.build.SupportConfig.BUILD_TOOLS_VERSION
 import androidx.build.SupportConfig.COMPILE_SDK_VERSION
 import androidx.build.SupportConfig.DEFAULT_MIN_SDK_VERSION
 import androidx.build.SupportConfig.INSTRUMENTATION_RUNNER
 import androidx.build.SupportConfig.TARGET_SDK_VERSION
-import androidx.build.checkapi.ApiType
-import androidx.build.checkapi.getApiFileDirectory
-import androidx.build.checkapi.getCurrentApiLocation
-import androidx.build.checkapi.getRequiredCompatibilityApiFileFromDir
-import androidx.build.checkapi.getVersionedApiLocation
-import androidx.build.checkapi.hasApiFileDirectory
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.dokka.Dokka.configureAndroidProjectForDokka
 import androidx.build.dokka.Dokka.configureJavaProjectForDokka
@@ -41,9 +33,8 @@ import androidx.build.jacoco.Jacoco
 import androidx.build.license.configureExternalDependencyLicenseCheck
 import androidx.build.metalava.MetalavaTasks.configureAndroidProjectForMetalava
 import androidx.build.metalava.MetalavaTasks.configureJavaProjectForMetalava
-import androidx.build.metalava.UpdateApiTask
+import androidx.build.resources.ResourceTasks.configureAndroidProjectForResourceTasks
 import androidx.build.studio.StudioTask
-import androidx.build.uptodatedness.cacheEvenIfNoOutputs
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryExtension
@@ -218,7 +209,6 @@ class AndroidXPlugin : Plugin<Project> {
 
         project.configureSourceJarForAndroid(libraryExtension)
         project.configureVersionFileWriter(libraryExtension, androidXExtension)
-        project.configureResourceApiChecks(libraryExtension)
         project.addCreateLibraryBuildInfoFileTask(androidXExtension)
 
         val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
@@ -249,12 +239,13 @@ class AndroidXPlugin : Plugin<Project> {
             }
         }
 
-        // Standard lint, docs, and Metalava configuration for AndroidX projects.
+        // Standard lint, docs, resource API, and Metalava configuration for AndroidX projects.
         project.configureAndroidProjectForLint(libraryExtension.lintOptions, androidXExtension)
         if (project.isDocumentationEnabled()) {
             project.configureAndroidProjectForDokka(libraryExtension, androidXExtension)
         }
         project.configureAndroidProjectForMetalava(libraryExtension, androidXExtension)
+        project.configureAndroidProjectForResourceTasks(libraryExtension, androidXExtension)
 
         project.addToProjectMap(androidXExtension)
     }
@@ -604,11 +595,14 @@ class AndroidXPlugin : Plugin<Project> {
         const val BUILD_ON_SERVER_TASK = "buildOnServer"
         const val BUILD_TEST_APKS_TASK = "buildTestApks"
         const val CHECK_RESOURCE_API_TASK = "checkResourceApi"
+        const val CHECK_RESOURCE_API_RELEASE_TASK = "checkResourceApiRelease"
         const val UPDATE_RESOURCE_API_TASK = "updateResourceApi"
         const val CHECK_RELEASE_READY_TASK = "checkReleaseReady"
         const val CREATE_LIBRARY_BUILD_INFO_FILES_TASK = "createLibraryBuildInfoFiles"
         const val CREATE_AGGREGATE_BUILD_INFO_FILES_TASK = "createAggregateBuildInfoFiles"
         const val REPORT_LIBRARY_METRICS_TASK = "reportLibraryMetrics"
+
+        const val TASK_GROUP_API = "API"
 
         const val EXTENSION_NAME = "androidx"
 
@@ -660,18 +654,6 @@ val Project.multiplatformExtension
     get() = extensions.findByType(KotlinMultiplatformExtension::class.java)
 
 /**
- * Creates the [CHECK_RESOURCE_API_TASK], which verifies the AAPT-generated resource API file
- * against the checked-in resource API file.
- */
-private fun Project.createCheckResourceApiTask(): TaskProvider<CheckResourceApiTask> {
-    return tasks.register(CHECK_RESOURCE_API_TASK, CheckResourceApiTask::class.java) { task ->
-        task.newApiFile = getGeneratedResourceApiFile()
-        task.oldApiFile = getVersionedApiLocation().resourceFile
-        task.cacheEvenIfNoOutputs()
-    }
-}
-
-/**
  * Creates the [CHECK_RELEASE_READY_TASK], which aggregates tasks that must pass for a
  * project to be considered ready for public release.
  */
@@ -683,66 +665,9 @@ private fun Project.createCheckReleaseReadyTask(taskProviderList: List<TaskProvi
     }
 }
 
-private fun Project.createUpdateResourceApiTask(): TaskProvider<UpdateResourceApiTask> {
-    val versionedApiLocation = project.getVersionedApiLocation()
-    val currentApiLocation = project.getCurrentApiLocation()
-
-    val outputApiLocations = if (project.isVersionedApiFileWritingEnabled()) {
-        listOf(
-            versionedApiLocation,
-            currentApiLocation
-        )
-    } else {
-        listOf(
-            currentApiLocation
-        )
-    }
-
-    return tasks.register(UPDATE_RESOURCE_API_TASK, UpdateResourceApiTask::class.java) { task ->
-        task.inputApiFile.set(getGeneratedResourceApiFile())
-        task.referenceResourceApiFile.set(getRequiredCompatibilityApiFileFromDir(
-            getApiFileDirectory(), version(), ApiType.RESOURCEAPI))
-        task.outputApiLocations.set(outputApiLocations)
-    }
-}
-
-private fun Project.getGeneratedResourceApiFile(): File {
-    // TODO(alanv): Follow up when b/154626581 gets resolved and AGP provides a stable API contract
-    return File(buildDir, "intermediates/public_res/release/public.txt")
-}
-
 @Suppress("UNCHECKED_CAST")
 fun Project.getProjectsMap(): ConcurrentHashMap<String, String> {
     return rootProject.extra.get("projects") as ConcurrentHashMap<String, String>
-}
-
-/**
- * Configures an Android library project to track and validate its public resource API surface.
- */
-private fun Project.configureResourceApiChecks(extension: LibraryExtension) {
-    // TODO(alanv): Fix this to occur during normal configuration.
-    afterEvaluate { project ->
-        // Only configure resource API checks for projects that are already tracking APIs.
-        // TODO(alanv): Migrate to check the AndroidX extension for "should generate API files".
-        if (project.hasApiFileDirectory()) {
-            val checkResourceApiTask = createCheckResourceApiTask()
-            val updateResourceApiTask = createUpdateResourceApiTask()
-
-            // Configure the check- and update- resource API tasks to depend on Java compilation,
-            // after which we expect the AAPT-generated public.txt file to be available.
-            extension.defaultPublishVariant { libraryVariant ->
-                // TODO(alanv): These should probably depend on public.txt as an input file.
-                checkResourceApiTask.configure { it.dependsOn(libraryVariant.javaCompileProvider) }
-                updateResourceApiTask.configure { it.dependsOn(libraryVariant.javaCompileProvider) }
-            }
-
-            // Ensure that this task runs as part of updateApi and buildOnServer
-            tasks.withType(UpdateApiTask::class.java).configureEach { task ->
-                task.dependsOn(updateResourceApiTask)
-            }
-            addToBuildOnServer(checkResourceApiTask)
-        }
-    }
 }
 
 /**

@@ -39,7 +39,12 @@ allprojects {
     tasks.withType(KotlinCompile).configureEach {
         kotlinOptions {
             jvmTarget = "1.8"
-            freeCompilerArgs += ["-Werror", "-Xskip-runtime-version-check"]
+            freeCompilerArgs += [
+                    "-Werror",
+                    "-Xskip-runtime-version-check",
+                    // Allow `@OptIn` and `@UseExperimental`
+                    "-Xopt-in=kotlin.RequiresOptIn"
+            ]
         }
     }
 }
