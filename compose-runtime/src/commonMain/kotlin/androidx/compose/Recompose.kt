@@ -25,15 +25,16 @@ package androidx.compose
  * maintain local state inside of composables. For cases where this is impractical, Recompose can
  * help you.
  *
- * Example:
- *
- * @sample androidx.compose.samples.recomposeSample
- *
- * Note: The above example can be done without [Recompose] by using [state].
- *
  * @see state
  * @see Observe
  * @see invalidate
  */
 @Composable
+@Deprecated(
+    "The Recompose composable is no longer a useful abstraction. Most recomposition should happen" +
+            " as a result of MutableState assignments. For anything beyond that, it is " +
+            "recommended that you use the `invalidate` function to trigger a recomposition of the" +
+            " current scope.",
+    replaceWith = ReplaceWith("val recompose = invalidate")
+)
 fun Recompose(body: @Composable (recompose: () -> Unit) -> Unit) = body(invalidate)

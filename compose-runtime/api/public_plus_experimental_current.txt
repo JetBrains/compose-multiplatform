@@ -316,7 +316,7 @@ package androidx.compose {
   }
 
   public final class RecomposeKt {
-    method @androidx.compose.Composable public static void Recompose(kotlin.jvm.functions.Function1<? super kotlin.jvm.functions.Function0<kotlin.Unit>,kotlin.Unit> body);
+    method @Deprecated @androidx.compose.Composable public static void Recompose(kotlin.jvm.functions.Function1<? super kotlin.jvm.functions.Function0<kotlin.Unit>,kotlin.Unit> body);
   }
 
   public abstract class Recomposer {

@@ -20,7 +20,6 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.compose.Composable
 import androidx.compose.Providers
-import androidx.compose.Recompose
 import androidx.compose.State
 import androidx.compose.ambientOf
 import androidx.compose.clearRoots
@@ -669,12 +668,10 @@ class EffectsTests : BaseComposeTest() {
         }
 
         @Composable fun SimpleComposable() {
-            Recompose {
-                requestRecompose = it
-                Providers(MyAmbient provides ambientValue++) {
-                    SimpleComposable2()
-                    Button(id = 123)
-                }
+            requestRecompose = invalidate
+            Providers(MyAmbient provides ambientValue++) {
+                SimpleComposable2()
+                Button(id = 123)
             }
         }
 
