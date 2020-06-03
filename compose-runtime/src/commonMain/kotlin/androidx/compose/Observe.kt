@@ -29,5 +29,12 @@ package androidx.compose
  * @see invalidate
  * @see Recompose
  */
+@Suppress("DeprecatedCallableAddReplaceWith")
 @Composable
+@Deprecated(
+    "Observe is no longer a useful abstraction. If you need to replicate it, its implementation " +
+            "can be replicated by just creating a composable function which executes a composable" +
+            " lambda parameter. For example, " +
+            "`@Composable fun Observe(body: @Composable () -> Unit) = body()"
+)
 fun Observe(body: @Composable () -> Unit) = body()

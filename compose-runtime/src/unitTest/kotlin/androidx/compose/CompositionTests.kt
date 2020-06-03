@@ -42,6 +42,8 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
+@Composable fun Container(body: @Composable () -> Unit) = body()
+
 @Stable
 class CompositionTests {
 
@@ -1299,7 +1301,7 @@ class CompositionTests {
                     text("Some text")
                 }
 
-                Observe {
+                Container {
                     text("Some text")
 
                     // Force the invalidation to survive the compose
@@ -1840,7 +1842,7 @@ class CompositionTests {
         fun MockComposeScope.test() {
             outerInvalidate = invalidate
             outerKeys.add(composer.currentCompoundKeyHash)
-            Observe {
+            Container {
                 innerInvalidate = invalidate
                 innerKeys.add(composer.currentCompoundKeyHash)
             }

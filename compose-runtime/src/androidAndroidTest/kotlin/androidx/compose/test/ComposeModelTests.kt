@@ -18,7 +18,6 @@ package androidx.compose.test
 
 import android.widget.TextView
 import androidx.compose.Composable
-import androidx.compose.Observe
 import androidx.compose.clearRoots
 import androidx.compose.frames.AbstractRecord
 import androidx.compose.frames.Framed
@@ -88,6 +87,8 @@ class Person(name: String, age: Int) : Framed {
         override fun create() = CustomerRecord()
     }
 }
+
+@Composable fun Observe(body: @Composable () -> Unit) = body()
 
 class TestState<T>(value: T) : Framed {
     @Suppress("UNCHECKED_CAST")

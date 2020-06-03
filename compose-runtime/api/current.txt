@@ -290,7 +290,7 @@ package androidx.compose {
   }
 
   public final class ObserveKt {
-    method @androidx.compose.Composable public static void Observe(kotlin.jvm.functions.Function0<kotlin.Unit> body);
+    method @Deprecated @androidx.compose.Composable public static void Observe(kotlin.jvm.functions.Function0<kotlin.Unit> body);
   }
 
   public final class ObserverMap<K, V> {

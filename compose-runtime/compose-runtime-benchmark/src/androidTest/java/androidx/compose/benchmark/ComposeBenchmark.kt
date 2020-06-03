@@ -17,7 +17,6 @@
 package androidx.compose.benchmark
 
 import androidx.compose.Composable
-import androidx.compose.Observe
 import androidx.compose.benchmark.realworld4.RealWorld4_FancyWidget_000
 import androidx.compose.getValue
 import androidx.compose.mutableStateOf
@@ -184,6 +183,8 @@ class ColorModel(color: Color = Color.Black) {
 fun OneRect(model: ColorModel) {
     Box(modifier = model.modifier)
 }
+
+@Composable fun Observe(body: @Composable () -> Unit) = body()
 
 @Composable
 fun TenRects(model: ColorModel, narrow: Boolean = false) {
