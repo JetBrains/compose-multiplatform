@@ -59,4 +59,5 @@ internal actual fun recordSourceKeyInfo(key: Any) {
     }
 }
 
+@InternalComposeApi
 actual fun keySourceInfoOf(key: Any): String? = keyInfo[key]

@@ -26,6 +26,7 @@ import androidx.compose.Composable
 import androidx.compose.Composer
 import androidx.compose.Composition
 import androidx.compose.FrameManager
+import androidx.compose.InternalComposeApi
 import androidx.compose.Recomposer
 import androidx.compose.currentComposer
 import androidx.ui.core.AndroidOwner
@@ -83,6 +84,7 @@ abstract class ComposeBenchmarkBase {
             }
 
             val didSomething = activeComposer?.let { composer ->
+                @OptIn(InternalComposeApi::class)
                 composer.recompose().also { composer.applyChanges() }
             } ?: false
             assertTrue(didSomething)

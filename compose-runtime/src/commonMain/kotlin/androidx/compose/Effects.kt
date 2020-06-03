@@ -15,7 +15,6 @@
  */
 
 @file:Suppress("unused")
-
 package androidx.compose
 
 /**
@@ -144,6 +143,7 @@ fun onDispose(callback: () -> Unit) {
  * @see [onActive]
  */
 @Suppress("NOTHING_TO_INLINE")
+@OptIn(ComposeCompilerApi::class)
 @Composable
 inline fun onCommit(noinline callback: CommitScope.() -> Unit) {
     currentComposer.changed(PostCommitScopeImpl(callback))
@@ -228,6 +228,7 @@ fun onCommit(vararg inputs: Any?, callback: CommitScope.() -> Unit) {
  * @see [onActive]
  */
 @Suppress("NOTHING_TO_INLINE")
+@OptIn(ComposeCompilerApi::class)
 @Composable
 inline fun onPreCommit(noinline callback: CommitScope.() -> Unit) {
     currentComposer.changed(PreCommitScopeImpl(callback))

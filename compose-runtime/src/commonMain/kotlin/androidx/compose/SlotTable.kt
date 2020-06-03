@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
+@file:OptIn(InternalComposeApi::class)
 package androidx.compose
 
+@InternalComposeApi
 class SlotReader(val table: SlotTable) {
     var current = 0
         private set
@@ -301,6 +303,7 @@ class SlotReader(val table: SlotTable) {
 @PublishedApi
 internal val EMPTY = SlotTable.EMPTY
 
+@InternalComposeApi
 class SlotWriter internal constructor(val table: SlotTable) {
     var current = 0
 
@@ -1088,6 +1091,7 @@ class SlotTable(internal var slots: Array<Any?> = arrayOf()) {
      *
      * @see SlotReader
      */
+    @InternalComposeApi
     fun <T> read(block: (reader: SlotReader) -> T): T = openReader().let { reader ->
         try {
             block(reader)
@@ -1103,6 +1107,7 @@ class SlotTable(internal var slots: Array<Any?> = arrayOf()) {
      *
      * @see SlotWriter
      */
+    @InternalComposeApi
     fun <T> write(block: (writer: SlotWriter) -> T): T = openWriter().let { writer ->
         try {
             block(writer)
@@ -1117,6 +1122,7 @@ class SlotTable(internal var slots: Array<Any?> = arrayOf()) {
      * [groupPathTo] creates a reader so it cannot be called when the slot table is being written
      * to.
      */
+    @InternalComposeApi
     fun groupPathTo(location: Int): List<Int> {
         require(location < size)
         val path = mutableListOf<Int>()
@@ -1145,6 +1151,7 @@ class SlotTable(internal var slots: Array<Any?> = arrayOf()) {
      *
      * @see SlotReader
      */
+    @InternalComposeApi
     fun openReader(): SlotReader {
         if (writer) error("Cannot read while a writer is pending")
         readers++
@@ -1157,6 +1164,7 @@ class SlotTable(internal var slots: Array<Any?> = arrayOf()) {
      *
      * @see SlotWriter
      */
+    @InternalComposeApi
     fun openWriter(): SlotWriter {
         if (writer) error("Cannot start a writer when another writer is pending")
         if (readers > 0) error("Cannot start a writer when a reader is pending")
@@ -1172,6 +1180,7 @@ class SlotTable(internal var slots: Array<Any?> = arrayOf()) {
      * well-formed.
      */
     @TestOnly
+    @InternalComposeApi
     fun verifyWellFormed() {
         var current = 0
 
@@ -1222,6 +1231,7 @@ class SlotTable(internal var slots: Array<Any?> = arrayOf()) {
      * The number of active slots in the slot table. The current capacity of the slot table is at
      * lease [size].
      */
+    @InternalComposeApi
     val size: Int get() = slots.size - gapLen
 
     internal fun close(reader: SlotReader) {
@@ -1349,7 +1359,9 @@ class SlotTable(internal var slots: Array<Any?> = arrayOf()) {
         return anchors[location] === anchor
     }
 
+    @InternalComposeApi
     companion object {
+        @InternalComposeApi
         val EMPTY = object : Any() {
             override fun toString(): String {
                 return "EMPTY"
@@ -1365,6 +1377,7 @@ private fun ArrayList<Anchor>.search(index: Int) = binarySearch { it.loc.compare
 /**
  * Information about groups and their keys.
  */
+@InternalComposeApi
 class KeyInfo internal constructor(
     /**
      * The group key.
@@ -1397,6 +1410,7 @@ class KeyInfo internal constructor(
     internal val group: Group
 )
 
+@InternalComposeApi
 class Anchor(internal var loc: Int) {
     val valid get() = loc >= 0
     fun location(slots: SlotTable) = slots.anchorLocation(this)

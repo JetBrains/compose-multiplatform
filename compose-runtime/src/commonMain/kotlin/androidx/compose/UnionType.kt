@@ -30,4 +30,5 @@ import kotlin.reflect.KClass
 @MustBeDocumented
 @Retention(AnnotationRetention.BINARY)
 @Target(AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
+@ExperimentalComposeApi
 annotation class UnionType(vararg val types: KClass<*>)

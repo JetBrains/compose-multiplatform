@@ -14,11 +14,17 @@
  * limitations under the License.
  */
 
-@file:Suppress("NOTHING_TO_INLINE")
 package androidx.compose
 
-@OptIn(ExperimentalStdlibApi::class)
-internal inline infix fun Int.ror(other: Int) = this.rotateRight(other)
-
-@OptIn(ExperimentalStdlibApi::class)
-internal inline infix fun Int.rol(other: Int) = this.rotateLeft(other)
+@RequiresOptIn(
+    level = RequiresOptIn.Level.WARNING,
+    message = "This API is intended to be targeted by the Compose Compiler Plugin and not called " +
+            "directly."
+)
+@Target(
+    AnnotationTarget.CLASS,
+    AnnotationTarget.FUNCTION,
+    AnnotationTarget.PROPERTY,
+    AnnotationTarget.TYPEALIAS
+)
+annotation class ComposeCompilerApi

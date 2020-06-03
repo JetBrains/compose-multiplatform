@@ -20,7 +20,6 @@ package androidx.compose
  * Remember the value produced by [calculation]. [calculation] will only be evaluated during the composition.
  * Recomposition will always return the value produced by composition.
  */
-
 @Composable
 inline fun <T> remember(calculation: () -> T): T =
     currentComposer.cache(true, calculation)
@@ -29,6 +28,7 @@ inline fun <T> remember(calculation: () -> T): T =
  * Remember the value returned by [calculation] if [v1] is equal to the previous composition, otherwise
  * produce and remember a new value by calling [calculation].
  */
+@OptIn(ComposeCompilerApi::class)
 @Composable
 inline fun <T, /*reified*/ V1> remember(v1: V1, calculation: () -> T): T {
     return currentComposer.cache(!currentComposer.changed(v1), calculation)
@@ -38,6 +38,7 @@ inline fun <T, /*reified*/ V1> remember(v1: V1, calculation: () -> T): T {
  * Remember the value returned by [calculation] if [v1] and [v2] are equal to the previous composition,
  * otherwise produce and remember a new value by calling [calculation].
  */
+@OptIn(ComposeCompilerApi::class)
 @Composable
 inline fun <T, /*reified*/ V1, /*reified*/ V2> remember(
     v1: V1,
@@ -53,6 +54,7 @@ inline fun <T, /*reified*/ V1, /*reified*/ V2> remember(
  * Remember the value returned by [calculation] if [v1], [v2] and [v3] are equal to the previous
  * composition, otherwise produce and remember a new value by calling [calculation].
  */
+@OptIn(ComposeCompilerApi::class)
 @Composable
 inline fun <T, /*reified*/ V1, /*reified*/ V2, /*reified*/ V3> remember(
     v1: V1,
@@ -70,6 +72,7 @@ inline fun <T, /*reified*/ V1, /*reified*/ V2, /*reified*/ V3> remember(
  * Remember the value returned by [block] if all values of [inputs] are equal to the previous
  * composition, otherwise produce and remember a new value by calling [block].
  */
+@OptIn(ComposeCompilerApi::class)
 @Composable
 inline fun <V> remember(vararg inputs: Any?, block: () -> V): V {
     var valid = true

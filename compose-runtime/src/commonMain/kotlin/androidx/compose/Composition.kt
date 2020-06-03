@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+@file:OptIn(InternalComposeApi::class)
 package androidx.compose
 
 /**

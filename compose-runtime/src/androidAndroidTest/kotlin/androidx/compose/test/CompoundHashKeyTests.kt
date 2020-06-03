@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalComposeApi::class)
 package androidx.compose.test
 
 import androidx.compose.Composable
+import androidx.compose.ExperimentalComposeApi
 import androidx.compose.currentComposer
 import androidx.compose.invalidate
 import androidx.compose.key

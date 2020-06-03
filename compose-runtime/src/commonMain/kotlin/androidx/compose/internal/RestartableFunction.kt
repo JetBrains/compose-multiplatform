@@ -15,10 +15,12 @@
  */
 
 @file:Suppress("UNCHECKED_CAST")
-
+@file:OptIn(InternalComposeApi::class)
 package androidx.compose.internal
 
+import androidx.compose.ComposeCompilerApi
 import androidx.compose.Composer
+import androidx.compose.InternalComposeApi
 import androidx.compose.RecomposeScope
 import androidx.compose.SlotTable
 import androidx.compose.Stable
@@ -41,6 +43,7 @@ internal fun differentBits(slot: Int): Int = bitsForSlot(0b10, slot)
  * multiple levels of composable functions.
  */
 @Stable
+@ComposeCompilerApi
 class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16,
         P17, P18, R>(
             val key: Int,
@@ -1136,10 +1139,12 @@ class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13
 private fun RecomposeScope?.replacableWith(other: RecomposeScope) =
     this == null || !this.valid || this == other || this.anchor == other.anchor
 
+@ComposeCompilerApi
 private typealias RFunction = RestartableFunction<Any, Any, Any, Any, Any, Any, Any, Any, Any, Any,
         Any, Any, Any, Any, Any, Any, Any, Any, Any>
 
 @Suppress("unused")
+@ComposeCompilerApi
 fun restartableFunction(composer: Composer<*>, key: Int, tracked: Boolean, block: Any): RFunction {
     composer.startReplaceableGroup(key)
     val slot = composer.nextSlot()
@@ -1156,5 +1161,6 @@ fun restartableFunction(composer: Composer<*>, key: Int, tracked: Boolean, block
 }
 
 @Suppress("unused")
+@ComposeCompilerApi
 fun restartableFunctionInstance(key: Int, tracked: Boolean, block: Any) =
     RFunction(key, tracked).apply { update(block) }

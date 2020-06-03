@@ -26,4 +26,5 @@ package androidx.compose
 @Target(
     AnnotationTarget.FUNCTION
 )
+@ExperimentalComposeApi
 annotation class Untracked
