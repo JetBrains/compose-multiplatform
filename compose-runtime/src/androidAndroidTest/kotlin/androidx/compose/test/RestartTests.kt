@@ -19,7 +19,7 @@ package androidx.compose.test
 import android.os.Debug
 import android.widget.TextView
 import androidx.compose.Composable
-import androidx.compose.Direct
+import androidx.compose.ComposableContract
 import androidx.compose.clearRoots
 import androidx.compose.mutableStateOf
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -263,7 +263,7 @@ fun Nothing() {
 }
 
 @Composable
-@Direct
+@ComposableContract(restartable = false)
 fun DirectNothing() {
 }
 
