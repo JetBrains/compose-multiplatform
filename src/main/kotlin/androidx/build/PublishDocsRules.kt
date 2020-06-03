@@ -48,6 +48,7 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.CAMERA.group, "camera-testing")
     ignore(LibraryGroups.CAMERA.group, "camera-extensions-stub")
     ignore(LibraryGroups.CAMERA.group, "camera-testlib-extensions")
+    ignore(LibraryGroups.CAMERA.group, "camera-video")
     prebuilts(LibraryGroups.CAMERA, "camera-view", "1.0.0-alpha16")
     prebuilts(LibraryGroups.CAMERA, "camera-extensions", "1.0.0-alpha16")
             .addStubs("camera/camera-extensions-stub/camera-extensions-stub.jar")
