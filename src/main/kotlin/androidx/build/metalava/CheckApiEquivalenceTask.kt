@@ -62,41 +62,30 @@ abstract class CheckApiEquivalenceTask : DefaultTask() {
         return checkedInApiFiles + builtApiFiles
     }
 
-    @TaskAction
-    fun exec() {
-        val builtApiLocation = builtApi.get()
-        for (checkedInApi in checkedInApis.get()) {
-            checkEqual(checkedInApi.publicApiFile, builtApiLocation.publicApiFile)
-            checkEqual(checkedInApi.experimentalApiFile, builtApiLocation.experimentalApiFile)
-            checkEqual(checkedInApi.restrictedApiFile, builtApiLocation.restrictedApiFile)
+    fun summarizeDiff(a: File, b: File): String {
+        if (!a.exists()) {
+            return "$a does not exist"
         }
+        if (!b.exists()) {
+            return "$b does not exist"
+        }
+        val process = ProcessBuilder(listOf("diff", a.toString(), b.toString()))
+                .redirectOutput(ProcessBuilder.Redirect.PIPE)
+                .start()
+        process.waitFor()
+        var diffLines = process.inputStream.bufferedReader().readLines().toMutableList()
+        val maxSummaryLines = 50
+        if (diffLines.size > maxSummaryLines) {
+            diffLines = diffLines.subList(0, maxSummaryLines)
+            diffLines.plusAssign("[long diff was truncated]")
+        }
+        return diffLines.joinToString("\n")
     }
-}
 
-private fun summarizeDiff(a: File, b: File): String {
-    if (!a.exists()) {
-        return "$a does not exist"
-    }
-    if (!b.exists()) {
-        return "$b does not exist"
-    }
-    val process = ProcessBuilder(listOf("diff", a.toString(), b.toString()))
-        .redirectOutput(ProcessBuilder.Redirect.PIPE)
-        .start()
-    process.waitFor()
-    var diffLines = process.inputStream.bufferedReader().readLines().toMutableList()
-    val maxSummaryLines = 50
-    if (diffLines.size > maxSummaryLines) {
-        diffLines = diffLines.subList(0, maxSummaryLines)
-        diffLines.plusAssign("[long diff was truncated]")
-    }
-    return diffLines.joinToString("\n")
-}
-
-fun checkEqual(expected: File, actual: File) {
-    if (!FileUtils.contentEquals(expected, actual)) {
-        val diff = summarizeDiff(expected, actual)
-        val message = """API definition has changed
+    private fun checkEqual(expected: File, actual: File) {
+        if (!FileUtils.contentEquals(expected, actual)) {
+            val diff = summarizeDiff(expected, actual)
+            val message = """API definition has changed
 
                     Declared definition is $expected
                     True     definition is $actual
@@ -106,6 +95,17 @@ fun checkEqual(expected: File, actual: File) {
 
                     Difference between these files:
                     $diff"""
-        throw GradleException(message)
+            throw GradleException(message)
+        }
+    }
+
+    @TaskAction
+    fun exec() {
+        val builtApiLocation = builtApi.get()
+        for (checkedInApi in checkedInApis.get()) {
+            checkEqual(checkedInApi.publicApiFile, builtApiLocation.publicApiFile)
+            checkEqual(checkedInApi.experimentalApiFile, builtApiLocation.experimentalApiFile)
+            checkEqual(checkedInApi.restrictedApiFile, builtApiLocation.restrictedApiFile)
+        }
     }
 }
