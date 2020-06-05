@@ -75,6 +75,10 @@ suspend fun CompositionCoroutineScope.awaitDispose(onDispose: () -> Unit = {}): 
  * Launch a suspending side effect when this composition is committed and cancel it
  * when [launchInComposition] leaves the composition. [block] will run in the **apply** scope of the
  * composition's [Recomposer], which is usually your UI's main thread.
+ *
+ * [block] will be launched **once** when this call enters the composition; recomposition will not
+ * cause [block] to launch again. To re-launch a suspend function when inputs change, see the
+ * other overloads of [launchInComposition] that accept input value parameters.
  */
 @Composable
 fun launchInComposition(
