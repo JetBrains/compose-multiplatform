@@ -18,14 +18,18 @@ package androidx.compose
 
 import androidx.compose.frames.Frame
 import androidx.compose.frames.abortHandler
-import androidx.compose.frames.open
 import androidx.compose.frames.commit
 import androidx.compose.frames.commitHandler
 import androidx.compose.frames.currentFrame
-import androidx.compose.frames.suspend
-import androidx.compose.frames.restore
-import androidx.compose.frames.registerCommitObserver
 import androidx.compose.frames.inFrame
+import androidx.compose.frames.open
+import androidx.compose.frames.registerCommitObserver
+import androidx.compose.frames.restore
+import androidx.compose.frames.suspend
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
 /**
  * The frame manager manages the priority frame in the main thread.
@@ -47,13 +51,15 @@ object FrameManager {
     private var deferredMap = ObserverMap<Frame, Any>()
     private val lock = Any()
 
-    private val handler by lazy { Handler(LooperWrapper.getMainLooper()) }
+    /**
+     * TODO: This will be merged later with the scopes used by [Recomposer]
+     */
+    private val scheduleScope = CoroutineScope(mainThreadCompositionDispatcher() + SupervisorJob())
 
     fun ensureStarted() {
         if (!started) {
             started = true
-            removeCommitObserver =
-                registerCommitObserver(commitObserver)
+            removeCommitObserver = registerCommitObserver(commitObserver)
             open()
         }
     }
@@ -246,7 +252,37 @@ object FrameManager {
         )
     }
 
+    /**
+     * List of deferred callbacks to run serially. Guarded by its own monitor lock.
+     */
+    private val scheduledCallbacks = mutableListOf<() -> Unit>()
+    /**
+     * Pending [Job] that will execute [scheduledCallbacks].
+     * Guarded by [scheduledCallbacks]'s monitor lock.
+     */
+    private var callbackRunner: Job? = null
+
+    /**
+     * Synchronously executes any outstanding callbacks and brings the [FrameManager] into a
+     * consistent, updated state.
+     */
+    internal fun synchronize() {
+        synchronized(scheduledCallbacks) {
+            scheduledCallbacks.forEach { it.invoke() }
+            scheduledCallbacks.clear()
+            callbackRunner?.cancel()
+            callbackRunner = null
+        }
+    }
+
     private fun schedule(block: () -> Unit) {
-        handler.postAtFrontOfQueue(block)
+        synchronized(scheduledCallbacks) {
+            scheduledCallbacks.add(block)
+            if (callbackRunner == null) {
+                callbackRunner = scheduleScope.launch {
+                    synchronize()
+                }
+            }
+        }
     }
 }

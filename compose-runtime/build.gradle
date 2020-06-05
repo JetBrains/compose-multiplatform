@@ -49,6 +49,8 @@ kotlin {
             dependencies {
                 api(KOTLIN_COROUTINES_ANDROID)
                 api "androidx.annotation:annotation:1.1.0"
+
+                implementation("androidx.core:core-ktx:1.1.0")
             }
             dependsOn jvmMain
         }
