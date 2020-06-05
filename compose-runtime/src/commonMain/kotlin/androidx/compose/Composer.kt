@@ -538,6 +538,7 @@ open class Composer<N>(
             parentProvider = parentRef.getAmbientScope()
             providersInvalidStack.push(providersInvalid.asInt())
             providersInvalid = changed(parentProvider)
+            startGroup(parentRef.compoundHashKey)
         }
     }
 
@@ -546,6 +547,9 @@ open class Composer<N>(
      * the composition.
      */
     fun endRoot() {
+        if (parentReference != null) {
+            endGroup()
+        }
         endGroup()
         recordEndRoot()
         finalizeCompose()
@@ -1074,7 +1078,7 @@ open class Composer<N>(
         if (ref == null || !inserting) {
             val scope = invalidateStack.peek()
             scope.used = true
-            ref = CompositionReferenceImpl(scope)
+            ref = CompositionReferenceImpl(scope, currentCompoundKeyHash)
             updateValue(ref)
         }
         endGroup()
@@ -2096,7 +2100,10 @@ open class Composer<N>(
         }
     }
 
-    private inner class CompositionReferenceImpl(val scope: RecomposeScope) : CompositionReference,
+    private inner class CompositionReferenceImpl(
+        val scope: RecomposeScope,
+        override val compoundHashKey: Int
+    ) : CompositionReference,
         CompositionLifecycleObserver {
 
         val composers = mutableSetOf<Composer<*>>()

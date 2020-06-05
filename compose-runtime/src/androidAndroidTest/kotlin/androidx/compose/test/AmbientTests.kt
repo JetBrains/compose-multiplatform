@@ -504,22 +504,6 @@ class AmbientTests : BaseComposeTest() {
         }
     }
 
-    @Composable
-    fun subCompose(block: @Composable () -> Unit) {
-        val container =
-            remember { escapeCompose { LayoutNode() } }
-        val reference = compositionReference()
-        // TODO(b/150390669): Review use of @Untracked
-        subcomposeInto(
-            activityRule.activity,
-            container,
-            Recomposer.current(),
-            reference
-        ) @Untracked {
-            block()
-        }
-    }
-
     class Ref<T : Any> {
         lateinit var value: T
     }

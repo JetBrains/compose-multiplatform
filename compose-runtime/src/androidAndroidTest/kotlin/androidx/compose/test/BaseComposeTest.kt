@@ -30,7 +30,14 @@ import androidx.compose.Composable
 import androidx.compose.Composition
 import androidx.compose.FrameManager
 import androidx.compose.Looper
+import androidx.compose.Recomposer
+import androidx.compose.Untracked
+import androidx.compose.compositionReference
+import androidx.compose.escapeCompose
+import androidx.compose.remember
+import androidx.ui.core.LayoutNode
 import androidx.ui.core.setViewContent
+import androidx.ui.core.subcomposeInto
 
 class TestActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -119,6 +126,22 @@ abstract class BaseComposeTest {
         activity,
         composable
     )
+
+    @Composable
+    fun subCompose(block: @Composable () -> Unit) {
+        val container =
+            remember { escapeCompose { LayoutNode() } }
+        val reference = compositionReference()
+        // TODO(b/150390669): Review use of @Untracked
+        subcomposeInto(
+            activityRule.activity,
+            container,
+            Recomposer.current(),
+            reference
+        ) @Untracked {
+            block()
+        }
+    }
 }
 
 sealed class ComposeTester(val activity: Activity, val composable: @Composable () -> Unit) {
