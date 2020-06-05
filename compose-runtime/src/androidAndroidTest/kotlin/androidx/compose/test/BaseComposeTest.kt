@@ -30,7 +30,6 @@ import androidx.compose.Composable
 import androidx.compose.Composition
 import androidx.compose.FrameManager
 import androidx.compose.Looper
-import androidx.test.rule.ActivityTestRule
 import androidx.ui.core.setViewContent
 
 class TestActivity : Activity() {
@@ -41,7 +40,8 @@ class TestActivity : Activity() {
         })
     }
 }
-fun makeTestActivityRule() = ActivityTestRule(TestActivity::class.java)
+@Suppress("DEPRECATION")
+fun makeTestActivityRule() = androidx.test.rule.ActivityTestRule(TestActivity::class.java)
 
 private val ROOT_ID = 18284847
 
@@ -101,7 +101,8 @@ internal fun Activity.waitForAFrame() {
 
 abstract class BaseComposeTest {
 
-    abstract val activityRule: ActivityTestRule<TestActivity>
+    @Suppress("DEPRECATION")
+    abstract val activityRule: androidx.test.rule.ActivityTestRule<TestActivity>
 
     val activity get() = activityRule.activity
 

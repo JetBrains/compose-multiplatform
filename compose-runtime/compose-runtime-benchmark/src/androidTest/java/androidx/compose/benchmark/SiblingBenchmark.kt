@@ -24,7 +24,6 @@ import androidx.compose.benchmark.siblings.update
 import androidx.compose.mutableStateOf
 import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.LargeTest
-import androidx.test.rule.ActivityTestRule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -98,7 +97,8 @@ class SiblingBenchmark(
 }
 
 // NOTE: remove when SAM conversion works in IR
-fun ActivityTestRule<ComposeActivity>.runUiRunnable(block: () -> Unit) {
+@Suppress("DEPRECATION")
+fun androidx.test.rule.ActivityTestRule<ComposeActivity>.runUiRunnable(block: () -> Unit) {
     runOnUiThread(object : Runnable {
         override fun run() {
             block()

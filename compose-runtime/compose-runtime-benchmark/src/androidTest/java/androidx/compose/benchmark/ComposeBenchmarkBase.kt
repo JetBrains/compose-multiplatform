@@ -28,7 +28,6 @@ import androidx.compose.Composition
 import androidx.compose.FrameManager
 import androidx.compose.Recomposer
 import androidx.compose.currentComposer
-import androidx.test.rule.ActivityTestRule
 import androidx.ui.core.AndroidOwner
 import androidx.ui.core.setContent
 import org.junit.Assert.assertTrue
@@ -38,8 +37,9 @@ abstract class ComposeBenchmarkBase {
     @get:Rule
     val benchmarkRule = BenchmarkRule()
 
+    @Suppress("DEPRECATION")
     @get:Rule
-    val activityRule = ActivityTestRule(ComposeActivity::class.java)
+    val activityRule = androidx.test.rule.ActivityTestRule(ComposeActivity::class.java)
 
     fun measureCompose(block: @Composable () -> Unit) {
         val activity = activityRule.activity
