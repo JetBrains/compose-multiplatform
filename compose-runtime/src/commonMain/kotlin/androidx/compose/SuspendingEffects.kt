@@ -41,7 +41,7 @@ private class SuspendingEffect(
 
 /**
  * A [CoroutineScope] used for launching [side effects][launchInComposition] of a composition
- * that also permits [awaiting][CompositionFrameClock.awaitFrameNanos] the next presentation
+ * that also permits [awaiting][CompositionFrameClock.withFrameNanos] the next presentation
  * frame of the composition. This can be useful for performing the next action of an animation
  * while the effect is still present in the composition.
  */
@@ -55,7 +55,7 @@ abstract class CompositionCoroutineScope : CoroutineScope, CompositionFrameClock
         replaceWith = ReplaceWith("awaitFrameNanos()", "androidx.compose.awaitFrameNanos"),
         level = DeprecationLevel.ERROR
     )
-    suspend fun awaitFrame(): Long = awaitFrameNanos()
+    suspend fun awaitFrame(): Long = withFrameNanos { it }
 }
 
 /**

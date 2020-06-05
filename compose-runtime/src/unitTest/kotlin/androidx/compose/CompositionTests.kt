@@ -2351,7 +2351,7 @@ private fun compose(
 
         val scope = CoroutineScope(Job())
         val clock = object : CompositionFrameClock {
-            override suspend fun <R> awaitFrameNanos(onFrame: (Long) -> R): R {
+            override suspend fun <R> withFrameNanos(onFrame: (Long) -> R): R {
                 // The original version of this test used a mock Recomposer
                 // that never successfully scheduled a frame.
                 suspendCancellableCoroutine<Unit> {}

@@ -56,7 +56,7 @@ internal class BroadcastFrameClock(
         }
     }
 
-    override suspend fun <R> awaitFrameNanos(
+    override suspend fun <R> withFrameNanos(
         onFrame: (Long) -> R
     ): R = suspendCancellableCoroutine { co ->
         val awaiter = FrameAwaiter(onFrame, co)

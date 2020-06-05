@@ -70,7 +70,7 @@ private val MainAndroidUiDispatcher by lazy {
 }
 
 private object MainDispatcherCompositionFrameClock : CompositionFrameClock {
-    override suspend fun <R> awaitFrameNanos(onFrame: (frameTimeNanos: Long) -> R): R =
+    override suspend fun <R> withFrameNanos(onFrame: (frameTimeNanos: Long) -> R): R =
         withContext(Dispatchers.Main) {
             onFrame(System.nanoTime())
         }

@@ -27,8 +27,8 @@ package androidx.compose {
 
   public final class AndroidUiCompositionFrameClock implements androidx.compose.CompositionFrameClock {
     ctor public AndroidUiCompositionFrameClock(android.view.Choreographer choreographer);
-    method public suspend <R> Object? awaitFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
     method public android.view.Choreographer getChoreographer();
+    method public suspend <R> Object? withFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
   }
 
   public final class AndroidUiDispatcher extends kotlinx.coroutines.CoroutineDispatcher {
@@ -203,13 +203,15 @@ package androidx.compose {
   }
 
   public interface CompositionFrameClock {
-    method public suspend <R> Object? awaitFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
+    method @Deprecated public default suspend <R> Object? awaitFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
+    method public suspend <R> Object? withFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
   }
 
   public final class CompositionFrameClockKt {
-    method public static suspend inline <R> Object? awaitFrameMillis(androidx.compose.CompositionFrameClock, kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
-    method public static suspend Object? awaitFrameMillis(androidx.compose.CompositionFrameClock, kotlin.coroutines.Continuation<? super java.lang.Long> p);
-    method public static suspend Object? awaitFrameNanos(androidx.compose.CompositionFrameClock, kotlin.coroutines.Continuation<? super java.lang.Long> p);
+    method @Deprecated public static suspend inline <R> Object? awaitFrameMillis(androidx.compose.CompositionFrameClock, kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
+    method @Deprecated public static suspend Object? awaitFrameMillis(androidx.compose.CompositionFrameClock, kotlin.coroutines.Continuation<? super java.lang.Long> p);
+    method @Deprecated public static suspend Object? awaitFrameNanos(androidx.compose.CompositionFrameClock, kotlin.coroutines.Continuation<? super java.lang.Long> p);
+    method public static suspend inline <R> Object? withFrameMillis(androidx.compose.CompositionFrameClock, kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
   }
 
   public final class CompositionKt {
