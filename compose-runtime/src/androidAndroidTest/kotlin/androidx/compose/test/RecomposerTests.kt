@@ -21,11 +21,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.compose.Composable
-import androidx.compose.Recomposer
-import androidx.compose.Untracked
 import androidx.compose.clearRoots
-import androidx.compose.compositionReference
-import androidx.compose.escapeCompose
 import androidx.compose.frames.currentFrame
 import androidx.compose.getValue
 import androidx.compose.invalidate
@@ -35,8 +31,6 @@ import androidx.compose.remember
 import androidx.compose.setValue
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import androidx.ui.core.LayoutNode
-import androidx.ui.core.subcomposeInto
 import androidx.ui.node.UiComposer
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
@@ -437,22 +431,6 @@ class RecomposerTests : BaseComposeTest() {
             frameId = currentFrame().id
         }.then {
             assertNotSame(frameId, currentFrame().id)
-        }
-    }
-
-    @Composable
-    fun subCompose(block: @Composable () -> Unit) {
-        val container =
-            remember { escapeCompose { LayoutNode() } }
-        val reference = compositionReference()
-        // TODO(b/150390669): Review use of @Untracked
-        subcomposeInto(
-            activityRule.activity,
-            container,
-            Recomposer.current(),
-            reference
-        ) @Untracked {
-            block()
         }
     }
 }

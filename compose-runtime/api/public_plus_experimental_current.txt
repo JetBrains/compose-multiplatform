@@ -200,8 +200,10 @@ package androidx.compose {
   public interface CompositionReference {
     method public <T> T! getAmbient(androidx.compose.Ambient<T> key);
     method public androidx.compose.BuildableMap<androidx.compose.Ambient<java.lang.Object>,androidx.compose.State<java.lang.Object>> getAmbientScope();
+    method public int getCompoundHashKey();
     method public void invalidate();
     method public <N> void registerComposer(androidx.compose.Composer<N> composer);
+    property public abstract int compoundHashKey;
   }
 
   @Deprecated @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.FUNCTION) public @interface Direct {

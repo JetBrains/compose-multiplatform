@@ -26,6 +26,7 @@ package androidx.compose
  * @see compositionReference
  */
 interface CompositionReference {
+    val compoundHashKey: Int
     fun <T> getAmbient(key: Ambient<T>): T
     fun invalidate()
     fun <N> registerComposer(composer: Composer<N>)
