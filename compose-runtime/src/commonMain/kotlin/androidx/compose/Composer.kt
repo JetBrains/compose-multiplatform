@@ -356,7 +356,7 @@ open class Composer<N>(
     private var collectKeySources = false
 
     private var nodeExpected = false
-    private var invalidations: MutableList<Invalidation> = mutableListOf()
+    private val invalidations: MutableList<Invalidation> = mutableListOf()
     private val entersStack = IntStack()
     private var parentProvider: AmbientMap = buildableMapOf()
     private val providerUpdates = HashMap<Group, AmbientMap>()
