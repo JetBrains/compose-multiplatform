@@ -20,6 +20,7 @@ import android.widget.TextView
 import androidx.compose.Ambient
 import androidx.compose.Composable
 import androidx.compose.CompositionReference
+import androidx.compose.ExperimentalComposeApi
 import androidx.compose.Providers
 import androidx.compose.Recomposer
 import androidx.compose.StructurallyEqual
@@ -514,6 +515,7 @@ class AmbientTests : BaseComposeTest() {
         val ref = Ref<CompositionReference>()
         narrowInvalidateForReference(ref = ref)
         return {
+            @OptIn(ExperimentalComposeApi::class)
             // TODO(b/150390669): Review use of @Untracked
             subcomposeInto(
                 activityRule.activity,

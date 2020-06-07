@@ -18,4 +18,5 @@ package androidx.compose
 
 internal expect fun recordSourceKeyInfo(key: Any)
 
+@InternalComposeApi
 expect fun keySourceInfoOf(key: Any): String?

@@ -19,6 +19,7 @@ package androidx.compose
 /**
  * An adapter that performs tree based operations on some tree startNode N without requiring a specific base type for N
  */
+@ExperimentalComposeApi
 interface ApplyAdapter<N> {
     fun N.start(instance: N)
     fun N.insertAt(index: Int, instance: N)
@@ -30,6 +31,7 @@ interface ApplyAdapter<N> {
 /**
  * A helper class to apply changes to a tree with startNode types N given an apply adapter for type N
  */
+@ExperimentalComposeApi
 class Applier<N>(root: N, private val adapter: ApplyAdapter<N>) {
     private val stack = Stack<N>()
     private var _current: N = root

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+@file:OptIn(ComposeCompilerApi::class, ExperimentalComposeApi::class)
 package androidx.compose.test
 
 import android.app.Activity
@@ -23,9 +23,11 @@ import android.view.ViewGroup
 import androidx.compose.Applier
 import androidx.compose.ApplyAdapter
 import androidx.compose.Composable
+import androidx.compose.ComposeCompilerApi
 import androidx.compose.Composer
 import androidx.compose.ComposerUpdater
 import androidx.compose.Composition
+import androidx.compose.ExperimentalComposeApi
 import androidx.compose.FrameManager
 import androidx.compose.Recomposer
 import androidx.compose.SlotTable

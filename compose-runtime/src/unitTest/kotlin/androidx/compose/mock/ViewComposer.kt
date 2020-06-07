@@ -19,8 +19,11 @@ package androidx.compose.mock
 import androidx.compose.Applier
 import androidx.compose.ApplyAdapter
 import androidx.compose.Composable
+import androidx.compose.ComposeCompilerApi
 import androidx.compose.Composer
 import androidx.compose.ComposerUpdater
+import androidx.compose.ExperimentalComposeApi
+import androidx.compose.InternalComposeApi
 import androidx.compose.Recomposer
 import androidx.compose.SlotTable
 import androidx.compose.Stable
@@ -28,6 +31,7 @@ import androidx.compose.currentComposer
 import androidx.compose.invokeComposable
 
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
+@OptIn(ExperimentalComposeApi::class)
 object ViewApplierAdapter :
     ApplyAdapter<View> {
     override fun View.start(instance: View) {}
@@ -44,6 +48,7 @@ interface MockComposeScope {
     val composer: MockViewComposer
 }
 
+@OptIn(InternalComposeApi::class, ExperimentalComposeApi::class, ComposeCompilerApi::class)
 class MockViewComposer(
     val root: View,
     recomposer: Recomposer
@@ -90,6 +95,7 @@ class MockViewComposer(
 }
 
 @Suppress("UNCHECKED_CAST")
+@OptIn(ComposeCompilerApi::class)
 @Composable
 fun <P1> MockComposeScope.memoize(
     key: Int,

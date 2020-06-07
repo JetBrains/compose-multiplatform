@@ -28,6 +28,7 @@ import androidx.compose.Choreographer
 import androidx.compose.ChoreographerFrameCallback
 import androidx.compose.Composable
 import androidx.compose.Composition
+import androidx.compose.ExperimentalComposeApi
 import androidx.compose.FrameManager
 import androidx.compose.Looper
 import androidx.compose.Recomposer
@@ -133,6 +134,7 @@ abstract class BaseComposeTest {
             remember { escapeCompose { LayoutNode() } }
         val reference = compositionReference()
         // TODO(b/150390669): Review use of @Untracked
+        @OptIn(ExperimentalComposeApi::class)
         subcomposeInto(
             activityRule.activity,
             container,

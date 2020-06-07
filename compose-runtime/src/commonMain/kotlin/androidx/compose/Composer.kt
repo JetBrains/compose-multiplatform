@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
+@file:OptIn(
+    InternalComposeApi::class,
+    ExperimentalComposeApi::class,
+    ComposeCompilerApi::class
+)
 package androidx.compose
 
 import androidx.compose.SlotTable.Companion.EMPTY
@@ -187,6 +192,7 @@ private class Invalidation(
     var location: Int
 )
 
+@ComposeCompilerApi
 interface ScopeUpdateScope {
     fun updateScope(block: (Composer<*>, Int, Int) -> Unit)
 }
@@ -316,6 +322,9 @@ private fun ambientMapOf(values: Array<out ProvidedValue<*>>): AmbientMap {
     }
 }
 
+@Deprecated(
+    "This interfce is only left here for backwards compatibility with the Compose IDE Plugin"
+)
 interface ComposerValidator {
     fun changed(value: Int): Boolean
     fun <T> changed(value: T): Boolean
@@ -339,6 +348,7 @@ open class Composer<N>(
     /**
      * Manager for scheduling recompositions.
      */
+    @ExperimentalComposeApi
     val recomposer: Recomposer
 ) {
     private val changes = mutableListOf<Change<N>>()
@@ -422,6 +432,7 @@ open class Composer<N>(
      * @see [startMovableGroup]
      * @see [startRestartGroup]
      */
+    @ComposeCompilerApi
     fun startReplaceableGroup(key: Int) = start(key, null, false, null)
 
     /**
@@ -436,6 +447,7 @@ open class Composer<N>(
      *
      * @see [startReplaceableGroup]
      */
+    @ComposeCompilerApi
     fun endReplaceableGroup() = endGroup()
 
     /**
@@ -444,6 +456,7 @@ open class Composer<N>(
      * directly from source code. Call this API at your own risk.
      *
      */
+    @ComposeCompilerApi
     fun startDefaults() = start(0, null, false, null)
 
     /**
@@ -453,6 +466,7 @@ open class Composer<N>(
      *
      * @see [startReplaceableGroup]
      */
+    @ComposeCompilerApi
     fun endDefaults() {
         endGroup()
         val scope = currentRecomposeScope
@@ -461,6 +475,7 @@ open class Composer<N>(
         }
     }
 
+    @ComposeCompilerApi
     val defaultsInvalid: Boolean
         get() {
             return providersInvalid || currentRecomposeScope?.defaultsInvalid == true
@@ -493,6 +508,7 @@ open class Composer<N>(
      * @see [startReplaceableGroup]
      * @see [startRestartGroup]
      */
+    @ComposeCompilerApi
     fun startMovableGroup(key: Int, dataKey: Any?) = start(key, dataKey, false, null)
 
     /**
@@ -510,9 +526,10 @@ open class Composer<N>(
      *
      * @see [startMovableGroup]
      */
+    @ComposeCompilerApi
     fun endMovableGroup() = endGroup()
 
-    @Suppress("UNUSED_PARAMETER", "DeprecatedCallableAddReplaceWith")
+    @Suppress("UNUSED_PARAMETER", "DeprecatedCallableAddReplaceWith", "DEPRECATION")
     @Deprecated(
         "This method is only left here for backwards compatibility with the Compose IDE Plugin"
     )
@@ -531,7 +548,7 @@ open class Composer<N>(
      * Start the composition. This should be called, and only be called, as the first group in
      * the composition.
      */
-    fun startRoot() {
+    internal fun startRoot() {
         reader = slotTable.openReader()
         startGroup(rootKey)
         parentReference?.let { parentRef ->
@@ -546,7 +563,7 @@ open class Composer<N>(
      * End the composition. This should be called, and only be called, to end the first group in
      * the composition.
      */
-    fun endRoot() {
+    internal fun endRoot() {
         if (parentReference != null) {
             endGroup()
         }
@@ -559,7 +576,7 @@ open class Composer<N>(
     /**
      * Discard a pending composition because an error was encountered during composition
      */
-    fun abortRoot() {
+    internal fun abortRoot() {
         cleanUpCompose()
         pendingStack.clear()
         nodeIndexStack.clear()
@@ -577,12 +594,14 @@ open class Composer<N>(
      * first composition this is always true. During recomposition this is true when new nodes
      * are being scheduled to be added to the tree.
      */
+    @ComposeCompilerApi
     var inserting: Boolean = false
         private set
 
     /**
      * True if the composition should be checking if the composable functions can be skipped.
      */
+    @ComposeCompilerApi
     val skipping: Boolean get() {
         return !inserting &&
                 !providersInvalid &&
@@ -593,6 +612,7 @@ open class Composer<N>(
      * Returns the hash of the compound key calculated as a combination of the keys of all the
      * currently started groups via [startGroup].
      */
+    @ExperimentalComposeApi
     var currentCompoundKeyHash: Int = 0
         private set
 
@@ -600,6 +620,7 @@ open class Composer<N>(
      * Start collecting key source information. This enables enables the tool API to be able to
      * determine the source location of where groups and nodes are created.
      */
+    @InternalComposeApi
     fun collectKeySourceInformation() {
         collectKeySources = true
     }
@@ -607,6 +628,7 @@ open class Composer<N>(
     /**
      * Apply the changes to the tree that were collected during the last composition.
      */
+    @InternalComposeApi
     fun applyChanges() {
         trace("Compose:applyChanges") {
             invalidateStack.clear()
@@ -685,14 +707,14 @@ open class Composer<N>(
      *
      *  @param key The key for the group
      */
-    fun startGroup(key: Int) = start(key, null, false, null)
+    internal fun startGroup(key: Int) = start(key, null, false, null)
 
-    fun startGroup(key: Int, dataKey: Any?) = start(key, dataKey, false, null)
+    internal fun startGroup(key: Int, dataKey: Any?) = start(key, dataKey, false, null)
 
     /**
      * End the current group.
      */
-    fun endGroup() = end(false)
+    internal fun endGroup() = end(false)
 
     private fun skipGroup() {
         groupNodeCount += reader.skipGroup()
@@ -707,12 +729,14 @@ open class Composer<N>(
      *
      * @param key the key for the node.
      */
+    @ComposeCompilerApi
     fun startNode(key: Any) {
         start(nodeKey, key, true, null)
         nodeExpected = true
     }
 
     // Deprecated
+    @ComposeCompilerApi
     fun <T : N> emitNode(factory: () -> T) {
         validateNodeExpected()
         if (inserting) {
@@ -736,6 +760,7 @@ open class Composer<N>(
      * call when the composer is inserting.
      */
     @Suppress("UNUSED")
+    @ComposeCompilerApi
     fun <T : N> createNode(factory: () -> T) {
         validateNodeExpected()
         require(inserting) { "createNode() can only be called when inserting" }
@@ -756,6 +781,7 @@ open class Composer<N>(
      * Schedule the given node to be inserted. This is only valid to call when the composer is
      * inserting.
      */
+    @ComposeCompilerApi
     fun emitNode(node: N) {
         validateNodeExpected()
         require(inserting) { "emitNode() called when not inserting" }
@@ -774,6 +800,7 @@ open class Composer<N>(
      * valid to call when the composition is not inserting. This must be called at the same
      * location as [emitNode] or [createNode] as called even if the value is unused.
      */
+    @ComposeCompilerApi
     fun useNode(): N {
         validateNodeExpected()
         require(!inserting) { "useNode() called while inserting" }
@@ -785,6 +812,7 @@ open class Composer<N>(
     /**
      * Called to end the node group.
      */
+    @ComposeCompilerApi
     fun endNode() = end(true)
 
     /**
@@ -792,7 +820,7 @@ open class Composer<N>(
      * node that is the current node in the tree which was either created by [createNode],
      * emitted by [emitNode] or returned by [useNode].
      */
-    fun <V, T> apply(value: V, block: T.(V) -> Unit) {
+    internal fun <V, T> apply(value: V, block: T.(V) -> Unit) {
         recordApplierOperation { applier, _, _ ->
             @Suppress("UNCHECKED_CAST")
             (applier.current as T).block(value)
@@ -803,12 +831,14 @@ open class Composer<N>(
      * Create a composed key that can be used in calls to [startGroup] or [startNode]. This will
      * use the key stored at the current location in the slot table to avoid allocating a new key.
      */
+    @ComposeCompilerApi
     fun joinKey(left: Any?, right: Any?): Any =
         getKey(reader.groupDataKey, left, right) ?: JoinedKey(left, right)
 
     /**
      * Return the next value in the slot table and advance the current location.
      */
+    @ComposeCompilerApi
     fun nextSlot(): Any? = if (inserting) {
         validateNodeNotExpected()
         EMPTY
@@ -822,6 +852,7 @@ open class Composer<N>(
      *
      * @param value the value to be compared.
      */
+    @ComposeCompilerApi
     fun changed(value: Any?): Boolean {
         return if (nextSlot() != value) {
             updateValue(value)
@@ -831,6 +862,7 @@ open class Composer<N>(
         }
     }
 
+    @ComposeCompilerApi
     fun changed(value: Char): Boolean {
         val next = nextSlot()
         if (next is Char) {
@@ -841,6 +873,7 @@ open class Composer<N>(
         return true
     }
 
+    @ComposeCompilerApi
     fun changed(value: Byte): Boolean {
         val next = nextSlot()
         if (next is Byte) {
@@ -851,6 +884,7 @@ open class Composer<N>(
         return true
     }
 
+    @ComposeCompilerApi
     fun changed(value: Short): Boolean {
         val next = nextSlot()
         if (next is Short) {
@@ -861,6 +895,7 @@ open class Composer<N>(
         return true
     }
 
+    @ComposeCompilerApi
     fun changed(value: Boolean): Boolean {
         val next = nextSlot()
         if (next is Boolean) {
@@ -871,6 +906,7 @@ open class Composer<N>(
         return true
     }
 
+    @ComposeCompilerApi
     fun changed(value: Float): Boolean {
         val next = nextSlot()
         if (next is Float) {
@@ -881,6 +917,7 @@ open class Composer<N>(
         return true
     }
 
+    @ComposeCompilerApi
     fun changed(value: Long): Boolean {
         val next = nextSlot()
         if (next is Long) {
@@ -891,6 +928,7 @@ open class Composer<N>(
         return true
     }
 
+    @ComposeCompilerApi
     fun changed(value: Double): Boolean {
         val next = nextSlot()
         if (next is Double) {
@@ -901,6 +939,7 @@ open class Composer<N>(
         return true
     }
 
+    @ComposeCompilerApi
     fun changed(value: Int): Boolean {
         val next = nextSlot()
         if (next is Int) {
@@ -916,7 +955,8 @@ open class Composer<N>(
      *
      * @param value the value to schedule to be written to the slot table.
      */
-    fun updateValue(value: Any?) {
+    @PublishedApi
+    internal fun updateValue(value: Any?) {
         if (inserting) {
             writer.update(value)
             if (value is CompositionLifecycleObserver) {
@@ -1071,7 +1111,7 @@ open class Composer<N>(
     /**
      * Create or use a memoized `CompositionReference` instance at this position in the slot table.
      */
-    fun buildReference(): CompositionReference {
+    internal fun buildReference(): CompositionReference {
         startGroup(referenceKey, reference)
 
         var ref = nextSlot() as? CompositionReference
@@ -1109,7 +1149,7 @@ open class Composer<N>(
      * Slot table movement (skipping groups and nodes) will be coalesced so this number is
      * possibly less than the total changes detected.
      */
-    val changeCount get() = changes.size
+    internal val changeCount get() = changes.size
 
     internal val currentRecomposeScope: RecomposeScope?
         get() =
@@ -1647,6 +1687,7 @@ open class Composer<N>(
      * Skip a group. Skips the group at the current location. This is only valid to call if the
      * composition is not inserting.
      */
+    @ComposeCompilerApi
     fun skipCurrentGroup() {
         if (invalidations.isEmpty()) {
             skipGroup()
@@ -1670,6 +1711,7 @@ open class Composer<N>(
     /**
      * Skip to the end of the group opened by [startGroup].
      */
+    @ComposeCompilerApi
     fun skipToGroupEnd() {
         require(groupNodeCount == 0) { "No nodes can be emitted before calling skipAndEndGroup" }
         if (invalidations.isEmpty()) {
@@ -1685,6 +1727,7 @@ open class Composer<N>(
      * will be recomposed. A recompose scope can be invalidated by calling the lambda returned by
      * [androidx.compose.invalidate].
      */
+    @ComposeCompilerApi
     fun startRestartGroup(key: Int) {
         start(key, null, false, null)
         if (inserting) {
@@ -1705,6 +1748,7 @@ open class Composer<N>(
      * composition as was produced by this group (including calling [startRestartGroup] and
      * [endRestartGroup]).
      */
+    @ComposeCompilerApi
     fun endRestartGroup(): ScopeUpdateScope? {
         // This allows for the invalidate stack to be out of sync since this might be called during exception stack
         // unwinding that might have not called the doneJoin/endRestartGroup in the wrong order.
@@ -1731,6 +1775,7 @@ open class Composer<N>(
      * Synchronously recompose all invalidated groups. This collects the changes which must be
      * applied by [applyChanges] to have an effect.
      */
+    @InternalComposeApi
     fun recompose(): Boolean {
         if (invalidations.isNotEmpty()) {
             trace("Compose:recompose") {
@@ -2227,7 +2272,8 @@ open class Composer<N>(
  * value is obtained from the slot table and [block] is not invoked. If [valid] is false a new
  * value is produced by calling [block] and the slot table is updated to contain the new value.
  */
-inline fun <N, T> Composer<N>.cache(valid: Boolean = true, block: () -> T): T {
+@PublishedApi
+internal inline fun <N, T> Composer<N>.cache(valid: Boolean = true, block: () -> T): T {
     var result = nextSlot()
     if (result === EMPTY || !valid) {
         val value = block()

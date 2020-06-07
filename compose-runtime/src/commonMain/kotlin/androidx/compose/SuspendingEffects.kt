@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+// TODO(b/158105080): make part of ComposeRuntime
+@file:OptIn(InternalComposeApi::class)
 package androidx.compose
 
 import kotlinx.coroutines.CoroutineScope
@@ -80,6 +82,7 @@ suspend fun CompositionCoroutineScope.awaitDispose(onDispose: () -> Unit = {}): 
 fun launchInComposition(
     block: suspend CompositionCoroutineScope.() -> Unit
 ) {
+    @OptIn(ExperimentalComposeApi::class)
     val recomposer = currentComposer.recomposer
     remember { SuspendingEffect(recomposer, block) }
 }
@@ -95,6 +98,7 @@ fun launchInComposition(
     v1: Any?,
     block: suspend CompositionCoroutineScope.() -> Unit
 ) {
+    @OptIn(ExperimentalComposeApi::class)
     val recomposer = currentComposer.recomposer
     remember(v1) { SuspendingEffect(recomposer, block) }
 }
@@ -112,6 +116,7 @@ fun launchInComposition(
     v2: Any?,
     block: suspend CompositionCoroutineScope.() -> Unit
 ) {
+    @OptIn(ExperimentalComposeApi::class)
     val recomposer = currentComposer.recomposer
     remember(v1, v2) { SuspendingEffect(recomposer, block) }
 }
@@ -130,6 +135,7 @@ fun launchInComposition(
     v3: Any?,
     block: suspend CompositionCoroutineScope.() -> Unit
 ) {
+    @OptIn(ExperimentalComposeApi::class)
     val recomposer = currentComposer.recomposer
     remember(v1, v2, v3) { SuspendingEffect(recomposer, block) }
 }
@@ -146,6 +152,7 @@ fun launchInComposition(
     vararg keys: Any?,
     block: suspend CompositionCoroutineScope.() -> Unit
 ) {
+    @OptIn(ExperimentalComposeApi::class)
     val recomposer = currentComposer.recomposer
     remember(*keys) { SuspendingEffect(recomposer, block) }
 }

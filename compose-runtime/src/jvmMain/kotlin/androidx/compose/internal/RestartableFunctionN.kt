@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
+@file:OptIn(InternalComposeApi::class)
 package androidx.compose.internal
 
+import androidx.compose.ComposeCompilerApi
 import androidx.compose.Composer
 import androidx.compose.FrameManager
+import androidx.compose.InternalComposeApi
 import androidx.compose.SlotTable
 import androidx.compose.Stable
 import kotlin.jvm.functions.FunctionN
@@ -25,6 +28,7 @@ import kotlin.jvm.functions.FunctionN
 private const val SLOTS_PER_INT = 15
 
 @Stable
+@ComposeCompilerApi
 class RestartableFunctionN<R>(
     val key: Int,
     private val tracked: Boolean,
@@ -88,6 +92,7 @@ class RestartableFunctionN<R>(
 }
 
 @Suppress("unused")
+@ComposeCompilerApi
 fun restartableFunctionN(
     composer: Composer<*>,
     key: Int,
@@ -111,6 +116,7 @@ fun restartableFunctionN(
 }
 
 @Suppress("unused")
+@ComposeCompilerApi
 fun restartableFunctionNInstance(
     key: Int,
     tracked: Boolean,
