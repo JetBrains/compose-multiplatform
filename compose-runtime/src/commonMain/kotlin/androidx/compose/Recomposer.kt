@@ -169,7 +169,7 @@ class Recomposer {
                 // Align work with the next frame to coalesce changes.
                 // Note: it is possible to resume from the above with no recompositions pending,
                 // instead someone might be awaiting our frame clock dispatch below.
-                frameClock.awaitFrameNanos { frameTime ->
+                frameClock.withFrameNanos { frameTime ->
                     trace("recomposeFrame") {
                         // Propagate the frame time to anyone who is awaiting from the
                         // recomposer clock.

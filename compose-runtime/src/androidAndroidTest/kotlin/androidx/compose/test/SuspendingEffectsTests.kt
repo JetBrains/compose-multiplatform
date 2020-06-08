@@ -77,7 +77,7 @@ class SuspendingEffectsTests : BaseComposeTest() {
         var awaitFrameTime by mutableStateOf(Long.MAX_VALUE)
         compose {
             launchInComposition {
-                awaitFrameNanos {
+                withFrameNanos {
                     awaitFrameTime = it
                 }
             }
