@@ -128,7 +128,7 @@ internal actual fun recordSourceKeyInfo(key: Any) {
 actual fun keySourceInfoOf(key: Any): String? = keyInfo[key]
 
 private object MainCompositionFrameClock : CompositionFrameClock {
-    override suspend fun <R> awaitFrameNanos(onFrame: (frameTimeNanos: Long) -> R): R =
+    override suspend fun <R> withFrameNanos(onFrame: (frameTimeNanos: Long) -> R): R =
         withContext(Dispatchers.Main) {
             onFrame(java.lang.System.nanoTime())
         }
