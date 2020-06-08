@@ -62,7 +62,7 @@ class Recomposer {
     /**
      * Track if any outstanding invalidated composers are awaiting recomposition.
      * This latch is closed any time we resume invalidComposersAwaiter and opened
-     * by [recomposeAndApplyChanges] when it suspends for no further work to do.
+     * by [recomposeAndApplyChanges] when it suspends when it has no further work to do.
      */
     private val idlingLatch = Latch()
 
