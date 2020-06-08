@@ -63,6 +63,10 @@ const val JAVAPOET = "com.squareup:javapoet:1.12.1"
 const val JSR250 = "javax.annotation:javax.annotation-api:1.2"
 const val JUNIT = "junit:junit:4.12"
 const val KOTLINPOET = "com.squareup:kotlinpoet:1.4.0"
+const val KOTLINPOET_METADATA = "com.squareup:kotlinpoet-metadata:1.4.0"
+const val KOTLINPOET_METADATA_SPECS = "com.squareup:kotlinpoet-metadata-specs:1.4.0"
+const val KOTLINPOET_CLASSINSPECTOR_ELEMENTS =
+    "com.squareup:kotlinpoet-classinspector-elements:1.4.0"
 const val KOTLIN_GRADLE_PLUGIN = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.20"
 
 const val KOTLIN_METADATA = "me.eugeniomarletti.kotlin.metadata:kotlin-metadata:1.4.0"
