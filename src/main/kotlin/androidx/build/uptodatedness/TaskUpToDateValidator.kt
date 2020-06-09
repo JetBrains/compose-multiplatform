@@ -204,17 +204,26 @@ class TaskUpToDateValidator {
             return readLogsMessage + outputsMessage + inputsMessage + reproductionMessage
         }
 
-        fun tryToExplainFileModification(file: File, triggeringTask: Task): String {
+        fun getTaskDeclaringFile(file: File, triggeringTask: Task): Task? {
             val taskDependencies = triggeringTask.taskDependencies.getDependencies(triggeringTask)
-            var createdByTask: Task? = null
-            for (otherTask in taskDependencies) {
-                if (otherTask.outputs.files.files.contains(file)) {
-                    createdByTask = otherTask
-                    break
+            for (task in taskDependencies) {
+                if (task.outputs.files.files.contains(file)) {
+                    return task
                 }
             }
+            return null
+        }
+        fun tryToExplainFileModification(file: File, triggeringTask: Task): String {
+            // Find the task declaring this file as an output,
+            // or the task declaring one of its parent dirs as an output
+            var createdByTask: Task? = null
+            var declaredFile: File? = file
+            while (createdByTask == null && declaredFile != null) {
+                createdByTask = getTaskDeclaringFile(declaredFile, triggeringTask)
+                declaredFile = declaredFile.parentFile
+            }
             if (createdByTask == null) {
-                return "This file is not declared as the output of any task."
+                return "This file is not declared as the output of any dependency task."
             }
             if (isExemptTask(createdByTask)) {
                 return "This file is declared as an output of " + createdByTask +
