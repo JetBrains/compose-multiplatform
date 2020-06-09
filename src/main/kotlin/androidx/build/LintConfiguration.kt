@@ -99,6 +99,10 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
 
             fatal("VisibleForTests")
 
+            if (com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.startsWith("4.2.")) {
+                disable("KtxExtensionAvailable")
+            }
+
             if (extension.compilationTarget != CompilationTarget.HOST) {
                 // Ignore other errors since we are only interested in nullness here
                 if (checkUnknownNullness) {
