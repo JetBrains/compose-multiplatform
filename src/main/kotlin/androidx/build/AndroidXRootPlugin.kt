@@ -16,6 +16,8 @@
 
 package androidx.build
 
+import androidx.build.AndroidXPlugin.Companion.GENERATE_TEST_CONFIGURATION_TASK
+import androidx.build.AndroidXPlugin.Companion.ZIP_TEST_CONFIGS_WITH_APKS_TASK
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.dokka.DokkaPublicDocs
 import androidx.build.dokka.DokkaSourceDocs
@@ -30,6 +32,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.tasks.bundling.Zip
 import org.gradle.kotlin.dsl.extra
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
@@ -76,7 +79,8 @@ class AndroidXRootPlugin : Plugin<Project> {
         val createArchiveTask = Release.getGlobalFullZipTask(this)
         buildOnServerTask.dependsOn(createArchiveTask)
         val partiallyDejetifyArchiveTask = partiallyDejetifyArchiveTask(
-            createArchiveTask.get().archiveFile)
+            createArchiveTask.get().archiveFile
+        )
         if (partiallyDejetifyArchiveTask != null)
             buildOnServerTask.dependsOn(partiallyDejetifyArchiveTask)
 
@@ -87,7 +91,8 @@ class AndroidXRootPlugin : Plugin<Project> {
             if (project.path == ":docs-runner") {
                 project.tasks.all { task ->
                     if (DokkaPublicDocs.ARCHIVE_TASK_NAME == task.name ||
-                        DokkaSourceDocs.ARCHIVE_TASK_NAME == task.name) {
+                        DokkaSourceDocs.ARCHIVE_TASK_NAME == task.name
+                    ) {
                         buildOnServerTask.dependsOn(task)
                     }
                 }
@@ -129,6 +134,22 @@ class AndroidXRootPlugin : Plugin<Project> {
             buildOnServerTask.dependsOn(Jacoco.createUberJarTask(this))
         }
 
+        val generateTestConfiguration = project.tasks.register(
+            GENERATE_TEST_CONFIGURATION_TASK, GenerateTestConfigurationTask::class.java
+        )
+        val zipTestConfigsWithApks = project.tasks.register(
+            ZIP_TEST_CONFIGS_WITH_APKS_TASK, Zip::class.java
+        )
+        zipTestConfigsWithApks.configure {
+            it.dependsOn(generateTestConfiguration)
+            it.destinationDirectory.set(project.getDistributionDirectory())
+            it.archiveFileName.set("androidTest.zip")
+            it.from(File(project.getDistributionDirectory().canonicalPath,
+                CONFIG_DIRECTORY
+            ))
+        }
+        project.addToBuildOnServer(zipTestConfigsWithApks)
+
         if (project.isDocumentationEnabled()) {
             val allDocsTask = DiffAndDocs.configureDiffAndDocs(
                 this,
@@ -153,7 +174,8 @@ class AndroidXRootPlugin : Plugin<Project> {
                     subproject.name != "camera-testapp-timing" &&
                     subproject.name != "room-testapp" &&
                     subproject.name != "support-media2-test-client-previous" &&
-                    subproject.name != "support-media2-test-service-previous") {
+                    subproject.name != "support-media2-test-service-previous"
+                ) {
 
                     subproject.configurations.all { configuration ->
                         configuration.resolutionStrategy.dependencySubstitution.apply {

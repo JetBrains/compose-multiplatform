@@ -420,31 +420,59 @@ class AndroidXPlugin : Plugin<Project> {
         extension: TestedExtension,
         testApk: Boolean
     ) {
-        packageApplicationProvider.configure { packageTask ->
+        packageApplicationProvider.get().let { packageTask ->
             AffectedModuleDetector.configureTaskGuard(packageTask)
-            packageTask.doLast {
-                // Skip copying AndroidTest apks if they have no source code (no tests to run).
-                if (testApk && !hasAndroidTestSourceCode(project, extension)) return@doLast
+            // Skip copying AndroidTest apks if they have no source code (no tests to run).
+            if (testApk && !hasAndroidTestSourceCode(project, extension)) {
+                return
+            }
 
+            if (testApk) {
+                project.rootProject.tasks.named(GENERATE_TEST_CONFIGURATION_TASK)
+                    .configure { task ->
+                        task as GenerateTestConfigurationTask
+                        val apkFile = File(
+                            "${project
+                                .buildDir}/outputs/apk/androidTest/debug/${project
+                                .name}-debug-androidTest.apk"
+                        )
+                        task.apkPackageMap[apkFile] = applicationId
+                    }
+
+                project.rootProject.tasks.named(ZIP_TEST_CONFIGS_WITH_APKS_TASK)
+                    .configure { task ->
+                        task as Zip
+                        task.from(packageTask.outputDirectory)
+                    }
+            }
+
+            packageTask.doLast {
                 project.copy {
                     it.from(packageTask.outputDirectory)
                     it.include("*.apk")
                     it.into(File(project.getDistributionDirectory(), "apks"))
                     it.rename { fileName ->
-                        if (fileName.contains("media-compat-test") ||
-                            fileName.contains("media2-test")) {
-                            // Exclude media-compat-test-* and media2-test-* modules from
-                            // existing support library presubmit tests.
-                            fileName.replace("-debug-androidTest", "")
-                        } else if (project.plugins.hasPlugin(BenchmarkPlugin::class.java)) {
-                            // Exclude '-benchmark' modules from correctness tests
-                            fileName.replace("-androidTest", "-androidBenchmark")
-                        } else {
-                            "${project.asFilenamePrefix()}_$fileName"
-                        }
+                        renameApkForTesting(fileName, project)
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Guarantees unique names for the APKs, and modifies some of the suffixes. The APK name is used
+     * to determine what gets run by our test runner
+     */
+    private fun renameApkForTesting(fileName: String, project: Project): String {
+        return if (fileName.contains("media-compat-test") ||
+            fileName.contains("media2-test")) {
+            // Exclude media-compat-test-* and media2-test-* modules from
+            // existing support library presubmit tests.
+            fileName.replace("-debug-androidTest", "")
+        } else if (project.plugins.hasPlugin(BenchmarkPlugin::class.java)) {
+            fileName.replace("-androidTest", "-androidBenchmark")
+        } else {
+            "${project.asFilenamePrefix()}_$fileName"
         }
     }
 
@@ -510,7 +538,7 @@ class AndroidXPlugin : Plugin<Project> {
         val buildTestApksTask = project.rootProject.tasks.named(BUILD_TEST_APKS_TASK)
         applicationVariants.all { variant ->
             // Using getName() instead of name due to b/150427408
-            if (variant.buildType.getName() == "debug") {
+            if (variant.buildType.name == "debug") {
                 buildTestApksTask.configure {
                     it.dependsOn(variant.assembleProvider)
                 }
@@ -596,11 +624,13 @@ class AndroidXPlugin : Plugin<Project> {
         const val BUILD_TEST_APKS_TASK = "buildTestApks"
         const val CHECK_RESOURCE_API_TASK = "checkResourceApi"
         const val CHECK_RESOURCE_API_RELEASE_TASK = "checkResourceApiRelease"
-        const val UPDATE_RESOURCE_API_TASK = "updateResourceApi"
         const val CHECK_RELEASE_READY_TASK = "checkReleaseReady"
         const val CREATE_LIBRARY_BUILD_INFO_FILES_TASK = "createLibraryBuildInfoFiles"
         const val CREATE_AGGREGATE_BUILD_INFO_FILES_TASK = "createAggregateBuildInfoFiles"
+        const val GENERATE_TEST_CONFIGURATION_TASK = "generateTestConfiguration"
         const val REPORT_LIBRARY_METRICS_TASK = "reportLibraryMetrics"
+        const val UPDATE_RESOURCE_API_TASK = "updateResourceApi"
+        const val ZIP_TEST_CONFIGS_WITH_APKS_TASK = "zipTestConfigsWithApks"
 
         const val TASK_GROUP_API = "API"
 
