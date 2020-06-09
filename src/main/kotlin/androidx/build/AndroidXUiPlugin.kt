@@ -105,13 +105,17 @@ private fun Project.configureForMultiplatform() {
     // Android Studio on versions >= 4.0canary8)
     libraryExtension.apply {
         sourceSets.findByName("main")?.apply {
-            java.srcDirs("src/commonMain/kotlin", "src/jvmMain/kotlin", "src/androidMain/kotlin")
+            java.srcDirs("src/commonMain/kotlin", "src/jvmMain/kotlin",
+                "src/androidMain/kotlin")
+            res.srcDirs("src/androidMain/res")
         }
         sourceSets.findByName("test")?.apply {
-            java.srcDirs("src/unitTest/kotlin")
+            java.srcDirs("src/test/kotlin")
+            res.srcDirs("src/test/res")
         }
         sourceSets.findByName("androidTest")?.apply {
             java.srcDirs("src/androidAndroidTest/kotlin")
+            res.srcDirs("src/androidAndroidTest/res")
         }
     }
 
