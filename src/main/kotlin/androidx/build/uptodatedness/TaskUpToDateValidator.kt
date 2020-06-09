@@ -111,9 +111,9 @@ class TaskUpToDateValidator {
                 rootProject.gradle.taskGraph.afterTask { task ->
                     if (task.didWork) {
                         if (!isExemptTask(task)) {
-                            val message = "Error: executed $task but " +
-                                DISALLOW_TASK_EXECUTION_FLAG_NAME +
-                                " was specified. This indicates that $task does not declare" +
+                            val message = "Ran two consecutive builds of the same tasks," +
+                                " and in the second build, observed $task to be not UP-TO-DATE." +
+                                " This indicates that $task does not declare" +
                                 " inputs and/or outputs correctly.\n" +
                                 tryToExplainTaskExecution(task)
                             throw GradleException(message)
@@ -197,8 +197,10 @@ class TaskUpToDateValidator {
 
             val reproductionMessage = "\nTo reproduce this error you can try running " +
                 "`./gradlew ${task.path} -PverifyUpToDate`\n"
-            val readLogsMessage = "\nTo see why Gradle executed this task, search for output " +
-                "generated immediately before the task began to execute.\n"
+            val readLogsMessage = "\nYou can check why Gradle executed ${task.path} by " +
+                "searching stdout for output generated immediately before the task began to " +
+                "execute.\n" +
+                "Our best guess for the reason that ${task.path} executed is below.\n"
             return readLogsMessage + outputsMessage + inputsMessage + reproductionMessage
         }
 
