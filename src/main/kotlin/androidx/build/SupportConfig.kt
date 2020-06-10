@@ -31,7 +31,7 @@ object SupportConfig {
      * Either an integer value or a pre-release platform code, prefixed with "android-" (ex.
      * "android-28" or "android-Q") as you would see within the SDK's platforms directory.
      */
-    const val COMPILE_SDK_VERSION = "android-R"
+    const val COMPILE_SDK_VERSION = "android-30"
 
     /**
      * The Android SDK version to use for targetSdkVersion meta-data.
