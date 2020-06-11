@@ -28,6 +28,7 @@ import androidx.build.Strategy.TipOfTree
  * Rule set used to generate public documentation.
  */
 val RELEASE_RULE = docsRules("public", false) {
+    ignore(LibraryGroups.ACTIVITY.group, "activity-lint")
     prebuilts(LibraryGroups.ACTIVITY, "1.2.0-alpha06")
     prebuilts(LibraryGroups.ADS, "1.0.0-alpha04")
     prebuilts(LibraryGroups.ANNOTATION, "annotation", "1.2.0-alpha01")
