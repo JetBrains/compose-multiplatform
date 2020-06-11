@@ -79,7 +79,6 @@ open class AndroidXExtension(val project: Project) {
     private var licenses: MutableCollection<License> = ArrayList()
     var publish: Publish = Publish.NONE
     var failOnDeprecationWarnings = true
-
     var compilationTarget: CompilationTarget = CompilationTarget.DEVICE
 
     /**
