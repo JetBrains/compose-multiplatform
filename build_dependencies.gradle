@@ -28,6 +28,8 @@ if (isUiProject) {
     build_versions.kotlin = "1.3.71"
     build_versions.kotlin_coroutines = "1.3.4"
     build_versions.agp = '4.1.0-alpha08'
+    // NOTE: When updating the lint version we also need to update the `api` version supported
+    //  by `IssueRegistry`'s.' For e.g. aosp/1331903
     build_versions.lint = '27.1.0-alpha08'
 }
 
