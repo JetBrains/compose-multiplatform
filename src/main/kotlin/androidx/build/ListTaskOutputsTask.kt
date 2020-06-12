@@ -109,7 +109,12 @@ val taskNamesKnownToDuplicateOutputs = setOf(
     "lint",
     "lintFix",
     "lintVital",
-    "sourceJar"
+    "sourceJar",
+    // MPP plugin has issues with modules using withJava() clause, see b/158747039.
+    "processTestResources",
+    "desktopTestProcessResources",
+    "processResources",
+    "desktopProcessResources"
 )
 
 // For this project and all subprojects, collects all tasks and creates a map keyed by their output files
