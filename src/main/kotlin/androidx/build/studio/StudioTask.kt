@@ -37,7 +37,7 @@ abstract class StudioTask : DefaultTask() {
     // TODO: support -y and --update-only options? Can use @Option for this
     @TaskAction
     fun studiow() {
-        update()
+        install()
         launch()
     }
 
@@ -99,19 +99,26 @@ abstract class StudioTask : DefaultTask() {
     @get:Internal
     protected abstract val studioArchiveCreator: StudioArchiveCreator
 
+    private val licenseAcceptedFile: File by lazy {
+        File("$studioInstallationDir/STUDIOW_LICENSE_ACCEPTED")
+    }
+
     /**
-     * Updates the Studio installation and removes any old installation files if they exist.
+     * Install Studio and removes any old installation files if they exist.
      */
-    private fun update() {
-        if (!studioInstallationDir.exists()) {
+    private fun install() {
+        val successfulInstallFile = File("$studioInstallationDir/INSTALL_SUCCESSFUL")
+        if (!licenseAcceptedFile.exists() && !successfulInstallFile.exists()) {
+            // Attempt to remove any old installations in the parent studio/ folder
+            studioInstallationDir.parentFile.deleteRecursively()
             // Create installation directory and any needed parent directories
             studioInstallationDir.mkdirs()
-            // Attempt to remove any old installations in the parent studio/ folder
-            removeOldInstallations()
             studioArchiveCreator(project, studioVersions, studioArchiveName, studioArchivePath)
             println("Extracting archive...")
             extractStudioArchive()
             with(platformUtilities) { updateJvmHeapSize() }
+            // Finish install process
+            successfulInstallFile.createNewFile()
         }
     }
 
@@ -152,7 +159,6 @@ abstract class StudioTask : DefaultTask() {
     }
 
     private fun checkLicenseAgreement(services: ServiceRegistry): Boolean {
-        val licenseAcceptedFile = File("$studioInstallationDir/STUDIOW_LICENSE_ACCEPTED")
         if (!licenseAcceptedFile.exists()) {
             val licensePath = with(platformUtilities) { licensePath }
 
@@ -176,20 +182,6 @@ abstract class StudioTask : DefaultTask() {
         project.exec { execSpec -> platformUtilities.extractArchive(fromPath, toPath, execSpec) }
         // Remove studio archive once done
         File(studioArchivePath).delete()
-    }
-
-    private fun removeOldInstallations() {
-        val parentFile = studioInstallationDir.parentFile
-        parentFile.walk().maxDepth(1)
-            .filter { file ->
-                // Remove any files that aren't either the directory / archive matching the
-                // current version, and also ignore the parent `studio/` directory
-                !file.name.contains(studioInstallationDir.name) && file != parentFile
-            }
-            .forEach { file ->
-                println("Removing old installation file ${file.absolutePath}")
-                file.deleteRecursively()
-            }
     }
 
     companion object {
