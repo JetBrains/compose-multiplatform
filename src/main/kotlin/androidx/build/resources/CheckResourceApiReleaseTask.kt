@@ -21,8 +21,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
@@ -41,19 +40,8 @@ abstract class CheckResourceApiReleaseTask : DefaultTask() {
      *
      * A file path must be specified but the file may not exist if the library has no resources.
      */
-    @get:Internal
+    @get:InputFiles
     abstract val apiFile: RegularFileProperty
-
-    @InputFile
-    @Optional
-    fun getApiFileIfExists(): File? {
-        val file = apiFile.get().asFile
-        return if (file.exists()) {
-            file
-        } else {
-            null
-        }
-    }
 
     @TaskAction
     fun checkResourceApiRelease() {
