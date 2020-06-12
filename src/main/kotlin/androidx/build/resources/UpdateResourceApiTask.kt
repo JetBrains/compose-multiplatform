@@ -20,9 +20,8 @@ import androidx.build.checkapi.ApiLocation
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
-import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
 import java.io.File
@@ -38,19 +37,8 @@ abstract class UpdateResourceApiTask : DefaultTask() {
      *
      * A file path must be specified but the file may not exist if the library has no resources.
      */
-    @get:Internal
+    @get:InputFiles
     abstract val inputApiFile: RegularFileProperty
-
-    @InputFile
-    @Optional
-    fun getInputApiFileIfExists(): File? {
-        val file = inputApiFile.get().asFile
-        return if (file.exists()) {
-            file
-        } else {
-            null
-        }
-    }
 
     /** Text files to which resource signatures will be written. */
     @get:Internal // outputs are declared in getTaskOutputs()

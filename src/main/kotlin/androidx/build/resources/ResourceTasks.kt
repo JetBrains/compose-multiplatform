@@ -100,7 +100,6 @@ object ResourceTasks {
             ) { task ->
                 task.referenceApiFile.set(lastReleasedApiFile.resourceFile)
                 task.apiFile.set(builtApiFile)
-                task.dependsOn(packageResTask)
                 task.cacheEvenIfNoOutputs()
             }
         }
@@ -116,7 +115,6 @@ object ResourceTasks {
             task.description = "Checks that the resource API generated from source matches the " +
                     "checked in resource API file"
             task.builtApi.set(builtApiFile)
-            task.dependsOn(packageResTask)
             task.cacheEvenIfNoOutputs()
             task.checkedInApis.set(outputApiFiles)
             checkResourceApiRelease?.let {
@@ -131,7 +129,6 @@ object ResourceTasks {
             task.group = TASK_GROUP_API
             task.description = "Updates the checked in resource API files to match source code API"
             task.inputApiFile.set(builtApiFile)
-            task.dependsOn(packageResTask)
             task.outputApiLocations.set(outputApiLocations)
             checkResourceApiRelease?.let {
                 // If a developer (accidentally) makes a non-backwards compatible change to an

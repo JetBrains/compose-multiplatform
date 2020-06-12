@@ -19,10 +19,7 @@ package androidx.build.resources
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.Internal
-import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
@@ -35,24 +32,13 @@ abstract class CheckResourceApiTask : DefaultTask() {
      *
      * A file path must be specified but the file may not exist if the library has no resources.
      */
-    @get:Internal
+    @get:InputFiles
     abstract val builtApi: RegularFileProperty
-
-    @InputFile
-    @Optional
-    fun getBuiltApiFileIfExists(): File? {
-        val file = builtApi.get().asFile
-        return if (file.exists()) {
-            file
-        } else {
-            null
-        }
-    }
 
     /**
      * API files (in source control) to compare against.
      */
-    @get:Input
+    @get:InputFiles
     abstract val checkedInApis: ListProperty<File>
 
     @TaskAction
