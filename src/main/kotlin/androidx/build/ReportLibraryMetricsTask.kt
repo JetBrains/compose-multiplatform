@@ -29,7 +29,7 @@ private const val AAR_FILE_EXTENSION = ".aar"
 private const val BYTECODE_SIZE = "bytecode_size"
 private const val METHOD_COUNT = "method_count"
 private const val METRICS_DIRECTORY = "librarymetrics"
-private const val METRICS_FILE_SUFFIX = "_librarymetrics.json"
+private const val JSON_FILE_EXTENSION = ".json"
 private const val JAR_FILE_EXTENSION = ".jar"
 
 abstract class ReportLibraryMetricsTask : DefaultTask() {
@@ -52,7 +52,7 @@ abstract class ReportLibraryMetricsTask : DefaultTask() {
         outputDir.mkdirs()
         val outputFile = File(
             outputDir,
-            "${project.group}_${project.name}$METRICS_FILE_SUFFIX"
+            "${project.group}_${project.name}$JSON_FILE_EXTENSION"
         )
         val json = JSONObject()
 
