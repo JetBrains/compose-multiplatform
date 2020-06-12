@@ -139,7 +139,8 @@ open class GMavenZipTask : Zip() {
                 } + "-$buildNumber"
                 task.archiveBaseName.set("$fileNamePrefix-$fileSuffix")
                 task.onlyIf {
-                    task.setupIncludes()
+                    // always run top diff zip as it is required by build on server task
+                    (!includeReleased && mavenGroup == "") || task.setupIncludes()
                 }
             }
         }
