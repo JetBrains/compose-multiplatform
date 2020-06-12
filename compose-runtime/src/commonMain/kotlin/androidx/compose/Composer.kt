@@ -22,7 +22,6 @@
 package androidx.compose
 
 import androidx.compose.SlotTable.Companion.EMPTY
-import kotlin.collections.isNotEmpty
 
 /**
  * This is here because outdated versions of the compose IDE plugin expect to find it.
