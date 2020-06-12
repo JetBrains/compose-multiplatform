@@ -38,6 +38,8 @@ internal class BroadcastFrameClock(
     private var awaiters = mutableListOf<FrameAwaiter<*>>()
     private var spareList = mutableListOf<FrameAwaiter<*>>()
 
+    val hasAwaiters: Boolean get() = synchronized(lock) { awaiters.isNotEmpty() }
+
     @Suppress("UNCHECKED_CAST")
     fun sendFrame(timeNanos: Long) {
         synchronized(lock) {

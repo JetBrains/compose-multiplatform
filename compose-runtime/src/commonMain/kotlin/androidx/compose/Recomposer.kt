@@ -52,7 +52,7 @@ class Recomposer {
     /**
      * This collection is its own lock, shared with [invalidComposersAwaiter]
      */
-    private val invalidComposers = mutableListOf<Composer<*>>()
+    private val invalidComposers = mutableSetOf<Composer<*>>()
 
     /**
      * The continuation to resume when there are invalid composers to process.
@@ -118,7 +118,7 @@ class Recomposer {
         frameCount: Long
     ) {
         var framesRemaining = frameCount
-        val toRecompose = mutableSetOf<Composer<*>>()
+        val toRecompose = mutableListOf<Composer<*>>()
 
         if (!applyingScope.compareAndSet(null, applyCoroutineScope)) {
             error("already recomposing and applying changes")
@@ -126,42 +126,31 @@ class Recomposer {
 
         try {
             idlingLatch.closeLatch()
-            while (true) {
-                // Suspend until we have something to do
-                if (toRecompose.isEmpty()) {
-                    // Don't hold the monitor lock across suspension.
-                    val shouldSuspend = synchronized(invalidComposers) {
-                        if (invalidComposers.isEmpty()) true else {
-                            toRecompose.addAll(invalidComposers)
-                            invalidComposers.clear()
-                            false
-                        }
-                    }
-
-                    if (shouldSuspend) {
-                        suspendCancellableCoroutine<Unit> { co ->
-                            synchronized(invalidComposers) {
-                                if (invalidComposers.isEmpty()) {
-                                    invalidComposersAwaiter = co
-                                    idlingLatch.openLatch()
-                                } else {
-                                    // We raced and lost, someone invalidated between our check
-                                    // and suspension. Resume immediately.
-                                    co.resume(Unit)
-                                    return@suspendCancellableCoroutine
-                                }
-                            }
-                            co.invokeOnCancellation {
-                                synchronized(invalidComposers) {
-                                    if (invalidComposersAwaiter === co) {
-                                        invalidComposersAwaiter = null
-                                    }
-                                }
-                            }
-                        }
+            while (frameCount == Long.MAX_VALUE || framesRemaining-- > 0L) {
+                // Don't hold the monitor lock across suspension.
+                val hasInvalidComposers = synchronized(invalidComposers) {
+                    invalidComposers.isNotEmpty()
+                }
+                if (!hasInvalidComposers && !broadcastFrameClock.hasAwaiters) {
+                    // Suspend until we have something to do
+                    suspendCancellableCoroutine<Unit> { co ->
                         synchronized(invalidComposers) {
-                            toRecompose.addAll(invalidComposers)
-                            invalidComposers.clear()
+                            if (invalidComposers.isEmpty()) {
+                                invalidComposersAwaiter = co
+                                idlingLatch.openLatch()
+                            } else {
+                                // We raced and lost, someone invalidated between our check
+                                // and suspension. Resume immediately.
+                                co.resume(Unit)
+                                return@suspendCancellableCoroutine
+                            }
+                        }
+                        co.invokeOnCancellation {
+                            synchronized(invalidComposers) {
+                                if (invalidComposersAwaiter === co) {
+                                    invalidComposersAwaiter = null
+                                }
+                            }
                         }
                     }
                 }
@@ -190,7 +179,9 @@ class Recomposer {
                         }
 
                         if (toRecompose.isNotEmpty()) {
-                            toRecompose.forEach { performRecompose(it) }
+                            for (i in 0 until toRecompose.size) {
+                                performRecompose(toRecompose[i])
+                            }
                             toRecompose.clear()
                         }
 
@@ -198,18 +189,6 @@ class Recomposer {
                         // threads.
                         FrameManager.nextFrame()
                     }
-                }
-
-                if (framesRemaining < Long.MAX_VALUE) {
-                    framesRemaining--
-                    if (framesRemaining == 0L) break
-                }
-
-                // Check to see if anyone else wanted to be recomposed
-                // while we were busy applying changes
-                synchronized(invalidComposers) {
-                    toRecompose.addAll(invalidComposers)
-                    invalidComposers.clear()
                 }
             }
         } finally {
