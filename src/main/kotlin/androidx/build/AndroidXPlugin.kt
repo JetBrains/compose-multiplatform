@@ -464,9 +464,8 @@ class AndroidXPlugin : Plugin<Project> {
      * to determine what gets run by our test runner
      */
     private fun renameApkForTesting(fileName: String, project: Project): String {
-        return if (fileName.contains("media-compat-test") ||
-            fileName.contains("media2-test")) {
-            // Exclude media-compat-test-* and media2-test-* modules from
+        return if (fileName.contains("media-test") || fileName.contains("media2-test")) {
+            // Exclude media-test-* and media2-test-* modules from
             // existing support library presubmit tests.
             fileName.replace("-debug-androidTest", "")
         } else if (project.plugins.hasPlugin(BenchmarkPlugin::class.java)) {

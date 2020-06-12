@@ -453,10 +453,10 @@ class AffectedModuleDetectorImpl constructor(
         private val COBUILT_TEST_PATHS = setOf(
             // Install media tests together per b/128577735
             setOf(
-                ":support-media-compat-test-client",
-                ":support-media-compat-test-service",
-                ":support-media-compat-test-client-previous",
-                ":support-media-compat-test-service-previous"
+                ":support-media-test-client",
+                ":support-media-test-service",
+                ":support-media-test-client-previous",
+                ":support-media-test-service-previous"
             ),
             setOf(
                 ":support-media2-test-client",
