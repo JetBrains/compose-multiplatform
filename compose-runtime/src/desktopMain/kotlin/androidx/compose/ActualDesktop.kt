@@ -127,6 +127,10 @@ internal actual fun recordSourceKeyInfo(key: Any) {
 @InternalComposeApi
 actual fun keySourceInfoOf(key: Any): String? = keyInfo[key]
 
+actual fun resetSourceInfo() {
+    keyInfo.clear()
+}
+
 private object MainCompositionFrameClock : CompositionFrameClock {
     override suspend fun <R> withFrameNanos(onFrame: (frameTimeNanos: Long) -> R): R =
         withContext(Dispatchers.Main) {

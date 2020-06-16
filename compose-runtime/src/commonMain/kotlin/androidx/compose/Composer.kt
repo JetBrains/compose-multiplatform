@@ -22,6 +22,7 @@
 package androidx.compose
 
 import androidx.compose.SlotTable.Companion.EMPTY
+import androidx.compose.tooling.InspectionTables
 
 /**
  * This is here because outdated versions of the compose IDE plugin expect to find it.
@@ -554,6 +555,11 @@ open class Composer<N>(
             parentProvider = parentRef.getAmbientScope()
             providersInvalidStack.push(providersInvalid.asInt())
             providersInvalid = changed(parentProvider)
+            collectKeySources = parentRef.collectingKeySources
+            resolveAmbient(InspectionTables, parentProvider)?.let {
+                it.add(slotTable)
+                parentRef.recordInspectionTable(it)
+            }
             startGroup(parentRef.compoundHashKey)
         }
     }
@@ -1117,7 +1123,7 @@ open class Composer<N>(
         if (ref == null || !inserting) {
             val scope = invalidateStack.peek()
             scope.used = true
-            ref = CompositionReferenceImpl(scope, currentCompoundKeyHash)
+            ref = CompositionReferenceImpl(scope, currentCompoundKeyHash, collectKeySources)
             updateValue(ref)
         }
         endGroup()
@@ -2146,10 +2152,11 @@ open class Composer<N>(
 
     private inner class CompositionReferenceImpl(
         val scope: RecomposeScope,
-        override val compoundHashKey: Int
-    ) : CompositionReference,
+        override val compoundHashKey: Int,
+        override val collectingKeySources: Boolean
+    ) : CompositionReference(),
         CompositionLifecycleObserver {
-
+        var inspectionTables: MutableSet<MutableSet<SlotTable>>? = null
         val composers = mutableSetOf<Composer<*>>()
 
         override fun onEnter() {
@@ -2157,7 +2164,15 @@ open class Composer<N>(
         }
 
         override fun onLeave() {
-            composers.clear()
+            if (composers.isNotEmpty()) {
+                inspectionTables?.let {
+                    for (composer in composers) {
+                        for (table in it)
+                            table.remove(composer.slotTable)
+                    }
+                }
+                composers.clear()
+            }
         }
 
         override fun <N> registerComposer(composer: Composer<N>) {
@@ -2184,6 +2199,12 @@ open class Composer<N>(
 
         override fun getAmbientScope(): AmbientMap {
             return ambientScopeAt(scope.anchor?.location(slotTable) ?: 0)
+        }
+
+        override fun recordInspectionTable(table: MutableSet<SlotTable>) {
+            (inspectionTables ?: HashSet<MutableSet<SlotTable>>().also {
+                inspectionTables = it
+            }).add(table)
         }
     }
 
