@@ -16,6 +16,8 @@
 
 package androidx.compose
 
+import androidx.compose.dispatch.AndroidUiDispatcher
+import androidx.compose.dispatch.MonotonicFrameClock
 import androidx.core.os.HandlerCompat
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -65,27 +67,25 @@ internal actual object Choreographer {
 // TODO: Our host-side tests still grab the Android actuals based on SDK stubs that return null.
 // Satisfy their dependencies.
 private val MainAndroidUiDispatcher by lazy {
-    if (Looper.getMainLooper() != null) AndroidUiDispatcher.Main
+    if (Looper.getMainLooper() != null) androidx.compose.dispatch.AndroidUiDispatcher.Main
     else Dispatchers.Main
 }
 
-private object MainDispatcherCompositionFrameClock : CompositionFrameClock {
+private object MainDispatcherFrameClock : MonotonicFrameClock {
     override suspend fun <R> withFrameNanos(onFrame: (frameTimeNanos: Long) -> R): R =
         withContext(Dispatchers.Main) {
             onFrame(System.nanoTime())
         }
 }
 
-private val MainAndroidCompositionFrameClock by lazy {
-    if (Looper.getMainLooper() != null) AndroidUiDispatcher.Main.compositionFrameClock
-    else MainDispatcherCompositionFrameClock
+private val MainAndroidFrameClock by lazy {
+    if (Looper.getMainLooper() != null) AndroidUiDispatcher.Main.frameClock
+    else MainDispatcherFrameClock
 }
 
-internal actual fun mainThreadCompositionDispatcher(): CoroutineDispatcher =
-    MainAndroidUiDispatcher
+internal actual fun mainThreadCompositionDispatcher(): CoroutineDispatcher = MainAndroidUiDispatcher
 
-internal actual fun mainThreadCompositionFrameClock(): CompositionFrameClock =
-    MainAndroidCompositionFrameClock
+internal actual fun mainThreadFrameClock(): MonotonicFrameClock = MainAndroidFrameClock
 
 internal actual object Trace {
     actual fun beginSection(name: String) = android.os.Trace.beginSection(name)

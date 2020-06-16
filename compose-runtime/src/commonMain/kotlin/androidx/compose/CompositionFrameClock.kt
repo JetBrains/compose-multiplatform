@@ -17,27 +17,16 @@
 // TODO(b/158105080): make part of ComposeRuntime
 package androidx.compose
 
+import androidx.compose.dispatch.MonotonicFrameClock
+import androidx.compose.dispatch.withFrameMillis as withFrameMillisDispatch
+
 /**
  * Provides a time source for display frames for use in composition.
  * This may be used for matching timing with the refresh rate of a display
  * or otherwise synchronizing with a desired frame rate of composition updates.
  */
-interface CompositionFrameClock {
-    /**
-     * Suspends until a new frame is requested, immediately invokes [onFrame] with the frame time
-     * in nanoseconds in the calling context of frame dispatch, then resumes with the result from
-     * [onFrame].
-     *
-     * `frameTimeNanos` should be used when calculating animation time deltas from frame to frame
-     * as it may be normalized to the target time for the frame, not necessarily a direct,
-     * "now" value.
-     *
-     * The time base of the value provided by [withFrameNanos] is implementation defined.
-     * Time values provided are monotonically increasing; after a call to [withFrameNanos]
-     * completes it must not provide the same value again for a subsequent call.
-     */
-    suspend fun <R> withFrameNanos(onFrame: (frameTimeNanos: Long) -> R): R
-
+@Deprecated("Moved and renamed to MonotonicFrameClock")
+interface CompositionFrameClock : MonotonicFrameClock {
     /**
      * Suspends until a new frame is requested, immediately invokes [onFrame] with the frame time
      * in nanoseconds in the calling context of frame dispatch, then resumes with the result from
@@ -70,10 +59,17 @@ interface CompositionFrameClock {
  * [CompositionFrameClock.withFrameMillis] completes it must not provide the same value again for
  * a subsequent call.
  */
-@Suppress("UnnecessaryLambdaCreation")
+@Deprecated(
+    "CompositionFrameClock moved and renamed to MonotonicFrameClock",
+    ReplaceWith(
+        "withFrameMillis(onFrame)",
+        "androidx.compose.dispatch.withFrameMillis"
+    )
+)
+@Suppress("UnnecessaryLambdaCreation", "DEPRECATION")
 suspend inline fun <R> CompositionFrameClock.withFrameMillis(
     crossinline onFrame: (frameTimeMillis: Long) -> R
-): R = withFrameNanos { onFrame(it / 1_000_000L) }
+): R = withFrameMillisDispatch(onFrame)
 
 /**
  * Suspends until a new frame is requested, immediately invokes [onFrame] with the frame time
@@ -88,6 +84,7 @@ suspend inline fun <R> CompositionFrameClock.withFrameMillis(
  * Time values provided are monotonically increasing; after a call to [awaitFrameNanos]
  * completes it must not provide the same value again for a subsequent call.
  */
+@Suppress("DEPRECATION")
 @Deprecated(
     "renamed to withFrameMillis",
     ReplaceWith("withFrameMillis(onFrame)", "androidx.compose.withFrameMillis")
@@ -106,6 +103,7 @@ suspend inline fun <R> CompositionFrameClock.awaitFrameMillis(
  * Time values returned are monotonically increasing; after a call to [awaitFrameNanos]
  * returns it must not return the same value again for a subsequent call.
  */
+@Suppress("DEPRECATION")
 @Deprecated(
     "callers will resume after missing the frame on most dispatchers",
     ReplaceWith("withFrameNanos { it }")
@@ -122,6 +120,7 @@ suspend fun CompositionFrameClock.awaitFrameNanos(): Long = withFrameNanos { it 
  * Time values returned are monotonically increasing; after a call to [awaitFrameMillis]
  * returns it must not return the same value again for a subsequent call.
  */
+@Suppress("DEPRECATION")
 @Deprecated(
     "callers will resume after missing the frame on most dispatchers",
     ReplaceWith("withFrameMillis { it }", "androidx.compose.withFrameMillis")

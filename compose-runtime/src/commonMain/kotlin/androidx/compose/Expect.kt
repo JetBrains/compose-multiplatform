@@ -16,6 +16,7 @@
 
 package androidx.compose
 
+import androidx.compose.dispatch.MonotonicFrameClock
 import kotlinx.coroutines.CoroutineDispatcher
 
 // TODO(aelias): Mark the typealiases internal when https://youtrack.jetbrains.com/issue/KT-36695 is fixed.
@@ -99,7 +100,7 @@ internal expect object Choreographer {
 }
 
 internal expect fun mainThreadCompositionDispatcher(): CoroutineDispatcher
-internal expect fun mainThreadCompositionFrameClock(): CompositionFrameClock
+internal expect fun mainThreadFrameClock(): MonotonicFrameClock
 
 @MustBeDocumented
 @Retention(AnnotationRetention.BINARY)

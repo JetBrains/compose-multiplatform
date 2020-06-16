@@ -14,27 +14,23 @@
  * limitations under the License.
  */
 
-package androidx.compose
+package androidx.compose.dispatch
 
 import android.view.Choreographer
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.coroutineContext
 
-/**
- * A [CompositionFrameClock] driven by an [android.view.Choreographer].
- */
-class AndroidUiCompositionFrameClock(
+class AndroidUiFrameClock(
     val choreographer: Choreographer
-) : CompositionFrameClock {
-
+) : MonotonicFrameClock {
     override suspend fun <R> withFrameNanos(
         onFrame: (Long) -> R
     ): R {
         val uiDispatcher = coroutineContext[ContinuationInterceptor] as? AndroidUiDispatcher
         return suspendCancellableCoroutine { co ->
             // Important: this callback won't throw, and AndroidUiDispatcher counts on it.
-            val callback = ChoreographerFrameCallback { frameTimeNanos ->
+            val callback = Choreographer.FrameCallback { frameTimeNanos ->
                 co.resumeWith(runCatching { onFrame(frameTimeNanos) })
             }
 

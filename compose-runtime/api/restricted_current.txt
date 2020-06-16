@@ -38,27 +38,6 @@ package androidx.compose {
     property public final boolean valid;
   }
 
-  public final class AndroidUiCompositionFrameClock implements androidx.compose.CompositionFrameClock {
-    ctor public AndroidUiCompositionFrameClock(android.view.Choreographer choreographer);
-    method public android.view.Choreographer getChoreographer();
-    method public suspend <R> Object? withFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
-  }
-
-  public final class AndroidUiDispatcher extends kotlinx.coroutines.CoroutineDispatcher {
-    method public void dispatch(kotlin.coroutines.CoroutineContext context, Runnable block);
-    method public android.view.Choreographer getChoreographer();
-    method public androidx.compose.CompositionFrameClock getCompositionFrameClock();
-    property public final androidx.compose.CompositionFrameClock compositionFrameClock;
-    field public static final androidx.compose.AndroidUiDispatcher.Companion! Companion;
-  }
-
-  public static final class AndroidUiDispatcher.Companion {
-    method public androidx.compose.AndroidUiDispatcher getCurrentThread();
-    method public androidx.compose.AndroidUiDispatcher getMain();
-    property public final androidx.compose.AndroidUiDispatcher CurrentThread;
-    property public final androidx.compose.AndroidUiDispatcher Main;
-  }
-
   @androidx.compose.ExperimentalComposeApi public interface Applier<N> {
     method public void down(N? node);
     method public N! getCurrent();
@@ -185,21 +164,20 @@ package androidx.compose {
     method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
-  public abstract class CompositionCoroutineScope implements androidx.compose.CompositionFrameClock kotlinx.coroutines.CoroutineScope {
+  public abstract class CompositionCoroutineScope implements kotlinx.coroutines.CoroutineScope androidx.compose.dispatch.MonotonicFrameClock {
     ctor public CompositionCoroutineScope();
     method @Deprecated public final suspend Object? awaitFrame(kotlin.coroutines.Continuation<? super java.lang.Long> p);
   }
 
-  public interface CompositionFrameClock {
+  @Deprecated public interface CompositionFrameClock extends androidx.compose.dispatch.MonotonicFrameClock {
     method @Deprecated public default suspend <R> Object? awaitFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
-    method public suspend <R> Object? withFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
   }
 
   public final class CompositionFrameClockKt {
     method @Deprecated public static suspend inline <R> Object? awaitFrameMillis(androidx.compose.CompositionFrameClock, kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
     method @Deprecated public static suspend Object? awaitFrameMillis(androidx.compose.CompositionFrameClock, kotlin.coroutines.Continuation<? super java.lang.Long> p);
     method @Deprecated public static suspend Object? awaitFrameNanos(androidx.compose.CompositionFrameClock, kotlin.coroutines.Continuation<? super java.lang.Long> p);
-    method public static suspend inline <R> Object? withFrameMillis(androidx.compose.CompositionFrameClock, kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
+    method @Deprecated public static suspend inline <R> Object? withFrameMillis(androidx.compose.CompositionFrameClock, kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R> p);
   }
 
   public final class CompositionKt {
@@ -363,11 +341,11 @@ package androidx.compose {
   public final class Recomposer {
     ctor public Recomposer();
     method public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public androidx.compose.CompositionFrameClock getFrameClock();
+    method public androidx.compose.dispatch.MonotonicFrameClock getFrameClock();
     method public boolean hasPendingChanges();
-    method public suspend Object? recomposeAndApplyChanges(kotlinx.coroutines.CoroutineScope applyCoroutineScope, androidx.compose.CompositionFrameClock frameClock, long frameCount, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public suspend Object? runRecomposeAndApplyChanges(androidx.compose.CompositionFrameClock frameClock, kotlin.coroutines.Continuation<?> p);
-    property public final androidx.compose.CompositionFrameClock frameClock;
+    method public suspend Object? recomposeAndApplyChanges(kotlinx.coroutines.CoroutineScope applyCoroutineScope, androidx.compose.dispatch.MonotonicFrameClock frameClock, long frameCount, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? runRecomposeAndApplyChanges(androidx.compose.dispatch.MonotonicFrameClock frameClock, kotlin.coroutines.Continuation<?> p);
+    property public final androidx.compose.dispatch.MonotonicFrameClock frameClock;
     field public static final androidx.compose.Recomposer.Companion! Companion;
   }
 
@@ -377,7 +355,7 @@ package androidx.compose {
   }
 
   public final class RecomposerKt {
-    method public static suspend Object? withRunningRecomposer(androidx.compose.CompositionFrameClock frameClock, kotlin.jvm.functions.Function3<? super kotlinx.coroutines.CoroutineScope,? super androidx.compose.Recomposer,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public static suspend Object? withRunningRecomposer(androidx.compose.dispatch.MonotonicFrameClock frameClock, kotlin.jvm.functions.Function3<? super kotlinx.coroutines.CoroutineScope,? super androidx.compose.Recomposer,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
   }
 
   public final class RememberKt {

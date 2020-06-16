@@ -17,6 +17,7 @@
 @file:OptIn(InternalComposeApi::class)
 package androidx.compose
 
+import androidx.compose.dispatch.MonotonicFrameClock
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -34,7 +35,7 @@ import kotlin.coroutines.resume
  * [frameClock] is used to align changes with display frames.
  */
 suspend fun withRunningRecomposer(
-    frameClock: CompositionFrameClock,
+    frameClock: MonotonicFrameClock,
     block: suspend CoroutineScope.(recomposer: Recomposer) -> Unit
 ): Unit = coroutineScope {
     val recomposer = Recomposer()
@@ -82,7 +83,7 @@ class Recomposer {
             }
         }
     }
-    val frameClock: CompositionFrameClock get() = broadcastFrameClock
+    val frameClock: MonotonicFrameClock get() = broadcastFrameClock
 
     /**
      * Await the invalidation of any associated [Composer]s, recompose them, and apply their
@@ -94,7 +95,7 @@ class Recomposer {
      * This method never returns. Cancel the calling [CoroutineScope] to stop.
      */
     suspend fun runRecomposeAndApplyChanges(
-        frameClock: CompositionFrameClock
+        frameClock: MonotonicFrameClock
     ): Nothing {
         coroutineScope {
             recomposeAndApplyChanges(this, frameClock, Long.MAX_VALUE)
@@ -114,7 +115,7 @@ class Recomposer {
      */
     suspend fun recomposeAndApplyChanges(
         applyCoroutineScope: CoroutineScope,
-        frameClock: CompositionFrameClock,
+        frameClock: MonotonicFrameClock,
         frameCount: Long
     ) {
         var framesRemaining = frameCount
@@ -200,8 +201,8 @@ class Recomposer {
 
     private class CompositionCoroutineScopeImpl(
         override val coroutineContext: CoroutineContext,
-        frameClock: CompositionFrameClock
-    ) : CompositionCoroutineScope(), CompositionFrameClock by frameClock
+        frameClock: MonotonicFrameClock
+    ) : CompositionCoroutineScope(), MonotonicFrameClock by frameClock
 
     /**
      * Implementation note: we launch effects undispatched so they can begin immediately during
@@ -330,7 +331,7 @@ class Recomposer {
                     mainRecomposer = it
                     @OptIn(ExperimentalCoroutinesApi::class)
                     mainScope.launch(start = CoroutineStart.UNDISPATCHED) {
-                        it.runRecomposeAndApplyChanges(mainThreadCompositionFrameClock())
+                        it.runRecomposeAndApplyChanges(mainThreadFrameClock())
                     }
                 }
             }

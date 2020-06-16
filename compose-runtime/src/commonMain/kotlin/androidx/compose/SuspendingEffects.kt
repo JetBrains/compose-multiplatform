@@ -18,6 +18,7 @@
 @file:OptIn(InternalComposeApi::class)
 package androidx.compose
 
+import androidx.compose.dispatch.MonotonicFrameClock
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
@@ -43,12 +44,12 @@ private class SuspendingEffect(
 
 /**
  * A [CoroutineScope] used for launching [side effects][launchInComposition] of a composition
- * that also permits [awaiting][CompositionFrameClock.withFrameNanos] the next presentation
+ * that also permits [awaiting][MonotonicFrameClock.withFrameNanos] the next presentation
  * frame of the composition. This can be useful for performing the next action of an animation
  * while the effect is still present in the composition.
  */
 // TODO Make this an interface once it doesn't experience compiler issues
-abstract class CompositionCoroutineScope : CoroutineScope, CompositionFrameClock {
+abstract class CompositionCoroutineScope : CoroutineScope, MonotonicFrameClock {
     // This method deliberately shadows the awaitFrame method from kotlinx-coroutines-android
     // to redirect usage to the CompositionFrameClock API in effect blocks.
     @Suppress("RedundantSuspendModifier")
