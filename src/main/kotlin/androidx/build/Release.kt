@@ -15,13 +15,11 @@
  */
 package androidx.build
 
-import androidx.build.gmaven.GMavenVersionChecker
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.LibraryVariant
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Zip
@@ -44,22 +42,8 @@ data class Artifact(
 
 /**
  * Zip task that zips all artifacts from given [candidates].
- *
- * Unless [includeReleased] is set to `true`, this task does not include any library artifact
- * that is already shipped to maven.google.com.
  */
 open class GMavenZipTask : Zip() {
-    /**
-     * The version checker which is used to check if a library is already released.
-     */
-    @get:Internal
-    lateinit var versionChecker: GMavenVersionChecker
-    /**
-     * If `true`, all libraries will be included in the zip. Otherwise, only those which are not
-     * in maven.google.com are included.
-     */
-    @get:Input
-    var includeReleased = false
     /**
      * Set to true to include maven-metadata.xml
      */
@@ -99,35 +83,19 @@ open class GMavenZipTask : Zip() {
             /**
              * The build number specified by the server
              */
-            val buildNumber: String,
-            /**
-             * The version checker that queries maven.google.com
-             */
-            val gMavenVersionChecker: GMavenVersionChecker,
-            /**
-             * Set to true to include all libraries even if they are released
-             */
-            val includeReleased: Boolean
+            val buildNumber: String
         )
 
         override fun execute(task: GMavenZipTask) {
             params.apply {
-                val descSuffix = if (includeReleased) {
-                    "."
-                } else {
-                    " without any libraries that are already on maven.google.com. " +
-                            "If you need a full repo, use ${Release.FULL_ARCHIVE_TASK_NAME} task."
-                }
                 task.description =
                         """
                         Creates a maven repository that includes just the libraries compiled in
-                        this project$descSuffix.
+                        this project.
                         Group: ${if (mavenGroup != "") mavenGroup else "All"}
                         """.trimIndent()
-                task.versionChecker = gMavenVersionChecker
                 task.from(supportRepoOut)
                 task.destinationDirectory.set(distDir)
-                task.includeReleased = params.includeReleased
                 task.includeMetadata = params.includeMetadata
                 task.into("m2repository")
                 val fileSuffix = if (mavenGroup == "") {
@@ -140,7 +108,7 @@ open class GMavenZipTask : Zip() {
                 task.archiveBaseName.set("$fileNamePrefix-$fileSuffix")
                 task.onlyIf {
                     // always run top diff zip as it is required by build on server task
-                    (!includeReleased && mavenGroup == "") || task.setupIncludes()
+                    task.setupIncludes()
                 }
             }
         }
@@ -154,27 +122,11 @@ open class GMavenZipTask : Zip() {
         // have 1 default include so that by default, nothing is included
         val includes = candidates.flatMap {
             val mavenGroupPath = it.mavenGroup.replace('.', '/')
-            when {
-                includeReleased -> listOfNotNull(
+            listOfNotNull(
                         "$mavenGroupPath/${it.projectName}/${it.version}" + "/**",
                         if (includeMetadata)
                             "$mavenGroupPath/${it.projectName}" + "/maven-metadata.*"
                         else null)
-                versionChecker.isReleased(it.mavenGroup, it.projectName, it.version) -> {
-                    // query maven.google to check if it is released.
-                    logger.info("looks like $it is released, skipping")
-                    emptyList()
-                }
-                else -> {
-                    logger.info("adding $it to partial maven zip because it cannot be found " +
-                            "on maven.google.com")
-                    listOfNotNull(
-                            "$mavenGroupPath/${it.projectName}/${it.version}" + "/**",
-                            if (includeMetadata)
-                                "$mavenGroupPath/${it.projectName}" + "/maven-metadata.*"
-                            else null)
-                }
-            }
         }
         includes.forEach {
             include(it)
@@ -256,11 +208,8 @@ object Release {
                 mavenGroup = "",
                 includeMetadata = false,
                 supportRepoOut = project.getRepositoryDirectory(),
-                gMavenVersionChecker =
-                project.property("versionChecker") as GMavenVersionChecker,
                 distDir = distDir,
                 fileNamePrefix = fileNamePrefix,
-                includeReleased = false,
                 buildNumber = getBuildId()
         ).also {
             configActionParams = it
@@ -308,7 +257,6 @@ object Release {
                         project.getDistributionDirectory(),
                         "top-of-tree-m2repository"
                     ).copy(
-                        includeReleased = true,
                         includeMetadata = true
                     )
                 ).execute(it)
@@ -352,7 +300,6 @@ object Release {
                 GMavenZipTask.ConfigAction(
                     getParams(project, File(project.getDistributionDirectory(), "per-project-zips"),
                             "${project.group}-${project.name}").copy(
-                        includeReleased = true,
                         includeMetadata = true
                     )
                 ).execute(it)
