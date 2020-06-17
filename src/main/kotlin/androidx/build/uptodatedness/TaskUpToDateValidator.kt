@@ -198,8 +198,8 @@ class TaskUpToDateValidator {
             val reproductionMessage = "\nTo reproduce this error you can try running " +
                 "`./gradlew ${task.path} -PverifyUpToDate`\n"
             val readLogsMessage = "\nYou can check why Gradle executed ${task.path} by " +
-                "searching stdout for output generated immediately before the task began to " +
-                "execute.\n" +
+                "passing the '--info' flag to Gradle and then searching stdout for output " +
+                "generated immediately before the task began to execute.\n" +
                 "Our best guess for the reason that ${task.path} executed is below.\n"
             return readLogsMessage + outputsMessage + inputsMessage + reproductionMessage
         }
