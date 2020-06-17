@@ -37,6 +37,7 @@ import androidx.compose.compositionReference
 import androidx.compose.remember
 import androidx.compose.snapshots.Snapshot
 import androidx.ui.core.ContextAmbient
+import androidx.ui.core.ExperimentalLayoutNodeApi
 import androidx.ui.core.LayoutNode
 import androidx.ui.core.setViewContent
 import androidx.ui.core.subcomposeInto
@@ -125,6 +126,7 @@ abstract class BaseComposeTest {
 
     @Composable
     fun subCompose(block: @Composable () -> Unit) {
+        @OptIn(ExperimentalLayoutNodeApi::class)
         val container = remember { LayoutNode() }
         val reference = compositionReference()
         // TODO(b/150390669): Review use of @ComposableContract(tracked = false)
