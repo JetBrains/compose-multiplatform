@@ -136,6 +136,7 @@ private fun JavaCompile.configureWithErrorProne() {
             "-Xep:ParameterName:ERROR",
             "-Xep:RxReturnValueIgnored:ERROR",
             "-Xep:BadImport:ERROR",
+            "-Xep:MissingCasesInEnumSwitch:ERROR",
 
             // Nullaway
             "-XepIgnoreUnknownCheckNames", // https://github.com/uber/NullAway/issues/25
