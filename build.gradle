@@ -167,3 +167,8 @@ def loadConfigurationQuicklyInto(fromConf, toConf) {
 loadConfigurationQuicklyInto(configurations.cacheableApi, configurations.api)
 loadConfigurationQuicklyInto(configurations.cacheableImplementation, configurations.implementation)
 loadConfigurationQuicklyInto(configurations.cacheableRuntime, configurations.runtime)
+
+project.tasks.withType(Jar) { task ->
+    task.reproducibleFileOrder = true
+    task.preserveFileTimestamps = false
+}
