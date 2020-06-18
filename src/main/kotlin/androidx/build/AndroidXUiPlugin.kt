@@ -120,7 +120,7 @@ private fun Project.configureForMultiplatform() {
     }
 
     /*
-    The following configures test source sets - there are two changes here:
+    The following configures source sets - note:
 
     1. The common unit test source set, commonTest, is included by default in both android
     unit and instrumented tests. This causes unnecessary duplication, so we explicitly do
@@ -130,17 +130,11 @@ private fun Project.configureForMultiplatform() {
 
     2. The default (android) unit test source set is named 'androidTest', which conflicts / is
     confusing as this shares the same name / expected directory as AGP's 'androidTest', which
-    represents _instrumented_ tests. As a result, instead we use 'unitTest' as the chosen
-    directory / sourceSet name here, and make 'androidTest' depend on 'unitTest' so the
-    multiplatform plugin is aware of it.
+    represents _instrumented_ tests.
     TODO: Consider changing unitTest to androidLocalTest and androidAndroidTest to
     androidDeviceTest when https://github.com/JetBrains/kotlin/pull/2829 rolls in.
     */
     multiplatformExtension!!.sourceSets {
-        // Create a new 'unitTest' source set - this is where we will put our unit test source.
-        // Make 'androidTest' depend on 'unitTest', so MPP is still aware of these unit tests.
-        findByName("androidTest")?.dependsOn(create("unitTest"))
-
         // Allow all experimental APIs, since MPP projects are themselves experimental
         (this as DomainObjectCollection<KotlinSourceSet>).all {
             it.languageSettings.apply {
