@@ -52,6 +52,7 @@ interface Composition {
  * @param parent The parent composition reference, if applicable. Default is null.
  * @param composerFactory The factory used to created a [Composer] to be used by the composition.
  */
+@Deprecated("Use the compositionFor(...) overload that accepts an Applier<N>")
 fun compositionFor(
     container: Any,
     recomposer: Recomposer,
@@ -76,6 +77,7 @@ fun compositionFor(
  * @param parent The parent composition reference, if applicable. Default is null.
  * @param composerFactory The factory used to created a [Composer] to be used by the composition.
  */
+@Suppress("DEPRECATION")
 @Deprecated(
     "Specify the Recomposer explicitly",
     ReplaceWith(
@@ -90,6 +92,46 @@ fun compositionFor(
 ): Composition = compositionFor(container, Recomposer.current(), parent, composerFactory)
 
 /**
+ * This method is the way to initiate a composition. Optionally, a [parent]
+ * [CompositionReference] can be provided to make the composition behave as a sub-composition of
+ * the parent.
+ *
+ * It is important to call [Composition.dispose] whenever this [key] is no longer needed in
+ * order to release resources.
+ *
+ * @sample androidx.compose.samples.CustomTreeComposition
+ *
+ * @param key The object this composition will be tied to. Only one [Composition] will be created
+ * for a given [key]. If the same [key] is passed in subsequent calls, the same [Composition]
+ * instance will be returned.
+ * @param applier The [Applier] instance to be used in the composition.
+ * @param recomposer The [Recomposer] instance to be used for composition.
+ * @param parent The parent composition reference, if applicable. Default is null.
+ * @param onCreated A function which will be executed only when the Composition is created.
+ *
+ * @see Applier
+ * @see Composition
+ * @see Recomposer
+ */
+@ExperimentalComposeApi
+fun compositionFor(
+    key: Any,
+    applier: Applier<*>,
+    recomposer: Recomposer,
+    parent: CompositionReference? = null,
+    onCreated: () -> Unit = {}
+): Composition = Compositions.findOrCreate(key) {
+    CompositionImpl(
+        recomposer,
+        parent,
+        composerFactory = { slots, rcmpsr -> Composer(slots, applier, rcmpsr) },
+        onDispose = { Compositions.onDisposed(key) }
+    ).also {
+        onCreated()
+    }
+}
+
+/**
  * @param parent An optional reference to the parent composition.
  * @param composerFactory A function to create a composer object, for use during composition
  * @param onDispose A callback to be triggered when [dispose] is called.
@@ -98,7 +140,7 @@ private class CompositionImpl(
     private val recomposer: Recomposer,
     parent: CompositionReference?,
     composerFactory: (SlotTable, Recomposer) -> Composer<*>,
-    private val onDispose: (() -> Unit)
+    private val onDispose: () -> Unit
 ) : Composition {
     private val slotTable: SlotTable = SlotTable()
     private val composer: Composer<*> = composerFactory(slotTable, recomposer).also {

@@ -17,7 +17,7 @@
 package androidx.compose.mock
 
 import androidx.compose.Composable
-import androidx.compose.currentComposer
+import androidx.compose.emit
 import androidx.compose.key
 
 @Composable
@@ -34,28 +34,38 @@ fun <T : Any> MockComposeScope.repeat(
 
 @Composable
 fun MockComposeScope.linear(block: @Composable MockComposeScope.() -> Unit) {
-    val c = currentComposer as MockViewComposer
-    View(name = "linear") {
-        c.block()
+    emit<View, ViewApplier>(
+        ctor = { View().also { it.name = "linear" } },
+        update = { }
+    ) {
+        block()
     }
 }
 
 @Composable
 fun MockComposeScope.text(value: String) {
-    View(name = "text", text = value)
+    emit<View, ViewApplier>(
+        ctor = { View().also { it.name = "text" } },
+        update = { set(value) { text = it } }
+    )
 }
 
 @Composable
 fun MockComposeScope.edit(value: String) {
-    View(name = "edit", value = value)
+    emit<View, ViewApplier>(
+        ctor = { View().also { it.name = "edit" } },
+        update = { set(value) { this.value = it } }
+    )
 }
 
 @Composable
 fun MockComposeScope.selectBox(selected: Boolean, block: @Composable MockComposeScope.() -> Unit) {
     if (selected) {
-        View(name = "box") {
-            block()
-        }
+        emit<View, ViewApplier>(
+            ctor = { View().also { it.name = "box" } },
+            update = { },
+            children = { block() }
+        )
     } else {
         block()
     }

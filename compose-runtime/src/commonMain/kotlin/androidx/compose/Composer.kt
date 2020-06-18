@@ -38,7 +38,7 @@ import androidx.compose.tooling.InspectionTables
     "This property should not be called directly. It is only used by the compiler.",
     replaceWith = ReplaceWith("currentComposer")
 )
-internal val composer: Composer<*> get() = error(
+val composer: Composer<*> get() = error(
     "This property should not be called directly. It is only used by the compiler."
 )
 
@@ -330,11 +330,11 @@ interface ComposerValidator {
     fun <T> changed(value: T): Boolean
 }
 
-// TODO(lmr): this could be named MutableTreeComposer
+// TODO(b/159074030): Consider removing type parameter
 /**
  * Implementation of a composer for mutable tree.
  */
-open class Composer<N>(
+class Composer<N>(
     /**
      * Backing storage for the composition
      */
@@ -343,7 +343,8 @@ open class Composer<N>(
     /**
      * An adapter that applies changes to the tree using the Applier abstraction.
      */
-    private val applier: Applier<N>,
+    @ComposeCompilerApi
+    val applier: Applier<N>,
 
     /**
      * Manager for scheduling recompositions.
@@ -351,6 +352,9 @@ open class Composer<N>(
     @ExperimentalComposeApi
     val recomposer: Recomposer
 ) {
+    init {
+        FrameManager.ensureStarted()
+    }
     private val changes = mutableListOf<Change<N>>()
     private val lifecycleObservers = HashMap<
         CompositionLifecycleObserverHolder,
@@ -404,7 +408,8 @@ open class Composer<N>(
     private var insertAnchor: Anchor = insertTable.anchor(0)
     private val insertFixups = mutableListOf<Change<N>>()
 
-    protected fun composeRoot(block: () -> Unit) {
+    @InternalComposeApi
+    fun composeRoot(block: () -> Unit) {
         startRoot()
         startGroup(invocationKey, invocation)
         block()
@@ -731,33 +736,11 @@ open class Composer<N>(
      * does not have the provided key a node with that key is scanned for and moved into the
      * current position if found, if no such node is found the composition switches into insert
      * mode and a the node is scheduled to be inserted at the current location.
-     *
-     * @param key the key for the node.
      */
     @ComposeCompilerApi
-    fun startNode(key: Any) {
-        start(nodeKey, key, true, null)
+    fun startNode() {
+        start(nodeKey, null, true, null)
         nodeExpected = true
-    }
-
-    // Deprecated
-    @ComposeCompilerApi
-    fun <T : N> emitNode(factory: () -> T) {
-        validateNodeExpected()
-        if (inserting) {
-            val insertIndex = nodeIndexStack.peek()
-            // The pending is the pending information for where the node is being inserted.
-            // pending will be null here when the parent was inserted too.
-            groupNodeCount++
-            recordFixup { applier, slots, _ ->
-                val node = factory()
-                slots.node = node
-                applier.insert(insertIndex, node)
-                applier.down(node)
-            }
-        } else {
-            recordDown(reader.node)
-        }
     }
 
     /**
@@ -787,13 +770,14 @@ open class Composer<N>(
      * inserting.
      */
     @ComposeCompilerApi
-    fun emitNode(node: N) {
+    fun emitNode(node: Any) {
         validateNodeExpected()
         require(inserting) { "emitNode() called when not inserting" }
         val insertIndex = nodeIndexStack.peek()
         // see emitNode
         groupNodeCount++
-        writer.node = node
+        @Suppress("UNCHECKED_CAST")
+        writer.node = node as N
         recordApplierOperation { applier, _, _ ->
             applier.insert(insertIndex, node)
             applier.down(node)
@@ -1198,7 +1182,7 @@ open class Composer<N>(
             if (collectKeySources)
                 recordSourceKeyInfo(key)
             when {
-                isNode -> writer.startNode(dataKey)
+                isNode -> writer.startNode(null)
                 data != null -> writer.startData(key, dataKey, data)
                 else -> writer.startGroup(key, dataKey)
             }
@@ -1267,7 +1251,7 @@ open class Composer<N>(
                 ensureWriter()
                 writer.beginInsert()
                 val insertLocation = writer.current
-                if (isNode) writer.startNode(dataKey) else writer.startGroup(key, dataKey)
+                if (isNode) writer.startNode(null) else writer.startGroup(key, dataKey)
                 insertAnchor = writer.anchor(insertLocation)
                 val insertKeyInfo = KeyInfo(key, -1, 0, -1, 0, writer.parentGroup)
                 pending.registerInsert(insertKeyInfo, nodeIndex - pending.startIndex)
@@ -2232,7 +2216,7 @@ open class Composer<N>(
 }
 
 @Suppress("UNCHECKED_CAST")
-/*inline */ class ComposerUpdater<N, T : N>(val composer: Composer<N>, val node: T) {
+/*inline */ class Updater<T>(val composer: Composer<*>, val node: T) {
     inline fun set(
         value: Int,
         /*crossinline*/
@@ -2283,6 +2267,12 @@ open class Composer<N>(
 //            val appliedBlock: T.(value: V) -> Unit = { block(it) }
 //            if (!inserting) composer.apply(value, appliedBlock)
         }
+    }
+
+    inline fun reconcile(
+        block: T.() -> Unit
+    ) {
+        node.block()
     }
 }
 
@@ -2425,10 +2415,18 @@ private fun MutableList<Invalidation>.removeRange(start: Int, end: Int) {
 private fun Boolean.asInt() = if (this) 1 else 0
 private fun Int.asBool() = this != 0
 
+@Deprecated(
+    "This no longer has any effect"
+)
 object NullCompilationScope {
     val composer = Unit
 }
 
+@Suppress("DEPRECATION")
+@Deprecated(
+    "This no longer has any effect",
+    ReplaceWith("block()")
+)
 inline fun <T> escapeCompose(block: NullCompilationScope.() -> T) = NullCompilationScope.block()
 
 @Composable

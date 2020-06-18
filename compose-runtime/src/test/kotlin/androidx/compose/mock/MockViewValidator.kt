@@ -90,7 +90,3 @@ fun MockViewValidator.skip(times: Int = 1) {
         assertEquals(true, hasNext)
     }
 }
-
-fun validate(root: View, block: MockViewValidator.() -> Unit) {
-    MockViewListValidator(root.children).validate(block)
-}
