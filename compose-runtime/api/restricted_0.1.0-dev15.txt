@@ -20,7 +20,7 @@ package androidx.compose {
   public final class ActualJvmKt {
   }
 
-  @androidx.compose.Immutable public abstract sealed class Ambient<T> {
+  @androidx.compose.Stable public abstract sealed class Ambient<T> {
     method public final inline T! getCurrent();
     property public final inline T! current;
   }
@@ -347,7 +347,7 @@ package androidx.compose {
     method public void onLeave();
   }
 
-  @androidx.compose.Immutable public abstract class ProvidableAmbient<T> extends androidx.compose.Ambient<T> {
+  @androidx.compose.Stable public abstract class ProvidableAmbient<T> extends androidx.compose.Ambient<T> {
     method public final infix androidx.compose.ProvidedValue<T> provides(T? value);
   }
 
