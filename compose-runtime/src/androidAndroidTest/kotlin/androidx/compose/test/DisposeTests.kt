@@ -18,6 +18,8 @@ package androidx.compose.test
 
 import androidx.compose.Composable
 import androidx.compose.Composition
+import androidx.compose.ExperimentalComposeApi
+import androidx.compose.Untracked
 import androidx.compose.clearRoots
 import androidx.compose.onActive
 import androidx.compose.onPreCommit
@@ -44,7 +46,8 @@ class DisposeTests : BaseComposeTest() {
     fun testDisposeComposition() {
         val log = mutableListOf<String>()
 
-        val composable = @Composable {
+        @OptIn(ExperimentalComposeApi::class)
+        val composable = @Composable @Untracked {
             onPreCommit {
                 log.add("onPreCommit")
                 onDispose {

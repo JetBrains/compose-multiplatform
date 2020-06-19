@@ -13,199 +13,55 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:OptIn(ComposeCompilerApi::class, ExperimentalComposeApi::class)
 package androidx.compose.test
 
-import android.app.Activity
-import android.content.Context
 import android.view.View
-import android.view.ViewGroup
-import androidx.compose.Applier
-import androidx.compose.ApplyAdapter
+import android.widget.TextView
+import android.widget.Button
+import android.widget.LinearLayout
 import androidx.compose.Composable
-import androidx.compose.ComposeCompilerApi
-import androidx.compose.Composer
-import androidx.compose.ComposerUpdater
-import androidx.compose.Composition
-import androidx.compose.ExperimentalComposeApi
-import androidx.compose.FrameManager
-import androidx.compose.Recomposer
-import androidx.compose.SlotTable
-import androidx.compose.compositionFor
-import androidx.ui.node.UiComposer
+import androidx.ui.viewinterop.emitView
 
-interface Emittable {
-    fun emitInsertAt(index: Int, instance: Emittable)
-    fun emitRemoveAt(index: Int, count: Int)
-    fun emitMove(from: Int, to: Int, count: Int)
-}
-
-internal class EmittableApplyAdapter : ApplyAdapter<Any> {
-    override fun Any.start(instance: Any) {}
-    override fun Any.insertAt(index: Int, instance: Any) {
-        when (this) {
-            is ViewGroup -> insertAt(index, instance)
-            is Emittable -> emitInsertAt(index, instance as Emittable)
-            else -> error("unexpected node")
-        }
-    }
-
-    override fun Any.removeAt(index: Int, count: Int) {
-        when (this) {
-            is ViewGroup -> removeViews(index, count)
-            is Emittable -> emitRemoveAt(index, count)
-            else -> error("unexpected node")
-        }
-    }
-
-    override fun Any.move(from: Int, to: Int, count: Int) {
-        when (this) {
-            is ViewGroup -> {
-                if (from > to) {
-                    var currentFrom = from
-                    var currentTo = to
-                    repeat(count) {
-                        val view = getChildAt(currentFrom)
-                        removeViewAt(currentFrom)
-                        addView(view, currentTo)
-                        currentFrom++
-                        currentTo++
-                    }
-                } else {
-                    repeat(count) {
-                        val view = getChildAt(from)
-                        removeViewAt(from)
-                        addView(view, to - 1)
-                    }
-                }
-            }
-            is Emittable -> {
-                emitMove(from, to, count)
-            }
-            else -> error("unexpected node")
-        }
-    }
-
-    override fun Any.end(instance: Any, parent: Any) {}
-}
-
-class EmittableComposer(
-    val context: Context,
-    val root: Any,
-    slotTable: SlotTable,
-    recomposer: Recomposer
-) : Composer<Any>(
-    slotTable,
-    Applier(
-        root,
-        EmittableApplyAdapter()
-    ),
-    recomposer
+@Composable
+fun TextView(
+    id: Int = 0,
+    text: String = "",
+    onClickListener: View.OnClickListener? = null
 ) {
-    init {
-        FrameManager.ensureStarted()
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    fun <T : View> emit(
-        key: Any,
-        /*crossinline*/
-        ctor: (context: Context) -> T,
-        update: ViewUpdater<T>.() -> Unit
-    ) {
-        startNode(key)
-        val node = if (inserting) ctor(context).also { emitNode(it) }
-        else useNode() as T
-        ViewUpdater(this, node).update()
-        endNode()
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    fun <T : ViewGroup> emit(
-        key: Any,
-        /*crossinline*/
-        ctor: (context: Context) -> T,
-        update: ViewUpdater<T>.() -> Unit,
-        children: () -> Unit
-    ) {
-        startNode(key)
-        val node = if (inserting) ctor(context).also { emitNode(it) }
-        else useNode() as T
-        ViewUpdater(this, node).update()
-        children()
-        endNode()
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    fun <T : Emittable> emit(
-        key: Any,
-        /*crossinline*/
-        ctor: () -> T,
-        update: ViewUpdater<T>.() -> Unit
-    ) {
-        startNode(key)
-        val node = if (inserting) ctor().also { emitNode(it) }
-        else useNode() as T
-        ViewUpdater(this, node).update()
-        endNode()
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    fun <T : Emittable> emit(
-        key: Any,
-        /*crossinline*/
-        ctor: () -> T,
-        update: ViewUpdater<T>.() -> Unit,
-        children: () -> Unit
-    ) {
-        startNode(key)
-        val node = if (inserting) ctor().also { emitNode(it) }
-        else useNode() as T
-        ViewUpdater(this, node).update()
-        children()
-        endNode()
+    emitView(::TextView) {
+        if (id != 0) it.id = id
+        it.text = text
+        if (onClickListener != null) it.setOnClickListener(onClickListener)
     }
 }
 
-typealias ViewUpdater<T> = ComposerUpdater<Any, T>
-
-class ComponentNodeScope { val composer: UiComposer get() = error("should not get called") }
-class EmittableScope { val composer: EmittableComposer get() = error("should not get called") }
-
-class Node(val name: String, var value: String = "") : Emittable {
-    val children = mutableListOf<Node>()
-
-    override fun emitInsertAt(index: Int, instance: Emittable) {
-        children.add(index, instance as Node)
-    }
-
-    override fun emitRemoveAt(index: Int, count: Int) {
-        repeat(count) { children.removeAt(index) }
-    }
-
-    override fun emitMove(from: Int, to: Int, count: Int) {
-        if (from > to) {
-            repeat(count) {
-                children.add(to + it, children.removeAt(from))
-            }
-        } else if (from < to) {
-            repeat(count) {
-                children.add(to - 1, children.removeAt(from))
-            }
-        }
+@Composable
+fun Button(
+    id: Int = 0,
+    text: String = "",
+    onClickListener: View.OnClickListener? = null
+) {
+    emitView(::Button) {
+        if (id != 0) it.id = id
+        it.text = text
+        if (onClickListener != null) it.setOnClickListener(onClickListener)
     }
 }
 
-fun Activity.setEmittableContent(content: @Composable () -> Unit): Composition {
-    val root = Node("Root")
-    val composition = compositionFor(root, Recomposer.current()) { slotTable, recomposer ->
-        EmittableComposer(
-            this,
-            root,
-            slotTable,
-            recomposer
-        )
-    }
-    composition.setContent(content)
-    return composition
+@Composable
+fun LinearLayout(
+    id: Int = 0,
+    orientation: Int = LinearLayout.VERTICAL,
+    onClickListener: View.OnClickListener? = null,
+    children: @Composable () -> Unit
+) {
+    emitView(
+        ::LinearLayout,
+        {
+            if (id != 0) it.id = id
+            if (onClickListener != null) it.setOnClickListener(onClickListener)
+            it.orientation = orientation
+        },
+        children
+    )
 }

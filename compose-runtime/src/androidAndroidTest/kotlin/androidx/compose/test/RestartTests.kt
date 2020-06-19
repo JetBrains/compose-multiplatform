@@ -24,7 +24,6 @@ import androidx.compose.clearRoots
 import androidx.compose.mutableStateOf
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import androidx.ui.node.UiComposer
 import junit.framework.TestCase
 import org.junit.After
 import org.junit.Rule
@@ -37,8 +36,6 @@ import kotlin.test.assertTrue
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class RestartTests : BaseComposeTest() {
-
-    val composer: UiComposer get() = error("should not be called")
 
     @After
     fun teardown() {

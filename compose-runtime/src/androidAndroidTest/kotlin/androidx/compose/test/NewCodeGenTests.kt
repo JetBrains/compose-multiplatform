@@ -17,7 +17,6 @@
 
 package androidx.compose.test
 
-import android.content.Context
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.compose.Composable
@@ -28,7 +27,6 @@ import androidx.compose.mutableStateOf
 import androidx.compose.setValue
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import androidx.ui.node.UiComposer
 import junit.framework.TestCase
 import org.junit.After
 import org.junit.Rule
@@ -38,8 +36,6 @@ import org.junit.runner.RunWith
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class NewCodeGenTests : BaseComposeTest() {
-
-    val composer: UiComposer get() = error("should not be called")
 
     @After
     fun teardown() {
@@ -274,58 +270,6 @@ class NewCodeGenTests : BaseComposeTest() {
                     textView.text
                 )
             }
-        }
-    }
-
-    @Test
-    fun testViewClassWithCtorParametersInvocation() {
-        val tvId = 749
-
-        class MyTextView(context: Context) : TextView(context) {
-            constructor(context: Context, someText: String) : this(context) {
-                text = someText
-            }
-        }
-
-        var hello by mutableStateOf("Hello world!")
-        compose {
-            // <MyTextView someText = hello />
-            key(hello) {
-                MyTextView(id = tvId, someText = hello)
-            }
-        }.then { activity ->
-            val tv = activity.findViewById(tvId) as TextView
-            TestCase.assertEquals("Hello world!", tv.text)
-
-            hello = "Salutations!"
-        }.then { activity ->
-            val tv = activity.findViewById(tvId) as TextView
-            TestCase.assertEquals("Salutations!", tv.text)
-        }
-    }
-
-    @Test
-    fun testViewClassWithMutableCtorParameter() {
-        val tvId = 749
-
-        class MyTextView(context: Context, var someValue: String) : TextView(context)
-
-        var hello by mutableStateOf("Hello world!")
-        var value by mutableStateOf("Unmodified")
-        compose {
-            // <MyTextView someText = hello />
-            MyTextView(id = tvId, someValue = value, text = hello)
-        }.then { activity ->
-            val tv = activity.findViewById(tvId) as MyTextView
-            TestCase.assertEquals("Hello world!", tv.text)
-            TestCase.assertEquals("Unmodified", tv.someValue)
-
-            hello = "Salutations!"
-            value = "Modified"
-        }.then { activity ->
-            val tv = activity.findViewById(tvId) as MyTextView
-            TestCase.assertEquals("Salutations!", tv.text)
-            TestCase.assertEquals("Modified", tv.someValue)
         }
     }
 }

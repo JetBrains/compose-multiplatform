@@ -31,11 +31,12 @@ import androidx.compose.Composition
 import androidx.compose.ExperimentalComposeApi
 import androidx.compose.FrameManager
 import androidx.compose.Looper
+import androidx.compose.Providers
 import androidx.compose.Recomposer
 import androidx.compose.Untracked
 import androidx.compose.compositionReference
-import androidx.compose.escapeCompose
 import androidx.compose.remember
+import androidx.ui.core.ContextAmbient
 import androidx.ui.core.LayoutNode
 import androidx.ui.core.setViewContent
 import androidx.ui.core.subcomposeInto
@@ -116,27 +117,18 @@ abstract class BaseComposeTest {
 
     fun compose(
         composable: @Composable () -> Unit
-    ) = UiTester(
-        activity,
-        composable
-    )
-
-    fun composeEmittables(
-        composable: @Composable () -> Unit
-    ) = EmittableTester(
+    ) = ComposeTester(
         activity,
         composable
     )
 
     @Composable
     fun subCompose(block: @Composable () -> Unit) {
-        val container =
-            remember { escapeCompose { LayoutNode() } }
+        val container = remember { LayoutNode() }
         val reference = compositionReference()
         // TODO(b/150390669): Review use of @Untracked
         @OptIn(ExperimentalComposeApi::class)
         subcomposeInto(
-            activityRule.activity,
             container,
             Recomposer.current(),
             reference
@@ -146,7 +138,7 @@ abstract class BaseComposeTest {
     }
 }
 
-sealed class ComposeTester(val activity: Activity, val composable: @Composable () -> Unit) {
+class ComposeTester(val activity: Activity, val composable: @Composable () -> Unit) {
     inner class ActiveTest(val activity: Activity, val composition: Composition) {
         fun then(block: ActiveTest.(activity: Activity) -> Unit): ActiveTest {
             activity.waitForAFrame()
@@ -161,7 +153,15 @@ sealed class ComposeTester(val activity: Activity, val composable: @Composable (
         }
     }
 
-    abstract fun initialComposition(composable: @Composable () -> Unit): Composition
+    private fun initialComposition(composable: @Composable () -> Unit): Composition {
+        return activity.show {
+            Providers(
+                ContextAmbient provides activity
+            ) {
+                composable()
+            }
+        }
+    }
 
     fun then(block: ComposeTester.(activity: Activity) -> Unit): ActiveTest {
         val composition = initialComposition(composable)
@@ -170,26 +170,5 @@ sealed class ComposeTester(val activity: Activity, val composable: @Composable (
             block(activity)
         }
         return ActiveTest(activity, composition)
-    }
-}
-
-class EmittableTester(activity: Activity, composable: @Composable () -> Unit) :
-    ComposeTester(activity, composable) {
-    override fun initialComposition(composable: @Composable () -> Unit): Composition {
-        var composition: Composition? = null
-        activity.uiThread {
-            FrameManager.nextFrame()
-            composition = activity.setEmittableContent(composable)
-        }
-        return composition!!
-    }
-}
-
-class UiTester(activity: Activity, composable: @Composable () -> Unit) :
-    ComposeTester(activity, composable) {
-    override fun initialComposition(composable: @Composable () -> Unit): Composition {
-        return activity.show {
-            composable()
-        }
     }
 }

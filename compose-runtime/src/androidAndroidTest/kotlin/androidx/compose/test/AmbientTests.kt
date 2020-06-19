@@ -27,7 +27,6 @@ import androidx.compose.StructurallyEqual
 import androidx.compose.Untracked
 import androidx.compose.ambientOf
 import androidx.compose.compositionReference
-import androidx.compose.escapeCompose
 import androidx.compose.invalidate
 import androidx.compose.remember
 import androidx.compose.staticAmbientOf
@@ -35,7 +34,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.ui.core.LayoutNode
 import androidx.ui.core.subcomposeInto
-import androidx.ui.node.UiComposer
+import androidx.ui.viewinterop.emitView
 import org.junit.After
 import org.junit.Rule
 import org.junit.Test
@@ -64,11 +63,9 @@ val someStaticInt = staticAmbientOf { 40 }
 @RunWith(AndroidJUnit4::class)
 class AmbientTests : BaseComposeTest() {
 
-    val composer: UiComposer get() = error("should not be called")
-
     @Composable
     fun Text(value: String, id: Int = 100) {
-        TextView(id = id, text = value)
+        emitView(::TextView) { it.id = id; it.text = value; }
     }
 
     @Composable
@@ -511,14 +508,13 @@ class AmbientTests : BaseComposeTest() {
     }
 
     @Composable fun deferredSubCompose(block: @Composable () -> Unit): () -> Unit {
-        val container = remember { escapeCompose { LayoutNode() } }
+        val container = remember { LayoutNode() }
         val ref = Ref<CompositionReference>()
         narrowInvalidateForReference(ref = ref)
         return {
             @OptIn(ExperimentalComposeApi::class)
             // TODO(b/150390669): Review use of @Untracked
             subcomposeInto(
-                activityRule.activity,
                 container,
                 Recomposer.current(),
                 ref.value

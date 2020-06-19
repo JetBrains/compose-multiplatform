@@ -20,11 +20,12 @@ package androidx.compose
 import androidx.compose.mock.Contact
 import androidx.compose.mock.ContactModel
 import androidx.compose.mock.MockComposeScope
-import androidx.compose.mock.MockViewComposer
+import androidx.compose.mock.MockViewListValidator
 import androidx.compose.mock.MockViewValidator
 import androidx.compose.mock.Point
 import androidx.compose.mock.Report
 import androidx.compose.mock.View
+import androidx.compose.mock.ViewApplier
 import androidx.compose.mock.contact
 import androidx.compose.mock.edit
 import androidx.compose.mock.linear
@@ -36,7 +37,6 @@ import androidx.compose.mock.reportsTo
 import androidx.compose.mock.selectContact
 import androidx.compose.mock.skip
 import androidx.compose.mock.text
-import androidx.compose.mock.validate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -61,11 +61,11 @@ class CompositionTests {
     @Test
     fun testComposeAModel() {
         val model = testModel()
-        val myComposer = compose {
+        val result = compose {
             selectContact(model)
         }
 
-        validate(myComposer.root) {
+        result.validate {
             linear {
                 linear {
                     text("Filter:")
@@ -86,13 +86,13 @@ class CompositionTests {
     @Test
     fun testRecomposeWithoutChanges() {
         val model = testModel()
-        val myComposer = compose {
+        val result = compose {
             selectContact(model)
         }
 
-        myComposer.expectNoChanges()
+        result.expectNoChanges()
 
-        validate(myComposer.root) {
+        result.validate {
             selectContact(model)
         }
     }
@@ -102,12 +102,12 @@ class CompositionTests {
         val model =
             testModel(mutableListOf(bob, jon))
         var changed = {}
-        val myComposer = compose {
+        val result = compose {
             changed = invalidate
             selectContact(model)
         }
 
-        validate(myComposer.root) {
+        result.validate {
             linear {
                 skip()
                 linear {
@@ -122,9 +122,9 @@ class CompositionTests {
 
         model.add(steve, after = bob)
         changed()
-        myComposer.expectChanges()
+        result.expectChanges()
 
-        validate(myComposer.root) {
+        result.validate {
             linear {
                 skip()
                 linear {
@@ -149,16 +149,16 @@ class CompositionTests {
             )
         )
         var changed = {}
-        val myComposer = compose {
+        val result = compose {
             changed = invalidate
             selectContact(model)
         }
 
         model.move(steve, after = jon)
         changed()
-        myComposer.expectChanges()
+        result.expectChanges()
 
-        validate(myComposer.root) {
+        result.validate {
             linear {
                 skip()
                 linear {
@@ -183,16 +183,16 @@ class CompositionTests {
             )
         )
         var changed: (() -> Unit)? = null
-        val myComposer = compose {
+        val result = compose {
             changed = invalidate
             selectContact(model)
         }
 
         model.filter = "Jon"
         changed!!()
-        myComposer.expectChanges()
+        result.expectChanges()
 
-        validate(myComposer.root) {
+        result.validate {
             linear {
                 skip()
                 linear {
@@ -213,11 +213,11 @@ class CompositionTests {
             clark_reports_to_lois
         )
 
-        val myComposer = compose {
+        val result = compose {
             reportsReport(reports)
         }
 
-        validate(myComposer.root) {
+        result.validate {
             reportsReport(reports)
         }
     }
@@ -230,7 +230,7 @@ class CompositionTests {
             clark_reports_to_lois
         )
         var changed: (() -> Unit)? = null
-        val myComposer = compose {
+        val result = compose {
             changed = invalidate
             reportsReport(reports)
         }
@@ -241,9 +241,9 @@ class CompositionTests {
             rob_reports_to_alice
         )
         changed!!()
-        myComposer.expectChanges()
+        result.expectChanges()
 
-        validate(myComposer.root) {
+        result.validate {
             reportsReport(reports)
         }
     }
@@ -275,22 +275,22 @@ class CompositionTests {
             }
             text("After")
         }
-        val myComposer = compose {
+        val result = compose {
             composition()
         }
-        validate(myComposer.root) {
+        result.validate {
             composition()
         }
         includeA = false
         changed!!()
-        myComposer.expectChanges()
-        validate(myComposer.root) {
+        result.expectChanges()
+        result.validate {
             composition()
         }
         includeA = true
         changed!!()
-        myComposer.expectChanges()
-        validate(myComposer.root) {
+        result.expectChanges()
+        result.validate {
             composition()
         }
     }
@@ -316,14 +316,14 @@ class CompositionTests {
             repeat(of = chars) { c -> textOf(c) }
         }
 
-        val myComposer = compose {
+        val result = compose {
             changed = invalidate
             chars(chars)
             chars(chars)
             chars(chars)
         }
 
-        validate(myComposer.root) {
+        result.validate {
             validatechars(chars)
             validatechars(chars)
             validatechars(chars)
@@ -331,9 +331,9 @@ class CompositionTests {
 
         chars = listOf('a', 'b', 'x', 'c')
         changed!!()
-        myComposer.expectChanges()
+        result.expectChanges()
 
-        validate(myComposer.root) {
+        result.validate {
             validatechars(chars)
             validatechars(chars)
             validatechars(chars)
@@ -343,13 +343,13 @@ class CompositionTests {
     @Test
     fun testSimpleMemoize() {
         val points = listOf(Point(1, 2), Point(2, 3))
-        val myComposer = compose {
+        val result = compose {
             points(points)
         }
 
-        validate(myComposer.root) { points(points) }
+        result.validate { points(points) }
 
-        val changes = myComposer.recompose()
+        val changes = result.recompose()
         assertFalse(changes)
     }
 
@@ -362,12 +362,12 @@ class CompositionTests {
             Point(6, 7)
         )
         var changed: (() -> Unit)? = null
-        val myComposer = compose {
+        val result = compose {
             changed = invalidate
             points(points)
         }
 
-        validate(myComposer.root) { points(points) }
+        result.validate { points(points) }
 
         points = listOf(
             Point(1, 2),
@@ -376,9 +376,9 @@ class CompositionTests {
             Point(6, 7)
         )
         changed!!()
-        myComposer.expectChanges()
+        result.expectChanges()
 
-        validate(myComposer.root) { points(points) }
+        result.validate { points(points) }
     }
 
     @Test
@@ -406,11 +406,11 @@ class CompositionTests {
             rob_reports_to_alice,
             clark_reports_to_lois
         )
-        val myComposer = compose {
+        val result = compose {
             reportsReport(reports)
         }
 
-        validate(myComposer.root) {
+        result.validate {
             linear {
                 reportsTo(jim_reports_to_sally)
                 reportsTo(rob_reports_to_alice)
@@ -418,7 +418,7 @@ class CompositionTests {
             }
         }
 
-        myComposer.expectNoChanges()
+        result.expectNoChanges()
     }
 
     @Test
@@ -435,11 +435,11 @@ class CompositionTests {
             }
         }
 
-        val myComposer = compose {
+        val result = compose {
             Two(41, 42)
         }
 
-        validate(myComposer.root) {
+        result.validate {
             two(41, 42)
         }
     }
@@ -458,11 +458,11 @@ class CompositionTests {
             }
         }
 
-        val myComposer = compose {
+        val result = compose {
             Three(41, 42, 43)
         }
 
-        validate(myComposer.root) {
+        result.validate {
             three(41, 42, 43)
         }
     }
@@ -486,11 +486,11 @@ class CompositionTests {
             }
         }
 
-        val myComposer = compose {
+        val result = compose {
             Four(41, 42, 43, 44)
         }
 
-        validate(myComposer.root) {
+        result.validate {
             four(41, 42, 43, 44)
         }
     }
@@ -548,13 +548,13 @@ class CompositionTests {
             test(showThree)
         }
 
-        val myComposer = compose(block = composition)
-        validate(myComposer.root, block = validation)
+        val result = compose(block = composition)
+        result.validate(validation)
 
         showThree = true
         recomposeTest()
-        myComposer.expectChanges()
-        validate(myComposer.root, block = validation)
+        result.expectChanges()
+        result.validate(validation)
     }
 
     @Test
@@ -573,20 +573,20 @@ class CompositionTests {
 
         var value = 42
         var changed: (() -> Unit)? = null
-        val myComposer = compose {
+        val result = compose {
             changed = invalidate
             callOne(value)
         }
 
-        validate(myComposer.root) {
+        result.validate {
             one(42)
         }
 
         value = 43
         changed!!()
-        myComposer.expectChanges()
+        result.expectChanges()
 
-        validate(myComposer.root) {
+        result.validate {
             one(43)
         }
     }
@@ -607,25 +607,25 @@ class CompositionTests {
 
         var value = 42
         var changed: (() -> Unit)? = null
-        val myComposer = compose {
+        val result = compose {
             changed = invalidate
             callOne(value)
         }
 
-        validate(myComposer.root) {
+        result.validate {
             one(42)
         }
 
         value = 43
         changed!!()
-        myComposer.expectChanges()
+        result.expectChanges()
 
-        validate(myComposer.root) {
+        result.validate {
             one(43)
         }
 
         changed!!()
-        myComposer.expectNoChanges()
+        result.expectNoChanges()
     }
 
     @Test
@@ -656,11 +656,11 @@ class CompositionTests {
             jim_reports_to_sally,
             rob_reports_to_alice,
             clark_reports_to_lois, r)
-        val myComposer = compose {
+        val result = compose {
             reportsReport(reports)
         }
 
-        validate(myComposer.root) {
+        result.validate {
             linear {
                 reportsTo(jim_reports_to_sally)
                 reportsTo(rob_reports_to_alice)
@@ -669,7 +669,7 @@ class CompositionTests {
             }
         }
 
-        myComposer.expectNoChanges()
+        result.expectNoChanges()
 
         // Demote Perry
         r.from = "Perry"
@@ -678,9 +678,9 @@ class CompositionTests {
         // Compose only the Lois report
         recomposeLois?.let { it() }
 
-        myComposer.expectChanges()
+        result.expectChanges()
 
-        validate(myComposer.root) {
+        result.validate {
             linear {
                 reportsTo(jim_reports_to_sally)
                 reportsTo(rob_reports_to_alice)
@@ -721,11 +721,11 @@ class CompositionTests {
             jim_reports_to_sally,
             rob_reports_to_alice,
             clark_reports_to_lois, r)
-        val myComposer = compose {
+        val result = compose {
             reportsReport(reports)
         }
 
-        validate(myComposer.root) {
+        result.validate {
             linear {
                 reportsTo(jim_reports_to_sally)
                 reportsTo(rob_reports_to_alice)
@@ -734,7 +734,7 @@ class CompositionTests {
             }
         }
 
-        myComposer.expectNoChanges()
+        result.expectNoChanges()
 
         // Demote Perry
         r.from = "Perry"
@@ -746,9 +746,9 @@ class CompositionTests {
         // Compose only the Lois report
         recomposeLois?.let { it() }
 
-        myComposer.expectChanges()
+        result.expectChanges()
 
-        validate(myComposer.root) {
+        result.validate {
             linear {
                 reportsTo(jim_reports_to_sally)
                 reportsTo(rob_reports_to_alice)
@@ -802,12 +802,12 @@ class CompositionTests {
 
         var filter = all
         var changed = {}
-        val myComposer = compose {
+        val result = compose {
             changed = invalidate
             reportsReport(reports, filter)
         }
 
-        validate(myComposer.root) {
+        result.validate {
             linear {
                 reportsTo(jim_reports_to_sally)
                 reportsTo(rob_reports_to_alice)
@@ -818,9 +818,9 @@ class CompositionTests {
 
         filter = notLois
         changed()
-        myComposer.expectChanges()
+        result.expectChanges()
 
-        validate(myComposer.root) {
+        result.validate {
             linear {
                 reportsTo(jim_reports_to_sally)
                 reportsTo(rob_reports_to_alice)
@@ -829,9 +829,9 @@ class CompositionTests {
 
         // Invalidate Lois which is now removed.
         recomposeLois()
-        myComposer.expectNoChanges()
+        result.expectNoChanges()
 
-        validate(myComposer.root) {
+        result.validate {
             linear {
                 reportsTo(jim_reports_to_sally)
                 reportsTo(rob_reports_to_alice)
@@ -862,16 +862,16 @@ class CompositionTests {
             text("value = $value")
         }
 
-        val myComposer = compose {
+        val result = compose {
             test(1)
         }
 
-        validate(myComposer.root) { test(1) }
+        result.validate { test(1) }
 
         assertEquals(1, count)
 
         changed!!()
-        myComposer.expectNoChanges()
+        result.expectNoChanges()
 
         // Expect the previous instance to be remembered
         assertEquals(1, count)
@@ -898,23 +898,23 @@ class CompositionTests {
 
         var value = 1
         var changed: (() -> Unit)? = null
-        val myComposer = compose {
+        val result = compose {
             changed = invalidate
             test(value)
         }
 
-        validate(myComposer.root) { test(1) }
+        result.validate { test(1) }
 
         value = 2
         changed!!()
-        myComposer.expectChanges()
+        result.expectChanges()
 
-        validate(myComposer.root) { test(2) }
+        result.validate { test(2) }
 
         changed!!()
-        myComposer.expectNoChanges()
+        result.expectNoChanges()
 
-        validate(myComposer.root) { test(2) }
+        result.validate { test(2) }
 
         assertEquals(2, count)
     }
@@ -942,24 +942,24 @@ class CompositionTests {
         var p2 = 2
         var changed: (() -> Unit)? = null
 
-        val myComposer = compose {
+        val result = compose {
             changed = invalidate
             test(p1, p2)
         }
 
-        validate(myComposer.root) { test(1, 2) }
+        result.validate { test(1, 2) }
 
         p1 = 2
         p2 = 3
         changed!!()
-        myComposer.expectChanges()
+        result.expectChanges()
 
-        validate(myComposer.root) { test(2, 3) }
+        result.validate { test(2, 3) }
 
         changed!!()
-        myComposer.expectNoChanges()
+        result.expectNoChanges()
 
-        validate(myComposer.root) { test(2, 3) }
+        result.validate { test(2, 3) }
 
         assertEquals(2, count)
     }
@@ -985,23 +985,23 @@ class CompositionTests {
 
         var p3 = 3
         var changed: (() -> Unit)? = null
-        val myComposer = compose {
+        val result = compose {
             changed = invalidate
             test(1, 2, p3)
         }
 
-        validate(myComposer.root) { test(1, 2, 3) }
+        result.validate { test(1, 2, 3) }
 
         p3 = 4
         changed!!()
-        myComposer.expectChanges()
+        result.expectChanges()
 
-        validate(myComposer.root) { test(1, 2, 4) }
+        result.validate { test(1, 2, 4) }
 
         changed!!()
-        myComposer.expectNoChanges()
+        result.expectNoChanges()
 
-        validate(myComposer.root) { test(1, 2, 4) }
+        result.validate { test(1, 2, 4) }
 
         assertEquals(2, count)
     }
@@ -1029,24 +1029,24 @@ class CompositionTests {
         var p4 = 4
         var changed: (() -> Unit)? = null
 
-        val myComposer = compose {
+        val result = compose {
             changed = invalidate
             test(1, 2, p3, p4)
         }
 
-        validate(myComposer.root) { test(1, 2, 3, 4) }
+        result.validate { test(1, 2, 3, 4) }
 
         p3 = 4
         p4 = 5
         changed!!()
-        myComposer.expectChanges()
+        result.expectChanges()
 
-        validate(myComposer.root) { test(1, 2, 4, 5) }
+        result.validate { test(1, 2, 4, 5) }
 
         changed!!()
-        myComposer.expectNoChanges()
+        result.expectNoChanges()
 
-        validate(myComposer.root) { test(1, 2, 4, 5) }
+        result.validate { test(1, 2, 4, 5) }
 
         assertEquals(2, count)
     }
@@ -1072,23 +1072,23 @@ class CompositionTests {
 
         var lastParameter = 5
         var changed: (() -> Unit)? = null
-        val myComposer = compose {
+        val result = compose {
             changed = invalidate
             test(1, 2, 3, 4, lastParameter)
         }
 
-        validate(myComposer.root) { test(1, 2, 3, 4, 5) }
+        result.validate { test(1, 2, 3, 4, 5) }
 
         lastParameter = 6
         changed!!()
 
-        myComposer.expectChanges()
+        result.expectChanges()
 
-        validate(myComposer.root) { test(1, 2, 3, 4, 6) }
+        result.validate { test(1, 2, 3, 4, 6) }
 
-        myComposer.expectNoChanges()
+        result.expectNoChanges()
 
-        validate(myComposer.root) { test(1, 2, 3, 4, 6) }
+        result.validate { test(1, 2, 3, 4, 6) }
 
         assertEquals(2, count)
     }
@@ -1116,15 +1116,15 @@ class CompositionTests {
             }
         }
 
-        val myComposer = compose { composition() }
+        val result = compose { composition() }
 
-        validate(myComposer.root) { composition() }
+        result.validate { composition() }
 
         for (i in 1..10) {
             values.add(i)
             changed!!()
-            myComposer.expectChanges()
-            validate(myComposer.root) { composition() }
+            result.expectChanges()
+            result.validate { composition() }
         }
     }
 
@@ -1164,14 +1164,14 @@ class CompositionTests {
             }
         }
 
-        val myComposer = compose { composition() }
-        validate(myComposer.root) { composition() }
+        val result = compose { composition() }
+        result.validate { composition() }
 
         threeVisible = true
         changed!!()
-        myComposer.expectChanges()
+        result.expectChanges()
 
-        validate(myComposer.root) { composition() }
+        result.validate { composition() }
     }
 
     @Test
@@ -1191,16 +1191,16 @@ class CompositionTests {
             }
         }
 
-        val myComposer = compose { composition() }
+        val result = compose { composition() }
 
-        validate(myComposer.root) { composition() }
+        result.validate { composition() }
 
         text = "Ending"
         myInvalidate?.let { it() }
 
-        myComposer.expectChanges()
+        result.expectChanges()
 
-        validate(myComposer.root) { composition() }
+        result.validate { composition() }
     }
 
     @Test
@@ -1230,22 +1230,22 @@ class CompositionTests {
             }
         }
 
-        val myComposer = compose { composition() }
+        val result = compose { composition() }
 
-        validate(myComposer.root) { composition() }
+        result.validate { composition() }
 
         text = "Ending"
         includeNested = false
         invalidate1()
         invalidate2()
 
-        myComposer.expectChanges()
+        result.expectChanges()
 
-        validate(myComposer.root) { composition() }
+        result.validate { composition() }
 
-        myComposer.expectNoChanges()
+        result.expectNoChanges()
 
-        validate(myComposer.root) { composition() }
+        result.validate { composition() }
     }
 
     @Test
@@ -1275,22 +1275,22 @@ class CompositionTests {
             }
         }
 
-        val myComposer = compose { composition() }
+        val result = compose { composition() }
 
-        validate(myComposer.root) { composition() }
+        result.validate { composition() }
 
         text = "Ending"
         includeNested = false
         invalidate1?.invoke()
         invalidate2?.invoke()
 
-        myComposer.expectChanges()
+        result.expectChanges()
 
-        validate(myComposer.root) { composition() }
+        result.validate { composition() }
 
-        myComposer.expectNoChanges()
+        result.expectNoChanges()
 
-        validate(myComposer.root) { composition() }
+        result.validate { composition() }
     }
 
     // b/132638679
@@ -1318,16 +1318,16 @@ class CompositionTests {
             }
         }
 
-        val myComposer = compose { composition() }
+        val result = compose { composition() }
 
         texts = 4
         invalidateOuter?.invoke()
         invalidateInner?.invoke()
-        myComposer.expectChanges()
+        result.expectChanges()
 
         texts = 3
         invalidateOuter?.invoke()
-        myComposer.expectChanges()
+        result.expectChanges()
     }
 
     @Test
@@ -1357,17 +1357,17 @@ class CompositionTests {
         }
 
         var changed: (() -> Unit)? = null
-        val myComposer = compose {
+        val result = compose {
             changed = invalidate
             composition()
         }
-        validate(myComposer.root) { composition() }
+        result.validate { composition() }
 
         assertEquals(1, lifecycleObject.count, "object should have been notified of an enter")
 
         changed!!()
-        myComposer.expectNoChanges()
-        validate(myComposer.root) { composition() }
+        result.expectNoChanges()
+        result.validate { composition() }
 
         assertEquals(1, lifecycleObject.count, "Object should have only been notified once")
     }
@@ -1408,17 +1408,17 @@ class CompositionTests {
         }
 
         var changed: (() -> Unit)? = null
-        val myComposer = compose {
+        val result = compose {
             changed = invalidate
             composition()
         }
-        validate(myComposer.root) { composition() }
+        result.validate { composition() }
 
         assertEquals(1, lifecycleObject.count, "object should have been notified of an enter")
 
         changed!!()
-        myComposer.expectNoChanges()
-        validate(myComposer.root) { composition() }
+        result.expectNoChanges()
+        result.validate { composition() }
 
         assertEquals(1, lifecycleObject.count, "Object should have only been notified once")
     }
@@ -1460,24 +1460,24 @@ class CompositionTests {
 
         var changed: (() -> Unit)? = null
         var value = true
-        val myComposer = compose {
+        val result = compose {
             changed = invalidate
             composition(value)
         }
-        validate(myComposer.root) { composition(true) }
+        result.validate { composition(true) }
 
         assertEquals(1, lifecycleObject.count, "object should have been notified of an enter")
 
         changed!!()
-        myComposer.expectNoChanges()
-        validate(myComposer.root) { composition(true) }
+        result.expectNoChanges()
+        result.validate { composition(true) }
 
         assertEquals(1, lifecycleObject.count, "Object should have only been notified once")
 
         value = false
         changed!!()
-        myComposer.expectChanges()
-        validate(myComposer.root) { composition(false) }
+        result.expectChanges()
+        result.validate { composition(false) }
 
         assertEquals(0, lifecycleObject.count, "Object should have been notified of a leave")
     }
@@ -1552,11 +1552,11 @@ class CompositionTests {
         var b = false
         var c = false
         var changed: (() -> Unit)? = null
-        val myComposer = compose {
+        val result = compose {
             changed = invalidate
             composition(a = a, b = b, c = c)
         }
-        validate(myComposer.root) {
+        result.validate {
             composition(
                 a = true,
                 b = false,
@@ -1573,8 +1573,8 @@ class CompositionTests {
         expectedEnter = false
         expectedLeave = false
         changed!!()
-        myComposer.expectNoChanges()
-        validate(myComposer.root) {
+        result.expectNoChanges()
+        result.validate {
             composition(
                 a = true,
                 b = false,
@@ -1593,8 +1593,8 @@ class CompositionTests {
         b = true
         c = false
         changed!!()
-        myComposer.expectChanges()
-        validate(myComposer.root) {
+        result.expectChanges()
+        result.validate {
             composition(
                 a = false,
                 b = true,
@@ -1609,8 +1609,8 @@ class CompositionTests {
         b = false
         c = true
         changed!!()
-        myComposer.expectChanges()
-        validate(myComposer.root) {
+        result.expectChanges()
+        result.validate {
             composition(
                 a = false,
                 b = false,
@@ -1625,8 +1625,8 @@ class CompositionTests {
         b = false
         c = false
         changed!!()
-        myComposer.expectChanges()
-        validate(myComposer.root) {
+        result.expectChanges()
+        result.validate {
             composition(
                 a = true,
                 b = false,
@@ -1641,8 +1641,8 @@ class CompositionTests {
         b = false
         c = false
         changed!!()
-        myComposer.expectChanges()
-        validate(myComposer.root) {
+        result.expectChanges()
+        result.validate {
             composition(
                 a = false,
                 b = false,
@@ -1696,25 +1696,25 @@ class CompositionTests {
             }
         }
 
-        val myComposer = compose {
+        val result = compose {
             changed = invalidate
             composition(obj = lifecycleObject)
         }
-        validate(myComposer.root) { composition() }
+        result.validate { composition() }
         assertEquals(1, lifecycleObject1.count, "first object should enter")
         assertEquals(0, lifecycleObject2.count, "second object should not have entered")
 
         lifecycleObject = lifecycleObject2
         changed()
-        myComposer.expectChanges()
-        validate(myComposer.root) { composition() }
+        result.expectChanges()
+        result.validate { composition() }
         assertEquals(0, lifecycleObject1.count, "first object should have left")
         assertEquals(1, lifecycleObject2.count, "second object should have entered")
 
         lifecycleObject = object {}
         changed()
-        myComposer.expectChanges()
-        validate(myComposer.root) { composition() }
+        result.expectChanges()
+        result.validate { composition() }
         assertEquals(0, lifecycleObject1.count, "first object should have left")
         assertEquals(0, lifecycleObject2.count, "second object should have left")
     }
@@ -1799,7 +1799,7 @@ class CompositionTests {
         var value = true
         var changed: (() -> Unit)? = null
 
-        val myComposer = compose {
+        val result = compose {
             changed = invalidate
             composition(value)
         }
@@ -1811,7 +1811,7 @@ class CompositionTests {
 
         value = false
         changed!!()
-        myComposer.expectChanges()
+        result.expectChanges()
 
         assertTrue(
             objects.mapNotNull { it as? Counted }.map { it.count == 0 }.all { it },
@@ -1847,16 +1847,16 @@ class CompositionTests {
         @Composable
         fun MockComposeScope.test() {
             outerInvalidate = invalidate
-            outerKeys.add(composer.currentCompoundKeyHash)
+            outerKeys.add(currentComposer.currentCompoundKeyHash)
             Container {
                 innerInvalidate = invalidate
-                innerKeys.add(composer.currentCompoundKeyHash)
+                innerKeys.add(currentComposer.currentCompoundKeyHash)
             }
             // asserts that the key is correctly rolled back after start and end of Observe
-            assertEquals(outerKeys.last(), composer.currentCompoundKeyHash)
+            assertEquals(outerKeys.last(), currentComposer.currentCompoundKeyHash)
         }
 
-        val myComposer = compose {
+        val result = compose {
             test()
         }
 
@@ -1865,12 +1865,12 @@ class CompositionTests {
 
         previousOuterKeysSize = outerKeys.size
         outerInvalidate()
-        myComposer.expectNoChanges()
+        result.expectNoChanges()
         assertNotEquals(previousOuterKeysSize, outerKeys.size)
 
         previousInnerKeysSize = innerKeys.size
         innerInvalidate()
-        myComposer.expectNoChanges()
+        result.expectNoChanges()
         assertNotEquals(previousInnerKeysSize, innerKeys.size)
 
         assertNotEquals(innerKeys[0], outerKeys[0])
@@ -1900,7 +1900,7 @@ class CompositionTests {
             }
         }
 
-        val myComposer = compose {
+        val result = compose {
             test()
         }
 
@@ -1909,7 +1909,7 @@ class CompositionTests {
         items[3] = 2
         invalidateComposition()
 
-        myComposer.expectChanges()
+        result.expectChanges()
     }
 
     @Test // b/154650546
@@ -1985,12 +1985,12 @@ class CompositionTests {
             }
         }
 
-        val myComposition = compose {
+        val result = compose {
             test()
         }
 
         fun validate() {
-            validate(myComposition.root) {
+            result.validate {
                 test()
             }
         }
@@ -2006,7 +2006,7 @@ class CompositionTests {
 
         invalidateComposition()
 
-        myComposition.expectChanges()
+        result.expectChanges()
         validate()
     }
 
@@ -2052,19 +2052,19 @@ class CompositionTests {
             }
         }
 
-        val myComposition = compose {
+        val result = compose {
             test()
         }
 
-        validate(myComposition.root) {
+        result.validate {
             test()
         }
 
         items.add(2 to listOf(3, 4, 5, 6))
         invalidateComposition()
 
-        myComposition.expectChanges()
-        validate(myComposition.root) {
+        result.expectChanges()
+        result.validate {
             test()
         }
     }
@@ -2158,12 +2158,12 @@ class CompositionTests {
             }
         }
 
-        val myComposition = compose {
+        val result = compose {
             test()
         }
 
         fun validate() {
-            validate(myComposition.root) {
+            result.validate {
                 test()
             }
         }
@@ -2171,29 +2171,29 @@ class CompositionTests {
 
         includeEven = false
         invalidateComposition()
-        myComposition.expectChanges()
+        result.expectChanges()
         validate()
 
         includeEven = true
         includeOdd = false
         invalidateComposition()
-        myComposition.expectChanges()
+        result.expectChanges()
         validate()
 
         includeEven = false
         includeOdd = false
         invalidateComposition()
-        myComposition.expectChanges()
+        result.expectChanges()
         validate()
 
         includeEven = true
         invalidateComposition()
-        myComposition.expectChanges()
+        result.expectChanges()
         validate()
 
         includeOdd = true
         invalidateComposition()
-        myComposition.expectChanges()
+        result.expectChanges()
         validate()
     }
 
@@ -2209,11 +2209,6 @@ class CompositionTests {
                 invalidate()
             }
             invalidates.clear()
-        }
-
-        @Composable
-        fun MockComposeScope.wrapper(children: @Composable () -> Unit) {
-            children()
         }
 
         @Composable
@@ -2288,12 +2283,12 @@ class CompositionTests {
             }
         }
 
-        val myComposition = compose {
+        val result = compose {
             test()
         }
 
         fun validate() {
-            validate(myComposition.root) {
+            result.validate {
                 test()
             }
         }
@@ -2302,33 +2297,33 @@ class CompositionTests {
         order = listOf(1, 2, 4, 3)
         includeEven = false
         invalidateComposition()
-        myComposition.expectChanges()
+        result.expectChanges()
         validate()
 
         order = listOf(1, 4, 2, 3)
         includeEven = true
         includeOdd = false
         invalidateComposition()
-        myComposition.expectChanges()
+        result.expectChanges()
         validate()
 
         order = listOf(3, 4, 2, 1)
         includeEven = false
         includeOdd = false
         invalidateComposition()
-        myComposition.expectChanges()
+        result.expectChanges()
         validate()
 
         order = listOf(4, 3, 2, 1)
         includeEven = true
         invalidateComposition()
-        myComposition.expectChanges()
+        result.expectChanges()
         validate()
 
         order = listOf(1, 2, 3, 4)
         includeOdd = true
         invalidateComposition()
-        myComposition.expectChanges()
+        result.expectChanges()
         validate()
     }
 }
@@ -2345,12 +2340,34 @@ private fun <T> assertArrayEquals(message: String, expected: Array<T>, received:
     }
 }
 
+private class CompositionResult(
+    val composer: Composer<*>,
+    val root: View
+) {
+    fun validate(block: MockViewValidator.() -> Unit) {
+        MockViewListValidator(root.children).validate(block)
+    }
+
+    fun expectNoChanges() {
+        val changes = composer.recompose() && composer.changeCount > 0
+        assertFalse(changes)
+    }
+
+    fun expectChanges() {
+        val changes = composer.recompose() && composer.changeCount > 0
+        assertTrue(changes, "Expected changes")
+        composer.applyChanges()
+        composer.slotTable.verifyWellFormed()
+    }
+
+    fun recompose(): Boolean = composer.recompose()
+}
+
 private fun compose(
     block: @Composable MockComposeScope.() -> Unit
-): MockViewComposer {
+): CompositionResult {
+    val root = View().apply { name = "root" }
     val composer = run {
-        val root = View().apply { name = "root" }
-
         val scope = CoroutineScope(Job())
         val clock = object : CompositionFrameClock {
             override suspend fun <R> withFrameNanos(onFrame: (Long) -> R): R {
@@ -2363,28 +2380,23 @@ private fun compose(
         val recomposer = Recomposer().apply {
             scope.launch { runRecomposeAndApplyChanges(clock) }
         }
-        MockViewComposer(root, recomposer)
+        Composer(
+            SlotTable(),
+            ViewApplier(root),
+            recomposer
+        )
     }
 
-    composer.compose {
-        block()
+    val mockScope = MockComposeScope()
+    composer.composeRoot {
+        invokeComposable(composer) {
+            mockScope.block()
+        }
     }
     composer.applyChanges()
     composer.slotTable.verifyWellFormed()
 
-    return composer
-}
-
-private fun MockViewComposer.expectNoChanges() {
-    val changes = recompose() && changeCount > 0
-    assertFalse(changes)
-}
-
-private fun MockViewComposer.expectChanges() {
-    val changes = recompose() && changeCount > 0
-    assertTrue(changes, "Expected changes")
-    applyChanges()
-    slotTable.verifyWellFormed()
+    return CompositionResult(composer, root)
 }
 
 // Contact test data

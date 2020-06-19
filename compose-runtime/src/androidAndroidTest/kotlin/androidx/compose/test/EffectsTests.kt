@@ -34,7 +34,6 @@ import androidx.compose.setValue
 import androidx.compose.state
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import androidx.ui.node.UiComposer
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import org.junit.After
@@ -45,8 +44,6 @@ import org.junit.runner.RunWith
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class EffectsTests : BaseComposeTest() {
-
-    val composer: UiComposer get() = error("should not be called")
 
     @After
     fun teardown() {
