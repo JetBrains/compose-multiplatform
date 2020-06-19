@@ -54,7 +54,7 @@ package androidx.compose
  *
  * @sample androidx.compose.samples.consumeAmbient
  */
-@Immutable
+@Stable
 sealed class Ambient<T> constructor(defaultFactory: (() -> T)? = null) {
     @Suppress("UNCHECKED_CAST")
     internal val defaultValueHolder = LazyValueHolder(defaultFactory)
@@ -80,7 +80,7 @@ sealed class Ambient<T> constructor(defaultFactory: (() -> T)? = null) {
  * @see Ambient
  * @see Providers
  */
-@Immutable
+@Stable
 abstract class ProvidableAmbient<T> internal constructor(defaultFactory: (() -> T)?) :
     Ambient<T> (defaultFactory) {
 
@@ -119,7 +119,6 @@ internal class DynamicProvidableAmbient<T> constructor(
  *
  * @see staticAmbientOf
  */
-@Immutable
 internal class StaticProvidableAmbient<T>(defaultFactory: (() -> T)?) :
     ProvidableAmbient<T>(defaultFactory) {
 
