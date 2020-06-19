@@ -34,9 +34,6 @@ package androidx.compose
 @MustBeDocumented
 @Retention(AnnotationRetention.BINARY)
 @Target(
-    // not currently used
-    AnnotationTarget.CLASS,
-
     // function declarations
     // @Composable fun Foo() { ... }
     // lambda expressions
