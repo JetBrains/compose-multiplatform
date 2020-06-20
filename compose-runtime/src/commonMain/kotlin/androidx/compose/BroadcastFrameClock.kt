@@ -16,6 +16,7 @@
 
 package androidx.compose
 
+import androidx.compose.dispatch.MonotonicFrameClock
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.Continuation
 
@@ -30,7 +31,7 @@ import kotlin.coroutines.Continuation
  */
 internal class BroadcastFrameClock(
     private val onNewAwaiters: (() -> Unit)? = null
-) : CompositionFrameClock {
+) : MonotonicFrameClock {
 
     private data class FrameAwaiter<R>(val onFrame: (Long) -> R, val continuation: Continuation<R>)
 

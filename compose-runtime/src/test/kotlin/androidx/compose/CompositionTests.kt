@@ -17,6 +17,7 @@
 @file:OptIn(ExperimentalComposeApi::class, InternalComposeApi::class)
 package androidx.compose
 
+import androidx.compose.dispatch.MonotonicFrameClock
 import androidx.compose.mock.Contact
 import androidx.compose.mock.ContactModel
 import androidx.compose.mock.MockComposeScope
@@ -2369,7 +2370,7 @@ private fun compose(
     val root = View().apply { name = "root" }
     val composer = run {
         val scope = CoroutineScope(Job())
-        val clock = object : CompositionFrameClock {
+        val clock = object : MonotonicFrameClock {
             override suspend fun <R> withFrameNanos(onFrame: (Long) -> R): R {
                 // The original version of this test used a mock Recomposer
                 // that never successfully scheduled a frame.

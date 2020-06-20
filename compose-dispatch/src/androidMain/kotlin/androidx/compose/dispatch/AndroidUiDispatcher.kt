@@ -14,20 +14,29 @@
  * limitations under the License.
  */
 
-package androidx.compose
+package androidx.compose.dispatch
 
+import android.os.Looper
 import android.view.Choreographer
 import androidx.core.os.HandlerCompat
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.runBlocking
 import kotlin.coroutines.CoroutineContext
 
 /**
- * A [CoroutineDispatcher] that will perform dispatch during [choreographer]'s animation frame
- * stage. Suspending will always wait until the next frame.
+ * A [CoroutineDispatcher] that will perform dispatch during a [handler] callback or
+ * [choreographer]'s animation frame stage, whichever comes first. Use [Main] to obtain
+ * a dispatcher for the process's main thread (i.e. the activity thread) or [CurrentThread]
+ * to obtain a dispatcher for the current thread.
  */
+// Implementation note: the constructor is private to direct users toward the companion object
+// accessors for the main/current threads. A choreographer must be obtained from its current
+// thread as per the only public API surface for obtaining one as of this writing, and the
+// choreographer and handler must match. Constructing an AndroidUiDispatcher with a handler
+// not marked as async will adversely affect dispatch behavior but not to the point of
+// incorrectness; more operations would be deferred to the choreographer frame as racing handler
+// messages would wait behind a frame barrier.
 @OptIn(ExperimentalStdlibApi::class)
 class AndroidUiDispatcher private constructor(
     val choreographer: Choreographer,
@@ -38,12 +47,12 @@ class AndroidUiDispatcher private constructor(
     private val lock = Any()
 
     private val toRunTrampolined = ArrayDeque<Runnable>()
-    private var toRunOnFrame = mutableListOf<ChoreographerFrameCallback>()
-    private var spareToRunOnFrame = mutableListOf<ChoreographerFrameCallback>()
+    private var toRunOnFrame = mutableListOf<Choreographer.FrameCallback>()
+    private var spareToRunOnFrame = mutableListOf<Choreographer.FrameCallback>()
     private var scheduledTrampolineDispatch = false
     private var scheduledFrameDispatch = false
 
-    private val dispatchCallback = object : ChoreographerFrameCallback, java.lang.Runnable {
+    private val dispatchCallback = object : Choreographer.FrameCallback, Runnable {
         override fun run() {
             performTrampolineDispatch()
             synchronized(lock) {
@@ -73,10 +82,10 @@ class AndroidUiDispatcher private constructor(
                 task = nextTask()
             }
         } while (
-            // We don't dispatch holding the lock so that other tasks can get in on our
-            // trampolining time slice, but once we're done, make sure nothing added a new task
-            // before we set scheduledDispatch = false, which would prevent the next dispatch
-            // from being correctly scheduled. Loop to run these stragglers now.
+        // We don't dispatch holding the lock so that other tasks can get in on our
+        // trampolining time slice, but once we're done, make sure nothing added a new task
+        // before we set scheduledDispatch = false, which would prevent the next dispatch
+        // from being correctly scheduled. Loop to run these stragglers now.
             synchronized(lock) {
                 if (toRunTrampolined.isEmpty()) {
                     scheduledTrampolineDispatch = false
@@ -102,7 +111,7 @@ class AndroidUiDispatcher private constructor(
         toRun.clear()
     }
 
-    internal fun postFrameCallback(callback: ChoreographerFrameCallback) {
+    internal fun postFrameCallback(callback: Choreographer.FrameCallback) {
         synchronized(lock) {
             toRunOnFrame.add(callback)
             if (!scheduledFrameDispatch) {
@@ -112,13 +121,17 @@ class AndroidUiDispatcher private constructor(
         }
     }
 
-    internal fun removeFrameCallback(callback: ChoreographerFrameCallback) {
+    internal fun removeFrameCallback(callback: Choreographer.FrameCallback) {
         synchronized(lock) {
             toRunOnFrame.remove(callback)
         }
     }
 
-    val compositionFrameClock: CompositionFrameClock = AndroidUiCompositionFrameClock(choreographer)
+    /**
+     * A [MonotonicFrameClock] associated with this [AndroidUiDispatcher]'s [choreographer]
+     * that may be used to await [Choreographer] frame dispatch.
+     */
+    val frameClock: MonotonicFrameClock = AndroidUiFrameClock(choreographer)
 
     override fun dispatch(context: CoroutineContext, block: Runnable) {
         synchronized(lock) {
@@ -135,6 +148,9 @@ class AndroidUiDispatcher private constructor(
     }
 
     companion object {
+        /**
+         * The [AndroidUiDispatcher] for the process's main thread.
+         */
         val Main by lazy {
             AndroidUiDispatcher(
                 if (isMainThread()) Choreographer.getInstance()
@@ -143,12 +159,26 @@ class AndroidUiDispatcher private constructor(
             )
         }
 
-        private val currentThread = ThreadLocal {
-            AndroidUiDispatcher(
-                Choreographer.getInstance(),
-                HandlerCompat.createAsync(Looper.myLooper() ?: error("no Looper on this thread"))
-            )
+        private val currentThread: ThreadLocal<AndroidUiDispatcher> =
+            object : ThreadLocal<AndroidUiDispatcher>() {
+                override fun initialValue(): AndroidUiDispatcher = AndroidUiDispatcher(
+                    Choreographer.getInstance(),
+                    HandlerCompat.createAsync(Looper.myLooper()
+                        ?: error("no Looper on this thread"))
+                )
+            }
+
+        /**
+         * The canonical [AndroidUiDispatcher] for the calling thread. Returns [Main] if accessed
+         * from the process's main thread.
+         *
+         * Throws [IllegalArgumentException] if the calling thread does not have
+         * both a [Choreographer] and an active [Looper].
+         */
+        val CurrentThread: AndroidUiDispatcher get() = if (isMainThread()) Main else {
+            currentThread.get() ?: error("no AndroidUiDispatcher for this thread")
         }
-        val CurrentThread: AndroidUiDispatcher get() = currentThread.get()
     }
 }
+
+private fun isMainThread() = Looper.myLooper() === Looper.getMainLooper()
