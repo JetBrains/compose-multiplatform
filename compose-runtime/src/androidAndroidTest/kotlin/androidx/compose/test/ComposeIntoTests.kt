@@ -18,10 +18,10 @@ package androidx.compose.test
 
 import android.os.HandlerThread
 import androidx.compose.Composable
+import androidx.compose.ComposableContract
 import androidx.compose.ExperimentalComposeApi
 import androidx.compose.FrameManager
 import androidx.compose.Handler
-import androidx.compose.Untracked
 import androidx.compose.clearRoots
 import androidx.compose.mutableStateOf
 import androidx.compose.onActive
@@ -55,7 +55,7 @@ class ComposeIntoTests : BaseComposeTest() {
         var initializationCount = 0
         var commitCount = 0
         @OptIn(ExperimentalComposeApi::class)
-        val composable = @Composable @Untracked {
+        val composable = @Composable @ComposableContract(tracked = false) {
             onActive { initializationCount++ }
             onCommit { commitCount++ }
         }

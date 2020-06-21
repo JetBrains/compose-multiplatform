@@ -27,4 +27,9 @@ package androidx.compose
     AnnotationTarget.FUNCTION
 )
 @ExperimentalComposeApi
+@Deprecated(
+    "This is now implemented as a composable contract",
+    ReplaceWith("@ComposableContract(tracked=false)", "androidx.compose.ComposableContract"),
+    DeprecationLevel.ERROR
+)
 annotation class Untracked

@@ -27,13 +27,13 @@ import android.view.ViewGroup
 import androidx.compose.Choreographer
 import androidx.compose.ChoreographerFrameCallback
 import androidx.compose.Composable
+import androidx.compose.ComposableContract
 import androidx.compose.Composition
 import androidx.compose.ExperimentalComposeApi
 import androidx.compose.FrameManager
 import androidx.compose.Looper
 import androidx.compose.Providers
 import androidx.compose.Recomposer
-import androidx.compose.Untracked
 import androidx.compose.compositionReference
 import androidx.compose.remember
 import androidx.ui.core.ContextAmbient
@@ -126,13 +126,13 @@ abstract class BaseComposeTest {
     fun subCompose(block: @Composable () -> Unit) {
         val container = remember { LayoutNode() }
         val reference = compositionReference()
-        // TODO(b/150390669): Review use of @Untracked
+        // TODO(b/150390669): Review use of @ComposableContract(tracked = false)
         @OptIn(ExperimentalComposeApi::class)
         subcomposeInto(
             container,
             Recomposer.current(),
             reference
-        ) @Untracked {
+        ) @ComposableContract(tracked = false) {
             block()
         }
     }
