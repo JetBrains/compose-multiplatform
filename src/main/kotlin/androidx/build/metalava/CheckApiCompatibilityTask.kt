@@ -21,7 +21,6 @@ import androidx.build.checkapi.ApiLocation
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
 import org.gradle.workers.WorkerExecutor
 import java.io.File
@@ -59,12 +58,6 @@ abstract class CheckApiCompatibilityTask @Inject constructor(
             baselineApiLocation.publicApiFile,
             baselineApiLocation.restrictedApiFile
         )
-    }
-
-    // Declaring outputs prevents Gradle from rerunning this task if the inputs haven't changed
-    @OutputFiles
-    fun getTaskOutputs(): List<File> {
-        return listOf(referenceApi.get().publicApiFile)
     }
 
     @TaskAction
