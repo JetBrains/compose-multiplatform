@@ -24,14 +24,18 @@ package androidx.compose
  * Caution: Use of this annotation means that the annotated declaration *MUST* comply with those
  * contracts, or else the resulting code's behavior will be undefined.
  *
- * @param restartable When false,this will prevent code from being generated which
+ * @param restartable if false, this will prevent code from being generated which
  * allow this function's execution to be skipped or restarted. This may be desirable for small
  * functions which just directly call another composable function and have very little machinery
  * in them directly.
  *
- * @param readonly if false, no group will be generated around the body of the function it annotates
+ * @param readonly if true, no group will be generated around the body of the function it annotates
  * . This is not safe unless the body of the function only executes "read" operations on the
  * passed in composer..
+ *
+ * @param tracked if false, this will disable lambda optimizations such as tracking execution of
+ * composable function expressions or remembering a function expression value based on its
+ * capture variables. This flag is only meaningful when applied to @Composable lambda expressions
  */
 @MustBeDocumented
 @Retention(AnnotationRetention.BINARY)
@@ -41,5 +45,6 @@ package androidx.compose
 )
 annotation class ComposableContract(
     val restartable: Boolean = true,
-    val readonly: Boolean = false
+    val readonly: Boolean = false,
+    val tracked: Boolean = true
 )

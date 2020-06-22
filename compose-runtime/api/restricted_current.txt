@@ -77,6 +77,7 @@ package androidx.compose {
   @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets={AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY}) public @interface ComposableContract {
     method public abstract boolean readonly() default false;
     method public abstract boolean restartable() default true;
+    method public abstract boolean tracked() default true;
   }
 
   @kotlin.RequiresOptIn(level=RequiresOptIn.Level.WARNING, message="This API is intended to be targeted by the Compose Compiler Plugin and not called " + "directly.") @kotlin.annotation.Target(allowedTargets={AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY, AnnotationTarget.TYPEALIAS}) public @interface ComposeCompilerApi {
@@ -532,7 +533,7 @@ package androidx.compose {
     method public abstract Class<?>[] types();
   }
 
-  @androidx.compose.ExperimentalComposeApi @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.FUNCTION) public @interface Untracked {
+  @Deprecated @androidx.compose.ExperimentalComposeApi @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.FUNCTION) public @interface Untracked {
   }
 
   public final class Updater<T> {

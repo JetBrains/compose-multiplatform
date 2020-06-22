@@ -19,12 +19,12 @@ package androidx.compose.test
 import android.widget.TextView
 import androidx.compose.Ambient
 import androidx.compose.Composable
+import androidx.compose.ComposableContract
 import androidx.compose.CompositionReference
 import androidx.compose.ExperimentalComposeApi
 import androidx.compose.Providers
 import androidx.compose.Recomposer
 import androidx.compose.StructurallyEqual
-import androidx.compose.Untracked
 import androidx.compose.ambientOf
 import androidx.compose.compositionReference
 import androidx.compose.invalidate
@@ -513,12 +513,12 @@ class AmbientTests : BaseComposeTest() {
         narrowInvalidateForReference(ref = ref)
         return {
             @OptIn(ExperimentalComposeApi::class)
-            // TODO(b/150390669): Review use of @Untracked
+            // TODO(b/150390669): Review use of @ComposableContract(tracked = false)
             subcomposeInto(
                 container,
                 Recomposer.current(),
                 ref.value
-            ) @Untracked {
+            ) @ComposableContract(tracked = false) {
                 block()
             }
         }
