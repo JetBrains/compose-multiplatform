@@ -158,6 +158,7 @@ object MetalavaTasks {
                 task.api.set(builtApiLocation)
                 task.dependencyClasspath = javaCompileInputs.dependencyClasspath
                 task.bootClasspath = javaCompileInputs.bootClasspath
+                task.cacheEvenIfNoOutputs()
                 task.dependsOn(generateApi)
             }
 
