@@ -235,7 +235,7 @@ package androidx.compose {
     method @org.jetbrains.annotations.TestOnly public <T> T! isolated(kotlin.jvm.functions.Function0<? extends T> block);
     method public void nextFrame();
     method @org.jetbrains.annotations.TestOnly public <T> T! unframed(kotlin.jvm.functions.Function0<? extends T> block);
-    field public static final androidx.compose.FrameManager! INSTANCE;
+    field public static final androidx.compose.FrameManager INSTANCE;
   }
 
   @androidx.compose.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.CLASS) public @interface Immutable {
@@ -290,7 +290,7 @@ package androidx.compose {
   @Deprecated public final class NullCompilationScope {
     method @Deprecated public kotlin.Unit getComposer();
     property public final kotlin.Unit composer;
-    field @Deprecated public static final androidx.compose.NullCompilationScope! INSTANCE;
+    field @Deprecated public static final androidx.compose.NullCompilationScope INSTANCE;
   }
 
   public final class ObserveKt {
@@ -346,7 +346,7 @@ package androidx.compose {
     method public suspend Object? recomposeAndApplyChanges(kotlinx.coroutines.CoroutineScope applyCoroutineScope, androidx.compose.dispatch.MonotonicFrameClock frameClock, long frameCount, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public suspend Object? runRecomposeAndApplyChanges(androidx.compose.dispatch.MonotonicFrameClock frameClock, kotlin.coroutines.Continuation<?> p);
     property public final androidx.compose.dispatch.MonotonicFrameClock frameClock;
-    field public static final androidx.compose.Recomposer.Companion! Companion;
+    field public static final androidx.compose.Recomposer.Companion Companion;
   }
 
   public static final class Recomposer.Companion {
@@ -439,7 +439,7 @@ package androidx.compose {
     method @androidx.compose.InternalComposeApi @org.jetbrains.annotations.TestOnly public void verifyWellFormed();
     method @androidx.compose.InternalComposeApi public <T> T! write(kotlin.jvm.functions.Function1<? super androidx.compose.SlotWriter,? extends T> block);
     property public final int size;
-    field public static final androidx.compose.SlotTable.Companion! Companion;
+    field public static final androidx.compose.SlotTable.Companion Companion;
   }
 
   @androidx.compose.InternalComposeApi public static final class SlotTable.Companion {
