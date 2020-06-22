@@ -6,7 +6,7 @@ package androidx.compose.dispatch {
     method public android.view.Choreographer getChoreographer();
     method public androidx.compose.dispatch.MonotonicFrameClock getFrameClock();
     property public final androidx.compose.dispatch.MonotonicFrameClock frameClock;
-    field public static final androidx.compose.dispatch.AndroidUiDispatcher.Companion! Companion;
+    field public static final androidx.compose.dispatch.AndroidUiDispatcher.Companion Companion;
   }
 
   public static final class AndroidUiDispatcher.Companion {
