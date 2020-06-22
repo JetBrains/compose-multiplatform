@@ -36,7 +36,7 @@ package androidx.compose {
     method public android.view.Choreographer getChoreographer();
     method public androidx.compose.CompositionFrameClock getCompositionFrameClock();
     property public final androidx.compose.CompositionFrameClock compositionFrameClock;
-    field public static final androidx.compose.AndroidUiDispatcher.Companion! Companion;
+    field public static final androidx.compose.AndroidUiDispatcher.Companion Companion;
   }
 
   public static final class AndroidUiDispatcher.Companion {
@@ -241,7 +241,7 @@ package androidx.compose {
     method @org.jetbrains.annotations.TestOnly public <T> T! isolated(kotlin.jvm.functions.Function0<? extends T> block);
     method public void nextFrame();
     method @org.jetbrains.annotations.TestOnly public <T> T! unframed(kotlin.jvm.functions.Function0<? extends T> block);
-    field public static final androidx.compose.FrameManager! INSTANCE;
+    field public static final androidx.compose.FrameManager INSTANCE;
   }
 
   @androidx.compose.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.CLASS) public @interface Immutable {
@@ -268,11 +268,6 @@ package androidx.compose {
     method @androidx.compose.Composable public static inline <T> T! key(Object![]? inputs, kotlin.jvm.functions.Function0<? extends T> block);
   }
 
-  public final class KeySourceInfoKt {
-    method @androidx.compose.InternalComposeApi public static String? keySourceInfoOf(Object key);
-    method @androidx.compose.InternalComposeApi public static void resetSourceInfo();
-  }
-
   @androidx.compose.Stable public interface MutableState<T> extends androidx.compose.State<T> {
     method public operator T! component1();
     method public operator kotlin.jvm.functions.Function1<T,kotlin.Unit> component2();
@@ -296,7 +291,7 @@ package androidx.compose {
   public final class NullCompilationScope {
     method public kotlin.Unit getComposer();
     property public final kotlin.Unit composer;
-    field public static final androidx.compose.NullCompilationScope! INSTANCE;
+    field public static final androidx.compose.NullCompilationScope INSTANCE;
   }
 
   public final class ObserveKt {
@@ -337,7 +332,7 @@ package androidx.compose {
     method public suspend Object? recomposeAndApplyChanges(kotlinx.coroutines.CoroutineScope applyCoroutineScope, androidx.compose.CompositionFrameClock frameClock, long frameCount, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public suspend Object? runRecomposeAndApplyChanges(androidx.compose.CompositionFrameClock frameClock, kotlin.coroutines.Continuation<?> p);
     property public final androidx.compose.CompositionFrameClock frameClock;
-    field public static final androidx.compose.Recomposer.Companion! Companion;
+    field public static final androidx.compose.Recomposer.Companion Companion;
   }
 
   public static final class Recomposer.Companion {
@@ -430,7 +425,7 @@ package androidx.compose {
     method @androidx.compose.InternalComposeApi @org.jetbrains.annotations.TestOnly public void verifyWellFormed();
     method @androidx.compose.InternalComposeApi public <T> T! write(kotlin.jvm.functions.Function1<? super androidx.compose.SlotWriter,? extends T> block);
     property public final int size;
-    field public static final androidx.compose.SlotTable.Companion! Companion;
+    field public static final androidx.compose.SlotTable.Companion Companion;
   }
 
   @androidx.compose.InternalComposeApi public static final class SlotTable.Companion {
