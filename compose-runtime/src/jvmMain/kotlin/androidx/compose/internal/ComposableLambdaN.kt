@@ -29,7 +29,7 @@ private const val SLOTS_PER_INT = 15
 
 @Stable
 @ComposeCompilerApi
-class RestartableFunctionN<R>(
+class ComposableLambdaN<R>(
     val key: Int,
     private val tracked: Boolean,
     override val arity: Int
@@ -93,22 +93,22 @@ class RestartableFunctionN<R>(
 
 @Suppress("unused")
 @ComposeCompilerApi
-fun restartableFunctionN(
+fun composableLambdaN(
     composer: Composer<*>,
     key: Int,
     tracked: Boolean,
     arity: Int,
     block: Any
-): RestartableFunctionN<*> {
+): ComposableLambdaN<*> {
     composer.startReplaceableGroup(key)
     val slot = composer.nextSlot()
     val result = if (slot === SlotTable.EMPTY) {
-        val value = RestartableFunctionN<Any>(key, tracked, arity)
+        val value = ComposableLambdaN<Any>(key, tracked, arity)
         composer.updateValue(value)
         value
     } else {
         @Suppress("UNCHECKED_CAST")
-        slot as RestartableFunctionN<Any>
+        slot as ComposableLambdaN<Any>
     }
     result.update(block)
     composer.endReplaceableGroup()
@@ -117,9 +117,9 @@ fun restartableFunctionN(
 
 @Suppress("unused")
 @ComposeCompilerApi
-fun restartableFunctionNInstance(
+fun composableLambdaNInstance(
     key: Int,
     tracked: Boolean,
     arity: Int,
     block: Any
-): RestartableFunctionN<*> = RestartableFunctionN<Any>(key, tracked, arity).apply { update(block) }
+): ComposableLambdaN<*> = ComposableLambdaN<Any>(key, tracked, arity).apply { update(block) }
