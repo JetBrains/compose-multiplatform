@@ -44,7 +44,7 @@ internal fun differentBits(slot: Int): Int = bitsForSlot(0b10, slot)
  */
 @Stable
 @ComposeCompilerApi
-class RestartableFunction<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16,
+class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16,
         P17, P18, R>(
             val key: Int,
             private val tracked: Boolean
@@ -1140,20 +1140,20 @@ private fun RecomposeScope?.replacableWith(other: RecomposeScope) =
     this == null || !this.valid || this == other || this.anchor == other.anchor
 
 @ComposeCompilerApi
-private typealias RFunction = RestartableFunction<Any, Any, Any, Any, Any, Any, Any, Any, Any, Any,
+private typealias CLambda = ComposableLambda<Any, Any, Any, Any, Any, Any, Any, Any, Any, Any,
         Any, Any, Any, Any, Any, Any, Any, Any, Any>
 
 @Suppress("unused")
 @ComposeCompilerApi
-fun restartableFunction(composer: Composer<*>, key: Int, tracked: Boolean, block: Any): RFunction {
+fun composableLambda(composer: Composer<*>, key: Int, tracked: Boolean, block: Any): CLambda {
     composer.startReplaceableGroup(key)
     val slot = composer.nextSlot()
     val result = if (slot === SlotTable.EMPTY) {
-        val value = RFunction(key, tracked)
+        val value = CLambda(key, tracked)
         composer.updateValue(value)
         value
     } else {
-        slot as RFunction
+        slot as CLambda
     }
     result.update(block)
     composer.endReplaceableGroup()
@@ -1162,5 +1162,5 @@ fun restartableFunction(composer: Composer<*>, key: Int, tracked: Boolean, block
 
 @Suppress("unused")
 @ComposeCompilerApi
-fun restartableFunctionInstance(key: Int, tracked: Boolean, block: Any) =
-    RFunction(key, tracked).apply { update(block) }
+fun composableLambdaInstance(key: Int, tracked: Boolean, block: Any) =
+    CLambda(key, tracked).apply { update(block) }
