@@ -66,7 +66,7 @@ package androidx.compose {
     method @MainThread public void disposeComposition(android.view.ViewGroup container, androidx.compose.CompositionReference? parent = null);
     method @MainThread public void disposeComposition(androidx.compose.Emittable container, android.content.Context context, androidx.compose.CompositionReference? parent = null);
     method @MainThread public androidx.compose.Composition subcomposeInto(androidx.compose.Emittable container, android.content.Context context, androidx.compose.CompositionReference? parent = null, kotlin.jvm.functions.Function0<kotlin.Unit> composable);
-    field public static final androidx.compose.Compose! INSTANCE;
+    field public static final androidx.compose.Compose INSTANCE;
   }
 
   public final class ComposeAndroidKt {
@@ -199,7 +199,7 @@ package androidx.compose {
     method @org.jetbrains.annotations.TestOnly public <T> T! isolated(kotlin.jvm.functions.Function0<? extends T> block);
     method public void nextFrame();
     method @org.jetbrains.annotations.TestOnly public <T> T! unframed(kotlin.jvm.functions.Function0<? extends T> block);
-    field public static final androidx.compose.FrameManager! INSTANCE;
+    field public static final androidx.compose.FrameManager INSTANCE;
   }
 
   @androidx.compose.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.CLASS) public @interface Immutable {
@@ -254,7 +254,7 @@ package androidx.compose {
   public final class NullCompilationScope {
     method public kotlin.Unit getComposer();
     property public final kotlin.Unit composer;
-    field public static final androidx.compose.NullCompilationScope! INSTANCE;
+    field public static final androidx.compose.NullCompilationScope INSTANCE;
   }
 
   public final class ObserveKt {
@@ -310,7 +310,7 @@ package androidx.compose {
     method protected final void dispatchRecomposes();
     method @org.jetbrains.annotations.TestOnly public abstract void recomposeSync();
     method protected abstract void scheduleChangesDispatch();
-    field public static final androidx.compose.Recomposer.Companion! Companion;
+    field public static final androidx.compose.Recomposer.Companion Companion;
   }
 
   public static final class Recomposer.Companion {
@@ -388,7 +388,7 @@ package androidx.compose {
     method public <T> T! read(kotlin.jvm.functions.Function1<? super androidx.compose.SlotReader,? extends T> block);
     method public <T> T! write(kotlin.jvm.functions.Function1<? super androidx.compose.SlotWriter,? extends T> block);
     property public final int size;
-    field public static final androidx.compose.SlotTable.Companion! Companion;
+    field public static final androidx.compose.SlotTable.Companion Companion;
   }
 
   public static final class SlotTable.Companion {
