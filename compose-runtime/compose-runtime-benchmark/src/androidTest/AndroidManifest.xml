@@ -26,6 +26,10 @@
         android:requestLegacyExternalStorage="true"
         android:debuggable="false"
         tools:replace="android:debuggable">
+        <!-- enable profileableByShell for non-intrusive profiling tools -->
+        <!--suppress AndroidElementNotAllowed -->
+        <profileable android:shell="true"/>
+
         <activity
             android:name=".ComposeActivity"/>
     </application>
