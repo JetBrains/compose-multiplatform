@@ -36,15 +36,21 @@ package androidx.compose
  * @param tracked if false, this will disable lambda optimizations such as tracking execution of
  * composable function expressions or remembering a function expression value based on its
  * capture variables. This flag is only meaningful when applied to @Composable lambda expressions
+ *
+ * @param preventCapture if true, this will prevent composable calls from happening inside of the
+ * function that it applies to. This is usually applied to lambda parameters of inline functions
+ * that ought to be safely inlined but cannot safely have composable calls in them
  */
 @MustBeDocumented
 @Retention(AnnotationRetention.BINARY)
 @Target(
     AnnotationTarget.FUNCTION,
-    AnnotationTarget.PROPERTY
+    AnnotationTarget.PROPERTY,
+    AnnotationTarget.TYPE
 )
 annotation class ComposableContract(
     val restartable: Boolean = true,
     val readonly: Boolean = false,
-    val tracked: Boolean = true
+    val tracked: Boolean = true,
+    val preventCapture: Boolean = false
 )

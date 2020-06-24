@@ -74,7 +74,8 @@ package androidx.compose {
   @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets={AnnotationTarget.FUNCTION, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER, AnnotationTarget.PROPERTY}) public @interface Composable {
   }
 
-  @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets={AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY}) public @interface ComposableContract {
+  @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets={AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY, AnnotationTarget.TYPE}) public @interface ComposableContract {
+    method public abstract boolean preventCapture() default false;
     method public abstract boolean readonly() default false;
     method public abstract boolean restartable() default true;
     method public abstract boolean tracked() default true;
