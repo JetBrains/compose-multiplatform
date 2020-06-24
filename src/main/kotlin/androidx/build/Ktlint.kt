@@ -50,7 +50,6 @@ fun Project.configureKtlint() {
     val outputFile = "${outputDir}ktlint-checkstyle-report.xml"
 
     val lintProvider = tasks.register("ktlint", JavaExec::class.java) { task ->
-        project.tasks.findByName("check")?.dependsOn(task)
         task.inputs.files(inputFiles)
         task.cacheEvenIfNoOutputs()
         task.description = "Check Kotlin code style."
@@ -66,6 +65,11 @@ fun Project.configureKtlint() {
             "$inputDir/$includeFiles",
             "!$inputDir/$excludeFiles"
         )
+    }
+
+    // afterEvaluate because Gradle's default "check" task doesn't exist yet
+    afterEvaluate {
+        addToCheckTask(lintProvider)
     }
     addToBuildOnServer(lintProvider)
 

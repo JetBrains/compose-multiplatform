@@ -646,14 +646,11 @@ class AndroidXPlugin : Plugin<Project> {
     companion object {
         const val BUILD_ON_SERVER_TASK = "buildOnServer"
         const val BUILD_TEST_APKS_TASK = "buildTestApks"
-        const val CHECK_RESOURCE_API_TASK = "checkResourceApi"
-        const val CHECK_RESOURCE_API_RELEASE_TASK = "checkResourceApiRelease"
         const val CHECK_RELEASE_READY_TASK = "checkReleaseReady"
         const val CREATE_LIBRARY_BUILD_INFO_FILES_TASK = "createLibraryBuildInfoFiles"
         const val CREATE_AGGREGATE_BUILD_INFO_FILES_TASK = "createAggregateBuildInfoFiles"
         const val GENERATE_TEST_CONFIGURATION_TASK = "generateTestConfiguration"
         const val REPORT_LIBRARY_METRICS_TASK = "reportLibraryMetrics"
-        const val UPDATE_RESOURCE_API_TASK = "updateResourceApi"
         const val ZIP_TEST_CONFIGS_WITH_APKS_TASK = "zipTestConfigsWithApks"
 
         const val TASK_GROUP_API = "API"
@@ -762,4 +759,14 @@ private fun Project.configureCompilationWarnings(task: KotlinCompile) {
  */
 private fun Project.asFilenamePrefix(): String {
     return project.path.substring(1).replace(':', '-')
+}
+
+/**
+ * Sets the specified [task] as a dependency of the top-level `check` task, ensuring that it runs
+ * as part of `./gradlew check`.
+ */
+fun <T : Task> Project.addToCheckTask(task: TaskProvider<T>) {
+    project.tasks.named("check").configure {
+        it.dependsOn(task)
+    }
 }

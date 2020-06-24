@@ -171,9 +171,7 @@ private fun Project.makeErrorProneTask(
             it.dependsOn(compileTask.dependsOn)
         },
         onRegister = { errorProneProvider ->
-            tasks.named("check").configure {
-                it.dependsOn(errorProneProvider)
-            }
+            project.addToCheckTask(errorProneProvider)
         }
     )
     addToBuildOnServer(errorProneTaskProvider)

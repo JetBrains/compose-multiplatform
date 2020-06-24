@@ -18,6 +18,7 @@ package androidx.build.metalava
 
 import androidx.build.AndroidXExtension
 import androidx.build.addToBuildOnServer
+import androidx.build.addToCheckTask
 import androidx.build.checkapi.ApiBaselinesLocation
 import androidx.build.checkapi.getBuiltApiLocation
 import androidx.build.checkapi.getVersionedApiLocation
@@ -244,9 +245,7 @@ object MetalavaTasks {
             task.dependsOn(updateApi)
         }
 
-        project.tasks.named("check").configure {
-            it.dependsOn(checkApi)
-        }
+        project.addToCheckTask(checkApi)
         project.addToBuildOnServer(checkApi)
     }
 

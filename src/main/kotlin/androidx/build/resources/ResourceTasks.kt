@@ -17,11 +17,10 @@
 package androidx.build.resources
 
 import androidx.build.AndroidXExtension
-import androidx.build.AndroidXPlugin.Companion.CHECK_RESOURCE_API_RELEASE_TASK
-import androidx.build.AndroidXPlugin.Companion.CHECK_RESOURCE_API_TASK
 import androidx.build.AndroidXPlugin.Companion.TASK_GROUP_API
-import androidx.build.AndroidXPlugin.Companion.UPDATE_RESOURCE_API_TASK
 import androidx.build.addToBuildOnServer
+import androidx.build.addToCheckTask
+import androidx.build.checkapi.getBuiltApiLocation
 import androidx.build.checkapi.getCurrentApiLocation
 import androidx.build.checkapi.getRequiredCompatibilityApiLocation
 import androidx.build.checkapi.getVersionedApiLocation
@@ -36,6 +35,10 @@ import org.gradle.api.Project
 import java.util.Locale
 
 object ResourceTasks {
+    private const val GENERATE_RESOURCE_API_TASK = "generateResourceApi"
+    private const val CHECK_RESOURCE_API_RELEASE_TASK = "checkResourceApiRelease"
+    private const val CHECK_RESOURCE_API_TASK = "checkResourceApi"
+    private const val UPDATE_RESOURCE_API_TASK = "updateResourceApi"
 
     @Suppress("UnstableApiUsage")
     fun Project.configureAndroidProjectForResourceTasks(
@@ -67,12 +70,14 @@ object ResourceTasks {
         @OptIn(ExperimentalStdlibApi::class)
         val packageResTask = project.tasks
             .named("package${variantName.capitalize(Locale.US)}Resources")
+        @Suppress("UnstableApiUsage") // flatMap
         val builtApiFile = packageResTask.flatMap { task ->
             (task as com.android.build.gradle.tasks.MergeResources).publicFile
         }
 
         val versionedApiLocation = project.getVersionedApiLocation()
         val currentApiLocation = project.getCurrentApiLocation()
+        val builtApiLocation = project.getBuiltApiLocation()
 
         val outputApiLocations = if (project.isVersionedApiFileWritingEnabled()) {
             listOf(
@@ -89,9 +94,20 @@ object ResourceTasks {
             location.resourceFile
         }
 
+        val generateResourceApi = project.tasks.register(
+            GENERATE_RESOURCE_API_TASK,
+            GenerateResourceApiTask::class.java
+        ) { task ->
+            task.group = "API"
+            task.description = "Generates resource API files from source"
+            task.builtApi.set(builtApiFile)
+            task.apiLocation.set(builtApiLocation)
+        }
+
         // Policy: If the artifact has previously been released, e.g. has a beta or later API file
         // checked in, then we must verify "release compatibility" against the work-in-progress
         // API file.
+        @Suppress("UnstableApiUsage") // flatMap
         val checkResourceApiRelease = project.getRequiredCompatibilityApiLocation()?.let {
             lastReleasedApiFile ->
             project.tasks.register(
@@ -99,7 +115,9 @@ object ResourceTasks {
                 CheckResourceApiReleaseTask::class.java
             ) { task ->
                 task.referenceApiFile.set(lastReleasedApiFile.resourceFile)
-                task.apiFile.set(builtApiFile)
+                task.apiLocation.set(generateResourceApi.flatMap { it.apiLocation })
+                // Since apiLocation isn't a File, we have to manually set up the dependency.
+                task.dependsOn(generateResourceApi)
                 task.cacheEvenIfNoOutputs()
             }
         }
@@ -107,6 +125,7 @@ object ResourceTasks {
         // Policy: All changes to API surfaces for which compatibility is enforced must be
         // explicitly confirmed by running the updateApi task. To enforce this, the implementation
         // checks the "work-in-progress" built API file against the checked in current API file.
+        @Suppress("UnstableApiUsage") // flatMap
         val checkResourceApi = project.tasks.register(
             CHECK_RESOURCE_API_TASK,
             CheckResourceApiTask::class.java
@@ -114,21 +133,26 @@ object ResourceTasks {
             task.group = TASK_GROUP_API
             task.description = "Checks that the resource API generated from source matches the " +
                     "checked in resource API file"
-            task.builtApi.set(builtApiFile)
+            task.apiLocation.set(generateResourceApi.flatMap { it.apiLocation })
+            // Since apiLocation isn't a File, we have to manually set up the dependency.
+            task.dependsOn(generateResourceApi)
             task.cacheEvenIfNoOutputs()
-            task.checkedInApis.set(outputApiFiles)
+            task.checkedInApiFiles.set(outputApiFiles)
             checkResourceApiRelease?.let {
                 task.dependsOn(it)
             }
         }
 
+        @Suppress("UnstableApiUsage") // flatMap
         val updateResourceApi = project.tasks.register(
             UPDATE_RESOURCE_API_TASK,
             UpdateResourceApiTask::class.java
         ) { task ->
             task.group = TASK_GROUP_API
             task.description = "Updates the checked in resource API files to match source code API"
-            task.inputApiFile.set(builtApiFile)
+            task.apiLocation.set(generateResourceApi.flatMap { it.apiLocation })
+            // Since apiLocation isn't a File, we have to manually set up the dependency.
+            task.dependsOn(generateResourceApi)
             task.outputApiLocations.set(outputApiLocations)
             checkResourceApiRelease?.let {
                 // If a developer (accidentally) makes a non-backwards compatible change to an
@@ -140,10 +164,12 @@ object ResourceTasks {
             }
         }
 
-        // Ensure that this task runs as part of updateApi and buildOnServer
+        // Ensure that this task runs as part of "updateApi" task from MetalavaTasks.
         project.tasks.withType(UpdateApiTask::class.java).configureEach { task ->
             task.dependsOn(updateResourceApi)
         }
+
+        project.addToCheckTask(checkResourceApi)
         project.addToBuildOnServer(checkResourceApi)
     }
 }
