@@ -17,6 +17,7 @@
 @file:OptIn(InternalComposeApi::class)
 package androidx.compose
 
+import androidx.compose.dispatch.DefaultMonotonicFrameClock
 import androidx.compose.dispatch.MonotonicFrameClock
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -28,18 +29,17 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.coroutineContext
 import kotlin.coroutines.resume
 
 /**
  * Runs [block] with a new, active [Recomposer] applying changes in the calling [CoroutineContext].
- * [frameClock] is used to align changes with display frames.
  */
 suspend fun withRunningRecomposer(
-    frameClock: MonotonicFrameClock,
     block: suspend CoroutineScope.(recomposer: Recomposer) -> Unit
 ): Unit = coroutineScope {
     val recomposer = Recomposer()
-    val recompositionJob = launch { recomposer.runRecomposeAndApplyChanges(frameClock) }
+    val recompositionJob = launch { recomposer.runRecomposeAndApplyChanges() }
     block(recomposer)
     recompositionJob.cancel()
 }
@@ -94,11 +94,9 @@ class Recomposer {
      *
      * This method never returns. Cancel the calling [CoroutineScope] to stop.
      */
-    suspend fun runRecomposeAndApplyChanges(
-        frameClock: MonotonicFrameClock
-    ): Nothing {
+    suspend fun runRecomposeAndApplyChanges(): Nothing {
         coroutineScope {
-            recomposeAndApplyChanges(this, frameClock, Long.MAX_VALUE)
+            recomposeAndApplyChanges(this, Long.MAX_VALUE)
         }
         error("this function never returns")
     }
@@ -115,7 +113,6 @@ class Recomposer {
      */
     suspend fun recomposeAndApplyChanges(
         applyCoroutineScope: CoroutineScope,
-        frameClock: MonotonicFrameClock,
         frameCount: Long
     ) {
         var framesRemaining = frameCount
@@ -124,6 +121,9 @@ class Recomposer {
         if (!applyingScope.compareAndSet(null, applyCoroutineScope)) {
             error("already recomposing and applying changes")
         }
+
+        // Cache this so we don't go looking for it each time through the loop.
+        val frameClock = coroutineContext[MonotonicFrameClock] ?: DefaultMonotonicFrameClock
 
         try {
             idlingLatch.closeLatch()
@@ -325,13 +325,13 @@ class Recomposer {
             require(isMainThread()) { "No Recomposer for this Thread" }
 
             return mainRecomposer ?: run {
-                val mainScope = CoroutineScope(NonCancellable + mainThreadCompositionDispatcher())
+                val mainScope = CoroutineScope(NonCancellable + mainThreadCompositionContext())
 
                 Recomposer().also {
                     mainRecomposer = it
                     @OptIn(ExperimentalCoroutinesApi::class)
                     mainScope.launch(start = CoroutineStart.UNDISPATCHED) {
-                        it.runRecomposeAndApplyChanges(mainThreadFrameClock())
+                        it.runRecomposeAndApplyChanges()
                     }
                 }
             }

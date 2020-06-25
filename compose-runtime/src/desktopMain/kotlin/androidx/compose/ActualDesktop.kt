@@ -16,12 +16,10 @@
 
 package androidx.compose
 
-import androidx.compose.dispatch.MonotonicFrameClock
 import javax.swing.JComponent
 import javax.swing.SwingUtilities
-import kotlinx.coroutines.CoroutineDispatcher
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 actual abstract class EmbeddingUIContext
 
@@ -132,17 +130,7 @@ actual fun resetSourceInfo() {
     keyInfo.clear()
 }
 
-private object MainDispatcherFrameClock : MonotonicFrameClock {
-    override suspend fun <R> withFrameNanos(onFrame: (frameTimeNanos: Long) -> R): R =
-        withContext(Dispatchers.Main) {
-            onFrame(java.lang.System.nanoTime())
-        }
-}
-
-internal actual fun mainThreadFrameClock(): MonotonicFrameClock = MainDispatcherFrameClock
-
-internal actual fun mainThreadCompositionDispatcher(): CoroutineDispatcher =
-    Dispatchers.Main
+internal actual fun mainThreadCompositionContext(): CoroutineContext = Dispatchers.Main
 
 // TODO(igotti): do we need actual processing for those?
 actual annotation class MainThread()
