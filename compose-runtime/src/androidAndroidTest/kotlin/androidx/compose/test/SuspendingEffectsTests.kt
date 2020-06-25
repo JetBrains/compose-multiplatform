@@ -23,16 +23,23 @@ import androidx.compose.getValue
 import androidx.compose.launchInComposition
 import androidx.compose.mutableStateOf
 import androidx.compose.onPreCommit
+import androidx.compose.rememberCoroutineScope
 import androidx.compose.setValue
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.isActive
 import org.junit.After
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -94,6 +101,55 @@ class SuspendingEffectsTests : BaseComposeTest() {
             assertNotEquals(awaitFrameTime, Long.MIN_VALUE, "awaitFrameNanos callback never ran")
             assertEquals(choreographerTime, awaitFrameTime,
                 "expected same values from choreographer post and awaitFrameNanos")
+        }
+    }
+
+    @Test
+    fun testRememberCoroutineScopeActiveWithComposition() {
+        lateinit var coroutineScope: CoroutineScope
+        val tester = compose {
+            coroutineScope = rememberCoroutineScope()
+        }.then {
+            assertTrue(coroutineScope.isActive, "coroutine scope was active before dispose")
+        }
+        tester.composition.dispose()
+        assertFalse(coroutineScope.isActive, "coroutine scope was inactive after dispose")
+    }
+
+    @Test
+    fun testRememberCoroutineScopeActiveAfterLeave() {
+        var coroutineScope: CoroutineScope? = null
+        var toggle by mutableStateOf(true)
+        compose {
+            if (toggle) {
+                coroutineScope = rememberCoroutineScope()
+            }
+        }.then {
+            assertTrue(coroutineScope?.isActive == true,
+                "coroutine scope should be active after initial composition")
+        }.then {
+            toggle = false
+        }.then {
+            assertTrue(coroutineScope?.isActive == false,
+                "coroutine scope should be cancelled after leaving composition")
+        }
+    }
+
+    @Test
+    fun testRememberCoroutineScopeDisallowsParentJob() {
+        var coroutineScope: CoroutineScope? = null
+        compose {
+            coroutineScope = rememberCoroutineScope { Job() }
+        }.then {
+            val scope = coroutineScope
+            assertNotNull(scope, "received non-null coroutine scope")
+            val job = scope.coroutineContext[Job]
+            assertNotNull(job, "scope context contains a job")
+            assertTrue(job.isCompleted, "job is complete")
+            var cause: Throwable? = null
+            job.invokeOnCompletion { cause = it }
+            assertTrue(cause is IllegalArgumentException,
+                "scope Job should be failed with IllegalArgumentException")
         }
     }
 }
