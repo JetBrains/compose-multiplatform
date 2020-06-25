@@ -2379,7 +2379,7 @@ private fun compose(
             }
         }
         val recomposer = Recomposer().apply {
-            scope.launch { runRecomposeAndApplyChanges(clock) }
+            scope.launch(clock) { runRecomposeAndApplyChanges() }
         }
         Composer(
             SlotTable(),

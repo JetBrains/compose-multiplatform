@@ -17,11 +17,9 @@
 package androidx.compose
 
 import androidx.compose.dispatch.AndroidUiDispatcher
-import androidx.compose.dispatch.MonotonicFrameClock
 import androidx.core.os.HandlerCompat
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlin.coroutines.CoroutineContext
 
 internal actual typealias EmbeddingUIContext = android.content.Context
 
@@ -66,26 +64,12 @@ internal actual object Choreographer {
 
 // TODO: Our host-side tests still grab the Android actuals based on SDK stubs that return null.
 // Satisfy their dependencies.
-private val MainAndroidUiDispatcher by lazy {
-    if (Looper.getMainLooper() != null) androidx.compose.dispatch.AndroidUiDispatcher.Main
+private val MainAndroidUiContext: CoroutineContext by lazy {
+    if (Looper.getMainLooper() != null) AndroidUiDispatcher.Main
     else Dispatchers.Main
 }
 
-private object MainDispatcherFrameClock : MonotonicFrameClock {
-    override suspend fun <R> withFrameNanos(onFrame: (frameTimeNanos: Long) -> R): R =
-        withContext(Dispatchers.Main) {
-            onFrame(System.nanoTime())
-        }
-}
-
-private val MainAndroidFrameClock by lazy {
-    if (Looper.getMainLooper() != null) AndroidUiDispatcher.Main.frameClock
-    else MainDispatcherFrameClock
-}
-
-internal actual fun mainThreadCompositionDispatcher(): CoroutineDispatcher = MainAndroidUiDispatcher
-
-internal actual fun mainThreadFrameClock(): MonotonicFrameClock = MainAndroidFrameClock
+internal actual fun mainThreadCompositionContext(): CoroutineContext = MainAndroidUiContext
 
 internal actual object Trace {
     actual fun beginSection(name: String) = android.os.Trace.beginSection(name)

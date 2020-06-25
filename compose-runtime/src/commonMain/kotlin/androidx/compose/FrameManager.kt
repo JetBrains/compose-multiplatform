@@ -54,7 +54,7 @@ object FrameManager {
     /**
      * TODO: This will be merged later with the scopes used by [Recomposer]
      */
-    private val scheduleScope = CoroutineScope(mainThreadCompositionDispatcher() + SupervisorJob())
+    private val scheduleScope = CoroutineScope(mainThreadCompositionContext() + SupervisorJob())
 
     fun ensureStarted() {
         if (!started) {

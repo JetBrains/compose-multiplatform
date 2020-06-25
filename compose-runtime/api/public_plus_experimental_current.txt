@@ -311,8 +311,8 @@ package androidx.compose {
     method public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public androidx.compose.dispatch.MonotonicFrameClock getFrameClock();
     method public boolean hasPendingChanges();
-    method public suspend Object? recomposeAndApplyChanges(kotlinx.coroutines.CoroutineScope applyCoroutineScope, androidx.compose.dispatch.MonotonicFrameClock frameClock, long frameCount, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
-    method public suspend Object? runRecomposeAndApplyChanges(androidx.compose.dispatch.MonotonicFrameClock frameClock, kotlin.coroutines.Continuation<?> p);
+    method public suspend Object? recomposeAndApplyChanges(kotlinx.coroutines.CoroutineScope applyCoroutineScope, long frameCount, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? runRecomposeAndApplyChanges(kotlin.coroutines.Continuation<?> p);
     property public final androidx.compose.dispatch.MonotonicFrameClock frameClock;
     field public static final androidx.compose.Recomposer.Companion Companion;
   }
@@ -322,7 +322,7 @@ package androidx.compose {
   }
 
   public final class RecomposerKt {
-    method public static suspend Object? withRunningRecomposer(androidx.compose.dispatch.MonotonicFrameClock frameClock, kotlin.jvm.functions.Function3<? super kotlinx.coroutines.CoroutineScope,? super androidx.compose.Recomposer,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public static suspend Object? withRunningRecomposer(kotlin.jvm.functions.Function3<? super kotlinx.coroutines.CoroutineScope,? super androidx.compose.Recomposer,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
   }
 
   public final class RememberKt {
