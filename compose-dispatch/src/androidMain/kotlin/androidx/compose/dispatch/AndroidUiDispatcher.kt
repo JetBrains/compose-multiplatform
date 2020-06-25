@@ -18,6 +18,8 @@ package androidx.compose.dispatch
 
 import android.os.Looper
 import android.view.Choreographer
+import androidx.compose.dispatch.AndroidUiDispatcher.Companion.CurrentThread
+import androidx.compose.dispatch.AndroidUiDispatcher.Companion.Main
 import androidx.core.os.HandlerCompat
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -105,7 +107,7 @@ class AndroidUiDispatcher private constructor(
             result
         }
         for (i in 0 until toRun.size) {
-            // This callback can't throw, see AndroidUiCompositionFrameClock
+            // This callback can't throw, see AndroidUiFrameClock
             toRun[i].doFrame(frameTimeNanos)
         }
         toRun.clear()
@@ -149,33 +151,37 @@ class AndroidUiDispatcher private constructor(
 
     companion object {
         /**
-         * The [AndroidUiDispatcher] for the process's main thread.
+         * The [CoroutineContext] containing the [AndroidUiDispatcher] and its [frameClock] for the
+         * process's main thread.
          */
-        val Main by lazy {
-            AndroidUiDispatcher(
+        val Main: CoroutineContext by lazy {
+            val dispatcher = AndroidUiDispatcher(
                 if (isMainThread()) Choreographer.getInstance()
                 else runBlocking(Dispatchers.Main) { Choreographer.getInstance() },
                 HandlerCompat.createAsync(Looper.getMainLooper())
             )
+
+            dispatcher + dispatcher.frameClock
         }
 
-        private val currentThread: ThreadLocal<AndroidUiDispatcher> =
-            object : ThreadLocal<AndroidUiDispatcher>() {
-                override fun initialValue(): AndroidUiDispatcher = AndroidUiDispatcher(
+        private val currentThread: ThreadLocal<CoroutineContext> =
+            object : ThreadLocal<CoroutineContext>() {
+                override fun initialValue(): CoroutineContext = AndroidUiDispatcher(
                     Choreographer.getInstance(),
                     HandlerCompat.createAsync(Looper.myLooper()
                         ?: error("no Looper on this thread"))
-                )
+                ).let { it + it.frameClock }
             }
 
         /**
-         * The canonical [AndroidUiDispatcher] for the calling thread. Returns [Main] if accessed
-         * from the process's main thread.
+         * The canonical [CoroutineContext] containing the [AndroidUiDispatcher] and its
+         * [frameClock] for the calling thread. Returns [Main] if accessed from the process's
+         * main thread.
          *
          * Throws [IllegalArgumentException] if the calling thread does not have
          * both a [Choreographer] and an active [Looper].
          */
-        val CurrentThread: AndroidUiDispatcher get() = if (isMainThread()) Main else {
+        val CurrentThread: CoroutineContext get() = if (isMainThread()) Main else {
             currentThread.get() ?: error("no AndroidUiDispatcher for this thread")
         }
     }

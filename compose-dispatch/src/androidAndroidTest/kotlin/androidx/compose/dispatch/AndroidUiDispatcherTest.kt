@@ -97,12 +97,13 @@ class AndroidUiDispatcherTest {
                             return@setOnTouchListener true
                         }
                         viewTouchedOnFrame.complete(preDrawCount)
+                        // Use the frame clock provided by AndroidUiDispatcher.Main
                         launch(AndroidUiDispatcher.Main) {
                             ranInputJobOnFrame.complete(preDrawCount)
-                            AndroidUiDispatcher.Main.frameClock.withFrameNanos {
+                            withFrameNanos {
                                 withFrameOnFrame.complete(preDrawCount)
                             }
-                            AndroidUiDispatcher.Main.frameClock.withFrameNanos {
+                            withFrameNanos {
                                 withFrameSecondCall.complete(preDrawCount)
                             }
                         }

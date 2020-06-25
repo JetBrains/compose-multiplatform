@@ -16,8 +16,7 @@
 
 package androidx.compose
 
-import androidx.compose.dispatch.MonotonicFrameClock
-import kotlinx.coroutines.CoroutineDispatcher
+import kotlin.coroutines.CoroutineContext
 
 // TODO(aelias): Mark the typealiases internal when https://youtrack.jetbrains.com/issue/KT-36695 is fixed.
 // Currently, they behave as internal because the actual is internal, even though the expect is public.
@@ -120,8 +119,7 @@ internal expect object Choreographer {
     fun removeFrameCallback(callback: ChoreographerFrameCallback)
 }
 
-internal expect fun mainThreadCompositionDispatcher(): CoroutineDispatcher
-internal expect fun mainThreadFrameClock(): MonotonicFrameClock
+internal expect fun mainThreadCompositionContext(): CoroutineContext
 
 expect class UnsupportedOperationException
 
