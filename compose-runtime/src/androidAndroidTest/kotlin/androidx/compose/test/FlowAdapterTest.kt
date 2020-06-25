@@ -53,20 +53,6 @@ class FlowAdapterTest {
     val rule = createComposeRule()
 
     @Test
-    fun whenValueIsNotSetWeGotNull() {
-        val stream = FlowChannel<String>()
-        var realValue: String? = "to-be-updated"
-        rule.setContent {
-            @Suppress("DEPRECATION")
-            realValue = stream.flow.collectAsState().value
-        }
-
-        runOnIdleCompose {
-            assertThat(realValue).isNull()
-        }
-    }
-
-    @Test
     fun weReceiveSubmittedValue() {
         val stream = FlowChannel<String>()
 

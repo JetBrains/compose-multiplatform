@@ -184,7 +184,6 @@ package androidx.compose {
 
   public final class CompositionKt {
     method @Deprecated public static androidx.compose.Composition compositionFor(Object container, androidx.compose.Recomposer recomposer, androidx.compose.CompositionReference? parent = null, kotlin.jvm.functions.Function2<? super androidx.compose.SlotTable,? super androidx.compose.Recomposer,? extends androidx.compose.Composer<?>> composerFactory);
-    method @Deprecated public static androidx.compose.Composition compositionFor(Object container, androidx.compose.CompositionReference? parent = null, kotlin.jvm.functions.Function2<? super androidx.compose.SlotTable,? super androidx.compose.Recomposer,? extends androidx.compose.Composer<?>> composerFactory);
     method @androidx.compose.ExperimentalComposeApi public static androidx.compose.Composition compositionFor(Object key, androidx.compose.Applier<?> applier, androidx.compose.Recomposer recomposer, androidx.compose.CompositionReference? parent = null, kotlin.jvm.functions.Function0<kotlin.Unit> onCreated = {});
   }
 
@@ -194,9 +193,6 @@ package androidx.compose {
   }
 
   public abstract class CompositionReference {
-  }
-
-  @Deprecated @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.FUNCTION) public @interface Direct {
   }
 
   public final class EffectsKt {
@@ -227,7 +223,6 @@ package androidx.compose {
 
   public final class FlowAdapterKt {
     method @androidx.compose.Composable @kotlinx.coroutines.ExperimentalCoroutinesApi public static inline <T> androidx.compose.State<T> collectAsState(kotlinx.coroutines.flow.StateFlow<? extends T>, kotlin.coroutines.CoroutineContext context = Dispatchers.Main);
-    method @Deprecated @androidx.compose.Composable public static inline <T> androidx.compose.State<T> collectAsState(kotlinx.coroutines.flow.Flow<? extends T>, kotlin.coroutines.CoroutineContext context = Dispatchers.Main);
     method @androidx.compose.Composable public static <T extends R, R> androidx.compose.State<R> collectAsState(kotlinx.coroutines.flow.Flow<? extends T>, R? initial, kotlin.coroutines.CoroutineContext context = Dispatchers.Main);
   }
 
@@ -295,10 +290,6 @@ package androidx.compose {
     field @Deprecated public static final androidx.compose.NullCompilationScope INSTANCE;
   }
 
-  public final class ObserveKt {
-    method @Deprecated @androidx.compose.Composable public static void Observe(kotlin.jvm.functions.Function0<kotlin.Unit> body);
-  }
-
   public final class ObserverMap<K, V> {
     ctor public ObserverMap();
     method public void add(K key, V value);
@@ -336,10 +327,6 @@ package androidx.compose {
     method public T! getValue();
   }
 
-  public final class RecomposeKt {
-    method @Deprecated @androidx.compose.Composable public static void Recompose(kotlin.jvm.functions.Function1<? super kotlin.jvm.functions.Function0<kotlin.Unit>,kotlin.Unit> body);
-  }
-
   public final class Recomposer {
     ctor public Recomposer();
     method public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
@@ -353,7 +340,6 @@ package androidx.compose {
 
   public static final class Recomposer.Companion {
     method @org.jetbrains.annotations.TestOnly public androidx.compose.Recomposer current();
-    method @Deprecated public boolean hasPendingChanges();
   }
 
   public final class RecomposerKt {

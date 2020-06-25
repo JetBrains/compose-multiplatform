@@ -67,33 +67,6 @@ fun compositionFor(
 /**
  * This method is the way to initiate a composition. Optionally, a [parent]
  * [CompositionReference] can be provided to make the composition behave as a sub-composition of
- * the parent.  The children of [container] will be updated and maintained by the time this
- * method returns.
- *
- * It is important to call [Composition.dispose] whenever this [container] is no longer needed in
- * order to release resources.
- *
- * @param container The container whose content is being composed.
- * @param parent The parent composition reference, if applicable. Default is null.
- * @param composerFactory The factory used to created a [Composer] to be used by the composition.
- */
-@Suppress("DEPRECATION")
-@Deprecated(
-    "Specify the Recomposer explicitly",
-    ReplaceWith(
-        "compositionFor(container, Recomposer.current(), parent, composerFactory)",
-        "androidx.compose.Recomposer"
-    )
-)
-fun compositionFor(
-    container: Any,
-    parent: CompositionReference? = null,
-    composerFactory: (SlotTable, Recomposer) -> Composer<*>
-): Composition = compositionFor(container, Recomposer.current(), parent, composerFactory)
-
-/**
- * This method is the way to initiate a composition. Optionally, a [parent]
- * [CompositionReference] can be provided to make the composition behave as a sub-composition of
  * the parent.
  *
  * It is important to call [Composition.dispose] whenever this [key] is no longer needed in
