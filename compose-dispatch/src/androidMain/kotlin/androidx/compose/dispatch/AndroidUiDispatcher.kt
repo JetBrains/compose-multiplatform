@@ -107,7 +107,7 @@ class AndroidUiDispatcher private constructor(
             result
         }
         for (i in 0 until toRun.size) {
-            // This callback can't throw, see AndroidUiFrameClock
+            // This callback will not and must not throw, see AndroidUiFrameClock
             toRun[i].doFrame(frameTimeNanos)
         }
         toRun.clear()
@@ -178,7 +178,7 @@ class AndroidUiDispatcher private constructor(
          * [frameClock] for the calling thread. Returns [Main] if accessed from the process's
          * main thread.
          *
-         * Throws [IllegalArgumentException] if the calling thread does not have
+         * Throws [IllegalStateException] if the calling thread does not have
          * both a [Choreographer] and an active [Looper].
          */
         val CurrentThread: CoroutineContext get() = if (isMainThread()) Main else {
