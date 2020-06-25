@@ -19,10 +19,14 @@ package androidx.compose.test
 import android.os.HandlerThread
 import androidx.compose.Composable
 import androidx.compose.ComposableContract
+import androidx.compose.Composer
+import androidx.compose.Composition
 import androidx.compose.ExperimentalComposeApi
 import androidx.compose.FrameManager
 import androidx.compose.Handler
 import androidx.compose.clearRoots
+import androidx.compose.currentComposer
+import androidx.compose.invalidate
 import androidx.compose.mutableStateOf
 import androidx.compose.onActive
 import androidx.compose.onCommit
@@ -33,8 +37,12 @@ import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.lang.ref.PhantomReference
+import java.lang.ref.ReferenceQueue
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 @RunWith(AndroidJUnit4::class)
@@ -103,6 +111,49 @@ class ComposeIntoTests : BaseComposeTest() {
         } finally {
             activity.runOnUiThread { composition.dispose() }
         }
+    }
+
+    @Test
+    @MediumTest
+    fun testCompositionCanBeCollectedWithPendingInvalidate() {
+        val referenceQueue = ReferenceQueue<Composer<*>>()
+        var invalidateMethod: () -> Unit = {}
+        var composition: Composition? = null
+        var composer: Composer<*>? = null
+        var phantomReference: PhantomReference<Composer<*>>? = null
+        fun doShow() {
+            val threadLatch = CountDownLatch(1)
+            composition = activity.show {
+                composer = currentComposer
+                invalidateMethod = invalidate
+                threadLatch.countDown()
+            }
+            threadLatch.wait()
+            phantomReference = PhantomReference<Composer<*>>(composer, referenceQueue)
+        }
+
+        doShow()
+        assertNotNull(invalidateMethod)
+
+        val threadLatch = CountDownLatch(1)
+        activity.runOnUiThread {
+            composition?.dispose()
+            composition = null
+            composer = null
+            threadLatch.countDown()
+        }
+        threadLatch.wait()
+        assertNull(composition)
+        assertNull(composer)
+        assertNotNull(phantomReference)
+
+        // Make sure that the composer was collected.
+        repeat(100) {
+            Runtime.getRuntime().gc()
+            val value = referenceQueue.poll()
+            if (value != null) return
+        }
+        error("Failed - composer leaked")
     }
 }
 

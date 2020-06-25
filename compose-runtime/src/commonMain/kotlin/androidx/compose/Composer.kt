@@ -233,7 +233,7 @@ internal enum class InvalidationResult {
  * stored in [anchor] and call [block] when recomposition is requested. It is created by
  * [Composer.startRestartGroup] and is used to track how to restart the group.
  */
-internal class RecomposeScope(var composer: Composer<*>, val key: Int) : ScopeUpdateScope {
+internal class RecomposeScope(var composer: Composer<*>?, val key: Int) : ScopeUpdateScope {
     /**
      * An anchor to the location in the slot table that start the group associated with this
      * recompose scope. This value is set by [composer] when the scope is committed to the slot
@@ -246,7 +246,7 @@ internal class RecomposeScope(var composer: Composer<*>, val key: Int) : ScopeUp
      * removed from the slot table. For example, if the scope is in the then clause of an if
      * statement that later becomes false.
      */
-    val valid: Boolean get() = inTable && anchor?.valid ?: false
+    val valid: Boolean get() = composer != null && anchor?.valid ?: false
 
     /**
      * Used is set when the [RecomposeScope] is used by, for example, [invalidate]. This is used
@@ -257,11 +257,6 @@ internal class RecomposeScope(var composer: Composer<*>, val key: Int) : ScopeUp
 
     var defaultsInScope = false
     var defaultsInvalid = false
-
-    /**
-     * True when the recompose scope is in an slot in the slot table
-     */
-    var inTable = true
 
     var requiresRecompose = false
 
@@ -283,7 +278,7 @@ internal class RecomposeScope(var composer: Composer<*>, val key: Int) : ScopeUp
     /**
      * Invalidate the group which will cause [composer] to request this scope be recomposed.
      */
-    fun invalidate(): InvalidationResult = composer.invalidate(this)
+    fun invalidate(): InvalidationResult = composer?.invalidate(this) ?: InvalidationResult.IGNORED
 
     /**
      * Update [block]. The scope is returned by [Composer.endRestartGroup] when [used] is true
@@ -959,7 +954,7 @@ class Composer<N>(
                     is CompositionLifecycleObserver ->
                         lifecycleManager.leaving(previous)
                     is RecomposeScope ->
-                        previous.inTable = false
+                        previous.composer = null
                 }
             }
             // Advance the writers reader location to account for the update above.
@@ -2316,8 +2311,9 @@ private fun removeCurrentGroup(slots: SlotWriter, lifecycleManager: LifeCycleMan
                 groupEndStack.push(groupEnd)
                 groupEnd = index + slot.slots
             }
-            is RecomposeScope ->
-                slot.inTable = false
+            is RecomposeScope -> {
+                slot.composer = null
+            }
         }
 
         index++
