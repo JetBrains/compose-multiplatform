@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2020 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -7,14 +7,14 @@
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed:in writing, software
+ * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
 
-package androidx.compose.frames
+package androidx.compose.snapshots
 
 import java.util.BitSet
 import kotlin.random.Random
@@ -22,11 +22,10 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class FrameIdSetTests {
-
+class SnapshotIdSetTests {
     @Test
     fun emptySetShouldBeEmpty() {
-        val empty = FrameIdSet.EMPTY
+        val empty = SnapshotIdSet.EMPTY
 
         repeat(1000) {
             empty.shouldBe(it, false)
@@ -36,7 +35,7 @@ class FrameIdSetTests {
     @Test
     fun shouldBeAbleToSetItems() {
         val times = 10000
-        val set = (0..times).fold(FrameIdSet.EMPTY) { prev, index ->
+        val set = (0..times).fold(SnapshotIdSet.EMPTY) { prev, index ->
             prev.set(index)
         }
 
@@ -48,7 +47,7 @@ class FrameIdSetTests {
     @Test
     fun shouldBeAbleToSetOnlyEven() {
         val times = 10000
-        val set = (0..times).fold(FrameIdSet.EMPTY) { prev, index ->
+        val set = (0..times).fold(SnapshotIdSet.EMPTY) { prev, index ->
             if (index % 2 == 0) prev.set(index) else prev
         }
 
@@ -60,7 +59,7 @@ class FrameIdSetTests {
     @Test
     fun shouldBeAbleToSetOnlyOdds() {
         val times = 10000
-        val set = (0..times).fold(FrameIdSet.EMPTY) { prev, index ->
+        val set = (0..times).fold(SnapshotIdSet.EMPTY) { prev, index ->
             if (index % 2 == 1) prev.set(index) else prev
         }
 
@@ -72,7 +71,7 @@ class FrameIdSetTests {
     @Test
     fun shouldBeAbleToClearEvens() {
         val times = 10000
-        val allSet = (0..times).fold(FrameIdSet.EMPTY) { prev, index ->
+        val allSet = (0..times).fold(SnapshotIdSet.EMPTY) { prev, index ->
             prev.set(index)
         }
 
@@ -88,7 +87,7 @@ class FrameIdSetTests {
     @Test
     fun shouldBeAbleToCrawlSet() {
         val times = 10000
-        val set = (0..times).fold(FrameIdSet.EMPTY) { prev, index ->
+        val set = (0..times).fold(SnapshotIdSet.EMPTY) { prev, index ->
             prev.clear(index - 1).set(index)
         }
 
@@ -101,7 +100,7 @@ class FrameIdSetTests {
     @Test
     fun shouldBeAbleToCrawlAndClear() {
         val times = 10000
-        val set = (0..times).fold(FrameIdSet.EMPTY) { prev, index ->
+        val set = (0..times).fold(SnapshotIdSet.EMPTY) { prev, index ->
             prev.let {
                 if ((index - 1) % 33 != 0) it.clear(index - 1) else it
             }.set(index)
@@ -114,7 +113,7 @@ class FrameIdSetTests {
             set.shouldBe(it, it % 33 == 0)
         }
 
-        val newSet = (0..times - 1).fold(set) { prev, index ->
+        val newSet = (0 until times).fold(set) { prev, index ->
             prev.clear(index)
         }
 
@@ -127,7 +126,7 @@ class FrameIdSetTests {
 
     @Test
     fun shouldBeAbleToInsertAndRemoveOutOfOptimalRange() {
-        FrameIdSet.EMPTY
+        SnapshotIdSet.EMPTY
             .set(1000)
             .set(1)
             .shouldBe(1000, true)
@@ -151,7 +150,7 @@ class FrameIdSetTests {
     fun shouldMatchBitSet() {
         val random = Random(10)
         val bitSet = BitSet()
-        val set = (0..100).fold(FrameIdSet.EMPTY) { prev, _ ->
+        val set = (0..100).fold(SnapshotIdSet.EMPTY) { prev, _ ->
             val value = random.nextInt(0, 1000)
             bitSet.set(value)
             prev.set(value)
@@ -166,6 +165,111 @@ class FrameIdSetTests {
         repeat(1000) {
             clear.shouldBe(it, bitSet[it])
         }
+    }
+
+    @Test
+    fun shouldBeAbleToAndNotBits() {
+        val random = Random(11)
+        val bitSetA = BitSet()
+        val setA = (0..100).fold(SnapshotIdSet.EMPTY) { prev, _ ->
+            val value = random.nextInt(0, 1000)
+            bitSetA.set(value)
+            prev.set(value)
+        }
+
+        val bitSetB = BitSet()
+        val setB = (0..100).fold(SnapshotIdSet.EMPTY) { prev, _ ->
+            val value = random.nextInt(0, 1000)
+            bitSetB.set(value)
+            prev.set(value)
+        }
+
+        val set = setA.andNot(setB)
+        bitSetA.andNot(bitSetB)
+        repeat(1000) {
+            set.shouldBe(it, bitSetA[it])
+        }
+    }
+
+    @Test
+    fun shouldBeAbleToAndNot() {
+        fun test(size: Int) {
+            val random = Random(size)
+            val bitSet = BitSet()
+            val setA = (0 until size).fold(SnapshotIdSet.EMPTY) { prev, index ->
+                if (random.nextInt(0, 1000) > 500) {
+                    bitSet.set(index)
+                    prev.set(index)
+                } else prev
+            }
+            val setB = (0 until size).fold(SnapshotIdSet.EMPTY) { prev, index ->
+                if (random.nextInt(0, 1000) > 500) {
+                    bitSet.clear(index)
+                    prev.set(index)
+                } else prev
+            }
+            val set = setA.andNot(setB)
+            repeat(size) {
+                set.shouldBe(it, bitSet[it])
+            }
+        }
+        test(32)
+        test(64)
+        test(128)
+        test(512)
+        test(1024)
+    }
+
+    @Test
+    fun shouldBeAbleToOr() {
+        fun test(size: Int) {
+            val random = Random(size)
+            val bitSet = BitSet()
+            val setA = (0 until size).fold(SnapshotIdSet.EMPTY) { prev, index ->
+                if (random.nextInt(0, 1000) > 500) {
+                    bitSet.set(index)
+                    prev.set(index)
+                } else prev
+            }
+            val setB = (0 until size).fold(SnapshotIdSet.EMPTY) { prev, index ->
+                if (random.nextInt(0, 1000) > 500) {
+                    bitSet.set(index)
+                    prev.set(index)
+                } else prev
+            }
+            val set = setA.or(setB)
+            repeat(size) {
+                set.shouldBe(it, bitSet[it])
+            }
+        }
+        test(32)
+        test(64)
+        test(128)
+        test(512)
+        test(1024)
+    }
+
+    @Test
+    fun shouldBeAbleToIterate() {
+        fun test(size: Int) {
+            val random = Random(size)
+            val values = mutableListOf<Int>()
+            val set = (0 until size).fold(SnapshotIdSet.EMPTY) { prev, index ->
+                if (random.nextInt(0, 1000) > 500) {
+                    values.add(index)
+                    prev.set(index)
+                } else prev
+            }
+            values.zip(set).forEach {
+                assertEquals(it.first, it.second)
+            }
+            assertEquals(values.size, set.count())
+        }
+
+        test(64)
+        test(128)
+        test(512)
+        test(1024)
     }
 
     @Test // Regression: b/147836978
@@ -5526,7 +5630,7 @@ class FrameIdSetTests {
                 it[0].toInt() to it[1].toBoolean()
             }
         }
-        operations.fold(FrameIdSet.EMPTY) { prev, (value, op) ->
+        operations.fold(SnapshotIdSet.EMPTY) { prev, (value, op) ->
             assertTrue(prev.get(value) != op, "Error on bit $value, expected ${!op}, received $op")
             val result = if (op) prev.set(value) else prev.clear(value)
             result
@@ -5534,7 +5638,7 @@ class FrameIdSetTests {
     }
 }
 
-private fun FrameIdSet.shouldBe(index: Int, value: Boolean): FrameIdSet {
+private fun SnapshotIdSet.shouldBe(index: Int, value: Boolean): SnapshotIdSet {
     assertEquals(value, get(index), "Bit $index should be $value")
     return this
 }

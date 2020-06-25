@@ -25,20 +25,14 @@ ArrayReturn: androidx.compose.UnionType#types():
 
 CallbackName: androidx.compose.CompositionLifecycleObserver:
     Class should be named CompositionLifecycleCallback
+CallbackName: androidx.compose.snapshots.SnapshotStateObserver:
+    Class should be named SnapshotStateCallback
 
 
 DocumentExceptions: androidx.compose.ComposerKt#getCurrentComposer():
     Method ComposerKt.getCurrentComposer appears to be throwing kotlin.NotImplementedError; this should be listed in the documentation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
-DocumentExceptions: androidx.compose.frames.FramesKt#commit(androidx.compose.frames.Frame):
-    Method FramesKt.commit appears to be throwing java.lang.IllegalStateException; this should be listed in the documentation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
-DocumentExceptions: androidx.compose.frames.FramesKt#currentFrame():
-    Method FramesKt.currentFrame appears to be throwing java.lang.IllegalStateException; this should be listed in the documentation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
-DocumentExceptions: androidx.compose.frames.FramesKt#writable(T, androidx.compose.frames.Framed, androidx.compose.frames.Frame):
-    Method FramesKt.writable appears to be throwing java.lang.IllegalStateException; this should be listed in the documentation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
-
-
-ExceptionName: androidx.compose.frames.FrameAborted:
-    Exceptions must be named `FooException`, was `FrameAborted`
+DocumentExceptions: androidx.compose.snapshots.SnapshotApplyResult.Failure#check():
+    Method Failure.check appears to be throwing androidx.compose.snapshots.SnapshotApplyConflictException; this should be recorded with a @Throws annotation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
 
 
 KotlinOperator: androidx.compose.SlotReader#get(androidx.compose.Anchor):
@@ -69,6 +63,8 @@ MissingNullability: androidx.compose.SlotReader#getGroupDataKey():
     Missing nullability on method `getGroupDataKey` return
 MissingNullability: androidx.compose.SlotReader#getGroupNode():
     Missing nullability on method `getGroupNode` return
+MissingNullability: androidx.compose.snapshots.Snapshot.Companion#getCurrent():
+    Missing nullability on method `getCurrent` return
 
 
 NoByteOrShort: androidx.compose.Composer#changed(byte) parameter #0:

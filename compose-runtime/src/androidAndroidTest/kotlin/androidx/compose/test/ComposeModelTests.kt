@@ -18,17 +18,13 @@ package androidx.compose.test
 
 import android.widget.TextView
 import androidx.compose.Composable
+import androidx.compose.ExperimentalComposeApi
 import androidx.compose.clearRoots
-import androidx.compose.frames.AbstractRecord
-import androidx.compose.frames.Framed
-import androidx.compose.frames.Record
-import androidx.compose.frames._created
-import androidx.compose.frames._readable
-import androidx.compose.frames._writable
-import androidx.compose.frames.commit
-import androidx.compose.frames.currentFrame
-import androidx.compose.frames.inFrame
-import androidx.compose.frames.open
+import androidx.compose.mutableStateOf
+import androidx.compose.snapshots.StateObject
+import androidx.compose.snapshots.StateRecord
+import androidx.compose.snapshots.readable
+import androidx.compose.snapshots.writable
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import junit.framework.TestCase.assertEquals
@@ -38,45 +34,41 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-val PRESIDENT_NAME_1 = "George Washington"
-val PRESIDENT_AGE_1 = 57
-val PRESIDENT_NAME_16 = "Abraham Lincoln"
-val PRESIDENT_AGE_16 = 52
+const val PRESIDENT_NAME_1 = "George Washington"
+const val PRESIDENT_AGE_1 = 57
+const val PRESIDENT_NAME_16 = "Abraham Lincoln"
+const val PRESIDENT_AGE_16 = 52
 
-class Person(name: String, age: Int) : Framed {
+@OptIn(ExperimentalComposeApi::class)
+class Person(name: String, age: Int) : StateObject {
     var name
-        get() = (_readable(_first, this) as CustomerRecord).name
+        get() = first.readable(this).name
         set(value) {
-            (_writable(_first, this) as CustomerRecord).name = value
+            first.writable(this) { name = value }
         }
 
     var age
-        get() = (_readable(_first, this) as CustomerRecord).age
+        get() = first.readable(this).age
         set(value) {
-            (_writable(_first, this) as CustomerRecord).age = value
+            first.writable(this) { age = value }
         }
 
-    private var _first: Record = CustomerRecord().apply {
+    private var first: CustomerRecord = CustomerRecord().apply {
         this.name = name
         this.age = age
-        this.frameId = currentFrame().id
-        _created(this@Person)
     }
 
-    override val firstFrameRecord: Record get() = _first
+    override val firstStateRecord: StateRecord get() = first
 
-    override fun prependFrameRecord(value: Record) {
-        value.next = _first
-        _first = value
+    override fun prependStateRecord(value: StateRecord) {
+        first = value as CustomerRecord
     }
 
-    class CustomerRecord : AbstractRecord() {
-        @JvmField
+    class CustomerRecord : StateRecord() {
         var name: String = ""
-        @JvmField
         var age: Int = 0
 
-        override fun assign(value: Record) {
+        override fun assign(value: StateRecord) {
             (value as? CustomerRecord)?.let {
                 this.name = it.name
                 this.age = it.age
@@ -88,40 +80,6 @@ class Person(name: String, age: Int) : Framed {
 }
 
 @Composable fun Observe(body: @Composable () -> Unit) = body()
-
-class TestState<T>(value: T) : Framed {
-    @Suppress("UNCHECKED_CAST")
-    var value: T
-        get() = (_readable(myFirst, this) as StateRecord<T>).value
-        set(value) {
-            (_writable(myFirst, this) as StateRecord<T>).value = value
-        }
-
-    private var myFirst: Record
-
-    init {
-        myFirst = StateRecord(value)
-    }
-
-    override val firstFrameRecord: Record
-        get() = myFirst
-
-    override fun prependFrameRecord(value: Record) {
-        value.next = myFirst
-        myFirst = value
-    }
-
-    private class StateRecord<T>(myValue: T) : AbstractRecord() {
-        override fun assign(value: Record) {
-            @Suppress("UNCHECKED_CAST")
-            this.value = (value as StateRecord<T>).value
-        }
-
-        override fun create(): Record = StateRecord(value)
-
-        var value: T = myValue
-    }
-}
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -164,12 +122,10 @@ class ModelViewTests : BaseComposeTest() {
     fun testModelView_PersonModel() {
         val tvIdName = 90
         val tvIdAge = 91
-        val president = frame {
-            Person(
-                PRESIDENT_NAME_1,
-                PRESIDENT_AGE_1
-            )
-        }
+        val president = Person(
+            PRESIDENT_NAME_1,
+            PRESIDENT_AGE_1
+        )
 
         compose {
             TextView(id = tvIdName, text = president.name)
@@ -192,19 +148,16 @@ class ModelViewTests : BaseComposeTest() {
 
     @Test
     fun testModelView_RecomposeScopeCleanup() {
-        val washington = frame {
-            Person(
-                PRESIDENT_NAME_1,
-                PRESIDENT_AGE_1
-            )
-        }
-        val lincoln = frame {
-            Person(
-                PRESIDENT_NAME_16,
-                PRESIDENT_AGE_16
-            )
-        }
-        val displayLincoln = frame { TestState(true) }
+        val washington = Person(
+            PRESIDENT_NAME_1,
+            PRESIDENT_AGE_1
+        )
+        val lincoln = Person(
+            PRESIDENT_NAME_16,
+            PRESIDENT_AGE_16
+        )
+
+        val displayLincoln = mutableStateOf(true)
 
         @Composable fun display(person: Person) {
             TextView(text = person.name)
@@ -229,12 +182,10 @@ class ModelViewTests : BaseComposeTest() {
     // b/122548164
     @Test
     fun testObserverEntering() {
-        val president = frame {
-            Person(
-                PRESIDENT_NAME_1,
-                PRESIDENT_AGE_1
-            )
-        }
+        val president = Person(
+            PRESIDENT_NAME_1,
+            PRESIDENT_AGE_1
+        )
         val tvName = 204
 
         @Composable fun display(person: Person) {
@@ -258,12 +209,10 @@ class ModelViewTests : BaseComposeTest() {
 
     @Test
     fun testModelUpdatesNextFrameVisibility() {
-        val president = frame {
-            Person(
+        val president = Person(
                 PRESIDENT_NAME_1,
                 PRESIDENT_AGE_1
             )
-        }
         val tvName = 204
 
         @Composable fun display(person: Person) {
@@ -287,10 +236,4 @@ class ModelViewTests : BaseComposeTest() {
             assertEquals(PRESIDENT_NAME_16, (activity.findViewById(tvName) as TextView).text)
         }
     }
-}
-
-fun <T> frame(block: () -> T): T {
-    val wasInFrame = inFrame
-    if (!wasInFrame) open()
-    return block().also { if (!wasInFrame) commit() }
 }

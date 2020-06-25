@@ -25,15 +25,17 @@ import androidx.benchmark.junit4.measureRepeated
 import androidx.compose.Composable
 import androidx.compose.Composer
 import androidx.compose.Composition
-import androidx.compose.FrameManager
+import androidx.compose.ExperimentalComposeApi
 import androidx.compose.InternalComposeApi
 import androidx.compose.Recomposer
 import androidx.compose.currentComposer
+import androidx.compose.snapshots.Snapshot
 import androidx.ui.core.AndroidOwner
 import androidx.ui.core.setContent
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 
+@OptIn(ExperimentalComposeApi::class)
 abstract class ComposeBenchmarkBase {
     @get:Rule
     val benchmarkRule = BenchmarkRule()
@@ -80,7 +82,7 @@ abstract class ComposeBenchmarkBase {
         benchmarkRule.measureRepeated {
             runWithTimingDisabled {
                 receiver.updateModelCb()
-                FrameManager.nextFrame()
+                Snapshot.sendApplyNotifications()
             }
 
             val didSomething = activeComposer?.let { composer ->

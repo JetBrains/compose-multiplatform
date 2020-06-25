@@ -39,7 +39,7 @@ class ComposableLambdaN<R>(
     fun update(block: Any) {
         if (block != this._block) {
             if (tracked) {
-                FrameManager.recordWrite(this, false)
+                FrameManager.recordWrite(this)
             }
             this._block = block as FunctionN<*>
         }
