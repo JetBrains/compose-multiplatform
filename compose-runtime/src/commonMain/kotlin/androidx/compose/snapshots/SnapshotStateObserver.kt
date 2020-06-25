@@ -20,6 +20,7 @@ import androidx.compose.ExperimentalComposeApi
 import androidx.compose.ObserverMap
 
 @ExperimentalComposeApi
+@Suppress("DEPRECATION_ERROR")
 class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit) -> Unit) {
     private val applyObserver: SnapshotApplyObserver = { applied, _ ->
         var hasValues = false

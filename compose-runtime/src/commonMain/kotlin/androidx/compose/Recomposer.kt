@@ -221,7 +221,7 @@ class Recomposer(var embeddingContext: EmbeddingContext = EmbeddingContext()) {
     internal val applyingCoroutineContext: CoroutineContext?
         get() = applyingScope.get()?.coroutineContext
 
-    @Suppress("PLUGIN_WARNING", "PLUGIN_ERROR")
+    @Suppress("PLUGIN_WARNING", "PLUGIN_ERROR", "ILLEGAL_TRY_CATCH_AROUND_COMPOSABLE")
     internal fun composeInitial(
         composable: @Composable () -> Unit,
         composer: Composer<*>
