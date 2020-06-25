@@ -62,7 +62,7 @@ import kotlin.reflect.KProperty
 @Composable
 inline fun <T> state(
     noinline areEquivalent: (old: T, new: T) -> Boolean = ReferentiallyEqual,
-    init: () -> T
+    init: @ComposableContract(preventCapture = true) () -> T
 ) = remember { mutableStateOf(init(), areEquivalent) }
 
 /**
@@ -85,8 +85,10 @@ inline fun <T> state(
  * @see [remember]
  */
 @Composable
-inline fun <T, /*reified*/ V1> stateFor(v1: V1, init: () -> T) =
-    remember(v1) { mutableStateOf(init()) }
+inline fun <T, /*reified*/ V1> stateFor(
+    v1: V1,
+    init: @ComposableContract(preventCapture = true) () -> T
+) = remember(v1) { mutableStateOf(init()) }
 
 /**
  * An effect to introduce a state value of type [T] into a composition that will last as long as the inputs [v1] and [v2] do not change.
@@ -110,7 +112,7 @@ inline fun <T, /*reified*/ V1> stateFor(v1: V1, init: () -> T) =
 inline fun <T, reified V1, reified V2> stateFor(
     v1: V1,
     v2: V2,
-    init: () -> T
+    init: @ComposableContract(preventCapture = true) () -> T
 ) = remember(v1, v2) { mutableStateOf(init()) }
 
 /**
@@ -131,8 +133,10 @@ inline fun <T, reified V1, reified V2> stateFor(
  * @see [remember]
  */
 @Composable
-inline fun <T> stateFor(vararg inputs: Any?, init: () -> T) =
-    remember(*inputs) { mutableStateOf(init()) }
+inline fun <T> stateFor(
+    vararg inputs: Any?,
+    init: @ComposableContract(preventCapture = true) () -> T
+) = remember(*inputs) { mutableStateOf(init()) }
 
 /**
  * Return a new [MutableState] initialized with the passed in [value]
