@@ -47,24 +47,6 @@ inline fun <T> StateFlow<T>.collectAsState(
  * would be new value posted into the [Flow] the returned [State] will be updated causing
  * recomposition of every [State.value] usage.
  *
- * @param context [CoroutineContext] to use for collecting.
- */
-@Deprecated(
-    "Either use collectAsState with an explicit initial value, " +
-            "or convert your Flow to a StateFlow.",
-    ReplaceWith("collectAsState(null, context)")
-)
-@Suppress("NOTHING_TO_INLINE")
-@Composable
-inline fun <T> Flow<T>.collectAsState(
-    context: CoroutineContext = Dispatchers.Main
-): State<T?> = collectAsState(null, context)
-
-/**
- * Collects values from this [Flow] and represents its latest value via [State]. Every time there
- * would be new value posted into the [Flow] the returned [State] will be updated causing
- * recomposition of every [State.value] usage.
- *
  * @sample androidx.compose.samples.FlowWithInitialSample
  *
  * @param context [CoroutineContext] to use for collecting.

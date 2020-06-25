@@ -302,21 +302,6 @@ class Recomposer {
     suspend fun awaitIdle(): Unit = idlingLatch.await()
 
     companion object {
-
-        /**
-         * Check if there's pending changes to be recomposed in this thread
-         *
-         * @return true if there're pending changes in this thread, false otherwise
-         */
-        @Deprecated(
-            "Use the Recomposer instance fun instead",
-            ReplaceWith(
-                "Recomposer.current().hasPendingChanges()",
-                "androidx.compose.Recomposer"
-            )
-        )
-        fun hasPendingChanges() = current().hasPendingChanges()
-
         /**
          * Retrieves [Recomposer] for the current thread. Needs to be the main thread.
          */
