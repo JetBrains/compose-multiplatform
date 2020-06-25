@@ -28,6 +28,7 @@ import androidx.build.license.CheckExternalDependencyLicensesTask
 import androidx.build.studio.StudioTask.Companion.registerStudioTask
 import androidx.build.uptodatedness.TaskUpToDateValidator
 import com.android.build.gradle.api.AndroidBasePlugin
+import com.android.build.gradle.internal.tasks.factory.dependsOn
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtraPropertiesExtension
@@ -88,6 +89,9 @@ class AndroidXRootPlugin : Plugin<Project> {
         val projectModules = ConcurrentHashMap<String, String>()
         extra.set("projects", projectModules)
         buildOnServerTask.dependsOn(tasks.named(CheckExternalDependencyLicensesTask.TASK_NAME))
+        // Anchor task that invokes running all subprojects :properties tasks which ensure that
+        // Android Studio sync is able to succeed.
+        val allProperties = tasks.register("allProperties")
         subprojects { project ->
             // Add a method for each sub project where they can declare an optional
             // dependency on a project or its latest snapshot artifact.
@@ -122,6 +126,8 @@ class AndroidXRootPlugin : Plugin<Project> {
             project.plugins.withType(JavaPlugin::class.java) {
                 buildOnServerTask.dependsOn("${project.path}:jar")
             }
+
+            allProperties.dependsOn("${project.path}:properties")
         }
 
         if (partiallyDejetifyArchiveTask != null) {
