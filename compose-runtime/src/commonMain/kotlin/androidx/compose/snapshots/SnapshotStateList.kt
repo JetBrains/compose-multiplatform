@@ -20,10 +20,19 @@ package androidx.compose.snapshots
 
 import androidx.compose.BuildableList
 import androidx.compose.ExperimentalComposeApi
-import androidx.compose.StableMutableList
+import androidx.compose.Stable
 import androidx.compose.buildableListOf
 
-internal class SnapshotStateList<T> : StableMutableList<T>, StateObject {
+/**
+ * An implementation of [MutableList] that can be observed and snapshot. This is the result type
+ * created by [androidx.compose.mutableStateListOf].
+ *
+ * This class closely implements the same semantics as [ArrayList].
+ *
+ * @see androidx.compose.mutableStateListOf
+ */
+@Stable
+class SnapshotStateList<T> : MutableList<T>, StateObject {
     override var firstStateRecord: StateListStateRecord<T> =
         StateListStateRecord<T>(buildableListOf())
         private set
@@ -40,10 +49,13 @@ internal class SnapshotStateList<T> : StableMutableList<T>, StateObject {
     internal val readable: StateListStateRecord<T> get() =
         firstStateRecord.readable(this)
 
-    internal class StateListStateRecord<T>(
-        var list: BuildableList<T>
+    /**
+     * This is an internal implementation class of [SnapshotStateList]. Do not use.
+     */
+    class StateListStateRecord<T> internal constructor(
+        internal var list: BuildableList<T>
     ) : StateRecord() {
-        var modification = 0
+        internal var modification = 0
         override fun assign(value: StateRecord) {
             @Suppress("UNCHECKED_CAST")
             list = (value as StateListStateRecord<T>).list

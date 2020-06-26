@@ -429,18 +429,6 @@ private object NeverEqualPolicy : SnapshotMutationPolicy<Any?> {
 }
 
 /**
- * A mutable list that is stable for composition.
- *
- * @sample androidx.compose.samples.stateListSample
- *
- * @see MutableList
- * @see Stable
- * @see Composable
- */
-@Stable
-interface StableMutableList<T> : MutableList<T>
-
-/**
  * Create a instance of MutableList<T> that is observable and can be snapshot.
  *
  * @sample androidx.compose.samples.stateListSample
@@ -450,7 +438,7 @@ interface StableMutableList<T> : MutableList<T>
  * @see MutableList
  * @see takeSnapshot
  */
-fun <T> mutableStateListOf(): StableMutableList<T> = SnapshotStateList<T>()
+fun <T> mutableStateListOf() = SnapshotStateList<T>()
 
 /**
  * Create an instance of MutableList<T> that is observable and can be snapshot.
@@ -460,26 +448,13 @@ fun <T> mutableStateListOf(): StableMutableList<T> = SnapshotStateList<T>()
  * @see MutableList
  * @see takeSnapshot
  */
-fun <T> mutableStateListOf(vararg elements: T): StableMutableList<T> =
-    SnapshotStateList<T>().also { it.addAll(elements) }
+fun <T> mutableStateListOf(vararg elements: T) =
+    SnapshotStateList<T>().also { it.addAll(elements.toList()) }
 
 /**
  * Create an instance of MutableList<T> from a collection that is observerable and can be snapshot.
  */
-fun <T> Collection<T>.toMutableStateList(): StableMutableList<T> =
-    SnapshotStateList<T>().also { it.addAll(this) }
-
-/**
- * A mutable map that is stable for composition.
- *
- * @sample androidx.compose.samples.stateMapSample
- *
- * @see MutableMap
- * @see Stable
- * @see Composable
- */
-@Stable
-interface StableMutableMap<K, V> : MutableMap<K, V>
+fun <T> Collection<T>.toMutableStateList() = SnapshotStateList<T>().also { it.addAll(this) }
 
 /**
  * Create a instance of MutableSet<K, V> that is observable and can be snapshot.
@@ -491,7 +466,7 @@ interface StableMutableMap<K, V> : MutableMap<K, V>
  * @see MutableMap
  * @see takeSnapshot
  */
-fun <K, V> mutableStateMapOf(): StableMutableMap<K, V> = SnapshotStateMap()
+fun <K, V> mutableStateMapOf() = SnapshotStateMap<K, V>()
 
 /**
  * Create a instance of MutableMap<K, V> that is observable and can be snapshot.
@@ -501,12 +476,12 @@ fun <K, V> mutableStateMapOf(): StableMutableMap<K, V> = SnapshotStateMap()
  * @see MutableMap
  * @see takeSnapshot
  */
-fun <K, V> mutableStateMapOf(vararg pairs: Pair<K, V>): StableMutableMap<K, V> =
-    SnapshotStateMap<K, V>().apply { putAll(pairs) }
+fun <K, V> mutableStateMapOf(vararg pairs: Pair<K, V>) =
+    SnapshotStateMap<K, V>().apply { putAll(pairs.toMap()) }
 
 /**
  * Create an instance of MutableMap<K, V> from a collection of pairs that is observable and can be
  * snapshot.
  */
-fun <K, V> Iterable<Pair<K, V>>.toMutableStateMap(): StableMutableMap<K, V> =
-    SnapshotStateMap<K, V>().also { it.putAll(this) }
+fun <K, V> Iterable<Pair<K, V>>.toMutableStateMap() =
+    SnapshotStateMap<K, V>().also { it.putAll(this.toMap()) }

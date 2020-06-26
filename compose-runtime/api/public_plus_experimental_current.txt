@@ -261,10 +261,10 @@ package androidx.compose {
     method @Deprecated public static kotlin.jvm.functions.Function2<java.lang.Object,java.lang.Object,java.lang.Boolean> getReferentiallyEqual();
     method @Deprecated public static kotlin.jvm.functions.Function2<java.lang.Object,java.lang.Object,java.lang.Boolean> getStructurallyEqual();
     method public static inline operator <T> T! getValue(androidx.compose.State<T>, Object? thisObj, kotlin.reflect.KProperty<?> property);
-    method public static <T> androidx.compose.StableMutableList<T> mutableStateListOf();
-    method public static <T> androidx.compose.StableMutableList<T> mutableStateListOf(T?... elements);
-    method public static <K, V> androidx.compose.StableMutableMap<K,V> mutableStateMapOf();
-    method public static <K, V> androidx.compose.StableMutableMap<K,V> mutableStateMapOf(kotlin.Pair<? extends K,? extends V>... pairs);
+    method public static <T> androidx.compose.snapshots.SnapshotStateList<T> mutableStateListOf();
+    method public static <T> androidx.compose.snapshots.SnapshotStateList<T> mutableStateListOf(T?... elements);
+    method public static <K, V> androidx.compose.snapshots.SnapshotStateMap<K,V> mutableStateMapOf();
+    method public static <K, V> androidx.compose.snapshots.SnapshotStateMap<K,V> mutableStateMapOf(kotlin.Pair<? extends K,? extends V>... pairs);
     method public static <T> androidx.compose.MutableState<T> mutableStateOf(T? value, androidx.compose.SnapshotMutationPolicy<T> policy = referentialEqualityPolicy());
     method public static <T> androidx.compose.SnapshotMutationPolicy<T> neverEqualPolicy();
     method public static <T> androidx.compose.SnapshotMutationPolicy<T> referentialEqualityPolicy();
@@ -274,8 +274,8 @@ package androidx.compose {
     method @androidx.compose.Composable public static inline <T> androidx.compose.MutableState<T> stateFor(Object![]? inputs, kotlin.jvm.functions.Function0<? extends T> init);
     method @androidx.compose.Composable public static inline <T, reified V1, reified V2> androidx.compose.MutableState<T>! stateFor(V1? v1, V2? v2, kotlin.jvm.functions.Function0<? extends T> init);
     method public static <T> androidx.compose.SnapshotMutationPolicy<T> structuralEqualityPolicy();
-    method public static <T> androidx.compose.StableMutableList<T> toMutableStateList(java.util.Collection<? extends T>);
-    method public static <K, V> androidx.compose.StableMutableMap<K,V> toMutableStateMap(Iterable<? extends kotlin.Pair<? extends K,? extends V>>);
+    method public static <T> androidx.compose.snapshots.SnapshotStateList<T> toMutableStateList(java.util.Collection<? extends T>);
+    method public static <K, V> androidx.compose.snapshots.SnapshotStateMap<K,V> toMutableStateMap(Iterable<? extends kotlin.Pair<? extends K,? extends V>>);
   }
 
   @Deprecated public final class NullCompilationScope {
@@ -480,12 +480,6 @@ package androidx.compose {
   }
 
   @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets={AnnotationTarget.ANNOTATION_CLASS, AnnotationTarget.CLASS}) public @interface StableMarker {
-  }
-
-  @androidx.compose.Stable public interface StableMutableList<T> extends java.util.List<T> kotlin.jvm.internal.markers.KMutableList {
-  }
-
-  @androidx.compose.Stable public interface StableMutableMap<K, V> extends java.util.Map<K,V> kotlin.jvm.internal.markers.KMutableMap {
   }
 
   @androidx.compose.Stable public interface State<T> {
@@ -796,7 +790,70 @@ package androidx.compose.snapshots {
     method public static inline <T extends androidx.compose.snapshots.StateRecord, R> R! writable(T, androidx.compose.snapshots.StateObject state, kotlin.jvm.functions.Function1<? super T,? extends R> block);
   }
 
+  @androidx.compose.Stable public final class SnapshotStateList<T> implements kotlin.jvm.internal.markers.KMutableList java.util.List<T> androidx.compose.snapshots.StateObject {
+    ctor public SnapshotStateList();
+    method public boolean add(T? element);
+    method public void add(int index, T? element);
+    method public boolean addAll(int index, java.util.Collection<? extends T> elements);
+    method public boolean addAll(java.util.Collection<? extends T> elements);
+    method public void clear();
+    method public boolean contains(Object? element);
+    method public boolean containsAll(java.util.Collection<?> elements);
+    method public T! get(int index);
+    method public androidx.compose.snapshots.SnapshotStateList.StateListStateRecord<T> getFirstStateRecord();
+    method public int getSize();
+    method public int indexOf(Object? element);
+    method public boolean isEmpty();
+    method public java.util.Iterator<T> iterator();
+    method public int lastIndexOf(Object? element);
+    method public java.util.ListIterator<T> listIterator();
+    method public java.util.ListIterator<T> listIterator(int index);
+    method public void prependStateRecord(androidx.compose.snapshots.StateRecord value);
+    method public boolean remove(Object? element);
+    method public boolean removeAll(java.util.Collection<?> elements);
+    method public T! removeAt(int index);
+    method public void removeRange(int fromIndex, int toIndex);
+    method public boolean retainAll(java.util.Collection<?> elements);
+    method public T! set(int index, T? element);
+    method public java.util.List<T> subList(int fromIndex, int toIndex);
+    property public androidx.compose.snapshots.SnapshotStateList.StateListStateRecord<T> firstStateRecord;
+    property public int size;
+  }
+
+  public static final class SnapshotStateList.StateListStateRecord<T> extends androidx.compose.snapshots.StateRecord {
+    method public void assign(androidx.compose.snapshots.StateRecord value);
+    method public androidx.compose.snapshots.StateRecord create();
+  }
+
   public final class SnapshotStateListKt {
+  }
+
+  @androidx.compose.Stable public final class SnapshotStateMap<K, V> implements kotlin.jvm.internal.markers.KMutableMap java.util.Map<K,V> androidx.compose.snapshots.StateObject {
+    ctor public SnapshotStateMap();
+    method public void clear();
+    method public boolean containsKey(Object? key);
+    method public boolean containsValue(Object? value);
+    method public V? get(Object? key);
+    method public java.util.Set<java.util.Map.Entry<K,V>> getEntries();
+    method public androidx.compose.snapshots.SnapshotStateMap.StateMapStateRecord<K,V> getFirstStateRecord();
+    method public java.util.Set<K> getKeys();
+    method public int getSize();
+    method public java.util.Collection<V> getValues();
+    method public boolean isEmpty();
+    method public void prependStateRecord(androidx.compose.snapshots.StateRecord value);
+    method public V? put(K? key, V? value);
+    method public void putAll(java.util.Map<? extends K,? extends V> from);
+    method public V? remove(Object? key);
+    property public java.util.Set<java.util.Map.Entry<K,V>> entries;
+    property public androidx.compose.snapshots.SnapshotStateMap.StateMapStateRecord<K,V> firstStateRecord;
+    property public java.util.Set<K> keys;
+    property public int size;
+    property public java.util.Collection<V> values;
+  }
+
+  public static final class SnapshotStateMap.StateMapStateRecord<K, V> extends androidx.compose.snapshots.StateRecord {
+    method public void assign(androidx.compose.snapshots.StateRecord value);
+    method public androidx.compose.snapshots.StateRecord create();
   }
 
   public final class SnapshotStateMapKt {
