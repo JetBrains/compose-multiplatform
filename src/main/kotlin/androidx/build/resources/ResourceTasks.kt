@@ -16,21 +16,13 @@
 
 package androidx.build.resources
 
-import androidx.build.AndroidXExtension
 import androidx.build.AndroidXPlugin.Companion.TASK_GROUP_API
 import androidx.build.addToBuildOnServer
 import androidx.build.addToCheckTask
-import androidx.build.checkapi.getBuiltApiLocation
-import androidx.build.checkapi.getCurrentApiLocation
+import androidx.build.checkapi.ApiLocation
 import androidx.build.checkapi.getRequiredCompatibilityApiLocation
-import androidx.build.checkapi.getVersionedApiLocation
-import androidx.build.checkapi.hasApiFileDirectory
-import androidx.build.checkapi.hasApiTasks
-import androidx.build.defaultPublishVariant
-import androidx.build.isVersionedApiFileWritingEnabled
 import androidx.build.metalava.UpdateApiTask
 import androidx.build.uptodatedness.cacheEvenIfNoOutputs
-import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Project
 import java.util.Locale
 
@@ -40,32 +32,11 @@ object ResourceTasks {
     private const val CHECK_RESOURCE_API_TASK = "checkResourceApi"
     private const val UPDATE_RESOURCE_API_TASK = "updateResourceApi"
 
-    @Suppress("UnstableApiUsage")
-    fun Project.configureAndroidProjectForResourceTasks(
-        library: LibraryExtension,
-        extension: AndroidXExtension
-    ) {
-        afterEvaluate { project ->
-            if (!hasApiTasks(this, extension)) {
-                return@afterEvaluate
-            }
-
-            library.defaultPublishVariant { variant ->
-                if (!project.hasApiFileDirectory()) {
-                    logger.info(
-                        "Project $name doesn't have an api folder, ignoring API tasks."
-                    )
-                    return@defaultPublishVariant
-                }
-
-                setupProject(project, variant.name)
-            }
-        }
-    }
-
-    private fun setupProject(
+    fun setupProject(
         project: Project,
-        variantName: String
+        variantName: String,
+        builtApiLocation: ApiLocation,
+        outputApiLocations: List<ApiLocation>
     ) {
         @OptIn(ExperimentalStdlibApi::class)
         val packageResTask = project.tasks
@@ -73,21 +44,6 @@ object ResourceTasks {
         @Suppress("UnstableApiUsage") // flatMap
         val builtApiFile = packageResTask.flatMap { task ->
             (task as com.android.build.gradle.tasks.MergeResources).publicFile
-        }
-
-        val versionedApiLocation = project.getVersionedApiLocation()
-        val currentApiLocation = project.getCurrentApiLocation()
-        val builtApiLocation = project.getBuiltApiLocation()
-
-        val outputApiLocations = if (project.isVersionedApiFileWritingEnabled()) {
-            listOf(
-                versionedApiLocation,
-                currentApiLocation
-            )
-        } else {
-            listOf(
-                currentApiLocation
-            )
         }
 
         val outputApiFiles = outputApiLocations.map { location ->

@@ -31,9 +31,9 @@ import androidx.build.gradle.getByType
 import androidx.build.gradle.isRoot
 import androidx.build.jacoco.Jacoco
 import androidx.build.license.configureExternalDependencyLicenseCheck
-import androidx.build.metalava.MetalavaTasks.configureAndroidProjectForMetalava
-import androidx.build.metalava.MetalavaTasks.configureJavaProjectForMetalava
-import androidx.build.resources.ResourceTasks.configureAndroidProjectForResourceTasks
+import androidx.build.checkapi.JavaApiTaskConfig
+import androidx.build.checkapi.LibraryApiTaskConfig
+import androidx.build.checkapi.configureProjectForApiTasks
 import androidx.build.studio.StudioTask
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
@@ -276,8 +276,11 @@ class AndroidXPlugin : Plugin<Project> {
         if (project.isDocumentationEnabled()) {
             project.configureAndroidProjectForDokka(libraryExtension, androidXExtension)
         }
-        project.configureAndroidProjectForMetalava(libraryExtension, androidXExtension)
-        project.configureAndroidProjectForResourceTasks(libraryExtension, androidXExtension)
+
+        project.configureProjectForApiTasks(
+            LibraryApiTaskConfig(libraryExtension),
+            androidXExtension
+        )
 
         project.addToProjectMap(androidXExtension)
     }
@@ -314,7 +317,11 @@ class AndroidXPlugin : Plugin<Project> {
         if (project.isDocumentationEnabled()) {
             project.configureJavaProjectForDokka(extension)
         }
-        project.configureJavaProjectForMetalava(extension)
+
+        project.configureProjectForApiTasks(
+            JavaApiTaskConfig,
+            extension
+        )
 
         project.afterEvaluate {
             if (extension.publish.shouldRelease()) {

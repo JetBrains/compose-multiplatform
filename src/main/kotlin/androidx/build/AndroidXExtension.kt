@@ -96,6 +96,12 @@ open class AndroidXExtension(val project: Project) {
         }
     private var licenses: MutableCollection<License> = ArrayList()
     var publish: Publish = Publish.NONE
+
+    /**
+     * Whether to run API tasks such as tracking and linting. The default value is
+     * [RunApiTasks.Auto], which automatically picks based on the project's properties.
+     */
+    var runApiTasks: RunApiTasks = RunApiTasks.Auto
     var failOnDeprecationWarnings = true
     var compilationTarget: CompilationTarget = CompilationTarget.DEVICE
 
@@ -152,6 +158,15 @@ enum class Publish {
 
     fun shouldRelease() = this == SNAPSHOT_AND_RELEASE
     fun shouldPublish() = this == SNAPSHOT_ONLY || this == SNAPSHOT_AND_RELEASE
+}
+
+sealed class RunApiTasks {
+    /** Automatically determine whether API tasks should be run. */
+    object Auto : RunApiTasks()
+    /** Always run API tasks regardless of other project properties. */
+    data class Yes(val reason: String? = null) : RunApiTasks()
+    /** Do not run any API tasks. */
+    data class No(val reason: String) : RunApiTasks()
 }
 
 class License {
