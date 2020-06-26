@@ -33,6 +33,7 @@ import androidx.compose.staticAmbientOf
 import androidx.compose.structuralEqualityPolicy
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.ui.core.ExperimentalLayoutNodeApi
 import androidx.ui.core.LayoutNode
 import androidx.ui.core.subcomposeInto
 import androidx.ui.viewinterop.emitView
@@ -508,6 +509,7 @@ class AmbientTests : BaseComposeTest() {
     }
 
     @Composable fun deferredSubCompose(block: @Composable () -> Unit): () -> Unit {
+        @OptIn(ExperimentalLayoutNodeApi::class)
         val container = remember { LayoutNode() }
         val ref = Ref<CompositionReference>()
         narrowInvalidateForReference(ref = ref)
