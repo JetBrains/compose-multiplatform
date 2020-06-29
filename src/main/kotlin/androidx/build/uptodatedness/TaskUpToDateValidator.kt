@@ -23,7 +23,7 @@ import java.io.File
 import java.util.Date
 
 /**
- * Validates that all tasks (except a temporary whitelist) are considered up-to-date.
+ * Validates that all tasks (except a temporary exception list) are considered up-to-date.
  * The expected usage of this is that the user will invoke a build with the
  * TaskUpToDateValidator disabled, and then reinvoke the same build with the TaskUpToDateValidator
  * enabled. If the second build actually runs any tasks, then some tasks don't have the correct
@@ -33,7 +33,7 @@ import java.util.Date
 const val DISALLOW_TASK_EXECUTION_FLAG_NAME = "disallowExecution"
 const val RECORD_FLAG_NAME = "verifyUpToDate"
 
-// Temporary whitelist of tasks that are known to still be out-of-date after running once
+// Temporary list of exempt tasks that are known to still be out-of-date after running once
 val EXEMPT_TASK_NAMES = setOf(
     "buildOnServer",
     "checkExternalLicenses",
