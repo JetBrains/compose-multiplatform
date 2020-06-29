@@ -96,9 +96,9 @@ open class VerifyDependencyVersionsTask : DefaultTask() {
 }
 
 fun shouldVerifyConfiguration(configuration: Configuration): Boolean {
-    // Only verify configurations that are exported to POM. In an ideal world, this would be a
-    // whitelist derived from the mappings used by the Maven Publish Plugin; however, since we
-    // don't have direct access to those, this should remain a blacklist.
+    // Only verify configurations that are exported to POM. In an ideal world, this would be an
+    // inclusion derived from the mappings used by the Maven Publish Plugin; however, since we
+    // don't have direct access to those, this should remain an exclusion list.
     var name = configuration.name
 
     // Don't check any Android-specific variants of Java plugin configurations -- releaseApi for
