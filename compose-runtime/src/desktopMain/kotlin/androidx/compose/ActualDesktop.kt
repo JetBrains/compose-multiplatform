@@ -16,37 +16,30 @@
 
 package androidx.compose
 
-import javax.swing.JComponent
 import javax.swing.SwingUtilities
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers
 
-actual abstract class EmbeddingUIContext
+// API to allow override embedding context creation mechanism for tests.
+var EmbeddingContextFactory: (() -> EmbeddingContext)? = null
 
-internal class SwingUIContext(val root: JComponent) : EmbeddingUIContext()
-
-actual class Looper
-
-internal actual fun isMainThread(): Boolean = SwingUtilities.isEventDispatchThread()
-
-internal actual object LooperWrapper {
-    private val mainLooper = Looper()
-    actual fun getMainLooper(): Looper = mainLooper
-}
-
-internal actual class Handler {
-    actual constructor(looper: Looper) {}
-    actual fun post(block: () -> Unit): Boolean {
-        SwingUtilities.invokeLater(block)
-        return true
+class SwingEmbeddingContext : EmbeddingContext {
+    override fun isMainThread(): Boolean {
+        return SwingUtilities.isEventDispatchThread()
     }
-}
 
-internal actual object Choreographer {
+    override fun mainThreadCompositionContext(): CoroutineContext {
+        return Dispatchers.Main
+    }
+
+    override fun postOnMainThread(block: () -> Unit) {
+        SwingUtilities.invokeLater(block)
+    }
+
     private val cancelled = mutableSetOf<ChoreographerFrameCallback>()
 
-    actual fun postFrameCallback(callback: ChoreographerFrameCallback) {
-        SwingUtilities.invokeLater {
+    override fun postFrameCallback(callback: ChoreographerFrameCallback) {
+        postOnMainThread {
             if (callback !in cancelled) {
                 callback.doFrame(System.currentTimeMillis() * 1000000)
             } else {
@@ -54,13 +47,13 @@ internal actual object Choreographer {
             }
         }
     }
-    actual fun postFrameCallbackDelayed(delayMillis: Long, callback: ChoreographerFrameCallback) {
-        TODO()
-    }
-    actual fun removeFrameCallback(callback: ChoreographerFrameCallback) {
+    override fun cancelFrameCallback(callback: ChoreographerFrameCallback) {
         cancelled += callback
     }
 }
+
+actual fun EmbeddingContext(): EmbeddingContext =
+    EmbeddingContextFactory?.let { it() } ?: SwingEmbeddingContext()
 
 actual interface ChoreographerFrameCallback {
     actual fun doFrame(frameTimeNanos: Long)
@@ -129,8 +122,6 @@ actual fun keySourceInfoOf(key: Any): String? = keyInfo[key]
 actual fun resetSourceInfo() {
     keyInfo.clear()
 }
-
-internal actual fun mainThreadCompositionContext(): CoroutineContext = Dispatchers.Main
 
 // TODO(igotti): do we need actual processing for those?
 actual annotation class MainThread()

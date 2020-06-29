@@ -15,6 +15,7 @@ package androidx.compose {
   }
 
   public final class ActualAndroidKt {
+    method public static androidx.compose.EmbeddingContext EmbeddingContext();
   }
 
   public final class ActualJvmKt {
@@ -36,6 +37,15 @@ package androidx.compose {
     method public boolean getValid();
     method public int location(androidx.compose.SlotTable slots);
     property public final boolean valid;
+  }
+
+  public final class AndroidEmbeddingContext implements androidx.compose.EmbeddingContext {
+    ctor public AndroidEmbeddingContext();
+    method public void cancelFrameCallback(android.view.Choreographer.FrameCallback callback);
+    method public boolean isMainThread();
+    method public kotlin.coroutines.CoroutineContext mainThreadCompositionContext();
+    method public void postFrameCallback(android.view.Choreographer.FrameCallback callback);
+    method public void postOnMainThread(kotlin.jvm.functions.Function0<kotlin.Unit> block);
   }
 
   @androidx.compose.ExperimentalComposeApi public interface Applier<N> {
@@ -210,6 +220,14 @@ package androidx.compose {
     method @androidx.compose.Composable public static void onPreCommit(Object![]? inputs, kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> callback);
   }
 
+  public interface EmbeddingContext {
+    method public void cancelFrameCallback(android.view.Choreographer.FrameCallback callback);
+    method public boolean isMainThread();
+    method public kotlin.coroutines.CoroutineContext mainThreadCompositionContext();
+    method public void postFrameCallback(android.view.Choreographer.FrameCallback callback);
+    method public void postOnMainThread(kotlin.jvm.functions.Function0<kotlin.Unit> block);
+  }
+
   public final class EmitKt {
     method @androidx.compose.Composable public static inline <T extends java.lang.Object, reified E extends androidx.compose.Applier<?>> void emit(kotlin.jvm.functions.Function0<? extends T> ctor, kotlin.jvm.functions.Function1<? super androidx.compose.Updater<T>,? extends kotlin.Unit> update);
     method @androidx.compose.Composable public static inline <T extends java.lang.Object, reified E extends androidx.compose.Applier<?>> void emit(kotlin.jvm.functions.Function0<? extends T> ctor, kotlin.jvm.functions.Function1<? super androidx.compose.Updater<T>,? extends kotlin.Unit> update, kotlin.jvm.functions.Function0<? extends kotlin.Unit> children);
@@ -313,7 +331,7 @@ package androidx.compose {
   }
 
   @kotlin.PublishedApi internal final class PostCommitScopeImpl implements android.view.Choreographer.FrameCallback androidx.compose.CommitScope androidx.compose.CompositionLifecycleObserver {
-    ctor public PostCommitScopeImpl(internal kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> onCommit);
+    ctor public PostCommitScopeImpl(internal kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> onCommit, androidx.compose.EmbeddingContext embeddingContext);
     method public void doFrame(long frameTimeNanos);
     method public void onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> callback);
     method public void onEnter();
@@ -337,12 +355,15 @@ package androidx.compose {
   }
 
   public final class Recomposer {
+    ctor public Recomposer(androidx.compose.EmbeddingContext embeddingContext);
     ctor public Recomposer();
     method public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public androidx.compose.EmbeddingContext getEmbeddingContext();
     method public androidx.compose.dispatch.MonotonicFrameClock getFrameClock();
     method public boolean hasPendingChanges();
     method public suspend Object? recomposeAndApplyChanges(kotlinx.coroutines.CoroutineScope applyCoroutineScope, long frameCount, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public suspend Object? runRecomposeAndApplyChanges(kotlin.coroutines.Continuation<?> p);
+    method public void setEmbeddingContext(androidx.compose.EmbeddingContext p);
     property public final androidx.compose.dispatch.MonotonicFrameClock frameClock;
     field public static final androidx.compose.Recomposer.Companion Companion;
   }

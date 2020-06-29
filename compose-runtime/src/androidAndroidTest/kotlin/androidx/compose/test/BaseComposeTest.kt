@@ -23,14 +23,13 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertTrue
 import android.app.Activity
+import android.os.Looper
 import android.view.ViewGroup
-import androidx.compose.Choreographer
 import androidx.compose.ChoreographerFrameCallback
 import androidx.compose.Composable
 import androidx.compose.ComposableContract
 import androidx.compose.Composition
 import androidx.compose.ExperimentalComposeApi
-import androidx.compose.Looper
 import androidx.compose.Providers
 import androidx.compose.Recomposer
 import androidx.compose.compositionReference
@@ -98,14 +97,14 @@ internal fun Activity.show(block: @Composable () -> Unit): Composition {
 
 internal fun Activity.waitForAFrame() {
     if (Looper.getMainLooper() == Looper.myLooper()) {
-        throw Exception("Cannot be run from the main looper thread")
+        throw Exception("Cannot be run from the main thread")
     }
     val latch = CountDownLatch(1)
     uiThread {
-        Choreographer.postFrameCallback(object :
+        android.view.Choreographer.getInstance().postFrameCallback(object :
             ChoreographerFrameCallback {
-            override fun doFrame(frameTimeNanos: Long) = latch.countDown()
-        })
+                override fun doFrame(frameTimeNanos: Long) = latch.countDown()
+            })
     }
     assertTrue(latch.await(1, TimeUnit.HOURS), "Time-out waiting for choreographer frame")
 }

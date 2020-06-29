@@ -52,7 +52,7 @@ suspend fun withRunningRecomposer(
  * The scheduler for performing recomposition and applying updates to one or more [Composition]s.
  * [frameClock] is used to align changes with display frames.
  */
-class Recomposer {
+class Recomposer(var embeddingContext: EmbeddingContext = EmbeddingContext()) {
 
     /**
      * This collection is its own lock, shared with [invalidComposersAwaiter]
@@ -305,17 +305,17 @@ class Recomposer {
     suspend fun awaitIdle(): Unit = idlingLatch.await()
 
     companion object {
+        private val embeddingContext by lazy { EmbeddingContext() }
         /**
          * Retrieves [Recomposer] for the current thread. Needs to be the main thread.
          */
         @TestOnly
         fun current(): Recomposer {
-            require(isMainThread()) { "No Recomposer for this Thread" }
-
             return mainRecomposer ?: run {
-                val mainScope = CoroutineScope(NonCancellable + mainThreadCompositionContext())
+                val mainScope = CoroutineScope(NonCancellable +
+                        embeddingContext.mainThreadCompositionContext())
 
-                Recomposer().also {
+                Recomposer(embeddingContext).also {
                     mainRecomposer = it
                     @OptIn(ExperimentalCoroutinesApi::class)
                     mainScope.launch(start = CoroutineStart.UNDISPATCHED) {

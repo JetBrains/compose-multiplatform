@@ -424,7 +424,7 @@ class CompositionTests {
 
     @Test
     fun testComposeTwoAttributeComponent() {
-        @Composable fun MockComposeScope.Two(first: Int = 1, second: Int = 2) {
+        @Composable fun MockComposeScope.Two2(first: Int = 1, second: Int = 2) {
             linear {
                 text("$first $second")
             }
@@ -437,7 +437,7 @@ class CompositionTests {
         }
 
         val result = compose {
-            Two(41, 42)
+            Two2(41, 42)
         }
 
         result.validate {
@@ -447,7 +447,7 @@ class CompositionTests {
 
     @Test
     fun testComposeThreeAttributeComponent() {
-        @Composable fun MockComposeScope.Three(first: Int = 1, second: Int = 2, third: Int = 3) {
+        @Composable fun MockComposeScope.Three3(first: Int = 1, second: Int = 2, third: Int = 3) {
             linear {
                 text("$first $second $third")
             }
@@ -460,7 +460,7 @@ class CompositionTests {
         }
 
         val result = compose {
-            Three(41, 42, 43)
+            Three3(41, 42, 43)
         }
 
         result.validate {
@@ -470,7 +470,7 @@ class CompositionTests {
 
     @Test
     fun testComposeFourOrMoreAttributeComponent() {
-        @Composable fun MockComposeScope.Four(
+        @Composable fun MockComposeScope.Four4(
             first: Int = 1,
             second: Int = 2,
             third: Int = 3,
@@ -488,7 +488,7 @@ class CompositionTests {
         }
 
         val result = compose {
-            Four(41, 42, 43, 44)
+            Four4(41, 42, 43, 44)
         }
 
         result.validate {
