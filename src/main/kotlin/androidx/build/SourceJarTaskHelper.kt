@@ -52,7 +52,7 @@ fun Project.configureSourceJarForAndroid(extension: LibraryExtension) {
                     project.tasks.named("sourceJar${variant.name.capitalize()}", Jar::class.java)
                 // multiplatform projects use different source sets, so we need to modify the task
                 sourceJar.configure { sourceJarTask ->
-                    // use a whitelist of source sets, because that is the preferred policy
+                    // use an inclusion list of source sets, because that is the preferred policy
                     sourceJarTask.from(kotlinExt.sourceSets.getByName("commonMain").kotlin.srcDirs)
                     sourceJarTask.from(kotlinExt.sourceSets.getByName("androidMain").kotlin.srcDirs)
                 }
