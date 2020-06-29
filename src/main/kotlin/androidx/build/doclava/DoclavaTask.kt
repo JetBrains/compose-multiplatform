@@ -65,8 +65,8 @@ open class DoclavaTask : Javadoc() {
     var hiddenPackages: Collection<String>? = null
 
     /**
-     * If non-null and not-empty, the whitelist of packages that will be present in the generated
-     * stubs; if null or empty, then all packages have stubs generated.<br>
+     * If non-null and not-empty, the inclusion list of packages that will be present in the
+     * generated stubs; if null or empty, then all packages have stubs generated.<br>
      * Wildcards are accepted.
      */
     @Optional
