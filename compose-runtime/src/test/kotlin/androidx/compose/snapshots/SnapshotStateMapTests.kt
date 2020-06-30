@@ -17,7 +17,6 @@
 package androidx.compose.snapshots
 
 import androidx.compose.ExperimentalComposeApi
-import androidx.compose.StableMutableMap
 import androidx.compose.mutableStateMapOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -465,7 +464,7 @@ class SnapshotStateMapTests {
     }
 
     private fun validateRead(
-        initialMap: StableMutableMap<Int, Float> = defaultMap(),
+        initialMap: MutableMap<Int, Float> = defaultMap(),
         block: (Map<Int, Float>, Map<Int, Float>) -> Unit
     ) {
         validateMaps(initialMap) { map, normalMap ->
@@ -474,7 +473,7 @@ class SnapshotStateMapTests {
     }
 
     private fun validateWrite(
-        initialMap: StableMutableMap<Int, Float> = defaultMap(),
+        initialMap: MutableMap<Int, Float> = defaultMap(),
         block: (MutableMap<Int, Float>) -> Unit
     ) {
         validateMaps(initialMap) { map, normalMap ->
@@ -485,7 +484,7 @@ class SnapshotStateMapTests {
     }
 
     private fun validateMaps(
-        map: StableMutableMap<Int, Float> = defaultMap(),
+        map: MutableMap<Int, Float> = defaultMap(),
         block: (MutableMap<Int, Float>, MutableMap<Int, Float>) -> Unit
     ) {
         val normalMap = map.toMutableMap()
