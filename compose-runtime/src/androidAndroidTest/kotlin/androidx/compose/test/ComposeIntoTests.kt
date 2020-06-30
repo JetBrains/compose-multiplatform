@@ -22,13 +22,13 @@ import androidx.compose.ComposableContract
 import androidx.compose.Composer
 import androidx.compose.Composition
 import androidx.compose.ExperimentalComposeApi
-import androidx.compose.Handler
 import androidx.compose.clearRoots
 import androidx.compose.currentComposer
 import androidx.compose.invalidate
 import androidx.compose.mutableStateOf
 import androidx.compose.onActive
 import androidx.compose.onCommit
+import androidx.core.os.HandlerCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import org.junit.After
@@ -97,7 +97,7 @@ class ComposeIntoTests : BaseComposeTest() {
             compositionLatch.wait()
             val thread = HandlerThread("")
             thread.start()
-            Handler(thread.looper).post {
+            HandlerCompat.createAsync(thread.looper).post {
                 model.value = 1
                 threadLatch.countDown()
             }

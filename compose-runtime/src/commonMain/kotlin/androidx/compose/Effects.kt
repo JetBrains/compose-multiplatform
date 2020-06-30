@@ -62,7 +62,8 @@ internal class PreCommitScopeImpl(
 
 @PublishedApi
 internal class PostCommitScopeImpl(
-    internal val onCommit: CommitScope.() -> Unit
+    internal val onCommit: CommitScope.() -> Unit,
+    private val embeddingContext: EmbeddingContext = Recomposer.current().embeddingContext
 ) : CommitScope, CompositionLifecycleObserver, ChoreographerFrameCallback {
 
     private var disposeCallback = emptyDispose
@@ -81,7 +82,7 @@ internal class PostCommitScopeImpl(
     }
 
     override fun onEnter() {
-        Choreographer.postFrameCallback(this)
+        embeddingContext.postFrameCallback(this)
     }
 
     override fun onLeave() {
@@ -90,7 +91,7 @@ internal class PostCommitScopeImpl(
         if (hasRun) {
             disposeCallback()
         } else {
-            Choreographer.removeFrameCallback(this)
+            embeddingContext.cancelFrameCallback(this)
         }
     }
 }

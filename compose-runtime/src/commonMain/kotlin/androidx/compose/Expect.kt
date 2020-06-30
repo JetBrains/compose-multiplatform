@@ -16,8 +16,6 @@
 
 package androidx.compose
 
-import kotlin.coroutines.CoroutineContext
-
 // TODO(aelias): Mark the typealiases internal when https://youtrack.jetbrains.com/issue/KT-36695 is fixed.
 // Currently, they behave as internal because the actual is internal, even though the expect is public.
 
@@ -61,22 +59,6 @@ expect class AtomicReference<V>(value: V) {
     fun compareAndSet(expect: V, newValue: V): Boolean
 }
 
-expect class Looper
-
-internal expect fun isMainThread(): Boolean
-
-internal expect object LooperWrapper {
-    fun getMainLooper(): Looper
-}
-
-internal expect class Handler(looper: Looper) {
-    fun post(block: () -> Unit): Boolean
-}
-
-expect interface ChoreographerFrameCallback {
-    fun doFrame(frameTimeNanos: Long)
-}
-
 internal expect class BuildableMapBuilder<K, V> : MutableMap<K, V> {
     fun build(): BuildableMap<K, V>
 }
@@ -112,14 +94,6 @@ internal expect fun <T> buildableListOf(): BuildableList<T>
 internal inline fun <T> BuildableList<T>.mutate(
     mutator: (MutableList<T>) -> Unit
 ): BuildableList<T> = builder().apply(mutator).build()
-
-internal expect object Choreographer {
-    fun postFrameCallback(callback: ChoreographerFrameCallback)
-    fun postFrameCallbackDelayed(delayMillis: Long, callback: ChoreographerFrameCallback)
-    fun removeFrameCallback(callback: ChoreographerFrameCallback)
-}
-
-internal expect fun mainThreadCompositionContext(): CoroutineContext
 
 expect class UnsupportedOperationException
 

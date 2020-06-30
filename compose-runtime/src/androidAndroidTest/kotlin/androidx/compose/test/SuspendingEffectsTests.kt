@@ -16,8 +16,8 @@
 
 package androidx.compose.test
 
-import androidx.compose.Choreographer
 import androidx.compose.ChoreographerFrameCallback
+import androidx.compose.Recomposer
 import androidx.compose.clearRoots
 import androidx.compose.getValue
 import androidx.compose.launchInComposition
@@ -82,7 +82,8 @@ class SuspendingEffectsTests : BaseComposeTest() {
                 }
             }
             onPreCommit(true) {
-                Choreographer.postFrameCallback(object : ChoreographerFrameCallback {
+                Recomposer.current().embeddingContext
+                    .postFrameCallback(object : ChoreographerFrameCallback {
                     override fun doFrame(frameTimeNanos: Long) {
                         choreographerTime = frameTimeNanos
                     }

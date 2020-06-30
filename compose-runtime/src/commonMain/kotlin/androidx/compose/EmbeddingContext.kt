@@ -18,13 +18,16 @@ package androidx.compose
 
 import kotlin.coroutines.CoroutineContext
 
-// Mapped to android.content.Context on Android.
-expect abstract class EmbeddingUIContext
-
-// Universal embedding context used for embedding Compose on the particular platform.
-internal interface EmbeddingContext<T> {
-    // Actual type here is not relevant for Compose runtime.
-    val componentRoot: T
-    val coroutineContext: CoroutineContext
-    val uiContext: EmbeddingUIContext
+expect interface ChoreographerFrameCallback {
+    fun doFrame(frameTimeNanos: Long)
 }
+
+interface EmbeddingContext {
+    fun isMainThread(): Boolean
+    fun mainThreadCompositionContext(): CoroutineContext
+    fun postOnMainThread(block: () -> Unit)
+    fun postFrameCallback(callback: ChoreographerFrameCallback)
+    fun cancelFrameCallback(callback: ChoreographerFrameCallback)
+}
+
+expect fun EmbeddingContext(): EmbeddingContext
