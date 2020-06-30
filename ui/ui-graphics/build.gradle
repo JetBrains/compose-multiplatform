@@ -58,7 +58,7 @@ kotlin {
         }
 
         androidAndroidTest.dependencies {
-            implementation project(":compose:ui:ui-graphics:samples")
+            implementation project(":compose:ui:ui-graphics:ui-graphics-samples")
             implementation project(":ui:ui-test")
             implementation(ANDROIDX_TEST_RULES)
             implementation(ANDROIDX_TEST_RUNNER)
