@@ -20,13 +20,19 @@ package androidx.compose.snapshots
 
 import androidx.compose.BuildableMap
 import androidx.compose.ExperimentalComposeApi
-import androidx.compose.StableMutableMap
+import androidx.compose.Stable
 import androidx.compose.buildableMapOf
 
 /**
- * The implementation class of observable maps.
+ * An implementation of [MutableMap] that can be observed and snapshot. This is the result type
+ * created by [androidx.compose.mutableStateMapOf].
+ *
+ * This class closely implements the same semantics as [HashMap].
+ *
+ * @see androidx.compose.mutableStateMapOf
  */
-internal class SnapshotStateMap<K, V> : StableMutableMap<K, V>, StateObject {
+@Stable
+class SnapshotStateMap<K, V> : MutableMap<K, V>, StateObject {
     override var firstStateRecord: StateMapStateRecord<K, V> =
         StateMapStateRecord<K, V>(buildableMapOf())
         private set
@@ -115,10 +121,13 @@ internal class SnapshotStateMap<K, V> : StableMutableMap<K, V>, StateObject {
         }
     }
 
-    internal class StateMapStateRecord<K, V>(
-        var map: BuildableMap<K, V>
+    /**
+     * Implementation class of [SnapshotStateMap]. Do not use.
+     */
+    class StateMapStateRecord<K, V> internal constructor(
+        internal var map: BuildableMap<K, V>
     ) : StateRecord() {
-        var modification = 0
+        internal var modification = 0
         override fun assign(value: StateRecord) {
             @Suppress("UNCHECKED_CAST")
             val other = (value as StateMapStateRecord<K, V>)
