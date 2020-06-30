@@ -540,6 +540,77 @@ package androidx.compose {
 
 }
 
+package androidx.compose.collection {
+
+  @kotlin.RequiresOptIn(level=RequiresOptIn.Level.ERROR, message="This is an experimental API for fast access collections and is likely to change " + "before becoming stable.") @kotlin.annotation.Target(allowedTargets={AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY}) public @interface ExperimentalCollectionApi {
+  }
+
+  @androidx.compose.collection.ExperimentalCollectionApi public final class MutableVector<T> {
+    method public boolean add(T? element);
+    method public void add(int index, T? element);
+    method public boolean addAll(int index, java.util.List<? extends T> elements);
+    method public boolean addAll(int index, androidx.compose.collection.MutableVector<T> elements);
+    method public inline boolean addAll(java.util.List<? extends T> elements);
+    method public inline boolean addAll(androidx.compose.collection.MutableVector<T> elements);
+    method public boolean addAll(T![] elements);
+    method public inline boolean any(kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> predicate);
+    method public void clear();
+    method public operator boolean contains(T? element);
+    method public boolean containsAll(java.util.List<? extends T> elements);
+    method public boolean containsAll(androidx.compose.collection.MutableVector<T> elements);
+    method public boolean contentEquals(androidx.compose.collection.MutableVector<T> other);
+    method public void ensureCapacity(int capacity);
+    method public T! first();
+    method public inline T! first(kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> predicate);
+    method public inline T? firstOrNull();
+    method public inline T? firstOrNull(kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> predicate);
+    method public inline <R> R! fold(R? initial, kotlin.jvm.functions.Function2<? super R,? super T,? extends R> operation);
+    method public inline <R> R! foldIndexed(R? initial, kotlin.jvm.functions.Function3<? super java.lang.Integer,? super R,? super T,? extends R> operation);
+    method public inline <R> R! foldRight(R? initial, kotlin.jvm.functions.Function2<? super T,? super R,? extends R> operation);
+    method public inline <R> R! foldRightIndexed(R? initial, kotlin.jvm.functions.Function3<? super java.lang.Integer,? super T,? super R,? extends R> operation);
+    method public inline void forEach(kotlin.jvm.functions.Function1<? super T,kotlin.Unit> block);
+    method public inline void forEachIndexed(kotlin.jvm.functions.Function2<? super java.lang.Integer,? super T,kotlin.Unit> block);
+    method public inline void forEachReversed(kotlin.jvm.functions.Function1<? super T,kotlin.Unit> block);
+    method public inline void forEachReversedIndexed(kotlin.jvm.functions.Function2<? super java.lang.Integer,? super T,kotlin.Unit> block);
+    method public inline operator T! get(int index);
+    method public inline kotlin.ranges.IntRange getIndices();
+    method public inline int getLastIndex();
+    method public int getSize();
+    method public int indexOf(T? element);
+    method public inline int indexOfFirst(kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> predicate);
+    method public inline int indexOfLast(kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> predicate);
+    method public boolean isEmpty();
+    method public boolean isNotEmpty();
+    method public T! last();
+    method public inline T! last(kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> predicate);
+    method public int lastIndexOf(T? element);
+    method public inline T? lastOrNull();
+    method public inline T? lastOrNull(kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> predicate);
+    method public inline <reified R> R![]! map(kotlin.jvm.functions.Function1<? super T,? extends R> transform);
+    method public inline <reified R> R![]! mapIndexed(kotlin.jvm.functions.Function2<? super java.lang.Integer,? super T,? extends R> transform);
+    method public inline <reified R> androidx.compose.collection.MutableVector<R>! mapIndexedNotNull(kotlin.jvm.functions.Function2<? super java.lang.Integer,? super T,? extends R> transform);
+    method public inline <reified R> androidx.compose.collection.MutableVector<R>! mapNotNull(kotlin.jvm.functions.Function1<? super T,? extends R> transform);
+    method public inline operator void plusAssign(T? element);
+    method public boolean remove(T? element);
+    method public boolean removeAll(java.util.List<? extends T> elements);
+    method public boolean removeAll(androidx.compose.collection.MutableVector<T> elements);
+    method public T! removeAt(int index);
+    method public operator T! set(int index, T? element);
+    method public inline int sumBy(kotlin.jvm.functions.Function1<? super T,java.lang.Integer> selector);
+    property public final inline kotlin.ranges.IntRange indices;
+    property public final inline int lastIndex;
+    property public final int size;
+  }
+
+  public final class MutableVectorKt {
+    method @androidx.compose.collection.ExperimentalCollectionApi public static inline <reified T> androidx.compose.collection.MutableVector<T>! MutableVector(int capacity = 16);
+    method @androidx.compose.collection.ExperimentalCollectionApi public static inline <reified T> androidx.compose.collection.MutableVector<T>! MutableVector(int size, kotlin.jvm.functions.Function1<? super java.lang.Integer,? extends T> init);
+    method @androidx.compose.collection.ExperimentalCollectionApi public static inline <reified T> androidx.compose.collection.MutableVector<T>! mutableVectorOf();
+    method @androidx.compose.collection.ExperimentalCollectionApi public static inline <reified T> androidx.compose.collection.MutableVector<T>! mutableVectorOf(T? elements);
+  }
+
+}
+
 package androidx.compose.frames {
 
   @Deprecated public abstract class AbstractRecord implements androidx.compose.frames.Record {

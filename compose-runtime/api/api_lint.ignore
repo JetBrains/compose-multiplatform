@@ -63,6 +63,18 @@ MissingNullability: androidx.compose.SlotReader#getGroupDataKey():
     Missing nullability on method `getGroupDataKey` return
 MissingNullability: androidx.compose.SlotReader#getGroupNode():
     Missing nullability on method `getGroupNode` return
+MissingNullability: androidx.compose.collection.MutableVector#mapIndexedNotNull(kotlin.jvm.functions.Function2<? super java.lang.Integer,? super T,? extends R>):
+    Missing nullability on method `mapIndexedNotNull` return
+MissingNullability: androidx.compose.collection.MutableVector#mapNotNull(kotlin.jvm.functions.Function1<? super T,? extends R>):
+    Missing nullability on method `mapNotNull` return
+MissingNullability: androidx.compose.collection.MutableVectorKt#MutableVector(int):
+    Missing nullability on method `MutableVector` return
+MissingNullability: androidx.compose.collection.MutableVectorKt#MutableVector(int, kotlin.jvm.functions.Function1<? super java.lang.Integer,? extends T>):
+    Missing nullability on method `MutableVector` return
+MissingNullability: androidx.compose.collection.MutableVectorKt#mutableVectorOf():
+    Missing nullability on method `mutableVectorOf` return
+MissingNullability: androidx.compose.collection.MutableVectorKt#mutableVectorOf(T):
+    Missing nullability on method `mutableVectorOf` return
 MissingNullability: androidx.compose.snapshots.Snapshot.Companion#getCurrent():
     Missing nullability on method `getCurrent` return
 
