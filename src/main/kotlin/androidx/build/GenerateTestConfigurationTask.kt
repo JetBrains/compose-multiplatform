@@ -42,6 +42,7 @@ private const val TEMPLATE = """<?xml version="1.0" encoding="utf-8"?>
         -->
         <configuration description="Runs tests for the module">
         <option name="test-suite-tag" value="androidx_unit_tests" />
+        <option name="config-descriptor:metadata" key="applicationId" value="APPLICATION_ID" />
         <option name="wifi:disable" value="true" />
         <include name="google/unbundled/common/setup" />
         <target_preparer class="com.android.tradefed.targetprep.suite.SuiteApkInstaller">
