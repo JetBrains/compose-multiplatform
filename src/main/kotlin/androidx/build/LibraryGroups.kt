@@ -106,6 +106,10 @@ object LibraryGroups {
     val WEBKIT = LibraryGroup("androidx.webkit", LibraryVersions.WEBKIT)
     val WINDOW = LibraryGroup("androidx.window", null)
     val WORK = LibraryGroup("androidx.work", LibraryVersions.WORK)
+
+    object Compose {
+        val MATERIAL = LibraryGroup("androidx.compose.material", null)
+    }
 }
 
 /**
