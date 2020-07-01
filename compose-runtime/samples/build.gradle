@@ -35,7 +35,7 @@ dependencies {
     implementation project(":compose:compose-runtime")
     implementation project(":ui:ui-core")
     implementation project(":ui:ui-layout")
-    implementation project(":ui:ui-material")
+    implementation project(":compose:material:material")
 }
 
 tasks.withType(KotlinCompile).configureEach {
