@@ -69,6 +69,7 @@ val EXEMPT_TASK_NAMES = setOf(
     "lintVitalRelease",
     "partiallyDejetifyArchive",
     "postInstrumentCode",
+    "properties",
     "publishBenchmarkPluginMarkerMavenPublicationToMavenRepository",
     "publishDesktopPublicationToMavenRepository",
     "publishKotlinMultiplatformPublicationToMavenRepository",
