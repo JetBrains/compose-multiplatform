@@ -100,7 +100,6 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.NAVIGATION.group, "navigation-safe-args-generator")
     ignore(LibraryGroups.NAVIGATION.group, "navigation-safe-args-gradle-plugin")
     prebuilts(LibraryGroups.NAVIGATION, "2.3.0")
-    ignore(LibraryGroups.PAGING.group, "paging-guava")
     prebuilts(LibraryGroups.PAGING, "3.0.0-alpha02")
     prebuilts(LibraryGroups.PALETTE, "1.0.0")
     // 1.0.1 was created to fix reference docs.  It contains no actual source changes from 1.0.0
