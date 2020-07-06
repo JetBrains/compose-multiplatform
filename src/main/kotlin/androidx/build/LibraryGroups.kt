@@ -108,6 +108,7 @@ object LibraryGroups {
     val WORK = LibraryGroup("androidx.work", LibraryVersions.WORK)
 
     object Compose {
+        val ANIMATION = LibraryGroup("androidx.compose.animation", null)
         val FOUNDATION = LibraryGroup("androidx.compose.foundation", null)
         val MATERIAL = LibraryGroup("androidx.compose.material", null)
         val TOOLING = LibraryGroup("androidx.compose.tooling", null)
