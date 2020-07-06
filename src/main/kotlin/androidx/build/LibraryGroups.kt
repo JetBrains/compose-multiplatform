@@ -110,6 +110,7 @@ object LibraryGroups {
     object Compose {
         val FOUNDATION = LibraryGroup("androidx.compose.foundation", null)
         val MATERIAL = LibraryGroup("androidx.compose.material", null)
+        val TOOLING = LibraryGroup("androidx.compose.tooling", null)
     }
 }
 
