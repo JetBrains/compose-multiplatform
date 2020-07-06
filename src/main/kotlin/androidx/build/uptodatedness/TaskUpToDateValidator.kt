@@ -20,6 +20,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.execution.TaskExecutionGraph
+import org.gradle.kotlin.dsl.extra
 import java.io.File
 import java.util.Date
 
@@ -96,6 +97,8 @@ val EXEMPT_TASK_NAMES = setOf(
 class TaskUpToDateValidator {
     companion object {
 
+        private val BUILD_START_TIME_KEY = "taskUpToDateValidatorSetupTime"
+
         private fun shouldRecord(project: Project): Boolean {
             return project.hasProperty(RECORD_FLAG_NAME) && !shouldValidate(project)
         }
@@ -108,7 +111,16 @@ class TaskUpToDateValidator {
             return EXEMPT_TASK_NAMES.contains(task.name)
         }
 
+        private fun recordBuildStartTime(rootProject: Project) {
+            rootProject.extra.set(BUILD_START_TIME_KEY, Date())
+        }
+
+        private fun getBuildStartTime(project: Project): Date {
+            return project.rootProject.extra.get(BUILD_START_TIME_KEY) as Date
+        }
+
         fun setup(rootProject: Project) {
+            recordBuildStartTime(rootProject)
             if (shouldValidate(rootProject)) {
                 val taskGraph = rootProject.gradle.taskGraph
                 taskGraph.afterTask { task ->
@@ -191,7 +203,8 @@ class TaskUpToDateValidator {
                 if (lastModifiedFile != null) {
                     task.path + " declares " + inputFiles.size + " input files. The " +
                         "last modified input file is\n" + lastModifiedFile + "\nmodified at " +
-                        lastModifiedWhen + ". " +
+                        lastModifiedWhen + " (this build started at about " +
+                        getBuildStartTime(task.project) + "). " +
                         tryToExplainFileModification(lastModifiedFile, taskGraph)
                 } else {
                     task.path + " declares " + inputFiles.size + " input files.\n"
