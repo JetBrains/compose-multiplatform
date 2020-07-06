@@ -117,7 +117,6 @@ fun Project.getApiLintArgs(): List<String> {
             // The list of checks that are API lint warnings and are yet to be enabled
             "ExecutorRegistration",
             "SamShouldBeLast",
-            "MissingJvmstatic",
             "CallbackMethodName",
             "GetterOnBuilder",
             "StaticFinalBuilder",
