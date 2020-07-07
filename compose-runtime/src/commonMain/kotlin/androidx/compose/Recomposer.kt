@@ -217,6 +217,10 @@ class Recomposer(var embeddingContext: EmbeddingContext = EmbeddingContext()) {
         CompositionCoroutineScopeImpl(coroutineContext, frameClock).block()
     } ?: error("apply scope missing; runRecomposeAndApplyChanges must be running")
 
+    // TODO this is temporary until more of this logic moves to Composition
+    internal val applyingCoroutineContext: CoroutineContext?
+        get() = applyingScope.get()?.coroutineContext
+
     @Suppress("PLUGIN_WARNING", "PLUGIN_ERROR")
     internal fun composeInitial(
         composable: @Composable () -> Unit,

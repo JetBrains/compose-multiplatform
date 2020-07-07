@@ -23,6 +23,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 private class SuspendingEffect(
     private val recomposer: Recomposer,
@@ -94,55 +96,70 @@ fun launchInComposition(
 
 /**
  * Launch a suspending side effect when this composition is committed and cancel it
- * when [launchInComposition] leaves the composition. If [v1] has changed since the last
+ * when [launchInComposition] leaves the composition. If [key] has changed since the last
  * recomposition, cancel the currently running [block] and launch again. [block] will run in the
  * **apply** scope of the composition's [Recomposer], which is usually your UI's main thread.
+ *
+ * This function should **not** be used to (re-)launch ongoing tasks in response to callback
+ * events by way of storing callback data in [MutableState] passed to [key]. Instead, see
+ * [rememberCoroutineScope] to obtain a [CoroutineScope] that may be used to launch ongoing jobs
+ * scoped to the composition in response to event callbacks.
  */
 @Composable
 fun launchInComposition(
-    v1: Any?,
+    key: Any?,
     block: suspend CompositionCoroutineScope.() -> Unit
 ) {
     @OptIn(ExperimentalComposeApi::class)
     val recomposer = currentComposer.recomposer
-    remember(v1) { SuspendingEffect(recomposer, block) }
+    remember(key) { SuspendingEffect(recomposer, block) }
 }
 
 /**
  * Launch a suspending side effect when this composition is committed and cancel it
- * when [launchInComposition] leaves the composition. If [v1] or [v2] has changed since the last
+ * when [launchInComposition] leaves the composition. If [key1] or [key2] has changed since the last
  * recomposition, cancel the currently running [block] and launch again. By default [block] will
  * run in the **apply** scope of the composition's [Recomposer], which is usually your UI's main
  * thread.
+ *
+ * This function should **not** be used to (re-)launch ongoing tasks in response to callback
+ * events by way of storing callback data in [MutableState] passed to [key1] or [key2]. Instead, see
+ * [rememberCoroutineScope] to obtain a [CoroutineScope] that may be used to launch ongoing jobs
+ * scoped to the composition in response to event callbacks.
  */
 @Composable
 fun launchInComposition(
-    v1: Any?,
-    v2: Any?,
+    key1: Any?,
+    key2: Any?,
     block: suspend CompositionCoroutineScope.() -> Unit
 ) {
     @OptIn(ExperimentalComposeApi::class)
     val recomposer = currentComposer.recomposer
-    remember(v1, v2) { SuspendingEffect(recomposer, block) }
+    remember(key1, key2) { SuspendingEffect(recomposer, block) }
 }
 
 /**
  * Launch a suspending side effect when this composition is committed and cancel it
- * when [launchInComposition] leaves the composition. If [v1], [v2] or [v3] has changed since the
- * last recomposition, cancel the currently running [block] and launch again. By default [block]
+ * when [launchInComposition] leaves the composition. If [key1], [key2] or [key3] has changed since
+ * the last recomposition, cancel the currently running [block] and launch again. By default [block]
  * will run in the **apply** scope of the composition's [Recomposer], which is usually your UI's
  * main thread.
+ *
+ * This function should **not** be used to (re-)launch ongoing tasks in response to callback
+ * events by way of storing callback data in [MutableState] passed to [key1], [key2] or [key3].
+ * Instead, see [rememberCoroutineScope] to obtain a [CoroutineScope] that may be used to launch
+ * ongoing jobs scoped to the composition in response to event callbacks.
  */
 @Composable
 fun launchInComposition(
-    v1: Any?,
-    v2: Any?,
-    v3: Any?,
+    key1: Any?,
+    key2: Any?,
+    key3: Any?,
     block: suspend CompositionCoroutineScope.() -> Unit
 ) {
     @OptIn(ExperimentalComposeApi::class)
     val recomposer = currentComposer.recomposer
-    remember(v1, v2, v3) { SuspendingEffect(recomposer, block) }
+    remember(key1, key2, key3) { SuspendingEffect(recomposer, block) }
 }
 
 /**
@@ -151,6 +168,11 @@ fun launchInComposition(
  * recomposition, cancel the currently running [block] and launch again. By default [block] will
  * run in the **apply** scope of the composition's [Recomposer], which is usually your UI's main
  * thread.
+ *
+ * This function should **not** be used to (re-)launch ongoing tasks in response to callback
+ * events by way of storing callback data in [MutableState] passed to [keys]. Instead, see
+ * [rememberCoroutineScope] to obtain a [CoroutineScope] that may be used to launch ongoing jobs
+ * scoped to the composition in response to event callbacks.
  */
 @Composable
 fun launchInComposition(
@@ -160,4 +182,71 @@ fun launchInComposition(
     @OptIn(ExperimentalComposeApi::class)
     val recomposer = currentComposer.recomposer
     remember(*keys) { SuspendingEffect(recomposer, block) }
+}
+
+@PublishedApi
+internal class CompositionScopedCoroutineScope(
+    override val coroutineContext: CoroutineContext
+) : CoroutineScope, CompositionLifecycleObserver {
+    override fun onEnter() {}
+    override fun onLeave() {
+        cancel()
+    }
+}
+
+// TODO(adamp) temporary until more of this moves to the Composition
+@PublishedApi
+@OptIn(ExperimentalComposeApi::class)
+internal val Composer<*>.applyContextAccessor: CoroutineContext?
+    get() = recomposer.applyingCoroutineContext
+
+/**
+ * Return a [CoroutineScope] bound to this point in the composition using the optional
+ * [CoroutineContext] provided by [getContext]. [getContext] will only be called once and the same
+ * [CoroutineScope] instance will be returned across recompositions.
+ *
+ * This scope will be [cancelled][CoroutineScope.cancel] when this call leaves the composition.
+ * The [CoroutineContext] returned by [getContext] may not contain a [Job] as this scope is
+ * considered to be a child of the composition.
+ *
+ * The default dispatcher of this scope if one is not provided by the context returned by
+ * [getContext] will be the applying dispatcher of the composition's [Recomposer].
+ *
+ * Use this scope to launch jobs in response to callback events such as clicks or other user
+ * interaction where the response to that event needs to unfold over time and be cancelled if the
+ * composable managing that process leaves the composition. Jobs should never be launched into
+ * **any** coroutine scope as a side effect of composition itself. For scoped ongoing jobs
+ * initiated by composition, see [launchInComposition].
+ *
+ * This function will not throw if preconditions are not met, as composable functions do not yet
+ * fully support exceptions. Instead the returned scope's [CoroutineScope.coroutineContext] will
+ * contain a failed [Job] with the associated exception and will not be capable of launching
+ * child jobs.
+ */
+@Composable
+inline fun rememberCoroutineScope(
+    getContext: () -> CoroutineContext = { EmptyCoroutineContext }
+): CoroutineScope {
+    val composer = currentComposer
+    return remember {
+        val suppliedContext = getContext()
+        if (suppliedContext[Job] != null) {
+            CoroutineScope(Job().apply {
+                    completeExceptionally(IllegalArgumentException("CoroutineContext supplied to " +
+                            "rememberCoroutineScope may not include a parent job"))
+                })
+        } else {
+            val applyContext = composer.applyContextAccessor
+            if (applyContext == null) {
+                CoroutineScope(Job().apply {
+                    completeExceptionally(IllegalStateException("cannot create a new composition " +
+                            "coroutine scope - Composition is not active"))
+                })
+            } else {
+                CompositionScopedCoroutineScope(
+                    applyContext + Job(applyContext[Job]) + suppliedContext
+                )
+            }
+        }
+    }
 }
