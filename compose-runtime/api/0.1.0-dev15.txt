@@ -3,13 +3,14 @@ package androidx.compose {
 
   @androidx.compose.ExperimentalComposeApi public abstract class AbstractApplier<T> implements androidx.compose.Applier<T> {
     ctor public AbstractApplier(T! root);
+    method public final void clear();
     method public void down(T? node);
     method public T! getCurrent();
     method public final T! getRoot();
     method protected final void move(java.util.List<T>, int from, int to, int count);
+    method protected abstract void onClear();
     method protected final void remove(java.util.List<T>, int index, int count);
-    method public void reset();
-    method public void setCurrent(T! p);
+    method protected void setCurrent(T! p);
     method public void up();
     property public T! current;
   }
@@ -49,12 +50,12 @@ package androidx.compose {
   }
 
   @androidx.compose.ExperimentalComposeApi public interface Applier<N> {
+    method public void clear();
     method public void down(N? node);
     method public N! getCurrent();
     method public void insert(int index, N? instance);
     method public void move(int from, int to, int count);
     method public void remove(int index, int count);
-    method public void reset();
     method public void up();
     property public abstract N! current;
   }
@@ -426,9 +427,9 @@ package androidx.compose {
     method @androidx.compose.InternalComposeApi public java.util.List<java.lang.Integer> groupPathTo(int location);
     method @androidx.compose.InternalComposeApi public androidx.compose.SlotReader openReader();
     method @androidx.compose.InternalComposeApi public androidx.compose.SlotWriter openWriter();
-    method @androidx.compose.InternalComposeApi public <T> T! read(kotlin.jvm.functions.Function1<? super androidx.compose.SlotReader,? extends T> block);
+    method @androidx.compose.InternalComposeApi public inline <T> T! read(kotlin.jvm.functions.Function1<? super androidx.compose.SlotReader,? extends T> block);
     method @androidx.compose.InternalComposeApi @org.jetbrains.annotations.TestOnly public void verifyWellFormed();
-    method @androidx.compose.InternalComposeApi public <T> T! write(kotlin.jvm.functions.Function1<? super androidx.compose.SlotWriter,? extends T> block);
+    method @androidx.compose.InternalComposeApi public inline <T> T! write(kotlin.jvm.functions.Function1<? super androidx.compose.SlotWriter,? extends T> block);
     property public final int size;
     field public static final androidx.compose.SlotTable.Companion Companion;
   }

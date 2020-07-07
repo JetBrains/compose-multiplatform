@@ -38,6 +38,10 @@ class ViewApplier(root: View) : AbstractApplier<View>(root) {
     override fun move(from: Int, to: Int, count: Int) {
         current.moveAt(from, to, count)
     }
+
+    override fun onClear() {
+        root.children.clear()
+    }
 }
 
 @Stable

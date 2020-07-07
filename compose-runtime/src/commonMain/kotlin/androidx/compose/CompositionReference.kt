@@ -32,5 +32,6 @@ abstract class CompositionReference internal constructor() {
     internal abstract fun <T> getAmbient(key: Ambient<T>): T
     internal abstract fun invalidate()
     internal abstract fun <N> registerComposer(composer: Composer<N>)
+    internal abstract fun unregisterComposer(composer: Composer<*>)
     internal abstract fun getAmbientScope(): AmbientMap
 }

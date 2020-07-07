@@ -51,6 +51,10 @@ fun CustomTreeComposition() {
         override fun move(from: Int, to: Int, count: Int) {
             current.children.move(from, to, count)
         }
+
+        override fun onClear() {
+            root.children.clear()
+        }
     }
 
     // A function like the following could be created to create a composition provided a root Node.
