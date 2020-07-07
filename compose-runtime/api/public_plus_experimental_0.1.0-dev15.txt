@@ -556,10 +556,14 @@ package androidx.compose.collection {
     method public inline boolean addAll(java.util.List<? extends T> elements);
     method public inline boolean addAll(androidx.compose.collection.MutableVector<T> elements);
     method public boolean addAll(T![] elements);
+    method public boolean addAll(int index, java.util.Collection<? extends T> elements);
+    method public boolean addAll(java.util.Collection<? extends T> elements);
     method public inline boolean any(kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> predicate);
+    method public java.util.List<T> asMutableList();
     method public void clear();
     method public operator boolean contains(T? element);
     method public boolean containsAll(java.util.List<? extends T> elements);
+    method public boolean containsAll(java.util.Collection<? extends T> elements);
     method public boolean containsAll(androidx.compose.collection.MutableVector<T> elements);
     method public boolean contentEquals(androidx.compose.collection.MutableVector<T> other);
     method public void ensureCapacity(int capacity);
@@ -597,7 +601,9 @@ package androidx.compose.collection {
     method public boolean remove(T? element);
     method public boolean removeAll(java.util.List<? extends T> elements);
     method public boolean removeAll(androidx.compose.collection.MutableVector<T> elements);
+    method public boolean removeAll(java.util.Collection<? extends T> elements);
     method public T! removeAt(int index);
+    method public boolean retainAll(java.util.Collection<? extends T> elements);
     method public operator T! set(int index, T? element);
     method public inline int sumBy(kotlin.jvm.functions.Function1<? super T,java.lang.Integer> selector);
     property public final inline kotlin.ranges.IntRange indices;

@@ -32,6 +32,9 @@ class MutableVector<T> @PublishedApi internal constructor(
     @PublishedApi internal var content: Array<T?>,
     size: Int
 ) {
+    /**
+     * The number of elements in the [MutableVector].
+     */
     var size: Int = size
         private set
 
@@ -157,6 +160,37 @@ class MutableVector<T> @PublishedApi internal constructor(
     }
 
     /**
+     * Adds all [elements] to the [MutableVector] at the given [index], shifting over any
+     * elements that are in the way.
+     */
+    fun addAll(index: Int, elements: Collection<T>): Boolean {
+        if (elements.isEmpty()) return false
+        ensureCapacity(size + elements.size)
+        val content = content
+        if (index != size) {
+            content.copyInto(
+                destination = content,
+                destinationOffset = index + elements.size,
+                startIndex = index,
+                endIndex = size
+            )
+        }
+        elements.forEachIndexed { i, item ->
+            content[index + i] = item
+        }
+        size += elements.size
+        return true
+    }
+
+    /**
+     * Adds all [elements] to the end of the [MutableVector] and returns `true` if the
+     * [MutableVector] was changed.
+     */
+    fun addAll(elements: Collection<T>): Boolean {
+        return addAll(size, elements)
+    }
+
+    /**
      * Returns `true` if any of the elements give a `true` return value for [predicate].
      */
     inline fun any(predicate: (T) -> Boolean): Boolean {
@@ -166,6 +200,11 @@ class MutableVector<T> @PublishedApi internal constructor(
         }
         return false
     }
+
+    /**
+     * Returns [MutableList] interface access to the [MutableVector].
+     */
+    fun asMutableList(): MutableList<T> = MutableVectorList(this)
 
     /**
      * Removes all elements in the [MutableVector].
@@ -195,6 +234,17 @@ class MutableVector<T> @PublishedApi internal constructor(
     fun containsAll(elements: List<T>): Boolean {
         for (i in elements.indices) {
             if (!contains(elements[i])) return false
+        }
+        return true
+    }
+
+    /**
+     * Returns `true` if the [MutableVector] contains all elements in [elements] or `false` if
+     * one or more are missing.
+     */
+    fun containsAll(elements: Collection<T>): Boolean {
+        elements.forEach {
+            if (!contains(it)) return false
         }
         return true
     }
@@ -566,26 +616,36 @@ class MutableVector<T> @PublishedApi internal constructor(
      * Removes all [elements] from the [MutableVector] and returns `true` if anything was removed.
      */
     fun removeAll(elements: List<T>): Boolean {
-        var modified = false
+        val initialSize = size
         for (i in elements.indices) {
-            if (remove(elements[i])) {
-                modified = true
-            }
+            remove(elements[i])
         }
-        return modified
+        return initialSize != size
     }
 
     /**
      * Removes all [elements] from the [MutableVector] and returns `true` if anything was removed.
      */
     fun removeAll(elements: MutableVector<T>): Boolean {
-        var modified = false
+        val initialSize = size
         for (i in 0..elements.lastIndex) {
-            if (remove(elements.get(i))) {
-                modified = true
-            }
+            remove(elements.get(i))
         }
-        return modified
+        return initialSize != size
+    }
+
+    /**
+     * Removes all [elements] from the [MutableVector] and returns `true` if anything was removed.
+     */
+    fun removeAll(elements: Collection<T>): Boolean {
+        if (elements.isEmpty()) {
+            return false
+        }
+        val initialSize = size
+        elements.forEach {
+            remove(it)
+        }
+        return initialSize != size
     }
 
     /**
@@ -605,6 +665,20 @@ class MutableVector<T> @PublishedApi internal constructor(
         size--
         content[size] = null
         return item
+    }
+
+    /**
+     * Keeps only [elements] in the [MutableVector] and removes all other values.
+     */
+    fun retainAll(elements: Collection<T>): Boolean {
+        val initialSize = size
+        for (i in lastIndex downTo 0) {
+            val item = get(i)
+            if (item !in elements) {
+                removeAt(i)
+            }
+        }
+        return initialSize != size
     }
 
     /**
@@ -633,6 +707,234 @@ class MutableVector<T> @PublishedApi internal constructor(
     @PublishedApi
     internal fun throwNoSuchElementException(): Nothing {
         throw NoSuchElementException("MutableVector contains no element matching the predicate.")
+    }
+
+    private class VectorListIterator<T>(
+        private val list: MutableList<T>,
+        private var index: Int
+    ) : MutableListIterator<T> {
+
+        override fun hasNext(): Boolean {
+            return index < list.size
+        }
+
+        override fun next(): T {
+            return list[index++]
+        }
+
+        override fun remove() {
+            index--
+            list.removeAt(index)
+        }
+
+        override fun hasPrevious(): Boolean {
+            return index > 0
+        }
+
+        override fun nextIndex(): Int {
+            return index
+        }
+
+        override fun previous(): T {
+            index--
+            return list[index]
+        }
+
+        override fun previousIndex(): Int {
+            return index - 1
+        }
+
+        override fun add(element: T) {
+            list.add(index, element)
+            index++
+        }
+
+        override fun set(element: T) {
+            list[index] = element
+        }
+    }
+
+    /**
+     * [MutableList] implementation for a [MutableVector], used in [asMutableList].
+     */
+    private class MutableVectorList<T>(private val vector: MutableVector<T>) : MutableList<T> {
+        override val size: Int
+            get() = vector.size
+
+        override fun contains(element: T): Boolean = vector.contains(element)
+
+        override fun containsAll(elements: Collection<T>): Boolean = vector.containsAll(elements)
+
+        override fun get(index: Int): T = vector[index]
+
+        override fun indexOf(element: T): Int = vector.indexOf(element)
+
+        override fun isEmpty(): Boolean = vector.isEmpty()
+
+        override fun iterator(): MutableIterator<T> = VectorListIterator(this, 0)
+
+        override fun lastIndexOf(element: T): Int = vector.lastIndexOf(element)
+
+        override fun add(element: T): Boolean = vector.add(element)
+
+        override fun add(index: Int, element: T) = vector.add(index, element)
+
+        override fun addAll(index: Int, elements: Collection<T>): Boolean =
+            vector.addAll(index, elements)
+
+        override fun addAll(elements: Collection<T>): Boolean = vector.addAll(elements)
+
+        override fun clear() = vector.clear()
+
+        override fun listIterator(): MutableListIterator<T> = VectorListIterator(this, 0)
+
+        override fun listIterator(index: Int): MutableListIterator<T> =
+            VectorListIterator(this, index)
+
+        override fun remove(element: T): Boolean = vector.remove(element)
+
+        override fun removeAll(elements: Collection<T>): Boolean = vector.removeAll(elements)
+
+        override fun removeAt(index: Int): T = vector.removeAt(index)
+
+        override fun retainAll(elements: Collection<T>): Boolean = vector.retainAll(elements)
+
+        override fun set(index: Int, element: T): T = vector.set(index, element)
+
+        override fun subList(fromIndex: Int, toIndex: Int): MutableList<T> =
+            SubList(this, fromIndex, toIndex)
+    }
+
+    /**
+     * A view into an underlying [MutableList] that directly accesses the underlying [MutableList].
+     * This is important for the implementation of [List.subList]. A change to the [SubList]
+     * also changes the referenced [MutableList].
+     */
+    private class SubList<T>(
+        private val list: MutableList<T>,
+        private val start: Int,
+        private var end: Int
+    ) : MutableList<T> {
+        override val size: Int
+            get() = end - start
+
+        override fun contains(element: T): Boolean {
+            for (i in start until end) {
+                if (list[i] == element) {
+                    return true
+                }
+            }
+            return false
+        }
+
+        override fun containsAll(elements: Collection<T>): Boolean {
+            elements.forEach {
+                if (!contains(it)) {
+                    return false
+                }
+            }
+            return true
+        }
+
+        override fun get(index: Int): T = list[index + start]
+
+        override fun indexOf(element: T): Int {
+            for (i in start until end) {
+                if (list[i] == element) {
+                    return i - start
+                }
+            }
+            return -1
+        }
+
+        override fun isEmpty(): Boolean = end == start
+
+        override fun iterator(): MutableIterator<T> = VectorListIterator(this, 0)
+
+        override fun lastIndexOf(element: T): Int {
+            for (i in end - 1 downTo start) {
+                if (list[i] == element) {
+                    return i - start
+                }
+            }
+            return -1
+        }
+
+        override fun add(element: T): Boolean {
+            list.add(end++, element)
+            return true
+        }
+
+        override fun add(index: Int, element: T) {
+            list.add(index + start, element)
+            end++
+        }
+
+        override fun addAll(index: Int, elements: Collection<T>): Boolean {
+            list.addAll(index + start, elements)
+            end += elements.size
+            return elements.size > 0
+        }
+
+        override fun addAll(elements: Collection<T>): Boolean {
+            list.addAll(end, elements)
+            end += elements.size
+            return elements.size > 0
+        }
+
+        override fun clear() {
+            for (i in end - 1 downTo start) {
+                list.removeAt(i)
+            }
+            end = start
+        }
+
+        override fun listIterator(): MutableListIterator<T> = VectorListIterator(this, 0)
+
+        override fun listIterator(index: Int): MutableListIterator<T> =
+            VectorListIterator(this, index)
+
+        override fun remove(element: T): Boolean {
+            for (i in start until end) {
+                if (list[i] == element) {
+                    list.removeAt(i)
+                    end--
+                    return true
+                }
+            }
+            return false
+        }
+
+        override fun removeAll(elements: Collection<T>): Boolean {
+            val originalEnd = end
+            elements.forEach {
+                remove(it)
+            }
+            return originalEnd != end
+        }
+
+        override fun removeAt(index: Int): T {
+            val item = list.removeAt(index + start)
+            end--
+            return item
+        }
+
+        override fun retainAll(elements: Collection<T>): Boolean {
+            val originalEnd = end
+            for (i in end - 1 downTo start) {
+                val item = list[i]
+                if (item !in elements) {
+                    list.removeAt(i)
+                    end--
+                }
+            }
+            return originalEnd != end
+        }
+
+        override fun set(index: Int, element: T): T = list.set(index + start, element)
+
+        override fun subList(fromIndex: Int, toIndex: Int): MutableList<T> =
+            SubList(this, fromIndex, toIndex)
     }
 }
 
