@@ -325,7 +325,6 @@ interface ComposerValidator {
     fun <T> changed(value: T): Boolean
 }
 
-// TODO(b/159074030): Consider removing type parameter
 /**
  * Implementation of a composer for mutable tree.
  */
@@ -435,6 +434,10 @@ class Composer<N>(
     @ComposeCompilerApi
     fun startReplaceableGroup(key: Int) = start(key, null, false, null)
 
+    @ComposeCompilerApi
+    fun startReplaceableGroup(key: Int, sourceInformation: String?) =
+        start(key, null, false, sourceInformation)
+
     /**
      * Indicates the end of a "Replaceable Group" at the current execution position. A
      * Replaceable Group is a group which cannot be moved between its siblings, but
@@ -510,6 +513,10 @@ class Composer<N>(
      */
     @ComposeCompilerApi
     fun startMovableGroup(key: Int, dataKey: Any?) = start(key, dataKey, false, null)
+
+    @ComposeCompilerApi
+    fun startMovableGroup(key: Int, dataKey: Any?, sourceInformation: String?) =
+        start(key, dataKey, false, sourceInformation)
 
     /**
      * Indicates the end of a "Movable Group" at the current execution position. A Movable Group is
@@ -1282,7 +1289,7 @@ class Composer<N>(
                 ensureWriter()
                 writer.beginInsert()
                 val insertLocation = writer.current
-                if (isNode) writer.startNode(null) else writer.startGroup(key, dataKey)
+                if (isNode) writer.startNode(null) else writer.startGroup(key, dataKey, data)
                 insertAnchor = writer.anchor(insertLocation)
                 val insertKeyInfo = KeyInfo(key, -1, 0, -1, 0, writer.parentGroup)
                 pending.registerInsert(insertKeyInfo, nodeIndex - pending.startIndex)
@@ -1750,6 +1757,16 @@ class Composer<N>(
     @ComposeCompilerApi
     fun startRestartGroup(key: Int) {
         start(key, null, false, null)
+        addRecomposeScope(key)
+    }
+
+    @ComposeCompilerApi
+    fun startRestartGroup(key: Int, sourceInformation: String?) {
+        start(key, null, false, sourceInformation)
+        addRecomposeScope(key)
+    }
+
+    private fun addRecomposeScope(key: Int) {
         if (inserting) {
             val scope = RecomposeScope(this, key)
             invalidateStack.push(scope)

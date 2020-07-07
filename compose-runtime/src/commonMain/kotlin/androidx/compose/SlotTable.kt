@@ -537,6 +537,12 @@ class SlotWriter internal constructor(val table: SlotTable) {
      */
     fun startGroup(key: Int, dataKey: Any?) = startGroup(key, dataKey, GROUP, null)
 
+    /**
+     * Start a group with a data key and auxiliary data.
+     */
+    fun startGroup(key: Int, dataKey: Any?, data: Any?) =
+        startGroup(key, dataKey, if (data != null) DATA else GROUP, data)
+
     private fun startGroup(key: Int, dataKey: Any?, kind: GroupKind, data: Any?) {
         val inserting = insertCount > 0
         val parent = if (startStack.isEmpty()) null else get(startStack.peek()).asGroup
