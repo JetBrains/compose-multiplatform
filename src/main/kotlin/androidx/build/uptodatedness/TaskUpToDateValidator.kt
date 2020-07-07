@@ -19,6 +19,8 @@ package androidx.build.uptodatedness
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.execution.TaskExecutionGraph
+import org.gradle.kotlin.dsl.extra
 import java.io.File
 import java.util.Date
 
@@ -95,6 +97,8 @@ val EXEMPT_TASK_NAMES = setOf(
 class TaskUpToDateValidator {
     companion object {
 
+        private val BUILD_START_TIME_KEY = "taskUpToDateValidatorSetupTime"
+
         private fun shouldRecord(project: Project): Boolean {
             return project.hasProperty(RECORD_FLAG_NAME) && !shouldValidate(project)
         }
@@ -107,16 +111,26 @@ class TaskUpToDateValidator {
             return EXEMPT_TASK_NAMES.contains(task.name)
         }
 
+        private fun recordBuildStartTime(rootProject: Project) {
+            rootProject.extra.set(BUILD_START_TIME_KEY, Date())
+        }
+
+        private fun getBuildStartTime(project: Project): Date {
+            return project.rootProject.extra.get(BUILD_START_TIME_KEY) as Date
+        }
+
         fun setup(rootProject: Project) {
+            recordBuildStartTime(rootProject)
             if (shouldValidate(rootProject)) {
-                rootProject.gradle.taskGraph.afterTask { task ->
+                val taskGraph = rootProject.gradle.taskGraph
+                taskGraph.afterTask { task ->
                     if (task.didWork) {
                         if (!isExemptTask(task)) {
                             val message = "Ran two consecutive builds of the same tasks," +
                                 " and in the second build, observed $task to be not UP-TO-DATE." +
                                 " This indicates that $task does not declare" +
                                 " inputs and/or outputs correctly.\n" +
-                                tryToExplainTaskExecution(task)
+                                tryToExplainTaskExecution(task, taskGraph)
                             throw GradleException(message)
                         }
                     }
@@ -162,7 +176,7 @@ class TaskUpToDateValidator {
             }
             return addedMessage + removedMessage
         }
-        fun tryToExplainTaskExecution(task: Task): String {
+        fun tryToExplainTaskExecution(task: Task, taskGraph: TaskExecutionGraph): String {
             val numOutputFiles = task.outputs.files.files.size
             val outputsMessage = if (numOutputFiles > 0) {
                 task.path + " declares " + numOutputFiles + " output files. This seems fine.\n"
@@ -189,8 +203,9 @@ class TaskUpToDateValidator {
                 if (lastModifiedFile != null) {
                     task.path + " declares " + inputFiles.size + " input files. The " +
                         "last modified input file is\n" + lastModifiedFile + "\nmodified at " +
-                        lastModifiedWhen + ". " +
-                        tryToExplainFileModification(lastModifiedFile, task)
+                        lastModifiedWhen + " (this build started at about " +
+                        getBuildStartTime(task.project) + "). " +
+                        tryToExplainFileModification(lastModifiedFile, taskGraph)
                 } else {
                     task.path + " declares " + inputFiles.size + " input files.\n"
                 }
@@ -205,26 +220,25 @@ class TaskUpToDateValidator {
             return readLogsMessage + outputsMessage + inputsMessage + reproductionMessage
         }
 
-        fun getTaskDeclaringFile(file: File, triggeringTask: Task): Task? {
-            val taskDependencies = triggeringTask.taskDependencies.getDependencies(triggeringTask)
-            for (task in taskDependencies) {
+        fun getTaskDeclaringFile(file: File, taskGraph: TaskExecutionGraph): Task? {
+            for (task in taskGraph.allTasks) {
                 if (task.outputs.files.files.contains(file)) {
                     return task
                 }
             }
             return null
         }
-        fun tryToExplainFileModification(file: File, triggeringTask: Task): String {
+        fun tryToExplainFileModification(file: File, taskGraph: TaskExecutionGraph): String {
             // Find the task declaring this file as an output,
             // or the task declaring one of its parent dirs as an output
             var createdByTask: Task? = null
             var declaredFile: File? = file
             while (createdByTask == null && declaredFile != null) {
-                createdByTask = getTaskDeclaringFile(declaredFile, triggeringTask)
+                createdByTask = getTaskDeclaringFile(declaredFile, taskGraph)
                 declaredFile = declaredFile.parentFile
             }
             if (createdByTask == null) {
-                return "This file is not declared as the output of any dependency task."
+                return "This file is not declared as the output of any task in this build."
             }
             if (isExemptTask(createdByTask)) {
                 return "This file is declared as an output of " + createdByTask +
