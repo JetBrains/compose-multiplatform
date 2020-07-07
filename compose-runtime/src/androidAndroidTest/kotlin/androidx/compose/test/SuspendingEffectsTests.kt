@@ -112,8 +112,11 @@ class SuspendingEffectsTests : BaseComposeTest() {
         }.then {
             assertTrue(coroutineScope.isActive, "coroutine scope was active before dispose")
         }
-        tester.composition.dispose()
-        assertFalse(coroutineScope.isActive, "coroutine scope was inactive after dispose")
+        val composition = tester.composition
+        tester.then {
+            composition.dispose()
+            assertFalse(coroutineScope.isActive, "coroutine scope was inactive after dispose")
+        }
     }
 
     @Test
