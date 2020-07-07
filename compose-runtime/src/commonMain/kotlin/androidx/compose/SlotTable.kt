@@ -1092,7 +1092,7 @@ class SlotTable(internal var slots: Array<Any?> = arrayOf()) {
      * @see SlotReader
      */
     @InternalComposeApi
-    fun <T> read(block: (reader: SlotReader) -> T): T = openReader().let { reader ->
+    inline fun <T> read(block: (reader: SlotReader) -> T): T = openReader().let { reader ->
         try {
             block(reader)
         } finally {
@@ -1108,7 +1108,7 @@ class SlotTable(internal var slots: Array<Any?> = arrayOf()) {
      * @see SlotWriter
      */
     @InternalComposeApi
-    fun <T> write(block: (writer: SlotWriter) -> T): T = openWriter().let { writer ->
+    inline fun <T> write(block: (writer: SlotWriter) -> T): T = openWriter().let { writer ->
         try {
             block(writer)
         } finally {

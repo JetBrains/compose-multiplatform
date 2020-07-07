@@ -74,9 +74,10 @@ interface Applier<N> {
     fun move(from: Int, to: Int, count: Int)
 
     /**
-     * Reset the applier's state
+     * Move to the root and remove all nodes from the root, preparing both this [Applier]
+     * and its root to be used as the target of a new composition in the future.
      */
-    fun reset()
+    fun clear()
 }
 
 /**
@@ -93,6 +94,7 @@ interface Applier<N> {
 abstract class AbstractApplier<T>(val root: T) : Applier<T> {
     private val stack = mutableListOf<T>()
     override var current: T = root
+        protected set
 
     override fun down(node: T) {
         stack.add(current)
@@ -103,10 +105,16 @@ abstract class AbstractApplier<T>(val root: T) : Applier<T> {
         current = stack.removeAt(stack.size - 1)
     }
 
-    override fun reset() {
+    final override fun clear() {
         stack.clear()
         current = root
+        onClear()
     }
+
+    /**
+     * Called to perform clearing of the [root] when [clear] is called.
+     */
+    protected abstract fun onClear()
 
     protected fun MutableList<T>.remove(index: Int, count: Int) {
         if (count == 1) {

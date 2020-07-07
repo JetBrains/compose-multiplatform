@@ -45,7 +45,7 @@ val composer: Composer<*> get() = error(
 internal typealias Change<N> = (
     applier: Applier<N>,
     slots: SlotWriter,
-    lifecycleManager: LifeCycleManager
+    lifecycleManager: LifecycleManager
 ) -> Unit
 
 private class GroupInfo(
@@ -66,7 +66,7 @@ private class GroupInfo(
     var nodeCount: Int
 )
 
-internal interface LifeCycleManager {
+internal interface LifecycleManager {
     fun entering(instance: CompositionLifecycleObserver)
     fun leaving(instance: CompositionLifecycleObserver)
 }
@@ -631,51 +631,39 @@ class Composer<N>(
     }
 
     /**
-     * Apply the changes to the tree that were collected during the last composition.
+     * Helper for collecting lifecycle enter and leave events for later strictly ordered dispatch.
+     * [lifecycleObservers] should be the long-lived set of observers tracked over time; brand new
+     * additions or leaves from this set will be tracked by the [LifecycleManager] callback methods.
+     * Call [dispatchLifecycleObservers] to invoke the observers in LIFO order - last in,
+     * first out.
      */
-    @InternalComposeApi
-    fun applyChanges() {
-        trace("Compose:applyChanges") {
-            invalidateStack.clear()
-            val enters = mutableSetOf<CompositionLifecycleObserverHolder>()
-            val leaves = mutableSetOf<CompositionLifecycleObserverHolder>()
-            val manager = object : LifeCycleManager {
-                override fun entering(instance: CompositionLifecycleObserver) {
-                    val holder = CompositionLifecycleObserverHolder(instance)
-                    lifecycleObservers.getOrPut(holder) {
-                        enters.add(holder)
-                        holder
-                    }.apply { count++ }
-                }
+    private class LifecycleEventDispatcher(
+        private val lifecycleObservers: MutableMap<CompositionLifecycleObserverHolder,
+                CompositionLifecycleObserverHolder>
+    ) : LifecycleManager {
+        private val enters = mutableSetOf<CompositionLifecycleObserverHolder>()
+        private val leaves = mutableSetOf<CompositionLifecycleObserverHolder>()
 
-                override fun leaving(instance: CompositionLifecycleObserver) {
-                    val holder = CompositionLifecycleObserverHolder(instance)
-                    val left = lifecycleObservers[holder]?.let {
-                        if (--it.count == 0) {
-                            leaves.add(it)
-                            it
-                        } else null
-                    }
-                    if (left != null) lifecycleObservers.remove(left)
-                }
+        override fun entering(instance: CompositionLifecycleObserver) {
+            val holder = CompositionLifecycleObserverHolder(instance)
+            lifecycleObservers.getOrPut(holder) {
+                enters.add(holder)
+                holder
+            }.apply { count++ }
+        }
+
+        override fun leaving(instance: CompositionLifecycleObserver) {
+            val holder = CompositionLifecycleObserverHolder(instance)
+            val left = lifecycleObservers[holder]?.let {
+                if (--it.count == 0) {
+                    leaves.add(it)
+                    it
+                } else null
             }
+            if (left != null) lifecycleObservers.remove(left)
+        }
 
-            val invalidationAnchors = invalidations.map { slotTable.anchor(it.location) to it }
-
-            // Apply all changes
-            slotTable.write { slots ->
-                changes.forEach { change -> change(applier, slots, manager) }
-                changes.clear()
-            }
-
-            providerUpdates.clear()
-
-            @Suppress("ReplaceManualRangeWithIndicesCalls") // Avoids allocation of an iterator
-            for (index in 0 until invalidationAnchors.size) {
-                val (anchor, invalidation) = invalidationAnchors[index]
-                invalidation.location = slotTable.anchorLocation(anchor)
-            }
-
+        fun dispatchLifecycleObservers() {
             trace("Compose:lifecycles") {
                 // Send lifecycle leaves
                 if (leaves.isNotEmpty()) {
@@ -697,7 +685,53 @@ class Composer<N>(
                     }
                 }
             }
+        }
+    }
 
+    /**
+     * Apply the changes to the tree that were collected during the last composition.
+     */
+    @InternalComposeApi
+    fun applyChanges() {
+        trace("Compose:applyChanges") {
+            invalidateStack.clear()
+            val invalidationAnchors = invalidations.map { slotTable.anchor(it.location) to it }
+            val manager = LifecycleEventDispatcher(lifecycleObservers)
+
+            // Apply all changes
+            slotTable.write { slots ->
+                changes.forEach { change -> change(applier, slots, manager) }
+                changes.clear()
+            }
+
+            providerUpdates.clear()
+
+            @Suppress("ReplaceManualRangeWithIndicesCalls") // Avoids allocation of an iterator
+            for (index in 0 until invalidationAnchors.size) {
+                val (anchor, invalidation) = invalidationAnchors[index]
+                invalidation.location = slotTable.anchorLocation(anchor)
+            }
+
+            manager.dispatchLifecycleObservers()
+            dispatchChangesAppliedObservers()
+        }
+    }
+
+    internal fun dispose() {
+        trace("Compose:Composer.dispose") {
+            parentReference?.unregisterComposer(this)
+            invalidateStack.clear()
+            invalidations.clear()
+            changes.clear()
+            applier.clear()
+            if (slotTable.size > 0) {
+                val manager = LifecycleEventDispatcher(lifecycleObservers)
+                slotTable.write { writer ->
+                    writer.removeCurrentGroup(manager)
+                }
+                providerUpdates.clear()
+                manager.dispatchLifecycleObservers()
+            }
             dispatchChangesAppliedObservers()
         }
     }
@@ -746,7 +780,7 @@ class Composer<N>(
     @ComposeCompilerApi
     fun <T : N> createNode(factory: () -> T) {
         validateNodeExpected()
-        require(inserting) { "createNode() can only be called when inserting" }
+        check(inserting) { "createNode() can only be called when inserting" }
         val insertIndex = nodeIndexStack.peek()
         // see emitNode
         groupNodeCount++
@@ -767,7 +801,7 @@ class Composer<N>(
     @ComposeCompilerApi
     fun emitNode(node: Any) {
         validateNodeExpected()
-        require(inserting) { "emitNode() called when not inserting" }
+        check(inserting) { "emitNode() called when not inserting" }
         val insertIndex = nodeIndexStack.peek()
         // see emitNode
         groupNodeCount++
@@ -787,7 +821,7 @@ class Composer<N>(
     @ComposeCompilerApi
     fun useNode(): N {
         validateNodeExpected()
-        require(!inserting) { "useNode() called while inserting" }
+        check(!inserting) { "useNode() called while inserting" }
         val result = reader.node
         recordDown(result)
         return result
@@ -1697,7 +1731,7 @@ class Composer<N>(
      */
     @ComposeCompilerApi
     fun skipToGroupEnd() {
-        require(groupNodeCount == 0) { "No nodes can be emitted before calling skipAndEndGroup" }
+        check(groupNodeCount == 0) { "No nodes can be emitted before calling skipAndEndGroup" }
         if (invalidations.isEmpty()) {
             skipReaderToGroupEnd()
         } else {
@@ -1796,14 +1830,14 @@ class Composer<N>(
     private fun SlotReader.nodeAt(location: Int) = nodeGroupAt(location).node as N
 
     private fun validateNodeExpected() {
-        require(nodeExpected) {
+        check(nodeExpected) {
             "A call to createNode(), emitNode() or useNode() expected was not expected"
         }
         nodeExpected = false
     }
 
     private fun validateNodeNotExpected() {
-        require(!nodeExpected) { "A call to createNode(), emitNode() or useNode() expected" }
+        check(!nodeExpected) { "A call to createNode(), emitNode() or useNode() expected" }
     }
 
     /**
@@ -2045,7 +2079,7 @@ class Composer<N>(
     private fun recordEndGroup() {
         val location = reader.parentLocation
         val currentStartedGroup = startedGroups.peekOr(-1)
-        require(currentStartedGroup <= location) { "Missed recording an endGroup" }
+        check(currentStartedGroup <= location) { "Missed recording an endGroup" }
         if (startedGroups.peekOr(-1) == location) {
             startedGroups.pop()
             recordSlotTableOperation(change = endGroupInstance)
@@ -2062,8 +2096,8 @@ class Composer<N>(
     private fun finalizeCompose() {
         realizeInsertUps()
         realizeUps()
-        require(pendingStack.isEmpty()) { "Start/end imbalance" }
-        require(startedGroups.isEmpty()) { "Missed recording an endGroup()" }
+        check(pendingStack.isEmpty()) { "Start/end imbalance" }
+        check(startedGroups.isEmpty()) { "Missed recording an endGroup()" }
         cleanUpCompose()
     }
 
@@ -2086,7 +2120,7 @@ class Composer<N>(
 
     private fun recordRemoveNode(nodeIndex: Int, count: Int) {
         if (count > 0) {
-            require(nodeIndex >= 0) { "Invalid remove index $nodeIndex" }
+            check(nodeIndex >= 0) { "Invalid remove index $nodeIndex" }
             if (previousRemove == nodeIndex) previousCount += count
             else {
                 realizeMovement()
@@ -2156,6 +2190,11 @@ class Composer<N>(
 
         override fun <N> registerComposer(composer: Composer<N>) {
             composers.add(composer)
+        }
+
+        override fun unregisterComposer(composer: Composer<*>) {
+            inspectionTables?.forEach { it.remove(composer.slotTable) }
+            composers.remove(composer)
         }
 
         override fun invalidate() {
@@ -2290,7 +2329,7 @@ internal inline fun <N, T> Composer<N>.cache(valid: Boolean = true, block: () ->
     return result as T
 }
 
-private fun removeCurrentGroup(slots: SlotWriter, lifecycleManager: LifeCycleManager) {
+private fun SlotWriter.removeCurrentGroup(lifecycleManager: LifecycleManager) {
     // Notify the lifecycle manager of any observers leaving the slot table
     // The notification order should ensure that listeners are notified of leaving
     // in opposite order that they are notified of entering.
@@ -2302,7 +2341,7 @@ private fun removeCurrentGroup(slots: SlotWriter, lifecycleManager: LifeCycleMan
     var index = 0
     val groupEndStack = IntStack()
 
-    for (slot in slots.groupSlots()) {
+    for (slot in groupSlots()) {
         when (slot) {
             is CompositionLifecycleObserver -> {
                 lifecycleManager.leaving(slot)
@@ -2327,7 +2366,7 @@ private fun removeCurrentGroup(slots: SlotWriter, lifecycleManager: LifeCycleMan
 
     // Remove the item from the slot table and notify the FrameManager if any
     // anchors are orphaned by removing the slots.
-    if (slots.removeGroup()) {
+    if (removeGroup()) {
         FrameManager.scheduleCleanup()
     }
 }
@@ -2487,7 +2526,7 @@ private fun nearestCommonRootOf(a: Group, b: Group, common: Group): Group? {
 }
 
 private val removeCurrentGroupInstance: Change<*> = { _, slots, lifecycleManager ->
-    removeCurrentGroup(slots, lifecycleManager)
+    slots.removeCurrentGroup(lifecycleManager)
 }
 private val skipToEndGroupInstance: Change<*> = { _, slots, _ -> slots.skipToGroupEnd() }
 private val endGroupInstance: Change<*> = { _, slots, _ -> slots.endGroup() }
