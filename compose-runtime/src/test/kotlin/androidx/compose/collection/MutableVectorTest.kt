@@ -168,6 +168,12 @@ class MutableVectorTest {
     }
 
     @Test
+    fun containsAllCollection() {
+        assertTrue(list.containsAll(setOf(2, 3, 1)))
+        assertFalse(list.containsAll(setOf(2, 3, 6)))
+    }
+
+    @Test
     fun lastIndexOf() {
         assertEquals(4, list.lastIndexOf(5))
         assertEquals(1, list.lastIndexOf(2))
@@ -374,6 +380,27 @@ class MutableVectorTest {
     }
 
     @Test
+    fun addAllCollectionAtIndex() {
+        val l = listOf(4) as Collection<Int>
+        val l2 = listOf(1, 2) as Collection<Int>
+        val l3 = listOf(5) as Collection<Int>
+        val l4 = mutableVectorOf(3)
+        assertTrue(l4.addAll(1, l3))
+        assertTrue(l4.addAll(0, l2))
+        assertTrue(l4.addAll(3, l))
+        assertFalse(l4.addAll(0, emptyList()))
+        assertTrue(l4.contentEquals(list))
+    }
+
+    @Test
+    fun addAllCollection() {
+        val l = listOf(3, 4, 5) as Collection<Int>
+        val l2 = mutableVectorOf(1, 2)
+        assertTrue(l2.addAll(l))
+        assertFalse(l2.addAll(emptyList()))
+    }
+
+    @Test
     fun clear() {
         val l = mutableVectorOf<Int>()
         l.addAll(list)
@@ -437,34 +464,301 @@ class MutableVectorTest {
     }
 
     @Test
+    fun removeAllCollection() {
+        assertFalse(list.removeAll(setOf(0, 10, 15)))
+        val l = mutableVectorOf(0, 1, 15, 10, 2, 3, 4, 5, 20, 5)
+        assertTrue(l.removeAll(setOf(20, 0, 15, 10, 5)))
+        assertTrue(l.contentEquals(list))
+    }
+
+    @Test
+    fun retainAll() {
+        assertFalse(list.retainAll(setOf(1, 2, 3, 4, 5, 6)))
+        val l = mutableVectorOf(0, 1, 15, 10, 2, 3, 4, 5, 20)
+        assertTrue(l.retainAll(setOf(1, 2, 3, 4, 5, 6)))
+        assertTrue(l.contentEquals(list))
+    }
+
+    @Test
     fun contentEquals() {
-        assertTrue(list.contentEquals(
-            mutableVectorOf(
-                1,
-                2,
-                3,
-                4,
-                5
-            )
-        ))
-        assertFalse(list.contentEquals(
-            mutableVectorOf(
-                2,
-                1,
-                3,
-                4,
-                5
-            )
-        ))
-        assertFalse(list.contentEquals(
-            mutableVectorOf(
-                1,
-                2,
-                3,
-                4,
-                5,
-                6
-            )
-        ))
+        assertTrue(list.contentEquals(mutableVectorOf(1, 2, 3, 4, 5)))
+        assertFalse(list.contentEquals(mutableVectorOf(2, 1, 3, 4, 5)))
+        assertFalse(list.contentEquals(mutableVectorOf(1, 2, 3, 4, 5, 6)))
+    }
+
+    @Test
+    fun iterator() {
+        val l = mutableVectorOf(1, 2, 3, 4, 5)
+        val iterator = l.asMutableList().iterator()
+        assertTrue(iterator.hasNext())
+        assertEquals(1, iterator.next())
+        assertTrue(iterator.hasNext())
+        assertEquals(2, iterator.next())
+        assertTrue(iterator.hasNext())
+        assertEquals(3, iterator.next())
+        assertTrue(iterator.hasNext())
+        iterator.remove()
+        assertTrue(iterator.hasNext())
+        assertTrue(l.contentEquals(mutableVectorOf(1, 2, 4, 5)))
+
+        assertEquals(4, iterator.next())
+        assertTrue(iterator.hasNext())
+        assertEquals(5, iterator.next())
+        assertFalse(iterator.hasNext())
+        iterator.remove()
+        assertTrue(l.contentEquals(mutableVectorOf(1, 2, 4)))
+    }
+
+    @Test
+    fun listIterator() {
+        val l = mutableVectorOf(1, 2, 3, 4, 5)
+        val iterator = l.asMutableList().listIterator()
+        assertEquals(1, iterator.next())
+        assertEquals(1, iterator.previous())
+        assertEquals(0, iterator.nextIndex())
+        iterator.add(6)
+        assertEquals(1, iterator.nextIndex())
+        assertEquals(0, iterator.previousIndex())
+        assertEquals(6, iterator.previous())
+        assertTrue(l.contentEquals(mutableVectorOf(6, 1, 2, 3, 4, 5)))
+    }
+
+    @Test
+    fun listIteratorInitialIndex() {
+        val iterator = list.asMutableList().listIterator(2)
+        assertEquals(2, iterator.nextIndex())
+    }
+
+    @Test
+    fun subList() {
+        val l = list.asMutableList().subList(1, 4)
+        assertEquals(3, l.size)
+        assertEquals(2, l[0])
+        assertEquals(3, l[1])
+        assertEquals(4, l[2])
+    }
+
+    @Test
+    fun subListContains() {
+        val l = list.asMutableList().subList(1, 4)
+        assertTrue(l.contains(2))
+        assertTrue(l.contains(3))
+        assertTrue(l.contains(4))
+        assertFalse(l.contains(5))
+        assertFalse(l.contains(1))
+    }
+
+    @Test
+    fun subListContainsAll() {
+        val l = list.asMutableList().subList(1, 4)
+        val smallList = listOf(2, 3, 4)
+        assertTrue(l.containsAll(smallList))
+        val largeList = listOf(3, 4, 5)
+        assertFalse(l.containsAll(largeList))
+    }
+
+    @Test
+    fun subListIndexOf() {
+        val l = list.asMutableList().subList(1, 4)
+        assertEquals(0, l.indexOf(2))
+        assertEquals(2, l.indexOf(4))
+        assertEquals(-1, l.indexOf(1))
+        val l2 = mutableVectorOf(2, 1, 1, 3).asMutableList().subList(1, 2)
+        assertEquals(0, l2.indexOf(1))
+    }
+
+    @Test
+    fun subListIsEmpty() {
+        val l = list.asMutableList().subList(1, 4)
+        assertFalse(l.isEmpty())
+        assertTrue(list.asMutableList().subList(4, 4).isEmpty())
+    }
+
+    @Test
+    fun subListIterator() {
+        val l = list.asMutableList().subList(1, 4)
+        val l2 = mutableListOf<Int>()
+        l.forEach { l2 += it }
+        assertEquals(3, l2.size)
+        assertEquals(2, l2[0])
+        assertEquals(3, l2[1])
+        assertEquals(4, l2[2])
+    }
+
+    @Test
+    fun subListLastIndexOf() {
+        val l = list.asMutableList().subList(1, 4)
+        assertEquals(0, l.lastIndexOf(2))
+        assertEquals(2, l.lastIndexOf(4))
+        assertEquals(-1, l.lastIndexOf(1))
+        val l2 = mutableVectorOf(2, 1, 1, 3).asMutableList().subList(1, 3)
+        assertEquals(1, l2.lastIndexOf(1))
+    }
+
+    @Test
+    fun subListAdd() {
+        val v = mutableVectorOf(1, 2, 3)
+        val l = v.asMutableList().subList(1, 2)
+        assertTrue(l.add(4))
+        assertEquals(2, l.size)
+        assertEquals(4, v.size)
+        assertEquals(2, l[0])
+        assertEquals(4, l[1])
+        assertEquals(2, v[1])
+        assertEquals(4, v[2])
+        assertEquals(3, v[3])
+    }
+
+    @Test
+    fun subListAddIndex() {
+        val v = mutableVectorOf(6, 1, 2, 3)
+        val l = v.asMutableList().subList(1, 3)
+        l.add(1, 4)
+        assertEquals(3, l.size)
+        assertEquals(5, v.size)
+        assertEquals(1, l[0])
+        assertEquals(4, l[1])
+        assertEquals(2, l[2])
+        assertEquals(1, v[1])
+        assertEquals(4, v[2])
+        assertEquals(2, v[3])
+    }
+
+    @Test
+    fun subListAddAllAtIndex() {
+        val v = mutableVectorOf(6, 1, 2, 3)
+        val l = v.asMutableList().subList(1, 3)
+        l.addAll(1, listOf(4, 5))
+        assertEquals(4, l.size)
+        assertEquals(6, v.size)
+        assertEquals(1, l[0])
+        assertEquals(4, l[1])
+        assertEquals(5, l[2])
+        assertEquals(2, l[3])
+        assertEquals(1, v[1])
+        assertEquals(4, v[2])
+        assertEquals(5, v[3])
+        assertEquals(2, v[4])
+    }
+
+    @Test
+    fun subListAddAll() {
+        val v = mutableVectorOf(6, 1, 2, 3)
+        val l = v.asMutableList().subList(1, 3)
+        l.addAll(listOf(4, 5))
+        assertEquals(4, l.size)
+        assertEquals(6, v.size)
+        assertEquals(1, l[0])
+        assertEquals(2, l[1])
+        assertEquals(4, l[2])
+        assertEquals(5, l[3])
+        assertEquals(1, v[1])
+        assertEquals(2, v[2])
+        assertEquals(4, v[3])
+        assertEquals(5, v[4])
+        assertEquals(3, v[5])
+    }
+
+    @Test
+    fun subListClear() {
+        val v = mutableVectorOf(1, 2, 3, 4, 5)
+        val l = v.asMutableList().subList(1, 4)
+        l.clear()
+        assertEquals(0, l.size)
+        assertEquals(2, v.size)
+        assertEquals(1, v[0])
+        assertEquals(5, v[1])
+        assertNull(v.content[2])
+        assertNull(v.content[3])
+        assertNull(v.content[4])
+    }
+
+    @Test
+    fun subListListIterator() {
+        val l = list.asMutableList().subList(1, 4)
+        val listIterator = l.listIterator()
+        assertTrue(listIterator.hasNext())
+        assertFalse(listIterator.hasPrevious())
+        assertEquals(0, listIterator.nextIndex())
+        assertEquals(2, listIterator.next())
+    }
+
+    @Test
+    fun subListListIteratorWithIndex() {
+        val l = list.asMutableList().subList(1, 4)
+        val listIterator = l.listIterator(1)
+        assertTrue(listIterator.hasNext())
+        assertTrue(listIterator.hasPrevious())
+        assertEquals(1, listIterator.nextIndex())
+        assertEquals(3, listIterator.next())
+    }
+
+    @Test
+    fun subListRemove() {
+        val l = mutableVectorOf(1, 2, 3, 4, 5)
+        val l2 = l.asMutableList().subList(1, 4)
+        assertTrue(l2.remove(3))
+        assertTrue(l.contentEquals(mutableVectorOf(1, 2, 4, 5)))
+        assertEquals(2, l2.size)
+        assertEquals(2, l2[0])
+        assertEquals(4, l2[1])
+        assertFalse(l2.remove(3))
+        assertTrue(l.contentEquals(mutableVectorOf(1, 2, 4, 5)))
+        assertEquals(2, l2.size)
+    }
+
+    @Test
+    fun subListRemoveAll() {
+        val l = mutableVectorOf(1, 2, 3, 4, 5)
+        val l2 = l.asMutableList().subList(1, 4)
+        assertFalse(l2.removeAll(listOf(1, 5, -1)))
+        assertEquals(5, l.size)
+        assertEquals(3, l2.size)
+        assertTrue(l2.removeAll(listOf(3, 4, 5)))
+        assertEquals(3, l.size)
+        assertEquals(1, l2.size)
+    }
+
+    @Test
+    fun subListRemoveAt() {
+        val l = mutableVectorOf(1, 2, 3, 4, 5)
+        val l2 = l.asMutableList().subList(1, 4)
+        assertEquals(3, l2.removeAt(1))
+        assertEquals(4, l.size)
+        assertEquals(2, l2.size)
+        assertEquals(4, l2.removeAt(1))
+        assertEquals(1, l2.size)
+    }
+
+    @Test
+    fun subListRetainAll() {
+        val l = mutableVectorOf(1, 2, 3, 4, 5)
+        val l2 = l.asMutableList().subList(1, 4)
+        assertFalse(l2.retainAll(list.asMutableList()))
+        assertFalse(l2.retainAll(listOf(2, 3, 4)))
+        assertEquals(3, l2.size)
+        assertEquals(5, l.size)
+        assertTrue(l2.retainAll(setOf(1, 2, 4)))
+        assertEquals(4, l.size)
+        assertEquals(2, l2.size)
+        assertTrue(l.contentEquals(mutableVectorOf(1, 2, 4, 5)))
+    }
+
+    @Test
+    fun subListSet() {
+        val l = mutableVectorOf(1, 2, 3, 4, 5)
+        val l2 = l.asMutableList().subList(1, 4)
+        l2[1] = 10
+        assertEquals(10, l2[1])
+        assertEquals(3, l2.size)
+        assertEquals(10, l[2])
+    }
+
+    @Test
+    fun subListSubList() {
+        val l = list.asMutableList().subList(1, 5)
+        val l2 = l.subList(1, 3)
+        assertEquals(2, l2.size)
+        assertEquals(3, l2[0])
     }
 }
