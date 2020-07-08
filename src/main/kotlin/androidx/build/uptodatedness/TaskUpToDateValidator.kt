@@ -36,7 +36,9 @@ const val DISALLOW_TASK_EXECUTION_FLAG_NAME = "disallowExecution"
 const val RECORD_FLAG_NAME = "verifyUpToDate"
 
 // Temporary list of exempt tasks that are known to still be out-of-date after running once
-val EXEMPT_TASK_NAMES = setOf(
+// Entries in this set may be task names (like assembleDebug) or task paths
+// (like :core:core:assembleDebug)
+val EXEMPT_TASKS = setOf(
     "buildOnServer",
     "checkExternalLicenses",
     "createArchive",
@@ -92,7 +94,10 @@ val EXEMPT_TASK_NAMES = setOf(
     "unzipDokkaPublicDocsDeps",
     "verifyDependencyVersions",
     "verifyReleaseResources",
-    "zipEcFiles"
+    "zipEcFiles",
+
+    ":camera:integration-tests:camera-testapp-view:mergeLibDexDebug",
+    ":camera:integration-tests:camera-testapp-view:packageDebug"
 )
 class TaskUpToDateValidator {
     companion object {
@@ -108,7 +113,7 @@ class TaskUpToDateValidator {
         }
 
         private fun isExemptTask(task: Task): Boolean {
-            return EXEMPT_TASK_NAMES.contains(task.name)
+            return EXEMPT_TASKS.contains(task.name) || EXEMPT_TASKS.contains(task.path)
         }
 
         private fun recordBuildStartTime(rootProject: Project) {
