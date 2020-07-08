@@ -52,7 +52,6 @@ private const val TEMPLATE = """<?xml version="1.0" encoding="utf-8"?>
         <test class="com.android.tradefed.testtype.AndroidJUnitTest">
         <option name="runner" value="androidx.test.runner.AndroidJUnitRunner"/>
         <option name="package" value="APPLICATION_ID" />
-        <option name="size" value="small"/>
         </test>
         </configuration>"""
 
