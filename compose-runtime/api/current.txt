@@ -184,8 +184,8 @@ package androidx.compose {
   }
 
   public interface CompositionLifecycleObserver {
-    method public void onEnter();
-    method public void onLeave();
+    method public default void onEnter();
+    method public default void onLeave();
   }
 
   public abstract class CompositionReference {

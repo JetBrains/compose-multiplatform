@@ -1132,16 +1132,18 @@ class Composer<N>(
     internal fun buildReference(): CompositionReference {
         startGroup(referenceKey, reference)
 
-        var ref = nextSlot() as? CompositionReference
+        var ref = nextSlot() as? CompositionReferenceHolder<*>
         if (ref == null || !inserting) {
             val scope = invalidateStack.peek()
             scope.used = true
-            ref = CompositionReferenceImpl(scope, currentCompoundKeyHash, collectKeySources)
+            ref = CompositionReferenceHolder(
+                CompositionReferenceImpl(scope, currentCompoundKeyHash, collectKeySources)
+            )
             updateValue(ref)
         }
         endGroup()
 
-        return ref
+        return ref.ref
     }
 
     private fun <T> resolveAmbient(key: Ambient<T>, scope: AmbientMap): T {
@@ -2163,20 +2165,29 @@ class Composer<N>(
         }
     }
 
+    /**
+     * A holder that will dispose of its [CompositionReference] when it leaves the composition
+     * that will not have its reference made visible to user code.
+     */
+    // This warning becomes an error if its advice is followed since Composer needs its type param
+    @Suppress("RemoveRedundantQualifierName")
+    private class CompositionReferenceHolder<T>(
+        val ref: Composer<T>.CompositionReferenceImpl
+    ) : CompositionLifecycleObserver {
+        override fun onLeave() {
+            ref.dispose()
+        }
+    }
+
     private inner class CompositionReferenceImpl(
         val scope: RecomposeScope,
         override val compoundHashKey: Int,
         override val collectingKeySources: Boolean
-    ) : CompositionReference(),
-        CompositionLifecycleObserver {
+    ) : CompositionReference() {
         var inspectionTables: MutableSet<MutableSet<SlotTable>>? = null
         val composers = mutableSetOf<Composer<*>>()
 
-        override fun onEnter() {
-            // do nothing
-        }
-
-        override fun onLeave() {
+        fun dispose() {
             if (composers.isNotEmpty()) {
                 inspectionTables?.let {
                     for (composer in composers) {
