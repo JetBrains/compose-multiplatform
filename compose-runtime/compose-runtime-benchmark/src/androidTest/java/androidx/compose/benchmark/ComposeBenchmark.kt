@@ -27,7 +27,7 @@ import androidx.test.filters.LargeTest
 import androidx.ui.core.Modifier
 import androidx.ui.core.drawBehind
 import androidx.ui.foundation.Box
-import androidx.ui.foundation.drawBackground
+import androidx.ui.foundation.background
 import androidx.ui.graphics.Color
 import androidx.ui.layout.fillMaxSize
 import org.junit.FixMethodOrder
@@ -175,7 +175,7 @@ class ColorModel(color: Color = Color.Black) {
             Color.Red -> redModifier
             Color.Black -> blackModifier
             Color.Yellow -> yellowModifier
-            else -> Modifier.fillMaxSize().drawBackground(color)
+            else -> Modifier.fillMaxSize().background(color = color)
         }
 }
 

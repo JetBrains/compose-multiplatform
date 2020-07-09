@@ -19,7 +19,7 @@ package androidx.compose.benchmark.deeptree
 import androidx.compose.Composable
 import androidx.ui.core.Modifier
 import androidx.ui.foundation.Box
-import androidx.ui.foundation.drawBackground
+import androidx.ui.foundation.background
 import androidx.ui.graphics.Color
 import androidx.ui.layout.Column
 import androidx.ui.layout.Row
@@ -27,9 +27,9 @@ import androidx.ui.layout.fillMaxHeight
 import androidx.ui.layout.fillMaxSize
 import androidx.ui.layout.fillMaxWidth
 
-val blueBackground = Modifier.drawBackground(Color.Blue)
-val magentaBackground = Modifier.drawBackground(Color.Magenta)
-val blackBackground = Modifier.drawBackground(Color.Black)
+val blueBackground = Modifier.background(color = Color.Blue)
+val magentaBackground = Modifier.background(color = Color.Magenta)
+val blackBackground = Modifier.background(color = Color.Black)
 
 @Composable
 fun Terminal(style: Int) {
