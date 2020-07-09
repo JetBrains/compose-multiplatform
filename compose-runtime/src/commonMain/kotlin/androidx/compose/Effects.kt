@@ -335,7 +335,7 @@ val invalidate: () -> Unit get() {
 /**
  * An Effect to construct a CompositionReference at the current point of composition. This can be used
  * to run a separate composition in the context of the current one, preserving ambients and propagating
- * invalidations.
+ * invalidations. When this call leaves the composition, the reference is invalidated.
  */
 @Composable
 fun compositionReference(): CompositionReference {

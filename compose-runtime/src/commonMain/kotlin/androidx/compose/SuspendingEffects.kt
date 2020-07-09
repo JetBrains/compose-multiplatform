@@ -185,20 +185,33 @@ fun launchInComposition(
 }
 
 @PublishedApi
-internal class CompositionScopedCoroutineScope(
-    override val coroutineContext: CoroutineContext
-) : CoroutineScope, CompositionLifecycleObserver {
-    override fun onEnter() {}
+internal class CompositionScopedCoroutineScopeCanceller(
+    val coroutineScope: CoroutineScope
+) : CompositionLifecycleObserver {
     override fun onLeave() {
-        cancel()
+        coroutineScope.cancel()
     }
 }
 
-// TODO(adamp) temporary until more of this moves to the Composition
 @PublishedApi
 @OptIn(ExperimentalComposeApi::class)
-internal val Composer<*>.applyContextAccessor: CoroutineContext?
-    get() = recomposer.applyingCoroutineContext
+internal fun createCompositionCoroutineScope(
+    coroutineContext: CoroutineContext,
+    composer: Composer<*>
+) = if (coroutineContext[Job] != null) {
+    CoroutineScope(Job().apply {
+        completeExceptionally(IllegalArgumentException("CoroutineContext supplied to " +
+                "rememberCoroutineScope may not include a parent job"))
+    })
+} else {
+    val applyContext = composer.recomposer.applyingCoroutineContext
+    if (applyContext == null) {
+        CoroutineScope(Job().apply {
+            completeExceptionally(IllegalStateException("cannot create a new composition " +
+                    "coroutine scope - Composition is not active"))
+        })
+    } else CoroutineScope(applyContext + Job(applyContext[Job]) + coroutineContext)
+}
 
 /**
  * Return a [CoroutineScope] bound to this point in the composition using the optional
@@ -228,25 +241,10 @@ inline fun rememberCoroutineScope(
     getContext: () -> CoroutineContext = { EmptyCoroutineContext }
 ): CoroutineScope {
     val composer = currentComposer
-    return remember {
-        val suppliedContext = getContext()
-        if (suppliedContext[Job] != null) {
-            CoroutineScope(Job().apply {
-                    completeExceptionally(IllegalArgumentException("CoroutineContext supplied to " +
-                            "rememberCoroutineScope may not include a parent job"))
-                })
-        } else {
-            val applyContext = composer.applyContextAccessor
-            if (applyContext == null) {
-                CoroutineScope(Job().apply {
-                    completeExceptionally(IllegalStateException("cannot create a new composition " +
-                            "coroutine scope - Composition is not active"))
-                })
-            } else {
-                CompositionScopedCoroutineScope(
-                    applyContext + Job(applyContext[Job]) + suppliedContext
-                )
-            }
-        }
+    val wrapper = remember {
+        CompositionScopedCoroutineScopeCanceller(
+            createCompositionCoroutineScope(getContext(), composer)
+        )
     }
+    return wrapper.coroutineScope
 }

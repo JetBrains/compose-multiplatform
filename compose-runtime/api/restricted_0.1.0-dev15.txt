@@ -199,18 +199,16 @@ package androidx.compose {
   }
 
   public interface CompositionLifecycleObserver {
-    method public void onEnter();
-    method public void onLeave();
+    method public default void onEnter();
+    method public default void onLeave();
   }
 
   public abstract class CompositionReference {
   }
 
-  @kotlin.PublishedApi internal final class CompositionScopedCoroutineScope implements androidx.compose.CompositionLifecycleObserver kotlinx.coroutines.CoroutineScope {
-    ctor public CompositionScopedCoroutineScope(kotlin.coroutines.CoroutineContext coroutineContext);
-    method public kotlin.coroutines.CoroutineContext getCoroutineContext();
-    method public void onEnter();
-    method public void onLeave();
+  @kotlin.PublishedApi internal final class CompositionScopedCoroutineScopeCanceller implements androidx.compose.CompositionLifecycleObserver {
+    ctor public CompositionScopedCoroutineScopeCanceller(kotlinx.coroutines.CoroutineScope coroutineScope);
+    method public kotlinx.coroutines.CoroutineScope getCoroutineScope();
   }
 
   public final class EffectsKt {
@@ -345,15 +343,11 @@ package androidx.compose {
     ctor public PostCommitScopeImpl(internal kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> onCommit, androidx.compose.EmbeddingContext embeddingContext);
     method public void doFrame(long frameTimeNanos);
     method public void onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> callback);
-    method public void onEnter();
-    method public void onLeave();
   }
 
   @kotlin.PublishedApi internal final class PreCommitScopeImpl implements androidx.compose.CommitScope androidx.compose.CompositionLifecycleObserver {
     ctor public PreCommitScopeImpl(internal kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit> onCommit);
     method public void onDispose(kotlin.jvm.functions.Function0<kotlin.Unit> callback);
-    method public void onEnter();
-    method public void onLeave();
   }
 
   @androidx.compose.Stable public abstract class ProvidableAmbient<T> extends androidx.compose.Ambient<T> {
@@ -552,6 +546,7 @@ package androidx.compose {
 
   public final class SuspendingEffectsKt {
     method public static suspend Object? awaitDispose(androidx.compose.CompositionCoroutineScope, kotlin.jvm.functions.Function0<kotlin.Unit> onDispose = {}, kotlin.coroutines.Continuation<?> p = {});
+    method @kotlin.PublishedApi internal static kotlinx.coroutines.CoroutineScope createCompositionCoroutineScope(kotlin.coroutines.CoroutineContext coroutineContext, androidx.compose.Composer<?> composer);
     method @androidx.compose.Composable public static void launchInComposition(kotlin.jvm.functions.Function2<? super androidx.compose.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
     method @androidx.compose.Composable public static void launchInComposition(Object? key, kotlin.jvm.functions.Function2<? super androidx.compose.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
     method @androidx.compose.Composable public static void launchInComposition(Object? key1, Object? key2, kotlin.jvm.functions.Function2<? super androidx.compose.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block);
