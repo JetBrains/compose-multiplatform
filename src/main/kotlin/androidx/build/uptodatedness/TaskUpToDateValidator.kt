@@ -94,10 +94,7 @@ val EXEMPT_TASKS = setOf(
     "unzipDokkaPublicDocsDeps",
     "verifyDependencyVersions",
     "verifyReleaseResources",
-    "zipEcFiles",
-
-    ":camera:integration-tests:camera-testapp-view:mergeLibDexDebug",
-    ":camera:integration-tests:camera-testapp-view:packageDebug"
+    "zipEcFiles"
 )
 class TaskUpToDateValidator {
     companion object {
