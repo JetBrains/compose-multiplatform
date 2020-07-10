@@ -112,6 +112,7 @@ object LibraryGroups {
         val CORE = LibraryGroup("androidx.compose.core", null)
         val FOUNDATION = LibraryGroup("androidx.compose.foundation", null)
         val MATERIAL = LibraryGroup("androidx.compose.material", null)
+        val RUNTIME = LibraryGroup("androidx.compose.runtime", null)
         val TEST = LibraryGroup("androidx.compose.test", null)
         val TOOLING = LibraryGroup("androidx.compose.tooling", null)
     }
