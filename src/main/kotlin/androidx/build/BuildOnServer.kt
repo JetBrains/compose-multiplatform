@@ -52,7 +52,6 @@ open class BuildOnServer : DefaultTask() {
         // "androidx-public-docs-$buildId.zip",
         // "dokkaPublicDocs-$buildId.zip",
         "androidx_aggregate_build_info.txt",
-        "gmaven-diff-all-$buildId.zip",
         "top-of-tree-m2repository-all-$buildId.zip")
 
         if (project.isDocumentationEnabled()) {
