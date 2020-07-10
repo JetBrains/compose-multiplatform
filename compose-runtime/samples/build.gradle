@@ -32,7 +32,7 @@ dependencies {
     implementation(KOTLIN_STDLIB)
 
     implementation project(":annotation:annotation-sampled")
-    implementation project(":compose:compose-runtime")
+    implementation project(":compose:runtime:runtime")
     implementation project(":compose:core:core")
     implementation project(":compose:foundation:foundation-layout")
     implementation project(":compose:material:material")

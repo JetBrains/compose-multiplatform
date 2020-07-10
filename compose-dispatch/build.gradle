@@ -85,7 +85,7 @@ androidx {
     name = "Compose Dispatch"
     publish = Publish.SNAPSHOT_AND_RELEASE
     mavenVersion = LibraryVersions.COMPOSE
-    mavenGroup = LibraryGroups.COMPOSE
+    mavenGroup = LibraryGroups.Compose.RUNTIME
     inceptionYear = "2020"
     description = "Platform timing and event dispatch utilities"
 }
