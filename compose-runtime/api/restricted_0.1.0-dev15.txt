@@ -639,8 +639,10 @@ package androidx.compose.collection {
     method public boolean removeAll(androidx.compose.collection.MutableVector<T> elements);
     method public boolean removeAll(java.util.Collection<? extends T> elements);
     method public T! removeAt(int index);
+    method public void removeRange(int start, int end);
     method public boolean retainAll(java.util.Collection<? extends T> elements);
     method public operator T! set(int index, T? element);
+    method public void sortWith(java.util.Comparator<T> comparator);
     method public inline int sumBy(kotlin.jvm.functions.Function1<? super T,java.lang.Integer> selector);
     method @kotlin.PublishedApi internal Void throwNoSuchElementException();
     property public final inline kotlin.ranges.IntRange indices;

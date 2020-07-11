@@ -18,6 +18,7 @@
 
 package androidx.compose.collection
 
+import androidx.compose.sortArrayWith
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.math.max
@@ -118,7 +119,9 @@ class MutableVector<T> @PublishedApi internal constructor(
         }
         elements.content.copyInto(
             destination = content,
-            destinationOffset = index
+            destinationOffset = index,
+            startIndex = 0,
+            endIndex = elements.size
         )
         size += elements.size
         return true
@@ -668,6 +671,27 @@ class MutableVector<T> @PublishedApi internal constructor(
     }
 
     /**
+     * Removes items from index [start] (inclusive) to [end] (exclusive).
+     */
+    fun removeRange(start: Int, end: Int) {
+        if (end > start) {
+            if (end < size) {
+                content.copyInto(
+                    destination = content,
+                    destinationOffset = start,
+                    startIndex = end,
+                    endIndex = size
+                )
+            }
+            val newSize = size - (end - start)
+            for (i in newSize..lastIndex) {
+                content[i] = null // clean up the removed items
+            }
+            size = newSize
+        }
+    }
+
+    /**
      * Keeps only [elements] in the [MutableVector] and removes all other values.
      */
     fun retainAll(elements: Collection<T>): Boolean {
@@ -689,6 +713,13 @@ class MutableVector<T> @PublishedApi internal constructor(
         val old = content[index] as T
         content[index] = element
         return old
+    }
+
+    /**
+     * Sorts the [MutableVector] using [comparator] to order the items.
+     */
+    fun sortWith(comparator: Comparator<T>) {
+        sortArrayWith(content as Array<T>, comparator = comparator, fromIndex = 0, toIndex = size)
     }
 
     /**
