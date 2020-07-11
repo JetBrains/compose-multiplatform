@@ -373,7 +373,10 @@ class MutableVectorTest {
 
     @Test
     fun addAllVector() {
-        val l = mutableVectorOf(3, 4, 5)
+        val l = MutableVector<Int>()
+        l.add(3)
+        l.add(4)
+        l.add(5)
         val l2 = mutableVectorOf(1, 2)
         assertTrue(l2.addAll(l))
         assertFalse(l2.addAll(mutableVectorOf()))
@@ -760,5 +763,27 @@ class MutableVectorTest {
         val l2 = l.subList(1, 3)
         assertEquals(2, l2.size)
         assertEquals(3, l2[0])
+    }
+
+    @Test
+    fun removeRange() {
+        val l = mutableVectorOf(1, 2, 3, 4, 5)
+        l.removeRange(1, 4)
+        assertNull(l.content[2])
+        assertNull(l.content[3])
+        assertNull(l.content[4])
+        assertTrue(l.contentEquals(mutableVectorOf(1, 5)))
+        val l2 = mutableVectorOf(1, 2, 3, 4, 5)
+        l2.removeRange(3, 5)
+        assertTrue(l2.contentEquals(mutableVectorOf(1, 2, 3)))
+        l2.removeRange(3, 3)
+        assertTrue(l2.contentEquals(mutableVectorOf(1, 2, 3)))
+    }
+
+    @Test
+    fun sortWith() {
+        val l = mutableVectorOf(1, 4, 2, 5, 3)
+        l.sortWith(Comparator { p0, p1 -> p0 - p1 })
+        assertTrue(l.contentEquals(list))
     }
 }
