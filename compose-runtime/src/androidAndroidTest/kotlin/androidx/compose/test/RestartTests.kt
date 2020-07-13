@@ -23,6 +23,7 @@ import androidx.compose.ComposableContract
 import androidx.compose.clearRoots
 import androidx.compose.mutableStateOf
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import junit.framework.TestCase
 import org.junit.After
@@ -142,6 +143,7 @@ class RestartTests : BaseComposeTest() {
     }
 
     @Test
+    @FlakyTest(bugId = 160876771)
     fun allocation_Test() {
         allocationCounting {
             compose {
