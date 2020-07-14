@@ -157,7 +157,8 @@ private fun Project.makeErrorProneTask(
         name = ERROR_PRONE_TASK,
         onConfigure = {
             val compileTask = compileTaskProvider.get()
-            it.classpath = compileTask.classpath
+            it.classpath = compileTask.classpath +
+                project.files("${project.buildDir}/classes/kotlin/main")
 
             it.source = compileTask.source
             it.destinationDir = file(buildDir.resolve("errorProne"))
