@@ -79,17 +79,25 @@ abstract class ComposeBenchmarkBase {
         val ownerView = findComposeView(activity)!!.view
         ownerView.restoreHierarchyState(SparseArray())
 
+        val composer = activeComposer
+        require(composer != null) { "Composer was null" }
         benchmarkRule.measureRepeated {
             runWithTimingDisabled {
                 receiver.updateModelCb()
                 Snapshot.sendApplyNotifications()
             }
-
-            val didSomething = activeComposer?.let { composer ->
-                @OptIn(InternalComposeApi::class)
-                composer.recompose().also { composer.applyChanges() }
-            } ?: false
+            @OptIn(InternalComposeApi::class)
+            val didSomething = composer.recompose().also { composer.applyChanges() }
             assertTrue(didSomething)
+            runWithTimingDisabled {
+                receiver.resetCb()
+                Snapshot.sendApplyNotifications()
+                @OptIn(InternalComposeApi::class)
+                composer.apply {
+                    recompose()
+                    applyChanges()
+                }
+            }
         }
 
         composition.dispose()
@@ -99,9 +107,14 @@ abstract class ComposeBenchmarkBase {
 class RecomposeReceiver {
     var composeCb: @Composable () -> Unit = @Composable { }
     var updateModelCb: () -> Unit = { }
+    var resetCb: () -> Unit = {}
 
     fun compose(block: @Composable () -> Unit) {
         composeCb = block
+    }
+
+    fun reset(block: () -> Unit) {
+        resetCb = block
     }
 
     fun update(block: () -> Unit) {
