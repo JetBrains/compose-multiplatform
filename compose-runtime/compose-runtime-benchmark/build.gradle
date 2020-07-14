@@ -48,8 +48,8 @@ dependencies {
     kotlinPlugin project(path: ":compose:compose-compiler")
 
     androidTestImplementation(project(":compose:runtime:runtime"))
-    androidTestImplementation(project("::compose:core:core"))
-    androidTestImplementation(project(":compose:core:core-text"))
+    androidTestImplementation(project("::compose:ui:ui"))
+    androidTestImplementation(project(":compose:ui:ui-text"))
     androidTestImplementation(project(":compose:foundation:foundation-layout"))
     androidTestImplementation(project(":compose:material:material"))
     androidTestImplementation(project(":compose:foundation:foundation"))
