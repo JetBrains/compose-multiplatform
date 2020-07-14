@@ -82,14 +82,19 @@ class SiblingBenchmark(
     @Test
     fun runBenchmark() {
         activityRule.runUiRunnable {
-            val items = mutableStateOf((0..count).map { Item(it) })
+            val listA = (0..count).map { Item(it) }
             val random = Random(0)
+            val listB = listA.update(reorder, random) { Item(it + 1) }
+            val items = mutableStateOf(listA)
             measureRecompose {
                 compose {
                     SiblingManagement(identity = identity, items = items.value)
                 }
                 update {
-                    items.value = items.value.update(reorder, random) { Item(it + 1) }
+                    items.value = listB
+                }
+                reset {
+                    items.value = listA
                 }
             }
         }
