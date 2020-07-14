@@ -68,7 +68,7 @@ kotlin {
             implementation(ANDROIDX_TEST_RULES)
             implementation(ANDROIDX_TEST_RUNNER)
             implementation(TRUTH)
-            implementation project(':compose:test:test-core')
+            implementation project(':ui:ui-test')
             implementation project(':compose:core:core')
         }
     }
