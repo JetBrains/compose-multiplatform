@@ -42,6 +42,7 @@ allprojects {
             freeCompilerArgs += [
                     "-Werror",
                     "-Xskip-runtime-version-check",
+                    "-Xskip-metadata-version-check",
                     // Allow `@OptIn` and `@UseExperimental`
                     "-Xopt-in=kotlin.RequiresOptIn"
             ]

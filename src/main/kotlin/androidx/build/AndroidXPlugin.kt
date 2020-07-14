@@ -716,7 +716,11 @@ private fun Project.configureCompilationWarnings(task: KotlinCompile) {
     if (hasProperty(ALL_WARNINGS_AS_ERRORS)) {
         task.kotlinOptions.allWarningsAsErrors = true
     }
-    task.kotlinOptions.freeCompilerArgs += listOf("-Xskip-runtime-version-check")
+    task.kotlinOptions.freeCompilerArgs += listOf(
+        "-Xskip-runtime-version-check",
+        "-Xskip-metadata-version-check",
+        "-XXLanguage:-NewInference"
+    )
 }
 
 /**
