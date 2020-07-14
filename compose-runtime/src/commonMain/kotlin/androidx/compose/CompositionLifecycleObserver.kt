@@ -17,19 +17,35 @@
 package androidx.compose
 
 /**
- * Instances of classes implementing this interface are notified when they are initially
- * used during composition and when they are no longer being used.
+ * Objects implementing this interface are notified when they are initially
+ * used in a composition and when they are no longer being used.
+ *
+ * An object [enters][onEnter] the composition if it is [remember]ed in at least one place in a
+ * composition. Compose may implicitly [remember] an object if doing so is required to restart
+ * the composition later, such as for composable function parameters. An object [leaves][onLeave]
+ * a composition when it is no longer [remember]ed anywhere in that composition.
+ *
+ * Implementations of [CompositionLifecycleObserver] should generally not expose those object
+ * references outside of their immediate usage sites. A [CompositionLifecycleObserver] reference
+ * that is propagated to multiple parts of a composition might remain present in the composition
+ * for longer than expected if it is remembered (explicitly or implicitly) elsewhere in the same
+ * composition, and a [CompositionLifecycleObserver] that appears in more than one composition may
+ * have its lifecycle callback methods called multiple times in no meaningful order and on
+ * multiple threads. Implementations intending to support this use case should implement atomic
+ * reference counting or a similar strategy to correctly manage resources.
  */
 interface CompositionLifecycleObserver {
     /**
-     * Called when the instance is used in composition.
+     * Called when this object successfully enters a composition.
+     * This method is called on the composition's **apply thread.**
      */
-    fun onEnter()
+    fun onEnter() {}
 
     /**
-     * Called when the instance is no longer used in the composition.
+     * Called when this object leaves a composition.
+     * This method is called on the composition's **apply thread.**
      */
-    fun onLeave()
+    fun onLeave() {}
 }
 
 /**

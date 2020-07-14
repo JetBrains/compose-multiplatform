@@ -38,24 +38,9 @@ import kotlin.coroutines.CoroutineContext
 @ExperimentalCoroutinesApi
 @Suppress("NOTHING_TO_INLINE")
 @Composable
-inline fun <T : Any> StateFlow<T>.collectAsState(
+inline fun <T> StateFlow<T>.collectAsState(
     context: CoroutineContext = Dispatchers.Main
 ): State<T> = collectAsState(value, context)
-
-/**
- * Collects values from this [Flow] and represents its latest value via [State]. Every time there
- * would be new value posted into the [Flow] the returned [State] will be updated causing
- * recomposition of every [State.value] usage.
- *
- * @sample androidx.compose.samples.FlowSample
- *
- * @param context [CoroutineContext] to use for collecting.
- */
-@Suppress("NOTHING_TO_INLINE")
-@Composable
-inline fun <T : Any> Flow<T>.collectAsState(
-    context: CoroutineContext = Dispatchers.Main
-): State<T?> = collectAsState(null, context)
 
 /**
  * Collects values from this [Flow] and represents its latest value via [State]. Every time there
@@ -67,17 +52,15 @@ inline fun <T : Any> Flow<T>.collectAsState(
  * @param context [CoroutineContext] to use for collecting.
  */
 @Composable
-fun <T> Flow<T>.collectAsState(
-    initial: T,
+fun <T : R, R> Flow<T>.collectAsState(
+    initial: R,
     context: CoroutineContext = Dispatchers.Main
-): State<T> {
+): State<R> {
     val state = state { initial }
     onPreCommit(this, context) {
         val job = CoroutineScope(context).launch {
             collect {
-                FrameManager.framed {
-                    state.value = it
-                }
+                state.value = it
             }
         }
         onDispose { job.cancel() }

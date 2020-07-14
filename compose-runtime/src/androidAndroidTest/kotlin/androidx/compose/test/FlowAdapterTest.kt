@@ -22,7 +22,7 @@ import androidx.compose.mutableStateOf
 import androidx.compose.setValue
 import androidx.test.filters.MediumTest
 import androidx.ui.test.createComposeRule
-import androidx.ui.test.runOnIdleCompose
+import androidx.ui.test.runOnIdle
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -53,32 +53,19 @@ class FlowAdapterTest {
     val rule = createComposeRule()
 
     @Test
-    fun whenValueIsNotSetWeGotNull() {
-        val stream = FlowChannel<String>()
-        var realValue: String? = "to-be-updated"
-        rule.setContent {
-            realValue = stream.flow.collectAsState().value
-        }
-
-        runOnIdleCompose {
-            assertThat(realValue).isNull()
-        }
-    }
-
-    @Test
     fun weReceiveSubmittedValue() {
         val stream = FlowChannel<String>()
 
         var realValue: String? = null
         rule.setContent {
-            realValue = stream.flow.collectAsState().value
+            realValue = stream.flow.collectAsState(initial = null).value
         }
 
-        runOnIdleCompose {
+        runOnIdle {
             stream.channel.offer("value")
         }
 
-        runOnIdleCompose {
+        runOnIdle {
             assertThat(realValue).isEqualTo("value")
         }
     }
@@ -89,19 +76,19 @@ class FlowAdapterTest {
 
         var realValue: String? = null
         rule.setContent {
-            realValue = stream.flow.collectAsState().value
+            realValue = stream.flow.collectAsState(initial = null).value
         }
 
-        runOnIdleCompose {
+        runOnIdle {
             stream.channel.offer("value")
         }
 
-        runOnIdleCompose {
+        runOnIdle {
             assertThat(realValue).isEqualTo("value")
             stream.channel.offer("value2")
         }
 
-        runOnIdleCompose {
+        runOnIdle {
             assertThat(realValue).isEqualTo("value2")
         }
     }
@@ -113,17 +100,17 @@ class FlowAdapterTest {
         var realValue: String? = "to-be-updated"
         rule.setContent {
             if (emit) {
-                realValue = stream.flow.collectAsState().value
+                realValue = stream.flow.collectAsState(initial = null).value
             }
         }
 
-        runOnIdleCompose { emit = false }
+        runOnIdle { emit = false }
 
-        runOnIdleCompose {
+        runOnIdle {
             stream.channel.offer("value")
         }
 
-        runOnIdleCompose {
+        runOnIdle {
             assertThat(realValue).isNull()
         }
     }
@@ -147,11 +134,11 @@ class FlowAdapterTest {
             realValue = stream.flow.collectAsState("value").value
         }
 
-        runOnIdleCompose {
+        runOnIdle {
             stream.channel.offer("value2")
         }
 
-        runOnIdleCompose {
+        runOnIdle {
             assertThat(realValue).isEqualTo("value2")
         }
     }
@@ -166,11 +153,11 @@ class FlowAdapterTest {
             realValue = stream.flow.collectAsState(initial).value
         }
 
-        runOnIdleCompose {
+        runOnIdle {
             initial = "initial2"
         }
 
-        runOnIdleCompose {
+        runOnIdle {
             assertThat(realValue).isEqualTo("initial1")
         }
     }
@@ -183,22 +170,22 @@ class FlowAdapterTest {
 
         var realValue: String? = null
         rule.setContent {
-            realValue = stream.flow.collectAsState().value
+            realValue = stream.flow.collectAsState(initial = null).value
         }
 
-        runOnIdleCompose {
+        runOnIdle {
             stream = stream2
         }
 
-        runOnIdleCompose {
+        runOnIdle {
             stream2.channel.offer("stream2")
         }
 
-        runOnIdleCompose {
+        runOnIdle {
             stream1.channel.offer("stream1")
         }
 
-        runOnIdleCompose {
+        runOnIdle {
             assertThat(realValue).isEqualTo("stream2")
         }
     }
@@ -211,18 +198,18 @@ class FlowAdapterTest {
 
         var realValue: String? = null
         rule.setContent {
-            realValue = stream.flow.collectAsState().value
+            realValue = stream.flow.collectAsState(initial = null).value
         }
 
-        runOnIdleCompose {
+        runOnIdle {
             stream1.channel.offer("value")
         }
 
-        runOnIdleCompose {
+        runOnIdle {
             stream = stream2
         }
 
-        runOnIdleCompose {
+        runOnIdle {
             assertThat(realValue).isEqualTo("value")
         }
     }
@@ -234,19 +221,19 @@ class FlowAdapterTest {
 
         var realValue: String? = null
         rule.setContent {
-            realValue = stream.flow.collectAsState(Dispatchers.Default).value
+            realValue = stream.flow.collectAsState(null, Dispatchers.Default).value
             if (realValue != null) {
                 latch.countDown()
             }
         }
 
-        runOnIdleCompose {
+        runOnIdle {
             stream.channel.offer("value")
         }
 
         assertThat(latch.await(5, TimeUnit.SECONDS)).isTrue()
 
-        runOnIdleCompose {
+        runOnIdle {
             assertThat(realValue).isEqualTo("value")
         }
     }
@@ -258,18 +245,18 @@ class FlowAdapterTest {
 
         var realValue: String? = null
         rule.setContent {
-            realValue = stream.flow.collectAsState(context).value
+            realValue = stream.flow.collectAsState(null, context).value
         }
 
-        runOnIdleCompose {
+        runOnIdle {
             stream.channel.offer("value")
         }
 
-        runOnIdleCompose {
+        runOnIdle {
             context = Dispatchers.IO
         }
 
-        runOnIdleCompose {
+        runOnIdle {
             assertThat(realValue).isEqualTo("value")
         }
     }
@@ -282,8 +269,21 @@ class FlowAdapterTest {
             realValue = flow.collectAsState().value
         }
 
-        runOnIdleCompose {
+        runOnIdle {
             assertThat(realValue).isEqualTo("initial")
+        }
+    }
+
+    @Test
+    fun stateFlowHandlesNullValue() {
+        val flow = MutableStateFlow<String?>(null)
+        var realValue: String? = "to-be-updated"
+        rule.setContent {
+            realValue = flow.collectAsState().value
+        }
+
+        runOnIdle {
+            assertThat(realValue).isNull()
         }
     }
 
@@ -295,11 +295,11 @@ class FlowAdapterTest {
             realValue = flow.collectAsState().value
         }
 
-        runOnIdleCompose {
+        runOnIdle {
             flow.value = "updated"
         }
 
-        runOnIdleCompose {
+        runOnIdle {
             assertThat(realValue).isEqualTo("updated")
         }
     }

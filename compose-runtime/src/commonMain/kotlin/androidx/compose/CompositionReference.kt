@@ -25,9 +25,13 @@ package androidx.compose
  *
  * @see compositionReference
  */
-interface CompositionReference {
-    fun <T> getAmbient(key: Ambient<T>): T
-    fun invalidate()
-    fun <N> registerComposer(composer: Composer<N>)
-    fun getAmbientScope(): AmbientMap
+abstract class CompositionReference internal constructor() {
+    internal abstract val compoundHashKey: Int
+    internal abstract val collectingKeySources: Boolean
+    internal abstract fun recordInspectionTable(table: MutableSet<SlotTable>)
+    internal abstract fun <T> getAmbient(key: Ambient<T>): T
+    internal abstract fun invalidate()
+    internal abstract fun <N> registerComposer(composer: Composer<N>)
+    internal abstract fun unregisterComposer(composer: Composer<*>)
+    internal abstract fun getAmbientScope(): AmbientMap
 }

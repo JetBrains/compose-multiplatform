@@ -25,28 +25,41 @@ import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
 import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
-import androidx.compose.plugins.kotlin.frames.analysis.FrameModelChecker
-import androidx.compose.plugins.kotlin.frames.analysis.FramePackageAnalysisHandlerExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
-import org.jetbrains.kotlin.extensions.internal.CandidateInterceptor
+import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import org.jetbrains.kotlin.extensions.internal.TypeResolutionInterceptor
-import org.jetbrains.kotlin.resolve.jvm.extensions.AnalysisHandlerExtension
+
+object ComposeConfiguration {
+    val LIVE_LITERALS_ENABLED_KEY =
+        CompilerConfigurationKey<Boolean>("Enable Live Literals code generation")
+}
 
 class ComposeCommandLineProcessor : CommandLineProcessor {
-
     companion object {
         val PLUGIN_ID = "androidx.compose.plugins.kotlin"
+        val LIVE_LITERALS_ENABLED_OPTION = CliOption(
+            "liveLiterals",
+            "<true|false>",
+            "Enable Live Literals code generation",
+            required = false,
+            allowMultipleOccurrences = false
+        )
     }
 
-    override val pluginId =
-        PLUGIN_ID
-    override val pluginOptions = emptyList<CliOption>()
+    override val pluginId = PLUGIN_ID
+    override val pluginOptions = listOf(LIVE_LITERALS_ENABLED_OPTION)
 
     override fun processOption(
         option: AbstractCliOption,
         value: String,
         configuration: CompilerConfiguration
-    ) = throw CliOptionProcessingException("Unknown option: ${option.optionName}")
+    ) = when (option) {
+        LIVE_LITERALS_ENABLED_OPTION -> configuration.put(
+            ComposeConfiguration.LIVE_LITERALS_ENABLED_KEY,
+            value == "true"
+        )
+        else -> throw CliOptionProcessingException("Unknown option: ${option.optionName}")
+    }
 }
 
 class ComposeComponentRegistrar : ComponentRegistrar {
@@ -67,9 +80,13 @@ class ComposeComponentRegistrar : ComponentRegistrar {
             project: Project,
             configuration: CompilerConfiguration
         ) {
+            val liveLiteralsEnabled = configuration.get(
+                ComposeConfiguration.LIVE_LITERALS_ENABLED_KEY,
+                false
+            )
             StorageComponentContainerContributor.registerExtension(
                 project,
-                ComposableAnnotationChecker()
+                ComposableCallChecker()
             )
             StorageComponentContainerContributor.registerExtension(
                 project,
@@ -88,18 +105,9 @@ class ComposeComponentRegistrar : ComponentRegistrar {
                 ComposeTypeResolutionInterceptorExtension()
             )
             IrGenerationExtension.registerExtension(project,
-                ComposeIrGenerationExtension()
-            )
-            CandidateInterceptor.registerExtension(
-                project,
-                ComposeCallResolutionInterceptorExtension()
-            )
-            StorageComponentContainerContributor.registerExtension(project,
-                FrameModelChecker()
-            )
-            AnalysisHandlerExtension.registerExtension(
-                project,
-                FramePackageAnalysisHandlerExtension()
+                ComposeIrGenerationExtension(
+                    liveLiteralsEnabled = liveLiteralsEnabled
+                )
             )
         }
     }

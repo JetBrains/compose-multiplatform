@@ -16,13 +16,11 @@
 
 package androidx.compose.plugins.kotlin
 
-import androidx.compose.plugins.kotlin.analysis.ComposeDefaultErrorMessages
 import androidx.compose.plugins.kotlin.analysis.ComposeErrors
 import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.container.StorageComponentContainer
 import org.jetbrains.kotlin.container.useInstance
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
-import org.jetbrains.kotlin.diagnostics.reportFromPlugin
 import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
 import org.jetbrains.kotlin.platform.TargetPlatform
 import org.jetbrains.kotlin.platform.jvm.isJvm
@@ -49,19 +47,16 @@ open class TryCatchComposableChecker : CallChecker, StorageComponentContainerCon
     ) {
         val trace = context.trace
         val call = resolvedCall.call.callElement
-        val shouldBeTag =
-            ComposableAnnotationChecker.get(call.project).shouldInvokeAsTag(trace, resolvedCall)
-        if (shouldBeTag) {
+        if (resolvedCall.isComposableInvocation()) {
             var walker: PsiElement? = call
             while (walker != null) {
                 val parent = walker.parent
                 if (parent is KtTryExpression) {
                     if (walker == parent.tryBlock)
-                        trace.reportFromPlugin(
+                        trace.report(
                             ComposeErrors.ILLEGAL_TRY_CATCH_AROUND_COMPOSABLE.on(
                                 parent.tryKeyword!!
-                            ),
-                            ComposeDefaultErrorMessages
+                            )
                         )
                 }
                 walker = try { walker.parent } catch (e: Throwable) { null }

@@ -16,54 +16,53 @@
 
 package androidx.compose
 
-internal actual typealias EmbeddingUIContext = android.content.Context
+import android.os.Handler
+import android.os.Looper
+import androidx.compose.dispatch.AndroidUiDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlin.coroutines.CoroutineContext
 
-// TODO(b/137794558): Create portable abstraction for scheduling
-internal actual typealias Looper = android.os.Looper
-
-// TODO(b/137794558): Create portable abstraction for scheduling
-internal actual object LooperWrapper {
-    actual fun getMainLooper(): Looper = android.os.Looper.getMainLooper()
-}
-
-internal actual fun isMainThread(): Boolean {
-    return android.os.Looper.myLooper() == android.os.Looper.getMainLooper()
-}
-
-// TODO(b/137794558): Create portable abstraction for scheduling
-internal actual class Handler {
-    val handler: android.os.Handler
-
-    actual constructor(looper: Looper) {
-        handler = android.os.Handler(looper)
+class AndroidEmbeddingContext : EmbeddingContext {
+    private val handler by lazy {
+        Handler(Looper.getMainLooper())
     }
-    actual fun postAtFrontOfQueue(block: () -> Unit): Boolean {
-        return handler.postAtFrontOfQueue(block)
+
+    override fun isMainThread(): Boolean {
+        return Looper.myLooper() == Looper.getMainLooper()
+    }
+
+    override fun mainThreadCompositionContext(): CoroutineContext {
+        return MainAndroidUiContext
+    }
+
+    override fun postOnMainThread(block: () -> Unit) {
+        handler.post(block)
+    }
+
+    override fun postFrameCallback(callback: ChoreographerFrameCallback) {
+        android.view.Choreographer.getInstance().postFrameCallback(callback)
+    }
+
+    override fun cancelFrameCallback(callback: ChoreographerFrameCallback) {
+        android.view.Choreographer.getInstance().removeFrameCallback(callback)
     }
 }
+
+actual fun EmbeddingContext(): EmbeddingContext = AndroidEmbeddingContext()
 
 // TODO(b/137794558): Create portable abstraction for scheduling
 internal actual typealias ChoreographerFrameCallback = android.view.Choreographer.FrameCallback
 
-internal actual object Choreographer {
-    actual fun postFrameCallback(callback: ChoreographerFrameCallback) {
-        android.view.Choreographer.getInstance().postFrameCallback(callback)
-    }
-    actual fun postFrameCallbackDelayed(delayMillis: Long, callback: ChoreographerFrameCallback) {
-        android.view.Choreographer.getInstance().postFrameCallbackDelayed(callback, delayMillis)
-    }
-    actual fun removeFrameCallback(callback: ChoreographerFrameCallback) {
-        android.view.Choreographer.getInstance().removeFrameCallback(callback)
-    }
+// TODO: Our host-side tests still grab the Android actuals based on SDK stubs that return null.
+// Satisfy their dependencies.
+private val MainAndroidUiContext: CoroutineContext by lazy {
+    if (Looper.getMainLooper() != null) AndroidUiDispatcher.Main
+    else Dispatchers.Main
 }
 
 internal actual object Trace {
     actual fun beginSection(name: String) = android.os.Trace.beginSection(name)
     actual fun endSection() = android.os.Trace.endSection()
-}
-
-internal actual fun createRecomposer(): Recomposer {
-    return AndroidRecomposer()
 }
 
 internal actual typealias MainThread = androidx.annotation.MainThread

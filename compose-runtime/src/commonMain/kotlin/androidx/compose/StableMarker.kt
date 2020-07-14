@@ -42,7 +42,6 @@ package androidx.compose
  *
  * @see Immutable
  * @see Stable
- * @see Model
  */
 @MustBeDocumented
 @Target(AnnotationTarget.ANNOTATION_CLASS, AnnotationTarget.CLASS)

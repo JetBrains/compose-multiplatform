@@ -25,6 +25,7 @@ import org.jetbrains.kotlin.descriptors.findClassAcrossModuleDependencies
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.resolve.annotations.argumentValue
 import org.jetbrains.kotlin.resolve.constants.ConstantValue
 import org.jetbrains.kotlin.resolve.descriptorUtil.annotationClass
 import org.jetbrains.kotlin.types.KotlinType
@@ -35,11 +36,18 @@ import org.jetbrains.kotlin.types.typeUtil.replaceAnnotations
 object ComposeFqNames {
     val Composable = ComposeUtils.composeFqName("Composable")
     val CurrentComposerIntrinsic = ComposeUtils.composeFqName("<get-currentComposer>")
-    val Direct = ComposeUtils.composeFqName("Direct")
+    val ComposableContract = ComposeUtils.composeFqName("ComposableContract")
+    val composableLambda = FqName.fromSegments(listOf(
+        "androidx",
+        "compose",
+        "internal",
+        "composableLambda"
+    ))
+    val remember = ComposeUtils.composeFqName("remember")
     val key = ComposeUtils.composeFqName("key")
     val StableMarker = ComposeUtils.composeFqName("StableMarker")
+    val Stable = ComposeUtils.composeFqName("Stable")
     val Composer = ComposeUtils.composeFqName("Composer")
-    val Untracked = ComposeUtils.composeFqName("Untracked")
     val UiComposer = FqName.fromSegments(listOf("androidx", "ui", "node", "UiComposer"))
     val Package = FqName.fromSegments(listOf("androidx", "compose"))
     val Function0 = FqName.fromSegments(listOf("kotlin", "jvm", "functions", "Function0"))
@@ -70,10 +78,23 @@ fun KotlinType.isMarkedStable(): Boolean =
                     (constructor.declarationDescriptor?.annotations?.hasStableMarker() ?: false))
 fun Annotated.hasComposableAnnotation(): Boolean =
     annotations.findAnnotation(ComposeFqNames.Composable) != null
-fun Annotated.hasDirectAnnotation(): Boolean =
-    annotations.findAnnotation(ComposeFqNames.Direct) != null
-fun Annotated.hasUntrackedAnnotation(): Boolean =
-    annotations.findAnnotation(ComposeFqNames.Untracked) != null
+fun Annotated.composableRestartableContract(): Boolean? {
+    val contract = annotations.findAnnotation(ComposeFqNames.ComposableContract) ?: return null
+    return contract.argumentValue("restartable")?.value as? Boolean
+}
+fun Annotated.composableReadonlyContract(): Boolean? {
+    val contract = annotations.findAnnotation(ComposeFqNames.ComposableContract) ?: return null
+    return contract.argumentValue("readonly")?.value as? Boolean
+}
+fun Annotated.composableTrackedContract(): Boolean? {
+    val contract = annotations.findAnnotation(ComposeFqNames.ComposableContract) ?: return null
+    return contract.argumentValue("tracked")?.value as? Boolean
+}
+
+fun Annotated.composablePreventCaptureContract(): Boolean? {
+    val contract = annotations.findAnnotation(ComposeFqNames.ComposableContract) ?: return null
+    return contract.argumentValue("preventCapture")?.value as? Boolean
+}
 
 internal val KotlinType.isSpecialType: Boolean get() =
     this === NO_EXPECTED_TYPE || this === UNIT_EXPECTED_TYPE

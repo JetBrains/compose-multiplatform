@@ -36,10 +36,11 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-compiler:$KOTLIN_VERSION")
 
     testImplementation(KOTLIN_STDLIB)
-    testImplementation(project(":compose:compose-runtime"))
-    testImplementation(project(":ui:ui-core"))
-    testImplementation(project(":ui:ui-android-view"))
+    testImplementation(project(":compose:runtime:runtime"))
+    testImplementation(project(":compose:ui:ui"))
+    testImplementation(project(":compose:android-view:android-view"))
     testImplementation(project(":compose:compose-compiler-hosted"))
+    testImplementation("androidx.core:core-ktx:1.1.0")
 }
 
 android {
@@ -65,6 +66,7 @@ android {
 tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
         jvmTarget = "1.8"
+        freeCompilerArgs += ["-Xopt-in=kotlin.RequiresOptIn", "-Xallow-jvm-ir-dependencies"]
     }
 }
 

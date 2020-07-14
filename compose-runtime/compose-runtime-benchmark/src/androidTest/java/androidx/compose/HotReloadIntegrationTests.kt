@@ -20,7 +20,6 @@ import android.app.Activity
 import androidx.compose.benchmark.ComposeActivity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.test.rule.ActivityTestRule
 import androidx.ui.core.WithConstraints
 import androidx.ui.core.setContent
 import androidx.ui.foundation.Text
@@ -46,8 +45,9 @@ import java.util.concurrent.TimeUnit
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class HotReloadIntegrationTests {
+    @Suppress("DEPRECATION")
     @get:Rule
-    val activityRule = ActivityTestRule(ComposeActivity::class.java)
+    val activityRule = androidx.test.rule.ActivityTestRule(ComposeActivity::class.java)
 
     @Test
     fun testSubComposition() {

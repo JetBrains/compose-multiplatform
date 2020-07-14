@@ -64,7 +64,6 @@ class ComposeCallResolverTests : AbstractCodegenTest() {
             @Composable
             fun test() {
                 <call>Foo()
-                <emit>TextView(text="text")
                 <normal>Bar()
             }
         """
@@ -198,12 +197,14 @@ class ComposeCallResolverTests : AbstractCodegenTest() {
             import androidx.compose.*
             import android.widget.LinearLayout
 
+            @Composable fun Group(content: @Composable () -> Unit) { content() }
+
             @Composable
             inline fun PointerInputWrapper(
                 crossinline children: @Composable () -> Unit
             ) {
                 // Hide the internals of PointerInputNode
-                <emit>LinearLayout {
+                <call>Group {
                     <call>children()
                 }
             }
@@ -231,21 +232,12 @@ class ComposeCallResolverTests : AbstractCodegenTest() {
                     "$calltype.")
 
             when (calltype) {
-                "<normal>" -> assert(!resolvedCall.isCall() && !resolvedCall.isEmit())
-                "<emit>" -> assert(resolvedCall.isEmit())
-                "<call>" -> assert(resolvedCall.isCall())
+                "<normal>" -> assert(!resolvedCall.isComposableInvocation())
+                "<call>" -> assert(resolvedCall.isComposableInvocation())
                 else -> error("Call type of $calltype not recognized.")
             }
         }
     }
-
-    private fun ResolvedCall<*>.isEmit(): Boolean = candidateDescriptor is ComposableEmitDescriptor
-    private fun ResolvedCall<*>.isCall(): Boolean =
-        when (candidateDescriptor) {
-            is ComposableFunctionDescriptor -> true
-            is ComposablePropertyDescriptor -> true
-            else -> false
-        }
 
     private val callPattern = Regex("(<normal>)|(<emit>)|(<call>)")
     private fun extractCarets(text: String): Pair<String, List<Pair<Int, String>>> {

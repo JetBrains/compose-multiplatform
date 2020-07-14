@@ -24,7 +24,6 @@ import androidx.compose.benchmark.siblings.update
 import androidx.compose.mutableStateOf
 import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.LargeTest
-import androidx.test.rule.ActivityTestRule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -83,14 +82,19 @@ class SiblingBenchmark(
     @Test
     fun runBenchmark() {
         activityRule.runUiRunnable {
-            val items = mutableStateOf((0..count).map { Item(it) })
+            val listA = (0..count).map { Item(it) }
             val random = Random(0)
+            val listB = listA.update(reorder, random) { Item(it + 1) }
+            val items = mutableStateOf(listA)
             measureRecompose {
                 compose {
                     SiblingManagement(identity = identity, items = items.value)
                 }
                 update {
-                    items.value = items.value.update(reorder, random) { Item(it + 1) }
+                    items.value = listB
+                }
+                reset {
+                    items.value = listA
                 }
             }
         }
@@ -98,7 +102,8 @@ class SiblingBenchmark(
 }
 
 // NOTE: remove when SAM conversion works in IR
-fun ActivityTestRule<ComposeActivity>.runUiRunnable(block: () -> Unit) {
+@Suppress("DEPRECATION")
+fun androidx.test.rule.ActivityTestRule<ComposeActivity>.runUiRunnable(block: () -> Unit) {
     runOnUiThread(object : Runnable {
         override fun run() {
             block()

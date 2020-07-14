@@ -54,7 +54,7 @@ package androidx.compose
  *
  * @sample androidx.compose.samples.consumeAmbient
  */
-@Immutable
+@Stable
 sealed class Ambient<T> constructor(defaultFactory: (() -> T)? = null) {
     @Suppress("UNCHECKED_CAST")
     internal val defaultValueHolder = LazyValueHolder(defaultFactory)
@@ -68,6 +68,7 @@ sealed class Ambient<T> constructor(defaultFactory: (() -> T)? = null) {
      *
      * @sample androidx.compose.samples.consumeAmbient
      */
+    @ComposableContract(readonly = true)
     @Composable
     inline val current: T get() = currentComposer.consume(this)
 }
@@ -79,7 +80,7 @@ sealed class Ambient<T> constructor(defaultFactory: (() -> T)? = null) {
  * @see Ambient
  * @see Providers
  */
-@Immutable
+@Stable
 abstract class ProvidableAmbient<T> internal constructor(defaultFactory: (() -> T)?) :
     Ambient<T> (defaultFactory) {
 
@@ -103,12 +104,12 @@ abstract class ProvidableAmbient<T> internal constructor(defaultFactory: (() -> 
  * @see ambientOf
  */
 internal class DynamicProvidableAmbient<T> constructor(
-    private val areEquivalent: (old: T, new: T) -> Boolean,
+    private val policy: SnapshotMutationPolicy<T>,
     defaultFactory: (() -> T)?
 ) : ProvidableAmbient<T>(defaultFactory) {
 
     @Composable
-    override fun provided(value: T): State<T> = state(areEquivalent) { value }.apply {
+    override fun provided(value: T): State<T> = state(policy) { value }.apply {
         this.value = value
     }
 }
@@ -118,7 +119,6 @@ internal class DynamicProvidableAmbient<T> constructor(
  *
  * @see staticAmbientOf
  */
-@Immutable
 internal class StaticProvidableAmbient<T>(defaultFactory: (() -> T)?) :
     ProvidableAmbient<T>(defaultFactory) {
 
@@ -131,13 +131,19 @@ internal class StaticProvidableAmbient<T>(defaultFactory: (() -> T)?) :
  * during recomposition will invalidate the children of [Providers] that read the value using
  * [Ambient.current].
  *
+ * @param policy a policy to determine when an ambient is considered changed. See
+ * [SnapshotMutationPolicy] for details.
+ *
  * @see Ambient
  * @see staticAmbientOf
+ * @see mutableStateOf
  */
 fun <T> ambientOf(
-    areEquivalent: (old: T, new: T) -> Boolean = ReferentiallyEqual,
+    policy: SnapshotMutationPolicy<T> =
+        @OptIn(ExperimentalComposeApi::class)
+        referentialEqualityPolicy(),
     defaultFactory: (() -> T)? = null
-): ProvidableAmbient<T> = DynamicProvidableAmbient(areEquivalent, defaultFactory)
+): ProvidableAmbient<T> = DynamicProvidableAmbient(policy, defaultFactory)
 
 /**
  * Create an ambient key that can be provided using [Providers]. Changing the value provided

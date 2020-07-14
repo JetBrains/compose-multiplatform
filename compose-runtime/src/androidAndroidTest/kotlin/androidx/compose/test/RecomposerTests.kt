@@ -21,23 +21,17 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.compose.Composable
-import androidx.compose.Recomposer
-import androidx.compose.Untracked
+import androidx.compose.ExperimentalComposeApi
 import androidx.compose.clearRoots
-import androidx.compose.compositionReference
-import androidx.compose.escapeCompose
-import androidx.compose.frames.currentFrame
 import androidx.compose.getValue
 import androidx.compose.invalidate
 import androidx.compose.key
 import androidx.compose.mutableStateOf
 import androidx.compose.remember
 import androidx.compose.setValue
+import androidx.compose.snapshots.currentSnapshot
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import androidx.ui.core.LayoutNode
-import androidx.ui.core.subcomposeInto
-import androidx.ui.node.UiComposer
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertNotSame
@@ -50,8 +44,6 @@ import org.junit.runner.RunWith
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class RecomposerTests : BaseComposeTest() {
-    val composer: UiComposer get() = error("should not be called")
-
     @After
     fun teardown() {
         clearRoots()
@@ -431,28 +423,13 @@ class RecomposerTests : BaseComposeTest() {
     }
 
     @Test
+    @OptIn(ExperimentalComposeApi::class)
     fun testFrameTransition() {
-        var frameId: Int? = null
+        var snapshotId: Int? = null
         compose {
-            frameId = currentFrame().id
+            snapshotId = currentSnapshot().id
         }.then {
-            assertNotSame(frameId, currentFrame().id)
-        }
-    }
-
-    @Composable
-    fun subCompose(block: @Composable () -> Unit) {
-        val container =
-            remember { escapeCompose { LayoutNode() } }
-        val reference = compositionReference()
-        // TODO(b/150390669): Review use of @Untracked
-        subcomposeInto(
-            activityRule.activity,
-            container,
-            Recomposer.current(),
-            reference
-        ) @Untracked {
-            block()
+            assertNotSame(snapshotId, currentSnapshot().id)
         }
     }
 }
@@ -493,13 +470,13 @@ fun printView(view: View, indent: Int, sb: StringBuilder) {
     val name = view.javaClass.simpleName
     val attributes = printAttributes(view)
     if (view is ViewGroup && view.childCount > 0) {
-        sb.appendln("$whitespace<$name$attributes>")
+        sb.appendLine("$whitespace<$name$attributes>")
         for (i in 0 until view.childCount) {
             printView(view.getChildAt(i), indent + 4, sb)
         }
-        sb.appendln("$whitespace</$name>")
+        sb.appendLine("$whitespace</$name>")
     } else {
-        sb.appendln("$whitespace<$name$attributes />")
+        sb.appendLine("$whitespace<$name$attributes />")
     }
 }
 

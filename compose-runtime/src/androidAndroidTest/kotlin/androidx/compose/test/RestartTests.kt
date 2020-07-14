@@ -19,12 +19,12 @@ package androidx.compose.test
 import android.os.Debug
 import android.widget.TextView
 import androidx.compose.Composable
-import androidx.compose.Direct
+import androidx.compose.ComposableContract
 import androidx.compose.clearRoots
 import androidx.compose.mutableStateOf
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
-import androidx.ui.node.UiComposer
 import junit.framework.TestCase
 import org.junit.After
 import org.junit.Rule
@@ -38,8 +38,6 @@ import kotlin.test.assertTrue
 @RunWith(AndroidJUnit4::class)
 class RestartTests : BaseComposeTest() {
 
-    val composer: UiComposer get() = error("should not be called")
-
     @After
     fun teardown() {
         clearRoots()
@@ -52,12 +50,10 @@ class RestartTests : BaseComposeTest() {
     fun restart_PersonModel_lambda() {
         val tvIdName = 90
         val tvIdAge = 91
-        val president = frame {
-            Person(
-                PRESIDENT_NAME_1,
-                PRESIDENT_AGE_1
-            )
-        }
+        val president = Person(
+            PRESIDENT_NAME_1,
+            PRESIDENT_AGE_1
+        )
 
         compose {
             RestartGroup {
@@ -84,12 +80,10 @@ class RestartTests : BaseComposeTest() {
     fun restart_PersonModel_lambda_parameters() {
         val tvIdNameBase = 90
         val tvIdAgeBase = 100
-        val president = frame {
-            Person(
-                PRESIDENT_NAME_1,
-                PRESIDENT_AGE_1
-            )
-        }
+        val president = Person(
+            PRESIDENT_NAME_1,
+            PRESIDENT_AGE_1
+        )
 
         compose {
             Repeat(5) { index ->
@@ -120,12 +114,10 @@ class RestartTests : BaseComposeTest() {
     fun restart_PersonModel_function() {
         val tvIdName = 90
         val tvIdAge = 91
-        val president = frame {
-            Person(
-                PRESIDENT_NAME_1,
-                PRESIDENT_AGE_1
-            )
-        }
+        val president = Person(
+            PRESIDENT_NAME_1,
+            PRESIDENT_AGE_1
+        )
 
         @Composable fun PersonView() {
             TextView(id = tvIdName, text = president.name)
@@ -151,6 +143,7 @@ class RestartTests : BaseComposeTest() {
     }
 
     @Test
+    @FlakyTest(bugId = 160876771)
     fun allocation_Test() {
         allocationCounting {
             compose {
@@ -170,9 +163,7 @@ class RestartTests : BaseComposeTest() {
     @Test
     fun restart_State_delete() {
         val tvStateId = 101
-        val state = frame {
-            mutableStateOf(true)
-        }
+        val state = mutableStateOf(true)
 
         @Composable fun ShowSomething() {
             TextView(id = tvStateId, text = "State = ${state.value}")
@@ -209,12 +200,10 @@ class RestartTests : BaseComposeTest() {
     fun restart_PersonModel_function_parameters() {
         val tvIdNameBase = 90
         val tvIdAgeBase = 100
-        val president = frame {
-            Person(
-                PRESIDENT_NAME_1,
-                PRESIDENT_AGE_1
-            )
-        }
+        val president = Person(
+            PRESIDENT_NAME_1,
+            PRESIDENT_AGE_1
+        )
 
         @Composable fun PersonView(index: Int) {
             TextView(id = tvIdNameBase + index, text = president.name)
@@ -263,7 +252,7 @@ fun Nothing() {
 }
 
 @Composable
-@Direct
+@ComposableContract(restartable = false)
 fun DirectNothing() {
 }
 

@@ -61,7 +61,11 @@ class LambdaMemoizationTests : AbstractLoweringTests() {
             fun Example(model: String) {
               class Nested {
                 // Should not memoize the initializer
-                val lambda: () -> Unit = { }
+                val lambda: () -> Unit
+                  get() {
+                    val capturedParameter = Math.random()
+                    return { capturedParameter }
+                  }
               }
               val n = Nested()
               ValidateModel(model)
@@ -664,7 +668,7 @@ class LambdaMemoizationTests : AbstractLoweringTests() {
         @Composable
         fun Example(model: String) {
           workToBeRepeated()
-          Wrapper @Untracked {
+          Wrapper @ComposableContract(tracked = false) {
             workToBeAvoided()
             ValidateModel(model)
           }
@@ -735,7 +739,11 @@ class LambdaMemoizationTests : AbstractLoweringTests() {
                 @Composable
                 fun TestHost() {
                    println("START: Iteration - ${'$'}iterations")
-                   Button(id=42, onClick=invalidate)
+                   val recompose = invalidate
+                   emitView(::Button) { 
+                     it.id=42 
+                     it.setOnClickListener(View.OnClickListener { recompose() })
+                   }
                    Example("Iteration ${'$'}iterations")
                    println("END  : Iteration - ${'$'}iterations")
                    validate()

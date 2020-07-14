@@ -47,12 +47,12 @@ android {
 dependencies {
     kotlinPlugin project(path: ":compose:compose-compiler")
 
-    androidTestImplementation(project(":compose:compose-runtime"))
-    androidTestImplementation(project(":ui:ui-core"))
-    androidTestImplementation(project(":ui:ui-text-core"))
-    androidTestImplementation(project(":ui:ui-layout"))
-    androidTestImplementation(project(":ui:ui-material"))
-    androidTestImplementation(project(":ui:ui-foundation"))
+    androidTestImplementation(project(":compose:runtime:runtime"))
+    androidTestImplementation(project("::compose:ui:ui"))
+    androidTestImplementation(project(":compose:ui:ui-text"))
+    androidTestImplementation(project(":compose:foundation:foundation-layout"))
+    androidTestImplementation(project(":compose:material:material"))
+    androidTestImplementation(project(":compose:foundation:foundation"))
 
     androidTestImplementation(JUNIT)
     androidTestImplementation(ANDROIDX_TEST_EXT_JUNIT)

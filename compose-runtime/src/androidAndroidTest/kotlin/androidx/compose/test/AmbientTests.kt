@@ -14,28 +14,29 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalComposeApi::class)
 package androidx.compose.test
 
 import android.widget.TextView
 import androidx.compose.Ambient
 import androidx.compose.Composable
+import androidx.compose.ComposableContract
 import androidx.compose.CompositionReference
-import androidx.compose.Observe
+import androidx.compose.ExperimentalComposeApi
 import androidx.compose.Providers
 import androidx.compose.Recomposer
-import androidx.compose.StructurallyEqual
-import androidx.compose.Untracked
 import androidx.compose.ambientOf
 import androidx.compose.compositionReference
-import androidx.compose.escapeCompose
 import androidx.compose.invalidate
 import androidx.compose.remember
 import androidx.compose.staticAmbientOf
+import androidx.compose.structuralEqualityPolicy
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.ui.core.ExperimentalLayoutNodeApi
 import androidx.ui.core.LayoutNode
 import androidx.ui.core.subcomposeInto
-import androidx.ui.node.UiComposer
+import androidx.ui.viewinterop.emitView
 import org.junit.After
 import org.junit.Rule
 import org.junit.Test
@@ -64,11 +65,9 @@ val someStaticInt = staticAmbientOf { 40 }
 @RunWith(AndroidJUnit4::class)
 class AmbientTests : BaseComposeTest() {
 
-    val composer: UiComposer get() = error("should not be called")
-
     @Composable
     fun Text(value: String, id: Int = 100) {
-        TextView(id = id, text = value)
+        emitView(::TextView) { it.id = id; it.text = value; }
     }
 
     @Composable
@@ -465,8 +464,7 @@ class AmbientTests : BaseComposeTest() {
     fun providingANewDataClassValueShouldNotRecompose() {
         val invalidates = mutableListOf<() -> Unit>()
         fun doInvalidate() = invalidates.forEach { it() }.also { invalidates.clear() }
-        val someDataAmbient =
-            ambientOf(StructurallyEqual) { SomeData() }
+        val someDataAmbient = ambientOf(structuralEqualityPolicy()) { SomeData() }
         var composed = false
 
         @Composable
@@ -497,27 +495,8 @@ class AmbientTests : BaseComposeTest() {
     @After
     fun ensureNoSubcomposePending() {
         activityRule.activity.uiThread {
-            val pendingChanges = with(Recomposer.current()) {
-                hasPendingChanges() && hasInvalidations()
-            }
-
-            assertTrue(!pendingChanges, "Pending changes detected after test completed")
-        }
-    }
-
-    @Composable
-    fun subCompose(block: @Composable () -> Unit) {
-        val container =
-            remember { escapeCompose { LayoutNode() } }
-        val reference = compositionReference()
-        // TODO(b/150390669): Review use of @Untracked
-        subcomposeInto(
-            activityRule.activity,
-            container,
-            Recomposer.current(),
-            reference
-        ) @Untracked {
-            block()
+            val hasPendingChanges = Recomposer.current().hasPendingChanges()
+            assertTrue(!hasPendingChanges, "Pending changes detected after test completed")
         }
     }
 
@@ -530,17 +509,18 @@ class AmbientTests : BaseComposeTest() {
     }
 
     @Composable fun deferredSubCompose(block: @Composable () -> Unit): () -> Unit {
-        val container = remember { escapeCompose { LayoutNode() } }
+        @OptIn(ExperimentalLayoutNodeApi::class)
+        val container = remember { LayoutNode() }
         val ref = Ref<CompositionReference>()
         narrowInvalidateForReference(ref = ref)
         return {
-            // TODO(b/150390669): Review use of @Untracked
+            @OptIn(ExperimentalComposeApi::class)
+            // TODO(b/150390669): Review use of @ComposableContract(tracked = false)
             subcomposeInto(
-                activityRule.activity,
                 container,
                 Recomposer.current(),
                 ref.value
-            ) @Untracked {
+            ) @ComposableContract(tracked = false) {
                 block()
             }
         }

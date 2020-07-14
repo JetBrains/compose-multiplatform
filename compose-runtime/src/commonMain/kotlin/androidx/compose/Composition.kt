@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+@file:OptIn(InternalComposeApi::class)
 package androidx.compose
 
 /**
@@ -51,6 +52,7 @@ interface Composition {
  * @param parent The parent composition reference, if applicable. Default is null.
  * @param composerFactory The factory used to created a [Composer] to be used by the composition.
  */
+@Deprecated("Use the compositionFor(...) overload that accepts an Applier<N>")
 fun compositionFor(
     container: Any,
     recomposer: Recomposer,
@@ -65,28 +67,42 @@ fun compositionFor(
 /**
  * This method is the way to initiate a composition. Optionally, a [parent]
  * [CompositionReference] can be provided to make the composition behave as a sub-composition of
- * the parent.  The children of [container] will be updated and maintained by the time this
- * method returns.
+ * the parent.
  *
- * It is important to call [Composition.dispose] whenever this [container] is no longer needed in
+ * It is important to call [Composition.dispose] whenever this [key] is no longer needed in
  * order to release resources.
  *
- * @param container The container whose content is being composed.
+ * @sample androidx.compose.samples.CustomTreeComposition
+ *
+ * @param key The object this composition will be tied to. Only one [Composition] will be created
+ * for a given [key]. If the same [key] is passed in subsequent calls, the same [Composition]
+ * instance will be returned.
+ * @param applier The [Applier] instance to be used in the composition.
+ * @param recomposer The [Recomposer] instance to be used for composition.
  * @param parent The parent composition reference, if applicable. Default is null.
- * @param composerFactory The factory used to created a [Composer] to be used by the composition.
+ * @param onCreated A function which will be executed only when the Composition is created.
+ *
+ * @see Applier
+ * @see Composition
+ * @see Recomposer
  */
-@Deprecated(
-    "Specify the Recomposer explicitly",
-    ReplaceWith(
-        "compositionFor(container, Recomposer.current(), parent, composerFactory)",
-        "androidx.compose.Recomposer"
-    )
-)
+@ExperimentalComposeApi
 fun compositionFor(
-    container: Any,
+    key: Any,
+    applier: Applier<*>,
+    recomposer: Recomposer,
     parent: CompositionReference? = null,
-    composerFactory: (SlotTable, Recomposer) -> Composer<*>
-): Composition = compositionFor(container, Recomposer.current(), parent, composerFactory)
+    onCreated: () -> Unit = {}
+): Composition = Compositions.findOrCreate(key) {
+    CompositionImpl(
+        recomposer,
+        parent,
+        composerFactory = { slots, rcmpsr -> Composer(slots, applier, rcmpsr) },
+        onDispose = { Compositions.onDisposed(key) }
+    ).also {
+        onCreated()
+    }
+}
 
 /**
  * @param parent An optional reference to the parent composition.
@@ -97,7 +113,7 @@ private class CompositionImpl(
     private val recomposer: Recomposer,
     parent: CompositionReference?,
     composerFactory: (SlotTable, Recomposer) -> Composer<*>,
-    private val onDispose: (() -> Unit)
+    private val onDispose: () -> Unit
 ) : Composition {
     private val slotTable: SlotTable = SlotTable()
     private val composer: Composer<*> = composerFactory(slotTable, recomposer).also {
@@ -117,22 +133,15 @@ private class CompositionImpl(
     override fun setContent(content: @Composable () -> Unit) {
         check(!disposed) { "The composition is disposed" }
         this.composable = content
-        recomposer.recompose(composable, composer)
+        recomposer.composeInitial(composable, composer)
     }
 
     override fun dispose() {
         if (!disposed) {
-            setContent(emptyContent())
-            slotTable.read { reader ->
-                for (index in 0 until slotTable.size) {
-                    val value = reader.get(index)
-                    if (value is RecomposeScope) {
-                        value.inTable = false
-                    }
-                }
-            }
-            onDispose()
             disposed = true
+            composable = emptyContent()
+            composer.dispose()
+            onDispose()
         }
     }
 }

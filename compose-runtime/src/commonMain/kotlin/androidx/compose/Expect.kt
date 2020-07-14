@@ -52,20 +52,11 @@ expect open class ReferenceQueue<T>() {
     open fun poll(): Reference<out T>?
 }
 
-expect class Looper
-
-internal expect fun isMainThread(): Boolean
-
-internal expect object LooperWrapper {
-    fun getMainLooper(): Looper
-}
-
-internal expect class Handler(looper: Looper) {
-    fun postAtFrontOfQueue(block: () -> Unit): Boolean
-}
-
-expect interface ChoreographerFrameCallback {
-    fun doFrame(frameTimeNanos: Long)
+expect class AtomicReference<V>(value: V) {
+    fun get(): V
+    fun set(value: V)
+    fun getAndSet(value: V): V
+    fun compareAndSet(expect: V, newValue: V): Boolean
 }
 
 internal expect class BuildableMapBuilder<K, V> : MutableMap<K, V> {
@@ -83,13 +74,28 @@ internal inline fun <K, V> BuildableMap<K, V>.mutate(
 
 internal expect fun <K, V> buildableMapOf(): BuildableMap<K, V>
 
-internal expect fun createRecomposer(): Recomposer
-
-internal expect object Choreographer {
-    fun postFrameCallback(callback: ChoreographerFrameCallback)
-    fun postFrameCallbackDelayed(delayMillis: Long, callback: ChoreographerFrameCallback)
-    fun removeFrameCallback(callback: ChoreographerFrameCallback)
+internal expect class BuildableListBuilder<T> : MutableList<T> {
+    fun build(): BuildableList<T>
 }
+
+internal expect class BuildableList<T> : List<T> {
+    internal fun builder(): BuildableListBuilder<T>
+    internal fun add(element: T): BuildableList<T>
+    internal fun add(index: Int, element: T): BuildableList<T>
+    internal fun addAll(elements: Collection<T>): BuildableList<T>
+    internal fun remove(element: T): BuildableList<T>
+    internal fun removeAll(elements: Collection<T>): BuildableList<T>
+    internal fun removeAt(index: Int): BuildableList<T>
+    internal fun set(index: Int, element: T): BuildableList<T>
+}
+
+internal expect fun <T> buildableListOf(): BuildableList<T>
+
+internal inline fun <T> BuildableList<T>.mutate(
+    mutator: (MutableList<T>) -> Unit
+): BuildableList<T> = builder().apply(mutator).build()
+
+expect class UnsupportedOperationException
 
 @MustBeDocumented
 @Retention(AnnotationRetention.BINARY)
@@ -103,7 +109,9 @@ expect annotation class MainThread()
 @Retention(AnnotationRetention.SOURCE)
 @Target(
     AnnotationTarget.FUNCTION,
-    AnnotationTarget.CONSTRUCTOR
+    AnnotationTarget.CONSTRUCTOR,
+    AnnotationTarget.PROPERTY_GETTER,
+    AnnotationTarget.PROPERTY_SETTER
 )
 expect annotation class TestOnly()
 
@@ -114,4 +122,12 @@ expect annotation class TestOnly()
 @MustBeDocumented
 expect annotation class CheckResult(
     val suggest: String
+)
+
+// Array<T>.sortWith(comparator, fromIndex, toIndex) is only available on jvm and native
+internal expect fun <T> sortArrayWith(
+    array: Array<T>,
+    comparator: Comparator<T>,
+    fromIndex: Int,
+    toIndex: Int
 )

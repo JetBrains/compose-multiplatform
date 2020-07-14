@@ -23,15 +23,23 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertTrue
 import android.app.Activity
+import android.os.Looper
 import android.view.ViewGroup
-import androidx.compose.Choreographer
 import androidx.compose.ChoreographerFrameCallback
 import androidx.compose.Composable
+import androidx.compose.ComposableContract
 import androidx.compose.Composition
-import androidx.compose.FrameManager
-import androidx.compose.Looper
-import androidx.test.rule.ActivityTestRule
+import androidx.compose.ExperimentalComposeApi
+import androidx.compose.Providers
+import androidx.compose.Recomposer
+import androidx.compose.compositionReference
+import androidx.compose.remember
+import androidx.compose.snapshots.Snapshot
+import androidx.ui.core.ContextAmbient
+import androidx.ui.core.ExperimentalLayoutNodeApi
+import androidx.ui.core.LayoutNode
 import androidx.ui.core.setViewContent
+import androidx.ui.core.subcomposeInto
 
 class TestActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,7 +49,8 @@ class TestActivity : Activity() {
         })
     }
 }
-fun makeTestActivityRule() = ActivityTestRule(TestActivity::class.java)
+@Suppress("DEPRECATION")
+fun makeTestActivityRule() = androidx.test.rule.ActivityTestRule(TestActivity::class.java)
 
 private val ROOT_ID = 18284847
 
@@ -79,7 +88,8 @@ internal fun Activity.uiThread(block: () -> Unit) {
 internal fun Activity.show(block: @Composable () -> Unit): Composition {
     var composition: Composition? = null
     uiThread {
-        FrameManager.nextFrame()
+        @OptIn(ExperimentalComposeApi::class)
+        Snapshot.sendApplyNotifications()
         composition = setViewContent(block)
     }
     return composition!!
@@ -87,40 +97,50 @@ internal fun Activity.show(block: @Composable () -> Unit): Composition {
 
 internal fun Activity.waitForAFrame() {
     if (Looper.getMainLooper() == Looper.myLooper()) {
-        throw Exception("Cannot be run from the main looper thread")
+        throw Exception("Cannot be run from the main thread")
     }
     val latch = CountDownLatch(1)
     uiThread {
-        Choreographer.postFrameCallback(object :
+        android.view.Choreographer.getInstance().postFrameCallback(object :
             ChoreographerFrameCallback {
-            override fun doFrame(frameTimeNanos: Long) = latch.countDown()
-        })
+                override fun doFrame(frameTimeNanos: Long) = latch.countDown()
+            })
     }
-    assertTrue(latch.await(1, TimeUnit.MINUTES), "Time-out waiting for choreographer frame")
+    assertTrue(latch.await(1, TimeUnit.HOURS), "Time-out waiting for choreographer frame")
 }
 
 abstract class BaseComposeTest {
 
-    abstract val activityRule: ActivityTestRule<TestActivity>
+    @Suppress("DEPRECATION")
+    abstract val activityRule: androidx.test.rule.ActivityTestRule<TestActivity>
 
     val activity get() = activityRule.activity
 
     fun compose(
         composable: @Composable () -> Unit
-    ) = UiTester(
+    ) = ComposeTester(
         activity,
         composable
     )
 
-    fun composeEmittables(
-        composable: @Composable () -> Unit
-    ) = EmittableTester(
-        activity,
-        composable
-    )
+    @Composable
+    fun subCompose(block: @Composable () -> Unit) {
+        @OptIn(ExperimentalLayoutNodeApi::class)
+        val container = remember { LayoutNode() }
+        val reference = compositionReference()
+        // TODO(b/150390669): Review use of @ComposableContract(tracked = false)
+        @OptIn(ExperimentalComposeApi::class)
+        subcomposeInto(
+            container,
+            Recomposer.current(),
+            reference
+        ) @ComposableContract(tracked = false) {
+            block()
+        }
+    }
 }
 
-sealed class ComposeTester(val activity: Activity, val composable: @Composable () -> Unit) {
+class ComposeTester(val activity: Activity, val composable: @Composable () -> Unit) {
     inner class ActiveTest(val activity: Activity, val composition: Composition) {
         fun then(block: ActiveTest.(activity: Activity) -> Unit): ActiveTest {
             activity.waitForAFrame()
@@ -135,7 +155,15 @@ sealed class ComposeTester(val activity: Activity, val composable: @Composable (
         }
     }
 
-    abstract fun initialComposition(composable: @Composable () -> Unit): Composition
+    private fun initialComposition(composable: @Composable () -> Unit): Composition {
+        return activity.show {
+            Providers(
+                ContextAmbient provides activity
+            ) {
+                composable()
+            }
+        }
+    }
 
     fun then(block: ComposeTester.(activity: Activity) -> Unit): ActiveTest {
         val composition = initialComposition(composable)
@@ -144,26 +172,5 @@ sealed class ComposeTester(val activity: Activity, val composable: @Composable (
             block(activity)
         }
         return ActiveTest(activity, composition)
-    }
-}
-
-class EmittableTester(activity: Activity, composable: @Composable () -> Unit) :
-    ComposeTester(activity, composable) {
-    override fun initialComposition(composable: @Composable () -> Unit): Composition {
-        var composition: Composition? = null
-        activity.uiThread {
-            FrameManager.nextFrame()
-            composition = activity.setEmittableContent(composable)
-        }
-        return composition!!
-    }
-}
-
-class UiTester(activity: Activity, composable: @Composable () -> Unit) :
-    ComposeTester(activity, composable) {
-    override fun initialComposition(composable: @Composable () -> Unit): Composition {
-        return activity.show {
-            composable()
-        }
     }
 }

@@ -16,40 +16,43 @@
 
 package androidx.compose.plugins.kotlin
 
-import androidx.compose.plugins.kotlin.compiler.lower.ComposableCallTransformer
+import androidx.compose.plugins.kotlin.compiler.lower.ComposableFunctionBodyTransformer
 import androidx.compose.plugins.kotlin.compiler.lower.ComposerIntrinsicTransformer
 import androidx.compose.plugins.kotlin.compiler.lower.ComposerLambdaMemoization
 import androidx.compose.plugins.kotlin.compiler.lower.ComposerParamTransformer
-import androidx.compose.plugins.kotlin.compiler.lower.ComposableFunctionBodyTransformer
-import androidx.compose.plugins.kotlin.compiler.lower.ComposeResolutionMetadataTransformer
-import androidx.compose.plugins.kotlin.frames.FrameIrTransformer
+import androidx.compose.plugins.kotlin.compiler.lower.DurableKeyVisitor
+import androidx.compose.plugins.kotlin.compiler.lower.LiveLiteralTransformer
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.backend.common.extensions.IrPluginContextImpl
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.util.DeepCopySymbolRemapper
 import org.jetbrains.kotlin.ir.util.SymbolTable
-import org.jetbrains.kotlin.ir.util.getDeclaration
 import org.jetbrains.kotlin.resolve.DelegatingBindingTrace
 
-class ComposeIrGenerationExtension : IrGenerationExtension {
+class ComposeIrGenerationExtension(
+    private val liveLiteralsEnabled: Boolean = false
+) : IrGenerationExtension {
     override fun generate(
         moduleFragment: IrModuleFragment,
         pluginContext: IrPluginContext
     ) {
         // TODO: refactor transformers to work with just BackendContext
+        @Suppress("DEPRECATION")
         val bindingTrace = DelegatingBindingTrace(pluginContext.bindingContext, "trace in " +
                 "ComposeIrGenerationExtension")
 
         // create a symbol remapper to be used across all transforms
         val symbolRemapper = DeepCopySymbolRemapper()
 
-        // add metadata from the frontend onto IR Nodes so that the metadata will travel
-        // with the ir nodes as they transform and get copied
-        ComposeResolutionMetadataTransformer(pluginContext).lower(moduleFragment)
-
-        // transform @Model classes
-        FrameIrTransformer(pluginContext).lower(moduleFragment)
+        LiveLiteralTransformer(
+            liveLiteralsEnabled,
+            DurableKeyVisitor(),
+            pluginContext,
+            symbolRemapper,
+            bindingTrace
+        ).lower(moduleFragment)
 
         // Memoize normal lambdas and wrap composable lambdas
         ComposerLambdaMemoization(pluginContext, symbolRemapper, bindingTrace).lower(moduleFragment)
@@ -76,12 +79,6 @@ class ComposeIrGenerationExtension : IrGenerationExtension {
         ).lower(moduleFragment)
 
         generateSymbols(pluginContext)
-
-        // transform composable calls and emits into their corresponding calls appealing
-        // to the composer
-        ComposableCallTransformer(pluginContext, symbolRemapper, bindingTrace).lower(moduleFragment)
-
-        generateSymbols(pluginContext)
     }
 }
 
@@ -99,11 +96,12 @@ val SymbolTable.allUnbound: List<IrSymbol>
         return r
     }
 
+@Suppress("UNUSED_PARAMETER", "DEPRECATION")
 fun generateSymbols(pluginContext: IrPluginContext) {
     lateinit var unbound: List<IrSymbol>
     val visited = mutableSetOf<IrSymbol>()
     do {
-        unbound = pluginContext.symbolTable.allUnbound
+        unbound = (pluginContext.symbolTable as SymbolTable).allUnbound
 
         for (symbol in unbound) {
             if (visited.contains(symbol)) {
@@ -111,7 +109,7 @@ fun generateSymbols(pluginContext: IrPluginContext) {
             }
             // Symbol could get bound as a side effect of deserializing other symbols.
             if (!symbol.isBound) {
-                pluginContext.irProviders.getDeclaration(symbol)
+                (pluginContext as IrPluginContextImpl).linker.getDeclaration(symbol)
             }
             if (!symbol.isBound) { visited.add(symbol) }
         }

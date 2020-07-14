@@ -25,21 +25,24 @@ import androidx.benchmark.junit4.measureRepeated
 import androidx.compose.Composable
 import androidx.compose.Composer
 import androidx.compose.Composition
-import androidx.compose.FrameManager
+import androidx.compose.ExperimentalComposeApi
+import androidx.compose.InternalComposeApi
 import androidx.compose.Recomposer
 import androidx.compose.currentComposer
-import androidx.test.rule.ActivityTestRule
+import androidx.compose.snapshots.Snapshot
 import androidx.ui.core.AndroidOwner
 import androidx.ui.core.setContent
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 
+@OptIn(ExperimentalComposeApi::class)
 abstract class ComposeBenchmarkBase {
     @get:Rule
     val benchmarkRule = BenchmarkRule()
 
+    @Suppress("DEPRECATION")
     @get:Rule
-    val activityRule = ActivityTestRule(ComposeActivity::class.java)
+    val activityRule = androidx.test.rule.ActivityTestRule(ComposeActivity::class.java)
 
     fun measureCompose(block: @Composable () -> Unit) {
         val activity = activityRule.activity
@@ -76,16 +79,25 @@ abstract class ComposeBenchmarkBase {
         val ownerView = findComposeView(activity)!!.view
         ownerView.restoreHierarchyState(SparseArray())
 
+        val composer = activeComposer
+        require(composer != null) { "Composer was null" }
         benchmarkRule.measureRepeated {
             runWithTimingDisabled {
                 receiver.updateModelCb()
-                FrameManager.nextFrame()
+                Snapshot.sendApplyNotifications()
             }
-
-            val didSomething = activeComposer?.let { composer ->
-                composer.recompose().also { composer.applyChanges() }
-            } ?: false
+            @OptIn(InternalComposeApi::class)
+            val didSomething = composer.recompose().also { composer.applyChanges() }
             assertTrue(didSomething)
+            runWithTimingDisabled {
+                receiver.resetCb()
+                Snapshot.sendApplyNotifications()
+                @OptIn(InternalComposeApi::class)
+                composer.apply {
+                    recompose()
+                    applyChanges()
+                }
+            }
         }
 
         composition.dispose()
@@ -95,9 +107,14 @@ abstract class ComposeBenchmarkBase {
 class RecomposeReceiver {
     var composeCb: @Composable () -> Unit = @Composable { }
     var updateModelCb: () -> Unit = { }
+    var resetCb: () -> Unit = {}
 
     fun compose(block: @Composable () -> Unit) {
         composeCb = block
+    }
+
+    fun reset(block: () -> Unit) {
+        resetCb = block
     }
 
     fun update(block: () -> Unit) {

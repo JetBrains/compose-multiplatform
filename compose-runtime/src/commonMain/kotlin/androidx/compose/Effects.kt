@@ -15,7 +15,6 @@
  */
 
 @file:Suppress("unused")
-
 package androidx.compose
 
 /**
@@ -63,7 +62,8 @@ internal class PreCommitScopeImpl(
 
 @PublishedApi
 internal class PostCommitScopeImpl(
-    internal val onCommit: CommitScope.() -> Unit
+    internal val onCommit: CommitScope.() -> Unit,
+    private val embeddingContext: EmbeddingContext = Recomposer.current().embeddingContext
 ) : CommitScope, CompositionLifecycleObserver, ChoreographerFrameCallback {
 
     private var disposeCallback = emptyDispose
@@ -82,7 +82,7 @@ internal class PostCommitScopeImpl(
     }
 
     override fun onEnter() {
-        Choreographer.postFrameCallback(this)
+        embeddingContext.postFrameCallback(this)
     }
 
     override fun onLeave() {
@@ -91,7 +91,7 @@ internal class PostCommitScopeImpl(
         if (hasRun) {
             disposeCallback()
         } else {
-            Choreographer.removeFrameCallback(this)
+            embeddingContext.cancelFrameCallback(this)
         }
     }
 }
@@ -144,6 +144,7 @@ fun onDispose(callback: () -> Unit) {
  * @see [onActive]
  */
 @Suppress("NOTHING_TO_INLINE")
+@OptIn(ComposeCompilerApi::class)
 @Composable
 inline fun onCommit(noinline callback: CommitScope.() -> Unit) {
     currentComposer.changed(PostCommitScopeImpl(callback))
@@ -228,6 +229,7 @@ fun onCommit(vararg inputs: Any?, callback: CommitScope.() -> Unit) {
  * @see [onActive]
  */
 @Suppress("NOTHING_TO_INLINE")
+@OptIn(ComposeCompilerApi::class)
 @Composable
 inline fun onPreCommit(noinline callback: CommitScope.() -> Unit) {
     currentComposer.changed(PreCommitScopeImpl(callback))
@@ -333,7 +335,7 @@ val invalidate: () -> Unit get() {
 /**
  * An Effect to construct a CompositionReference at the current point of composition. This can be used
  * to run a separate composition in the context of the current one, preserving ambients and propagating
- * invalidations.
+ * invalidations. When this call leaves the composition, the reference is invalidated.
  */
 @Composable
 fun compositionReference(): CompositionReference {

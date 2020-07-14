@@ -32,10 +32,10 @@ dependencies {
     implementation(KOTLIN_STDLIB)
 
     implementation project(":annotation:annotation-sampled")
-    implementation project(":compose:compose-runtime")
-    implementation project(":ui:ui-core")
-    implementation project(":ui:ui-layout")
-    implementation project(":ui:ui-material")
+    implementation project(":compose:runtime:runtime")
+    implementation project(":compose:ui:ui")
+    implementation project(":compose:foundation:foundation-layout")
+    implementation project(":compose:material:material")
 }
 
 tasks.withType(KotlinCompile).configureEach {

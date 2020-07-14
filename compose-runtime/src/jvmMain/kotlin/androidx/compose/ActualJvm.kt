@@ -18,8 +18,12 @@ package androidx.compose
 
 import kotlinx.collections.immutable.PersistentMap
 import kotlinx.collections.immutable.persistentHashMapOf
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
 
 internal actual typealias BitSet = java.util.BitSet
+
+actual typealias AtomicReference<V> = java.util.concurrent.atomic.AtomicReference<V>
 
 internal actual open class ThreadLocal<T> actual constructor(
     private val initialValue: () -> T
@@ -74,4 +78,44 @@ private val emptyPersistentMap = persistentHashMapOf<Any, Any>()
 
 @Suppress("UNCHECKED_CAST")
 internal actual fun <K, V> buildableMapOf(): BuildableMap<K, V> =
-    BuildableMap<K, V>(emptyPersistentMap as PersistentMap<K, V>)
+    BuildableMap(emptyPersistentMap as PersistentMap<K, V>)
+
+internal actual class BuildableListBuilder<T>(
+    val builder: PersistentList.Builder<T>
+) : MutableList<T> by builder {
+    actual fun build(): BuildableList<T> {
+        return BuildableList(builder.build())
+    }
+}
+
+internal actual data class BuildableList<T>(val list: PersistentList<T>) : List<T> by list {
+    internal actual fun add(element: T) = BuildableList(list.add(element))
+    internal actual fun add(index: Int, element: T) = BuildableList(list.add(index, element))
+    internal actual fun addAll(elements: Collection<T>) = BuildableList(list.addAll(elements))
+    internal actual fun remove(element: T) = BuildableList(list.remove(element))
+    internal actual fun removeAll(elements: Collection<T>) = BuildableList(list.removeAll(elements))
+    internal actual fun removeAt(index: Int) = BuildableList(list.removeAt(index))
+    internal actual fun set(index: Int, element: T) = BuildableList(list.set(index, element))
+
+    internal actual fun builder(): BuildableListBuilder<T> {
+        return BuildableListBuilder(list.builder())
+    }
+}
+
+private val emptyPersistentList = persistentListOf<Any>()
+private val emptyBuildableList = BuildableList<Any>(emptyPersistentList)
+
+@Suppress("UNCHECKED_CAST")
+internal actual fun <T> buildableListOf(): BuildableList<T> = emptyBuildableList as BuildableList<T>
+
+public actual typealias UnsupportedOperationException = java.lang.UnsupportedOperationException
+
+@Suppress("NOTHING_TO_INLINE")
+internal actual inline fun <T> sortArrayWith(
+    array: Array<T>,
+    comparator: Comparator<T>,
+    fromIndex: Int,
+    toIndex: Int
+) {
+    array.sortWith(comparator, fromIndex, toIndex)
+}

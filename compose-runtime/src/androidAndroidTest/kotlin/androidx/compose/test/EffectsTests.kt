@@ -20,7 +20,6 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.compose.Composable
 import androidx.compose.Providers
-import androidx.compose.Recompose
 import androidx.compose.State
 import androidx.compose.ambientOf
 import androidx.compose.clearRoots
@@ -35,7 +34,6 @@ import androidx.compose.setValue
 import androidx.compose.state
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import androidx.ui.node.UiComposer
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import org.junit.After
@@ -46,8 +44,6 @@ import org.junit.runner.RunWith
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class EffectsTests : BaseComposeTest() {
-
-    val composer: UiComposer get() = error("should not be called")
 
     @After
     fun teardown() {
@@ -185,13 +181,11 @@ class EffectsTests : BaseComposeTest() {
         val reader by readonly
         var writer by myState
 
-        frame {
-            writer = expected
+        writer = expected
 
-            assertEquals("state object after write", expected, myState.value)
-            assertEquals("reader after write", expected, reader)
-            assertEquals("writer after write", expected, writer)
-        }
+        assertEquals("state object after write", expected, myState.value)
+        assertEquals("reader after write", expected, reader)
+        assertEquals("writer after write", expected, writer)
     }
 
     @Test
@@ -669,12 +663,10 @@ class EffectsTests : BaseComposeTest() {
         }
 
         @Composable fun SimpleComposable() {
-            Recompose {
-                requestRecompose = it
-                Providers(MyAmbient provides ambientValue++) {
-                    SimpleComposable2()
-                    Button(id = 123)
-                }
+            requestRecompose = invalidate
+            Providers(MyAmbient provides ambientValue++) {
+                SimpleComposable2()
+                Button(id = 123)
             }
         }
 

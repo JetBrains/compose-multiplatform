@@ -14,27 +14,30 @@
  * limitations under the License.
  */
 
+@file:OptIn(
+    ExperimentalComposeApi::class,
+    InternalComposeApi::class
+)
+
 package androidx.compose
 
-import androidx.compose.frames.Frame
-import androidx.compose.frames.abortHandler
-import androidx.compose.frames.open
-import androidx.compose.frames.commit
-import androidx.compose.frames.commitHandler
-import androidx.compose.frames.currentFrame
-import androidx.compose.frames.suspend
-import androidx.compose.frames.restore
-import androidx.compose.frames.registerCommitObserver
-import androidx.compose.frames.inFrame
+import androidx.compose.snapshots.MutableSnapshot
+import androidx.compose.snapshots.Snapshot
+import androidx.compose.snapshots.SnapshotApplyResult
+import androidx.compose.snapshots.SnapshotWriteObserver
+import androidx.compose.snapshots.currentSnapshot
+import androidx.compose.snapshots.takeMutableSnapshot
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
 /**
- * The frame manager manages the priority frame in the main thread.
+ * The frame manager manages how changes to state objects are observed.
  *
- * Once the FrameManager has started there is always an open frame in the main thread. If a model
- * object is committed in any frame then the frame manager schedules the current frame to commit
- * with the Choreographer and a new frame is open. Any model objects read during composition are
- * recorded in an invalidations map. If they are mutated during a frame the recompose scope that
- * was active during the read is invalidated.
+ * The [FrameManager] observers state reads during composition and records where in the
+ * composition the state read occur. If any of the state objects are modified it will
+ * invalidate the composition causing the associated [Recomposer] to schedule a recomposition.
  */
 object FrameManager {
     private var started = false
@@ -42,19 +45,23 @@ object FrameManager {
     private var reclaimPending = false
     internal var composing = false
     private var invalidations = ObserverMap<Any, RecomposeScope>()
-    private var removeCommitObserver: (() -> Unit)? = null
-    private var immediateMap = ObserverMap<Frame, Any>()
-    private var deferredMap = ObserverMap<Frame, Any>()
+    private var removeApplyObserver: (() -> Unit)? = null
+    private var removeWriteObserver: (() -> Unit)? = null
+    private var alreadyProcessed = ObserverMap<Snapshot, Any>()
+    private var needsInvalidate = ObserverMap<Snapshot, Any>()
     private val lock = Any()
 
-    private val handler by lazy { Handler(LooperWrapper.getMainLooper()) }
+    /**
+     * TODO: This will be merged later with the scopes used by [Recomposer]
+     */
+    private val scheduleScope = CoroutineScope(Recomposer.current().embeddingContext
+        .mainThreadCompositionContext() + SupervisorJob())
 
     fun ensureStarted() {
         if (!started) {
             started = true
-            removeCommitObserver =
-                registerCommitObserver(commitObserver)
-            open()
+            removeApplyObserver = Snapshot.registerApplyObserver(applyObserver)
+            removeWriteObserver = Snapshot.registerGlobalWriteObserver(globalWriteObserver)
         }
     }
 
@@ -62,8 +69,8 @@ object FrameManager {
         synchronized(lock) {
             invalidations.clear()
         }
-        if (inFrame) commit()
-        removeCommitObserver?.let { it() }
+        removeApplyObserver?.invoke()
+        removeWriteObserver?.invoke()
         started = false
         invalidations = ObserverMap()
     }
@@ -71,14 +78,28 @@ object FrameManager {
     internal inline fun <T> composing(block: () -> T): T {
         val wasComposing = composing
         composing = true
+        val snapshot = takeMutableSnapshot(readObserver, writeObserver)
         try {
-            return block()
+            return snapshot.enter(block)
         } finally {
             composing = wasComposing
+            applyAndCheck(snapshot)
+        }
+    }
+
+    internal fun applyAndCheck(snapshot: MutableSnapshot) {
+        val applyResult = snapshot.apply()
+        if (applyResult is SnapshotApplyResult.Failure) {
+            error("Unsupported concurrent change during composition. A state object was " +
+                    "modified by composition as well as being modified outside composition.")
+            // TODO(chuckj): Consider lifting this restriction by forcing a recompose
         }
     }
 
     @TestOnly
+    @Deprecated(
+        "This is no longer needed. The frame manager no longer maintains a 'frame' in the main " +
+                "thread", replaceWith = ReplaceWith("block()"))
     fun <T> isolated(block: () -> T): T {
         ensureStarted()
         try {
@@ -89,44 +110,28 @@ object FrameManager {
     }
 
     @TestOnly
-    fun <T> unframed(block: () -> T): T {
-        if (inFrame) {
-            val frame = suspend()
-            try {
-                val result = block()
-                if (inFrame) error("An unframed block left a frame uncommitted or aborted")
-                return result
-            } finally {
-                restore(frame)
-            }
-        } else return block()
-    }
+    @Deprecated(
+        "This is no longer needed. The frame manager no longer maintains a 'frame' in the main " +
+                "thread", replaceWith = ReplaceWith("block()"))
+    fun <T> unframed(block: () -> T): T = block()
 
     /**
      * Ensure that [block] is executed in a frame. If the code is not in a frame create one for the
      * code to run in that is committed when [block] commits.
      */
-    fun <T> framed(block: () -> T): T {
-        return if (inFrame) {
-            block()
-        } else {
-            open(false)
-            try {
-                block()
-            } catch (e: Throwable) {
-                abortHandler()
-                throw e
-            } finally {
-                commitHandler()
-            }
-        }
-    }
+    @Deprecated(
+        "This is no longer needed. The frame manager no longer maintains a 'frame' in the main " +
+                "thread", replaceWith = ReplaceWith("block()"))
+    fun <T> framed(block: () -> T): T = block()
 
+    @Deprecated(
+        "The frame manager no longer manages a 'frame' in the main thread but global state does " +
+                "not send change notifications until Snapshot.applyGlobalSnapshot() is called. " +
+                "Consider calling Snapshot.sendApplyNotifications() instead.",
+        ReplaceWith("Snapshot.applyGlobalSnapshot()", "androidx.compose.snapshots.Snapshot")
+    )
     fun nextFrame() {
-        if (inFrame) {
-            commit()
-            open()
-        }
+        Snapshot.sendApplyNotifications()
     }
 
     internal fun scheduleCleanup() {
@@ -158,16 +163,17 @@ object FrameManager {
      */
     internal fun recordRead(value: Any) = readObserver(value)
 
-    private val writeObserver: (write: Any, isNew: Boolean) -> Unit = { value, isNew ->
+    private val globalWriteObserver: SnapshotWriteObserver = {
         if (!commitPending) {
             commitPending = true
             schedule {
                 commitPending = false
-                nextFrame()
+                Snapshot.sendApplyNotifications()
             }
         }
-        recordWrite(value, isNew)
     }
+
+    private val writeObserver: SnapshotWriteObserver = ::recordWrite
 
     /**
      * Records that [value], or one of its fields, was changed and the reads recorded by
@@ -176,54 +182,65 @@ object FrameManager {
      * Calling this method outside of composition is ignored. This is only intended for
      * invaliding composable lambdas while composing.
      */
-    internal fun recordWrite(value: Any, isNew: Boolean) {
-        if (!isNew && composing) {
+    internal fun recordWrite(value: Any) {
+        if (composing) {
             val currentInvalidations = synchronized(lock) {
                 invalidations.getValueOf(value)
             }
             if (currentInvalidations.isNotEmpty()) {
-                var hasDeferred = false
-                var hasImminent = false
+                var invalidateNeeeded = false
+                var processed = false
                 for (index in 0 until currentInvalidations.size) {
                     val scope = currentInvalidations[index]
                     when (scope.invalidate()) {
-                        InvalidationResult.DEFERRED -> hasDeferred = true
-                        InvalidationResult.IMMINENT -> hasImminent = true
+                        InvalidationResult.DEFERRED ->
+                            // Even if we already processed elsewhere we need to invalidate this
+                            // object because of a write after read.
+                            invalidateNeeeded = true
+                        InvalidationResult.IGNORED,
+                        InvalidationResult.IMMINENT ->
+                            // Either the write happened before the composition landed or no
+                            // reads of the state occurred during composition before the write.
+                            // In either case a valid composition was will be generated that
+                            // incorporates the change.
+                            processed = true
                         else -> { } // Nothing to do
                     }
                 }
-                if (hasDeferred || hasImminent) {
-                    val frame = currentFrame()
-                    if (hasDeferred)
-                        deferredMap.add(frame, value)
-                    if (hasImminent)
-                        immediateMap.add(frame, value)
+                if (invalidateNeeeded || processed) {
+                    val snapshot = currentSnapshot().root
+                    if (invalidateNeeeded)
+                        this.needsInvalidate.add(snapshot, value)
+                    if (processed)
+                        alreadyProcessed.add(snapshot, value)
                 }
             }
         }
     }
 
-    private val commitObserver: (committed: Set<Any>, frame: Frame) -> Unit = { committed, frame ->
-        trace("Model:commitTransaction") {
-            val currentInvalidations = synchronized(lock) {
-                val deferred = deferredMap.getValueOf(frame)
-                val immediate = immediateMap.getValueOf(frame)
-                // Ignore the object if its invalidations were all immediate for the frame.
-                invalidations[committed.filter {
-                    !immediate.contains(it) || deferred.contains(it)
-                }]
-            }
-            if (currentInvalidations.isNotEmpty()) {
-                if (!isMainThread()) {
-                    schedule {
+    private val applyObserver: (committed: Set<Any>, snapshot: Snapshot) -> Unit =
+        { committed, snapshot ->
+            trace("Model:appliedSnapshot") {
+                val currentInvalidations = synchronized(lock) {
+                    val invalidateNeeded = needsInvalidate.getValueOf(snapshot)
+                    val processed = alreadyProcessed.getValueOf(snapshot)
+                    // Ignore the object if its invalidations was already processed for this
+                    // snapshot and was not marked as needing an invalidate.
+                    invalidations[committed.filter {
+                        !processed.contains(it) || invalidateNeeded.contains(it)
+                    }]
+                }
+                if (currentInvalidations.isNotEmpty()) {
+                    if (!Recomposer.current().embeddingContext.isMainThread()) {
+                        schedule {
+                            currentInvalidations.forEach { scope -> scope.invalidate() }
+                        }
+                    } else {
                         currentInvalidations.forEach { scope -> scope.invalidate() }
                     }
-                } else {
-                    currentInvalidations.forEach { scope -> scope.invalidate() }
                 }
             }
         }
-    }
 
     /**
      * Remove all invalidation scopes not currently part of a composition
@@ -239,14 +256,37 @@ object FrameManager {
         }
     }
 
-    private fun open() {
-        open(
-            readObserver = readObserver,
-            writeObserver = writeObserver
-        )
+    /**
+     * List of deferred callbacks to run serially. Guarded by its own monitor lock.
+     */
+    private val scheduledCallbacks = mutableListOf<() -> Unit>()
+    /**
+     * Pending [Job] that will execute [scheduledCallbacks].
+     * Guarded by [scheduledCallbacks]'s monitor lock.
+     */
+    private var callbackRunner: Job? = null
+
+    /**
+     * Synchronously executes any outstanding callbacks and brings the [FrameManager] into a
+     * consistent, updated state.
+     */
+    internal fun synchronize() {
+        synchronized(scheduledCallbacks) {
+            scheduledCallbacks.forEach { it.invoke() }
+            scheduledCallbacks.clear()
+            callbackRunner?.cancel()
+            callbackRunner = null
+        }
     }
 
     private fun schedule(block: () -> Unit) {
-        handler.postAtFrontOfQueue(block)
+        synchronized(scheduledCallbacks) {
+            scheduledCallbacks.add(block)
+            if (callbackRunner == null) {
+                callbackRunner = scheduleScope.launch {
+                    synchronize()
+                }
+            }
+        }
     }
 }

@@ -16,39 +16,30 @@
 
 package androidx.compose
 
-import javax.swing.JComponent
 import javax.swing.SwingUtilities
-import kotlinx.coroutines.CoroutineScope
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.withContext
 
-actual abstract class EmbeddingUIContext
+// API to allow override embedding context creation mechanism for tests.
+var EmbeddingContextFactory: (() -> EmbeddingContext)? = null
 
-internal class SwingUIContext(val root: JComponent) : EmbeddingUIContext()
-
-actual class Looper
-
-internal actual fun isMainThread(): Boolean = SwingUtilities.isEventDispatchThread()
-
-internal actual object LooperWrapper {
-    private val mainLooper = Looper()
-    actual fun getMainLooper(): Looper = mainLooper
-}
-
-internal actual class Handler {
-    actual constructor(looper: Looper) {}
-    actual fun postAtFrontOfQueue(block: () -> Unit): Boolean {
-        SwingUtilities.invokeLater(block)
-        return true
+class SwingEmbeddingContext : EmbeddingContext {
+    override fun isMainThread(): Boolean {
+        return SwingUtilities.isEventDispatchThread()
     }
-}
 
-internal actual object Choreographer {
+    override fun mainThreadCompositionContext(): CoroutineContext {
+        return Dispatchers.Main
+    }
+
+    override fun postOnMainThread(block: () -> Unit) {
+        SwingUtilities.invokeLater(block)
+    }
+
     private val cancelled = mutableSetOf<ChoreographerFrameCallback>()
 
-    actual fun postFrameCallback(callback: ChoreographerFrameCallback) {
-        SwingUtilities.invokeLater {
+    override fun postFrameCallback(callback: ChoreographerFrameCallback) {
+        postOnMainThread {
             if (callback !in cancelled) {
                 callback.doFrame(System.currentTimeMillis() * 1000000)
             } else {
@@ -56,13 +47,13 @@ internal actual object Choreographer {
             }
         }
     }
-    actual fun postFrameCallbackDelayed(delayMillis: Long, callback: ChoreographerFrameCallback) {
-        TODO()
-    }
-    actual fun removeFrameCallback(callback: ChoreographerFrameCallback) {
+    override fun cancelFrameCallback(callback: ChoreographerFrameCallback) {
         cancelled += callback
     }
 }
+
+actual fun EmbeddingContext(): EmbeddingContext =
+    EmbeddingContextFactory?.let { it() } ?: SwingEmbeddingContext()
 
 actual interface ChoreographerFrameCallback {
     actual fun doFrame(frameTimeNanos: Long)
@@ -125,61 +116,11 @@ internal actual fun recordSourceKeyInfo(key: Any) {
     }
 }
 
+@InternalComposeApi
 actual fun keySourceInfoOf(key: Any): String? = keyInfo[key]
 
-// TODO placeholder; this should be used to await the next drawing frame for animation purposes
-internal class DesktopCompositionFrameClock : CompositionFrameClock {
-    override suspend fun <R> awaitFrameNanos(onFrame: (frameTimeNanos: Long) -> R): R =
-        withContext(Dispatchers.Main) {
-            onFrame(System.nanoTime())
-        }
-}
-
-@OptIn(InternalComposeApi::class)
-internal class DesktopRecomposer : Recomposer() {
-
-    private var frameScheduled = false
-
-    inner class Callback : Runnable {
-            @Volatile var cancelled: Boolean = false
-
-            override fun run() {
-                if (cancelled) return
-                frameScheduled = false
-                dispatchRecomposes()
-            }
-    }
-
-    private val frameCallback = Callback()
-
-    init {
-        SwingUtilities.invokeLater(Callback())
-    }
-
-    override val effectCoroutineScope: CoroutineScope =
-        CoroutineScope(SupervisorJob() + Dispatchers.Main)
-
-    override val compositionFrameClock: CompositionFrameClock = DesktopCompositionFrameClock()
-
-    override fun scheduleChangesDispatch() {
-        if (!frameScheduled) {
-            frameScheduled = true
-            SwingUtilities.invokeLater(Callback())
-        }
-    }
-
-    override fun hasPendingChanges(): Boolean = frameScheduled
-
-    override fun recomposeSync() {
-        if (frameScheduled) {
-            frameCallback.cancelled = true
-            frameCallback.run()
-        }
-    }
-}
-
-internal actual fun createRecomposer(): Recomposer {
-    return DesktopRecomposer()
+actual fun resetSourceInfo() {
+    keyInfo.clear()
 }
 
 // TODO(igotti): do we need actual processing for those?

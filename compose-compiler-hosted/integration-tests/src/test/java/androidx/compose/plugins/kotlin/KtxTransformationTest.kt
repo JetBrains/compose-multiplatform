@@ -16,29 +16,25 @@
 
 package androidx.compose.plugins.kotlin
 
-import org.junit.Ignore
-
 class KtxTransformationTest : AbstractCodegenTest() {
 
-    fun testObserveLowering() = ensureSetup { testCompile(
+    fun testObserveLowering() = ensureSetup { testCompileWithViewStubs(
         """
-            import android.widget.Button
-            import androidx.compose.*
-            import androidx.ui.androidview.adapters.setOnClick
-
-            @Model
-            class FancyButtonData() {
-                var x = 0
-            }
+            import androidx.compose.MutableState
+            import androidx.compose.mutableStateOf
 
             @Composable
             fun SimpleComposable() {
-                FancyButton(state=FancyButtonData())
+                FancyButton(state=mutableStateOf(0))
             }
 
             @Composable
-            fun FancyButton(state: FancyButtonData) {
-               Button(text=("Clicked "+state.x+" times"), onClick={state.x++}, id=42)
+            fun FancyButton(state: MutableState<Int>) {
+               Button(
+                 text=("Clicked "+state.value+" times"),
+                 onClick={state.value++},
+                 id=42
+               )
             }
         """
     ) }
@@ -54,11 +50,8 @@ class KtxTransformationTest : AbstractCodegenTest() {
         """
     ) }
 
-    fun testSingleViewCompose() = ensureSetup { testCompile(
+    fun testSingleViewCompose() = ensureSetup { testCompileWithViewStubs(
         """
-        import androidx.compose.*
-        import android.widget.*
-
         class Foo {
             @Composable
             operator fun invoke() {
@@ -68,11 +61,8 @@ class KtxTransformationTest : AbstractCodegenTest() {
         """
     ) }
 
-    fun testMultipleRootViewCompose() = ensureSetup { testCompile(
+    fun testMultipleRootViewCompose() = ensureSetup { testCompileWithViewStubs(
         """
-        import androidx.compose.*
-        import android.widget.*
-
         class Foo {
             @Composable
             operator fun invoke() {
@@ -84,11 +74,8 @@ class KtxTransformationTest : AbstractCodegenTest() {
         """
     ) }
 
-    fun testNestedViewCompose() = ensureSetup { testCompile(
+    fun testNestedViewCompose() = ensureSetup { testCompileWithViewStubs(
         """
-        import androidx.compose.*
-        import android.widget.*
-
         class Foo {
             @Composable
             operator fun invoke() {
@@ -138,11 +125,8 @@ class KtxTransformationTest : AbstractCodegenTest() {
         """
     ) }
 
-    fun testViewAndComposites() = ensureSetup { testCompile(
+    fun testViewAndComposites() = ensureSetup { testCompileWithViewStubs(
         """
-        import androidx.compose.*
-        import android.widget.*
-
         @Composable
         fun Bar() {}
 
@@ -236,28 +220,8 @@ class KtxTransformationTest : AbstractCodegenTest() {
         """
     ) }
 
-    fun testExtensionFunctions() = ensureSetup { testCompile(
+    fun testChildrenWithTypedParameters() = ensureSetup { testCompileWithViewStubs(
         """
-
-        import androidx.compose.*
-        import android.widget.*
-
-        fun LinearLayout.setSomeExtension(x: Int) {
-        }
-        class X {
-            @Composable
-            operator fun invoke() {
-                LinearLayout(someExtension=123)
-            }
-        }
-        """
-    ) }
-
-    fun testChildrenWithTypedParameters() = ensureSetup { testCompile(
-        """
-        import android.widget.*
-        import androidx.compose.*
-
         @Composable fun HelperComponent(
             children: @Composable (title: String, rating: Int) -> Unit
         ) {
@@ -278,11 +242,8 @@ class KtxTransformationTest : AbstractCodegenTest() {
         """
     ) }
 
-    fun testChildrenCaptureVariables() = ensureSetup { testCompile(
+    fun testChildrenCaptureVariables() = ensureSetup { testCompileWithViewStubs(
         """
-        import android.widget.*
-        import androidx.compose.*
-
         @Composable fun HelperComponent(children: @Composable () -> Unit) {
         }
 
@@ -357,11 +318,8 @@ class KtxTransformationTest : AbstractCodegenTest() {
         )
     }
 
-    fun testChildrenOfNativeView() = ensureSetup { testCompile(
+    fun testChildrenOfNativeView() = ensureSetup { testCompileWithViewStubs(
         """
-        import android.widget.*
-        import androidx.compose.*
-
         class MainComponent {
             @Composable
             operator fun invoke() {
@@ -374,11 +332,8 @@ class KtxTransformationTest : AbstractCodegenTest() {
         """
     ) }
 
-    fun testIrSpecial() = ensureSetup { testCompile(
+    fun testIrSpecial() = ensureSetup { testCompileWithViewStubs(
         """
-        import android.widget.*
-        import androidx.compose.*
-
         @Composable fun HelperComponent(children: @Composable () -> Unit) {}
 
         class MainComponent {
@@ -468,17 +423,6 @@ class KtxTransformationTest : AbstractCodegenTest() {
         @Composable
         fun run() {
             Obj.B()
-        }
-        """
-    ) }
-
-    fun testPackageQualifiedTags() = ensureSetup { testCompile(
-        """
-        import androidx.compose.*
-
-        @Composable
-        fun run() {
-            android.widget.TextView(text="bar")
         }
         """
     ) }
@@ -606,11 +550,8 @@ class KtxTransformationTest : AbstractCodegenTest() {
         """
     ) }
 
-    fun testKtxLambdaInIfElse() = ensureSetup { testCompile(
+    fun testKtxLambdaInIfElse() = ensureSetup { testCompileWithViewStubs(
         """
-        import androidx.compose.*
-        import android.widget.TextView
-
         @Composable
         fun foo(x: Boolean) {
             val lambda = @Composable { TextView(text="Hello World") }
@@ -652,52 +593,6 @@ class KtxTransformationTest : AbstractCodegenTest() {
         """
         )
     }
-
-    fun testKtxEmittable() = ensureSetup { testCompileEmittable(
-        """
-
-        open class MockEmittable: Emittable {
-          override fun emitInsertAt(index: Int, instance: Emittable) {}
-          override fun emitRemoveAt(index: Int, count: Int) {}
-          override fun emitMove(from: Int, to: Int, count: Int) {}
-        }
-
-        class MyEmittable: MockEmittable() {
-          var a: Int = 1
-        }
-
-        class Comp {
-            @Composable
-            fun Example() {
-                MyEmittable(a=2)
-            }
-        }
-        """
-    ) }
-
-    @Ignore("b/150394471")
-    fun xtestKtxCompoundEmittable() = ensureSetup { testCompileEmittable(
-        """
-        open class MockEmittable: Emittable {
-          override fun emitInsertAt(index: Int, instance: Emittable) {}
-          override fun emitRemoveAt(index: Int, count: Int) {}
-          override fun emitMove(from: Int, to: Int, count: Int) {}
-        }
-
-        class MyEmittable: MockEmittable() {
-          var a: Int = 1
-        }
-
-        @Composable fun Test() {
-            MyEmittable(a=1) {
-                MyEmittable(a=2)
-                MyEmittable(a=3)
-                MyEmittable(a=4)
-                MyEmittable(a=5)
-            }
-        }
-        """
-    ) }
 
     fun testInvocableObject() = ensureSetup { testCompile(
         """

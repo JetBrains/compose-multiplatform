@@ -14,11 +14,28 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION", "UNUSED_PARAMETER")
+
 package androidx.compose.frames
 
 import kotlin.jvm.JvmField
 
-class ModelList<T> : MutableList<T>, Framed {
+@Deprecated(
+    "Frames have been replaced by snapshots",
+    ReplaceWith(
+        "StableMutableList<T>",
+        "androidx.compose.StableMutableList"
+    )
+)
+class ModelList<T>
+        @Deprecated(
+            "Frames have been replaced by snapshots",
+            ReplaceWith(
+                "mutableStateListOf()",
+                "androidx.compose.mutableStateListOf"
+            )
+        )
+        constructor() : MutableList<T>, Framed {
     private var myFirst: Record =
         ArrayContainer<T>()
     override val firstFrameRecord: Record get() = myFirst
@@ -29,17 +46,9 @@ class ModelList<T> : MutableList<T>, Framed {
     }
 
     @Suppress("UNCHECKED_CAST") private val readable: ArrayContainer<T>
-        get() =
-            _readable(
-                myFirst,
-                this
-            ) as ArrayContainer<T>
+        get() = deprecated()
     @Suppress("UNCHECKED_CAST") private val writable: ArrayContainer<T>
-        get() =
-            _writable(
-                myFirst,
-                this
-            ) as ArrayContainer<T>
+        get() = deprecated()
 
     override val size: Int get() = readable.list.size
     override fun add(element: T): Boolean = writable.list.add(element)
@@ -84,26 +93,10 @@ class ModelList<T> : MutableList<T>, Framed {
         MutableListIterator<T> {
 
         private var nextCount = 0
-        private var readId = currentFrame().id
+        private var readId: Int = deprecated()
         private var currentIterator = modelList.readable.list.listIterator(index)
 
-        private fun ensureMutable(): ModelListIterator<T> {
-            val currentId = currentFrame().id
-            when (readId) {
-                currentId -> {
-                    // Convert list to being writable
-                    currentIterator = modelList.writable.list.listIterator(index)
-                    repeat(-nextCount) { currentIterator.previous() }
-                    repeat(nextCount) { currentIterator.next() }
-                    readId = -1
-                }
-                -1 -> {
-                    // Nothing to do as the currentIterator is mutable
-                }
-                else -> error("Cannot mutate a list using an iterator created in a different frame")
-            }
-            return this
-        }
+        private fun ensureMutable(): ModelListIterator<T> = deprecated()
 
         override fun hasNext(): Boolean = currentIterator.hasNext()
         override fun next(): T = currentIterator.next().also { nextCount++ }
@@ -117,11 +110,52 @@ class ModelList<T> : MutableList<T>, Framed {
     }
 }
 
-fun <T> modelListOf() = ModelList<T>()
+@Deprecated(
+    "Frames have been replaced by snapshots",
+    ReplaceWith(
+        "mutableStateListOf()",
+        "androidx.compose.mutableStateListOf"
+    ),
+    DeprecationLevel.ERROR
+)
+fun <T> modelListOf(): ModelList<T> = deprecated()
+
+@Deprecated(
+    "Frames have been replaced by snapshots",
+    ReplaceWith(
+        "mutableStateListOf(element)",
+        "androidx.compose.mutableStateListOf"
+    ),
+    DeprecationLevel.ERROR
+)
 fun <T> modelListOf(element: T) = ModelList<T>().apply { add(element) }
+
+@Deprecated(
+    "Frames have been replaced by snapshots",
+    ReplaceWith(
+        "mutableStateListOf(*elements)",
+        "androidx.compose.mutableStateListOf"
+    ),
+    DeprecationLevel.ERROR
+)
 fun <T> modelListOf(vararg elements: T) = ModelList<T>().apply { addAll(elements) }
 
-class ModelMap<K, V> : MutableMap<K, V>, Framed {
+@Deprecated(
+    "Frames have been replaced by snapshots",
+    ReplaceWith(
+        "StableMutableMap<K, V>",
+        "androidx.compose.StableMutableMap"
+    )
+)
+class ModelMap<K, V>
+    @Deprecated(
+        "Frames have been replaced by snapshots",
+        ReplaceWith(
+            "mutableStateMapOf()",
+            "androidx.compose.StableMutableMap"
+        )
+    )
+    constructor() : MutableMap<K, V>, Framed {
     private var myFirst: Record =
         MapContainer<K, V>()
     override val firstFrameRecord: Record get() = myFirst
@@ -133,16 +167,10 @@ class ModelMap<K, V> : MutableMap<K, V>, Framed {
 
     @Suppress("UNCHECKED_CAST")
     private val readable: MapContainer<K, V>
-        get() = _readable(
-            myFirst,
-            this
-        ) as MapContainer<K, V>
+        get() = deprecated()
     @Suppress("UNCHECKED_CAST")
     private val writable: MapContainer<K, V>
-        get() = _writable(
-            myFirst,
-            this
-        ) as MapContainer<K, V>
+        get() = deprecated()
 
     override val size: Int get() = readable.map.size
     override fun containsKey(key: K): Boolean = readable.map.containsKey(key)
@@ -177,8 +205,25 @@ class ModelMap<K, V> : MutableMap<K, V>, Framed {
     }
 }
 
-fun <K, V> modelMapOf() = ModelMap<K, V>()
-fun <K, V> modelMapOf(vararg pairs: Pair<K, V>) = ModelMap<K, V>().apply { putAll(pairs) }
+@Deprecated(
+    "Frames have been replaced by snapshots",
+    ReplaceWith(
+        "mutableStateMapOf()",
+        "androidx.compose.mutableStateMapOf"
+    ),
+    DeprecationLevel.ERROR
+)
+fun <K, V> modelMapOf(): ModelMap<K, V> = deprecated()
+
+@Deprecated(
+    "Frames have been replaced by snapshots",
+    ReplaceWith(
+        "mutableStateMapOf(*pairs)",
+        "androidx.compose.mutableStateMapOf"
+    ),
+    DeprecationLevel.ERROR
+)
+fun <K, V> modelMapOf(vararg pairs: Pair<K, V>): ModelMap<K, V> = deprecated()
 
 private fun error(): Nothing =
     error("Model sub-collection, iterators, lists and sets are immutable, use asMutable() first")
