@@ -461,7 +461,8 @@ class AndroidXPlugin : Plugin<Project> {
             // existing support library presubmit tests.
             fileName.replace("-debug-androidTest", "")
         } else if (project.plugins.hasPlugin(BenchmarkPlugin::class.java)) {
-            fileName.replace("-androidTest", "-androidBenchmark")
+            val name = fileName.replace("-androidTest", "-androidBenchmark")
+            "${project.asFilenamePrefix()}_$name"
         } else {
             "${project.asFilenamePrefix()}_$fileName"
         }
