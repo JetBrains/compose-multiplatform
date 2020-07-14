@@ -109,10 +109,10 @@ object LibraryGroups {
 
     object Compose {
         val ANIMATION = LibraryGroup("androidx.compose.animation", null)
-        val CORE = LibraryGroup("androidx.compose.core", null)
         val FOUNDATION = LibraryGroup("androidx.compose.foundation", null)
         val MATERIAL = LibraryGroup("androidx.compose.material", null)
         val RUNTIME = LibraryGroup("androidx.compose.runtime", null)
+        val UI = LibraryGroup("androidx.compose.ui", null)
     }
 }
 
