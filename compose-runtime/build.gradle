@@ -61,7 +61,7 @@ kotlin {
 
         commonTest.dependencies {
             implementation kotlin("test-junit")
-            implementation project(":compose:core:core")
+            implementation project(":compose:ui:ui")
         }
         androidAndroidTest.dependencies {
             implementation(ANDROIDX_TEST_EXT_JUNIT)
@@ -69,7 +69,7 @@ kotlin {
             implementation(ANDROIDX_TEST_RUNNER)
             implementation(TRUTH)
             implementation project(':ui:ui-test')
-            implementation project(':compose:core:core')
+            implementation project(':compose:ui:ui')
         }
     }
 }
