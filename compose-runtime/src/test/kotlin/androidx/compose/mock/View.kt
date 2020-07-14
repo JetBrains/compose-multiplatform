@@ -29,12 +29,12 @@ open class View {
         indent(indent, builder)
         builder.append("<$name$attributesAsString")
         if (children.size > 0) {
-            builder.appendln(">")
+            builder.appendLine(">")
             children.forEach { it.render(indent + 2, builder) }
             indent(indent, builder)
-            builder.appendln("</$name>")
+            builder.appendLine("</$name>")
         } else {
-            builder.appendln(" />")
+            builder.appendLine(" />")
         }
     }
 

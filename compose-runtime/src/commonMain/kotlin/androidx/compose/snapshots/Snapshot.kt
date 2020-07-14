@@ -1347,6 +1347,7 @@ private val threadSnapshot = ThreadLocal<Snapshot>()
 internal val lock = Any()
 
 @PublishedApi
+@Suppress("DEPRECATION_ERROR")
 internal inline fun <T> sync(block: () -> T): T = synchronized(lock, block)
 
 // The following variables should only be written when sync is taken

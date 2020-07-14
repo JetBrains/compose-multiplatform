@@ -470,13 +470,13 @@ fun printView(view: View, indent: Int, sb: StringBuilder) {
     val name = view.javaClass.simpleName
     val attributes = printAttributes(view)
     if (view is ViewGroup && view.childCount > 0) {
-        sb.appendln("$whitespace<$name$attributes>")
+        sb.appendLine("$whitespace<$name$attributes>")
         for (i in 0 until view.childCount) {
             printView(view.getChildAt(i), indent + 4, sb)
         }
-        sb.appendln("$whitespace</$name>")
+        sb.appendLine("$whitespace</$name>")
     } else {
-        sb.appendln("$whitespace<$name$attributes />")
+        sb.appendLine("$whitespace<$name$attributes />")
     }
 }
 
