@@ -32,6 +32,7 @@ private const val SLOTS_PER_INT = 15
 class ComposableLambdaN<R>(
     val key: Int,
     private val tracked: Boolean,
+    private val sourceInformation: String?,
     override val arity: Int
 ) : FunctionN<R> {
     private var _block: Any? = null
@@ -63,7 +64,7 @@ class ComposableLambdaN<R>(
         val c = args[realParams] as Composer<*>
         val allArgsButLast = args.slice(0 until args.size - 1).toTypedArray()
         val lastChanged = args[args.size - 1] as Int
-        c.startRestartGroup(key)
+        c.startRestartGroup(key, sourceInformation)
         val dirty = lastChanged or if (c.changed(this))
             differentBits(realParams)
         else
@@ -97,13 +98,14 @@ fun composableLambdaN(
     composer: Composer<*>,
     key: Int,
     tracked: Boolean,
+    sourceInformation: String?,
     arity: Int,
     block: Any
 ): ComposableLambdaN<*> {
     composer.startReplaceableGroup(key)
     val slot = composer.nextSlot()
     val result = if (slot === SlotTable.EMPTY) {
-        val value = ComposableLambdaN<Any>(key, tracked, arity)
+        val value = ComposableLambdaN<Any>(key, tracked, sourceInformation, arity)
         composer.updateValue(value)
         value
     } else {
@@ -122,4 +124,9 @@ fun composableLambdaNInstance(
     tracked: Boolean,
     arity: Int,
     block: Any
-): ComposableLambdaN<*> = ComposableLambdaN<Any>(key, tracked, arity).apply { update(block) }
+): ComposableLambdaN<*> = ComposableLambdaN<Any>(
+    key,
+    tracked,
+    null,
+    arity
+).apply { update(block) }
