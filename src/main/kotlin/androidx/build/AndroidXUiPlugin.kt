@@ -52,7 +52,7 @@ class AndroidXUiPlugin : Plugin<Project> {
                     project.dependencies.add(
                         "lintChecks",
                         project.dependencies.project(mapOf(
-                            "path" to ":ui:ui-internal-lint-checks", "configuration" to "shadow"
+                            "path" to ":compose:internal-lint-checks", "configuration" to "shadow"
                         ))
                     )
 
@@ -66,11 +66,14 @@ class AndroidXUiPlugin : Plugin<Project> {
                     val conf = project.configurations.create("kotlinPlugin")
 
                     project.tasks.withType(KotlinCompile::class.java).configureEach { compile ->
-                        // TODO: remove when this is enabled by default in Kotlin 1.4
+                        // TODO(b/157230246): remove when this is enabled by default in Kotlin 1.4
                         compile.kotlinOptions.freeCompilerArgs +=
                             "-XXLanguage:+NonParenthesizedAnnotationsOnFunctionalTypes"
                         compile.kotlinOptions.freeCompilerArgs +=
                             listOf("-P", "plugin:androidx.compose.plugins.idea:enabled=true")
+                        // TODO(b/157230235): remove when this is enabled by default
+                        compile.kotlinOptions.freeCompilerArgs +=
+                            "-Xopt-in=kotlin.RequiresOptIn"
                         compile.dependsOn(conf)
                         compile.doFirst {
                             if (!conf.isEmpty) {
@@ -102,18 +105,22 @@ private fun Project.configureForMultiplatform() {
     // Android Studio on versions >= 4.0canary8)
     libraryExtension.apply {
         sourceSets.findByName("main")?.apply {
-            java.srcDirs("src/commonMain/kotlin", "src/jvmMain/kotlin", "src/androidMain/kotlin")
+            java.srcDirs("src/commonMain/kotlin", "src/jvmMain/kotlin",
+                "src/androidMain/kotlin")
+            res.srcDirs("src/androidMain/res")
         }
         sourceSets.findByName("test")?.apply {
-            java.srcDirs("src/unitTest/kotlin")
+            java.srcDirs("src/test/kotlin")
+            res.srcDirs("src/test/res")
         }
         sourceSets.findByName("androidTest")?.apply {
             java.srcDirs("src/androidAndroidTest/kotlin")
+            res.srcDirs("src/androidAndroidTest/res")
         }
     }
 
     /*
-    The following configures test source sets - there are two changes here:
+    The following configures source sets - note:
 
     1. The common unit test source set, commonTest, is included by default in both android
     unit and instrumented tests. This causes unnecessary duplication, so we explicitly do
@@ -123,17 +130,11 @@ private fun Project.configureForMultiplatform() {
 
     2. The default (android) unit test source set is named 'androidTest', which conflicts / is
     confusing as this shares the same name / expected directory as AGP's 'androidTest', which
-    represents _instrumented_ tests. As a result, instead we use 'unitTest' as the chosen
-    directory / sourceSet name here, and make 'androidTest' depend on 'unitTest' so the
-    multiplatform plugin is aware of it.
+    represents _instrumented_ tests.
     TODO: Consider changing unitTest to androidLocalTest and androidAndroidTest to
     androidDeviceTest when https://github.com/JetBrains/kotlin/pull/2829 rolls in.
     */
     multiplatformExtension!!.sourceSets {
-        // Create a new 'unitTest' source set - this is where we will put our unit test source.
-        // Make 'androidTest' depend on 'unitTest', so MPP is still aware of these unit tests.
-        findByName("androidTest")?.dependsOn(create("unitTest"))
-
         // Allow all experimental APIs, since MPP projects are themselves experimental
         (this as DomainObjectCollection<KotlinSourceSet>).all {
             it.languageSettings.apply {

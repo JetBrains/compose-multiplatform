@@ -19,11 +19,13 @@ package androidx.build.uptodatedness
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.execution.TaskExecutionGraph
+import org.gradle.kotlin.dsl.extra
 import java.io.File
 import java.util.Date
 
 /**
- * Validates that all tasks (except a temporary whitelist) are considered up-to-date.
+ * Validates that all tasks (except a temporary exception list) are considered up-to-date.
  * The expected usage of this is that the user will invoke a build with the
  * TaskUpToDateValidator disabled, and then reinvoke the same build with the TaskUpToDateValidator
  * enabled. If the second build actually runs any tasks, then some tasks don't have the correct
@@ -33,8 +35,10 @@ import java.util.Date
 const val DISALLOW_TASK_EXECUTION_FLAG_NAME = "disallowExecution"
 const val RECORD_FLAG_NAME = "verifyUpToDate"
 
-// Temporary whitelist of tasks that are known to still be out-of-date after running once
-val EXEMPT_TASK_NAMES = setOf(
+// Temporary list of exempt tasks that are known to still be out-of-date after running once
+// Entries in this set may be task names (like assembleDebug) or task paths
+// (like :core:core:assembleDebug)
+val EXEMPT_TASKS = setOf(
     "buildOnServer",
     "checkExternalLicenses",
     "createArchive",
@@ -69,6 +73,7 @@ val EXEMPT_TASK_NAMES = setOf(
     "lintVitalRelease",
     "partiallyDejetifyArchive",
     "postInstrumentCode",
+    "properties",
     "publishBenchmarkPluginMarkerMavenPublicationToMavenRepository",
     "publishDesktopPublicationToMavenRepository",
     "publishKotlinMultiplatformPublicationToMavenRepository",
@@ -89,10 +94,15 @@ val EXEMPT_TASK_NAMES = setOf(
     "unzipDokkaPublicDocsDeps",
     "verifyDependencyVersions",
     "verifyReleaseResources",
-    "zipEcFiles"
+    "zipEcFiles",
+
+    ":camera:integration-tests:camera-testapp-view:mergeLibDexDebug",
+    ":camera:integration-tests:camera-testapp-view:packageDebug"
 )
 class TaskUpToDateValidator {
     companion object {
+
+        private val BUILD_START_TIME_KEY = "taskUpToDateValidatorSetupTime"
 
         private fun shouldRecord(project: Project): Boolean {
             return project.hasProperty(RECORD_FLAG_NAME) && !shouldValidate(project)
@@ -103,19 +113,29 @@ class TaskUpToDateValidator {
         }
 
         private fun isExemptTask(task: Task): Boolean {
-            return EXEMPT_TASK_NAMES.contains(task.name)
+            return EXEMPT_TASKS.contains(task.name) || EXEMPT_TASKS.contains(task.path)
+        }
+
+        private fun recordBuildStartTime(rootProject: Project) {
+            rootProject.extra.set(BUILD_START_TIME_KEY, Date())
+        }
+
+        private fun getBuildStartTime(project: Project): Date {
+            return project.rootProject.extra.get(BUILD_START_TIME_KEY) as Date
         }
 
         fun setup(rootProject: Project) {
+            recordBuildStartTime(rootProject)
             if (shouldValidate(rootProject)) {
-                rootProject.gradle.taskGraph.afterTask { task ->
+                val taskGraph = rootProject.gradle.taskGraph
+                taskGraph.afterTask { task ->
                     if (task.didWork) {
                         if (!isExemptTask(task)) {
-                            val message = "Error: executed $task but " +
-                                DISALLOW_TASK_EXECUTION_FLAG_NAME +
-                                " was specified. This indicates that $task does not declare" +
+                            val message = "Ran two consecutive builds of the same tasks," +
+                                " and in the second build, observed $task to be not UP-TO-DATE." +
+                                " This indicates that $task does not declare" +
                                 " inputs and/or outputs correctly.\n" +
-                                tryToExplainTaskExecution(task)
+                                tryToExplainTaskExecution(task, taskGraph)
                             throw GradleException(message)
                         }
                     }
@@ -161,7 +181,7 @@ class TaskUpToDateValidator {
             }
             return addedMessage + removedMessage
         }
-        fun tryToExplainTaskExecution(task: Task): String {
+        fun tryToExplainTaskExecution(task: Task, taskGraph: TaskExecutionGraph): String {
             val numOutputFiles = task.outputs.files.files.size
             val outputsMessage = if (numOutputFiles > 0) {
                 task.path + " declares " + numOutputFiles + " output files. This seems fine.\n"
@@ -188,8 +208,9 @@ class TaskUpToDateValidator {
                 if (lastModifiedFile != null) {
                     task.path + " declares " + inputFiles.size + " input files. The " +
                         "last modified input file is\n" + lastModifiedFile + "\nmodified at " +
-                        lastModifiedWhen + ". " +
-                        tryToExplainFileModification(lastModifiedFile, task)
+                        lastModifiedWhen + " (this build started at about " +
+                        getBuildStartTime(task.project) + "). " +
+                        tryToExplainFileModification(lastModifiedFile, taskGraph)
                 } else {
                     task.path + " declares " + inputFiles.size + " input files.\n"
                 }
@@ -197,20 +218,32 @@ class TaskUpToDateValidator {
 
             val reproductionMessage = "\nTo reproduce this error you can try running " +
                 "`./gradlew ${task.path} -PverifyUpToDate`\n"
-            return outputsMessage + inputsMessage + reproductionMessage
+            val readLogsMessage = "\nYou can check why Gradle executed ${task.path} by " +
+                "passing the '--info' flag to Gradle and then searching stdout for output " +
+                "generated immediately before the task began to execute.\n" +
+                "Our best guess for the reason that ${task.path} executed is below.\n"
+            return readLogsMessage + outputsMessage + inputsMessage + reproductionMessage
         }
 
-        fun tryToExplainFileModification(file: File, triggeringTask: Task): String {
-            val taskDependencies = triggeringTask.taskDependencies.getDependencies(triggeringTask)
-            var createdByTask: Task? = null
-            for (otherTask in taskDependencies) {
-                if (otherTask.outputs.files.files.contains(file)) {
-                    createdByTask = otherTask
-                    break
+        fun getTaskDeclaringFile(file: File, taskGraph: TaskExecutionGraph): Task? {
+            for (task in taskGraph.allTasks) {
+                if (task.outputs.files.files.contains(file)) {
+                    return task
                 }
             }
+            return null
+        }
+        fun tryToExplainFileModification(file: File, taskGraph: TaskExecutionGraph): String {
+            // Find the task declaring this file as an output,
+            // or the task declaring one of its parent dirs as an output
+            var createdByTask: Task? = null
+            var declaredFile: File? = file
+            while (createdByTask == null && declaredFile != null) {
+                createdByTask = getTaskDeclaringFile(declaredFile, taskGraph)
+                declaredFile = declaredFile.parentFile
+            }
             if (createdByTask == null) {
-                return "This file is not declared as the output of any task."
+                return "This file is not declared as the output of any task in this build."
             }
             if (isExemptTask(createdByTask)) {
                 return "This file is declared as an output of " + createdByTask +

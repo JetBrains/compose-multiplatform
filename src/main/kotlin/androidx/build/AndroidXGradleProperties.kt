@@ -50,4 +50,32 @@ fun Project.isDocumentationEnabled(): Boolean =
  * Returns whether the project has coverage enabled.
  */
 fun Project.isCoverageEnabled(): Boolean =
-    (project.findProperty("androidx.coverageEnabled") as? String)?.toBoolean() ?: true
+    (project.findProperty("androidx.coverageEnabled") as? String)?.toBoolean() ?: false
+
+/**
+ * Returns the path to the Android SDK to be used.
+ */
+fun Project.androidxSdkPath(): String? =
+    project.findProperty("androidx.sdkPath") as? String
+
+/**
+ * Returns the Studio type for the project's studio task
+ */
+fun Project.studioType() = StudioType.findType(
+    findProperty("androidx.studio.type")?.toString()
+)
+
+enum class StudioType {
+    ANDROIDX,
+    PLAYGROUND,
+    COMPOSE;
+
+    companion object {
+        fun findType(value: String?) = when (value) {
+            "playground" -> PLAYGROUND
+            "compose" -> COMPOSE
+            null, "androidx" -> ANDROIDX
+            else -> error("Invalid project type $value")
+        }
+    }
+}

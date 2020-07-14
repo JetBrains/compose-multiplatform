@@ -102,10 +102,18 @@ object LibraryGroups {
     val VERSIONEDPARCELABLE = LibraryGroup("androidx.versionedparcelable", null)
     val VIEWPAGER = LibraryGroup("androidx.viewpager", LibraryVersions.VIEWPAGER)
     val VIEWPAGER2 = LibraryGroup("androidx.viewpager2", LibraryVersions.VIEWPAGER2)
-    val WEAR = LibraryGroup("androidx.wear", LibraryVersions.WEAR)
+    val WEAR = LibraryGroup("androidx.wear", null)
     val WEBKIT = LibraryGroup("androidx.webkit", LibraryVersions.WEBKIT)
     val WINDOW = LibraryGroup("androidx.window", null)
     val WORK = LibraryGroup("androidx.work", LibraryVersions.WORK)
+
+    object Compose {
+        val ANIMATION = LibraryGroup("androidx.compose.animation", null)
+        val FOUNDATION = LibraryGroup("androidx.compose.foundation", null)
+        val MATERIAL = LibraryGroup("androidx.compose.material", null)
+        val RUNTIME = LibraryGroup("androidx.compose.runtime", null)
+        val UI = LibraryGroup("androidx.compose.ui", null)
+    }
 }
 
 /**

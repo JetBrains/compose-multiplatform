@@ -445,7 +445,7 @@ private fun createDistDocsTask(
     it.apply {
         dependsOn(generateDocs)
         from(generateDocs.map {
-            it.destinationDir
+            it.destinationDir!!
         })
         val baseName = "androidx-$ruleName-docs"
         val buildId = getBuildId()

@@ -16,6 +16,8 @@
 
 package androidx.build
 
+import androidx.build.AndroidXPlugin.Companion.GENERATE_TEST_CONFIGURATION_TASK
+import androidx.build.AndroidXPlugin.Companion.ZIP_TEST_CONFIGS_WITH_APKS_TASK
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.dokka.DokkaPublicDocs
 import androidx.build.dokka.DokkaSourceDocs
@@ -26,10 +28,13 @@ import androidx.build.license.CheckExternalDependencyLicensesTask
 import androidx.build.studio.StudioTask.Companion.registerStudioTask
 import androidx.build.uptodatedness.TaskUpToDateValidator
 import com.android.build.gradle.api.AndroidBasePlugin
+import com.android.build.gradle.internal.tasks.factory.dependsOn
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.tasks.bundling.Zip
+import org.gradle.kotlin.dsl.KotlinClosure1
 import org.gradle.kotlin.dsl.extra
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
@@ -76,18 +81,34 @@ class AndroidXRootPlugin : Plugin<Project> {
         val createArchiveTask = Release.getGlobalFullZipTask(this)
         buildOnServerTask.dependsOn(createArchiveTask)
         val partiallyDejetifyArchiveTask = partiallyDejetifyArchiveTask(
-            createArchiveTask.get().archiveFile)
+            createArchiveTask.get().archiveFile
+        )
         if (partiallyDejetifyArchiveTask != null)
             buildOnServerTask.dependsOn(partiallyDejetifyArchiveTask)
 
         val projectModules = ConcurrentHashMap<String, String>()
         extra.set("projects", projectModules)
         buildOnServerTask.dependsOn(tasks.named(CheckExternalDependencyLicensesTask.TASK_NAME))
+        // Anchor task that invokes running all subprojects :properties tasks which ensure that
+        // Android Studio sync is able to succeed.
+        val allProperties = tasks.register("allProperties")
         subprojects { project ->
+            // Add a method for each sub project where they can declare an optional
+            // dependency on a project or its latest snapshot artifact.
+            // In AndroidX build, this is always enforsed to the project while in Playground
+            // builds, they are converted to the latest SNAPSHOT artifact if the project is
+            // not included in that playground. see: AndroidXPlaygroundRootPlugin
+            project.extra.set(PROJECT_OR_ARTIFACT_EXT_NAME, KotlinClosure1<String, Project>(
+                function = {
+                    // this refers to the first parameter of the closure.
+                    project.project(this)
+                }
+            ))
             if (project.path == ":docs-runner") {
                 project.tasks.all { task ->
                     if (DokkaPublicDocs.ARCHIVE_TASK_NAME == task.name ||
-                        DokkaSourceDocs.ARCHIVE_TASK_NAME == task.name) {
+                        DokkaSourceDocs.ARCHIVE_TASK_NAME == task.name
+                    ) {
                         buildOnServerTask.dependsOn(task)
                     }
                 }
@@ -105,6 +126,8 @@ class AndroidXRootPlugin : Plugin<Project> {
             project.plugins.withType(JavaPlugin::class.java) {
                 buildOnServerTask.dependsOn("${project.path}:jar")
             }
+
+            allProperties.dependsOn("${project.path}:properties")
         }
 
         if (partiallyDejetifyArchiveTask != null) {
@@ -128,6 +151,22 @@ class AndroidXRootPlugin : Plugin<Project> {
             buildOnServerTask.dependsOn(Jacoco.createZipEcFilesTask(this))
             buildOnServerTask.dependsOn(Jacoco.createUberJarTask(this))
         }
+
+        val generateTestConfiguration = project.tasks.register(
+            GENERATE_TEST_CONFIGURATION_TASK, GenerateTestConfigurationTask::class.java
+        )
+        val zipTestConfigsWithApks = project.tasks.register(
+            ZIP_TEST_CONFIGS_WITH_APKS_TASK, Zip::class.java
+        )
+        zipTestConfigsWithApks.configure {
+            it.dependsOn(generateTestConfiguration)
+            it.destinationDirectory.set(project.getDistributionDirectory())
+            it.archiveFileName.set("androidTest.zip")
+            it.from(File(project.getDistributionDirectory().canonicalPath,
+                CONFIG_DIRECTORY
+            ))
+        }
+        project.addToBuildOnServer(zipTestConfigsWithApks)
 
         if (project.isDocumentationEnabled()) {
             val allDocsTask = DiffAndDocs.configureDiffAndDocs(
@@ -153,7 +192,8 @@ class AndroidXRootPlugin : Plugin<Project> {
                     subproject.name != "camera-testapp-timing" &&
                     subproject.name != "room-testapp" &&
                     subproject.name != "support-media2-test-client-previous" &&
-                    subproject.name != "support-media2-test-service-previous") {
+                    subproject.name != "support-media2-test-service-previous"
+                ) {
 
                     subproject.configurations.all { configuration ->
                         configuration.resolutionStrategy.dependencySubstitution.apply {
@@ -189,5 +229,9 @@ class AndroidXRootPlugin : Plugin<Project> {
         androidx.build.dependencies.kotlinCoroutinesVersion = getVersion("kotlin_coroutines")
         androidx.build.dependencies.agpVersion = getVersion("agp")
         androidx.build.dependencies.lintVersion = getVersion("lint")
+    }
+
+    companion object {
+        const val PROJECT_OR_ARTIFACT_EXT_NAME = "projectOrArtifact"
     }
 }

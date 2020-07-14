@@ -99,6 +99,10 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
 
             fatal("VisibleForTests")
 
+            if (com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.startsWith("4.2.")) {
+                disable("KtxExtensionAvailable")
+            }
+
             if (extension.compilationTarget != CompilationTarget.HOST) {
                 // Ignore other errors since we are only interested in nullness here
                 if (checkUnknownNullness) {
@@ -149,7 +153,12 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
                     isAbortOnError = false
                     // Avoid printing every single lint error to the terminal
                     textReport = false
-                    lintBaseline.delete()
+                    val lintDebugTask = tasks.named("lintDebug")
+                    lintDebugTask.configure {
+                        it.doFirst {
+                            lintBaseline.delete()
+                        }
+                    }
                     System.setProperty(LINT_BASELINE_CONTINUE, "true")
                 }
                 baseline(lintBaseline)

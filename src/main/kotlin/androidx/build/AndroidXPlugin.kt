@@ -18,20 +18,12 @@ package androidx.build
 
 import androidx.benchmark.gradle.BenchmarkPlugin
 import androidx.build.AndroidXPlugin.Companion.CHECK_RELEASE_READY_TASK
-import androidx.build.AndroidXPlugin.Companion.CHECK_RESOURCE_API_TASK
 import androidx.build.AndroidXPlugin.Companion.TASK_TIMEOUT_MINUTES
-import androidx.build.AndroidXPlugin.Companion.UPDATE_RESOURCE_API_TASK
 import androidx.build.SupportConfig.BUILD_TOOLS_VERSION
 import androidx.build.SupportConfig.COMPILE_SDK_VERSION
 import androidx.build.SupportConfig.DEFAULT_MIN_SDK_VERSION
 import androidx.build.SupportConfig.INSTRUMENTATION_RUNNER
 import androidx.build.SupportConfig.TARGET_SDK_VERSION
-import androidx.build.checkapi.ApiType
-import androidx.build.checkapi.getApiFileDirectory
-import androidx.build.checkapi.getCurrentApiLocation
-import androidx.build.checkapi.getRequiredCompatibilityApiFileFromDir
-import androidx.build.checkapi.getVersionedApiLocation
-import androidx.build.checkapi.hasApiFileDirectory
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.dokka.Dokka.configureAndroidProjectForDokka
 import androidx.build.dokka.Dokka.configureJavaProjectForDokka
@@ -41,9 +33,8 @@ import androidx.build.jacoco.Jacoco
 import androidx.build.license.configureExternalDependencyLicenseCheck
 import androidx.build.metalava.MetalavaTasks.configureAndroidProjectForMetalava
 import androidx.build.metalava.MetalavaTasks.configureJavaProjectForMetalava
-import androidx.build.metalava.UpdateApiTask
+import androidx.build.resources.ResourceTasks.configureAndroidProjectForResourceTasks
 import androidx.build.studio.StudioTask
-import androidx.build.uptodatedness.cacheEvenIfNoOutputs
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryExtension
@@ -202,17 +193,22 @@ class AndroidXPlugin : Plugin<Project> {
             configureAndroidCommonOptions(project, androidXExtension)
             configureAndroidLibraryOptions(project, androidXExtension)
         }
-        libraryExtension.packagingOptions.apply {
+        libraryExtension.packagingOptions {
             // We need this as a work-around for b/155721209
             // It can be removed when we have a newer plugin version
-            excludes = excludes.also {
+            // 2nd workaround - this DSL was made saner in a breaking way which hasn't landed
+            // yes in AGP 4.1, that will allow just excludes -= "...".
+            // This reflection enables us to be source compatible with both for now.
+
+            javaClass.getMethod("setExcludes", Set::class.java).invoke(this, excludes.also {
                 it.remove("/META-INF/*.kotlin_module")
-            }
+            })
+
+            check(!excludes.contains("/META-INF/*.kotlin_module"))
         }
 
         project.configureSourceJarForAndroid(libraryExtension)
         project.configureVersionFileWriter(libraryExtension, androidXExtension)
-        project.configureResourceApiChecks(libraryExtension)
         project.addCreateLibraryBuildInfoFileTask(androidXExtension)
 
         val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
@@ -243,12 +239,13 @@ class AndroidXPlugin : Plugin<Project> {
             }
         }
 
-        // Standard lint, docs, and Metalava configuration for AndroidX projects.
+        // Standard lint, docs, resource API, and Metalava configuration for AndroidX projects.
         project.configureAndroidProjectForLint(libraryExtension.lintOptions, androidXExtension)
         if (project.isDocumentationEnabled()) {
             project.configureAndroidProjectForDokka(libraryExtension, androidXExtension)
         }
         project.configureAndroidProjectForMetalava(libraryExtension, androidXExtension)
+        project.configureAndroidProjectForResourceTasks(libraryExtension, androidXExtension)
 
         project.addToProjectMap(androidXExtension)
     }
@@ -319,10 +316,7 @@ class AndroidXPlugin : Plugin<Project> {
 
         defaultConfig.testInstrumentationRunner = INSTRUMENTATION_RUNNER
 
-        // Enable code coverage for debug builds only if we are not running inside the IDE, since
-        // enabling coverage reports breaks the method parameter resolution in the IDE debugger.
-        buildTypes.getByName("debug").isTestCoverageEnabled =
-            !project.hasProperty("android.injected.invoked.from.ide")
+        buildTypes.getByName("debug").isTestCoverageEnabled = project.isCoverageEnabled()
 
         testOptions.animationsDisabled = true
         testOptions.unitTests.isReturnDefaultValues = true
@@ -360,14 +354,6 @@ class AndroidXPlugin : Plugin<Project> {
         buildTypes.all { buildType ->
             // Sign all the builds (including release) with debug key
             buildType.signingConfig = debugSigningConfig
-        }
-
-        // Disable generating BuildConfig.java
-        // TODO remove after https://issuetracker.google.com/72050365
-        variants.all { variant ->
-            variant.generateBuildConfigProvider.configure {
-                it.enabled = false
-            }
         }
 
         project.configureErrorProneForAndroid(variants)
@@ -426,31 +412,59 @@ class AndroidXPlugin : Plugin<Project> {
         extension: TestedExtension,
         testApk: Boolean
     ) {
-        packageApplicationProvider.configure { packageTask ->
+        packageApplicationProvider.get().let { packageTask ->
             AffectedModuleDetector.configureTaskGuard(packageTask)
-            packageTask.doLast {
-                // Skip copying AndroidTest apks if they have no source code (no tests to run).
-                if (testApk && !hasAndroidTestSourceCode(project, extension)) return@doLast
+            // Skip copying AndroidTest apks if they have no source code (no tests to run).
+            if (testApk && !hasAndroidTestSourceCode(project, extension)) {
+                return
+            }
 
+            if (testApk) {
+                project.rootProject.tasks.named(GENERATE_TEST_CONFIGURATION_TASK)
+                    .configure { task ->
+                        task as GenerateTestConfigurationTask
+                        val apkFile = File(
+                            "${project
+                                .buildDir}/outputs/apk/androidTest/debug/${project
+                                .name}-debug-androidTest.apk"
+                        )
+                        task.apkPackageMap[apkFile] = applicationId
+                    }
+
+                project.rootProject.tasks.named(ZIP_TEST_CONFIGS_WITH_APKS_TASK)
+                    .configure { task ->
+                        task as Zip
+                        task.from(packageTask.outputDirectory)
+                    }
+            }
+
+            packageTask.doLast {
                 project.copy {
                     it.from(packageTask.outputDirectory)
                     it.include("*.apk")
                     it.into(File(project.getDistributionDirectory(), "apks"))
                     it.rename { fileName ->
-                        if (fileName.contains("media-compat-test") ||
-                            fileName.contains("media2-test")) {
-                            // Exclude media-compat-test-* and media2-test-* modules from
-                            // existing support library presubmit tests.
-                            fileName.replace("-debug-androidTest", "")
-                        } else if (project.plugins.hasPlugin(BenchmarkPlugin::class.java)) {
-                            // Exclude '-benchmark' modules from correctness tests
-                            fileName.replace("-androidTest", "-androidBenchmark")
-                        } else {
-                            "${project.asFilenamePrefix()}_$fileName"
-                        }
+                        renameApkForTesting(fileName, project)
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Guarantees unique names for the APKs, and modifies some of the suffixes. The APK name is used
+     * to determine what gets run by our test runner
+     */
+    private fun renameApkForTesting(fileName: String, project: Project): String {
+        return if (fileName.contains("media-test") || fileName.contains("media2-test")) {
+            // Exclude media-test-* and media2-test-* modules from
+            // existing support library presubmit tests.
+            fileName.replace("-debug-androidTest", "")
+        } else if (project.plugins.hasPlugin(BenchmarkPlugin::class.java)) {
+            val name = fileName.replace("-androidTest", "-androidBenchmark")
+            "${project.asFilenamePrefix()}_$name"
+        } else {
+            "${project.asFilenamePrefix()}_$fileName"
         }
     }
 
@@ -516,7 +530,7 @@ class AndroidXPlugin : Plugin<Project> {
         val buildTestApksTask = project.rootProject.tasks.named(BUILD_TEST_APKS_TASK)
         applicationVariants.all { variant ->
             // Using getName() instead of name due to b/150427408
-            if (variant.buildType.getName() == "debug") {
+            if (variant.buildType.name == "debug") {
                 buildTestApksTask.configure {
                     it.dependsOn(variant.assembleProvider)
                 }
@@ -601,11 +615,16 @@ class AndroidXPlugin : Plugin<Project> {
         const val BUILD_ON_SERVER_TASK = "buildOnServer"
         const val BUILD_TEST_APKS_TASK = "buildTestApks"
         const val CHECK_RESOURCE_API_TASK = "checkResourceApi"
-        const val UPDATE_RESOURCE_API_TASK = "updateResourceApi"
+        const val CHECK_RESOURCE_API_RELEASE_TASK = "checkResourceApiRelease"
         const val CHECK_RELEASE_READY_TASK = "checkReleaseReady"
         const val CREATE_LIBRARY_BUILD_INFO_FILES_TASK = "createLibraryBuildInfoFiles"
         const val CREATE_AGGREGATE_BUILD_INFO_FILES_TASK = "createAggregateBuildInfoFiles"
+        const val GENERATE_TEST_CONFIGURATION_TASK = "generateTestConfiguration"
         const val REPORT_LIBRARY_METRICS_TASK = "reportLibraryMetrics"
+        const val UPDATE_RESOURCE_API_TASK = "updateResourceApi"
+        const val ZIP_TEST_CONFIGS_WITH_APKS_TASK = "zipTestConfigsWithApks"
+
+        const val TASK_GROUP_API = "API"
 
         const val EXTENSION_NAME = "androidx"
 
@@ -657,18 +676,6 @@ val Project.multiplatformExtension
     get() = extensions.findByType(KotlinMultiplatformExtension::class.java)
 
 /**
- * Creates the [CHECK_RESOURCE_API_TASK], which verifies the AAPT-generated resource API file
- * against the checked-in resource API file.
- */
-private fun Project.createCheckResourceApiTask(): TaskProvider<CheckResourceApiTask> {
-    return tasks.register(CHECK_RESOURCE_API_TASK, CheckResourceApiTask::class.java) { task ->
-        task.newApiFile = getGeneratedResourceApiFile()
-        task.oldApiFile = getVersionedApiLocation().resourceFile
-        task.cacheEvenIfNoOutputs()
-    }
-}
-
-/**
  * Creates the [CHECK_RELEASE_READY_TASK], which aggregates tasks that must pass for a
  * project to be considered ready for public release.
  */
@@ -680,66 +687,9 @@ private fun Project.createCheckReleaseReadyTask(taskProviderList: List<TaskProvi
     }
 }
 
-private fun Project.createUpdateResourceApiTask(): TaskProvider<UpdateResourceApiTask> {
-    val versionedApiLocation = project.getVersionedApiLocation()
-    val currentApiLocation = project.getCurrentApiLocation()
-
-    val outputApiLocations = if (project.isVersionedApiFileWritingEnabled()) {
-        listOf(
-            versionedApiLocation,
-            currentApiLocation
-        )
-    } else {
-        listOf(
-            currentApiLocation
-        )
-    }
-
-    return tasks.register(UPDATE_RESOURCE_API_TASK, UpdateResourceApiTask::class.java) { task ->
-        task.inputApiFile.set(getGeneratedResourceApiFile())
-        task.referenceResourceApiFile.set(getRequiredCompatibilityApiFileFromDir(
-            getApiFileDirectory(), version(), ApiType.RESOURCEAPI))
-        task.outputApiLocations.set(outputApiLocations)
-    }
-}
-
-private fun Project.getGeneratedResourceApiFile(): File {
-    // TODO(alanv): Follow up when b/154626581 gets resolved and AGP provides a stable API contract
-    return File(buildDir, "intermediates/public_res/release/public.txt")
-}
-
 @Suppress("UNCHECKED_CAST")
 fun Project.getProjectsMap(): ConcurrentHashMap<String, String> {
     return rootProject.extra.get("projects") as ConcurrentHashMap<String, String>
-}
-
-/**
- * Configures an Android library project to track and validate its public resource API surface.
- */
-private fun Project.configureResourceApiChecks(extension: LibraryExtension) {
-    // TODO(alanv): Fix this to occur during normal configuration.
-    afterEvaluate { project ->
-        // Only configure resource API checks for projects that are already tracking APIs.
-        // TODO(alanv): Migrate to check the AndroidX extension for "should generate API files".
-        if (project.hasApiFileDirectory()) {
-            val checkResourceApiTask = createCheckResourceApiTask()
-            val updateResourceApiTask = createUpdateResourceApiTask()
-
-            // Configure the check- and update- resource API tasks to depend on Java compilation,
-            // after which we expect the AAPT-generated public.txt file to be available.
-            extension.defaultPublishVariant { libraryVariant ->
-                // TODO(alanv): These should probably depend on public.txt as an input file.
-                checkResourceApiTask.configure { it.dependsOn(libraryVariant.javaCompileProvider) }
-                updateResourceApiTask.configure { it.dependsOn(libraryVariant.javaCompileProvider) }
-            }
-
-            // Ensure that this task runs as part of updateApi and buildOnServer
-            tasks.withType(UpdateApiTask::class.java).configureEach { task ->
-                task.dependsOn(updateResourceApiTask)
-            }
-            addToBuildOnServer(checkResourceApiTask)
-        }
-    }
 }
 
 /**
@@ -767,7 +717,11 @@ private fun Project.configureCompilationWarnings(task: KotlinCompile) {
     if (hasProperty(ALL_WARNINGS_AS_ERRORS)) {
         task.kotlinOptions.allWarningsAsErrors = true
     }
-    task.kotlinOptions.freeCompilerArgs += listOf("-Xskip-runtime-version-check")
+    task.kotlinOptions.freeCompilerArgs += listOf(
+        "-Xskip-runtime-version-check",
+        "-Xskip-metadata-version-check",
+        "-XXLanguage:-NewInference"
+    )
 }
 
 /**

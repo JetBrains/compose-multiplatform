@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
-    def supportRootFolder = project.projectDir.getParentFile()
+    project.ext.supportRootFolder = project.projectDir.getParentFile()
     repositories {
         maven {
             url "${supportRootFolder}/../../prebuilts/androidx/external"
@@ -39,7 +39,13 @@ allprojects {
     tasks.withType(KotlinCompile).configureEach {
         kotlinOptions {
             jvmTarget = "1.8"
-            freeCompilerArgs += ["-Werror", "-Xskip-runtime-version-check"]
+            freeCompilerArgs += [
+                    "-Werror",
+                    "-Xskip-runtime-version-check",
+                    "-Xskip-metadata-version-check",
+                    // Allow `@OptIn` and `@UseExperimental`
+                    "-Xopt-in=kotlin.RequiresOptIn"
+            ]
         }
     }
 }
@@ -67,7 +73,7 @@ dependencies {
     cacheableImplementation gradleApi()
     cacheableApi build_libs.dokka_gradle
     // needed by inspection plugin
-    cacheableImplementation "com.google.protobuf:protobuf-gradle-plugin:0.8.8"
+    cacheableImplementation "com.google.protobuf:protobuf-gradle-plugin:0.8.12"
     cacheableImplementation "org.anarres.jarjar:jarjar-gradle:1.0.1"
     // dependencies that aren't used by buildSrc directly but that we resolve here so that the
     // root project doesn't need to re-resolve them and their dependencies on every build
@@ -162,3 +168,8 @@ def loadConfigurationQuicklyInto(fromConf, toConf) {
 loadConfigurationQuicklyInto(configurations.cacheableApi, configurations.api)
 loadConfigurationQuicklyInto(configurations.cacheableImplementation, configurations.implementation)
 loadConfigurationQuicklyInto(configurations.cacheableRuntime, configurations.runtime)
+
+project.tasks.withType(Jar) { task ->
+    task.reproducibleFileOrder = true
+    task.preserveFileTimestamps = false
+}

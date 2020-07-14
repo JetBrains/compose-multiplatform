@@ -203,7 +203,7 @@ class GitClientImpl(
                 .redirectError(ProcessBuilder.Redirect.PIPE)
                 .start()
 
-            proc.waitFor(1, TimeUnit.MINUTES)
+            // Read output, waiting for process to finish, as needed
             val stdout = proc
                 .inputStream
                 .bufferedReader()
@@ -213,6 +213,9 @@ class GitClientImpl(
                 .bufferedReader()
                 .readText()
             val message = stdout + stderr
+            // wait potentially a little bit longer in case Git was waiting for us to
+            // read its response before it exited
+            proc.waitFor(10, TimeUnit.SECONDS)
             if (stderr != "") {
                 logger?.error("Response: $message")
             } else {
