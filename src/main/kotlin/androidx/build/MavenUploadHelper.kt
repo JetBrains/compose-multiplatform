@@ -128,7 +128,12 @@ private fun Project.removePreviouslyUploadedArchives(group: String) {
 private fun Project.addInformativeMetadata(pom: MavenPom, extension: AndroidXExtension) {
     pom.name.set(provider { extension.name })
     pom.description.set(provider { extension.description })
-    pom.url.set(provider { extension.url })
+    pom.url.set(provider {
+        "https://developer.android.com/jetpack/androidx/releases/" +
+                extension.mavenGroup!!.group.removePrefix("androidx.")
+                    .replace(".", "-") +
+                "#" + extension.project.version()
+    })
     pom.inceptionYear.set(provider { extension.inceptionYear })
     pom.licenses { licenses ->
         licenses.license { license ->
@@ -145,7 +150,7 @@ private fun Project.addInformativeMetadata(pom: MavenPom, extension: AndroidXExt
         }
     }
     pom.scm { scm ->
-        scm.url.set("http://source.android.com")
+        scm.url.set("https://cs.android.com/androidx/platform/frameworks/support")
         scm.connection.set(ANDROID_GIT_URL)
     }
     pom.developers { devs ->
