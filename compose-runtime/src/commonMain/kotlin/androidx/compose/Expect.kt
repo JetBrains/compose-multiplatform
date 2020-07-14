@@ -109,7 +109,9 @@ expect annotation class MainThread()
 @Retention(AnnotationRetention.SOURCE)
 @Target(
     AnnotationTarget.FUNCTION,
-    AnnotationTarget.CONSTRUCTOR
+    AnnotationTarget.CONSTRUCTOR,
+    AnnotationTarget.PROPERTY_GETTER,
+    AnnotationTarget.PROPERTY_SETTER
 )
 expect annotation class TestOnly()
 
