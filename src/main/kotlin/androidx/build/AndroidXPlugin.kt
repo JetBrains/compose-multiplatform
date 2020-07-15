@@ -45,8 +45,10 @@ import org.gradle.api.JavaVersion.VERSION_1_8
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.Zip
@@ -114,6 +116,8 @@ class AndroidXPlugin : Plugin<Project> {
         // Configure all Jar-packing tasks for hermetic builds.
         project.tasks.withType(Jar::class.java).configureEach { it.configureForHermeticBuild() }
 
+        project.tasks.withType(Copy::class.java).configureEach { it.configureForHermeticBuild() }
+
         // copy host side test results to DIST
         project.tasks.withType(Test::class.java) { task -> configureTestTask(project, task) }
 
@@ -127,6 +131,10 @@ class AndroidXPlugin : Plugin<Project> {
     private fun Jar.configureForHermeticBuild() {
         isReproducibleFileOrder = true
         isPreserveFileTimestamps = false
+    }
+
+    private fun Copy.configureForHermeticBuild() {
+        duplicatesStrategy = DuplicatesStrategy.FAIL
     }
 
     private fun configureTestTask(project: Project, task: Test) {
