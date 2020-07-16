@@ -21,10 +21,10 @@ import androidx.compose.Composable
 import androidx.compose.getValue
 import androidx.compose.setValue
 import androidx.compose.state
-import androidx.ui.foundation.TextField
 import androidx.ui.foundation.Text
 import androidx.ui.input.TextFieldValue
 import androidx.ui.material.Button
+import androidx.ui.text.CoreTextField
 
 @Composable
 @Sampled
@@ -36,11 +36,11 @@ fun stateSample() {
 
         fun login() = Api.login(username.text, password.text)
 
-        TextField(
+        CoreTextField(
             value = username,
             onValueChange = { username = it }
         )
-        TextField(
+        CoreTextField(
             value = password,
             onValueChange = { password = it }
         )

@@ -23,11 +23,11 @@ import androidx.compose.setValue
 import androidx.compose.mutableStateListOf
 import androidx.compose.state
 import androidx.ui.foundation.Text
-import androidx.ui.foundation.TextField
 import androidx.ui.input.TextFieldValue
 import androidx.ui.layout.Column
 import androidx.ui.layout.Row
 import androidx.ui.material.Button
+import androidx.ui.text.CoreTextField
 
 @Composable
 @Sampled
@@ -39,7 +39,7 @@ fun stateListSample() {
 
         Column {
             Row {
-                TextField(
+                CoreTextField(
                     value = name,
                     onValueChange = { name = it }
                 )
