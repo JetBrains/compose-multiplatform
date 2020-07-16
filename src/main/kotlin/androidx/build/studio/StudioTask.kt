@@ -94,6 +94,12 @@ abstract class StudioTask : DefaultTask() {
     protected abstract val ideaProperties: File
 
     /**
+     * The studio.vmoptions file that we want to start Studio with
+     */
+    @get:Internal
+    open val vmOptions = File(project.getSupportRootFolder(), "development/studio/studio.vmoptions")
+
+    /**
      * [StudioArchiveCreator] that will ensure that an archive is present at [studioArchivePath]
      */
     @get:Internal
@@ -128,8 +134,6 @@ abstract class StudioTask : DefaultTask() {
     }
 
     private fun launchStudio() {
-        val vmOptions = File(project.getSupportRootFolder(), "development/studio/studio.vmoptions")
-
         ProcessBuilder().apply {
             inheritIO()
             with(platformUtilities) { command(launchCommandArguments) }
@@ -226,5 +230,7 @@ open class ComposeStudioTask : StudioTask() {
  * Task for launching studio in a playground project
  */
 open class PlaygroundStudioTask : RootStudioTask() {
-    override val installParentDir get() = project.rootProject.projectDir.resolve("..")
+    override val installParentDir get() = projectRoot.resolve("..")
+    override val ideaProperties get() = projectRoot.resolve("../playground-common/idea.properties")
+    override val vmOptions get() = projectRoot.resolve("../playground-common/studio.vmoptions")
 }
