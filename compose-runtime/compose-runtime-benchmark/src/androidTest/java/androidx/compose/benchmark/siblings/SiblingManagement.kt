@@ -21,7 +21,7 @@ import androidx.compose.key
 import androidx.ui.core.Modifier
 import androidx.ui.foundation.Box
 import androidx.ui.foundation.Text
-import androidx.ui.foundation.drawBackground
+import androidx.ui.foundation.background
 import androidx.ui.graphics.Color
 import androidx.ui.layout.Column
 import androidx.ui.layout.Row
@@ -31,9 +31,9 @@ import androidx.ui.layout.fillMaxWidth
 import androidx.ui.text.TextStyle
 import kotlin.random.Random
 
-val blackBackground = Modifier.drawBackground(Color.Black)
-val blueBackground = Modifier.drawBackground(Color.Blue)
-val magentaBackground = Modifier.drawBackground(Color.Magenta)
+val blackBackground = Modifier.background(color = Color.Black)
+val blueBackground = Modifier.background(color = Color.Blue)
+val magentaBackground = Modifier.background(color = Color.Magenta)
 val blackStyle = TextStyle(color = Color.Black)
 val blueStyle = TextStyle(color = Color.Blue)
 val magentaStyle = TextStyle(color = Color.Magenta)
