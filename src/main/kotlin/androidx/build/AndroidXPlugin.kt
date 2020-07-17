@@ -187,10 +187,23 @@ class AndroidXPlugin : Plugin<Project> {
     }
 
     private fun configureWithAppPlugin(project: Project, extension: AndroidXExtension) {
-        project.extensions.getByType<AppExtension>().apply {
+        val appExtension = project.extensions.getByType<AppExtension>().apply {
             configureAndroidCommonOptions(project, extension)
             configureAndroidApplicationOptions(project)
         }
+
+        // TODO: Replace this with a per-variant packagingOption for androidTest specifically once
+        //  b/69953968 is resolved.
+        // Workaround for b/161465530 in AGP that fails to strip these <module>.kotlin_module files,
+        // which causes mergeDebugAndroidTestJavaResource to fail for sample apps.
+        appExtension.packagingOptions.exclude("/META-INF/*.kotlin_module")
+        // Workaround a limitation in AGP that fails to merge these META-INF license files.
+        appExtension.packagingOptions.pickFirst("/META-INF/AL2.0")
+        // In addition to working around the above issue, we exclude the LGPL2.1 license as we're
+        // approved to distribute code via AL2.0 and the only dependencies which pull in LGPL2.1
+        // are currently dual-licensed with AL2.0 and LGPL2.1. The affected dependencies are:
+        //   - net.java.dev.jna:jna:5.5.0
+        appExtension.packagingOptions.exclude("/META-INF/LGPL2.1")
     }
 
     private fun configureWithLibraryPlugin(
@@ -202,6 +215,17 @@ class AndroidXPlugin : Plugin<Project> {
             configureAndroidLibraryOptions(project, androidXExtension)
         }
         libraryExtension.packagingOptions {
+            // TODO: Replace this with a per-variant packagingOption for androidTest specifically
+            //  once b/69953968 is resolved.
+            // Workaround for b/161465530 in AGP that fails to merge these META-INF license files
+            // for libraries that publish Java resources under the same name.
+            pickFirst("/META-INF/AL2.0")
+            // In addition to working around the above issue, we exclude the LGPL2.1 license as we're
+            // approved to distribute code via AL2.0 and the only dependencies which pull in LGPL2.1
+            // currently are dual-licensed with AL2.0 and LGPL2.1. The affected dependencies are:
+            //   - net.java.dev.jna:jna:5.5.0
+            exclude("/META-INF/LGPL2.1")
+
             // We need this as a work-around for b/155721209
             // It can be removed when we have a newer plugin version
             // 2nd workaround - this DSL was made saner in a breaking way which hasn't landed
