@@ -142,6 +142,8 @@ val KOTLIN_COROUTINES_TEST
     get() = "org.jetbrains.kotlinx:kotlinx-coroutines-test:$kotlinCoroutinesVersion"
 val KOTLIN_COROUTINES_RX2
     get() = "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:$kotlinCoroutinesVersion"
+val KOTLIN_COROUTINES_RX3
+    get() = "org.jetbrains.kotlinx:kotlinx-coroutines-rx3:$kotlinCoroutinesVersion"
 
 internal lateinit var agpVersion: String
 
