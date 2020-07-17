@@ -976,6 +976,26 @@ class Composer<N>(
     }
 
     /**
+     * Cache a value in the composition. During initial composition [block] is called to produce the
+     * value that is then stored in the slot table. During recomposition, if [invalid] is false
+     * the value is obtained from the slot table and [block] is not invoked. If [invalid] is
+     * false a new value is produced by calling [block] and the slot table is updated to contain
+     * the new value.
+     */
+    @ComposeCompilerApi
+    inline fun <T> cache(invalid: Boolean, block: () -> T): T {
+        var result = nextSlot()
+        if (result === EMPTY || invalid) {
+            val value = block()
+            updateValue(value)
+            result = value
+        }
+
+        @Suppress("UNCHECKED_CAST")
+        return result as T
+    }
+
+    /**
      * Schedule the current value in the slot table to be updated to [value].
      *
      * @param value the value to schedule to be written to the slot table.
@@ -2336,25 +2356,6 @@ class Composer<N>(
     ) {
         node.block()
     }
-}
-
-/**
- * Cache a value in the composition. During initial composition [block] is called to produce the
- * value that is then * stored in the slot table. During recomposition, if [valid] is true the
- * value is obtained from the slot table and [block] is not invoked. If [valid] is false a new
- * value is produced by calling [block] and the slot table is updated to contain the new value.
- */
-@PublishedApi
-internal inline fun <N, T> Composer<N>.cache(valid: Boolean = true, block: () -> T): T {
-    var result = nextSlot()
-    if (result === EMPTY || !valid) {
-        val value = block()
-        updateValue(value)
-        result = value
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    return result as T
 }
 
 private fun SlotWriter.removeCurrentGroup(lifecycleManager: LifecycleManager) {
