@@ -114,6 +114,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.REMOTECALLBACK, "1.0.0-alpha02")
     // TODO: Remove this once b/157899389 is resolved
     ignore(LibraryGroups.ROOM.group, "room-compiler")
+    ignore(LibraryGroups.ROOM.group, "room-compiler-xprocessing")
     // TODO: Remove during release phase of rxjava3 artifact
     ignore(LibraryGroups.ROOM.group, "room-rxjava3")
     prebuilts(LibraryGroups.ROOM, "2.3.0-alpha01")
