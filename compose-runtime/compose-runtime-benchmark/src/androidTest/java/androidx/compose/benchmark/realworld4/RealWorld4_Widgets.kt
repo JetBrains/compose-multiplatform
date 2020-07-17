@@ -30,8 +30,8 @@ import androidx.ui.core.WithConstraints
 import androidx.ui.graphics.Color
 import androidx.ui.layout.Column
 import androidx.ui.layout.padding
-import androidx.ui.foundation.Box
-import androidx.ui.foundation.background
+import androidx.compose.foundation.Box
+import androidx.compose.foundation.background
 import androidx.ui.layout.Row
 import androidx.ui.layout.fillMaxSize
 import androidx.ui.layout.fillMaxWidth

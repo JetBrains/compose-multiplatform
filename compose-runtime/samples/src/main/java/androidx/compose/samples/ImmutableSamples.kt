@@ -19,7 +19,7 @@ package androidx.compose.samples
 import androidx.annotation.Sampled
 import androidx.compose.Composable
 import androidx.compose.Immutable
-import androidx.ui.foundation.Text
+import androidx.compose.foundation.Text
 import androidx.ui.layout.Row
 import androidx.ui.layout.Column
 

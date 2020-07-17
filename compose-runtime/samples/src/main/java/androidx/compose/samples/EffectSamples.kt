@@ -25,7 +25,7 @@ import androidx.compose.onCommit
 import androidx.compose.setValue
 import androidx.compose.state
 import androidx.compose.stateFor
-import androidx.ui.foundation.Text
+import androidx.compose.foundation.Text
 import androidx.ui.layout.Row
 import androidx.ui.material.Button
 

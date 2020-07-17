@@ -20,7 +20,7 @@ import androidx.annotation.Sampled
 import androidx.compose.Composable
 import androidx.compose.collectAsState
 import androidx.compose.getValue
-import androidx.ui.foundation.Text
+import androidx.compose.foundation.Text
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow

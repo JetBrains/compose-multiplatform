@@ -21,7 +21,7 @@ import androidx.compose.getValue
 import androidx.compose.mutableStateOf
 import androidx.compose.setValue
 import androidx.ui.core.Modifier
-import androidx.ui.foundation.Text
+import androidx.compose.foundation.Text
 import androidx.ui.layout.Column
 import androidx.ui.layout.Row
 import androidx.ui.layout.fillMaxHeight
