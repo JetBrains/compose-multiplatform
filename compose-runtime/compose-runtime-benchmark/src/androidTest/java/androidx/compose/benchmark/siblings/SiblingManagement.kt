@@ -54,7 +54,7 @@ fun ItemRow(item: Item) {
         else -> magentaStyle
     }
     Row(Modifier.fillMaxWidth()) {
-        Box(Modifier.fillMaxSize() + background)
+        Box(Modifier.fillMaxSize().then(background))
         Text(text = "${item.id}", style = style)
     }
 }

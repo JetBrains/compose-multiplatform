@@ -38,7 +38,7 @@ fun Terminal(style: Int) {
         1 -> blackBackground
         else -> magentaBackground
     }
-    Box(modifier = Modifier.fillMaxSize() + background)
+    Box(modifier = Modifier.fillMaxSize().then(background))
 }
 
 @Composable
@@ -80,7 +80,7 @@ fun DeepTree(depth: Int, breadth: Int, wrap: Int, id: Int = 0) {
             Terminal(style = id % 3)
         } else {
             repeat(breadth) {
-                Box(Modifier.fillMaxSize() + blueBackground)
+                Box(Modifier.fillMaxSize().then(blueBackground))
             }
         }
     }
