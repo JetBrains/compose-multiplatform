@@ -80,6 +80,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.HILT, "1.0.0-alpha02")
     prebuilts(LibraryGroups.INTERPOLATOR, "1.0.0")
     ignore(LibraryGroups.LEANBACK.group, "leanback-paging")
+    ignore(LibraryGroups.LEANBACK.group, "leanback-tab")
     prebuilts(LibraryGroups.LEANBACK, "1.1.0-alpha03")
     prebuilts(LibraryGroups.LEGACY, "1.0.0")
     ignore(LibraryGroups.LIFECYCLE.group, "lifecycle-compiler")
