@@ -196,6 +196,6 @@ class AndroidXPlaygroundRootPlugin : Plugin<Project> {
     }
 
     companion object {
-        private const val SNAPSHOT_MARKER = "REPLACE_WITH_SNAPSHOT"
+        const val SNAPSHOT_MARKER = "REPLACE_WITH_SNAPSHOT"
     }
 }
