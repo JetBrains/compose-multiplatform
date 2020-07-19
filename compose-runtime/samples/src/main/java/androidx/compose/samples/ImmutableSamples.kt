@@ -20,8 +20,8 @@ import androidx.annotation.Sampled
 import androidx.compose.Composable
 import androidx.compose.Immutable
 import androidx.compose.foundation.Text
-import androidx.ui.layout.Row
-import androidx.ui.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Column
 
 @Sampled
 @Composable

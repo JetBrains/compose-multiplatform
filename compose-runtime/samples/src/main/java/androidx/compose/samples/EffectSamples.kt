@@ -26,7 +26,7 @@ import androidx.compose.setValue
 import androidx.compose.state
 import androidx.compose.stateFor
 import androidx.compose.foundation.Text
-import androidx.ui.layout.Row
+import androidx.compose.foundation.layout.Row
 import androidx.ui.material.Button
 
 @Suppress("unused")

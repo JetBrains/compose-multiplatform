@@ -22,10 +22,10 @@ import androidx.compose.mutableStateOf
 import androidx.compose.setValue
 import androidx.ui.core.Modifier
 import androidx.compose.foundation.Text
-import androidx.ui.layout.Column
-import androidx.ui.layout.Row
-import androidx.ui.layout.fillMaxHeight
-import androidx.ui.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import kotlin.random.Random
 
 private fun randomQuery(random: Random): String = random.nextDouble().let {

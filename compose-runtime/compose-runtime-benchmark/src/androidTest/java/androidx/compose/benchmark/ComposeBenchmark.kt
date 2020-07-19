@@ -29,7 +29,7 @@ import androidx.ui.core.drawBehind
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.background
 import androidx.ui.graphics.Color
-import androidx.ui.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxSize
 import org.junit.FixMethodOrder
 import org.junit.Ignore
 import org.junit.Test

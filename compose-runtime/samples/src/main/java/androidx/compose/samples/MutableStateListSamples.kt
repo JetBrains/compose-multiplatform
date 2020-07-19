@@ -24,8 +24,8 @@ import androidx.compose.mutableStateListOf
 import androidx.compose.state
 import androidx.compose.foundation.Text
 import androidx.ui.input.TextFieldValue
-import androidx.ui.layout.Column
-import androidx.ui.layout.Row
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.ui.material.Button
 import androidx.ui.text.CoreTextField
 

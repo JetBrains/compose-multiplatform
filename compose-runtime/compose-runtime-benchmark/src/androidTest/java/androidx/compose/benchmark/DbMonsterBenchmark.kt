@@ -22,8 +22,8 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.ui.core.Modifier
-import androidx.ui.layout.Column
-import androidx.ui.layout.fillMaxHeight
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import org.junit.FixMethodOrder
 import org.junit.Test
 import org.junit.runner.RunWith
