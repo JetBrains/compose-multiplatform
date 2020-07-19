@@ -27,7 +27,7 @@ import androidx.ui.input.TextFieldValue
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.ui.material.Button
-import androidx.ui.text.CoreTextField
+import androidx.compose.foundation.text.CoreTextField
 
 @Composable
 @Sampled
