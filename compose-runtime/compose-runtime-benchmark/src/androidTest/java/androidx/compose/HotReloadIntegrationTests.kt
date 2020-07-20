@@ -22,8 +22,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.ui.core.WithConstraints
 import androidx.ui.core.setContent
-import androidx.ui.foundation.Text
-import androidx.ui.layout.Column
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.Column
 import androidx.ui.material.DrawerState
 import androidx.ui.material.ModalDrawerLayout
 import org.junit.Rule
