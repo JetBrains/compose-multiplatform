@@ -24,7 +24,7 @@ import android.view.ViewGroup.LayoutParams
 import androidx.core.view.doOnLayout
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.MediumTest
+import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import kotlinx.coroutines.CompletableDeferred
@@ -40,7 +40,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@MediumTest
+@LargeTest
 @RunWith(AndroidJUnit4::class)
 class AndroidUiDispatcherTest {
     @get:Rule
