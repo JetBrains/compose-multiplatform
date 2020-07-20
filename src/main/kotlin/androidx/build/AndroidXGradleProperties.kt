@@ -53,12 +53,6 @@ fun Project.isCoverageEnabled(): Boolean =
     (project.findProperty("androidx.coverageEnabled") as? String)?.toBoolean() ?: false
 
 /**
- * Returns the path to the Android SDK to be used.
- */
-fun Project.androidxSdkPath(): String? =
-    project.findProperty("androidx.sdkPath") as? String
-
-/**
  * Returns the Studio type for the project's studio task
  */
 fun Project.studioType() = StudioType.findType(
