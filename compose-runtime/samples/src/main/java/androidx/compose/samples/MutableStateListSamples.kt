@@ -18,6 +18,8 @@ package androidx.compose.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.Composable
+import androidx.compose.foundation.BaseTextField
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.getValue
 import androidx.compose.setValue
 import androidx.compose.mutableStateListOf
@@ -27,9 +29,9 @@ import androidx.ui.input.TextFieldValue
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.ui.material.Button
-import androidx.compose.foundation.text.CoreTextField
 
 @Composable
+@OptIn(ExperimentalFoundationApi::class)
 @Sampled
 fun stateListSample() {
     @Composable
@@ -39,7 +41,7 @@ fun stateListSample() {
 
         Column {
             Row {
-                CoreTextField(
+                BaseTextField(
                     value = name,
                     onValueChange = { name = it }
                 )
