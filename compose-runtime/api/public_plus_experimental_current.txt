@@ -103,6 +103,7 @@ package androidx.compose {
   public final class Composer<N> {
     ctor public Composer(androidx.compose.SlotTable slotTable, androidx.compose.Applier<N> applier, androidx.compose.Recomposer recomposer);
     method @androidx.compose.InternalComposeApi public void applyChanges();
+    method @androidx.compose.ComposeCompilerApi public inline <T> T! cache(boolean invalid, kotlin.jvm.functions.Function0<? extends T> block);
     method @Deprecated public inline void call(Object key, kotlin.jvm.functions.Function1<? super androidx.compose.ComposerValidator,java.lang.Boolean> invalid, kotlin.jvm.functions.Function0<kotlin.Unit> block);
     method @androidx.compose.ComposeCompilerApi public boolean changed(Object? value);
     method @androidx.compose.ComposeCompilerApi public boolean changed(char value);
@@ -358,7 +359,7 @@ package androidx.compose {
     method @androidx.compose.Composable public static inline <T, V1> T! remember(V1? v1, kotlin.jvm.functions.Function0<? extends T> calculation);
     method @androidx.compose.Composable public static inline <T, V1, V2> T! remember(V1? v1, V2? v2, kotlin.jvm.functions.Function0<? extends T> calculation);
     method @androidx.compose.Composable public static inline <T, V1, V2, V3> T! remember(V1? v1, V2? v2, V3? v3, kotlin.jvm.functions.Function0<? extends T> calculation);
-    method @androidx.compose.Composable public static inline <V> V! remember(Object![]? inputs, kotlin.jvm.functions.Function0<? extends V> block);
+    method @androidx.compose.Composable public static inline <V> V! remember(Object![]? inputs, kotlin.jvm.functions.Function0<? extends V> calculation);
   }
 
   @androidx.compose.ComposeCompilerApi public interface ScopeUpdateScope {
