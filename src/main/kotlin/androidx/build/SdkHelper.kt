@@ -16,10 +16,12 @@
 
 package androidx.build
 
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtraPropertiesExtension
 import java.io.File
 import java.util.Locale
+import java.util.Properties
 
 /**
  * Writes the appropriate SDK path to local.properties file in specified location.
@@ -52,9 +54,37 @@ fun Project.writeSdkPathToLocalPropertiesFile() {
  * Returns the root project's platform-specific SDK path as a file.
  */
 fun Project.getSdkPath(): File {
-    val sdkPath = androidxSdkPath()
-    if (sdkPath != null) {
-        return File(sdkPath)
+    if (rootProject.plugins.hasPlugin(AndroidXPlaygroundRootPlugin::class.java)) {
+        // This is not full checkout, use local settings instead.
+        // https://developer.android.com/studio/command-line/variables
+        // check for local.properties first
+        val localPropsFile = rootProject.projectDir.resolve("local.properties")
+        if (localPropsFile.exists()) {
+            val localProps = Properties()
+            localPropsFile.inputStream().use {
+                localProps.load(it)
+            }
+            val localSdkDir = localProps["sdk.dir"]?.toString()
+            if (localSdkDir != null) {
+                val sdkDirectory = File(localSdkDir)
+                if (sdkDirectory.isDirectory) {
+                    return sdkDirectory
+                }
+            }
+        }
+        // check for environment variables, in the order AGP checks
+        listOf("ANDROID_HOME", "ANDROID_SDK_ROOT").forEach {
+            val envValue = System.getenv(it)
+            if (envValue != null) {
+                val sdkDirectory = File(envValue)
+                if (sdkDirectory.isDirectory) {
+                    return sdkDirectory
+                }
+            }
+        }
+        // only print the error for SDK ROOT since ANDROID_HOME is deprecated but we first check
+        // it because it is prioritized according to the documentation
+        throw GradleException("ANDROID_SDK_ROOT environment variable is not set")
     }
 
     val osName = System.getProperty("os.name").toLowerCase(Locale.US)
