@@ -18,7 +18,7 @@ package androidx.compose
 
 import javax.swing.SwingUtilities
 import kotlin.coroutines.CoroutineContext
-import kotlinx.coroutines.Dispatchers
+import androidx.compose.dispatch.DesktopUiDispatcher
 
 // API to allow override embedding context creation mechanism for tests.
 var EmbeddingContextFactory: (() -> EmbeddingContext)? = null
@@ -29,19 +29,19 @@ class SwingEmbeddingContext : EmbeddingContext {
     }
 
     override fun mainThreadCompositionContext(): CoroutineContext {
-        return Dispatchers.Main
+        return DesktopUiDispatcher.Main
     }
 
     override fun postOnMainThread(block: () -> Unit) {
-        SwingUtilities.invokeLater(block)
+        DesktopUiDispatcher.Dispatcher.scheduleCallback { block() }
     }
 
     private val cancelled = mutableSetOf<ChoreographerFrameCallback>()
 
     override fun postFrameCallback(callback: ChoreographerFrameCallback) {
-        postOnMainThread {
+        DesktopUiDispatcher.Dispatcher.scheduleCallback { now ->
             if (callback !in cancelled) {
-                callback.doFrame(System.currentTimeMillis() * 1000000)
+                callback.doFrame(now)
             } else {
                 cancelled.remove(callback)
             }

@@ -16,24 +16,6 @@
 
 package androidx.compose.dispatch
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
-
-/**
- * TODO: a more appropriate implementation that matches the vsync rate of the default display.
- * The current implementation will result in clock skew over time as resuming from delay() is not
- * guaranteed to be precise or frame-accurate.
- */
-private object MainDispatcherFrameClock : MonotonicFrameClock {
-    private const val DefaultFrameDelay = 16L // milliseconds
-
-    override suspend fun <R> withFrameNanos(onFrame: (frameTimeNanos: Long) -> R): R =
-        withContext(Dispatchers.Main) {
-            delay(DefaultFrameDelay)
-            onFrame(System.nanoTime())
-        }
+actual val DefaultMonotonicFrameClock: MonotonicFrameClock by lazy {
+    DesktopUiDispatcher.Dispatcher.frameClock
 }
-
-actual val DefaultMonotonicFrameClock: MonotonicFrameClock
-    get() = MainDispatcherFrameClock
