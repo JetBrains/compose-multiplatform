@@ -75,6 +75,7 @@ open class AndroidXExtension(val project: Project) {
     }
     var description: String? = null
     var inceptionYear: String? = null
+    var url = SUPPORT_URL
     /**
      * targetsJavaConsumers = true, if project is intended to be accessed from Java-language
      * source code.
@@ -129,7 +130,12 @@ open class AndroidXExtension(val project: Project) {
     }
 
     companion object {
-        const val DEFAULT_UNSPECIFIED_VERSION = "unspecified"
+        @JvmField
+        val ARCHITECTURE_URL =
+                "https://developer.android.com/topic/libraries/architecture/index.html"
+        @JvmField
+        val SUPPORT_URL = "https://developer.android.com/jetpack/androidx"
+        val DEFAULT_UNSPECIFIED_VERSION = "unspecified"
     }
 }
 
