@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.dispatch
+package androidx.compose.runtime.dispatch
 
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.coroutineContext

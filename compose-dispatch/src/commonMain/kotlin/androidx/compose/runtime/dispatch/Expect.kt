@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.dispatch
+package androidx.compose.runtime.dispatch
 
 /**
  * The [MonotonicFrameClock] used by [withFrameNanos] and [withFrameMillis] if one is not present
