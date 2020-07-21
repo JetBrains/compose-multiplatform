@@ -28,7 +28,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.ui.text.TextStyle
+import androidx.compose.ui.text.TextStyle
 import kotlin.random.Random
 
 val blackBackground = Modifier.background(color = Color.Black)

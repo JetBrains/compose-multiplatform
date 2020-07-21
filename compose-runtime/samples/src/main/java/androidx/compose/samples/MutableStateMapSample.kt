@@ -25,7 +25,7 @@ import androidx.compose.setValue
 import androidx.compose.mutableStateMapOf
 import androidx.compose.state
 import androidx.compose.foundation.Text
-import androidx.ui.input.TextFieldValue
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.ui.material.Button
