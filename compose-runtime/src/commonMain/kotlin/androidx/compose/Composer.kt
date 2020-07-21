@@ -24,24 +24,6 @@ package androidx.compose
 import androidx.compose.SlotTable.Companion.EMPTY
 import androidx.compose.tooling.InspectionTables
 
-/**
- * This is here because outdated versions of the compose IDE plugin expect to find it.
- * Without it, calls to [remember] are seen as errors, which breaks inference of [state] and more.
- *
- * This API is no longer needed in any way by the compiler, but we still need this API
- * to be here to support versions of Android Studio that are still looking for it. Without it,
- * valid composable code will look broken in the IDE. Remove this after we have left some time to
- * get all versions of Studio upgraded.
- * TODO b/152059242
- */
-@Deprecated(
-    "This property should not be called directly. It is only used by the compiler.",
-    replaceWith = ReplaceWith("currentComposer")
-)
-val composer: Composer<*> get() = error(
-    "This property should not be called directly. It is only used by the compiler."
-)
-
 internal typealias Change<N> = (
     applier: Applier<N>,
     slots: SlotWriter,
@@ -317,14 +299,6 @@ private fun ambientMapOf(values: Array<out ProvidedValue<*>>): AmbientMap {
     }
 }
 
-@Deprecated(
-    "This interfce is only left here for backwards compatibility with the Compose IDE Plugin"
-)
-interface ComposerValidator {
-    fun changed(value: Int): Boolean
-    fun <T> changed(value: T): Boolean
-}
-
 /**
  * Implementation of a composer for mutable tree.
  */
@@ -535,21 +509,6 @@ class Composer<N>(
      */
     @ComposeCompilerApi
     fun endMovableGroup() = endGroup()
-
-    @Suppress("UNUSED_PARAMETER", "DeprecatedCallableAddReplaceWith", "DEPRECATION")
-    @Deprecated(
-        "This method is only left here for backwards compatibility with the Compose IDE Plugin"
-    )
-    inline fun call(
-        key: Any,
-        invalid: ComposerValidator.() -> Boolean,
-        block: () -> Unit
-    ) {
-        error(
-            "This method should not be executed unless you are using an out of date Compose " +
-                    "Compiler Plugin"
-        )
-    }
 
     /**
      * Start the composition. This should be called, and only be called, as the first group in
@@ -2478,20 +2437,6 @@ private fun MutableList<Invalidation>.removeRange(start: Int, end: Int) {
 
 private fun Boolean.asInt() = if (this) 1 else 0
 private fun Int.asBool() = this != 0
-
-@Deprecated(
-    "This no longer has any effect"
-)
-object NullCompilationScope {
-    val composer = Unit
-}
-
-@Suppress("DEPRECATION")
-@Deprecated(
-    "This no longer has any effect",
-    ReplaceWith("block()")
-)
-inline fun <T> escapeCompose(block: NullCompilationScope.() -> T) = NullCompilationScope.block()
 
 @Composable
 val currentComposer: Composer<*> get() {
