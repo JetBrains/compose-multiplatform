@@ -18,7 +18,7 @@ package androidx.compose
 
 import android.os.Handler
 import android.os.Looper
-import androidx.compose.dispatch.AndroidUiDispatcher
+import androidx.compose.runtime.dispatch.AndroidUiDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
 

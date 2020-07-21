@@ -17,8 +17,8 @@
 // TODO(b/158105080): make part of ComposeRuntime
 package androidx.compose
 
-import androidx.compose.dispatch.MonotonicFrameClock
-import androidx.compose.dispatch.withFrameMillis as withFrameMillisDispatch
+import androidx.compose.runtime.dispatch.MonotonicFrameClock
+import androidx.compose.runtime.dispatch.withFrameMillis as withFrameMillisDispatch
 
 /**
  * Provides a time source for display frames for use in composition.
@@ -63,7 +63,7 @@ interface CompositionFrameClock : MonotonicFrameClock {
     "CompositionFrameClock moved and renamed to MonotonicFrameClock",
     ReplaceWith(
         "withFrameMillis(onFrame)",
-        "androidx.compose.dispatch.withFrameMillis"
+        "androidx.compose.runtime.dispatch.withFrameMillis"
     )
 )
 @Suppress("UnnecessaryLambdaCreation", "DEPRECATION")

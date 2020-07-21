@@ -17,7 +17,7 @@
 @file:OptIn(ExperimentalComposeApi::class, InternalComposeApi::class)
 package androidx.compose
 
-import androidx.compose.dispatch.MonotonicFrameClock
+import androidx.compose.runtime.dispatch.MonotonicFrameClock
 import androidx.compose.mock.Contact
 import androidx.compose.mock.ContactModel
 import androidx.compose.mock.MockComposeScope

@@ -20,8 +20,8 @@
 )
 package androidx.compose
 
-import androidx.compose.dispatch.DefaultMonotonicFrameClock
-import androidx.compose.dispatch.MonotonicFrameClock
+import androidx.compose.runtime.dispatch.DefaultMonotonicFrameClock
+import androidx.compose.runtime.dispatch.MonotonicFrameClock
 import androidx.compose.snapshots.Snapshot
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
