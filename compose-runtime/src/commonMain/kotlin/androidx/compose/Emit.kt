@@ -76,12 +76,12 @@ package androidx.compose
  */
 @OptIn(ComposeCompilerApi::class)
 @Composable
-inline fun <T : Any, reified E : Applier<*>> emit(
+inline fun <T : Any?, reified E : Applier<*>> emit(
     noinline ctor: () -> T,
     update: Updater<T>.() -> Unit,
     children: @Composable () -> Unit
 ) {
-    require(currentComposer.applier is E)
+    if (currentComposer.applier !is E) invalidApplier()
     currentComposer.startNode()
     val node = if (currentComposer.inserting)
         ctor().also { currentComposer.emitNode(it) }
@@ -92,3 +92,6 @@ inline fun <T : Any, reified E : Applier<*>> emit(
     children()
     currentComposer.endNode()
 }
+
+@PublishedApi
+internal fun invalidApplier(): Nothing = error("Invalid applier")

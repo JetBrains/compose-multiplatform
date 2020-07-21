@@ -118,7 +118,7 @@ package androidx.compose {
     method @androidx.compose.InternalComposeApi public void composeRoot(kotlin.jvm.functions.Function0<kotlin.Unit> block);
     method @kotlin.PublishedApi internal <T> T! consume(androidx.compose.Ambient<T> key);
     method @androidx.compose.ComposeCompilerApi public <T extends N> void createNode(kotlin.jvm.functions.Function0<? extends T> factory);
-    method @androidx.compose.ComposeCompilerApi public void emitNode(Object node);
+    method @androidx.compose.ComposeCompilerApi public void emitNode(Object? node);
     method @androidx.compose.ComposeCompilerApi public void endDefaults();
     method @androidx.compose.ComposeCompilerApi public void endMovableGroup();
     method @androidx.compose.ComposeCompilerApi public void endNode();
@@ -240,6 +240,7 @@ package androidx.compose {
   public final class EmitKt {
     method @androidx.compose.Composable public static inline <T extends java.lang.Object, reified E extends androidx.compose.Applier<?>> void emit(kotlin.jvm.functions.Function0<? extends T> ctor, kotlin.jvm.functions.Function1<? super androidx.compose.Updater<T>,? extends kotlin.Unit> update);
     method @androidx.compose.Composable public static inline <T extends java.lang.Object, reified E extends androidx.compose.Applier<?>> void emit(kotlin.jvm.functions.Function0<? extends T> ctor, kotlin.jvm.functions.Function1<? super androidx.compose.Updater<T>,? extends kotlin.Unit> update, kotlin.jvm.functions.Function0<? extends kotlin.Unit> children);
+    method @kotlin.PublishedApi internal static Void invalidApplier();
   }
 
   public final class ExpectKt {

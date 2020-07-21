@@ -806,7 +806,7 @@ class Composer<N>(
      * inserting.
      */
     @ComposeCompilerApi
-    fun emitNode(node: Any) {
+    fun emitNode(node: Any?) {
         validateNodeExpected()
         check(inserting) { "emitNode() called when not inserting" }
         val insertIndex = nodeIndexStack.peek()

@@ -117,7 +117,7 @@ package androidx.compose {
     method @androidx.compose.InternalComposeApi public void collectKeySourceInformation();
     method @androidx.compose.InternalComposeApi public void composeRoot(kotlin.jvm.functions.Function0<kotlin.Unit> block);
     method @androidx.compose.ComposeCompilerApi public <T extends N> void createNode(kotlin.jvm.functions.Function0<? extends T> factory);
-    method @androidx.compose.ComposeCompilerApi public void emitNode(Object node);
+    method @androidx.compose.ComposeCompilerApi public void emitNode(Object? node);
     method @androidx.compose.ComposeCompilerApi public void endDefaults();
     method @androidx.compose.ComposeCompilerApi public void endMovableGroup();
     method @androidx.compose.ComposeCompilerApi public void endNode();
