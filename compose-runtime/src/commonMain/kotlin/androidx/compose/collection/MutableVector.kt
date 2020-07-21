@@ -34,6 +34,11 @@ class MutableVector<T> @PublishedApi internal constructor(
     size: Int
 ) {
     /**
+     * Stores allocated [MutableList] representation of this vector.
+     */
+    private var list: MutableList<T>? = null
+
+    /**
      * The number of elements in the [MutableVector].
      */
     var size: Int = size
@@ -207,7 +212,11 @@ class MutableVector<T> @PublishedApi internal constructor(
     /**
      * Returns [MutableList] interface access to the [MutableVector].
      */
-    fun asMutableList(): MutableList<T> = MutableVectorList(this)
+    fun asMutableList(): MutableList<T> {
+        return list ?: MutableVectorList(this).also {
+            list = it
+        }
+    }
 
     /**
      * Removes all elements in the [MutableVector].
