@@ -16,7 +16,7 @@
 
 package androidx.compose
 
-import androidx.compose.dispatch.MonotonicFrameClock
+import androidx.compose.runtime.dispatch.MonotonicFrameClock
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.Continuation
 

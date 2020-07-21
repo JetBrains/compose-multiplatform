@@ -18,7 +18,7 @@
 @file:OptIn(InternalComposeApi::class)
 package androidx.compose
 
-import androidx.compose.dispatch.MonotonicFrameClock
+import androidx.compose.runtime.dispatch.MonotonicFrameClock
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel

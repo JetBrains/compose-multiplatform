@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-package androidx.compose.dispatch
+package androidx.compose.runtime.dispatch
 
-actual val DefaultMonotonicFrameClock: MonotonicFrameClock by lazy {
-    DesktopUiDispatcher.Dispatcher.frameClock
-}
+import androidx.core.app.ComponentActivity
+
+class TestActivity : ComponentActivity()

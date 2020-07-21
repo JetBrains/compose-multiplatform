@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package androidx.compose.dispatch
+package androidx.compose.runtime.dispatch
 
 import android.os.Looper
 import android.view.Choreographer
-import androidx.compose.dispatch.AndroidUiDispatcher.Companion.CurrentThread
-import androidx.compose.dispatch.AndroidUiDispatcher.Companion.Main
+import androidx.compose.runtime.dispatch.AndroidUiDispatcher.Companion.CurrentThread
+import androidx.compose.runtime.dispatch.AndroidUiDispatcher.Companion.Main
 import androidx.core.os.HandlerCompat
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
