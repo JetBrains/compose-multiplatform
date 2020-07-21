@@ -104,7 +104,6 @@ package androidx.compose {
     ctor public Composer(androidx.compose.SlotTable slotTable, androidx.compose.Applier<N> applier, androidx.compose.Recomposer recomposer);
     method @androidx.compose.InternalComposeApi public void applyChanges();
     method @androidx.compose.ComposeCompilerApi public inline <T> T! cache(boolean invalid, kotlin.jvm.functions.Function0<? extends T> block);
-    method @Deprecated public inline void call(Object key, kotlin.jvm.functions.Function1<? super androidx.compose.ComposerValidator,java.lang.Boolean> invalid, kotlin.jvm.functions.Function0<kotlin.Unit> block);
     method @androidx.compose.ComposeCompilerApi public boolean changed(Object? value);
     method @androidx.compose.ComposeCompilerApi public boolean changed(char value);
     method @androidx.compose.ComposeCompilerApi public boolean changed(byte value);
@@ -151,14 +150,7 @@ package androidx.compose {
   }
 
   public final class ComposerKt {
-    method @Deprecated public static inline <T> T! escapeCompose(kotlin.jvm.functions.Function1<? super androidx.compose.NullCompilationScope,? extends T> block);
-    method @Deprecated public static androidx.compose.Composer<?> getComposer();
     method public static androidx.compose.Composer<?> getCurrentComposer();
-  }
-
-  @Deprecated public interface ComposerValidator {
-    method @Deprecated public boolean changed(int value);
-    method @Deprecated public <T> boolean changed(T? value);
   }
 
   public interface Composition {
@@ -183,7 +175,6 @@ package androidx.compose {
   }
 
   public final class CompositionKt {
-    method @Deprecated public static androidx.compose.Composition compositionFor(Object container, androidx.compose.Recomposer recomposer, androidx.compose.CompositionReference? parent = null, kotlin.jvm.functions.Function2<? super androidx.compose.SlotTable,? super androidx.compose.Recomposer,? extends androidx.compose.Composer<?>> composerFactory);
     method @androidx.compose.ExperimentalComposeApi public static androidx.compose.Composition compositionFor(Object key, androidx.compose.Applier<?> applier, androidx.compose.Recomposer recomposer, androidx.compose.CompositionReference? parent = null, kotlin.jvm.functions.Function0<kotlin.Unit> onCreated = {});
   }
 
@@ -302,12 +293,6 @@ package androidx.compose {
   }
 
   @kotlin.annotation.Retention(AnnotationRetention.SOURCE) @kotlin.annotation.Target(allowedTargets={AnnotationTarget.PROPERTY, AnnotationTarget.FUNCTION, AnnotationTarget.CLASS, AnnotationTarget.FILE}) public @interface NoLiveLiterals {
-  }
-
-  @Deprecated public final class NullCompilationScope {
-    method @Deprecated public kotlin.Unit getComposer();
-    property public final kotlin.Unit composer;
-    field @Deprecated public static final androidx.compose.NullCompilationScope INSTANCE;
   }
 
   public final class ObserverMap<K, V> {
@@ -532,9 +517,6 @@ package androidx.compose {
 
   @androidx.compose.ExperimentalComposeApi @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets={AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER}) public @interface UnionType {
     method public abstract Class<?>[] types();
-  }
-
-  @Deprecated @androidx.compose.ExperimentalComposeApi @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=AnnotationTarget.FUNCTION) public @interface Untracked {
   }
 
   public final class Updater<T> {

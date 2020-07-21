@@ -41,32 +41,6 @@ interface Composition {
 /**
  * This method is the way to initiate a composition. Optionally, a [parent]
  * [CompositionReference] can be provided to make the composition behave as a sub-composition of
- * the parent.  The children of [container] will be updated and maintained by the time this
- * method returns.
- *
- * It is important to call [Composition.dispose] whenever this [container] is no longer needed in
- * order to release resources.
- *
- * @param container The container whose content is being composed.
- * @param recomposer The [Recomposer] to coordinate scheduling of composition updates.
- * @param parent The parent composition reference, if applicable. Default is null.
- * @param composerFactory The factory used to created a [Composer] to be used by the composition.
- */
-@Deprecated("Use the compositionFor(...) overload that accepts an Applier<N>")
-fun compositionFor(
-    container: Any,
-    recomposer: Recomposer,
-    parent: CompositionReference? = null,
-    composerFactory: (SlotTable, Recomposer) -> Composer<*>
-): Composition = Compositions.findOrCreate(container) {
-    CompositionImpl(recomposer, parent, composerFactory) {
-        Compositions.onDisposed(container)
-    }
-}
-
-/**
- * This method is the way to initiate a composition. Optionally, a [parent]
- * [CompositionReference] can be provided to make the composition behave as a sub-composition of
  * the parent.
  *
  * It is important to call [Composition.dispose] whenever this [key] is no longer needed in
