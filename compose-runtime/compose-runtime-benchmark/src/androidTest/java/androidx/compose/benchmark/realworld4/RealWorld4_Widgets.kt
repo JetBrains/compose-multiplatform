@@ -35,7 +35,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.ui.unit.dp
+import androidx.compose.ui.unit.dp
 import kotlin.reflect.KCallable
 import kotlin.reflect.full.memberProperties
 
