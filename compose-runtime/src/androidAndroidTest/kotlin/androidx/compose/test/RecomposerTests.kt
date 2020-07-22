@@ -40,6 +40,7 @@ import org.junit.After
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.test.assertNotNull
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -419,6 +420,44 @@ class RecomposerTests : BaseComposeTest() {
             someOtherState = 10
         }.then {
             // force recompose
+        }
+    }
+
+    @Test // regression test for b/161892016
+    fun testMultipleRecompose() {
+        class A
+
+        var state1 by mutableStateOf(1)
+        var state2 by mutableStateOf(1)
+
+        @Composable fun validate(a: A?) {
+            assertNotNull(a)
+        }
+
+        @Composable fun use(@Suppress("UNUSED_PARAMETER") i: Int) { }
+
+        @Composable fun useA(a: A = A()) {
+            validate(a)
+            use(state2)
+        }
+
+        @Composable fun test() {
+            use(state1)
+            useA()
+        }
+
+        compose {
+            test()
+        }.then {
+            // Recompose test() skipping useA()
+            state1 = 2
+        }.then {
+            // Recompose useA(). In the bug this causes validate() to be passed a null because
+            // the recompose scope is updated with a lambda that captures the parameters when the
+            // default parameter expressions are skipped.
+            state2 = 2
+        }.then {
+            // force recompose to validate a.
         }
     }
 
