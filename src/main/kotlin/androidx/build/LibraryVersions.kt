@@ -60,7 +60,7 @@ object LibraryVersions {
     val ENTERPRISE = Version("1.1.0-alpha01")
     val EXIFINTERFACE = Version("1.3.0-alpha02")
     val FRAGMENT = Version("1.3.0-alpha07")
-    val FUTURES = Version("1.1.0-rc01")
+    val FUTURES = Version("1.2.0-alpha01")
     val GRIDLAYOUT = Version("1.1.0-alpha01")
     val HEIFWRITER = Version("1.1.0-alpha01")
     val HILT = Version("1.0.0-alpha02")
@@ -121,5 +121,5 @@ object LibraryVersions {
     val WEBKIT = Version("1.4.0-alpha01")
     val WINDOW = Version("1.0.0-alpha02")
     val WINDOW_SIDECAR = Version("0.1.0-alpha01")
-    val WORK = Version("2.4.0-rc01")
+    val WORK = Version("2.5.0-alpha01")
 }
