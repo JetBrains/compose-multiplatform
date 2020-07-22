@@ -1720,6 +1720,7 @@ class Composer<N>(
     @ComposeCompilerApi
     fun skipToGroupEnd() {
         check(groupNodeCount == 0) { "No nodes can be emitted before calling skipAndEndGroup" }
+        currentRecomposeScope?.used = false
         if (invalidations.isEmpty()) {
             skipReaderToGroupEnd()
         } else {
