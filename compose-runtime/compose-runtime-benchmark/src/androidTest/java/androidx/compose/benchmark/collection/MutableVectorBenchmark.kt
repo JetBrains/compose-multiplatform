@@ -23,9 +23,9 @@ import androidx.compose.collection.MutableVector
 import androidx.compose.collection.mutableVectorOf
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.ui.util.fastAny
-import androidx.ui.util.fastForEach
-import androidx.ui.util.fastSumBy
+import androidx.compose.ui.util.fastAny
+import androidx.compose.ui.util.fastForEach
+import androidx.compose.ui.util.fastSumBy
 import org.junit.Before
 import org.junit.FixMethodOrder
 import org.junit.Test
