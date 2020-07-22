@@ -16,7 +16,7 @@
 
 package androidx.compose.benchmark.realworld4
 
-import androidx.ui.graphics.Color
+import androidx.compose.ui.graphics.Color
 import java.util.Random
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec

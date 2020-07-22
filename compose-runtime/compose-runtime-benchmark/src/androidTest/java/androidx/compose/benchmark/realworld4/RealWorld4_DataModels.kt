@@ -24,7 +24,7 @@ package androidx.compose.benchmark.realworld4
 import androidx.compose.getValue
 import androidx.compose.mutableStateOf
 import androidx.compose.setValue
-import androidx.ui.graphics.Color
+import androidx.compose.ui.graphics.Color
 
 class RealWorld4_DataModel_09() {
     var f0: Color by mutableStateOf(

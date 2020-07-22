@@ -28,7 +28,7 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.ui.core.Modifier
-import androidx.ui.graphics.Color
+import androidx.compose.ui.graphics.Color
 import org.junit.FixMethodOrder
 import org.junit.Ignore
 import org.junit.Test
