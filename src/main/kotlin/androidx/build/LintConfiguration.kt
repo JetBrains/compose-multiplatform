@@ -22,11 +22,6 @@ import org.gradle.api.Project
 import java.io.File
 
 /**
- * Setting this property means that lint will fail for UnknownNullness issues.
- */
-private const val CHECK_UNKNOWN_NULLNESS = "checkUnknownNullness"
-
-/**
  * Setting this property means that lint will update lint-baseline.xml if it exists.
  */
 private const val UPDATE_LINT_BASELINE = "updateLintBaseline"
@@ -68,9 +63,6 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
         project.rootProject.project(":lint-checks")
     )
 
-    // If -PcheckUnknownNullness was set we should fail on UnknownNullness warnings
-    val checkUnknownNullness = hasProperty(CHECK_UNKNOWN_NULLNESS)
-
     // If -PupdateLintBaseline was set we should update the baseline if it exists
     val updateLintBaseline = hasProperty(UPDATE_LINT_BASELINE)
 
@@ -99,55 +91,51 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
 
             fatal("VisibleForTests")
 
+            // Workaround for integration branch using a newer AGP with a check that we don't want.
+            // This will be removed when we update to that AGP (b/160261355).
             if (com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.startsWith("4.2.")) {
                 disable("KtxExtensionAvailable")
             }
 
             if (extension.compilationTarget != CompilationTarget.HOST) {
-                // Ignore other errors since we are only interested in nullness here
-                if (checkUnknownNullness) {
-                    fatal("UnknownNullness")
+                fatal("Assert")
+                fatal("NewApi")
+                fatal("ObsoleteSdkInt")
+                fatal("NoHardKeywords")
+                fatal("UnusedResources")
+                fatal("KotlinPropertyAccess")
+                fatal("LambdaLast")
+                fatal("UnknownNullness")
+
+                // If the project has not overridden the lint config, set the default one.
+                if (lintConfig == null) {
+                    // suppress warnings more specifically than issue-wide severity (regexes)
+                    // Currently suppresses warnings from baseline files working as intended
+                    lintConfig = project.rootProject.file("buildSrc/lint.xml")
+                }
+
+                // Only override if not set explicitly.
+                // Some Kotlin projects may wish to disable this.
+                if (severityOverrides!!["SyntheticAccessor"] == null) {
+                    fatal("SyntheticAccessor")
+                }
+
+                // Only check for missing translations in finalized (beta and later) modules.
+                if (extension.mavenVersion?.isFinalApi() == true) {
+                    fatal("MissingTranslation")
                 } else {
-                    fatal("Assert")
-                    fatal("NewApi")
-                    fatal("ObsoleteSdkInt")
-                    fatal("NoHardKeywords")
-                    fatal("UnusedResources")
-                    fatal("KotlinPropertyAccess")
-                    fatal("LambdaLast")
-                    fatal("UnknownNullness")
-
-                    // If the project has not overridden the lint config, set the default one.
-                    if (lintConfig == null) {
-                        // suppress warnings more specifically than issue-wide severity (regexes)
-                        // Currently suppresses warnings from baseline files working as intended
-                        lintConfig = project.rootProject.file("buildSrc/lint.xml")
-                    }
-
-                    // Only override if not set explicitly.
-                    // Some Kotlin projects may wish to disable this.
-                    if (severityOverrides!!["SyntheticAccessor"] == null) {
-                        fatal("SyntheticAccessor")
-                    }
-
-                    if (extension.mavenVersion?.isFinalApi() == true) {
-                        fatal("MissingTranslation")
-                    } else {
-                        disable("MissingTranslation")
-                    }
+                    disable("MissingTranslation")
                 }
             }
 
-            if (checkUnknownNullness) {
-                val lintDebugTask = tasks.named("lintDebug")
-                lintDebugTask.configure {
-                    it.doFirst {
-                        logger.warn(
-                            "-PcheckUnknownNullness set - checking UnknownNullness lint warnings."
-                        )
-                    }
-                }
-            } else if (lintBaseline.exists()) {
+            // Teams shouldn't be able to generate new baseline files or add new violations to
+            // existing files; they should only be able to burn down existing violations. That's
+            // hard to enforce, though, so we'll just prevent them from creating new ones.
+            //
+            // If you are working on enabling a new check -- and ONLY if you are working on a new
+            // check, then you may need to comment out this line  so that you can suppress all
+            // the new failures.
+            if (lintBaseline.exists()) {
                 if (updateLintBaseline) {
                     // Continue generating baselines regardless of errors
                     isAbortOnError = false
