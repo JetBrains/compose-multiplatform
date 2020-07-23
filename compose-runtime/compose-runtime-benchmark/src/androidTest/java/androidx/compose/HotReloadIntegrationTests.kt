@@ -24,8 +24,8 @@ import androidx.ui.core.WithConstraints
 import androidx.ui.core.setContent
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
-import androidx.ui.material.DrawerState
-import androidx.ui.material.ModalDrawerLayout
+import androidx.compose.material.DrawerState
+import androidx.compose.material.ModalDrawerLayout
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

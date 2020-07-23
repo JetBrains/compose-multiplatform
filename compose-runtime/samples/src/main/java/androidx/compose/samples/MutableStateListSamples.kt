@@ -28,7 +28,7 @@ import androidx.compose.foundation.Text
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.ui.material.Button
+import androidx.compose.material.Button
 
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
