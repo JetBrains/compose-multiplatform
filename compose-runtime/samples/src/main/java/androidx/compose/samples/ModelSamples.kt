@@ -25,7 +25,7 @@ import androidx.compose.getValue
 import androidx.compose.setValue
 import androidx.compose.state
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.ui.material.Button
+import androidx.compose.material.Button
 
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
