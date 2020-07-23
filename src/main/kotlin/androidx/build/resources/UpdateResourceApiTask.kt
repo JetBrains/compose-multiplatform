@@ -18,29 +18,28 @@ package androidx.build.resources
 
 import androidx.build.checkapi.ApiLocation
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
-import org.gradle.api.tasks.InputFiles
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
 import java.io.File
-import java.nio.file.Files
-import java.util.SortedSet
 
 /**
  * Task for updating the public Android resource surface, e.g. `public.xml`.
  */
 abstract class UpdateResourceApiTask : DefaultTask() {
-    /**
-     * Text file from which resource API signatures will be read.
-     *
-     * A file path must be specified but the file may not exist if the library has no resources.
-     */
-    @get:InputFiles
-    abstract val inputApiFile: RegularFileProperty
+    /** Generated resource API file (in build output). */
+    @get:Internal
+    abstract val apiLocation: Property<ApiLocation>
 
-    /** Text files to which resource signatures will be written. */
+    @InputFile
+    fun getTaskInput(): File {
+        return apiLocation.get().resourceFile
+    }
+
+    /** Resource API files to which APIs should be written (in source control). */
     @get:Internal // outputs are declared in getTaskOutputs()
     abstract val outputApiLocations: ListProperty<ApiLocation>
 
@@ -65,31 +64,11 @@ abstract class UpdateResourceApiTask : DefaultTask() {
             }
         }
 
-        val inputApi = inputApiFile.get().asFile
-
-        // Read the current API surface, if any, into memory.
-        val inputApiSet = if (inputApi.exists()) {
-            HashSet(inputApi.readLines())
-        } else {
-            emptySet<String>()
-        }
-
-        // Sort the resources for the sake of source control diffs.
-        val inputApiSortedSet: SortedSet<String> = inputApiSet.toSortedSet()
-
-        // Write current API surface to temporary file.
-        val tempApi = Files.createTempFile("res-api", "txt").toFile()
-        tempApi.deleteOnExit()
-        tempApi.bufferedWriter().use { out ->
-            inputApiSortedSet.forEach { api ->
-                out.write(api)
-                out.newLine()
-            }
-        }
+        val inputApi = apiLocation.get().resourceFile
 
         for (outputApi in outputApiLocations.get()) {
             androidx.build.metalava.copy(
-                tempApi,
+                inputApi,
                 outputApi.resourceFile,
                 permitOverwriting,
                 project.logger

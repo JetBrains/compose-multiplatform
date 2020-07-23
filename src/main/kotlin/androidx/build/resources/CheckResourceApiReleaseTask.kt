@@ -16,37 +16,37 @@
 
 package androidx.build.resources
 
+import androidx.build.checkapi.ApiLocation
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
-import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
 /**
- * Task for updating the public Android resource surface, e.g. `public.xml`.
+ * Task for verifying changes in the public Android resource surface, e.g. `public.xml`.
  */
 abstract class CheckResourceApiReleaseTask : DefaultTask() {
-    /**
-     * Text file from which the resource API signatures will be read.
-     */
+    /** Reference resource API file (in source control). */
     @get:InputFile
     abstract val referenceApiFile: Property<File>
 
-    /**
-     * Text file representing the current resource API surface to check.
-     *
-     * A file path must be specified but the file may not exist if the library has no resources.
-     */
-    @get:InputFiles
-    abstract val apiFile: RegularFileProperty
+    /** Generated resource API file (in build output). */
+    @get:Internal
+    abstract val apiLocation: Property<ApiLocation>
+
+    @InputFiles
+    fun getTaskInput(): File {
+        return apiLocation.get().resourceFile
+    }
 
     @TaskAction
     fun checkResourceApiRelease() {
         val referenceApiFile = referenceApiFile.get()
-        val apiFile = apiFile.get().asFile
+        val apiFile = apiLocation.get().resourceFile
 
         // Read the current API surface, if any, into memory.
         val newApiSet = if (apiFile.exists()) {

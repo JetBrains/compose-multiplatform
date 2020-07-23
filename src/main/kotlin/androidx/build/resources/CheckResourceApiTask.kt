@@ -16,10 +16,13 @@
 
 package androidx.build.resources
 
+import androidx.build.checkapi.ApiLocation
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
@@ -27,41 +30,25 @@ import java.io.File
  * Task for detecting changes in the public Android resource surface, e.g. `public.xml`.
  */
 abstract class CheckResourceApiTask : DefaultTask() {
-    /**
-     * API file (in the build dir) to check.
-     *
-     * A file path must be specified but the file may not exist if the library has no resources.
-     */
+    /** Checked in resource API files (in source control). */
     @get:InputFiles
-    abstract val builtApi: RegularFileProperty
+    abstract val checkedInApiFiles: ListProperty<File>
 
-    /**
-     * API files (in source control) to compare against.
-     */
-    @get:InputFiles
-    abstract val checkedInApis: ListProperty<File>
+    /** Generated resource API file (in build output). */
+    @get:Internal
+    abstract val apiLocation: Property<ApiLocation>
+
+    @InputFile
+    fun getTaskInput(): File {
+        return apiLocation.get().resourceFile
+    }
 
     @TaskAction
     fun checkResourceApi() {
-        val apiFile = builtApi.get().asFile
+        val builtApi = apiLocation.get().resourceFile
 
-        // The built API file, if any, needs to be sorted first because that's how we store them.
-        val sortedApiLines = if (apiFile.exists()) {
-            apiFile.readLines().toSortedSet()
-        } else {
-            emptySet<String>()
-        }
-
-        val builtApiSorted = File.createTempFile("res", "txt")
-        builtApiSorted.bufferedWriter().use { out ->
-            sortedApiLines.forEach {
-                out.write(it)
-                out.newLine()
-            }
-        }
-
-        for (checkedInApi in checkedInApis.get()) {
-            androidx.build.metalava.checkEqual(checkedInApi, builtApiSorted)
+        for (checkedInApi in checkedInApiFiles.get()) {
+            androidx.build.metalava.checkEqual(checkedInApi, builtApi)
         }
     }
 }
