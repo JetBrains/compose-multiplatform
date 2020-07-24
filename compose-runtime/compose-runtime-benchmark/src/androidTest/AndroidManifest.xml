@@ -17,7 +17,7 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="androidx.compose.benchmark">
+    package="androidx.compose.runtime.benchmark">
     <!--
       ~ Important: disable debuggable for accurate performance results
       ~ requestLegacyExternalStorage to enable legacy JSON reporting when targeting Q
