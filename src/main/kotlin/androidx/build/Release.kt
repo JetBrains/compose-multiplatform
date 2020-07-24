@@ -178,7 +178,6 @@ object Release {
         }
         zipTasks.addAll(listOf(
                 getGroupReleaseZipTask(project, mavenGroup),
-                getGlobalReleaseZipTask(project),
                 getGlobalFullZipTask(project)))
         val artifact = Artifact(
                 mavenGroup = mavenGroup,
@@ -201,7 +200,7 @@ object Release {
     private fun getParams(
         project: Project,
         distDir: File,
-        fileNamePrefix: String,
+        fileNamePrefix: String = "",
         group: String? = null
     ): GMavenZipTask.ConfigAction.Params {
         val params = configActionParams ?: GMavenZipTask.ConfigAction.Params(
@@ -221,27 +220,6 @@ object Release {
                 distDir = distDir,
                 fileNamePrefix = fileNamePrefix
         )
-    }
-
-    /**
-     * Creates and returns the task that generates the combined gmaven diff file for all projects.
-     */
-    private fun getGlobalReleaseZipTask(project: Project): TaskProvider<GMavenZipTask> {
-        val taskProvider: TaskProvider<GMavenZipTask> = project.rootProject.maybeRegister(
-            name = "${DIFF_TASK_PREFIX}ForAll",
-            onConfigure = {
-                GMavenZipTask.ConfigAction(
-                    getParams(
-                        project,
-                        project.getDistributionDirectory(),
-                        "gmaven-diff")
-                    ).execute(it)
-            },
-            onRegister = {
-            }
-        )
-        project.addToBuildOnServer(taskProvider)
-        return taskProvider
     }
 
     /**
@@ -277,9 +255,10 @@ object Release {
             name = "${DIFF_TASK_PREFIX}For${groupToTaskNameSuffix(group)}",
             onConfigure = {
                 GMavenZipTask.ConfigAction(
-                    getParams(project,
-                        File(project.getDistributionDirectory(), "per-group-zips"),
-                        "gmaven-diff", group
+                    getParams(project = project,
+                        distDir = File(project.getDistributionDirectory(), "per-group-zips"),
+                        fileNamePrefix = "gmaven-",
+                        group = group
                     )
                 ).execute(it)
             },
