@@ -26,11 +26,11 @@ import android.app.Activity
 import android.os.Looper
 import android.view.ViewGroup
 import androidx.compose.runtime.snapshots.Snapshot
-import androidx.ui.core.ContextAmbient
-import androidx.ui.core.ExperimentalLayoutNodeApi
-import androidx.ui.core.LayoutNode
-import androidx.ui.core.setViewContent
-import androidx.ui.core.subcomposeInto
+import androidx.compose.ui.node.ExperimentalLayoutNodeApi
+import androidx.compose.ui.node.LayoutNode
+import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.platform.setViewContent
+import androidx.compose.ui.platform.subcomposeInto
 
 class TestActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {

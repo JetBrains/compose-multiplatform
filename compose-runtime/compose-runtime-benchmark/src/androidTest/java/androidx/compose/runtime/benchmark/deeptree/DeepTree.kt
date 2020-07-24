@@ -17,7 +17,7 @@
 package androidx.compose.runtime.benchmark.deeptree
 
 import androidx.compose.runtime.Composable
-import androidx.ui.core.Modifier
+import androidx.compose.ui.Modifier
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.background
 import androidx.compose.ui.graphics.Color

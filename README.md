@@ -6,7 +6,7 @@ A Compose application is comprised of `@Composable` functions, which are functio
 
 ```
 import androidx.compose.runtime.*
-import androidx.ui.core.*
+import androidx.compose.foundation.*
 
 @Composable
 fun Greeting(name: String) {
