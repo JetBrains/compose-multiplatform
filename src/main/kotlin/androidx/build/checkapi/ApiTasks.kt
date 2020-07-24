@@ -19,10 +19,11 @@ package androidx.build.checkapi
 import androidx.build.AndroidXExtension
 import androidx.build.Release
 import androidx.build.RunApiTasks
-import androidx.build.isVersionedApiFileWritingEnabled
+import androidx.build.isWriteVersionedApiFilesEnabled
 import androidx.build.java.JavaCompileInputs
 import androidx.build.metalava.MetalavaTasks
 import androidx.build.resources.ResourceTasks
+import androidx.build.version
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.tasks.ProcessLibraryManifest
 import org.gradle.api.GradleException
@@ -91,6 +92,30 @@ private fun AndroidXExtension.shouldConfigureApiTasks(): Boolean {
     return true
 }
 
+/**
+ * Returns whether the project should write versioned API files, e.g. `1.1.0-alpha01.txt`.
+ * <p>
+ * When set to `true`, the `updateApi` task will write the current API surface to both `current.txt`
+ * and `<version>.txt`. When set to `false`, only `current.txt` will be written. The default value
+ * is `true`.
+ */
+private fun Project.shouldWriteVersionedApiFile(): Boolean {
+    // Is versioned file writing disabled globally, ex. we're on a downstream branch?
+    if (!project.isWriteVersionedApiFilesEnabled()) {
+        return false
+    }
+
+    // Policy: Don't write versioned files for non-final API surfaces, ex. dev or alpha, or for
+    // versions that should only exist in dead-end release branches, ex. rc or stable.
+    if (!project.version().isFinalApi() ||
+        project.version().isRC() ||
+        project.version().isStable()) {
+        return false
+    }
+
+    return true
+}
+
 fun Project.configureProjectForApiTasks(
     config: ApiTaskConfig,
     extension: AndroidXExtension
@@ -104,7 +129,7 @@ fun Project.configureProjectForApiTasks(
         val builtApiLocation = project.getBuiltApiLocation()
         val versionedApiLocation = project.getVersionedApiLocation()
         val currentApiLocation = project.getCurrentApiLocation()
-        val outputApiLocations = if (project.isVersionedApiFileWritingEnabled()) {
+        val outputApiLocations = if (project.shouldWriteVersionedApiFile()) {
             listOf(
                 versionedApiLocation,
                 currentApiLocation
