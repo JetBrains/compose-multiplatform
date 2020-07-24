@@ -37,7 +37,7 @@ const val ALL_WARNINGS_AS_ERRORS = "androidx.allWarningsAsErrors"
  * and `<version>.txt`. When set to `false`, only `current.txt` will be written. The default value
  * is `true`.
  */
-fun Project.isVersionedApiFileWritingEnabled(): Boolean =
+fun Project.isWriteVersionedApiFilesEnabled(): Boolean =
     (project.findProperty("androidx.writeVersionedApiFiles") as? String)?.toBoolean() ?: true
 
 /**
