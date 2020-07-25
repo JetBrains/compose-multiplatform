@@ -7,7 +7,7 @@
         errorLine1="/*inline*/ fun &lt;T> memo(calculation: () -> T) = remember { calculation() }"
         errorLine2="                                                           ~~~~~~~~~~~">
         <location
-            file="src/commonMain/kotlin/androidx/compose/Remember.kt"
+            file="src/commonMain/kotlin/androidx/compose/runtime/Remember.kt"
             line="99"
             column="60"/>
     </issue>
@@ -18,7 +18,7 @@
         errorLine1=") = remember(v1) { calculation() }"
         errorLine2="                   ~~~~~~~~~~~">
         <location
-            file="src/commonMain/kotlin/androidx/compose/Remember.kt"
+            file="src/commonMain/kotlin/androidx/compose/runtime/Remember.kt"
             line="117"
             column="20"/>
     </issue>
@@ -29,7 +29,7 @@
         errorLine1=") = remember(v1, v2) { calculation() }"
         errorLine2="                       ~~~~~~~~~~~">
         <location
-            file="src/commonMain/kotlin/androidx/compose/Remember.kt"
+            file="src/commonMain/kotlin/androidx/compose/runtime/Remember.kt"
             line="137"
             column="24"/>
     </issue>
@@ -40,7 +40,7 @@
         errorLine1="fun &lt;T> memo(vararg inputs: Any?, calculation: () -> T) = remember(*inputs) { calculation() }"
         errorLine2="                                                                              ~~~~~~~~~~~">
         <location
-            file="src/commonMain/kotlin/androidx/compose/Remember.kt"
+            file="src/commonMain/kotlin/androidx/compose/runtime/Remember.kt"
             line="152"
             column="79"/>
     </issue>

@@ -1,91 +1,91 @@
 // Baseline format: 1.0
-AcronymName: androidx.compose.SlotTable.Companion#getEMPTY():
+AcronymName: androidx.compose.runtime.SlotTable.Companion#getEMPTY():
     Acronyms should not be capitalized in method names: was `getEMPTY`, should this be `getEmpty`?
 
 
-ArrayReturn: androidx.compose.AmbientKt#Providers(androidx.compose.ProvidedValue<?>[], kotlin.jvm.functions.Function0<kotlin.Unit>) parameter #0:
-    Method parameter should be Collection<ProvidedValue> (or subclass) instead of raw array; was `androidx.compose.ProvidedValue<?>[]`
-ArrayReturn: androidx.compose.EffectsKt#onCommit(Object[], kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit>) parameter #0:
+ArrayReturn: androidx.compose.runtime.AmbientKt#Providers(androidx.compose.runtime.ProvidedValue<?>[], kotlin.jvm.functions.Function0<kotlin.Unit>) parameter #0:
+    Method parameter should be Collection<ProvidedValue> (or subclass) instead of raw array; was `androidx.compose.runtime.ProvidedValue<?>[]`
+ArrayReturn: androidx.compose.runtime.EffectsKt#onCommit(Object[], kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit>) parameter #0:
     Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
-ArrayReturn: androidx.compose.EffectsKt#onPreCommit(Object[], kotlin.jvm.functions.Function1<? super androidx.compose.CommitScope,kotlin.Unit>) parameter #0:
+ArrayReturn: androidx.compose.runtime.EffectsKt#onPreCommit(Object[], kotlin.jvm.functions.Function1<? super androidx.compose.runtime.CommitScope,kotlin.Unit>) parameter #0:
     Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
-ArrayReturn: androidx.compose.KeyKt#key(Object[], kotlin.jvm.functions.Function0<? extends T>) parameter #0:
+ArrayReturn: androidx.compose.runtime.KeyKt#key(Object[], kotlin.jvm.functions.Function0<? extends T>) parameter #0:
     Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
-ArrayReturn: androidx.compose.MutableStateKt#stateFor(Object[], kotlin.jvm.functions.Function0<? extends T>) parameter #0:
+ArrayReturn: androidx.compose.runtime.MutableStateKt#stateFor(Object[], kotlin.jvm.functions.Function0<? extends T>) parameter #0:
     Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
-ArrayReturn: androidx.compose.RememberKt#remember(Object[], kotlin.jvm.functions.Function0<? extends V>) parameter #0:
+ArrayReturn: androidx.compose.runtime.RememberKt#remember(Object[], kotlin.jvm.functions.Function0<? extends V>) parameter #0:
     Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
-ArrayReturn: androidx.compose.SlotTable#SlotTable(Object[]) parameter #0:
+ArrayReturn: androidx.compose.runtime.SlotTable#SlotTable(Object[]) parameter #0:
     Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
-ArrayReturn: androidx.compose.SuspendingEffectsKt#launchInComposition(Object[], kotlin.jvm.functions.Function2<? super androidx.compose.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?>) parameter #0:
+ArrayReturn: androidx.compose.runtime.SuspendingEffectsKt#launchInComposition(Object[], kotlin.jvm.functions.Function2<? super androidx.compose.runtime.CompositionCoroutineScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?>) parameter #0:
     Method parameter should be Collection<Object> (or subclass) instead of raw array; was `java.lang.Object[]`
-ArrayReturn: androidx.compose.UnionType#types():
+ArrayReturn: androidx.compose.runtime.UnionType#types():
     Method should return Collection<Class> (or subclass) instead of raw array; was `java.lang.Class<?>[]`
 
 
-CallbackName: androidx.compose.CompositionLifecycleObserver:
+CallbackName: androidx.compose.runtime.CompositionLifecycleObserver:
     Class should be named CompositionLifecycleCallback
-CallbackName: androidx.compose.snapshots.SnapshotStateObserver:
+CallbackName: androidx.compose.runtime.snapshots.SnapshotStateObserver:
     Class should be named SnapshotStateCallback
 
 
-DocumentExceptions: androidx.compose.ComposerKt#getCurrentComposer():
+DocumentExceptions: androidx.compose.runtime.ComposerKt#getCurrentComposer():
     Method ComposerKt.getCurrentComposer appears to be throwing kotlin.NotImplementedError; this should be listed in the documentation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
-DocumentExceptions: androidx.compose.snapshots.SnapshotApplyResult.Failure#check():
-    Method Failure.check appears to be throwing androidx.compose.snapshots.SnapshotApplyConflictException; this should be recorded with a @Throws annotation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
+DocumentExceptions: androidx.compose.runtime.snapshots.SnapshotApplyResult.Failure#check():
+    Method Failure.check appears to be throwing androidx.compose.runtime.snapshots.SnapshotApplyConflictException; this should be recorded with a @Throws annotation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
 
 
-KotlinOperator: androidx.compose.SlotReader#get(androidx.compose.Anchor):
+KotlinOperator: androidx.compose.runtime.SlotReader#get(androidx.compose.runtime.Anchor):
     Note that adding the `operator` keyword would allow calling this method using operator syntax
-KotlinOperator: androidx.compose.SlotReader#get(int):
+KotlinOperator: androidx.compose.runtime.SlotReader#get(int):
     Note that adding the `operator` keyword would allow calling this method using operator syntax
-KotlinOperator: androidx.compose.SlotWriter#get(androidx.compose.Anchor):
+KotlinOperator: androidx.compose.runtime.SlotWriter#get(androidx.compose.runtime.Anchor):
     Note that adding the `operator` keyword would allow calling this method using operator syntax
-KotlinOperator: androidx.compose.SlotWriter#get(int):
+KotlinOperator: androidx.compose.runtime.SlotWriter#get(int):
     Note that adding the `operator` keyword would allow calling this method using operator syntax
-KotlinOperator: androidx.compose.Updater#set(V, kotlin.jvm.functions.Function2<? super T,? super V,? extends kotlin.Unit>):
+KotlinOperator: androidx.compose.runtime.Updater#set(V, kotlin.jvm.functions.Function2<? super T,? super V,? extends kotlin.Unit>):
     Note that adding the `operator` keyword would allow calling this method using operator syntax
-KotlinOperator: androidx.compose.Updater#set(int, kotlin.jvm.functions.Function2<? super T,? super java.lang.Integer,kotlin.Unit>):
+KotlinOperator: androidx.compose.runtime.Updater#set(int, kotlin.jvm.functions.Function2<? super T,? super java.lang.Integer,kotlin.Unit>):
     Note that adding the `operator` keyword would allow calling this method using operator syntax
 
 
-MissingNullability: androidx.compose.BuildableMap#containsKey(Object) parameter #0:
+MissingNullability: androidx.compose.runtime.BuildableMap#containsKey(Object) parameter #0:
     Missing nullability on parameter `key` in method `containsKey`
-MissingNullability: androidx.compose.BuildableMap#containsValue(Object) parameter #0:
+MissingNullability: androidx.compose.runtime.BuildableMap#containsValue(Object) parameter #0:
     Missing nullability on parameter `value` in method `containsValue`
-MissingNullability: androidx.compose.BuildableMap#get(Object) parameter #0:
+MissingNullability: androidx.compose.runtime.BuildableMap#get(Object) parameter #0:
     Missing nullability on parameter `key` in method `get`
-MissingNullability: androidx.compose.MutableStateKt#stateFor(V1, V2, kotlin.jvm.functions.Function0<? extends T>):
+MissingNullability: androidx.compose.runtime.MutableStateKt#stateFor(V1, V2, kotlin.jvm.functions.Function0<? extends T>):
     Missing nullability on method `stateFor` return
-MissingNullability: androidx.compose.SlotReader#getGroupData():
+MissingNullability: androidx.compose.runtime.SlotReader#getGroupData():
     Missing nullability on method `getGroupData` return
-MissingNullability: androidx.compose.SlotReader#getGroupDataKey():
+MissingNullability: androidx.compose.runtime.SlotReader#getGroupDataKey():
     Missing nullability on method `getGroupDataKey` return
-MissingNullability: androidx.compose.SlotReader#getGroupNode():
+MissingNullability: androidx.compose.runtime.SlotReader#getGroupNode():
     Missing nullability on method `getGroupNode` return
-MissingNullability: androidx.compose.collection.MutableVector#mapIndexedNotNull(kotlin.jvm.functions.Function2<? super java.lang.Integer,? super T,? extends R>):
+MissingNullability: androidx.compose.runtime.collection.MutableVector#mapIndexedNotNull(kotlin.jvm.functions.Function2<? super java.lang.Integer,? super T,? extends R>):
     Missing nullability on method `mapIndexedNotNull` return
-MissingNullability: androidx.compose.collection.MutableVector#mapNotNull(kotlin.jvm.functions.Function1<? super T,? extends R>):
+MissingNullability: androidx.compose.runtime.collection.MutableVector#mapNotNull(kotlin.jvm.functions.Function1<? super T,? extends R>):
     Missing nullability on method `mapNotNull` return
-MissingNullability: androidx.compose.collection.MutableVectorKt#MutableVector(int):
+MissingNullability: androidx.compose.runtime.collection.MutableVectorKt#MutableVector(int):
     Missing nullability on method `MutableVector` return
-MissingNullability: androidx.compose.collection.MutableVectorKt#MutableVector(int, kotlin.jvm.functions.Function1<? super java.lang.Integer,? extends T>):
+MissingNullability: androidx.compose.runtime.collection.MutableVectorKt#MutableVector(int, kotlin.jvm.functions.Function1<? super java.lang.Integer,? extends T>):
     Missing nullability on method `MutableVector` return
-MissingNullability: androidx.compose.collection.MutableVectorKt#mutableVectorOf():
+MissingNullability: androidx.compose.runtime.collection.MutableVectorKt#mutableVectorOf():
     Missing nullability on method `mutableVectorOf` return
-MissingNullability: androidx.compose.collection.MutableVectorKt#mutableVectorOf(T):
+MissingNullability: androidx.compose.runtime.collection.MutableVectorKt#mutableVectorOf(T):
     Missing nullability on method `mutableVectorOf` return
-MissingNullability: androidx.compose.snapshots.Snapshot.Companion#getCurrent():
+MissingNullability: androidx.compose.runtime.snapshots.Snapshot.Companion#getCurrent():
     Missing nullability on method `getCurrent` return
 
 
-NoByteOrShort: androidx.compose.Composer#changed(byte) parameter #0:
-    Should avoid odd sized primitives; use `int` instead of `byte` in parameter value in androidx.compose.Composer.changed(byte value)
-NoByteOrShort: androidx.compose.Composer#changed(short) parameter #0:
-    Should avoid odd sized primitives; use `int` instead of `short` in parameter value in androidx.compose.Composer.changed(short value)
+NoByteOrShort: androidx.compose.runtime.Composer#changed(byte) parameter #0:
+    Should avoid odd sized primitives; use `int` instead of `byte` in parameter value in androidx.compose.runtime.Composer.changed(byte value)
+NoByteOrShort: androidx.compose.runtime.Composer#changed(short) parameter #0:
+    Should avoid odd sized primitives; use `int` instead of `short` in parameter value in androidx.compose.runtime.Composer.changed(short value)
 
 
-NotCloseable: androidx.compose.SlotReader:
-    Classes that release resources (close()) should implement AutoClosable and CloseGuard: class androidx.compose.SlotReader
-NotCloseable: androidx.compose.SlotWriter:
-    Classes that release resources (close()) should implement AutoClosable and CloseGuard: class androidx.compose.SlotWriter
+NotCloseable: androidx.compose.runtime.SlotReader:
+    Classes that release resources (close()) should implement AutoClosable and CloseGuard: class androidx.compose.runtime.SlotReader
+NotCloseable: androidx.compose.runtime.SlotWriter:
+    Classes that release resources (close()) should implement AutoClosable and CloseGuard: class androidx.compose.runtime.SlotWriter
