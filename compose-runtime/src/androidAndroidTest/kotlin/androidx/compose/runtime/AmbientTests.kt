@@ -20,10 +20,10 @@ package androidx.compose.runtime
 import android.widget.TextView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import androidx.ui.core.ExperimentalLayoutNodeApi
-import androidx.ui.core.LayoutNode
-import androidx.ui.core.subcomposeInto
-import androidx.ui.viewinterop.emitView
+import androidx.compose.ui.node.ExperimentalLayoutNodeApi
+import androidx.compose.ui.node.LayoutNode
+import androidx.compose.ui.platform.subcomposeInto
+import androidx.compose.ui.viewinterop.emitView
 import org.junit.After
 import org.junit.Rule
 import org.junit.Test

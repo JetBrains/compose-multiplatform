@@ -20,8 +20,8 @@ import android.app.Activity
 import androidx.compose.runtime.benchmark.ComposeActivity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.ui.core.WithConstraints
-import androidx.ui.core.setContent
+import androidx.compose.ui.WithConstraints
+import androidx.compose.ui.platform.setContent
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.DrawerState

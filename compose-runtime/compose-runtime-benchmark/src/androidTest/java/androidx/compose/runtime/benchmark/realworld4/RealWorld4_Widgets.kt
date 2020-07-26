@@ -25,8 +25,8 @@ package androidx.compose.runtime.benchmark.realworld4
  */
 
 import androidx.compose.runtime.Composable
-import androidx.ui.core.Modifier
-import androidx.ui.core.WithConstraints
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.WithConstraints
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding

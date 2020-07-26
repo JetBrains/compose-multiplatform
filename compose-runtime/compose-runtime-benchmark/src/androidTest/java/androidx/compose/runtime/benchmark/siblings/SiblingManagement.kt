@@ -18,7 +18,7 @@ package androidx.compose.runtime.benchmark.siblings
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
-import androidx.ui.core.Modifier
+import androidx.compose.ui.Modifier
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background

@@ -19,7 +19,7 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Button
 import android.widget.LinearLayout
-import androidx.ui.viewinterop.emitView
+import androidx.compose.ui.viewinterop.emitView
 
 @Composable
 fun TextView(

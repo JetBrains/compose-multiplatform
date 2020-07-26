@@ -30,8 +30,8 @@ import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.snapshots.Snapshot
-import androidx.ui.core.AndroidOwner
-import androidx.ui.core.setContent
+import androidx.compose.ui.platform.AndroidOwner
+import androidx.compose.ui.platform.setContent
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 
