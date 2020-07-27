@@ -19,6 +19,7 @@ package androidx.build.checkapi
 import androidx.build.AndroidXExtension
 import androidx.build.Release
 import androidx.build.RunApiTasks
+import androidx.build.Version
 import androidx.build.isWriteVersionedApiFilesEnabled
 import androidx.build.java.JavaCompileInputs
 import androidx.build.metalava.MetalavaTasks
@@ -63,7 +64,7 @@ private fun AndroidXExtension.shouldConfigureApiTasks(): Boolean {
         return false
     }
 
-    if (mavenVersion == null) {
+    if (project.version !is Version) {
         project.logger.info("Project ${project.name} has no version set, ignoring API tasks.")
         return false
     }
@@ -81,12 +82,6 @@ private fun AndroidXExtension.shouldConfigureApiTasks(): Boolean {
                 "If you still want to track APIs, create an \"api\" directory in your project" +
                 " root and run the updateApi task.")
         return false
-    }
-
-    if (publish.shouldRelease() && mavenVersion!!.isFinalApi()) {
-        throw GradleException("Project ${project.name} must track APIs before stabilizing " +
-                "for release. To do that, create an \"api\" directory in your project root " +
-                "and run the updateApi task.")
     }
 
     return true
