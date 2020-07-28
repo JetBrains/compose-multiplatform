@@ -141,7 +141,7 @@ internal class StaticProvidableAmbient<T>(defaultFactory: (() -> T)?) :
 fun <T> ambientOf(
     policy: SnapshotMutationPolicy<T> =
         @OptIn(ExperimentalComposeApi::class)
-        referentialEqualityPolicy(),
+        structuralEqualityPolicy(),
     defaultFactory: (() -> T)? = null
 ): ProvidableAmbient<T> = DynamicProvidableAmbient(policy, defaultFactory)
 

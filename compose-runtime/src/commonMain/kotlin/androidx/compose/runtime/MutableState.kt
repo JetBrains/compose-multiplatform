@@ -66,7 +66,7 @@ import kotlin.reflect.KProperty
  */
 @Composable
 inline fun <T> state(
-    policy: SnapshotMutationPolicy<T> = referentialEqualityPolicy(),
+    policy: SnapshotMutationPolicy<T> = structuralEqualityPolicy(),
     init: @ComposableContract(preventCapture = true) () -> T
 ) = remember { mutableStateOf(init(), policy) }
 
@@ -169,7 +169,7 @@ inline fun <T> stateFor(
  */
 fun <T> mutableStateOf(
     value: T,
-    policy: SnapshotMutationPolicy<T> = referentialEqualityPolicy()
+    policy: SnapshotMutationPolicy<T> = structuralEqualityPolicy()
 ): MutableState<T> = SnapshotMutableState(value, policy)
 
 /**
@@ -178,8 +178,8 @@ fun <T> mutableStateOf(
 @Deprecated(
     "areEquivalent callbacks have been replaced by MutableStateSnapshotPolicy",
     ReplaceWith(
-        "referenceEqualityPolicy()",
-        "androidx.compose.runtime.referenceEqualityPolicy"
+        "referentialEqualityPolicy()",
+        "androidx.compose.runtime.referentialEqualityPolicy"
     )
 )
 val ReferentiallyEqual = fun(old: Any?, new: Any?) = old === new
@@ -378,6 +378,8 @@ interface SnapshotMutationPolicy<T> {
      * and [applied] has changed fields that are unmodified by [current] it might be valid to return
      * a new copy of the data class that combines that changes from both [current] and [applied]
      * allowing a snapshot to apply that would have otherwise failed.
+     *
+     * @sample androidx.compose.runtime.samples.counterSample
      */
     @ExperimentalComposeApi
     fun merge(previous: T, current: T, applied: T): T? = null
