@@ -17,7 +17,6 @@
 package androidx.compose.runtime.benchmark
 
 import android.app.Activity
-import android.util.SparseArray
 import android.view.View
 import android.view.ViewGroup
 import androidx.benchmark.junit4.BenchmarkRule
@@ -50,11 +49,6 @@ abstract class ComposeBenchmarkBase {
         benchmarkRule.measureRepeated {
             composition = activity.setContent(Recomposer.current(), block)
 
-            // AndroidComposeView is postponing the composition till the saved state will be restored.
-            // We will emulate the restoration of the empty state to trigger the real composition.
-            val composeView = (findComposeView(activity) as ViewGroup?)!!
-            composeView.restoreHierarchyState(SparseArray())
-
             runWithTimingDisabled {
                 composition?.dispose()
             }
@@ -73,11 +67,6 @@ abstract class ComposeBenchmarkBase {
             activeComposer = currentComposer
             receiver.composeCb()
         }
-
-        // AndroidOwner is postponing the composition till the saved state will be restored.
-        // We will emulate the restoration of the empty state to trigger the real composition.
-        val ownerView = findComposeView(activity)!!.view
-        ownerView.restoreHierarchyState(SparseArray())
 
         val composer = activeComposer
         require(composer != null) { "Composer was null" }
