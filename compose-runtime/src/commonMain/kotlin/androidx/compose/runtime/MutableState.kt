@@ -64,6 +64,10 @@ import kotlin.reflect.KProperty
  * @see [remember]
  * @see [SnapshotMutationPolicy]
  */
+@Deprecated(
+    "Replace with explicit use of remember {}",
+    ReplaceWith("remember { mutableStateOf(init(), policy) }")
+)
 @Composable
 inline fun <T> state(
     policy: SnapshotMutationPolicy<T> = structuralEqualityPolicy(),
@@ -91,6 +95,10 @@ inline fun <T> state(
  * @see [state]
  * @see [remember]
  */
+@Deprecated(
+    "Replace with explicit use of remember {}",
+    ReplaceWith("remember(v1) { mutableStateOf(init()) }")
+)
 @Composable
 inline fun <T, /*reified*/ V1> stateFor(
     v1: V1,
@@ -342,7 +350,7 @@ private class SnapshotMutableState<T>(
      * The componentN() operators allow state objects to be used with the property destructuring
      * syntax
      *
-     * var (foo, setFoo) = state { 0 }
+     * var (foo, setFoo) = remember { mutableStateOf(0) }
      * setFoo(123) // set
      * foo == 123 // get
      */

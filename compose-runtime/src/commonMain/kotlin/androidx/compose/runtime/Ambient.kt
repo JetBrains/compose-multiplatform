@@ -109,7 +109,7 @@ internal class DynamicProvidableAmbient<T> constructor(
 ) : ProvidableAmbient<T>(defaultFactory) {
 
     @Composable
-    override fun provided(value: T): State<T> = state(policy) { value }.apply {
+    override fun provided(value: T): State<T> = remember { mutableStateOf(value, policy) }.apply {
         this.value = value
     }
 }

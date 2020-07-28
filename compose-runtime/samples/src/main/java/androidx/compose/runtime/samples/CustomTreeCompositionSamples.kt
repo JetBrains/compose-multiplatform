@@ -25,8 +25,9 @@ import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.compositionFor
 import androidx.compose.runtime.emit
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.state
 
 @Suppress("unused")
 @OptIn(ExperimentalComposeApi::class)
@@ -86,7 +87,7 @@ fun CustomTreeComposition() {
     // and then a sample tree could be composed:
     fun runApp(root: GroupNode) {
         root.setContent {
-            var count by state { 0 }
+            var count by remember { mutableStateOf(0) }
             Group {
                 Text("Count: $count")
                 Text("Increment") { count++ }

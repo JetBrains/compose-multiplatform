@@ -17,15 +17,16 @@
 package androidx.compose.runtime.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.runtime.Composable
 import androidx.compose.foundation.BaseTextField
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Text
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.state
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.material.Button
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.input.TextFieldValue
 
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
@@ -33,8 +34,8 @@ import androidx.compose.material.Button
 fun stateSample() {
     @Composable
     fun LoginScreen() {
-        var username by state { TextFieldValue("user") }
-        var password by state { TextFieldValue("pass") }
+        var username by remember { mutableStateOf(TextFieldValue("user")) }
+        var password by remember { mutableStateOf(TextFieldValue("pass")) }
 
         fun login() = Api.login(username.text, password.text)
 
