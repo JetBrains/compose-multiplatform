@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package androidx.compose.runtime
+package androidx.compose.runtime.dispatch
 
-import androidx.compose.runtime.dispatch.MonotonicFrameClock
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.Continuation
 
 /**
- * A simple frame clock used by [Recomposer].
+ * A simple frame clock.
  *
  * This implementation is intended for low-contention environments involving
  * low total numbers of threads in a pool on the order of ~number of CPU cores available for UI
@@ -29,7 +28,7 @@ import kotlin.coroutines.Continuation
  *
  * [onNewAwaiters] will be invoked whenever the number of awaiters has changed from 0 to 1.
  */
-internal class BroadcastFrameClock(
+class BroadcastFrameClock(
     private val onNewAwaiters: (() -> Unit)? = null
 ) : MonotonicFrameClock {
 
@@ -39,10 +38,12 @@ internal class BroadcastFrameClock(
     private var awaiters = mutableListOf<FrameAwaiter<*>>()
     private var spareList = mutableListOf<FrameAwaiter<*>>()
 
+    @Suppress("DEPRECATION_ERROR")
     val hasAwaiters: Boolean get() = synchronized(lock) { awaiters.isNotEmpty() }
 
     @Suppress("UNCHECKED_CAST")
     fun sendFrame(timeNanos: Long) {
+        @Suppress("DEPRECATION_ERROR")
         synchronized(lock) {
             // Rotate the lists so that if a resumed continuation on an immediate dispatcher
             // bound to the thread calling sendFrame immediately awaits again we don't disrupt
@@ -63,6 +64,7 @@ internal class BroadcastFrameClock(
         onFrame: (Long) -> R
     ): R = suspendCancellableCoroutine { co ->
         val awaiter = FrameAwaiter(onFrame, co)
+        @Suppress("DEPRECATION_ERROR")
         val hasNewAwaiters = synchronized(lock) {
             val hadAwaiters = awaiters.isNotEmpty()
             awaiters.add(awaiter)
@@ -70,6 +72,7 @@ internal class BroadcastFrameClock(
         }
 
         co.invokeOnCancellation {
+            @Suppress("DEPRECATION_ERROR")
             synchronized(lock) {
                 awaiters.remove(awaiter)
             }
