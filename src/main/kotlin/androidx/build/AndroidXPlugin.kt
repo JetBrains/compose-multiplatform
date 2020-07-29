@@ -214,6 +214,13 @@ class AndroidXPlugin : Plugin<Project> {
             configureAndroidCommonOptions(project, androidXExtension)
             configureAndroidLibraryOptions(project, androidXExtension)
         }
+        libraryExtension.onVariants.withBuildType("release") {
+            // Disable unit test for release build type
+            unitTest {
+                @Suppress("UnstableApiUsage")
+                enabled = false
+            }
+        }
         libraryExtension.packagingOptions {
             // TODO: Replace this with a per-variant packagingOption for androidTest specifically
             //  once b/69953968 is resolved.
