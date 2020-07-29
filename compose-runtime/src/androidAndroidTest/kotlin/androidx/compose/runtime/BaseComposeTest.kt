@@ -81,6 +81,7 @@ internal fun Activity.show(block: @Composable () -> Unit): Composition {
     uiThread {
         @OptIn(ExperimentalComposeApi::class)
         Snapshot.sendApplyNotifications()
+        @Suppress("DEPRECATION")
         composition = setViewContent(block)
     }
     return composition!!
