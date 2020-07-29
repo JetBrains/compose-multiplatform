@@ -273,7 +273,7 @@ class AffectedModuleDetectorImpl constructor(
 
     /**
      * Finds only the set of projects that were directly changed in the commit. This includes
-     * dumb-tests and any modules that need to be co-built.
+     * placeholder-tests and any modules that need to be co-built.
      *
      * Also populates the unknownFiles var which is used in findAffectedProjects
      *
@@ -326,7 +326,8 @@ class AffectedModuleDetectorImpl constructor(
      *
      * If it cannot determine the containing module for a file (e.g. buildSrc or root), it
      * defaults to all projects unless [ignoreUnknownProjects] is set to true. However,
-     * with param changedProjects, it only returns the dumb-test (see companion object below).
+     * with param changedProjects, it only returns the placeholder-test (see companion object
+     * below).
      * This is because we run all tests including @large on the changed set. So when we must
      * build all, we only want to run @small and @medium tests in the test runner for
      * DEPENDENT_PROJECTS.
@@ -447,7 +448,7 @@ class AffectedModuleDetectorImpl constructor(
     companion object {
         // dummy test to ensure no failure due to "no instrumentation. We can eventually remove
         // if we resolve b/127819369
-        private val ALWAYS_BUILD = setOf(":dumb-tests")
+        private val ALWAYS_BUILD = setOf(":placeholder-tests")
 
         // Some tests are codependent even if their modules are not. Enable manual bundling of tests
         private val COBUILT_TEST_PATHS = setOf(
