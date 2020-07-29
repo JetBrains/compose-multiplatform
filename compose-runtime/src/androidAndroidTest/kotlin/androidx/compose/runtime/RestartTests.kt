@@ -19,10 +19,10 @@ package androidx.compose.runtime
 import android.os.Debug
 import android.widget.TextView
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import junit.framework.TestCase
 import org.junit.After
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -139,7 +139,7 @@ class RestartTests : BaseComposeTest() {
     }
 
     @Test
-    @FlakyTest(bugId = 160876771)
+    @Ignore("Test manually, this test is too flaky for CI b/160876771, b/162304228")
     fun allocation_Test() {
         allocationCounting {
             compose {
