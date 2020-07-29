@@ -20,6 +20,7 @@
 )
 package androidx.compose.runtime
 
+import androidx.compose.runtime.dispatch.BroadcastFrameClock
 import androidx.compose.runtime.dispatch.DefaultMonotonicFrameClock
 import androidx.compose.runtime.dispatch.MonotonicFrameClock
 import androidx.compose.runtime.snapshots.Snapshot
