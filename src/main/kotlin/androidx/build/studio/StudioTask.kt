@@ -104,6 +104,14 @@ abstract class StudioTask : DefaultTask() {
     }
 
     /**
+     * Allows for the patching of a Studio installation (including replacing plugins).
+     * TODO: Consider removing after Studio has switched to Kotlin 1.4
+     * b/162414740
+     */
+    @get:Internal
+    protected open val studioPatcher = NoopStudioPatcher
+
+    /**
      * Install Studio and removes any old installation files if they exist.
      */
     private fun install() {
@@ -116,6 +124,7 @@ abstract class StudioTask : DefaultTask() {
             studioArchiveCreator(project, studioVersions, studioArchiveName, studioArchivePath)
             println("Extracting archive...")
             extractStudioArchive()
+            studioPatcher(this, project, studioInstallationDir)
             with(platformUtilities) { updateJvmHeapSize() }
             // Finish install process
             successfulInstallFile.createNewFile()
@@ -211,6 +220,7 @@ open class RootStudioTask : StudioTask() {
  */
 open class ComposeStudioTask : StudioTask() {
     override val studioArchiveCreator = UrlArchiveCreator
+    override val studioPatcher = ComposeStudioPatcher
     override val ideaProperties get() = projectRoot.resolve("idea.properties")
 }
 
