@@ -96,6 +96,7 @@ val EXEMPT_TASKS = setOf(
     "verifyReleaseResources",
     "zipEcFiles",
 
+    ":camera:integration-tests:camera-testapp-uiwidgets:mergeLibDexDebug",
     ":camera:integration-tests:camera-testapp-view:mergeLibDexDebug",
     ":camera:integration-tests:camera-testapp-view:packageDebug"
 )
