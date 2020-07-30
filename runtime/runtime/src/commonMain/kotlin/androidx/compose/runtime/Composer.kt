@@ -176,7 +176,7 @@ private class Invalidation(
 
 @ComposeCompilerApi
 interface ScopeUpdateScope {
-    fun updateScope(block: (Composer<*>, Int, Int) -> Unit)
+    fun updateScope(block: (Composer<*>, Int) -> Unit)
 }
 
 internal enum class InvalidationResult {
@@ -215,7 +215,7 @@ internal enum class InvalidationResult {
  * stored in [anchor] and call [block] when recomposition is requested. It is created by
  * [Composer.startRestartGroup] and is used to track how to restart the group.
  */
-internal class RecomposeScope(var composer: Composer<*>?, val key: Int) : ScopeUpdateScope {
+internal class RecomposeScope(var composer: Composer<*>?) : ScopeUpdateScope {
     /**
      * An anchor to the location in the slot table that start the group associated with this
      * recompose scope. This value is set by [composer] when the scope is committed to the slot
@@ -245,7 +245,7 @@ internal class RecomposeScope(var composer: Composer<*>?, val key: Int) : ScopeU
     /**
      * The lambda to call to restart the scopes composition.
      */
-    private var block: ((Composer<*>, Int, Int) -> Unit)? = null
+    private var block: ((Composer<*>, Int) -> Unit)? = null
 
     /**
      * Restart the scope's composition. It is an error if [block] was not updated. The code
@@ -254,7 +254,7 @@ internal class RecomposeScope(var composer: Composer<*>?, val key: Int) : ScopeU
      * incorrect direct calls to [Composer.startRestartGroup] and [Composer.endRestartGroup].
      */
     fun <N> compose(composer: Composer<N>) {
-        block?.invoke(composer, key, 1) ?: error("Invalid restart scope")
+        block?.invoke(composer, 1) ?: error("Invalid restart scope")
     }
 
     /**
@@ -266,7 +266,7 @@ internal class RecomposeScope(var composer: Composer<*>?, val key: Int) : ScopeU
      * Update [block]. The scope is returned by [Composer.endRestartGroup] when [used] is true
      * and implements [ScopeUpdateScope].
      */
-    override fun updateScope(block: (Composer<*>, Int, Int) -> Unit) { this.block = block }
+    override fun updateScope(block: (Composer<*>, Int) -> Unit) { this.block = block }
 }
 
 /**
@@ -1779,23 +1779,23 @@ class Composer<N>(
      * Start a restart group. A restart group creates a recompose scope and sets it as the current
      * recompose scope of the composition. If the recompose scope is invalidated then this group
      * will be recomposed. A recompose scope can be invalidated by calling the lambda returned by
-     * [androidx.compose.invalidate].
+     * [androidx.compose.runtime.invalidate].
      */
     @ComposeCompilerApi
     fun startRestartGroup(key: Int) {
         start(key, null, false, null)
-        addRecomposeScope(key)
+        addRecomposeScope()
     }
 
     @ComposeCompilerApi
     fun startRestartGroup(key: Int, sourceInformation: String?) {
         start(key, null, false, sourceInformation)
-        addRecomposeScope(key)
+        addRecomposeScope()
     }
 
-    private fun addRecomposeScope(key: Int) {
+    private fun addRecomposeScope() {
         if (inserting) {
-            val scope = RecomposeScope(this, key)
+            val scope = RecomposeScope(this)
             invalidateStack.push(scope)
             updateValue(scope)
         } else {
@@ -2680,8 +2680,8 @@ val currentComposer: Composer<*> get() {
 
 internal fun invokeComposable(composer: Composer<*>, composable: @Composable () -> Unit) {
     @Suppress("UNCHECKED_CAST")
-    val realFn = composable as Function3<Composer<*>, Int, Int, Unit>
-    realFn(composer, 0, 1)
+    val realFn = composable as Function2<Composer<*>, Int, Unit>
+    realFn(composer, 1)
 }
 
 internal fun <T> invokeComposableForResult(
@@ -2689,8 +2689,8 @@ internal fun <T> invokeComposableForResult(
     composable: @Composable () -> T
 ): T {
     @Suppress("UNCHECKED_CAST")
-    val realFn = composable as Function3<Composer<*>, Int, Int, T>
-    return realFn(composer, 0, 1)
+    val realFn = composable as Function2<Composer<*>, Int, T>
+    return realFn(composer, 1)
 }
 
 private fun Group.distanceFrom(root: Group): Int {

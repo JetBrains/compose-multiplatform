@@ -50,30 +50,29 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             private val tracked: Boolean,
             private val sourceInformation: String?
         ) :
-    Function3<Composer<*>, Int, Int, R>,
-    Function4<P1, Composer<*>, Int, Int, R>,
-    Function5<P1, P2, Composer<*>, Int, Int, R>,
-    Function6<P1, P2, P3, Composer<*>, Int, Int, R>,
-    Function7<P1, P2, P3, P4, Composer<*>, Int, Int, R>,
-    Function8<P1, P2, P3, P4, P5, Composer<*>, Int, Int, R>,
-    Function9<P1, P2, P3, P4, P5, P6, Composer<*>, Int, Int, R>,
-    Function10<P1, P2, P3, P4, P5, P6, P7, Composer<*>, Int, Int, R>,
-    Function11<P1, P2, P3, P4, P5, P6, P7, P8, Composer<*>, Int, Int, R>,
-    Function12<P1, P2, P3, P4, P5, P6, P7, P8, P9, Composer<*>, Int, Int, R>,
-    Function13<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, Composer<*>, Int, Int, R>,
-    Function14<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, Composer<*>, Int, Int, R>,
-    Function15<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, Composer<*>, Int, Int, R>,
-    Function16<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, Composer<*>, Int, Int, R>,
-    Function17<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, Composer<*>, Int,
-            Int, R>,
-    Function18<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15,
+    Function2<Composer<*>, Int, R>,
+    Function3<P1, Composer<*>, Int, R>,
+    Function4<P1, P2, Composer<*>, Int, R>,
+    Function5<P1, P2, P3, Composer<*>, Int, R>,
+    Function6<P1, P2, P3, P4, Composer<*>, Int, R>,
+    Function7<P1, P2, P3, P4, P5, Composer<*>, Int, R>,
+    Function8<P1, P2, P3, P4, P5, P6, Composer<*>, Int, R>,
+    Function9<P1, P2, P3, P4, P5, P6, P7, Composer<*>, Int, R>,
+    Function10<P1, P2, P3, P4, P5, P6, P7, P8, Composer<*>, Int, R>,
+    Function11<P1, P2, P3, P4, P5, P6, P7, P8, P9, Composer<*>, Int, R>,
+    Function12<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, Composer<*>, Int, R>,
+    Function13<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, Composer<*>, Int, R>,
+    Function14<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, Composer<*>, Int, R>,
+    Function15<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, Composer<*>, Int, R>,
+    Function16<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, Composer<*>, Int, R>,
+    Function17<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, Composer<*>, Int,
+            R>,
+    Function19<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16,
             Composer<*>, Int, Int, R>,
-    Function20<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16,
-            Composer<*>, Int, Int, Int, R>,
-    Function21<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17,
-            Composer<*>, Int, Int, Int, R>,
-    Function22<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18,
-            Composer<*>, Int, Int, Int, R> {
+    Function20<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17,
+            Composer<*>, Int, Int, R>,
+    Function21<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14, P15, P16, P17, P18,
+            Composer<*>, Int, Int, R> {
     private var _block: Any? = null
     private var scope: RecomposeScope? = null
     private var scopes: MutableList<RecomposeScope>? = null
@@ -136,50 +135,47 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         }
     }
 
-    override operator fun invoke(c: Composer<*>, k: Int, changed: Int): R {
+    override operator fun invoke(c: Composer<*>, changed: Int): R {
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(0) else sameBits(0)
-        val result = (_block as (c: Composer<*>, k: Int, changed: Int) -> R)(c, key, dirty)
-        c.endRestartGroup()?.updateScope(this as (Composer<*>, Int, Int) -> Unit)
+        val result = (_block as (c: Composer<*>, changed: Int) -> R)(c, dirty)
+        c.endRestartGroup()?.updateScope(this as (Composer<*>, Int) -> Unit)
         return result
     }
 
-    override operator fun invoke(p1: P1, c: Composer<*>, k: Int, changed: Int): R {
+    override operator fun invoke(p1: P1, c: Composer<*>, changed: Int): R {
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(1) else sameBits(1)
         val result = (_block as (
             p1: P1,
             c: Composer<*>,
-            k: Int,
             changed: Int
         ) -> R)(
             p1,
             c,
-            key,
             dirty
         )
-        c.endRestartGroup()?.updateScope { nc, nk, _ -> this(p1, nc, nk, changed or 0b1) }
+        c.endRestartGroup()?.updateScope { nc, _ -> this(p1, nc, changed or 0b1) }
         return result
     }
 
-    override operator fun invoke(p1: P1, p2: P2, c: Composer<*>, k: Int, changed: Int): R {
+    override operator fun invoke(p1: P1, p2: P2, c: Composer<*>, changed: Int): R {
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(2) else sameBits(2)
-        val result = (_block as (p1: P1, p2: P2, c: Composer<*>, k: Int, changed: Int) -> R)(
+        val result = (_block as (p1: P1, p2: P2, c: Composer<*>, changed: Int) -> R)(
             p1,
             p2,
             c,
-            key,
             dirty
         )
-        c.endRestartGroup()?.updateScope { nc, nk, _ -> this(p1, p2, nc, nk, changed or 0b1) }
+        c.endRestartGroup()?.updateScope { nc, _ -> this(p1, p2, nc, changed or 0b1) }
         return result
     }
 
-    override operator fun invoke(p1: P1, p2: P2, p3: P3, c: Composer<*>, k: Int, changed: Int): R {
+    override operator fun invoke(p1: P1, p2: P2, p3: P3, c: Composer<*>, changed: Int): R {
         c.startRestartGroup(key, sourceInformation)
         trackRead(c)
         val dirty = changed or if (c.changed(this)) differentBits(3) else sameBits(3)
@@ -188,17 +184,15 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             p2: P2,
             p3: P3,
             c: Composer<*>,
-            k: Int,
             changed: Int
         ) -> R)(
             p1,
             p2,
             p3,
             c,
-            key,
             dirty
         )
-        c.endRestartGroup()?.updateScope { nc, nk, _ -> this(p1, p2, p3, nc, nk, changed or 0b1) }
+        c.endRestartGroup()?.updateScope { nc, _ -> this(p1, p2, p3, nc, changed or 0b1) }
         return result
     }
 
@@ -208,7 +202,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         p3: P3,
         p4: P4,
         c: Composer<*>,
-        k: Int,
         changed: Int
     ): R {
         c.startRestartGroup(key, sourceInformation)
@@ -220,7 +213,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             p3: P3,
             p4: P4,
             c: Composer<*>,
-            k: Int,
             changed: Int
         ) -> R)(
             p1,
@@ -228,11 +220,10 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             p3,
             p4,
             c,
-            key,
             dirty
         )
-        c.endRestartGroup()?.updateScope { nc, nk, _ ->
-            this(p1, p2, p3, p4, nc, nk, changed or 0b1)
+        c.endRestartGroup()?.updateScope { nc, _ ->
+            this(p1, p2, p3, p4, nc, changed or 0b1)
         }
         return result
     }
@@ -244,7 +235,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         p4: P4,
         p5: P5,
         c: Composer<*>,
-        k: Int,
         changed: Int
     ): R {
         c.startRestartGroup(key, sourceInformation)
@@ -257,7 +247,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             p4: P4,
             p5: P5,
             c: Composer<*>,
-            k: Int,
             changed: Int
         ) -> R)(
             p1,
@@ -266,11 +255,10 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             p4,
             p5,
             c,
-            key,
             dirty
         )
-        c.endRestartGroup()?.updateScope { nc, nk, _ ->
-            this(p1, p2, p3, p4, p5, nc, nk, changed or 0b1)
+        c.endRestartGroup()?.updateScope { nc, _ ->
+            this(p1, p2, p3, p4, p5, nc, changed or 0b1)
         }
         return result
     }
@@ -283,7 +271,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         p5: P5,
         p6: P6,
         c: Composer<*>,
-        k: Int,
         changed: Int
     ): R {
         c.startRestartGroup(key, sourceInformation)
@@ -297,7 +284,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             p5: P5,
             p6: P6,
             c: Composer<*>,
-            k: Int,
             changed: Int
         ) -> R)(
             p1,
@@ -307,11 +293,10 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             p5,
             p6,
             c,
-            key,
             dirty
         )
-        c.endRestartGroup()?.updateScope { nc, nk, _ ->
-            this(p1, p2, p3, p4, p5, p6, nc, nk, changed or 0b1)
+        c.endRestartGroup()?.updateScope { nc, _ ->
+            this(p1, p2, p3, p4, p5, p6, nc, changed or 0b1)
         }
         return result
     }
@@ -325,7 +310,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         p6: P6,
         p7: P7,
         c: Composer<*>,
-        k: Int,
         changed: Int
     ): R {
         c.startRestartGroup(key, sourceInformation)
@@ -340,7 +324,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             p6: P6,
             p7: P7,
             c: Composer<*>,
-            k: Int,
             changed: Int
         ) -> R)(
             p1,
@@ -351,11 +334,10 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             p6,
             p7,
             c,
-            key,
             dirty
         )
-        c.endRestartGroup()?.updateScope { nc, nk, _ ->
-            this(p1, p2, p3, p4, p5, p6, p7, nc, nk, changed or 0b1)
+        c.endRestartGroup()?.updateScope { nc, _ ->
+            this(p1, p2, p3, p4, p5, p6, p7, nc, changed or 0b1)
         }
         return result
     }
@@ -370,7 +352,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         p7: P7,
         p8: P8,
         c: Composer<*>,
-        k: Int,
         changed: Int
     ): R {
         c.startRestartGroup(key, sourceInformation)
@@ -386,7 +367,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             p7: P7,
             p8: P8,
             c: Composer<*>,
-            k: Int,
             changed: Int
         ) -> R) (
             p1,
@@ -398,11 +378,10 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             p7,
             p8,
             c,
-            key,
             dirty
         )
-        c.endRestartGroup()?.updateScope { nc, nk, _ ->
-            this(p1, p2, p3, p4, p5, p6, p7, p8, nc, nk, changed or 0b1)
+        c.endRestartGroup()?.updateScope { nc, _ ->
+            this(p1, p2, p3, p4, p5, p6, p7, p8, nc, changed or 0b1)
         }
         return result
     }
@@ -418,7 +397,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         p8: P8,
         p9: P9,
         c: Composer<*>,
-        k: Int,
         changed: Int
     ): R {
         c.startRestartGroup(key, sourceInformation)
@@ -435,7 +413,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             p8: P8,
             p9: P9,
             c: Composer<*>,
-            k: Int,
             changed: Int
         ) -> R)(
             p1,
@@ -448,11 +425,10 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             p8,
             p9,
             c,
-            key,
             dirty
         )
-        c.endRestartGroup()?.updateScope { nc, nk, _ ->
-            this(p1, p2, p3, p4, p5, p6, p7, p8, p9, nc, nk, changed or 0b1)
+        c.endRestartGroup()?.updateScope { nc, _ ->
+            this(p1, p2, p3, p4, p5, p6, p7, p8, p9, nc, changed or 0b1)
         }
         return result
     }
@@ -469,7 +445,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         p9: P9,
         p10: P10,
         c: Composer<*>,
-        k: Int,
         changed: Int
     ): R {
         c.startRestartGroup(key, sourceInformation)
@@ -487,7 +462,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             p9: P9,
             p10: P10,
             c: Composer<*>,
-            k: Int,
             changed: Int
         ) -> R)(
             p1,
@@ -501,11 +475,10 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             p9,
             p10,
             c,
-            key,
             dirty
         )
-        c.endRestartGroup()?.updateScope { nc, nk, _ ->
-            this(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, nc, nk, changed or 0b1)
+        c.endRestartGroup()?.updateScope { nc, _ ->
+            this(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, nc, changed or 0b1)
         }
         return result
     }
@@ -523,7 +496,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         p10: P10,
         p11: P11,
         c: Composer<*>,
-        k: Int,
         changed: Int
     ): R {
         c.startRestartGroup(key, sourceInformation)
@@ -542,7 +514,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             p10: P10,
             p11: P11,
             c: Composer<*>,
-            k: Int,
             changed: Int
         ) -> R)(
             p1,
@@ -557,11 +528,10 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             p10,
             p11,
             c,
-            key,
             dirty
         )
-        c.endRestartGroup()?.updateScope { nc, nk, _ ->
-            this(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, nc, nk, changed or 0b1)
+        c.endRestartGroup()?.updateScope { nc, _ ->
+            this(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, nc, changed or 0b1)
         }
         return result
     }
@@ -580,7 +550,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         p11: P11,
         p12: P12,
         c: Composer<*>,
-        k: Int,
         changed: Int
     ): R {
         c.startRestartGroup(key, sourceInformation)
@@ -600,7 +569,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             p11: P11,
             p12: P12,
             c: Composer<*>,
-            k: Int,
             changed: Int
         ) -> R)(
             p1,
@@ -616,11 +584,10 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             p11,
             p12,
             c,
-            key,
             dirty
         )
-        c.endRestartGroup()?.updateScope { nc, nk, _ ->
-            this(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, nc, nk, changed or 0b1)
+        c.endRestartGroup()?.updateScope { nc, _ ->
+            this(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, nc, changed or 0b1)
         }
         return result
     }
@@ -640,7 +607,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         p12: P12,
         p13: P13,
         c: Composer<*>,
-        k: Int,
         changed: Int
     ): R {
         c.startRestartGroup(key, sourceInformation)
@@ -661,7 +627,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             p12: P12,
             p13: P13,
             c: Composer<*>,
-            k: Int,
             changed: Int
         ) -> R)(
             p1,
@@ -678,11 +643,10 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             p12,
             p13,
             c,
-            key,
             dirty
         )
-        c.endRestartGroup()?.updateScope { nc, nk, _ ->
-            this(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, nc, nk, changed or 0b1)
+        c.endRestartGroup()?.updateScope { nc, _ ->
+            this(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, nc, changed or 0b1)
         }
         return result
     }
@@ -703,7 +667,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         p13: P13,
         p14: P14,
         c: Composer<*>,
-        k: Int,
         changed: Int
     ): R {
         c.startRestartGroup(key, sourceInformation)
@@ -725,7 +688,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             p13: P13,
             p14: P14,
             c: Composer<*>,
-            k: Int,
             changed: Int
         ) -> R)(
             p1,
@@ -743,12 +705,10 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             p13,
             p14,
             c,
-            key,
             dirty
         )
-        c.endRestartGroup()?.updateScope { nc, nk, _ ->
-            this(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, nc, nk, changed or
-                    0b1)
+        c.endRestartGroup()?.updateScope { nc, _ ->
+            this(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, nc, changed or 0b1)
         }
         return result
     }
@@ -770,7 +730,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         p14: P14,
         p15: P15,
         c: Composer<*>,
-        k: Int,
         changed: Int
     ): R {
         c.startRestartGroup(key, sourceInformation)
@@ -793,7 +752,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             p14: P14,
             p15: P15,
             c: Composer<*>,
-            k: Int,
             changed: Int
         ) -> R)(
             p1,
@@ -812,10 +770,9 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             p14,
             p15,
             c,
-            key,
             dirty
         )
-        c.endRestartGroup()?.updateScope { nc, nk, _ ->
+        c.endRestartGroup()?.updateScope { nc, _ ->
             this(
                 p1,
                 p2,
@@ -833,7 +790,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
                 p14,
                 p15,
                 nc,
-                nk,
                 changed or 0b1
             )
         }
@@ -858,7 +814,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         p15: P15,
         p16: P16,
         c: Composer<*>,
-        k: Int,
         changed: Int,
         changed1: Int
     ): R {
@@ -883,7 +838,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             p15: P15,
             p16: P16,
             c: Composer<*>,
-            k: Int,
             changed: Int,
             changed1: Int
         ) -> R)(
@@ -904,11 +858,10 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             p15,
             p16,
             c,
-            key,
             changed,
             dirty
         )
-        c.endRestartGroup()?.updateScope { nc, nk, _ ->
+        c.endRestartGroup()?.updateScope { nc, _ ->
             this(
                 p1,
                 p2,
@@ -927,7 +880,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
                 p15,
                 p16,
                 nc,
-                nk,
                 changed or 0b1,
                 changed1
             )
@@ -954,7 +906,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         p16: P16,
         p17: P17,
         c: Composer<*>,
-        k: Int,
         changed: Int,
         changed1: Int
     ): R {
@@ -980,7 +931,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             p16: P16,
             p17: P17,
             c: Composer<*>,
-            k: Int,
             changed: Int,
             changed1: Int
         ) -> R)(
@@ -1002,11 +952,10 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             p16,
             p17,
             c,
-            key,
             changed,
             dirty
         )
-        c.endRestartGroup()?.updateScope { nc, nk, _ ->
+        c.endRestartGroup()?.updateScope { nc, _ ->
             this(
                 p1,
                 p2,
@@ -1026,7 +975,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
                 p16,
                 p17,
                 nc,
-                nk,
                 changed or 0b1,
                 changed1)
         }
@@ -1053,7 +1001,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
         p17: P17,
         p18: P18,
         c: Composer<*>,
-        k: Int,
         changed: Int,
         changed1: Int
     ): R {
@@ -1080,7 +1027,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             p17: P17,
             p18: P18,
             c: Composer<*>,
-            k: Int,
             changed: Int,
             changed1: Int
         ) -> R)(
@@ -1103,11 +1049,10 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
             p17,
             p18,
             c,
-            key,
             changed,
             dirty
         )
-        c.endRestartGroup()?.updateScope { nc, nk, _ ->
+        c.endRestartGroup()?.updateScope { nc, _ ->
             this(
                 p1,
                 p2,
@@ -1128,7 +1073,6 @@ class ComposableLambda<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P
                 p17,
                 p18,
                 nc,
-                nk,
                 changed or 0b1,
                 changed1
             )

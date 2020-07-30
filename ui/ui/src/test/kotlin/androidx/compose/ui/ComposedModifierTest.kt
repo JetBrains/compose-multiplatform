@@ -217,8 +217,8 @@ private fun compose(
     ).apply {
         composeInitial {
             @Suppress("UNCHECKED_CAST")
-            val fn = block as (Composer<*>, Int, Int) -> Unit
-            fn(this, 0, 0)
+            val fn = block as (Composer<*>, Int) -> Unit
+            fn(this, 0)
         }
         applyChanges()
         slotTable.verifyWellFormed()

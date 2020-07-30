@@ -147,7 +147,7 @@ class RestartTests : BaseComposeTest() {
                 limitAllocations(2) {
                     Nothing()
                 }
-                limitAllocations(1) {
+                limitAllocations(2) {
                     DirectNothing()
                 }
             }.then {
