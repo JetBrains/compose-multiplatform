@@ -16,14 +16,13 @@
 
 package androidx.compose.runtime
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * Collects values from this [StateFlow] and represents its latest value via [State].
@@ -39,7 +38,7 @@ import kotlin.coroutines.CoroutineContext
 @Suppress("NOTHING_TO_INLINE")
 @Composable
 inline fun <T> StateFlow<T>.collectAsState(
-    context: CoroutineContext = Dispatchers.Main
+    context: CoroutineContext = EmptyCoroutineContext
 ): State<T> = collectAsState(value, context)
 
 /**
@@ -54,16 +53,19 @@ inline fun <T> StateFlow<T>.collectAsState(
 @Composable
 fun <T : R, R> Flow<T>.collectAsState(
     initial: R,
-    context: CoroutineContext = Dispatchers.Main
+    context: CoroutineContext = EmptyCoroutineContext
 ): State<R> {
     val state = state { initial }
-    onPreCommit(this, context) {
-        val job = CoroutineScope(context).launch {
+    launchInComposition(this, context) {
+        if (context == EmptyCoroutineContext) {
+            collect {
+                state.value = it
+            }
+        } else withContext(context) {
             collect {
                 state.value = it
             }
         }
-        onDispose { job.cancel() }
     }
     return state
 }
