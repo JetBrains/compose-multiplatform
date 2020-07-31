@@ -100,7 +100,7 @@ class EffectsTests : BaseComposeTest() {
         var local = mutableStateOf("invalid")
 
         compose {
-            local = state { "Hello world! ${inc++}" }
+            local = remember { mutableStateOf("Hello world! ${inc++}") } // NOTYPO
             TextView(id = tv1Id, text = local.value)
         }.then { activity ->
             val helloText = activity.findViewById(tv1Id) as TextView
@@ -127,8 +127,8 @@ class EffectsTests : BaseComposeTest() {
         var local2 = mutableStateOf("invalid")
 
         compose {
-            local1 = state { "First" }
-            local2 = state { "Second" }
+            local1 = remember { mutableStateOf("First") }
+            local2 = remember { mutableStateOf("Second") }
             TextView(id = tv1Id, text = local1.value)
             TextView(id = tv2Id, text = local2.value)
         }.then { activity ->
@@ -491,7 +491,7 @@ class EffectsTests : BaseComposeTest() {
 
         @Composable
         fun UpdateStateInPreCommit() {
-            var value by state { 1 }
+            var value by remember { mutableStateOf(1) }
             readValue = value
             onPreCommit {
                 value = 2
@@ -730,7 +730,7 @@ class EffectsTests : BaseComposeTest() {
         var inc = 0
 
         compose {
-            val local = state { "Hello world! ${inc++}" }
+            val local = remember { mutableStateOf("Hello world! ${inc++}") } // NOTYPO
             TextView(id = tv1Id, text = local.value)
         }.then { activity ->
             val helloText = activity.findViewById(tv1Id) as TextView

@@ -17,17 +17,17 @@
 package androidx.compose.runtime.samples
 
 import androidx.annotation.Sampled
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material.Button
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onCommit
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.state
-import androidx.compose.runtime.stateFor
-import androidx.compose.foundation.Text
-import androidx.compose.foundation.layout.Row
-import androidx.compose.material.Button
 
 @Suppress("unused")
 @Sampled
@@ -35,7 +35,7 @@ import androidx.compose.material.Button
 fun observeUserSample() {
     @Composable
     fun observeUser(userId: Int): User? {
-        val user = stateFor<User?>(userId) { null }
+        val user = remember(userId) { mutableStateOf<User?>(null) }
         onCommit(userId) {
             val subscription = UserAPI.subscribeToUser(userId) {
                 user.value = it
@@ -52,7 +52,7 @@ fun observeUserSample() {
 @Composable
 fun twoInputsKeySample() {
     for (element in elements) {
-        val selected by key(element.id, parentId) { state { false } }
+        val selected by key(element.id, parentId) { remember { mutableStateOf(false) } }
         ListItem(item = element, selected = selected)
     }
 }
@@ -60,7 +60,7 @@ fun twoInputsKeySample() {
 @Sampled
 @Composable
 fun SimpleStateSample() {
-    val count = state { 0 }
+    val count = remember { mutableStateOf(0) }
 
     Text(text = "You clicked ${count.value} times")
     Button(onClick = { count.value++ }) {
@@ -71,7 +71,7 @@ fun SimpleStateSample() {
 @Sampled
 @Composable
 fun DestructuredStateSample() {
-    val (count, setCount) = state { 0 }
+    val (count, setCount) = remember { mutableStateOf(0) }
 
     Text(text = "You clicked $count times")
     Button(onClick = { setCount(count + 1) }) {
@@ -101,7 +101,7 @@ fun DelegatedReadOnlyStateSample() {
 @Sampled
 @Composable
 fun DelegatedStateSample() {
-    var count by state { 0 }
+    var count by remember { mutableStateOf(0) }
 
     Text(text = "You clicked $count times")
     Button(onClick = { count = count + 1 }) {

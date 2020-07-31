@@ -303,8 +303,8 @@ package androidx.compose.runtime {
     method public static <T> androidx.compose.runtime.SnapshotMutationPolicy<T> neverEqualPolicy();
     method public static <T> androidx.compose.runtime.SnapshotMutationPolicy<T> referentialEqualityPolicy();
     method public static inline operator <T> void setValue(androidx.compose.runtime.MutableState<T>, Object? thisObj, kotlin.reflect.KProperty<?> property, T? value);
-    method @androidx.compose.runtime.Composable public static inline <T> androidx.compose.runtime.MutableState<T> state(androidx.compose.runtime.SnapshotMutationPolicy<T> policy = structuralEqualityPolicy(), kotlin.jvm.functions.Function0<? extends T> init);
-    method @androidx.compose.runtime.Composable public static inline <T, V1> androidx.compose.runtime.MutableState<T> stateFor(V1? v1, kotlin.jvm.functions.Function0<? extends T> init);
+    method @Deprecated @androidx.compose.runtime.Composable public static inline <T> androidx.compose.runtime.MutableState<T> state(androidx.compose.runtime.SnapshotMutationPolicy<T> policy = structuralEqualityPolicy(), kotlin.jvm.functions.Function0<? extends T> init);
+    method @Deprecated @androidx.compose.runtime.Composable public static inline <T, V1> androidx.compose.runtime.MutableState<T> stateFor(V1? v1, kotlin.jvm.functions.Function0<? extends T> init);
     method @androidx.compose.runtime.Composable public static inline <T> androidx.compose.runtime.MutableState<T> stateFor(Object![]? inputs, kotlin.jvm.functions.Function0<? extends T> init);
     method @androidx.compose.runtime.Composable public static inline <T, reified V1, reified V2> androidx.compose.runtime.MutableState<T>! stateFor(V1? v1, V2? v2, kotlin.jvm.functions.Function0<? extends T> init);
     method public static <T> androidx.compose.runtime.SnapshotMutationPolicy<T> structuralEqualityPolicy();

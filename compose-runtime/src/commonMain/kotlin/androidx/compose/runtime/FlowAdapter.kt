@@ -55,7 +55,7 @@ fun <T : R, R> Flow<T>.collectAsState(
     initial: R,
     context: CoroutineContext = EmptyCoroutineContext
 ): State<R> {
-    val state = state { initial }
+    val state = remember { mutableStateOf(initial) }
     launchInComposition(this, context) {
         if (context == EmptyCoroutineContext) {
             collect {
