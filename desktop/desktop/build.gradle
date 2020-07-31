@@ -49,9 +49,6 @@ kotlin {
             api(SKIKO)
 
             implementation(KOTLIN_COROUTINES_SWING)
-
-            // TODO: move to jvmTest
-            implementation(JUNIT)
         }
 
         jvmTest {
@@ -59,8 +56,14 @@ kotlin {
             resources.srcDirs += "src/jvmTest/res"
             dependencies {
                 implementation(SKIKO_CURRENT_OS)
+                implementation project(":ui:ui-test")
+                implementation(JUNIT)
                 implementation(TRUTH)
             }
+        }
+
+        test.dependencies {
+            implementation project(":ui:ui-test")
         }
     }
 }

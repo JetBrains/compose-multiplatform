@@ -71,7 +71,7 @@ class ConstraintLayoutTest : LayoutTest() {
                         height = Dimension.wrapContent
                     }
                     // Try to be large to make wrap content impossible.
-                    .preferredWidth((composeTestRule.displayMetrics.widthPixels).toDp())
+                    .preferredWidth((composeTestRule.displaySize.width).toDp())
                     // This could be any (width in height out child) e.g. text
                     .aspectRatio(2f)
                     .onPositioned { coordinates ->
@@ -93,12 +93,12 @@ class ConstraintLayoutTest : LayoutTest() {
         runOnIdle {
             // The aspect ratio could not wrap and it is wrap suggested, so it respects constraints.
             assertEquals(
-                (composeTestRule.displayMetrics.widthPixels / 2),
+                (composeTestRule.displaySize.width / 2),
                 aspectRatioBoxSize.value!!.width
             )
             // Aspect ratio is preserved.
             assertEquals(
-                (composeTestRule.displayMetrics.widthPixels / 2 / 2),
+                (composeTestRule.displaySize.width / 2 / 2),
                 aspectRatioBoxSize.value!!.height
             )
             // Divider has fixed width 1.dp in constraint set.
@@ -129,7 +129,7 @@ class ConstraintLayoutTest : LayoutTest() {
                         height = Dimension.preferredWrapContent
                     }
                     // Try to be large to make wrap content impossible.
-                    .preferredWidth((composeTestRule.displayMetrics.widthPixels).toDp())
+                    .preferredWidth((composeTestRule.displaySize.width).toDp())
                     // This could be any (width in height out child) e.g. text
                     .aspectRatio(2f)
                     .onPositioned { coordinates ->
@@ -151,12 +151,12 @@ class ConstraintLayoutTest : LayoutTest() {
         runOnIdle {
             // The aspect ratio could not wrap and it is wrap suggested, so it respects constraints.
             assertEquals(
-                (composeTestRule.displayMetrics.widthPixels / 2),
+                (composeTestRule.displaySize.width / 2),
                 aspectRatioBoxSize.value!!.width
             )
             // Aspect ratio is preserved.
             assertEquals(
-                (composeTestRule.displayMetrics.widthPixels / 2 / 2),
+                (composeTestRule.displaySize.width / 2 / 2),
                 aspectRatioBoxSize.value!!.height
             )
             // Divider has fixed width 1.dp in constraint set.
@@ -187,7 +187,7 @@ class ConstraintLayoutTest : LayoutTest() {
                         height = Dimension.wrapContent
                     }
                     // Try to be large to make wrap content impossible.
-                    .preferredWidth((composeTestRule.displayMetrics.widthPixels).toDp())
+                    .preferredWidth((composeTestRule.displaySize.width).toDp())
                     // This could be any (width in height out child) e.g. text
                     .aspectRatio(2f)
                     .onPositioned { coordinates ->
@@ -210,12 +210,12 @@ class ConstraintLayoutTest : LayoutTest() {
         runOnIdle {
             // The aspect ratio could not wrap and it is wrap suggested, so it respects constraints.
             assertEquals(
-                (composeTestRule.displayMetrics.widthPixels / 2),
+                (composeTestRule.displaySize.width / 2),
                 aspectRatioBoxSize.value!!.width
             )
             // Aspect ratio is preserved.
             assertEquals(
-                (composeTestRule.displayMetrics.widthPixels / 2 / 2),
+                (composeTestRule.displaySize.width / 2 / 2),
                 aspectRatioBoxSize.value!!.height
             )
             // Divider has fixed width 1.dp in constraint set.
@@ -245,7 +245,7 @@ class ConstraintLayoutTest : LayoutTest() {
                         height = Dimension.wrapContent
                     }
                     // Try to be large to make wrap content impossible.
-                    .preferredWidth((composeTestRule.displayMetrics.widthPixels).toDp())
+                    .preferredWidth((composeTestRule.displaySize.width).toDp())
                     // This could be any (width in height out child) e.g. text
                     .aspectRatio(2f)
                     .onPositioned { coordinates ->
@@ -268,12 +268,12 @@ class ConstraintLayoutTest : LayoutTest() {
         runOnIdle {
             // The aspect ratio could not wrap and it is wrap suggested, so it respects constraints.
             assertEquals(
-                (composeTestRule.displayMetrics.widthPixels / 2),
+                (composeTestRule.displaySize.width / 2),
                 aspectRatioBoxSize.value!!.width
             )
             // Aspect ratio is preserved.
             assertEquals(
-                (composeTestRule.displayMetrics.widthPixels / 2 / 2),
+                (composeTestRule.displaySize.width / 2 / 2),
                 aspectRatioBoxSize.value!!.height
             )
             // Divider has fixed width 1.dp in constraint set.
@@ -395,8 +395,8 @@ class ConstraintLayoutTest : LayoutTest() {
             }
         }
 
-        val displayWidth = composeTestRule.displayMetrics.widthPixels
-        val displayHeight = composeTestRule.displayMetrics.heightPixels
+        val displayWidth = composeTestRule.displaySize.width
+        val displayHeight = composeTestRule.displaySize.height
 
         runOnIdle {
             assertEquals(
@@ -463,8 +463,8 @@ class ConstraintLayoutTest : LayoutTest() {
             }
         }
 
-        val displayWidth = composeTestRule.displayMetrics.widthPixels
-        val displayHeight = composeTestRule.displayMetrics.heightPixels
+        val displayWidth = composeTestRule.displaySize.width
+        val displayHeight = composeTestRule.displaySize.height
 
         runOnIdle {
             assertEquals(
@@ -536,8 +536,8 @@ class ConstraintLayoutTest : LayoutTest() {
             }
         }
 
-        val displayWidth = composeTestRule.displayMetrics.widthPixels
-        val displayHeight = composeTestRule.displayMetrics.heightPixels
+        val displayWidth = composeTestRule.displaySize.width
+        val displayHeight = composeTestRule.displaySize.height
 
         runOnIdle {
             assertEquals(

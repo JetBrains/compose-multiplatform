@@ -218,7 +218,7 @@ class DesktopOwner(
         root.draw(DesktopCanvas(canvas))
     }
 
-    internal fun processPointerInput(event: PointerInputEvent) {
+    fun processPointerInput(event: PointerInputEvent) {
         measureAndLayout()
         pointerInputEventProcessor.process(event)
     }

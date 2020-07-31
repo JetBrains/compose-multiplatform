@@ -16,8 +16,7 @@
 
 package androidx.compose.ui.graphics
 
-import androidx.compose.desktop.initCompose
-import androidx.compose.desktop.test.DesktopScreenshotTestRule
+import androidx.ui.test.DesktopScreenshotTestRule
 import org.jetbrains.skija.Surface
 import org.junit.After
 import org.junit.Rule
@@ -46,11 +45,5 @@ abstract class DesktopGraphicsTest {
     @After
     fun teardown() {
         _surface?.close()
-    }
-
-    private companion object {
-        init {
-            initCompose()
-        }
     }
 }

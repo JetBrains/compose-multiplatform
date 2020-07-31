@@ -38,7 +38,7 @@ class DesktopOwners(
     component: Component,
     private val redraw: () -> Unit
 ) {
-    private val list = LinkedHashSet<DesktopOwner>()
+    val list = LinkedHashSet<DesktopOwner>()
 
     // Optimization: we don't need more than one redrawing per tick
     private var redrawingScheduled = false
