@@ -55,6 +55,7 @@ import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.testing.Test
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
@@ -141,8 +142,16 @@ class AndroidXPlugin : Plugin<Project> {
         AffectedModuleDetector.configureTaskGuard(task)
 
         // Enable tracing to see results in command line
-        task.testLogging.events = hashSetOf(TestLogEvent.FAILED, TestLogEvent.PASSED,
-            TestLogEvent.SKIPPED, TestLogEvent.STANDARD_OUT)
+        task.testLogging.apply {
+            events = hashSetOf(
+                TestLogEvent.FAILED, TestLogEvent.PASSED,
+                TestLogEvent.SKIPPED, TestLogEvent.STANDARD_OUT
+            )
+            showExceptions = true
+            showCauses = true
+            showStackTraces = true
+            exceptionFormat = TestExceptionFormat.FULL
+        }
         val report = task.reports.junitXml
         if (report.isEnabled) {
             val zipTask = project.tasks.register(
