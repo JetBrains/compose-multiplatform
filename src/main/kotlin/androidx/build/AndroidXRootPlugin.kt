@@ -16,7 +16,6 @@
 
 package androidx.build
 
-import androidx.build.AndroidXPlugin.Companion.GENERATE_TEST_CONFIGURATION_TASK
 import androidx.build.AndroidXPlugin.Companion.ZIP_TEST_CONFIGS_WITH_APKS_TASK
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.dokka.DokkaPublicDocs
@@ -152,21 +151,16 @@ class AndroidXRootPlugin : Plugin<Project> {
             buildOnServerTask.dependsOn(Jacoco.createUberJarTask(this))
         }
 
-        val generateTestConfiguration = project.tasks.register(
-            GENERATE_TEST_CONFIGURATION_TASK, GenerateTestConfigurationTask::class.java
-        )
         val zipTestConfigsWithApks = project.tasks.register(
             ZIP_TEST_CONFIGS_WITH_APKS_TASK, Zip::class.java
         )
+        // can't chain this, or a kotlin.Unit gets added as dependency below instead of the task
         zipTestConfigsWithApks.configure {
-            it.dependsOn(generateTestConfiguration)
             it.destinationDirectory.set(project.getDistributionDirectory())
             it.archiveFileName.set("androidTest.zip")
-            it.from(File(project.getDistributionDirectory().canonicalPath,
-                CONFIG_DIRECTORY
-            ))
+            it.from(project.getTestConfigDirectory())
         }
-        project.addToBuildOnServer(zipTestConfigsWithApks)
+        buildOnServerTask.dependsOn(zipTestConfigsWithApks)
 
         if (project.isDocumentationEnabled()) {
             val allDocsTask = DiffAndDocs.configureDiffAndDocs(
