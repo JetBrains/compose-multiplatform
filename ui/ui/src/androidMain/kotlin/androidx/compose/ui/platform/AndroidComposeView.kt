@@ -455,6 +455,10 @@ internal class AndroidComposeView constructor(
         accessibilityDelegate.onSemanticsChange()
     }
 
+    override fun onSemanticLayoutChange(semanticsNodeId: Int) {
+        accessibilityDelegate.onSemanticLayoutChange(semanticsNodeId)
+    }
+
     private fun updateLayerProperties(layer: OwnedLayer) {
         snapshotObserver.observeReads(layer, onCommitAffectingLayerParams) {
             layer.updateLayerProperties()
