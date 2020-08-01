@@ -461,7 +461,9 @@ class AffectedModuleDetectorImpl constructor(
             ),
             setOf(
                 ":support-media2-test-client",
-                ":support-media2-test-service"
+                ":support-media2-test-service",
+                ":support-media2-test-client-previous",
+                ":support-media2-test-service-previous"
             ), // Link graphics and material to always run @Large in presubmit per b/160624022
             setOf(
                 ":compose:ui:ui-graphics",
