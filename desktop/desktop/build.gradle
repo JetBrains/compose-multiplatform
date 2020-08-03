@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+import androidx.build.LibraryGroups
+import androidx.build.LibraryVersions
+import androidx.build.Publish
+import androidx.build.RunApiTasks
 import androidx.build.SupportConfigKt
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -70,6 +74,54 @@ tasks.findByName("jvmTest").configure {
 tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
         useIR = true
+    }
+}
+
+androidx {
+    name = "Jetpack Compose desktop implementation"
+    publish = Publish.SNAPSHOT_AND_RELEASE
+    mavenVersion = LibraryVersions.COMPOSE
+    mavenGroup = LibraryGroups.Compose.DESKTOP
+    inceptionYear = "2020"
+    legacyDisableKotlinStrictApiMode = true
+    runApiTasks = new RunApiTasks.No(
+            "API tracking for desktop isn't supported at the moment, see b/163110180"
+    )
+}
+
+PublicationContainer.metaClass.jvmOs = { name, skikoDeps ->
+    delegate.create("jvm$name", MavenPublication) {
+        artifactId = "${project.name}-jvm-$name"
+        pom {
+            withXml {
+                def dependenciesNode = asNode().appendNode("dependencies")
+                def desktopDependency = dependenciesNode.appendNode("dependency")
+                desktopDependency.appendNode("groupId", group)
+                desktopDependency.appendNode("artifactId", project.name)
+                desktopDependency.appendNode("version", LibraryVersions.COMPOSE)
+                desktopDependency.appendNode("scope", "compile")
+
+                for (skiko in skikoDeps) {
+                    def skikoParts = skiko.split(":")
+                    def skikoDependency = dependenciesNode.appendNode("dependency")
+                    skikoDependency.appendNode("groupId", skikoParts[0])
+                    skikoDependency.appendNode("artifactId", skikoParts[1])
+                    skikoDependency.appendNode("version", skikoParts[2])
+                    skikoDependency.appendNode("scope", "runtime")
+                }
+            }
+        }
+    }
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            it.jvmOs("linux", [SKIKO_LINUX])
+            it.jvmOs("macos", [SKIKO_MACOS])
+            it.jvmOs("windows", [SKIKO_WINDOWS])
+            it.jvmOs("all", [SKIKO_LINUX, SKIKO_MACOS, SKIKO_WINDOWS])
+        }
     }
 }
 
