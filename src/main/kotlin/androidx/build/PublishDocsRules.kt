@@ -158,7 +158,7 @@ val RELEASE_RULE = docsRules("public", false) {
             .addStubs("wear/wear_stubs/com.google.android.wearable-stubs.jar")
     ignore(LibraryGroups.WEAR.group, "wear-input")
     ignore(LibraryGroups.WEAR.group, "wear-input-testing")
-    prebuilts(LibraryGroups.WEBKIT, "1.3.0-rc01")
+    prebuilts(LibraryGroups.WEBKIT, "1.3.0-rc02")
     ignore(LibraryGroups.WINDOW.group, "window-sidecar")
     prebuilts(LibraryGroups.WINDOW, "1.0.0-alpha01")
             .addStubs("window/stubs/window-sidecar-release-0.1.0-alpha01.aar")
