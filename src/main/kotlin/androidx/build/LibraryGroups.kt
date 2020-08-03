@@ -92,7 +92,7 @@ object LibraryGroups {
     val TRACING = LibraryGroup("androidx.tracing", LibraryVersions.TRACING)
     val TRANSITION = LibraryGroup("androidx.transition", LibraryVersions.TRANSITION)
     val TVPROVIDER = LibraryGroup("androidx.tvprovider", LibraryVersions.TVPROVIDER)
-    val UI = LibraryGroup("androidx.ui", null)
+    val UI = LibraryGroup(System.getenv("COMPOSE_CUSTOM_GROUP_UI") ?: "androidx.ui", null)
     val VECTORDRAWABLE = LibraryGroup("androidx.vectordrawable", null)
     val VERSIONEDPARCELABLE = LibraryGroup("androidx.versionedparcelable", null)
     val VIEWPAGER = LibraryGroup("androidx.viewpager", LibraryVersions.VIEWPAGER)
@@ -103,12 +103,14 @@ object LibraryGroups {
     val WORK = LibraryGroup("androidx.work", LibraryVersions.WORK)
 
     object Compose {
-        val ANIMATION = LibraryGroup("androidx.compose.animation", null)
-        val COMPILER = LibraryGroup("androidx.compose.compiler", null)
-        val FOUNDATION = LibraryGroup("androidx.compose.foundation", null)
-        val MATERIAL = LibraryGroup("androidx.compose.material", null)
-        val RUNTIME = LibraryGroup("androidx.compose.runtime", null)
-        val UI = LibraryGroup("androidx.compose.ui", null)
+        private val group = System.getenv("COMPOSE_CUSTOM_GROUP") ?: "androidx.compose"
+        val ANIMATION = LibraryGroup("$group.animation", null)
+        val COMPILER = LibraryGroup("$group.compiler", null)
+        val DESKTOP = LibraryGroup("$group.desktop", null)
+        val FOUNDATION = LibraryGroup("$group.foundation", null)
+        val MATERIAL = LibraryGroup("$group.material", null)
+        val RUNTIME = LibraryGroup("$group.runtime", null)
+        val UI = LibraryGroup("$group.ui", null)
     }
 }
 
