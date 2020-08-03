@@ -44,7 +44,7 @@ object SupportConfig {
      * order for tests to run on devices running released versions of the Android OS. If this is
      * set to a pre-release version, tests will only be able to run on pre-release devices.
      */
-    const val TARGET_SDK_VERSION = 29
+    const val TARGET_SDK_VERSION = 30
 
     @JvmStatic
     fun isUiProject() = System.getenv("DIST_SUBDIR") == "/ui"
