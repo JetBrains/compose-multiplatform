@@ -34,4 +34,6 @@ abstract class CompositionReference internal constructor() {
     internal abstract fun <N> registerComposer(composer: Composer<N>)
     internal abstract fun unregisterComposer(composer: Composer<*>)
     internal abstract fun getAmbientScope(): AmbientMap
+    internal abstract fun startComposing()
+    internal abstract fun doneComposing()
 }

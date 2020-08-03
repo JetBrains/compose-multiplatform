@@ -344,6 +344,7 @@ class Composer<N>(
     private val providerUpdates = HashMap<Group, AmbientMap>()
     private var providersInvalid = false
     private val providersInvalidStack = IntStack()
+    private var childrenComposing: Int = 0
 
     private val invalidateStack = Stack<RecomposeScope>()
 
@@ -518,6 +519,7 @@ class Composer<N>(
         reader = slotTable.openReader()
         startGroup(rootKey)
         parentReference?.let { parentRef ->
+            parentRef.startComposing()
             parentProvider = parentRef.getAmbientScope()
             providersInvalidStack.push(providersInvalid.asInt())
             providersInvalid = changed(parentProvider)
@@ -535,8 +537,9 @@ class Composer<N>(
      * the composition.
      */
     internal fun endRoot() {
-        if (parentReference != null) {
+        parentReference?.let { parentRef ->
             endGroup()
+            parentRef.doneComposing()
         }
         endGroup()
         recordEndRoot()
@@ -557,6 +560,7 @@ class Composer<N>(
         invalidateStack.clear()
         reader.close()
         currentCompoundKeyHash = 0
+        childrenComposing = 0
         nodeExpected = false
     }
 
@@ -1158,8 +1162,9 @@ class Composer<N>(
     internal val changeCount get() = changes.size
 
     internal val currentRecomposeScope: RecomposeScope?
-        get() =
-            invalidateStack.let { if (it.isNotEmpty()) it.peek() else null }
+        get() = invalidateStack.let {
+            if (childrenComposing == 0 && it.isNotEmpty()) it.peek() else null
+        }
 
     private fun ensureWriter() {
         if (writer.closed) {
@@ -2232,6 +2237,14 @@ class Composer<N>(
                 inspectionTables = it
             }).add(table)
         }
+
+        override fun startComposing() {
+            childrenComposing++
+        }
+
+        override fun doneComposing() {
+            childrenComposing--
+        }
     }
 
     private fun updateCompoundKeyWhenWeEnterGroup(groupKey: Int, dataKey: Any?) {
@@ -2443,9 +2456,6 @@ private fun Int.asBool() = this != 0
 val currentComposer: Composer<*> get() {
     throw NotImplementedError("Implemented as an intrinsic")
 }
-
-// TODO: get rid of the need for this when we merge FrameManager and Recomposer together!
-internal var currentComposerInternal: Composer<*>? = null
 
 internal fun invokeComposable(composer: Composer<*>, composable: @Composable () -> Unit) {
     @Suppress("UNCHECKED_CAST")

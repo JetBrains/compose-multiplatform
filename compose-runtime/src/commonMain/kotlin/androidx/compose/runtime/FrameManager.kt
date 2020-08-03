@@ -24,6 +24,7 @@ package androidx.compose.runtime
 import androidx.compose.runtime.snapshots.MutableSnapshot
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.snapshots.SnapshotApplyResult
+import androidx.compose.runtime.snapshots.SnapshotReadObserver
 import androidx.compose.runtime.snapshots.SnapshotWriteObserver
 import androidx.compose.runtime.snapshots.currentSnapshot
 import androidx.compose.runtime.snapshots.takeMutableSnapshot
@@ -75,10 +76,14 @@ object FrameManager {
         invalidations = ObserverMap()
     }
 
-    internal inline fun <T> composing(block: () -> T): T {
+    internal fun readObserverOf(composer: Composer<*>): SnapshotReadObserver {
+        return { value -> recordRead(value, composer) }
+    }
+
+    internal inline fun <T> composing(composer: Composer<*>, block: () -> T): T {
         val wasComposing = composing
         composing = true
-        val snapshot = takeMutableSnapshot(readObserver, writeObserver)
+        val snapshot = takeMutableSnapshot(readObserverOf(composer), writeObserver)
         try {
             return snapshot.enter(block)
         } finally {
@@ -145,23 +150,21 @@ object FrameManager {
         }
     }
 
-    private val readObserver: (read: Any) -> Unit = { read ->
-        currentComposerInternal?.currentRecomposeScope?.let {
+    /**
+     * Records that [value], or one of its fields, read while composing and its values were
+     * used by [composer] while composing.
+     *
+     * This is the underlying mechanism used by [State] objects to allow composition to observe
+     * changes made to them.
+     */
+    internal fun recordRead(value: Any, composer: Composer<*>) {
+        composer.currentRecomposeScope?.let {
             synchronized(lock) {
                 it.used = true
-                invalidations.add(read, it)
+                invalidations.add(value, it)
             }
         }
     }
-
-    /**
-     * Records that [value], or one of its fields, read while composing and its values were
-     * used during composition.
-     *
-     * This is the underlying mechanism used by [State] objects to allow composition to observe
-     * changes made to model objects.
-     */
-    internal fun recordRead(value: Any) = readObserver(value)
 
     private val globalWriteObserver: SnapshotWriteObserver = {
         if (!commitPending) {

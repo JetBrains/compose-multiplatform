@@ -70,7 +70,7 @@ class ComposableLambdaN<R>(
         else
             sameBits(realParams)
         if (tracked) {
-            FrameManager.recordRead(this)
+            FrameManager.recordRead(this, c)
         }
         @Suppress("UNCHECKED_CAST")
         val result = (_block as FunctionN<*>)(*allArgsButLast, dirty) as R
