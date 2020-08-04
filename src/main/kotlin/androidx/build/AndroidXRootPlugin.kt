@@ -24,6 +24,7 @@ import androidx.build.gmaven.GMavenVersionChecker
 import androidx.build.gradle.isRoot
 import androidx.build.jacoco.Jacoco
 import androidx.build.license.CheckExternalDependencyLicensesTask
+import androidx.build.playground.VerifyPlaygroundGradlePropertiesTask
 import androidx.build.studio.StudioTask.Companion.registerStudioTask
 import androidx.build.uptodatedness.TaskUpToDateValidator
 import com.android.build.gradle.api.AndroidBasePlugin
@@ -75,6 +76,10 @@ class AndroidXRootPlugin : Plugin<Project> {
         buildOnServerTask.dependsOn(
             tasks.register(AndroidXPlugin.CREATE_LIBRARY_BUILD_INFO_FILES_TASK)
         )
+
+        VerifyPlaygroundGradlePropertiesTask.createIfNecessary(project)?.let {
+            buildOnServerTask.dependsOn(it)
+        }
 
         extra.set("versionChecker", GMavenVersionChecker(logger))
         val createArchiveTask = Release.getGlobalFullZipTask(this)
