@@ -450,15 +450,16 @@ class AndroidXPlugin : Plugin<Project> {
     private fun CommonExtension<*, *, *, *, *, *, *, *>
             .configureTestConfigGeneration(project: Project) {
         onVariants {
+            val variant = this
             androidTestProperties {
                 val generateTestConfigurationTask = project.tasks.register(
-                    "${project.name}$GENERATE_TEST_CONFIGURATION_TASK",
+                    "${project.name}${GENERATE_TEST_CONFIGURATION_TASK}${variant.name}",
                     GenerateTestConfigurationTask::class.java
                 ) {
                     it.testFolder.set(artifacts.get(ArtifactType.APK))
                     it.testLoader.set(artifacts.getBuiltArtifactsLoader())
                     it.outputXml.fileValue(File(project.getTestConfigDirectory(),
-                        "${project.asFilenamePrefix()}AndroidTest.xml"))
+                        "${project.asFilenamePrefix()}${variant.name}AndroidTest.xml"))
                 }
                 project.rootProject.tasks.findByName(ZIP_TEST_CONFIGS_WITH_APKS_TASK)!!
                     .dependsOn(generateTestConfigurationTask)
