@@ -228,59 +228,50 @@ class Recomposer(var embeddingContext: EmbeddingContext = EmbeddingContext()) {
         composer: Composer<*>
     ) {
         val composerWasComposing = composer.isComposing
-        val prevComposer = currentComposerInternal
         try {
-            try {
-                composer.isComposing = true
-                currentComposerInternal = composer
-                FrameManager.composing {
-                    trace("Compose:recompose") {
-                        var complete = false
-                        try {
-                            composer.startRoot()
-                            composer.startGroup(invocationKey, invocation)
-                            invokeComposable(composer, composable)
-                            composer.endGroup()
-                            composer.endRoot()
-                            complete = true
-                        } finally {
-                            if (!complete) composer.abortRoot()
-                        }
+            composer.isComposing = true
+            FrameManager.composing(composer) {
+                trace("Compose:recompose") {
+                    var complete = false
+                    try {
+                        composer.startRoot()
+                        composer.startGroup(invocationKey, invocation)
+                        invokeComposable(composer, composable)
+                        composer.endGroup()
+                        composer.endRoot()
+                        complete = true
+                    } finally {
+                        if (!complete) composer.abortRoot()
                     }
                 }
-            } finally {
-                composer.isComposing = composerWasComposing
-            }
-            // TODO(b/143755743)
-            if (!composerWasComposing) {
-                Snapshot.notifyObjectsInitialized()
-            }
-            composer.applyChanges()
-
-            if (!composerWasComposing) {
-                // Ensure that any state objects created during applyChanges are seen as changed
-                // if modified after this call.
-                Snapshot.notifyObjectsInitialized()
             }
         } finally {
-            currentComposerInternal = prevComposer
+            composer.isComposing = composerWasComposing
+        }
+        // TODO(b/143755743)
+        if (!composerWasComposing) {
+            Snapshot.notifyObjectsInitialized()
+        }
+        composer.applyChanges()
+
+        if (!composerWasComposing) {
+            // Ensure that any state objects created during applyChanges are seen as changed
+            // if modified after this call.
+            Snapshot.notifyObjectsInitialized()
         }
     }
 
     private fun performRecompose(composer: Composer<*>): Boolean {
         if (composer.isComposing) return false
-        val prevComposer = currentComposerInternal
         val hadChanges: Boolean
         try {
-            currentComposerInternal = composer
             composer.isComposing = true
-            hadChanges = FrameManager.composing {
+            hadChanges = FrameManager.composing(composer) {
                 composer.recompose()
             }
             composer.applyChanges()
         } finally {
             composer.isComposing = false
-            currentComposerInternal = prevComposer
         }
         return hadChanges
     }
