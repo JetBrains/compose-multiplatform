@@ -12,4 +12,147 @@
             column="9"/>
     </issue>
 
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 28, the call containing class androidx.compose.testutils.AndroidComposeTestCaseRunner is not annotated with @RequiresApi(x) where x is at least 28. Either annotate the containing class with at least @RequiresApi(28) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(28)."
+        errorLine1="            bitmap = Bitmap.createBitmap(picture)"
+        errorLine2="                            ~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/testutils/AndroidComposeTestCaseRunner.kt"
+            line="265"
+            column="29"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.testutils.RenderNodeCapture is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="    private val renderNode = RenderNode(&quot;Test&quot;)"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/testutils/AndroidComposeTestCaseRunner.kt"
+            line="338"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.testutils.RenderNodeCapture is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        renderNode.setPosition(0, 0, width, height)"
+        errorLine2="                   ~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/testutils/AndroidComposeTestCaseRunner.kt"
+            line="341"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.testutils.RenderNodeCapture is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        return renderNode.beginRecording()"
+        errorLine2="                          ~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/testutils/AndroidComposeTestCaseRunner.kt"
+            line="342"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.testutils.RenderNodeCapture is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        renderNode.endRecording()"
+        errorLine2="                   ~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/testutils/AndroidComposeTestCaseRunner.kt"
+            line="346"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.testutils.benchmark.android.RenderNodeCapture is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="    private val renderNode = RenderNode(&quot;Test&quot;)"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/android/AndroidTestCaseRunner.kt"
+            line="161"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.testutils.benchmark.android.RenderNodeCapture is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        renderNode.setPosition(0, 0, width, height)"
+        errorLine2="                   ~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/android/AndroidTestCaseRunner.kt"
+            line="164"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.testutils.benchmark.android.RenderNodeCapture is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        return renderNode.beginRecording()"
+        errorLine2="                          ~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/android/AndroidTestCaseRunner.kt"
+            line="165"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.testutils.benchmark.android.RenderNodeCapture is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        renderNode.endRecording()"
+        errorLine2="                   ~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/android/AndroidTestCaseRunner.kt"
+            line="169"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.testutils.benchmark.RenderNodeCapture is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="    private val renderNode = RenderNode(&quot;Test&quot;)"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/BenchmarkHelpers.kt"
+            line="44"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.testutils.benchmark.RenderNodeCapture is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        renderNode.setPosition(0, 0, width, height)"
+        errorLine2="                   ~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/BenchmarkHelpers.kt"
+            line="47"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.testutils.benchmark.RenderNodeCapture is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        return Canvas(renderNode.beginRecording())"
+        errorLine2="                                 ~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/BenchmarkHelpers.kt"
+            line="48"
+            column="34"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.testutils.benchmark.RenderNodeCapture is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        renderNode.endRecording()"
+        errorLine2="                   ~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/testutils/benchmark/BenchmarkHelpers.kt"
+            line="52"
+            column="20"/>
+    </issue>
+
 </issues>

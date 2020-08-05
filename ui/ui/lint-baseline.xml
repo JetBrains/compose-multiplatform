@@ -1,0 +1,763 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="5" by="lint 4.2.0-alpha06" client="gradle" variant="debug" version="4.2.0-alpha06">
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 23, the call containing class androidx.compose.ui.autofill.AndroidAutofillKt is not annotated with @RequiresApi(x) where x is at least 23. Either annotate the containing class with at least @RequiresApi(23) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(23)."
+        errorLine1="    var index = root.addChildCount(autofillTree.children.count())"
+        errorLine2="                     ~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
+            line="70"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 23, the call containing class androidx.compose.ui.autofill.AndroidAutofillKt is not annotated with @RequiresApi(x) where x is at least 23. Either annotate the containing class with at least @RequiresApi(23) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(23)."
+        errorLine1="        root.newChild(index)?.apply {"
+        errorLine2="             ~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
+            line="73"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.autofill.AndroidAutofillKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        errorLine1="            setAutofillId(root.autofillId!!, id)"
+        errorLine2="            ~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
+            line="74"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.autofill.AndroidAutofillKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        errorLine1="            setAutofillId(root.autofillId!!, id)"
+        errorLine2="                               ~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
+            line="74"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 23, the call containing class androidx.compose.ui.autofill.AndroidAutofillKt is not annotated with @RequiresApi(x) where x is at least 23. Either annotate the containing class with at least @RequiresApi(23) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(23)."
+        errorLine1="            setId(id, view.context.packageName, null, null)"
+        errorLine2="            ~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
+            line="75"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.autofill.AndroidAutofillKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        errorLine1="            setAutofillType(View.AUTOFILL_TYPE_TEXT)"
+        errorLine2="            ~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
+            line="76"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.autofill.AndroidAutofillKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        errorLine1="            setAutofillHints(autofillNode.autofillTypes.map { it.androidType }.toTypedArray())"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
+            line="77"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 23, the call containing class androidx.compose.ui.autofill.AndroidAutofillKt is not annotated with @RequiresApi(x) where x is at least 23. Either annotate the containing class with at least @RequiresApi(23) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(23)."
+        errorLine1="                setDimens(left, top, 0, 0, width(), height()) }"
+        errorLine2="                ~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
+            line="89"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.autofill.AndroidAutofillKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        errorLine1="            value.isText -> autofillTree.performAutofill(itemId, value.textValue.toString())"
+        errorLine2="                  ~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
+            line="104"
+            column="19"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.autofill.AndroidAutofillKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        errorLine1="            value.isText -> autofillTree.performAutofill(itemId, value.textValue.toString())"
+        errorLine2="                                                                       ~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
+            line="104"
+            column="72"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.autofill.AndroidAutofillKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        errorLine1="            value.isDate -> TODO(&quot;b/138604541: Add onFill() callback for date&quot;)"
+        errorLine2="                  ~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
+            line="105"
+            column="19"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.autofill.AndroidAutofillKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        errorLine1="            value.isList -> TODO(&quot;b/138604541: Add onFill() callback for list&quot;)"
+        errorLine2="                  ~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
+            line="106"
+            column="19"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.autofill.AndroidAutofillKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        errorLine1="            value.isToggle -> TODO(&quot;b/138604541:  Add onFill() callback for toggle&quot;)"
+        errorLine2="                  ~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofill.kt"
+            line="107"
+            column="19"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.autofill.AndroidAutofillDebugUtilsKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        errorLine1="    autofillManager.registerCallback(AutofillCallback)"
+        errorLine2="                    ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofillDebugUtils.kt"
+            line="63"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.autofill.AndroidAutofillDebugUtilsKt is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        errorLine1="    autofillManager.unregisterCallback(AutofillCallback)"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/autofill/AndroidAutofillDebugUtils.kt"
+            line="71"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.platform.AndroidComposeView is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        errorLine1="            focusable = View.FOCUSABLE"
+        errorLine2="            ~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeView.kt"
+            line="237"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.platform.AndroidComposeView is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        errorLine1="            defaultFocusHighlightEnabled = false"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeView.kt"
+            line="239"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        errorLine1="            info.unwrap().availableExtraData = listOf(EXTRA_DATA_TEXT_CHARACTER_LOCATION_KEY)"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidComposeViewAccessibilityDelegateCompat.kt"
+            line="290"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 23, the call containing class androidx.compose.ui.platform.AndroidTextToolbar is not annotated with @RequiresApi(x) where x is at least 23. Either annotate the containing class with at least @RequiresApi(23) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(23)."
+        errorLine1="            actionMode = view.startActionMode("
+        errorLine2="                              ~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/AndroidTextToolbar.kt"
+            line="52"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 23, the call containing class androidx.compose.ui.res.ColorResourcesKt is not annotated with @RequiresApi(x) where x is at least 23. Either annotate the containing class with at least @RequiresApi(23) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(23)."
+        errorLine1="        Color(context.resources.getColor(id, context.theme))"
+        errorLine2="                                ~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/res/ColorResources.kt"
+            line="35"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 23, the call containing class androidx.compose.ui.platform.actionmodecallback.FloatingTextActionModeCallback is not annotated with @RequiresApi(x) where x is at least 23. Either annotate the containing class with at least @RequiresApi(23) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(23)."
+        errorLine1=") : ActionMode.Callback2() {"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/actionmodecallback/FloatingTextActionModeCallback.kt"
+            line="30"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="    private val renderNode = RenderNode(null).apply {"
+        errorLine2="                             ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="62"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        setHasOverlappingRendering(true)"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="63"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        get() = renderNode.uniqueId"
+        errorLine2="                           ~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="67"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        val wasClippingManually = renderNode.clipToOutline &amp;&amp; outlineResolver.clipPath != null"
+        errorLine2="                                             ~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="79"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        renderNode.scaleX = modifier.scaleX"
+        errorLine2="                   ~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="80"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        renderNode.scaleY = modifier.scaleY"
+        errorLine2="                   ~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="81"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        renderNode.alpha = modifier.alpha"
+        errorLine2="                   ~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="82"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        renderNode.translationX = modifier.translationX"
+        errorLine2="                   ~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="83"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        renderNode.translationY = modifier.translationY"
+        errorLine2="                   ~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="84"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        renderNode.elevation = modifier.shadowElevation"
+        errorLine2="                   ~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="85"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        renderNode.rotationZ = modifier.rotationZ"
+        errorLine2="                   ~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="86"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        renderNode.rotationX = modifier.rotationX"
+        errorLine2="                   ~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="87"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        renderNode.rotationY = modifier.rotationY"
+        errorLine2="                   ~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="88"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        renderNode.pivotX = transformOrigin.pivotFractionX * renderNode.width"
+        errorLine2="                   ~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="89"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        renderNode.pivotX = transformOrigin.pivotFractionX * renderNode.width"
+        errorLine2="                                                                        ~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="89"
+            column="73"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        renderNode.pivotX = transformOrigin.pivotFractionX * renderNode.width"
+        errorLine2="                                                                        ~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="89"
+            column="73"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        renderNode.pivotY = transformOrigin.pivotFractionY * renderNode.height"
+        errorLine2="                   ~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="90"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        renderNode.pivotY = transformOrigin.pivotFractionY * renderNode.height"
+        errorLine2="                                                                        ~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="90"
+            column="73"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        renderNode.pivotY = transformOrigin.pivotFractionY * renderNode.height"
+        errorLine2="                                                                        ~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="90"
+            column="73"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        renderNode.clipToOutline = clip &amp;&amp; shape !== RectangleShape"
+        errorLine2="                   ~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="93"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        renderNode.clipToBounds = clip &amp;&amp; shape === RectangleShape"
+        errorLine2="                   ~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="94"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="            renderNode.alpha,"
+        errorLine2="                       ~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="97"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="            renderNode.clipToOutline,"
+        errorLine2="                       ~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="98"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="            renderNode.elevation"
+        errorLine2="                       ~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="99"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        renderNode.setOutline(outlineResolver.outline)"
+        errorLine2="                   ~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="101"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        val isClippingManually = renderNode.clipToOutline &amp;&amp; outlineResolver.clipPath != null"
+        errorLine2="                                            ~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="102"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        if (!drawnWithZ &amp;&amp; renderNode.elevation > 0f) {"
+        errorLine2="                                      ~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="108"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        renderNode.pivotX = transformOrigin.pivotFractionX * width"
+        errorLine2="                   ~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="116"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        renderNode.pivotY = transformOrigin.pivotFractionY * height"
+        errorLine2="                   ~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="117"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        if (renderNode.setPosition("
+        errorLine2="                       ~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="118"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="            renderNode.left,"
+        errorLine2="                       ~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="119"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="            renderNode.top,"
+        errorLine2="                       ~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="120"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="            renderNode.left + width,"
+        errorLine2="                       ~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="121"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="            renderNode.top + height"
+        errorLine2="                       ~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="122"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="            renderNode.setOutline(outlineResolver.outline)"
+        errorLine2="                       ~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="125"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        val oldLeft = renderNode.left"
+        errorLine2="                                 ~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="131"
+            column="34"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        val oldTop = renderNode.top"
+        errorLine2="                                ~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="132"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="            renderNode.offsetLeftAndRight(newLeft - oldLeft)"
+        errorLine2="                       ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="136"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="            renderNode.offsetTopAndBottom(newTop - oldTop)"
+        errorLine2="                       ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="137"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 26, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 26. Either annotate the containing class with at least @RequiresApi(26) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(26)."
+        errorLine1="        ownerView.parent?.onDescendantInvalidated(ownerView, ownerView)"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="156"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="            drawnWithZ = renderNode.elevation > 0f"
+        errorLine2="                                    ~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="163"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="            androidCanvas.drawRenderNode(renderNode)"
+        errorLine2="                          ~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="167"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        if (isDirty || !renderNode.hasDisplayList()) {"
+        errorLine2="                                   ~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="178"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="            canvasHolder.drawInto(renderNode.beginRecording()) {"
+        errorLine2="                                             ~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="179"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="                val manuallyClip = renderNode.clipToOutline &amp;&amp; clipPath != null"
+        errorLine2="                                              ~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="181"
+            column="47"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="            renderNode.endRecording()"
+        errorLine2="                       ~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="193"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.RenderNodeLayer is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="        renderNode.getMatrix(androidMatrix)"
+        errorLine2="                   ~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/RenderNodeLayer.kt"
+            line="207"
+            column="20"/>
+    </issue>
+
+    <issue
+        id="UnsafeNewApiCall"
+        message="This call is to a method from API 29, the call containing class androidx.compose.ui.platform.WrapperKt is not annotated with @RequiresApi(x) where x is at least 29. Either annotate the containing class with at least @RequiresApi(29) or move the call to a static method in a wrapper class annotated with at least @RequiresApi(29)."
+        errorLine1="            owner.view.attributeSourceResourceMap.isNotEmpty()"
+        errorLine2="                       ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/ui/platform/Wrapper.kt"
+            line="329"
+            column="24"/>
+    </issue>
+
+</issues>
