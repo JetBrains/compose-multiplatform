@@ -147,6 +147,12 @@ fun Project.configureLint(lintOptions: LintOptions, extension: AndroidXExtension
                             lintBaseline.delete()
                         }
                     }
+                    val lintTask = tasks.named("lint")
+                    lintTask.configure {
+                        it.doFirst {
+                            lintBaseline.delete()
+                        }
+                    }
                     System.setProperty(LINT_BASELINE_CONTINUE, "true")
                 }
                 baseline(lintBaseline)
