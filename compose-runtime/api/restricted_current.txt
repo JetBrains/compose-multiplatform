@@ -114,7 +114,7 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.ComposeCompilerApi public boolean changed(double value);
     method @androidx.compose.runtime.ComposeCompilerApi public boolean changed(int value);
     method @androidx.compose.runtime.InternalComposeApi public void collectKeySourceInformation();
-    method @androidx.compose.runtime.InternalComposeApi public void composeRoot(kotlin.jvm.functions.Function0<kotlin.Unit> block);
+    method @androidx.compose.runtime.InternalComposeApi public void composeInitial(kotlin.jvm.functions.Function0<kotlin.Unit> block);
     method @kotlin.PublishedApi internal <T> T! consume(androidx.compose.runtime.Ambient<T> key);
     method @androidx.compose.runtime.ComposeCompilerApi public <T extends N> void createNode(kotlin.jvm.functions.Function0<? extends T> factory);
     method @androidx.compose.runtime.ComposeCompilerApi public void emitNode(Object? node);
@@ -133,6 +133,9 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.ComposeCompilerApi public Object joinKey(Object? left, Object? right);
     method @androidx.compose.runtime.ComposeCompilerApi public Object? nextSlot();
     method @androidx.compose.runtime.InternalComposeApi public boolean recompose();
+    method @androidx.compose.runtime.InternalComposeApi public void recordModificationsOf(java.util.Set<?> values);
+    method @androidx.compose.runtime.InternalComposeApi public void recordReadOf(Object value);
+    method @androidx.compose.runtime.InternalComposeApi public void recordWriteOf(Object value);
     method @androidx.compose.runtime.ComposeCompilerApi public void skipCurrentGroup();
     method @androidx.compose.runtime.ComposeCompilerApi public void skipToGroupEnd();
     method @androidx.compose.runtime.ComposeCompilerApi public void startDefaults();
@@ -247,10 +250,6 @@ package androidx.compose.runtime {
 
   public final class FrameManager {
     method public void ensureStarted();
-    method @Deprecated public <T> T! framed(kotlin.jvm.functions.Function0<? extends T> block);
-    method @Deprecated @org.jetbrains.annotations.TestOnly public <T> T! isolated(kotlin.jvm.functions.Function0<? extends T> block);
-    method @Deprecated public void nextFrame();
-    method @Deprecated @org.jetbrains.annotations.TestOnly public <T> T! unframed(kotlin.jvm.functions.Function0<? extends T> block);
     field public static final androidx.compose.runtime.FrameManager INSTANCE;
   }
 
@@ -816,7 +815,7 @@ package androidx.compose.runtime.internal {
     method public int getArity();
     method public int getKey();
     method public R! invoke(java.lang.Object?... args);
-    method public void update(Object block);
+    method public void update(Object block, androidx.compose.runtime.Composer<?>? composer);
   }
 
   public final class ComposableLambdaNKt {

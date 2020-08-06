@@ -19,7 +19,6 @@ package androidx.compose.runtime.internal
 
 import androidx.compose.runtime.ComposeCompilerApi
 import androidx.compose.runtime.Composer
-import androidx.compose.runtime.FrameManager
 import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.SlotTable
 import androidx.compose.runtime.Stable
@@ -37,10 +36,10 @@ class ComposableLambdaN<R>(
 ) : FunctionN<R> {
     private var _block: Any? = null
 
-    fun update(block: Any) {
+    fun update(block: Any, composer: Composer<*>?) {
         if (block != this._block) {
             if (tracked) {
-                FrameManager.recordWrite(this)
+                composer?.recordWriteOf(this)
             }
             this._block = block as FunctionN<*>
         }
@@ -70,7 +69,7 @@ class ComposableLambdaN<R>(
         else
             sameBits(realParams)
         if (tracked) {
-            FrameManager.recordRead(this, c)
+            c.recordReadOf(this)
         }
         @Suppress("UNCHECKED_CAST")
         val result = (_block as FunctionN<*>)(*allArgsButLast, dirty) as R
@@ -112,7 +111,7 @@ fun composableLambdaN(
         @Suppress("UNCHECKED_CAST")
         slot as ComposableLambdaN<Any>
     }
-    result.update(block)
+    result.update(block, composer)
     composer.endReplaceableGroup()
     return result
 }
@@ -129,4 +128,4 @@ fun composableLambdaNInstance(
     tracked,
     null,
     arity
-).apply { update(block) }
+).apply { update(block, null) }

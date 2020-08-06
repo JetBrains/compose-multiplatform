@@ -23,7 +23,13 @@ package androidx.compose.runtime
 import androidx.compose.runtime.dispatch.BroadcastFrameClock
 import androidx.compose.runtime.dispatch.DefaultMonotonicFrameClock
 import androidx.compose.runtime.dispatch.MonotonicFrameClock
+import androidx.compose.runtime.snapshots.MutableSnapshot
 import androidx.compose.runtime.snapshots.Snapshot
+import androidx.compose.runtime.snapshots.SnapshotApplyObserver
+import androidx.compose.runtime.snapshots.SnapshotApplyResult
+import androidx.compose.runtime.snapshots.SnapshotReadObserver
+import androidx.compose.runtime.snapshots.SnapshotWriteObserver
+import androidx.compose.runtime.snapshots.takeMutableSnapshot
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -222,31 +228,19 @@ class Recomposer(var embeddingContext: EmbeddingContext = EmbeddingContext()) {
     internal val applyingCoroutineContext: CoroutineContext?
         get() = applyingScope.get()?.coroutineContext
 
-    @Suppress("PLUGIN_WARNING", "PLUGIN_ERROR", "ILLEGAL_TRY_CATCH_AROUND_COMPOSABLE")
     internal fun composeInitial(
         composable: @Composable () -> Unit,
         composer: Composer<*>
     ) {
+        if (composer.disposeHook == null) {
+            // This will eventually move to the recomposer once it tracks active compositions.
+            // After this is moved the disposeHook should be removed as well.
+            composer.disposeHook = Snapshot.registerApplyObserver(applyObserverOf(composer))
+        }
+
         val composerWasComposing = composer.isComposing
-        try {
-            composer.isComposing = true
-            FrameManager.composing(composer) {
-                trace("Compose:recompose") {
-                    var complete = false
-                    try {
-                        composer.startRoot()
-                        composer.startGroup(invocationKey, invocation)
-                        invokeComposable(composer, composable)
-                        composer.endGroup()
-                        composer.endRoot()
-                        complete = true
-                    } finally {
-                        if (!complete) composer.abortRoot()
-                    }
-                }
-            }
-        } finally {
-            composer.isComposing = composerWasComposing
+        composing(composer) {
+            composer.composeInitial(composable)
         }
         // TODO(b/143755743)
         if (!composerWasComposing) {
@@ -263,17 +257,50 @@ class Recomposer(var embeddingContext: EmbeddingContext = EmbeddingContext()) {
 
     private fun performRecompose(composer: Composer<*>): Boolean {
         if (composer.isComposing) return false
-        val hadChanges: Boolean
-        try {
-            composer.isComposing = true
-            hadChanges = FrameManager.composing(composer) {
-                composer.recompose()
+        return composing(composer) {
+            composer.recompose().also {
+                composer.applyChanges()
             }
-            composer.applyChanges()
-        } finally {
-            composer.isComposing = false
         }
-        return hadChanges
+    }
+
+    private fun readObserverOf(composer: Composer<*>): SnapshotReadObserver {
+        return { value -> composer.recordReadOf(value) }
+    }
+
+    private fun writeObserverOf(composer: Composer<*>): SnapshotWriteObserver {
+        return { value -> composer.recordWriteOf(value) }
+    }
+
+    private fun applyObserverOf(composer: Composer<*>): SnapshotApplyObserver {
+        return { values, _ ->
+            if (embeddingContext.isMainThread())
+                composer.recordModificationsOf(values)
+            else {
+                FrameManager.schedule {
+                    composer.recordModificationsOf(values)
+                }
+            }
+        }
+    }
+
+    private inline fun <T> composing(composer: Composer<*>, block: () -> T): T {
+        val snapshot = takeMutableSnapshot(
+            readObserverOf(composer), writeObserverOf(composer))
+        try {
+            return snapshot.enter(block)
+        } finally {
+            applyAndCheck(snapshot)
+        }
+    }
+
+    private fun applyAndCheck(snapshot: MutableSnapshot) {
+        val applyResult = snapshot.apply()
+        if (applyResult is SnapshotApplyResult.Failure) {
+            error("Unsupported concurrent change during composition. A state object was " +
+                    "modified by composition as well as being modified outside composition.")
+            // TODO(chuckj): Consider lifting this restriction by forcing a recompose
+        }
     }
 
     fun hasPendingChanges(): Boolean =
