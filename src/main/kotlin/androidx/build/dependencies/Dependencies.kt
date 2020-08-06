@@ -99,7 +99,7 @@ const val OKHTTP_MOCKWEBSERVER = "com.squareup.okhttp3:mockwebserver:3.14.7"
 const val SQLDELIGHT_ANDROID = "com.squareup.sqldelight:android-driver:1.3.0"
 const val SQLDELIGHT_COROUTINES_EXT = "com.squareup.sqldelight:coroutines-extensions:1.3.0"
 
-const val ROBOLECTRIC = "org.robolectric:robolectric:4.3.1"
+const val ROBOLECTRIC = "org.robolectric:robolectric:4.4-alpha-2"
 
 const val SHADOW_PLUGIN = "com.github.jengelman.gradle.plugins:shadow:5.2.0"
 
