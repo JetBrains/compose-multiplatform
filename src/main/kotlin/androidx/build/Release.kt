@@ -257,7 +257,7 @@ object Release {
                 GMavenZipTask.ConfigAction(
                     getParams(project = project,
                         distDir = File(project.getDistributionDirectory(), "per-group-zips"),
-                        fileNamePrefix = "gmaven-",
+                        fileNamePrefix = "gmaven",
                         group = group
                     )
                 ).execute(it)
