@@ -351,24 +351,6 @@ class Composer<N>(
     internal var parentReference: CompositionReference? = null
     internal var isComposing = false
 
-    private val changesAppliedObservers = mutableListOf<() -> Unit>()
-
-    private fun dispatchChangesAppliedObservers() {
-        trace("Compose:dispatchChangesAppliedObservers") {
-            val listeners = changesAppliedObservers.toTypedArray()
-            changesAppliedObservers.clear()
-            listeners.forEach { it() }
-        }
-    }
-
-    internal fun addChangesAppliedObserver(l: () -> Unit) {
-        changesAppliedObservers.add(l)
-    }
-
-    internal fun removeChangesAppliedObserver(l: () -> Unit) {
-        changesAppliedObservers.remove(l)
-    }
-
     private var reader: SlotReader = slotTable.openReader().also { it.close() }
 
     private val insertTable = SlotTable()
@@ -683,7 +665,6 @@ class Composer<N>(
             }
 
             manager.dispatchLifecycleObservers()
-            dispatchChangesAppliedObservers()
         }
     }
 
@@ -702,7 +683,6 @@ class Composer<N>(
                 providerUpdates.clear()
                 manager.dispatchLifecycleObservers()
             }
-            dispatchChangesAppliedObservers()
         }
     }
 
