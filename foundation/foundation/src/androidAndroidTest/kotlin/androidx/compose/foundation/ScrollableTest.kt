@@ -16,12 +16,8 @@
 
 package androidx.compose.foundation
 
-import android.os.Handler
-import android.os.Looper
 import androidx.compose.animation.core.ExponentialDecay
-import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.animation.core.ManualFrameClock
-import androidx.compose.animation.core.MonotonicFrameAnimationClock
 import androidx.compose.animation.core.advanceClockMillis
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.gestures.ScrollableController
@@ -29,8 +25,6 @@ import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Recomposer
-import androidx.compose.runtime.dispatch.AndroidUiDispatcher
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -40,28 +34,28 @@ import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.milliseconds
-import androidx.test.filters.SmallTest
+import androidx.test.filters.LargeTest
+import androidx.ui.test.TestUiDispatcher
 import androidx.ui.test.center
 import androidx.ui.test.createComposeRule
+import androidx.ui.test.monotonicFrameAnimationClockOf
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performGesture
+import androidx.ui.test.runBlockingWithManualClock
 import androidx.ui.test.runOnIdle
 import androidx.ui.test.runOnUiThread
 import androidx.ui.test.swipe
 import androidx.ui.test.swipeWithVelocity
-import com.google.common.truth.Truth
+import androidx.ui.test.waitForIdle
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.runBlocking
+import com.google.common.truth.Truth.assertWithMessage
 import kotlinx.coroutines.withContext
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
-@SmallTest
+@LargeTest
 @RunWith(JUnit4::class)
 class ScrollableTest {
 
@@ -70,12 +64,8 @@ class ScrollableTest {
 
     private val scrollableBoxTag = "scrollableBox"
 
-    private lateinit var recomposer: Recomposer
-
     @Test
-    fun scrollable_horizontalScroll() = runBlocking {
-        @Suppress("DEPRECATION")
-        val clock = ManualFrameClock(0L, true)
+    fun scrollable_horizontalScroll() = runBlockingWithManualClock { clock ->
         var total = 0f
         val controller = ScrollableController(
             consumeScrollDelta = {
@@ -83,9 +73,7 @@ class ScrollableTest {
                 it
             },
             flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
-            animationClock = MonotonicFrameAnimationClock(
-                CoroutineScope(coroutineContext + AndroidUiDispatcher.Main + clock)
-            )
+            animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
         )
         setScrollableContent {
             Modifier.scrollable(
@@ -132,8 +120,7 @@ class ScrollableTest {
     }
 
     @Test
-    fun scrollable_verticalScroll() {
-        val clocks = ManualAnimationClock(0L)
+    fun scrollable_verticalScroll() = runBlockingWithManualClock { clock ->
         var total = 0f
         val controller = ScrollableController(
             consumeScrollDelta = {
@@ -141,7 +128,7 @@ class ScrollableTest {
                 it
             },
             flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
-            animationClock = clocks
+            animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
         )
         setScrollableContent {
             Modifier.scrollable(
@@ -156,7 +143,7 @@ class ScrollableTest {
                 duration = 100.milliseconds
             )
         }
-        advanceClockAndAwaitAnimation(controller, clocks)
+        advanceClockAndAwaitAnimation(clock)
 
         val lastTotal = runOnIdle {
             assertThat(total).isGreaterThan(0)
@@ -169,7 +156,7 @@ class ScrollableTest {
                 duration = 100.milliseconds
             )
         }
-        advanceClockAndAwaitAnimation(controller, clocks)
+        advanceClockAndAwaitAnimation(clock)
 
         runOnIdle {
             assertThat(total).isEqualTo(lastTotal)
@@ -181,17 +168,16 @@ class ScrollableTest {
                 duration = 100.milliseconds
             )
         }
-        advanceClockAndAwaitAnimation(controller, clocks)
+        advanceClockAndAwaitAnimation(clock)
         runOnIdle {
             assertThat(total).isLessThan(0.01f)
         }
     }
 
     @Test
-    fun scrollable_startStop_notify() {
+    fun scrollable_startStop_notify() = runBlockingWithManualClock(true) { clock ->
         var startTrigger = 0f
         var stopTrigger = 0f
-        val clocks = ManualAnimationClock(0L)
         var total = 0f
         val controller = ScrollableController(
             consumeScrollDelta = {
@@ -199,7 +185,7 @@ class ScrollableTest {
                 it
             },
             flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
-            animationClock = clocks
+            animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
         )
         setScrollableContent {
             Modifier.scrollable(
@@ -225,7 +211,7 @@ class ScrollableTest {
             assertThat(startTrigger).isEqualTo(1)
             assertThat(stopTrigger).isEqualTo(0)
         }
-        advanceClockAndAwaitAnimation(controller, clocks)
+        advanceClockAndAwaitAnimation(clock)
         // after wait we expect stop to trigger
         runOnIdle {
             assertThat(startTrigger).isEqualTo(1)
@@ -234,9 +220,8 @@ class ScrollableTest {
     }
 
     @Test
-    fun scrollable_disabledWontCallLambda() {
-        var enabled = mutableStateOf(true)
-        val clocks = ManualAnimationClock(0L)
+    fun scrollable_disabledWontCallLambda() = runBlockingWithManualClock(true) { clock ->
+        val enabled = mutableStateOf(true)
         var total = 0f
         val controller = ScrollableController(
             consumeScrollDelta = {
@@ -244,7 +229,7 @@ class ScrollableTest {
                 it
             },
             flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
-            animationClock = clocks
+            animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
         )
         setScrollableContent {
             Modifier.scrollable(
@@ -260,7 +245,7 @@ class ScrollableTest {
                 duration = 100.milliseconds
             )
         }
-        advanceClockAndAwaitAnimation(controller, clocks)
+        advanceClockAndAwaitAnimation(clock)
         val prevTotal = runOnIdle {
             assertThat(total).isGreaterThan(0f)
             enabled.value = false
@@ -273,16 +258,15 @@ class ScrollableTest {
                 duration = 100.milliseconds
             )
         }
-        advanceClockAndAwaitAnimation(controller, clocks)
+        advanceClockAndAwaitAnimation(clock)
         runOnIdle {
             assertThat(total).isEqualTo(prevTotal)
         }
     }
 
     @Test
-    fun scrollable_velocityProxy() {
+    fun scrollable_velocityProxy() = runBlockingWithManualClock { clock ->
         var velocityTriggered = 0f
-        val clocks = ManualAnimationClock(0L)
         var total = 0f
         val controller = ScrollableController(
             consumeScrollDelta = {
@@ -290,7 +274,7 @@ class ScrollableTest {
                 it
             },
             flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
-            animationClock = clocks
+            animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
         )
         setScrollableContent {
             Modifier.scrollable(
@@ -328,8 +312,7 @@ class ScrollableTest {
     }
 
     @Test
-    fun scrollable_startWithoutSlop_ifFlinging() {
-        val clocks = ManualAnimationClock(0L)
+    fun scrollable_startWithoutSlop_ifFlinging() = runBlockingWithManualClock { clock ->
         var total = 0f
         val controller = ScrollableController(
             consumeScrollDelta = {
@@ -337,7 +320,7 @@ class ScrollableTest {
                 it
             },
             flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
-            animationClock = clocks
+            animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
         )
         setScrollableContent {
             Modifier.scrollable(
@@ -354,7 +337,7 @@ class ScrollableTest {
         }
         // don't advance clocks
         val prevTotal = runOnUiThread {
-            Truth.assertThat(total).isGreaterThan(0f)
+            assertThat(total).isGreaterThan(0f)
             total
         }
         onNodeWithTag(scrollableBoxTag).performGesture {
@@ -372,17 +355,16 @@ class ScrollableTest {
     }
 
     @Test
-    fun scrollable_cancel_callsDragStop() {
+    fun scrollable_cancel_callsDragStop() = runBlockingWithManualClock { clock ->
         var total by mutableStateOf(0f)
         var dragStopped = 0f
-        val clocks = ManualAnimationClock(0L)
         val controller = ScrollableController(
             consumeScrollDelta = {
                 total += it
                 it
             },
             flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
-            animationClock = clocks
+            animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
         )
         setScrollableContent {
             if (total < 20) {
@@ -411,16 +393,15 @@ class ScrollableTest {
     }
 
     @Test
-    fun scrollable_snappingScrolling() {
+    fun scrollable_snappingScrolling() = runBlockingWithManualClock(true) { clock ->
         var total = 0f
-        val clocks = ManualAnimationClock(0L)
         val controller = ScrollableController(
             consumeScrollDelta = {
                 total += it
                 it
             },
             flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
-            animationClock = clocks
+            animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
         )
         setScrollableContent {
             Modifier.scrollable(orientation = Orientation.Vertical, controller = controller)
@@ -431,63 +412,31 @@ class ScrollableTest {
         runOnIdle {
             controller.smoothScrollBy(1000f)
         }
-        advanceClockAndAwaitAnimation(controller, clocks)
+        advanceClockAndAwaitAnimation(clock)
         runOnIdle {
             assertThat(total).isEqualTo(1000f)
         }
         runOnIdle {
             controller.smoothScrollBy(-200f)
         }
-        advanceClockAndAwaitAnimation(controller, clocks)
+        advanceClockAndAwaitAnimation(clock)
         runOnIdle {
             assertThat(total).isEqualTo(800f)
         }
     }
 
     @Test
-    fun scrollable_immediateDisposal() {
+    fun scrollable_explicitDisposal() = runBlockingWithManualClock(true) { clock ->
         val disposed = mutableStateOf(false)
         var total = 0f
-        val clocks = ManualAnimationClock(0L)
         val controller = ScrollableController(
             consumeScrollDelta = {
-                Truth.assertWithMessage("Animating after dispose!").that(disposed.value).isFalse()
+                assertWithMessage("Animating after dispose!").that(disposed.value).isFalse()
                 total += it
                 it
             },
             flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
-            animationClock = clocks
-        )
-        setScrollableContent {
-            if (!disposed.value) {
-                Modifier.scrollable(orientation = Orientation.Vertical, controller = controller)
-            } else {
-                Modifier
-            }
-        }
-        runOnUiThread {
-            controller.smoothScrollBy(1000f)
-            disposed.value = true
-        }
-        advanceClockAndAwaitAnimation(controller, clocks)
-        runOnIdle {
-            assertThat(total).isEqualTo(0f)
-        }
-    }
-
-    @Test
-    fun scrollable_explicitDisposal() {
-        val disposed = mutableStateOf(false)
-        var total = 0f
-        val clocks = ManualAnimationClock(0L)
-        val controller = ScrollableController(
-            consumeScrollDelta = {
-                Truth.assertWithMessage("Animating after dispose!").that(disposed.value).isFalse()
-                total += it
-                it
-            },
-            flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
-            animationClock = clocks
+            animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
         )
         setScrollableContent {
             if (!disposed.value) {
@@ -499,7 +448,7 @@ class ScrollableTest {
         runOnIdle {
             controller.smoothScrollBy(300f)
         }
-        advanceClockAndAwaitAnimation(controller, clocks)
+        advanceClockAndAwaitAnimation(clock)
         runOnIdle {
             assertThat(total).isEqualTo(300f)
         }
@@ -510,7 +459,7 @@ class ScrollableTest {
         runOnUiThread {
             disposed.value = true
         }
-        advanceClockAndAwaitAnimation(controller, clocks)
+        advanceClockAndAwaitAnimation(clock)
         // still 300 and didn't fail in onScrollConsumptionRequested.. lambda
         runOnIdle {
             assertThat(total).isEqualTo(300f)
@@ -518,17 +467,17 @@ class ScrollableTest {
     }
 
     @Test
-    fun scrollable_nestedDrag() {
+    fun scrollable_nestedDrag() = runBlockingWithManualClock { clock ->
         var innerDrag = 0f
         var outerDrag = 0f
-        val clocks = ManualAnimationClock(0L)
+        val animationClock = monotonicFrameAnimationClockOf(coroutineContext, clock)
         val outerState = ScrollableController(
             consumeScrollDelta = {
                 outerDrag += it
                 it
             },
             flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
-            animationClock = clocks
+            animationClock = animationClock
         )
         val innerState = ScrollableController(
             consumeScrollDelta = {
@@ -536,7 +485,7 @@ class ScrollableTest {
                 it / 2
             },
             flingConfig = FlingConfig(decayAnimation = ExponentialDecay()),
-            animationClock = clocks
+            animationClock = animationClock
         )
 
         composeTestRule.setContent {
@@ -574,8 +523,8 @@ class ScrollableTest {
             assertThat(outerDrag).isEqualTo(innerDrag)
             innerDrag
         }
-        advanceClockAndAwaitAnimation(innerState, clocks)
-        advanceClockAndAwaitAnimation(outerState, clocks)
+        advanceClockAndAwaitAnimation(clock)
+        advanceClockAndAwaitAnimation(clock)
         // and nothing should change as we don't do nested fling
         runOnIdle {
             assertThat(outerDrag).isEqualTo(lastEqualDrag)
@@ -584,7 +533,6 @@ class ScrollableTest {
 
     private fun setScrollableContent(scrollableModifierFactory: @Composable () -> Modifier) {
         composeTestRule.setContent {
-            recomposer = Recomposer.current()
             Stack {
                 val scrollable = scrollableModifierFactory()
                 Box(
@@ -596,37 +544,10 @@ class ScrollableTest {
         }
     }
 
-    // TODO(b/147291885): This should not be needed in the future.
-    private fun awaitScrollAnimation(controller: ScrollableController) {
-        val latch = CountDownLatch(1)
-        val handler = Handler(Looper.getMainLooper())
-        handler.post(object : Runnable {
-            override fun run() {
-                if (controller.isAnimationRunning) {
-                    handler.post(this)
-                } else {
-                    latch.countDown()
-                }
-            }
-        })
-        Truth.assertWithMessage("Scroll didn't finish after 20 seconds")
-            .that(latch.await(20, TimeUnit.SECONDS)).isTrue()
-    }
-
-    private fun advanceClockAndAwaitAnimation(
-        controller: ScrollableController,
-        clock: ManualAnimationClock
-    ) {
-        runOnIdle {
-            clock.clockTimeMillis += 5000
-        }
-        awaitScrollAnimation(controller)
-    }
-
     private suspend fun advanceClockAndAwaitAnimation(clock: ManualFrameClock) {
-        withContext(AndroidUiDispatcher.Main) {
+        waitForIdle()
+        withContext(TestUiDispatcher.Main) {
             clock.advanceClockMillis(5000L)
         }
-        recomposer.awaitIdle()
     }
 }
