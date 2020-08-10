@@ -57,6 +57,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.CONCURRENT, "1.1.0-rc01")
     prebuilts(LibraryGroups.CONTENTPAGER, "1.0.0")
     prebuilts(LibraryGroups.COORDINATORLAYOUT, "1.1.0")
+    ignore(LibraryGroups.CORE.group, "core-appdigest")
     prebuilts(LibraryGroups.CORE, "core", "1.5.0-alpha01")
     prebuilts(LibraryGroups.CORE, "core-animation", "1.0.0-alpha02")
     prebuilts(LibraryGroups.CORE, "core-animation-testing", "1.0.0-alpha02")
