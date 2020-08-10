@@ -2,7 +2,7 @@
 package androidx.compose.runtime {
 
   @androidx.compose.runtime.ExperimentalComposeApi public abstract class AbstractApplier<T> implements androidx.compose.runtime.Applier<T> {
-    ctor public AbstractApplier(T! root);
+    ctor public AbstractApplier(T? root);
     method public final void clear();
     method public void down(T? node);
     method public T! getCurrent();
@@ -101,7 +101,7 @@ package androidx.compose.runtime {
   }
 
   public final class Composer<N> {
-    ctor public Composer(androidx.compose.runtime.SlotTable slotTable, androidx.compose.runtime.Applier<N> applier, androidx.compose.runtime.Recomposer recomposer);
+    ctor public Composer(androidx.compose.runtime.SlotTable slotTable, @androidx.compose.runtime.ComposeCompilerApi androidx.compose.runtime.Applier<N> applier, @androidx.compose.runtime.ExperimentalComposeApi androidx.compose.runtime.Recomposer recomposer);
     method @androidx.compose.runtime.InternalComposeApi public void applyChanges();
     method @androidx.compose.runtime.ComposeCompilerApi public inline <T> T! cache(boolean invalid, kotlin.jvm.functions.Function0<? extends T> block);
     method @androidx.compose.runtime.ComposeCompilerApi public boolean changed(Object? value);
@@ -553,7 +553,7 @@ package androidx.compose.runtime {
   }
 
   public final class Updater<T> {
-    ctor public Updater(androidx.compose.runtime.Composer<?> composer, T! node);
+    ctor public Updater(androidx.compose.runtime.Composer<?> composer, T? node);
     method public androidx.compose.runtime.Composer<?> getComposer();
     method public T! getNode();
     method public inline void reconcile(kotlin.jvm.functions.Function1<? super T,kotlin.Unit> block);
@@ -571,7 +571,7 @@ package androidx.compose.runtime.collection {
   }
 
   @androidx.compose.runtime.collection.ExperimentalCollectionApi public final class MutableVector<T> {
-    ctor @kotlin.PublishedApi internal MutableVector(internal T![] content, int size);
+    ctor @kotlin.PublishedApi internal MutableVector(@kotlin.PublishedApi internal T![] content, int size);
     method public boolean add(T? element);
     method public void add(int index, T? element);
     method public boolean addAll(int index, java.util.List<? extends T> elements);
@@ -847,17 +847,17 @@ package androidx.compose.runtime.snapshots {
 
   @androidx.compose.runtime.ExperimentalComposeApi public class MutableSnapshot extends androidx.compose.runtime.snapshots.Snapshot {
     method public androidx.compose.runtime.snapshots.SnapshotApplyResult apply();
-    method public void close$lintWithKotlin();
-    method public java.util.Set<androidx.compose.runtime.snapshots.StateObject>? getModified$lintWithKotlin();
-    method public kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? getReadObserver$lintWithKotlin();
+    method public void close$metalava_module();
+    method public java.util.Set<androidx.compose.runtime.snapshots.StateObject>? getModified$metalava_module();
+    method public kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? getReadObserver$metalava_module();
     method public boolean getReadonly();
     method public androidx.compose.runtime.snapshots.Snapshot getRoot();
-    method public kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? getWriteObserver$lintWithKotlin();
+    method public kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? getWriteObserver$metalava_module();
     method public boolean hasPendingChanges();
-    method public void nestedActivated$lintWithKotlin(androidx.compose.runtime.snapshots.Snapshot snapshot);
-    method public void nestedDeactivated$lintWithKotlin(androidx.compose.runtime.snapshots.Snapshot snapshot);
-    method public void notifyObjectsInitialized$lintWithKotlin();
-    method public void recordModified$lintWithKotlin(androidx.compose.runtime.snapshots.StateObject state);
+    method public void nestedActivated$metalava_module(androidx.compose.runtime.snapshots.Snapshot snapshot);
+    method public void nestedDeactivated$metalava_module(androidx.compose.runtime.snapshots.Snapshot snapshot);
+    method public void notifyObjectsInitialized$metalava_module();
+    method public void recordModified$metalava_module(androidx.compose.runtime.snapshots.StateObject state);
     method public void setModified(java.util.Set<androidx.compose.runtime.snapshots.StateObject>? p);
     method public androidx.compose.runtime.snapshots.MutableSnapshot takeNestedMutableSnapshot(kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? readObserver = null, kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? writeObserver = null);
     method public androidx.compose.runtime.snapshots.Snapshot takeNestedSnapshot(kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? readObserver);
@@ -875,7 +875,7 @@ package androidx.compose.runtime.snapshots {
     method public abstract boolean hasPendingChanges();
     method @kotlin.PublishedApi internal androidx.compose.runtime.snapshots.Snapshot? makeCurrent();
     method @kotlin.PublishedApi internal void restoreCurrent(androidx.compose.runtime.snapshots.Snapshot? snapshot);
-    method public void setId$lintWithKotlin(int p);
+    method public void setId$metalava_module(int p);
     method public abstract androidx.compose.runtime.snapshots.Snapshot takeNestedSnapshot(kotlin.jvm.functions.Function1<java.lang.Object,kotlin.Unit>? readObserver = null);
     property public int id;
     property public abstract boolean readonly;
