@@ -40,6 +40,7 @@ private typealias Queue = ArrayList<Action>
  **/
 class DesktopUiDispatcher : CoroutineDispatcher() {
     private val lock = Any()
+    @PublishedApi internal val callbackLock = Any()
     private var callbacks = Queue()
     private var afterCallbacks = Queue()
 
@@ -112,10 +113,19 @@ class DesktopUiDispatcher : CoroutineDispatcher() {
         }
     }
 
+    /**
+     * Prevent execution of callbacks while we execute [block] on other thread.
+     */
+    inline fun lockCallbacks(block: () -> Unit) = synchronized(callbackLock, block)
+
     private fun runCallbacks(now: Long, callbacks: Queue) {
         synchronized(lock) {
             callbacks.toList().also { callbacks.clear() }
-        }.forEach { it(now) }
+        }.forEach {
+            synchronized(callbackLock) {
+                it(now)
+            }
+        }
     }
 
     override fun dispatch(context: CoroutineContext, block: Runnable) {
