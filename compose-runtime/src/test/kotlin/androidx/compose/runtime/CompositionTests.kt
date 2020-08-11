@@ -2072,6 +2072,7 @@ class CompositionTests {
 
     @Test
     fun evenOddRecomposeGroup() {
+
         var includeEven = true
         var includeOdd = true
         val invalidates = mutableListOf<() -> Unit>()
@@ -2389,10 +2390,8 @@ private fun compose(
     }
 
     val mockScope = MockComposeScope()
-    composer.composeRoot {
-        invokeComposable(composer) {
-            mockScope.block()
-        }
+    composer.composeInitial {
+        mockScope.block()
     }
     composer.applyChanges()
     composer.slotTable.verifyWellFormed()
