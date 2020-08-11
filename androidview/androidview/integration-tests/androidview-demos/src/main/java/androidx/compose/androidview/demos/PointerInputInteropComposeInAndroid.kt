@@ -18,14 +18,18 @@ package androidx.compose.androidview.demos
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.compose.androidview.adapters.setOnClick
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.ScrollableRow
+import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -37,6 +41,7 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.Button
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.mutableStateOf
@@ -48,6 +53,8 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentActivity
 import androidx.ui.demos.common.ActivityDemo
 import androidx.ui.demos.common.DemoCategory
 
@@ -72,6 +79,10 @@ val ComposeInAndroidDemos = DemoCategory(
         ActivityDemo(
             "Compose scroll in Android scroll (different orientations)",
             ComposeScrollInAndroidScrollDifferentOrientation::class
+        ),
+        ActivityDemo(
+            "Compose in Android dialog dismisses dialog during dispatch",
+            ComposeInAndroidDialogDismissDialogDuringDispatch::class
         )
     )
 )
@@ -310,5 +321,69 @@ open class ComposeScrollInAndroidScrollDifferentOrientation : ComponentActivity(
     override fun onDestroy() {
         super.onDestroy()
         composition.dispose()
+    }
+}
+
+open class ComposeInAndroidDialogDismissDialogDuringDispatch : FragmentActivity() {
+
+    @SuppressLint("SetTextI18n")
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        setContentView(R.layout.compose_in_android_dialog_dismiss_dialog_during_dispatch)
+
+        findViewById<TextView>(R.id.text1).text =
+            "Demonstrates that a synchronous touch even that causes itself to be removed from " +
+                    "the hierarchy is safe."
+
+        findViewById<TextView>(R.id.text2).text =
+            "Open the dialog, then click the compose button in the dialog to remove the compose " +
+                    "button from the hierarchy synchronously."
+
+        findViewById<Button>(R.id.showDialogButton).setOnClick { showDialog() }
+    }
+
+    private fun showDialog() {
+        // Create and show the dialog.
+        val newFragment: DialogFragment = MyDialogFragment.newInstance()
+        newFragment.show(supportFragmentManager.beginTransaction(), "dialog")
+    }
+}
+
+class MyDialogFragment : DialogFragment() {
+
+    private lateinit var composition: Composition
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+
+        val frameLayout = FrameLayout(inflater.context).apply {
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        }
+
+        composition = frameLayout.setContent(Recomposer.current()) {
+            Button({ this@MyDialogFragment.dismiss() }) {
+                Text("Close me")
+            }
+        }
+
+        return frameLayout
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        composition.dispose()
+    }
+
+    companion object {
+        fun newInstance(): MyDialogFragment {
+            return MyDialogFragment()
+        }
     }
 }
