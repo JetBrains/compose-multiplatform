@@ -27,6 +27,7 @@ fun TextView(
     text: String = "",
     onClickListener: View.OnClickListener? = null
 ) {
+    @Suppress("Deprecation")
     emitView(::TextView) {
         if (id != 0) it.id = id
         it.text = text
@@ -40,6 +41,7 @@ fun Button(
     text: String = "",
     onClickListener: View.OnClickListener? = null
 ) {
+    @Suppress("Deprecation")
     emitView(::Button) {
         if (id != 0) it.id = id
         it.text = text
@@ -54,6 +56,7 @@ fun LinearLayout(
     onClickListener: View.OnClickListener? = null,
     children: @Composable () -> Unit
 ) {
+    @Suppress("Deprecation")
     emitView(
         ::LinearLayout,
         {
