@@ -18,16 +18,9 @@ package androidx.compose.runtime
 
 import kotlin.coroutines.CoroutineContext
 
-expect interface ChoreographerFrameCallback {
-    fun doFrame(frameTimeNanos: Long)
-}
-
 interface EmbeddingContext {
     fun isMainThread(): Boolean
     fun mainThreadCompositionContext(): CoroutineContext
-    fun postOnMainThread(block: () -> Unit)
-    fun postFrameCallback(callback: ChoreographerFrameCallback)
-    fun cancelFrameCallback(callback: ChoreographerFrameCallback)
 }
 
 expect fun EmbeddingContext(): EmbeddingContext

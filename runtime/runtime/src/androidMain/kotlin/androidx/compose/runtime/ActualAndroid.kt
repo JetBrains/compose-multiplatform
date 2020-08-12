@@ -16,16 +16,12 @@
 
 package androidx.compose.runtime
 
-import android.os.Handler
 import android.os.Looper
 import androidx.compose.runtime.dispatch.AndroidUiDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
 
 class AndroidEmbeddingContext : EmbeddingContext {
-    private val handler by lazy {
-        Handler(Looper.getMainLooper())
-    }
 
     override fun isMainThread(): Boolean {
         return Looper.myLooper() == Looper.getMainLooper()
@@ -34,24 +30,9 @@ class AndroidEmbeddingContext : EmbeddingContext {
     override fun mainThreadCompositionContext(): CoroutineContext {
         return MainAndroidUiContext
     }
-
-    override fun postOnMainThread(block: () -> Unit) {
-        handler.post(block)
-    }
-
-    override fun postFrameCallback(callback: ChoreographerFrameCallback) {
-        android.view.Choreographer.getInstance().postFrameCallback(callback)
-    }
-
-    override fun cancelFrameCallback(callback: ChoreographerFrameCallback) {
-        android.view.Choreographer.getInstance().removeFrameCallback(callback)
-    }
 }
 
 actual fun EmbeddingContext(): EmbeddingContext = AndroidEmbeddingContext()
-
-// TODO(b/137794558): Create portable abstraction for scheduling
-internal actual typealias ChoreographerFrameCallback = android.view.Choreographer.FrameCallback
 
 // TODO: Our host-side tests still grab the Android actuals based on SDK stubs that return null.
 // Satisfy their dependencies.

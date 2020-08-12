@@ -42,11 +42,8 @@ package androidx.compose.runtime {
 
   public final class AndroidEmbeddingContext implements androidx.compose.runtime.EmbeddingContext {
     ctor public AndroidEmbeddingContext();
-    method public void cancelFrameCallback(android.view.Choreographer.FrameCallback callback);
     method public boolean isMainThread();
     method public kotlin.coroutines.CoroutineContext mainThreadCompositionContext();
-    method public void postFrameCallback(android.view.Choreographer.FrameCallback callback);
-    method public void postOnMainThread(kotlin.jvm.functions.Function0<kotlin.Unit> block);
   }
 
   @androidx.compose.runtime.ExperimentalComposeApi public interface Applier<N> {
@@ -205,11 +202,8 @@ package androidx.compose.runtime {
   }
 
   public interface EmbeddingContext {
-    method public void cancelFrameCallback(android.view.Choreographer.FrameCallback callback);
     method public boolean isMainThread();
     method public kotlin.coroutines.CoroutineContext mainThreadCompositionContext();
-    method public void postFrameCallback(android.view.Choreographer.FrameCallback callback);
-    method public void postOnMainThread(kotlin.jvm.functions.Function0<kotlin.Unit> block);
   }
 
   public final class EmitKt {

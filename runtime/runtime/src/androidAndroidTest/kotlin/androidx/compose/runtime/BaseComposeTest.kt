@@ -20,6 +20,7 @@ package androidx.compose.runtime
 import android.app.Activity
 import android.os.Bundle
 import android.os.Looper
+import android.view.Choreographer
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.compose.runtime.snapshots.Snapshot
@@ -93,10 +94,7 @@ internal fun Activity.waitForAFrame() {
     }
     val latch = CountDownLatch(1)
     uiThread {
-        android.view.Choreographer.getInstance().postFrameCallback(object :
-            ChoreographerFrameCallback {
-                override fun doFrame(frameTimeNanos: Long) = latch.countDown()
-            })
+        Choreographer.getInstance().postFrameCallback { latch.countDown() }
     }
     assertTrue(latch.await(1, TimeUnit.HOURS), "Time-out waiting for choreographer frame")
 }

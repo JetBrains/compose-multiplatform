@@ -1,6 +1,5 @@
 package androidx.compose.desktop.test
 
-import androidx.compose.runtime.ChoreographerFrameCallback
 import androidx.compose.runtime.EmbeddingContext
 import androidx.compose.runtime.EmbeddingContextFactory
 import kotlinx.coroutines.Dispatchers
@@ -205,24 +204,4 @@ class ScreenshotTestRule internal constructor(val config: GoldenConfig) : TestRu
 
     override fun isMainThread() = true
     override fun mainThreadCompositionContext() = Dispatchers.Main
-
-    override fun postOnMainThread(block: () -> Unit) {
-        executionQueue.add(block)
-    }
-
-    private val cancelled = mutableSetOf<ChoreographerFrameCallback>()
-
-    override fun postFrameCallback(callback: ChoreographerFrameCallback) {
-        postOnMainThread {
-            if (callback !in cancelled) {
-                callback.doFrame(System.currentTimeMillis() * 1000000)
-            } else {
-                cancelled.remove(callback)
-            }
-        }
-    }
-
-    override fun cancelFrameCallback(callback: ChoreographerFrameCallback) {
-        cancelled += callback
-    }
 }

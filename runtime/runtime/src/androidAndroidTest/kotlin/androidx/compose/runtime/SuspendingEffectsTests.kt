@@ -16,6 +16,7 @@
 
 package androidx.compose.runtime
 
+import android.view.Choreographer
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import kotlinx.coroutines.CoroutineScope
@@ -78,12 +79,9 @@ class SuspendingEffectsTests : BaseComposeTest() {
                 }
             }
             onCommit(true) {
-                Recomposer.current().embeddingContext
-                    .postFrameCallback(object : ChoreographerFrameCallback {
-                    override fun doFrame(frameTimeNanos: Long) {
-                        choreographerTime = frameTimeNanos
-                    }
-                })
+                Choreographer.getInstance().postFrameCallback { frameTimeNanos ->
+                    choreographerTime = frameTimeNanos
+                }
             }
         }.then {
             assertNotEquals(choreographerTime, Long.MIN_VALUE, "Choreographer callback never ran")
