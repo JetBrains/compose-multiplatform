@@ -1722,7 +1722,6 @@ class Composer<N>(
         val location = anchor.location(slotTable)
         if (location < 0)
             return InvalidationResult.IGNORED // The scope was removed from the composition
-
         invalidations.insertIfMissing(location, scope)
         if (isComposing && location >= reader.current) {
             // if we are invalidating a scope that is going to be traversed during this
@@ -1881,7 +1880,6 @@ class Composer<N>(
                     isComposing = wasComposing
                     if (!complete) abortRoot()
                 }
-                finalizeCompose()
             }
             return true
         }
@@ -2398,6 +2396,14 @@ class Composer<N>(
         block: T.() -> Unit
     ) {
         node.block()
+    }
+}
+
+class SkippableUpdater<T>(val composer: Composer<*>, val node: T) {
+    inline fun update(block: Updater<T>.() -> Unit) {
+        composer.startReplaceableGroup(0x1e65194f)
+        Updater(composer, node).block()
+        composer.endReplaceableGroup()
     }
 }
 

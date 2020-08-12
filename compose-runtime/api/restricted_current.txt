@@ -234,7 +234,8 @@ package androidx.compose.runtime {
   public final class EmitKt {
     method @androidx.compose.runtime.Composable public static inline <T extends java.lang.Object, reified E extends androidx.compose.runtime.Applier<?>> void emit(kotlin.jvm.functions.Function0<? extends T> ctor, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update);
     method @androidx.compose.runtime.Composable public static inline <T extends java.lang.Object, reified E extends androidx.compose.runtime.Applier<?>> void emit(kotlin.jvm.functions.Function0<? extends T> ctor, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update, kotlin.jvm.functions.Function0<? extends kotlin.Unit> children);
-    method @kotlin.PublishedApi internal static Void invalidApplier();
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ComposableContract(readonly=true) public static inline <T extends java.lang.Object, reified E extends androidx.compose.runtime.Applier<?>> void emit(kotlin.jvm.functions.Function0<? extends T> ctor, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,? extends kotlin.Unit> update, kotlin.jvm.functions.Function1<? super androidx.compose.runtime.SkippableUpdater<T>,? extends kotlin.Unit> skippableUpdate, kotlin.jvm.functions.Function0<? extends kotlin.Unit> children);
+    method @kotlin.PublishedApi internal static void invalidApplier();
   }
 
   public final class ExpectKt {
@@ -379,6 +380,13 @@ package androidx.compose.runtime {
 
   @androidx.compose.runtime.ComposeCompilerApi public interface ScopeUpdateScope {
     method public void updateScope(kotlin.jvm.functions.Function3<? super androidx.compose.runtime.Composer<?>,? super java.lang.Integer,? super java.lang.Integer,kotlin.Unit> block);
+  }
+
+  public final class SkippableUpdater<T> {
+    ctor public SkippableUpdater(androidx.compose.runtime.Composer<?> composer, T? node);
+    method public androidx.compose.runtime.Composer<?> getComposer();
+    method public T! getNode();
+    method public inline void update(kotlin.jvm.functions.Function1<? super androidx.compose.runtime.Updater<T>,kotlin.Unit> block);
   }
 
   @androidx.compose.runtime.InternalComposeApi public final class SlotReader {
