@@ -29,12 +29,15 @@ import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.snapshots.Snapshot
+import androidx.compose.runtime.snapshots.SnapshotReadObserver
+import androidx.compose.runtime.snapshots.SnapshotWriteObserver
+import androidx.compose.runtime.snapshots.takeMutableSnapshot
 import androidx.compose.ui.platform.AndroidOwner
 import androidx.compose.ui.platform.setContent
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 
-@OptIn(ExperimentalComposeApi::class)
+@OptIn(ExperimentalComposeApi::class, InternalComposeApi::class)
 abstract class ComposeBenchmarkBase {
     @get:Rule
     val benchmarkRule = BenchmarkRule()
@@ -70,27 +73,37 @@ abstract class ComposeBenchmarkBase {
 
         val composer = activeComposer
         require(composer != null) { "Composer was null" }
+        val readObserver: SnapshotReadObserver = { composer.recordReadOf(it) }
+        val writeObserver: SnapshotWriteObserver = { composer.recordWriteOf(it) }
         benchmarkRule.measureRepeated {
             runWithTimingDisabled {
                 receiver.updateModelCb()
                 Snapshot.sendApplyNotifications()
             }
-            @OptIn(InternalComposeApi::class)
-            val didSomething = composer.recompose().also { composer.applyChanges() }
+            val didSomething = composer.performRecompose(readObserver, writeObserver)
             assertTrue(didSomething)
             runWithTimingDisabled {
                 receiver.resetCb()
                 Snapshot.sendApplyNotifications()
-                @OptIn(InternalComposeApi::class)
-                composer.apply {
-                    recompose()
-                    applyChanges()
-                }
+                composer.performRecompose(readObserver, writeObserver)
             }
         }
 
         composition.dispose()
     }
+}
+
+@OptIn(ExperimentalComposeApi::class, InternalComposeApi::class)
+fun Composer<*>.performRecompose(
+    readObserver: SnapshotReadObserver,
+    writeObserver: SnapshotWriteObserver
+): Boolean {
+    val snapshot = takeMutableSnapshot(readObserver, writeObserver)
+    val result = snapshot.enter {
+        recompose().also { applyChanges() }
+    }
+    snapshot.apply().check()
+    return result
 }
 
 class RecomposeReceiver {
