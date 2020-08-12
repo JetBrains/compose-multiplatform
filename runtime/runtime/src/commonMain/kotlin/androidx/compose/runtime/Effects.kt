@@ -60,42 +60,6 @@ internal class PreCommitScopeImpl(
     }
 }
 
-@PublishedApi
-internal class PostCommitScopeImpl(
-    internal val onCommit: CommitScope.() -> Unit,
-    private val embeddingContext: EmbeddingContext = Recomposer.current().embeddingContext
-) : CommitScope, CompositionLifecycleObserver, ChoreographerFrameCallback {
-
-    private var disposeCallback = emptyDispose
-    private var hasRun = false
-
-    override fun onDispose(callback: () -> Unit) {
-        require(disposeCallback === emptyDispose) {
-            "onDispose(...) should only be called once"
-        }
-        disposeCallback = callback
-    }
-
-    override fun doFrame(frameTimeNanos: Long) {
-        hasRun = true
-        onCommit(this)
-    }
-
-    override fun onEnter() {
-        embeddingContext.postFrameCallback(this)
-    }
-
-    override fun onLeave() {
-        // If `onCommit` hasn't executed yet, we should not call `onDispose`. We should document
-        // somewhere the invariants we intend to have around call order for these.
-        if (hasRun) {
-            disposeCallback()
-        } else {
-            embeddingContext.cancelFrameCallback(this)
-        }
-    }
-}
-
 /**
  * An effect used to observe the lifecycle of the composition. The [callback] will execute once initially after the first composition
  * is applied, and then will not fire again. The [callback] will get executed with a receiver scope that has an
@@ -107,12 +71,11 @@ internal class PostCommitScopeImpl(
  * @param callback The lambda to execute when the composition commits for the first time and becomes active.
  *
  * @see [onCommit]
- * @see [onPreCommit]
  * @see [onDispose]
  */
 @Composable
 fun onActive(callback: CommitScope.() -> Unit) {
-    remember { PostCommitScopeImpl(callback) }
+    remember { PreCommitScopeImpl(callback) }
 }
 
 /**
@@ -123,7 +86,6 @@ fun onActive(callback: CommitScope.() -> Unit) {
  * @param callback The lambda to be executed when the effect leaves the composition.
  *
  * @see [onCommit]
- * @see [onPreCommit]
  * @see [onActive]
  */
 @Composable
@@ -140,14 +102,13 @@ fun onDispose(callback: () -> Unit) {
  * @param callback The lambda to be executed when the effect is committed to the composition.
  *
  * @see [onDispose]
- * @see [onPreCommit]
  * @see [onActive]
  */
 @Suppress("NOTHING_TO_INLINE")
 @OptIn(ComposeCompilerApi::class)
 @Composable
 inline fun onCommit(noinline callback: CommitScope.() -> Unit) {
-    currentComposer.changed(PostCommitScopeImpl(callback))
+    currentComposer.changed(PreCommitScopeImpl(callback))
 }
 
 /**
@@ -160,7 +121,6 @@ inline fun onCommit(noinline callback: CommitScope.() -> Unit) {
  * @param callback The lambda to be executed when the effect is committed to the composition.
  *
  * @see [onDispose]
- * @see [onPreCommit]
  * @see [onActive]
  */
 @Composable
@@ -169,7 +129,7 @@ inline fun onCommit(noinline callback: CommitScope.() -> Unit) {
     /*noinline*/
     callback: CommitScope.() -> Unit
 ) {
-    remember(v1) { PostCommitScopeImpl(callback) }
+    remember(v1) { PreCommitScopeImpl(callback) }
 }
 
 /**
@@ -183,7 +143,6 @@ inline fun onCommit(noinline callback: CommitScope.() -> Unit) {
  * @param callback The lambda to be executed when the effect is committed to the composition.
  *
  * @see [onDispose]
- * @see [onPreCommit]
  * @see [onActive]
  */
 @Composable
@@ -193,7 +152,7 @@ inline fun onCommit(noinline callback: CommitScope.() -> Unit) {
     /*noinline*/
     callback: CommitScope.() -> Unit
 ) {
-    remember(v1, v2) { PostCommitScopeImpl(callback) }
+    remember(v1, v2) { PreCommitScopeImpl(callback) }
 }
 
 /**
@@ -206,12 +165,11 @@ inline fun onCommit(noinline callback: CommitScope.() -> Unit) {
  * @param callback The lambda to be executed when the effect is committed to the composition.
  *
  * @see [onDispose]
- * @see [onPreCommit]
  * @see [onActive]
  */
 @Composable
 fun onCommit(vararg inputs: Any?, callback: CommitScope.() -> Unit) {
-    remember(*inputs) { PostCommitScopeImpl(callback) }
+    remember(*inputs) { PreCommitScopeImpl(callback) }
 }
 
 /**
@@ -225,15 +183,13 @@ fun onCommit(vararg inputs: Any?, callback: CommitScope.() -> Unit) {
  * @param callback The lambda to be executed when the effect is committed to the composition.
  *
  * @see [onDispose]
- * @see [onPreCommit]
  * @see [onActive]
  */
 @Suppress("NOTHING_TO_INLINE")
 @OptIn(ComposeCompilerApi::class)
 @Composable
-inline fun onPreCommit(noinline callback: CommitScope.() -> Unit) {
-    currentComposer.changed(PreCommitScopeImpl(callback))
-}
+@Deprecated("onCommit now has onPreCommit's behavior", ReplaceWith("onCommit(callback)"))
+inline fun onPreCommit(noinline callback: CommitScope.() -> Unit) = onCommit(callback)
 
 /**
  * The onPreCommit effect is a lifecycle effect that will execute [callback] every time the inputs to the
@@ -251,13 +207,12 @@ inline fun onPreCommit(noinline callback: CommitScope.() -> Unit) {
  * @see [onActive]
  */
 @Composable
+@Deprecated("onCommit now has onPreCommit's behavior", ReplaceWith("onCommit(v1, callback)"))
 /*inline*/ fun </*reified*/ V1> onPreCommit(
     v1: V1,
     /*noinline*/
     callback: CommitScope.() -> Unit
-) {
-    remember(v1) { PreCommitScopeImpl(callback) }
-}
+) = onCommit(v1, callback)
 
 /**
  * The onPreCommit effect is a lifecycle effect that will execute [callback] every time the inputs to the
@@ -276,14 +231,13 @@ inline fun onPreCommit(noinline callback: CommitScope.() -> Unit) {
  * @see [onActive]
  */
 @Composable
+@Deprecated("onCommit now has onPreCommit's behavior", ReplaceWith("onCommit(v1, v2, callback)"))
 /*inline*/ fun </*reified*/ V1, /*reified*/ V2> onPreCommit(
     v1: V1,
     v2: V2,
     /*noinline*/
     callback: CommitScope.() -> Unit
-) {
-    remember(v1, v2) { PreCommitScopeImpl(callback) }
-}
+) = onCommit(v1, v2, callback)
 
 /**
  * The onPreCommit effect is a lifecycle effect that will execute [callback] every time the inputs to the
@@ -301,9 +255,12 @@ inline fun onPreCommit(noinline callback: CommitScope.() -> Unit) {
  * @see [onActive]
  */
 @Composable
-fun onPreCommit(vararg inputs: Any?, callback: CommitScope.() -> Unit) {
-    remember(*inputs) { PreCommitScopeImpl(callback) }
-}
+@Deprecated(
+    "onCommit now has onPreCommit's behavior",
+    ReplaceWith("onCommit(*inputs, callback = callback)")
+)
+fun onPreCommit(vararg inputs: Any?, callback: CommitScope.() -> Unit) =
+    onCommit(*inputs, callback = callback)
 
 /**
  * The model effect is an alias to the `memo` effect, but the semantics behind how it is used are different from

@@ -21,7 +21,7 @@ import androidx.compose.foundation.Box
 import androidx.compose.foundation.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onPreCommit
+import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.test.filters.SmallTest
 import androidx.ui.test.android.AndroidComposeTestRule
@@ -87,7 +87,7 @@ class AndroidComposeTestCaseRunnerTest {
         composeTestRule.forGivenContent {
             val state = remember { mutableStateOf(0) }
             Text("Hello ${state.value}")
-            onPreCommit {
+            onCommit {
                 state.value++
             }
         }.performTestWithEventsControl {
