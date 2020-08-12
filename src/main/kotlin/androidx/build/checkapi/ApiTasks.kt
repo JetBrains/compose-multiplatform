@@ -159,9 +159,7 @@ fun Project.configureProjectForApiTasks(
             }
         }
 
-        // Note that the use of a versioned baseline file conflicts with the "don't generate
-        // versioned API files" bit. We'll cross the bridge when we get to it.
-        val baselinesApiLocation = ApiBaselinesLocation.fromApiLocation(versionedApiLocation)
+        val baselinesApiLocation = ApiBaselinesLocation.fromApiLocation(currentApiLocation)
 
         MetalavaTasks.setupProject(
             project, javaInputs, extension, processManifest, baselinesApiLocation,
