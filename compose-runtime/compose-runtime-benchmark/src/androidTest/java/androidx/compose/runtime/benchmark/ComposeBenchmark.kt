@@ -16,19 +16,23 @@
 
 package androidx.compose.runtime.benchmark
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.benchmark.realworld4.RealWorld4_FancyWidget_000
+import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.benchmark.realworld4.RealWorld4_FancyWidget_000
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import org.junit.FixMethodOrder
 import org.junit.Ignore
 import org.junit.Test
@@ -148,6 +152,30 @@ class ComposeBenchmark : ComposeBenchmarkBase() {
             }
             update {
                 model.f2.f15.f1.f1.f1_modified = !model.f2.f15.f1.f1.f1_modified
+            }
+        }
+    }
+
+    @UiThreadTest
+    @Test
+    fun benchmark_10_NestedRowColumnsWithModifier() {
+        var pad by mutableStateOf(0)
+        val modifier = Modifier.composed {
+            Modifier.padding(pad.dp)
+        }
+        measureRecompose {
+            compose {
+                Column(modifier = modifier) {
+                    repeat(100) {
+                        Text("Some text")
+                    }
+                }
+            }
+            update {
+                pad = 10
+            }
+            reset {
+                pad = 0
             }
         }
     }

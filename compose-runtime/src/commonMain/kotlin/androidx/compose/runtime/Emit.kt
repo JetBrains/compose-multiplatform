@@ -40,7 +40,7 @@ package androidx.compose.runtime
     noinline ctor: () -> T,
     update: Updater<T>.() -> Unit
 ) {
-    require(currentComposer.applier is E)
+    if (currentComposer.applier !is E) invalidApplier()
     currentComposer.startNode()
     val node = if (currentComposer.inserting)
         ctor().also { currentComposer.emitNode(it) }
@@ -93,5 +93,28 @@ inline fun <T : Any?, reified E : Applier<*>> emit(
     currentComposer.endNode()
 }
 
+@OptIn(ComposeCompilerApi::class)
+@Composable @ComposableContract(readonly = true)
+inline fun <T : Any?, reified E : Applier<*>> emit(
+    noinline ctor: () -> T,
+    update: Updater<T>.() -> Unit,
+    noinline skippableUpdate: @Composable SkippableUpdater<T>.() -> Unit,
+    children: @Composable () -> Unit
+) {
+    if (currentComposer.applier !is E) invalidApplier()
+    currentComposer.startNode()
+    val node = if (currentComposer.inserting)
+        ctor().also { currentComposer.emitNode(it) }
+    else
+        @Suppress("UNCHECKED_CAST")
+        currentComposer.useNode() as T
+    Updater(currentComposer, node).update()
+    SkippableUpdater(currentComposer, node).skippableUpdate()
+    currentComposer.startReplaceableGroup(0x7ab4aae9)
+    children()
+    currentComposer.endReplaceableGroup()
+    currentComposer.endNode()
+}
+
 @PublishedApi
-internal fun invalidApplier(): Nothing = error("Invalid applier")
+internal fun invalidApplier(): Unit = error("Invalid applier")
