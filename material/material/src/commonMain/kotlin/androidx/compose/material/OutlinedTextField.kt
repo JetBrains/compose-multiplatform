@@ -69,12 +69,12 @@ import kotlin.math.roundToInt
  * @param value the input text to be shown in the text field
  * @param onValueChange the callback that is triggered when the input service updates the text. An
  * updated text comes as a parameter of the callback
- * @param label the label to be displayed inside the text field container. The default text style
- * for internal [Text] is [Typography.caption] when the text field is in focus and
- * [Typography.subtitle1] when the text field is not in focus
  * @param modifier a [Modifier] for this text field
  * @param textStyle the style to be applied to the input text. The default [textStyle] uses the
  * [currentTextStyle] defined by the theme
+ * @param label the optional label to be displayed inside the text field container. The default
+ * text style for internal [Text] is [Typography.caption] when the text field is in focus and
+ * [Typography.subtitle1] when the text field is not in focus
  * @param placeholder the optional placeholder to be displayed when the text field is in focus and
  * the input text is empty. The default text style for internal [Text] is [Typography.subtitle1]
  * @param leadingIcon the optional leading icon to be displayed at the beginning of the text field
@@ -112,9 +112,9 @@ import kotlin.math.roundToInt
 fun OutlinedTextField(
     value: String,
     onValueChange: (String) -> Unit,
-    label: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     textStyle: TextStyle = currentTextStyle(),
+    label: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
@@ -130,6 +130,7 @@ fun OutlinedTextField(
 ) {
     var selection by remember { mutableStateOf(TextRange.Zero) }
     var composition by remember { mutableStateOf<TextRange?>(null) }
+
     @OptIn(InternalTextApi::class)
     val textFieldValue = TextFieldValue(
         text = value,
@@ -181,12 +182,12 @@ fun OutlinedTextField(
  * @param value the input [TextFieldValue] to be shown in the text field
  * @param onValueChange the callback that is triggered when the input service updates values in
  * [TextFieldValue]. An updated [TextFieldValue] comes as a parameter of the callback
- * @param label the label to be displayed inside the text field container. The default text style
- * for internal [Text] is [Typography.caption] when the text field is in focus and
- * [Typography.subtitle1] when the text field is not in focus
  * @param modifier a [Modifier] for this text field
  * @param textStyle the style to be applied to the input text. The default [textStyle] uses the
  * [currentTextStyle] defined by the theme
+ * @param label the optional label to be displayed inside the text field container. The default
+ * text style for internal [Text] is [Typography.caption] when the text field is in focus and
+ * [Typography.subtitle1] when the text field is not in focus
  * @param placeholder the optional placeholder to be displayed when the text field is in focus and
  * the input text is empty. The default text style for internal [Text] is [Typography.subtitle1]
  * @param leadingIcon the optional leading icon to be displayed at the beginning of the text field
@@ -224,9 +225,9 @@ fun OutlinedTextField(
 fun OutlinedTextField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
-    label: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     textStyle: TextStyle = currentTextStyle(),
+    label: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
@@ -269,8 +270,8 @@ fun OutlinedTextField(
 internal fun OutlinedTextFieldLayout(
     modifier: Modifier = Modifier,
     decoratedTextField: @Composable (Modifier) -> Unit,
-    decoratedPlaceholder: @Composable (() -> Unit)?,
-    decoratedLabel: @Composable () -> Unit,
+    decoratedPlaceholder: @Composable ((Modifier) -> Unit)?,
+    decoratedLabel: @Composable (() -> Unit)?,
     leading: @Composable (() -> Unit)?,
     trailing: @Composable (() -> Unit)?,
     leadingColor: Color,
@@ -322,8 +323,8 @@ internal fun OutlinedTextFieldLayout(
 private fun IconsWithTextFieldLayout(
     modifier: Modifier = Modifier,
     textField: @Composable (Modifier) -> Unit,
-    placeholder: @Composable (() -> Unit)?,
-    label: @Composable () -> Unit,
+    placeholder: @Composable ((Modifier) -> Unit)?,
+    label: @Composable (() -> Unit)?,
     leading: @Composable (() -> Unit)?,
     trailing: @Composable (() -> Unit)?,
     leadingColor: Color,
@@ -350,12 +351,7 @@ private fun IconsWithTextFieldLayout(
                 }
             }
             if (placeholder != null) {
-                Box(
-                    modifier = Modifier
-                        .layoutId(PlaceholderId)
-                        .padding(horizontal = TextFieldPadding),
-                    children = placeholder
-                )
+                placeholder(Modifier.layoutId(PlaceholderId).padding(horizontal = TextFieldPadding))
             }
 
             textField(
@@ -364,7 +360,9 @@ private fun IconsWithTextFieldLayout(
                     .padding(horizontal = TextFieldPadding)
             )
 
-            Box(modifier = Modifier.layoutId(LabelId), children = label)
+            if (label != null) {
+                Box(modifier = Modifier.layoutId(LabelId), children = label)
+            }
         },
         modifier = modifier
     ) { measurables, incomingConstraints ->
@@ -393,13 +391,13 @@ private fun IconsWithTextFieldLayout(
             vertical = -bottomPadding
         )
         val labelPlaceable =
-            measurables.first { it.id == LabelId }.measure(labelConstraints)
-        onLabelMeasured(labelPlaceable.width)
+            measurables.find { it.id == LabelId }?.measure(labelConstraints)
+        onLabelMeasured(labelPlaceable?.width ?: 0)
 
         // measure text field
         // on top we offset either by default padding or by label's half height if its too big
         // minWidth must not be set to 0 due to how foundation TextField treats zero minWidth
-        val topPadding = max(labelPlaceable.height / 2, bottomPadding)
+        val topPadding = max(heightOrZero(labelPlaceable) / 2, bottomPadding)
         val textContraints = incomingConstraints.offset(
             horizontal = -occupiedSpaceHorizontally,
             vertical = -bottomPadding - topPadding
@@ -455,16 +453,14 @@ private fun calculateWidth(
     leadingPlaceable: Placeable?,
     trailingPlaceable: Placeable?,
     textFieldPlaceable: Placeable,
-    labelPlaceable: Placeable,
+    labelPlaceable: Placeable?,
     placeholderPlaceable: Placeable?,
     constraints: Constraints
 ): Int {
-    val middleSection = widthOrZero(
-        listOf(
-            textFieldPlaceable,
-            labelPlaceable,
-            placeholderPlaceable
-        ).maxByOrNull { widthOrZero(it) }
+    val middleSection = maxOf(
+        textFieldPlaceable.width,
+        widthOrZero(labelPlaceable),
+        widthOrZero(placeholderPlaceable)
     )
     val wrappedWidth =
         widthOrZero(leadingPlaceable) + middleSection + widthOrZero(
@@ -481,7 +477,7 @@ private fun calculateHeight(
     leadingPlaceable: Placeable?,
     trailingPlaceable: Placeable?,
     textFieldPlaceable: Placeable,
-    labelPlaceable: Placeable,
+    labelPlaceable: Placeable?,
     placeholderPlaceable: Placeable?,
     constraints: Constraints,
     density: Float
@@ -496,15 +492,15 @@ private fun calculateHeight(
     val topBottomPadding = TextFieldPadding.value * density
     val middleSectionHeight = inputFieldHeight + topBottomPadding + max(
         topBottomPadding,
-        labelPlaceable.height / 2f
+        heightOrZero(labelPlaceable) / 2f
     )
     return max(
-        listOf(
+        constraints.minHeight,
+        maxOf(
             heightOrZero(leadingPlaceable),
             heightOrZero(trailingPlaceable),
             middleSectionHeight.roundToInt()
-        ).maxOrNull() ?: 0,
-        constraints.minHeight
+        )
     )
 }
 
@@ -518,7 +514,7 @@ private fun Placeable.PlacementScope.place(
     leadingPlaceable: Placeable?,
     trailingPlaceable: Placeable?,
     textFieldPlaceable: Placeable,
-    labelPlaceable: Placeable,
+    labelPlaceable: Placeable?,
     placeholderPlaceable: Placeable?,
     animationProgress: Float,
     density: Float
@@ -538,12 +534,14 @@ private fun Placeable.PlacementScope.place(
     // if animation progress is 0, the label will be centered vertically
     // if animation progress is 1, vertically it will be centered to the container's top edge
     // horizontally it is placed after the leading icon
-    val labelPositionY =
-        Alignment.CenterVertically.align(height - labelPlaceable.height) * (1 -
-                animationProgress) - (labelPlaceable.height / 2) * animationProgress
-    val labelPositionX = (TextFieldPadding.value * density) +
-            widthOrZero(leadingPlaceable) * (1 - animationProgress)
-    labelPlaceable.placeRelative(labelPositionX.roundToInt(), labelPositionY.roundToInt())
+    if (labelPlaceable != null) {
+        val labelPositionY =
+            Alignment.CenterVertically.align(height - labelPlaceable.height) * (1 -
+                    animationProgress) - (labelPlaceable.height / 2) * animationProgress
+        val labelPositionX = (TextFieldPadding.value * density) +
+                widthOrZero(leadingPlaceable) * (1 - animationProgress)
+        labelPlaceable.placeRelative(labelPositionX.roundToInt(), labelPositionY.roundToInt())
+    }
 
     // placed center vertically and after the leading icon horizontally
     textFieldPlaceable.placeRelative(
