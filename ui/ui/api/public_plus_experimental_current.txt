@@ -679,8 +679,8 @@ package androidx.compose.ui.gesture.util {
 
   public final class VelocityTracker {
     ctor public VelocityTracker();
-    method public void addPosition-cJzGd7g(androidx.compose.ui.unit.Uptime uptime, long position);
-    method public androidx.compose.ui.unit.Velocity calculateVelocity();
+    method public void addPosition-cJzGd7g(long uptime, long position);
+    method public long calculateVelocity();
     method public void resetTracking();
   }
 
