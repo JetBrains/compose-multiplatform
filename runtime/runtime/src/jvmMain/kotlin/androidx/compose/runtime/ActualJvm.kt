@@ -16,9 +16,9 @@
 
 package androidx.compose.runtime
 
+import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.PersistentMap
 import kotlinx.collections.immutable.persistentHashMapOf
-import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 
 internal actual typealias BitSet = java.util.BitSet

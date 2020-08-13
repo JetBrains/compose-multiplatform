@@ -16,13 +16,12 @@
 
 package androidx.compose.runtime.snapshots
 
-import java.lang.IllegalStateException
+import androidx.compose.runtime.ExperimentalComposeApi
+import androidx.compose.runtime.mutableStateListOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
-import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.mutableStateListOf
 
 class SnapshotStateListTests {
     @Test

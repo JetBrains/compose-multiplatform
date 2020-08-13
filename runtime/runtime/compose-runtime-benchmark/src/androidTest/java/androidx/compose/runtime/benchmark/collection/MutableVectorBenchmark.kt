@@ -21,11 +21,11 @@ import androidx.compose.runtime.benchmark.ComposeBenchmarkBase
 import androidx.compose.runtime.collection.ExperimentalCollectionApi
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.LargeTest
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastSumBy
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import org.junit.Before
 import org.junit.FixMethodOrder
 import org.junit.Test

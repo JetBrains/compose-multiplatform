@@ -16,9 +16,9 @@
 
 package androidx.compose.runtime
 
+import androidx.compose.runtime.dispatch.DesktopUiDispatcher
 import javax.swing.SwingUtilities
 import kotlin.coroutines.CoroutineContext
-import androidx.compose.runtime.dispatch.DesktopUiDispatcher
 
 // API to allow override embedding context creation mechanism for tests.
 var EmbeddingContextFactory: (() -> EmbeddingContext)? = null

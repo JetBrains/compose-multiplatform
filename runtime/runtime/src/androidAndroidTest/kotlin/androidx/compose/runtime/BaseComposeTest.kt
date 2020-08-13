@@ -17,20 +17,20 @@
 @file:Suppress("PLUGIN_ERROR")
 package androidx.compose.runtime
 
-import android.os.Bundle
-import android.widget.LinearLayout
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
-import kotlin.test.assertTrue
 import android.app.Activity
+import android.os.Bundle
 import android.os.Looper
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.platform.setViewContent
 import androidx.compose.ui.platform.subcomposeInto
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import kotlin.test.assertTrue
 
 class TestActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
