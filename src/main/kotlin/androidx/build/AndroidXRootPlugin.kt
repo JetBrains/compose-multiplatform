@@ -16,7 +16,6 @@
 
 package androidx.build
 
-import androidx.build.AndroidXPlugin.Companion.GENERATE_TEST_CONFIGURATION_TASK
 import androidx.build.AndroidXPlugin.Companion.ZIP_TEST_CONFIGS_WITH_APKS_TASK
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.dokka.DokkaPublicDocs
@@ -25,6 +24,7 @@ import androidx.build.gmaven.GMavenVersionChecker
 import androidx.build.gradle.isRoot
 import androidx.build.jacoco.Jacoco
 import androidx.build.license.CheckExternalDependencyLicensesTask
+import androidx.build.playground.VerifyPlaygroundGradlePropertiesTask
 import androidx.build.studio.StudioTask.Companion.registerStudioTask
 import androidx.build.uptodatedness.TaskUpToDateValidator
 import com.android.build.gradle.api.AndroidBasePlugin
@@ -76,6 +76,10 @@ class AndroidXRootPlugin : Plugin<Project> {
         buildOnServerTask.dependsOn(
             tasks.register(AndroidXPlugin.CREATE_LIBRARY_BUILD_INFO_FILES_TASK)
         )
+
+        VerifyPlaygroundGradlePropertiesTask.createIfNecessary(project)?.let {
+            buildOnServerTask.dependsOn(it)
+        }
 
         extra.set("versionChecker", GMavenVersionChecker(logger))
         val createArchiveTask = Release.getGlobalFullZipTask(this)
@@ -152,21 +156,16 @@ class AndroidXRootPlugin : Plugin<Project> {
             buildOnServerTask.dependsOn(Jacoco.createUberJarTask(this))
         }
 
-        val generateTestConfiguration = project.tasks.register(
-            GENERATE_TEST_CONFIGURATION_TASK, GenerateTestConfigurationTask::class.java
-        )
         val zipTestConfigsWithApks = project.tasks.register(
             ZIP_TEST_CONFIGS_WITH_APKS_TASK, Zip::class.java
         )
+        // can't chain this, or a kotlin.Unit gets added as dependency below instead of the task
         zipTestConfigsWithApks.configure {
-            it.dependsOn(generateTestConfiguration)
             it.destinationDirectory.set(project.getDistributionDirectory())
             it.archiveFileName.set("androidTest.zip")
-            it.from(File(project.getDistributionDirectory().canonicalPath,
-                CONFIG_DIRECTORY
-            ))
+            it.from(project.getTestConfigDirectory())
         }
-        project.addToBuildOnServer(zipTestConfigsWithApks)
+        buildOnServerTask.dependsOn(zipTestConfigsWithApks)
 
         if (project.isDocumentationEnabled()) {
             val allDocsTask = DiffAndDocs.configureDiffAndDocs(

@@ -37,7 +37,7 @@ abstract class StudioTask : DefaultTask() {
     // TODO: support -y and --update-only options? Can use @Option for this
     @TaskAction
     fun studiow() {
-        update()
+        install()
         launch()
     }
 
@@ -94,24 +94,46 @@ abstract class StudioTask : DefaultTask() {
     protected abstract val ideaProperties: File
 
     /**
+     * The studio.vmoptions file that we want to start Studio with
+     */
+    @get:Internal
+    open val vmOptions = File(project.getSupportRootFolder(), "development/studio/studio.vmoptions")
+
+    /**
      * [StudioArchiveCreator] that will ensure that an archive is present at [studioArchivePath]
      */
     @get:Internal
     protected abstract val studioArchiveCreator: StudioArchiveCreator
 
+    private val licenseAcceptedFile: File by lazy {
+        File("$studioInstallationDir/STUDIOW_LICENSE_ACCEPTED")
+    }
+
     /**
-     * Updates the Studio installation and removes any old installation files if they exist.
+     * Allows for the patching of a Studio installation (including replacing plugins).
+     * TODO: Consider removing after Studio has switched to Kotlin 1.4
+     * b/162414740
      */
-    private fun update() {
-        if (!studioInstallationDir.exists()) {
+    @get:Internal
+    protected open val studioPatcher = NoopStudioPatcher
+
+    /**
+     * Install Studio and removes any old installation files if they exist.
+     */
+    private fun install() {
+        val successfulInstallFile = File("$studioInstallationDir/INSTALL_SUCCESSFUL")
+        if (!licenseAcceptedFile.exists() && !successfulInstallFile.exists()) {
+            // Attempt to remove any old installations in the parent studio/ folder
+            studioInstallationDir.parentFile.deleteRecursively()
             // Create installation directory and any needed parent directories
             studioInstallationDir.mkdirs()
-            // Attempt to remove any old installations in the parent studio/ folder
-            removeOldInstallations()
             studioArchiveCreator(project, studioVersions, studioArchiveName, studioArchivePath)
             println("Extracting archive...")
             extractStudioArchive()
+            studioPatcher(this, project, studioInstallationDir)
             with(platformUtilities) { updateJvmHeapSize() }
+            // Finish install process
+            successfulInstallFile.createNewFile()
         }
     }
 
@@ -128,8 +150,6 @@ abstract class StudioTask : DefaultTask() {
     }
 
     private fun launchStudio() {
-        val vmOptions = File(project.getSupportRootFolder(), "development/studio/studio.vmoptions")
-
         ProcessBuilder().apply {
             inheritIO()
             with(platformUtilities) { command(launchCommandArguments) }
@@ -152,7 +172,6 @@ abstract class StudioTask : DefaultTask() {
     }
 
     private fun checkLicenseAgreement(services: ServiceRegistry): Boolean {
-        val licenseAcceptedFile = File("$studioInstallationDir/STUDIOW_LICENSE_ACCEPTED")
         if (!licenseAcceptedFile.exists()) {
             val licensePath = with(platformUtilities) { licensePath }
 
@@ -176,20 +195,6 @@ abstract class StudioTask : DefaultTask() {
         project.exec { execSpec -> platformUtilities.extractArchive(fromPath, toPath, execSpec) }
         // Remove studio archive once done
         File(studioArchivePath).delete()
-    }
-
-    private fun removeOldInstallations() {
-        val parentFile = studioInstallationDir.parentFile
-        parentFile.walk().maxDepth(1)
-            .filter { file ->
-                // Remove any files that aren't either the directory / archive matching the
-                // current version, and also ignore the parent `studio/` directory
-                !file.name.contains(studioInstallationDir.name) && file != parentFile
-            }
-            .forEach { file ->
-                println("Removing old installation file ${file.absolutePath}")
-                file.deleteRecursively()
-            }
     }
 
     companion object {
@@ -219,6 +224,7 @@ open class RootStudioTask : StudioTask() {
  */
 open class ComposeStudioTask : StudioTask() {
     override val studioArchiveCreator = UrlArchiveCreator
+    override val studioPatcher = ComposeStudioPatcher
     override val ideaProperties get() = projectRoot.resolve("idea.properties")
 }
 
@@ -226,5 +232,7 @@ open class ComposeStudioTask : StudioTask() {
  * Task for launching studio in a playground project
  */
 open class PlaygroundStudioTask : RootStudioTask() {
-    override val installParentDir get() = project.rootProject.projectDir.resolve("..")
+    override val installParentDir get() = projectRoot.resolve("..")
+    override val ideaProperties get() = projectRoot.resolve("../playground-common/idea.properties")
+    override val vmOptions get() = projectRoot.resolve("../playground-common/studio.vmoptions")
 }

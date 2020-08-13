@@ -48,6 +48,13 @@ sealed class StudioPlatformUtilities(val projectRoot: File, val studioInstallati
     abstract val StudioTask.libDirectory: File
 
     /**
+     * The plugins directory of the Studio installation.
+     * TODO: Consider removing after Studio has switched to Kotlin 1.4
+     * b/162414740
+     */
+    abstract val StudioTask.pluginsDirectory: File
+
+    /**
      * The license path for the Studio installation.
      */
     abstract val StudioTask.licensePath: String
@@ -111,6 +118,9 @@ private class MacOsUtilities(projectRoot: File, studioInstallationDir: File) :
     override val StudioTask.libDirectory: File
         get() = File(binaryDirectory, "Contents/lib")
 
+    override val StudioTask.pluginsDirectory: File
+        get() = File(binaryDirectory, "Contents/plugins")
+
     override val StudioTask.licensePath: String
         get() = File(binaryDirectory, "Contents/Resources/LICENSE.txt").absolutePath
 
@@ -144,6 +154,9 @@ private class LinuxUtilities(projectRoot: File, studioInstallationDir: File) :
                 projectRoot.absolutePath
             )
         }
+
+    override val StudioTask.pluginsDirectory: File
+        get() = File(binaryDirectory, "plugins")
 
     override val StudioTask.libDirectory: File
         get() = File(binaryDirectory, "lib")

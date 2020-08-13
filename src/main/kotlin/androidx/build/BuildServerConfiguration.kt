@@ -61,6 +61,12 @@ fun Project.getBuildInfoDirectory(): File =
         File(getDistributionDirectory(), "build-info")
 
 /**
+ * Directory for android test configuration files that get consumed by Tradefed in CI.
+ */
+fun Project.getTestConfigDirectory(): File =
+    File(getDistributionDirectory(), "test-xml-configs")
+
+/**
  * Directory to put release note files for generate release note tasks.
  */
 fun Project.getReleaseNotesDirectory(): File =

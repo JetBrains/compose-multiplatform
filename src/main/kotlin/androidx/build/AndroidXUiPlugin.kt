@@ -69,8 +69,6 @@ class AndroidXUiPlugin : Plugin<Project> {
                         // TODO(b/157230246): remove when this is enabled by default in Kotlin 1.4
                         compile.kotlinOptions.freeCompilerArgs +=
                             "-XXLanguage:+NonParenthesizedAnnotationsOnFunctionalTypes"
-                        compile.kotlinOptions.freeCompilerArgs +=
-                            listOf("-P", "plugin:androidx.compose.plugins.idea:enabled=true")
                         // TODO(b/157230235): remove when this is enabled by default
                         compile.kotlinOptions.freeCompilerArgs +=
                             "-Xopt-in=kotlin.RequiresOptIn"

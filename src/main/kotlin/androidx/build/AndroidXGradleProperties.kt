@@ -37,7 +37,7 @@ const val ALL_WARNINGS_AS_ERRORS = "androidx.allWarningsAsErrors"
  * and `<version>.txt`. When set to `false`, only `current.txt` will be written. The default value
  * is `true`.
  */
-fun Project.isVersionedApiFileWritingEnabled(): Boolean =
+fun Project.isWriteVersionedApiFilesEnabled(): Boolean =
     (project.findProperty("androidx.writeVersionedApiFiles") as? String)?.toBoolean() ?: true
 
 /**
@@ -51,12 +51,6 @@ fun Project.isDocumentationEnabled(): Boolean =
  */
 fun Project.isCoverageEnabled(): Boolean =
     (project.findProperty("androidx.coverageEnabled") as? String)?.toBoolean() ?: false
-
-/**
- * Returns the path to the Android SDK to be used.
- */
-fun Project.androidxSdkPath(): String? =
-    project.findProperty("androidx.sdkPath") as? String
 
 /**
  * Returns the Studio type for the project's studio task

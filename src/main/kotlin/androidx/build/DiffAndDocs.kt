@@ -582,10 +582,6 @@ private fun createGenerateDocsTask(
                         addStringOption("dac_libraryroot", dacOptions.libraryroot)
                         addStringOption("dac_dataname", dacOptions.dataname)
                     }
-
-                    if (taskName.equals("publicDocsTask")) {
-                        addBooleanOption("suppressReferenceErrors", true)
-                    }
                 }
 
                 addArtifactsAndSince()

@@ -31,10 +31,13 @@ import androidx.build.gradle.getByType
 import androidx.build.gradle.isRoot
 import androidx.build.jacoco.Jacoco
 import androidx.build.license.configureExternalDependencyLicenseCheck
-import androidx.build.metalava.MetalavaTasks.configureAndroidProjectForMetalava
-import androidx.build.metalava.MetalavaTasks.configureJavaProjectForMetalava
-import androidx.build.resources.ResourceTasks.configureAndroidProjectForResourceTasks
+import androidx.build.checkapi.JavaApiTaskConfig
+import androidx.build.checkapi.LibraryApiTaskConfig
+import androidx.build.checkapi.configureProjectForApiTasks
 import androidx.build.studio.StudioTask
+import com.android.build.api.artifact.ArtifactType
+import com.android.build.api.dsl.ApplicationExtension
+import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryExtension
@@ -55,6 +58,7 @@ import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.testing.Test
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
@@ -141,8 +145,16 @@ class AndroidXPlugin : Plugin<Project> {
         AffectedModuleDetector.configureTaskGuard(task)
 
         // Enable tracing to see results in command line
-        task.testLogging.events = hashSetOf(TestLogEvent.FAILED, TestLogEvent.PASSED,
-            TestLogEvent.SKIPPED, TestLogEvent.STANDARD_OUT)
+        task.testLogging.apply {
+            events = hashSetOf(
+                TestLogEvent.FAILED, TestLogEvent.PASSED,
+                TestLogEvent.SKIPPED, TestLogEvent.STANDARD_OUT
+            )
+            showExceptions = true
+            showCauses = true
+            showStackTraces = true
+            exceptionFormat = TestExceptionFormat.FULL
+        }
         val report = task.reports.junitXml
         if (report.isEnabled) {
             val zipTask = project.tasks.register(
@@ -187,10 +199,23 @@ class AndroidXPlugin : Plugin<Project> {
     }
 
     private fun configureWithAppPlugin(project: Project, extension: AndroidXExtension) {
-        project.extensions.getByType<AppExtension>().apply {
+        val appExtension = project.extensions.getByType<AppExtension>().apply {
             configureAndroidCommonOptions(project, extension)
             configureAndroidApplicationOptions(project)
         }
+
+        // TODO: Replace this with a per-variant packagingOption for androidTest specifically once
+        //  b/69953968 is resolved.
+        // Workaround for b/161465530 in AGP that fails to strip these <module>.kotlin_module files,
+        // which causes mergeDebugAndroidTestJavaResource to fail for sample apps.
+        appExtension.packagingOptions.exclude("/META-INF/*.kotlin_module")
+        // Workaround a limitation in AGP that fails to merge these META-INF license files.
+        appExtension.packagingOptions.pickFirst("/META-INF/AL2.0")
+        // In addition to working around the above issue, we exclude the LGPL2.1 license as we're
+        // approved to distribute code via AL2.0 and the only dependencies which pull in LGPL2.1
+        // are currently dual-licensed with AL2.0 and LGPL2.1. The affected dependencies are:
+        //   - net.java.dev.jna:jna:5.5.0
+        appExtension.packagingOptions.exclude("/META-INF/LGPL2.1")
     }
 
     private fun configureWithLibraryPlugin(
@@ -201,7 +226,25 @@ class AndroidXPlugin : Plugin<Project> {
             configureAndroidCommonOptions(project, androidXExtension)
             configureAndroidLibraryOptions(project, androidXExtension)
         }
+        libraryExtension.onVariants.withBuildType("release") {
+            // Disable unit test for release build type
+            unitTest {
+                @Suppress("UnstableApiUsage")
+                enabled = false
+            }
+        }
         libraryExtension.packagingOptions {
+            // TODO: Replace this with a per-variant packagingOption for androidTest specifically
+            //  once b/69953968 is resolved.
+            // Workaround for b/161465530 in AGP that fails to merge these META-INF license files
+            // for libraries that publish Java resources under the same name.
+            pickFirst("/META-INF/AL2.0")
+            // In addition to working around the above issue, we exclude the LGPL2.1 license as we're
+            // approved to distribute code via AL2.0 and the only dependencies which pull in LGPL2.1
+            // currently are dual-licensed with AL2.0 and LGPL2.1. The affected dependencies are:
+            //   - net.java.dev.jna:jna:5.5.0
+            exclude("/META-INF/LGPL2.1")
+
             // We need this as a work-around for b/155721209
             // It can be removed when we have a newer plugin version
             // 2nd workaround - this DSL was made saner in a breaking way which hasn't landed
@@ -252,8 +295,11 @@ class AndroidXPlugin : Plugin<Project> {
         if (project.isDocumentationEnabled()) {
             project.configureAndroidProjectForDokka(libraryExtension, androidXExtension)
         }
-        project.configureAndroidProjectForMetalava(libraryExtension, androidXExtension)
-        project.configureAndroidProjectForResourceTasks(libraryExtension, androidXExtension)
+
+        project.configureProjectForApiTasks(
+            LibraryApiTaskConfig(libraryExtension),
+            androidXExtension
+        )
 
         project.addToProjectMap(androidXExtension)
     }
@@ -290,7 +336,11 @@ class AndroidXPlugin : Plugin<Project> {
         if (project.isDocumentationEnabled()) {
             project.configureJavaProjectForDokka(extension)
         }
-        project.configureJavaProjectForMetalava(extension)
+
+        project.configureProjectForApiTasks(
+            JavaApiTaskConfig,
+            extension
+        )
 
         project.afterEvaluate {
             if (extension.publish.shouldRelease()) {
@@ -383,12 +433,47 @@ class AndroidXPlugin : Plugin<Project> {
             Jacoco.registerClassFilesTask(project, this)
         }
 
+        val commonExtension = project.extensions.getByType(CommonExtension::class.java)
+        if (hasAndroidTestSourceCode(project, this)) {
+            commonExtension.configureTestConfigGeneration(project)
+        }
+
         val buildTestApksTask = project.rootProject.tasks.named(BUILD_TEST_APKS_TASK)
         testVariants.all { variant ->
             buildTestApksTask.configure {
                 it.dependsOn(variant.assembleProvider)
             }
             variant.configureApkCopy(project, this, true)
+        }
+    }
+
+    private fun CommonExtension<*, *, *, *, *, *, *, *>
+            .configureTestConfigGeneration(project: Project) {
+        onVariants {
+            val variant = this
+            androidTestProperties {
+                val generateTestConfigurationTask = project.tasks.register(
+                    "${project.name}${GENERATE_TEST_CONFIGURATION_TASK}${variant.name}",
+                    GenerateTestConfigurationTask::class.java
+                ) {
+                    it.testFolder.set(artifacts.get(ArtifactType.APK))
+                    it.testLoader.set(artifacts.getBuiltArtifactsLoader())
+                    it.outputXml.fileValue(File(project.getTestConfigDirectory(),
+                        "${project.asFilenamePrefix()}${variant.name}AndroidTest.xml"))
+                }
+                project.rootProject.tasks.findByName(ZIP_TEST_CONFIGS_WITH_APKS_TASK)!!
+                    .dependsOn(generateTestConfigurationTask)
+            }
+        }
+    }
+
+    private fun ApplicationExtension<*, *, *, *, *>
+            .addAppApkToTestConfigGeneration(project: Project) {
+        onVariantProperties {
+            project.tasks.withType(GenerateTestConfigurationTask::class.java) {
+                it.appFolder.set(artifacts.get(ArtifactType.APK))
+                it.appLoader.set(artifacts.getBuiltArtifactsLoader())
+            }
         }
     }
 
@@ -427,24 +512,12 @@ class AndroidXPlugin : Plugin<Project> {
                 return
             }
 
-            if (testApk) {
-                project.rootProject.tasks.named(GENERATE_TEST_CONFIGURATION_TASK)
-                    .configure { task ->
-                        task as GenerateTestConfigurationTask
-                        val apkFile = File(
-                            "${project
-                                .buildDir}/outputs/apk/androidTest/debug/${project
-                                .name}-debug-androidTest.apk"
-                        )
-                        task.apkPackageMap[apkFile] = applicationId
-                    }
-
                 project.rootProject.tasks.named(ZIP_TEST_CONFIGS_WITH_APKS_TASK)
                     .configure { task ->
                         task as Zip
                         task.from(packageTask.outputDirectory)
+                        task.dependsOn(packageTask)
                     }
-            }
 
             packageTask.doLast {
                 project.copy {
@@ -535,6 +608,9 @@ class AndroidXPlugin : Plugin<Project> {
             }
         }
 
+        val applicationExtension = project.extensions.getByType(ApplicationExtension::class.java)
+        applicationExtension.addAppApkToTestConfigGeneration(project)
+
         val buildTestApksTask = project.rootProject.tasks.named(BUILD_TEST_APKS_TASK)
         applicationVariants.all { variant ->
             // Using getName() instead of name due to b/150427408
@@ -622,14 +698,11 @@ class AndroidXPlugin : Plugin<Project> {
     companion object {
         const val BUILD_ON_SERVER_TASK = "buildOnServer"
         const val BUILD_TEST_APKS_TASK = "buildTestApks"
-        const val CHECK_RESOURCE_API_TASK = "checkResourceApi"
-        const val CHECK_RESOURCE_API_RELEASE_TASK = "checkResourceApiRelease"
         const val CHECK_RELEASE_READY_TASK = "checkReleaseReady"
         const val CREATE_LIBRARY_BUILD_INFO_FILES_TASK = "createLibraryBuildInfoFiles"
         const val CREATE_AGGREGATE_BUILD_INFO_FILES_TASK = "createAggregateBuildInfoFiles"
-        const val GENERATE_TEST_CONFIGURATION_TASK = "generateTestConfiguration"
+        const val GENERATE_TEST_CONFIGURATION_TASK = "GenerateTestConfiguration"
         const val REPORT_LIBRARY_METRICS_TASK = "reportLibraryMetrics"
-        const val UPDATE_RESOURCE_API_TASK = "updateResourceApi"
         const val ZIP_TEST_CONFIGS_WITH_APKS_TASK = "zipTestConfigsWithApks"
 
         const val TASK_GROUP_API = "API"
@@ -736,6 +809,16 @@ private fun Project.configureCompilationWarnings(task: KotlinCompile) {
  * Returns a string that is a valid filename and loosely based on the project name
  * The value returned for each project will be distinct
  */
-private fun Project.asFilenamePrefix(): String {
+fun Project.asFilenamePrefix(): String {
     return project.path.substring(1).replace(':', '-')
+}
+
+/**
+ * Sets the specified [task] as a dependency of the top-level `check` task, ensuring that it runs
+ * as part of `./gradlew check`.
+ */
+fun <T : Task> Project.addToCheckTask(task: TaskProvider<T>) {
+    project.tasks.named("check").configure {
+        it.dependsOn(task)
+    }
 }
