@@ -34,6 +34,7 @@ import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutEmitHelper
 import androidx.compose.ui.node.LayoutNode
+import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.platform.simpleIdentityToString
 import androidx.compose.ui.unit.Constraints
@@ -236,6 +237,7 @@ fun measureBlocksOf(
         ctor = LayoutEmitHelper.constructor,
         update = {
             set(measureBlocks, LayoutEmitHelper.setMeasureBlocks)
+            set(DensityAmbient.current, LayoutEmitHelper.setDensity)
             set(LayoutDirectionAmbient.current, LayoutEmitHelper.setLayoutDirection)
         },
         skippableUpdate = materializerOf(modifier),
@@ -265,12 +267,14 @@ fun MultiMeasureLayout(
 ) {
     val measureBlocks = remember(measureBlock) { MeasuringIntrinsicsMeasureBlocks(measureBlock) }
     val materialized = currentComposer.materialize(modifier)
+
     @OptIn(ExperimentalComposeApi::class)
     emit<LayoutNode, Applier<Any>>(
         ctor = LayoutEmitHelper.constructor,
         update = {
             set(materialized, LayoutEmitHelper.setModifier)
             set(measureBlocks, LayoutEmitHelper.setMeasureBlocks)
+            set(DensityAmbient.current, LayoutEmitHelper.setDensity)
             set(LayoutDirectionAmbient.current, LayoutEmitHelper.setLayoutDirection)
             @Suppress("DEPRECATION")
             set(Unit) { this.canMultiMeasure = true }

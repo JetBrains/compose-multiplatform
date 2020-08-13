@@ -30,6 +30,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.Providers
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,9 +39,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.onPositioned
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.R
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -56,6 +59,7 @@ import androidx.ui.test.captureToBitmap
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.runOnIdle
 import androidx.ui.test.runOnUiThread
+import androidx.ui.test.waitForIdle
 import com.google.common.truth.Truth.assertThat
 import org.hamcrest.CoreMatchers.endsWith
 import org.hamcrest.CoreMatchers.equalTo
@@ -312,6 +316,21 @@ class AndroidViewTest {
         runOnIdle {
             assertThat(obtainedSize).isEqualTo(IntSize(size, size))
         }
+    }
+
+    @Test
+    fun androidView_propagatesDensity() {
+        composeTestRule.setContent {
+            val size = 50.dp
+            val density = Density(3f)
+            val sizeIpx = with(density) { size.toIntPx() }
+            Providers(DensityAmbient provides density) {
+                AndroidView({ FrameLayout(it) }, Modifier.size(size).onPositioned {
+                    assertThat(it.size).isEqualTo(IntSize(sizeIpx, sizeIpx))
+                })
+            }
+        }
+        waitForIdle()
     }
 
     private fun Dp.toPx(displayMetrics: DisplayMetrics) =

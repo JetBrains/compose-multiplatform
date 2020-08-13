@@ -37,6 +37,7 @@ import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutEmitHelper
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNode.LayoutState
+import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.platform.subcomposeInto
 import androidx.compose.ui.unit.Constraints
@@ -87,6 +88,7 @@ fun <T> SubcomposeLayout(
             set(Unit, state.setRoot)
             set(materialized, LayoutEmitHelper.setModifier)
             set(measureBlock, state.setMeasureBlock)
+            set(DensityAmbient.current, LayoutEmitHelper.setDensity)
             set(LayoutDirectionAmbient.current, LayoutEmitHelper.setLayoutDirection)
         }
     )
