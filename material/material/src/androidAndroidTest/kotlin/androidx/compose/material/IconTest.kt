@@ -15,20 +15,20 @@
  */
 package androidx.compose.material
 
-import androidx.test.filters.LargeTest
-import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.foundation.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.painter.ImagePainter
 import androidx.compose.ui.graphics.vector.VectorAssetBuilder
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.unit.dp
+import androidx.test.filters.LargeTest
 import androidx.ui.test.assertHeightIsEqualTo
 import androidx.ui.test.assertWidthIsEqualTo
 import androidx.ui.test.createComposeRule
-import androidx.compose.ui.unit.dp
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

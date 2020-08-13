@@ -16,6 +16,11 @@
 
 package androidx.compose.material.icons
 
+import androidx.compose.material.icons.Icons.Filled
+import androidx.compose.material.icons.Icons.Outlined
+import androidx.compose.material.icons.Icons.Rounded
+import androidx.compose.material.icons.Icons.Sharp
+import androidx.compose.material.icons.Icons.TwoTone
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap

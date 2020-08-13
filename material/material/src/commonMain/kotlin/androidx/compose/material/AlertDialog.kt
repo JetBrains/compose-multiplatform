@@ -16,13 +16,8 @@
 
 package androidx.compose.material
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.foundation.Box
-import androidx.compose.ui.window.Dialog
 import androidx.compose.foundation.ProvideTextStyle
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayout
 import androidx.compose.foundation.layout.FlowRow
@@ -33,8 +28,13 @@ import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 
 /**
  * Alert dialog is a [Dialog] which interrupts the user with urgent information, details or actions.

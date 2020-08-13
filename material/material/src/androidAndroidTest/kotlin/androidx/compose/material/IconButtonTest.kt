@@ -15,14 +15,15 @@
  */
 package androidx.compose.material
 
-import androidx.compose.runtime.emptyContent
-import androidx.test.filters.LargeTest
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.material.samples.IconButtonSample
 import androidx.compose.material.samples.IconToggleButtonSample
+import androidx.compose.runtime.emptyContent
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.dp
+import androidx.test.filters.LargeTest
 import androidx.ui.test.assertHeightIsEqualTo
 import androidx.ui.test.assertIsOff
 import androidx.ui.test.assertIsOn
@@ -30,11 +31,10 @@ import androidx.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.ui.test.assertWidthIsEqualTo
 import androidx.ui.test.createComposeRule
-import androidx.ui.test.performClick
+import androidx.ui.test.isToggleable
 import androidx.ui.test.onNode
 import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.isToggleable
-import androidx.compose.ui.unit.dp
+import androidx.ui.test.performClick
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

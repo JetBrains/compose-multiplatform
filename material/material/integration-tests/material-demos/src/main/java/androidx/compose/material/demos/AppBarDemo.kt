@@ -16,12 +16,12 @@
 
 package androidx.compose.material.demos
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material.samples.SimpleBottomAppBar
 import androidx.compose.material.samples.SimpleTopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 
 @Composable
 fun AppBarDemo() {

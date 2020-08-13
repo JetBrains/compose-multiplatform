@@ -17,14 +17,14 @@
 
 package androidx.compose.material.ripple
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.staticAmbientOf
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.contentColor
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.staticAmbientOf
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 
 /**
  * Defines the appearance and the behavior for [RippleIndication]s.

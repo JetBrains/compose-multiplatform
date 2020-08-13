@@ -16,7 +16,6 @@
 
 package androidx.compose.material.demos
 
-import androidx.compose.runtime.Composable
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
@@ -26,6 +25,7 @@ import androidx.compose.material.samples.ThreeLineListItems
 import androidx.compose.material.samples.ThreeLineRtlLtrListItems
 import androidx.compose.material.samples.TwoLineListItems
 import androidx.compose.material.samples.TwoLineRtlLtrListItems
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.imageResource
 
 @Composable

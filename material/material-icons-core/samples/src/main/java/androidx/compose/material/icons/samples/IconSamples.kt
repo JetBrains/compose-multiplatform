@@ -17,15 +17,15 @@
 package androidx.compose.material.icons.samples
 
 import androidx.annotation.Sampled
+import androidx.compose.foundation.Box
+import androidx.compose.foundation.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
-import androidx.compose.foundation.Box
-import androidx.compose.foundation.Icon
 import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.graphics.vector.VectorPainter
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Menu
 
 @Sampled
 @Composable

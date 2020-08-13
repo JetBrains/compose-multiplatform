@@ -16,6 +16,7 @@
 
 package androidx.compose.material.ripple
 
+import androidx.compose.animation.OffsetPropKey
 import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.FloatPropKey
@@ -28,7 +29,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.animation.OffsetPropKey
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color

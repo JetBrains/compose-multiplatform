@@ -16,23 +16,23 @@
 
 package androidx.compose.material
 
-import androidx.test.filters.SmallTest
-import androidx.compose.foundation.text.FirstBaseline
-import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.node.Ref
-import androidx.compose.ui.onPositioned
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.text.FirstBaseline
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ImageAsset
-import androidx.ui.test.assertHeightIsEqualTo
-import androidx.ui.test.createComposeRule
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.node.Ref
+import androidx.compose.ui.onPositioned
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.test.filters.SmallTest
+import androidx.ui.test.assertHeightIsEqualTo
+import androidx.ui.test.createComposeRule
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test

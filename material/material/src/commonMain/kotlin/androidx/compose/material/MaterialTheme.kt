@@ -16,13 +16,13 @@
 
 package androidx.compose.material
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
-import androidx.compose.runtime.remember
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.IndicationAmbient
 import androidx.compose.foundation.ProvideTextStyle
 import androidx.compose.material.ripple.RippleIndication
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Providers
+import androidx.compose.runtime.remember
 
 /**
  * A MaterialTheme defines the styling principles from the Material design specification.

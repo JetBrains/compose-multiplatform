@@ -16,29 +16,28 @@
 
 package androidx.compose.material
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
 import androidx.compose.foundation.layout.DpConstraints
 import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.layout.preferredSizeIn
+import androidx.compose.foundation.text.FirstBaseline
+import androidx.compose.foundation.text.LastBaseline
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.node.ExperimentalLayoutNodeApi
+import androidx.compose.ui.platform.AndroidOwner
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.ui.test.ComposeTestRule
 import androidx.ui.test.SemanticsNodeInteraction
 import androidx.ui.test.assertHeightIsEqualTo
 import androidx.ui.test.assertIsEqualTo
 import androidx.ui.test.assertWidthIsEqualTo
+import androidx.ui.test.getAlignmentLinePosition
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.onRoot
-import androidx.ui.test.getAlignmentLinePosition
 import androidx.ui.test.runOnIdle
-import androidx.compose.foundation.text.FirstBaseline
-import androidx.compose.foundation.text.LastBaseline
-import androidx.compose.ui.node.ExperimentalLayoutNodeApi
-import androidx.compose.ui.platform.AndroidOwner
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.width
 
 fun ComposeTestRule.setMaterialContent(
     modifier: Modifier = Modifier,

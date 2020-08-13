@@ -16,21 +16,21 @@
 
 package androidx.compose.material
 
-import androidx.compose.runtime.mutableStateOf
-import androidx.test.filters.MediumTest
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
 import androidx.compose.foundation.Strings
 import androidx.compose.foundation.layout.Column
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.dp
+import androidx.test.filters.MediumTest
 import androidx.ui.test.SemanticsNodeInteraction
 import androidx.ui.test.assertIsInMutuallyExclusiveGroup
-import androidx.ui.test.assertIsSelected
 import androidx.ui.test.assertIsNotSelected
+import androidx.ui.test.assertIsSelected
 import androidx.ui.test.assertValueEquals
 import androidx.ui.test.createComposeRule
-import androidx.ui.test.performClick
 import androidx.ui.test.onNodeWithTag
-import androidx.compose.ui.unit.dp
+import androidx.ui.test.performClick
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

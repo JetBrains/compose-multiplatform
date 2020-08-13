@@ -16,14 +16,14 @@
 
 package androidx.compose.material.demos
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.material.samples.MaterialThemeSample
 import androidx.compose.material.samples.ThemeColorSample
 import androidx.compose.material.samples.ThemeTextStyleSample
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 
 @Composable
 fun MaterialThemeDemo() {

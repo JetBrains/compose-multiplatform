@@ -16,9 +16,9 @@
 
 package androidx.compose.material.studies
 
+import androidx.compose.material.studies.rally.RallyActivity
 import androidx.ui.demos.common.ActivityDemo
 import androidx.ui.demos.common.DemoCategory
-import androidx.compose.material.studies.rally.RallyActivity
 
 val MaterialStudies = DemoCategory("Material Studies", listOf(
     ActivityDemo("Rally", RallyActivity::class)

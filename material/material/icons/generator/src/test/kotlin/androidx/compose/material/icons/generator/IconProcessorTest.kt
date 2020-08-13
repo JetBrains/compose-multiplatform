@@ -24,7 +24,6 @@ import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import java.io.File
-import java.lang.IllegalStateException
 
 /**
  * Test for [IconProcessor].

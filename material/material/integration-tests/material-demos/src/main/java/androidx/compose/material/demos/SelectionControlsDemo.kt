@@ -16,8 +16,6 @@
 
 package androidx.compose.material.demos
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Arrangement
@@ -29,6 +27,8 @@ import androidx.compose.material.samples.RadioButtonSample
 import androidx.compose.material.samples.RadioGroupSample
 import androidx.compose.material.samples.SwitchSample
 import androidx.compose.material.samples.TriStateCheckboxSample
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
