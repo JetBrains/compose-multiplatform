@@ -53,6 +53,7 @@ val someStaticInt = staticAmbientOf { 40 }
 class AmbientTests : BaseComposeTest() {
 
     @Composable
+    @Suppress("Deprecation")
     fun Text(value: String, id: Int = 100) {
         emitView(::TextView) { it.id = id; it.text = value; }
     }
