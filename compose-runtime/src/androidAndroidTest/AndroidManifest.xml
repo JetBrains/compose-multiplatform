@@ -14,11 +14,12 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="androidx.compose">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="androidx.compose.runtime">
      <application>
           <activity
-              android:name="androidx.compose.test.TestActivity"/>
+              android:name="androidx.compose.runtime.TestActivity"/>
           <activity
-              android:name="androidx.compose.test.DisposeTests$DisposeTestActivity"/>
+              android:name="androidx.compose.runtime.DisposeTests$DisposeTestActivity"/>
      </application>
 </manifest>

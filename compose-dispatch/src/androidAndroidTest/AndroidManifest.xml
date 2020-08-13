@@ -15,8 +15,8 @@
   limitations under the License.
   -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="androidx.compose.dispatch.test">
+    package="androidx.compose.runtime.dispatch">
     <application>
-        <activity android:name="androidx.compose.dispatch.TestActivity" />
+        <activity android:name="androidx.compose.runtime.dispatch.TestActivity" />
     </application>
 </manifest>

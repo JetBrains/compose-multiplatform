@@ -87,7 +87,7 @@ androidx {
     mavenVersion = LibraryVersions.COMPOSE
     mavenGroup = LibraryGroups.Compose.RUNTIME
     inceptionYear = "2020"
-    description = "Platform timing and event dispatch utilities"
+    description = "Platform scheduling and event dispatch utilities used by Compose"
 }
 
 tasks.withType(KotlinCompile).configureEach {
