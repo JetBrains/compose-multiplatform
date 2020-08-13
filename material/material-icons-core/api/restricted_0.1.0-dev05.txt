@@ -1,0 +1,116 @@
+// Signature format: 3.0
+package androidx.ui.material.icons {
+
+  public final class Icons {
+    method public androidx.ui.material.icons.Icons.Filled getDefault();
+    property public final androidx.ui.material.icons.Icons.Filled Default;
+    field public static final androidx.ui.material.icons.Icons! INSTANCE;
+  }
+
+  public static final class Icons.Filled {
+    field public static final androidx.ui.material.icons.Icons.Filled! INSTANCE;
+  }
+
+  public static final class Icons.Outlined {
+    field public static final androidx.ui.material.icons.Icons.Outlined! INSTANCE;
+  }
+
+  public static final class Icons.Rounded {
+    field public static final androidx.ui.material.icons.Icons.Rounded! INSTANCE;
+  }
+
+  public static final class Icons.Sharp {
+    field public static final androidx.ui.material.icons.Icons.Sharp! INSTANCE;
+  }
+
+  public static final class Icons.TwoTone {
+    field public static final androidx.ui.material.icons.Icons.TwoTone! INSTANCE;
+  }
+
+  public final class IconsKt {
+    method public static kotlin.Lazy<androidx.ui.graphics.vector.VectorAsset> lazyMaterialIcon(kotlin.jvm.functions.Function1<? super androidx.ui.graphics.vector.VectorAssetBuilder,androidx.ui.graphics.vector.VectorAssetBuilder> block);
+    method public static androidx.ui.graphics.vector.VectorAssetBuilder materialPath(androidx.ui.graphics.vector.VectorAssetBuilder, float fillAlpha = 1f, float strokeAlpha = 1f, kotlin.jvm.functions.Function1<? super androidx.ui.graphics.vector.PathBuilder,kotlin.Unit> pathBuilder);
+  }
+
+}
+
+package androidx.ui.material.icons.filled {
+
+  public final class CloseKt {
+    method public static androidx.ui.graphics.vector.VectorAsset getClose(androidx.ui.material.icons.Icons.Filled);
+  }
+
+  public final class FavoriteKt {
+    method public static androidx.ui.graphics.vector.VectorAsset getFavorite(androidx.ui.material.icons.Icons.Filled);
+  }
+
+  public final class MenuKt {
+    method public static androidx.ui.graphics.vector.VectorAsset getMenu(androidx.ui.material.icons.Icons.Filled);
+  }
+
+}
+
+package androidx.ui.material.icons.outlined {
+
+  public final class CloseKt {
+    method public static androidx.ui.graphics.vector.VectorAsset getClose(androidx.ui.material.icons.Icons.Outlined);
+  }
+
+  public final class FavoriteKt {
+    method public static androidx.ui.graphics.vector.VectorAsset getFavorite(androidx.ui.material.icons.Icons.Outlined);
+  }
+
+  public final class MenuKt {
+    method public static androidx.ui.graphics.vector.VectorAsset getMenu(androidx.ui.material.icons.Icons.Outlined);
+  }
+
+}
+
+package androidx.ui.material.icons.rounded {
+
+  public final class CloseKt {
+    method public static androidx.ui.graphics.vector.VectorAsset getClose(androidx.ui.material.icons.Icons.Rounded);
+  }
+
+  public final class FavoriteKt {
+    method public static androidx.ui.graphics.vector.VectorAsset getFavorite(androidx.ui.material.icons.Icons.Rounded);
+  }
+
+  public final class MenuKt {
+    method public static androidx.ui.graphics.vector.VectorAsset getMenu(androidx.ui.material.icons.Icons.Rounded);
+  }
+
+}
+
+package androidx.ui.material.icons.sharp {
+
+  public final class CloseKt {
+    method public static androidx.ui.graphics.vector.VectorAsset getClose(androidx.ui.material.icons.Icons.Sharp);
+  }
+
+  public final class FavoriteKt {
+    method public static androidx.ui.graphics.vector.VectorAsset getFavorite(androidx.ui.material.icons.Icons.Sharp);
+  }
+
+  public final class MenuKt {
+    method public static androidx.ui.graphics.vector.VectorAsset getMenu(androidx.ui.material.icons.Icons.Sharp);
+  }
+
+}
+
+package androidx.ui.material.icons.twotone {
+
+  public final class CloseKt {
+    method public static androidx.ui.graphics.vector.VectorAsset getClose(androidx.ui.material.icons.Icons.TwoTone);
+  }
+
+  public final class FavoriteKt {
+    method public static androidx.ui.graphics.vector.VectorAsset getFavorite(androidx.ui.material.icons.Icons.TwoTone);
+  }
+
+  public final class MenuKt {
+    method public static androidx.ui.graphics.vector.VectorAsset getMenu(androidx.ui.material.icons.Icons.TwoTone);
+  }
+
+}
+
