@@ -946,6 +946,7 @@ package androidx.compose.runtime.snapshots {
     method public static inline <T extends androidx.compose.runtime.snapshots.StateRecord, R> R! writable(T, androidx.compose.runtime.snapshots.StateObject state, kotlin.jvm.functions.Function1<? super T,? extends R> block);
     method @kotlin.PublishedApi internal static <T extends androidx.compose.runtime.snapshots.StateRecord> T writableRecord(T, androidx.compose.runtime.snapshots.StateObject state, androidx.compose.runtime.snapshots.Snapshot snapshot);
     field @kotlin.PublishedApi internal static final Object lock;
+    field @kotlin.PublishedApi internal static final androidx.compose.runtime.snapshots.Snapshot snapshotInitializer;
   }
 
   @androidx.compose.runtime.Stable public final class SnapshotStateList<T> implements kotlin.jvm.internal.markers.KMutableList java.util.List<T> androidx.compose.runtime.snapshots.StateObject {

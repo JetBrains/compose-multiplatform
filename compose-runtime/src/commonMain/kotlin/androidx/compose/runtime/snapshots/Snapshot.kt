@@ -1371,6 +1371,15 @@ private var currentGlobalSnapshot = GlobalSnapshot(
     openSnapshots = openSnapshots.set(it.id)
 }
 
+// A value to use to initialize the snapshot local variable of writable below. The value of this
+// doesn't matter as it is just used to initialize the local that is immediately overwritten by
+// Snapshot.current. This is done to avoid a compiler error complaining that the var has not been
+// initialized. This can be removed once contracts are out of experimental; then we can mark sync
+// with the correct contracts so the compiler would be able to figure out that the variable is
+// initialized.
+@PublishedApi
+internal val snapshotInitializer: Snapshot = currentGlobalSnapshot
+
 private fun <T> takeNewGlobalSnapshot(
     previousGlobalSnapshot: Snapshot,
     block: (invalid: SnapshotIdSet) -> T
@@ -1602,8 +1611,15 @@ inline fun <T : StateRecord, R> T.writable(
  * called for the first state record in a state object. A record is writable if it was created in
  * the current mutable snapshot.
  */
-inline fun <T : StateRecord, R> T.writable(state: StateObject, block: T.() -> R): R =
-    this.writable(state, Snapshot.current, block)
+inline fun <T : StateRecord, R> T.writable(state: StateObject, block: T.() -> R): R {
+    var snapshot: Snapshot = snapshotInitializer
+    return sync {
+        snapshot = Snapshot.current
+        this.writableRecord(state, snapshot).block()
+    }.also {
+        notifyWrite(snapshot, state)
+    }
+}
 
 /**
  * Produce a set of optimistic merges of the state records, this is performed outside the
