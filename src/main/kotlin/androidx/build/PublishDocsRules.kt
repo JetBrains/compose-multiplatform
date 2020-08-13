@@ -54,7 +54,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.CAMERA, "1.0.0-beta08")
     prebuilts(LibraryGroups.CARDVIEW, "1.0.0")
     prebuilts(LibraryGroups.COLLECTION, "1.1.0")
-    prebuilts(LibraryGroups.CONCURRENT, "1.1.0-rc01")
+    prebuilts(LibraryGroups.CONCURRENT, "1.1.0")
     prebuilts(LibraryGroups.CONTENTPAGER, "1.0.0")
     prebuilts(LibraryGroups.COORDINATORLAYOUT, "1.1.0")
     ignore(LibraryGroups.CORE.group, "core-appdigest")
