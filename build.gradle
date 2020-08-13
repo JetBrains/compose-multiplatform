@@ -95,7 +95,8 @@ sourceSets {
     main.resources.srcDirs += "${supportRootFolder}/inspection/inspection-gradle-plugin/src/main" +
             "/resources"
 
-    main.java.srcDirs += "${supportRootFolder}/ui/ui-material/icons/generator/src/main/kotlin"
+    main.java.srcDirs += "${supportRootFolder}/compose/material/material/icons/generator/src/main" +
+            "/kotlin"
 }
 
 gradlePlugin {
