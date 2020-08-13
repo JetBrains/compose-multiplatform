@@ -31,19 +31,24 @@ import androidx.compose.ui.unit.IntSize
 import kotlin.math.max
 
 /**
- * A composable that positions its children relative to its edges.
+ * A layout composable that positions its children relative to its edges.
  * The component is useful for drawing children that overlap. The children will always be
  * drawn in the order they are specified in the body of the [Stack].
- * Use [StackScope.gravity] modifier to define the position of the target element inside the
- * [Stack] box.
+ * When children are smaller than the parent, by default they will be positioned inside the [Stack]
+ * according to the [alignment]. If individual alignment of the children is needed, apply the
+ * [StackScope.gravity] modifier to a child to specify its alignment.
  *
  * Example usage:
  *
  * @sample androidx.compose.foundation.layout.samples.SimpleStack
+ *
+ * @param modifier The modifier to be applied to the layout.
+ * @param alignment The default alignment inside the Stack.
  */
 @Composable
 fun Stack(
     modifier: Modifier = Modifier,
+    alignment: Alignment = Alignment.TopStart,
     children: @Composable StackScope.() -> Unit
 ) {
     val stackChildren: @Composable () -> Unit = { StackScope().children() }
@@ -76,10 +81,10 @@ fun Stack(
         layout(stackWidth, stackHeight) {
             (0 until measurables.size).forEach { i ->
                 val measurable = measurables[i]
-                val childData = measurable.stackChildData
+                val childAlignment = measurable.stackChildData?.alignment ?: alignment
                 val placeable = placeables[i]!!
 
-                val position = childData.alignment.align(
+                val position = childAlignment.align(
                     IntSize(
                         stackWidth - placeable.width,
                         stackHeight - placeable.height
@@ -131,10 +136,8 @@ private data class StackChildData(
     val stretch: Boolean = false
 )
 
-private val Measurable.stackChildData: StackChildData
-    get() = (parentData as? StackChildData) ?: StackChildData(Alignment.TopStart)
-private val Measurable.stretch: Boolean
-    get() = stackChildData.stretch
+private val Measurable.stackChildData: StackChildData? get() = parentData as? StackChildData
+private val Measurable.stretch: Boolean get() = stackChildData?.stretch ?: false
 
 private data class StackGravityModifier(
     val alignment: Alignment,

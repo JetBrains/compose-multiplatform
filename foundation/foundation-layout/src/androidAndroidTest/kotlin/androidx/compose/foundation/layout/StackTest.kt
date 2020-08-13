@@ -24,6 +24,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.onPositioned
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
@@ -382,6 +383,29 @@ class StackTest : LayoutTest() {
             ),
             childPosition[1].value
         )
+    }
+
+    @Test
+    fun testStack_alignmentParameter() = with(density) {
+        val outerSizePx = 50f
+        val outerSize = outerSizePx.toDp()
+        val innerSizePx = 10f
+        val innerSize = innerSizePx.toDp()
+
+        val positionedLatch = CountDownLatch(1)
+        show {
+            Stack(
+                alignment = Alignment.BottomEnd,
+                modifier = Modifier.size(outerSize)
+            ) {
+                Stack(Modifier.size(innerSize).onPositioned {
+                    assertEquals(outerSizePx - innerSizePx, it.positionInParent.x)
+                    assertEquals(outerSizePx - innerSizePx, it.positionInParent.y)
+                    positionedLatch.countDown()
+                }) {}
+            }
+        }
+        assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
     }
 
     @Test
