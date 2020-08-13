@@ -166,6 +166,7 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.WORK.group, "work-gcm")
     ignore(LibraryGroups.WORK.group, "work-runtime-lint")
     ignore(LibraryGroups.WORK.group, "work-rxjava3")
+    ignore(LibraryGroups.WORK.group, "work-multiprocess")
     prebuilts(LibraryGroups.WORK, "2.5.0-alpha01")
     default(Ignore)
 }
