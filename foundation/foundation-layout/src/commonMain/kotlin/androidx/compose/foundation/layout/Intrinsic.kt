@@ -18,7 +18,6 @@ package androidx.compose.foundation.layout
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.Layout
 import androidx.compose.ui.LayoutModifier
 import androidx.compose.ui.Measurable
@@ -26,8 +25,10 @@ import androidx.compose.ui.MeasureScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
-import androidx.compose.ui.unit.enforce
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.enforce
+
 /**
  * Declare the preferred width of the content to be the same as the min or max intrinsic width of
  * the content. The incoming measurement [Constraints] may override this value, forcing the content

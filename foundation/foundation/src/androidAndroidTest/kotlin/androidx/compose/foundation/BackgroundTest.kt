@@ -17,20 +17,20 @@
 package androidx.compose.foundation
 
 import android.os.Build
-import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.InspectableParameter
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.Density
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
-import androidx.compose.ui.platform.DensityAmbient
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.InspectableParameter
-import androidx.compose.ui.platform.testTag
 import androidx.ui.test.assertShape
 import androidx.ui.test.captureToBitmap
 import androidx.ui.test.createComposeRule

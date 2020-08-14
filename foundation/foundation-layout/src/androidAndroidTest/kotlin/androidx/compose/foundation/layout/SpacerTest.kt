@@ -16,12 +16,12 @@
 
 package androidx.compose.foundation.layout
 
-import androidx.test.filters.MediumTest
-import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.onPositioned
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth
 import org.junit.Assert.assertTrue
 import org.junit.Test

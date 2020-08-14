@@ -16,14 +16,14 @@
 
 package androidx.compose.foundation.demos
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.foundation.samples.DraggableSample
-import androidx.compose.foundation.samples.ScrollableSample
-import androidx.compose.foundation.samples.ZoomableSample
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.samples.DraggableSample
+import androidx.compose.foundation.samples.ScrollableSample
+import androidx.compose.foundation.samples.ZoomableSample
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable

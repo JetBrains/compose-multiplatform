@@ -16,8 +16,8 @@
 
 package androidx.compose.foundation.text.selection
 
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 
 /**
  * The enum class allows user to decide the selection mode.

@@ -16,23 +16,23 @@
 
 package androidx.compose.foundation.layout
 
-import androidx.compose.runtime.Composable
 import androidx.compose.foundation.Box
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Layout
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.WithConstraints
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.node.Ref
+import androidx.compose.ui.onPositioned
+import androidx.compose.ui.platform.InspectableParameter
+import androidx.compose.ui.platform.ParameterElement
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.SmallTest
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Layout
-import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.WithConstraints
-import androidx.compose.ui.node.Ref
-import androidx.compose.ui.onPositioned
-import androidx.compose.ui.platform.InspectableParameter
-import androidx.compose.ui.platform.ParameterElement
 import com.google.common.truth.Truth.assertThat
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

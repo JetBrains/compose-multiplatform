@@ -19,26 +19,26 @@ package androidx.compose.foundation.layout
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.AlignmentLine
 import androidx.compose.ui.HorizontalAlignmentLine
-import androidx.test.filters.SmallTest
 import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.VerticalAlignmentLine
-import androidx.compose.ui.node.Ref
 import androidx.compose.ui.WithConstraints
-import androidx.compose.ui.onPositioned
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.node.Ref
+import androidx.compose.ui.onPositioned
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.test.filters.SmallTest
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import kotlin.math.min
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import kotlin.math.min
 
 @SmallTest
 @RunWith(JUnit4::class)

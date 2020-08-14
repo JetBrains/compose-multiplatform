@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.gestures
 
+import androidx.compose.animation.asDisposableClock
 import androidx.compose.animation.core.AnimatedFloat
 import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.AnimationEndReason
@@ -25,12 +26,11 @@ import androidx.compose.animation.core.SpringSpec
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
-import androidx.compose.animation.asDisposableClock
-import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.gesture.ScaleObserver
 import androidx.compose.ui.gesture.scaleGestureFilter
+import androidx.compose.ui.platform.AnimationClockAmbient
 
 /**
  * Create and remember [ZoomableController] with default [AnimationClockObservable].

@@ -16,18 +16,18 @@
 
 package androidx.compose.foundation.gestures
 
+import androidx.compose.foundation.Interaction
+import androidx.compose.foundation.InteractionState
 import androidx.compose.runtime.onDispose
-import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.gesture.Direction
 import androidx.compose.ui.gesture.ScrollCallback
 import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.gesture.scrollGestureFilter
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
-import androidx.compose.foundation.Interaction
-import androidx.compose.foundation.InteractionState
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.Direction
+import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.unit.Density
 
 /**

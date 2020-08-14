@@ -20,15 +20,6 @@ import androidx.build.Publish
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 import static androidx.build.dependencies.DependenciesKt.*
-import static androidx.build.dependencies.DependenciesKt.ANDROIDX_TEST_RULES
-import static androidx.build.dependencies.DependenciesKt.ANDROIDX_TEST_RUNNER
-import static androidx.build.dependencies.DependenciesKt.ANDROIDX_TEST_UIAUTOMATOR
-import static androidx.build.dependencies.DependenciesKt.DEXMAKER_MOCKITO
-import static androidx.build.dependencies.DependenciesKt.ESPRESSO_CORE
-import static androidx.build.dependencies.DependenciesKt.JUNIT
-import static androidx.build.dependencies.DependenciesKt.MOCKITO_CORE
-import static androidx.build.dependencies.DependenciesKt.MOCKITO_KOTLIN
-import static androidx.build.dependencies.DependenciesKt.TRUTH
 
 plugins {
     id("AndroidXPlugin")

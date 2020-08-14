@@ -17,26 +17,11 @@
 package androidx.compose.foundation.text
 
 import androidx.compose.ui.AlignmentLine
-import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.createTextLayoutResult
-import androidx.compose.ui.text.input.CommitTextEditOp
-import androidx.compose.ui.text.input.EditOperation
-import androidx.compose.ui.text.input.EditProcessor
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.input.FinishComposingTextEditOp
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.OffsetMap
-import androidx.compose.ui.text.input.SetSelectionEditOp
-import androidx.compose.ui.text.input.TextInputService
-import androidx.compose.ui.text.input.TransformedText
-import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.MultiParagraphIntrinsics
@@ -45,9 +30,24 @@ import androidx.compose.ui.text.TextDelegate
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.createTextLayoutResult
+import androidx.compose.ui.text.input.CommitTextEditOp
+import androidx.compose.ui.text.input.EditOperation
+import androidx.compose.ui.text.input.EditProcessor
+import androidx.compose.ui.text.input.FinishComposingTextEditOp
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.OffsetMap
+import androidx.compose.ui.text.input.SetSelectionEditOp
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.TextInputService
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
@@ -64,7 +64,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import org.mockito.ArgumentMatchers.anyLong
-import kotlin.text.Typography.times
 
 @OptIn(InternalTextApi::class)
 @RunWith(JUnit4::class)

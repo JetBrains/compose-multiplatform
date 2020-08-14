@@ -18,10 +18,10 @@ package androidx.compose.foundation
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.AccessibilityRangeInfo
 import androidx.compose.ui.semantics.accessibilityValue
 import androidx.compose.ui.semantics.accessibilityValueRange
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.util.annotation.FloatRange
 import androidx.compose.ui.util.format
 import kotlin.math.roundToInt

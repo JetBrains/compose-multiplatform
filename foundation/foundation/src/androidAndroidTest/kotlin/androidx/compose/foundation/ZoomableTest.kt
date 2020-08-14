@@ -16,26 +16,26 @@
 
 package androidx.compose.foundation
 
+import androidx.compose.foundation.gestures.ZoomableController
+import androidx.compose.foundation.gestures.zoomable
+import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.test.filters.SmallTest
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
-import androidx.compose.foundation.gestures.zoomable
-import androidx.compose.foundation.gestures.ZoomableController
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toSize
+import androidx.test.filters.SmallTest
 import androidx.ui.test.AnimationClockTestRule
 import androidx.ui.test.center
 import androidx.ui.test.createComposeRule
-import androidx.ui.test.performGesture
 import androidx.ui.test.onNodeWithTag
+import androidx.ui.test.performGesture
+import androidx.ui.test.pinch
 import androidx.ui.test.runOnIdle
 import androidx.ui.test.runOnUiThread
-import androidx.ui.test.pinch
 import androidx.ui.test.size
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.toSize
 import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertWithMessage
 import org.junit.Rule

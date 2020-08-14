@@ -16,25 +16,25 @@
 
 package androidx.compose.foundation.layout
 
-import androidx.compose.runtime.mutableStateOf
-import androidx.test.filters.SmallTest
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.node.Ref
-import androidx.compose.ui.layout.layoutId
-import androidx.compose.ui.onPositioned
 import androidx.compose.foundation.Box
 import androidx.compose.runtime.Providers
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.boundsInParent
+import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.node.Ref
+import androidx.compose.ui.onPositioned
 import androidx.compose.ui.platform.LayoutDirectionAmbient
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.runOnIdle
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.ui.test.waitForIdle
 import androidx.compose.ui.unit.dp
+import androidx.test.filters.SmallTest
+import androidx.ui.test.createComposeRule
+import androidx.ui.test.runOnIdle
+import androidx.ui.test.waitForIdle
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test

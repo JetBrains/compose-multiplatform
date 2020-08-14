@@ -16,11 +16,6 @@
 
 package androidx.compose.foundation.selection
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.IndicationAmbient
 import androidx.compose.foundation.Interaction
@@ -29,7 +24,12 @@ import androidx.compose.foundation.Strings
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.semantics.inMutuallyExclusiveGroup
 import androidx.compose.foundation.semantics.selected
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.semantics.accessibilityValue
+import androidx.compose.ui.semantics.semantics
 
 /**
  * Configure component to be selectable, usually as a part of a mutually exclusive group, where

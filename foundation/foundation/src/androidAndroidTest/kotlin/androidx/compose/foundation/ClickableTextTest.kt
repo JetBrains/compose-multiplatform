@@ -16,14 +16,14 @@
 
 package androidx.compose.foundation
 
-import androidx.test.filters.SmallTest
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.performClick
-import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.runOnIdle
 import androidx.compose.ui.text.AnnotatedString
+import androidx.test.filters.SmallTest
+import androidx.ui.test.createComposeRule
+import androidx.ui.test.onNodeWithTag
+import androidx.ui.test.performClick
+import androidx.ui.test.runOnIdle
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.times

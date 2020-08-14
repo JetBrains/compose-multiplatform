@@ -16,6 +16,9 @@
 
 package androidx.compose.foundation.layout
 
+import androidx.compose.foundation.layout.ColumnScope.alignWithSiblings
+import androidx.compose.foundation.layout.ColumnScope.weight
+import androidx.compose.foundation.layout.RowScope.alignWithSiblings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
@@ -23,8 +26,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.layout.ColumnScope.alignWithSiblings
-import androidx.compose.foundation.layout.RowScope.alignWithSiblings
 import androidx.compose.ui.VerticalAlignmentLine
 import androidx.compose.ui.layout.Measured
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi

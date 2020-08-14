@@ -16,9 +16,9 @@
 
 package androidx.compose.foundation.layout.demos
 
+import androidx.compose.foundation.layout.samples.SimpleFlowRow
 import androidx.ui.demos.common.ComposableDemo
 import androidx.ui.demos.common.DemoCategory
-import androidx.compose.foundation.layout.samples.SimpleFlowRow
 
 val LayoutDemos = DemoCategory("Layout", listOf(
     DemoCategory("ConstraintLayout", listOf(

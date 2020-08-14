@@ -16,21 +16,21 @@
 
 package androidx.compose.foundation
 
+import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.mutableStateOf
-import androidx.test.filters.MediumTest
 import androidx.compose.ui.ContentDrawScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.testTag
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.ui.unit.dp
+import androidx.test.filters.MediumTest
 import androidx.ui.test.center
 import androidx.ui.test.createComposeRule
-import androidx.ui.test.performGesture
-import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.runOnIdle
 import androidx.ui.test.down
+import androidx.ui.test.onNodeWithTag
+import androidx.ui.test.performGesture
+import androidx.ui.test.runOnIdle
 import androidx.ui.test.up
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.unit.dp
 import com.google.common.truth.Truth.assertThat
 import org.junit.Ignore
 import org.junit.Rule

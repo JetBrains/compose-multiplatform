@@ -20,12 +20,6 @@ import androidx.build.Publish
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 import static androidx.build.dependencies.DependenciesKt.*
-import static androidx.build.dependencies.DependenciesKt.ANDROIDX_TEST_RULES
-import static androidx.build.dependencies.DependenciesKt.ANDROIDX_TEST_RUNNER
-import static androidx.build.dependencies.DependenciesKt.CONSTRAINT_LAYOUT_CORE
-import static androidx.build.dependencies.DependenciesKt.JUNIT
-import static androidx.build.dependencies.DependenciesKt.TRUTH
-import static androidx.build.dependencies.DependenciesKt.getKOTLIN_STDLIB
 
 plugins {
     id("AndroidXPlugin")

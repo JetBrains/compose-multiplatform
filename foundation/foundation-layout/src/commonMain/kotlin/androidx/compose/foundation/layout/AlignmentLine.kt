@@ -17,13 +17,13 @@
 package androidx.compose.foundation.layout
 
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.LayoutModifier
 import androidx.compose.ui.AlignmentLine
 import androidx.compose.ui.HorizontalAlignmentLine
+import androidx.compose.ui.LayoutModifier
 import androidx.compose.ui.Measurable
 import androidx.compose.ui.MeasureScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import kotlin.math.max
 

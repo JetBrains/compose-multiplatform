@@ -16,28 +16,28 @@
 
 package androidx.compose.foundation
 
+import androidx.compose.foundation.layout.Stack
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.test.filters.MediumTest
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.foundation.layout.Stack
+import androidx.test.filters.MediumTest
 import androidx.ui.test.assertHasClickAction
 import androidx.ui.test.assertHasNoClickAction
 import androidx.ui.test.assertIsEnabled
 import androidx.ui.test.assertIsNotEnabled
 import androidx.ui.test.center
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.performClick
-import androidx.ui.test.performGesture
-import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.onNodeWithSubstring
-import androidx.ui.test.runOnIdle
 import androidx.ui.test.click
+import androidx.ui.test.createComposeRule
 import androidx.ui.test.doubleClick
 import androidx.ui.test.down
 import androidx.ui.test.longClick
+import androidx.ui.test.onNodeWithSubstring
+import androidx.ui.test.onNodeWithTag
+import androidx.ui.test.performClick
+import androidx.ui.test.performGesture
+import androidx.ui.test.runOnIdle
 import androidx.ui.test.up
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule

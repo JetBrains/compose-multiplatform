@@ -16,16 +16,16 @@
 
 package androidx.compose.foundation.layout
 
-import androidx.test.filters.SmallTest
-import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.foundation.text.CoreText
 import androidx.compose.foundation.text.CoreTextField
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith

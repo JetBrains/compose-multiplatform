@@ -16,18 +16,18 @@
 
 package androidx.compose.foundation
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.test.filters.MediumTest
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.selection.ToggleableState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.selection.triStateToggleable
 import androidx.compose.foundation.semantics.FoundationSemanticsProperties
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.test.filters.MediumTest
 import androidx.ui.test.SemanticsMatcher
 import androidx.ui.test.assert
 import androidx.ui.test.assertHasClickAction
@@ -38,14 +38,14 @@ import androidx.ui.test.assertIsOff
 import androidx.ui.test.assertIsOn
 import androidx.ui.test.center
 import androidx.ui.test.createComposeRule
-import androidx.ui.test.performClick
-import androidx.ui.test.performGesture
+import androidx.ui.test.down
+import androidx.ui.test.isToggleable
 import androidx.ui.test.onNode
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.onNodeWithText
-import androidx.ui.test.isToggleable
+import androidx.ui.test.performClick
+import androidx.ui.test.performGesture
 import androidx.ui.test.runOnIdle
-import androidx.ui.test.down
 import androidx.ui.test.up
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
