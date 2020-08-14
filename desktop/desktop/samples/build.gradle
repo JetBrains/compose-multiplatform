@@ -1,0 +1,84 @@
+/*
+ * Copyright 2020 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+import androidx.build.SupportConfigKt
+
+import static androidx.build.dependencies.DependenciesKt.*
+
+plugins {
+    id("AndroidXPlugin")
+    id("AndroidXUiPlugin")
+    id("kotlin-multiplatform")
+}
+
+dependencies {
+    kotlinPlugin project(path: ":compose:compose-compiler")
+}
+
+kotlin {
+    jvm()
+
+    sourceSets {
+        jvmMain {
+            resources.srcDirs += new File(SupportConfigKt.getExternalProjectPath(project), "noto-fonts/other/")
+            resources.srcDirs += "src/jvmMain/res"
+        }
+
+        jvmMain.dependencies {
+            implementation(SKIKO_CURRENT_OS)
+            implementation project(":compose:desktop:desktop")
+        }
+    }
+}
+
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions {
+        useIR = true
+    }
+}
+
+task run1(type: JavaExec) {
+    dependsOn(":compose:desktop:desktop:jar")
+    main = 'androidx.compose.desktop.examples.example1.MainKt'
+    def compilation = kotlin.jvm().compilations["main"]
+    classpath =
+        compilation.output.allOutputs +
+        compilation.runtimeDependencyFiles
+}
+
+task run2(type: JavaExec) {
+    dependsOn(":compose:desktop:desktop:jar")
+    main = 'androidx.compose.desktop.examples.example2.MainKt'
+    def compilation = kotlin.jvm().compilations["main"]
+    classpath =
+        compilation.output.allOutputs +
+        compilation.runtimeDependencyFiles
+}
+
+task run3(type: JavaExec) {
+    dependsOn(":compose:desktop:desktop:jar")
+    main = 'androidx.compose.desktop.examples.popupexample.MainKt'
+    def compilation = kotlin.jvm().compilations["main"]
+    classpath =
+        compilation.output.allOutputs +
+        compilation.runtimeDependencyFiles
+}
+
+task run {
+    dependsOn("run1")
+}
