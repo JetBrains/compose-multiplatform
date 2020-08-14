@@ -19,7 +19,7 @@ package androidx.compose.ui.demos.viewinterop
 import android.view.View
 import androidx.compose.ui.node.Ref
 
-// TODO(popam): this file is a subset of ViewRef.kt in android-view. Deduplicate later
+// TODO(popam): this file is a subset of ViewRef.kt in androidview. Deduplicate later
 
 /**
  * A Ref is essentially a "value-holder" class that can be used with Compose to get

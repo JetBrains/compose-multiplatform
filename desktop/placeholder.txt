@@ -1,4 +1,0 @@
-This file exists to make sure the directory this is in gets created by git, so that
-settings.gradle can point to this directory and not complain about it missing.
-
-TODO: b/160233169 remove this file once the directory structure is migrated from ui/ to here.

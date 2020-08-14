@@ -21,7 +21,7 @@ dependencies {
     implementation project(":compose:foundation:foundation-layout")
     implementation project(":compose:material:material:samples")
     implementation project(":compose:ui:ui-text")
-    implementation project(":compose:android-view:android-view")
+    implementation project(":compose:androidview:androidview")
     implementation project(":compose:material:material")
 }
 
