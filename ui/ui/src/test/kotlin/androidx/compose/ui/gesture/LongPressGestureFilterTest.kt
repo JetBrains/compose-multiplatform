@@ -18,15 +18,15 @@ package androidx.compose.ui.gesture
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.customevents.LongPressFiredEvent
+import androidx.compose.ui.input.pointer.CustomEventDispatcher
+import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.consume
+import androidx.compose.ui.input.pointer.consumeDownChange
 import androidx.compose.ui.input.pointer.down
 import androidx.compose.ui.input.pointer.invokeOverAllPasses
 import androidx.compose.ui.input.pointer.moveBy
 import androidx.compose.ui.input.pointer.moveTo
 import androidx.compose.ui.input.pointer.up
-import androidx.compose.ui.input.pointer.CustomEventDispatcher
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.consumeDownChange
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.milliseconds
 import com.google.common.truth.Truth.assertThat

@@ -16,8 +16,8 @@
 package androidx.compose.ui.text.android.style
 
 import android.text.TextPaint
-import androidx.test.filters.SmallTest
 import androidx.compose.ui.text.android.InternalPlatformTextApi
+import androidx.test.filters.SmallTest
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4

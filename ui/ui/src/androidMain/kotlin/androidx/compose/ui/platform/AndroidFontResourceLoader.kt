@@ -18,9 +18,9 @@ package androidx.compose.ui.platform
 
 import android.content.Context
 import android.graphics.Typeface
-import androidx.core.content.res.ResourcesCompat
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.ResourceFont
+import androidx.core.content.res.ResourcesCompat
 
 /**
  * Android implementation for [Font.ResourceLoader]

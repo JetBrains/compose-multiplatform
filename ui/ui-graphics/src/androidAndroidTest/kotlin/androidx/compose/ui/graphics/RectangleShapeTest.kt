@@ -16,10 +16,10 @@
 
 package androidx.compose.ui.graphics
 
-import androidx.test.filters.SmallTest
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.unit.Density
+import androidx.test.filters.SmallTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith

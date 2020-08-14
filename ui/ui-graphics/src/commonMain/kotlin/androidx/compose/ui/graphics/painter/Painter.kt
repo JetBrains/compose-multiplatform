@@ -16,7 +16,6 @@
 package androidx.compose.ui.graphics.painter
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ColorFilter
@@ -26,6 +25,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.drawCanvas
 import androidx.compose.ui.graphics.drawscope.inset
 import androidx.compose.ui.graphics.withSaveLayer
+import androidx.compose.ui.unit.LayoutDirection
 
 /**
  * Abstraction for something that can be drawn. In addition to providing the ability to draw

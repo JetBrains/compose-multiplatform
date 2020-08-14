@@ -18,9 +18,9 @@ package androidx.compose.ui.text.style
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.text.lerpTextUnitInheritable
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.lerpTextUnitInheritable
 
 /**
  * Specify the indentation of a paragraph.

@@ -18,8 +18,8 @@ package androidx.compose.ui.graphics.vector
 
 import androidx.compose.runtime.AbstractApplier
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.Composition
+import androidx.compose.runtime.CompositionReference
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.compositionFor

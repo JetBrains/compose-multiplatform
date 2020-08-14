@@ -16,9 +16,9 @@
 
 package androidx.compose.ui.node
 
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
-import androidx.compose.ui.geometry.Offset
 
 internal class PointerInputDelegatingWrapper(
     wrapped: LayoutNodeWrapper,

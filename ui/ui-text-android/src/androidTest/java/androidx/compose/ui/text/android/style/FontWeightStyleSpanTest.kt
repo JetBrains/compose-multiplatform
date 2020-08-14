@@ -19,9 +19,9 @@ package androidx.compose.ui.text.android.style
 import android.graphics.Typeface
 import android.graphics.fonts.FontStyle
 import android.text.TextPaint
+import androidx.compose.ui.text.android.InternalPlatformTextApi
 import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
-import androidx.compose.ui.text.android.InternalPlatformTextApi
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith

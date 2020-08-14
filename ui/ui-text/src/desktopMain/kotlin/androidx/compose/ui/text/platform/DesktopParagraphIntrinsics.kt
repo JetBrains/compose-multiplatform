@@ -28,15 +28,15 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
-import org.jetbrains.skija.paragraph.DecorationLineStyle as SkDecorationLineStyle
 import org.jetbrains.skija.paragraph.Paragraph
 import org.jetbrains.skija.paragraph.ParagraphBuilder
 import org.jetbrains.skija.paragraph.ParagraphStyle
 import kotlin.math.ceil
-import org.jetbrains.skija.paragraph.TextStyle as SkTextStyle
-import org.jetbrains.skija.paragraph.DecorationStyle as SkDecorationStyle
 import org.jetbrains.skija.FontStyle as SkFontStyle
 import org.jetbrains.skija.Paint as SkPaint
+import org.jetbrains.skija.paragraph.DecorationLineStyle as SkDecorationLineStyle
+import org.jetbrains.skija.paragraph.DecorationStyle as SkDecorationStyle
+import org.jetbrains.skija.paragraph.TextStyle as SkTextStyle
 
 @Suppress("UNUSED_PARAMETER")
 internal actual fun ActualParagraphIntrinsics(

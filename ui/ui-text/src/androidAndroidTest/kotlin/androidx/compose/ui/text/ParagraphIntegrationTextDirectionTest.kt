@@ -16,11 +16,11 @@
 
 package androidx.compose.ui.text
 
-import androidx.test.filters.SmallTest
-import androidx.test.platform.app.InstrumentationRegistry
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.unit.Density
+import androidx.test.filters.SmallTest
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import org.junit.After
 import org.junit.Before

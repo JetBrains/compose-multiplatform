@@ -16,16 +16,16 @@
 
 package androidx.compose.ui.input.key
 
-import androidx.test.filters.SmallTest
+import androidx.compose.foundation.Box
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.input.key.Key.Companion.A
-import androidx.compose.ui.input.key.KeyEventType.KeyUp
-import androidx.compose.foundation.Box
-import androidx.compose.ui.focus
 import androidx.compose.ui.focus.setFocusableContent
 import androidx.compose.ui.focusRequester
+import androidx.compose.ui.input.key.Key.Companion.A
+import androidx.compose.ui.input.key.KeyEventType.KeyUp
+import androidx.test.filters.SmallTest
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.onRoot
 import androidx.ui.test.performKeyPress

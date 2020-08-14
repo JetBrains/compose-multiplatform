@@ -16,19 +16,19 @@
 
 package androidx.compose.ui.platform
 
-import android.graphics.Outline as AndroidOutline
 import android.os.Build
-import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.isSimple
-import androidx.compose.ui.graphics.asAndroidPath
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.asAndroidPath
 import androidx.compose.ui.unit.Density
 import kotlin.math.roundToInt
+import android.graphics.Outline as AndroidOutline
 
 /**
  * Resolves the [AndroidOutline] from the [Shape] of an [OwnedLayer].

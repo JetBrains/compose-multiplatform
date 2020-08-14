@@ -21,12 +21,12 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.TextPaint
 import android.text.style.ScaleXSpan
+import androidx.compose.ui.text.android.style.BaselineShiftSpan
+import androidx.compose.ui.text.android.style.SkewXSpan
+import androidx.compose.ui.text.font.test.R
 import androidx.core.content.res.ResourcesCompat
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.compose.ui.text.font.test.R
-import androidx.compose.ui.text.android.style.BaselineShiftSpan
-import androidx.compose.ui.text.android.style.SkewXSpan
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import org.junit.Before

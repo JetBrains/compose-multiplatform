@@ -17,16 +17,16 @@
 package androidx.compose.ui.graphics
 
 import androidx.compose.ui.graphics.colorspace.Adaptation
-import androidx.compose.ui.graphics.colorspace.ColorSpace
-import androidx.compose.ui.graphics.colorspace.Connector
 import androidx.compose.ui.graphics.colorspace.ColorModel
+import androidx.compose.ui.graphics.colorspace.ColorSpace
 import androidx.compose.ui.graphics.colorspace.ColorSpaces
 import androidx.compose.ui.graphics.colorspace.ColorSpaces.ColorSpacesArray
+import androidx.compose.ui.graphics.colorspace.Connector
 import androidx.compose.ui.graphics.colorspace.Illuminant
-import androidx.compose.ui.graphics.colorspace.WhitePoint
 import androidx.compose.ui.graphics.colorspace.RenderIntent
 import androidx.compose.ui.graphics.colorspace.Rgb
 import androidx.compose.ui.graphics.colorspace.TransferParameters
+import androidx.compose.ui.graphics.colorspace.WhitePoint
 import androidx.compose.ui.graphics.colorspace.adapt
 import androidx.compose.ui.graphics.colorspace.connect
 import org.junit.Assert.assertEquals
@@ -36,7 +36,6 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
-
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4

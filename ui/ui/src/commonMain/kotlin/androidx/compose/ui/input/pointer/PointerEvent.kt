@@ -20,9 +20,12 @@ package androidx.compose.ui.input.pointer
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerEventPass.Final
+import androidx.compose.ui.input.pointer.PointerEventPass.Initial
+import androidx.compose.ui.input.pointer.PointerEventPass.Main
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.Uptime

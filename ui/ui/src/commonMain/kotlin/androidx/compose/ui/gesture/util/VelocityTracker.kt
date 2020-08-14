@@ -16,8 +16,8 @@
 
 package androidx.compose.ui.gesture.util
 
-import androidx.compose.ui.unit.Duration
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.unit.Duration
 import androidx.compose.ui.unit.Uptime
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.inMilliseconds

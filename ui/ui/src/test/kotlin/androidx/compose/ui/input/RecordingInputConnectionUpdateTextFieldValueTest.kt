@@ -20,11 +20,11 @@ import android.view.View
 import android.view.inputmethod.ExtractedText
 import android.view.inputmethod.InputConnection
 import android.view.inputmethod.InputMethodManager
-import androidx.test.filters.SmallTest
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.InputEventListener
 import androidx.compose.ui.text.input.RecordingInputConnection
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.test.filters.SmallTest
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.eq

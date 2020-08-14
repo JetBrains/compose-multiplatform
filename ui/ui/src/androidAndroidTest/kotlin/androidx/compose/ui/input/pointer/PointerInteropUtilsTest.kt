@@ -18,11 +18,11 @@ package androidx.compose.ui.input.pointer
 
 import android.view.MotionEvent
 import android.view.View
-import androidx.test.filters.SmallTest
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.PointerCoords
 import androidx.compose.ui.gesture.PointerProperties
 import androidx.compose.ui.unit.milliseconds
+import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith

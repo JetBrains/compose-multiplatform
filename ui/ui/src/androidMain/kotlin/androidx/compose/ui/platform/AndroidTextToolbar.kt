@@ -19,10 +19,10 @@ package androidx.compose.ui.platform
 import android.os.Build
 import android.view.ActionMode
 import android.view.View
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.platform.actionmodecallback.FloatingTextActionModeCallback
 import androidx.compose.ui.platform.actionmodecallback.PrimaryTextActionModeCallback
 import androidx.compose.ui.platform.actionmodecallback.TextActionModeCallback
-import androidx.compose.ui.geometry.Rect
 
 /**
  * Android implementation for [TextToolbar].

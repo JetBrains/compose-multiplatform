@@ -16,8 +16,8 @@
 
 package androidx.compose.ui.text
 
-import androidx.test.filters.SmallTest
 import androidx.compose.ui.text.intl.LocaleList
+import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith

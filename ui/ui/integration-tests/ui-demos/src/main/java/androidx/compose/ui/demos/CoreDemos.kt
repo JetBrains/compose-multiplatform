@@ -31,11 +31,11 @@ import androidx.compose.ui.demos.gestures.NestedLongPressDemo
 import androidx.compose.ui.demos.gestures.NestedPressingDemo
 import androidx.compose.ui.demos.gestures.NestedScalingDemo
 import androidx.compose.ui.demos.gestures.NestedScrollingDemo
+import androidx.compose.ui.demos.gestures.PointerInputDuringSubComp
 import androidx.compose.ui.demos.gestures.PopupDragDemo
 import androidx.compose.ui.demos.gestures.PressIndicatorGestureFilterDemo
 import androidx.compose.ui.demos.gestures.RawDragGestureFilterDemo
 import androidx.compose.ui.demos.gestures.ScaleGestureFilterDemo
-import androidx.compose.ui.demos.gestures.PointerInputDuringSubComp
 import androidx.compose.ui.demos.gestures.ScrollGestureFilterDemo
 import androidx.compose.ui.demos.gestures.TapGestureFilterDemo
 import androidx.compose.ui.demos.gestures.VerticalScrollerInDrawerDemo

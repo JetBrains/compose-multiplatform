@@ -31,10 +31,10 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.gesture.PointerCoords
 import androidx.compose.ui.gesture.PointerProperties
 import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.test.filters.SmallTest
-import androidx.ui.test.android.createAndroidComposeRule
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.milliseconds
+import androidx.test.filters.SmallTest
+import androidx.ui.test.android.createAndroidComposeRule
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Rule

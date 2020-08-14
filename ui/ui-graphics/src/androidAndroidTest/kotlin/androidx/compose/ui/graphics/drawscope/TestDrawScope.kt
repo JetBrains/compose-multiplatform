@@ -16,11 +16,11 @@
 
 package androidx.compose.ui.graphics.drawscope
 
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.unit.LayoutDirection
 
 /**
  * TestDrawScope implementation with default values for density and layout direction

@@ -16,12 +16,12 @@
 
 package androidx.compose.ui.text
 
-import androidx.test.platform.app.InstrumentationRegistry
 import androidx.compose.ui.text.font.asFontFamily
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 

@@ -17,7 +17,6 @@
 package androidx.compose.ui.platform.actionmodecallback
 
 import android.view.ActionMode
-import android.view.ActionMode.Callback
 import android.view.Menu
 import android.view.MenuItem
 

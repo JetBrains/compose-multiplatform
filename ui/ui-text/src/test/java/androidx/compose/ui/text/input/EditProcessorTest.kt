@@ -16,9 +16,9 @@
 
 package androidx.compose.ui.text.input
 
-import androidx.test.filters.SmallTest
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextRange
+import androidx.test.filters.SmallTest
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.eq

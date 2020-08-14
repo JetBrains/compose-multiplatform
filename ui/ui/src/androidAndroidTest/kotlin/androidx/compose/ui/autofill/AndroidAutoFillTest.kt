@@ -21,14 +21,14 @@ import android.view.View
 import android.view.ViewStructure
 import android.view.autofill.AutofillValue
 import androidx.autofill.HintConstants.AUTOFILL_HINT_PERSON_NAME
-import androidx.test.filters.SdkSuppress
-import androidx.test.filters.SmallTest
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.platform.AutofillAmbient
 import androidx.compose.ui.platform.AutofillTreeAmbient
 import androidx.compose.ui.platform.ViewAmbient
-import androidx.ui.test.fake.FakeViewStructure
+import androidx.test.filters.SdkSuppress
+import androidx.test.filters.SmallTest
 import androidx.ui.test.createComposeRule
+import androidx.ui.test.fake.FakeViewStructure
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Rule

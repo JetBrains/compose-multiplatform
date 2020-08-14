@@ -16,6 +16,7 @@
 
 package androidx.compose.ui
 
+import androidx.compose.ui.MeasureScope.MeasureResult
 import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.LayoutDirection

@@ -17,9 +17,9 @@
 package androidx.compose.ui.text.samples
 
 import androidx.annotation.Sampled
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.OffsetMap
 import androidx.compose.ui.text.input.TransformedText
-import androidx.compose.ui.text.AnnotatedString
 
 @Sampled
 fun passwordFilter(text: AnnotatedString): TransformedText {

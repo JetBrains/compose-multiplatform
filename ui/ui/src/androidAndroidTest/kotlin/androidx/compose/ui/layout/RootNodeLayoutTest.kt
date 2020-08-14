@@ -18,16 +18,16 @@ package androidx.compose.ui.layout
 
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Recomposer
-import androidx.test.filters.SmallTest
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.onPositioned
-import androidx.compose.ui.test.TestActivity
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.onPositioned
 import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.test.TestActivity
+import androidx.compose.ui.unit.Constraints
+import androidx.test.filters.SmallTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull

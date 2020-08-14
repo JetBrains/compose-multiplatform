@@ -17,8 +17,8 @@
 package androidx.compose.ui.text.android.style
 
 import android.text.TextPaint
-import androidx.test.filters.SmallTest
 import androidx.compose.ui.text.android.InternalPlatformTextApi
+import androidx.test.filters.SmallTest
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock

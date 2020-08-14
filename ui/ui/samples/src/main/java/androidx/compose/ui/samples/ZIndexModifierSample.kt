@@ -17,11 +17,11 @@
 package androidx.compose.ui.samples
 
 import androidx.annotation.Sampled
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.Stack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
-import androidx.compose.foundation.Text
-import androidx.compose.foundation.layout.Stack
 
 @Sampled
 @Composable

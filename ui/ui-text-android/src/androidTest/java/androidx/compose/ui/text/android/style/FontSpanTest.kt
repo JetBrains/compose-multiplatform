@@ -18,8 +18,8 @@ package androidx.compose.ui.text.android.style
 
 import android.graphics.Typeface
 import android.text.TextPaint
-import androidx.test.filters.SmallTest
 import androidx.compose.ui.text.android.InternalPlatformTextApi
+import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith

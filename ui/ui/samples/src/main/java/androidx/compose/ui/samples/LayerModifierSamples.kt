@@ -17,13 +17,13 @@
 package androidx.compose.ui.samples
 
 import androidx.annotation.Sampled
+import androidx.compose.animation.animatedFloat
+import androidx.compose.foundation.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.onCommit
-import androidx.compose.animation.animatedFloat
 import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawLayer
-import androidx.compose.foundation.Text
 
 @Sampled
 @Composable

@@ -16,10 +16,10 @@
 
 package androidx.compose.ui.text.platform
 
-import androidx.test.filters.SmallTest
-import androidx.test.platform.app.InstrumentationRegistry
 import androidx.compose.ui.text.FontTestData
 import androidx.compose.ui.text.matchers.assertThat
+import androidx.test.filters.SmallTest
+import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner

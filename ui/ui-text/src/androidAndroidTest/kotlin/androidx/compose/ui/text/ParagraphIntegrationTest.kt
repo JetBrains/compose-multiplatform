@@ -15,10 +15,7 @@
  */
 package androidx.compose.ui.text
 
-import androidx.test.filters.SdkSuppress
-import androidx.test.filters.SmallTest
-import androidx.test.platform.app.InstrumentationRegistry
-import androidx.compose.ui.text.intl.LocaleList
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
@@ -33,17 +30,20 @@ import androidx.compose.ui.text.FontTestData.Companion.BASIC_MEASURE_FONT
 import androidx.compose.ui.text.FontTestData.Companion.FONT_100_REGULAR
 import androidx.compose.ui.text.FontTestData.Companion.FONT_200_REGULAR
 import androidx.compose.ui.text.font.asFontFamily
+import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.matchers.assertThat
 import androidx.compose.ui.text.matchers.isZero
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.ResolvedTextDirection
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import androidx.test.filters.SdkSuppress
+import androidx.test.filters.SmallTest
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import org.junit.Test

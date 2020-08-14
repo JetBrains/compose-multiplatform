@@ -16,8 +16,8 @@
 
 package androidx.compose.ui.text.input
 
-import androidx.test.filters.SmallTest
 import androidx.compose.ui.text.InternalTextApi
+import androidx.test.filters.SmallTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith

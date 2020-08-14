@@ -16,10 +16,10 @@
 
 package androidx.compose.ui.layout
 
-import androidx.test.filters.SmallTest
 import androidx.compose.ui.Remeasurement
 import androidx.compose.ui.RemeasurementModifier
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
+import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith

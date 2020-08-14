@@ -18,9 +18,9 @@ package androidx.compose.ui.text
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.AnnotatedString.Builder
 import androidx.compose.ui.text.AnnotatedString.Range
+import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.util.fastForEach
 
 /**

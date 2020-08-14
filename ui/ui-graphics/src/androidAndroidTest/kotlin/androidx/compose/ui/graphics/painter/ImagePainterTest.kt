@@ -17,7 +17,6 @@
 package androidx.compose.ui.graphics.painter
 
 import androidx.compose.ui.geometry.Offset
-import androidx.test.filters.SmallTest
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
@@ -31,6 +30,7 @@ import androidx.compose.ui.graphics.drawscope.drawPainter
 import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.test.filters.SmallTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.fail

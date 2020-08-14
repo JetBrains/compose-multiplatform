@@ -18,10 +18,10 @@ package androidx.compose.ui.focus
 
 import androidx.compose.foundation.Box
 import androidx.compose.ui.FocusModifier
-import androidx.test.filters.SmallTest
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focusObserver
 import androidx.compose.ui.focusRequester
+import androidx.test.filters.SmallTest
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.runOnIdle
 import com.google.common.truth.Truth.assertThat

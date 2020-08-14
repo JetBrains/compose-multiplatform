@@ -19,9 +19,9 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Typeface
-import androidx.core.content.res.ResourcesCompat
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.ResourceFont
+import androidx.core.content.res.ResourcesCompat
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 

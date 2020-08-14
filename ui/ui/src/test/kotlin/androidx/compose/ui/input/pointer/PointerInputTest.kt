@@ -16,17 +16,17 @@
 
 package androidx.compose.ui.input.pointer
 
-import androidx.test.filters.SmallTest
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.Uptime
 import androidx.compose.ui.unit.milliseconds
+import androidx.test.filters.SmallTest
+import com.google.common.truth.Truth.assertThat
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.core.IsEqual.equalTo
 import org.junit.Assert.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import com.google.common.truth.Truth.assertThat
 
 // TODO(shepshapard): Write the following tests when functionality is done.
 // consumeDownChange_noChangeOccurred_throwsException

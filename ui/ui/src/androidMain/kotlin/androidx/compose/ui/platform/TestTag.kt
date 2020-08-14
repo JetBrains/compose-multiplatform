@@ -17,10 +17,10 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.SemanticsPropertyReceiver
-import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.SemanticsPropertyReceiver
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 
 /**
  * Applies a tag to allow modified element to be found in tests.

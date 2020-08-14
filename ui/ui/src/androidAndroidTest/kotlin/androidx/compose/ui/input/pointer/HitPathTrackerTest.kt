@@ -16,14 +16,14 @@
 
 package androidx.compose.ui.input.pointer
 
-import androidx.test.filters.SmallTest
 import androidx.compose.ui.AlignmentLine
-import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.milliseconds
+import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq

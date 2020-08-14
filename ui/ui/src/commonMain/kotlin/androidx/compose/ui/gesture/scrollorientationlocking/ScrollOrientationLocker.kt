@@ -17,12 +17,12 @@
 package androidx.compose.ui.gesture.scrollorientationlocking
 
 import androidx.compose.ui.gesture.ExperimentalPointerInput
-import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.CustomEvent
 import androidx.compose.ui.input.pointer.CustomEventDispatcher
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputChange
+import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.changedToDownIgnoreConsumed
 import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
 import androidx.compose.ui.util.annotation.VisibleForTesting

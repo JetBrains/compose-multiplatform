@@ -16,10 +16,10 @@
 
 package androidx.compose.ui.text.android.style
 
-import kotlin.math.ceil
 import android.text.TextPaint
 import android.text.style.MetricAffectingSpan
 import androidx.compose.ui.text.android.InternalPlatformTextApi
+import kotlin.math.ceil
 
 /**
  * Span which shifts the vertical position of baseline.

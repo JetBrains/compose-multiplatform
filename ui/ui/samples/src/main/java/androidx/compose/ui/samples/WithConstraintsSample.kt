@@ -17,13 +17,13 @@
 package androidx.compose.ui.samples
 
 import androidx.annotation.Sampled
+import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.WithConstraints
-import androidx.compose.foundation.Box
 import androidx.compose.ui.graphics.Color
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.ui.unit.dp
 
 @Sampled

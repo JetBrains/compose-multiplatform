@@ -18,14 +18,14 @@ package androidx.compose.ui.gesture
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.Stack
 import androidx.compose.runtime.emptyContent
-import androidx.test.filters.LargeTest
 import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.test.TestActivity
-import androidx.compose.foundation.layout.Stack
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.test.TestActivity
+import androidx.test.filters.LargeTest
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.inOrder
 import com.nhaarman.mockitokotlin2.spy

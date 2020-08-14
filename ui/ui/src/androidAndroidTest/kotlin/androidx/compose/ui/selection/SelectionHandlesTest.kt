@@ -17,17 +17,17 @@
 package androidx.compose.ui.selection
 
 import android.os.Build
-import androidx.test.filters.SdkSuppress
-import androidx.test.filters.SmallTest
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.runOnUiThreadIR
+import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.waitAndScreenShot
+import androidx.test.filters.SdkSuppress
+import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.mock
 import org.junit.Before

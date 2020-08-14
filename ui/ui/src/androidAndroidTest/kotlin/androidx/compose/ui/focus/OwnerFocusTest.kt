@@ -17,9 +17,8 @@
 package androidx.compose.ui.focus
 
 import android.view.View
-import androidx.compose.runtime.Composable
 import androidx.compose.foundation.Box
-import androidx.test.filters.SmallTest
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus
 import androidx.compose.ui.focus.FocusState.Active
@@ -27,6 +26,7 @@ import androidx.compose.ui.focus.FocusState.Inactive
 import androidx.compose.ui.focusObserver
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.platform.ViewAmbient
+import androidx.test.filters.SmallTest
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.runOnIdle
 import com.google.common.truth.Truth.assertThat

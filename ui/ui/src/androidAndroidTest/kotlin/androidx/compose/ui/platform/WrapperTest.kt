@@ -26,13 +26,13 @@ import androidx.compose.runtime.invalidate
 import androidx.compose.runtime.onActive
 import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.onDispose
+import androidx.compose.ui.test.TestActivity
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.test.filters.MediumTest
-import androidx.compose.ui.test.TestActivity
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.ui.test.runOnUiThread
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

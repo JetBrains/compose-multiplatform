@@ -31,7 +31,6 @@ import androidx.compose.ui.graphics.vector.compat.seekToStartTag
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.util.trace
 import org.xmlpull.v1.XmlPullParserException
-import kotlin.jvm.Throws
 
 /**
  * Effect used to load a [VectorAsset] from an Android resource id

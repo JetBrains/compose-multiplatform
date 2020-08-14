@@ -20,9 +20,9 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.DesktopPath
-import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toComposeRect
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Paragraph
@@ -40,9 +40,9 @@ import org.jetbrains.skija.paragraph.LineMetrics
 import org.jetbrains.skija.paragraph.RectHeightMode
 import org.jetbrains.skija.paragraph.RectWidthMode
 import org.jetbrains.skija.paragraph.TextBox
-import org.jetbrains.skija.Rect as SkRect
 import java.nio.charset.Charset
 import kotlin.math.floor
+import org.jetbrains.skija.Rect as SkRect
 
 @Suppress("UNUSED_PARAMETER")
 internal actual fun ActualParagraph(

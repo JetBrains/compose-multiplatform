@@ -17,13 +17,12 @@
 package androidx.compose.ui.autofill
 
 import android.app.Activity
-import android.graphics.Rect as AndroidRect
 import android.view.View
 import android.view.autofill.AutofillManager
-import androidx.test.filters.SmallTest
-import androidx.compose.ui.test.ComposeUiRobolectricTestRunner
-import androidx.compose.ui.graphics.toComposeRect
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.toComposeRect
+import androidx.compose.ui.test.ComposeUiRobolectricTestRunner
+import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Rule
@@ -35,6 +34,7 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.Implementation
 import org.robolectric.annotation.Implements
 import org.robolectric.shadow.api.Shadow
+import android.graphics.Rect as AndroidRect
 
 @SmallTest
 @RunWith(ComposeUiRobolectricTestRunner::class)

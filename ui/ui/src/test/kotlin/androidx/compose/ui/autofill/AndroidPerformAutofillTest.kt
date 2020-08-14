@@ -20,9 +20,9 @@ import android.app.Activity
 import android.util.SparseArray
 import android.view.View
 import android.view.autofill.AutofillValue
-import androidx.test.filters.SmallTest
-import androidx.compose.ui.test.ComposeUiRobolectricTestRunner
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.test.ComposeUiRobolectricTestRunner
+import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth
 import org.junit.Before
 import org.junit.Test

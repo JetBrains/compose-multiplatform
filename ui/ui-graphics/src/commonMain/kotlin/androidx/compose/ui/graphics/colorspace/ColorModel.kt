@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.graphics.colorspace
 
+import androidx.compose.ui.graphics.colorspace.ColorModel.Rgb
 import androidx.compose.ui.util.annotation.IntRange
 
 /**

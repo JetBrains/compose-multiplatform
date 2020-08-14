@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.graphics.vector
 
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
@@ -27,6 +26,7 @@ import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.toSize
 
 /**

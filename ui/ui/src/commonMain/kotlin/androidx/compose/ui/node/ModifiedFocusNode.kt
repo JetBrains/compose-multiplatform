@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.node
 
-import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.FocusModifier
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusState
@@ -27,6 +26,7 @@ import androidx.compose.ui.focus.FocusState.Disabled
 import androidx.compose.ui.focus.FocusState.Inactive
 import androidx.compose.ui.focus.focusableChildren2
 import androidx.compose.ui.focus.searchChildrenForFocusNode
+import androidx.compose.ui.util.fastForEach
 
 @OptIn(
     ExperimentalFocus::class,

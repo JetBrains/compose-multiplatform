@@ -16,8 +16,8 @@
 
 package androidx.compose.ui.layout
 
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.constrain
 import androidx.compose.ui.unit.enforce
 import androidx.compose.ui.unit.hasFixedHeight
@@ -32,7 +32,6 @@ import org.junit.Assert.fail
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import kotlin.IllegalArgumentException
 
 @RunWith(JUnit4::class)
 class ConstraintsTest {

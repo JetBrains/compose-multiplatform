@@ -17,10 +17,10 @@
 package androidx.compose.ui.text.platform
 
 import android.text.SpannableString
-import androidx.compose.ui.text.android.InternalPlatformTextApi
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.android.InternalPlatformTextApi
 import androidx.compose.ui.text.platform.extensions.setLineHeight
 import androidx.compose.ui.text.platform.extensions.setPlaceholders
 import androidx.compose.ui.text.platform.extensions.setSpanStyles

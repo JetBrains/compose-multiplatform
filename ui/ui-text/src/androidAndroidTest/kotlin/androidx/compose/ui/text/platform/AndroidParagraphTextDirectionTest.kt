@@ -18,9 +18,9 @@ package androidx.compose.ui.text.platform
 
 import androidx.compose.ui.text.android.InternalPlatformTextApi
 import androidx.compose.ui.text.android.LayoutCompat
-import androidx.test.filters.SmallTest
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.TextDirection
+import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.After
 import org.junit.Before

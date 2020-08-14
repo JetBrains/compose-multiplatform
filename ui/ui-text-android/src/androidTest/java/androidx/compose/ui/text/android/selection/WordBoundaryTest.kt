@@ -15,8 +15,8 @@
  */
 package androidx.compose.ui.text.android.selection
 
-import androidx.test.filters.SmallTest
 import androidx.compose.ui.text.android.InternalPlatformTextApi
+import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith

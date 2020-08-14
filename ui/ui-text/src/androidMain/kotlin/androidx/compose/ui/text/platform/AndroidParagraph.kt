@@ -18,11 +18,14 @@ package androidx.compose.ui.text.platform
 import android.text.Spanned
 import android.text.TextPaint
 import android.text.TextUtils
-import androidx.compose.ui.text.android.InternalPlatformTextApi
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.asComposePath
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.text.ParagraphConstraints
@@ -31,7 +34,7 @@ import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.android.InternalPlatformTextApi
 import androidx.compose.ui.text.android.LayoutCompat.ALIGN_CENTER
 import androidx.compose.ui.text.android.LayoutCompat.ALIGN_LEFT
 import androidx.compose.ui.text.android.LayoutCompat.ALIGN_NORMAL
@@ -44,15 +47,12 @@ import androidx.compose.ui.text.android.LayoutCompat.JUSTIFICATION_MODE_INTER_WO
 import androidx.compose.ui.text.android.TextLayout
 import androidx.compose.ui.text.android.selection.WordBoundary
 import androidx.compose.ui.text.android.style.PlaceholderSpan
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.ResolvedTextDirection
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.platform.extensions.applySpanStyle
+import androidx.compose.ui.text.style.ResolvedTextDirection
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.util.annotation.VisibleForTesting
 import java.util.Locale as JavaLocale
 

@@ -18,13 +18,13 @@ package androidx.compose.ui.res
 
 import android.util.LruCache
 import androidx.compose.runtime.Providers
-import androidx.test.filters.SmallTest
-import androidx.test.platform.app.InstrumentationRegistry
-import androidx.compose.ui.test.R
 import androidx.compose.ui.graphics.ImageAsset
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.imageFromResource
 import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.test.R
+import androidx.test.filters.SmallTest
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.runOnIdle
 import com.google.common.truth.Truth.assertThat

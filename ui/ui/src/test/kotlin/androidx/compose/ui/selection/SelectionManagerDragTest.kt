@@ -16,10 +16,10 @@
 
 package androidx.compose.ui.selection
 
-import androidx.test.filters.SmallTest
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.text.style.ResolvedTextDirection
-import androidx.compose.ui.geometry.Offset
+import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn

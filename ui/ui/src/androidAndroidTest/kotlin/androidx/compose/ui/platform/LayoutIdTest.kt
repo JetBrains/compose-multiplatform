@@ -16,16 +16,16 @@
 
 package androidx.compose.ui.platform
 
+import androidx.compose.foundation.layout.Stack
 import androidx.compose.runtime.emptyContent
-import androidx.test.filters.SmallTest
+import androidx.compose.ui.AtLeastSize
 import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.layoutId
-import androidx.compose.foundation.layout.Stack
-import androidx.compose.ui.AtLeastSize
 import androidx.compose.ui.layout.id
+import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.runOnUiThreadIR
 import androidx.compose.ui.test.TestActivity
+import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

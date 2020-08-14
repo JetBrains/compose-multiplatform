@@ -16,8 +16,8 @@
 
 package androidx.compose.ui.graphics
 
-import androidx.test.filters.SmallTest
 import androidx.compose.ui.geometry.Rect
+import androidx.test.filters.SmallTest
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith

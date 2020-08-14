@@ -18,22 +18,22 @@ package androidx.compose.ui.text.platform
 
 import android.graphics.Paint
 import android.text.TextPaint
-import androidx.compose.ui.text.android.InternalPlatformTextApi
-import androidx.compose.ui.text.android.LayoutCompat
-import androidx.compose.ui.text.android.LayoutIntrinsics
-import androidx.core.text.TextUtilsCompat
-import androidx.core.view.ViewCompat
-import androidx.compose.ui.text.intl.AndroidLocale
-import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ParagraphIntrinsics
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.android.InternalPlatformTextApi
+import androidx.compose.ui.text.android.LayoutCompat
+import androidx.compose.ui.text.android.LayoutIntrinsics
 import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.intl.AndroidLocale
+import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.platform.extensions.applySpanStyle
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.Density
+import androidx.core.text.TextUtilsCompat
+import androidx.core.view.ViewCompat
 import java.util.Locale
 
 @OptIn(InternalPlatformTextApi::class)

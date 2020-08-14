@@ -16,8 +16,8 @@
 
 package androidx.compose.ui.gesture.customevents
 
-import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.CustomEvent
+import androidx.compose.ui.input.pointer.PointerInputFilter
 
 /**
  * Dispatched to indicate that a [PointerInputFilter] that responds to a pointer touching a

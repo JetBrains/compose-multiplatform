@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.em
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import java.lang.IllegalArgumentException
 
 @RunWith(JUnit4::class)
 class PlaceholderTest {

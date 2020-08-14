@@ -20,7 +20,6 @@ import android.content.Context
 import android.graphics.Typeface
 import android.util.TypedValue
 import androidx.collection.LruCache
-import androidx.core.content.res.ResourcesCompat
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontListFontFamily
@@ -30,6 +29,7 @@ import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.ResourceFont
 import androidx.compose.ui.util.fastForEach
+import androidx.core.content.res.ResourcesCompat
 
 /**
  * An implementation of [AndroidTypeface] for [FontListFontFamily]

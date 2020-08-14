@@ -25,9 +25,9 @@ import android.text.TextPaint
 import android.text.TextUtils
 import android.text.style.ForegroundColorSpan
 import android.text.style.LeadingMarginSpan
-import androidx.test.filters.SmallTest
 import androidx.compose.ui.text.android.BoringLayoutFactory.create
 import androidx.compose.ui.text.android.BoringLayoutFactory.measure
+import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith

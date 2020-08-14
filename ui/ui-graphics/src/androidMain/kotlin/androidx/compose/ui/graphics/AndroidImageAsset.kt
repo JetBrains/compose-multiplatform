@@ -24,7 +24,6 @@ import android.util.DisplayMetrics
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.colorspace.ColorSpace
 import androidx.compose.ui.graphics.colorspace.ColorSpaces
-import kotlin.UnsupportedOperationException
 
 /**
  * Create an [ImageAsset] from an image file stored in resources for the application

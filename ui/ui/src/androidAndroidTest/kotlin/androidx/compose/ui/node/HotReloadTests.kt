@@ -20,20 +20,20 @@ package androidx.compose.ui.node
 
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.compose.runtime.clearRoots
+import androidx.compose.foundation.Box
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.clearRoots
 import androidx.compose.runtime.emit
 import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.simulateHotReload
-import androidx.test.filters.MediumTest
-import androidx.compose.foundation.Box
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.accessibilityLabel
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.test.TestActivity
+import androidx.test.filters.MediumTest
 import androidx.ui.test.android.createAndroidComposeRule
 import androidx.ui.test.assertLabelEquals
 import androidx.ui.test.onNodeWithTag

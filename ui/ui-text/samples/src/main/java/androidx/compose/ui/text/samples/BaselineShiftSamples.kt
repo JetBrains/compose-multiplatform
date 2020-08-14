@@ -17,8 +17,8 @@
 package androidx.compose.ui.text.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.runtime.Composable
 import androidx.compose.foundation.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.annotatedString
 import androidx.compose.ui.text.style.BaselineShift

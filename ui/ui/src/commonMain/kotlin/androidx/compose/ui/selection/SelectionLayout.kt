@@ -22,19 +22,19 @@ import androidx.compose.ui.Layout
 import androidx.compose.ui.LayoutModifier
 import androidx.compose.ui.Measurable
 import androidx.compose.ui.MeasureScope
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Placeable
-import androidx.compose.ui.unit.enforce
-import androidx.compose.ui.unit.hasFixedHeight
-import androidx.compose.ui.unit.hasFixedWidth
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.window.Popup
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.style.ResolvedTextDirection
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.enforce
+import androidx.compose.ui.unit.hasFixedHeight
+import androidx.compose.ui.unit.hasFixedWidth
+import androidx.compose.ui.window.Popup
 import kotlin.math.max
 import kotlin.math.roundToInt
 

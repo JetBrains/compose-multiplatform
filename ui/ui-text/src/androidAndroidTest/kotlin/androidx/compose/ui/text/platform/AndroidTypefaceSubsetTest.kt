@@ -17,8 +17,6 @@
 package androidx.compose.ui.text.platform
 
 import android.content.Context
-import androidx.test.filters.SmallTest
-import androidx.test.platform.app.InstrumentationRegistry
 import androidx.compose.ui.text.FontTestData
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -26,6 +24,8 @@ import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.fontFamily
 import androidx.compose.ui.text.matchers.assertThat
+import androidx.test.filters.SmallTest
+import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner

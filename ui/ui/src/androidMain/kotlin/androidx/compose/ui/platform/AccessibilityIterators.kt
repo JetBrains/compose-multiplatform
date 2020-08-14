@@ -17,10 +17,10 @@
 package androidx.compose.ui.platform
 
 import android.graphics.Rect
-import androidx.compose.ui.text.TextLayoutResult
-import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.style.ResolvedTextDirection
 import java.text.BreakIterator
 import java.util.Locale
 

@@ -22,7 +22,6 @@ import android.graphics.Paint
 import android.text.style.ReplacementSpan
 import androidx.annotation.IntDef
 import androidx.compose.ui.text.android.InternalPlatformTextApi
-import java.lang.IllegalArgumentException
 import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min

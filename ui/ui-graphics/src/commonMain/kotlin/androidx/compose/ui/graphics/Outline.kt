@@ -17,15 +17,15 @@
 package androidx.compose.ui.graphics
 
 import androidx.compose.runtime.Immutable
-import androidx.compose.ui.util.annotation.FloatRange
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Radius
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.graphics.drawscope.Fill
+import androidx.compose.ui.util.annotation.FloatRange
 
 /**
  * Defines a simple shape, used for bounding graphical regions.

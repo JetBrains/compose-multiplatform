@@ -16,16 +16,6 @@
 
 package androidx.compose.ui.graphics.vector
 
-import kotlin.math.abs
-import kotlin.math.atan2
-import kotlin.math.ceil
-import kotlin.math.cos
-import kotlin.math.sin
-import kotlin.math.sqrt
-import kotlin.math.tan
-import kotlin.math.PI
-import kotlin.text.toFloat
-
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.vector.PathNode.ArcTo
 import androidx.compose.ui.graphics.vector.PathNode.Close
@@ -47,6 +37,14 @@ import androidx.compose.ui.graphics.vector.PathNode.RelativeReflectiveQuadTo
 import androidx.compose.ui.graphics.vector.PathNode.RelativeVerticalTo
 import androidx.compose.ui.graphics.vector.PathNode.VerticalTo
 import androidx.compose.ui.util.toRadians
+import kotlin.math.PI
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.ceil
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
+import kotlin.math.tan
 
 class PathParser {
 

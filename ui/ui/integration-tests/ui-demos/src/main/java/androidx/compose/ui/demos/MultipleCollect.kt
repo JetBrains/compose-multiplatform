@@ -18,15 +18,15 @@
 
 package androidx.compose.ui.demos
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.Layout
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.layoutId
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Layout
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.id
+import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.unit.Constraints
 
 @Composable
 fun HeaderFooterLayout(

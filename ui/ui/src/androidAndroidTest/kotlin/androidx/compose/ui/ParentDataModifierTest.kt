@@ -17,13 +17,13 @@ package androidx.compose.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.emptyContent
-import androidx.test.filters.SmallTest
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.LayoutIdParentData
 import androidx.compose.ui.layout.layoutId
-import androidx.compose.ui.test.TestActivity
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.setContent
+import androidx.compose.ui.test.TestActivity
+import androidx.test.filters.SmallTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue

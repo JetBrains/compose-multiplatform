@@ -16,11 +16,11 @@
 
 package androidx.compose.ui.layout
 
-import androidx.test.filters.SmallTest
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode.LayoutState
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
+import androidx.compose.ui.unit.Constraints
+import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test

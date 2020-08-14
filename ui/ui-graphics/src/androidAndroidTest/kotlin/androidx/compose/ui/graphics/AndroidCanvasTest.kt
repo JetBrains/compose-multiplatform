@@ -26,10 +26,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.compose.ui.geometry.Offset
-import androidx.test.filters.MediumTest
-import androidx.test.filters.SdkSuppress
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.test.filters.MediumTest
+import androidx.test.filters.SdkSuppress
 import androidx.ui.test.captureToBitmap
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals

@@ -16,11 +16,11 @@
 
 package androidx.compose.ui.focus
 
-import androidx.compose.runtime.Composable
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.layout.size
-import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.ui.test.ComposeTestRule
 
 /**

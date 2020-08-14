@@ -18,8 +18,8 @@ package androidx.compose.ui.autofill
 
 import android.os.Build
 import android.util.Log
-import android.view.autofill.AutofillManager
 import android.view.View
+import android.view.autofill.AutofillManager
 import androidx.annotation.RequiresApi
 
 /**

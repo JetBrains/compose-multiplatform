@@ -15,14 +15,14 @@
  */
 package androidx.compose.ui.text.platform
 
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Paragraph
-import androidx.compose.ui.text.ParagraphIntrinsics
 import androidx.compose.ui.text.ParagraphConstraints
+import androidx.compose.ui.text.ParagraphIntrinsics
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.unit.Density
 
 // TODO(b/157854677): remove after fixing.

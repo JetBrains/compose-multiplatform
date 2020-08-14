@@ -16,11 +16,11 @@
 
 package androidx.compose.ui.layout
 
+import androidx.compose.ui.AbsoluteAlignment
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.AbsoluteAlignment
-import androidx.compose.ui.Alignment
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith

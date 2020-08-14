@@ -16,8 +16,6 @@
 
 package androidx.compose.ui.util
 
-import kotlin.collections.ArrayList
-
 /**
  * Iterates through a [List] using the index and calls [action] for each item.
  * This does not allocate an iterator like [Iterable.forEach].

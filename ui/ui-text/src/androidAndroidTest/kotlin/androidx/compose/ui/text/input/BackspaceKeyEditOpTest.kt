@@ -15,9 +15,9 @@
  */
 package androidx.compose.ui.text.input
 
+import androidx.compose.ui.text.TextRange
 import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
-import androidx.compose.ui.text.TextRange
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Test

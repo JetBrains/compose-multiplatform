@@ -21,20 +21,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
-import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.gesture.LongPressDragObserver
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.TextToolbarStatus
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.length
 import androidx.compose.ui.text.subSequence
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.text.InternalTextApi
 import kotlin.math.max
 import kotlin.math.min
 

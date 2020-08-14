@@ -17,11 +17,11 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.ui.node.DepthSortedSet
-import androidx.test.filters.SmallTest
-import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
+import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.add
+import androidx.test.filters.SmallTest
 import com.nhaarman.mockitokotlin2.spy
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
