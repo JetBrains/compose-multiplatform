@@ -1,0 +1,84 @@
+// Signature format: 3.0
+package androidx.ui.animation {
+
+  public final class AnimatedFloatModel extends androidx.animation.AnimatedFloat {
+    ctor public AnimatedFloatModel(float value, androidx.animation.AnimationClockObservable clock);
+    method public Float getValue();
+    method protected void setValue(float p);
+  }
+
+  public final class AnimatedValueEffectsKt {
+    method public static androidx.animation.AnimatedValue<androidx.ui.graphics.Color,androidx.animation.AnimationVector4D> animatedColor(androidx.ui.graphics.Color initVal, androidx.animation.AnimationClockObservable clock = AnimationClockAmbient.current);
+    method public static androidx.animation.AnimatedFloat animatedFloat(float initVal, androidx.animation.AnimationClockObservable clock = AnimationClockAmbient.current);
+    method public static <T, V extends androidx.animation.AnimationVector> androidx.animation.AnimatedValue<T,V> animatedValue(T? initVal, androidx.animation.TwoWayConverter<T,V> converter, androidx.animation.AnimationClockObservable clock = AnimationClockAmbient.current);
+  }
+
+  public final class AnimatedValueModel<T, V extends androidx.animation.AnimationVector> extends androidx.animation.AnimatedValue<T,V> {
+    ctor public AnimatedValueModel(T! value, androidx.animation.TwoWayConverter<T,V> typeConverter, androidx.animation.AnimationClockObservable clock);
+    method public T! getValue();
+    method protected void setValue(T? p);
+  }
+
+  public final class ColorPropKey implements androidx.animation.PropKey<androidx.ui.graphics.Color,androidx.animation.AnimationVector4D> {
+    ctor public ColorPropKey(androidx.ui.graphics.colorspace.ColorSpace colorSpace);
+    ctor public ColorPropKey();
+    method public androidx.animation.TypeConverter4D<androidx.ui.graphics.Color> getTypeConverter();
+    property public androidx.animation.TypeConverter4D<androidx.ui.graphics.Color> typeConverter;
+  }
+
+  public final class CrossfadeKt {
+    method public static <T> void Crossfade(T? current, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> children);
+  }
+
+  public final class DpPropKey implements androidx.animation.PropKey<androidx.ui.unit.Dp,androidx.animation.AnimationVector1D> {
+    ctor public DpPropKey();
+    method public androidx.animation.TypeConverter1D<androidx.ui.unit.Dp> getTypeConverter();
+    property public androidx.animation.TypeConverter1D<androidx.ui.unit.Dp> typeConverter;
+  }
+
+  public final class PropertyKeysKt {
+    method public static kotlin.jvm.functions.Function1<androidx.ui.graphics.colorspace.ColorSpace,androidx.animation.TypeConverter4D<androidx.ui.graphics.Color>> getColorToVectorConverter();
+    method public static androidx.animation.TypeConverter1D<androidx.ui.unit.Dp> getDpToVectorConverter();
+    method public static androidx.animation.TypeConverter2D<androidx.ui.unit.PxPosition> getPxPositionToVectorConverter();
+    method public static androidx.animation.TypeConverter1D<androidx.ui.unit.Px> getPxToVectorConverter();
+    method public static androidx.animation.TypeConverter4D<androidx.ui.geometry.Rect> getRectToVectorConverter();
+  }
+
+  public final class PxPositionPropKey implements androidx.animation.PropKey<androidx.ui.unit.PxPosition,androidx.animation.AnimationVector2D> {
+    ctor public PxPositionPropKey();
+    method public androidx.animation.TypeConverter2D<androidx.ui.unit.PxPosition> getTypeConverter();
+    property public androidx.animation.TypeConverter2D<androidx.ui.unit.PxPosition> typeConverter;
+  }
+
+  public final class PxPropKey implements androidx.animation.PropKey<androidx.ui.unit.Px,androidx.animation.AnimationVector1D> {
+    ctor public PxPropKey();
+    method public androidx.animation.TypeConverter1D<androidx.ui.unit.Px> getTypeConverter();
+    property public androidx.animation.TypeConverter1D<androidx.ui.unit.Px> typeConverter;
+  }
+
+  public final class RectPropKey implements androidx.animation.PropKey<androidx.ui.geometry.Rect,androidx.animation.AnimationVector4D> {
+    ctor public RectPropKey();
+    method public androidx.animation.TypeConverter4D<androidx.ui.geometry.Rect> getTypeConverter();
+    property public androidx.animation.TypeConverter4D<androidx.ui.geometry.Rect> typeConverter;
+  }
+
+  public final class SingleValueAnimationKt {
+    method public static float animate(float target, androidx.animation.AnimationBuilder<java.lang.Float> animBuilder = remember({ 
+    <init>()
+}), kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit>? endListener = null);
+    method public static androidx.ui.graphics.Color animate(androidx.ui.graphics.Color target, androidx.animation.AnimationBuilder<androidx.ui.graphics.Color> animBuilder = remember({ 
+    <init>()
+}), kotlin.jvm.functions.Function1<? super androidx.ui.graphics.Color,kotlin.Unit>? endListener = null);
+    method public static <T, V extends androidx.animation.AnimationVector> T! animate(T? target, androidx.animation.TwoWayConverter<T,V> converter, androidx.animation.AnimationBuilder<T> animBuilder = remember({ 
+    <init>()
+}), kotlin.jvm.functions.Function1<? super T,kotlin.Unit>? endListener = null);
+  }
+
+  public final class TransitionKt {
+    method public static <T> void Transition(androidx.animation.TransitionDefinition<T> definition, T? toState, androidx.animation.AnimationClockObservable clock = AnimationClockAmbient.current, T? initState = toState, kotlin.jvm.functions.Function1<? super T,kotlin.Unit>? onStateChangeFinished = null, kotlin.jvm.functions.Function1<? super androidx.animation.TransitionState,kotlin.Unit> children);
+    method public static boolean getTransitionsEnabled();
+    method public static void setTransitionsEnabled(boolean p);
+  }
+
+}
+

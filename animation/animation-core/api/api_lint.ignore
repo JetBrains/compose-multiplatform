@@ -1,0 +1,25 @@
+// Baseline format: 1.0
+ArrayReturn: androidx.compose.animation.core.TransitionDefinition#snapTransition(kotlin.Pair<? extends T,? extends T>[], T) parameter #0:
+    Method parameter should be Collection<Pair> (or subclass) instead of raw array; was `kotlin.Pair<? extends T,? extends T>[]`
+ArrayReturn: androidx.compose.animation.core.TransitionDefinition#transition(kotlin.Pair<? extends T,? extends T>[], kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.TransitionSpec<T>,kotlin.Unit>) parameter #0:
+    Method parameter should be Collection<Pair> (or subclass) instead of raw array; was `kotlin.Pair<? extends T,? extends T>[]`
+
+
+AutoBoxing: androidx.compose.animation.core.CubicBezierEasing#invoke(float):
+    Must avoid boxed primitives (`java.lang.Float`)
+
+
+CallbackName: androidx.compose.animation.core.AnimationClockObserver:
+    Class should be named AnimationClockCallback
+
+
+HiddenTypeParameter: androidx.compose.animation.core.BaseAnimationClock#Companion:
+    Field BaseAnimationClock.Companion references hidden type androidx.compose.animation.core.BaseAnimationClock.Companion.
+
+
+MissingNullability: androidx.compose.animation.core.CubicBezierEasing#invoke(float):
+    Missing nullability on method `invoke` return
+
+
+NotCloseable: androidx.compose.animation.core.BaseAnimatedValue:
+    Classes that release resources (stop()) should implement AutoClosable and CloseGuard: class androidx.compose.animation.core.BaseAnimatedValue
