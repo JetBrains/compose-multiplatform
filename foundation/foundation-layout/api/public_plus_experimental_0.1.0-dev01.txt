@@ -1,0 +1,306 @@
+// Signature format: 3.0
+package androidx.ui.layout {
+
+  public final class AbsolutePadding implements androidx.ui.core.LayoutModifier {
+    ctor public AbsolutePadding(androidx.ui.core.Dp left, androidx.ui.core.Dp top, androidx.ui.core.Dp right, androidx.ui.core.Dp bottom);
+    ctor public AbsolutePadding();
+    method public androidx.ui.core.Dp component1();
+    method public androidx.ui.core.Dp component2();
+    method public androidx.ui.core.Dp component3();
+    method public androidx.ui.core.Dp component4();
+    method public androidx.ui.layout.AbsolutePadding copy(androidx.ui.core.Dp left, androidx.ui.core.Dp top, androidx.ui.core.Dp right, androidx.ui.core.Dp bottom);
+    method public androidx.ui.core.Dp getBottom();
+    method public androidx.ui.core.Dp getLeft();
+    method public androidx.ui.core.Dp getRight();
+    method public androidx.ui.core.Dp getTop();
+    method public androidx.ui.core.IntPx maxIntrinsicHeightOf(androidx.ui.core.DensityScope, androidx.ui.core.Measurable measurable, androidx.ui.core.IntPx width);
+    method public androidx.ui.core.IntPx maxIntrinsicWidthOf(androidx.ui.core.DensityScope, androidx.ui.core.Measurable measurable, androidx.ui.core.IntPx height);
+    method public androidx.ui.core.IntPx minIntrinsicHeightOf(androidx.ui.core.DensityScope, androidx.ui.core.Measurable measurable, androidx.ui.core.IntPx width);
+    method public androidx.ui.core.IntPx minIntrinsicWidthOf(androidx.ui.core.DensityScope, androidx.ui.core.Measurable measurable, androidx.ui.core.IntPx height);
+    method public androidx.ui.core.IntPx? modifyAlignmentLine(androidx.ui.core.DensityScope, androidx.ui.core.AlignmentLine line, androidx.ui.core.IntPx? value);
+    method public androidx.ui.core.Constraints modifyConstraints(androidx.ui.core.DensityScope, androidx.ui.core.Constraints constraints);
+    method public androidx.ui.core.IntPxPosition modifyPosition(androidx.ui.core.DensityScope, androidx.ui.core.IntPxPosition childPosition, androidx.ui.core.IntPxSize childSize, androidx.ui.core.IntPxSize containerSize);
+    method public androidx.ui.core.IntPxSize modifySize(androidx.ui.core.DensityScope, androidx.ui.core.Constraints constraints, androidx.ui.core.IntPxSize childSize);
+  }
+
+  public final class AlignKt {
+    ctor public AlignKt();
+    method public static void Align(androidx.ui.core.Alignment alignment, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+    method public static void Center(kotlin.jvm.functions.Function0<kotlin.Unit> children);
+  }
+
+  public final class AlignmentLineKt {
+    ctor public AlignmentLineKt();
+    method public static void AlignmentLineOffset(androidx.ui.core.AlignmentLine alignmentLine, androidx.ui.core.Dp before = 0.dp, androidx.ui.core.Dp after = 0.dp, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+    method public static void CenterAlignmentLine(androidx.ui.core.AlignmentLine alignmentLine, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+  }
+
+  public final class AspectRatioKt {
+    ctor public AspectRatioKt();
+    method public static androidx.ui.core.LayoutModifier AspectRatio(float value);
+    method @Deprecated public static void AspectRatio(float aspectRatio, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+  }
+
+  public final class ConstrainedBoxKt {
+    ctor public ConstrainedBoxKt();
+    method public static void ConstrainedBox(androidx.ui.layout.DpConstraints constraints, androidx.ui.core.Modifier modifier = Modifier.None, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+  }
+
+  public final class ContainerKt {
+    ctor public ContainerKt();
+    method public static void Container(androidx.ui.core.Modifier modifier = Modifier.None, androidx.ui.layout.EdgeInsets padding = androidx.ui.layout.EdgeInsets(0.dp), androidx.ui.core.Alignment alignment = Alignment.Center, boolean expanded = false, androidx.ui.layout.DpConstraints constraints = androidx.ui.layout.DpConstraints(), androidx.ui.core.Dp? width = null, androidx.ui.core.Dp? height = null, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+  }
+
+  public final class CrossAxisAlignment {
+    field public static final androidx.ui.layout.CrossAxisAlignment.Companion! Companion;
+  }
+
+  public static final class CrossAxisAlignment.Companion {
+    method public androidx.ui.layout.CrossAxisAlignment AlignmentLine(androidx.ui.core.AlignmentLine alignmentLine);
+    method public androidx.ui.layout.CrossAxisAlignment getCenter();
+    method public androidx.ui.layout.CrossAxisAlignment getEnd();
+    method public androidx.ui.layout.CrossAxisAlignment getStart();
+    method public androidx.ui.layout.CrossAxisAlignment getStretch();
+    property public final androidx.ui.layout.CrossAxisAlignment Center;
+    property public final androidx.ui.layout.CrossAxisAlignment End;
+    property public final androidx.ui.layout.CrossAxisAlignment Start;
+    property public final androidx.ui.layout.CrossAxisAlignment Stretch;
+  }
+
+  public final class DpConstraints {
+    ctor public DpConstraints(androidx.ui.core.Dp minWidth, androidx.ui.core.Dp maxWidth, androidx.ui.core.Dp minHeight, androidx.ui.core.Dp maxHeight);
+    ctor public DpConstraints();
+    method public androidx.ui.core.Dp component1();
+    method public androidx.ui.core.Dp component2();
+    method public androidx.ui.core.Dp component3();
+    method public androidx.ui.core.Dp component4();
+    method public androidx.ui.layout.DpConstraints copy(androidx.ui.core.Dp minWidth, androidx.ui.core.Dp maxWidth, androidx.ui.core.Dp minHeight, androidx.ui.core.Dp maxHeight);
+    method public androidx.ui.core.Dp getMaxHeight();
+    method public androidx.ui.core.Dp getMaxWidth();
+    method public androidx.ui.core.Dp getMinHeight();
+    method public androidx.ui.core.Dp getMinWidth();
+    field public static final androidx.ui.layout.DpConstraints.Companion! Companion;
+  }
+
+  public static final class DpConstraints.Companion {
+    method public androidx.ui.layout.DpConstraints tightConstraints(androidx.ui.core.Dp width, androidx.ui.core.Dp height);
+    method public androidx.ui.layout.DpConstraints tightConstraintsForHeight(androidx.ui.core.Dp height);
+    method public androidx.ui.layout.DpConstraints tightConstraintsForWidth(androidx.ui.core.Dp width);
+  }
+
+  public final class DpConstraintsKt {
+    ctor public DpConstraintsKt();
+    method public static androidx.ui.core.Constraints Constraints(androidx.ui.core.DensityScope, androidx.ui.layout.DpConstraints dpConstraints);
+    method public static androidx.ui.layout.DpConstraints DpConstraints(androidx.ui.core.DensityScope, androidx.ui.core.Constraints constraints);
+    method public static androidx.ui.layout.DpConstraints enforce(androidx.ui.layout.DpConstraints, androidx.ui.layout.DpConstraints otherConstraints);
+    method public static boolean getHasBoundedHeight(androidx.ui.layout.DpConstraints);
+    method public static boolean getHasBoundedWidth(androidx.ui.layout.DpConstraints);
+    method public static boolean getHasTightHeight(androidx.ui.layout.DpConstraints);
+    method public static boolean getHasTightWidth(androidx.ui.layout.DpConstraints);
+    method public static boolean getSatisfiable(androidx.ui.layout.DpConstraints);
+    method public static boolean isTight(androidx.ui.layout.DpConstraints);
+    method public static boolean isZero(androidx.ui.layout.DpConstraints);
+    method public static androidx.ui.layout.DpConstraints looseMax(androidx.ui.layout.DpConstraints);
+    method public static androidx.ui.layout.DpConstraints looseMin(androidx.ui.layout.DpConstraints);
+    method public static androidx.ui.layout.DpConstraints offset(androidx.ui.layout.DpConstraints, androidx.ui.core.Dp horizontal = 0.dp, androidx.ui.core.Dp vertical = 0.dp);
+    method public static androidx.ui.layout.DpConstraints tightMax(androidx.ui.layout.DpConstraints);
+    method public static androidx.ui.layout.DpConstraints tightMin(androidx.ui.layout.DpConstraints);
+    method public static androidx.ui.layout.DpConstraints withTight(androidx.ui.layout.DpConstraints, androidx.ui.core.Dp? width = null, androidx.ui.core.Dp? height = null);
+  }
+
+  public final class EdgeInsets {
+    ctor public EdgeInsets(androidx.ui.core.Dp left, androidx.ui.core.Dp top, androidx.ui.core.Dp right, androidx.ui.core.Dp bottom);
+    ctor public EdgeInsets();
+    ctor public EdgeInsets(androidx.ui.core.Dp all);
+    method public androidx.ui.core.Dp component1();
+    method public androidx.ui.core.Dp component2();
+    method public androidx.ui.core.Dp component3();
+    method public androidx.ui.core.Dp component4();
+    method public androidx.ui.layout.EdgeInsets copy(androidx.ui.core.Dp left, androidx.ui.core.Dp top, androidx.ui.core.Dp right, androidx.ui.core.Dp bottom);
+    method public androidx.ui.core.Dp getBottom();
+    method public androidx.ui.core.Dp getLeft();
+    method public androidx.ui.core.Dp getRight();
+    method public androidx.ui.core.Dp getTop();
+  }
+
+  public final class ExpandedModifierKt {
+    ctor public ExpandedModifierKt();
+    method public static androidx.ui.core.LayoutModifier getExpanded();
+    method public static androidx.ui.core.LayoutModifier getExpandedHeight();
+    method public static androidx.ui.core.LayoutModifier getExpandedWidth();
+  }
+
+  public final class FlexChildren {
+    method public void expanded(@FloatRange(from=0.0) float flex, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+    method public void flexible(@FloatRange(from=0.0) float flex, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+    method public void inflexible(kotlin.jvm.functions.Function0<kotlin.Unit> children);
+  }
+
+  public final class FlexKt {
+    ctor public FlexKt();
+    method public static void Column(androidx.ui.core.Modifier modifier = Modifier.None, androidx.ui.layout.MainAxisAlignment mainAxisAlignment = MainAxisAlignment.Start, androidx.ui.layout.LayoutSize mainAxisSize = LayoutSize.Wrap, androidx.ui.layout.CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.Start, androidx.ui.layout.LayoutSize crossAxisSize = LayoutSize.Wrap, kotlin.jvm.functions.Function1<? super androidx.ui.layout.FlexScope,kotlin.Unit> block);
+    method public static void FlexColumn(androidx.ui.core.Modifier modifier = Modifier.None, androidx.ui.layout.MainAxisAlignment mainAxisAlignment = MainAxisAlignment.Start, androidx.ui.layout.LayoutSize mainAxisSize = LayoutSize.Expand, androidx.ui.layout.CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.Start, androidx.ui.layout.LayoutSize crossAxisSize = LayoutSize.Wrap, kotlin.jvm.functions.Function1<? super androidx.ui.layout.FlexChildren,kotlin.Unit> block);
+    method public static void FlexRow(androidx.ui.core.Modifier modifier = Modifier.None, androidx.ui.layout.MainAxisAlignment mainAxisAlignment = MainAxisAlignment.Start, androidx.ui.layout.LayoutSize mainAxisSize = LayoutSize.Expand, androidx.ui.layout.CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.Start, androidx.ui.layout.LayoutSize crossAxisSize = LayoutSize.Wrap, kotlin.jvm.functions.Function1<? super androidx.ui.layout.FlexChildren,kotlin.Unit> block);
+    method public static void Row(androidx.ui.core.Modifier modifier = Modifier.None, androidx.ui.layout.MainAxisAlignment mainAxisAlignment = MainAxisAlignment.Start, androidx.ui.layout.LayoutSize mainAxisSize = LayoutSize.Wrap, androidx.ui.layout.CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.Start, androidx.ui.layout.LayoutSize crossAxisSize = LayoutSize.Wrap, kotlin.jvm.functions.Function1<? super androidx.ui.layout.FlexScope,kotlin.Unit> block);
+  }
+
+  public final class FlexScope {
+    ctor public FlexScope();
+    method public androidx.ui.core.LayoutModifier Flexible(float flex, boolean tight = true);
+    method public androidx.ui.core.LayoutModifier Inflexible();
+  }
+
+  public enum FlowCrossAxisAlignment {
+    enum_constant public static final androidx.ui.layout.FlowCrossAxisAlignment Center;
+    enum_constant public static final androidx.ui.layout.FlowCrossAxisAlignment End;
+    enum_constant public static final androidx.ui.layout.FlowCrossAxisAlignment Start;
+  }
+
+  public final class FlowKt {
+    ctor public FlowKt();
+    method public static void FlowColumn(androidx.ui.layout.LayoutSize mainAxisSize = LayoutSize.Wrap, androidx.ui.layout.MainAxisAlignment mainAxisAlignment = FlowMainAxisAlignment.Start, androidx.ui.core.Dp mainAxisSpacing = 0.dp, androidx.ui.layout.FlowCrossAxisAlignment crossAxisAlignment = FlowCrossAxisAlignment.Start, androidx.ui.core.Dp crossAxisSpacing = 0.dp, androidx.ui.layout.MainAxisAlignment lastLineMainAxisAlignment = mainAxisAlignment, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+    method public static void FlowRow(androidx.ui.layout.LayoutSize mainAxisSize = LayoutSize.Wrap, androidx.ui.layout.MainAxisAlignment mainAxisAlignment = FlowMainAxisAlignment.Start, androidx.ui.core.Dp mainAxisSpacing = 0.dp, androidx.ui.layout.FlowCrossAxisAlignment crossAxisAlignment = FlowCrossAxisAlignment.Start, androidx.ui.core.Dp crossAxisSpacing = 0.dp, androidx.ui.layout.MainAxisAlignment lastLineMainAxisAlignment = mainAxisAlignment, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+  }
+
+  public final class IntrinsicKt {
+    ctor public IntrinsicKt();
+    method public static void MaxIntrinsicHeight(kotlin.jvm.functions.Function0<kotlin.Unit> children);
+    method public static void MaxIntrinsicWidth(kotlin.jvm.functions.Function0<kotlin.Unit> children);
+    method public static void MinIntrinsicHeight(kotlin.jvm.functions.Function0<kotlin.Unit> children);
+    method public static void MinIntrinsicWidth(kotlin.jvm.functions.Function0<kotlin.Unit> children);
+  }
+
+  public enum LayoutSize {
+    enum_constant public static final androidx.ui.layout.LayoutSize Expand;
+    enum_constant public static final androidx.ui.layout.LayoutSize Wrap;
+  }
+
+  public enum MainAxisAlignment {
+    enum_constant public static final androidx.ui.layout.MainAxisAlignment Center;
+    enum_constant public static final androidx.ui.layout.MainAxisAlignment End;
+    enum_constant public static final androidx.ui.layout.MainAxisAlignment SpaceAround;
+    enum_constant public static final androidx.ui.layout.MainAxisAlignment SpaceBetween;
+    enum_constant public static final androidx.ui.layout.MainAxisAlignment SpaceEvenly;
+    enum_constant public static final androidx.ui.layout.MainAxisAlignment Start;
+  }
+
+  public final class PaddingKt {
+    ctor public PaddingKt();
+    method public static void Padding(androidx.ui.layout.EdgeInsets padding, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+    method public static void Padding(androidx.ui.core.Dp left = 0.dp, androidx.ui.core.Dp top = 0.dp, androidx.ui.core.Dp right = 0.dp, androidx.ui.core.Dp bottom = 0.dp, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+    method public static void Padding(androidx.ui.core.Dp padding, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+    method public static androidx.ui.layout.AbsolutePadding absolutePadding(androidx.ui.core.Dp left = 0.dp, androidx.ui.core.Dp top = 0.dp, androidx.ui.core.Dp right = 0.dp, androidx.ui.core.Dp bottom = 0.dp);
+    method public static androidx.ui.layout.AbsolutePadding padding(androidx.ui.core.Dp all = 0.dp);
+    method public static androidx.ui.layout.AbsolutePadding padding(androidx.ui.core.Dp horizontal = 0.dp, androidx.ui.core.Dp vertical = 0.dp);
+  }
+
+  public final class SpacerKt {
+    ctor public SpacerKt();
+    method public static void FixedSpacer(androidx.ui.core.Dp width, androidx.ui.core.Dp height);
+    method public static void HeightSpacer(androidx.ui.core.Dp height);
+    method public static void WidthSpacer(androidx.ui.core.Dp width);
+  }
+
+  public final class StackChildren {
+    ctor public StackChildren();
+    method public void aligned(androidx.ui.core.Alignment alignment, boolean loose = true, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+    method public void expanded(kotlin.jvm.functions.Function0<kotlin.Unit> children);
+    method public void positioned(androidx.ui.core.Dp? leftInset = null, androidx.ui.core.Dp? topInset = null, androidx.ui.core.Dp? rightInset = null, androidx.ui.core.Dp? bottomInset = null, androidx.ui.core.Alignment fallbackAlignment = Alignment.Center, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+  }
+
+  public final class StackKt {
+    ctor public StackKt();
+    method public static void Stack(androidx.ui.core.Modifier modifier = Modifier.None, kotlin.jvm.functions.Function1<? super androidx.ui.layout.StackChildren,kotlin.Unit> block);
+  }
+
+  public final class TableChildren {
+    method public void tableDecoration(boolean overlay, kotlin.jvm.functions.Function1<? super androidx.ui.layout.TableDecorationChildren,kotlin.Unit> decoration);
+    method public void tableRow(kotlin.jvm.functions.Function0<kotlin.Unit> children);
+  }
+
+  public abstract class TableColumnWidth {
+    method public androidx.ui.core.IntPx maxIntrinsicWidth(java.util.List<androidx.ui.layout.TableMeasurable> cells, androidx.ui.core.IntPx containerWidth, androidx.ui.core.Density density, androidx.ui.core.IntPx availableHeight);
+    method public androidx.ui.core.IntPx minIntrinsicWidth(java.util.List<androidx.ui.layout.TableMeasurable> cells, androidx.ui.core.IntPx containerWidth, androidx.ui.core.Density density, androidx.ui.core.IntPx availableHeight);
+    method public abstract androidx.ui.core.IntPx preferredWidth(java.util.List<androidx.ui.layout.TableMeasurable> cells, androidx.ui.core.IntPx containerWidth, androidx.ui.core.Density density);
+  }
+
+  public static final class TableColumnWidth.Fixed extends androidx.ui.layout.TableColumnWidth.Inflexible {
+    ctor public TableColumnWidth.Fixed(androidx.ui.core.Dp width);
+    method public androidx.ui.layout.TableColumnWidth.Fixed copy(androidx.ui.core.Dp width);
+    method public androidx.ui.core.IntPx preferredWidth(java.util.List<androidx.ui.layout.TableMeasurable> cells, androidx.ui.core.IntPx containerWidth, androidx.ui.core.Density density);
+  }
+
+  public static final class TableColumnWidth.Flex extends androidx.ui.layout.TableColumnWidth {
+    ctor public TableColumnWidth.Flex(@FloatRange(from=null) float flex);
+    method public androidx.ui.layout.TableColumnWidth.Flex copy(float flex);
+    method public androidx.ui.core.IntPx preferredWidth(java.util.List<androidx.ui.layout.TableMeasurable> cells, androidx.ui.core.IntPx containerWidth, androidx.ui.core.Density density);
+  }
+
+  public static final class TableColumnWidth.Fraction extends androidx.ui.layout.TableColumnWidth.Inflexible {
+    ctor public TableColumnWidth.Fraction(@FloatRange(from=null, to=null) float fraction);
+    method public androidx.ui.layout.TableColumnWidth.Fraction copy(float fraction);
+    method public androidx.ui.core.IntPx preferredWidth(java.util.List<androidx.ui.layout.TableMeasurable> cells, androidx.ui.core.IntPx containerWidth, androidx.ui.core.Density density);
+  }
+
+  public abstract static class TableColumnWidth.Inflexible extends androidx.ui.layout.TableColumnWidth {
+    ctor public TableColumnWidth.Inflexible();
+    method public final androidx.ui.layout.TableColumnWidth flexible(float flex);
+  }
+
+  public static final class TableColumnWidth.Max extends androidx.ui.layout.TableColumnWidth.Inflexible {
+    ctor public TableColumnWidth.Max(androidx.ui.layout.TableColumnWidth.Inflexible a, androidx.ui.layout.TableColumnWidth.Inflexible b);
+    method public androidx.ui.layout.TableColumnWidth.Max copy(androidx.ui.layout.TableColumnWidth.Inflexible a, androidx.ui.layout.TableColumnWidth.Inflexible b);
+    method public androidx.ui.core.IntPx preferredWidth(java.util.List<androidx.ui.layout.TableMeasurable> cells, androidx.ui.core.IntPx containerWidth, androidx.ui.core.Density density);
+  }
+
+  public static final class TableColumnWidth.MaxIntrinsic extends androidx.ui.layout.TableColumnWidth.Inflexible {
+    method public androidx.ui.core.IntPx preferredWidth(java.util.List<androidx.ui.layout.TableMeasurable> cells, androidx.ui.core.IntPx containerWidth, androidx.ui.core.Density density);
+    field public static final androidx.ui.layout.TableColumnWidth.MaxIntrinsic! INSTANCE;
+  }
+
+  public static final class TableColumnWidth.Min extends androidx.ui.layout.TableColumnWidth.Inflexible {
+    ctor public TableColumnWidth.Min(androidx.ui.layout.TableColumnWidth.Inflexible a, androidx.ui.layout.TableColumnWidth.Inflexible b);
+    method public androidx.ui.layout.TableColumnWidth.Min copy(androidx.ui.layout.TableColumnWidth.Inflexible a, androidx.ui.layout.TableColumnWidth.Inflexible b);
+    method public androidx.ui.core.IntPx preferredWidth(java.util.List<androidx.ui.layout.TableMeasurable> cells, androidx.ui.core.IntPx containerWidth, androidx.ui.core.Density density);
+  }
+
+  public static final class TableColumnWidth.MinIntrinsic extends androidx.ui.layout.TableColumnWidth.Inflexible {
+    method public androidx.ui.core.IntPx preferredWidth(java.util.List<androidx.ui.layout.TableMeasurable> cells, androidx.ui.core.IntPx containerWidth, androidx.ui.core.Density density);
+    field public static final androidx.ui.layout.TableColumnWidth.MinIntrinsic! INSTANCE;
+  }
+
+  public static final class TableColumnWidth.Wrap extends androidx.ui.layout.TableColumnWidth.Inflexible {
+    method public androidx.ui.core.IntPx preferredWidth(java.util.List<androidx.ui.layout.TableMeasurable> cells, androidx.ui.core.IntPx containerWidth, androidx.ui.core.Density density);
+    field public static final androidx.ui.layout.TableColumnWidth.Wrap! INSTANCE;
+  }
+
+  public final class TableDecorationChildren {
+    method public java.util.List<androidx.ui.core.IntPx> component1();
+    method public java.util.List<androidx.ui.core.IntPx> component2();
+    method public androidx.ui.layout.TableDecorationChildren copy(java.util.List<androidx.ui.core.IntPx> verticalOffsets, java.util.List<androidx.ui.core.IntPx> horizontalOffsets);
+    method public java.util.List<androidx.ui.core.IntPx> getHorizontalOffsets();
+    method public java.util.List<androidx.ui.core.IntPx> getVerticalOffsets();
+  }
+
+  public final class TableKt {
+    ctor public TableKt();
+    method public static void Table(int columns, kotlin.jvm.functions.Function1<? super java.lang.Integer,? extends androidx.ui.core.Alignment> alignment = { Alignment.TopLeft }, kotlin.jvm.functions.Function1<? super java.lang.Integer,? extends androidx.ui.layout.TableColumnWidth> columnWidth = { TableColumnWidth.<init>(1.0) }, kotlin.jvm.functions.Function1<? super androidx.ui.layout.TableChildren,kotlin.Unit> block);
+  }
+
+  public final class TableMeasurable {
+    method public kotlin.jvm.functions.Function0<androidx.ui.core.IntPx> component1();
+    method public kotlin.jvm.functions.Function1<androidx.ui.core.IntPx,androidx.ui.core.IntPx> component2();
+    method public kotlin.jvm.functions.Function1<androidx.ui.core.IntPx,androidx.ui.core.IntPx> component3();
+    method public androidx.ui.layout.TableMeasurable copy(kotlin.jvm.functions.Function0<androidx.ui.core.IntPx> preferredWidth, kotlin.jvm.functions.Function1<? super androidx.ui.core.IntPx,androidx.ui.core.IntPx> minIntrinsicWidth, kotlin.jvm.functions.Function1<? super androidx.ui.core.IntPx,androidx.ui.core.IntPx> maxIntrinsicWidth);
+    method public kotlin.jvm.functions.Function1<androidx.ui.core.IntPx,androidx.ui.core.IntPx> getMaxIntrinsicWidth();
+    method public kotlin.jvm.functions.Function1<androidx.ui.core.IntPx,androidx.ui.core.IntPx> getMinIntrinsicWidth();
+    method public kotlin.jvm.functions.Function0<androidx.ui.core.IntPx> getPreferredWidth();
+  }
+
+  public final class WrapKt {
+    ctor public WrapKt();
+    method public static void Wrap(androidx.ui.core.Alignment alignment = Alignment.TopLeft, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+  }
+
+}
+

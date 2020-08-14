@@ -1,0 +1,352 @@
+// Signature format: 3.0
+package androidx.ui.foundation {
+
+  public final class BackgroundKt {
+    ctor public BackgroundKt();
+    method public static androidx.ui.core.DrawModifier background(androidx.ui.graphics.Color color);
+    method public static androidx.ui.core.DrawModifier background(androidx.ui.graphics.Brush brush);
+    method public static androidx.ui.core.DrawModifier background(androidx.ui.engine.geometry.Shape shape, androidx.ui.graphics.Color color);
+    method public static androidx.ui.core.DrawModifier background(androidx.ui.engine.geometry.Shape shape, androidx.ui.graphics.Brush brush);
+  }
+
+  public final class ClickableKt {
+    ctor public ClickableKt();
+    method public static void Clickable(kotlin.jvm.functions.Function0<kotlin.Unit>? onClick = null, boolean consumeDownOnStart = false, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+  }
+
+  public final class ColoredRectKt {
+    ctor public ColoredRectKt();
+    method public static void ColoredRect(androidx.ui.graphics.Brush brush, androidx.ui.core.Modifier modifier = Modifier.None, androidx.ui.core.Dp? width = null, androidx.ui.core.Dp? height = null);
+    method public static void ColoredRect(androidx.ui.graphics.Color color, androidx.ui.core.Modifier modifier = Modifier.None, androidx.ui.core.Dp? width = null, androidx.ui.core.Dp? height = null);
+  }
+
+  public final class ContentColorKt {
+    ctor public ContentColorKt();
+    method public static void ProvideContentColor(androidx.ui.graphics.Color color, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+    method public static androidx.ui.graphics.Color contentColor();
+  }
+
+  public final class DarkThemeKt {
+    ctor public DarkThemeKt();
+    method public static androidx.compose.Effect<java.lang.Boolean> isSystemInDarkTheme();
+  }
+
+  public final class DeterminateProgressIndicatorKt {
+    ctor public DeterminateProgressIndicatorKt();
+    method public static void DeterminateProgressIndicator(@FloatRange(from=0.0, to=1.0) float progress, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+  }
+
+  public final class DialogKt {
+    ctor public DialogKt();
+    method public static void Dialog(kotlin.jvm.functions.Function0<kotlin.Unit> onCloseRequest, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+  }
+
+  public final class DrawBordersReceiver {
+    method public void all(androidx.ui.foundation.shape.border.Border border = defaultBorder);
+    method public void allHorizontal(androidx.ui.foundation.shape.border.Border border = defaultBorder);
+    method public void allVertical(androidx.ui.foundation.shape.border.Border border = defaultBorder);
+    method public void bottom(androidx.ui.foundation.shape.border.Border border = defaultBorder);
+    method public void horizontal(int row, kotlin.ranges.IntRange columns = 0 <other> columnCount, androidx.ui.foundation.shape.border.Border border = defaultBorder);
+    method public void left(androidx.ui.foundation.shape.border.Border border = defaultBorder);
+    method public void outer(androidx.ui.foundation.shape.border.Border border = defaultBorder);
+    method public void right(androidx.ui.foundation.shape.border.Border border = defaultBorder);
+    method public void top(androidx.ui.foundation.shape.border.Border border = defaultBorder);
+    method public void vertical(int column, kotlin.ranges.IntRange rows = 0 <other> rowCount, androidx.ui.foundation.shape.border.Border border = defaultBorder);
+  }
+
+  public final class ImageKt {
+    ctor public ImageKt();
+    method public static void DrawImage(androidx.ui.graphics.Image image, androidx.ui.graphics.Color? tint = null);
+    method public static void SimpleImage(androidx.ui.graphics.Image image, androidx.ui.graphics.Color? tint = null);
+  }
+
+  public final class ScrollerKt {
+    ctor public ScrollerKt();
+    method public static void HorizontalScroller(androidx.ui.foundation.ScrollerPosition scrollerPosition = +memo({ 
+    <init>()
+}), androidx.ui.core.Modifier modifier = Modifier.None, boolean isScrollable = true, kotlin.jvm.functions.Function0<kotlin.Unit> child);
+    method public static void VerticalScroller(androidx.ui.foundation.ScrollerPosition scrollerPosition = +memo({ 
+    <init>()
+}), androidx.ui.core.Modifier modifier = Modifier.None, boolean isScrollable = true, kotlin.jvm.functions.Function0<kotlin.Unit> child);
+  }
+
+  public final class ScrollerPosition {
+    ctor public ScrollerPosition(float initial);
+    ctor public ScrollerPosition();
+    method public androidx.ui.foundation.animation.FlingConfig getFlingConfig();
+    method public androidx.ui.core.Px getMaxPosition();
+    method public androidx.ui.core.Px getValue();
+    method public void scrollBy(androidx.ui.core.Px value);
+    method public void scrollTo(androidx.ui.core.Px value);
+    method public void setFlingConfig(androidx.ui.foundation.animation.FlingConfig p);
+    method public void smoothScrollBy(androidx.ui.core.Px value, kotlin.jvm.functions.Function2<? super androidx.animation.AnimationEndReason,? super java.lang.Float,kotlin.Unit> onEnd = { _, _ ->  });
+    method public void smoothScrollTo(androidx.ui.core.Px value, kotlin.jvm.functions.Function2<? super androidx.animation.AnimationEndReason,? super java.lang.Float,kotlin.Unit> onEnd = { _, _ ->  });
+    property public final androidx.ui.foundation.animation.FlingConfig flingConfig;
+    property public final androidx.ui.core.Px maxPosition;
+    property public final androidx.ui.core.Px value;
+  }
+
+  public final class Strings {
+    method public String getChecked();
+    method public String getIndeterminate();
+    method public String getNotSelected();
+    method public String getSelected();
+    method public String getUnchecked();
+    property public final String Checked;
+    property public final String Indeterminate;
+    property public final String NotSelected;
+    property public final String Selected;
+    property public final String Unchecked;
+    field public static final androidx.ui.foundation.Strings! INSTANCE;
+  }
+
+  public final class TableBordersKt {
+    ctor public TableBordersKt();
+    method public static void drawBorders(androidx.ui.layout.TableChildren, androidx.ui.foundation.shape.border.Border defaultBorder = Border(Color.Black, Dp.Hairline), kotlin.jvm.functions.Function1<? super androidx.ui.foundation.DrawBordersReceiver,kotlin.Unit> block);
+  }
+
+  public interface ValueHolder<T> {
+    method public T getValue();
+    property public abstract T value;
+  }
+
+}
+
+package androidx.ui.foundation.animation {
+
+  public final class AnimatedValueHolder implements androidx.ui.foundation.ValueHolder<java.lang.Float> {
+    ctor public AnimatedValueHolder(float initial);
+    method public void fling(androidx.ui.foundation.animation.FlingConfig config, float startVelocity);
+    method public androidx.animation.AnimatedFloat getAnimatedFloat();
+    method public Float! getValue();
+    method public void setBounds(float min = Float.NEGATIVE_INFINITY, float max = Float.POSITIVE_INFINITY);
+    property public final androidx.animation.AnimatedFloat animatedFloat;
+    property public Float! value;
+  }
+
+  public final class AnimatedValueHolderKt {
+    ctor public AnimatedValueHolderKt();
+    method @CheckResult(suggest="+") public static androidx.compose.Effect<androidx.ui.foundation.animation.AnimatedValueHolder> animatedDragValue(float initial, float minBound, float maxBound);
+  }
+
+  public final class FlingConfig {
+    ctor public FlingConfig(androidx.animation.DecayAnimation decayAnimation, kotlin.jvm.functions.Function3<? super androidx.animation.AnimationEndReason,? super java.lang.Float,? super java.lang.Float,kotlin.Unit>? onAnimationEnd, kotlin.jvm.functions.Function1<? super java.lang.Float,androidx.animation.TargetAnimation> adjustTarget);
+    ctor public FlingConfig();
+    method public androidx.animation.DecayAnimation component1();
+    method public kotlin.jvm.functions.Function3<androidx.animation.AnimationEndReason,java.lang.Float,java.lang.Float,kotlin.Unit>? component2();
+    method public kotlin.jvm.functions.Function1<java.lang.Float,androidx.animation.TargetAnimation> component3();
+    method public androidx.ui.foundation.animation.FlingConfig copy(androidx.animation.DecayAnimation decayAnimation, kotlin.jvm.functions.Function3<? super androidx.animation.AnimationEndReason,? super java.lang.Float,? super java.lang.Float,kotlin.Unit>? onAnimationEnd, kotlin.jvm.functions.Function1<? super java.lang.Float,androidx.animation.TargetAnimation> adjustTarget);
+    method public kotlin.jvm.functions.Function1<java.lang.Float,androidx.animation.TargetAnimation> getAdjustTarget();
+    method public androidx.animation.DecayAnimation getDecayAnimation();
+    method public kotlin.jvm.functions.Function3<androidx.animation.AnimationEndReason,java.lang.Float,java.lang.Float,kotlin.Unit>? getOnAnimationEnd();
+  }
+
+  public final class FlingConfigKt {
+    ctor public FlingConfigKt();
+    method public static androidx.ui.foundation.animation.FlingConfig AnchorsFlingConfig(java.util.List<java.lang.Float> anchors, androidx.animation.AnimationBuilder<java.lang.Float> animationBuilder = androidx.animation.PhysicsBuilder(), kotlin.jvm.functions.Function3<? super androidx.animation.AnimationEndReason,? super java.lang.Float,? super java.lang.Float,kotlin.Unit>? onAnimationEnd = null, androidx.animation.DecayAnimation decayAnimation = androidx.animation.ExponentialDecay());
+    method public static void fling(androidx.animation.AnimatedFloat, androidx.ui.foundation.animation.FlingConfig config, float startVelocity);
+  }
+
+}
+
+package androidx.ui.foundation.gestures {
+
+  public abstract sealed class DragDirection {
+  }
+
+  public static final class DragDirection.Horizontal extends androidx.ui.foundation.gestures.DragDirection {
+    field public static final androidx.ui.foundation.gestures.DragDirection.Horizontal! INSTANCE;
+  }
+
+  public static final class DragDirection.Vertical extends androidx.ui.foundation.gestures.DragDirection {
+    field public static final androidx.ui.foundation.gestures.DragDirection.Vertical! INSTANCE;
+  }
+
+  public interface DragValueController {
+    method public float getCurrentValue();
+    method public void onDrag(float target);
+    method public void onDragEnd(float velocity, kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit> onValueSettled);
+    method public void setBounds(float min, float max);
+    property public abstract float currentValue;
+  }
+
+  public final class DraggableKt {
+    ctor public DraggableKt();
+    method public static void Draggable(androidx.ui.foundation.gestures.DragDirection dragDirection, androidx.ui.foundation.ValueHolder<java.lang.Float> dragValue, kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit> onDragValueChangeRequested, kotlin.jvm.functions.Function1<? super androidx.ui.core.PxPosition,kotlin.Unit> onDragStarted = {}, kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit> onDragStopped = {}, boolean enabled = true, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+  }
+
+  public final class FloatDragValueController implements androidx.ui.foundation.gestures.DragValueController {
+    ctor public FloatDragValueController(float initialValue);
+    method public float getCurrentValue();
+    method public void onDrag(float target);
+    method public void onDragEnd(float velocity, kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit> onValueSettled);
+    method public void setBounds(float min, float max);
+    property public float currentValue;
+  }
+
+}
+
+package androidx.ui.foundation.selection {
+
+  public final class MutuallyExclusiveSetItemKt {
+    ctor public MutuallyExclusiveSetItemKt();
+    method public static void MutuallyExclusiveSetItem(boolean selected, kotlin.jvm.functions.Function0<kotlin.Unit> onClick, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+  }
+
+  public final class ToggleableKt {
+    ctor public ToggleableKt();
+    method public static void Toggleable(boolean value, kotlin.jvm.functions.Function1<? super java.lang.Boolean,kotlin.Unit>? onValueChange = null, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+    method public static androidx.ui.foundation.selection.ToggleableState ToggleableState(boolean value);
+    method public static void TriStateToggleable(androidx.ui.foundation.selection.ToggleableState value = androidx.ui.foundation.selection.ToggleableState.On, kotlin.jvm.functions.Function0<kotlin.Unit>? onToggle = null, kotlin.jvm.functions.Function0<kotlin.Unit> children);
+  }
+
+  public enum ToggleableState {
+    enum_constant public static final androidx.ui.foundation.selection.ToggleableState Indeterminate;
+    enum_constant public static final androidx.ui.foundation.selection.ToggleableState Off;
+    enum_constant public static final androidx.ui.foundation.selection.ToggleableState On;
+  }
+
+}
+
+package androidx.ui.foundation.semantics {
+
+  public final class FoundationSemanticsProperties {
+    method public androidx.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> getInMutuallyExclusiveGroup();
+    method public androidx.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> getSelected();
+    method public androidx.ui.semantics.SemanticsPropertyKey<androidx.ui.foundation.selection.ToggleableState> getToggleableState();
+    property public final androidx.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> InMutuallyExclusiveGroup;
+    property public final androidx.ui.semantics.SemanticsPropertyKey<java.lang.Boolean> Selected;
+    property public final androidx.ui.semantics.SemanticsPropertyKey<androidx.ui.foundation.selection.ToggleableState> ToggleableState;
+    field public static final androidx.ui.foundation.semantics.FoundationSemanticsProperties! INSTANCE;
+  }
+
+  public final class FoundationSemanticsPropertiesKt {
+    ctor public FoundationSemanticsPropertiesKt();
+    method public static boolean getInMutuallyExclusiveGroup(androidx.ui.semantics.SemanticsPropertyReceiver);
+    method public static boolean getSelected(androidx.ui.semantics.SemanticsPropertyReceiver);
+    method public static androidx.ui.foundation.selection.ToggleableState getToggleableState(androidx.ui.semantics.SemanticsPropertyReceiver);
+    method public static void setInMutuallyExclusiveGroup(androidx.ui.semantics.SemanticsPropertyReceiver, boolean p);
+    method public static void setSelected(androidx.ui.semantics.SemanticsPropertyReceiver, boolean p);
+    method public static void setToggleableState(androidx.ui.semantics.SemanticsPropertyReceiver, androidx.ui.foundation.selection.ToggleableState p);
+  }
+
+}
+
+package androidx.ui.foundation.shape {
+
+  public final class DrawShapeKt {
+    ctor public DrawShapeKt();
+    method public static void DrawShape(androidx.ui.engine.geometry.Shape shape, androidx.ui.graphics.Color color);
+    method public static void DrawShape(androidx.ui.engine.geometry.Shape shape, androidx.ui.graphics.Brush brush);
+  }
+
+  public final class GenericShape implements androidx.ui.engine.geometry.Shape {
+    ctor public GenericShape(kotlin.jvm.functions.Function2<? super androidx.ui.graphics.Path,? super androidx.ui.core.PxSize,kotlin.Unit> builder);
+    method public androidx.ui.foundation.shape.GenericShape copy(kotlin.jvm.functions.Function2<? super androidx.ui.graphics.Path,? super androidx.ui.core.PxSize,kotlin.Unit> builder);
+    method public androidx.ui.engine.geometry.Outline createOutline(androidx.ui.core.PxSize size, androidx.ui.core.Density density);
+  }
+
+  public final class RectangleShapeKt {
+    ctor public RectangleShapeKt();
+    method public static androidx.ui.engine.geometry.Shape getRectangleShape();
+  }
+
+}
+
+package androidx.ui.foundation.shape.border {
+
+  public final class Border {
+    ctor public Border(androidx.ui.graphics.Brush brush, androidx.ui.core.Dp width);
+    method public androidx.ui.graphics.Brush component1();
+    method public androidx.ui.core.Dp component2();
+    method public androidx.ui.foundation.shape.border.Border copy(androidx.ui.graphics.Brush brush, androidx.ui.core.Dp width);
+    method public androidx.ui.graphics.Brush getBrush();
+    method public androidx.ui.core.Dp getWidth();
+  }
+
+  public final class BorderKt {
+    ctor public BorderKt();
+    method public static androidx.ui.foundation.shape.border.Border Border(androidx.ui.graphics.Color color, androidx.ui.core.Dp width);
+  }
+
+  public final class DrawBorderKt {
+    ctor public DrawBorderKt();
+    method public static void DrawBorder(androidx.ui.engine.geometry.Shape shape, androidx.ui.foundation.shape.border.Border border);
+  }
+
+}
+
+package androidx.ui.foundation.shape.corner {
+
+  public abstract class CornerBasedShape implements androidx.ui.engine.geometry.Shape {
+    ctor public CornerBasedShape(androidx.ui.foundation.shape.corner.CornerSize topLeft, androidx.ui.foundation.shape.corner.CornerSize topRight, androidx.ui.foundation.shape.corner.CornerSize bottomRight, androidx.ui.foundation.shape.corner.CornerSize bottomLeft);
+    method public final androidx.ui.engine.geometry.Outline createOutline(androidx.ui.core.PxSize size, androidx.ui.core.Density density);
+    method public abstract androidx.ui.engine.geometry.Outline createOutline(androidx.ui.core.PxSize size, androidx.ui.core.Px topLeft, androidx.ui.core.Px topRight, androidx.ui.core.Px bottomRight, androidx.ui.core.Px bottomLeft);
+  }
+
+  public interface CornerSize {
+    method public androidx.ui.core.Px toPx(androidx.ui.core.PxSize shapeSize, androidx.ui.core.Density density);
+  }
+
+  public final class CornerSizeKt {
+    ctor public CornerSizeKt();
+    method public static androidx.ui.foundation.shape.corner.CornerSize CornerSize(androidx.ui.core.Dp size);
+    method public static androidx.ui.foundation.shape.corner.CornerSize CornerSize(androidx.ui.core.Px size);
+    method public static androidx.ui.foundation.shape.corner.CornerSize CornerSize(@IntRange(from=0, to=50) int percent);
+    method public static androidx.ui.foundation.shape.corner.CornerSize CornerSize(@FloatRange(from=0.0, to=50.0) float percent);
+    method public static androidx.ui.foundation.shape.corner.CornerSize getZeroCornerSize();
+  }
+
+  public final class CutCornerShape extends androidx.ui.foundation.shape.corner.CornerBasedShape {
+    ctor public CutCornerShape(androidx.ui.foundation.shape.corner.CornerSize topLeft, androidx.ui.foundation.shape.corner.CornerSize topRight, androidx.ui.foundation.shape.corner.CornerSize bottomRight, androidx.ui.foundation.shape.corner.CornerSize bottomLeft);
+    method public androidx.ui.foundation.shape.corner.CornerSize component1();
+    method public androidx.ui.foundation.shape.corner.CornerSize component2();
+    method public androidx.ui.foundation.shape.corner.CornerSize component3();
+    method public androidx.ui.foundation.shape.corner.CornerSize component4();
+    method public androidx.ui.foundation.shape.corner.CutCornerShape copy(androidx.ui.foundation.shape.corner.CornerSize topLeft, androidx.ui.foundation.shape.corner.CornerSize topRight, androidx.ui.foundation.shape.corner.CornerSize bottomRight, androidx.ui.foundation.shape.corner.CornerSize bottomLeft);
+    method public androidx.ui.engine.geometry.Outline.Generic createOutline(androidx.ui.core.PxSize size, androidx.ui.core.Px topLeft, androidx.ui.core.Px topRight, androidx.ui.core.Px bottomRight, androidx.ui.core.Px bottomLeft);
+    method public androidx.ui.foundation.shape.corner.CornerSize getBottomLeft();
+    method public androidx.ui.foundation.shape.corner.CornerSize getBottomRight();
+    method public androidx.ui.foundation.shape.corner.CornerSize getTopLeft();
+    method public androidx.ui.foundation.shape.corner.CornerSize getTopRight();
+  }
+
+  public final class CutCornerShapeKt {
+    ctor public CutCornerShapeKt();
+    method public static androidx.ui.foundation.shape.corner.CutCornerShape CutCornerShape(androidx.ui.foundation.shape.corner.CornerSize corner);
+    method public static androidx.ui.foundation.shape.corner.CutCornerShape CutCornerShape(androidx.ui.core.Dp size);
+    method public static androidx.ui.foundation.shape.corner.CutCornerShape CutCornerShape(androidx.ui.core.Px size);
+    method public static androidx.ui.foundation.shape.corner.CutCornerShape CutCornerShape(int percent);
+    method public static androidx.ui.foundation.shape.corner.CutCornerShape CutCornerShape(androidx.ui.core.Dp topLeft = 0.dp, androidx.ui.core.Dp topRight = 0.dp, androidx.ui.core.Dp bottomRight = 0.dp, androidx.ui.core.Dp bottomLeft = 0.dp);
+    method public static androidx.ui.foundation.shape.corner.CutCornerShape CutCornerShape(androidx.ui.core.Px topLeft = 0.px, androidx.ui.core.Px topRight = 0.px, androidx.ui.core.Px bottomRight = 0.px, androidx.ui.core.Px bottomLeft = 0.px);
+    method public static androidx.ui.foundation.shape.corner.CutCornerShape CutCornerShape(@IntRange(from=0, to=50) int topLeftPercent = 0, @IntRange(from=0, to=50) int topRightPercent = 0, @IntRange(from=0, to=50) int bottomRightPercent = 0, @IntRange(from=0, to=50) int bottomLeftPercent = 0);
+  }
+
+  public final class RoundedCornerShape extends androidx.ui.foundation.shape.corner.CornerBasedShape {
+    ctor public RoundedCornerShape(androidx.ui.foundation.shape.corner.CornerSize topLeft, androidx.ui.foundation.shape.corner.CornerSize topRight, androidx.ui.foundation.shape.corner.CornerSize bottomRight, androidx.ui.foundation.shape.corner.CornerSize bottomLeft);
+    method public androidx.ui.foundation.shape.corner.CornerSize component1();
+    method public androidx.ui.foundation.shape.corner.CornerSize component2();
+    method public androidx.ui.foundation.shape.corner.CornerSize component3();
+    method public androidx.ui.foundation.shape.corner.CornerSize component4();
+    method public androidx.ui.foundation.shape.corner.RoundedCornerShape copy(androidx.ui.foundation.shape.corner.CornerSize topLeft, androidx.ui.foundation.shape.corner.CornerSize topRight, androidx.ui.foundation.shape.corner.CornerSize bottomRight, androidx.ui.foundation.shape.corner.CornerSize bottomLeft);
+    method public androidx.ui.engine.geometry.Outline.Rounded createOutline(androidx.ui.core.PxSize size, androidx.ui.core.Px topLeft, androidx.ui.core.Px topRight, androidx.ui.core.Px bottomRight, androidx.ui.core.Px bottomLeft);
+    method public androidx.ui.foundation.shape.corner.CornerSize getBottomLeft();
+    method public androidx.ui.foundation.shape.corner.CornerSize getBottomRight();
+    method public androidx.ui.foundation.shape.corner.CornerSize getTopLeft();
+    method public androidx.ui.foundation.shape.corner.CornerSize getTopRight();
+  }
+
+  public final class RoundedCornerShapeKt {
+    ctor public RoundedCornerShapeKt();
+    method public static androidx.ui.foundation.shape.corner.RoundedCornerShape RoundedCornerShape(androidx.ui.foundation.shape.corner.CornerSize corner);
+    method public static androidx.ui.foundation.shape.corner.RoundedCornerShape RoundedCornerShape(androidx.ui.core.Dp size);
+    method public static androidx.ui.foundation.shape.corner.RoundedCornerShape RoundedCornerShape(androidx.ui.core.Px size);
+    method public static androidx.ui.foundation.shape.corner.RoundedCornerShape RoundedCornerShape(int percent);
+    method public static androidx.ui.foundation.shape.corner.RoundedCornerShape RoundedCornerShape(androidx.ui.core.Dp topLeft = 0.dp, androidx.ui.core.Dp topRight = 0.dp, androidx.ui.core.Dp bottomRight = 0.dp, androidx.ui.core.Dp bottomLeft = 0.dp);
+    method public static androidx.ui.foundation.shape.corner.RoundedCornerShape RoundedCornerShape(androidx.ui.core.Px topLeft = 0.px, androidx.ui.core.Px topRight = 0.px, androidx.ui.core.Px bottomRight = 0.px, androidx.ui.core.Px bottomLeft = 0.px);
+    method public static androidx.ui.foundation.shape.corner.RoundedCornerShape RoundedCornerShape(@IntRange(from=0, to=50) int topLeftPercent = 0, @IntRange(from=0, to=50) int topRightPercent = 0, @IntRange(from=0, to=50) int bottomRightPercent = 0, @IntRange(from=0, to=50) int bottomLeftPercent = 0);
+    method public static androidx.ui.foundation.shape.corner.RoundedCornerShape getCircleShape();
+  }
+
+}
+
