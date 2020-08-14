@@ -15,7 +15,7 @@
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="androidx.ui.androidview.demos">
+    package="androidx.compose.androidview.demos">
 
     <application>
         <activity
