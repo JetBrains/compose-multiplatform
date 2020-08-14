@@ -1,0 +1,313 @@
+/*
+ * Copyright 2019 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package androidx.compose.ui.text
+
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.platform.ActualParagraph
+import androidx.compose.ui.text.style.ResolvedTextDirection
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.text.style.TextDecoration
+
+internal const val DefaultMaxLines = Int.MAX_VALUE
+
+/**
+ * A paragraph of text that is laid out.
+ *
+ * Paragraphs can be displayed on a [Canvas] using the [paint] method.
+ */
+interface Paragraph {
+    /**
+     * The amount of horizontal space this paragraph occupies.
+     */
+    val width: Float
+
+    /**
+     * The amount of vertical space this paragraph occupies.
+     */
+    val height: Float
+
+    /**
+     * The width for text if all soft wrap opportunities were taken.
+     */
+    val minIntrinsicWidth: Float
+
+    /**
+     * Returns the smallest width beyond which increasing the width never
+     * decreases the height.
+     */
+    val maxIntrinsicWidth: Float
+
+    /**
+     * The distance from the top of the paragraph to the alphabetic
+     * baseline of the first line, in logical pixels.
+     */
+    val firstBaseline: Float
+
+    /**
+     * The distance from the top of the paragraph to the alphabetic
+     * baseline of the last line, in logical pixels.
+     */
+    val lastBaseline: Float
+
+    /**
+     * True if there is more vertical content, but the text was truncated, either
+     * because we reached `maxLines` lines of text or because the `maxLines` was
+     * null, `ellipsis` was not null, and one of the lines exceeded the width
+     * constraint.
+     *
+     * See the discussion of the `maxLines` and `ellipsis` arguments at [ParagraphStyle].
+     */
+    val didExceedMaxLines: Boolean
+
+    /**
+     * The total number of lines in the text.
+     */
+    val lineCount: Int
+
+    /**
+     * The bounding boxes reserved for the input placeholders in this Paragraphs. Their locations
+     * are relative to this Paragraph's coordinate. The order of this list corresponds to that of
+     * input placeholders.
+     * Notice that [Rect] in [placeholderRects] is nullable. When [Rect] is null, it indicates
+     * that the corresponding [Placeholder] is ellipsized.
+     */
+    val placeholderRects: List<Rect?>
+
+    /** Returns path that enclose the given text range. */
+    fun getPathForRange(start: Int, end: Int): Path
+
+    /** Returns rectangle of the cursor area. */
+    fun getCursorRect(offset: Int): Rect
+
+    /** Returns the left x Coordinate of the given line. */
+    fun getLineLeft(lineIndex: Int): Float
+
+    /** Returns the right x Coordinate of the given line. */
+    fun getLineRight(lineIndex: Int): Float
+
+    /** Returns the bottom y coordinate of the given line. */
+    fun getLineTop(lineIndex: Int): Float
+
+    /** Returns the bottom y coordinate of the given line. */
+    fun getLineBottom(lineIndex: Int): Float
+
+    /** Returns the height of the given line. */
+    fun getLineHeight(lineIndex: Int): Float
+
+    /** Returns the width of the given line. */
+    fun getLineWidth(lineIndex: Int): Float
+
+    /** Returns the start offset of the given line, inclusive. */
+    fun getLineStart(lineIndex: Int): Int
+
+    /**
+     * Returns the end offset of the given line
+     *
+     * If ellipsis happens on the given line, this returns the end of text since ellipsized
+     * characters are counted into the same line.
+     *
+     * @param lineIndex the line number
+     * @return an exclusive end offset of the line.
+     * @see getLineVisibleEnd
+     */
+    fun getLineEnd(lineIndex: Int): Int
+
+    /**
+     * Returns the end of visible offset of the given line.
+     *
+     * If no ellipsis happens on the given line, this returns the line end offset with excluding
+     * trailing whitespaces.
+     * If ellipsis happens on the given line, this returns the offset that ellipsis started, i.e.
+     * the exclusive not ellipsized last character.
+     * @param lineIndex a 0 based line index
+     * @return an exclusive line end offset that is visible on the display
+     * @see getLineEnd
+     */
+    fun getLineVisibleEnd(lineIndex: Int): Int
+
+    /**
+     * Returns true if ellipsis happens on the given line, otherwise returns false
+     *
+     * @param lineIndex a 0 based line index
+     * @return true if ellipsis happens on the given line, otherwise false
+     */
+    fun isLineEllipsized(lineIndex: Int): Boolean
+
+    /**
+     * Returns the line number on which the specified text offset appears.
+     * If you ask for a position before 0, you get 0; if you ask for a position
+     * beyond the end of the text, you get the last line.
+     */
+    fun getLineForOffset(offset: Int): Int
+
+    /**
+     * Compute the horizontal position where a newly inserted character at [offset] would be.
+     *
+     * If the inserted character at [offset] is within a LTR/RTL run, the returned position will be
+     * the left(right) edge of the character.
+     * ```
+     * For example:
+     *     Paragraph's direction is LTR.
+     *     Text in logic order:               L0 L1 L2 R3 R4 R5
+     *     Text in visual order:              L0 L1 L2 R5 R4 R3
+     *         position of the offset(2):          |
+     *         position of the offset(4):                   |
+     *```
+     * However, when the [offset] is at the BiDi transition offset, there will be two possible
+     * visual positions, which depends on the direction of the inserted character.
+     * ```
+     * For example:
+     *     Paragraph's direction is LTR.
+     *     Text in logic order:               L0 L1 L2 R3 R4 R5
+     *     Text in visual order:              L0 L1 L2 R5 R4 R3
+     *         position of the offset(3):             |           (The inserted character is LTR)
+     *                                                         |  (The inserted character is RTL)
+     *```
+     * In this case, [usePrimaryDirection] will be used to resolve the ambiguity. If true, the
+     * inserted character's direction is assumed to be the same as Paragraph's direction.
+     * Otherwise, the inserted character's direction is assumed to be the opposite of the
+     * Paragraph's direction.
+     * ```
+     * For example:
+     *     Paragraph's direction is LTR.
+     *     Text in logic order:               L0 L1 L2 R3 R4 R5
+     *     Text in visual order:              L0 L1 L2 R5 R4 R3
+     *         position of the offset(3):             |           (usePrimaryDirection is true)
+     *                                                         |  (usePrimaryDirection is false)
+     *```
+     * This method is useful to compute cursor position.
+     *
+     * @param offset the offset of the character, in the range of [0, length].
+     * @param usePrimaryDirection whether the paragraph direction is respected when [offset]
+     * points to a BiDi transition point.
+     * @return a float number representing the horizontal position in the unit of pixel.
+     */
+    fun getHorizontalPosition(offset: Int, usePrimaryDirection: Boolean): Float
+
+    /**
+     * Get the text direction of the paragraph containing the given offset.
+     */
+    fun getParagraphDirection(offset: Int): ResolvedTextDirection
+
+    /**
+     * Get the text direction of the character at the given offset.
+     */
+    fun getBidiRunDirection(offset: Int): ResolvedTextDirection
+
+    /**
+     * Returns line number closest to the given graphical vertical position.
+     * If you ask for a vertical position before 0, you get 0; if you ask for a vertical position
+     * beyond the last line, you get the last line.
+     */
+    fun getLineForVerticalPosition(vertical: Float): Int
+
+    /** Returns the character offset closest to the given graphical position. */
+    fun getOffsetForPosition(position: Offset): Int
+
+    /**
+     * Returns the bounding box as Rect of the character for given character offset. Rect
+     * includes the top, bottom, left and right of a character.
+     */
+    fun getBoundingBox(offset: Int): Rect
+
+    /**
+     * Returns the TextRange of the word at the given character offset. Characters not
+     * part of a word, such as spaces, symbols, and punctuation, have word breaks
+     * on both sides. In such cases, this method will return TextRange(offset, offset+1).
+     * Word boundaries are defined more precisely in Unicode Standard Annex #29
+     * http://www.unicode.org/reports/tr29/#Word_Boundaries
+     */
+    fun getWordBoundary(offset: Int): TextRange
+
+    /**
+     * Paint the paragraph to canvas, and also overrides some paint settings.
+     */
+    fun paint(
+        canvas: Canvas,
+        color: Color = Color.Unset,
+        shadow: Shadow? = null,
+        textDecoration: TextDecoration? = null
+    )
+}
+
+/**
+ * Lays out a given [text] with the given constraints. A paragraph is a text that has a single
+ * [ParagraphStyle].
+ *
+ * If the [style] does not contain any [androidx.compose.ui.text.style.TextDirection],
+ * [androidx.compose.ui.text.style.TextDirection.Content] is used as the default value.
+ *
+ * @param text the text to be laid out
+ * @param style the [TextStyle] to be applied to the whole text
+ * @param spanStyles [SpanStyle]s to be applied to parts of text
+ * @param placeholders a list of placeholder metrics which tells [Paragraph] where should
+ * be left blank to leave space for inline elements.
+ * @param maxLines the maximum number of lines that the text can have
+ * @param ellipsis whether to ellipsize text, applied only when [maxLines] is set
+ * @param constraints how wide the text is allowed to be
+ * @param density density of the device
+ * @param resourceLoader [Font.ResourceLoader] to be used to load the font given in [SpanStyle]s
+ *
+ * @throws IllegalArgumentException if [ParagraphStyle.textDirection] is not set
+ */
+fun Paragraph(
+    text: String,
+    style: TextStyle,
+    spanStyles: List<AnnotatedString.Range<SpanStyle>> = listOf(),
+    placeholders: List<AnnotatedString.Range<Placeholder>> = listOf(),
+    maxLines: Int = DefaultMaxLines,
+    ellipsis: Boolean = false,
+    constraints: ParagraphConstraints,
+    density: Density,
+    resourceLoader: Font.ResourceLoader
+): Paragraph = ActualParagraph(
+    text,
+    style,
+    spanStyles,
+    placeholders,
+    maxLines,
+    ellipsis,
+    constraints,
+    density,
+    resourceLoader
+)
+
+/**
+ * Lays out the text in [ParagraphIntrinsics] with the given constraints. A paragraph is a text
+ * that has a single [ParagraphStyle].
+ *
+ * @param paragraphIntrinsics [ParagraphIntrinsics] instance
+ * @param maxLines the maximum number of lines that the text can have
+ * @param ellipsis whether to ellipsize text, applied only when [maxLines] is set
+ * @param constraints how wide the text is allowed to be
+ */
+fun Paragraph(
+    paragraphIntrinsics: ParagraphIntrinsics,
+    maxLines: Int = DefaultMaxLines,
+    ellipsis: Boolean = false,
+    constraints: ParagraphConstraints
+): Paragraph = ActualParagraph(
+    paragraphIntrinsics,
+    maxLines,
+    ellipsis,
+    constraints
+)

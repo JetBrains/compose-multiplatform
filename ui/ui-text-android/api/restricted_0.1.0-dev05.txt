@@ -1,0 +1,109 @@
+// Signature format: 3.0
+package androidx.text {
+
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP) public class LayoutCompat {
+    field public static final int ALIGN_CENTER = 2; // 0x2
+    field public static final int ALIGN_LEFT = 3; // 0x3
+    field public static final int ALIGN_NORMAL = 0; // 0x0
+    field public static final int ALIGN_OPPOSITE = 1; // 0x1
+    field public static final int ALIGN_RIGHT = 4; // 0x4
+    field public static final int BREAK_STRATEGY_BALANCED = 2; // 0x2
+    field public static final int BREAK_STRATEGY_HIGH_QUALITY = 1; // 0x1
+    field public static final int BREAK_STRATEGY_SIMPLE = 0; // 0x0
+    field public static final int DEFAULT_ALIGNMENT = 0; // 0x0
+    field public static final int DEFAULT_BREAK_STRATEGY = 0; // 0x0
+    field public static final int DEFAULT_HYPHENATION_FREQUENCY = 0; // 0x0
+    field public static final boolean DEFAULT_INCLUDE_PADDING = true;
+    field public static final int DEFAULT_JUSTIFICATION_MODE = 0; // 0x0
+    field public static final float DEFAULT_LINESPACING_EXTRA = 0.0f;
+    field public static final float DEFAULT_LINESPACING_MULTIPLIER = 1.0f;
+    field public static final int DEFAULT_MAX_LINES = 2147483647; // 0x7fffffff
+    field public static final int DEFAULT_TEXT_DIRECTION = 2; // 0x2
+    field public static final int HYPHENATION_FREQUENCY_FULL = 2; // 0x2
+    field public static final int HYPHENATION_FREQUENCY_NONE = 0; // 0x0
+    field public static final int HYPHENATION_FREQUENCY_NORMAL = 1; // 0x1
+    field public static final int JUSTIFICATION_MODE_INTER_WORD = 1; // 0x1
+    field public static final int JUSTIFICATION_MODE_NONE = 0; // 0x0
+    field public static final int TEXT_DIRECTION_ANY_RTL_LTR = 4; // 0x4
+    field public static final int TEXT_DIRECTION_FIRST_STRONG_LTR = 2; // 0x2
+    field public static final int TEXT_DIRECTION_FIRST_STRONG_RTL = 3; // 0x3
+    field public static final int TEXT_DIRECTION_LOCALE = 5; // 0x5
+    field public static final int TEXT_DIRECTION_LTR = 0; // 0x0
+    field public static final int TEXT_DIRECTION_RTL = 1; // 0x1
+  }
+
+
+  public final class LayoutIntrinsicsKt {
+    ctor public LayoutIntrinsicsKt();
+  }
+
+
+
+  public final class TextLayoutKt {
+    ctor public TextLayoutKt();
+  }
+
+}
+
+package androidx.text.selection {
+
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP) public class WordBoundary {
+    ctor public WordBoundary(java.util.Locale!, CharSequence!);
+    method public int getWordEnd(int);
+    method public int getWordStart(int);
+  }
+
+}
+
+package androidx.text.style {
+
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP) public class BaselineShiftSpan extends android.text.style.MetricAffectingSpan {
+    ctor public BaselineShiftSpan(float);
+    method public float getMultiplier();
+    method public void updateDrawState(android.text.TextPaint);
+    method public void updateMeasureState(android.text.TextPaint);
+  }
+
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP) public class FontFeatureSpan extends android.text.style.MetricAffectingSpan {
+    ctor public FontFeatureSpan(String);
+    method public String! getFontFeatureSettings();
+    method public void updateDrawState(android.text.TextPaint!);
+    method public void updateMeasureState(android.text.TextPaint);
+  }
+
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP) public class LetterSpacingSpan extends android.text.style.MetricAffectingSpan {
+    ctor public LetterSpacingSpan(float);
+    method public void updateDrawState(android.text.TextPaint);
+    method public void updateMeasureState(android.text.TextPaint);
+  }
+
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP) public class LineHeightSpan implements android.text.style.LineHeightSpan {
+    ctor public LineHeightSpan(@Px int);
+    method public void chooseHeight(CharSequence, int, int, int, int, android.graphics.Paint.FontMetricsInt);
+  }
+
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP) public class ShadowSpan extends android.text.style.CharacterStyle {
+    ctor public ShadowSpan(@ColorInt int, float, float, float);
+    method public int getColor();
+    method public float getOffsetX();
+    method public float getOffsetY();
+    method public float getRadius();
+    method public void updateDrawState(android.text.TextPaint);
+  }
+
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP) public class SkewXSpan extends android.text.style.MetricAffectingSpan {
+    ctor public SkewXSpan(float);
+    method public float getSkewX();
+    method public void updateDrawState(android.text.TextPaint!);
+    method public void updateMeasureState(android.text.TextPaint!);
+  }
+
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP) public class TypefaceSpan extends android.text.style.MetricAffectingSpan {
+    ctor public TypefaceSpan(android.graphics.Typeface);
+    method public android.graphics.Typeface getTypeface();
+    method public void updateDrawState(android.text.TextPaint);
+    method public void updateMeasureState(android.text.TextPaint);
+  }
+
+}
+

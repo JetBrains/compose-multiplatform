@@ -1,0 +1,63 @@
+// Baseline format: 1.0
+ArrayReturn: androidx.compose.ui.input.pointer.PointerInputTestUtilKt#invokeOverAllPasses-he86P5Q(kotlin.jvm.functions.Function3<? super java.util.List<androidx.compose.ui.input.pointer.PointerInputChange>,? super androidx.compose.ui.input.pointer.PointerEventPass,? super androidx.compose.ui.unit.IntSize,? extends java.util.List<androidx.compose.ui.input.pointer.PointerInputChange>>, androidx.compose.ui.input.pointer.PointerInputChange[], long) parameter #1:
+    Method parameter should be Collection<PointerInputChange> (or subclass) instead of raw array; was `androidx.compose.ui.input.pointer.PointerInputChange[]`
+ArrayReturn: androidx.compose.ui.input.pointer.PointerInputTestUtilKt#invokeOverPasses-34fyLIo(kotlin.jvm.functions.Function3<? super java.util.List<androidx.compose.ui.input.pointer.PointerInputChange>,? super androidx.compose.ui.input.pointer.PointerEventPass,? super androidx.compose.ui.unit.IntSize,? extends java.util.List<androidx.compose.ui.input.pointer.PointerInputChange>>, androidx.compose.ui.input.pointer.PointerInputChange, androidx.compose.ui.input.pointer.PointerEventPass[], long) parameter #2:
+    Method parameter should be Collection<PointerEventPass> (or subclass) instead of raw array; was `androidx.compose.ui.input.pointer.PointerEventPass[]`
+ArrayReturn: androidx.compose.ui.input.pointer.PointerInputTestUtilKt#invokeOverPasses-kxbhPDs(kotlin.jvm.functions.Function3<? super java.util.List<androidx.compose.ui.input.pointer.PointerInputChange>,? super androidx.compose.ui.input.pointer.PointerEventPass,? super androidx.compose.ui.unit.IntSize,? extends java.util.List<androidx.compose.ui.input.pointer.PointerInputChange>>, androidx.compose.ui.input.pointer.PointerInputChange[], androidx.compose.ui.input.pointer.PointerEventPass, long) parameter #1:
+    Method parameter should be Collection<PointerInputChange> (or subclass) instead of raw array; was `androidx.compose.ui.input.pointer.PointerInputChange[]`
+
+
+AutoBoxing: androidx.compose.ui.node.LayoutNode#getAlignmentLine(androidx.compose.ui.AlignmentLine):
+    Must avoid boxed primitives (`java.lang.Integer`)
+
+
+BuilderSetStyle: androidx.compose.ui.graphics.vector.VectorAssetBuilder#popGroup():
+    Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.graphics.vector.VectorAssetBuilder.popGroup()
+BuilderSetStyle: androidx.compose.ui.graphics.vector.VectorAssetBuilder#pushGroup(String, float, float, float, float, float, float, float, java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode>):
+    Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.graphics.vector.VectorAssetBuilder.pushGroup(String,float,float,float,float,float,float,float,java.util.List<? extends androidx.compose.ui.graphics.vector.PathNode>)
+
+
+CallbackName: androidx.compose.ui.gesture.DragObserver:
+    Class should be named DragCallback
+CallbackName: androidx.compose.ui.gesture.LongPressDragObserver:
+    Class should be named LongPressDragCallback
+CallbackName: androidx.compose.ui.gesture.RawScaleObserver:
+    Class should be named RawScaleCallback
+CallbackName: androidx.compose.ui.gesture.ScaleObserver:
+    Class should be named ScaleCallback
+
+
+ListenerLast: androidx.compose.ui.gesture.ScrollGestureFilterKt#scrollGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.ScrollCallback, androidx.compose.ui.gesture.scrollorientationlocking.Orientation, kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean>, boolean) parameter #2:
+    Listeners should always be at end of argument list (method `scrollGestureFilter`)
+ListenerLast: androidx.compose.ui.gesture.ScrollGestureFilterKt#scrollGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.ScrollCallback, androidx.compose.ui.gesture.scrollorientationlocking.Orientation, kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean>, boolean) parameter #3:
+    Listeners should always be at end of argument list (method `scrollGestureFilter`)
+ListenerLast: androidx.compose.ui.gesture.ScrollGestureFilterKt#scrollGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.ScrollCallback, androidx.compose.ui.gesture.scrollorientationlocking.Orientation, kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean>, boolean) parameter #4:
+    Listeners should always be at end of argument list (method `scrollGestureFilter`)
+
+
+MissingNullability: androidx.compose.ui.TransformOrigin#toString-impl(long):
+    Missing nullability on method `toString-impl` return
+MissingNullability: androidx.compose.ui.input.pointer.PointerId#toString-impl(long):
+    Missing nullability on method `toString-impl` return
+MissingNullability: androidx.compose.ui.layout.Measured#constructor-impl(androidx.compose.ui.Placeable):
+    Missing nullability on method `constructor-impl` return
+MissingNullability: androidx.compose.ui.layout.Measured#equals-impl(androidx.compose.ui.Placeable, Object) parameter #0:
+    Missing nullability on parameter `p` in method `equals-impl`
+MissingNullability: androidx.compose.ui.layout.Measured#getHeight-impl(androidx.compose.ui.Placeable) parameter #0:
+    Missing nullability on parameter `$this` in method `getHeight-impl`
+MissingNullability: androidx.compose.ui.layout.Measured#getWidth-impl(androidx.compose.ui.Placeable) parameter #0:
+    Missing nullability on parameter `$this` in method `getWidth-impl`
+MissingNullability: androidx.compose.ui.layout.Measured#hashCode-impl(androidx.compose.ui.Placeable) parameter #0:
+    Missing nullability on parameter `p` in method `hashCode-impl`
+MissingNullability: androidx.compose.ui.layout.Measured#toString-impl(androidx.compose.ui.Placeable):
+    Missing nullability on method `toString-impl` return
+MissingNullability: androidx.compose.ui.layout.Measured#toString-impl(androidx.compose.ui.Placeable) parameter #0:
+    Missing nullability on parameter `p` in method `toString-impl`
+
+
+NotCloseable: androidx.compose.ui.node.OwnedLayer:
+    Classes that release resources (destroy()) should implement AutoClosable and CloseGuard: class androidx.compose.ui.node.OwnedLayer
+
+
+TopLevelBuilder: androidx.compose.ui.graphics.vector.VectorAssetBuilder:
+    Builder should be defined as inner class: androidx.compose.ui.graphics.vector.VectorAssetBuilder

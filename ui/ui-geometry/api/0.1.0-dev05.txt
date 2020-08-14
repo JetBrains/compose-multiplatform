@@ -1,0 +1,257 @@
+// Signature format: 3.0
+package androidx.ui.geometry {
+
+  public final class Offset implements androidx.ui.geometry.OffsetBase {
+    ctor public Offset(float dx, float dy);
+    method public infix androidx.ui.geometry.Rect and(androidx.ui.geometry.Size other);
+    method public float component1();
+    method public float component2();
+    method public androidx.ui.geometry.Offset copy(float dx, float dy);
+    method public operator androidx.ui.geometry.Offset div(float operand);
+    method public float getDirection();
+    method public float getDistance();
+    method public float getDistanceSquared();
+    method public float getDx();
+    method public float getDy();
+    method public operator androidx.ui.geometry.Offset minus(androidx.ui.geometry.Offset other);
+    method public operator androidx.ui.geometry.Offset plus(androidx.ui.geometry.Offset other);
+    method public operator androidx.ui.geometry.Offset rem(float operand);
+    method public androidx.ui.geometry.Offset scale(float scaleX, float scaleY);
+    method public operator androidx.ui.geometry.Offset times(float operand);
+    method public androidx.ui.geometry.Offset translate(float translateX, float translateY);
+    method public androidx.ui.geometry.Offset truncDiv(float operand);
+    method public operator androidx.ui.geometry.Offset unaryMinus();
+    field public static final androidx.ui.geometry.Offset.Companion! Companion;
+  }
+
+  public static final class Offset.Companion {
+    method public androidx.ui.geometry.Offset getInfinite();
+    method public androidx.ui.geometry.Offset getZero();
+    method public boolean isValid(androidx.ui.geometry.Offset offset);
+    method public androidx.ui.geometry.Offset lerp(androidx.ui.geometry.Offset start, androidx.ui.geometry.Offset stop, float fraction);
+    property public final androidx.ui.geometry.Offset infinite;
+    property public final androidx.ui.geometry.Offset zero;
+  }
+
+  public interface OffsetBase {
+    method public float getDx();
+    method public float getDy();
+    method public default boolean isFinite();
+    method public default boolean isGreaterOrEqThan(androidx.ui.geometry.OffsetBase other);
+    method public default boolean isGreaterThan(androidx.ui.geometry.OffsetBase other);
+    method public default boolean isInfinite();
+    method public default boolean isLessOrEqThan(androidx.ui.geometry.OffsetBase other);
+    method public default boolean isLessThan(androidx.ui.geometry.OffsetBase other);
+    property public abstract float dx;
+    property public abstract float dy;
+  }
+
+  public final class RRect {
+    ctor public RRect(float left, float top, float right, float bottom, float topLeftRadiusX, float topLeftRadiusY, float topRightRadiusX, float topRightRadiusY, float bottomRightRadiusX, float bottomRightRadiusY, float bottomLeftRadiusX, float bottomLeftRadiusY);
+    method public float component1();
+    method public float component10();
+    method public float component11();
+    method public float component12();
+    method public float component2();
+    method public float component3();
+    method public float component4();
+    method public float component5();
+    method public float component6();
+    method public float component7();
+    method public float component8();
+    method public float component9();
+    method public boolean contains(androidx.ui.geometry.Offset point);
+    method public androidx.ui.geometry.RRect copy(float left, float top, float right, float bottom, float topLeftRadiusX, float topLeftRadiusY, float topRightRadiusX, float topRightRadiusY, float bottomRightRadiusX, float bottomRightRadiusY, float bottomLeftRadiusX, float bottomLeftRadiusY);
+    method @Deprecated public androidx.ui.geometry.RRect deflate(float delta);
+    method public float getBottom();
+    method public float getBottomLeftRadiusX();
+    method public float getBottomLeftRadiusY();
+    method public float getBottomRightRadiusX();
+    method public float getBottomRightRadiusY();
+    method public float getHeight();
+    method public float getLeft();
+    method public float getRight();
+    method public float getTop();
+    method public float getTopLeftRadiusX();
+    method public float getTopLeftRadiusY();
+    method public float getTopRightRadiusX();
+    method public float getTopRightRadiusY();
+    method public float getWidth();
+    method public static androidx.ui.geometry.RRect getZero();
+    method @Deprecated public androidx.ui.geometry.RRect inflate(float delta);
+    property public final float height;
+    property public final float width;
+    field public static final androidx.ui.geometry.RRect.Companion! Companion;
+  }
+
+  public static final class RRect.Companion {
+    method public androidx.ui.geometry.RRect getZero();
+    property public final androidx.ui.geometry.RRect Zero;
+  }
+
+  public final class RRectKt {
+    method public static androidx.ui.geometry.RRect RRect(float left, float top, float right, float bottom, float radiusX, float radiusY);
+    method public static androidx.ui.geometry.RRect RRect(float left, float top, float right, float bottom, androidx.ui.geometry.Radius radius);
+    method public static androidx.ui.geometry.RRect RRect(androidx.ui.geometry.Rect rect, float radiusX, float radiusY);
+    method public static androidx.ui.geometry.RRect RRect(androidx.ui.geometry.Rect rect, androidx.ui.geometry.Radius radius);
+    method public static androidx.ui.geometry.RRect RRect(float left, float top, float right, float bottom, androidx.ui.geometry.Radius topLeft = Radius.zero, androidx.ui.geometry.Radius topRight = Radius.zero, androidx.ui.geometry.Radius bottomRight = Radius.zero, androidx.ui.geometry.Radius bottomLeft = Radius.zero);
+    method public static androidx.ui.geometry.RRect RRect(androidx.ui.geometry.Rect rect, androidx.ui.geometry.Radius topLeft = Radius.zero, androidx.ui.geometry.Radius topRight = Radius.zero, androidx.ui.geometry.Radius bottomRight = Radius.zero, androidx.ui.geometry.Radius bottomLeft = Radius.zero);
+    method public static androidx.ui.geometry.Radius bottomLeftRadius(androidx.ui.geometry.RRect);
+    method public static androidx.ui.geometry.Radius bottomRightRadius(androidx.ui.geometry.RRect);
+    method public static androidx.ui.geometry.Offset center(androidx.ui.geometry.RRect);
+    method public static float getLongestSide(androidx.ui.geometry.RRect);
+    method public static float getShortestSide(androidx.ui.geometry.RRect);
+    method public static androidx.ui.geometry.RRect grow(androidx.ui.geometry.RRect, float delta);
+    method public static boolean isCircle(androidx.ui.geometry.RRect);
+    method public static boolean isEllipse(androidx.ui.geometry.RRect);
+    method public static boolean isEmpty(androidx.ui.geometry.RRect);
+    method public static boolean isFinite(androidx.ui.geometry.RRect);
+    method public static boolean isRect(androidx.ui.geometry.RRect);
+    method public static boolean isStadium(androidx.ui.geometry.RRect);
+    method public static androidx.ui.geometry.RRect lerp(androidx.ui.geometry.RRect start, androidx.ui.geometry.RRect stop, float fraction);
+    method public static androidx.ui.geometry.Rect middleRect(androidx.ui.geometry.RRect);
+    method public static androidx.ui.geometry.Rect outerRect(androidx.ui.geometry.RRect);
+    method public static androidx.ui.geometry.Rect safeInnerRect(androidx.ui.geometry.RRect);
+    method public static androidx.ui.geometry.RRect shift(androidx.ui.geometry.RRect, androidx.ui.geometry.Offset offset);
+    method public static androidx.ui.geometry.RRect shrink(androidx.ui.geometry.RRect, float delta);
+    method public static androidx.ui.geometry.Rect tallMiddleRect(androidx.ui.geometry.RRect);
+    method public static androidx.ui.geometry.Radius topLeftRadius(androidx.ui.geometry.RRect);
+    method public static androidx.ui.geometry.Radius topRightRadius(androidx.ui.geometry.RRect);
+    method public static androidx.ui.geometry.Rect wideMiddleRect(androidx.ui.geometry.RRect);
+    method public static androidx.ui.geometry.RRect withRadius(androidx.ui.geometry.RRect, androidx.ui.geometry.Radius radius);
+  }
+
+  public final class Radius {
+    ctor public Radius(float x, float y);
+    method public float component1();
+    method public float component2();
+    method public androidx.ui.geometry.Radius copy(float x, float y);
+    method public operator androidx.ui.geometry.Radius div(float operand);
+    method public float getX();
+    method public float getY();
+    method public operator androidx.ui.geometry.Radius minus(androidx.ui.geometry.Radius other);
+    method public operator androidx.ui.geometry.Radius plus(androidx.ui.geometry.Radius other);
+    method public operator androidx.ui.geometry.Radius rem(float operand);
+    method public operator androidx.ui.geometry.Radius times(float operand);
+    method public androidx.ui.geometry.Radius truncDiv(float operand);
+    method public operator androidx.ui.geometry.Radius unaryMinus();
+    field public static final androidx.ui.geometry.Radius.Companion! Companion;
+  }
+
+  public static final class Radius.Companion {
+    method public androidx.ui.geometry.Radius circular(float radius);
+    method public androidx.ui.geometry.Radius elliptical(float x, float y);
+    method public androidx.ui.geometry.Radius getZero();
+    property public final androidx.ui.geometry.Radius zero;
+  }
+
+  public final class RadiusKt {
+    method public static androidx.ui.geometry.Radius lerp(androidx.ui.geometry.Radius start, androidx.ui.geometry.Radius stop, float fraction);
+  }
+
+  public final class Rect {
+    ctor public Rect(float left, float top, float right, float bottom);
+    method public float component1();
+    method public float component2();
+    method public float component3();
+    method public float component4();
+    method public boolean contains(androidx.ui.geometry.Offset offset);
+    method public androidx.ui.geometry.Rect copy(float left, float top, float right, float bottom);
+    method public androidx.ui.geometry.Rect deflate(float delta);
+    method public androidx.ui.geometry.Rect expandToInclude(androidx.ui.geometry.Rect other);
+    method public float getBottom();
+    method public androidx.ui.geometry.Offset getBottomCenter();
+    method public androidx.ui.geometry.Offset getBottomLeft();
+    method public androidx.ui.geometry.Offset getBottomRight();
+    method public androidx.ui.geometry.Offset getCenter();
+    method public androidx.ui.geometry.Offset getCenterLeft();
+    method public androidx.ui.geometry.Offset getCenterRight();
+    method public float getHeight();
+    method public float getLeft();
+    method public float getLongestSide();
+    method public float getRight();
+    method public float getShortestSide();
+    method public androidx.ui.geometry.Size getSize();
+    method public float getTop();
+    method public androidx.ui.geometry.Offset getTopCenter();
+    method public androidx.ui.geometry.Offset getTopLeft();
+    method public androidx.ui.geometry.Offset getTopRight();
+    method public float getWidth();
+    method public androidx.ui.geometry.Rect inflate(float delta);
+    method public androidx.ui.geometry.Rect intersect(androidx.ui.geometry.Rect other);
+    method public boolean isEmpty();
+    method public boolean isFinite();
+    method public boolean isInfinite();
+    method public androidx.ui.geometry.Rect join(androidx.ui.geometry.Rect other);
+    method public boolean overlaps(androidx.ui.geometry.Rect other);
+    method public androidx.ui.geometry.Rect shift(androidx.ui.geometry.Offset offset);
+    method public androidx.ui.geometry.Rect translate(float translateX, float translateY);
+    property public final float height;
+    property public final float width;
+    field public static final androidx.ui.geometry.Rect.Companion! Companion;
+  }
+
+  public static final class Rect.Companion {
+    method public androidx.ui.geometry.Rect fromCircle(androidx.ui.geometry.Offset center, float radius);
+    method public androidx.ui.geometry.Rect fromLTRB(float left, float top, float right, float bottom);
+    method public androidx.ui.geometry.Rect fromLTWH(float left, float top, float width, float height);
+    method public androidx.ui.geometry.Rect fromPoints(androidx.ui.geometry.Offset a, androidx.ui.geometry.Offset b);
+    method public androidx.ui.geometry.Rect getLargest();
+    method public androidx.ui.geometry.Rect getZero();
+    method public float get_giantScalar();
+    property public final float _giantScalar;
+    property public final androidx.ui.geometry.Rect largest;
+    property public final androidx.ui.geometry.Rect zero;
+  }
+
+  public final class RectKt {
+    method public static androidx.ui.geometry.Rect lerp(androidx.ui.geometry.Rect start, androidx.ui.geometry.Rect stop, float fraction);
+  }
+
+  public class Size implements androidx.ui.geometry.OffsetBase {
+    ctor public Size(float width, float height);
+    method public final androidx.ui.geometry.Offset bottomCenter(androidx.ui.geometry.Offset origin);
+    method public final androidx.ui.geometry.Offset bottomLeft(androidx.ui.geometry.Offset origin);
+    method public final androidx.ui.geometry.Offset bottomRight(androidx.ui.geometry.Offset origin);
+    method public final androidx.ui.geometry.Offset center(androidx.ui.geometry.Offset origin);
+    method public final androidx.ui.geometry.Offset centerLeft(androidx.ui.geometry.Offset origin);
+    method public final androidx.ui.geometry.Offset centerRight(androidx.ui.geometry.Offset origin);
+    method public final boolean contains(androidx.ui.geometry.Offset offset);
+    method public final operator androidx.ui.geometry.Size div(float operand);
+    method public float getDx();
+    method public float getDy();
+    method public final androidx.ui.geometry.Size getFlipped();
+    method public final float getHeight();
+    method public final float getLongestSide();
+    method public final float getShortestSide();
+    method public final float getWidth();
+    method public final boolean isEmpty();
+    method public final operator androidx.ui.geometry.Size minus(androidx.ui.geometry.Offset other);
+    method public final operator androidx.ui.geometry.Offset minus(androidx.ui.geometry.Size other);
+    method public final operator androidx.ui.geometry.Size plus(androidx.ui.geometry.Offset other);
+    method public final operator androidx.ui.geometry.Size rem(float operand);
+    method public final operator androidx.ui.geometry.Size times(float operand);
+    method public final androidx.ui.geometry.Offset topCenter(androidx.ui.geometry.Offset origin);
+    method public final androidx.ui.geometry.Offset topLeft(androidx.ui.geometry.Offset origin);
+    method public final androidx.ui.geometry.Offset topRight(androidx.ui.geometry.Offset origin);
+    method public final androidx.ui.geometry.Size truncDiv(float operand);
+    property public float dx;
+    property public float dy;
+    field public static final androidx.ui.geometry.Size.Companion! Companion;
+  }
+
+  public static final class Size.Companion {
+    method public androidx.ui.geometry.Size copy(androidx.ui.geometry.Size source);
+    method public androidx.ui.geometry.Size fromHeight(float height);
+    method public androidx.ui.geometry.Size fromRadius(float radius);
+    method public androidx.ui.geometry.Size fromWidth(float width);
+    method public androidx.ui.geometry.Size getInfinite();
+    method public androidx.ui.geometry.Size getZero();
+    method public androidx.ui.geometry.Size? lerp(androidx.ui.geometry.Size start, androidx.ui.geometry.Size stop, float fraction);
+    method public androidx.ui.geometry.Size square(float dimension);
+    property public final androidx.ui.geometry.Size infinite;
+    property public final androidx.ui.geometry.Size zero;
+  }
+
+}
+

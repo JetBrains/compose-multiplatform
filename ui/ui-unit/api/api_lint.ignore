@@ -1,0 +1,3 @@
+// Baseline format: 1.0
+MethodNameUnits: androidx.compose.ui.unit.Durations#inSeconds(androidx.compose.ui.unit.Duration):
+    Returned time values must be in milliseconds, was `inSeconds`
