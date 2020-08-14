@@ -1,15 +1,15 @@
-package androidx.ui.desktop.test
+package androidx.compose.desktop.test
 
 import androidx.compose.runtime.ChoreographerFrameCallback
 import androidx.compose.runtime.EmbeddingContext
 import androidx.compose.runtime.EmbeddingContextFactory
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.skija.Surface
+import org.junit.rules.TestRule
+import org.junit.runner.Description
+import org.junit.runners.model.Statement
 import java.io.File
 import java.security.MessageDigest
-import org.junit.rules.TestRule
-import org.junit.runners.model.Statement
-import org.junit.runner.Description
 import java.util.LinkedList
 
 // TODO: replace with androidx.test.screenshot.proto.ScreenshotResultProto after MPP

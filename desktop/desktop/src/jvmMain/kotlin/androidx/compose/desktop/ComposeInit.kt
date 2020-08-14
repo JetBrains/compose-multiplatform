@@ -16,7 +16,7 @@
 
 @file:Suppress("DEPRECATION_ERROR")
 
-package androidx.ui.desktop
+package androidx.compose.desktop
 
 import org.jetbrains.skiko.Library
 

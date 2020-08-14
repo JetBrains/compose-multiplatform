@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package androidx.ui.desktop.test
+package androidx.compose.desktop.test
 
+import androidx.compose.desktop.initCompose
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.DesktopOwner
 import androidx.compose.ui.platform.DesktopOwners
 import androidx.compose.ui.platform.setContent
-import androidx.ui.desktop.initCompose
 import org.jetbrains.skija.Canvas
 import org.jetbrains.skija.Surface
 import java.awt.Component

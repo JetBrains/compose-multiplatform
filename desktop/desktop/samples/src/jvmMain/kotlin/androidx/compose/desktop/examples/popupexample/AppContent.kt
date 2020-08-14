@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package androidx.ui.desktop.examples.popupexample
+package androidx.compose.desktop.examples.popupexample
 
+import androidx.compose.desktop.AppManager
+import androidx.compose.desktop.AppWindow
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.ContentGravity
 import androidx.compose.foundation.Text
@@ -41,10 +43,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Popup
-import androidx.ui.desktop.AppManager
-import androidx.ui.desktop.AppWindow
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.Popup
 
 @Composable
 fun content() {

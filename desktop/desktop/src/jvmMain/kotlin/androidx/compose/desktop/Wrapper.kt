@@ -13,21 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package androidx.ui.desktop.examples.popupexample
+package androidx.compose.desktop
 
-import androidx.ui.desktop.AppWindow
-import androidx.ui.desktop.AppManager
-import androidx.compose.ui.unit.IntSize
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Composition
+import androidx.compose.ui.platform.DesktopOwner
+import androidx.compose.ui.platform.DesktopOwners
+import androidx.compose.ui.platform.setContent
 
-fun main() {
-    AppManager.onWindowsEmptyAction = onCloseAppEvent
+fun ComposeWindow.setContent(content: @Composable () -> Unit): Composition {
+    val owners = DesktopOwners(this, this::redrawLayer)
+    val owner = DesktopOwner(owners)
+    val composition = owner.setContent(content)
 
-    AppWindow("Desktop Compose Popup", IntSize(800, 600)).show {
-        content()
-    }
-}
+    this.owners = owners
 
-val onCloseAppEvent = {
-    println("App exit.")
-    System.exit(0)
+    parent.onDismissEvents.add(owner::dispose)
+
+    return composition
 }

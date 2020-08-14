@@ -15,6 +15,8 @@
  */
 package androidx.compose.ui.window
 
+import androidx.compose.desktop.AppWindow
+import androidx.compose.desktop.AppWindowAmbient
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.onActive
@@ -22,8 +24,6 @@ import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import androidx.ui.desktop.AppWindow
-import androidx.ui.desktop.AppWindowAmbient
 
 @Composable
 fun Dialog(

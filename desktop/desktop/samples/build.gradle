@@ -54,7 +54,7 @@ tasks.withType(KotlinCompile).configureEach {
 
 task run1(type: JavaExec) {
     dependsOn(":compose:desktop:desktop:jar")
-    main = 'androidx.ui.desktop.examples.example1.MainKt'
+    main = 'androidx.compose.desktop.examples.example1.MainKt'
     def compilation = kotlin.jvm().compilations["main"]
     classpath =
         compilation.output.allOutputs +
@@ -63,7 +63,7 @@ task run1(type: JavaExec) {
 
 task run2(type: JavaExec) {
     dependsOn(":compose:desktop:desktop:jar")
-    main = 'androidx.ui.desktop.examples.example2.MainKt'
+    main = 'androidx.compose.desktop.examples.example2.MainKt'
     def compilation = kotlin.jvm().compilations["main"]
     classpath =
         compilation.output.allOutputs +
@@ -72,7 +72,7 @@ task run2(type: JavaExec) {
 
 task run3(type: JavaExec) {
     dependsOn(":compose:desktop:desktop:jar")
-    main = 'androidx.ui.desktop.examples.popupexample.MainKt'
+    main = 'androidx.compose.desktop.examples.popupexample.MainKt'
     def compilation = kotlin.jvm().compilations["main"]
     classpath =
         compilation.output.allOutputs +

@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package androidx.ui.desktop.examples.example1
+package androidx.compose.desktop.examples.example1
 
+import androidx.compose.desktop.AppWindow
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
@@ -45,7 +46,6 @@ import androidx.compose.ui.text.platform.font
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.ui.desktop.AppWindow
 
 private const val title = "Desktop Compose Elements"
 
@@ -156,7 +156,7 @@ fun main() {
                         label = { Text(text = "Input2") }
                     )
 
-                    Image(imageResource("androidx/ui/desktop/example/circus.jpg"))
+                    Image(imageResource("androidx.compose.desktop/example/circus.jpg"))
                 }
             }
         )
