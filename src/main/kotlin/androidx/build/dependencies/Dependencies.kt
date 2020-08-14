@@ -93,6 +93,15 @@ const val SKIKO = "org.jetbrains.skiko:skiko-jvm:$SKIKO_VERSION"
 const val SKIKO_LINUX = "org.jetbrains.skiko:skiko-jvm-runtime-linux:$SKIKO_VERSION"
 const val SKIKO_MACOS = "org.jetbrains.skiko:skiko-jvm-runtime-macos:$SKIKO_VERSION"
 const val SKIKO_WINDOWS = "org.jetbrains.skiko:skiko-jvm-runtime-windows:$SKIKO_VERSION"
+val SKIKO_CURRENT_OS by lazy {
+    val os = System.getProperty("os.name")
+    when {
+        os == "Mac OS X" -> SKIKO_MACOS
+        os.startsWith("Win") -> SKIKO_WINDOWS
+        os.startsWith("Linux") -> SKIKO_LINUX
+        else -> throw Error("Unsupported OS $os")
+    }
+}
 const val TRUTH = "com.google.truth:truth:1.0.1"
 const val XERIAL = "org.xerial:sqlite-jdbc:3.25.2"
 const val XPP3 = "xpp3:xpp3:1.1.4c"
