@@ -1,0 +1,397 @@
+// Signature format: 3.0
+package androidx.animation {
+
+  public final class AnimatedFloat extends androidx.animation.BaseAnimatedValue<java.lang.Float,androidx.animation.Vector1D> {
+    ctor public AnimatedFloat(androidx.animation.FloatValueHolder valueHolder);
+    method public void doAnimationFrame$lintWithKotlin(long time);
+    method public float getVelocity();
+    method public void setBounds(float min = Float.NEGATIVE_INFINITY, float max = Float.POSITIVE_INFINITY);
+    method public void snapTo(float targetValue);
+    property public final float velocity;
+  }
+
+  public final class AnimatedValue<T, V extends androidx.animation.Vector> extends androidx.animation.BaseAnimatedValue<T,V> {
+    ctor public AnimatedValue(androidx.animation.ValueHolder<T,V> valueHolder);
+    method public V getVelocity();
+    property public final V velocity;
+  }
+
+  public final class AnimatedValueKt {
+    ctor public AnimatedValueKt();
+    method public static void fling(androidx.animation.AnimatedFloat, float startVelocity, androidx.animation.DecayAnimation decay = androidx.animation.ExponentialDecay(), kotlin.jvm.functions.Function3<? super androidx.animation.AnimationEndReason,? super java.lang.Float,? super java.lang.Float,kotlin.Unit>? onEnd = null);
+    method public static void fling(androidx.animation.AnimatedFloat, float startVelocity, androidx.animation.DecayAnimation decay = androidx.animation.ExponentialDecay(), kotlin.jvm.functions.Function1<? super java.lang.Float,androidx.animation.TargetAnimation> adjustTarget, kotlin.jvm.functions.Function3<? super androidx.animation.AnimationEndReason,? super java.lang.Float,? super java.lang.Float,kotlin.Unit>? onEnd = null);
+  }
+
+  public abstract class AnimationBuilder<T> {
+    ctor public AnimationBuilder();
+  }
+
+  public final class AnimationBuilderKt {
+    ctor public AnimationBuilderKt();
+    field public static final int DefaultDuration = 300; // 0x12c
+    field public static final int Infinite = 2147483647; // 0x7fffffff
+  }
+
+  public interface AnimationClockObservable {
+    method public void subscribe(androidx.animation.AnimationClockObserver observer);
+    method public void unsubscribe(androidx.animation.AnimationClockObserver observer);
+  }
+
+  public interface AnimationClockObserver {
+    method public void onAnimationFrame(long frameTimeMillis);
+  }
+
+  public enum AnimationEndReason {
+    enum_constant public static final androidx.animation.AnimationEndReason BoundReached;
+    enum_constant public static final androidx.animation.AnimationEndReason Interrupted;
+    enum_constant public static final androidx.animation.AnimationEndReason TargetReached;
+  }
+
+  public abstract sealed class BaseAnimatedValue<T, V extends androidx.animation.Vector> {
+    method public final void animateTo(T? targetValue);
+    method public final void animateTo(T? targetValue, kotlin.jvm.functions.Function2<? super androidx.animation.AnimationEndReason,? super T,kotlin.Unit> onEnd);
+    method public final void animateTo(T? targetValue, androidx.animation.AnimationBuilder<T> anim, kotlin.jvm.functions.Function2<? super androidx.animation.AnimationEndReason,? super T,kotlin.Unit> onEnd);
+    method public final void animateTo(T? targetValue, androidx.animation.AnimationBuilder<T> anim);
+    method public final T! getTargetValue();
+    method public final T! getValue();
+    method public final boolean isRunning();
+    method public void snapTo(T? targetValue);
+    method public final void stop();
+    property public final boolean isRunning;
+    property public final T! targetValue;
+    property public final T! value;
+  }
+
+  public abstract sealed class BaseAnimationClock implements androidx.animation.AnimationClockObservable {
+    method public void subscribe(androidx.animation.AnimationClockObserver observer);
+    method public void unsubscribe(androidx.animation.AnimationClockObserver observer);
+  }
+
+  public final class CubicBezierEasing implements kotlin.jvm.functions.Function1<java.lang.Float,java.lang.Float> {
+    ctor public CubicBezierEasing(float a, float b, float c, float d);
+    method public Float! invoke(float fraction);
+  }
+
+  public interface DecayAnimation {
+    method public float getAbsVelocityThreshold();
+    method public float getTarget(float start, float startVelocity);
+    method public float getValue(long playTime, float start, float startVelocity);
+    method public float getVelocity(long playTime, float start, float startVelocity);
+    method public boolean isFinished(long playTime, float start, float startVelocity);
+    property public abstract float absVelocityThreshold;
+  }
+
+  public final class DecayAnimationKt {
+    ctor public DecayAnimationKt();
+  }
+
+  public final class DefaultAnimationClock extends androidx.animation.BaseAnimationClock {
+    ctor public DefaultAnimationClock();
+    method public void dispatchTime$lintWithKotlin(long frameTimeMillis);
+  }
+
+  public abstract class DurationBasedAnimationBuilder<T> extends androidx.animation.AnimationBuilder<T> {
+    ctor public DurationBasedAnimationBuilder();
+    method public abstract <V extends androidx.animation.Vector> androidx.animation.DurationBasedAnimation<V> build$lintWithKotlin(androidx.animation.TwoWayConverter<T,V> converter);
+    method public final int getDelay();
+    method public final int getDuration();
+    method public final void setDelay(int value);
+    method public final void setDuration(int value);
+    property public final int delay;
+    property public final int duration;
+  }
+
+  public final class EasingKt {
+    ctor public EasingKt();
+    method public static androidx.animation.CubicBezierEasing getFastOutLinearInEasing();
+    method public static androidx.animation.CubicBezierEasing getFastOutSlowInEasing();
+    method public static kotlin.jvm.functions.Function1<java.lang.Float,java.lang.Float> getLinearEasing();
+    method public static androidx.animation.CubicBezierEasing getLinearOutSlowInEasing();
+  }
+
+  public final class ExponentialDecay implements androidx.animation.DecayAnimation {
+    ctor public ExponentialDecay(@FloatRange(from=null, fromInclusive=null) float frictionMultiplier, @FloatRange(from=null, fromInclusive=null) float absVelocityThreshold);
+    ctor public ExponentialDecay();
+    method public float getAbsVelocityThreshold();
+    method public float getTarget(float start, float startVelocity);
+    method public float getValue(long playTime, float start, float startVelocity);
+    method public float getVelocity(long playTime, float start, float startVelocity);
+    method public boolean isFinished(long playTime, float start, float startVelocity);
+    property public float absVelocityThreshold;
+  }
+
+  public final class FloatPropKey implements androidx.animation.PropKey<java.lang.Float,androidx.animation.Vector1D> {
+    ctor public FloatPropKey();
+    method public androidx.animation.TwoWayConverter<java.lang.Float,androidx.animation.Vector1D> getTypeConverter();
+    property public androidx.animation.TwoWayConverter<java.lang.Float,androidx.animation.Vector1D> typeConverter;
+  }
+
+  public interface FloatValueHolder extends androidx.animation.ValueHolder<java.lang.Float,androidx.animation.Vector1D> {
+    method public default androidx.animation.TwoWayConverter<java.lang.Float,androidx.animation.Vector1D> getTypeConverter();
+    property public default androidx.animation.TwoWayConverter<java.lang.Float,androidx.animation.Vector1D> typeConverter;
+  }
+
+  public final class IntPropKey implements androidx.animation.PropKey<java.lang.Integer,androidx.animation.Vector1D> {
+    ctor public IntPropKey();
+    method public androidx.animation.TwoWayConverter<java.lang.Integer,androidx.animation.Vector1D> getTypeConverter();
+    property public androidx.animation.TwoWayConverter<java.lang.Integer,androidx.animation.Vector1D> typeConverter;
+  }
+
+  public enum InterruptionHandling {
+    enum_constant public static final androidx.animation.InterruptionHandling PHYSICS;
+    enum_constant public static final androidx.animation.InterruptionHandling SNAP_TO_END;
+    enum_constant public static final androidx.animation.InterruptionHandling TWEEN;
+    enum_constant public static final androidx.animation.InterruptionHandling UNINTERRUPTIBLE;
+  }
+
+  public final class KeyframesBuilder<T> extends androidx.animation.DurationBasedAnimationBuilder<T> {
+    ctor public KeyframesBuilder();
+    method public infix androidx.animation.KeyframesBuilder<T>.KeyframeEntity<T> at(T?, int timeStamp);
+    method public <V extends androidx.animation.Vector> androidx.animation.DurationBasedAnimation<V> build$lintWithKotlin(androidx.animation.TwoWayConverter<T,V> converter);
+    method public infix void with(androidx.animation.KeyframesBuilder<T>.KeyframeEntity<T>, kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> easing);
+  }
+
+  public final class KeyframesBuilder.KeyframeEntity<T> {
+  }
+
+  public final class ManualAnimationClock extends androidx.animation.BaseAnimationClock {
+    ctor public ManualAnimationClock(long initTimeMillis);
+    method public long getClockTimeMillis();
+    method public void setClockTimeMillis(long value);
+    property public final long clockTimeMillis;
+  }
+
+  public interface MutableTransitionState {
+    method public operator <T, V extends androidx.animation.Vector> void set(androidx.animation.PropKey<T,V> propKey, T? prop);
+  }
+
+  public final class PhysicsBuilder<T> extends androidx.animation.AnimationBuilder<T> {
+    ctor public PhysicsBuilder(float dampingRatio, float stiffness);
+    ctor public PhysicsBuilder();
+    method public <V extends androidx.animation.Vector> androidx.animation.Animation<V> build$lintWithKotlin(androidx.animation.TwoWayConverter<T,V> converter);
+    method public float getDampingRatio();
+    method public float getStiffness();
+    method public void setDampingRatio(float p);
+    method public void setStiffness(float p);
+  }
+
+  public interface PropKey<T, V extends androidx.animation.Vector> {
+    method public androidx.animation.TwoWayConverter<T,V> getTypeConverter();
+    property public abstract androidx.animation.TwoWayConverter<T,V> typeConverter;
+  }
+
+  public final class PropKeyKt {
+    ctor public PropKeyKt();
+    method public static androidx.animation.TwoWayConverter<java.lang.Float,androidx.animation.Vector1D> getFloatToVectorConverter();
+    method public static androidx.animation.TwoWayConverter<java.lang.Integer,androidx.animation.Vector1D> getIntToVectorConverter();
+  }
+
+  public final class RepeatableBuilder<T> extends androidx.animation.AnimationBuilder<T> {
+    ctor public RepeatableBuilder();
+    method public <V extends androidx.animation.Vector> androidx.animation.Animation<V> build$lintWithKotlin(androidx.animation.TwoWayConverter<T,V> converter);
+    method public androidx.animation.DurationBasedAnimationBuilder<T>? getAnimation();
+    method public Integer? getIterations();
+    method public void setAnimation(androidx.animation.DurationBasedAnimationBuilder<T>? p);
+    method public void setIterations(Integer? value);
+    property public final androidx.animation.DurationBasedAnimationBuilder<T>? animation;
+    property public final Integer? iterations;
+  }
+
+  public final class SnapBuilder<T> extends androidx.animation.AnimationBuilder<T> {
+    ctor public SnapBuilder();
+    method public <V extends androidx.animation.Vector> androidx.animation.Animation<V> build$lintWithKotlin(androidx.animation.TwoWayConverter<T,V> converter);
+  }
+
+  public final class Spring {
+    field public static final float DampingRatioHighBouncy = 0.2f;
+    field public static final float DampingRatioLowBouncy = 0.75f;
+    field public static final float DampingRatioMediumBouncy = 0.5f;
+    field public static final float DampingRatioNoBouncy = 1.0f;
+    field public static final androidx.animation.Spring! INSTANCE;
+    field public static final float StiffnessHigh = 10000.0f;
+    field public static final float StiffnessLow = 200.0f;
+    field public static final float StiffnessMedium = 1500.0f;
+    field public static final float StiffnessVeryLow = 50.0f;
+  }
+
+  public final class SpringSimulationKt {
+    ctor public SpringSimulationKt();
+  }
+
+  public final class TargetAnimation {
+    ctor public TargetAnimation(float target, androidx.animation.AnimationBuilder<java.lang.Float> animation);
+    method public float component1();
+    method public androidx.animation.AnimationBuilder<java.lang.Float> component2();
+    method public androidx.animation.TargetAnimation copy(float target, androidx.animation.AnimationBuilder<java.lang.Float> animation);
+    method public androidx.animation.AnimationBuilder<java.lang.Float> getAnimation();
+    method public float getTarget();
+  }
+
+  public final class TransitionAnimation<T> implements androidx.animation.TransitionState {
+    ctor public TransitionAnimation(androidx.animation.TransitionDefinition<T> def, androidx.animation.AnimationClockObservable clock, T? initState);
+    method public operator <T, V extends androidx.animation.Vector> T! get(androidx.animation.PropKey<T,V> propKey);
+    method public kotlin.jvm.functions.Function1<T,kotlin.Unit>? getOnStateChangeFinished();
+    method public kotlin.jvm.functions.Function0<kotlin.Unit>? getOnUpdate();
+    method public boolean isRunning();
+    method public void setOnStateChangeFinished(kotlin.jvm.functions.Function1<? super T,kotlin.Unit>? p);
+    method public void setOnUpdate(kotlin.jvm.functions.Function0<kotlin.Unit>? p);
+    method public void toState(T? name);
+    property public final boolean isRunning;
+    property public final kotlin.jvm.functions.Function1<T,kotlin.Unit>? onStateChangeFinished;
+    property public final kotlin.jvm.functions.Function0<kotlin.Unit>? onUpdate;
+  }
+
+  public final class TransitionDefinition<T> {
+    ctor public TransitionDefinition();
+    method public androidx.animation.TransitionState getStateFor(T? name);
+    method public void snapTransition(kotlin.Pair<? extends T,? extends T>![] fromToPairs, T? nextState = null);
+    method public void state(T? name, kotlin.jvm.functions.Function1<? super androidx.animation.MutableTransitionState,kotlin.Unit> init);
+    method public void transition(T? fromState = null, T? toState = null, kotlin.jvm.functions.Function1<? super androidx.animation.TransitionSpec<T>,kotlin.Unit> init);
+    method public void transition(kotlin.Pair<? extends T,? extends T>![] fromToPairs, kotlin.jvm.functions.Function1<? super androidx.animation.TransitionSpec<T>,kotlin.Unit> init);
+  }
+
+  public final class TransitionDefinitionKt {
+    ctor public TransitionDefinitionKt();
+    method public static <T> androidx.animation.TransitionAnimation<T> createAnimation(androidx.animation.TransitionDefinition<T>);
+    method public static <T> androidx.animation.TransitionAnimation<T> createAnimation(androidx.animation.TransitionDefinition<T>, androidx.animation.AnimationClockObservable clock, T? initState = null);
+    method public static <T> androidx.animation.TransitionDefinition<T> transitionDefinition(kotlin.jvm.functions.Function1<? super androidx.animation.TransitionDefinition<T>,kotlin.Unit> init);
+  }
+
+  public final class TransitionSpec<S> {
+    method public androidx.animation.InterruptionHandling getInterruptionHandling();
+    method public S? getNextState();
+    method public <T> androidx.animation.KeyframesBuilder<T> keyframes(kotlin.jvm.functions.Function1<? super androidx.animation.KeyframesBuilder<T>,kotlin.Unit> init);
+    method public <T> androidx.animation.AnimationBuilder<T> physics(kotlin.jvm.functions.Function1<? super androidx.animation.PhysicsBuilder<T>,kotlin.Unit> init);
+    method public <T> androidx.animation.AnimationBuilder<T> repeatable(kotlin.jvm.functions.Function1<? super androidx.animation.RepeatableBuilder<T>,kotlin.Unit> init);
+    method public void setInterruptionHandling(androidx.animation.InterruptionHandling p);
+    method public void setNextState(S? p);
+    method public <T> androidx.animation.AnimationBuilder<T> snap();
+    method public <T> androidx.animation.DurationBasedAnimationBuilder<T> tween(kotlin.jvm.functions.Function1<? super androidx.animation.TweenBuilder<T>,kotlin.Unit> init);
+    method public infix <T, V extends androidx.animation.Vector> void using(androidx.animation.PropKey<T,V>, androidx.animation.AnimationBuilder<T> builder);
+    property public final androidx.animation.InterruptionHandling interruptionHandling;
+    property public final S? nextState;
+  }
+
+  public interface TransitionState {
+    method public operator <T, V extends androidx.animation.Vector> T! get(androidx.animation.PropKey<T,V> propKey);
+  }
+
+  public final class TweenBuilder<T> extends androidx.animation.DurationBasedAnimationBuilder<T> {
+    ctor public TweenBuilder();
+    method public <V extends androidx.animation.Vector> androidx.animation.DurationBasedAnimation<V> build$lintWithKotlin(androidx.animation.TwoWayConverter<T,V> converter);
+    method public kotlin.jvm.functions.Function1<java.lang.Float,java.lang.Float> getEasing();
+    method public void setEasing(kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> p);
+    property public final kotlin.jvm.functions.Function1<java.lang.Float,java.lang.Float> easing;
+  }
+
+  public abstract sealed class TwoWayConverter<T, V extends androidx.animation.Vector> {
+    method public abstract kotlin.jvm.functions.Function1<V,T> getConvertFromVector();
+    method public abstract kotlin.jvm.functions.Function1<T,V> getConvertToVector();
+    property public abstract kotlin.jvm.functions.Function1<V,T> convertFromVector;
+    property public abstract kotlin.jvm.functions.Function1<T,V> convertToVector;
+  }
+
+  public final class TypeConverter1D<T> extends androidx.animation.TwoWayConverter<T,androidx.animation.Vector1D> {
+    ctor public TypeConverter1D(kotlin.jvm.functions.Function1<? super T,androidx.animation.Vector1D> convertToVector, kotlin.jvm.functions.Function1<? super androidx.animation.Vector1D,? extends T> convertFromVector);
+    method public androidx.animation.Vector1D createNewVector$lintWithKotlin();
+    method public androidx.animation.Arithmetic<androidx.animation.Vector1D> getArithmetic$lintWithKotlin();
+    method public kotlin.jvm.functions.Function1<androidx.animation.Vector1D,T> getConvertFromVector();
+    method public kotlin.jvm.functions.Function1<T,androidx.animation.Vector1D> getConvertToVector();
+    property public androidx.animation.Arithmetic<androidx.animation.Vector1D> arithmetic;
+  }
+
+  public final class TypeConverter2D<T> extends androidx.animation.TwoWayConverter<T,androidx.animation.Vector2D> {
+    ctor public TypeConverter2D(kotlin.jvm.functions.Function1<? super T,androidx.animation.Vector2D> convertToVector, kotlin.jvm.functions.Function1<? super androidx.animation.Vector2D,? extends T> convertFromVector);
+    method public androidx.animation.Vector2D createNewVector$lintWithKotlin();
+    method public androidx.animation.Arithmetic<androidx.animation.Vector2D> getArithmetic$lintWithKotlin();
+    method public kotlin.jvm.functions.Function1<androidx.animation.Vector2D,T> getConvertFromVector();
+    method public kotlin.jvm.functions.Function1<T,androidx.animation.Vector2D> getConvertToVector();
+    property public androidx.animation.Arithmetic<androidx.animation.Vector2D> arithmetic;
+  }
+
+  public final class TypeConverter3D<T> extends androidx.animation.TwoWayConverter<T,androidx.animation.Vector3D> {
+    ctor public TypeConverter3D(kotlin.jvm.functions.Function1<? super T,androidx.animation.Vector3D> convertToVector, kotlin.jvm.functions.Function1<? super androidx.animation.Vector3D,? extends T> convertFromVector);
+    method public androidx.animation.Vector3D createNewVector$lintWithKotlin();
+    method public androidx.animation.Arithmetic<androidx.animation.Vector3D> getArithmetic$lintWithKotlin();
+    method public kotlin.jvm.functions.Function1<androidx.animation.Vector3D,T> getConvertFromVector();
+    method public kotlin.jvm.functions.Function1<T,androidx.animation.Vector3D> getConvertToVector();
+    property public androidx.animation.Arithmetic<androidx.animation.Vector3D> arithmetic;
+  }
+
+  public final class TypeConverter4D<T> extends androidx.animation.TwoWayConverter<T,androidx.animation.Vector4D> {
+    ctor public TypeConverter4D(kotlin.jvm.functions.Function1<? super T,androidx.animation.Vector4D> convertToVector, kotlin.jvm.functions.Function1<? super androidx.animation.Vector4D,? extends T> convertFromVector);
+    method public androidx.animation.Vector4D createNewVector$lintWithKotlin();
+    method public androidx.animation.Arithmetic<androidx.animation.Vector4D> getArithmetic$lintWithKotlin();
+    method public kotlin.jvm.functions.Function1<androidx.animation.Vector4D,T> getConvertFromVector();
+    method public kotlin.jvm.functions.Function1<T,androidx.animation.Vector4D> getConvertToVector();
+    property public androidx.animation.Arithmetic<androidx.animation.Vector4D> arithmetic;
+  }
+
+  public interface ValueHolder<T, V extends androidx.animation.Vector> {
+    method public androidx.animation.TwoWayConverter<T,V> getTypeConverter();
+    method public T! getValue();
+    method public void setValue(T! p);
+    property public abstract androidx.animation.TwoWayConverter<T,V> typeConverter;
+    property public abstract T! value;
+  }
+
+  public final class ValueHolderImpl<T, V extends androidx.animation.Vector> implements androidx.animation.ValueHolder<T,V> {
+    ctor public ValueHolderImpl(T! value, androidx.animation.TwoWayConverter<T,V> typeConverter);
+    method public T! component1();
+    method public androidx.animation.TwoWayConverter<T,V> component2();
+    method public androidx.animation.ValueHolderImpl<T,V> copy(T! value, androidx.animation.TwoWayConverter<T,V> typeConverter);
+    method public androidx.animation.TwoWayConverter<T,V> getTypeConverter();
+    method public T! getValue();
+    method public void setValue(T? p);
+  }
+
+  public abstract sealed class Vector {
+  }
+
+  public final class Vector1D extends androidx.animation.Vector {
+    ctor public Vector1D(float initVal);
+    method public float getValue();
+    method public void reset$lintWithKotlin();
+    property public final float value;
+  }
+
+  public final class Vector2D extends androidx.animation.Vector {
+    ctor public Vector2D(float v1, float v2);
+    method public float getV1();
+    method public float getV2();
+    method public void reset$lintWithKotlin();
+    property public final float v1;
+    property public final float v2;
+  }
+
+  public final class Vector3D extends androidx.animation.Vector {
+    ctor public Vector3D(float v1, float v2, float v3);
+    method public float getV1();
+    method public float getV2();
+    method public float getV3();
+    method public void reset$lintWithKotlin();
+    property public final float v1;
+    property public final float v2;
+    property public final float v3;
+  }
+
+  public final class Vector4D extends androidx.animation.Vector {
+    ctor public Vector4D(float v1, float v2, float v3, float v4);
+    method public float getV1();
+    method public float getV2();
+    method public float getV3();
+    method public float getV4();
+    method public void reset$lintWithKotlin();
+    property public final float v1;
+    property public final float v2;
+    property public final float v3;
+    property public final float v4;
+  }
+
+  public final class VectorAnimationKt {
+    ctor public VectorAnimationKt();
+    field public static final boolean DEBUG = false;
+  }
+
+}
+

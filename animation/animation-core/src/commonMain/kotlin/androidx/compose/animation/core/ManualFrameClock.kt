@@ -1,0 +1,77 @@
+/*
+ * Copyright 2020 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package androidx.compose.animation.core
+
+import androidx.compose.runtime.dispatch.BroadcastFrameClock
+import androidx.compose.runtime.dispatch.MonotonicFrameClock
+
+/**
+ * A [MonotonicFrameClock] built on a [BroadcastFrameClock] that keeps track of the current time.
+ *
+ * For backwards compatibility with the older [ManualAnimationClock][androidx.animation
+ * .ManualAnimationClock], which immediately calls the subscriber's callback with the current
+ * time, supply [dispatchOnSubscribe] to the constructor.
+ */
+class ManualFrameClock
+@Deprecated(
+    message = "dispatchOnSubscribe should only be used for backwards compatibility when this " +
+            "MonotonicFrameClock is used as an AnimationClockObservable in places where " +
+            "ManualAnimationClock was used before.",
+    replaceWith = ReplaceWith("ManualFrameClock(initialTime)")
+)
+constructor(
+    initialTime: Long = 0L,
+    internal val dispatchOnSubscribe: Boolean
+) : MonotonicFrameClock {
+    @Suppress("DEPRECATION")
+    constructor(initialTime: Long = 0L) : this(initialTime, false)
+
+    private val broadcastClock = BroadcastFrameClock()
+
+    /**
+     * The current time of this [frame clock][MonotonicFrameClock], in nanoseconds.
+     */
+    var currentTime: Long = initialTime
+        private set
+
+    /**
+     * Advances the clock by the given number of [nanoseconds][nanos]. One frame will be sent,
+     * with a frame time that is [nanos] nanoseconds after the last frame time (or after the
+     * initial time, if no frames have been sent yet).
+     */
+    fun advanceClock(nanos: Long) {
+        require(nanos > 0) {
+            "Cannot advance the clock by $nanos ns, only values greater than 0 are allowed"
+        }
+        // Make sure multiple invocations of advanceClock can't run concurrently
+        @Suppress("DEPRECATION_ERROR")
+        synchronized(broadcastClock) {
+            currentTime += nanos
+            broadcastClock.sendFrame(currentTime)
+        }
+    }
+
+    override suspend fun <R> withFrameNanos(onFrame: (frameTimeNanos: Long) -> R): R {
+        return broadcastClock.withFrameNanos(onFrame)
+    }
+}
+
+/**
+ * Advances the clock by the given number of [milliseconds][millis]. See
+ * [ManualFrameClock.advanceClock] for more information.
+ */
+fun ManualFrameClock.advanceClockMillis(millis: Long) = advanceClock(millis * 1_000_000)
