@@ -1,0 +1,10 @@
+// Signature format: 3.0
+package androidx.ui.livedata {
+
+  public final class LiveDataAdapterKt {
+    method @androidx.compose.Composable public static inline <T> androidx.compose.State<T> observeAsState(androidx.lifecycle.LiveData<T>);
+    method @androidx.compose.Composable public static <R, T extends R> androidx.compose.State<R> observeAsState(androidx.lifecycle.LiveData<T>, R? initial);
+  }
+
+}
+
