@@ -17,9 +17,9 @@
 package androidx.compose.animation.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.runtime.Composable
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Text
+import androidx.compose.runtime.Composable
 
 @Sampled
 @Composable

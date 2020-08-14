@@ -16,33 +16,33 @@
 
 package androidx.compose.animation.demos
 
+import androidx.compose.animation.animatedFloat
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.FloatPropKey
 import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.transitionDefinition
 import androidx.compose.animation.core.tween
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
-import androidx.compose.runtime.remember
 import androidx.compose.animation.transition
-import androidx.compose.animation.animatedFloat
-import androidx.compose.ui.platform.AnimationClockAmbient
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.gesture.DragObserver
-import androidx.compose.ui.gesture.pressIndicatorGestureFilter
-import androidx.compose.ui.gesture.rawDragGestureFilter
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Text
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Providers
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.gesture.DragObserver
+import androidx.compose.ui.gesture.pressIndicatorGestureFilter
+import androidx.compose.ui.gesture.rawDragGestureFilter
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 

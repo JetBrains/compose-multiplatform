@@ -16,12 +16,12 @@
 
 package androidx.compose.animation.core.samples
 
+import androidx.annotation.Sampled
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.KeyframesSpec
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.keyframes
-import androidx.annotation.Sampled
 import androidx.compose.ui.unit.Position
 import androidx.compose.ui.unit.dp
 

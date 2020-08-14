@@ -30,8 +30,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
-import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.AnimationClockAmbient
 
 /**
  * The animatedValue effect creates an [AnimatedValue] and positionally memoizes it. When the

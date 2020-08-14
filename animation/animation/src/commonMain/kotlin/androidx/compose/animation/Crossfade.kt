@@ -20,6 +20,7 @@ import androidx.compose.animation.core.AnimatedFloat
 import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Stack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.invalidate
 import androidx.compose.runtime.key
@@ -27,7 +28,6 @@ import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawOpacity
-import androidx.compose.foundation.layout.Stack
 import androidx.compose.ui.util.fastForEach
 
 /**

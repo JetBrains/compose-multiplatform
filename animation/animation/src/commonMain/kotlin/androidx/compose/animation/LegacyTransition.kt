@@ -20,8 +20,6 @@ import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.TransitionDefinition
 import androidx.compose.animation.core.TransitionState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.AnimationClockAmbient
 
 /**

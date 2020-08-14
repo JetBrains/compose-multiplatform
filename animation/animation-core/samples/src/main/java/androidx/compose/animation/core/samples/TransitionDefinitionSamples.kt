@@ -16,12 +16,12 @@
 
 package androidx.compose.animation.core.samples
 
+import androidx.annotation.Sampled
 import androidx.compose.animation.core.FloatPropKey
 import androidx.compose.animation.core.InterruptionHandling
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.transitionDefinition
-import androidx.annotation.Sampled
 
 private val radius = FloatPropKey()
 private val alpha = FloatPropKey()

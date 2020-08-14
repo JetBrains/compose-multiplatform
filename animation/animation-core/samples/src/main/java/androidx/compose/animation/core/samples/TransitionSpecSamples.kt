@@ -16,6 +16,7 @@
 
 package androidx.compose.animation.core.samples
 
+import androidx.annotation.Sampled
 import androidx.compose.animation.core.FloatPropKey
 import androidx.compose.animation.core.InterruptionHandling
 import androidx.compose.animation.core.LinearEasing
@@ -23,7 +24,6 @@ import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.transitionDefinition
 import androidx.compose.animation.core.tween
-import androidx.annotation.Sampled
 
 enum class ButtonState {
     Released,
