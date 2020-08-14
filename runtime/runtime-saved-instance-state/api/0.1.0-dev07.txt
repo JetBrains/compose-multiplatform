@@ -1,0 +1,17 @@
+// Signature format: 3.0
+package androidx.ui.savedinstancestate {
+
+  public interface UiSavedStateRegistry {
+    method public boolean canBeSaved(Object value);
+    method public Object? consumeRestored(String key);
+    method public java.util.Map<java.lang.String,java.lang.Object> performSave();
+    method public void registerProvider(String key, kotlin.jvm.functions.Function0<?> valueProvider);
+    method public void unregisterProvider(String key);
+  }
+
+  public final class UiSavedStateRegistryKt {
+    method public static androidx.ui.savedinstancestate.UiSavedStateRegistry UiSavedStateRegistry(java.util.Map<java.lang.String,?>? restoredValues, kotlin.jvm.functions.Function1<java.lang.Object,java.lang.Boolean> canBeSaved);
+  }
+
+}
+

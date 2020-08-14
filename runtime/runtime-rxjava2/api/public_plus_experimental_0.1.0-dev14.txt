@@ -1,0 +1,17 @@
+// Signature format: 3.0
+package androidx.ui.rxjava2 {
+
+  public final class RxJava2AdapterKt {
+    method @androidx.compose.Composable public static inline <T> androidx.compose.State<T> subscribeAsState(io.reactivex.Observable<T>);
+    method @androidx.compose.Composable public static <R, T extends R> androidx.compose.State<R> subscribeAsState(io.reactivex.Observable<T>, R? initial);
+    method @androidx.compose.Composable public static inline <T> androidx.compose.State<T> subscribeAsState(io.reactivex.Flowable<T>);
+    method @androidx.compose.Composable public static <R, T extends R> androidx.compose.State<R> subscribeAsState(io.reactivex.Flowable<T>, R? initial);
+    method @androidx.compose.Composable public static inline <T> androidx.compose.State<T> subscribeAsState(io.reactivex.Single<T>);
+    method @androidx.compose.Composable public static <R, T extends R> androidx.compose.State<R> subscribeAsState(io.reactivex.Single<T>, R? initial);
+    method @androidx.compose.Composable public static inline <T> androidx.compose.State<T> subscribeAsState(io.reactivex.Maybe<T>);
+    method @androidx.compose.Composable public static <R, T extends R> androidx.compose.State<R> subscribeAsState(io.reactivex.Maybe<T>, R? initial);
+    method @androidx.compose.Composable public static androidx.compose.State<java.lang.Boolean> subscribeAsState(io.reactivex.Completable);
+  }
+
+}
+
