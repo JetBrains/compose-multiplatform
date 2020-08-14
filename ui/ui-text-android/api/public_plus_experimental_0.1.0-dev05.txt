@@ -1,0 +1,13 @@
+// Signature format: 3.0
+package androidx.text {
+
+  public final class LayoutIntrinsicsKt {
+    ctor public LayoutIntrinsicsKt();
+  }
+
+  public final class TextLayoutKt {
+    ctor public TextLayoutKt();
+  }
+
+}
+

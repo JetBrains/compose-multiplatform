@@ -1,0 +1,87 @@
+// Signature format: 3.0
+package androidx.ui.util {
+
+  public final class Float16 implements java.lang.Comparable<androidx.ui.util.Float16> {
+    ctor public Float16(short halfValue);
+    ctor public Float16(float value);
+    ctor public Float16(double value);
+    method public androidx.ui.util.Float16 absoluteValue();
+    method public androidx.ui.util.Float16 ceil();
+    method public operator int compareTo(androidx.ui.util.Float16 other);
+    method public androidx.ui.util.Float16 floor();
+    method public int getExponent();
+    method public short getHalfValue();
+    method public androidx.ui.util.Float16 getSign();
+    method public int getSignificand();
+    method public boolean isFinite();
+    method public boolean isInfinite();
+    method public boolean isNaN();
+    method public boolean isNormalized();
+    method public androidx.ui.util.Float16 round();
+    method public int toBits();
+    method public byte toByte();
+    method public double toDouble();
+    method public float toFloat();
+    method public String toHexString();
+    method public int toInt();
+    method public long toLong();
+    method public int toRawBits();
+    method public short toShort();
+    method public androidx.ui.util.Float16 trunc();
+    method public androidx.ui.util.Float16 withSign(androidx.ui.util.Float16 sign);
+    property public final int exponent;
+    property public final androidx.ui.util.Float16 sign;
+    property public final int significand;
+    field public static final androidx.ui.util.Float16.Companion! Companion;
+    field public static final int MaxExponent = 15; // 0xf
+    field public static final int MinExponent = -14; // 0xfffffff2
+    field public static final int Size = 16; // 0x10
+  }
+
+  public static final class Float16.Companion {
+    method public androidx.ui.util.Float16 getEpsilon();
+    method public androidx.ui.util.Float16 getLowestValue();
+    method public androidx.ui.util.Float16 getMaxValue();
+    method public androidx.ui.util.Float16 getMinNormal();
+    method public androidx.ui.util.Float16 getMinValue();
+    method public androidx.ui.util.Float16 getNaN();
+    method public androidx.ui.util.Float16 getNegativeInfinity();
+    method public androidx.ui.util.Float16 getNegativeZero();
+    method public androidx.ui.util.Float16 getPositiveInfinity();
+    method public androidx.ui.util.Float16 getPositiveZero();
+    property public final androidx.ui.util.Float16 Epsilon;
+    property public final androidx.ui.util.Float16 LowestValue;
+    property public final androidx.ui.util.Float16 MaxValue;
+    property public final androidx.ui.util.Float16 MinNormal;
+    property public final androidx.ui.util.Float16 MinValue;
+    property public final androidx.ui.util.Float16 NaN;
+    property public final androidx.ui.util.Float16 NegativeInfinity;
+    property public final androidx.ui.util.Float16 NegativeZero;
+    property public final androidx.ui.util.Float16 PositiveInfinity;
+    property public final androidx.ui.util.Float16 PositiveZero;
+  }
+
+  public final class Float16Kt {
+    method public static androidx.ui.util.Float16 max(androidx.ui.util.Float16 x, androidx.ui.util.Float16 y);
+    method public static androidx.ui.util.Float16 min(androidx.ui.util.Float16 x, androidx.ui.util.Float16 y);
+  }
+
+  public final class InlineClassHelperKt {
+    method public static inline long packFloats(float val1, float val2);
+    method public static inline long packInts(int val1, int val2);
+    method public static inline float unpackFloat1(long value);
+    method public static inline float unpackFloat2(long value);
+    method public static inline int unpackInt1(long value);
+    method public static inline int unpackInt2(long value);
+  }
+
+  public final class MathHelpersKt {
+    method public static float lerp(float start, float stop, float fraction);
+    method public static int lerp(int start, int stop, float fraction);
+    method public static long lerp(long start, long stop, float fraction);
+    method public static String toHexString(int);
+    method public static String toStringAsFixed(float, int digits);
+  }
+
+}
+

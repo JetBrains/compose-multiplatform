@@ -1,0 +1,45 @@
+// Signature format: 3.0
+package androidx.text {
+
+  public final class LayoutIntrinsicsKt {
+  }
+
+  public final class TextLayoutKt {
+  }
+
+}
+
+package androidx.text.style {
+
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP) public final class PlaceholderSpan extends android.text.style.ReplacementSpan {
+    ctor public PlaceholderSpan(float width, int widthUnit, float height, int heightUnit, float pxPerSp, int verticalAlign);
+    method public void draw(android.graphics.Canvas canvas, CharSequence? text, int start, int end, float x, int top, int y, int bottom, android.graphics.Paint paint);
+    method public android.graphics.Paint.FontMetricsInt getFontMetrics();
+    method public int getHeightPx();
+    method public int getSize(android.graphics.Paint paint, CharSequence? text, int start, int end, android.graphics.Paint.FontMetricsInt? fm);
+    method public int getVerticalAlign();
+    method public int getWidthPx();
+    property public final android.graphics.Paint.FontMetricsInt fontMetrics;
+    property public final int heightPx;
+    property public final int widthPx;
+    field public static final int ALIGN_ABOVE_BASELINE = 0; // 0x0
+    field public static final int ALIGN_BOTTOM = 2; // 0x2
+    field public static final int ALIGN_CENTER = 3; // 0x3
+    field public static final int ALIGN_TEXT_BOTTOM = 5; // 0x5
+    field public static final int ALIGN_TEXT_CENTER = 6; // 0x6
+    field public static final int ALIGN_TEXT_TOP = 4; // 0x4
+    field public static final int ALIGN_TOP = 1; // 0x1
+    field public static final androidx.text.style.PlaceholderSpan.Companion! Companion;
+    field public static final int UNIT_EM = 1; // 0x1
+    field public static final int UNIT_INHERIT = 2; // 0x2
+    field public static final int UNIT_SP = 0; // 0x0
+  }
+
+  public static final class PlaceholderSpan.Companion {
+  }
+
+  public final class PlaceholderSpanKt {
+  }
+
+}
+

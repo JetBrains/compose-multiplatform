@@ -1,0 +1,158 @@
+// Signature format: 3.0
+package androidx.text {
+
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP) public final class LayoutIntrinsics {
+    ctor public LayoutIntrinsics(CharSequence charSequence, android.text.TextPaint textPaint, int textDirectionHeuristic);
+    method public android.text.BoringLayout.Metrics? getBoringMetrics();
+    method public float getMaxIntrinsicWidth();
+    method public float getMinIntrinsicWidth();
+    property public final android.text.BoringLayout.Metrics? boringMetrics;
+    property public final float maxIntrinsicWidth;
+    property public final float minIntrinsicWidth;
+  }
+
+  public final class LayoutIntrinsicsKt {
+  }
+
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP) public final class TextLayout {
+    ctor public TextLayout(CharSequence charSequence, float width, android.text.TextPaint textPaint, int alignment, android.text.TextUtils.TruncateAt? ellipsize, int textDirectionHeuristic, float lineSpacingMultiplier, @Px float lineSpacingExtra, boolean includePadding, int maxLines, int breakStrategy, int hyphenationFrequency, int justificationMode, int[]? leftIndents, int[]? rightIndents, androidx.text.LayoutIntrinsics layoutIntrinsics);
+    method public boolean getDidExceedMaxLines();
+    method public int getHeight();
+    method public android.text.Layout getLayout();
+    method public androidx.text.LayoutIntrinsics getLayoutIntrinsics();
+    method public float getLineBaseline(int line);
+    method public float getLineBottom(int line);
+    method public int getLineCount();
+    method public int getLineForOffset(int offset);
+    method public int getLineForVertical(int vertical);
+    method public float getLineHeight(int lineIndex);
+    method public float getLineLeft(int lineIndex);
+    method public float getLineRight(int lineIndex);
+    method public float getLineTop(int line);
+    method public float getLineWidth(int lineIndex);
+    method public float getMaxIntrinsicWidth();
+    method public float getMinIntrinsicWidth();
+    method public int getOffsetForHorizontal(int line, float horizontal);
+    method public int getParagraphDirection(int line);
+    method public float getPrimaryHorizontal(int offset);
+    method public float getSecondaryHorizontal(int offset);
+    method public void getSelectionPath(int start, int end, android.graphics.Path dest);
+    method public CharSequence getText();
+    method public boolean isEllipsisApplied(int lineIndex);
+    method public boolean isRtlCharAt(int offset);
+    method public void paint(android.graphics.Canvas canvas);
+    property public final boolean didExceedMaxLines;
+    property public final int height;
+    property public final android.text.Layout layout;
+    property public final int lineCount;
+    property public final float maxIntrinsicWidth;
+    property public final float minIntrinsicWidth;
+    property public final CharSequence text;
+  }
+
+  public final class TextLayoutKt {
+  }
+
+}
+
+package androidx.text.selection {
+
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP) public final class WordBoundary {
+    ctor public WordBoundary(java.util.Locale locale, CharSequence text);
+    method public int getWordEnd(int offset);
+    method public int getWordStart(int offset);
+  }
+
+}
+
+package androidx.text.style {
+
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP) public class BaselineShiftSpan extends android.text.style.MetricAffectingSpan {
+    ctor public BaselineShiftSpan(float multiplier);
+    method public final float getMultiplier();
+    method public void updateDrawState(android.text.TextPaint textPaint);
+    method public void updateMeasureState(android.text.TextPaint textPaint);
+  }
+
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP) public final class FontFeatureSpan extends android.text.style.MetricAffectingSpan {
+    ctor public FontFeatureSpan(String fontFeatureSettings);
+    method public String getFontFeatureSettings();
+    method public void updateDrawState(android.text.TextPaint textPaint);
+    method public void updateMeasureState(android.text.TextPaint textPaint);
+  }
+
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP) public final class LetterSpacingSpanEm extends android.text.style.MetricAffectingSpan {
+    ctor public LetterSpacingSpanEm(float letterSpacing);
+    method public float getLetterSpacing();
+    method public void updateDrawState(android.text.TextPaint textPaint);
+    method public void updateMeasureState(android.text.TextPaint textPaint);
+  }
+
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP) public final class LetterSpacingSpanPx extends android.text.style.MetricAffectingSpan {
+    ctor public LetterSpacingSpanPx(@Px float letterSpacing);
+    method public float getLetterSpacing();
+    method public void updateDrawState(android.text.TextPaint textPaint);
+    method public void updateMeasureState(android.text.TextPaint textPaint);
+  }
+
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP) public final class LineHeightSpan implements android.text.style.LineHeightSpan {
+    ctor public LineHeightSpan(int lineHeight);
+    method public void chooseHeight(CharSequence text, int start, int end, int spanstartVertical, int lineHeight, android.graphics.Paint.FontMetricsInt fontMetricsInt);
+    method public int getLineHeight();
+  }
+
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP) public final class PlaceholderSpan extends android.text.style.ReplacementSpan {
+    ctor public PlaceholderSpan(float width, int widthUnit, float height, int heightUnit, float pxPerSp, int verticalAlign);
+    method public void draw(android.graphics.Canvas canvas, CharSequence? text, int start, int end, float x, int top, int y, int bottom, android.graphics.Paint paint);
+    method public android.graphics.Paint.FontMetricsInt getFontMetrics();
+    method public int getHeightPx();
+    method public int getSize(android.graphics.Paint paint, CharSequence? text, int start, int end, android.graphics.Paint.FontMetricsInt? fm);
+    method public int getVerticalAlign();
+    method public int getWidthPx();
+    property public final android.graphics.Paint.FontMetricsInt fontMetrics;
+    property public final int heightPx;
+    property public final int widthPx;
+    field public static final int ALIGN_ABOVE_BASELINE = 0; // 0x0
+    field public static final int ALIGN_BOTTOM = 2; // 0x2
+    field public static final int ALIGN_CENTER = 3; // 0x3
+    field public static final int ALIGN_TEXT_BOTTOM = 5; // 0x5
+    field public static final int ALIGN_TEXT_CENTER = 6; // 0x6
+    field public static final int ALIGN_TEXT_TOP = 4; // 0x4
+    field public static final int ALIGN_TOP = 1; // 0x1
+    field public static final androidx.text.style.PlaceholderSpan.Companion! Companion;
+    field public static final int UNIT_EM = 1; // 0x1
+    field public static final int UNIT_INHERIT = 2; // 0x2
+    field public static final int UNIT_SP = 0; // 0x0
+  }
+
+  public static final class PlaceholderSpan.Companion {
+  }
+
+  public final class PlaceholderSpanKt {
+  }
+
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP) public final class ShadowSpan extends android.text.style.CharacterStyle {
+    ctor public ShadowSpan(int color, float offsetX, float offsetY, float radius);
+    method public int getColor();
+    method public float getOffsetX();
+    method public float getOffsetY();
+    method public float getRadius();
+    method public void updateDrawState(android.text.TextPaint tp);
+  }
+
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP) public class SkewXSpan extends android.text.style.MetricAffectingSpan {
+    ctor public SkewXSpan(float skewX);
+    method public final float getSkewX();
+    method public void updateDrawState(android.text.TextPaint textPaint);
+    method public void updateMeasureState(android.text.TextPaint textPaint);
+  }
+
+  @RestrictTo(androidx.annotation.RestrictTo.Scope.LIBRARY_GROUP) public final class TypefaceSpan extends android.text.style.MetricAffectingSpan {
+    ctor public TypefaceSpan(android.graphics.Typeface typeface);
+    method public android.graphics.Typeface getTypeface();
+    method public void updateDrawState(android.text.TextPaint ds);
+    method public void updateMeasureState(android.text.TextPaint paint);
+  }
+
+}
+

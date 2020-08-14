@@ -1,0 +1,18 @@
+// Signature format: 3.0
+package androidx.ui.text.platform {
+
+  public final class LayoutIntrinsicsKt {
+  }
+
+  public final class TextLayoutKt {
+  }
+
+}
+
+package androidx.ui.text.platform.style {
+
+  public final class PlaceholderSpanKt {
+  }
+
+}
+

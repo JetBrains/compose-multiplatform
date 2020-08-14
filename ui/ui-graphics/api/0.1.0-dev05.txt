@@ -1,0 +1,1509 @@
+// Signature format: 3.0
+package androidx.ui.core {
+
+  public final class RectHelperKt {
+    method public static android.graphics.Rect toFrameworkRect(androidx.ui.geometry.Rect);
+    method public static android.graphics.RectF toFrameworkRectF(androidx.ui.geometry.Rect);
+  }
+
+}
+
+package androidx.ui.graphics {
+
+  public final class AndroidCanvasKt {
+    method public static androidx.ui.graphics.Canvas Canvas(androidx.ui.graphics.Image image);
+    method public static androidx.ui.graphics.Canvas Canvas(androidx.ui.graphics.PictureRecorder recorder, androidx.ui.geometry.Rect cullRect = Rect.largest);
+    method public static androidx.ui.graphics.Canvas Canvas(android.graphics.Canvas c);
+  }
+
+  public final class AndroidImageKt {
+    method public static androidx.ui.graphics.Image Image(int width, int height, androidx.ui.graphics.ImageConfig config = androidx.ui.graphics.ImageConfig.Argb8888, boolean hasAlpha = true, androidx.ui.graphics.colorspace.ColorSpace colorSpace = ColorSpaces.Srgb);
+    method public static androidx.ui.graphics.Image imageFromResource(android.content.res.Resources res, int resId);
+  }
+
+  public enum BlendMode {
+    method public final android.graphics.PorterDuff.Mode toPorterDuffMode();
+    enum_constant public static final androidx.ui.graphics.BlendMode clear;
+    enum_constant public static final androidx.ui.graphics.BlendMode color;
+    enum_constant public static final androidx.ui.graphics.BlendMode colorBurn;
+    enum_constant public static final androidx.ui.graphics.BlendMode colorDodge;
+    enum_constant public static final androidx.ui.graphics.BlendMode darken;
+    enum_constant public static final androidx.ui.graphics.BlendMode difference;
+    enum_constant public static final androidx.ui.graphics.BlendMode dst;
+    enum_constant public static final androidx.ui.graphics.BlendMode dstATop;
+    enum_constant public static final androidx.ui.graphics.BlendMode dstIn;
+    enum_constant public static final androidx.ui.graphics.BlendMode dstOut;
+    enum_constant public static final androidx.ui.graphics.BlendMode dstOver;
+    enum_constant public static final androidx.ui.graphics.BlendMode exclusion;
+    enum_constant public static final androidx.ui.graphics.BlendMode hardLight;
+    enum_constant public static final androidx.ui.graphics.BlendMode hue;
+    enum_constant public static final androidx.ui.graphics.BlendMode lighten;
+    enum_constant public static final androidx.ui.graphics.BlendMode luminosity;
+    enum_constant public static final androidx.ui.graphics.BlendMode modulate;
+    enum_constant public static final androidx.ui.graphics.BlendMode multiply;
+    enum_constant public static final androidx.ui.graphics.BlendMode overlay;
+    enum_constant public static final androidx.ui.graphics.BlendMode plus;
+    enum_constant public static final androidx.ui.graphics.BlendMode saturation;
+    enum_constant public static final androidx.ui.graphics.BlendMode screen;
+    enum_constant public static final androidx.ui.graphics.BlendMode softLight;
+    enum_constant public static final androidx.ui.graphics.BlendMode src;
+    enum_constant public static final androidx.ui.graphics.BlendMode srcATop;
+    enum_constant public static final androidx.ui.graphics.BlendMode srcIn;
+    enum_constant public static final androidx.ui.graphics.BlendMode srcOut;
+    enum_constant public static final androidx.ui.graphics.BlendMode srcOver;
+    enum_constant public static final androidx.ui.graphics.BlendMode xor;
+  }
+
+  public enum BlurStyle {
+    enum_constant public static final androidx.ui.graphics.BlurStyle inner;
+    enum_constant public static final androidx.ui.graphics.BlurStyle normal;
+    enum_constant public static final androidx.ui.graphics.BlurStyle outer;
+    enum_constant public static final androidx.ui.graphics.BlurStyle solid;
+  }
+
+  public interface Brush {
+    method public void applyTo(androidx.ui.graphics.Paint p);
+  }
+
+  public final class BrushKt {
+    method public static androidx.ui.graphics.LinearGradient HorizontalGradient(java.util.List<androidx.ui.graphics.Color> colors, androidx.ui.unit.Px startX, androidx.ui.unit.Px endX, androidx.ui.graphics.TileMode tileMode = androidx.ui.graphics.TileMode.Clamp);
+    method public static androidx.ui.graphics.Brush HorizontalGradient(kotlin.Pair<java.lang.Float,androidx.ui.graphics.Color>![] colorStops, androidx.ui.unit.Px startX, androidx.ui.unit.Px endX, androidx.ui.graphics.TileMode tileMode = androidx.ui.graphics.TileMode.Clamp);
+    method public static androidx.ui.graphics.LinearGradient LinearGradient(java.util.List<androidx.ui.graphics.Color> colors, androidx.ui.unit.Px startX, androidx.ui.unit.Px startY, androidx.ui.unit.Px endX, androidx.ui.unit.Px endY, androidx.ui.graphics.TileMode tileMode = androidx.ui.graphics.TileMode.Clamp);
+    method public static androidx.ui.graphics.LinearGradient LinearGradient(kotlin.Pair<java.lang.Float,androidx.ui.graphics.Color>![] colorStops, androidx.ui.unit.Px startX, androidx.ui.unit.Px startY, androidx.ui.unit.Px endX, androidx.ui.unit.Px endY, androidx.ui.graphics.TileMode tileMode = androidx.ui.graphics.TileMode.Clamp);
+    method public static androidx.ui.graphics.RadialGradient RadialGradient(kotlin.Pair<java.lang.Float,androidx.ui.graphics.Color>![] colorStops, float centerX, float centerY, float radius, androidx.ui.graphics.TileMode tileMode = androidx.ui.graphics.TileMode.Clamp);
+    method public static androidx.ui.graphics.RadialGradient RadialGradient(java.util.List<androidx.ui.graphics.Color> colors, float centerX, float centerY, float radius, androidx.ui.graphics.TileMode tileMode = androidx.ui.graphics.TileMode.Clamp);
+    method public static androidx.ui.graphics.LinearGradient VerticalGradient(java.util.List<androidx.ui.graphics.Color> colors, androidx.ui.unit.Px startY, androidx.ui.unit.Px endY, androidx.ui.graphics.TileMode tileMode = androidx.ui.graphics.TileMode.Clamp);
+    method public static androidx.ui.graphics.LinearGradient VerticalGradient(kotlin.Pair<java.lang.Float,androidx.ui.graphics.Color>![] colorStops, androidx.ui.unit.Px startY, androidx.ui.unit.Px endY, androidx.ui.graphics.TileMode tileMode = androidx.ui.graphics.TileMode.Clamp);
+  }
+
+  public interface Canvas {
+    method public void clipPath(androidx.ui.graphics.Path path);
+    method public void clipRRect(androidx.ui.geometry.RRect rrect);
+    method public void clipRect(androidx.ui.geometry.Rect rect, androidx.ui.graphics.ClipOp clipOp = androidx.ui.graphics.ClipOp.intersect);
+    method public void concat(androidx.ui.graphics.vectormath.Matrix4 matrix4);
+    method public void drawArc(androidx.ui.geometry.Rect rect, float startAngle, float sweepAngle, boolean useCenter, androidx.ui.graphics.Paint paint);
+    method public default void drawArcRad(androidx.ui.geometry.Rect rect, float startAngleRad, float sweepAngleRad, boolean useCenter, androidx.ui.graphics.Paint paint);
+    method public void drawCircle(androidx.ui.geometry.Offset center, float radius, androidx.ui.graphics.Paint paint);
+    method public void drawDoubleRoundRect(androidx.ui.geometry.RRect outer, androidx.ui.geometry.RRect inner, androidx.ui.graphics.Paint paint);
+    method public void drawImage(androidx.ui.graphics.Image image, androidx.ui.geometry.Offset topLeftOffset, androidx.ui.graphics.Paint paint);
+    method public void drawImageRect(androidx.ui.graphics.Image image, androidx.ui.geometry.Rect src, androidx.ui.geometry.Rect dst, androidx.ui.graphics.Paint paint);
+    method public void drawLine(androidx.ui.geometry.Offset p1, androidx.ui.geometry.Offset p2, androidx.ui.graphics.Paint paint);
+    method public void drawOval(androidx.ui.geometry.Rect rect, androidx.ui.graphics.Paint paint);
+    method public void drawPath(androidx.ui.graphics.Path path, androidx.ui.graphics.Paint paint);
+    method public void drawPicture(androidx.ui.graphics.Picture picture);
+    method public void drawPoints(androidx.ui.graphics.PointMode pointMode, java.util.List<androidx.ui.geometry.Offset> points, androidx.ui.graphics.Paint paint);
+    method public void drawRRect(androidx.ui.geometry.RRect rrect, androidx.ui.graphics.Paint paint);
+    method public void drawRawPoints(androidx.ui.graphics.PointMode pointMode, float[] points, androidx.ui.graphics.Paint paint);
+    method public void drawRect(androidx.ui.geometry.Rect rect, androidx.ui.graphics.Paint paint);
+    method public void drawVertices(androidx.ui.graphics.Vertices vertices, androidx.ui.graphics.BlendMode blendMode, androidx.ui.graphics.Paint paint);
+    method public android.graphics.Canvas getNativeCanvas();
+    method public void restore();
+    method public void rotate(float degrees);
+    method public default void rotateRad(float radians);
+    method public void save();
+    method public void saveLayer(androidx.ui.geometry.Rect bounds, androidx.ui.graphics.Paint paint);
+    method public void scale(float sx, float sy = sx);
+    method public void skew(float sx, float sy);
+    method public default void skewRad(float sxRad, float syRad);
+    method public void translate(float dx, float dy);
+    property public abstract android.graphics.Canvas nativeCanvas;
+  }
+
+  public final class CanvasKt {
+    method public static inline void withSave(androidx.ui.graphics.Canvas, kotlin.jvm.functions.Function0<kotlin.Unit> block);
+    method public static inline void withSaveLayer(androidx.ui.graphics.Canvas, androidx.ui.geometry.Rect bounds, androidx.ui.graphics.Paint paint, kotlin.jvm.functions.Function0<kotlin.Unit> block);
+  }
+
+  public enum ClipOp {
+    enum_constant public static final androidx.ui.graphics.ClipOp difference;
+    enum_constant public static final androidx.ui.graphics.ClipOp intersect;
+  }
+
+  public final class Color {
+    method public androidx.ui.graphics.Color convert(androidx.ui.graphics.colorspace.ColorSpace colorSpace);
+    method public androidx.ui.graphics.Color copy(float alpha = this.alpha, float red = this.red, float green = this.green, float blue = this.blue);
+    method public float getAlpha();
+    method public float getBlue();
+    method public androidx.ui.graphics.colorspace.ColorSpace getColorSpace();
+    method public float getGreen();
+    method public float getRed();
+    method public long getValue();
+    property public final float alpha;
+    property public final float blue;
+    property public final androidx.ui.graphics.colorspace.ColorSpace colorSpace;
+    property public final float green;
+    property public final float red;
+    field public static final androidx.ui.graphics.Color.Companion! Companion;
+  }
+
+  public static final class Color.Companion {
+    method public androidx.ui.graphics.Color getBlack();
+    method public androidx.ui.graphics.Color getBlue();
+    method public androidx.ui.graphics.Color getCyan();
+    method public androidx.ui.graphics.Color getDarkGray();
+    method public androidx.ui.graphics.Color getGray();
+    method public androidx.ui.graphics.Color getGreen();
+    method public androidx.ui.graphics.Color getLightGray();
+    method public androidx.ui.graphics.Color getMagenta();
+    method public androidx.ui.graphics.Color getRed();
+    method public androidx.ui.graphics.Color getTransparent();
+    method public androidx.ui.graphics.Color getWhite();
+    method public androidx.ui.graphics.Color getYellow();
+    property public final androidx.ui.graphics.Color Black;
+    property public final androidx.ui.graphics.Color Blue;
+    property public final androidx.ui.graphics.Color Cyan;
+    property public final androidx.ui.graphics.Color DarkGray;
+    property public final androidx.ui.graphics.Color Gray;
+    property public final androidx.ui.graphics.Color Green;
+    property public final androidx.ui.graphics.Color LightGray;
+    property public final androidx.ui.graphics.Color Magenta;
+    property public final androidx.ui.graphics.Color Red;
+    property public final androidx.ui.graphics.Color Transparent;
+    property public final androidx.ui.graphics.Color White;
+    property public final androidx.ui.graphics.Color Yellow;
+  }
+
+  public final class ColorFilter {
+    ctor public ColorFilter(androidx.ui.graphics.Color color, androidx.ui.graphics.BlendMode blendMode);
+    method public androidx.ui.graphics.Color component1();
+    method public androidx.ui.graphics.BlendMode component2();
+    method public androidx.ui.graphics.ColorFilter copy(androidx.ui.graphics.Color color, androidx.ui.graphics.BlendMode blendMode);
+    method public androidx.ui.graphics.BlendMode getBlendMode();
+    method public androidx.ui.graphics.Color getColor();
+  }
+
+  public final class ColorKt {
+    method public static androidx.ui.graphics.Color Color(float red, float green, float blue, float alpha = 1f, androidx.ui.graphics.colorspace.ColorSpace colorSpace = ColorSpaces.Srgb);
+    method public static androidx.ui.graphics.Color Color(@ColorInt int color);
+    method public static androidx.ui.graphics.Color Color(long color);
+    method public static androidx.ui.graphics.Color Color(@IntRange(from=0, to=255) int red, @IntRange(from=0, to=255) int green, @IntRange(from=0, to=255) int blue, @IntRange(from=0, to=255) int alpha = 0xFF);
+    method public static androidx.ui.graphics.Color compositeOver(androidx.ui.graphics.Color, androidx.ui.graphics.Color background);
+    method public static androidx.ui.graphics.Color lerp(androidx.ui.graphics.Color start, androidx.ui.graphics.Color stop, @FloatRange(from=0.0, to=1.0) float fraction);
+    method public static float luminance(androidx.ui.graphics.Color);
+    method @ColorInt public static int toArgb(androidx.ui.graphics.Color);
+  }
+
+  public enum FilterQuality {
+    enum_constant public static final androidx.ui.graphics.FilterQuality high;
+    enum_constant public static final androidx.ui.graphics.FilterQuality low;
+    enum_constant public static final androidx.ui.graphics.FilterQuality medium;
+    enum_constant public static final androidx.ui.graphics.FilterQuality none;
+  }
+
+  public final class FixedScale implements androidx.ui.graphics.ScaleFit {
+    ctor public FixedScale(float value);
+    method public float component1();
+    method public androidx.ui.graphics.FixedScale copy(float value);
+    method public float getValue();
+    method public float scale(androidx.ui.unit.PxSize srcSize, androidx.ui.unit.PxSize dstSize);
+  }
+
+  public interface Image {
+    method public androidx.ui.graphics.colorspace.ColorSpace getColorSpace();
+    method public androidx.ui.graphics.ImageConfig getConfig();
+    method public boolean getHasAlpha();
+    method public int getHeight();
+    method public android.graphics.Bitmap getNativeImage();
+    method public int getWidth();
+    method public void prepareToDraw();
+    property public abstract androidx.ui.graphics.colorspace.ColorSpace colorSpace;
+    property public abstract androidx.ui.graphics.ImageConfig config;
+    property public abstract boolean hasAlpha;
+    property public abstract int height;
+    property public abstract android.graphics.Bitmap nativeImage;
+    property public abstract int width;
+  }
+
+  public enum ImageConfig {
+    enum_constant public static final androidx.ui.graphics.ImageConfig Alpha8;
+    enum_constant public static final androidx.ui.graphics.ImageConfig Argb8888;
+    enum_constant public static final androidx.ui.graphics.ImageConfig F16;
+    enum_constant public static final androidx.ui.graphics.ImageConfig Gpu;
+    enum_constant public static final androidx.ui.graphics.ImageConfig Rgb565;
+  }
+
+  public final class ImageKt {
+  }
+
+  public final class LinearGradient extends androidx.ui.graphics.ShaderBrush {
+    method public androidx.ui.graphics.LinearGradient copy(java.util.List<androidx.ui.graphics.Color> colors, java.util.List<java.lang.Float>? stops, androidx.ui.unit.Px startX, androidx.ui.unit.Px startY, androidx.ui.unit.Px endX, androidx.ui.unit.Px endY, androidx.ui.graphics.TileMode tileMode);
+  }
+
+  public final class MaskFilter {
+    ctor public MaskFilter(androidx.ui.graphics.BlurStyle style, float sigma);
+    method public androidx.ui.graphics.BlurStyle component1();
+    method public float component2();
+    method public androidx.ui.graphics.MaskFilter copy(androidx.ui.graphics.BlurStyle style, float sigma);
+    method public float getSigma();
+    method public androidx.ui.graphics.BlurStyle getStyle();
+    field public static final androidx.ui.graphics.MaskFilter.Companion! Companion;
+    field public static final int TYPE_BLUR = 1; // 0x1
+    field public static final int TYPE_NONE = 0; // 0x0
+  }
+
+  public static final class MaskFilter.Companion {
+  }
+
+  public abstract sealed class Outline {
+  }
+
+  public static final class Outline.Generic extends androidx.ui.graphics.Outline {
+    ctor public Outline.Generic(androidx.ui.graphics.Path path);
+    method public androidx.ui.graphics.Path component1();
+    method public androidx.ui.graphics.Outline.Generic copy(androidx.ui.graphics.Path path);
+    method public androidx.ui.graphics.Path getPath();
+  }
+
+  public static final class Outline.Rectangle extends androidx.ui.graphics.Outline {
+    ctor public Outline.Rectangle(androidx.ui.geometry.Rect rect);
+    method public androidx.ui.geometry.Rect component1();
+    method public androidx.ui.graphics.Outline.Rectangle copy(androidx.ui.geometry.Rect rect);
+    method public androidx.ui.geometry.Rect getRect();
+  }
+
+  public static final class Outline.Rounded extends androidx.ui.graphics.Outline {
+    ctor public Outline.Rounded(androidx.ui.geometry.RRect rrect);
+    method public androidx.ui.geometry.RRect component1();
+    method public androidx.ui.graphics.Outline.Rounded copy(androidx.ui.geometry.RRect rrect);
+    method public androidx.ui.geometry.RRect getRrect();
+  }
+
+  public final class OutlineKt {
+    method public static void addOutline(androidx.ui.graphics.Path, androidx.ui.graphics.Outline outline);
+    method public static void drawOutline(androidx.ui.graphics.Canvas, androidx.ui.graphics.Outline outline, androidx.ui.graphics.Paint paint);
+  }
+
+  public final class Paint {
+    ctor public Paint();
+    method public android.graphics.Paint asFrameworkPaint();
+    method public float getAlpha();
+    method public androidx.ui.graphics.BlendMode getBlendMode();
+    method public androidx.ui.graphics.Color getColor();
+    method public androidx.ui.graphics.ColorFilter? getColorFilter();
+    method public androidx.ui.graphics.FilterQuality getFilterQuality();
+    method public androidx.ui.graphics.MaskFilter getMaskFilter();
+    method public androidx.ui.graphics.Shader? getShader();
+    method public androidx.ui.graphics.StrokeCap getStrokeCap();
+    method public androidx.ui.graphics.StrokeJoin getStrokeJoin();
+    method public float getStrokeMiterLimit();
+    method public float getStrokeWidth();
+    method public androidx.ui.graphics.PaintingStyle getStyle();
+    method public boolean isAntiAlias();
+    method public void setAlpha(float value);
+    method public void setAntiAlias(boolean value);
+    method public void setBlendMode(androidx.ui.graphics.BlendMode value);
+    method public void setColor(androidx.ui.graphics.Color color);
+    method public void setColorFilter(androidx.ui.graphics.ColorFilter? value);
+    method public void setFilterQuality(androidx.ui.graphics.FilterQuality value);
+    method public void setMaskFilter(androidx.ui.graphics.MaskFilter value);
+    method public void setShader(androidx.ui.graphics.Shader? value);
+    method public void setStrokeCap(androidx.ui.graphics.StrokeCap value);
+    method public void setStrokeJoin(androidx.ui.graphics.StrokeJoin value);
+    method public void setStrokeMiterLimit(float value);
+    method public void setStrokeWidth(float value);
+    method public void setStyle(androidx.ui.graphics.PaintingStyle value);
+    property public final float alpha;
+    property public final androidx.ui.graphics.BlendMode blendMode;
+    property public final androidx.ui.graphics.Color color;
+    property public final androidx.ui.graphics.ColorFilter? colorFilter;
+    property public final androidx.ui.graphics.FilterQuality filterQuality;
+    property public final boolean isAntiAlias;
+    property public final androidx.ui.graphics.MaskFilter maskFilter;
+    property public final androidx.ui.graphics.Shader? shader;
+    property public final androidx.ui.graphics.StrokeCap strokeCap;
+    property public final androidx.ui.graphics.StrokeJoin strokeJoin;
+    property public final float strokeMiterLimit;
+    property public final float strokeWidth;
+    property public final androidx.ui.graphics.PaintingStyle style;
+  }
+
+  public final class PaintKt {
+    field public static final float DefaultAlpha = 1.0f;
+  }
+
+  public enum PaintingStyle {
+    enum_constant public static final androidx.ui.graphics.PaintingStyle fill;
+    enum_constant public static final androidx.ui.graphics.PaintingStyle stroke;
+  }
+
+  public final class Path {
+    ctor public Path(android.graphics.Path internalPath);
+    ctor public Path();
+    method public void _addRect(float left, float top, float right, float bottom);
+    method public void addArc(androidx.ui.geometry.Rect oval, float startAngleDegrees, float sweepAngleDegrees);
+    method public void addArcRad(androidx.ui.geometry.Rect oval, float startAngleRadians, float sweepAngleRadians);
+    method public void addOval(androidx.ui.geometry.Rect oval);
+    method public void addPath(androidx.ui.graphics.Path path, androidx.ui.geometry.Offset offset = Offset.zero, androidx.ui.graphics.vectormath.Matrix4? matrix = null);
+    method public void addPolygon(java.util.List<androidx.ui.geometry.Offset> points, boolean close);
+    method public void addRRect(androidx.ui.geometry.RRect rrect);
+    method public void addRect(androidx.ui.geometry.Rect rect);
+    method public void arcTo(androidx.ui.geometry.Rect rect, float startAngleDegrees, float sweepAngleDegrees, boolean forceMoveTo);
+    method public void arcToPoint(androidx.ui.geometry.Offset arcEnd, androidx.ui.geometry.Radius radius = Radius.zero, float rotation = 0.0f, boolean largeArc = false, boolean clockwise = true);
+    method public void arcToRad(androidx.ui.geometry.Rect rect, float startAngleRadians, float sweepAngleRadians, boolean forceMoveTo);
+    method public void close();
+    method public void conicTo(float x1, float y1, float x2, float y2, float w);
+    method public boolean contains(androidx.ui.geometry.Offset offset);
+    method public void cubicTo(float x1, float y1, float x2, float y2, float x3, float y3);
+    method public void extendWithPath(androidx.ui.graphics.Path path, androidx.ui.geometry.Offset offset, androidx.ui.graphics.vectormath.Matrix4 matrix);
+    method public androidx.ui.geometry.Rect getBounds();
+    method public androidx.ui.graphics.PathFillType getFillType();
+    method public boolean isConvex();
+    method public boolean isEmpty();
+    method public void lineTo(float dx, float dy);
+    method public void moveTo(float dx, float dy);
+    method public boolean op(androidx.ui.graphics.Path path1, androidx.ui.graphics.Path path2, androidx.ui.graphics.PathOperation operation);
+    method public void quadraticBezierTo(float x1, float y1, float x2, float y2);
+    method public void relativeArcToPoint(androidx.ui.geometry.Offset arcEndDelta, androidx.ui.geometry.Radius radius = Radius.zero, float rotation = 0.0f, boolean largeArc = false, boolean clockwise = true);
+    method public void relativeConicTo(float x1, float y1, float x2, float y2, float w);
+    method public void relativeCubicTo(float x1, float y1, float x2, float y2, float x3, float y3);
+    method public void relativeLineTo(float dx, float dy);
+    method public void relativeMoveTo(float dx, float dy);
+    method public void relativeQuadraticBezierTo(float x1, float y1, float x2, float y2);
+    method public void reset();
+    method public void setFillType(androidx.ui.graphics.PathFillType value);
+    method public void shift(androidx.ui.geometry.Offset offset);
+    method public android.graphics.Path toFrameworkPath();
+    method public androidx.ui.graphics.Path transform(androidx.ui.graphics.vectormath.Matrix4 matrix);
+    property public final boolean isConvex;
+    property public final boolean isEmpty;
+    field public static final androidx.ui.graphics.Path.Companion! Companion;
+  }
+
+  public static final class Path.Companion {
+    method public androidx.ui.graphics.Path combine(androidx.ui.graphics.PathOperation operation, androidx.ui.graphics.Path path1, androidx.ui.graphics.Path path2);
+  }
+
+  public enum PathFillType {
+    enum_constant public static final androidx.ui.graphics.PathFillType evenOdd;
+    enum_constant public static final androidx.ui.graphics.PathFillType nonZero;
+  }
+
+  public enum PathOperation {
+    enum_constant public static final androidx.ui.graphics.PathOperation difference;
+    enum_constant public static final androidx.ui.graphics.PathOperation intersect;
+    enum_constant public static final androidx.ui.graphics.PathOperation reverseDifference;
+    enum_constant public static final androidx.ui.graphics.PathOperation union;
+    enum_constant public static final androidx.ui.graphics.PathOperation xor;
+  }
+
+  public final class Picture {
+    ctor public Picture(android.graphics.Picture frameworkPicture);
+    method public androidx.ui.geometry.Rect cullRect();
+    method public void dispose();
+    method public android.graphics.Picture getFrameworkPicture();
+  }
+
+  public final class PictureRecorder {
+    ctor public PictureRecorder();
+    method public androidx.ui.graphics.Picture endRecording();
+    method public boolean isRecording();
+    property public final boolean isRecording;
+  }
+
+  public enum PointMode {
+    enum_constant public static final androidx.ui.graphics.PointMode lines;
+    enum_constant public static final androidx.ui.graphics.PointMode points;
+    enum_constant public static final androidx.ui.graphics.PointMode polygon;
+  }
+
+  public final class RadialGradient extends androidx.ui.graphics.ShaderBrush {
+    method public androidx.ui.graphics.RadialGradient copy(java.util.List<androidx.ui.graphics.Color> colors, java.util.List<java.lang.Float>? stops, float centerX, float centerY, float radius, androidx.ui.graphics.TileMode tileMode);
+  }
+
+  public interface ScaleFit {
+    method public float scale(androidx.ui.unit.PxSize srcSize, androidx.ui.unit.PxSize dstSize);
+    field public static final androidx.ui.graphics.ScaleFit.Companion! Companion;
+  }
+
+  public static final class ScaleFit.Companion {
+    method public androidx.ui.graphics.ScaleFit getFillHeight();
+    method public androidx.ui.graphics.ScaleFit getFillMaxDimension();
+    method public androidx.ui.graphics.ScaleFit getFillMinDimension();
+    method public androidx.ui.graphics.ScaleFit getFillWidth();
+    method public androidx.ui.graphics.ScaleFit getFit();
+    method public androidx.ui.graphics.FixedScale getNone();
+    property public final androidx.ui.graphics.ScaleFit FillHeight;
+    property public final androidx.ui.graphics.ScaleFit FillMaxDimension;
+    property public final androidx.ui.graphics.ScaleFit FillMinDimension;
+    property public final androidx.ui.graphics.ScaleFit FillWidth;
+    property public final androidx.ui.graphics.ScaleFit Fit;
+    property public final androidx.ui.graphics.FixedScale None;
+  }
+
+  public final class ScaleFitKt {
+  }
+
+  public final class Shader {
+    ctor public Shader(android.graphics.Shader nativeShader);
+    method public android.graphics.Shader getNativeShader();
+  }
+
+  public class ShaderBrush implements androidx.ui.graphics.Brush {
+    ctor public ShaderBrush(androidx.ui.graphics.Shader shader);
+    method public void applyTo(androidx.ui.graphics.Paint p);
+    method public final androidx.ui.graphics.Shader getShader();
+  }
+
+  public final class ShaderKt {
+    method public static androidx.ui.graphics.Shader ImageShader(androidx.ui.graphics.Image image, androidx.ui.graphics.TileMode tileModeX = androidx.ui.graphics.TileMode.Clamp, androidx.ui.graphics.TileMode tileModeY = androidx.ui.graphics.TileMode.Clamp);
+    method public static androidx.ui.graphics.Shader LinearGradientShader(androidx.ui.geometry.Offset from, androidx.ui.geometry.Offset to, java.util.List<androidx.ui.graphics.Color> colors, java.util.List<java.lang.Float>? colorStops = null, androidx.ui.graphics.TileMode tileMode = androidx.ui.graphics.TileMode.Clamp);
+    method public static androidx.ui.graphics.Shader RadialGradientShader(androidx.ui.geometry.Offset center, float radius, java.util.List<androidx.ui.graphics.Color> colors, java.util.List<java.lang.Float>? colorStops = null, androidx.ui.graphics.TileMode tileMode = androidx.ui.graphics.TileMode.Clamp);
+  }
+
+  public final class Shadow {
+    ctor public Shadow(androidx.ui.graphics.Color color, androidx.ui.geometry.Offset offset, androidx.ui.unit.Px blurRadius);
+    ctor public Shadow();
+    method public androidx.ui.graphics.Color component1();
+    method public androidx.ui.geometry.Offset component2();
+    method public androidx.ui.unit.Px component3();
+    method public androidx.ui.graphics.Shadow copy(androidx.ui.graphics.Color color, androidx.ui.geometry.Offset offset, androidx.ui.unit.Px blurRadius);
+    method public androidx.ui.unit.Px getBlurRadius();
+    method public androidx.ui.graphics.Color getColor();
+    method public androidx.ui.geometry.Offset getOffset();
+    field public static final androidx.ui.graphics.Shadow.Companion! Companion;
+  }
+
+  public static final class Shadow.Companion {
+    method public androidx.ui.graphics.Shadow getNone();
+    property public final androidx.ui.graphics.Shadow None;
+  }
+
+  public final class ShadowKt {
+    method public static androidx.ui.graphics.Shadow lerp(androidx.ui.graphics.Shadow start, androidx.ui.graphics.Shadow stop, float fraction);
+  }
+
+  public interface Shape {
+    method public androidx.ui.graphics.Outline createOutline(androidx.ui.unit.PxSize size, androidx.ui.unit.Density density);
+  }
+
+  public final class SolidColor implements androidx.ui.graphics.Brush {
+    ctor public SolidColor(androidx.ui.graphics.Color value);
+    method public void applyTo(androidx.ui.graphics.Paint p);
+    method public androidx.ui.graphics.Color component1();
+    method public androidx.ui.graphics.SolidColor copy(androidx.ui.graphics.Color value);
+    method public androidx.ui.graphics.Color getValue();
+  }
+
+  public enum StrokeCap {
+    enum_constant public static final androidx.ui.graphics.StrokeCap butt;
+    enum_constant public static final androidx.ui.graphics.StrokeCap round;
+    enum_constant public static final androidx.ui.graphics.StrokeCap square;
+  }
+
+  public enum StrokeJoin {
+    enum_constant public static final androidx.ui.graphics.StrokeJoin bevel;
+    enum_constant public static final androidx.ui.graphics.StrokeJoin miter;
+    enum_constant public static final androidx.ui.graphics.StrokeJoin round;
+  }
+
+  public enum TileMode {
+    method public final android.graphics.Shader.TileMode getNativeTileMode();
+    enum_constant public static final androidx.ui.graphics.TileMode Clamp;
+    enum_constant public static final androidx.ui.graphics.TileMode Mirror;
+    enum_constant public static final androidx.ui.graphics.TileMode Repeated;
+  }
+
+  public final class TileModeKt {
+    method public static android.graphics.Shader.TileMode NativeClampTileMode();
+    method public static android.graphics.Shader.TileMode NativeMirrorTileMode();
+    method public static android.graphics.Shader.TileMode NativeRepeatedTileMode();
+  }
+
+  public enum VertexMode {
+    method public final android.graphics.Canvas.VertexMode toFrameworkVertexMode();
+    enum_constant public static final androidx.ui.graphics.VertexMode triangleFan;
+    enum_constant public static final androidx.ui.graphics.VertexMode triangleStrip;
+    enum_constant public static final androidx.ui.graphics.VertexMode triangles;
+  }
+
+  public final class Vertices {
+    ctor public Vertices(androidx.ui.graphics.VertexMode vertexMode, java.util.List<androidx.ui.geometry.Offset> positions, java.util.List<androidx.ui.geometry.Offset> textureCoordinates, java.util.List<androidx.ui.graphics.Color> colors, java.util.List<java.lang.Integer> indices);
+    method public int[] getColors();
+    method public short[] getIndices();
+    method public float[] getPositions();
+    method public float[] getTextureCoordinates();
+    method public androidx.ui.graphics.VertexMode getVertexMode();
+    property public final int[] colors;
+    property public final short[] indices;
+    property public final float[] positions;
+    property public final float[] textureCoordinates;
+  }
+
+}
+
+package androidx.ui.graphics.colorspace {
+
+  public enum Adaptation {
+    enum_constant public static final androidx.ui.graphics.colorspace.Adaptation Bradford;
+    enum_constant public static final androidx.ui.graphics.colorspace.Adaptation Ciecat02;
+    enum_constant public static final androidx.ui.graphics.colorspace.Adaptation VonKries;
+  }
+
+  public enum ColorModel {
+    method public final int getComponentCount();
+    enum_constant public static final androidx.ui.graphics.colorspace.ColorModel Cmyk;
+    enum_constant public static final androidx.ui.graphics.colorspace.ColorModel Lab;
+    enum_constant public static final androidx.ui.graphics.colorspace.ColorModel Rgb;
+    enum_constant public static final androidx.ui.graphics.colorspace.ColorModel Xyz;
+  }
+
+  public abstract class ColorSpace {
+    ctor public ColorSpace(String name, androidx.ui.graphics.colorspace.ColorModel model);
+    method @Size(min=3) public final float[] fromXyz(float x, float y, float z);
+    method @Size(min=3) public abstract float[] fromXyz(@Size(min=3) float[] v);
+    method @IntRange(from=1, to=4) public final int getComponentCount();
+    method public abstract float getMaxValue(@IntRange(from=0, to=3) int component);
+    method public abstract float getMinValue(@IntRange(from=0, to=3) int component);
+    method public final androidx.ui.graphics.colorspace.ColorModel getModel();
+    method public final String getName();
+    method public boolean isSrgb();
+    method public abstract boolean isWideGamut();
+    method @Size(3) public final float[] toXyz(float r, float g, float b);
+    method @Size(min=3) public abstract float[] toXyz(@Size(min=3) float[] v);
+    property @IntRange(from=1, to=4) public final int componentCount;
+    property public boolean isSrgb;
+    property public abstract boolean isWideGamut;
+  }
+
+  public final class ColorSpaceKt {
+    method public static androidx.ui.graphics.colorspace.ColorSpace adapt(androidx.ui.graphics.colorspace.ColorSpace, androidx.ui.graphics.colorspace.WhitePoint whitePoint, androidx.ui.graphics.colorspace.Adaptation adaptation = androidx.ui.graphics.colorspace.Adaptation.Bradford);
+    method public static androidx.ui.graphics.colorspace.ColorSpace adapt(androidx.ui.graphics.colorspace.ColorSpace, androidx.ui.graphics.colorspace.WhitePoint whitePoint);
+    method public static androidx.ui.graphics.colorspace.Connector connect(androidx.ui.graphics.colorspace.ColorSpace, androidx.ui.graphics.colorspace.ColorSpace destination = ColorSpaces.Srgb, androidx.ui.graphics.colorspace.RenderIntent intent = androidx.ui.graphics.colorspace.RenderIntent.Perceptual);
+  }
+
+  public final class ColorSpaces {
+    method public androidx.ui.graphics.colorspace.Rgb getAces();
+    method public androidx.ui.graphics.colorspace.Rgb getAcescg();
+    method public androidx.ui.graphics.colorspace.Rgb getAdobeRgb();
+    method public androidx.ui.graphics.colorspace.Rgb getBt2020();
+    method public androidx.ui.graphics.colorspace.Rgb getBt709();
+    method public androidx.ui.graphics.colorspace.ColorSpace getCieLab();
+    method public androidx.ui.graphics.colorspace.ColorSpace getCieXyz();
+    method public androidx.ui.graphics.colorspace.Rgb getDciP3();
+    method public androidx.ui.graphics.colorspace.Rgb getDisplayP3();
+    method public androidx.ui.graphics.colorspace.Rgb getExtendedSrgb();
+    method public androidx.ui.graphics.colorspace.Rgb getLinearExtendedSrgb();
+    method public androidx.ui.graphics.colorspace.Rgb getLinearSrgb();
+    method public androidx.ui.graphics.colorspace.Rgb getNtsc1953();
+    method public androidx.ui.graphics.colorspace.Rgb getProPhotoRgb();
+    method public androidx.ui.graphics.colorspace.Rgb getSmpteC();
+    method public androidx.ui.graphics.colorspace.Rgb getSrgb();
+    method public androidx.ui.graphics.colorspace.ColorSpace? match(@Size(9) float[] toXYZD50, androidx.ui.graphics.colorspace.TransferParameters function);
+    property public final androidx.ui.graphics.colorspace.Rgb Aces;
+    property public final androidx.ui.graphics.colorspace.Rgb Acescg;
+    property public final androidx.ui.graphics.colorspace.Rgb AdobeRgb;
+    property public final androidx.ui.graphics.colorspace.Rgb Bt2020;
+    property public final androidx.ui.graphics.colorspace.Rgb Bt709;
+    property public final androidx.ui.graphics.colorspace.ColorSpace CieLab;
+    property public final androidx.ui.graphics.colorspace.ColorSpace CieXyz;
+    property public final androidx.ui.graphics.colorspace.Rgb DciP3;
+    property public final androidx.ui.graphics.colorspace.Rgb DisplayP3;
+    property public final androidx.ui.graphics.colorspace.Rgb ExtendedSrgb;
+    property public final androidx.ui.graphics.colorspace.Rgb LinearExtendedSrgb;
+    property public final androidx.ui.graphics.colorspace.Rgb LinearSrgb;
+    property public final androidx.ui.graphics.colorspace.Rgb Ntsc1953;
+    property public final androidx.ui.graphics.colorspace.Rgb ProPhotoRgb;
+    property public final androidx.ui.graphics.colorspace.Rgb SmpteC;
+    property public final androidx.ui.graphics.colorspace.Rgb Srgb;
+    field public static final androidx.ui.graphics.colorspace.ColorSpaces! INSTANCE;
+  }
+
+  public class Connector {
+    method public final androidx.ui.graphics.colorspace.ColorSpace getDestination();
+    method public final androidx.ui.graphics.colorspace.RenderIntent getRenderIntent();
+    method public final androidx.ui.graphics.colorspace.ColorSpace getSource();
+    method @Size(3) public final float[] transform(float r, float g, float b);
+    method @Size(min=3) public float[] transform(@Size(min=3) float[] v);
+  }
+
+  public final class Illuminant {
+    method public androidx.ui.graphics.colorspace.WhitePoint getA();
+    method public androidx.ui.graphics.colorspace.WhitePoint getB();
+    method public androidx.ui.graphics.colorspace.WhitePoint getC();
+    method public androidx.ui.graphics.colorspace.WhitePoint getD50();
+    method public androidx.ui.graphics.colorspace.WhitePoint getD55();
+    method public androidx.ui.graphics.colorspace.WhitePoint getD60();
+    method public androidx.ui.graphics.colorspace.WhitePoint getD65();
+    method public androidx.ui.graphics.colorspace.WhitePoint getD75();
+    method public androidx.ui.graphics.colorspace.WhitePoint getE();
+    property public final androidx.ui.graphics.colorspace.WhitePoint A;
+    property public final androidx.ui.graphics.colorspace.WhitePoint B;
+    property public final androidx.ui.graphics.colorspace.WhitePoint C;
+    property public final androidx.ui.graphics.colorspace.WhitePoint D50;
+    property public final androidx.ui.graphics.colorspace.WhitePoint D55;
+    property public final androidx.ui.graphics.colorspace.WhitePoint D60;
+    property public final androidx.ui.graphics.colorspace.WhitePoint D65;
+    property public final androidx.ui.graphics.colorspace.WhitePoint D75;
+    property public final androidx.ui.graphics.colorspace.WhitePoint E;
+    field public static final androidx.ui.graphics.colorspace.Illuminant! INSTANCE;
+  }
+
+  public enum RenderIntent {
+    enum_constant public static final androidx.ui.graphics.colorspace.RenderIntent Absolute;
+    enum_constant public static final androidx.ui.graphics.colorspace.RenderIntent Perceptual;
+    enum_constant public static final androidx.ui.graphics.colorspace.RenderIntent Relative;
+    enum_constant public static final androidx.ui.graphics.colorspace.RenderIntent Saturation;
+  }
+
+  public final class Rgb extends androidx.ui.graphics.colorspace.ColorSpace {
+    ctor public Rgb(@Size(min=null) String name, @Size(null) float[] toXYZ, kotlin.jvm.functions.Function1<? super java.lang.Double,java.lang.Double> oetf, kotlin.jvm.functions.Function1<? super java.lang.Double,java.lang.Double> eotf);
+    ctor public Rgb(@Size(min=null) String name, @Size(min=null, max=null) float[] primaries, androidx.ui.graphics.colorspace.WhitePoint whitePoint, kotlin.jvm.functions.Function1<? super java.lang.Double,java.lang.Double> oetf, kotlin.jvm.functions.Function1<? super java.lang.Double,java.lang.Double> eotf, float min, float max);
+    ctor public Rgb(@Size(min=null) String name, @Size(null) float[] toXYZ, androidx.ui.graphics.colorspace.TransferParameters function);
+    ctor public Rgb(@Size(min=null) String name, @Size(min=null, max=null) float[] primaries, androidx.ui.graphics.colorspace.WhitePoint whitePoint, androidx.ui.graphics.colorspace.TransferParameters function);
+    ctor public Rgb(@Size(min=null) String name, @Size(null) float[] toXYZ, double gamma);
+    ctor public Rgb(@Size(min=null) String name, @Size(min=null, max=null) float[] primaries, androidx.ui.graphics.colorspace.WhitePoint whitePoint, double gamma);
+    method @Size(3) public float[] fromLinear(float r, float g, float b);
+    method @Size(min=3) public float[] fromLinear(@Size(min=3) float[] v);
+    method @Size(min=3) public float[] fromXyz(@Size(min=3) float[] v);
+    method public kotlin.jvm.functions.Function1<java.lang.Double,java.lang.Double> getEotf();
+    method @Size(9) public float[] getInverseTransform();
+    method @Size(min=9) public float[] getInverseTransform(@Size(min=9) float[] inverseTransform);
+    method public float getMaxValue(int component);
+    method public float getMinValue(int component);
+    method public kotlin.jvm.functions.Function1<java.lang.Double,java.lang.Double> getOetf();
+    method @Size(6) public float[] getPrimaries();
+    method @Size(min=6) public float[] getPrimaries(@Size(min=6) float[] primaries);
+    method public androidx.ui.graphics.colorspace.TransferParameters? getTransferParameters();
+    method @Size(9) public float[] getTransform();
+    method @Size(min=9) public float[] getTransform(@Size(min=9) float[] transform);
+    method public androidx.ui.graphics.colorspace.WhitePoint getWhitePoint();
+    method public boolean isWideGamut();
+    method @Size(3) public float[] toLinear(float r, float g, float b);
+    method @Size(min=3) public float[] toLinear(@Size(min=3) float[] v);
+    method @Size(min=3) public float[] toXyz(@Size(min=3) float[] v);
+    property public final kotlin.jvm.functions.Function1<java.lang.Double,java.lang.Double> eotf;
+    property public boolean isSrgb;
+    property public boolean isWideGamut;
+    property public final kotlin.jvm.functions.Function1<java.lang.Double,java.lang.Double> oetf;
+  }
+
+  public final class TransferParameters {
+    ctor public TransferParameters(double gamma, double a, double b, double c, double d, double e, double f);
+    method public double component1();
+    method public double component2();
+    method public double component3();
+    method public double component4();
+    method public double component5();
+    method public double component6();
+    method public double component7();
+    method public androidx.ui.graphics.colorspace.TransferParameters copy(double gamma, double a, double b, double c, double d, double e, double f);
+    method public double getA();
+    method public double getB();
+    method public double getC();
+    method public double getD();
+    method public double getE();
+    method public double getF();
+    method public double getGamma();
+  }
+
+  public final class WhitePoint {
+    ctor public WhitePoint(float x, float y);
+    ctor public WhitePoint(float x, float y, float z);
+    method public float component1();
+    method public float component2();
+    method public androidx.ui.graphics.colorspace.WhitePoint copy(float x, float y);
+    method public float getX();
+    method public float getY();
+  }
+
+}
+
+package androidx.ui.graphics.painter {
+
+  public final class ColorPainter extends androidx.ui.graphics.painter.Painter {
+    ctor public ColorPainter(androidx.ui.graphics.Color color);
+    method public androidx.ui.graphics.Color component1();
+    method public androidx.ui.graphics.painter.ColorPainter copy(androidx.ui.graphics.Color color);
+    method public androidx.ui.graphics.Color getColor();
+    method public androidx.ui.unit.PxSize getIntrinsicSize();
+    method protected void onDraw(androidx.ui.graphics.Canvas canvas, androidx.ui.unit.PxSize bounds);
+    property public androidx.ui.unit.PxSize intrinsicSize;
+  }
+
+  public final class ImagePainter extends androidx.ui.graphics.painter.Painter {
+    ctor public ImagePainter(androidx.ui.graphics.Image image);
+    method public androidx.ui.graphics.painter.ImagePainter copy(androidx.ui.graphics.Image image);
+    method public androidx.ui.unit.PxSize getIntrinsicSize();
+    method protected void onDraw(androidx.ui.graphics.Canvas canvas, androidx.ui.unit.PxSize bounds);
+    property public androidx.ui.unit.PxSize intrinsicSize;
+  }
+
+  public final class ImagePainterKt {
+  }
+
+  public abstract class Painter {
+    ctor public Painter();
+    method protected boolean applyAlpha(float alpha);
+    method protected boolean applyColorFilter(androidx.ui.graphics.ColorFilter? colorFilter);
+    method protected boolean applyRtl(boolean rtl);
+    method public final void draw(androidx.ui.graphics.Canvas canvas, androidx.ui.unit.PxSize bounds, float alpha = 1.0f, androidx.ui.graphics.ColorFilter? colorFilter = null, boolean rtl = false);
+    method public abstract androidx.ui.unit.PxSize getIntrinsicSize();
+    method protected abstract void onDraw(androidx.ui.graphics.Canvas canvas, androidx.ui.unit.PxSize bounds);
+    property public abstract androidx.ui.unit.PxSize intrinsicSize;
+  }
+
+}
+
+package androidx.ui.graphics.vector {
+
+  public final class PathBuilder {
+    ctor public PathBuilder();
+    method public androidx.ui.graphics.vector.PathBuilder arcTo(float horizontalEllipseRadius, float verticalEllipseRadius, float theta, boolean isMoreThanHalf, boolean isPositiveArc, float x1, float y1);
+    method public androidx.ui.graphics.vector.PathBuilder arcToRelative(float a, float b, float theta, boolean isMoreThanHalf, boolean isPositiveArc, float x1, float y1);
+    method public androidx.ui.graphics.vector.PathBuilder close();
+    method public androidx.ui.graphics.vector.PathBuilder curveTo(float x1, float y1, float x2, float y2, float x3, float y3);
+    method public androidx.ui.graphics.vector.PathBuilder curveToRelative(float dx1, float dy1, float dx2, float dy2, float dx3, float dy3);
+    method public java.util.List<androidx.ui.graphics.vector.PathNode> getNodes();
+    method public androidx.ui.graphics.vector.PathBuilder horizontalLineTo(float x);
+    method public androidx.ui.graphics.vector.PathBuilder horizontalLineToRelative(float x);
+    method public androidx.ui.graphics.vector.PathBuilder lineTo(float x, float y);
+    method public androidx.ui.graphics.vector.PathBuilder lineToRelative(float x, float y);
+    method public androidx.ui.graphics.vector.PathBuilder moveTo(float x, float y);
+    method public androidx.ui.graphics.vector.PathBuilder moveToRelative(float x, float y);
+    method public androidx.ui.graphics.vector.PathBuilder quadTo(float x1, float y1, float x2, float y2);
+    method public androidx.ui.graphics.vector.PathBuilder quadToRelative(float x1, float y1, float x2, float y2);
+    method public androidx.ui.graphics.vector.PathBuilder reflectiveCurveTo(float x1, float y1, float x2, float y2);
+    method public androidx.ui.graphics.vector.PathBuilder reflectiveCurveToRelative(float x1, float y1, float x2, float y2);
+    method public androidx.ui.graphics.vector.PathBuilder reflectiveQuadTo(float x1, float y1);
+    method public androidx.ui.graphics.vector.PathBuilder reflectiveQuadToRelative(float x1, float y1);
+    method public androidx.ui.graphics.vector.PathBuilder verticalLineTo(float y);
+    method public androidx.ui.graphics.vector.PathBuilder verticalLineToRelative(float y);
+  }
+
+  public abstract sealed class PathNode {
+    method public final boolean isCurve();
+    method public final boolean isQuad();
+  }
+
+  public static final class PathNode.ArcTo extends androidx.ui.graphics.vector.PathNode {
+    ctor public PathNode.ArcTo(float horizontalEllipseRadius, float verticalEllipseRadius, float theta, boolean isMoreThanHalf, boolean isPositiveArc, float arcStartX, float arcStartY);
+    method public float component1();
+    method public float component2();
+    method public float component3();
+    method public boolean component4();
+    method public boolean component5();
+    method public float component6();
+    method public float component7();
+    method public androidx.ui.graphics.vector.PathNode.ArcTo copy(float horizontalEllipseRadius, float verticalEllipseRadius, float theta, boolean isMoreThanHalf, boolean isPositiveArc, float arcStartX, float arcStartY);
+    method public float getArcStartX();
+    method public float getArcStartY();
+    method public float getHorizontalEllipseRadius();
+    method public float getTheta();
+    method public float getVerticalEllipseRadius();
+    method public boolean isMoreThanHalf();
+    method public boolean isPositiveArc();
+  }
+
+  public static final class PathNode.Close extends androidx.ui.graphics.vector.PathNode {
+    field public static final androidx.ui.graphics.vector.PathNode.Close! INSTANCE;
+  }
+
+  public static final class PathNode.CurveTo extends androidx.ui.graphics.vector.PathNode {
+    ctor public PathNode.CurveTo(float x1, float y1, float x2, float y2, float x3, float y3);
+    method public float component1();
+    method public float component2();
+    method public float component3();
+    method public float component4();
+    method public float component5();
+    method public float component6();
+    method public androidx.ui.graphics.vector.PathNode.CurveTo copy(float x1, float y1, float x2, float y2, float x3, float y3);
+    method public float getX1();
+    method public float getX2();
+    method public float getX3();
+    method public float getY1();
+    method public float getY2();
+    method public float getY3();
+  }
+
+  public static final class PathNode.HorizontalTo extends androidx.ui.graphics.vector.PathNode {
+    ctor public PathNode.HorizontalTo(float x);
+    method public float component1();
+    method public androidx.ui.graphics.vector.PathNode.HorizontalTo copy(float x);
+    method public float getX();
+  }
+
+  public static final class PathNode.LineTo extends androidx.ui.graphics.vector.PathNode {
+    ctor public PathNode.LineTo(float x, float y);
+    method public float component1();
+    method public float component2();
+    method public androidx.ui.graphics.vector.PathNode.LineTo copy(float x, float y);
+    method public float getX();
+    method public float getY();
+  }
+
+  public static final class PathNode.MoveTo extends androidx.ui.graphics.vector.PathNode {
+    ctor public PathNode.MoveTo(float x, float y);
+    method public float component1();
+    method public float component2();
+    method public androidx.ui.graphics.vector.PathNode.MoveTo copy(float x, float y);
+    method public float getX();
+    method public float getY();
+  }
+
+  public static final class PathNode.QuadTo extends androidx.ui.graphics.vector.PathNode {
+    ctor public PathNode.QuadTo(float x1, float y1, float x2, float y2);
+    method public float component1();
+    method public float component2();
+    method public float component3();
+    method public float component4();
+    method public androidx.ui.graphics.vector.PathNode.QuadTo copy(float x1, float y1, float x2, float y2);
+    method public float getX1();
+    method public float getX2();
+    method public float getY1();
+    method public float getY2();
+  }
+
+  public static final class PathNode.ReflectiveCurveTo extends androidx.ui.graphics.vector.PathNode {
+    ctor public PathNode.ReflectiveCurveTo(float x1, float y1, float x2, float y2);
+    method public float component1();
+    method public float component2();
+    method public float component3();
+    method public float component4();
+    method public androidx.ui.graphics.vector.PathNode.ReflectiveCurveTo copy(float x1, float y1, float x2, float y2);
+    method public float getX1();
+    method public float getX2();
+    method public float getY1();
+    method public float getY2();
+  }
+
+  public static final class PathNode.ReflectiveQuadTo extends androidx.ui.graphics.vector.PathNode {
+    ctor public PathNode.ReflectiveQuadTo(float x, float y);
+    method public float component1();
+    method public float component2();
+    method public androidx.ui.graphics.vector.PathNode.ReflectiveQuadTo copy(float x, float y);
+    method public float getX();
+    method public float getY();
+  }
+
+  public static final class PathNode.RelativeArcTo extends androidx.ui.graphics.vector.PathNode {
+    ctor public PathNode.RelativeArcTo(float horizontalEllipseRadius, float verticalEllipseRadius, float theta, boolean isMoreThanHalf, boolean isPositiveArc, float arcStartDx, float arcStartDy);
+    method public float component1();
+    method public float component2();
+    method public float component3();
+    method public boolean component4();
+    method public boolean component5();
+    method public float component6();
+    method public float component7();
+    method public androidx.ui.graphics.vector.PathNode.RelativeArcTo copy(float horizontalEllipseRadius, float verticalEllipseRadius, float theta, boolean isMoreThanHalf, boolean isPositiveArc, float arcStartDx, float arcStartDy);
+    method public float getArcStartDx();
+    method public float getArcStartDy();
+    method public float getHorizontalEllipseRadius();
+    method public float getTheta();
+    method public float getVerticalEllipseRadius();
+    method public boolean isMoreThanHalf();
+    method public boolean isPositiveArc();
+  }
+
+  public static final class PathNode.RelativeCurveTo extends androidx.ui.graphics.vector.PathNode {
+    ctor public PathNode.RelativeCurveTo(float dx1, float dy1, float dx2, float dy2, float dx3, float dy3);
+    method public float component1();
+    method public float component2();
+    method public float component3();
+    method public float component4();
+    method public float component5();
+    method public float component6();
+    method public androidx.ui.graphics.vector.PathNode.RelativeCurveTo copy(float dx1, float dy1, float dx2, float dy2, float dx3, float dy3);
+    method public float getDx1();
+    method public float getDx2();
+    method public float getDx3();
+    method public float getDy1();
+    method public float getDy2();
+    method public float getDy3();
+  }
+
+  public static final class PathNode.RelativeHorizontalTo extends androidx.ui.graphics.vector.PathNode {
+    ctor public PathNode.RelativeHorizontalTo(float x);
+    method public float component1();
+    method public androidx.ui.graphics.vector.PathNode.RelativeHorizontalTo copy(float x);
+    method public float getX();
+  }
+
+  public static final class PathNode.RelativeLineTo extends androidx.ui.graphics.vector.PathNode {
+    ctor public PathNode.RelativeLineTo(float x, float y);
+    method public float component1();
+    method public float component2();
+    method public androidx.ui.graphics.vector.PathNode.RelativeLineTo copy(float x, float y);
+    method public float getX();
+    method public float getY();
+  }
+
+  public static final class PathNode.RelativeMoveTo extends androidx.ui.graphics.vector.PathNode {
+    ctor public PathNode.RelativeMoveTo(float x, float y);
+    method public float component1();
+    method public float component2();
+    method public androidx.ui.graphics.vector.PathNode.RelativeMoveTo copy(float x, float y);
+    method public float getX();
+    method public float getY();
+  }
+
+  public static final class PathNode.RelativeQuadTo extends androidx.ui.graphics.vector.PathNode {
+    ctor public PathNode.RelativeQuadTo(float x1, float y1, float x2, float y2);
+    method public float component1();
+    method public float component2();
+    method public float component3();
+    method public float component4();
+    method public androidx.ui.graphics.vector.PathNode.RelativeQuadTo copy(float x1, float y1, float x2, float y2);
+    method public float getX1();
+    method public float getX2();
+    method public float getY1();
+    method public float getY2();
+  }
+
+  public static final class PathNode.RelativeReflectiveCurveTo extends androidx.ui.graphics.vector.PathNode {
+    ctor public PathNode.RelativeReflectiveCurveTo(float x1, float y1, float x2, float y2);
+    method public float component1();
+    method public float component2();
+    method public float component3();
+    method public float component4();
+    method public androidx.ui.graphics.vector.PathNode.RelativeReflectiveCurveTo copy(float x1, float y1, float x2, float y2);
+    method public float getX1();
+    method public float getX2();
+    method public float getY1();
+    method public float getY2();
+  }
+
+  public static final class PathNode.RelativeReflectiveQuadTo extends androidx.ui.graphics.vector.PathNode {
+    ctor public PathNode.RelativeReflectiveQuadTo(float x, float y);
+    method public float component1();
+    method public float component2();
+    method public androidx.ui.graphics.vector.PathNode.RelativeReflectiveQuadTo copy(float x, float y);
+    method public float getX();
+    method public float getY();
+  }
+
+  public static final class PathNode.RelativeVerticalTo extends androidx.ui.graphics.vector.PathNode {
+    ctor public PathNode.RelativeVerticalTo(float y);
+    method public float component1();
+    method public androidx.ui.graphics.vector.PathNode.RelativeVerticalTo copy(float y);
+    method public float getY();
+  }
+
+  public static final class PathNode.VerticalTo extends androidx.ui.graphics.vector.PathNode {
+    ctor public PathNode.VerticalTo(float y);
+    method public float component1();
+    method public androidx.ui.graphics.vector.PathNode.VerticalTo copy(float y);
+    method public float getY();
+  }
+
+  public final class PathNodeKt {
+  }
+
+  public final class PathParser {
+    ctor public PathParser();
+    method public androidx.ui.graphics.vector.PathParser addPathNodes(java.util.List<? extends androidx.ui.graphics.vector.PathNode> nodes);
+    method public void clear();
+    method public androidx.ui.graphics.vector.PathParser parsePathString(String pathData);
+    method public java.util.List<androidx.ui.graphics.vector.PathNode> toNodes();
+    method public androidx.ui.graphics.Path toPath(androidx.ui.graphics.Path target = androidx.ui.graphics.Path());
+  }
+
+  public final class PathParserKt {
+  }
+
+}
+
+package androidx.ui.graphics.vectormath {
+
+  public final class Matrix3 {
+    ctor public Matrix3(androidx.ui.graphics.vectormath.Vector3 x, androidx.ui.graphics.vectormath.Vector3 y, androidx.ui.graphics.vectormath.Vector3 z);
+    ctor public Matrix3();
+    ctor public Matrix3(androidx.ui.graphics.vectormath.Matrix3 m);
+    method public androidx.ui.graphics.vectormath.Vector3 component1();
+    method public androidx.ui.graphics.vectormath.Vector3 component2();
+    method public androidx.ui.graphics.vectormath.Vector3 component3();
+    method public androidx.ui.graphics.vectormath.Matrix3 copy(androidx.ui.graphics.vectormath.Vector3 x, androidx.ui.graphics.vectormath.Vector3 y, androidx.ui.graphics.vectormath.Vector3 z);
+    method public operator androidx.ui.graphics.vectormath.Matrix3 dec();
+    method public operator androidx.ui.graphics.vectormath.Matrix3 div(float v);
+    method public operator androidx.ui.graphics.vectormath.Vector3 get(int column);
+    method public operator float get(int column, int row);
+    method public operator androidx.ui.graphics.vectormath.Vector3 get(androidx.ui.graphics.vectormath.MatrixColumn column);
+    method public operator float get(androidx.ui.graphics.vectormath.MatrixColumn column, int row);
+    method public inline java.util.List<java.lang.Float> getM3storage();
+    method public androidx.ui.graphics.vectormath.Vector3 getX();
+    method public androidx.ui.graphics.vectormath.Vector3 getY();
+    method public androidx.ui.graphics.vectormath.Vector3 getZ();
+    method public operator androidx.ui.graphics.vectormath.Matrix3 inc();
+    method public operator androidx.ui.graphics.vectormath.Matrix3 minus(float v);
+    method public operator androidx.ui.graphics.vectormath.Matrix3 plus(float v);
+    method public operator void set(int column, androidx.ui.graphics.vectormath.Vector3 v);
+    method public operator void set(int column, int row, float v);
+    method public void setX(androidx.ui.graphics.vectormath.Vector3 p);
+    method public void setY(androidx.ui.graphics.vectormath.Vector3 p);
+    method public void setZ(androidx.ui.graphics.vectormath.Vector3 p);
+    method public operator androidx.ui.graphics.vectormath.Matrix3 times(float v);
+    method public operator androidx.ui.graphics.vectormath.Matrix3 times(androidx.ui.graphics.vectormath.Matrix3 m);
+    method public operator androidx.ui.graphics.vectormath.Vector3 times(androidx.ui.graphics.vectormath.Vector3 v);
+    method public float[] toFloatArray();
+    method public operator androidx.ui.graphics.vectormath.Matrix3 unaryMinus();
+    property public final inline java.util.List<java.lang.Float> m3storage;
+    field public static final androidx.ui.graphics.vectormath.Matrix3.Companion! Companion;
+  }
+
+  public static final class Matrix3.Companion {
+    method public androidx.ui.graphics.vectormath.Matrix3 identity();
+    method public androidx.ui.graphics.vectormath.Matrix3 of(float... a);
+  }
+
+  public final class Matrix4 {
+    ctor public Matrix4(androidx.ui.graphics.vectormath.Vector4 x, androidx.ui.graphics.vectormath.Vector4 y, androidx.ui.graphics.vectormath.Vector4 z, androidx.ui.graphics.vectormath.Vector4 w);
+    ctor public Matrix4();
+    ctor public Matrix4(androidx.ui.graphics.vectormath.Vector3 right, androidx.ui.graphics.vectormath.Vector3 up, androidx.ui.graphics.vectormath.Vector3 forward, androidx.ui.graphics.vectormath.Vector3 position);
+    ctor public Matrix4(androidx.ui.graphics.vectormath.Matrix4 m);
+    method public void assignColumns(androidx.ui.graphics.vectormath.Matrix4 other);
+    method public void assignFromStorage(java.util.List<java.lang.Float> storage);
+    method public androidx.ui.graphics.vectormath.Vector4 component1();
+    method public androidx.ui.graphics.vectormath.Vector4 component2();
+    method public androidx.ui.graphics.vectormath.Vector4 component3();
+    method public androidx.ui.graphics.vectormath.Vector4 component4();
+    method public androidx.ui.graphics.vectormath.Matrix4 copy(androidx.ui.graphics.vectormath.Vector4 x, androidx.ui.graphics.vectormath.Vector4 y, androidx.ui.graphics.vectormath.Vector4 z, androidx.ui.graphics.vectormath.Vector4 w);
+    method public float copyInverse(androidx.ui.graphics.vectormath.Matrix4 arg);
+    method public operator androidx.ui.graphics.vectormath.Matrix4 dec();
+    method public operator androidx.ui.graphics.vectormath.Matrix4 div(float v);
+    method public operator androidx.ui.graphics.vectormath.Vector4 get(int column);
+    method public operator float get(int column, int row);
+    method public operator androidx.ui.graphics.vectormath.Vector4 get(androidx.ui.graphics.vectormath.MatrixColumn column);
+    method public operator float get(androidx.ui.graphics.vectormath.MatrixColumn column, int row);
+    method public float getDeterminant();
+    method public inline androidx.ui.graphics.vectormath.Vector3 getForward();
+    method public inline java.util.List<java.lang.Float> getM4storage();
+    method public inline androidx.ui.graphics.vectormath.Vector3 getPosition();
+    method public inline androidx.ui.graphics.vectormath.Vector3 getRight();
+    method public androidx.ui.graphics.vectormath.Vector3 getRotation();
+    method public androidx.ui.graphics.vectormath.Vector4 getRow(int row);
+    method public inline androidx.ui.graphics.vectormath.Vector3 getScale();
+    method public inline androidx.ui.graphics.vectormath.Vector3 getTranslation();
+    method public inline androidx.ui.graphics.vectormath.Vector3 getUp();
+    method public inline androidx.ui.graphics.vectormath.Matrix3 getUpperLeft();
+    method public androidx.ui.graphics.vectormath.Vector4 getW();
+    method public androidx.ui.graphics.vectormath.Vector4 getX();
+    method public androidx.ui.graphics.vectormath.Vector4 getY();
+    method public androidx.ui.graphics.vectormath.Vector4 getZ();
+    method public operator androidx.ui.graphics.vectormath.Matrix4 inc();
+    method public float invert();
+    method public operator androidx.ui.graphics.vectormath.Matrix4 minus(float v);
+    method public androidx.ui.graphics.vectormath.Vector3 perspectiveTransform(androidx.ui.graphics.vectormath.Vector3 arg);
+    method public operator androidx.ui.graphics.vectormath.Matrix4 plus(float v);
+    method public void rotateX(float radians);
+    method public void rotateY(float radians);
+    method public void rotateZ(float radians);
+    method public void scale(Object x, Float? y = null, Float? z = null);
+    method public operator void set(int column, androidx.ui.graphics.vectormath.Vector4 v);
+    method public operator void set(int column, int row, float v);
+    method public inline void setForward(androidx.ui.graphics.vectormath.Vector3 value);
+    method public void setFrom(androidx.ui.graphics.vectormath.Matrix4 arg);
+    method public inline void setPosition(androidx.ui.graphics.vectormath.Vector3 value);
+    method public inline void setRight(androidx.ui.graphics.vectormath.Vector3 value);
+    method public void setTranslationRaw(float x, float y, float z);
+    method public inline void setUp(androidx.ui.graphics.vectormath.Vector3 value);
+    method public void setW(androidx.ui.graphics.vectormath.Vector4 p);
+    method public void setX(androidx.ui.graphics.vectormath.Vector4 p);
+    method public void setY(androidx.ui.graphics.vectormath.Vector4 p);
+    method public void setZ(androidx.ui.graphics.vectormath.Vector4 p);
+    method public operator androidx.ui.graphics.vectormath.Matrix4 times(float v);
+    method public operator androidx.ui.graphics.vectormath.Matrix4 times(androidx.ui.graphics.vectormath.Matrix4 m);
+    method public operator androidx.ui.graphics.vectormath.Vector4 times(androidx.ui.graphics.vectormath.Vector4 v);
+    method public operator void timesAssign(androidx.ui.graphics.vectormath.Matrix4 m);
+    method public float[] toFloatArray();
+    method public void translate(Object x, float y = 0.0f, float z = 0.0f);
+    method public operator androidx.ui.graphics.vectormath.Matrix4 unaryMinus();
+    property public final float determinant;
+    property public final inline androidx.ui.graphics.vectormath.Vector3 forward;
+    property public final inline java.util.List<java.lang.Float> m4storage;
+    property public final inline androidx.ui.graphics.vectormath.Vector3 position;
+    property public final inline androidx.ui.graphics.vectormath.Vector3 right;
+    property public final androidx.ui.graphics.vectormath.Vector3 rotation;
+    property public final inline androidx.ui.graphics.vectormath.Vector3 scale;
+    property public final inline androidx.ui.graphics.vectormath.Vector3 translation;
+    property public final inline androidx.ui.graphics.vectormath.Vector3 up;
+    property public final inline androidx.ui.graphics.vectormath.Matrix3 upperLeft;
+    field public static final androidx.ui.graphics.vectormath.Matrix4.Companion! Companion;
+  }
+
+  public static final class Matrix4.Companion {
+    method public androidx.ui.graphics.vectormath.Matrix4 diagonal3(androidx.ui.graphics.vectormath.Vector3 scale);
+    method public androidx.ui.graphics.vectormath.Matrix4 diagonal3Values(float x, float y, float z);
+    method public androidx.ui.graphics.vectormath.Matrix4 identity();
+    method public androidx.ui.graphics.vectormath.Matrix4 of(float... a);
+    method public androidx.ui.graphics.vectormath.Matrix4 rotationX(float radians);
+    method public androidx.ui.graphics.vectormath.Matrix4 rotationY(float radians);
+    method public androidx.ui.graphics.vectormath.Matrix4 rotationZ(float radians);
+    method public androidx.ui.graphics.vectormath.Matrix4 translation(androidx.ui.graphics.vectormath.Vector3 translation);
+    method public androidx.ui.graphics.vectormath.Matrix4 translationValues(float x, float y, float z);
+    method public androidx.ui.graphics.vectormath.Matrix4 zero();
+  }
+
+  public final class Matrix4Kt {
+    method public static Float? getAsScale(androidx.ui.graphics.vectormath.Matrix4);
+    method public static androidx.ui.geometry.Offset? getAsTranslation(androidx.ui.graphics.vectormath.Matrix4);
+    method public static androidx.ui.geometry.Rect inverseTransformRect(androidx.ui.graphics.vectormath.Matrix4 transform, androidx.ui.geometry.Rect rect);
+    method public static boolean isIdentity(androidx.ui.graphics.vectormath.Matrix4);
+    method public static boolean matrixEquals(androidx.ui.graphics.vectormath.Matrix4? a, androidx.ui.graphics.vectormath.Matrix4? b);
+    method public static androidx.ui.geometry.Offset transformPoint(androidx.ui.graphics.vectormath.Matrix4, androidx.ui.geometry.Offset point);
+    method public static androidx.ui.geometry.Rect transformRect(androidx.ui.graphics.vectormath.Matrix4, androidx.ui.geometry.Rect rect);
+  }
+
+  public enum MatrixColumn {
+    enum_constant public static final androidx.ui.graphics.vectormath.MatrixColumn W;
+    enum_constant public static final androidx.ui.graphics.vectormath.MatrixColumn X;
+    enum_constant public static final androidx.ui.graphics.vectormath.MatrixColumn Y;
+    enum_constant public static final androidx.ui.graphics.vectormath.MatrixColumn Z;
+  }
+
+  public final class MatrixExtensionsKt {
+    method public static androidx.ui.graphics.vectormath.Matrix3 inverse(androidx.ui.graphics.vectormath.Matrix3 m);
+    method public static androidx.ui.graphics.vectormath.Matrix4 inverse(androidx.ui.graphics.vectormath.Matrix4 m);
+    method public static androidx.ui.graphics.vectormath.Matrix4 lookAt(androidx.ui.graphics.vectormath.Vector3 eye, androidx.ui.graphics.vectormath.Vector3 target, androidx.ui.graphics.vectormath.Vector3 up = androidx.ui.graphics.vectormath.Vector3(1.0));
+    method public static androidx.ui.graphics.vectormath.Matrix4 lookTowards(androidx.ui.graphics.vectormath.Vector3 eye, androidx.ui.graphics.vectormath.Vector3 forward, androidx.ui.graphics.vectormath.Vector3 up = androidx.ui.graphics.vectormath.Vector3(1.0));
+    method public static androidx.ui.graphics.vectormath.Matrix4 normal(androidx.ui.graphics.vectormath.Matrix4 m);
+    method public static androidx.ui.graphics.vectormath.Matrix4 ortho(float l, float r, float b, float t, float n, float f);
+    method public static androidx.ui.graphics.vectormath.Matrix4 perspective(float fov, float ratio, float near, float far);
+    method public static androidx.ui.graphics.vectormath.Matrix4 rotation(androidx.ui.graphics.vectormath.Matrix4 m);
+    method public static androidx.ui.graphics.vectormath.Matrix4 rotation(androidx.ui.graphics.vectormath.Vector3 d);
+    method public static androidx.ui.graphics.vectormath.Matrix4 rotation(androidx.ui.graphics.vectormath.Vector3 axis, float angle);
+    method public static androidx.ui.graphics.vectormath.Matrix4 scale(androidx.ui.graphics.vectormath.Vector3 s);
+    method public static androidx.ui.graphics.vectormath.Matrix4 scale(androidx.ui.graphics.vectormath.Matrix4 m);
+    method public static androidx.ui.graphics.vectormath.Matrix4 translation(androidx.ui.graphics.vectormath.Vector3 t);
+    method public static androidx.ui.graphics.vectormath.Matrix4 translation(androidx.ui.graphics.vectormath.Matrix4 m);
+    method public static androidx.ui.graphics.vectormath.Matrix3 transpose(androidx.ui.graphics.vectormath.Matrix3 m);
+    method public static androidx.ui.graphics.vectormath.Matrix4 transpose(androidx.ui.graphics.vectormath.Matrix4 m);
+  }
+
+  public final class ScalarKt {
+    method public static inline float degrees(float v);
+    method public static inline float radians(float v);
+    field public static final float FOUR_PI = 12.566371f;
+    field public static final float HALF_PI = 1.5707964f;
+    field public static final float INV_FOUR_PI = 0.07957747f;
+    field public static final float INV_PI = 0.31830987f;
+    field public static final float INV_TWO_PI = 0.15915494f;
+    field public static final float PI = 3.1415927f;
+    field public static final float TWO_PI = 6.2831855f;
+  }
+
+  public final class Vector2 {
+    ctor public Vector2(float x, float y);
+    ctor public Vector2();
+    ctor public Vector2(androidx.ui.graphics.vectormath.Vector2 v);
+    method public float component1();
+    method public float component2();
+    method public androidx.ui.graphics.vectormath.Vector2 copy(float x, float y);
+    method public operator androidx.ui.graphics.vectormath.Vector2 dec();
+    method public inline operator androidx.ui.graphics.vectormath.Vector2 div(float v);
+    method public inline operator androidx.ui.graphics.vectormath.Vector2 div(androidx.ui.graphics.vectormath.Vector2 v);
+    method public operator float get(androidx.ui.graphics.vectormath.VectorComponent index);
+    method public operator androidx.ui.graphics.vectormath.Vector2 get(androidx.ui.graphics.vectormath.VectorComponent index1, androidx.ui.graphics.vectormath.VectorComponent index2);
+    method public operator float get(int index);
+    method public operator androidx.ui.graphics.vectormath.Vector2 get(int index1, int index2);
+    method public inline float getG();
+    method public inline float getR();
+    method public inline androidx.ui.graphics.vectormath.Vector2 getRg();
+    method public inline float getS();
+    method public inline androidx.ui.graphics.vectormath.Vector2 getSt();
+    method public inline float getT();
+    method public inline java.util.List<java.lang.Float> getV2storage();
+    method public float getX();
+    method public inline androidx.ui.graphics.vectormath.Vector2 getXy();
+    method public float getY();
+    method public operator androidx.ui.graphics.vectormath.Vector2 inc();
+    method public inline operator androidx.ui.graphics.vectormath.Vector2 minus(float v);
+    method public inline operator androidx.ui.graphics.vectormath.Vector2 minus(androidx.ui.graphics.vectormath.Vector2 v);
+    method public inline operator androidx.ui.graphics.vectormath.Vector2 plus(float v);
+    method public inline operator androidx.ui.graphics.vectormath.Vector2 plus(androidx.ui.graphics.vectormath.Vector2 v);
+    method public operator void set(int index, float v);
+    method public operator void set(int index1, int index2, float v);
+    method public operator void set(androidx.ui.graphics.vectormath.VectorComponent index, float v);
+    method public operator void set(androidx.ui.graphics.vectormath.VectorComponent index1, androidx.ui.graphics.vectormath.VectorComponent index2, float v);
+    method public inline void setG(float value);
+    method public inline void setR(float value);
+    method public inline void setRg(androidx.ui.graphics.vectormath.Vector2 value);
+    method public inline void setS(float value);
+    method public inline void setSt(androidx.ui.graphics.vectormath.Vector2 value);
+    method public inline void setT(float value);
+    method public void setX(float p);
+    method public inline void setXy(androidx.ui.graphics.vectormath.Vector2 value);
+    method public void setY(float p);
+    method public inline operator androidx.ui.graphics.vectormath.Vector2 times(float v);
+    method public inline operator androidx.ui.graphics.vectormath.Vector2 times(androidx.ui.graphics.vectormath.Vector2 v);
+    method public inline androidx.ui.graphics.vectormath.Vector2 transform(kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> block);
+    method public operator androidx.ui.graphics.vectormath.Vector2 unaryMinus();
+    property public final inline float g;
+    property public final inline float r;
+    property public final inline androidx.ui.graphics.vectormath.Vector2 rg;
+    property public final inline float s;
+    property public final inline androidx.ui.graphics.vectormath.Vector2 st;
+    property public final inline float t;
+    property public final inline java.util.List<java.lang.Float> v2storage;
+    property public final inline androidx.ui.graphics.vectormath.Vector2 xy;
+  }
+
+  public final class Vector3 {
+    ctor public Vector3(float x, float y, float z);
+    ctor public Vector3();
+    ctor public Vector3(androidx.ui.graphics.vectormath.Vector2 v, float z);
+    ctor public Vector3(androidx.ui.graphics.vectormath.Vector3 v);
+    method public float component1();
+    method public float component2();
+    method public float component3();
+    method public androidx.ui.graphics.vectormath.Vector3 copy(float x, float y, float z);
+    method public operator androidx.ui.graphics.vectormath.Vector3 dec();
+    method public inline operator androidx.ui.graphics.vectormath.Vector3 div(float v);
+    method public inline operator androidx.ui.graphics.vectormath.Vector3 div(androidx.ui.graphics.vectormath.Vector2 v);
+    method public inline operator androidx.ui.graphics.vectormath.Vector3 div(androidx.ui.graphics.vectormath.Vector3 v);
+    method public operator float get(androidx.ui.graphics.vectormath.VectorComponent index);
+    method public operator androidx.ui.graphics.vectormath.Vector2 get(androidx.ui.graphics.vectormath.VectorComponent index1, androidx.ui.graphics.vectormath.VectorComponent index2);
+    method public operator androidx.ui.graphics.vectormath.Vector3 get(androidx.ui.graphics.vectormath.VectorComponent index1, androidx.ui.graphics.vectormath.VectorComponent index2, androidx.ui.graphics.vectormath.VectorComponent index3);
+    method public operator float get(int index);
+    method public operator androidx.ui.graphics.vectormath.Vector2 get(int index1, int index2);
+    method public operator androidx.ui.graphics.vectormath.Vector3 get(int index1, int index2, int index3);
+    method public inline float getB();
+    method public inline float getG();
+    method public inline float getP();
+    method public inline float getR();
+    method public inline androidx.ui.graphics.vectormath.Vector2 getRg();
+    method public inline androidx.ui.graphics.vectormath.Vector3 getRgb();
+    method public inline float getS();
+    method public inline androidx.ui.graphics.vectormath.Vector2 getSt();
+    method public inline androidx.ui.graphics.vectormath.Vector3 getStp();
+    method public inline float getT();
+    method public inline java.util.List<java.lang.Float> getV3storage();
+    method public float getX();
+    method public inline androidx.ui.graphics.vectormath.Vector2 getXy();
+    method public inline androidx.ui.graphics.vectormath.Vector3 getXyz();
+    method public float getY();
+    method public float getZ();
+    method public operator androidx.ui.graphics.vectormath.Vector3 inc();
+    method public inline operator androidx.ui.graphics.vectormath.Vector3 minus(float v);
+    method public inline operator androidx.ui.graphics.vectormath.Vector3 minus(androidx.ui.graphics.vectormath.Vector2 v);
+    method public inline operator androidx.ui.graphics.vectormath.Vector3 minus(androidx.ui.graphics.vectormath.Vector3 v);
+    method public inline operator androidx.ui.graphics.vectormath.Vector3 plus(float v);
+    method public inline operator androidx.ui.graphics.vectormath.Vector3 plus(androidx.ui.graphics.vectormath.Vector2 v);
+    method public inline operator androidx.ui.graphics.vectormath.Vector3 plus(androidx.ui.graphics.vectormath.Vector3 v);
+    method public operator void set(int index, float v);
+    method public operator void set(int index1, int index2, float v);
+    method public operator void set(int index1, int index2, int index3, float v);
+    method public operator void set(androidx.ui.graphics.vectormath.VectorComponent index, float v);
+    method public operator void set(androidx.ui.graphics.vectormath.VectorComponent index1, androidx.ui.graphics.vectormath.VectorComponent index2, float v);
+    method public operator void set(androidx.ui.graphics.vectormath.VectorComponent index1, androidx.ui.graphics.vectormath.VectorComponent index2, androidx.ui.graphics.vectormath.VectorComponent index3, float v);
+    method public inline void setB(float value);
+    method public inline void setG(float value);
+    method public inline void setP(float value);
+    method public inline void setR(float value);
+    method public inline void setRg(androidx.ui.graphics.vectormath.Vector2 value);
+    method public inline void setRgb(androidx.ui.graphics.vectormath.Vector3 value);
+    method public inline void setS(float value);
+    method public inline void setSt(androidx.ui.graphics.vectormath.Vector2 value);
+    method public inline void setStp(androidx.ui.graphics.vectormath.Vector3 value);
+    method public inline void setT(float value);
+    method public void setX(float p);
+    method public inline void setXy(androidx.ui.graphics.vectormath.Vector2 value);
+    method public inline void setXyz(androidx.ui.graphics.vectormath.Vector3 value);
+    method public void setY(float p);
+    method public void setZ(float p);
+    method public inline operator androidx.ui.graphics.vectormath.Vector3 times(float v);
+    method public inline operator androidx.ui.graphics.vectormath.Vector3 times(androidx.ui.graphics.vectormath.Vector2 v);
+    method public inline operator androidx.ui.graphics.vectormath.Vector3 times(androidx.ui.graphics.vectormath.Vector3 v);
+    method public inline androidx.ui.graphics.vectormath.Vector3 transform(kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> block);
+    method public operator androidx.ui.graphics.vectormath.Vector3 unaryMinus();
+    property public final inline float b;
+    property public final inline float g;
+    property public final inline float p;
+    property public final inline float r;
+    property public final inline androidx.ui.graphics.vectormath.Vector2 rg;
+    property public final inline androidx.ui.graphics.vectormath.Vector3 rgb;
+    property public final inline float s;
+    property public final inline androidx.ui.graphics.vectormath.Vector2 st;
+    property public final inline androidx.ui.graphics.vectormath.Vector3 stp;
+    property public final inline float t;
+    property public final inline java.util.List<java.lang.Float> v3storage;
+    property public final inline androidx.ui.graphics.vectormath.Vector2 xy;
+    property public final inline androidx.ui.graphics.vectormath.Vector3 xyz;
+  }
+
+  public final class Vector4 {
+    ctor public Vector4(float x, float y, float z, float w);
+    ctor public Vector4();
+    ctor public Vector4(androidx.ui.graphics.vectormath.Vector2 v, float z, float w);
+    ctor public Vector4(androidx.ui.graphics.vectormath.Vector3 v, float w);
+    ctor public Vector4(androidx.ui.graphics.vectormath.Vector4 v);
+    method public void assignFromStorage(java.util.List<java.lang.Float> storage);
+    method public float component1();
+    method public float component2();
+    method public float component3();
+    method public float component4();
+    method public androidx.ui.graphics.vectormath.Vector4 copy(float x, float y, float z, float w);
+    method public operator androidx.ui.graphics.vectormath.Vector4 dec();
+    method public inline operator androidx.ui.graphics.vectormath.Vector4 div(float v);
+    method public inline operator androidx.ui.graphics.vectormath.Vector4 div(androidx.ui.graphics.vectormath.Vector2 v);
+    method public inline operator androidx.ui.graphics.vectormath.Vector4 div(androidx.ui.graphics.vectormath.Vector3 v);
+    method public inline operator androidx.ui.graphics.vectormath.Vector4 div(androidx.ui.graphics.vectormath.Vector4 v);
+    method public operator float get(androidx.ui.graphics.vectormath.VectorComponent index);
+    method public operator androidx.ui.graphics.vectormath.Vector2 get(androidx.ui.graphics.vectormath.VectorComponent index1, androidx.ui.graphics.vectormath.VectorComponent index2);
+    method public operator androidx.ui.graphics.vectormath.Vector3 get(androidx.ui.graphics.vectormath.VectorComponent index1, androidx.ui.graphics.vectormath.VectorComponent index2, androidx.ui.graphics.vectormath.VectorComponent index3);
+    method public operator androidx.ui.graphics.vectormath.Vector4 get(androidx.ui.graphics.vectormath.VectorComponent index1, androidx.ui.graphics.vectormath.VectorComponent index2, androidx.ui.graphics.vectormath.VectorComponent index3, androidx.ui.graphics.vectormath.VectorComponent index4);
+    method public operator float get(int index);
+    method public operator androidx.ui.graphics.vectormath.Vector2 get(int index1, int index2);
+    method public operator androidx.ui.graphics.vectormath.Vector3 get(int index1, int index2, int index3);
+    method public operator androidx.ui.graphics.vectormath.Vector4 get(int index1, int index2, int index3, int index4);
+    method public inline float getA();
+    method public inline float getB();
+    method public inline float getG();
+    method public inline float getP();
+    method public inline float getQ();
+    method public inline float getR();
+    method public inline androidx.ui.graphics.vectormath.Vector2 getRg();
+    method public inline androidx.ui.graphics.vectormath.Vector3 getRgb();
+    method public inline androidx.ui.graphics.vectormath.Vector4 getRgba();
+    method public inline float getS();
+    method public inline androidx.ui.graphics.vectormath.Vector2 getSt();
+    method public inline androidx.ui.graphics.vectormath.Vector3 getStp();
+    method public inline androidx.ui.graphics.vectormath.Vector4 getStpq();
+    method public inline float getT();
+    method public inline java.util.List<java.lang.Float> getV4storage();
+    method public float getW();
+    method public float getX();
+    method public inline androidx.ui.graphics.vectormath.Vector2 getXy();
+    method public inline androidx.ui.graphics.vectormath.Vector3 getXyz();
+    method public inline androidx.ui.graphics.vectormath.Vector4 getXyzw();
+    method public float getY();
+    method public float getZ();
+    method public operator androidx.ui.graphics.vectormath.Vector4 inc();
+    method public inline operator androidx.ui.graphics.vectormath.Vector4 minus(float v);
+    method public inline operator androidx.ui.graphics.vectormath.Vector4 minus(androidx.ui.graphics.vectormath.Vector2 v);
+    method public inline operator androidx.ui.graphics.vectormath.Vector4 minus(androidx.ui.graphics.vectormath.Vector3 v);
+    method public inline operator androidx.ui.graphics.vectormath.Vector4 minus(androidx.ui.graphics.vectormath.Vector4 v);
+    method public inline operator androidx.ui.graphics.vectormath.Vector4 plus(float v);
+    method public inline operator androidx.ui.graphics.vectormath.Vector4 plus(androidx.ui.graphics.vectormath.Vector2 v);
+    method public inline operator androidx.ui.graphics.vectormath.Vector4 plus(androidx.ui.graphics.vectormath.Vector3 v);
+    method public inline operator androidx.ui.graphics.vectormath.Vector4 plus(androidx.ui.graphics.vectormath.Vector4 v);
+    method public operator void set(int index, float v);
+    method public operator void set(int index1, int index2, float v);
+    method public operator void set(int index1, int index2, int index3, float v);
+    method public operator void set(int index1, int index2, int index3, int index4, float v);
+    method public operator void set(androidx.ui.graphics.vectormath.VectorComponent index, float v);
+    method public operator void set(androidx.ui.graphics.vectormath.VectorComponent index1, androidx.ui.graphics.vectormath.VectorComponent index2, float v);
+    method public operator void set(androidx.ui.graphics.vectormath.VectorComponent index1, androidx.ui.graphics.vectormath.VectorComponent index2, androidx.ui.graphics.vectormath.VectorComponent index3, float v);
+    method public operator void set(androidx.ui.graphics.vectormath.VectorComponent index1, androidx.ui.graphics.vectormath.VectorComponent index2, androidx.ui.graphics.vectormath.VectorComponent index3, androidx.ui.graphics.vectormath.VectorComponent index4, float v);
+    method public inline void setA(float value);
+    method public inline void setB(float value);
+    method public inline void setG(float value);
+    method public inline void setP(float value);
+    method public inline void setQ(float value);
+    method public inline void setR(float value);
+    method public inline void setRg(androidx.ui.graphics.vectormath.Vector2 value);
+    method public inline void setRgb(androidx.ui.graphics.vectormath.Vector3 value);
+    method public inline void setRgba(androidx.ui.graphics.vectormath.Vector4 value);
+    method public inline void setS(float value);
+    method public inline void setSt(androidx.ui.graphics.vectormath.Vector2 value);
+    method public inline void setStp(androidx.ui.graphics.vectormath.Vector3 value);
+    method public inline void setStpq(androidx.ui.graphics.vectormath.Vector4 value);
+    method public inline void setT(float value);
+    method public void setW(float p);
+    method public void setX(float p);
+    method public inline void setXy(androidx.ui.graphics.vectormath.Vector2 value);
+    method public inline void setXyz(androidx.ui.graphics.vectormath.Vector3 value);
+    method public inline void setXyzw(androidx.ui.graphics.vectormath.Vector4 value);
+    method public void setY(float p);
+    method public void setZ(float p);
+    method public inline operator androidx.ui.graphics.vectormath.Vector4 times(float v);
+    method public inline operator androidx.ui.graphics.vectormath.Vector4 times(androidx.ui.graphics.vectormath.Vector2 v);
+    method public inline operator androidx.ui.graphics.vectormath.Vector4 times(androidx.ui.graphics.vectormath.Vector3 v);
+    method public inline operator androidx.ui.graphics.vectormath.Vector4 times(androidx.ui.graphics.vectormath.Vector4 v);
+    method public inline androidx.ui.graphics.vectormath.Vector4 transform(kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> block);
+    method public operator androidx.ui.graphics.vectormath.Vector4 unaryMinus();
+    property public final inline float a;
+    property public final inline float b;
+    property public final inline float g;
+    property public final inline float p;
+    property public final inline float q;
+    property public final inline float r;
+    property public final inline androidx.ui.graphics.vectormath.Vector2 rg;
+    property public final inline androidx.ui.graphics.vectormath.Vector3 rgb;
+    property public final inline androidx.ui.graphics.vectormath.Vector4 rgba;
+    property public final inline float s;
+    property public final inline androidx.ui.graphics.vectormath.Vector2 st;
+    property public final inline androidx.ui.graphics.vectormath.Vector3 stp;
+    property public final inline androidx.ui.graphics.vectormath.Vector4 stpq;
+    property public final inline float t;
+    property public final inline java.util.List<java.lang.Float> v4storage;
+    property public final inline androidx.ui.graphics.vectormath.Vector2 xy;
+    property public final inline androidx.ui.graphics.vectormath.Vector3 xyz;
+    property public final inline androidx.ui.graphics.vectormath.Vector4 xyzw;
+  }
+
+  public enum VectorComponent {
+    enum_constant public static final androidx.ui.graphics.vectormath.VectorComponent A;
+    enum_constant public static final androidx.ui.graphics.vectormath.VectorComponent B;
+    enum_constant public static final androidx.ui.graphics.vectormath.VectorComponent G;
+    enum_constant public static final androidx.ui.graphics.vectormath.VectorComponent P;
+    enum_constant public static final androidx.ui.graphics.vectormath.VectorComponent Q;
+    enum_constant public static final androidx.ui.graphics.vectormath.VectorComponent R;
+    enum_constant public static final androidx.ui.graphics.vectormath.VectorComponent S;
+    enum_constant public static final androidx.ui.graphics.vectormath.VectorComponent T;
+    enum_constant public static final androidx.ui.graphics.vectormath.VectorComponent W;
+    enum_constant public static final androidx.ui.graphics.vectormath.VectorComponent X;
+    enum_constant public static final androidx.ui.graphics.vectormath.VectorComponent Y;
+    enum_constant public static final androidx.ui.graphics.vectormath.VectorComponent Z;
+  }
+
+  public final class VectorExtensionsKt {
+    method public static inline androidx.ui.graphics.vectormath.Vector2 abs(androidx.ui.graphics.vectormath.Vector2 v);
+    method public static inline androidx.ui.graphics.vectormath.Vector3 abs(androidx.ui.graphics.vectormath.Vector3 v);
+    method public static inline androidx.ui.graphics.vectormath.Vector4 abs(androidx.ui.graphics.vectormath.Vector4 v);
+    method public static inline androidx.ui.graphics.vectormath.Vector2 coerceIn(androidx.ui.graphics.vectormath.Vector2, float min, float max);
+    method public static inline androidx.ui.graphics.vectormath.Vector2 coerceIn(androidx.ui.graphics.vectormath.Vector2, androidx.ui.graphics.vectormath.Vector2 min, androidx.ui.graphics.vectormath.Vector2 max);
+    method public static inline androidx.ui.graphics.vectormath.Vector3 coerceIn(androidx.ui.graphics.vectormath.Vector3, float min, float max);
+    method public static inline androidx.ui.graphics.vectormath.Vector3 coerceIn(androidx.ui.graphics.vectormath.Vector3, androidx.ui.graphics.vectormath.Vector3 min, androidx.ui.graphics.vectormath.Vector3 max);
+    method public static inline androidx.ui.graphics.vectormath.Vector4 coerceIn(androidx.ui.graphics.vectormath.Vector4, float min, float max);
+    method public static inline androidx.ui.graphics.vectormath.Vector4 coerceIn(androidx.ui.graphics.vectormath.Vector4, androidx.ui.graphics.vectormath.Vector4 min, androidx.ui.graphics.vectormath.Vector4 max);
+    method public static inline androidx.ui.graphics.vectormath.Vector3 cross(androidx.ui.graphics.vectormath.Vector3 a, androidx.ui.graphics.vectormath.Vector3 b);
+    method public static inline float distance(androidx.ui.graphics.vectormath.Vector2 a, androidx.ui.graphics.vectormath.Vector2 b);
+    method public static inline float distance(androidx.ui.graphics.vectormath.Vector3 a, androidx.ui.graphics.vectormath.Vector3 b);
+    method public static inline float distance(androidx.ui.graphics.vectormath.Vector4 a, androidx.ui.graphics.vectormath.Vector4 b);
+    method public static inline operator androidx.ui.graphics.vectormath.Vector2 div(float, androidx.ui.graphics.vectormath.Vector2 v);
+    method public static inline operator androidx.ui.graphics.vectormath.Vector3 div(float, androidx.ui.graphics.vectormath.Vector3 v);
+    method public static inline operator androidx.ui.graphics.vectormath.Vector4 div(float, androidx.ui.graphics.vectormath.Vector4 v);
+    method public static inline float dot(androidx.ui.graphics.vectormath.Vector2 a, androidx.ui.graphics.vectormath.Vector2 b);
+    method public static inline float dot(androidx.ui.graphics.vectormath.Vector3 a, androidx.ui.graphics.vectormath.Vector3 b);
+    method public static inline float dot(androidx.ui.graphics.vectormath.Vector4 a, androidx.ui.graphics.vectormath.Vector4 b);
+    method public static inline float length(androidx.ui.graphics.vectormath.Vector2 v);
+    method public static inline float length(androidx.ui.graphics.vectormath.Vector3 v);
+    method public static inline float length(androidx.ui.graphics.vectormath.Vector4 v);
+    method public static inline float length2(androidx.ui.graphics.vectormath.Vector2 v);
+    method public static inline float length2(androidx.ui.graphics.vectormath.Vector3 v);
+    method public static inline float length2(androidx.ui.graphics.vectormath.Vector4 v);
+    method public static inline float max(androidx.ui.graphics.vectormath.Vector2 v);
+    method public static inline androidx.ui.graphics.vectormath.Vector2 max(androidx.ui.graphics.vectormath.Vector2 a, androidx.ui.graphics.vectormath.Vector2 b);
+    method public static inline float max(androidx.ui.graphics.vectormath.Vector3 v);
+    method public static inline androidx.ui.graphics.vectormath.Vector3 max(androidx.ui.graphics.vectormath.Vector3 a, androidx.ui.graphics.vectormath.Vector3 b);
+    method public static inline float max(androidx.ui.graphics.vectormath.Vector4 v);
+    method public static inline androidx.ui.graphics.vectormath.Vector4 max(androidx.ui.graphics.vectormath.Vector4 a, androidx.ui.graphics.vectormath.Vector4 b);
+    method public static inline float min(androidx.ui.graphics.vectormath.Vector2 v);
+    method public static inline androidx.ui.graphics.vectormath.Vector2 min(androidx.ui.graphics.vectormath.Vector2 a, androidx.ui.graphics.vectormath.Vector2 b);
+    method public static inline float min(androidx.ui.graphics.vectormath.Vector3 v);
+    method public static inline androidx.ui.graphics.vectormath.Vector3 min(androidx.ui.graphics.vectormath.Vector3 a, androidx.ui.graphics.vectormath.Vector3 b);
+    method public static inline float min(androidx.ui.graphics.vectormath.Vector4 v);
+    method public static inline androidx.ui.graphics.vectormath.Vector4 min(androidx.ui.graphics.vectormath.Vector4 a, androidx.ui.graphics.vectormath.Vector4 b);
+    method public static inline operator androidx.ui.graphics.vectormath.Vector2 minus(float, androidx.ui.graphics.vectormath.Vector2 v);
+    method public static inline operator androidx.ui.graphics.vectormath.Vector3 minus(float, androidx.ui.graphics.vectormath.Vector3 v);
+    method public static inline operator androidx.ui.graphics.vectormath.Vector4 minus(float, androidx.ui.graphics.vectormath.Vector4 v);
+    method public static androidx.ui.graphics.vectormath.Vector2 normalize(androidx.ui.graphics.vectormath.Vector2 v);
+    method public static androidx.ui.graphics.vectormath.Vector3 normalize(androidx.ui.graphics.vectormath.Vector3 v);
+    method public static androidx.ui.graphics.vectormath.Vector4 normalize(androidx.ui.graphics.vectormath.Vector4 v);
+    method public static inline operator androidx.ui.graphics.vectormath.Vector2 plus(float, androidx.ui.graphics.vectormath.Vector2 v);
+    method public static inline operator androidx.ui.graphics.vectormath.Vector3 plus(float, androidx.ui.graphics.vectormath.Vector3 v);
+    method public static inline operator androidx.ui.graphics.vectormath.Vector4 plus(float, androidx.ui.graphics.vectormath.Vector4 v);
+    method public static inline androidx.ui.graphics.vectormath.Vector2 reflect(androidx.ui.graphics.vectormath.Vector2 i, androidx.ui.graphics.vectormath.Vector2 n);
+    method public static inline androidx.ui.graphics.vectormath.Vector3 reflect(androidx.ui.graphics.vectormath.Vector3 i, androidx.ui.graphics.vectormath.Vector3 n);
+    method public static androidx.ui.graphics.vectormath.Vector2 refract(androidx.ui.graphics.vectormath.Vector2 i, androidx.ui.graphics.vectormath.Vector2 n, float eta);
+    method public static androidx.ui.graphics.vectormath.Vector3 refract(androidx.ui.graphics.vectormath.Vector3 i, androidx.ui.graphics.vectormath.Vector3 n, float eta);
+    method public static inline operator androidx.ui.graphics.vectormath.Vector2 times(float, androidx.ui.graphics.vectormath.Vector2 v);
+    method public static inline operator androidx.ui.graphics.vectormath.Vector3 times(float, androidx.ui.graphics.vectormath.Vector3 v);
+    method public static inline operator androidx.ui.graphics.vectormath.Vector4 times(float, androidx.ui.graphics.vectormath.Vector4 v);
+    method public static inline androidx.ui.graphics.vectormath.Vector2 transform(androidx.ui.graphics.vectormath.Vector2 v, kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> block);
+    method public static inline androidx.ui.graphics.vectormath.Vector3 transform(androidx.ui.graphics.vectormath.Vector3 v, kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> block);
+    method public static inline androidx.ui.graphics.vectormath.Vector4 transform(androidx.ui.graphics.vectormath.Vector4 v, kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> block);
+    method public static inline infix androidx.ui.graphics.vectormath.Vector3 x(androidx.ui.graphics.vectormath.Vector3, androidx.ui.graphics.vectormath.Vector3 v);
+  }
+
+}
+
