@@ -42,6 +42,7 @@ class DesktopOwners(
     // Optimization: we don't need more than one redrawing per tick
     private var redrawingScheduled = false
 
+    private var pointerId = 0L
     private var isMousePressed = false
 
     internal val platformInputService: DesktopPlatformInput = DesktopPlatformInput(component)
@@ -71,6 +72,7 @@ class DesktopOwners(
     fun onMouseReleased(x: Int, y: Int) {
         isMousePressed = false
         list.lastOrNull()?.processPointerInput(pointerInputEvent(x, y, isMousePressed))
+        pointerId += 1
     }
 
     fun onMouseDragged(x: Int, y: Int) {
@@ -103,7 +105,7 @@ class DesktopOwners(
             time,
             listOf(
                 PointerInputEventData(
-                    PointerId(0),
+                    PointerId(pointerId),
                     PointerInputData(
                         time,
                         Offset(x.toFloat(), y.toFloat()),
