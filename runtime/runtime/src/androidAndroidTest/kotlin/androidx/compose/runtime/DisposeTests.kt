@@ -41,10 +41,10 @@ class DisposeTests : BaseComposeTest() {
 
         @OptIn(ExperimentalComposeApi::class)
         val composable = @Composable @ComposableContract(tracked = false) {
-            onPreCommit {
-                log.add("onPreCommit")
+            onCommit {
+                log.add("onCommit")
                 onDispose {
-                    log.add("onPreCommitDispose")
+                    log.add("onCommitDispose")
                 }
             }
             onActive {
@@ -63,24 +63,24 @@ class DisposeTests : BaseComposeTest() {
 
         var composition: Composition? = null
 
-        assertLog("onPreCommit, onActive") {
+        assertLog("onCommit, onActive") {
             composition = activity.show(composable)
             activity.waitForAFrame()
         }
 
-        assertLog("onPreCommitDispose, onPreCommit") {
+        assertLog("onCommitDispose, onCommit") {
             activity.show(composable)
             activity.waitForAFrame()
         }
 
-        assertLog("onActiveDispose, onPreCommitDispose") {
+        assertLog("onActiveDispose, onCommitDispose") {
             activity.uiThread {
                 composition?.dispose()
             }
             activity.waitForAFrame()
         }
 
-        assertLog("onPreCommit, onActive") {
+        assertLog("onCommit, onActive") {
             activity.show(composable)
             activity.waitForAFrame()
         }

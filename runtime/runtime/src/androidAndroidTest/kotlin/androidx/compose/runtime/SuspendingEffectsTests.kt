@@ -77,7 +77,7 @@ class SuspendingEffectsTests : BaseComposeTest() {
                     awaitFrameTime = it
                 }
             }
-            onPreCommit(true) {
+            onCommit(true) {
                 Recomposer.current().embeddingContext
                     .postFrameCallback(object : ChoreographerFrameCallback {
                     override fun doFrame(frameTimeNanos: Long) {
