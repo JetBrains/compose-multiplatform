@@ -50,6 +50,23 @@ fun Window(
 
 class AppWindow : AppFrame {
 
+    override val window: ComposeWindow
+
+    init {
+        window = ComposeWindow(parent = this)
+        window.apply {
+            defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            addWindowListener(object : WindowAdapter() {
+                override fun windowClosing(windowevent: WindowEvent) {
+                    if (defaultCloseOperation != WindowConstants.DO_NOTHING_ON_CLOSE) {
+                        onDismissEvents.forEach { it.invoke() }
+                        AppManager.removeWindow(parent)
+                    }
+                }
+            })
+        }
+    }
+
     internal constructor(
         attached: AppFrame? = null,
         title: String = "JetpackDesktopWindow",
@@ -59,15 +76,6 @@ class AppWindow : AppFrame {
         centered: Boolean = true
     ) : this(title, size, position, onDismissEvent, centered) {
         this.invoker = attached
-        this.invoker?.connectPair(this)
-    }
-
-    internal var pair: AppFrame? = null
-    internal override fun connectPair(window: AppFrame) {
-        pair = window
-    }
-    internal override fun disconnectPair() {
-        pair = null
     }
 
     constructor(
@@ -90,6 +98,14 @@ class AppWindow : AppFrame {
         AppManager.addWindow(this)
     }
 
+    internal var pair: AppFrame? = null
+    internal override fun connectPair(window: AppFrame) {
+        pair = window
+    }
+    internal override fun disconnectPair() {
+        pair = null
+    }
+
     override fun setSize(width: Int, height: Int) {
         // better check min/max values of current window size
         var w = width
@@ -103,78 +119,80 @@ class AppWindow : AppFrame {
         }
         this.width = w
         this.height = h
-        window?.setSize(w, h)
+        window.setSize(w, h)
     }
 
     override fun setPosition(x: Int, y: Int) {
         this.x = x
         this.y = y
-        window?.setLocation(x, y)
+        window.setLocation(x, y)
     }
 
     override fun setWindowCentered() {
         val dim: Dimension = Toolkit.getDefaultToolkit().getScreenSize()
         this.x = dim.width / 2 - width / 2
         this.y = dim.height / 2 - height / 2
-        window?.setLocation(x, y)
+        window.setLocation(x, y)
     }
 
     private fun onCreate(content: @Composable () -> Unit) {
-
-        window = ComposeWindow(parent = this)
-
-        window!!.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-        val appWindow = this
-        window!!.addWindowListener(object : WindowAdapter() {
-            override fun windowClosing(windowevent: WindowEvent) {
-                onDismissEvents.forEach { it.invoke() }
-                window?.disposeCanvas()
-                window?.dispose()
-                invoker?.locked = false
-                invoker?.window?.toFront()
-                invoker?.window?.requestFocus()
-                invoker?.disconnectPair()
-                AppManager.removeWindow(appWindow)
-            }
-        })
-        window!!.addWindowFocusListener(object : WindowAdapter() {
-            override fun windowGainedFocus(windowEvent: WindowEvent) {
-                if (pair != null) {
-                    pair!!.window?.toFront()
-                    pair!!.window?.requestFocus()
-                }
-            }
-        })
-
-        window!!.title = title
-
-        window!!.setContent {
+        window.setContent {
             Providers(
                 AppWindowAmbient provides this,
                 children = content
             )
         }
+    }
+
+    override fun show(content: @Composable () -> Unit) {
+        if (invoker != null) {
+            invoker!!.lockWindow()
+            window.setAlwaysOnTop(true)
+        }
+
+        onCreate {
+            content()
+        }
 
         if (isCentered) {
             setWindowCentered()
         }
-        window!!.setVisible(true)
-        window!!.setSize(width, height)
-
-        window!!.updateLayer()
-    }
-
-    override fun show(content: @Composable () -> Unit) {
-        invoker?.locked = true
-        onCreate {
-            content()
-        }
-        if (invoker != null) {
-            window!!.setAlwaysOnTop(true)
-        }
+        window.title = title
+        window.setSize(width, height)
+        window.setVisible(true)
     }
 
     override fun close() {
-        window?.dispatchEvent(WindowEvent(window, WindowEvent.WINDOW_CLOSING))
+        window.dispatchEvent(WindowEvent(window, WindowEvent.WINDOW_CLOSING))
+    }
+
+    internal override fun dispose() {
+        window.apply {
+            disposeCanvas()
+            dispose()
+        }
+        invoker?.unlockWindow()
+    }
+
+    internal override fun lockWindow() {
+        window.apply {
+            defaultCloseOperation = WindowConstants.DO_NOTHING_ON_CLOSE
+            setFocusableWindowState(false)
+            setResizable(false)
+            setEnabled(false)
+        }
+        invoker?.connectPair(this)
+    }
+
+    internal override fun unlockWindow() {
+        window.apply {
+            defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+            setFocusableWindowState(true)
+            setResizable(true)
+            setEnabled(true)
+            toFront()
+            requestFocus()
+        }
+        disconnectPair()
     }
 }

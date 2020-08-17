@@ -33,6 +33,7 @@ object AppManager {
 
     internal fun removeWindow(window: AppFrame) {
         windows.remove(window)
+        window.dispose()
         if (windows.isEmpty()) {
             onWindowsEmptyAction.invoke()
         }
@@ -44,7 +45,7 @@ object AppManager {
 
     fun getCurrentFocusedWindow(): AppFrame? {
         for (current in windows) {
-            if (current.window!!.isFocused) {
+            if (current.window.isFocused) {
                 return current
             }
         }
