@@ -36,6 +36,8 @@ const val CREATE_STUB_API_JAR_TASK = "createStubApiJar"
 
 object MetalavaTasks {
 
+    // flatMap is marked unstable, but it's required for lazy eval
+    @Suppress("UnstableApiUsage")
     fun setupProject(
         project: Project,
         javaCompileInputs: JavaCompileInputs,
@@ -70,6 +72,7 @@ object MetalavaTasks {
         // checked in, then we must verify "release compatibility" against the work-in-progress
         // API file.
         var checkApiRelease: TaskProvider<CheckApiCompatibilityTask>? = null
+        var ignoreApiChanges: TaskProvider<IgnoreApiChangesTask>? = null
         project.getRequiredCompatibilityApiLocation()?.let { lastReleasedApiFile ->
             checkApiRelease = project.tasks.register(
                 "checkApiRelease",
@@ -86,7 +89,10 @@ object MetalavaTasks {
                 task.dependsOn(generateApi)
             }
 
-            project.tasks.register("ignoreApiChanges", IgnoreApiChangesTask::class.java) { task ->
+            ignoreApiChanges = project.tasks.register(
+                "ignoreApiChanges",
+                IgnoreApiChangesTask::class.java
+            ) { task ->
                 task.configuration = metalavaConfiguration
                 task.referenceApi.set(checkApiRelease!!.flatMap { it.referenceApi })
                 task.baselines.set(checkApiRelease!!.flatMap { it.baselines })
@@ -135,14 +141,15 @@ object MetalavaTasks {
             task.description = "Regenerates historic API .txt files using the " +
                 "corresponding prebuilt and the latest Metalava"
             task.generateRestrictToLibraryGroupAPIs = generateRestrictToLibraryGroupAPIs
-            // if checkApiRelease and regenerateOldApis both run, then checkApiRelease must
-            // be the second one run of the two (because checkApiRelease validates
-            // files modified by regenerateOldApis)
-            val cr = checkApiRelease
-            if (cr != null) {
-                cr.get().mustRunAfter(task)
-            }
         }
+
+        // ignoreApiChanges depends on the output of this task for the "last released" API
+        // surface. Make sure it always runs *after* the regenerateOldApis task.
+        ignoreApiChanges?.configure { it.mustRunAfter(regenerateOldApis) }
+
+        // checkApiRelease validates the output of this task, so make sure it always runs
+        // *after* the regenerateOldApis task.
+        checkApiRelease?.configure { it.mustRunAfter(regenerateOldApis) }
 
         val updateApi = project.tasks.register("updateApi", UpdateApiTask::class.java) { task ->
             task.group = "API"
@@ -150,22 +157,25 @@ object MetalavaTasks {
             task.inputApiLocation.set(generateApi.flatMap { it.apiLocation })
             task.outputApiLocations.set(checkApi.flatMap { it.checkedInApis })
             task.dependsOn(generateApi)
-            if (checkApiRelease != null) {
-                // If a developer (accidentally) makes a non-backwards compatible change to an
-                // api, the developer will want to be informed of it as soon as possible.
-                // So, whenever a developer updates an api, if backwards compatibility checks are
-                // enabled in the library, then we want to check that the changes are backwards
-                // compatible
-                task.dependsOn(checkApiRelease)
-            }
+
+            // If a developer (accidentally) makes a non-backwards compatible change to an API,
+            // the developer will want to be informed of it as soon as possible. So, whenever a
+            // developer updates an API, if backwards compatibility checks are enabled in the
+            // library, then we want to check that the changes are backwards compatible.
+            checkApiRelease?.let { task.dependsOn(it) }
         }
+
+        // ignoreApiChanges depends on the output of this task for the "current" API surface.
+        // Make sure it always runs *after* the updateApi task.
+        ignoreApiChanges?.configure { it.mustRunAfter(updateApi) }
 
         project.tasks.register("regenerateApis") { task ->
             task.group = "API"
             task.description = "Regenerates current and historic API .txt files using the " +
-                "corresponding prebuilt and the latest Metalava"
+                "corresponding prebuilt and the latest Metalava, then updates API ignore files"
             task.dependsOn(regenerateOldApis)
             task.dependsOn(updateApi)
+            ignoreApiChanges?.let { task.dependsOn(it) }
         }
 
         project.addToCheckTask(checkApi)
