@@ -26,6 +26,7 @@ import androidx.compose.runtime.dispatch.MonotonicFrameClock
  * .ManualAnimationClock], which immediately calls the subscriber's callback with the current
  * time, supply [dispatchOnSubscribe] to the constructor.
  */
+// TODO(b/163462047): Consider propagating the onNewAwaiters callback from BroadcastFrameClock
 class ManualFrameClock
 @Deprecated(
     message = "dispatchOnSubscribe should only be used for backwards compatibility when this " +
@@ -47,6 +48,18 @@ constructor(
      */
     var currentTime: Long = initialTime
         private set
+
+    /**
+     * Whether or not there are currently routines awaiting a frame from this clock.
+     *
+     * Note that immediately after [advanceClock], coroutines that have received a frame time
+     * might not have had their continuation run yet. This can lead to [hasAwaiters] returning
+     * false, even though those coroutines may request another frame immediately when they are
+     * continued. To work around this caveat, make sure that those coroutines have run before
+     * calling [hasAwaiters]. For example, `withContext(AndroidUiDispatcher.Main) {}` will finish
+     * when all work currently scheduled on the AndroidUiDispatcher is done.
+     */
+    val hasAwaiters: Boolean get() = broadcastClock.hasAwaiters
 
     /**
      * Advances the clock by the given number of [nanoseconds][nanos]. One frame will be sent,
