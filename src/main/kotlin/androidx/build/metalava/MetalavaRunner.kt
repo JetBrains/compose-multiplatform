@@ -144,7 +144,8 @@ fun Project.getApiLintArgs(): List<String> {
             "MethodNameTense",
             "UseIcu",
             "NoByteOrShort",
-            "CommonArgsFirst"
+            "CommonArgsFirst",
+            "HiddenSuperclass"
         ).joinToString()
     )
 
