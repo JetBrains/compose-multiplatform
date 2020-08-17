@@ -175,7 +175,7 @@ class EffectsTests : BaseComposeTest() {
     }
 
     @Test
-    fun testPreCommit1() {
+    fun testCommit1() {
         var mount by mutableStateOf(true)
 
         val logHistory = mutableListOf<String>()
@@ -184,8 +184,8 @@ class EffectsTests : BaseComposeTest() {
         @Composable
         fun Unmountable() {
             log("Unmountable:start")
-            onPreCommit {
-                log("onPreCommit")
+            onCommit {
+                log("onCommit")
                 onDispose {
                     log("onDispose")
                 }
@@ -206,7 +206,7 @@ class EffectsTests : BaseComposeTest() {
                     "Unmountable:start",
                     "Unmountable:end",
                     "compose:end",
-                    "onPreCommit"
+                    "onCommit"
                 ),
                 logHistory
             )
@@ -218,7 +218,7 @@ class EffectsTests : BaseComposeTest() {
                     "Unmountable:start",
                     "Unmountable:end",
                     "compose:end",
-                    "onPreCommit",
+                    "onCommit",
                     "compose:start",
                     "compose:end",
                     "onDispose"
@@ -229,7 +229,7 @@ class EffectsTests : BaseComposeTest() {
     }
 
     @Test
-    fun testPreCommit2() {
+    fun testCommit2() {
         var mount by mutableStateOf(true)
 
         val logHistory = mutableListOf<String>()
@@ -237,14 +237,14 @@ class EffectsTests : BaseComposeTest() {
 
         @Composable
         fun Unmountable() {
-            onPreCommit {
-                log("onPreCommit:a2")
+            onCommit {
+                log("onCommit:a2")
                 onDispose {
                     log("onDispose:a2")
                 }
             }
-            onPreCommit {
-                log("onPreCommit:b2")
+            onCommit {
+                log("onCommit:b2")
                 onDispose {
                     log("onDispose:b2")
                 }
@@ -252,8 +252,8 @@ class EffectsTests : BaseComposeTest() {
         }
 
         compose {
-            onPreCommit {
-                log("onPreCommit:a1")
+            onCommit {
+                log("onCommit:a1")
                 onDispose {
                     log("onDispose:a1")
                 }
@@ -261,8 +261,8 @@ class EffectsTests : BaseComposeTest() {
             if (mount) {
                 Unmountable()
             }
-            onPreCommit {
-                log("onPreCommit:b1")
+            onCommit {
+                log("onCommit:b1")
                 onDispose {
                     log("onDispose:b1")
                 }
@@ -270,10 +270,10 @@ class EffectsTests : BaseComposeTest() {
         }.then { _ ->
             assertArrayEquals(
                 listOf(
-                    "onPreCommit:a1",
-                    "onPreCommit:a2",
-                    "onPreCommit:b2",
-                    "onPreCommit:b1"
+                    "onCommit:a1",
+                    "onCommit:a2",
+                    "onCommit:b2",
+                    "onCommit:b1"
                 ),
                 logHistory
             )
@@ -282,17 +282,17 @@ class EffectsTests : BaseComposeTest() {
         }.then { _ ->
             assertArrayEquals(
                 listOf(
-                    "onPreCommit:a1",
-                    "onPreCommit:a2",
-                    "onPreCommit:b2",
-                    "onPreCommit:b1",
+                    "onCommit:a1",
+                    "onCommit:a2",
+                    "onCommit:b2",
+                    "onCommit:b1",
                     "recompose",
                     "onDispose:b2",
                     "onDispose:a2",
                     "onDispose:b1",
                     "onDispose:a1",
-                    "onPreCommit:a1",
-                    "onPreCommit:b1"
+                    "onCommit:a1",
+                    "onCommit:b1"
                 ),
                 logHistory
             )
@@ -300,7 +300,7 @@ class EffectsTests : BaseComposeTest() {
     }
 
     @Test
-    fun testPreCommit3() {
+    fun testCommit3() {
         var x = 0
         val trigger = Trigger()
 
@@ -309,9 +309,9 @@ class EffectsTests : BaseComposeTest() {
 
         compose {
             trigger.subscribe()
-            onPreCommit {
+            onCommit {
                 val y = x++
-                log("onPreCommit:$y")
+                log("onCommit:$y")
                 onDispose {
                     log("dispose:$y")
                 }
@@ -322,10 +322,10 @@ class EffectsTests : BaseComposeTest() {
         }.then { _ ->
             assertArrayEquals(
                 listOf(
-                    "onPreCommit:0",
+                    "onCommit:0",
                     "recompose",
                     "dispose:0",
-                    "onPreCommit:1"
+                    "onCommit:1"
                 ),
                 logHistory
             )
@@ -333,7 +333,7 @@ class EffectsTests : BaseComposeTest() {
     }
 
     @Test
-    fun testPreCommit31() {
+    fun testCommit31() {
         var a = 0
         var b = 0
         val trigger = Trigger()
@@ -343,16 +343,16 @@ class EffectsTests : BaseComposeTest() {
 
         compose {
             trigger.subscribe()
-            onPreCommit {
+            onCommit {
                 val y = a++
-                log("onPreCommit a:$y")
+                log("onCommit a:$y")
                 onDispose {
                     log("dispose a:$y")
                 }
             }
-            onPreCommit {
+            onCommit {
                 val y = b++
-                log("onPreCommit b:$y")
+                log("onCommit b:$y")
                 onDispose {
                     log("dispose b:$y")
                 }
@@ -363,13 +363,13 @@ class EffectsTests : BaseComposeTest() {
         }.then { _ ->
             assertArrayEquals(
                 listOf(
-                    "onPreCommit a:0",
-                    "onPreCommit b:0",
+                    "onCommit a:0",
+                    "onCommit b:0",
                     "recompose",
                     "dispose b:0",
                     "dispose a:0",
-                    "onPreCommit a:1",
-                    "onPreCommit b:1"
+                    "onCommit a:1",
+                    "onCommit b:1"
                 ),
                 logHistory
             )
@@ -377,7 +377,7 @@ class EffectsTests : BaseComposeTest() {
     }
 
     @Test
-    fun testPreCommit4() {
+    fun testCommit4() {
         var x = 0
         var key = 123
         val trigger = Trigger()
@@ -387,9 +387,9 @@ class EffectsTests : BaseComposeTest() {
 
         compose {
             trigger.subscribe()
-            onPreCommit(key) {
+            onCommit(key) {
                 val y = x++
-                log("onPreCommit:$y")
+                log("onCommit:$y")
                 onDispose {
                     log("dispose:$y")
                 }
@@ -400,7 +400,7 @@ class EffectsTests : BaseComposeTest() {
         }.then { _ ->
             assertArrayEquals(
                 listOf(
-                    "onPreCommit:0",
+                    "onCommit:0",
                     "recompose"
                 ),
                 logHistory
@@ -411,11 +411,11 @@ class EffectsTests : BaseComposeTest() {
         }.then { _ ->
             assertArrayEquals(
                 listOf(
-                    "onPreCommit:0",
+                    "onCommit:0",
                     "recompose",
                     "recompose (key -> 345)",
                     "dispose:0",
-                    "onPreCommit:1"
+                    "onCommit:1"
                 ),
                 logHistory
             )
@@ -423,7 +423,7 @@ class EffectsTests : BaseComposeTest() {
     }
 
     @Test
-    fun testPreCommit5() {
+    fun testCommit5() {
         var a = 0
         var b = 0
         var c = 0
@@ -435,9 +435,9 @@ class EffectsTests : BaseComposeTest() {
         @Composable
         fun Sub() {
             trigger.subscribe()
-            onPreCommit {
+            onCommit {
                 val y = c++
-                log("onPreCommit c:$y")
+                log("onCommit c:$y")
                 onDispose {
                     log("dispose c:$y")
                 }
@@ -446,17 +446,17 @@ class EffectsTests : BaseComposeTest() {
 
         compose {
             trigger.subscribe()
-            onPreCommit {
+            onCommit {
                 val y = a++
-                log("onPreCommit a:$y")
+                log("onCommit a:$y")
                 onDispose {
                     log("dispose a:$y")
                 }
             }
 
-            onPreCommit {
+            onCommit {
                 val y = b++
-                log("onPreCommit b:$y")
+                log("onCommit b:$y")
                 onDispose {
                     log("dispose b:$y")
                 }
@@ -469,16 +469,16 @@ class EffectsTests : BaseComposeTest() {
         }.then { _ ->
             assertArrayEquals(
                 listOf(
-                    "onPreCommit a:0",
-                    "onPreCommit b:0",
-                    "onPreCommit c:0",
+                    "onCommit a:0",
+                    "onCommit b:0",
+                    "onCommit c:0",
                     "recompose",
                     "dispose c:0",
                     "dispose b:0",
                     "dispose a:0",
-                    "onPreCommit a:1",
-                    "onPreCommit b:1",
-                    "onPreCommit c:1"
+                    "onCommit a:1",
+                    "onCommit b:1",
+                    "onCommit c:1"
                 ),
                 logHistory
             )
@@ -486,20 +486,20 @@ class EffectsTests : BaseComposeTest() {
     }
 
     @Test
-    fun testPreCommit6() {
+    fun testCommit6() {
         var readValue = 0
 
         @Composable
-        fun UpdateStateInPreCommit() {
+        fun UpdateStateInCommit() {
             var value by remember { mutableStateOf(1) }
             readValue = value
-            onPreCommit {
+            onCommit {
                 value = 2
             }
         }
 
         compose {
-            UpdateStateInPreCommit()
+            UpdateStateInCommit()
         }.then { _ ->
             assertEquals(2, readValue)
         }
@@ -532,78 +532,6 @@ class EffectsTests : BaseComposeTest() {
         }.then { _ ->
             assertArrayEquals(
                 listOf("recompose", "onDispose:2"),
-                logHistory
-            )
-        }
-    }
-
-    @Test
-    fun testOnCommit1() {
-        var mount by mutableStateOf(true)
-
-        val logHistory = mutableListOf<String>()
-        fun log(x: String) = logHistory.add(x)
-
-        @Composable
-        fun Unmountable() {
-            log("Unmountable:start")
-            onCommit {
-                log("onCommit 1")
-                onDispose {
-                    log("onDispose 1")
-                }
-            }
-            onPreCommit {
-                log("onPreCommit 2")
-                onDispose {
-                    log("onDispose 2")
-                }
-            }
-            onCommit {
-                log("onCommit 3")
-                onDispose {
-                    log("onDispose 3")
-                }
-            }
-            log("Unmountable:end")
-        }
-
-        compose {
-                log("compose:start")
-                if (mount) {
-                    Unmountable()
-                }
-                log("compose:end")
-        }.then { _ ->
-            assertArrayEquals(
-                listOf(
-                    "compose:start",
-                    "Unmountable:start",
-                    "Unmountable:end",
-                    "compose:end",
-                    "onPreCommit 2",
-                    "onCommit 1",
-                    "onCommit 3"
-                ),
-                logHistory
-            )
-            mount = false
-        }.then { _ ->
-            assertArrayEquals(
-                listOf(
-                    "compose:start",
-                    "Unmountable:start",
-                    "Unmountable:end",
-                    "compose:end",
-                    "onPreCommit 2",
-                    "onCommit 1",
-                    "onCommit 3",
-                    "compose:start",
-                    "compose:end",
-                    "onDispose 3",
-                    "onDispose 2",
-                    "onDispose 1"
-                ),
                 logHistory
             )
         }

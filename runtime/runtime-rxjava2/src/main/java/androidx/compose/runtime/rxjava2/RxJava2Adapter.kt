@@ -19,7 +19,7 @@ package androidx.compose.runtime.rxjava2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onPreCommit
+import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -212,7 +212,7 @@ private inline fun <T, S> S.asState(
     crossinline subscribe: S.((T) -> Unit) -> Disposable
 ): State<T> {
     val state = remember { mutableStateOf(initial) }
-    onPreCommit(this) {
+    onCommit(this) {
         val disposable = subscribe {
             state.value = it
         }
