@@ -27,6 +27,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.test.filters.MediumTest
+import androidx.ui.test.StateRestorationTester
 import androidx.ui.test.center
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.onNodeWithTag
@@ -1320,6 +1321,36 @@ class SwipeableTest {
         assertThat(endValue).isNull()
         advanceClock()
         assertThat(endValue).isEqualTo("B")
+    }
+
+    /**
+     * Tests that the [SwipeableState] is restored, when created with [rememberSwipeableState].
+     */
+    @Test
+    fun swipeable_restoreSwipeableState() {
+        val restorationTester = StateRestorationTester(composeTestRule)
+        var state: SwipeableState<String>? = null
+
+        restorationTester.setContent {
+            state = rememberSwipeableState("A")
+            Box(Modifier.swipeable(
+                state = state!!,
+                anchors = mapOf(0f to "A", 100f to "B"),
+                thresholds = { _, _ -> FractionalThreshold(0.5f) },
+                orientation = Orientation.Horizontal
+            ))
+        }
+
+        runOnIdle {
+            state!!.animateTo("B")
+            state = null
+        }
+
+        restorationTester.emulateSavedInstanceStateRestore()
+
+        runOnIdle {
+            assertThat(state!!.value).isEqualTo("B")
+        }
     }
 
     private fun swipeRight(
