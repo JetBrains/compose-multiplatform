@@ -16,14 +16,23 @@
 
 package androidx.compose.navigation
 
+import android.content.Context
+import android.os.Bundle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.savedinstancestate.Saver
+import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
+import androidx.compose.ui.platform.ContextAmbient
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
+import androidx.navigation.navigation
 
 /**
  * Gets the current navigation back stack entry as a [MutableState]. When the given navController
@@ -49,3 +58,59 @@ fun NavController.currentBackStackEntryAsState(): State<NavBackStackEntry?> {
     }
     return currentNavBackStackEntry
 }
+
+/**
+ * Creates a NavHostController that handles the adding of the [ComposeNavigator].
+ *
+ * @see NavHost
+ */
+@Composable
+fun rememberNavController(): NavHostController {
+    val context = ContextAmbient.current
+    return rememberSavedInstanceState(saver = NavControllerSaver(context)) {
+        createNavController(context)
+    }
+}
+
+private fun createNavController(context: Context) =
+    NavHostController(context).apply {
+        navigatorProvider.addNavigator(ComposeNavigator())
+    }
+
+/**
+ * Saver to save and restore the NavController across config change and process death.
+ */
+private fun NavControllerSaver(
+    context: Context
+): Saver<NavHostController, *> = Saver<NavHostController, Bundle>(
+    save = { it.saveState() },
+    restore = { createNavController(context).apply { restoreState(it) } }
+)
+
+/**
+ * Navigate to a destination from the current navigation graph.
+ *
+ * @param destinationId a id to navigate to
+ */
+fun NavHostController.navigate(destinationId: Any) {
+    navigate(generateId(destinationId))
+}
+
+/**
+ * Construct a new [NavGraph]
+ *
+ * @param id the id to set on the graph
+ * @param startDestination an object to identify a destination
+ * @param builder the builder used to construct the graph
+ */
+internal fun NavHostController.createGraph(
+    id: Int = 0,
+    startDestination: Any,
+    builder: NavGraphBuilder.() -> Unit
+): NavGraph = navigatorProvider.navigation(id, generateId(startDestination), builder)
+
+/**
+ * Used to generate an id from any object
+ */
+internal fun generateId(anchor: Any) = anchor.hashCode() + initialId
+private const val initialId = 0x00010000
