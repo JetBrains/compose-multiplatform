@@ -42,5 +42,9 @@
             android:name=".ComposeScrollInAndroidScrollDifferentOrientation"
             android:configChanges="orientation|screenSize"
             android:label="ComposeScrollInAndroidScrollDifferentOrientation Activity" />
+        <activity
+            android:name=".ComposeInAndroidDialogDismissDialogDuringDispatch"
+            android:configChanges="orientation|screenSize"
+            android:label="Dialog" />
     </application>
 </manifest>
