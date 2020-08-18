@@ -53,8 +53,11 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.semantics.AccessibilityScrollState
 import androidx.compose.ui.semantics.scrollBy
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.horizontalAccessibilityScrollState
+import androidx.compose.ui.semantics.verticalAccessibilityScrollState
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -364,6 +367,16 @@ private fun Modifier.scroll(
 ) = composed {
     val semantics = Modifier.semantics {
         if (isScrollable) {
+            val accessibilityScrollState = AccessibilityScrollState(
+                value = state.value,
+                maxValue = state.maxValue,
+                reverseScrolling = reverseScrolling
+            )
+            if (isVertical) {
+                this.verticalAccessibilityScrollState = accessibilityScrollState
+            } else {
+                this.horizontalAccessibilityScrollState = accessibilityScrollState
+            }
             // when b/156389287 is fixed, this should be proper scrollTo with reverse handling
             scrollBy(action = { x: Float, y: Float ->
                 if (isVertical) {

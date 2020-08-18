@@ -90,6 +90,14 @@ object SemanticsProperties {
     )
 
     /**
+     * The horizontal scroll state of this node if this node is scrollable.
+     *
+     * @see SemanticsPropertyReceiver.horizontalAccessibilityScrollState
+     */
+    val HorizontalAccessibilityScrollState =
+        SemanticsPropertyKey<AccessibilityScrollState>("HorizontalAccessibilityScrollState")
+
+    /**
      * Whether this semantics node represents a Popup. Not to be confused with if this node is
      * _part of_ a Popup.
      *
@@ -159,6 +167,14 @@ object SemanticsProperties {
      * @see SemanticsPropertyReceiver.textSelectionRange
      */
     val TextSelectionRange = SemanticsPropertyKey<TextRange>("TextSelectionRange")
+
+    /**
+     * The vertical scroll state of this node if this node is scrollable.
+     *
+     * @see SemanticsPropertyReceiver.verticalAccessibilityScrollState
+     */
+    val VerticalAccessibilityScrollState =
+        SemanticsPropertyKey<AccessibilityScrollState>("VerticalAccessibilityScrollState")
 }
 
 /**
@@ -307,6 +323,21 @@ data class AccessibilityRangeInfo(
     @IntRange(from = 0) val steps: Int = 0
 )
 
+/**
+ * The scroll state of this node if this node is scrollable.
+ *
+ * @param value current scroll position value in pixels
+ * @param maxValue maximum bound for [value], or [Float.POSITIVE_INFINITY] if still unknown
+ * @param reverseScrolling for horizontal scroll, when this is `true`, 0 [value] will mean right,
+ * when`false`, 0 [value] will mean left. For vertical scroll, when this is `true`, 0 [value] will
+ * mean bottom, when `false`, 0 [value] will mean top
+ */
+data class AccessibilityScrollState(
+    val value: Float = 0f,
+    val maxValue: Float = 0f,
+    val reverseScrolling: Boolean = false
+)
+
 interface SemanticsPropertyReceiver {
     operator fun <T> set(key: SemanticsPropertyKey<T>, value: T)
 }
@@ -361,6 +392,22 @@ var SemanticsPropertyReceiver.focused by SemanticsProperties.Focused
 fun SemanticsPropertyReceiver.hidden() {
     this[SemanticsProperties.Hidden] = Unit
 }
+
+/**
+ * The horizontal scroll state of this node if this node is scrollable.
+ *
+ * @see SemanticsProperties.HorizontalAccessibilityScrollState
+ */
+var SemanticsPropertyReceiver.horizontalAccessibilityScrollState
+        by SemanticsProperties.HorizontalAccessibilityScrollState
+
+/**
+ * The vertical scroll state of this node if this node is scrollable.
+ *
+ * @see SemanticsProperties.VerticalAccessibilityScrollState
+ */
+var SemanticsPropertyReceiver.verticalAccessibilityScrollState
+        by SemanticsProperties.VerticalAccessibilityScrollState
 
 /**
  * Whether this semantics node represents a Popup. Not to be confused with if this node is
