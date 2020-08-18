@@ -16,16 +16,18 @@
 
 package androidx.compose.ui.input.pointer
 
+import androidx.test.filters.SmallTest
 import androidx.compose.ui.AlignmentLine
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.milliseconds
-import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.argumentCaptor
+import com.nhaarman.mockitokotlin2.capture
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.inOrder
 import com.nhaarman.mockitokotlin2.mock
@@ -3052,6 +3054,72 @@ class HitPathTrackerTest {
     }
 
     @Test
+    fun dispatchChanges_pifMovesSelfDuringInitial_pointerCoordsCorrectAfterMove() {
+        dispatchChanges_pifMovesSelfDuringDispatch_pointerCoordsCorrectAfterMove(
+            PointerEventPass.Initial
+        )
+    }
+
+    @Test
+    fun dispatchChanges_pifMovesSelfDuringMain_pointerCoordsCorrectAfterMove() {
+        dispatchChanges_pifMovesSelfDuringDispatch_pointerCoordsCorrectAfterMove(
+            PointerEventPass.Main
+        )
+    }
+
+    // This is a bit of a weird test. For performance reasons, HitPathTracker mutates an
+    // InternalPointerEvent with position changes.  Previously there was a bug where during
+    // dispatch, the pointer positions would be offset by the location of the PointerInputFilter,
+    // then they would be dispatched to the PointerInputFilter, that dispatch would move the
+    // PointerInputFilter, and then we'd get the new location of the PointerInputFilter and to
+    // undo the position change that occurred before dispatch.  That position change after
+    // dispatch is simply ment to reset the position back to being global for the next dispatch
+    // to another PointerInputFilter.
+    //
+    // This test makes sure we don't create that bug again accidentally.
+    private fun dispatchChanges_pifMovesSelfDuringDispatch_pointerCoordsCorrectAfterMove(
+        movePass: PointerEventPass
+    ) {
+        val layoutCoordinates = LayoutCoordinatesStub(true)
+        val pif = PointerInputFilterMock(
+            pointerInputHandler =
+            spy(StubPointerInputHandler { changes, pass, _ ->
+                if (pass == movePass) {
+                    layoutCoordinates.additionalOffset = Offset(500f, 500f)
+                }
+                changes
+            }),
+            layoutCoordinates = layoutCoordinates
+        )
+        val parent = PointerInputFilterMock()
+        val child = PointerInputFilterMock()
+        hitPathTracker.addHitPath(PointerId(13), listOf(parent, pif, child))
+
+        val actual = internalPointerEventOf(down(13, 120.milliseconds, 1.0f, 1.0f))
+        val expected = PointerEvent(listOf(down(13, 120.milliseconds, 1.0f, 1.0f)))
+
+        hitPathTracker.dispatchChanges(actual)
+
+        PointerEventPass.values().forEach {
+            argumentCaptor<PointerEvent>().apply {
+                verify(parent).onPointerEventMock(capture(), eq(it), any())
+                assertThat(this.allValues).hasSize(1)
+                assertThat(firstValue.changes).isEqualTo(expected.changes)
+                verify(child).onPointerEventMock(capture(), eq(it), any())
+                assertThat(allValues).hasSize(2)
+                assertThat(secondValue.changes).isEqualTo(expected.changes)
+            }
+        }
+    }
+
+    @Test
+    fun dispatchChanges_pifMovesSelfDuringFinal_pointerCoordsCorrectAfterMove() {
+        dispatchChanges_pifMovesSelfDuringDispatch_pointerCoordsCorrectAfterMove(
+            PointerEventPass.Final
+        )
+    }
+
+    @Test
     fun dispatchCustomMessage_pifRemovesSelfDuringInitial_noPassesReceivedAfterwards() {
         dispatchCustomMessage_pifRemovesSelfDuringDispatch_noPassesReceivedAfterwards(
             PointerEventPass.Initial
@@ -3344,6 +3412,8 @@ class LayoutCoordinatesStub(
     override var isAttached: Boolean = true
 ) : LayoutCoordinates {
 
+    var additionalOffset = Offset.Zero
+
     override val size: IntSize
         get() = IntSize(Constraints.Infinity, Constraints.Infinity)
 
@@ -3358,7 +3428,8 @@ class LayoutCoordinatesStub(
     }
 
     override fun localToGlobal(local: Offset): Offset {
-        return local
+        assertThat(isAttached).isTrue()
+        return local + additionalOffset
     }
 
     override fun localToRoot(local: Offset): Offset {

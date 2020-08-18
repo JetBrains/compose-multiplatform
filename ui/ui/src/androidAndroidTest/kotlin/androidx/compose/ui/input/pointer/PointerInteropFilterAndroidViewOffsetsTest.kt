@@ -133,23 +133,26 @@ class PointerInteropFilterAndroidViewOffsetsTest {
 
         composeTestRule.activityRule.scenario.onActivity {
             val down =
-                MotionEvent.obtain(
-                    0L,
-                    0L,
+                MotionEvent(
+                    0,
                     ACTION_DOWN,
-                    x.toFloat(),
-                    y.toFloat(),
-                    0
+                    1,
+                    0,
+                    arrayOf(PointerProperties(1)),
+                    arrayOf(PointerCoords(x.toFloat(), y.toFloat())),
+                    five
                 )
             val up =
-                MotionEvent.obtain(
-                    0L,
-                    1L,
+                MotionEvent(
+                    10,
                     ACTION_UP,
-                    x.toFloat(),
-                    y.toFloat(),
-                    0
+                    1,
+                    0,
+                    arrayOf(PointerProperties(1)),
+                    arrayOf(PointerCoords(x.toFloat(), y.toFloat())),
+                    five
                 )
+
             five.dispatchTouchEvent(down)
             five.dispatchTouchEvent(up)
         }

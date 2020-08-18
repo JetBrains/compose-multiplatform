@@ -36,6 +36,7 @@ dependencies {
     implementation project(":compose:ui:ui")
     implementation project(":compose:foundation:foundation-layout")
     implementation project(":compose:material:material")
+    implementation "androidx.fragment:fragment-ktx:1.2.5"
 }
 
 android {

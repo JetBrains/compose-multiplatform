@@ -17,9 +17,9 @@
 package androidx.compose.ui.input.pointer
 
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.plus
 import androidx.compose.ui.util.annotation.VisibleForTesting
+import androidx.compose.ui.util.fastForEach
 
 /**
  * Organizes pointers and the [PointerInputFilter]s that they hit into a hierarchy such that
@@ -37,6 +37,7 @@ internal class HitPathTracker {
         operator fun component1(): InternalPointerEvent
         operator fun component2(): Boolean
     }
+
     private class DispatchChangesRetValImpl : DispatchChangesRetVal {
         lateinit var internalPointerEvent: InternalPointerEvent
         var wasDispatchedToSomething: Boolean = false
@@ -402,7 +403,7 @@ internal class Node(val pointerInputFilter: PointerInputFilter) : NodeParent() {
             }
 
         if (relevantChanges.isEmpty()) {
-            // If there are not relevant changes, there is nothing to process so return.
+            // If there are not relevant changes, there is nothing to process so return false.
             return false
         }
 
@@ -410,46 +411,30 @@ internal class Node(val pointerInputFilter: PointerInputFilter) : NodeParent() {
         val allChanges = internalPointerEvent.changes
         internalPointerEvent.changes = relevantChanges
 
-        // TODO(b/158243568): For this attached check, and all of the following checks like this, we
-        //  should ideally be dispatching cancel to the sub tree with this node as it's root, and
-        //  we should remove the same sub tree from the tracker.  This will currently happen on
-        //  the next dispatch of events, but we shouldn't have to wait for another event.
-        if (pointerInputFilter.isAttached) {
-            internalPointerEvent.let {
-                // TODO(shepshapard): would be nice if we didn't have to subtract and then add
-                //  offsets. This is currently done because the calculated offsets are currently
-                //  global, not relative to each other.
-                it.subtractOffset(pointerInputFilter.position)
-                it.dispatchToPointerInputFilter(
-                    pointerInputFilter,
-                    downPass,
-                    pointerInputFilter.size
-                )
-                it.addOffset(pointerInputFilter.position)
-            }
-        }
+        // TODO(b/158243568): The below dispatching operations may cause the pointerInputFilter to
+        //  become detached. Currently, they just no-op if it becomes detached and the detached
+        //  pointerInputFilters are removed from being tracked with the next event. I currently
+        //  believe they should be detached immediately. Though, it is possible they should be
+        //  detached after the conclusion of dispatch (so onCancel isn't called during calls
+        //  to onPointerEvent).
 
+        // Dispatch on the tunneling pass.
+        internalPointerEvent.tryDispatchToPointerInputFilter(pointerInputFilter, downPass)
+
+        // Dispatch to children.
         if (pointerInputFilter.isAttached) {
             children.forEach { it.dispatchChanges(internalPointerEvent, downPass, upPass) }
         }
 
-        if (pointerInputFilter.isAttached && upPass != null) {
-            internalPointerEvent.let {
-                // TODO(shepshapard): would be nice if we didn't have to subtract and then add
-                //  offsets.  This is currently done because the calculated offsets are currently
-                //  global, not relative to each other.
-                it.subtractOffset(pointerInputFilter.position)
-                it.dispatchToPointerInputFilter(pointerInputFilter, upPass, pointerInputFilter.size)
-                it.addOffset(pointerInputFilter.position)
-            }
-        }
+        // Dispatch on the bubbling pass.
+        internalPointerEvent.tryDispatchToPointerInputFilter(pointerInputFilter, upPass)
 
         // Put all of the relevant changes that were in the internalPointerEvent back into all of
         // the changes, and then set all of the changes back onto the internalPointerEvent.
         allChanges.putAll(internalPointerEvent.changes)
         internalPointerEvent.changes = allChanges
 
-        // We dispatched to at least one pointer input filter, so return true.
+        // We dispatched to at least one pointer input filter so return true.
         return true
     }
 
@@ -514,15 +499,38 @@ internal class Node(val pointerInputFilter: PointerInputFilter) : NodeParent() {
                 "pointerIds=$pointerIds)"
     }
 
-    private fun InternalPointerEvent.dispatchToPointerInputFilter(
+    /**
+     * Dispatches [this] to [filter].
+     *
+     * This includes offsetting the pointer coordinates to be relative to [filter].  Also manages
+     * cases where the [filter] is removed from the hierarchy during dispatch.
+     *
+     * Is a no-op if [filter] is not attached or [pass] is null.
+     */
+    private fun InternalPointerEvent.tryDispatchToPointerInputFilter(
         filter: PointerInputFilter,
-        pass: PointerEventPass,
-        size: IntSize
+        pass: PointerEventPass?
     ) {
+        if (pass == null || !pointerInputFilter.isAttached) {
+            return
+        }
+
+        // Get the position before dispatch as the PointerInputFilter may not be attached after
+        // dispatch or could have moved in some synchronous way (an Android parent may have moved
+        // for example) and we actually want to add back whatever position was previously
+        // subtracted.
+        val position = pointerInputFilter.position
+        val size = pointerInputFilter.size
+
+        // TODO(shepshapard): Subtracting offsets and adding offsets is currently expensive because
+        //  PointerInputChanges are copied during the operation. Should be better when
+        //  PointerInputChanges are privately mutable.
+        subtractOffset(position)
         val pointerEvent = PointerEvent(this.changes.values.toList(), this)
-        filter.onPointerEvent(pointerEvent, pass, size).forEach {
+        filter.onPointerEvent(pointerEvent, pass, size).fastForEach {
             this.changes[it.id] = it
         }
+        addOffset(position)
     }
 
     private fun InternalPointerEvent.addOffset(position: IntOffset) {
