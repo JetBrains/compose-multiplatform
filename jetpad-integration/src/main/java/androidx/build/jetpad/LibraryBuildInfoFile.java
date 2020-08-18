@@ -42,6 +42,8 @@ public class LibraryBuildInfoFile {
     public String version;
     public String path;
     public String sha;
+    public String groupZipPath;
+    public String projectZipPath;
     public Boolean groupIdRequiresSameVersion;
     public ArrayList<Dependency> dependencies;
     public ArrayList<Check> checks;
