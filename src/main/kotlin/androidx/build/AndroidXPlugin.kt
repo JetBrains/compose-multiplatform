@@ -800,8 +800,7 @@ private fun Project.configureCompilationWarnings(task: KotlinCompile) {
     }
     task.kotlinOptions.freeCompilerArgs += listOf(
         "-Xskip-runtime-version-check",
-        "-Xskip-metadata-version-check",
-        "-XXLanguage:-NewInference"
+        "-Xskip-metadata-version-check"
     )
 }
 
