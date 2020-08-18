@@ -31,33 +31,10 @@ class SwingEmbeddingContext : EmbeddingContext {
     override fun mainThreadCompositionContext(): CoroutineContext {
         return DesktopUiDispatcher.Main
     }
-
-    override fun postOnMainThread(block: () -> Unit) {
-        DesktopUiDispatcher.Dispatcher.scheduleCallback { block() }
-    }
-
-    private val cancelled = mutableSetOf<ChoreographerFrameCallback>()
-
-    override fun postFrameCallback(callback: ChoreographerFrameCallback) {
-        DesktopUiDispatcher.Dispatcher.scheduleCallback { now ->
-            if (callback !in cancelled) {
-                callback.doFrame(now)
-            } else {
-                cancelled.remove(callback)
-            }
-        }
-    }
-    override fun cancelFrameCallback(callback: ChoreographerFrameCallback) {
-        cancelled += callback
-    }
 }
 
 actual fun EmbeddingContext(): EmbeddingContext =
     EmbeddingContextFactory?.let { it() } ?: SwingEmbeddingContext()
-
-actual interface ChoreographerFrameCallback {
-    actual fun doFrame(frameTimeNanos: Long)
-}
 
 internal actual object Trace {
     actual fun beginSection(name: String) {
