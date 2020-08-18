@@ -27,6 +27,7 @@ import androidx.ui.test.createComposeRule
 import androidx.ui.test.runOnIdle
 import androidx.ui.test.runOnUiThread
 import com.google.common.truth.Truth.assertThat
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -103,7 +104,8 @@ class RememberSavedInstanceStateTest {
                     }
                 }
             ) {
-                rememberSavedInstanceState { 1 }
+                val v = rememberSavedInstanceState { 1 }
+                assertEquals(1, v)
             }
         }
 
@@ -127,7 +129,8 @@ class RememberSavedInstanceStateTest {
                     }
                 }
             ) {
-                rememberSavedInstanceState { 2 }
+                val v = rememberSavedInstanceState { 2 }
+                assertEquals(2, v)
             }
         }
 
@@ -180,7 +183,8 @@ class RememberSavedInstanceStateTest {
                     registryFactory(it)
                 }
             ) {
-                rememberSavedInstanceState { 1 }
+                val v = rememberSavedInstanceState { 1 }
+                assertEquals(1, v)
             }
         }
 
@@ -226,7 +230,8 @@ class RememberSavedInstanceStateTest {
                     }
                 }
             ) {
-                rememberSavedInstanceState(key = key) { 1 }
+                val v = rememberSavedInstanceState(key = key) { 1 }
+                assertEquals(1, v)
             }
         }
 
@@ -314,7 +319,8 @@ class RememberSavedInstanceStateTest {
                     }
                 }
             ) {
-                rememberSavedInstanceState(key = passedKey) { 2 }
+                val v = rememberSavedInstanceState(key = passedKey) { 2 }
+                assertEquals(2, v)
             }
         }
 
@@ -335,7 +341,8 @@ class RememberSavedInstanceStateTest {
                     }
                 }
             ) {
-                rememberSavedInstanceState(key = "") { 2 }
+                val v = rememberSavedInstanceState(key = "") { 2 }
+                assertEquals(2, v)
             }
         }
 
