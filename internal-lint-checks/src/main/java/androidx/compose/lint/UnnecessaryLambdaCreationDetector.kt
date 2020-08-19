@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.ui.lint
+package androidx.compose.lint
 
 import com.android.tools.lint.client.api.UElementHandler
 import com.android.tools.lint.detector.api.Category

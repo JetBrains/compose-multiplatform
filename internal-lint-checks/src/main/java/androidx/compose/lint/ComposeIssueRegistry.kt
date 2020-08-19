@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.ui.lint
+package androidx.compose.lint
 
 import androidx.build.lint.AndroidXIssueRegistry
 import com.android.tools.lint.client.api.IssueRegistry

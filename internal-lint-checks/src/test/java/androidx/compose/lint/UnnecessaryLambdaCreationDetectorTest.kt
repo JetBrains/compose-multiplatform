@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.ui.lint
+package androidx.compose.lint
 
 import com.android.tools.lint.checks.infrastructure.TestFiles.kt
 import com.android.tools.lint.checks.infrastructure.TestLintResult
@@ -22,7 +22,7 @@ import com.android.tools.lint.checks.infrastructure.TestLintTask
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import androidx.ui.lint.UnnecessaryLambdaCreationDetector.Companion.ISSUE
+import androidx.compose.lint.UnnecessaryLambdaCreationDetector.Companion.ISSUE
 import org.intellij.lang.annotations.Language
 
 /* ktlint-disable max-line-length */
