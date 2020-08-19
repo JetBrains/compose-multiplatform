@@ -16,6 +16,11 @@ package androidx.compose.ui.graphics {
     method public static androidx.compose.ui.graphics.ImageAsset imageFromResource(android.content.res.Resources res, int resId);
   }
 
+  public final class AndroidMatrixConversionsKt {
+    method public static void setFrom-7lL006A(float[], android.graphics.Matrix matrix);
+    method public static void setFrom-8AuSnpc(android.graphics.Matrix, float[] matrix);
+  }
+
   public final class AndroidPaint implements androidx.compose.ui.graphics.Paint {
     ctor public AndroidPaint();
     method public android.graphics.Paint asFrameworkPaint();

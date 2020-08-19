@@ -23,26 +23,3 @@ expect class AtomicInt(value_: Int) {
     fun addAndGet(delta: Int): Int
     fun compareAndSet(expected: Int, new: Int): Boolean
 }
-
-// TODO(b/160140398): rewrite depending code using androidx.compose.ui.geometry.Rect and androidx.ui.vectormath64.Matrix3.
-expect class NativeRectF() {
-    var left: Float
-    var right: Float
-    var top: Float
-    var bottom: Float
-
-    fun set(left: Float, right: Float, top: Float, bottom: Float)
-
-    fun intersect(left: Float, right: Float, top: Float, bottom: Float): Boolean
-
-    fun setEmpty()
-}
-
-expect class NativeMatrix() {
-    fun isIdentity(): Boolean
-
-    fun invert(inverted: NativeMatrix): Boolean
-
-    fun mapPoints(points: FloatArray)
-    fun mapRect(rect: NativeRectF): Boolean
-}

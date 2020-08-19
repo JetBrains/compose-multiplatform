@@ -17,15 +17,16 @@
 package androidx.compose.ui.platform
 
 import android.annotation.TargetApi
-import android.graphics.Matrix
 import android.graphics.RenderNode
 import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.TransformOrigin
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
+import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.setFrom
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -46,7 +47,7 @@ internal class RenderNodeLayer(
     private var isDirty = false
     private val outlineResolver = OutlineResolver(ownerView.density)
     private var isDestroyed = false
-    private var cacheMatrix: Matrix? = null
+    private var androidMatrixCache: android.graphics.Matrix? = null
     private var drawnWithZ = false
 
     private val canvasHolder = CanvasHolder()
@@ -199,9 +200,11 @@ internal class RenderNodeLayer(
         ownerView.dirtyLayers -= this
     }
 
-    override fun getMatrix(): Matrix {
-        val matrix = cacheMatrix ?: Matrix().also { cacheMatrix = it }
-        renderNode.getMatrix(matrix)
-        return matrix
+    override fun getMatrix(matrix: Matrix) {
+        val androidMatrix = androidMatrixCache ?: android.graphics.Matrix().also {
+            androidMatrixCache = it
+        }
+        renderNode.getMatrix(androidMatrix)
+        matrix.setFrom(androidMatrix)
     }
 }

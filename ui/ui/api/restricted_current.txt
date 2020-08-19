@@ -1872,7 +1872,7 @@ package androidx.compose.ui.node {
     method public void destroy();
     method public void drawLayer(androidx.compose.ui.graphics.Canvas canvas);
     method public long getLayerId();
-    method public android.graphics.Matrix getMatrix();
+    method public void getMatrix-58bKbWc(float[] matrix);
     method public androidx.compose.ui.DrawLayerModifier getModifier();
     method public void invalidate();
     method public void move--gyyYBs(long position);
@@ -1994,9 +1994,6 @@ package androidx.compose.ui.platform {
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.text.input.TextInputService> getTextInputServiceAmbient();
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.TextToolbar> getTextToolbarAmbient();
     method public static androidx.compose.runtime.ProvidableAmbient<androidx.compose.ui.platform.UriHandler> getUriHandlerAmbient();
-  }
-
-  public final class AndroidActualsKt {
   }
 
   public final class AndroidAmbientsKt {

@@ -19,6 +19,7 @@ package androidx.compose.ui.platform
 import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.DesktopCanvas
+import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.unit.Density
@@ -51,7 +52,9 @@ class SkijaLayer(
     }
 
     // TODO(demin): calculate matrix
-    override fun getMatrix() = NativeMatrix()
+    override fun getMatrix(matrix: Matrix) {
+        matrix.reset()
+    }
 
     override fun invalidate() {
         invalidateParentLayer()
