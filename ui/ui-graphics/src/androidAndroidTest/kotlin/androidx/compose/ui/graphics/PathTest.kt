@@ -19,13 +19,12 @@ package androidx.compose.ui.graphics
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.vectormath.PI
-import androidx.compose.ui.graphics.vectormath.radians
 import androidx.test.filters.SmallTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import kotlin.math.PI
 
 @SmallTest
 @RunWith(JUnit4::class)
@@ -41,7 +40,7 @@ class PathTest {
             addArcRad(
                 Rect(Offset.Zero, Size(width.toFloat(), height.toFloat())),
                 0.0f,
-                PI / 2
+                PI.toFloat() / 2
             )
         }
 
@@ -52,8 +51,8 @@ class PathTest {
         val path2 = Path().apply {
             arcToRad(
                 Rect(Offset(0.0f, 0.0f), Size(width.toFloat(), height.toFloat())),
-                PI,
-                PI / 2,
+                PI.toFloat(),
+                PI.toFloat() / 2,
                 false
             )
             close()
@@ -62,7 +61,7 @@ class PathTest {
         canvas.drawPath(path2, arcPaint)
 
         val pixelmap = image.toPixelMap()
-        val x = (50.0 * Math.cos(radians(45.0f).toDouble())).toInt()
+        val x = (50.0 * Math.cos(PI / 4)).toInt()
         assertEquals(arcColor,
             pixelmap[
                 width / 2 + x - 1,

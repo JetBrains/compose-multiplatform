@@ -16,11 +16,8 @@
 
 package androidx.compose.ui.graphics
 
-import android.graphics.Matrix
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.vectormath.Matrix4
-import androidx.compose.ui.graphics.vectormath.isIdentity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastForEach
@@ -139,28 +136,28 @@ private val EmptyCanvas = android.graphics.Canvas()
     /**
      * @throws IllegalStateException if an arbitrary transform is provided
      */
-    override fun concat(matrix4: Matrix4) {
-        if (!matrix4.isIdentity()) {
-            val frameworkMatrix = Matrix()
-            if (matrix4.get(2, 0) != 0f ||
-                matrix4.get(2, 1) != 0f ||
-                matrix4.get(2, 0) != 0f ||
-                matrix4.get(2, 1) != 0f ||
-                matrix4.get(2, 2) != 1f ||
-                matrix4.get(2, 3) != 0f ||
-                matrix4.get(3, 2) != 0f) {
+    override fun concat(matrix: Matrix) {
+        if (!matrix.isIdentity()) {
+            val frameworkMatrix = android.graphics.Matrix()
+            if (matrix.get(2, 0) != 0f ||
+                matrix.get(2, 1) != 0f ||
+                matrix.get(2, 0) != 0f ||
+                matrix.get(2, 1) != 0f ||
+                matrix.get(2, 2) != 1f ||
+                matrix.get(2, 3) != 0f ||
+                matrix.get(3, 2) != 0f) {
                 throw IllegalStateException("Android does not support arbitrary transforms")
             }
             val values = floatArrayOf(
-                matrix4.get(0, 0),
-                matrix4.get(1, 0),
-                matrix4.get(3, 0),
-                matrix4.get(0, 1),
-                matrix4.get(1, 1),
-                matrix4.get(3, 1),
-                matrix4.get(0, 3),
-                matrix4.get(1, 3),
-                matrix4.get(3, 3)
+                matrix.get(0, 0),
+                matrix.get(1, 0),
+                matrix.get(3, 0),
+                matrix.get(0, 1),
+                matrix.get(1, 1),
+                matrix.get(3, 1),
+                matrix.get(0, 3),
+                matrix.get(1, 3),
+                matrix.get(3, 3)
             )
             frameworkMatrix.setValues(values)
             internalCanvas.concat(frameworkMatrix)

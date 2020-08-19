@@ -16,9 +16,10 @@
 
 package androidx.compose.ui.platform
 
-import androidx.compose.ui.graphics.vectormath.Matrix3
-import androidx.compose.ui.graphics.vectormath.Vector3
-import androidx.compose.ui.graphics.vectormath.inverse
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Matrix
+import androidx.compose.ui.graphics.isIdentity
 
 actual class NativeRectF {
     actual var left: Float = 0f
@@ -64,44 +65,32 @@ actual class NativeRectF {
 }
 
 actual class NativeMatrix {
-    private var matrix = identityMatrix
+    private var matrix = Matrix()
 
-    actual fun isIdentity(): Boolean = matrix == identityMatrix
+    actual fun isIdentity(): Boolean = matrix.isIdentity()
 
     actual fun invert(inverted: NativeMatrix): Boolean {
-        inverted.matrix = inverse(matrix)
+        matrix.setFrom(inverted.matrix)
+        matrix.invert()
         return true
     }
 
     actual fun mapPoints(points: FloatArray) {
         for (i in points.indices step 2) {
-            val original = Vector3(points[i], points[i + 1])
-            val result = matrix * original
+            val original = Offset(points[i], points[i + 1])
+            val result = matrix.map(original)
             points[i] = result.x
             points[i + 1] = result.y
         }
     }
 
     actual fun mapRect(rect: NativeRectF): Boolean {
-        val lt = Vector3(rect.left, rect.top, 1f)
-        val lb = Vector3(rect.left, rect.bottom, 1f)
-        val rt = Vector3(rect.right, rect.top, 1f)
-        val rb = Vector3(rect.right, rect.bottom, 1f)
-
-        val transformedLT = matrix * lt
-        val transformedLB = matrix * lb
-        val transformedRT = matrix * rt
-        val transformedRB = matrix * rb
-
-        rect.left = minOf(transformedLT.x, transformedLB.x, transformedRT.x, transformedRB.x)
-        rect.right = maxOf(transformedLT.x, transformedLB.x, transformedRT.x, transformedRB.x)
-        rect.top = minOf(transformedLT.y, transformedLB.y, transformedRT.y, transformedRB.y)
-        rect.bottom = maxOf(transformedLT.y, transformedLB.y, transformedRT.y, transformedRB.y)
-
+        val tmp = Rect(rect.left, rect.top, rect.right, rect.bottom)
+        val result = matrix.map(tmp)
+        rect.left = result.left
+        rect.top = result.top
+        rect.right = result.right
+        rect.bottom = result.bottom
         return true
-    }
-
-    companion object {
-        private val identityMatrix = Matrix3.identity()
     }
 }

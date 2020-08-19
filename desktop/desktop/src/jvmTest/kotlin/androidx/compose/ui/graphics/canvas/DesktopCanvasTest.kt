@@ -26,7 +26,7 @@ import androidx.compose.ui.graphics.DesktopGraphicsTest
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.imageFromResource
-import androidx.compose.ui.graphics.vectormath.Matrix4
+import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.withSave
 import androidx.compose.ui.graphics.withSaveLayer
 import androidx.compose.ui.unit.IntOffset
@@ -244,7 +244,7 @@ class DesktopCanvasTest : DesktopGraphicsTest() {
 
         canvas.withSave {
             canvas.concat(
-                Matrix4.identity().apply {
+                Matrix().apply {
                     translate(12f, 2f)
                 }
             )

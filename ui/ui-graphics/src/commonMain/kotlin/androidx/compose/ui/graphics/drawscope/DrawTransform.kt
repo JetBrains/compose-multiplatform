@@ -20,8 +20,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.vectormath.Matrix4
-import androidx.compose.ui.graphics.vectormath.degrees
+import androidx.compose.ui.graphics.Matrix
+import androidx.compose.ui.graphics.degrees
 
 /**
  * Convenience method modifies the [DrawTransform] bounds to inset both left and right bounds by
@@ -161,5 +161,5 @@ interface DrawTransform {
      * Transform the drawing environment by the given matrix
      * @param matrix transformation matrix used to transform the drawing environment
      */
-    fun transform(matrix: Matrix4)
+    fun transform(matrix: Matrix)
 }

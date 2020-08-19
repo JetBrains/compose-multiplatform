@@ -40,12 +40,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.vectormath.degrees
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.annotation.FloatRange
+import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.max
 
@@ -306,7 +306,8 @@ private fun DrawScope.drawIndeterminateCircularIndicator(
     // Length of arc is angle * radius
     // Angle (radians) is length / radius
     // The length should be the same as the stroke width for calculating the min angle
-    val squareStrokeCapOffset = degrees(strokeWidth / (CircularIndicatorDiameter / 2)) / 2
+    val squareStrokeCapOffset =
+        (180.0 / PI).toFloat() * (strokeWidth / (CircularIndicatorDiameter / 2)) / 2f
 
     // Adding a square stroke cap draws half the stroke width behind the start point, so we want to
     // move it forward by that amount so the arc visually appears in the correct place
