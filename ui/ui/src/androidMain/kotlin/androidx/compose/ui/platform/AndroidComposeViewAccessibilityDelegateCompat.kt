@@ -70,7 +70,9 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         /**
         * The undefined cursor position.
         */
-        private val AccessibilityCursorPositionUndefined = -1
+        const val AccessibilityCursorPositionUndefined = -1
+        // 20 is taken from AbsSeekbar.java.
+        const val AccessibilitySliderStepsCount = 20
         private val AccessibilityActionsResourceIds = intArrayOf(
             R.id.accessibility_custom_action_0,
             R.id.accessibility_custom_action_1,
@@ -240,20 +242,6 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SET_PROGRESS
             )
         }
-        // TODO(b/157692376): remove scroll forward/backward api together with slider scroll action.
-        @Suppress("DEPRECATION")
-        if (semanticsNode.config.contains(SemanticsActions.ScrollForward)) {
-            info.addAction(
-                AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_FORWARD
-            )
-        }
-        @Suppress("DEPRECATION")
-        if (semanticsNode.config.contains(SemanticsActions.ScrollBackward)) {
-            info.addAction(
-                AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_BACKWARD
-            )
-        }
-
         if (semanticsNode.config.contains(SemanticsActions.SetText)) {
             info.className = "android.widget.EditText"
             info.addAction(AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SET_TEXT)
@@ -297,6 +285,18 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 AccessibilityNodeInfoCompat.RangeInfoCompat.RANGE_TYPE_FLOAT,
                 rangeInfo.range.start, rangeInfo.range.endInclusive, rangeInfo.current
             )
+            if (semanticsNode.config.contains(SemanticsActions.SetProgress)) {
+                if (rangeInfo.current <
+                    rangeInfo.range.endInclusive.coerceAtLeast(rangeInfo.range.start))
+                info.addAction(
+                    AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_FORWARD
+                )
+                if (rangeInfo.current >
+                    rangeInfo.range.start.coerceAtMost(rangeInfo.range.endInclusive))
+                    info.addAction(
+                        AccessibilityNodeInfoCompat.AccessibilityActionCompat.ACTION_SCROLL_BACKWARD
+                    )
+            }
         }
 
         if (semanticsNode.config.contains(CustomActions)) {
@@ -539,23 +539,24 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                     false
                 }
             }
-            AccessibilityNodeInfoCompat.ACTION_SCROLL_FORWARD -> {
-                // TODO(b/157692376): remove scroll forward/backward api together with slider
-                //  scroll action.
-                @Suppress("DEPRECATION")
-                return if (node.config.contains(SemanticsActions.ScrollForward)) {
-                    node.config[SemanticsActions.ScrollForward].action()
-                } else {
-                    false
-                }
-            }
+            AccessibilityNodeInfoCompat.ACTION_SCROLL_FORWARD,
             AccessibilityNodeInfoCompat.ACTION_SCROLL_BACKWARD -> {
-                @Suppress("DEPRECATION")
-                return if (node.config.contains(SemanticsActions.ScrollBackward)) {
-                    node.config[SemanticsActions.ScrollBackward].action()
-                } else {
-                    false
+                val rangeInfo = node.config.getOrNull(SemanticsProperties.AccessibilityRangeInfo)
+                val setProgressAction = node.config.getOrNull(SemanticsActions.SetProgress)
+                if (rangeInfo != null && setProgressAction != null) {
+                    val max = rangeInfo.range.endInclusive.coerceAtLeast(rangeInfo.range.start)
+                    val min = rangeInfo.range.start.coerceAtMost(rangeInfo.range.endInclusive)
+                    var increment = if (rangeInfo.steps > 0) {
+                        (max - min) / (rangeInfo.steps + 1)
+                    } else {
+                        (max - min) / AccessibilitySliderStepsCount
+                    }
+                    if (action == AccessibilityNodeInfoCompat.ACTION_SCROLL_BACKWARD) {
+                        increment = -increment
+                    }
+                    return setProgressAction.action(rangeInfo.current + increment)
                 }
+                return false
             }
             android.R.id.accessibilityActionSetProgress -> {
                 if (arguments == null || !arguments.containsKey(

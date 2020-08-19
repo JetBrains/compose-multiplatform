@@ -61,8 +61,6 @@ import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.semantics.AccessibilityRangeInfo
 import androidx.compose.ui.semantics.accessibilityValue
 import androidx.compose.ui.semantics.accessibilityValueRange
-import androidx.compose.ui.semantics.scrollBackward
-import androidx.compose.ui.semantics.scrollForward
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.setProgress
 import androidx.compose.ui.unit.LayoutDirection
@@ -359,56 +357,27 @@ private fun Modifier.sliderSemantics(
     }
     return semantics {
         accessibilityValue = Strings.TemplatePercent.format(percent)
-        accessibilityValueRange = AccessibilityRangeInfo(coerced, valueRange)
-        setProgress(action = { setSliderProgress(it, coerced, position, onValueChange, steps) })
-
-        // TODO(b/157692376) Remove accessibility scroll actions in Slider when
-        //  talkback is fixed
-        var increment = (position.endValue - position.startValue) / AccessibilityStepsCount
-        if (steps > 0) {
-            increment = (position.endValue - position.startValue) / (steps + 1)
-        }
-        if (coerced < position.endValue) {
-            @Suppress("DEPRECATION")
-            scrollForward(action = {
-                setSliderProgress(coerced + increment, coerced, position, onValueChange, steps)
-            })
-        }
-        if (coerced > position.startValue) {
-            @Suppress("DEPRECATION")
-            scrollBackward(action = {
-                setSliderProgress(coerced - increment, coerced, position, onValueChange, steps)
-            })
-        }
+        accessibilityValueRange = AccessibilityRangeInfo(coerced, valueRange, steps)
+        setProgress(action = { targetValue ->
+            val newValue = targetValue.coerceIn(position.startValue, position.endValue)
+            val resolvedValue = if (steps > 0) {
+                position.tickFractions
+                    .map { lerp(position.startValue, position.endValue, it) }
+                    .minByOrNull { abs(it - newValue) } ?: newValue
+            } else {
+                newValue
+            }
+            // This is to keep it consistent with AbsSeekbar.java: return false if no
+            // change from current.
+            if (resolvedValue == coerced) {
+                false
+            } else {
+                onValueChange(resolvedValue)
+                true
+            }
+        })
     }
 }
-
-private fun setSliderProgress(
-    targetValue: Float,
-    currentValue: Float,
-    position: SliderPosition,
-    onValueChange: (Float) -> Unit,
-    @IntRange(from = 0) steps: Int = 0
-): Boolean {
-    var newValue = targetValue.coerceIn(position.startValue, position.endValue)
-    if (steps >= 0) {
-        val anchorsValue = position.tickFractions.map {
-            lerp(position.startValue, position.endValue, it)
-        }
-        val point = anchorsValue.minByOrNull { abs(it - newValue) }
-        newValue = point ?: newValue
-    }
-    // This is to keep it consistent with AbsSeekbar.java: return false if no
-    // change from current.
-    if (newValue == currentValue) {
-        return false
-    }
-    onValueChange(newValue)
-    return true
-}
-
-// 20 is taken from AbsSeekbar.java.
-private const val AccessibilityStepsCount = 20
 
 /**
  * Internal state for [Slider] that represents the Slider value, its bounds and optional amount of

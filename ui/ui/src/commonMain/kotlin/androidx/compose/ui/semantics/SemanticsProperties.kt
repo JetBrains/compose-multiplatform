@@ -20,6 +20,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.annotatedString
+import androidx.compose.ui.util.annotation.IntRange
 import kotlin.reflect.KProperty
 
 /**
@@ -190,26 +191,6 @@ object SemanticsActions {
         SemanticsPropertyKey<AccessibilityAction<(x: Float, y: Float) -> Boolean>>("ScrollBy")
 
     /**
-     * Action to scroll the content forward.
-     *
-     * @see SemanticsPropertyReceiver.scrollForward
-     */
-    @Deprecated("Use scroll up/down/left/right instead. Need more discussion")
-    // TODO(b/157692376): remove scroll forward/backward api together with slider scroll action.
-    val ScrollForward =
-        SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("ScrollForward")
-
-    /**
-     * Action to scroll the content backward.
-     *
-     * @see SemanticsPropertyReceiver.scrollBackward
-     */
-    @Deprecated("Use scroll up/down/left/right instead. Need more discussion.")
-    // TODO(b/157692376): remove scroll forward/backward api together with slider scroll action.
-    val ScrollBackward =
-        SemanticsPropertyKey<AccessibilityAction<() -> Boolean>>("ScrollForward")
-
-    /**
      * Action to set slider progress.
      *
      * @see SemanticsPropertyReceiver.setProgress
@@ -312,9 +293,18 @@ data class AccessibilityAction<T : Function<Boolean>>(val label: CharSequence?, 
  */
 data class CustomAccessibilityAction(val label: CharSequence, val action: () -> Boolean)
 
+/**
+ * Data class for accessibility range information.
+ *
+ * @param current current value in the range
+ * @param range range of this node
+ * @param steps if greater than 0, specifies the number of discrete values, evenly distributed
+ * between across the whole value range. If 0, any value from the range specified can be chosen.
+ */
 data class AccessibilityRangeInfo(
     val current: Float,
-    val range: ClosedFloatingPointRange<Float>
+    val range: ClosedFloatingPointRange<Float>,
+    @IntRange(from = 0) val steps: Int = 0
 )
 
 interface SemanticsPropertyReceiver {
@@ -453,32 +443,6 @@ fun SemanticsPropertyReceiver.scrollBy(
     action: (x: Float, y: Float) -> Boolean
 ) {
     this[SemanticsActions.ScrollBy] = AccessibilityAction(label, action)
-}
-
-/**
- * This function adds the [SemanticsActions.ScrollForward] to the [SemanticsPropertyReceiver].
- *
- * @param label Optional label for this action.
- * @param action Action to be performed when the [SemanticsActions.ScrollForward] is called.
- */
-// TODO(b/157692376): remove scroll forward/backward api together with slider scroll action.
-@Deprecated("Use scroll up/down/left/right instead")
-fun SemanticsPropertyReceiver.scrollForward(label: String? = null, action: () -> Boolean) {
-    @Suppress("DEPRECATION")
-    this[SemanticsActions.ScrollForward] = AccessibilityAction(label, action)
-}
-
-/**
- * This function adds the [SemanticsActions.ScrollBackward] to the [SemanticsPropertyReceiver].
- *
- * @param label Optional label for this action.
- * @param action Action to be performed when the [SemanticsActions.ScrollBackward] is called.
- */
-// TODO(b/157692376): remove scroll forward/backward api together with slider scroll action.
-@Deprecated("Use scroll up/down/left/right instead")
-fun SemanticsPropertyReceiver.scrollBackward(label: String? = null, action: () -> Boolean) {
-    @Suppress("DEPRECATION")
-    this[SemanticsActions.ScrollBackward] = AccessibilityAction(label, action)
 }
 
 /**
