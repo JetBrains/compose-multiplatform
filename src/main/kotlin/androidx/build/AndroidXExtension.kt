@@ -39,6 +39,7 @@ open class AndroidXExtension(val project: Project) {
 
     private fun chooseProjectVersion() {
         val version: Version
+        val group: String? = mavenGroup?.group
         val groupVersion: Version? = mavenGroup?.forcedVersion
         val mavenVersion: Version? = mavenVersion
         if (mavenVersion != null) {
@@ -56,6 +57,9 @@ open class AndroidXExtension(val project: Project) {
             } else {
                 return
             }
+        }
+        if (group != null) {
+            project.group = group
         }
         project.version = if (isSnapshotBuild()) version.copy(extra = "-SNAPSHOT") else version
         versionIsSet = true
