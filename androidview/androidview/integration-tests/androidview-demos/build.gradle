@@ -30,12 +30,12 @@ dependencies {
 
     implementation(KOTLIN_STDLIB)
 
-    implementation project(":compose:runtime:runtime")
-    implementation project(":compose:integration-tests:demos:common")
     implementation project(":compose:androidview:androidview")
-    implementation project(":compose:ui:ui")
     implementation project(":compose:foundation:foundation-layout")
+    implementation project(":compose:integration-tests:demos:common")
     implementation project(":compose:material:material")
+    implementation project(":compose:runtime:runtime")
+    implementation project(":compose:ui:ui")
     implementation "androidx.fragment:fragment-ktx:1.2.5"
 }
 

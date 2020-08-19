@@ -14,15 +14,15 @@ dependencies {
     kotlinPlugin project(path: ":compose:compose-compiler")
     implementation(KOTLIN_STDLIB)
 
-    implementation project(":compose:runtime:runtime")
-    implementation project(":compose:integration-tests:demos:common")
-    implementation project(":compose:ui:ui")
+    implementation project(":compose:androidview:androidview")
     implementation project(":compose:foundation:foundation")
     implementation project(":compose:foundation:foundation-layout")
-    implementation project(":compose:material:material:samples")
-    implementation project(":compose:ui:ui-text")
-    implementation project(":compose:androidview:androidview")
+    implementation project(":compose:integration-tests:demos:common")
     implementation project(":compose:material:material")
+    implementation project(":compose:material:material:samples")
+    implementation project(":compose:runtime:runtime")
+    implementation project(":compose:ui:ui")
+    implementation project(":compose:ui:ui-text")
 }
 
 android {

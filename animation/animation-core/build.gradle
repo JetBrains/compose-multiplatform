@@ -38,9 +38,9 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation project(":compose:ui:ui-util")
-            implementation project(":compose:runtime:runtime-dispatch")
             implementation project(":compose:runtime:runtime")
+            implementation project(":compose:runtime:runtime-dispatch")
+            implementation project(":compose:ui:ui-util")
             implementation (KOTLIN_STDLIB_COMMON)
         }
         androidMain.dependencies {

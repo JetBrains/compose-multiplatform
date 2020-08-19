@@ -32,9 +32,9 @@ dependencies {
 
     implementation project(":annotation:annotation-sampled")
 
-    implementation project(":compose:runtime:runtime")
     implementation project(":compose:material:material")
     implementation project(":compose:material:material-icons-core")
+    implementation project(":compose:runtime:runtime")
 }
 
 android {

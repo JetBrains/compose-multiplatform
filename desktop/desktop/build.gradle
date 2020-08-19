@@ -35,10 +35,10 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             api(KOTLIN_STDLIB_COMMON)
-            api project(":compose:runtime:runtime")
-            api project(":compose:ui:ui")
             api project(":compose:foundation:foundation")
             api project(":compose:material:material")
+            api project(":compose:runtime:runtime")
+            api project(":compose:ui:ui")
         }
 
         jvmMain.dependencies {

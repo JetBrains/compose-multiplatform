@@ -33,8 +33,8 @@ dependencies {
     implementation project(":annotation:annotation-sampled")
 
     implementation project(":compose:runtime:runtime")
-    implementation project(":compose:ui:ui-unit")
     implementation project(":compose:ui:ui")
+    implementation project(":compose:ui:ui-unit")
 }
 
 android {
