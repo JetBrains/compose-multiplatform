@@ -82,9 +82,7 @@ class ComposeWindow : JFrame {
             override fun inputMethodTextChanged(
                 event: InputMethodEvent
             ) = DesktopUiDispatcher.Dispatcher.lockCallbacks {
-                if (!parent.locked) {
-                    owners?.onInputMethodTextChanged(event)
-                }
+                owners?.onInputMethodTextChanged(event)
             }
         })
 
@@ -94,51 +92,39 @@ class ComposeWindow : JFrame {
             override fun mousePressed(
                 event: MouseEvent
             ) = DesktopUiDispatcher.Dispatcher.lockCallbacks {
-                if (!parent.locked) {
-                    owners?.onMousePressed(event.x, event.y)
-                }
+                owners?.onMousePressed(event.x, event.y)
             }
 
             override fun mouseReleased(
                 event: MouseEvent
             ) = DesktopUiDispatcher.Dispatcher.lockCallbacks {
-                if (!parent.locked) {
-                    owners?.onMouseReleased(event.x, event.y)
-                }
+                owners?.onMouseReleased(event.x, event.y)
             }
         })
         layer.addMouseMotionListener(object : MouseMotionAdapter() {
             override fun mouseDragged(
                 event: MouseEvent
             ) = DesktopUiDispatcher.Dispatcher.lockCallbacks {
-                if (!parent.locked) {
-                    owners?.onMouseDragged(event.x, event.y)
-                }
+                owners?.onMouseDragged(event.x, event.y)
             }
         })
         layer.addKeyListener(object : KeyAdapter() {
             override fun keyPressed(
                 event: KeyEvent
             ) = DesktopUiDispatcher.Dispatcher.lockCallbacks {
-                if (!parent.locked) {
-                    owners?.onKeyPressed(event.keyCode, event.keyChar)
-                }
+                owners?.onKeyPressed(event.keyCode, event.keyChar)
             }
 
             override fun keyReleased(
                 event: KeyEvent
             ) = DesktopUiDispatcher.Dispatcher.lockCallbacks {
-                if (!parent.locked) {
-                    owners?.onKeyReleased(event.keyCode, event.keyChar)
-                }
+                owners?.onKeyReleased(event.keyCode, event.keyChar)
             }
 
             override fun keyTyped(
                 event: KeyEvent
             ) = DesktopUiDispatcher.Dispatcher.lockCallbacks {
-                if (!parent.locked) {
-                    owners?.onKeyTyped(event.keyChar)
-                }
+                owners?.onKeyTyped(event.keyChar)
             }
         })
     }
@@ -147,6 +133,11 @@ class ComposeWindow : JFrame {
         layer.disposeLayer()
         layer.updateLayer()
         layer.renderer!!.onDispose()
+    }
+
+    override fun setVisible(value: Boolean) {
+        super.setVisible(value)
+        updateLayer()
     }
 }
 

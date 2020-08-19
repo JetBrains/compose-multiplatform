@@ -210,7 +210,8 @@ class DesktopOwner(
     }
 
     fun draw(canvas: org.jetbrains.skija.Canvas) {
-        measureAndLayout()
+        measureAndLayoutDelegate.measureAndLayout()
+        measureAndLayoutDelegate.dispatchOnPositionedCallbacks()
         root.draw(DesktopCanvas(canvas))
     }
 

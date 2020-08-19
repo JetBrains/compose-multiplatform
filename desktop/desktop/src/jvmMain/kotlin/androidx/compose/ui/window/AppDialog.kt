@@ -53,6 +53,6 @@ fun Dialog(
     }
 
     onDispose {
-        dialog.close()
+        dialog.dispose()
     }
 }
