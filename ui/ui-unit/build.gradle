@@ -37,8 +37,8 @@ kotlin {
             implementation(KOTLIN_STDLIB_COMMON)
             api project(":compose:ui:ui-geometry")
 
-            implementation project(":compose:ui:ui-util")
             implementation project(":compose:runtime:runtime")
+            implementation project(":compose:ui:ui-util")
         }
         jvmMain.dependencies {
             implementation(KOTLIN_STDLIB)

@@ -46,8 +46,8 @@ kotlin {
             implementation project(":compose:foundation:foundation")
             implementation project(":compose:foundation:foundation-layout")
             implementation project(":compose:ui:ui")
-            implementation project(":ui:ui-test")
             implementation project(":test-screenshot")
+            implementation project(":ui:ui-test")
 
             implementation(ANDROIDX_TEST_RULES)
             implementation(ANDROIDX_TEST_RUNNER)

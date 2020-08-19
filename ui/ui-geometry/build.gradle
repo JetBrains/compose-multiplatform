@@ -36,8 +36,8 @@ kotlin {
         commonMain.dependencies {
             implementation(KOTLIN_STDLIB_COMMON)
 
-            implementation project(":compose:ui:ui-util")
             implementation project(":compose:runtime:runtime")
+            implementation project(":compose:ui:ui-util")
         }
         jvmMain.dependencies {
             implementation(KOTLIN_STDLIB)

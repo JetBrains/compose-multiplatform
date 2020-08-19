@@ -39,13 +39,13 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(KOTLIN_STDLIB_COMMON)
-            api project(':compose:runtime:runtime')
-            api project(':compose:ui:ui')
             api project(':compose:animation:animation')
-            implementation project(':compose:foundation:foundation-layout')
+            api project(':compose:runtime:runtime')
             api project(':compose:runtime:runtime-saved-instance-state')
-            implementation project(':compose:ui:ui-text')
+            api project(':compose:ui:ui')
+            implementation project(':compose:foundation:foundation-layout')
             implementation project(':compose:foundation:foundation-text')
+            implementation project(':compose:ui:ui-text')
             implementation project(':compose:ui:ui-util')
         }
         androidMain.dependencies {
