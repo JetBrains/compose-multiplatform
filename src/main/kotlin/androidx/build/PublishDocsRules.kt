@@ -101,8 +101,6 @@ val RELEASE_RULE = docsRules("public", false) {
     ignore(LibraryGroups.NAVIGATION.group, "navigation-safe-args-generator")
     ignore(LibraryGroups.NAVIGATION.group, "navigation-safe-args-gradle-plugin")
     prebuilts(LibraryGroups.NAVIGATION, "2.3.0")
-    // TODO: Remove during release phase of rxjava3 artifact
-    ignore(LibraryGroups.PAGING.group, "paging-rxjava3")
     prebuilts(LibraryGroups.PAGING, "3.0.0-alpha05")
     prebuilts(LibraryGroups.PALETTE, "1.0.0")
     // 1.0.1 was created to fix reference docs.  It contains no actual source changes from 1.0.0
@@ -124,10 +122,7 @@ val RELEASE_RULE = docsRules("public", false) {
     prebuilts(LibraryGroups.SAVEDSTATE, "1.1.0-alpha01")
     // TODO: Remove this ignore once androidx.security:security-biometric:1.0.0-alpha01 is released
     ignore(LibraryGroups.SECURITY.group, "security-biometric")
-    // TODO: Remove this ignore once androidx.security:security-crypto-ktx:1.0.0-alpha01 is release
-    ignore(LibraryGroups.SECURITY.group, "security-crypto-ktx")
-    // TODO: Remove this ignore once androidx.security:security-identity-credential:1.0.0-alpha01 is released
-    ignore(LibraryGroups.SECURITY.group, "security-identity-credential")
+    prebuilts(LibraryGroups.SECURITY, "security-identity-credential", "1.0.0-alpha01")
     prebuilts(LibraryGroups.SECURITY, "1.1.0-alpha02")
     prebuilts(LibraryGroups.SHARETARGET, "1.0.0")
     prebuilts(LibraryGroups.SLICE, "slice-builders", "1.1.0-alpha01")
