@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.ui.benchmark.android
+package androidx.compose.testutils.benchmark.android
 
 import android.R
 import android.annotation.TargetApi

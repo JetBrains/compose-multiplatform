@@ -16,9 +16,9 @@
 
 package androidx.ui.benchmark.test
 
-import androidx.compose.animation.core.estimateAnimationDurationMillis
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
+import androidx.compose.animation.core.estimateAnimationDurationMillis
 import androidx.test.filters.LargeTest
 import org.junit.Rule
 import org.junit.Test

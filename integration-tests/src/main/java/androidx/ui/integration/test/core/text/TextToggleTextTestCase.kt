@@ -22,12 +22,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.testutils.ComposeTestCase
+import androidx.compose.testutils.ToggleableTestCase
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.ui.integration.test.RandomTextGenerator
-import androidx.ui.test.ToggleableTestCase
-import androidx.ui.test.ComposeTestCase
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 

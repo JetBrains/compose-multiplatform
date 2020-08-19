@@ -17,13 +17,13 @@
 package androidx.ui.integration.test
 
 import androidx.activity.ComponentActivity
+import androidx.compose.testutils.assertMeasureSizeIsPositive
+import androidx.compose.testutils.assertNoPendingChanges
+import androidx.compose.testutils.forGivenTestCase
 import androidx.test.filters.MediumTest
-import androidx.ui.test.assertMeasureSizeIsPositive
-import androidx.ui.test.assertNoPendingChanges
 import androidx.ui.integration.test.material.CheckboxesInRowsTestCase
 import androidx.ui.test.ExperimentalTesting
 import androidx.ui.test.android.createAndroidComposeRule
-import androidx.ui.test.forGivenTestCase
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

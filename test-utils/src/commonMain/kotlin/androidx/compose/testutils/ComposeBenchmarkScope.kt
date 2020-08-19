@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.ui.test
+package androidx.compose.testutils
 
 /**
  * Test scope accessible from benchmarks. Provides extended set of hooks for compose benchmarking.

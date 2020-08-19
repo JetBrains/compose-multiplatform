@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.ui.test
+package androidx.compose.testutils
 
 import android.annotation.TargetApi
 import android.app.Activity

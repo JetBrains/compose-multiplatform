@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Copyright 2020 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package androidx.ui.benchmark
+package androidx.compose.testutils.benchmark
 
 import androidx.activity.ComponentActivity
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
-import androidx.ui.benchmark.android.AndroidTestCase
-import androidx.ui.test.ComposeBenchmarkScope
-import androidx.ui.test.ComposeTestCase
+import androidx.compose.testutils.benchmark.android.AndroidTestCase
+import androidx.compose.testutils.ComposeBenchmarkScope
+import androidx.compose.testutils.ComposeTestCase
+import androidx.compose.testutils.createAndroidComposeBenchmarkRunner
 import androidx.ui.test.DisableTransitions
-import androidx.ui.test.createAndroidComposeBenchmarkRunner
 import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement

@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package androidx.ui.benchmark
+package androidx.compose.testutils.benchmark
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.ui.test.ComposeExecutionControl
-import androidx.ui.test.ComposeTestCase
-import androidx.ui.test.LayeredComposeTestCase
-import androidx.ui.test.assertNoPendingChanges
-import androidx.ui.test.doFramesUntilNoChangesPending
+import androidx.compose.testutils.ComposeExecutionControl
+import androidx.compose.testutils.ComposeTestCase
+import androidx.compose.testutils.LayeredComposeTestCase
+import androidx.compose.testutils.assertNoPendingChanges
+import androidx.compose.testutils.doFramesUntilNoChangesPending
 import org.junit.Assert.assertTrue
 
 /**

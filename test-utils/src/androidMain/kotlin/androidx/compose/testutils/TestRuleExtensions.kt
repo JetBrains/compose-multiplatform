@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.ui.test
+package androidx.compose.testutils
 
 import androidx.activity.ComponentActivity
 import androidx.ui.test.android.AndroidComposeTestRule

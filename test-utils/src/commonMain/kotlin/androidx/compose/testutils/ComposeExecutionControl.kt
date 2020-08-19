@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.ui.test
+package androidx.compose.testutils
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -114,7 +114,7 @@ interface ComposeTestCaseSetup {
      * so the frames can be controlled manually. See [ComposeExecutionControl] for available
      * methods.
      */
-    fun performTestWithEventsControl(block: androidx.ui.test.ComposeExecutionControl.() -> Unit)
+    fun performTestWithEventsControl(block: ComposeExecutionControl.() -> Unit)
 }
 
 // Assertions

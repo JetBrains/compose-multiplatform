@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package androidx.ui.benchmark
+package androidx.compose.testutils.benchmark
 
 import android.view.View
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
-import androidx.ui.test.ComposeTestCase
-import androidx.ui.benchmark.android.AndroidTestCase
+import androidx.compose.testutils.ComposeTestCase
 import androidx.compose.ui.graphics.Canvas
-import androidx.ui.test.ToggleableTestCase
-import androidx.ui.test.assertNoPendingChanges
-import androidx.ui.test.doFramesUntilNoChangesPending
-import androidx.ui.test.recomposeAssertHadChanges
-import androidx.ui.test.setupContent
+import androidx.compose.testutils.ToggleableTestCase
+import androidx.compose.testutils.assertNoPendingChanges
+import androidx.compose.testutils.benchmark.android.AndroidTestCase
+import androidx.compose.testutils.doFramesUntilNoChangesPending
+import androidx.compose.testutils.recomposeAssertHadChanges
+import androidx.compose.testutils.setupContent
 
 /**
  * Measures measure and layout performance of the given test case by toggling measure constraints.

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.ui.benchmark
+package androidx.compose.testutils.benchmark
 
 import android.annotation.TargetApi
 import android.graphics.Picture

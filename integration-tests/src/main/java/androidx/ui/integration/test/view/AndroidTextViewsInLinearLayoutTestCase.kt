@@ -20,7 +20,7 @@ import android.app.Activity
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.ui.benchmark.android.AndroidTestCase
+import androidx.compose.testutils.benchmark.android.AndroidTestCase
 import androidx.ui.integration.test.material.CheckboxesInRowsTestCase
 
 /**
