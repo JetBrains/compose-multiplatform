@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package androidx.ui.demos.test
+package androidx.compose.integration.demos.test
 
 import androidx.compose.androidview.demos.ComposeInAndroidDialogDismissDialogDuringDispatch
 import androidx.test.espresso.Espresso
 import androidx.test.filters.MediumTest
 import androidx.test.filters.LargeTest
-import androidx.ui.demos.AllDemosCategory
-import androidx.ui.demos.DemoActivity
-import androidx.ui.demos.Tags
-import androidx.ui.demos.common.ActivityDemo
-import androidx.ui.demos.common.ComposableDemo
-import androidx.ui.demos.common.Demo
-import androidx.ui.demos.common.DemoCategory
-import androidx.ui.demos.common.allDemos
-import androidx.ui.demos.common.allLaunchableDemos
+import androidx.compose.integration.demos.AllDemosCategory
+import androidx.compose.integration.demos.DemoActivity
+import androidx.compose.integration.demos.Tags
+import androidx.compose.integration.demos.common.ActivityDemo
+import androidx.compose.integration.demos.common.ComposableDemo
+import androidx.compose.integration.demos.common.Demo
+import androidx.compose.integration.demos.common.DemoCategory
+import androidx.compose.integration.demos.common.allDemos
+import androidx.compose.integration.demos.common.allLaunchableDemos
 import androidx.ui.test.SemanticsNodeInteractionCollection
 import androidx.ui.test.android.createAndroidComposeRule
 import androidx.ui.test.assertTextEquals

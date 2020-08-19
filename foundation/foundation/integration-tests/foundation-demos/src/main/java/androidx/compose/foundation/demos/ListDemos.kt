@@ -51,7 +51,7 @@ import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.ui.demos.common.ComposableDemo
+import androidx.compose.integration.demos.common.ComposableDemo
 import kotlin.random.Random
 
 val LazyListDemos = listOf(

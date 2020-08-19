@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package androidx.ui.demos
+package androidx.compose.integration.demos
 
 import androidx.compose.androidview.demos.AndroidViewDemos
 import androidx.compose.animation.demos.AnimationDemos
 import androidx.compose.ui.demos.CoreDemos
-import androidx.ui.demos.common.DemoCategory
+import androidx.compose.integration.demos.common.DemoCategory
 import androidx.compose.foundation.demos.FoundationDemos
 import androidx.compose.foundation.layout.demos.LayoutDemos
 import androidx.compose.material.demos.MaterialDemos

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.ui.demos
+package androidx.compose.integration.demos
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,11 +24,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.ui.demos.common.ActivityDemo
-import androidx.ui.demos.common.ComposableDemo
-import androidx.ui.demos.common.Demo
-import androidx.ui.demos.common.DemoCategory
-import androidx.ui.demos.common.allLaunchableDemos
+import androidx.compose.integration.demos.common.ActivityDemo
+import androidx.compose.integration.demos.common.ComposableDemo
+import androidx.compose.integration.demos.common.Demo
+import androidx.compose.integration.demos.common.DemoCategory
+import androidx.compose.integration.demos.common.allLaunchableDemos
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text

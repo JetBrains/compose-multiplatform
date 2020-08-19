@@ -55,8 +55,8 @@ import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
-import androidx.ui.demos.common.ActivityDemo
-import androidx.ui.demos.common.DemoCategory
+import androidx.compose.integration.demos.common.ActivityDemo
+import androidx.compose.integration.demos.common.DemoCategory
 
 val ComposeInAndroidDemos = DemoCategory(
     "Compose in Android Interop", listOf(

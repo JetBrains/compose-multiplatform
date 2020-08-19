@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.ui.demos
+package androidx.compose.integration.demos
 
 import android.app.Activity
 import android.content.Context
@@ -35,9 +35,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.preference.PreferenceManager
 import androidx.compose.ui.platform.setContent
-import androidx.ui.demos.common.ActivityDemo
-import androidx.ui.demos.common.Demo
-import androidx.ui.demos.common.DemoCategory
+import androidx.compose.integration.demos.common.ActivityDemo
+import androidx.compose.integration.demos.common.Demo
+import androidx.compose.integration.demos.common.DemoCategory
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.ui.demos
+package androidx.compose.integration.demos
 
 import android.content.SharedPreferences
 import androidx.compose.runtime.Composable
