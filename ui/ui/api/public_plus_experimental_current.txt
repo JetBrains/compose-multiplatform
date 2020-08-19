@@ -497,23 +497,23 @@ package androidx.compose.ui.focus {
 package androidx.compose.ui.gesture {
 
   public final class ConstantsKt {
-    method public static androidx.compose.ui.unit.Duration getDoubleTapMinTime();
+    method public static long getDoubleTapMinTime();
     method public static float getDoubleTapSlop();
-    method public static androidx.compose.ui.unit.Duration getDoubleTapTimeout();
+    method public static long getDoubleTapTimeout();
     method public static float getDoubleTapTouchSlop();
     method public static float getHoverTapSlop();
-    method public static androidx.compose.ui.unit.Duration getHoverTapTimeout();
-    method public static androidx.compose.ui.unit.Duration getJumpTapTimeout();
-    method public static androidx.compose.ui.unit.Duration getLongPressTimeout();
+    method public static long getHoverTapTimeout();
+    method public static long getJumpTapTimeout();
+    method public static long getLongPressTimeout();
     method public static float getMaxFlingVelocity();
     method public static float getMinFlingVelocity();
     method public static float getPagingTouchSlop();
     method public static float getPanSlop();
-    method public static androidx.compose.ui.unit.Duration getPressTimeout();
+    method public static long getPressTimeout();
     method public static float getScaleSlop();
     method public static float getTouchSlop();
     method public static float getWindowTouchSlop();
-    method public static androidx.compose.ui.unit.Duration getZoomControlsTimeout();
+    method public static long getZoomControlsTimeout();
   }
 
   public enum Direction {

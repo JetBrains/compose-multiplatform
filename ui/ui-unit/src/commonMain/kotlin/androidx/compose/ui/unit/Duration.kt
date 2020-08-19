@@ -33,14 +33,12 @@ const val MillisecondsPerSecond = 1000L
 const val SecondsPerMinute = 60L
 const val MinutesPerHour = 60L
 const val HoursPerDay = 24L
-
-// TODO(mount): these should be "const val", but that doesn't work right
-// now with the IR compiler.
-val NanosecondsPerMillisecond = NanosecondsPerMicrosecond * MicrosecondsPerMillisecond
-val NanosecondsPerSecond = NanosecondsPerMillisecond * MillisecondsPerSecond
-val NanosecondsPerMinute = NanosecondsPerSecond * SecondsPerMinute
-val NanosecondsPerHour = NanosecondsPerMinute * MinutesPerHour
-val NanosecondsPerDay = NanosecondsPerHour * HoursPerDay
+const val NanosecondsPerMillisecond =
+    NanosecondsPerMicrosecond * MicrosecondsPerMillisecond
+const val NanosecondsPerSecond = NanosecondsPerMillisecond * MillisecondsPerSecond
+const val NanosecondsPerMinute = NanosecondsPerSecond * SecondsPerMinute
+const val NanosecondsPerHour = NanosecondsPerMinute * MinutesPerHour
+const val NanosecondsPerDay = NanosecondsPerHour * HoursPerDay
 
 /** Only used by this implementation */
 private const val MicrosecondsPerSecond = MicrosecondsPerMillisecond * MillisecondsPerSecond
@@ -67,60 +65,50 @@ fun Duration(
 )
 
 /* A [Duration] of this many days. */
-// TODO(inline)
-val Long.days: Duration get() = Duration(this * NanosecondsPerDay)
+inline val Long.days: Duration get() = Duration(this * NanosecondsPerDay)
 
 /* A [Duration] of this many hours. */
-// TODO(inline)
-val Long.hours: Duration get() = Duration(this * NanosecondsPerHour)
+inline val Long.hours: Duration get() = Duration(this * NanosecondsPerHour)
 
 /* A [Duration] of this many minutes. */
-// TODO(inline)
-val Long.minutes: Duration get() = Duration(this * NanosecondsPerMinute)
+inline val Long.minutes: Duration get() = Duration(this * NanosecondsPerMinute)
 
 /* A [Duration] of this many seconds. */
-// TODO(inline)
-val Long.seconds: Duration get() = Duration(this * NanosecondsPerSecond)
+inline val Long.seconds: Duration
+    @Suppress("MethodNameUnits") // lint warning is confused by an inline class.
+    get() = Duration(this * NanosecondsPerSecond)
 
 /* A [Duration] of this many milliseconds. */
-// TODO(inline)
-val Long.milliseconds: Duration get() = Duration(this * NanosecondsPerMillisecond)
+inline val Long.milliseconds: Duration get() = Duration(this * NanosecondsPerMillisecond)
 
 /* A [Duration] of this many microseconds. */
-// TODO(inline)
-val Long.microseconds: Duration get() = Duration(this * NanosecondsPerMicrosecond)
+inline val Long.microseconds: Duration get() = Duration(this * NanosecondsPerMicrosecond)
 
 /* A [Duration] of this many nanoseconds. */
-// TODO(inline)
-val Long.nanoseconds: Duration get() = Duration(this)
+inline val Long.nanoseconds: Duration get() = Duration(this)
 
 /* A [Duration] of this many days. */
-// TODO(inline)
-val Int.days: Duration get() = toLong().days
+inline val Int.days: Duration get() = toLong().days
 
 /* A [Duration] of this many hours. */
-// TODO(inline)
-val Int.hours: Duration get() = toLong().hours
+inline val Int.hours: Duration get() = toLong().hours
 
 /* A [Duration] of this many minutes. */
-// TODO(inline)
-val Int.minutes: Duration get() = toLong().minutes
+inline val Int.minutes: Duration get() = toLong().minutes
 
 /* A [Duration] of this many seconds. */
-// TODO(inline)
-val Int.seconds: Duration get() = toLong().seconds
+inline val Int.seconds: Duration
+    @Suppress("MethodNameUnits") // lint warning is confused by an inline class.
+    get() = toLong().seconds
 
 /* A [Duration] of this many milliseconds. */
-// TODO(inline)
-val Int.milliseconds: Duration get() = toLong().milliseconds
+inline val Int.milliseconds: Duration get() = toLong().milliseconds
 
 /* A [Duration] of this many microseconds. */
-// TODO(inline)
-val Int.microseconds: Duration get() = toLong().microseconds
+inline val Int.microseconds: Duration get() = toLong().microseconds
 
 /* A [Duration] of this many nanoseconds. */
-// TODO(inline)
-val Int.nanoseconds: Duration get() = toLong().nanoseconds
+inline val Int.nanoseconds: Duration get() = toLong().nanoseconds
 
 /**
  * A span of time, such as 27 days, 4 hours, 12 minutes, and 3 seconds.
@@ -163,8 +151,9 @@ val Int.nanoseconds: Duration get() = toLong().nanoseconds
  *     val aLongWeekend = 86.hours
  *     assertEquals(3, aLongWeekend.inDays())
  */
+@Suppress("EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-data class Duration(val nanoseconds: Long) : Comparable<Duration> {
+inline class Duration(val nanoseconds: Long) : Comparable<Duration> {
 
     /**
      * Adds this Duration and [other] and returns the sum as a Duration.
@@ -259,43 +248,37 @@ data class Duration(val nanoseconds: Long) : Comparable<Duration> {
 /**
  * Returns the number of whole days spanned by this Duration.
  */
-// TODO(inline)
-fun Duration.inDays(): Long = nanoseconds / NanosecondsPerDay
+inline fun Duration.inDays(): Long = nanoseconds / NanosecondsPerDay
 
 /**
  * Returns the number of whole hours spanned by this Duration.
  *
  * The returned value can be greater than 23.
  */
-// TODO(inline)
-fun Duration.inHours(): Long = nanoseconds / NanosecondsPerHour
+inline fun Duration.inHours(): Long = nanoseconds / NanosecondsPerHour
 
 /**
  * Returns the number of whole minutes spanned by this Duration.
  *
  * The returned value can be greater than 59.
  */
-// TODO(inline)
-fun Duration.inMinutes(): Long = nanoseconds / NanosecondsPerMinute
+inline fun Duration.inMinutes(): Long = nanoseconds / NanosecondsPerMinute
 
 /**
  * Returns the number of whole seconds spanned by this Duration.
  *
  * The returned value can be greater than 59.
  */
-// TODO(inline)
-fun Duration.inSeconds(): Long = nanoseconds / NanosecondsPerSecond
+inline fun Duration.inSeconds(): Long = nanoseconds / NanosecondsPerSecond
 
 /**
  * Returns number of whole milliseconds spanned by this Duration.
  *
  * The returned value can be greater than 999.
  */
-// TODO(inline)
-fun Duration.inMilliseconds(): Long = nanoseconds / NanosecondsPerMillisecond
+inline fun Duration.inMilliseconds(): Long = nanoseconds / NanosecondsPerMillisecond
 
 /**
  * Returns number of whole microseconds spanned by this Duration.
  */
-// TODO(inline)
-fun Duration.inMicroseconds(): Long = nanoseconds / NanosecondsPerMicrosecond
+inline fun Duration.inMicroseconds(): Long = nanoseconds / NanosecondsPerMicrosecond
