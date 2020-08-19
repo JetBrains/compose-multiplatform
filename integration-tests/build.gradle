@@ -38,13 +38,13 @@ dependencies {
     implementation(TRUTH)
     implementation(ANDROIDX_TEST_RULES)
 
-    implementation project(":compose:runtime:runtime")
-    implementation project(":compose:ui:ui")
     implementation project(":compose:foundation:foundation")
     implementation project(":compose:foundation:foundation-layout")
     implementation project(":compose:material:material")
-    implementation project(":ui:ui-test")
+    implementation project(":compose:runtime:runtime")
     implementation project(":compose:test-utils")
+    implementation project(":compose:ui:ui")
+    implementation project(":ui:ui-test")
 }
 
 androidx {

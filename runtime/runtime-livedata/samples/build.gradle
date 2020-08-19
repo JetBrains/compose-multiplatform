@@ -30,8 +30,8 @@ dependencies {
 
     implementation(KOTLIN_STDLIB)
     implementation project(":annotation:annotation-sampled")
-    implementation project(":compose:runtime:runtime-livedata")
     implementation project(":compose:foundation:foundation")
+    implementation project(":compose:runtime:runtime-livedata")
 }
 
 android {

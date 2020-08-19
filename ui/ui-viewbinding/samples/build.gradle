@@ -29,8 +29,8 @@ dependencies {
     kotlinPlugin project(path: ":compose:compose-compiler")
 
     implementation(KOTLIN_STDLIB)
-    implementation project(":compose:runtime:runtime")
     implementation project(":annotation:annotation-sampled")
+    implementation project(":compose:runtime:runtime")
     implementation project(":compose:ui:ui")
     implementation project(":compose:ui:ui-viewbinding")
 }

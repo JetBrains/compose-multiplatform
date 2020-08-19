@@ -39,17 +39,17 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(KOTLIN_STDLIB_COMMON)
-            api project(":compose:runtime:runtime")
-            implementation project(":compose:ui:ui-util")
-            api project(":compose:ui:ui")
-            api project(":compose:foundation:foundation")
-            api project(":compose:material:material-icons-core")
-            api project(":compose:ui:ui-text")
-            api project(":compose:foundation:foundation-text")
             api project(":compose:animation:animation-core")
+            api project(":compose:foundation:foundation")
+            api project(":compose:foundation:foundation-text")
+            api project(":compose:material:material-icons-core")
+            api project(":compose:runtime:runtime")
+            api project(":compose:ui:ui")
+            api project(":compose:ui:ui-text")
 
-            implementation project(":compose:foundation:foundation-layout")
             implementation project(":compose:animation:animation")
+            implementation project(":compose:foundation:foundation-layout")
+            implementation project(":compose:ui:ui-util")
         }
 
         androidMain.dependencies {
@@ -70,8 +70,8 @@ kotlin {
 
         androidAndroidTest.dependencies {
             implementation project(":compose:material:material:samples")
-            implementation project(":ui:ui-test")
             implementation project(":test-screenshot")
+            implementation project(":ui:ui-test")
 
             implementation(ANDROIDX_TEST_RULES)
             implementation(ANDROIDX_TEST_RUNNER)
