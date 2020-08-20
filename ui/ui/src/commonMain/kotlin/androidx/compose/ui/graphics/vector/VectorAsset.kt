@@ -116,15 +116,14 @@ class VectorGroup internal constructor(
     /**
      * Path information used to clip the content within the group
      */
-    val clipPathData: List<PathNode> = EmptyPath
+    val clipPathData: List<PathNode> = EmptyPath,
 
+    /**
+     * Child Vector nodes that are part of this group, this can contain
+     * paths or other groups
+     */
+    private val children: List<VectorNode> = emptyList()
 ) : VectorNode(), Iterable<VectorNode> {
-
-    private val children = ArrayList<VectorNode>()
-
-    internal fun addNode(node: VectorNode) {
-        children.add(node)
-    }
 
     val size: Int
         get() = children.size
