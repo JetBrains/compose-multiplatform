@@ -20,8 +20,9 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.geometry.Offset
 
 /** A velocity in two dimensions. */
+@Suppress("EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-data class Velocity(
+inline class Velocity(
     /** The number of pixels per second of velocity in the x and y directions. */
     val pixelsPerSecond: Offset
 ) {

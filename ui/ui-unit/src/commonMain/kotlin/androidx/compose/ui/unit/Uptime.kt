@@ -26,8 +26,9 @@ import androidx.compose.runtime.Immutable
  * nonsensical to add two [Uptime]s, an [Uptime] + a [Duration] yields an [Uptime], and an
  * [Uptime] - an [Uptime] yields a [Duration].
  */
+@Suppress("EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
-data class Uptime(val nanoseconds: Long) : Comparable<Uptime> {
+inline class Uptime(val nanoseconds: Long) : Comparable<Uptime> {
 
     /**
      * Adds a [Duration] to this [Uptime] and returns the result.
