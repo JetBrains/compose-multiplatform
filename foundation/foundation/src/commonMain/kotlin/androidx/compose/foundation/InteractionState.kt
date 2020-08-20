@@ -35,13 +35,31 @@ import androidx.compose.ui.geometry.Offset
  * recomposition when there are changes to the state of [Interaction], such as when a [clickable]
  * becomes [Interaction.Pressed].
  *
- * @sample androidx.compose.foundation.samples.InteractionStateSample
+ * For cases when you are only interested in one [Interaction], or you have a priority for cases
+ * when multiple [Interaction]s are present, you can use [contains], such as in the following
+ * example:
+ *
+ * @sample androidx.compose.foundation.samples.PriorityInteractionStateSample
+ *
+ * Often it is important to respond to the most recently added [Interaction], as this corresponds
+ * to the user's most recent interaction with a component. To enable such cases, [value] is
+ * guaranteed to have its ordering preserved, with the most recent [Interaction] added to the end.
+ * As a result, you can simply iterate / filter [value] from the end, until you find an
+ * [Interaction] you are interested in, such as in the following example:
+ *
+ * @sample androidx.compose.foundation.samples.MultipleInteractionStateSample
  */
 @Stable
 class InteractionState : State<Set<Interaction>> {
 
     private var map: Map<Interaction, Offset?> by mutableStateOf(emptyMap())
 
+    /**
+     * The [Set] containing all [Interaction]s present in this [InteractionState]. Note that this
+     * set is ordered, and the most recently added [Interaction] will be the last element in the
+     * set. For representing the most recent [Interaction] in a component, you should iterate over
+     * the set in reversed order, until you find an [Interaction] that you are interested in.
+     */
     override val value: Set<Interaction>
         get() = map.keys
 
