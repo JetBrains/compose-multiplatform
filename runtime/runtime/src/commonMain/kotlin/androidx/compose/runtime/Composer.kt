@@ -605,7 +605,7 @@ class Composer<N>(
     @InternalComposeApi
     fun recordWriteOf(value: Any) {
         observations.forEachScopeOf(value) { scope ->
-            if (scope.invalidate() != InvalidationResult.DEFERRED) {
+            if (scope.invalidate() == InvalidationResult.IMMINENT) {
                 // If we process this during recordWriteOf, ignore it when recording modifications
                 observationsProcessed.insertIfMissing(value, scope)
             }
