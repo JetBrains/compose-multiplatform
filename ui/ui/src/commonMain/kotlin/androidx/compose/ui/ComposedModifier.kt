@@ -58,8 +58,8 @@ fun Composer<*>.materialize(modifier: Modifier): Modifier {
         acc.then(
             if (element is ComposedModifier) {
                 @kotlin.Suppress("UNCHECKED_CAST")
-                val factory = element.factory as Modifier.(Composer<*>, Int, Int) -> Modifier
-                val composedMod = factory(Modifier, this, 0, 0)
+                val factory = element.factory as Modifier.(Composer<*>, Int) -> Modifier
+                val composedMod = factory(Modifier, this, 0)
                 materialize(composedMod)
             } else element
         )
