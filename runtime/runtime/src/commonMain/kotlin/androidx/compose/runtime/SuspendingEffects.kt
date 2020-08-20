@@ -71,7 +71,7 @@ abstract class CompositionCoroutineScope : CoroutineScope, MonotonicFrameClock {
  * [kotlinx.coroutines.Job].
  */
 suspend fun CompositionCoroutineScope.awaitDispose(onDispose: () -> Unit = {}): Nothing = try {
-    suspendCancellableCoroutine { /* Suspend until cancellation */ }
+    suspendCancellableCoroutine<Nothing> { /* Suspend until cancellation */ }
 } finally {
     onDispose()
 }
