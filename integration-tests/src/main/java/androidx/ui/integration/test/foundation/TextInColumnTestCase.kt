@@ -19,11 +19,11 @@ package androidx.ui.integration.test.foundation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.foundation.Text
-import androidx.ui.test.ToggleableTestCase
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.ui.test.ComposeTestCase
+import androidx.compose.testutils.ComposeTestCase
+import androidx.compose.testutils.ToggleableTestCase
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
 

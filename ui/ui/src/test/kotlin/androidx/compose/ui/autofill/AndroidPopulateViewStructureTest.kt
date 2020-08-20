@@ -20,10 +20,10 @@ import android.app.Activity
 import android.view.View
 import android.view.ViewStructure
 import androidx.autofill.HintConstants.AUTOFILL_HINT_PERSON_NAME
+import androidx.compose.testutils.fake.FakeViewStructure
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.test.ComposeUiRobolectricTestRunner
 import androidx.test.filters.SmallTest
-import androidx.ui.test.fake.FakeViewStructure
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Test

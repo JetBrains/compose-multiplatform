@@ -30,7 +30,6 @@ import androidx.compose.foundation.Text
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.background
 import androidx.compose.ui.graphics.Color
-import androidx.ui.test.ToggleableTestCase
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -39,7 +38,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.ui.test.ComposeTestCase
+import androidx.compose.testutils.ComposeTestCase
+import androidx.compose.testutils.ToggleableTestCase
 import kotlin.random.Random
 
 /**

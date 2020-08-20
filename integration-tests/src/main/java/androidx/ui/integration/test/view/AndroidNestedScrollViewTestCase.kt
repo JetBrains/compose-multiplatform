@@ -20,10 +20,10 @@ import android.app.Activity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.HorizontalScrollView
+import androidx.compose.testutils.ToggleableTestCase
+import androidx.compose.testutils.benchmark.android.AndroidTestCase
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.ui.test.ToggleableTestCase
-import androidx.ui.benchmark.android.AndroidTestCase
 import androidx.ui.integration.test.foundation.NestedScrollerTestCase
 import kotlin.random.Random
 

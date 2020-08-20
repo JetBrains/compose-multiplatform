@@ -20,9 +20,9 @@ import android.content.Context
 import android.util.TypedValue
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
+import androidx.compose.testutils.benchmark.measureRepeatedRecordingCanvas
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.ui.benchmark.measureRepeatedRecordingCanvas
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.graphics.Canvas

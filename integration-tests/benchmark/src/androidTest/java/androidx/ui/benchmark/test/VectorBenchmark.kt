@@ -16,12 +16,12 @@
 
 package androidx.ui.benchmark.test
 
+import androidx.compose.testutils.benchmark.ComposeBenchmarkRule
+import androidx.compose.testutils.benchmark.benchmarkFirstCompose
+import androidx.compose.testutils.benchmark.benchmarkFirstDraw
+import androidx.compose.testutils.benchmark.benchmarkFirstLayout
+import androidx.compose.testutils.benchmark.benchmarkFirstMeasure
 import androidx.test.filters.LargeTest
-import androidx.ui.benchmark.ComposeBenchmarkRule
-import androidx.ui.benchmark.benchmarkFirstCompose
-import androidx.ui.benchmark.benchmarkFirstDraw
-import androidx.ui.benchmark.benchmarkFirstLayout
-import androidx.ui.benchmark.benchmarkFirstMeasure
 import androidx.ui.integration.test.framework.ProgrammaticVectorTestCase
 import androidx.ui.integration.test.framework.XmlVectorTestCase
 import org.junit.Rule

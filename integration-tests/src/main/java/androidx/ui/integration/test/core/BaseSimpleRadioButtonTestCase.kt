@@ -20,10 +20,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.testutils.ComposeTestCase
+import androidx.compose.testutils.ToggleableTestCase
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.ui.test.ToggleableTestCase
-import androidx.ui.test.ComposeTestCase
 
 abstract class BaseSimpleRadioButtonTestCase : ComposeTestCase, ToggleableTestCase {
 
