@@ -18,19 +18,31 @@
 
 package androidx.compose.foundation.text
 
+import androidx.compose.animation.core.AnimatedFloat
+import androidx.compose.animation.core.AnimationClockObservable
+import androidx.compose.animation.core.AnimationConstants
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.repeatable
 import androidx.compose.foundation.text.selection.SelectionHandle
 import androidx.compose.foundation.text.selection.TextFieldSelectionManager
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.state
+import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Layout
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.drawBehind
+import androidx.compose.ui.drawWithContent
 import androidx.compose.ui.focus
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusRequester
@@ -38,15 +50,18 @@ import androidx.compose.ui.focus.isFocused
 import androidx.compose.ui.focusObserver
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.gesture.LongPressDragObserver
 import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.gesture.longPressDragGestureFilter
 import androidx.compose.ui.gesture.pressIndicatorGestureFilter
 import androidx.compose.ui.gesture.tapGestureFilter
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.onGloballyPositioned
+import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.platform.ClipboardManagerAmbient
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.FontLoaderAmbient
@@ -73,8 +88,11 @@ import androidx.compose.ui.text.input.EditProcessor
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.NO_SESSION
+import androidx.compose.ui.text.input.OffsetMap
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.annotation.VisibleForTesting
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -120,6 +138,7 @@ import kotlin.math.roundToInt
  * communicating with platform text input service, e.g. software keyboard on Android. Called with
  * [SoftwareKeyboardController] instance which can be used for requesting input show/hide software
  * keyboard.
+ * @param cursorColor Color of the cursor. If [Color.Unset], there will be no cursor drawn
  */
 @Composable
 @OptIn(
@@ -136,7 +155,8 @@ fun CoreTextField(
     onImeActionPerformed: (ImeAction) -> Unit = {},
     visualTransformation: VisualTransformation = VisualTransformation.None,
     onTextLayout: (TextLayoutResult) -> Unit = {},
-    onTextInputStarted: (SoftwareKeyboardController) -> Unit = {}
+    onTextInputStarted: (SoftwareKeyboardController) -> Unit = {},
+    cursorColor: Color = Color.Unset
 ) {
     // If developer doesn't pass new value to TextField, recompose won't happen but internal state
     // and IME may think it is updated. To fix this inconsistent state, enforce recompose by
@@ -358,11 +378,15 @@ fun CoreTextField(
             }
         }
 
+        val cursorModifier =
+            Modifier.cursor(state, value, offsetMap, cursorColor)
+
         onDispose { manager.hideSelectionToolbar() }
 
         SelectionLayout(
             modifier.focusRequester(focusRequester)
                 .then(focusObserver)
+                .then(cursorModifier)
                 .then(dragPositionGestureModifier)
                 .then(focusRequestTapModifier)
                 .then(drawModifier)
@@ -541,3 +565,82 @@ private fun Modifier.dragPositionGestureFilter(
         )
         .longPressDragGestureFilter(longPressDragObserver)
 }
+
+private val cursorAnimationSpec: AnimationSpec<Float>
+    get() = repeatable(
+        iterations = AnimationConstants.Infinite,
+        animation = keyframes {
+            durationMillis = 1000
+            1f at 0
+            1f at 499
+            0f at 500
+            0f at 999
+        }
+    )
+
+private val DefaultCursorThickness = 2.dp
+
+@OptIn(InternalTextApi::class)
+private fun Modifier.cursor(
+    state: TextFieldState,
+    value: TextFieldValue,
+    offsetMap: OffsetMap,
+    cursorColor: Color
+) = composed {
+    // this should be a disposable clock, but it's not available in this module
+    // however, we only launch one animation and guarantee that we stop it (via snap) in dispose
+    val animationClocks = AnimationClockAmbient.current
+    val cursorAlpha = remember(animationClocks) { AnimatedFloatModel(0f, animationClocks) }
+
+    if (state.hasFocus && value.selection.collapsed && cursorColor != Color.Unset) {
+        onCommit(cursorColor) {
+            if (blinkingCursorEnabled) {
+                cursorAlpha.animateTo(0f, anim = cursorAnimationSpec)
+            } else {
+                cursorAlpha.snapTo(1f)
+            }
+            onDispose {
+                cursorAlpha.snapTo(0f)
+            }
+        }
+        drawWithContent {
+            this.drawContent()
+            val cursorAlphaValue = cursorAlpha.value.coerceIn(0f, 1f)
+            if (cursorAlphaValue != 0f) {
+                val transformedOffset = offsetMap
+                    .originalToTransformed(value.selection.start)
+                val cursorRect = state.layoutResult?.getCursorRect(transformedOffset)
+                    ?: Rect(0f, 0f, 0f, 0f)
+                val cursorWidth = DefaultCursorThickness.toPx()
+                val cursorX = (cursorRect.left + cursorWidth / 2)
+                    .coerceAtMost(size.width - cursorWidth / 2)
+
+                drawLine(
+                    cursorColor,
+                    Offset(cursorX, cursorRect.top),
+                    Offset(cursorX, cursorRect.bottom),
+                    alpha = cursorAlphaValue,
+                    strokeWidth = cursorWidth
+                )
+            }
+        }
+    } else {
+        Modifier
+    }
+}
+
+@Stable
+private class AnimatedFloatModel(
+    initialValue: Float,
+    clock: AnimationClockObservable,
+    visibilityThreshold: Float = Spring.DefaultDisplacementThreshold
+) : AnimatedFloat(clock, visibilityThreshold) {
+    override var value: Float by mutableStateOf(initialValue, structuralEqualityPolicy())
+}
+
+// TODO(b/151940543): Remove this variable when we have a solution for idling animations
+@InternalTextApi
+/** @suppress */
+var blinkingCursorEnabled: Boolean = true
+    @VisibleForTesting
+    set

@@ -16,34 +16,13 @@
 
 package androidx.compose.foundation
 
-import androidx.compose.animation.animatedColor
-import androidx.compose.animation.core.AnimatedValue
-import androidx.compose.animation.core.AnimationConstants.Infinite
-import androidx.compose.animation.core.keyframes
-import androidx.compose.animation.core.repeatable
 import androidx.compose.foundation.layout.defaultMinSizeConstraints
 import androidx.compose.foundation.text.CoreTextField
-import androidx.compose.foundation.text.TextFieldDelegate
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.onCommit
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.ContentDrawScope
-import androidx.compose.ui.DrawModifier
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.focus.ExperimentalFocus
-import androidx.compose.ui.focus.isFocused
-import androidx.compose.ui.focusObserver
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.useOrElse
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
@@ -52,14 +31,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.annotation.VisibleForTesting
-
-// TODO(b/151940543): Remove this variable when we have a solution for idling animations
-/** @suppress */
-@InternalFoundationApi
-var blinkingCursorEnabled: Boolean = true
-    @VisibleForTesting
-    set
 
 /**
  * Composable that enables users to edit text via hardware or software keyboard.
@@ -113,7 +84,7 @@ var blinkingCursorEnabled: Boolean = true
  * communicating with platform text input service, e.g. software keyboard on Android. Called with
  * [SoftwareKeyboardController] instance which can be used for requesting input show/hide software
  * keyboard.
- * @param cursorColor Color of the cursor.
+ * @param cursorColor Color of the cursor. If [Color.Unset], there will be no cursor drawn
  *
  * @see TextFieldValue
  * @see ImeAction
@@ -140,47 +111,10 @@ fun BaseTextField(
     val color = textColor.useOrElse { textStyle.color.useOrElse { AmbientContentColor.current } }
     val mergedStyle = textStyle.merge(TextStyle(color = color))
 
-    // cursor with blinking animation
-    val cursorState: CursorState = remember { CursorState() }
-    val cursorNeeded = cursorState.focused && value.selection.collapsed
-    val animColor = animatedColor(cursorColor)
-    onCommit(cursorColor, cursorState.focused, value) {
-        if (cursorNeeded) {
-            // TODO(b/151940543): Disable blinking in tests until we handle idling animations
-            @OptIn(InternalFoundationApi::class)
-            if (blinkingCursorEnabled) {
-                animColor.animateTo(Color.Transparent, anim = repeatable(
-                    iterations = Infinite,
-                    animation = keyframes {
-                        durationMillis = 1000
-                        cursorColor at 0
-                        cursorColor at 499
-                        Color.Transparent at 500
-                    }
-                ))
-            } else {
-                animColor.snapTo(cursorColor)
-            }
-        } else {
-            animColor.snapTo(Color.Transparent)
-        }
-
-        onDispose {
-            animColor.stop()
-        }
-    }
-
-    val cursorModifier = if (cursorNeeded) {
-        Modifier.cursorModifier(animColor, cursorState, value, visualTransformation)
-    } else {
-        Modifier
-    }
     CoreTextField(
         value = value,
         modifier = modifier
-            .focusObserver { cursorState.focused = it.isFocused }
-            .defaultMinSizeConstraints(minWidth = DefaultTextFieldWidth)
-            .then(cursorModifier),
+            .defaultMinSizeConstraints(minWidth = DefaultTextFieldWidth),
         onValueChange = {
             onValueChange(it)
         },
@@ -190,69 +124,11 @@ fun BaseTextField(
         onImeActionPerformed = onImeActionPerformed,
         visualTransformation = visualTransformation,
         onTextLayout = {
-            cursorState.layoutResult = it
             onTextLayout(it)
         },
-        onTextInputStarted = onTextInputStarted
+        onTextInputStarted = onTextInputStarted,
+        cursorColor = cursorColor
     )
 }
 
-@Stable
-private class CursorState {
-    var focused by mutableStateOf(false)
-    var layoutResult by mutableStateOf<TextLayoutResult?>(null)
-}
-
-private fun Modifier.cursorModifier(
-    color: AnimatedValue<Color, *>,
-    cursorState: CursorState,
-    textFieldValue: TextFieldValue,
-    visualTransformation: VisualTransformation
-) = composed {
-    remember(cursorState, textFieldValue, visualTransformation) {
-        CursorModifier(color, cursorState, textFieldValue, visualTransformation)
-    }
-}
-
-private data class CursorModifier(
-    val color: AnimatedValue<Color, *>,
-    val cursorState: CursorState,
-    val textFieldValue: TextFieldValue,
-    val visualTransformation: VisualTransformation
-) : DrawModifier {
-    override fun ContentDrawScope.draw() {
-        if (color.value.alpha != 0f) {
-            val transformed = visualTransformation.filter(
-                AnnotatedString(textFieldValue.text)
-            )
-
-            @OptIn(InternalTextApi::class)
-            val transformedText = textFieldValue.composition?.let {
-                TextFieldDelegate.applyCompositionDecoration(it, transformed)
-            } ?: transformed
-            val cursorWidth = CursorThickness.value * density
-            val cursorHeight = cursorState.layoutResult?.size?.height?.toFloat() ?: 0f
-
-            val cursorRect = cursorState.layoutResult?.getCursorRect(
-                transformedText.offsetMap.originalToTransformed(textFieldValue.selection.start)
-            ) ?: Rect(
-                0f, 0f,
-                cursorWidth, cursorHeight
-            )
-            val cursorX = (cursorRect.left + cursorWidth / 2)
-                .coerceAtMost(size.width - cursorWidth / 2)
-
-            drawLine(
-                color.value,
-                Offset(cursorX, cursorRect.top),
-                Offset(cursorX, cursorRect.bottom),
-                strokeWidth = cursorWidth
-            )
-        }
-
-        drawContent()
-    }
-}
-
-private val CursorThickness = 2.dp
 private val DefaultTextFieldWidth = 280.dp

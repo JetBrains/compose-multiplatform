@@ -49,6 +49,11 @@ kotlin {
             implementation(KOTLIN_STDLIB)
         }
 
+        desktopMain.dependencies {
+            implementation(KOTLIN_STDLIB)
+            implementation(SKIKO)
+        }
+
         test.dependencies {
             implementation(ANDROIDX_TEST_RULES)
             implementation(ANDROIDX_TEST_RUNNER)
