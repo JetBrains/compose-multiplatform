@@ -48,7 +48,6 @@ class ComposableLambdaN<R>(
     private fun realParamCount(params: Int): Int {
         var realParams = params
         realParams-- // composer parameter
-        realParams-- // key parameter
         realParams-- // changed parameter
         var changedParams = 1
         while (changedParams * SLOTS_PER_INT < realParams) {
@@ -73,16 +72,14 @@ class ComposableLambdaN<R>(
         }
         @Suppress("UNCHECKED_CAST")
         val result = (_block as FunctionN<*>)(*allArgsButLast, dirty) as R
-        c.endRestartGroup()?.updateScope { nc, nk, _ ->
+        c.endRestartGroup()?.updateScope { nc, _ ->
             val params = args.slice(0 until realParams).toTypedArray()
             @Suppress("UNUSED_VARIABLE")
-            val key = args[realParams + 1] as Int
-            val changed = args[realParams + 2] as Int
-            val changedN = args.slice(realParams + 3 until args.size).toTypedArray()
+            val changed = args[realParams + 1] as Int
+            val changedN = args.slice(realParams + 2 until args.size).toTypedArray()
             this(
                 *params,
                 nc,
-                nk,
                 changed or 0b1,
                 *changedN
             )

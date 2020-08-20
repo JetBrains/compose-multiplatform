@@ -60,8 +60,8 @@ fun <P1> MockComposeScope.memoize(
     if (!currentComposer.changed(p1)) {
         currentComposer.skipToGroupEnd()
     } else {
-        val realFn = block as Function4<P1, Composer<*>, Int, Int, Unit>
-        realFn(p1, currentComposer, 0, 0)
+        val realFn = block as Function3<P1, Composer<*>, Int, Unit>
+        realFn(p1, currentComposer, 0)
     }
     currentComposer.endGroup()
 }
