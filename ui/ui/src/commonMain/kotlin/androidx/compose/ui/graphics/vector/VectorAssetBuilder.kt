@@ -70,12 +70,12 @@ class VectorAssetBuilder(
      */
     val viewportHeight: Float
 ) {
-    private val nodes = Stack<VectorGroup>()
+    private val nodes = Stack<GroupParams>()
 
-    private var root = VectorGroup()
+    private var root = GroupParams()
     private var isConsumed = false
 
-    private val currentGroup: VectorGroup
+    private val currentGroup: GroupParams
         get() = nodes.peek()
 
     init {
@@ -109,7 +109,7 @@ class VectorAssetBuilder(
         clipPathData: List<PathNode> = EmptyPath
     ): VectorAssetBuilder {
         ensureNotConsumed()
-        val group = VectorGroup(
+        val group = GroupParams(
             name,
             rotate,
             pivotX,
@@ -120,7 +120,6 @@ class VectorAssetBuilder(
             translationY,
             clipPathData
         )
-        currentGroup.addNode(group)
         nodes.push(group)
         return this
     }
@@ -132,7 +131,8 @@ class VectorAssetBuilder(
      */
     fun popGroup(): VectorAssetBuilder {
         ensureNotConsumed()
-        nodes.pop()
+        val popped = nodes.pop()
+        currentGroup.children.add(popped.asVectorGroup())
         return this
     }
 
@@ -177,7 +177,7 @@ class VectorAssetBuilder(
         trimPathOffset: Float = DefaultTrimPathOffset
     ): VectorAssetBuilder {
         ensureNotConsumed()
-        currentGroup.addNode(
+        currentGroup.children.add(
             VectorPath(
                 name,
                 pathData,
@@ -204,13 +204,18 @@ class VectorAssetBuilder(
      */
     fun build(): VectorAsset {
         ensureNotConsumed()
+        // pop all groups except for the root
+        while (nodes.size > 1) {
+            popGroup()
+        }
+
         val vectorImage = VectorAsset(
             name,
             defaultWidth,
             defaultHeight,
             viewportWidth,
             viewportHeight,
-            root
+            root.asVectorGroup()
         )
 
         isConsumed = true
@@ -226,6 +231,42 @@ class VectorAssetBuilder(
             "VectorAssetBuilder is single use, create a new instance to create a new VectorAsset"
         }
     }
+
+    /**
+     * Helper method to create an immutable VectorGroup object
+     * from an set of GroupParams which represent a group
+     * that is in the middle of being constructed
+     */
+    private fun GroupParams.asVectorGroup(): VectorGroup =
+        VectorGroup(
+            name,
+            rotate,
+            pivotX,
+            pivotY,
+            scaleX,
+            scaleY,
+            translationX,
+            translationY,
+            clipPathData,
+            children
+        )
+
+    /**
+     * Internal helper class to help assist with in progress creation of
+     * a vector group before creating the immutable result
+     */
+    private class GroupParams (
+        var name: String = DefaultGroupName,
+        var rotate: Float = DefaultRotation,
+        var pivotX: Float = DefaultPivotX,
+        var pivotY: Float = DefaultPivotY,
+        var scaleX: Float = DefaultScaleX,
+        var scaleY: Float = DefaultScaleY,
+        var translationX: Float = DefaultTranslationX,
+        var translationY: Float = DefaultTranslationY,
+        var clipPathData: List<PathNode> = EmptyPath,
+        var children: MutableList<VectorNode> = mutableListOf()
+    )
 }
 
 /**
