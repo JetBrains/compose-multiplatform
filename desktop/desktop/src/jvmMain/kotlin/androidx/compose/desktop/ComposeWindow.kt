@@ -16,6 +16,9 @@
 package androidx.compose.desktop
 
 import androidx.compose.runtime.dispatch.DesktopUiDispatcher
+import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
+import androidx.compose.ui.input.mouse.MouseScrollEvent
+import androidx.compose.ui.input.mouse.MouseScrollUnit
 import androidx.compose.ui.platform.DesktopOwners
 import org.jetbrains.skija.Canvas
 import org.jetbrains.skiko.SkiaLayer
@@ -29,6 +32,7 @@ import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.awt.event.MouseMotionAdapter
+import java.awt.event.MouseWheelEvent
 import javax.swing.JFrame
 
 class ComposeWindow : JFrame {
@@ -108,6 +112,11 @@ class ComposeWindow : JFrame {
                 owners?.onMouseDragged(event.x, event.y)
             }
         })
+        layer.addMouseWheelListener { event ->
+            DesktopUiDispatcher.Dispatcher.lockCallbacks {
+                owners?.onMouseScroll(event.x, event.y, event.toComposeEvent())
+            }
+        }
         layer.addKeyListener(object : KeyAdapter() {
             override fun keyPressed(
                 event: KeyEvent
@@ -153,6 +162,21 @@ private class OwnersRenderer(private val owners: DesktopOwners) : SkiaRenderer {
         }
     }
 }
+
+private fun MouseWheelEvent.toComposeEvent() = MouseScrollEvent(
+    delta = if (scrollType == MouseWheelEvent.WHEEL_BLOCK_SCROLL) {
+        MouseScrollUnit.Page((scrollAmount * preciseWheelRotation).toFloat())
+    } else {
+        MouseScrollUnit.Line((scrollAmount * preciseWheelRotation).toFloat())
+    },
+
+    // There are no other way to detect horizontal scrolling in AWT
+    orientation = if (isShiftDown) {
+        Orientation.Horizontal
+    } else {
+        Orientation.Vertical
+    }
+)
 
 // Simple FPS tracker for debug purposes
 internal class FPSTracker {

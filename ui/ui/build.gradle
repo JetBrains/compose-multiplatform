@@ -122,6 +122,7 @@ kotlin {
                 exclude group: 'org.mockito' // to keep control on the mockito version
             }
             implementation(SKIKO_CURRENT_OS)
+            implementation project(":compose:foundation:foundation")
         }
     }
 }
