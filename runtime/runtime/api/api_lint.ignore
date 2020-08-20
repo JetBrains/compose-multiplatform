@@ -35,6 +35,16 @@ DocumentExceptions: androidx.compose.runtime.snapshots.SnapshotApplyResult.Failu
     Method Failure.check appears to be throwing androidx.compose.runtime.snapshots.SnapshotApplyConflictException; this should be recorded with a @Throws annotation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
 
 
+ExecutorRegistration: androidx.compose.runtime.AndroidEmbeddingContext#cancelFrameCallback(android.view.Choreographer.FrameCallback):
+    Registration methods should have overload that accepts delivery Executor: `cancelFrameCallback`
+ExecutorRegistration: androidx.compose.runtime.AndroidEmbeddingContext#postFrameCallback(android.view.Choreographer.FrameCallback):
+    Registration methods should have overload that accepts delivery Executor: `postFrameCallback`
+ExecutorRegistration: androidx.compose.runtime.EmbeddingContext#cancelFrameCallback(android.view.Choreographer.FrameCallback):
+    Registration methods should have overload that accepts delivery Executor: `cancelFrameCallback`
+ExecutorRegistration: androidx.compose.runtime.EmbeddingContext#postFrameCallback(android.view.Choreographer.FrameCallback):
+    Registration methods should have overload that accepts delivery Executor: `postFrameCallback`
+
+
 KotlinOperator: androidx.compose.runtime.SlotReader#get(androidx.compose.runtime.Anchor):
     Note that adding the `operator` keyword would allow calling this method using operator syntax
 KotlinOperator: androidx.compose.runtime.SlotReader#get(int):

@@ -27,6 +27,10 @@ CallbackName: androidx.compose.ui.gesture.ScaleObserver:
     Class should be named ScaleCallback
 
 
+ExecutorRegistration: androidx.compose.ui.gesture.ScrollGestureFilterKt#scrollGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.ScrollCallback, androidx.compose.ui.gesture.scrollorientationlocking.Orientation, kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean>, boolean):
+    Registration methods should have overload that accepts delivery Executor: `scrollGestureFilter`
+
+
 ListenerLast: androidx.compose.ui.gesture.ScrollGestureFilterKt#scrollGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.ScrollCallback, androidx.compose.ui.gesture.scrollorientationlocking.Orientation, kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean>, boolean) parameter #2:
     Listeners should always be at end of argument list (method `scrollGestureFilter`)
 ListenerLast: androidx.compose.ui.gesture.ScrollGestureFilterKt#scrollGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.ScrollCallback, androidx.compose.ui.gesture.scrollorientationlocking.Orientation, kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean>, boolean) parameter #3:
