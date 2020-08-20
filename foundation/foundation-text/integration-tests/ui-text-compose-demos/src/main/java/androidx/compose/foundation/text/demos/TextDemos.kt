@@ -16,8 +16,8 @@
 
 package androidx.compose.foundation.text.demos
 
-import androidx.ui.demos.common.ComposableDemo
-import androidx.ui.demos.common.DemoCategory
+import androidx.compose.integration.demos.common.ComposableDemo
+import androidx.compose.integration.demos.common.DemoCategory
 
 val TextDemos = DemoCategory("Text", listOf(
     ComposableDemo("Static text") { TextDemo() },

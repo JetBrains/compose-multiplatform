@@ -18,13 +18,13 @@ package androidx.compose.ui
 
 import androidx.compose.foundation.layout.Stack
 import androidx.compose.runtime.Composable
+import androidx.compose.testutils.LayeredComposeTestCase
+import androidx.compose.testutils.benchmark.ComposeBenchmarkRule
+import androidx.compose.testutils.benchmark.benchmarkFirstComposeFast
+import androidx.compose.testutils.benchmark.benchmarkFirstDrawFast
+import androidx.compose.testutils.benchmark.benchmarkFirstLayoutFast
+import androidx.compose.testutils.benchmark.benchmarkFirstMeasureFast
 import androidx.test.filters.LargeTest
-import androidx.ui.benchmark.ComposeBenchmarkRule
-import androidx.ui.benchmark.benchmarkFirstComposeFast
-import androidx.ui.benchmark.benchmarkFirstDrawFast
-import androidx.ui.benchmark.benchmarkFirstLayoutFast
-import androidx.ui.benchmark.benchmarkFirstMeasureFast
-import androidx.ui.test.LayeredComposeTestCase
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

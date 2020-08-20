@@ -16,18 +16,18 @@
 
 package androidx.ui.benchmark.test
 
+import androidx.compose.testutils.benchmark.ComposeBenchmarkRule
+import androidx.compose.testutils.benchmark.benchmarkDrawPerf
+import androidx.compose.testutils.benchmark.benchmarkFirstCompose
+import androidx.compose.testutils.benchmark.benchmarkFirstDraw
+import androidx.compose.testutils.benchmark.benchmarkFirstLayout
+import androidx.compose.testutils.benchmark.benchmarkFirstMeasure
+import androidx.compose.testutils.benchmark.benchmarkLayoutPerf
+import androidx.compose.testutils.benchmark.toggleStateBenchmarkDraw
+import androidx.compose.testutils.benchmark.toggleStateBenchmarkLayout
+import androidx.compose.testutils.benchmark.toggleStateBenchmarkMeasure
+import androidx.compose.testutils.benchmark.toggleStateBenchmarkRecompose
 import androidx.test.filters.LargeTest
-import androidx.ui.benchmark.ComposeBenchmarkRule
-import androidx.ui.benchmark.benchmarkDrawPerf
-import androidx.ui.benchmark.benchmarkFirstCompose
-import androidx.ui.benchmark.benchmarkFirstDraw
-import androidx.ui.benchmark.benchmarkFirstLayout
-import androidx.ui.benchmark.benchmarkFirstMeasure
-import androidx.ui.benchmark.benchmarkLayoutPerf
-import androidx.ui.benchmark.toggleStateBenchmarkDraw
-import androidx.ui.benchmark.toggleStateBenchmarkLayout
-import androidx.ui.benchmark.toggleStateBenchmarkMeasure
-import androidx.ui.benchmark.toggleStateBenchmarkRecompose
 import androidx.ui.integration.test.foundation.RectsInColumnSharedModelTestCase
 import org.junit.Rule
 import org.junit.Test

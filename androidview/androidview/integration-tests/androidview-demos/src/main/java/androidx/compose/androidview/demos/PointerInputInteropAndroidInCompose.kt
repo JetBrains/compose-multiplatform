@@ -44,8 +44,8 @@ import androidx.compose.ui.gesture.tapGestureFilter
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.ui.demos.common.ComposableDemo
-import androidx.ui.demos.common.DemoCategory
+import androidx.compose.integration.demos.common.ComposableDemo
+import androidx.compose.integration.demos.common.DemoCategory
 
 val AndroidInComposeDemos = DemoCategory("Android In Compose Interop", listOf(
     ComposableDemo("4 Android tap in Compose") { FourAndroidTapInCompose() },

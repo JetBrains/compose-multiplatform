@@ -16,6 +16,8 @@
 
 package androidx.ui.benchmark.test
 
+import androidx.benchmark.junit4.BenchmarkRule
+import androidx.benchmark.junit4.measureRepeated
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.AnimationVector2D
 import androidx.compose.animation.core.AnimationVector3D
@@ -29,8 +31,6 @@ import androidx.compose.animation.core.VectorizedSnapSpec
 import androidx.compose.animation.core.VectorizedSpringSpec
 import androidx.compose.animation.core.VectorizedTweenSpec
 import androidx.compose.animation.core.createAnimation
-import androidx.benchmark.junit4.BenchmarkRule
-import androidx.benchmark.junit4.measureRepeated
 import androidx.test.filters.LargeTest
 import org.junit.Rule
 import org.junit.Test

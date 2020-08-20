@@ -16,22 +16,22 @@
 
 package androidx.compose.ui
 
+import androidx.compose.testutils.benchmark.ComposeBenchmarkRule
+import androidx.compose.testutils.benchmark.benchmarkDrawPerf
+import androidx.compose.testutils.benchmark.benchmarkFirstComposeFast
+import androidx.compose.testutils.benchmark.benchmarkFirstDrawFast
+import androidx.compose.testutils.benchmark.benchmarkFirstLayoutFast
+import androidx.compose.testutils.benchmark.benchmarkFirstMeasureFast
+import androidx.compose.testutils.benchmark.benchmarkLayoutPerf
+import androidx.compose.testutils.benchmark.toggleStateBenchmarkDraw
+import androidx.compose.testutils.benchmark.toggleStateBenchmarkLayout
+import androidx.compose.testutils.benchmark.toggleStateBenchmarkMeasure
+import androidx.compose.testutils.benchmark.toggleStateBenchmarkRecompose
 import androidx.compose.ui.text.AnnotatedString
 import androidx.test.filters.LargeTest
-import androidx.ui.benchmark.ComposeBenchmarkRule
-import androidx.ui.benchmark.benchmarkDrawPerf
-import androidx.ui.benchmark.benchmarkLayoutPerf
-import androidx.ui.benchmark.toggleStateBenchmarkDraw
-import androidx.ui.benchmark.toggleStateBenchmarkLayout
-import androidx.ui.benchmark.toggleStateBenchmarkMeasure
-import androidx.ui.benchmark.toggleStateBenchmarkRecompose
 import androidx.ui.integration.test.TextBenchmarkTestRule
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.ui.benchmark.benchmarkFirstComposeFast
-import androidx.ui.benchmark.benchmarkFirstDrawFast
-import androidx.ui.benchmark.benchmarkFirstLayoutFast
-import androidx.ui.benchmark.benchmarkFirstMeasureFast
 import androidx.ui.integration.test.core.text.TextInColumnTestCase
 import org.junit.Rule
 import org.junit.Test

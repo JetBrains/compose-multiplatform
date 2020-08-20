@@ -41,8 +41,8 @@ import androidx.compose.ui.demos.gestures.TapGestureFilterDemo
 import androidx.compose.ui.demos.gestures.VerticalScrollerInDrawerDemo
 import androidx.compose.ui.demos.keyinput.KeyInputDemo
 import androidx.compose.ui.demos.viewinterop.ViewInteropDemo
-import androidx.ui.demos.common.ComposableDemo
-import androidx.ui.demos.common.DemoCategory
+import androidx.compose.integration.demos.common.ComposableDemo
+import androidx.compose.integration.demos.common.DemoCategory
 
 private val GestureDemos = DemoCategory("Gestures", listOf(
     DemoCategory("Common Gestures", listOf(

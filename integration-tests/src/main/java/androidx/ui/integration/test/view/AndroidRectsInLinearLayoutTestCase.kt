@@ -21,7 +21,7 @@ import android.graphics.Color
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import androidx.ui.benchmark.android.AndroidTestCase
+import androidx.compose.testutils.benchmark.android.AndroidTestCase
 import androidx.ui.integration.test.material.CheckboxesInRowsTestCase
 
 /**

@@ -16,14 +16,14 @@
 
 package androidx.compose.ui
 
+import androidx.compose.testutils.benchmark.ComposeBenchmarkRule
+import androidx.compose.testutils.benchmark.benchmarkDrawPerf
+import androidx.compose.testutils.benchmark.benchmarkFirstCompose
+import androidx.compose.testutils.benchmark.benchmarkFirstDraw
+import androidx.compose.testutils.benchmark.benchmarkFirstLayout
+import androidx.compose.testutils.benchmark.benchmarkFirstMeasure
+import androidx.compose.testutils.benchmark.benchmarkLayoutPerf
 import androidx.test.filters.LargeTest
-import androidx.ui.benchmark.ComposeBenchmarkRule
-import androidx.ui.benchmark.benchmarkDrawPerf
-import androidx.ui.benchmark.benchmarkFirstCompose
-import androidx.ui.benchmark.benchmarkFirstDraw
-import androidx.ui.benchmark.benchmarkFirstLayout
-import androidx.ui.benchmark.benchmarkFirstMeasure
-import androidx.ui.benchmark.benchmarkLayoutPerf
 import androidx.ui.integration.test.TextBenchmarkTestRule
 import androidx.ui.integration.test.cartesian
 import androidx.compose.ui.unit.dp

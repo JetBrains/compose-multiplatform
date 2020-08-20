@@ -30,8 +30,8 @@ import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.graphics.vector.VectorAssetBuilder
 import androidx.compose.ui.graphics.vector.VectorPainter
 import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.testutils.ComposeTestCase
 import androidx.compose.ui.res.vectorResource
-import androidx.ui.test.ComposeTestCase
 import androidx.compose.ui.unit.dp
 
 /**

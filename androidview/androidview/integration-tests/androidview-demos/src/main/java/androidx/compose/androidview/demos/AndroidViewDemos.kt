@@ -16,8 +16,8 @@
 
 package androidx.compose.androidview.demos
 
-import androidx.ui.demos.common.ActivityDemo
-import androidx.ui.demos.common.DemoCategory
+import androidx.compose.integration.demos.common.ActivityDemo
+import androidx.compose.integration.demos.common.DemoCategory
 
 val AndroidViewDemos = DemoCategory("AndroidView", listOf(
     ComposeInAndroidDemos,

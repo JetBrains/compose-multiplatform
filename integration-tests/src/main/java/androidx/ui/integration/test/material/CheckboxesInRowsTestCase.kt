@@ -27,10 +27,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.testutils.ComposeTestCase
+import androidx.compose.testutils.ToggleableTestCase
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.ui.test.ToggleableTestCase
-import androidx.ui.test.ComposeTestCase
 
 /**
  * Test case that puts the given amount of checkboxes into a column of rows and makes changes by

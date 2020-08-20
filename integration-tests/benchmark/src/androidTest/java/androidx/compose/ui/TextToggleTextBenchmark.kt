@@ -16,12 +16,12 @@
 
 package androidx.compose.ui
 
+import androidx.compose.testutils.benchmark.ComposeBenchmarkRule
+import androidx.compose.testutils.benchmark.toggleStateBenchmarkDraw
+import androidx.compose.testutils.benchmark.toggleStateBenchmarkLayout
+import androidx.compose.testutils.benchmark.toggleStateBenchmarkMeasure
+import androidx.compose.testutils.benchmark.toggleStateBenchmarkRecompose
 import androidx.test.filters.SmallTest
-import androidx.ui.benchmark.ComposeBenchmarkRule
-import androidx.ui.benchmark.toggleStateBenchmarkDraw
-import androidx.ui.benchmark.toggleStateBenchmarkLayout
-import androidx.ui.benchmark.toggleStateBenchmarkMeasure
-import androidx.ui.benchmark.toggleStateBenchmarkRecompose
 import androidx.ui.integration.test.TextBenchmarkTestRule
 import androidx.ui.integration.test.core.text.TextToggleTextTestCase
 import androidx.compose.ui.unit.dp
