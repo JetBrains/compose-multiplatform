@@ -133,10 +133,8 @@ class LazyColumnForTest {
 
     @Test
     fun compositionsAreDisposed_whenDataIsChanged() {
-        var composed: Boolean
+        var composed = 0
         var disposals = 0
-        val latch1 = CountDownLatch(3)
-        val latch2 = CountDownLatch(2)
         val data1 = (1..3).toList()
         val data2 = (4..5).toList() // smaller, to ensure removal is handled properly
 
@@ -148,13 +146,7 @@ class LazyColumnForTest {
                 modifier = Modifier.testTag(LazyColumnForTag).fillMaxSize()
             ) {
                 onCommit {
-                    composed = true
-                    // Signal when everything is done composing
-                    if (!part2) {
-                        latch1.countDown()
-                    } else {
-                        latch2.countDown()
-                    }
+                    composed++
                     onDispose {
                         disposals++
                     }
@@ -164,22 +156,24 @@ class LazyColumnForTest {
             }
         }
 
-        latch1.await()
+        runOnIdle {
+            assertWithMessage("Not all items were composed")
+                .that(composed).isEqualTo(data1.size)
+            composed = 0
 
-        composed = false
+            part2 = true
+        }
 
-        runOnIdle { part2 = true }
+        runOnIdle {
+            assertWithMessage(
+                "No additional items were composed after data change, something didn't work"
+            ).that(composed).isEqualTo(data2.size)
 
-        latch2.await()
-
-        assertWithMessage(
-            "No additional items were composed after data change, something didn't work"
-        ).that(composed).isTrue()
-
-        // We may need to modify this test once we prefetch/cache items outside the viewport
-        assertWithMessage(
-            "Not enough compositions were disposed after scrolling, compositions were leaked"
-        ).that(disposals).isEqualTo(data1.size)
+            // We may need to modify this test once we prefetch/cache items outside the viewport
+            assertWithMessage(
+                "Not enough compositions were disposed after scrolling, compositions were leaked"
+            ).that(disposals).isEqualTo(data1.size)
+        }
     }
 
     @Test
