@@ -79,6 +79,12 @@ kotlin {
                 exclude group: 'org.mockito' // to keep control on the mockito version
             }
         }
+
+        desktopTest.dependencies {
+            implementation(TRUTH)
+            implementation(JUNIT)
+            implementation(SKIKO_CURRENT_OS)
+        }
     }
 }
 

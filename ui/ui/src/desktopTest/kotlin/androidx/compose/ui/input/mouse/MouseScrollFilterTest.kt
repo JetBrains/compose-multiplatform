@@ -41,7 +41,7 @@ class MouseScrollFilterTest {
         window.setContent {
             Box(
                 Modifier
-                    .mouseScrollFilter {
+                    .mouseScrollFilter { event, bounds ->
                         actualEvent = event
                         actualBounds = bounds
                         true
@@ -69,7 +69,7 @@ class MouseScrollFilterTest {
         window.setContent {
             Box(
                 Modifier
-                    .mouseScrollFilter {
+                    .mouseScrollFilter { event, bounds ->
                         actualEvent = event
                         actualBounds = bounds
                         true
@@ -98,7 +98,7 @@ class MouseScrollFilterTest {
         window.setContent {
             Box(
                 Modifier
-                    .mouseScrollFilter {
+                    .mouseScrollFilter { event, bounds ->
                         actualEvent1 = event
                         actualBounds1 = bounds
                         true
@@ -107,7 +107,7 @@ class MouseScrollFilterTest {
             )
             Box(
                 Modifier
-                    .mouseScrollFilter {
+                    .mouseScrollFilter { event, bounds ->
                         actualEvent2 = event
                         actualBounds2 = bounds
                         true
@@ -137,7 +137,7 @@ class MouseScrollFilterTest {
         window.setContent {
             Box(
                 Modifier
-                    .mouseScrollFilter {
+                    .mouseScrollFilter { event, bounds ->
                         actualEvent = event
                         actualBounds = bounds
                         true
@@ -146,7 +146,7 @@ class MouseScrollFilterTest {
             )
             Box(
                 Modifier
-                    .mouseScrollFilter {
+                    .mouseScrollFilter { event, bounds ->
                         false
                     }
                     .size(5.dp, 10.dp)
@@ -171,7 +171,7 @@ class MouseScrollFilterTest {
         window.setContent {
             Box(
                 Modifier
-                    .mouseScrollFilter {
+                    .mouseScrollFilter { event, bounds ->
                         actualEvent = event
                         actualBounds = bounds
                         true
@@ -205,7 +205,7 @@ class MouseScrollFilterTest {
         window.setContent {
             Box(
                 Modifier
-                    .mouseScrollFilter {
+                    .mouseScrollFilter { event, bounds ->
                         actualEvent1 = event
                         actualBounds1 = bounds
                         true
@@ -214,7 +214,7 @@ class MouseScrollFilterTest {
             ) {
                 Box(
                     Modifier
-                        .mouseScrollFilter {
+                        .mouseScrollFilter { event, bounds ->
                             actualEvent2 = event
                             actualBounds2 = bounds
                             true
@@ -245,7 +245,7 @@ class MouseScrollFilterTest {
         window.setContent {
             Box(
                 Modifier
-                    .mouseScrollFilter {
+                    .mouseScrollFilter { event, bounds ->
                         actualEvent = event
                         actualBounds = bounds
                         true
@@ -254,7 +254,7 @@ class MouseScrollFilterTest {
             ) {
                 Box(
                     Modifier
-                        .mouseScrollFilter {
+                        .mouseScrollFilter { event, bounds ->
                             false
                         }
                         .size(5.dp, 10.dp)
@@ -281,7 +281,7 @@ class MouseScrollFilterTest {
         window.setContent {
             Box(
                 Modifier
-                    .mouseScrollFilter {
+                    .mouseScrollFilter { event, bounds ->
                         actualEvent = event
                         actualBounds = bounds
                         true
