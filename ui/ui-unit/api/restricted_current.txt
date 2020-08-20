@@ -517,43 +517,51 @@ package androidx.compose.ui.unit {
     enum_constant public static final androidx.compose.ui.unit.TextUnitType Sp;
   }
 
-  @androidx.compose.runtime.Immutable public final class Uptime implements java.lang.Comparable<androidx.compose.ui.unit.Uptime> {
-    ctor public Uptime(long nanoseconds);
-    method public int compareTo(androidx.compose.ui.unit.Uptime other);
-    method public long component1();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.unit.Uptime copy(long nanoseconds);
+  @androidx.compose.runtime.Immutable public final inline class Uptime implements java.lang.Comparable<androidx.compose.ui.unit.Uptime> {
+    ctor public Uptime();
+    method public int compareTo-fQUwLeo(long p);
+    method public static int compareTo-fQUwLeo(long $this, long other);
+    method public static long constructor-impl(long nanoseconds);
+    method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
+    method public static boolean equals-impl0(long p1, long p2);
     method public long getNanoseconds();
-    method public operator long minus(androidx.compose.ui.unit.Uptime other);
-    method public operator androidx.compose.ui.unit.Uptime minus-WUeva1s(long duration);
-    method public operator androidx.compose.ui.unit.Uptime plus-WUeva1s(long duration);
+    method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(long p);
+    method public static operator long minus-WUeva1s(long $this, long duration);
+    method public static operator long minus-fQUwLeo(long $this, long other);
+    method public static operator long plus-WUeva1s(long $this, long duration);
+    method @androidx.compose.runtime.Immutable public static inline String! toString-impl(long p);
     field public static final androidx.compose.ui.unit.Uptime.Companion Companion;
   }
 
   public static final class Uptime.Companion {
-    method public androidx.compose.ui.unit.Uptime getBoot();
-    property public final androidx.compose.ui.unit.Uptime Boot;
+    method public long getBoot();
+    property public final long Boot;
   }
 
   public final class UptimeKt {
-    method public static operator androidx.compose.ui.unit.Uptime plus-I3RPvYE(long, androidx.compose.ui.unit.Uptime uptime);
+    method public static operator long plus-I3RPvYE(long, long uptime);
   }
 
-  @androidx.compose.runtime.Immutable public final class Velocity {
-    method public long component1();
-    method @androidx.compose.runtime.Immutable public androidx.compose.ui.unit.Velocity copy-k-4lQ0M(long pixelsPerSecond);
+  @androidx.compose.runtime.Immutable public final inline class Velocity {
+    ctor public Velocity();
+    method public static long constructor-impl(long pixelsPerSecond);
+    method @androidx.compose.runtime.Immutable public static inline boolean equals-impl(long p, Object? p1);
+    method public static boolean equals-impl0(long p1, long p2);
     method public long getPixelsPerSecond();
-    method public operator androidx.compose.ui.unit.Velocity unaryMinus();
+    method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(long p);
+    method @androidx.compose.runtime.Immutable public static inline String! toString-impl(long p);
+    method public static operator long unaryMinus-impl(long $this);
     field public static final androidx.compose.ui.unit.Velocity.Companion Companion;
   }
 
   public static final class Velocity.Companion {
-    method public androidx.compose.ui.unit.Velocity getZero();
-    property public final androidx.compose.ui.unit.Velocity Zero;
+    method public long getZero();
+    property public final long Zero;
   }
 
   public final class VelocityKt {
-    method public static operator androidx.compose.ui.unit.Velocity minus(androidx.compose.ui.unit.Velocity, androidx.compose.ui.unit.Velocity other);
-    method public static operator androidx.compose.ui.unit.Velocity plus(androidx.compose.ui.unit.Velocity, androidx.compose.ui.unit.Velocity other);
+    method public static operator long minus-uYzo7IE(long, long other);
+    method public static operator long plus-uYzo7IE(long, long other);
   }
 
 }
