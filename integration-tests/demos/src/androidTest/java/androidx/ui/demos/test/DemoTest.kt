@@ -16,12 +16,14 @@
 
 package androidx.ui.demos.test
 
+import androidx.compose.androidview.demos.ComposeInAndroidDialogDismissDialogDuringDispatch
 import androidx.test.espresso.Espresso
 import androidx.test.filters.MediumTest
 import androidx.test.filters.LargeTest
 import androidx.ui.demos.AllDemosCategory
 import androidx.ui.demos.DemoActivity
 import androidx.ui.demos.Tags
+import androidx.ui.demos.common.ActivityDemo
 import androidx.ui.demos.common.ComposableDemo
 import androidx.ui.demos.common.Demo
 import androidx.ui.demos.common.DemoCategory
@@ -172,8 +174,12 @@ class DemoTest {
             }
         }
 
-        // Don't `findAll` in WebComponentActivity, it doesn't have an AndroidOwner
-        if (title != "WebComponent") {
+        // TODO: b/165693257 demos without a compose view crash as onAllNodes will fail to
+        // find the semantic nodes.
+        val hasComposeView: Boolean = (this as? ActivityDemo<*>)
+            ?.activityClass != ComposeInAndroidDialogDismissDialogDuringDispatch::class
+
+        if (hasComposeView) {
             while (onAllNodes(isDialog()).isNotEmpty()) {
                 waitForIdle()
                 Espresso.pressBack()
