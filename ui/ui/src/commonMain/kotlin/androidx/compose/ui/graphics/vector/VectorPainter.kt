@@ -174,6 +174,7 @@ private fun RenderVectorGroup(group: VectorGroup) {
         if (vectorNode is VectorPath) {
             Path(
                 pathData = vectorNode.pathData,
+                pathFillType = vectorNode.pathFillType,
                 name = vectorNode.name,
                 fill = vectorNode.fill,
                 fillAlpha = vectorNode.fillAlpha,

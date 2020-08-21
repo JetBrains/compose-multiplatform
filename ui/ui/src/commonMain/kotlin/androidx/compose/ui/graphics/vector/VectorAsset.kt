@@ -18,6 +18,7 @@ package androidx.compose.ui.graphics.vector
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.unit.Dp
@@ -195,6 +196,11 @@ class VectorPath internal constructor(
     val pathData: List<PathNode>,
 
     /**
+     * Rule to determine how the interior of the path is to be calculated
+     */
+    val pathFillType: PathFillType,
+
+    /**
      *  Specifies the color or gradient used to fill the path
      */
     val fill: Brush? = null,
@@ -271,6 +277,7 @@ class VectorPath internal constructor(
         if (trimPathStart != other.trimPathStart) return false
         if (trimPathEnd != other.trimPathEnd) return false
         if (trimPathOffset != other.trimPathOffset) return false
+        if (pathFillType != other.pathFillType) return false
         if (pathData != other.pathData) return false
 
         return true
@@ -290,6 +297,7 @@ class VectorPath internal constructor(
         result = 31 * result + trimPathStart.hashCode()
         result = 31 * result + trimPathEnd.hashCode()
         result = 31 * result + trimPathOffset.hashCode()
+        result = 31 * result + pathFillType.hashCode()
         return result
     }
 }

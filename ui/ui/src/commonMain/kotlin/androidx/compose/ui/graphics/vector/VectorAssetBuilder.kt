@@ -17,6 +17,7 @@
 package androidx.compose.ui.graphics.vector
 
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.unit.Dp
@@ -141,6 +142,7 @@ class VectorAssetBuilder(
      * tree structure
      *
      * @param pathData path information to render the shape of the path
+     * @param pathFillType rule to determine how the interior of the path is to be calculated
      * @param name the name of the path
      * @param fill specifies the [Brush] used to fill the path
      * @param fillAlpha the alpha to fill the path
@@ -163,6 +165,7 @@ class VectorAssetBuilder(
      */
     fun addPath(
         pathData: List<PathNode>,
+        pathFillType: PathFillType = DefaultFillType,
         name: String = DefaultPathName,
         fill: Brush? = null,
         fillAlpha: Float = 1.0f,
@@ -181,6 +184,7 @@ class VectorAssetBuilder(
             VectorPath(
                 name,
                 pathData,
+                pathFillType,
                 fill,
                 fillAlpha,
                 stroke,
@@ -295,9 +299,11 @@ inline fun VectorAssetBuilder.path(
     strokeLineCap: StrokeCap = DefaultStrokeLineCap,
     strokeLineJoin: StrokeJoin = DefaultStrokeLineJoin,
     strokeLineMiter: Float = DefaultStrokeLineMiter,
+    pathFillType: PathFillType = DefaultFillType,
     pathBuilder: PathBuilder.() -> Unit
 ) = addPath(
     PathData(pathBuilder),
+    pathFillType,
     name,
     fill,
     fillAlpha,

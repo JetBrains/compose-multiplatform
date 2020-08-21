@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
@@ -63,6 +64,7 @@ val DefaultStrokeLineCap = StrokeCap.Butt
 val DefaultStrokeLineJoin = StrokeJoin.Miter
 val DefaultTintBlendMode = BlendMode.SrcIn
 val DefaultTintColor = Color.Transparent
+val DefaultFillType = PathFillType.NonZero
 
 fun addPathNodes(pathStr: String?): List<PathNode> =
     if (pathStr == null) {
@@ -194,6 +196,13 @@ internal class PathComponent : VNode() {
         set(value) {
             field = value
             isPathDirty = true
+            invalidate()
+        }
+
+    var pathFillType: PathFillType = DefaultFillType
+        set(value) {
+            field = value
+            renderPath.fillType = value
             invalidate()
         }
 

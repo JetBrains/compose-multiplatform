@@ -17,9 +17,16 @@
 package androidx.ui.integration.test
 
 import android.os.Build
+import androidx.compose.foundation.Image
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.vectorResource
 import androidx.ui.test.captureToBitmap
 import androidx.ui.integration.test.framework.ProgrammaticVectorTestCase
 import androidx.ui.integration.test.framework.XmlVectorTestCase
@@ -31,6 +38,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import kotlin.math.roundToInt
 
 /**
  * Test to ensure that [XmlVectorTestCase] and [ProgrammaticVectorTestCase] have an identical pixel
@@ -74,5 +82,36 @@ class VectorAssetTest {
         }
 
         assertArrayEquals(xmlPixelArray, programmaticBitmapArray)
+    }
+
+    @Test
+    fun testEvenOddPathType() {
+        val testTag = "testTag"
+        var insetRectSize: Int = 0
+        composeTestRule.setContent {
+            with(DensityAmbient.current) {
+                insetRectSize = (10f * this.density).roundToInt()
+            }
+            val vectorAsset =
+                vectorResource(R.drawable.ic_pathfill_sample)
+            Image(vectorAsset, modifier = Modifier.testTag(testTag))
+        }
+
+        onNodeWithTag(testTag).captureToBitmap().apply {
+            assertEquals(Color.Blue.toArgb(), getPixel(0, 0))
+            assertEquals(Color.Blue.toArgb(), getPixel(width - 1, 0))
+            assertEquals(Color.Blue.toArgb(), getPixel(0, height - 1))
+            assertEquals(Color.Blue.toArgb(), getPixel(width - 1, height - 1))
+
+            assertEquals(Color.Blue.toArgb(), getPixel(width / 2, height / 2))
+
+            assertEquals(Color.Red.toArgb(), getPixel(insetRectSize + 2, insetRectSize + 2))
+            assertEquals(Color.Red.toArgb(), getPixel(width - insetRectSize - 2,
+                insetRectSize + 2))
+            assertEquals(Color.Red.toArgb(), getPixel(insetRectSize + 2,
+                height - insetRectSize - 2))
+            assertEquals(Color.Red.toArgb(), getPixel(width - insetRectSize - 2, height -
+                    insetRectSize - 2))
+        }
     }
 }
