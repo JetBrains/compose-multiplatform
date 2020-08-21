@@ -259,7 +259,6 @@ class Recomposer(var embeddingContext: EmbeddingContext = EmbeddingContext()) {
         if (composer.isComposing) return false
         return composing(composer) {
             composer.recompose().also {
-                Snapshot.notifyObjectsInitialized()
                 composer.applyChanges()
             }
         }
