@@ -25,6 +25,8 @@ import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.currentTextStyle
 import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.wrapContentSize
@@ -38,7 +40,7 @@ import androidx.compose.ui.unit.dp
 
 @Sampled
 @Composable
-fun InteractionStateSample() {
+fun PriorityInteractionStateSample() {
     val interactionState = remember { InteractionState() }
 
     val draggable = Modifier.draggable(
@@ -47,6 +49,8 @@ fun InteractionStateSample() {
     ) { /* update some business state here */ }
 
     // Use InteractionState to determine how this component should appear during transient UI states
+    // In this example we are using a 'priority' system, such that we ignore multiple states, and
+    // don't care about the most recent state - Dragged is more important than Pressed.
     val (text, color) = when {
         Interaction.Dragged in interactionState -> "Dragged" to Color.Red
         Interaction.Pressed in interactionState -> "Pressed" to Color.Blue
@@ -72,5 +76,77 @@ fun InteractionStateSample() {
                 modifier = Modifier.fillMaxSize().wrapContentSize()
             )
         }
+    }
+}
+
+@Sampled
+@Composable
+fun MultipleInteractionStateSample() {
+    val interactionState = remember { InteractionState() }
+
+    val draggable = Modifier.draggable(
+        orientation = Orientation.Horizontal,
+        interactionState = interactionState
+    ) { /* update some business state here */ }
+
+    val clickable = Modifier.clickable(interactionState = interactionState) {
+        /* update some business state here */
+    }
+
+    // In this example we have a complex component that can be in multiple states at the same time
+    // (both pressed and dragged, since different areas of the same component can be pressed and
+    // dragged at the same time), and we want to use only the most recent state to show the visual
+    // state of the component. This could be with a visual overlay, or similar. Note that the most
+    // recent state is the _last_ state added to interactionState, so we want to start from the end,
+    // hence we use `lastOrNull` and not `firstOrNull`.
+    val latestState = interactionState.value.lastOrNull {
+        // We only care about pressed and dragged states here, so ignore everything else
+        it is Interaction.Dragged || it is Interaction.Pressed
+    }
+
+    val text = when (latestState) {
+        Interaction.Dragged -> "Dragged"
+        Interaction.Pressed -> "Pressed"
+        else -> "No state"
+    }
+
+    Column(
+        Modifier
+            .fillMaxSize()
+            .wrapContentSize()
+    ) {
+        Row {
+            Box(
+                Modifier
+                    .preferredSize(width = 240.dp, height = 80.dp)
+                    .then(clickable),
+                border = BorderStroke(3.dp, Color.Blue)
+            ) {
+                val pressed = Interaction.Pressed in interactionState
+                Text(
+                    text = if (pressed) "Pressed" else "Not pressed",
+                    style = currentTextStyle().copy(textAlign = TextAlign.Center),
+                    modifier = Modifier.fillMaxSize().wrapContentSize()
+                )
+            }
+            Box(
+                Modifier
+                    .preferredSize(width = 240.dp, height = 80.dp)
+                    .then(draggable),
+                border = BorderStroke(3.dp, Color.Red)
+            ) {
+                val dragged = Interaction.Dragged in interactionState
+                Text(
+                    text = if (dragged) "Dragged" else "Not dragged",
+                    style = currentTextStyle().copy(textAlign = TextAlign.Center),
+                    modifier = Modifier.fillMaxSize().wrapContentSize()
+                )
+            }
+        }
+        Text(
+            text = text,
+            style = currentTextStyle().copy(textAlign = TextAlign.Center),
+            modifier = Modifier.fillMaxSize().wrapContentSize()
+        )
     }
 }
