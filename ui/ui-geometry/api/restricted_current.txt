@@ -1,6 +1,33 @@
 // Signature format: 3.0
 package androidx.compose.ui.geometry {
 
+  public final class MutableRect {
+    ctor public MutableRect(float left, float top, float right, float bottom);
+    method public boolean contains-k-4lQ0M(long offset);
+    method public float getBottom();
+    method public inline float getHeight();
+    method public float getLeft();
+    method public float getRight();
+    method public long getSize();
+    method public float getTop();
+    method public inline float getWidth();
+    method @androidx.compose.runtime.Stable public void intersect(float left, float top, float right, float bottom);
+    method public boolean isEmpty();
+    method public void set(float left, float top, float right, float bottom);
+    method public void setBottom(float p);
+    method public void setLeft(float p);
+    method public void setRight(float p);
+    method public void setTop(float p);
+    property public final inline float height;
+    property public final boolean isEmpty;
+    property public final long size;
+    property public final inline float width;
+  }
+
+  public final class MutableRectKt {
+    method public static androidx.compose.ui.geometry.Rect toRect(androidx.compose.ui.geometry.MutableRect);
+  }
+
   @androidx.compose.runtime.Immutable public final inline class Offset {
     ctor public Offset();
     method @androidx.compose.runtime.Stable public static operator float component1-impl(long $this);

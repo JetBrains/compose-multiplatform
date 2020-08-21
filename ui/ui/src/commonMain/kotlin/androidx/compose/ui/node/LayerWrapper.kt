@@ -18,6 +18,7 @@ package androidx.compose.ui.node
 
 import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.Placeable
+import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Canvas
@@ -108,20 +109,17 @@ internal class LayerWrapper(
         return super.toParentPosition(targetPosition)
     }
 
-    override fun rectInParent(bounds: Rect): Rect {
-        val clipped: Rect
-        if (!modifier.clip) {
-            clipped = bounds
-        } else {
-            clipped = bounds.intersect(Rect(0f, 0f, size.width.toFloat(), size.height.toFloat()))
-            if (clipped.isEmpty) {
-                return Rect.Zero
+    override fun rectInParent(bounds: MutableRect) {
+        if (modifier.clip) {
+            bounds.intersect(0f, 0f, size.width.toFloat(), size.height.toFloat())
+            if (bounds.isEmpty) {
+                return
             }
         }
         val matrix = matrixCache
         layer.getMatrix(matrix)
-        val mapped = matrix.map(clipped)
-        return super.rectInParent(mapped)
+        matrix.map(bounds)
+        return super.rectInParent(bounds)
     }
 
     override fun hitTest(
