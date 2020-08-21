@@ -16,11 +16,13 @@
 @file:Suppress("PLUGIN_ERROR")
 package androidx.compose.runtime
 
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
 import org.junit.After
 import org.junit.Rule
@@ -666,6 +668,58 @@ class EffectsTests : BaseComposeTest() {
         }.then { activity ->
             val helloText = activity.findViewById(tv1Id) as TextView
             assertEquals("Hello world! 0", helloText.text)
+        }
+    }
+
+    @Test // regression test for 165416179
+    fun recomposeNewModifiedState() {
+        val id = 100
+        var enabler by mutableStateOf(false)
+        compose {
+            // "enabler" forces the test into the recompose code path
+            // rather than initial composition
+            if (enabler) {
+                var state by remember { mutableStateOf(0) }
+                onCommit(Unit) {
+                    state = 1
+                }
+                TextView(id = id, text = "$state")
+                Button(
+                    id = id + 1,
+                    text = "click me",
+                    onClickListener = View.OnClickListener {
+                        state++
+                        println("Setting state to $state")
+                    }
+                )
+            }
+        }.then { activity ->
+            assertNull(
+                "Text present in initial composition",
+                activity.findViewById(id)
+            )
+            enabler = true
+        }.then { activity ->
+            val text = (activity.findViewById(id) as? TextView)?.text
+
+            // Text could be either "0" or "1" here depending on timing. It is most likely still
+            // "0" but could be "1" if the recompose implied by the onCommit lands before this
+            // code runs.
+            assertTrue(text == "0" || text == "1")
+        }.then { activity ->
+            // Here this should run after the recompose lands.
+            assertEquals(
+                "1",
+                (activity.findViewById(id) as? TextView)?.text
+            )
+
+            // Cause the state to advance.
+            (activity.findViewById<Button>(id + 1)?.callOnClick())
+        }.then { activity ->
+            assertEquals(
+                "2",
+                (activity.findViewById(id) as? TextView)?.text
+            )
         }
     }
 }
