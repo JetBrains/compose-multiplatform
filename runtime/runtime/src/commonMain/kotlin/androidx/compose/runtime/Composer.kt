@@ -605,7 +605,7 @@ class Composer<N>(
     @InternalComposeApi
     fun recordWriteOf(value: Any) {
         observations.forEachScopeOf(value) { scope ->
-            if (scope.invalidate() != InvalidationResult.DEFERRED) {
+            if (scope.invalidate() == InvalidationResult.IMMINENT) {
                 // If we process this during recordWriteOf, ignore it when recording modifications
                 observationsProcessed.insertIfMissing(value, scope)
             }
@@ -624,7 +624,11 @@ class Composer<N>(
             var canRemove = true
             val workDone = observations.forEachScopeOf(value) { scope ->
                 if (!observationsProcessed.removeValueScope(value, scope)) {
-                    scope.invalidate()
+                    if (scope.invalidate() == InvalidationResult.IGNORED) {
+                        // This scope is still in the insert table so we should keep it in
+                        // the observation list.
+                        canRemove = false
+                    }
                 } else {
                     canRemove = false
                 }
