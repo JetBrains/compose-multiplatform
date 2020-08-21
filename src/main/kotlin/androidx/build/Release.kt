@@ -98,14 +98,7 @@ open class GMavenZipTask : Zip() {
                 task.destinationDirectory.set(distDir)
                 task.includeMetadata = params.includeMetadata
                 task.into("m2repository")
-                val fileSuffix = if (mavenGroup == "") {
-                    "all"
-                } else {
-                    mavenGroup
-                            .split(".")
-                            .joinToString("-")
-                } + "-$buildNumber"
-                task.archiveBaseName.set("$fileNamePrefix-$fileSuffix")
+                task.archiveBaseName.set(getZipName(fileNamePrefix, mavenGroup))
                 task.onlyIf {
                     // always run top diff zip as it is required by build on server task
                     task.setupIncludes()
@@ -144,6 +137,9 @@ object Release {
     const val DIFF_TASK_PREFIX = "createDiffArchive"
     const val FULL_ARCHIVE_TASK_NAME = "createArchive"
     const val DEFAULT_PUBLISH_CONFIG = "release"
+    const val GROUP_ZIPS_FOLDER = "per-group-zips"
+    const val PROJECT_ZIPS_FOLDER = "per-project-zips"
+    const val GROUP_ZIP_PREFIX = "gmaven"
     // lazily created config action params so that we don't keep re-creating them
     private var configActionParams: GMavenZipTask.ConfigAction.Params? = null
 
@@ -256,8 +252,8 @@ object Release {
             onConfigure = {
                 GMavenZipTask.ConfigAction(
                     getParams(project = project,
-                        distDir = File(project.getDistributionDirectory(), "per-group-zips"),
-                        fileNamePrefix = "gmaven",
+                        distDir = File(project.getDistributionDirectory(), GROUP_ZIPS_FOLDER),
+                        fileNamePrefix = GROUP_ZIP_PREFIX,
                         group = group
                     )
                 ).execute(it)
@@ -277,8 +273,8 @@ object Release {
             name = taskName,
             onConfigure = {
                 GMavenZipTask.ConfigAction(
-                    getParams(project, File(project.getDistributionDirectory(), "per-project-zips"),
-                            "${project.group}-${project.name}").copy(
+                    getParams(project, File(project.getDistributionDirectory(),
+                        PROJECT_ZIPS_FOLDER), project.projectZipPrefix()).copy(
                         includeMetadata = true
                     )
                 ).execute(it)
@@ -321,4 +317,31 @@ private fun projectToNameSuffix(project: Project): String {
             .joinToString("") {
                 it.capitalize()
             }
+}
+
+private fun Project.projectZipPrefix(): String {
+    return "${project.group}-${project.name}"
+}
+
+private fun getZipName(fileNamePrefix: String, mavenGroup: String): String {
+    val fileSuffix = if (mavenGroup == "") {
+        "all"
+    } else {
+        mavenGroup
+            .split(".")
+            .joinToString("-")
+    } + "-${getBuildId()}"
+    return "$fileNamePrefix-$fileSuffix"
+}
+
+fun Project.getProjectZipPath():
+        String {
+    return Release.PROJECT_ZIPS_FOLDER + "/" +
+            getZipName(projectZipPrefix(), project.group.toString()) + ".zip"
+}
+
+fun Project.getGroupZipPath():
+        String {
+    return Release.GROUP_ZIPS_FOLDER + "/" +
+            getZipName(Release.GROUP_ZIP_PREFIX, project.group.toString()) + ".zip"
 }
