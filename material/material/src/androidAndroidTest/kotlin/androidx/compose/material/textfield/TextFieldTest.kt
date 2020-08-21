@@ -70,7 +70,6 @@ import androidx.ui.test.performClick
 import androidx.ui.test.performGesture
 import androidx.ui.test.performImeAction
 import androidx.ui.test.runOnIdle
-import androidx.ui.test.waitForIdle
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.atLeastOnce
@@ -284,7 +283,7 @@ class TextFieldTest {
         }
 
         // click to focus
-        clickAndAdvanceClock(TextfieldTag, 200)
+        clickAndAdvanceClock()
 
         testRule.runOnIdleWithDensity {
             // size
@@ -361,7 +360,7 @@ class TextFieldTest {
             }
         }
         // click to focus
-        clickAndAdvanceClock(TextfieldTag, 200)
+        clickAndAdvanceClock()
 
         testRule.runOnIdleWithDensity {
             // size
@@ -402,7 +401,7 @@ class TextFieldTest {
             }
         }
         // click to focus
-        clickAndAdvanceClock(TextfieldTag, 200)
+        clickAndAdvanceClock()
 
         testRule.runOnIdleWithDensity {
             // size
@@ -443,7 +442,7 @@ class TextFieldTest {
         }
 
         // click to focus
-        clickAndAdvanceClock(TextfieldTag, 200)
+        clickAndAdvanceClock()
 
         testRule.runOnIdleWithDensity {
             assertThat(placeholderSize.value).isNull()
@@ -657,7 +656,7 @@ class TextFieldTest {
             }
         }
 
-        clickAndAdvanceClock(TextfieldTag, 200)
+        clickAndAdvanceClock()
 
         runOnIdle {
             verify(textInputService, atLeastOnce()).startInput(
@@ -798,10 +797,8 @@ class TextFieldTest {
         }
     }
 
-    private fun clickAndAdvanceClock(tag: String, time: Long) {
-        onNodeWithTag(tag).performClick()
-        waitForIdle()
-        testRule.clockTestRule.pauseClock()
-        testRule.clockTestRule.advanceClock(time)
+    private fun clickAndAdvanceClock() {
+        onNodeWithTag(TextfieldTag).performClick()
+        testRule.clockTestRule.advanceClock(200L)
     }
 }
