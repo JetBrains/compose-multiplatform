@@ -118,7 +118,7 @@ class DesktopOwners(
 
     fun invalidate() {
         if (!redrawingScheduled) {
-            DesktopUiDispatcher.Dispatcher.scheduleAfterCallback {
+            DesktopUiDispatcher.Dispatcher.scheduleCallback {
                 redrawingScheduled = false
                 if (Recomposer.current().hasPendingChanges()) {
                     invalidate()
