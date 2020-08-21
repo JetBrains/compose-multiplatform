@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.platform.NativeRectF
+import androidx.compose.ui.semantics.outerSemantics
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -63,10 +64,13 @@ internal abstract class LayoutNodeWrapper(
     var measureResult: MeasureScope.MeasureResult
         get() = _measureResult ?: error(UnmeasuredError)
         internal set(value) {
-            if (invalidateLayerOnBoundsChange &&
-                (value.width != _measureResult?.width || value.height != _measureResult?.height)
-            ) {
-                findLayer()?.invalidate()
+            if ((value.width != _measureResult?.width || value.height != _measureResult?.height)) {
+                if (invalidateLayerOnBoundsChange) {
+                    findLayer()?.invalidate()
+                }
+                layoutNode.outerSemantics?.modifier?.id?.let {
+                    layoutNode.owner?.onSemanticLayoutChange(it)
+                }
             }
             _measureResult = value
             measuredSize = IntSize(measureResult.width, measureResult.height)
@@ -74,8 +78,13 @@ internal abstract class LayoutNodeWrapper(
 
     var position: IntOffset = IntOffset.Zero
         internal set(value) {
-            if (invalidateLayerOnBoundsChange && value != field) {
-                findLayer()?.invalidate()
+            if (value != field) {
+                if (invalidateLayerOnBoundsChange) {
+                    findLayer()?.invalidate()
+                }
+                layoutNode.outerSemantics?.modifier?.id?.let {
+                    layoutNode.owner?.onSemanticLayoutChange(it)
+                }
             }
             field = value
         }
