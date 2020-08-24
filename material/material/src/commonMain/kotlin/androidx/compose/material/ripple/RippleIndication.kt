@@ -143,7 +143,7 @@ class RippleIndication internal constructor(
 }
 
 @OptIn(ExperimentalMaterialApi::class)
-private class RippleIndicationInstance internal constructor(
+private class RippleIndicationInstance constructor(
     private val bounded: Boolean,
     private val radius: Dp? = null,
     private var color: State<Color>,
@@ -171,8 +171,6 @@ private class RippleIndicationInstance internal constructor(
                 addRipple(targetRadius, pressPosition)
             }
         } else {
-            // TODO: possibly handle cancelling the animation here, need to clarify spec for when
-            // ripples and state layers overlap
             removeRipple()
         }
         drawRipples(color)
@@ -216,6 +214,29 @@ private class RippleIndicationInstance internal constructor(
     }
 }
 
+/**
+ * Represents the layer underneath the press ripple, that displays an overlay for states such as
+ * [Interaction.Dragged].
+ *
+ * Typically, there should be both an 'incoming' and an 'outgoing' layer, so that when
+ * transitioning between two states, the incoming of the new state, and the outgoing of the old
+ * state can be displayed. However, because:
+ *
+ * a) the duration of these outgoing transitions are so short (mostly 15ms, which is less than 1
+ * frame at 60fps), and hence are barely noticeable if they happen at the same time as an
+ * incoming transition
+ * b) two layers cause a lot of extra work, and related performance concerns
+ *
+ * We skip managing two layers, and instead only show one layer. The details for the
+ * [AnimationSpec]s used are as follows:
+ *
+ * No state -> a state = incoming transition for the new state
+ * A state -> a different state = incoming transition for the new state
+ * A state -> no state = outgoing transition for the old state
+ *
+ * @see IncomingStateLayerAnimationSpecs
+ * @see OutgoingStateLayerAnimationSpecs
+ */
 @OptIn(ExperimentalMaterialApi::class)
 private class StateLayer(
     clock: AnimationClockObservable,
@@ -234,26 +255,28 @@ private class StateLayer(
         val currentInteractions = interactionState.value
         var handled = false
 
-        // Handle a new interaction
-        for (interaction in currentInteractions) {
+        // Handle a new interaction, starting from the end as we care about the most recent
+        // interaction, not the oldest interaction.
+        for (interaction in currentInteractions.reversed()) {
             // Stop looping if we have already moved to a new state
             if (handled) break
 
-            // Move to the next interaction if this interaction is not a new interaction
-            if (interaction in previousInteractions) continue
-
             // Pressed state is explicitly handled with a ripple animation, and not a state layer
             if (interaction is Interaction.Pressed) continue
+
+            // Move to the next interaction if this interaction is not a new interaction
+            if (interaction in previousInteractions) continue
 
             // Move to the next interaction if this is not an interaction we show a state layer for
             val targetOpacity = rippleOpacity.opacityForInteraction(interaction)
             if (targetOpacity == 0f) continue
 
-            val animationSpec = animationSpecForInteraction(interaction)
-            animatedOpacity.animateTo(
-                targetOpacity,
-                animationSpec
-            )
+            // TODO: consider defaults - these will be used for a custom Interaction that we are
+            // not aware of, but has an alpha that should be shown because of a custom RippleTheme.
+            val incomingAnimationSpec = IncomingStateLayerAnimationSpecs[interaction]
+                ?: TweenSpec(durationMillis = 15, easing = LinearEasing)
+
+            animatedOpacity.animateTo(targetOpacity, incomingAnimationSpec)
 
             lastDrawnInteraction = interaction
             handled = true
@@ -263,10 +286,13 @@ private class StateLayer(
         if (!handled) {
             val previousInteraction = lastDrawnInteraction
             if (previousInteraction != null && previousInteraction !in currentInteractions) {
-                animatedOpacity.animateTo(
-                    0f,
-                    animationSpecForInteraction(previousInteraction)
-                )
+                // TODO: consider defaults - these will be used for a custom Interaction that we are
+                // not aware of, but has an alpha that should be shown because of a custom
+                // RippleTheme.
+                val outgoingAnimationSpec = OutgoingStateLayerAnimationSpecs[previousInteraction]
+                    ?: TweenSpec(durationMillis = 15, easing = LinearEasing)
+
+                animatedOpacity.animateTo(0f, outgoingAnimationSpec)
 
                 lastDrawnInteraction = null
             }
@@ -288,17 +314,31 @@ private class StateLayer(
             }
         }
     }
-
-    /**
-     * TODO: handle [interaction] for hover / focus states
-     */
-    @Suppress("UNUSED_PARAMETER")
-    private fun animationSpecForInteraction(
-        interaction: Interaction
-    ): AnimationSpec<Float> {
-        return TweenSpec(
-            durationMillis = 15,
-            easing = LinearEasing
-        )
-    }
 }
+
+/**
+ * [AnimationSpec]s used when transitioning to a new state, either from a previous state, or no
+ * state.
+ *
+ * TODO: handle hover / focus states
+ */
+private val IncomingStateLayerAnimationSpecs: Map<Interaction, AnimationSpec<Float>> = mapOf(
+    // TODO: b/161522042 - clarify specs for dragged state transitions
+    Interaction.Dragged to TweenSpec(
+        durationMillis = 45,
+        easing = LinearEasing
+    )
+)
+
+/**
+ * [AnimationSpec]s used when transitioning away from a state, to no state.
+ *
+ * TODO: handle hover / focus states
+ */
+private val OutgoingStateLayerAnimationSpecs: Map<Interaction, AnimationSpec<Float>> = mapOf(
+    // TODO: b/161522042 - clarify specs for dragged state transitions
+    Interaction.Dragged to TweenSpec(
+        durationMillis = 150,
+        easing = LinearEasing
+    )
+)
