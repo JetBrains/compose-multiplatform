@@ -30,10 +30,9 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.withTransform
-import androidx.compose.ui.graphics.vectormath.Matrix4
+import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastForEach
-import androidx.compose.ui.util.toRadians
 import kotlin.math.ceil
 
 const val DefaultGroupName = ""
@@ -340,7 +339,7 @@ internal class PathComponent : VNode() {
 
 internal class GroupComponent : VNode() {
 
-    private var groupMatrix: Matrix4? = null
+    private var groupMatrix: Matrix? = null
 
     private val children = mutableListOf<VNode>()
 
@@ -449,20 +448,20 @@ internal class GroupComponent : VNode() {
     private var isMatrixDirty = true
 
     private fun updateMatrix() {
-        val matrix: Matrix4
+        val matrix: Matrix
         val target = groupMatrix
         if (target == null) {
-            matrix = Matrix4()
+            matrix = Matrix()
             groupMatrix = matrix
         } else {
             matrix = target
+            matrix.reset()
         }
-        matrix.assignColumns(Matrix4.identity())
         // M = T(translationX + pivotX, translationY + pivotY) *
         //     R(rotation) * S(scaleX, scaleY) *
         //     T(-pivotX, -pivotY)
         matrix.translate(translationX + pivotX, translationY + pivotY)
-        matrix.rotateZ(radians = rotation.toRadians())
+        matrix.rotateZ(degrees = rotation)
         matrix.scale(scaleX, scaleY, 1f)
         matrix.translate(-pivotX, -pivotY)
     }

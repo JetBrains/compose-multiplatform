@@ -19,8 +19,6 @@ package androidx.compose.ui.graphics
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.RoundRect
-import androidx.compose.ui.graphics.vectormath.Matrix4
-import androidx.compose.ui.graphics.vectormath.isIdentity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastForEach
@@ -78,29 +76,29 @@ class DesktopCanvas(val skija: org.jetbrains.skija.Canvas) : Canvas {
     /**
      * @throws IllegalStateException if an arbitrary transform is provided
      */
-    override fun concat(matrix4: Matrix4) {
-        if (!matrix4.isIdentity()) {
-            if (matrix4[2, 0] != 0f ||
-                matrix4[2, 1] != 0f ||
-                matrix4[2, 0] != 0f ||
-                matrix4[2, 1] != 0f ||
-                matrix4[2, 2] != 1f ||
-                matrix4[2, 3] != 0f ||
-                matrix4[3, 2] != 0f
+    override fun concat(matrix: Matrix) {
+        if (!matrix.isIdentity()) {
+            if (matrix[2, 0] != 0f ||
+                matrix[2, 1] != 0f ||
+                matrix[2, 0] != 0f ||
+                matrix[2, 1] != 0f ||
+                matrix[2, 2] != 1f ||
+                matrix[2, 3] != 0f ||
+                matrix[3, 2] != 0f
             ) {
                 throw IllegalStateException("Desktop does not support arbitrary transforms")
             }
             skija.concat(
                 SkijaMatrix33(
-                    matrix4[0, 0],
-                    matrix4[1, 0],
-                    matrix4[3, 0],
-                    matrix4[0, 1],
-                    matrix4[1, 1],
-                    matrix4[3, 1],
-                    matrix4[0, 3],
-                    matrix4[1, 3],
-                    matrix4[3, 3]
+                    matrix[0, 0],
+                    matrix[1, 0],
+                    matrix[3, 0],
+                    matrix[0, 1],
+                    matrix[1, 1],
+                    matrix[3, 1],
+                    matrix[0, 3],
+                    matrix[1, 3],
+                    matrix[3, 3]
                 )
             )
         }
