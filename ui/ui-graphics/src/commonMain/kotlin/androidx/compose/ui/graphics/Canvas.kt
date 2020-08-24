@@ -18,8 +18,6 @@ package androidx.compose.ui.graphics
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.vectormath.Matrix4
-import androidx.compose.ui.graphics.vectormath.degrees
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 
@@ -304,7 +302,7 @@ interface Canvas {
      * Multiply the current transform by the specified 4⨉4 transformation matrix
      * specified as a list of values in column-major order.
      */
-    fun concat(matrix4: Matrix4)
+    fun concat(matrix: Matrix)
 
     /**
      * Reduces the clip region to the intersection of the current clip and the

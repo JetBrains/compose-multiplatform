@@ -9,14 +9,6 @@ ArrayReturn: androidx.compose.ui.graphics.BrushKt#VerticalGradient(kotlin.Pair<j
     Method parameter should be Collection<Pair> (or subclass) instead of raw array; was `kotlin.Pair<java.lang.Float,androidx.compose.ui.graphics.Color>[]`
 
 
-AutoBoxing: androidx.compose.ui.graphics.vectormath.Matrix4#scale(Object, Float, Float) parameter #1:
-    Must avoid boxed primitives (`java.lang.Float`)
-AutoBoxing: androidx.compose.ui.graphics.vectormath.Matrix4#scale(Object, Float, Float) parameter #2:
-    Must avoid boxed primitives (`java.lang.Float`)
-AutoBoxing: androidx.compose.ui.graphics.vectormath.Matrix4Kt#getAsScale(androidx.compose.ui.graphics.vectormath.Matrix4):
-    Must avoid boxed primitives (`java.lang.Float`)
-
-
 BuilderSetStyle: androidx.compose.ui.graphics.vector.PathBuilder#arcTo(float, float, float, boolean, boolean, float, float):
     Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.graphics.vector.PathBuilder.arcTo(float,float,float,boolean,boolean,float,float)
 BuilderSetStyle: androidx.compose.ui.graphics.vector.PathBuilder#arcToRelative(float, float, float, boolean, boolean, float, float):
@@ -57,36 +49,22 @@ BuilderSetStyle: androidx.compose.ui.graphics.vector.PathBuilder#verticalLineToR
     Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.graphics.vector.PathBuilder.verticalLineToRelative(float)
 
 
-DocumentExceptions: androidx.compose.ui.graphics.vectormath.Matrix3#get(androidx.compose.ui.graphics.vectormath.MatrixColumn):
-    Method Matrix3.get appears to be throwing java.lang.IllegalArgumentException; this should be listed in the documentation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
-DocumentExceptions: androidx.compose.ui.graphics.vectormath.Matrix3#get(int):
-    Method Matrix3.get appears to be throwing java.lang.IllegalArgumentException; this should be listed in the documentation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
-DocumentExceptions: androidx.compose.ui.graphics.vectormath.Matrix4#get(int):
-    Method Matrix4.get appears to be throwing java.lang.IllegalArgumentException; this should be listed in the documentation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
-DocumentExceptions: androidx.compose.ui.graphics.vectormath.Vector2#get(androidx.compose.ui.graphics.vectormath.VectorComponent):
-    Method Vector2.get appears to be throwing java.lang.IllegalArgumentException; this should be listed in the documentation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
-DocumentExceptions: androidx.compose.ui.graphics.vectormath.Vector2#get(int):
-    Method Vector2.get appears to be throwing java.lang.IllegalArgumentException; this should be listed in the documentation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
-DocumentExceptions: androidx.compose.ui.graphics.vectormath.Vector2#set(androidx.compose.ui.graphics.vectormath.VectorComponent, float):
-    Method Vector2.set appears to be throwing java.lang.IllegalArgumentException; this should be listed in the documentation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
-DocumentExceptions: androidx.compose.ui.graphics.vectormath.Vector2#set(int, float):
-    Method Vector2.set appears to be throwing java.lang.IllegalArgumentException; this should be listed in the documentation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
-DocumentExceptions: androidx.compose.ui.graphics.vectormath.Vector3#get(androidx.compose.ui.graphics.vectormath.VectorComponent):
-    Method Vector3.get appears to be throwing java.lang.IllegalArgumentException; this should be listed in the documentation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
-DocumentExceptions: androidx.compose.ui.graphics.vectormath.Vector3#get(int):
-    Method Vector3.get appears to be throwing java.lang.IllegalArgumentException; this should be listed in the documentation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
-DocumentExceptions: androidx.compose.ui.graphics.vectormath.Vector3#set(androidx.compose.ui.graphics.vectormath.VectorComponent, float):
-    Method Vector3.set appears to be throwing java.lang.IllegalArgumentException; this should be listed in the documentation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
-DocumentExceptions: androidx.compose.ui.graphics.vectormath.Vector3#set(int, float):
-    Method Vector3.set appears to be throwing java.lang.IllegalArgumentException; this should be listed in the documentation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
-DocumentExceptions: androidx.compose.ui.graphics.vectormath.Vector4#get(int):
-    Method Vector4.get appears to be throwing java.lang.IllegalArgumentException; this should be listed in the documentation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
-DocumentExceptions: androidx.compose.ui.graphics.vectormath.Vector4#set(int, float):
-    Method Vector4.set appears to be throwing java.lang.IllegalArgumentException; this should be listed in the documentation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions
-
-
 MissingBuildMethod: androidx.compose.ui.graphics.vector.PathBuilder:
     androidx.compose.ui.graphics.vector.PathBuilder does not declare a `build()` method, but builder classes are expected to
+
+
+MissingNullability: androidx.compose.ui.graphics.Matrix#constructor-impl(float[]):
+    Missing nullability on method `constructor-impl` return
+MissingNullability: androidx.compose.ui.graphics.Matrix#equals-impl(float[], Object) parameter #0:
+    Missing nullability on parameter `p` in method `equals-impl`
+MissingNullability: androidx.compose.ui.graphics.Matrix#hashCode-impl(float[]) parameter #0:
+    Missing nullability on parameter `p` in method `hashCode-impl`
+MissingNullability: androidx.compose.ui.graphics.Matrix#invert-impl(float[]) parameter #0:
+    Missing nullability on parameter `$this` in method `invert-impl`
+MissingNullability: androidx.compose.ui.graphics.Matrix#reset-impl(float[]) parameter #0:
+    Missing nullability on parameter `$this` in method `reset-impl`
+MissingNullability: androidx.compose.ui.graphics.Matrix#toString-impl(float[]) parameter #0:
+    Missing nullability on parameter `$this` in method `toString-impl`
 
 
 NotCloseable: androidx.compose.ui.graphics.AndroidPath:

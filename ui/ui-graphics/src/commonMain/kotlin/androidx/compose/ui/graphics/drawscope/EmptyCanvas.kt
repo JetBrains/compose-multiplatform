@@ -26,7 +26,7 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.Vertices
-import androidx.compose.ui.graphics.vectormath.Matrix4
+import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 
@@ -69,7 +69,7 @@ internal class EmptyCanvas : Canvas {
         throw UnsupportedOperationException()
     }
 
-    override fun concat(matrix4: Matrix4) {
+    override fun concat(matrix: Matrix) {
         throw UnsupportedOperationException()
     }
 

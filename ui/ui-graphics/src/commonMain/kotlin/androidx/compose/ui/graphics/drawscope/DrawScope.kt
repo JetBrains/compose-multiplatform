@@ -33,8 +33,8 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
-import androidx.compose.ui.graphics.vectormath.Matrix4
-import androidx.compose.ui.graphics.vectormath.degrees
+import androidx.compose.ui.graphics.Matrix
+import androidx.compose.ui.graphics.degrees
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -136,7 +136,9 @@ inline fun DrawScope.rotateRad(
     pivotX: Float = center.x,
     pivotY: Float = center.y,
     block: DrawScope.() -> Unit
-) = withTransform({ rotate(degrees(radians), pivotX, pivotY) }, block)
+) {
+    withTransform({ rotate(degrees(radians), pivotX, pivotY) }, block)
+}
 
 /**
  * Add an axis-aligned scale to the current transform, scaling by the first
@@ -307,7 +309,7 @@ abstract class DrawScope : Density {
             }
         }
 
-        override fun transform(matrix: Matrix4) {
+        override fun transform(matrix: Matrix) {
             this@DrawScope.canvas.concat(matrix)
         }
     }

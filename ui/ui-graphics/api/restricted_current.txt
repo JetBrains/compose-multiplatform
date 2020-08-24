@@ -9,7 +9,7 @@ package androidx.compose.ui.graphics {
     ctor public AndroidCanvas();
     method public void clipPath(androidx.compose.ui.graphics.Path path, androidx.compose.ui.graphics.ClipOp clipOp);
     method public void clipRect(float left, float top, float right, float bottom, androidx.compose.ui.graphics.ClipOp clipOp);
-    method public void concat(androidx.compose.ui.graphics.vectormath.Matrix4 matrix4);
+    method public void concat-58bKbWc(float[] matrix);
     method public void disableZ();
     method public void drawArc(float left, float top, float right, float bottom, float startAngle, float sweepAngle, boolean useCenter, androidx.compose.ui.graphics.Paint paint);
     method public void drawCircle-tVKstsI(long center, float radius, androidx.compose.ui.graphics.Paint paint);
@@ -208,7 +208,7 @@ package androidx.compose.ui.graphics {
     method public void clipPath(androidx.compose.ui.graphics.Path path, androidx.compose.ui.graphics.ClipOp clipOp = androidx.compose.ui.graphics.ClipOp.Intersect);
     method public default void clipRect(androidx.compose.ui.geometry.Rect rect, androidx.compose.ui.graphics.ClipOp clipOp = androidx.compose.ui.graphics.ClipOp.Intersect);
     method public void clipRect(float left, float top, float right, float bottom, androidx.compose.ui.graphics.ClipOp clipOp = androidx.compose.ui.graphics.ClipOp.Intersect);
-    method public void concat(androidx.compose.ui.graphics.vectormath.Matrix4 matrix4);
+    method public void concat-58bKbWc(float[] matrix);
     method public void disableZ();
     method public default void drawArc(androidx.compose.ui.geometry.Rect rect, float startAngle, float sweepAngle, boolean useCenter, androidx.compose.ui.graphics.Paint paint);
     method public void drawArc(float left, float top, float right, float bottom, float startAngle, float sweepAngle, boolean useCenter, androidx.compose.ui.graphics.Paint paint);
@@ -338,6 +338,10 @@ package androidx.compose.ui.graphics {
     method public static inline long useOrElse-iYUlWp8(long, kotlin.jvm.functions.Function0<androidx.compose.ui.graphics.Color> block);
   }
 
+  public final class DegreesKt {
+    method @kotlin.PublishedApi internal static float degrees(float radians);
+  }
+
   public enum FilterQuality {
     method public static androidx.compose.ui.graphics.FilterQuality valueOf(String name) throws java.lang.IllegalArgumentException;
     method public static androidx.compose.ui.graphics.FilterQuality[] values();
@@ -382,6 +386,33 @@ package androidx.compose.ui.graphics {
 
   @androidx.compose.runtime.Immutable public final class LinearGradient extends androidx.compose.ui.graphics.ShaderBrush {
     method @androidx.compose.runtime.Immutable public androidx.compose.ui.graphics.LinearGradient copy(java.util.List<androidx.compose.ui.graphics.Color> colors, java.util.List<java.lang.Float>? stops, float startX, float startY, float endX, float endY, androidx.compose.ui.graphics.TileMode tileMode);
+  }
+
+  public final inline class Matrix {
+    ctor public Matrix();
+    method public static float[]! constructor-impl(float[] values);
+    method public static inline boolean equals-impl(float[]! p, Object? p1);
+    method public static boolean equals-impl0(float[] p1, float[] p2);
+    method public static inline operator float get-impl(float[] $this, int row, int column);
+    method public float[] getValues();
+    method public static inline int hashCode-impl(float[]! p);
+    method public static void invert-impl(float[]! $this);
+    method public static androidx.compose.ui.geometry.Rect map-impl(float[] $this, androidx.compose.ui.geometry.Rect rect);
+    method public static long map-k-4lQ0M(float[] $this, long point);
+    method public static void reset-impl(float[]! $this);
+    method public static void rotateX-impl(float[] $this, float degrees);
+    method public static void rotateY-impl(float[] $this, float degrees);
+    method public static void rotateZ-impl(float[] $this, float degrees);
+    method public static void scale-impl(float[] $this, float x = 1f, float y = 1f, float z = 1f);
+    method public static inline operator void set-impl(float[] $this, int row, int column, float v);
+    method public static void setFrom-58bKbWc(float[] $this, float[] matrix);
+    method public static operator void timesAssign-58bKbWc(float[] $this, float[] m);
+    method public static String toString-impl(float[]! $this);
+    method public static void translate-impl(float[] $this, float x = 0f, float y = 0f, float z = 0f);
+  }
+
+  public final class MatrixKt {
+    method public static boolean isIdentity-58bKbWc(float[]);
   }
 
   public abstract sealed class Outline {
@@ -902,7 +933,7 @@ package androidx.compose.ui.graphics.drawscope {
     method public void inset(float left, float top, float right, float bottom);
     method public void rotate(float degrees, float pivotX = center.x, float pivotY = center.y);
     method public void scale(float scaleX, float scaleY = scaleX, float pivotX = center.x, float pivotY = center.y);
-    method public void transform(androidx.compose.ui.graphics.vectormath.Matrix4 matrix);
+    method public void transform-58bKbWc(float[] matrix);
     method public void translate(float left = 0.0f, float top = 0.0f);
     property public default long center;
     property public abstract long size;
@@ -1227,515 +1258,6 @@ package androidx.compose.ui.graphics.vector {
     method public androidx.compose.ui.graphics.vector.PathParser parsePathString(String pathData);
     method public java.util.List<androidx.compose.ui.graphics.vector.PathNode> toNodes();
     method public androidx.compose.ui.graphics.Path toPath(androidx.compose.ui.graphics.Path target = Path());
-  }
-
-}
-
-package androidx.compose.ui.graphics.vectormath {
-
-  public final class Matrix3 {
-    ctor public Matrix3(androidx.compose.ui.graphics.vectormath.Vector3 x, androidx.compose.ui.graphics.vectormath.Vector3 y, androidx.compose.ui.graphics.vectormath.Vector3 z);
-    ctor public Matrix3();
-    ctor public Matrix3(androidx.compose.ui.graphics.vectormath.Matrix3 m);
-    method public androidx.compose.ui.graphics.vectormath.Vector3 component1();
-    method public androidx.compose.ui.graphics.vectormath.Vector3 component2();
-    method public androidx.compose.ui.graphics.vectormath.Vector3 component3();
-    method public androidx.compose.ui.graphics.vectormath.Matrix3 copy(androidx.compose.ui.graphics.vectormath.Vector3 x, androidx.compose.ui.graphics.vectormath.Vector3 y, androidx.compose.ui.graphics.vectormath.Vector3 z);
-    method public operator androidx.compose.ui.graphics.vectormath.Matrix3 dec();
-    method public operator androidx.compose.ui.graphics.vectormath.Matrix3 div(float v);
-    method public operator androidx.compose.ui.graphics.vectormath.Vector3 get(int column);
-    method public operator float get(int column, int row);
-    method public operator androidx.compose.ui.graphics.vectormath.Vector3 get(androidx.compose.ui.graphics.vectormath.MatrixColumn column);
-    method public operator float get(androidx.compose.ui.graphics.vectormath.MatrixColumn column, int row);
-    method public inline java.util.List<java.lang.Float> getM3storage();
-    method public androidx.compose.ui.graphics.vectormath.Vector3 getX();
-    method public androidx.compose.ui.graphics.vectormath.Vector3 getY();
-    method public androidx.compose.ui.graphics.vectormath.Vector3 getZ();
-    method public operator androidx.compose.ui.graphics.vectormath.Matrix3 inc();
-    method public operator androidx.compose.ui.graphics.vectormath.Matrix3 minus(float v);
-    method public operator androidx.compose.ui.graphics.vectormath.Matrix3 plus(float v);
-    method public operator void set(int column, androidx.compose.ui.graphics.vectormath.Vector3 v);
-    method public operator void set(int column, int row, float v);
-    method public void setX(androidx.compose.ui.graphics.vectormath.Vector3 p);
-    method public void setY(androidx.compose.ui.graphics.vectormath.Vector3 p);
-    method public void setZ(androidx.compose.ui.graphics.vectormath.Vector3 p);
-    method public operator androidx.compose.ui.graphics.vectormath.Matrix3 times(float v);
-    method public operator androidx.compose.ui.graphics.vectormath.Matrix3 times(androidx.compose.ui.graphics.vectormath.Matrix3 m);
-    method public operator androidx.compose.ui.graphics.vectormath.Vector3 times(androidx.compose.ui.graphics.vectormath.Vector3 v);
-    method public float[] toFloatArray();
-    method public operator androidx.compose.ui.graphics.vectormath.Matrix3 unaryMinus();
-    property public final inline java.util.List<java.lang.Float> m3storage;
-    field public static final androidx.compose.ui.graphics.vectormath.Matrix3.Companion Companion;
-  }
-
-  public static final class Matrix3.Companion {
-    method public androidx.compose.ui.graphics.vectormath.Matrix3 identity();
-    method public androidx.compose.ui.graphics.vectormath.Matrix3 of(float... a);
-  }
-
-  public final class Matrix4 {
-    ctor public Matrix4(androidx.compose.ui.graphics.vectormath.Vector4 x, androidx.compose.ui.graphics.vectormath.Vector4 y, androidx.compose.ui.graphics.vectormath.Vector4 z, androidx.compose.ui.graphics.vectormath.Vector4 w);
-    ctor public Matrix4();
-    ctor public Matrix4(androidx.compose.ui.graphics.vectormath.Vector3 right, androidx.compose.ui.graphics.vectormath.Vector3 up, androidx.compose.ui.graphics.vectormath.Vector3 forward, androidx.compose.ui.graphics.vectormath.Vector3 position);
-    ctor public Matrix4(androidx.compose.ui.graphics.vectormath.Matrix4 m);
-    method public void assignColumns(androidx.compose.ui.graphics.vectormath.Matrix4 other);
-    method public void assignFromStorage(java.util.List<java.lang.Float> storage);
-    method public androidx.compose.ui.graphics.vectormath.Vector4 component1();
-    method public androidx.compose.ui.graphics.vectormath.Vector4 component2();
-    method public androidx.compose.ui.graphics.vectormath.Vector4 component3();
-    method public androidx.compose.ui.graphics.vectormath.Vector4 component4();
-    method public androidx.compose.ui.graphics.vectormath.Matrix4 copy(androidx.compose.ui.graphics.vectormath.Vector4 x, androidx.compose.ui.graphics.vectormath.Vector4 y, androidx.compose.ui.graphics.vectormath.Vector4 z, androidx.compose.ui.graphics.vectormath.Vector4 w);
-    method public float copyInverse(androidx.compose.ui.graphics.vectormath.Matrix4 arg);
-    method public operator androidx.compose.ui.graphics.vectormath.Matrix4 dec();
-    method public operator androidx.compose.ui.graphics.vectormath.Matrix4 div(float v);
-    method public operator androidx.compose.ui.graphics.vectormath.Vector4 get(int column);
-    method public operator float get(int column, int row);
-    method public operator androidx.compose.ui.graphics.vectormath.Vector4 get(androidx.compose.ui.graphics.vectormath.MatrixColumn column);
-    method public operator float get(androidx.compose.ui.graphics.vectormath.MatrixColumn column, int row);
-    method public float getDeterminant();
-    method public inline androidx.compose.ui.graphics.vectormath.Vector3 getForward();
-    method public inline java.util.List<java.lang.Float> getM4storage();
-    method public inline androidx.compose.ui.graphics.vectormath.Vector3 getPosition();
-    method public inline androidx.compose.ui.graphics.vectormath.Vector3 getRight();
-    method public androidx.compose.ui.graphics.vectormath.Vector3 getRotation();
-    method public androidx.compose.ui.graphics.vectormath.Vector4 getRow(int row);
-    method public inline androidx.compose.ui.graphics.vectormath.Vector3 getScale();
-    method public inline androidx.compose.ui.graphics.vectormath.Vector3 getTranslation();
-    method public inline androidx.compose.ui.graphics.vectormath.Vector3 getUp();
-    method public inline androidx.compose.ui.graphics.vectormath.Matrix3 getUpperLeft();
-    method public androidx.compose.ui.graphics.vectormath.Vector4 getW();
-    method public androidx.compose.ui.graphics.vectormath.Vector4 getX();
-    method public androidx.compose.ui.graphics.vectormath.Vector4 getY();
-    method public androidx.compose.ui.graphics.vectormath.Vector4 getZ();
-    method public operator androidx.compose.ui.graphics.vectormath.Matrix4 inc();
-    method public float invert();
-    method public operator androidx.compose.ui.graphics.vectormath.Matrix4 minus(float v);
-    method public androidx.compose.ui.graphics.vectormath.Vector3 perspectiveTransform(androidx.compose.ui.graphics.vectormath.Vector3 arg);
-    method public operator androidx.compose.ui.graphics.vectormath.Matrix4 plus(float v);
-    method public void rotateX(float radians);
-    method public void rotateY(float radians);
-    method public void rotateZ(float radians);
-    method public void scale(Object x, Float? y = null, Float? z = null);
-    method public operator void set(int column, androidx.compose.ui.graphics.vectormath.Vector4 v);
-    method public operator void set(int column, int row, float v);
-    method public inline void setForward(androidx.compose.ui.graphics.vectormath.Vector3 value);
-    method public void setFrom(androidx.compose.ui.graphics.vectormath.Matrix4 arg);
-    method public inline void setPosition(androidx.compose.ui.graphics.vectormath.Vector3 value);
-    method public inline void setRight(androidx.compose.ui.graphics.vectormath.Vector3 value);
-    method public void setTranslationRaw(float x, float y, float z);
-    method public inline void setUp(androidx.compose.ui.graphics.vectormath.Vector3 value);
-    method public void setW(androidx.compose.ui.graphics.vectormath.Vector4 p);
-    method public void setX(androidx.compose.ui.graphics.vectormath.Vector4 p);
-    method public void setY(androidx.compose.ui.graphics.vectormath.Vector4 p);
-    method public void setZ(androidx.compose.ui.graphics.vectormath.Vector4 p);
-    method public operator androidx.compose.ui.graphics.vectormath.Matrix4 times(float v);
-    method public operator androidx.compose.ui.graphics.vectormath.Matrix4 times(androidx.compose.ui.graphics.vectormath.Matrix4 m);
-    method public operator androidx.compose.ui.graphics.vectormath.Vector4 times(androidx.compose.ui.graphics.vectormath.Vector4 v);
-    method public operator void timesAssign(androidx.compose.ui.graphics.vectormath.Matrix4 m);
-    method public float[] toFloatArray();
-    method public void translate(Object x, float y = 0.0f, float z = 0.0f);
-    method public operator androidx.compose.ui.graphics.vectormath.Matrix4 unaryMinus();
-    property public final float determinant;
-    property public final inline androidx.compose.ui.graphics.vectormath.Vector3 forward;
-    property public final inline java.util.List<java.lang.Float> m4storage;
-    property public final inline androidx.compose.ui.graphics.vectormath.Vector3 position;
-    property public final inline androidx.compose.ui.graphics.vectormath.Vector3 right;
-    property public final androidx.compose.ui.graphics.vectormath.Vector3 rotation;
-    property public final inline androidx.compose.ui.graphics.vectormath.Vector3 scale;
-    property public final inline androidx.compose.ui.graphics.vectormath.Vector3 translation;
-    property public final inline androidx.compose.ui.graphics.vectormath.Vector3 up;
-    property public final inline androidx.compose.ui.graphics.vectormath.Matrix3 upperLeft;
-    field public static final androidx.compose.ui.graphics.vectormath.Matrix4.Companion Companion;
-  }
-
-  public static final class Matrix4.Companion {
-    method public androidx.compose.ui.graphics.vectormath.Matrix4 diagonal3(androidx.compose.ui.graphics.vectormath.Vector3 scale);
-    method public androidx.compose.ui.graphics.vectormath.Matrix4 diagonal3Values(float x, float y, float z);
-    method public androidx.compose.ui.graphics.vectormath.Matrix4 identity();
-    method public androidx.compose.ui.graphics.vectormath.Matrix4 of(float... a);
-    method public androidx.compose.ui.graphics.vectormath.Matrix4 rotationX(float radians);
-    method public androidx.compose.ui.graphics.vectormath.Matrix4 rotationY(float radians);
-    method public androidx.compose.ui.graphics.vectormath.Matrix4 rotationZ(float radians);
-    method public androidx.compose.ui.graphics.vectormath.Matrix4 translation(androidx.compose.ui.graphics.vectormath.Vector3 translation);
-    method public androidx.compose.ui.graphics.vectormath.Matrix4 translationValues(float x, float y, float z);
-    method public androidx.compose.ui.graphics.vectormath.Matrix4 zero();
-  }
-
-  public final class Matrix4Kt {
-    method public static Float? getAsScale(androidx.compose.ui.graphics.vectormath.Matrix4);
-    method public static androidx.compose.ui.geometry.Offset? getAsTranslation(androidx.compose.ui.graphics.vectormath.Matrix4);
-    method public static androidx.compose.ui.geometry.Rect inverseTransformRect(androidx.compose.ui.graphics.vectormath.Matrix4 transform, androidx.compose.ui.geometry.Rect rect);
-    method public static boolean isIdentity(androidx.compose.ui.graphics.vectormath.Matrix4);
-    method public static boolean matrixEquals(androidx.compose.ui.graphics.vectormath.Matrix4? a, androidx.compose.ui.graphics.vectormath.Matrix4? b);
-    method public static long transformPoint-uF5TQos(androidx.compose.ui.graphics.vectormath.Matrix4, long point);
-    method public static androidx.compose.ui.geometry.Rect transformRect(androidx.compose.ui.graphics.vectormath.Matrix4, androidx.compose.ui.geometry.Rect rect);
-  }
-
-  public enum MatrixColumn {
-    method public static androidx.compose.ui.graphics.vectormath.MatrixColumn valueOf(String name) throws java.lang.IllegalArgumentException;
-    method public static androidx.compose.ui.graphics.vectormath.MatrixColumn[] values();
-    enum_constant public static final androidx.compose.ui.graphics.vectormath.MatrixColumn W;
-    enum_constant public static final androidx.compose.ui.graphics.vectormath.MatrixColumn X;
-    enum_constant public static final androidx.compose.ui.graphics.vectormath.MatrixColumn Y;
-    enum_constant public static final androidx.compose.ui.graphics.vectormath.MatrixColumn Z;
-  }
-
-  public final class MatrixExtensionsKt {
-    method public static androidx.compose.ui.graphics.vectormath.Matrix3 inverse(androidx.compose.ui.graphics.vectormath.Matrix3 m);
-    method public static androidx.compose.ui.graphics.vectormath.Matrix4 inverse(androidx.compose.ui.graphics.vectormath.Matrix4 m);
-    method public static androidx.compose.ui.graphics.vectormath.Matrix4 lookAt(androidx.compose.ui.graphics.vectormath.Vector3 eye, androidx.compose.ui.graphics.vectormath.Vector3 target, androidx.compose.ui.graphics.vectormath.Vector3 up = androidx.compose.ui.graphics.vectormath.Vector3(1.0));
-    method public static androidx.compose.ui.graphics.vectormath.Matrix4 lookTowards(androidx.compose.ui.graphics.vectormath.Vector3 eye, androidx.compose.ui.graphics.vectormath.Vector3 forward, androidx.compose.ui.graphics.vectormath.Vector3 up = androidx.compose.ui.graphics.vectormath.Vector3(1.0));
-    method public static androidx.compose.ui.graphics.vectormath.Matrix4 normal(androidx.compose.ui.graphics.vectormath.Matrix4 m);
-    method public static androidx.compose.ui.graphics.vectormath.Matrix4 ortho(float l, float r, float b, float t, float n, float f);
-    method public static androidx.compose.ui.graphics.vectormath.Matrix4 perspective(float fov, float ratio, float near, float far);
-    method public static androidx.compose.ui.graphics.vectormath.Matrix4 rotation(androidx.compose.ui.graphics.vectormath.Matrix4 m);
-    method public static androidx.compose.ui.graphics.vectormath.Matrix4 rotation(androidx.compose.ui.graphics.vectormath.Vector3 d);
-    method public static androidx.compose.ui.graphics.vectormath.Matrix4 rotation(androidx.compose.ui.graphics.vectormath.Vector3 axis, float angle);
-    method public static androidx.compose.ui.graphics.vectormath.Matrix4 scale(androidx.compose.ui.graphics.vectormath.Vector3 s);
-    method public static androidx.compose.ui.graphics.vectormath.Matrix4 scale(androidx.compose.ui.graphics.vectormath.Matrix4 m);
-    method public static androidx.compose.ui.graphics.vectormath.Matrix4 translation(androidx.compose.ui.graphics.vectormath.Vector3 t);
-    method public static androidx.compose.ui.graphics.vectormath.Matrix4 translation(androidx.compose.ui.graphics.vectormath.Matrix4 m);
-    method public static androidx.compose.ui.graphics.vectormath.Matrix3 transpose(androidx.compose.ui.graphics.vectormath.Matrix3 m);
-    method public static androidx.compose.ui.graphics.vectormath.Matrix4 transpose(androidx.compose.ui.graphics.vectormath.Matrix4 m);
-  }
-
-  public final class ScalarKt {
-    method public static inline float degrees(float v);
-    method public static inline float radians(float v);
-    field public static final float FOUR_PI = 12.566371f;
-    field public static final float HALF_PI = 1.5707964f;
-    field public static final float INV_FOUR_PI = 0.07957747f;
-    field public static final float INV_PI = 0.31830987f;
-    field public static final float INV_TWO_PI = 0.15915494f;
-    field public static final float PI = 3.1415927f;
-    field public static final float TWO_PI = 6.2831855f;
-  }
-
-  public final class Vector2 {
-    ctor public Vector2(float x, float y);
-    ctor public Vector2();
-    ctor public Vector2(androidx.compose.ui.graphics.vectormath.Vector2 v);
-    method public float component1();
-    method public float component2();
-    method public androidx.compose.ui.graphics.vectormath.Vector2 copy(float x, float y);
-    method public operator androidx.compose.ui.graphics.vectormath.Vector2 dec();
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector2 div(float v);
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector2 div(androidx.compose.ui.graphics.vectormath.Vector2 v);
-    method public operator float get(androidx.compose.ui.graphics.vectormath.VectorComponent index);
-    method public operator androidx.compose.ui.graphics.vectormath.Vector2 get(androidx.compose.ui.graphics.vectormath.VectorComponent index1, androidx.compose.ui.graphics.vectormath.VectorComponent index2);
-    method public operator float get(int index);
-    method public operator androidx.compose.ui.graphics.vectormath.Vector2 get(int index1, int index2);
-    method public inline float getG();
-    method public inline float getR();
-    method public inline androidx.compose.ui.graphics.vectormath.Vector2 getRg();
-    method public inline float getS();
-    method public inline androidx.compose.ui.graphics.vectormath.Vector2 getSt();
-    method public inline float getT();
-    method public inline java.util.List<java.lang.Float> getV2storage();
-    method public float getX();
-    method public inline androidx.compose.ui.graphics.vectormath.Vector2 getXy();
-    method public float getY();
-    method public operator androidx.compose.ui.graphics.vectormath.Vector2 inc();
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector2 minus(float v);
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector2 minus(androidx.compose.ui.graphics.vectormath.Vector2 v);
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector2 plus(float v);
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector2 plus(androidx.compose.ui.graphics.vectormath.Vector2 v);
-    method public operator void set(int index, float v);
-    method public operator void set(int index1, int index2, float v);
-    method public operator void set(androidx.compose.ui.graphics.vectormath.VectorComponent index, float v);
-    method public operator void set(androidx.compose.ui.graphics.vectormath.VectorComponent index1, androidx.compose.ui.graphics.vectormath.VectorComponent index2, float v);
-    method public inline void setG(float value);
-    method public inline void setR(float value);
-    method public inline void setRg(androidx.compose.ui.graphics.vectormath.Vector2 value);
-    method public inline void setS(float value);
-    method public inline void setSt(androidx.compose.ui.graphics.vectormath.Vector2 value);
-    method public inline void setT(float value);
-    method public void setX(float p);
-    method public inline void setXy(androidx.compose.ui.graphics.vectormath.Vector2 value);
-    method public void setY(float p);
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector2 times(float v);
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector2 times(androidx.compose.ui.graphics.vectormath.Vector2 v);
-    method public inline androidx.compose.ui.graphics.vectormath.Vector2 transform(kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> block);
-    method public operator androidx.compose.ui.graphics.vectormath.Vector2 unaryMinus();
-    property public final inline float g;
-    property public final inline float r;
-    property public final inline androidx.compose.ui.graphics.vectormath.Vector2 rg;
-    property public final inline float s;
-    property public final inline androidx.compose.ui.graphics.vectormath.Vector2 st;
-    property public final inline float t;
-    property public final inline java.util.List<java.lang.Float> v2storage;
-    property public final inline androidx.compose.ui.graphics.vectormath.Vector2 xy;
-  }
-
-  public final class Vector3 {
-    ctor public Vector3(float x, float y, float z);
-    ctor public Vector3();
-    ctor public Vector3(androidx.compose.ui.graphics.vectormath.Vector2 v, float z);
-    ctor public Vector3(androidx.compose.ui.graphics.vectormath.Vector3 v);
-    method public float component1();
-    method public float component2();
-    method public float component3();
-    method public androidx.compose.ui.graphics.vectormath.Vector3 copy(float x, float y, float z);
-    method public operator androidx.compose.ui.graphics.vectormath.Vector3 dec();
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector3 div(float v);
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector3 div(androidx.compose.ui.graphics.vectormath.Vector2 v);
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector3 div(androidx.compose.ui.graphics.vectormath.Vector3 v);
-    method public operator float get(androidx.compose.ui.graphics.vectormath.VectorComponent index);
-    method public operator androidx.compose.ui.graphics.vectormath.Vector2 get(androidx.compose.ui.graphics.vectormath.VectorComponent index1, androidx.compose.ui.graphics.vectormath.VectorComponent index2);
-    method public operator androidx.compose.ui.graphics.vectormath.Vector3 get(androidx.compose.ui.graphics.vectormath.VectorComponent index1, androidx.compose.ui.graphics.vectormath.VectorComponent index2, androidx.compose.ui.graphics.vectormath.VectorComponent index3);
-    method public operator float get(int index);
-    method public operator androidx.compose.ui.graphics.vectormath.Vector2 get(int index1, int index2);
-    method public operator androidx.compose.ui.graphics.vectormath.Vector3 get(int index1, int index2, int index3);
-    method public inline float getB();
-    method public inline float getG();
-    method public inline float getP();
-    method public inline float getR();
-    method public inline androidx.compose.ui.graphics.vectormath.Vector2 getRg();
-    method public inline androidx.compose.ui.graphics.vectormath.Vector3 getRgb();
-    method public inline float getS();
-    method public inline androidx.compose.ui.graphics.vectormath.Vector2 getSt();
-    method public inline androidx.compose.ui.graphics.vectormath.Vector3 getStp();
-    method public inline float getT();
-    method public inline java.util.List<java.lang.Float> getV3storage();
-    method public float getX();
-    method public inline androidx.compose.ui.graphics.vectormath.Vector2 getXy();
-    method public inline androidx.compose.ui.graphics.vectormath.Vector3 getXyz();
-    method public float getY();
-    method public float getZ();
-    method public operator androidx.compose.ui.graphics.vectormath.Vector3 inc();
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector3 minus(float v);
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector3 minus(androidx.compose.ui.graphics.vectormath.Vector2 v);
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector3 minus(androidx.compose.ui.graphics.vectormath.Vector3 v);
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector3 plus(float v);
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector3 plus(androidx.compose.ui.graphics.vectormath.Vector2 v);
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector3 plus(androidx.compose.ui.graphics.vectormath.Vector3 v);
-    method public operator void set(int index, float v);
-    method public operator void set(int index1, int index2, float v);
-    method public operator void set(int index1, int index2, int index3, float v);
-    method public operator void set(androidx.compose.ui.graphics.vectormath.VectorComponent index, float v);
-    method public operator void set(androidx.compose.ui.graphics.vectormath.VectorComponent index1, androidx.compose.ui.graphics.vectormath.VectorComponent index2, float v);
-    method public operator void set(androidx.compose.ui.graphics.vectormath.VectorComponent index1, androidx.compose.ui.graphics.vectormath.VectorComponent index2, androidx.compose.ui.graphics.vectormath.VectorComponent index3, float v);
-    method public inline void setB(float value);
-    method public inline void setG(float value);
-    method public inline void setP(float value);
-    method public inline void setR(float value);
-    method public inline void setRg(androidx.compose.ui.graphics.vectormath.Vector2 value);
-    method public inline void setRgb(androidx.compose.ui.graphics.vectormath.Vector3 value);
-    method public inline void setS(float value);
-    method public inline void setSt(androidx.compose.ui.graphics.vectormath.Vector2 value);
-    method public inline void setStp(androidx.compose.ui.graphics.vectormath.Vector3 value);
-    method public inline void setT(float value);
-    method public void setX(float p);
-    method public inline void setXy(androidx.compose.ui.graphics.vectormath.Vector2 value);
-    method public inline void setXyz(androidx.compose.ui.graphics.vectormath.Vector3 value);
-    method public void setY(float p);
-    method public void setZ(float p);
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector3 times(float v);
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector3 times(androidx.compose.ui.graphics.vectormath.Vector2 v);
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector3 times(androidx.compose.ui.graphics.vectormath.Vector3 v);
-    method public inline androidx.compose.ui.graphics.vectormath.Vector3 transform(kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> block);
-    method public operator androidx.compose.ui.graphics.vectormath.Vector3 unaryMinus();
-    property public final inline float b;
-    property public final inline float g;
-    property public final inline float p;
-    property public final inline float r;
-    property public final inline androidx.compose.ui.graphics.vectormath.Vector2 rg;
-    property public final inline androidx.compose.ui.graphics.vectormath.Vector3 rgb;
-    property public final inline float s;
-    property public final inline androidx.compose.ui.graphics.vectormath.Vector2 st;
-    property public final inline androidx.compose.ui.graphics.vectormath.Vector3 stp;
-    property public final inline float t;
-    property public final inline java.util.List<java.lang.Float> v3storage;
-    property public final inline androidx.compose.ui.graphics.vectormath.Vector2 xy;
-    property public final inline androidx.compose.ui.graphics.vectormath.Vector3 xyz;
-  }
-
-  public final class Vector4 {
-    ctor public Vector4(float x, float y, float z, float w);
-    ctor public Vector4();
-    ctor public Vector4(androidx.compose.ui.graphics.vectormath.Vector2 v, float z, float w);
-    ctor public Vector4(androidx.compose.ui.graphics.vectormath.Vector3 v, float w);
-    ctor public Vector4(androidx.compose.ui.graphics.vectormath.Vector4 v);
-    method public void assignFromStorage(java.util.List<java.lang.Float> storage);
-    method public float component1();
-    method public float component2();
-    method public float component3();
-    method public float component4();
-    method public androidx.compose.ui.graphics.vectormath.Vector4 copy(float x, float y, float z, float w);
-    method public operator androidx.compose.ui.graphics.vectormath.Vector4 dec();
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector4 div(float v);
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector4 div(androidx.compose.ui.graphics.vectormath.Vector2 v);
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector4 div(androidx.compose.ui.graphics.vectormath.Vector3 v);
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector4 div(androidx.compose.ui.graphics.vectormath.Vector4 v);
-    method public operator float get(androidx.compose.ui.graphics.vectormath.VectorComponent index);
-    method public operator androidx.compose.ui.graphics.vectormath.Vector2 get(androidx.compose.ui.graphics.vectormath.VectorComponent index1, androidx.compose.ui.graphics.vectormath.VectorComponent index2);
-    method public operator androidx.compose.ui.graphics.vectormath.Vector3 get(androidx.compose.ui.graphics.vectormath.VectorComponent index1, androidx.compose.ui.graphics.vectormath.VectorComponent index2, androidx.compose.ui.graphics.vectormath.VectorComponent index3);
-    method public operator androidx.compose.ui.graphics.vectormath.Vector4 get(androidx.compose.ui.graphics.vectormath.VectorComponent index1, androidx.compose.ui.graphics.vectormath.VectorComponent index2, androidx.compose.ui.graphics.vectormath.VectorComponent index3, androidx.compose.ui.graphics.vectormath.VectorComponent index4);
-    method public operator float get(int index);
-    method public operator androidx.compose.ui.graphics.vectormath.Vector2 get(int index1, int index2);
-    method public operator androidx.compose.ui.graphics.vectormath.Vector3 get(int index1, int index2, int index3);
-    method public operator androidx.compose.ui.graphics.vectormath.Vector4 get(int index1, int index2, int index3, int index4);
-    method public inline float getA();
-    method public inline float getB();
-    method public inline float getG();
-    method public inline float getP();
-    method public inline float getQ();
-    method public inline float getR();
-    method public inline androidx.compose.ui.graphics.vectormath.Vector2 getRg();
-    method public inline androidx.compose.ui.graphics.vectormath.Vector3 getRgb();
-    method public inline androidx.compose.ui.graphics.vectormath.Vector4 getRgba();
-    method public inline float getS();
-    method public inline androidx.compose.ui.graphics.vectormath.Vector2 getSt();
-    method public inline androidx.compose.ui.graphics.vectormath.Vector3 getStp();
-    method public inline androidx.compose.ui.graphics.vectormath.Vector4 getStpq();
-    method public inline float getT();
-    method public inline java.util.List<java.lang.Float> getV4storage();
-    method public float getW();
-    method public float getX();
-    method public inline androidx.compose.ui.graphics.vectormath.Vector2 getXy();
-    method public inline androidx.compose.ui.graphics.vectormath.Vector3 getXyz();
-    method public inline androidx.compose.ui.graphics.vectormath.Vector4 getXyzw();
-    method public float getY();
-    method public float getZ();
-    method public operator androidx.compose.ui.graphics.vectormath.Vector4 inc();
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector4 minus(float v);
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector4 minus(androidx.compose.ui.graphics.vectormath.Vector2 v);
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector4 minus(androidx.compose.ui.graphics.vectormath.Vector3 v);
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector4 minus(androidx.compose.ui.graphics.vectormath.Vector4 v);
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector4 plus(float v);
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector4 plus(androidx.compose.ui.graphics.vectormath.Vector2 v);
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector4 plus(androidx.compose.ui.graphics.vectormath.Vector3 v);
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector4 plus(androidx.compose.ui.graphics.vectormath.Vector4 v);
-    method public operator void set(int index, float v);
-    method public operator void set(int index1, int index2, float v);
-    method public operator void set(int index1, int index2, int index3, float v);
-    method public operator void set(int index1, int index2, int index3, int index4, float v);
-    method public operator void set(androidx.compose.ui.graphics.vectormath.VectorComponent index, float v);
-    method public operator void set(androidx.compose.ui.graphics.vectormath.VectorComponent index1, androidx.compose.ui.graphics.vectormath.VectorComponent index2, float v);
-    method public operator void set(androidx.compose.ui.graphics.vectormath.VectorComponent index1, androidx.compose.ui.graphics.vectormath.VectorComponent index2, androidx.compose.ui.graphics.vectormath.VectorComponent index3, float v);
-    method public operator void set(androidx.compose.ui.graphics.vectormath.VectorComponent index1, androidx.compose.ui.graphics.vectormath.VectorComponent index2, androidx.compose.ui.graphics.vectormath.VectorComponent index3, androidx.compose.ui.graphics.vectormath.VectorComponent index4, float v);
-    method public inline void setA(float value);
-    method public inline void setB(float value);
-    method public inline void setG(float value);
-    method public inline void setP(float value);
-    method public inline void setQ(float value);
-    method public inline void setR(float value);
-    method public inline void setRg(androidx.compose.ui.graphics.vectormath.Vector2 value);
-    method public inline void setRgb(androidx.compose.ui.graphics.vectormath.Vector3 value);
-    method public inline void setRgba(androidx.compose.ui.graphics.vectormath.Vector4 value);
-    method public inline void setS(float value);
-    method public inline void setSt(androidx.compose.ui.graphics.vectormath.Vector2 value);
-    method public inline void setStp(androidx.compose.ui.graphics.vectormath.Vector3 value);
-    method public inline void setStpq(androidx.compose.ui.graphics.vectormath.Vector4 value);
-    method public inline void setT(float value);
-    method public void setW(float p);
-    method public void setX(float p);
-    method public inline void setXy(androidx.compose.ui.graphics.vectormath.Vector2 value);
-    method public inline void setXyz(androidx.compose.ui.graphics.vectormath.Vector3 value);
-    method public inline void setXyzw(androidx.compose.ui.graphics.vectormath.Vector4 value);
-    method public void setY(float p);
-    method public void setZ(float p);
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector4 times(float v);
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector4 times(androidx.compose.ui.graphics.vectormath.Vector2 v);
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector4 times(androidx.compose.ui.graphics.vectormath.Vector3 v);
-    method public inline operator androidx.compose.ui.graphics.vectormath.Vector4 times(androidx.compose.ui.graphics.vectormath.Vector4 v);
-    method public inline androidx.compose.ui.graphics.vectormath.Vector4 transform(kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> block);
-    method public operator androidx.compose.ui.graphics.vectormath.Vector4 unaryMinus();
-    property public final inline float a;
-    property public final inline float b;
-    property public final inline float g;
-    property public final inline float p;
-    property public final inline float q;
-    property public final inline float r;
-    property public final inline androidx.compose.ui.graphics.vectormath.Vector2 rg;
-    property public final inline androidx.compose.ui.graphics.vectormath.Vector3 rgb;
-    property public final inline androidx.compose.ui.graphics.vectormath.Vector4 rgba;
-    property public final inline float s;
-    property public final inline androidx.compose.ui.graphics.vectormath.Vector2 st;
-    property public final inline androidx.compose.ui.graphics.vectormath.Vector3 stp;
-    property public final inline androidx.compose.ui.graphics.vectormath.Vector4 stpq;
-    property public final inline float t;
-    property public final inline java.util.List<java.lang.Float> v4storage;
-    property public final inline androidx.compose.ui.graphics.vectormath.Vector2 xy;
-    property public final inline androidx.compose.ui.graphics.vectormath.Vector3 xyz;
-    property public final inline androidx.compose.ui.graphics.vectormath.Vector4 xyzw;
-  }
-
-  public enum VectorComponent {
-    method public static androidx.compose.ui.graphics.vectormath.VectorComponent valueOf(String name) throws java.lang.IllegalArgumentException;
-    method public static androidx.compose.ui.graphics.vectormath.VectorComponent[] values();
-    enum_constant public static final androidx.compose.ui.graphics.vectormath.VectorComponent A;
-    enum_constant public static final androidx.compose.ui.graphics.vectormath.VectorComponent B;
-    enum_constant public static final androidx.compose.ui.graphics.vectormath.VectorComponent G;
-    enum_constant public static final androidx.compose.ui.graphics.vectormath.VectorComponent P;
-    enum_constant public static final androidx.compose.ui.graphics.vectormath.VectorComponent Q;
-    enum_constant public static final androidx.compose.ui.graphics.vectormath.VectorComponent R;
-    enum_constant public static final androidx.compose.ui.graphics.vectormath.VectorComponent S;
-    enum_constant public static final androidx.compose.ui.graphics.vectormath.VectorComponent T;
-    enum_constant public static final androidx.compose.ui.graphics.vectormath.VectorComponent W;
-    enum_constant public static final androidx.compose.ui.graphics.vectormath.VectorComponent X;
-    enum_constant public static final androidx.compose.ui.graphics.vectormath.VectorComponent Y;
-    enum_constant public static final androidx.compose.ui.graphics.vectormath.VectorComponent Z;
-  }
-
-  public final class VectorExtensionsKt {
-    method public static inline androidx.compose.ui.graphics.vectormath.Vector2 abs(androidx.compose.ui.graphics.vectormath.Vector2 v);
-    method public static inline androidx.compose.ui.graphics.vectormath.Vector3 abs(androidx.compose.ui.graphics.vectormath.Vector3 v);
-    method public static inline androidx.compose.ui.graphics.vectormath.Vector4 abs(androidx.compose.ui.graphics.vectormath.Vector4 v);
-    method public static inline androidx.compose.ui.graphics.vectormath.Vector2 coerceIn(androidx.compose.ui.graphics.vectormath.Vector2, float min, float max);
-    method public static inline androidx.compose.ui.graphics.vectormath.Vector2 coerceIn(androidx.compose.ui.graphics.vectormath.Vector2, androidx.compose.ui.graphics.vectormath.Vector2 min, androidx.compose.ui.graphics.vectormath.Vector2 max);
-    method public static inline androidx.compose.ui.graphics.vectormath.Vector3 coerceIn(androidx.compose.ui.graphics.vectormath.Vector3, float min, float max);
-    method public static inline androidx.compose.ui.graphics.vectormath.Vector3 coerceIn(androidx.compose.ui.graphics.vectormath.Vector3, androidx.compose.ui.graphics.vectormath.Vector3 min, androidx.compose.ui.graphics.vectormath.Vector3 max);
-    method public static inline androidx.compose.ui.graphics.vectormath.Vector4 coerceIn(androidx.compose.ui.graphics.vectormath.Vector4, float min, float max);
-    method public static inline androidx.compose.ui.graphics.vectormath.Vector4 coerceIn(androidx.compose.ui.graphics.vectormath.Vector4, androidx.compose.ui.graphics.vectormath.Vector4 min, androidx.compose.ui.graphics.vectormath.Vector4 max);
-    method public static inline androidx.compose.ui.graphics.vectormath.Vector3 cross(androidx.compose.ui.graphics.vectormath.Vector3 a, androidx.compose.ui.graphics.vectormath.Vector3 b);
-    method public static inline float distance(androidx.compose.ui.graphics.vectormath.Vector2 a, androidx.compose.ui.graphics.vectormath.Vector2 b);
-    method public static inline float distance(androidx.compose.ui.graphics.vectormath.Vector3 a, androidx.compose.ui.graphics.vectormath.Vector3 b);
-    method public static inline float distance(androidx.compose.ui.graphics.vectormath.Vector4 a, androidx.compose.ui.graphics.vectormath.Vector4 b);
-    method public static inline operator androidx.compose.ui.graphics.vectormath.Vector2 div(float, androidx.compose.ui.graphics.vectormath.Vector2 v);
-    method public static inline operator androidx.compose.ui.graphics.vectormath.Vector3 div(float, androidx.compose.ui.graphics.vectormath.Vector3 v);
-    method public static inline operator androidx.compose.ui.graphics.vectormath.Vector4 div(float, androidx.compose.ui.graphics.vectormath.Vector4 v);
-    method public static inline float dot(androidx.compose.ui.graphics.vectormath.Vector2 a, androidx.compose.ui.graphics.vectormath.Vector2 b);
-    method public static inline float dot(androidx.compose.ui.graphics.vectormath.Vector3 a, androidx.compose.ui.graphics.vectormath.Vector3 b);
-    method public static inline float dot(androidx.compose.ui.graphics.vectormath.Vector4 a, androidx.compose.ui.graphics.vectormath.Vector4 b);
-    method public static inline float length(androidx.compose.ui.graphics.vectormath.Vector2 v);
-    method public static inline float length(androidx.compose.ui.graphics.vectormath.Vector3 v);
-    method public static inline float length(androidx.compose.ui.graphics.vectormath.Vector4 v);
-    method public static inline float length2(androidx.compose.ui.graphics.vectormath.Vector2 v);
-    method public static inline float length2(androidx.compose.ui.graphics.vectormath.Vector3 v);
-    method public static inline float length2(androidx.compose.ui.graphics.vectormath.Vector4 v);
-    method public static inline float max(androidx.compose.ui.graphics.vectormath.Vector2 v);
-    method public static inline androidx.compose.ui.graphics.vectormath.Vector2 max(androidx.compose.ui.graphics.vectormath.Vector2 a, androidx.compose.ui.graphics.vectormath.Vector2 b);
-    method public static inline float max(androidx.compose.ui.graphics.vectormath.Vector3 v);
-    method public static inline androidx.compose.ui.graphics.vectormath.Vector3 max(androidx.compose.ui.graphics.vectormath.Vector3 a, androidx.compose.ui.graphics.vectormath.Vector3 b);
-    method public static inline float max(androidx.compose.ui.graphics.vectormath.Vector4 v);
-    method public static inline androidx.compose.ui.graphics.vectormath.Vector4 max(androidx.compose.ui.graphics.vectormath.Vector4 a, androidx.compose.ui.graphics.vectormath.Vector4 b);
-    method public static inline float min(androidx.compose.ui.graphics.vectormath.Vector2 v);
-    method public static inline androidx.compose.ui.graphics.vectormath.Vector2 min(androidx.compose.ui.graphics.vectormath.Vector2 a, androidx.compose.ui.graphics.vectormath.Vector2 b);
-    method public static inline float min(androidx.compose.ui.graphics.vectormath.Vector3 v);
-    method public static inline androidx.compose.ui.graphics.vectormath.Vector3 min(androidx.compose.ui.graphics.vectormath.Vector3 a, androidx.compose.ui.graphics.vectormath.Vector3 b);
-    method public static inline float min(androidx.compose.ui.graphics.vectormath.Vector4 v);
-    method public static inline androidx.compose.ui.graphics.vectormath.Vector4 min(androidx.compose.ui.graphics.vectormath.Vector4 a, androidx.compose.ui.graphics.vectormath.Vector4 b);
-    method public static inline operator androidx.compose.ui.graphics.vectormath.Vector2 minus(float, androidx.compose.ui.graphics.vectormath.Vector2 v);
-    method public static inline operator androidx.compose.ui.graphics.vectormath.Vector3 minus(float, androidx.compose.ui.graphics.vectormath.Vector3 v);
-    method public static inline operator androidx.compose.ui.graphics.vectormath.Vector4 minus(float, androidx.compose.ui.graphics.vectormath.Vector4 v);
-    method public static androidx.compose.ui.graphics.vectormath.Vector2 normalize(androidx.compose.ui.graphics.vectormath.Vector2 v);
-    method public static androidx.compose.ui.graphics.vectormath.Vector3 normalize(androidx.compose.ui.graphics.vectormath.Vector3 v);
-    method public static androidx.compose.ui.graphics.vectormath.Vector4 normalize(androidx.compose.ui.graphics.vectormath.Vector4 v);
-    method public static inline operator androidx.compose.ui.graphics.vectormath.Vector2 plus(float, androidx.compose.ui.graphics.vectormath.Vector2 v);
-    method public static inline operator androidx.compose.ui.graphics.vectormath.Vector3 plus(float, androidx.compose.ui.graphics.vectormath.Vector3 v);
-    method public static inline operator androidx.compose.ui.graphics.vectormath.Vector4 plus(float, androidx.compose.ui.graphics.vectormath.Vector4 v);
-    method public static inline androidx.compose.ui.graphics.vectormath.Vector2 reflect(androidx.compose.ui.graphics.vectormath.Vector2 i, androidx.compose.ui.graphics.vectormath.Vector2 n);
-    method public static inline androidx.compose.ui.graphics.vectormath.Vector3 reflect(androidx.compose.ui.graphics.vectormath.Vector3 i, androidx.compose.ui.graphics.vectormath.Vector3 n);
-    method public static androidx.compose.ui.graphics.vectormath.Vector2 refract(androidx.compose.ui.graphics.vectormath.Vector2 i, androidx.compose.ui.graphics.vectormath.Vector2 n, float eta);
-    method public static androidx.compose.ui.graphics.vectormath.Vector3 refract(androidx.compose.ui.graphics.vectormath.Vector3 i, androidx.compose.ui.graphics.vectormath.Vector3 n, float eta);
-    method public static inline operator androidx.compose.ui.graphics.vectormath.Vector2 times(float, androidx.compose.ui.graphics.vectormath.Vector2 v);
-    method public static inline operator androidx.compose.ui.graphics.vectormath.Vector3 times(float, androidx.compose.ui.graphics.vectormath.Vector3 v);
-    method public static inline operator androidx.compose.ui.graphics.vectormath.Vector4 times(float, androidx.compose.ui.graphics.vectormath.Vector4 v);
-    method public static inline androidx.compose.ui.graphics.vectormath.Vector2 transform(androidx.compose.ui.graphics.vectormath.Vector2 v, kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> block);
-    method public static inline androidx.compose.ui.graphics.vectormath.Vector3 transform(androidx.compose.ui.graphics.vectormath.Vector3 v, kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> block);
-    method public static inline androidx.compose.ui.graphics.vectormath.Vector4 transform(androidx.compose.ui.graphics.vectormath.Vector4 v, kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> block);
-    method public static inline infix androidx.compose.ui.graphics.vectormath.Vector3 x(androidx.compose.ui.graphics.vectormath.Vector3, androidx.compose.ui.graphics.vectormath.Vector3 v);
   }
 
 }
