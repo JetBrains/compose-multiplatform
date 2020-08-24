@@ -34,6 +34,7 @@ import androidx.compose.runtime.SlotTable
 import androidx.compose.runtime.compositionFor
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.emptyContent
+import androidx.compose.runtime.tooling.InspectionTables
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.R
 import androidx.compose.ui.focus.ExperimentalFocus
@@ -250,6 +251,7 @@ private class WrappedComposition(
     private var addedToLifecycle: Lifecycle? = null
     private var contentWaitingForCreated: @Composable () -> Unit = emptyContent()
 
+    @OptIn(InternalComposeApi::class)
     override fun setContent(content: @Composable () -> Unit) {
         owner.setOnViewTreeOwnersAvailable {
             if (!disposed) {
@@ -261,22 +263,22 @@ private class WrappedComposition(
                 if (lifecycle.currentState.isAtLeast(Lifecycle.State.CREATED)) {
                     original.setContent {
                         @Suppress("UNCHECKED_CAST")
-                        (owner.view.getTag(R.id.inspection_slot_table_set) as?
-                                MutableSet<SlotTable>)
-                            ?.let {
-                                val composer = currentComposer
-                                @OptIn(InternalComposeApi::class)
-                                composer.collectKeySourceInformation()
-                                it.add(composer.slotTable)
+                        val inspectionTable =
+                            owner.view.getTag(R.id.inspection_slot_table_set) as?
+                                    MutableSet<SlotTable>
+                        if (inspectionTable != null) {
+                            inspectionTable.add(currentComposer.slotTable)
+                        }
+                        Providers(InspectionTables provides inspectionTable) {
+                            ProvideAndroidAmbients(owner) {
+                                SelectionContainer(
+                                    modifier = Modifier.noConsumptionTapGestureFilter {
+                                        @OptIn(ExperimentalFocus::class)
+                                        owner.focusManager.clearFocus()
+                                    },
+                                    children = content
+                                )
                             }
-                        ProvideAndroidAmbients(owner) {
-                            SelectionContainer(
-                                modifier = Modifier.noConsumptionTapGestureFilter {
-                                    @OptIn(ExperimentalFocus::class)
-                                    owner.focusManager.clearFocus()
-                                },
-                                children = content
-                            )
                         }
                     }
                 } else {
