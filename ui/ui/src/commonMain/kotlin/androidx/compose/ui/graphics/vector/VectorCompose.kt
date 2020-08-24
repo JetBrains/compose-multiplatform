@@ -25,6 +25,7 @@ import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.compositionFor
 import androidx.compose.runtime.emit
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 
@@ -62,6 +63,7 @@ fun Group(
 @Composable
 fun Path(
     pathData: List<PathNode>,
+    pathFillType: PathFillType = DefaultFillType,
     name: String = DefaultPathName,
     fill: Brush? = null,
     fillAlpha: Float = 1.0f,
@@ -80,6 +82,7 @@ fun Path(
         update = {
             set(name) { this.name = it }
             set(pathData) { this.pathData = it }
+            set(pathFillType) { this.pathFillType = it }
             set(fill) { this.fill = it }
             set(fillAlpha) { this.fillAlpha = it }
             set(stroke) { this.stroke = it }
