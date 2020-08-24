@@ -20,6 +20,7 @@ import android.content.res.Resources
 import android.util.AttributeSet
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
@@ -291,20 +292,21 @@ internal fun XmlPullParser.parsePath(
         0.0f
     )
 
-    // TODO(njawad) handle fill rule
-//    val fillRule = TypedArrayUtils.getNamedInt(
-//        a, this, "fillType",
-//        AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_PATH_TRIM_PATH_FILLTYPE,
-//        FILL_TYPE_WINDING
-//    )
+    val fillRule = TypedArrayUtils.getNamedInt(
+        a, this, "fillType",
+        AndroidVectorResources.STYLEABLE_VECTOR_DRAWABLE_PATH_TRIM_PATH_FILLTYPE,
+        FILL_TYPE_WINDING
+    )
 
     a.recycle()
 
     val fillBrush = obtainBrushFromComplexColor(fillColor)
     val strokeBrush = obtainBrushFromComplexColor(strokeColor)
+    val fillPathType = if (fillRule == 0) PathFillType.NonZero else PathFillType.EvenOdd
 
     builder.addPath(
         pathData,
+        fillPathType,
         name,
         fillBrush,
         fillAlpha,
