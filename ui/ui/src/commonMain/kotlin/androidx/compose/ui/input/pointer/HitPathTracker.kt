@@ -419,7 +419,7 @@ internal class Node(val pointerInputFilter: PointerInputFilter) : NodeParent() {
         //  to onPointerEvent).
 
         // Dispatch on the tunneling pass.
-        internalPointerEvent.tryDispatchToPointerInputFilter(pointerInputFilter, downPass)
+        internalPointerEvent.dispatchToPointerInputFilter(pointerInputFilter, downPass)
 
         // Dispatch to children.
         if (pointerInputFilter.isAttached) {
@@ -427,7 +427,7 @@ internal class Node(val pointerInputFilter: PointerInputFilter) : NodeParent() {
         }
 
         // Dispatch on the bubbling pass.
-        internalPointerEvent.tryDispatchToPointerInputFilter(pointerInputFilter, upPass)
+        internalPointerEvent.dispatchToPointerInputFilter(pointerInputFilter, upPass)
 
         // Put all of the relevant changes that were in the internalPointerEvent back into all of
         // the changes, and then set all of the changes back onto the internalPointerEvent.
@@ -507,7 +507,7 @@ internal class Node(val pointerInputFilter: PointerInputFilter) : NodeParent() {
      *
      * Is a no-op if [filter] is not attached or [pass] is null.
      */
-    private fun InternalPointerEvent.tryDispatchToPointerInputFilter(
+    private fun InternalPointerEvent.dispatchToPointerInputFilter(
         filter: PointerInputFilter,
         pass: PointerEventPass?
     ) {
