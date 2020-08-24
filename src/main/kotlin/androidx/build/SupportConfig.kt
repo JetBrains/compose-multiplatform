@@ -57,6 +57,14 @@ fun Project.getExternalProjectPath(): File {
     return File(project.getCheckoutRoot(), "external")
 }
 
+fun distSubdir(): String {
+    val subdir = System.getenv("DIST_SUBDIR")
+    if (subdir != null && subdir.isNotEmpty()) {
+        return subdir.substring(1) + "/"
+    }
+    return ""
+}
+
 fun Project.getKeystore(): File {
     return File(project.getSupportRootFolder(), "development/keystore/debug.keystore")
 }
