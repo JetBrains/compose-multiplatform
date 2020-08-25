@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.graphics
 
+import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.test.filters.SmallTest
@@ -80,6 +81,29 @@ class MatrixTest {
         assertEquals(0f, rect45.top, 0.0001f)
         assertEquals(sqrt2Times10 / 2f, rect45.right, 0.0001f)
         assertEquals(sqrt2Times10, rect45.bottom, 0.0001f)
+    }
+
+    @Test
+    fun mapMutableRect() {
+        val matrix = Matrix()
+
+        val rect = MutableRect(0f, 0f, 10f, 10f)
+        matrix.map(rect)
+        assertEquals(MutableRect(0f, 0f, 10f, 10f), rect)
+
+        matrix.rotateZ(90f)
+        matrix.scale(2f, 2f)
+
+        matrix.map(rect)
+        assertEquals(MutableRect(-20f, 0f, 0f, 20f), rect)
+
+        matrix.reset()
+        matrix.rotateZ(45f)
+
+        rect.set(0f, 0f, 10f, 10f)
+        matrix.map(rect)
+        val sqrt2Times10 = 10f * sqrt(2f)
+        assertEquals(MutableRect(-sqrt2Times10 / 2f, 0f, sqrt2Times10 / 2f, sqrt2Times10), rect)
     }
 
     @Test
@@ -201,6 +225,13 @@ class MatrixTest {
         private fun assertEquals(expected: Offset, actual: Offset) {
             assertEquals(expected.x, actual.x, 0.0001f)
             assertEquals(expected.y, actual.y, 0.0001f)
+        }
+
+        private fun assertEquals(expected: MutableRect, actual: MutableRect) {
+            assertEquals(expected.left, actual.left, 0.0001f)
+            assertEquals(expected.top, actual.top, 0.0001f)
+            assertEquals(expected.right, actual.right, 0.0001f)
+            assertEquals(expected.bottom, actual.bottom, 0.0001f)
         }
 
         private fun Matrix.isNearIdentity(): Boolean {

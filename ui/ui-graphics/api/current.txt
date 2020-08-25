@@ -371,6 +371,7 @@ package androidx.compose.ui.graphics {
     method public static inline int hashCode-impl(float[]! p);
     method public static void invert-impl(float[]! $this);
     method public static androidx.compose.ui.geometry.Rect map-impl(float[] $this, androidx.compose.ui.geometry.Rect rect);
+    method public static void map-impl(float[] $this, androidx.compose.ui.geometry.MutableRect rect);
     method public static long map-k-4lQ0M(float[] $this, long point);
     method public static void reset-impl(float[]! $this);
     method public static void rotateX-impl(float[] $this, float degrees);
