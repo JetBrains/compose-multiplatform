@@ -67,7 +67,7 @@ IconGenerationTask.registerExtendedIconProject(project, android)
 androidx {
     name = "Compose Material Icons Extended"
     publish = Publish.SNAPSHOT_AND_RELEASE
-    mavenVersion = LibraryVersions.UI
+    mavenVersion = LibraryVersions.COMPOSE
     mavenGroup = LibraryGroups.Compose.MATERIAL
     // This module has a large number (5000+) of generated source files and so doc generation /
     // API tracking will simply take too long

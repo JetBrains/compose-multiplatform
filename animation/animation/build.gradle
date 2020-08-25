@@ -72,7 +72,7 @@ kotlin {
 androidx {
     name = "Compose Animation"
     publish = Publish.SNAPSHOT_AND_RELEASE
-    mavenVersion = LibraryVersions.UI
+    mavenVersion = LibraryVersions.COMPOSE
     mavenGroup = LibraryGroups.Compose.ANIMATION
     inceptionYear = "2019"
     description = "Compose animation library"

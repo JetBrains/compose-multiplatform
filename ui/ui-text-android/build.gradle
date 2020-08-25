@@ -54,7 +54,7 @@ androidx {
     name = "Compose UI Text Android support"
     publish = Publish.SNAPSHOT_AND_RELEASE
     generateDocs = false
-    mavenVersion = LibraryVersions.UI
+    mavenVersion = LibraryVersions.COMPOSE
     mavenGroup = LibraryGroups.Compose.UI
     inceptionYear = "2018"
     description = "Android specific implementations for Text in Compose"

@@ -71,7 +71,7 @@ kotlin {
 androidx {
     name = "Compose Graphics"
     publish = Publish.SNAPSHOT_AND_RELEASE
-    mavenVersion = LibraryVersions.UI
+    mavenVersion = LibraryVersions.COMPOSE
     mavenGroup = LibraryGroups.Compose.UI
     inceptionYear = "2020"
     description = "Compose graphics"
