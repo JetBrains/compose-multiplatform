@@ -29,7 +29,6 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.platform.NativeRectF
 import androidx.compose.ui.semantics.outerSemantics
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
@@ -98,9 +97,6 @@ internal abstract class LayoutNodeWrapper(
     // True when the wrapper is running its own placing block to obtain the position of the
     // wrapped, but is not interested in the position of the wrapped of the wrapped.
     var isShallowPlacing = false
-
-    // TODO(mount): This is not thread safe.
-    private var rectCache: NativeRectF? = null
 
     /**
      * Whether a pointer that is relative to the device screen is in the bounds of this
@@ -253,21 +249,22 @@ internal abstract class LayoutNodeWrapper(
      * Modifies bounds to be in the parent LayoutNodeWrapper's coordinates, including clipping,
      * scaling, etc.
      */
-    protected open fun rectInParent(bounds: NativeRectF) {
+    protected open fun rectInParent(bounds: Rect): Rect {
         val x = position.x
-        bounds.left += x
-        bounds.right += x
 
         val y = position.y
-        bounds.top += y
-        bounds.bottom += y
+        return Rect(
+            left = bounds.left + x,
+            top = bounds.top + y,
+            right = bounds.right + x,
+            bottom = bounds.bottom + y
+        )
     }
 
     override fun childBoundingBox(child: LayoutCoordinates): Rect {
         check(isAttached) { ExpectAttachedLayoutCoordinates }
         check(child.isAttached) { "Child $child is not attached!" }
-        val rectF = rectCache ?: NativeRectF().also { rectCache = it }
-        rectF.set(
+        var bounds = Rect(
             0f,
             0f,
             child.size.width.toFloat(),
@@ -275,7 +272,7 @@ internal abstract class LayoutNodeWrapper(
         )
         var wrapper = child as LayoutNodeWrapper
         while (wrapper !== this) {
-            wrapper.rectInParent(rectF)
+            bounds = wrapper.rectInParent(bounds)
 
             val parent = wrapper.wrappedBy
             check(parent != null) {
@@ -283,12 +280,7 @@ internal abstract class LayoutNodeWrapper(
             }
             wrapper = parent
         }
-        return Rect(
-            left = rectF.left,
-            top = rectF.top,
-            right = rectF.right,
-            bottom = rectF.bottom
-        )
+        return bounds
     }
 
     /**

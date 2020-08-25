@@ -19,16 +19,18 @@ package androidx.compose.ui.platform
 import android.os.Build
 import android.view.View
 import android.view.ViewOutlineProvider
-import androidx.compose.ui.DrawLayerModifier
-import androidx.compose.ui.TransformOrigin
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.DrawLayerModifier
+import androidx.compose.ui.TransformOrigin
+import androidx.compose.ui.graphics.Matrix
+import androidx.compose.ui.graphics.setFrom
+import androidx.compose.ui.node.OwnedLayer
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 
@@ -212,6 +214,11 @@ internal class ViewLayer(
     override fun forceLayout() {
         // Don't do anything. These Views are treated as RenderNodes, so a forced layout
         // should not do anything. If we keep this, we get more redrawing than is necessary.
+    }
+
+    override fun getMatrix(matrix: Matrix) {
+        val androidMatrix = super.getMatrix()
+        matrix.setFrom(androidMatrix)
     }
 
     companion object {

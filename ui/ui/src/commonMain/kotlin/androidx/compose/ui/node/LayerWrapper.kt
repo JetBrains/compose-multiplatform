@@ -21,10 +21,9 @@ import androidx.compose.ui.Placeable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.layout.globalPosition
-import androidx.compose.ui.platform.NativeMatrix
-import androidx.compose.ui.platform.NativeRectF
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 
@@ -33,7 +32,6 @@ internal class LayerWrapper(
     modifier: DrawLayerModifier
 ) : DelegatingLayoutNodeWrapper<DrawLayerModifier>(wrapped, modifier) {
     private var _layer: OwnedLayer? = null
-    private var layerDestroyed = false
 
     // Do not invalidate itself on position change.
     override val invalidateLayerOnBoundsChange get() = false
@@ -61,10 +59,10 @@ internal class LayerWrapper(
             }
         }
 
-    // TODO(mount): This cache isn't thread safe at all.
-    private var positionCache: FloatArray? = null
     // TODO (njawad): This cache matrix is not thread safe
-    private var inverseMatrixCache: NativeMatrix? = null
+    private var _matrixCache: Matrix? = null
+    private val matrixCache: Matrix
+        get() = _matrixCache ?: Matrix().also { _matrixCache = it }
 
     override fun performMeasure(constraints: Constraints): Placeable {
         val placeable = super.performMeasure(constraints)
@@ -97,57 +95,33 @@ internal class LayerWrapper(
     }
 
     override fun fromParentPosition(position: Offset): Offset {
-        val matrix = layer.getMatrix()
-        val targetPosition =
-            if (!matrix.isIdentity()) {
-                val inverse = inverseMatrixCache ?: NativeMatrix().also { inverseMatrixCache = it }
-                matrix.invert(inverse)
-                mapPointsFromMatrix(inverse, position)
-            } else {
-                position
-            }
+        val inverse = matrixCache
+        layer.getMatrix(inverse)
+        inverse.invert()
+        val targetPosition = inverse.map(position)
         return super.fromParentPosition(targetPosition)
     }
 
     override fun toParentPosition(position: Offset): Offset {
-        val matrix = layer.getMatrix()
-        val targetPosition =
-            if (!matrix.isIdentity()) {
-                mapPointsFromMatrix(matrix, position)
-            } else {
-                position
-            }
+        val matrix = matrixCache
+        val targetPosition = matrix.map(position)
         return super.toParentPosition(targetPosition)
     }
 
-    /**
-     * Return a transformed [Offset] based off of the provided matrix transformation
-     * and untransformed position.
-     */
-    private fun mapPointsFromMatrix(matrix: NativeMatrix, position: Offset): Offset {
-        val x = position.x
-        val y = position.y
-        val cache = positionCache
-        val point = if (cache != null) {
-            cache[0] = x
-            cache[1] = y
-            cache
+    override fun rectInParent(bounds: Rect): Rect {
+        val clipped: Rect
+        if (!modifier.clip) {
+            clipped = bounds
         } else {
-            floatArrayOf(x, y).also { positionCache = it }
+            clipped = bounds.intersect(Rect(0f, 0f, size.width.toFloat(), size.height.toFloat()))
+            if (clipped.isEmpty) {
+                return Rect.Zero
+            }
         }
-        matrix.mapPoints(point)
-        return Offset(point[0], point[1])
-    }
-
-    override fun rectInParent(bounds: NativeRectF) {
-        if (modifier.clip &&
-            !bounds.intersect(0f, 0f, size.width.toFloat(), size.height.toFloat())
-        ) {
-            bounds.setEmpty()
-        }
-        val matrix = layer.getMatrix()
-        matrix.mapRect(bounds)
-        return super.rectInParent(bounds)
+        val matrix = matrixCache
+        layer.getMatrix(matrix)
+        val mapped = matrix.map(clipped)
+        return super.rectInParent(mapped)
     }
 
     override fun hitTest(

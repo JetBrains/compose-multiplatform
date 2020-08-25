@@ -18,7 +18,7 @@ package androidx.compose.ui.node
 
 import androidx.compose.ui.DrawLayerModifier
 import androidx.compose.ui.graphics.Canvas
-import androidx.compose.ui.platform.NativeMatrix
+import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 
@@ -74,8 +74,7 @@ interface OwnedLayer {
     fun destroy()
 
     /**
-     * Returns a matrix that this layer will use to transform the contents.
-     * The caller must not modify the returned Matrix.
+     * Modifies [matrix] to be the transform that this layer applies to its content.
      */
-    fun getMatrix(): NativeMatrix
+    fun getMatrix(matrix: Matrix)
 }
