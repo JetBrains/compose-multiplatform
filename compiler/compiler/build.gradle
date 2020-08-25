@@ -34,11 +34,11 @@ plugins {
 apply plugin: 'org.anarres.jarjar'
 
 dependencies {
-    compileOnly(project(":compose:compose-compiler-hosted"))
+    compileOnly(project(":compose:compiler:compiler-hosted"))
 }
 
 jarjar.repackage('embeddedPlugin') {
-    destinationName "compose-compiler.jar"
+    destinationName "compiler.jar"
     from configurations.compileClasspath
     classRename 'com.intellij.**', 'org.jetbrains.kotlin.com.intellij.@1'
 }
@@ -60,7 +60,7 @@ androidx {
     publish = Publish.SNAPSHOT_AND_RELEASE
     toolingProject = true
     mavenVersion = LibraryVersions.COMPOSE
-    mavenGroup = LibraryGroups.COMPOSE
+    mavenGroup = LibraryGroups.Compose.COMPILER
     inceptionYear = "2019"
     description = "Compiler plugin that enables Compose"
     compilationTarget = CompilationTarget.HOST

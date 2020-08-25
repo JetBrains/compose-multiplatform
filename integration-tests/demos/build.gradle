@@ -10,7 +10,7 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin project(path: ":compose:compose-compiler")
+    kotlinPlugin project(path: ":compose:compiler:compiler")
 
     implementation project(":compose:androidview:androidview:integration-tests:androidview-demos")
     implementation project(":compose:animation:animation:integration-tests:animation-demos")
