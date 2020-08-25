@@ -53,61 +53,6 @@ data class Rect(
 ) {
 
     companion object {
-        /** Construct a rectangle from its left, top, right, and bottom edges. */
-        @Deprecated("Use Rect constructor instead", ReplaceWith("Rect(left, top, right, bottom)",
-            "androidx.compose.ui.geometry"))
-        @Stable
-        fun fromLTRB(left: Float, top: Float, right: Float, bottom: Float): Rect {
-            return Rect(left, top, right, bottom)
-        }
-
-        /**
-         * Construct a rectangle from its left and top edges, its width, and its
-         * height.
-         *
-         * To construct a [Rect] from an [Offset] and a [Size], you can use the
-         * rectangle constructor operator `&`. See [Offset.&].
-         */
-        @Deprecated("Use Rect(Offset, Size) instead",
-            ReplaceWith("Rect(Offset(left, top), Size(width, height))",
-                "androidx.compose.ui.geometry"))
-        @Stable
-        fun fromLTWH(left: Float, top: Float, width: Float, height: Float): Rect {
-            return Rect(left, top, left + width, top + height)
-        }
-
-        /**
-         * Construct a rectangle that bounds the given circle.
-         *
-         * The `center` argument is assumed to be an offset from the origin.
-         */
-        @Deprecated("Use Rect(Offset, Float) instead",
-            ReplaceWith("Rect(center, radius)", "androidx.compose.ui.geometry"))
-        @Stable
-        fun fromCircle(center: Offset, radius: Float): Rect {
-            return Rect(
-                center.x - radius,
-                center.y - radius,
-                center.x + radius,
-                center.y + radius
-            )
-        }
-
-        /**
-         * Construct the smallest rectangle that encloses the given offsets, treating
-         * them as vectors from the origin.
-         */
-        @Stable
-        @Deprecated("Use Rect(a, b) instead",
-            ReplaceWith("Rect(a, b)", "androidx.compose.ui.geometry"))
-        fun fromPoints(a: Offset, b: Offset): Rect {
-            return Rect(
-                min(a.x, b.x),
-                min(a.y, b.y),
-                max(a.x, b.x),
-                max(a.y, b.y)
-            )
-        }
 
         /** A rectangle with left, top, right, and bottom edges all at zero. */
         @Stable
@@ -392,8 +337,8 @@ fun Rect(topLeft: Offset, bottomRight: Offset): Rect =
 fun Rect(center: Offset, radius: Float): Rect =
     Rect(
         center.x - radius,
-        center.x + radius,
         center.y - radius,
+        center.x + radius,
         center.y + radius
     )
 
