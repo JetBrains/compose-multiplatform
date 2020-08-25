@@ -84,8 +84,6 @@ import androidx.compose.ui.unit.TextUnit
  * @param maxLines An optional maximum number of lines for the text to span, wrapping if
  * necessary. If the text exceeds the given number of lines, it will be truncated according to
  * [overflow] and [softWrap]. If it is not null, then it must be greater than zero.
- * @param inlineContent A map store composables that replaces certain ranges of the text. It's
- * used to insert composables into text layout. Check [InlineTextContent] for more information.
  * @param onTextLayout Callback that is executed when a new text layout is calculated.
  * @param style Style configuration for the text such as color, font, line height etc.
  */
@@ -105,7 +103,6 @@ fun Text(
     overflow: TextOverflow = TextOverflow.Clip,
     softWrap: Boolean = true,
     maxLines: Int = Int.MAX_VALUE,
-    inlineContent: Map<String, InlineTextContent> = mapOf(),
     onTextLayout: (TextLayoutResult) -> Unit = {},
     style: TextStyle = currentTextStyle()
 ) {
@@ -124,7 +121,7 @@ fun Text(
         overflow,
         softWrap,
         maxLines,
-        inlineContent,
+        emptyMap(),
         onTextLayout,
         style
     )
