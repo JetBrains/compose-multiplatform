@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.IntOffset
 internal class LayerWrapper(
     wrapped: LayoutNodeWrapper,
     modifier: DrawLayerModifier
-) : DelegatingLayoutNodeWrapper<DrawLayerModifier>(wrapped, modifier) {
+) : DelegatingLayoutNodeWrapper<DrawLayerModifier>(wrapped, modifier), (Canvas) -> Unit {
     private var _layer: OwnedLayer? = null
 
     // Do not invalidate itself on position change.
@@ -52,7 +52,7 @@ internal class LayerWrapper(
         get() {
             return _layer ?: layoutNode.requireOwner().createLayer(
                 modifier,
-                wrapped::draw,
+                this,
                 invalidateParentLayer
             ).also {
                 _layer = it
@@ -150,5 +150,9 @@ internal class LayerWrapper(
 
     override fun onModifierChanged() {
         _layer?.invalidate()
+    }
+
+    override fun invoke(canvas: Canvas) {
+        wrapped.draw(canvas)
     }
 }
