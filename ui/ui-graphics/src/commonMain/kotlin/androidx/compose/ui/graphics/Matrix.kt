@@ -17,6 +17,7 @@
 
 package androidx.compose.ui.graphics
 
+import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import kotlin.math.PI
@@ -67,6 +68,21 @@ inline class Matrix(
         val right = max(max(p0.x, p1.x), max(p3.x, p4.x))
         val bottom = max(max(p0.y, p1.y), max(p3.y, p4.y))
         return Rect(left, top, right, bottom)
+    }
+
+    /**
+     * Does a 3D transform on [rect], transforming [rect] with the results.
+     */
+    fun map(rect: MutableRect) {
+        val p0 = map(Offset(rect.left, rect.top))
+        val p1 = map(Offset(rect.left, rect.bottom))
+        val p3 = map(Offset(rect.right, rect.top))
+        val p4 = map(Offset(rect.right, rect.bottom))
+
+        rect.left = min(min(p0.x, p1.x), min(p3.x, p4.x))
+        rect.top = min(min(p0.y, p1.y), min(p3.y, p4.y))
+        rect.right = max(max(p0.x, p1.x), max(p3.x, p4.x))
+        rect.bottom = max(max(p0.y, p1.y), max(p3.y, p4.y))
     }
 
     /**
