@@ -12,6 +12,48 @@ package androidx.compose.material {
     method @androidx.compose.runtime.Composable public static void TopAppBar-ye6PvEY(androidx.compose.ui.Modifier modifier = Modifier, long backgroundColor = MaterialTheme.colors.primarySurface, long contentColor = contentColorFor(backgroundColor), float elevation = androidx.compose.material.AppBarKt.TopAppBarElevation, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
   }
 
+  public final class BackdropConstants {
+    method public float getDefaultFrontLayerElevation();
+    method public long getDefaultFrontLayerScrimColor();
+    method public androidx.compose.ui.graphics.Shape getDefaultFrontLayerShape();
+    method public float getDefaultHeaderHeight();
+    method public float getDefaultPeekHeight();
+    property public final float DefaultFrontLayerElevation;
+    property public final long DefaultFrontLayerScrimColor;
+    property public final androidx.compose.ui.graphics.Shape DefaultFrontLayerShape;
+    property public final float DefaultHeaderHeight;
+    property public final float DefaultPeekHeight;
+    field public static final androidx.compose.material.BackdropConstants INSTANCE;
+  }
+
+  public final class BackdropScaffoldKt {
+    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static void BackdropScaffold-n7o2bDw(androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.material.BackdropScaffoldState backdropScaffoldState = rememberBackdropState(Concealed), boolean gesturesEnabled = true, float peekHeight = BackdropConstants.DefaultPeekHeight, float headerHeight = BackdropConstants.DefaultHeaderHeight, boolean persistentAppBar = true, boolean stickyFrontLayer = true, long backLayerBackgroundColor = MaterialTheme.colors.primary, long backLayerContentColor = contentColorFor(backLayerBackgroundColor), androidx.compose.ui.graphics.Shape frontLayerShape = BackdropConstants.DefaultFrontLayerShape, float frontLayerElevation = BackdropConstants.DefaultFrontLayerElevation, long frontLayerBackgroundColor = MaterialTheme.colors.surface, long frontLayerContentColor = contentColorFor(frontLayerBackgroundColor), long frontLayerScrimColor = BackdropConstants.DefaultFrontLayerScrimColor, kotlin.jvm.functions.Function1<? super androidx.compose.material.SnackbarHostState,kotlin.Unit> snackbarHost = { SnackbarHost(it) }, kotlin.jvm.functions.Function0<kotlin.Unit> appBar, kotlin.jvm.functions.Function0<kotlin.Unit> backLayerContent, kotlin.jvm.functions.Function0<kotlin.Unit> frontLayerContent);
+    method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static androidx.compose.material.BackdropScaffoldState rememberBackdropState(androidx.compose.material.BackdropValue initialValue, androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec = SwipeableConstants.DefaultAnimationSpec, kotlin.jvm.functions.Function1<? super androidx.compose.material.BackdropValue,java.lang.Boolean> confirmStateChange = { return true }, androidx.compose.material.SnackbarHostState snackbarHostState = androidx.compose.material.SnackbarHostState());
+  }
+
+  @androidx.compose.material.ExperimentalMaterialApi public final class BackdropScaffoldState extends androidx.compose.material.SwipeableState<androidx.compose.material.BackdropValue> {
+    ctor public BackdropScaffoldState(androidx.compose.material.BackdropValue initialValue, androidx.compose.animation.core.AnimationClockObservable clock, androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, kotlin.jvm.functions.Function1<? super androidx.compose.material.BackdropValue,java.lang.Boolean> confirmStateChange, androidx.compose.material.SnackbarHostState snackbarHostState);
+    method public void conceal(kotlin.jvm.functions.Function0<kotlin.Unit>? onConcealed = null);
+    method public androidx.compose.material.SnackbarHostState getSnackbarHostState();
+    method public boolean isConcealed();
+    method public boolean isRevealed();
+    method public void reveal(kotlin.jvm.functions.Function0<kotlin.Unit>? onRevealed = null);
+    property public final boolean isConcealed;
+    property public final boolean isRevealed;
+    field public static final androidx.compose.material.BackdropScaffoldState.Companion Companion;
+  }
+
+  public static final class BackdropScaffoldState.Companion {
+    method public androidx.compose.runtime.savedinstancestate.Saver<androidx.compose.material.BackdropScaffoldState,?> Saver(androidx.compose.animation.core.AnimationClockObservable clock, androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, kotlin.jvm.functions.Function1<? super androidx.compose.material.BackdropValue,java.lang.Boolean> confirmStateChange, androidx.compose.material.SnackbarHostState snackbarHostState);
+  }
+
+  public enum BackdropValue {
+    method public static androidx.compose.material.BackdropValue valueOf(String name) throws java.lang.IllegalArgumentException;
+    method public static androidx.compose.material.BackdropValue[] values();
+    enum_constant public static final androidx.compose.material.BackdropValue Concealed;
+    enum_constant public static final androidx.compose.material.BackdropValue Revealed;
+  }
+
   public final class BottomDrawerState extends androidx.compose.material.SwipeableState<androidx.compose.material.BottomDrawerValue> {
     ctor public BottomDrawerState(androidx.compose.material.BottomDrawerValue initialValue, androidx.compose.animation.core.AnimationClockObservable clock, kotlin.jvm.functions.Function1<? super androidx.compose.material.BottomDrawerValue,java.lang.Boolean> confirmStateChange);
     method public void close(kotlin.jvm.functions.Function0<kotlin.Unit>? onClosed = null);
