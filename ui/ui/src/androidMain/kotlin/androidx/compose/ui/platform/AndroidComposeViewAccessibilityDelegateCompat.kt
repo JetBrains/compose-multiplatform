@@ -845,22 +845,6 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         }
     }
 
-    internal fun onSemanticLayoutChange(id: Int) {
-        if (accessibilityManager.isEnabled) {
-            val node = view.semanticsOwner.rootSemanticsNode.findChildById(id) ?: return
-            var mergedNodeId = node.id
-            if (!node.unmergedConfig.isMergingSemanticsOfDescendants &&
-                node.parent?.unmergedConfig?.isMergingSemanticsOfDescendants == true) {
-                mergedNodeId = node.parent!!.id
-            }
-            sendEventForVirtualView(
-                semanticsNodeIdToAccessibilityVirtualNodeId(mergedNodeId),
-                AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED,
-                AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE
-            )
-        }
-    }
-
     private fun checkForSemanticsChanges() {
         val newSemanticsNodes = view.semanticsOwner.getAllSemanticsNodesToMap()
 

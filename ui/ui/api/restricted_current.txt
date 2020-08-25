@@ -1910,7 +1910,6 @@ package androidx.compose.ui.node {
     method public void onInvalidate(androidx.compose.ui.node.LayoutNode layoutNode);
     method public void onRequestMeasure(androidx.compose.ui.node.LayoutNode layoutNode);
     method public void onRequestRelayout(androidx.compose.ui.node.LayoutNode layoutNode);
-    method public void onSemanticLayoutChange(int semanticsNodeId);
     method public void onSemanticsChange();
     method public void pauseModelReadObserveration(kotlin.jvm.functions.Function0<kotlin.Unit> block);
     method public boolean requestFocus();

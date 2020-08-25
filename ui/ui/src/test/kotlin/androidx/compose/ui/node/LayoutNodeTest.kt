@@ -1735,9 +1735,6 @@ private class MockOwner(
     override fun onSemanticsChange() {
     }
 
-    override fun onSemanticLayoutChange(semanticsNodeId: Int) {
-    }
-
     override val measureIteration: Long = 0
 }
 
