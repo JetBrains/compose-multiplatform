@@ -1,1 +1,9 @@
 // Signature format: 3.0
+package androidx.compose.navigation {
+
+  public final class NavHostControllerKt {
+    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<androidx.navigation.NavBackStackEntry> currentBackStackEntryAsState(androidx.navigation.NavController);
+  }
+
+}
+
