@@ -126,10 +126,6 @@ package androidx.compose.ui.geometry {
   }
 
   public static final class Rect.Companion {
-    method @Deprecated @androidx.compose.runtime.Stable public androidx.compose.ui.geometry.Rect fromCircle-MQFEXWE(long center, float radius);
-    method @Deprecated @androidx.compose.runtime.Stable public androidx.compose.ui.geometry.Rect fromLTRB(float left, float top, float right, float bottom);
-    method @Deprecated @androidx.compose.runtime.Stable public androidx.compose.ui.geometry.Rect fromLTWH(float left, float top, float width, float height);
-    method @Deprecated @androidx.compose.runtime.Stable public androidx.compose.ui.geometry.Rect fromPoints-FZVz7gs(long a, long b);
     method public androidx.compose.ui.geometry.Rect getZero();
     property public final androidx.compose.ui.geometry.Rect Zero;
   }
