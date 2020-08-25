@@ -469,7 +469,7 @@ class AndroidXPlugin : Plugin<Project> {
 
     private fun ApplicationExtension<*, *, *, *, *>
             .addAppApkToTestConfigGeneration(project: Project) {
-        onVariantProperties {
+        onVariantProperties.withBuildType("debug") {
             project.tasks.withType(GenerateTestConfigurationTask::class.java) {
                 it.appFolder.set(artifacts.get(ArtifactType.APK))
                 it.appLoader.set(artifacts.getBuiltArtifactsLoader())
