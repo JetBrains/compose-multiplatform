@@ -110,7 +110,6 @@ object LibraryVersions {
     val TRACING = Version("1.0.0-rc01")
     val TRANSITION = Version("1.4.0-beta01")
     val TVPROVIDER = Version("1.1.0-alpha01")
-    val UI = Version("1.0.0-alpha02")
     val VECTORDRAWABLE = Version("1.2.0-alpha02")
     val VECTORDRAWABLE_ANIMATED = Version("1.2.0-alpha01")
     val VECTORDRAWABLE_SEEKABLE = Version("1.0.0-alpha02")
