@@ -139,27 +139,7 @@ private val EmptyCanvas = android.graphics.Canvas()
     override fun concat(matrix: Matrix) {
         if (!matrix.isIdentity()) {
             val frameworkMatrix = android.graphics.Matrix()
-            if (matrix.get(2, 0) != 0f ||
-                matrix.get(2, 1) != 0f ||
-                matrix.get(2, 0) != 0f ||
-                matrix.get(2, 1) != 0f ||
-                matrix.get(2, 2) != 1f ||
-                matrix.get(2, 3) != 0f ||
-                matrix.get(3, 2) != 0f) {
-                throw IllegalStateException("Android does not support arbitrary transforms")
-            }
-            val values = floatArrayOf(
-                matrix.get(0, 0),
-                matrix.get(1, 0),
-                matrix.get(3, 0),
-                matrix.get(0, 1),
-                matrix.get(1, 1),
-                matrix.get(3, 1),
-                matrix.get(0, 3),
-                matrix.get(1, 3),
-                matrix.get(3, 3)
-            )
-            frameworkMatrix.setValues(values)
+            frameworkMatrix.setFrom(matrix)
             internalCanvas.concat(frameworkMatrix)
         }
     }
