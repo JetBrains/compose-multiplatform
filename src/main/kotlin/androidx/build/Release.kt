@@ -336,12 +336,12 @@ private fun getZipName(fileNamePrefix: String, mavenGroup: String): String {
 
 fun Project.getProjectZipPath():
         String {
-    return Release.PROJECT_ZIPS_FOLDER + "/" +
+    return distSubdir() + Release.PROJECT_ZIPS_FOLDER + "/" +
             getZipName(projectZipPrefix(), project.group.toString()) + ".zip"
 }
 
 fun Project.getGroupZipPath():
         String {
-    return Release.GROUP_ZIPS_FOLDER + "/" +
+    return distSubdir() + Release.GROUP_ZIPS_FOLDER + "/" +
             getZipName(Release.GROUP_ZIP_PREFIX, project.group.toString()) + ".zip"
 }
