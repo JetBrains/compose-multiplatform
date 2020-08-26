@@ -83,7 +83,7 @@ kotlin {
 androidx {
     name = "Compose Text"
     publish = Publish.SNAPSHOT_AND_RELEASE
-    mavenVersion = LibraryVersions.UI
+    mavenVersion = LibraryVersions.COMPOSE
     mavenGroup = LibraryGroups.Compose.FOUNDATION
     inceptionYear = "2020"
     description = "Compose Text higher level APIs"
