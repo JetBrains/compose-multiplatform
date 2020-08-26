@@ -26,8 +26,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.DragObserver
 import androidx.compose.ui.gesture.rawDragGestureFilter
 import androidx.compose.ui.gesture.rawPressStartGestureFilter
-import androidx.compose.ui.input.pointer.PointerInputFilter
-import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.onPositioned
 import androidx.compose.ui.selection.Selection
 import androidx.compose.ui.selection.SelectionRegistrarAmbient
@@ -65,9 +63,6 @@ internal fun DesktopSelectionContainer(children: @Composable () -> Unit) {
         children = children
     )
 }
-
-private class PointerInputModifierImpl(override val pointerInputFilter: PointerInputFilter) :
-    PointerInputModifier
 
 private fun Modifier.selectionFilter(observer: DragObserver): Modifier = composed {
     val glue = remember { DragGlue(observer) }
