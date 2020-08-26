@@ -24,6 +24,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.CoreTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Providers
@@ -44,8 +46,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.constrain
 import androidx.compose.ui.text.input.CommitTextEditOp
 import androidx.compose.ui.text.input.EditOperation
 import androidx.compose.ui.text.input.ImeAction
@@ -72,6 +76,8 @@ import androidx.ui.test.onNode
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performClick
 import androidx.ui.test.performSemanticsAction
+import androidx.ui.test.performTextClearance
+import androidx.ui.test.performTextInput
 import androidx.ui.test.runOnIdle
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
@@ -98,6 +104,7 @@ class TextFieldTest {
     val composeTestRule = createComposeRule()
 
     private val DefaultTextFieldWidth = 280.dp
+    private val Tag = "textField"
 
     @Test
     fun textField_focusInSemantics() {
@@ -538,4 +545,62 @@ class TextFieldTest {
         onNode(hasInputMethodsSupport())
             .assert(hasImeAction(ImeAction.Search))
     }
+
+    @Test
+    fun stringOverrideTextField_canDeleteLastSymbol() {
+        var lastSeenText = ""
+        composeTestRule.setContent {
+            var text by remember { mutableStateOf("") }
+            TextFieldStringOverride(
+                value = text,
+                onValueChange = {
+                    text = it
+                    lastSeenText = it
+                },
+                modifier = Modifier.testTag(Tag)
+            )
+        }
+
+        onNodeWithTag(Tag)
+            .performTextInput("A")
+
+        runOnIdle {
+            assertThat(lastSeenText).isEqualTo("A")
+        }
+
+        onNodeWithTag(Tag)
+            .performTextClearance(true)
+
+        runOnIdle {
+            assertThat(lastSeenText).isEqualTo("")
+        }
+    }
+}
+
+@Composable
+@OptIn(InternalTextApi::class, ExperimentalFoundationApi::class)
+private fun TextFieldStringOverride(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var selection by remember { mutableStateOf(TextRange.Zero) }
+    var composition by remember { mutableStateOf<TextRange?>(null) }
+    val textFieldValue = TextFieldValue(
+        text = value,
+        selection = selection.constrain(0, value.length),
+        composition = composition?.constrain(0, value.length)
+    )
+
+    CoreTextField(
+        value = textFieldValue,
+        onValueChange = {
+            selection = it.selection
+            composition = it.composition
+            if (textFieldValue.text != it.text) {
+                onValueChange(it.text)
+            }
+        },
+        modifier = modifier.width(100.dp)
+    )
 }

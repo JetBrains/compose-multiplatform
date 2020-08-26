@@ -208,7 +208,7 @@ fun CoreTextField(
                     state.processor,
                     keyboardType,
                     imeAction,
-                    onValueChangeWrapper,
+                    { manager.onValueChange(it) },
                     onImeActionPerformed
                 )
                 if (state.inputSession != NO_SESSION && textInputService != null) {
