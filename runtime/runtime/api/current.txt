@@ -884,6 +884,11 @@ package androidx.compose.runtime.snapshots {
     field public static final androidx.compose.runtime.snapshots.SnapshotApplyResult.Success INSTANCE;
   }
 
+  public final class SnapshotFlowKt {
+    method @androidx.compose.runtime.ExperimentalComposeApi public static <T> kotlinx.coroutines.flow.Flow<T> snapshotFlow(kotlin.jvm.functions.Function0<? extends T> block);
+    method @androidx.compose.runtime.ExperimentalComposeApi public static inline <R> R! withMutableSnapshot(kotlin.jvm.functions.Function0<? extends R> block);
+  }
+
   public final class SnapshotIdSetKt {
   }
 
