@@ -127,6 +127,9 @@ enum class FabPosition {
  * screen, by ensuring proper layout strategy for them and collecting necessary data so these
  * components will work together correctly.
  *
+ * For a similar API which uses a backdrop as the centerpiece of the screen, use the experimental
+ * [BackdropScaffold] component.
+ *
  * Simple example of a Scaffold with [TopAppBar], [FloatingActionButton] and drawer:
  *
  * @sample androidx.compose.material.samples.SimpleScaffoldWithTopBar
