@@ -201,8 +201,6 @@ class DesktopOwner(
 
     override fun onSemanticsChange() = Unit
 
-    override fun onSemanticLayoutChange(semanticsNodeId: Int) = Unit
-
     override fun calculatePosition() = IntOffset.Zero
 
     fun setSize(width: Int, height: Int) {
