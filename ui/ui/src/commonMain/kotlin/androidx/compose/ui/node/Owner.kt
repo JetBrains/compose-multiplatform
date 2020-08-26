@@ -181,12 +181,6 @@ interface Owner {
      */
     fun onSemanticsChange()
 
-    /**
-     * The layout of the semantics node with id semanticsNodeId changed. It currently includes
-     * position and size changes.
-     */
-    fun onSemanticLayoutChange(semanticsNodeId: Int)
-
     val measureIteration: Long
 
     companion object {
