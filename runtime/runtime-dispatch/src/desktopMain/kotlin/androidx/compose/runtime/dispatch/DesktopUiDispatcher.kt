@@ -28,12 +28,7 @@ private typealias Action = (Long) -> Unit
 private typealias Queue = ArrayList<Action>
 
 /**
- * Ticks scheduler for Desktop. It tries to mimic Android's Choreographer and has multiple levels of
- * callbacks: "just" callbacks and "after" callbacks (Choreographer has more, but two is enough for us)
- * It's necessary because recomposition and drawing should be synchronized, otherwise races and
- * inconsistencies are possible. On Android, this synchronization is achieved implicitly by executing
- * recomposition and scheduling of redrawing as different types of callbacks. It guarantees,
- * that after recomposition, redrawing happens in the exactly same tick.
+ * Ticks scheduler for Desktop. It tries to mimic Android's Choreographer.
  *
  * There are some plans to make possible redrawing based on composition snapshots,
  * so maybe some requirements for dispatcher will be mitigated in the future.
@@ -42,14 +37,13 @@ class DesktopUiDispatcher : CoroutineDispatcher() {
     private val lock = Any()
     @PublishedApi internal val callbackLock = Any()
     private var callbacks = Queue()
-    private var afterCallbacks = Queue()
 
     @Volatile
     private var scheduled = false
 
     private fun scheduleIfNeeded() {
         synchronized(lock) {
-            if (!scheduled && (callbacks.isNotEmpty() || afterCallbacks.isNotEmpty())) {
+            if (!scheduled && (callbacks.isNotEmpty())) {
                 invokeLater { tick() }
                 scheduled = true
             }
@@ -80,7 +74,6 @@ class DesktopUiDispatcher : CoroutineDispatcher() {
         scheduled = false
         val now = System.nanoTime()
         runCallbacks(now, callbacks)
-        runCallbacks(now, afterCallbacks)
         scheduleIfNeeded()
     }
 
@@ -88,12 +81,6 @@ class DesktopUiDispatcher : CoroutineDispatcher() {
         synchronized(lock) {
             callbacks.add(action)
             scheduleIfNeeded()
-        }
-    }
-
-    fun scheduleAfterCallback(action: Action) {
-        synchronized(lock) {
-            afterCallbacks.add(action)
         }
     }
 
