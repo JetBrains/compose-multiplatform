@@ -58,7 +58,6 @@ inline fun Offset(x: Float, y: Float) = Offset(packFloats(x, y))
  * Creates an offset. The first argument sets [x], the horizontal component,
  * and the second sets [y], the vertical component.
  */
-// TODO b/162284207 njawad make this an inline class
 @Suppress("EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
 inline class Offset(val packedValue: Long) {
