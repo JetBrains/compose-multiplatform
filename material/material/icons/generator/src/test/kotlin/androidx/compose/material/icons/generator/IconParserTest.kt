@@ -16,6 +16,7 @@
 
 package androidx.compose.material.icons.generator
 
+import androidx.compose.material.icons.generator.vector.FillType
 import androidx.compose.material.icons.generator.vector.PathNode
 import androidx.compose.material.icons.generator.vector.VectorNode
 import com.google.common.truth.Truth
@@ -40,6 +41,7 @@ class IconParserTest {
         val firstPath = nodes[0] as VectorNode.Path
         Truth.assertThat(firstPath.fillAlpha).isEqualTo(0.3f)
         Truth.assertThat(firstPath.strokeAlpha).isEqualTo(1f)
+        Truth.assertThat(firstPath.fillType).isEqualTo(FillType.NonZero)
 
         val expectedFirstPathNodes = listOf(
             PathNode.MoveTo(20f, 10f),
@@ -53,6 +55,7 @@ class IconParserTest {
         val secondPath = nodes[1] as VectorNode.Path
         Truth.assertThat(secondPath.fillAlpha).isEqualTo(1f)
         Truth.assertThat(secondPath.strokeAlpha).isEqualTo(0.9f)
+        Truth.assertThat(secondPath.fillType).isEqualTo(FillType.EvenOdd)
 
         val expectedSecondPathNodes = listOf(
             PathNode.MoveTo(16.5f, 9.0f),
@@ -74,6 +77,7 @@ private val TestVector = """
             android:pathData="M20,10, l10,10 0,10 -10, 0z" />
         <path
             android:strokeAlpha=".9"
-            android:pathData="M16.5,9h3.5v9h-3.5z" />
+            android:pathData="M16.5,9h3.5v9h-3.5z"
+            android:fillType="evenOdd" />
     </vector>
 """.trimIndent()

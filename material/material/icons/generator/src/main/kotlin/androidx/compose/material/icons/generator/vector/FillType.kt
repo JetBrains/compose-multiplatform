@@ -17,23 +17,12 @@
 package androidx.compose.material.icons.generator.vector
 
 /**
- * Simplified representation of a vector, with root [nodes].
+ * Determines the winding rule that decides how the interior of a [VectorNode.Path] is calculated.
  *
- * [nodes] may either be a singleton list of the root group, or a list of root paths / groups if
- * there are multiple top level declaration.
+ * This maps to [android.graphics.Path.FillType] used in the framework, and can be defined in XML
+ * via `android:fillType`.
  */
-class Vector(val nodes: List<VectorNode>)
-
-/**
- * Simplified vector node representation, as the total set of properties we need to care about
- * for Material icons is very limited.
- */
-sealed class VectorNode {
-    class Group(val paths: MutableList<Path> = mutableListOf()) : VectorNode()
-    class Path(
-        val strokeAlpha: Float,
-        val fillAlpha: Float,
-        val fillType: FillType,
-        val nodes: List<PathNode>
-    ) : VectorNode()
+enum class FillType {
+    NonZero,
+    EvenOdd
 }
