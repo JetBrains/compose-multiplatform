@@ -35,6 +35,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.milliseconds
 import androidx.test.filters.LargeTest
+import androidx.ui.test.ExperimentalTesting
 import androidx.ui.test.TestUiDispatcher
 import androidx.ui.test.center
 import androidx.ui.test.createComposeRule
@@ -65,6 +66,7 @@ class ScrollableTest {
     private val scrollableBoxTag = "scrollableBox"
 
     @Test
+    @OptIn(ExperimentalTesting::class)
     fun scrollable_horizontalScroll() = runBlockingWithManualClock { clock ->
         var total = 0f
         val controller = ScrollableController(
@@ -120,6 +122,7 @@ class ScrollableTest {
     }
 
     @Test
+    @OptIn(ExperimentalTesting::class)
     fun scrollable_verticalScroll() = runBlockingWithManualClock { clock ->
         var total = 0f
         val controller = ScrollableController(
@@ -175,6 +178,7 @@ class ScrollableTest {
     }
 
     @Test
+    @OptIn(ExperimentalTesting::class)
     fun scrollable_startStop_notify() = runBlockingWithManualClock(true) { clock ->
         var startTrigger = 0f
         var stopTrigger = 0f
@@ -220,6 +224,7 @@ class ScrollableTest {
     }
 
     @Test
+    @OptIn(ExperimentalTesting::class)
     fun scrollable_disabledWontCallLambda() = runBlockingWithManualClock(true) { clock ->
         val enabled = mutableStateOf(true)
         var total = 0f
@@ -265,6 +270,7 @@ class ScrollableTest {
     }
 
     @Test
+    @OptIn(ExperimentalTesting::class)
     fun scrollable_velocityProxy() = runBlockingWithManualClock { clock ->
         var velocityTriggered = 0f
         var total = 0f
@@ -312,6 +318,7 @@ class ScrollableTest {
     }
 
     @Test
+    @OptIn(ExperimentalTesting::class)
     fun scrollable_startWithoutSlop_ifFlinging() = runBlockingWithManualClock { clock ->
         var total = 0f
         val controller = ScrollableController(
@@ -355,6 +362,7 @@ class ScrollableTest {
     }
 
     @Test
+    @OptIn(ExperimentalTesting::class)
     fun scrollable_cancel_callsDragStop() = runBlockingWithManualClock { clock ->
         var total by mutableStateOf(0f)
         var dragStopped = 0f
@@ -393,6 +401,7 @@ class ScrollableTest {
     }
 
     @Test
+    @OptIn(ExperimentalTesting::class)
     fun scrollable_snappingScrolling() = runBlockingWithManualClock(true) { clock ->
         var total = 0f
         val controller = ScrollableController(
@@ -426,6 +435,7 @@ class ScrollableTest {
     }
 
     @Test
+    @OptIn(ExperimentalTesting::class)
     fun scrollable_explicitDisposal() = runBlockingWithManualClock(true) { clock ->
         val disposed = mutableStateOf(false)
         var total = 0f
@@ -467,6 +477,7 @@ class ScrollableTest {
     }
 
     @Test
+    @OptIn(ExperimentalTesting::class)
     fun scrollable_nestedDrag() = runBlockingWithManualClock { clock ->
         var innerDrag = 0f
         var outerDrag = 0f
@@ -544,6 +555,7 @@ class ScrollableTest {
         }
     }
 
+    @ExperimentalTesting
     private suspend fun advanceClockAndAwaitAnimation(clock: ManualFrameClock) {
         waitForIdle()
         withContext(TestUiDispatcher.Main) {
