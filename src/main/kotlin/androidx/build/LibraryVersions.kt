@@ -73,7 +73,7 @@ object LibraryVersions {
     val LEANBACK_PREFERENCE = Version("1.1.0-alpha04")
     val LEGACY = Version("1.1.0-alpha01")
     val LOCALBROADCASTMANAGER = Version("1.1.0-alpha02")
-    val LIFECYCLE = Version("2.3.0-alpha07")
+    val LIFECYCLE = Version("2.3.0-beta01")
     val LIFECYCLE_EXTENSIONS = Version("2.2.0")
     val LOADER = Version("1.2.0-alpha01")
     val MEDIA = Version("1.2.0-rc01")
