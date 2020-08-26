@@ -16,6 +16,7 @@
 
 package androidx.compose.material.icons.generator
 
+import androidx.compose.material.icons.generator.vector.FillType
 import androidx.compose.material.icons.generator.vector.PathParser
 import androidx.compose.material.icons.generator.vector.Vector
 import androidx.compose.material.icons.generator.vector.VectorNode
@@ -59,12 +60,18 @@ class IconParser(private val icon: Icon) {
                             )
                             val fillAlpha = parser.getValueAsFloat(FILL_ALPHA)
                             val strokeAlpha = parser.getValueAsFloat(STROKE_ALPHA)
-                            val path =
-                                VectorNode.Path(
-                                    strokeAlpha = strokeAlpha ?: 1f,
-                                    fillAlpha = fillAlpha ?: 1f,
-                                    nodes = PathParser.parsePathString(pathData)
-                                )
+                            val fillType = when (parser.getAttributeValue(null, FILL_TYPE)) {
+                                // evenOdd and nonZero are the only supported values here, where
+                                // nonZero is the default if no values are defined.
+                                EVEN_ODD -> FillType.EvenOdd
+                                else -> FillType.NonZero
+                            }
+                            val path = VectorNode.Path(
+                                strokeAlpha = strokeAlpha ?: 1f,
+                                fillAlpha = fillAlpha ?: 1f,
+                                fillType = fillType,
+                                nodes = PathParser.parsePathString(pathData)
+                            )
                             if (currentGroup != null) {
                                 currentGroup.paths.add(path)
                             } else {
@@ -119,3 +126,7 @@ private const val PATH = "path"
 private const val PATH_DATA = "android:pathData"
 private const val FILL_ALPHA = "android:fillAlpha"
 private const val STROKE_ALPHA = "android:strokeAlpha"
+private const val FILL_TYPE = "android:fillType"
+
+// XML attribute values
+private const val EVEN_ODD = "evenOdd"

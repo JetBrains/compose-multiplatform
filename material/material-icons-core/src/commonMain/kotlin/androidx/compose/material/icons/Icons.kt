@@ -22,9 +22,11 @@ import androidx.compose.material.icons.Icons.Rounded
 import androidx.compose.material.icons.Icons.Sharp
 import androidx.compose.material.icons.Icons.TwoTone
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.vector.DefaultFillType
 import androidx.compose.ui.graphics.vector.PathBuilder
 import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.graphics.vector.VectorAssetBuilder
@@ -113,11 +115,13 @@ inline fun materialIcon(
  *
  * @param fillAlpha fill alpha for this path
  * @param strokeAlpha stroke alpha for this path
+ * @param pathFillType [PathFillType] for this path
  * @param pathBuilder builder lambda to add commands to this path
  */
 inline fun VectorAssetBuilder.materialPath(
     fillAlpha: Float = 1f,
     strokeAlpha: Float = 1f,
+    pathFillType: PathFillType = DefaultFillType,
     pathBuilder: PathBuilder.() -> Unit
 ) =
     // TODO: b/146213225
@@ -132,6 +136,7 @@ inline fun VectorAssetBuilder.materialPath(
         strokeLineCap = StrokeCap.Butt,
         strokeLineJoin = StrokeJoin.Bevel,
         strokeLineMiter = 1f,
+        pathFillType = pathFillType,
         pathBuilder = pathBuilder
     )
 

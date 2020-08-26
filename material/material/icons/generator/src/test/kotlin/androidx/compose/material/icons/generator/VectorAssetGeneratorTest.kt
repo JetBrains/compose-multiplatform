@@ -17,6 +17,7 @@
 package androidx.compose.material.icons.generator
 
 import androidx.compose.material.icons.generator.PackageNames.MaterialIconsPackage
+import androidx.compose.material.icons.generator.vector.FillType
 import androidx.compose.material.icons.generator.vector.PathNode
 import androidx.compose.material.icons.generator.vector.Vector
 import androidx.compose.material.icons.generator.vector.VectorNode
@@ -67,6 +68,7 @@ private val ExpectedFile = """
     import androidx.compose.material.icons.Icons
     import androidx.compose.material.icons.materialIcon
     import androidx.compose.material.icons.materialPath
+    import androidx.compose.ui.graphics.PathFillType.EvenOdd
     import androidx.compose.ui.graphics.vector.VectorAsset
     import androidx.compose.ui.graphics.vector.group
 
@@ -83,7 +85,7 @@ private val ExpectedFile = """
                     close()
                 }
                 group {
-                    materialPath {
+                    materialPath(pathFillType = EvenOdd) {
                         moveTo(0.0f, 10.0f)
                         lineToRelative(-10.0f, 0.0f)
                         close()
@@ -100,6 +102,7 @@ private val ExpectedFile = """
 private val path1 = VectorNode.Path(
     strokeAlpha = 1f,
     fillAlpha = 0.8f,
+    fillType = FillType.NonZero,
     nodes = listOf(
         PathNode.MoveTo(20f, 10f),
         PathNode.RelativeLineTo(0f, 10f),
@@ -111,6 +114,7 @@ private val path1 = VectorNode.Path(
 private val path2 = VectorNode.Path(
     strokeAlpha = 1f,
     fillAlpha = 1f,
+    fillType = FillType.EvenOdd,
     nodes = listOf(
         PathNode.MoveTo(0f, 10f),
         PathNode.RelativeLineTo(-10f, 0f),

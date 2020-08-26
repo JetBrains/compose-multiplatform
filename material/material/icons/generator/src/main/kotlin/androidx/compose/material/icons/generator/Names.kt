@@ -24,7 +24,8 @@ import com.squareup.kotlinpoet.MemberName
  */
 enum class PackageNames(val packageName: String) {
     MaterialIconsPackage("androidx.compose.material.icons"),
-    VectorPackage("androidx.compose.ui.graphics.vector")
+    GraphicsPackage("androidx.compose.ui.graphics"),
+    VectorPackage(GraphicsPackage.packageName + ".vector")
 }
 
 /**
@@ -33,6 +34,7 @@ enum class PackageNames(val packageName: String) {
 object ClassNames {
     val Icons = PackageNames.MaterialIconsPackage.className("Icons")
     val VectorAsset = PackageNames.VectorPackage.className("VectorAsset")
+    val PathFillType = PackageNames.GraphicsPackage.className("PathFillType")
 }
 
 /**
@@ -42,6 +44,7 @@ object MemberNames {
     val MaterialIcon = MemberName(PackageNames.MaterialIconsPackage.packageName, "materialIcon")
     val MaterialPath = MemberName(PackageNames.MaterialIconsPackage.packageName, "materialPath")
 
+    val EvenOdd = MemberName(ClassNames.PathFillType, "EvenOdd")
     val Group = MemberName(PackageNames.VectorPackage.packageName, "group")
 }
 

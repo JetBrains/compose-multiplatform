@@ -16,13 +16,13 @@
 
 package androidx.compose.material.icons.generator
 
+import androidx.compose.material.icons.generator.vector.FillType
 import androidx.compose.material.icons.generator.vector.Vector
 import androidx.compose.material.icons.generator.vector.VectorNode
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.buildCodeBlock
 import java.util.Locale
@@ -118,14 +118,14 @@ private fun CodeBlock.Builder.addRecursively(vectorNode: VectorNode) {
     when (vectorNode) {
         // TODO: b/147418351 - add clip-paths once they are supported
         is VectorNode.Group -> {
-            addFunctionWithLambda(MemberNames.Group) {
-                vectorNode.paths.forEach { path ->
-                    addRecursively(path)
-                }
+            beginControlFlow("%M", MemberNames.Group)
+            vectorNode.paths.forEach { path ->
+                addRecursively(path)
             }
+            endControlFlow()
         }
         is VectorNode.Path -> {
-            addFunctionWithLambda(MemberNames.MaterialPath, vectorNode.getParameters()) {
+            addPath(vectorNode) {
                 vectorNode.nodes.forEach { pathNode ->
                     addStatement(pathNode.asFunctionCall())
                 }
@@ -135,36 +135,35 @@ private fun CodeBlock.Builder.addRecursively(vectorNode: VectorNode) {
 }
 
 /**
- * @return a [String] representing the parameters to add to the path function call to create the
- * correct path.
+ * Adds a function call to create the given [path], with [pathBody] containing the commands for
+ * the path.
  */
-private fun VectorNode.Path.getParameters(): String {
-    val parameterList = listOfNotNull(
-        "fillAlpha = ${fillAlpha}f".takeIf { fillAlpha != 1f },
-        "strokeAlpha = ${strokeAlpha}f".takeIf { strokeAlpha != 1f }
-    )
+private fun CodeBlock.Builder.addPath(
+    path: VectorNode.Path,
+    pathBody: CodeBlock.Builder.() -> Unit
+) {
+    // Only set the fill type if it is EvenOdd - otherwise it will just be the default.
+    val setFillType = path.fillType == FillType.EvenOdd
 
-    return if (parameterList.isNotEmpty()) {
+    val parameterList = with(path) {
+        listOfNotNull(
+            "fillAlpha = ${fillAlpha}f".takeIf { fillAlpha != 1f },
+            "strokeAlpha = ${strokeAlpha}f".takeIf { strokeAlpha != 1f },
+            "pathFillType = %M".takeIf { setFillType }
+        )
+    }
+
+    val parameters = if (parameterList.isNotEmpty()) {
         parameterList.joinToString(prefix = "(", postfix = ")")
     } else {
         ""
     }
-}
 
-/**
- * Generates a correctly indented lambda invocation for the given [function] and [lambdaBody].
- *
- * @param function [MemberName] of the function call
- * @param parameters string representing the parameters of this function call, e.g. "(1, 3)".
- * @param lambdaBody body for the trailing lambda of this function call
- *
- */
-private fun CodeBlock.Builder.addFunctionWithLambda(
-    function: MemberName,
-    parameters: String = "",
-    lambdaBody: CodeBlock.Builder.() -> Unit
-) {
-    beginControlFlow("%M$parameters", function)
-    lambdaBody()
+    if (setFillType) {
+        beginControlFlow("%M$parameters", MemberNames.MaterialPath, MemberNames.EvenOdd)
+    } else {
+        beginControlFlow("%M$parameters", MemberNames.MaterialPath)
+    }
+    pathBody()
     endControlFlow()
 }
