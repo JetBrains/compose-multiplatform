@@ -16,16 +16,17 @@
 
 package androidx.compose.material.demos
 
+import androidx.compose.integration.demos.common.ActivityDemo
+import androidx.compose.integration.demos.common.ComposableDemo
+import androidx.compose.integration.demos.common.DemoCategory
 import androidx.compose.material.samples.AlertDialogSample
+import androidx.compose.material.samples.BackdropSample
 import androidx.compose.material.samples.BottomDrawerSample
 import androidx.compose.material.samples.CustomAlertDialogSample
 import androidx.compose.material.samples.EmphasisSample
 import androidx.compose.material.samples.ModalDrawerSample
 import androidx.compose.material.samples.ScaffoldWithBottomBarAndCutout
 import androidx.compose.material.samples.ScaffoldWithCoroutinesSnackbar
-import androidx.compose.integration.demos.common.ActivityDemo
-import androidx.compose.integration.demos.common.ComposableDemo
-import androidx.compose.integration.demos.common.DemoCategory
 
 val MaterialDemos = DemoCategory("Material", listOf(
     DemoCategory("AlertDialog", listOf(
@@ -33,6 +34,7 @@ val MaterialDemos = DemoCategory("Material", listOf(
         ComposableDemo("Custom buttons") { CustomAlertDialogSample() }
     )),
     ComposableDemo("App Bars") { AppBarDemo() },
+    ComposableDemo("Backdrop") { BackdropSample() },
     ComposableDemo("Bottom Navigation") { BottomNavigationDemo() },
     ComposableDemo("Buttons & FABs") { ButtonDemo() },
     DemoCategory("Navigation drawer", listOf(
