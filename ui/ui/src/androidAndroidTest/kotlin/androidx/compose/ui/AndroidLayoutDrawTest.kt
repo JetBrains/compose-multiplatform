@@ -2725,6 +2725,29 @@ class AndroidLayoutDrawTest {
         }
     }
 
+    // Make sure that when the child of a layer changes that the drawing changes to match.
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun changedLayerChild() {
+        var showInner by mutableStateOf(true)
+        activityTestRule.runOnUiThread {
+            activity.setContent {
+                FixedSize(
+                    size = 10,
+                    modifier = Modifier.background(Color.Blue)
+                        .then(PaddingModifier(10))
+                        .drawLayer()
+                        .then(if (showInner) Modifier.background(Color.White) else Modifier)
+                        .drawLatchModifier()
+                )
+            }
+        }
+        validateSquareColors(outerColor = Color.Blue, innerColor = Color.White, size = 10)
+        drawLatch = CountDownLatch(1)
+        showInner = false
+        validateSquareColors(outerColor = Color.Blue, innerColor = Color.Blue, size = 10)
+    }
+
     private fun composeSquares(model: SquareModel) {
         activityTestRule.runOnUiThreadIR {
             activity.setContent {
