@@ -24,6 +24,8 @@ import org.jetbrains.skija.Canvas
 import org.jetbrains.skija.Surface
 import java.awt.Component
 
+// TODO(demin): replace by androidx.compose.ui.test.TestComposeWindow when it will be
+//  in :ui:ui-test module
 class TestSkiaWindow(
     val width: Int,
     val height: Int

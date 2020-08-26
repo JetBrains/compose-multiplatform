@@ -19,6 +19,7 @@ import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.dispatch.DesktopUiDispatcher
 import androidx.compose.runtime.staticAmbientOf
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.mouse.MouseScrollEvent
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputData
 import androidx.compose.ui.input.pointer.PointerInputEvent
@@ -77,6 +78,11 @@ class DesktopOwners(
 
     fun onMouseDragged(x: Int, y: Int) {
         list.lastOrNull()?.processPointerInput(pointerInputEvent(x, y, isMousePressed))
+    }
+
+    fun onMouseScroll(x: Int, y: Int, event: MouseScrollEvent) {
+        val position = Offset(x.toFloat(), y.toFloat())
+        list.lastOrNull()?.onMouseScroll(position, event)
     }
 
     fun onKeyPressed(code: Int, char: Char) {

@@ -28,13 +28,17 @@ import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.drawLayer
 import androidx.compose.ui.focus.ExperimentalFocus
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.DesktopCanvas
 import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyInputModifier
+import androidx.compose.ui.input.mouse.MouseScrollEvent
+import androidx.compose.ui.input.mouse.MouseScrollEventFilter
 import androidx.compose.ui.input.pointer.PointerInputEvent
 import androidx.compose.ui.input.pointer.PointerInputEventProcessor
+import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
@@ -59,7 +63,9 @@ import androidx.compose.ui.unit.LayoutDirection
     InternalCoreApi::class
 )
 class DesktopOwner(
-    val container: DesktopOwners
+    val container: DesktopOwners,
+    // TODO(demin): pass density here instead of scale canvas (SkiaWindow.kt#initSkija)
+    override val density: Density = Density(1f, 1f)
 ) : Owner {
     private var size: IntSize = IntSize(0, 0)
 
@@ -101,9 +107,6 @@ class DesktopOwner(
         container.unregister(this)
         // we don't need to call root.detach() because root will be garbage collected
     }
-
-    // TODO(demin): pass density here instead of scale canvas (SkiaWindow.kt#initSkija)
-    override val density = Density(1f, 1f)
 
     override val textInputService = TextInputService(container.platformInputService)
 
@@ -218,5 +221,23 @@ class DesktopOwner(
     internal fun processPointerInput(event: PointerInputEvent) {
         measureAndLayout()
         pointerInputEventProcessor.process(event)
+    }
+
+    // TODO(demin): This is likely temporary. After PointerInputEvent can handle mouse events
+    //  (scroll in particular), we can replace it with processPointerInput. see b/166105940
+    internal fun onMouseScroll(position: Offset, event: MouseScrollEvent) {
+        measureAndLayout()
+
+        val inputFilters = mutableListOf<PointerInputFilter>()
+        root.hitTest(position, inputFilters)
+
+        for (filter in inputFilters
+            .asReversed()
+            .asSequence()
+            .filterIsInstance<MouseScrollEventFilter>()
+        ) {
+            val isConsumed = filter.onMouseScroll(event)
+            if (isConsumed) break
+        }
     }
 }
