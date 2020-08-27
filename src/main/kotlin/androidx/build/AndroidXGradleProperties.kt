@@ -26,9 +26,19 @@ import org.gradle.api.Project
 const val TEST_FAILURES_DO_NOT_FAIL_TEST_TASK = "androidx.ignoreTestFailures"
 
 /**
+ * Setting this property to false makes test tasks not display detailed output to stdout.
+ */
+const val DISPLAY_TEST_OUTPUT = "androidx.displayTestOutput"
+/**
  * Setting this property turns javac and kotlinc warnings into errors that fail the build.
  */
 const val ALL_WARNINGS_AS_ERRORS = "androidx.allWarningsAsErrors"
+
+/**
+ * Returns whether tests in the project should display output
+ */
+fun Project.isDisplayTestOutput(): Boolean =
+    (project.findProperty(DISPLAY_TEST_OUTPUT) as? String)?.toBoolean() ?: true
 
 /**
  * Returns whether the project should write versioned API files, e.g. `1.1.0-alpha01.txt`.
