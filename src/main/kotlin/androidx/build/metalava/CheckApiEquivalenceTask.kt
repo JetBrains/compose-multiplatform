@@ -47,6 +47,7 @@ abstract class CheckApiEquivalenceTask : DefaultTask() {
         val checkedInApiFiles = checkedInApiLocations.flatMap { checkedInApiLocation ->
             listOf(
                 checkedInApiLocation.publicApiFile,
+                checkedInApiLocation.removedApiFile,
                 checkedInApiLocation.experimentalApiFile,
                 checkedInApiLocation.restrictedApiFile
             )
@@ -55,6 +56,7 @@ abstract class CheckApiEquivalenceTask : DefaultTask() {
         val builtApiLocation = builtApi.get()
         val builtApiFiles = listOf(
             builtApiLocation.publicApiFile,
+            builtApiLocation.removedApiFile,
             builtApiLocation.experimentalApiFile,
             builtApiLocation.restrictedApiFile
         )
@@ -67,6 +69,7 @@ abstract class CheckApiEquivalenceTask : DefaultTask() {
         val builtApiLocation = builtApi.get()
         for (checkedInApi in checkedInApis.get()) {
             checkEqual(checkedInApi.publicApiFile, builtApiLocation.publicApiFile)
+            checkEqual(checkedInApi.removedApiFile, builtApiLocation.removedApiFile)
             checkEqual(checkedInApi.experimentalApiFile, builtApiLocation.experimentalApiFile)
             checkEqual(checkedInApi.restrictedApiFile, builtApiLocation.restrictedApiFile)
         }

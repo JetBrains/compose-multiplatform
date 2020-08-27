@@ -182,10 +182,10 @@ fun Project.generateApi(
     pathToManifest: String? = null
 ) {
     generateApi(files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
-        apiLocation.publicApiFile, GenerateApiMode.PublicApi, apiLintMode, workerExecutor,
+        apiLocation, GenerateApiMode.PublicApi, apiLintMode, workerExecutor,
         pathToManifest)
     generateApi(files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
-        apiLocation.experimentalApiFile, GenerateApiMode.ExperimentalApi, apiLintMode,
+        apiLocation, GenerateApiMode.ExperimentalApi, apiLintMode,
         workerExecutor, pathToManifest)
 
     val restrictedAPIMode = if (includeRestrictToLibraryGroupApis) {
@@ -194,8 +194,16 @@ fun Project.generateApi(
         GenerateApiMode.RestrictToLibraryGroupPrefixApis
     }
     generateApi(files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
-        apiLocation.restrictedApiFile, restrictedAPIMode, ApiLintMode.Skip,
+        apiLocation, restrictedAPIMode, ApiLintMode.Skip,
         workerExecutor)
+    workerExecutor.await()
+    val removedApiFile = apiLocation.removedApiFile
+    if (removedApiFile.exists()) {
+        if (removedApiFile.readText().split("\n", limit = 3).count() < 3) {
+            // If the removedApi file is just a header (one "\n"), then we treat it as empty
+            removedApiFile.delete()
+        }
+    }
 }
 
 // Gets arguments for generating the specified api file
@@ -203,13 +211,13 @@ fun Project.generateApi(
     bootClasspath: Collection<File>,
     dependencyClasspath: FileCollection,
     sourcePaths: Collection<File>,
-    outputFile: File,
+    outputLocation: ApiLocation,
     generateApiMode: GenerateApiMode,
     apiLintMode: ApiLintMode,
     workerExecutor: WorkerExecutor,
     pathToManifest: String? = null
 ) {
-    val args = getGenerateApiArgs(bootClasspath, dependencyClasspath, sourcePaths, outputFile,
+    val args = getGenerateApiArgs(bootClasspath, dependencyClasspath, sourcePaths, outputLocation,
         generateApiMode, apiLintMode, pathToManifest)
     runMetalavaWithArgs(getMetalavaConfiguration(), args, workerExecutor)
 }
@@ -219,7 +227,7 @@ fun Project.getGenerateApiArgs(
     bootClasspath: Collection<File>,
     dependencyClasspath: FileCollection,
     sourcePaths: Collection<File>,
-    outputFile: File?,
+    outputLocation: ApiLocation?,
     generateApiMode: GenerateApiMode,
     apiLintMode: ApiLintMode,
     pathToManifest: String? = null
@@ -240,8 +248,20 @@ fun Project.getGenerateApiArgs(
         args += listOf("--manifest", pathToManifest)
     }
 
-    if (outputFile != null) {
-        args += listOf("--api", outputFile.toString())
+    if (outputLocation != null) {
+        when (generateApiMode) {
+            is GenerateApiMode.PublicApi -> {
+                args += listOf("--api", outputLocation.publicApiFile.toString())
+                args += listOf("--removed-api", outputLocation.removedApiFile.toString())
+            }
+            is GenerateApiMode.AllRestrictedApis,
+                GenerateApiMode.RestrictToLibraryGroupPrefixApis -> {
+                args += listOf("--api", outputLocation.restrictedApiFile.toString())
+            }
+            is GenerateApiMode.ExperimentalApi -> {
+                args += listOf("--api", outputLocation.experimentalApiFile.toString())
+            }
+        }
     }
 
     when (generateApiMode) {

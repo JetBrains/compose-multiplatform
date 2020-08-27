@@ -53,8 +53,10 @@ abstract class CheckApiCompatibilityTask @Inject constructor(
         return listOf(
             apiLocation.publicApiFile,
             apiLocation.restrictedApiFile,
+            apiLocation.removedApiFile,
             referenceApiLocation.publicApiFile,
             referenceApiLocation.restrictedApiFile,
+            referenceApiLocation.removedApiFile,
             baselineApiLocation.publicApiFile,
             baselineApiLocation.restrictedApiFile
         )
@@ -70,21 +72,32 @@ abstract class CheckApiCompatibilityTask @Inject constructor(
 
         checkApiFile(
             apiLocation.publicApiFile,
+            apiLocation.removedApiFile,
             referenceApiLocation.publicApiFile,
+            referenceApiLocation.removedApiFile,
             baselineApiLocation.publicApiFile
         )
 
         if (referenceApiLocation.restrictedApiFile.exists()) {
             checkApiFile(
                 apiLocation.restrictedApiFile,
+                null, // removed api
                 referenceApiLocation.restrictedApiFile,
+                null, // removed api
                 baselineApiLocation.restrictedApiFile
             )
         }
     }
 
-    // Confirms that <api> is compatible with <oldApi> except for any baselines listed in <baselineFile>
-    fun checkApiFile(api: File, oldApi: File, baselineFile: File) {
+    // Confirms that <api>+<removedApi> is compatible with
+    // <oldApi>+<oldRemovedApi> except for any baselines listed in <baselineFile>
+    fun checkApiFile(
+        api: File,
+        removedApi: File?,
+        oldApi: File,
+        oldRemovedApi: File?,
+        baselineFile: File
+    ) {
         var args = listOf(
             "--classpath",
             (bootClasspath + dependencyClasspath.files).joinToString(File.pathSeparator),
@@ -98,6 +111,12 @@ abstract class CheckApiCompatibilityTask @Inject constructor(
             "--warnings-as-errors",
             "--format=v3"
         )
+        if (removedApi != null && removedApi.exists()) {
+            args = args + listOf("--source-files", removedApi.toString())
+        }
+        if (oldRemovedApi != null && oldRemovedApi.exists()) {
+            args = args + listOf("--check-compatibility:removed:released", oldRemovedApi.toString())
+        }
         if (baselineFile.exists()) {
             args = args + listOf("--baseline", baselineFile.toString())
         }
