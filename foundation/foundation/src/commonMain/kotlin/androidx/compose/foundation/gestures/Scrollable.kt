@@ -36,7 +36,6 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.Direction
 import androidx.compose.ui.gesture.ScrollCallback
-import androidx.compose.ui.gesture.scrollGestureFilter
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.platform.AnimationClockAmbient
 
@@ -179,43 +178,64 @@ fun Modifier.scrollable(
         controller.stopAnimation()
     }
 
-    scrollGestureFilter(
-        scrollCallback = object : ScrollCallback {
+    val scrollCallback = object : ScrollCallback {
 
-            override fun onStart(downPosition: Offset) {
-                if (enabled) {
-                    controller.stopAnimation()
-                    onScrollStarted(downPosition)
-                }
-            }
-
-            override fun onScroll(scrollDistance: Float): Float {
-                if (!enabled) return 0f
+        override fun onStart(downPosition: Offset) {
+            if (enabled) {
                 controller.stopAnimation()
-                val toConsume = if (reverseDirection) scrollDistance * -1 else scrollDistance
-                val consumed = controller.consumeScrollDelta(toConsume)
-                controller.value = controller.value + consumed
-                return if (reverseDirection) consumed * -1 else consumed
+                onScrollStarted(downPosition)
             }
+        }
 
-            override fun onCancel() {
-                if (enabled) onScrollStopped(0f)
-            }
+        override fun onScroll(scrollDistance: Float): Float {
+            if (!enabled) return 0f
+            controller.stopAnimation()
+            val toConsume = if (reverseDirection) scrollDistance * -1 else scrollDistance
+            val consumed = controller.consumeScrollDelta(toConsume)
+            controller.value = controller.value + consumed
+            return if (reverseDirection) consumed * -1 else consumed
+        }
 
-            override fun onStop(velocity: Float) {
-                if (enabled) {
-                    controller.fling(
-                        velocity = if (reverseDirection) velocity * -1 else velocity,
-                        onScrollEnd = onScrollStopped
-                    )
-                }
+        override fun onCancel() {
+            if (enabled) onScrollStopped(0f)
+        }
+
+        override fun onStop(velocity: Float) {
+            if (enabled) {
+                controller.fling(
+                    velocity = if (reverseDirection) velocity * -1 else velocity,
+                    onScrollEnd = onScrollStopped
+                )
             }
-        },
+        }
+    }
+
+    touchScrollable(
+        scrollCallback = scrollCallback,
         orientation = orientation,
-        canDrag = canScroll,
-        startDragImmediately = controller.isAnimationRunning
+        canScroll = canScroll,
+        startScrollImmediately = controller.isAnimationRunning
+    ).mouseScrollable(
+        scrollCallback,
+        orientation
     )
 }
+
+internal expect fun Modifier.touchScrollable(
+    scrollCallback: ScrollCallback,
+    orientation: Orientation,
+    canScroll: ((Direction) -> Boolean)?,
+    startScrollImmediately: Boolean
+): Modifier
+
+// TODO(demin): think how we can move touchScrollable/mouseScrollable into commonMain,
+//  so Android can support mouse wheel scrolling, and desktop can support touch scrolling.
+//  For this we need first to implement different types of PointerInputEvent
+//  (to differentiate mouse and touch)
+internal expect fun Modifier.mouseScrollable(
+    scrollCallback: ScrollCallback,
+    orientation: Orientation
+): Modifier
 
 private class DeltaAnimatedFloat(
     initial: Float,
