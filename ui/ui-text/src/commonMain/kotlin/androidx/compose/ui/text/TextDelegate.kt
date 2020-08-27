@@ -87,28 +87,22 @@ class TextDelegate(
     internal var paragraphIntrinsics: MultiParagraphIntrinsics? = null
     internal var intrinsicsLayoutDirection: LayoutDirection? = null
 
-    private inline fun <T> assumeIntrinsics(block: (MultiParagraphIntrinsics) -> T) =
-        block(paragraphIntrinsics
-            ?: throw IllegalStateException("layoutForIntrinsics must be called first")
-        )
+    private val nonNullIntrinsics: MultiParagraphIntrinsics get() = paragraphIntrinsics
+        ?: throw IllegalStateException("layoutForIntrinsics must be called first")
 
     /**
      * The width for text if all soft wrap opportunities were taken.
      *
      * Valid only after [layout] has been called.
      */
-    val minIntrinsicWidth: Int get() = assumeIntrinsics {
-        ceil(it.minIntrinsicWidth).toInt()
-    }
+    val minIntrinsicWidth: Int get() = ceil(nonNullIntrinsics.minIntrinsicWidth).toInt()
 
     /**
      * The width at which increasing the width of the text no longer decreases the height.
      *
      * Valid only after [layout] has been called.
      */
-    val maxIntrinsicWidth: Int get() = assumeIntrinsics {
-        ceil(it.maxIntrinsicWidth).toInt()
-    }
+    val maxIntrinsicWidth: Int get() = ceil(nonNullIntrinsics.maxIntrinsicWidth).toInt()
 
     init {
         check(maxLines > 0)
@@ -143,29 +137,27 @@ class TextDelegate(
     private fun layoutText(minWidth: Float, maxWidth: Float, layoutDirection: LayoutDirection):
             MultiParagraph {
         layoutIntrinsics(layoutDirection)
-        assumeIntrinsics { paragraphIntrinsics ->
-            // if minWidth == maxWidth the width is fixed.
-            //    therefore we can pass that value to our paragraph and use it
-            // if minWidth != maxWidth there is a range
-            //    then we should check if the max intrinsic width is in this range to decide the
-            //    width to be passed to Paragraph
-            //        if max intrinsic width is between minWidth and maxWidth
-            //           we can use it to layout
-            //        else if max intrinsic width is greater than maxWidth, we can only use maxWidth
-            //        else if max intrinsic width is less than minWidth, we should use minWidth
-            val width = if (minWidth == maxWidth) {
-                maxWidth
-            } else {
-                paragraphIntrinsics.maxIntrinsicWidth.coerceIn(minWidth, maxWidth)
-            }
-
-            return MultiParagraph(
-                intrinsics = paragraphIntrinsics,
-                maxLines = maxLines,
-                ellipsis = overflow == TextOverflow.Ellipsis,
-                constraints = ParagraphConstraints(width = width)
-            )
+        // if minWidth == maxWidth the width is fixed.
+        //    therefore we can pass that value to our paragraph and use it
+        // if minWidth != maxWidth there is a range
+        //    then we should check if the max intrinsic width is in this range to decide the
+        //    width to be passed to Paragraph
+        //        if max intrinsic width is between minWidth and maxWidth
+        //           we can use it to layout
+        //        else if max intrinsic width is greater than maxWidth, we can only use maxWidth
+        //        else if max intrinsic width is less than minWidth, we should use minWidth
+        val width = if (minWidth == maxWidth) {
+            maxWidth
+        } else {
+            nonNullIntrinsics.maxIntrinsicWidth.coerceIn(minWidth, maxWidth)
         }
+
+        return MultiParagraph(
+            intrinsics = nonNullIntrinsics,
+            maxLines = maxLines,
+            ellipsis = overflow == TextOverflow.Ellipsis,
+            constraints = ParagraphConstraints(width = width)
+        )
     }
 
     fun layout(
