@@ -39,6 +39,7 @@ fun Size(width: Float, height: Float) = Size(packFloats(width, height))
  *
  * You can think of this as an [Offset] from the origin.
  */
+@Suppress("EXPERIMENTAL_FEATURE_WARNING")
 @Immutable
 inline class Size(@PublishedApi internal val packedValue: Long) {
 
@@ -65,15 +66,6 @@ inline class Size(@PublishedApi internal val packedValue: Long) {
     fun copy(width: Float = this.width, height: Float = this.height) = Size(width, height)
 
     companion object {
-        /**
-         * Creates an instance of [Size] that has the same values as another.
-         */
-        // Used by the rendering library's _DebugSize hack.
-        @Deprecated("Use copy(width, height) on the desired Size instance instead",
-            ReplaceWith("source.copy()"))
-        fun copy(source: Size): Size {
-            return Size(source.width, source.height)
-        }
 
         /**
          * An empty size, one with a zero width and a zero height.
@@ -91,19 +83,6 @@ inline class Size(@PublishedApi internal val packedValue: Long) {
          */
         @Stable
         val Unspecified = Size(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
-
-        /**
-         * A size whose [width] and [height] are infinite.
-         *
-         * See also:
-         *
-         *  * [isInfinite], which checks whether either dimension is infinite.
-         *  * [isFinite], which checks whether both dimensions are finite.
-         */
-        @Deprecated("Use Unspecified instead",
-            ReplaceWith("Unspecified", "androidx.compose.ui.geometry"))
-        @Stable
-        val UnspecifiedSize = Unspecified
     }
 
     /**
@@ -113,46 +92,6 @@ inline class Size(@PublishedApi internal val packedValue: Long) {
      */
     @Stable
     fun isEmpty() = width <= 0.0f || height <= 0.0f
-
-    /**
-     * Binary subtraction operator for [Size].
-     *
-     * Subtracting a [Size] from a [Size] returns the [Offset] that describes how
-     * much bigger the left-hand-side operand is than the right-hand-side
-     * operand. Adding that resulting [Offset] to the [Size] that was the
-     * right-hand-side operand would return a [Size] equal to the [Size] that was
-     * the left-hand-side operand. (i.e. if `sizeA - sizeB -> offsetA`, then
-     * `offsetA + sizeB -> sizeA`)
-     *
-     * Subtracting an [Offset] from a [Size] returns the [Size] that is smaller than
-     * the [Size] operand by the difference given by the [Offset] operand. In other
-     * words, the returned [Size] has a [width] consisting of the [width] of the
-     * left-hand-side operand minus the [Offset.x] dimension of the
-     * right-hand-side operand, and a [height] consisting of the [height] of the
-     * left-hand-side operand minus the [Offset.y] dimension of the
-     * right-hand-side operand.
-     */
-    @Stable
-    operator fun minus(other: Offset): Size {
-        return Size(width - other.x, height - other.y)
-    }
-
-    @Stable
-    operator fun minus(other: Size): Offset {
-        return Offset(width - other.width, height - other.height)
-    }
-
-    /**
-     * Binary addition operator for adding an [Offset] to a [Size].
-     *
-     * Returns a [Size] whose [width] is the sum of the [width] of the
-     * left-hand-side operand, a [Size], and the [Offset.x] dimension of the
-     * right-hand-side operand, an [Offset], and whose [height] is the sum of the
-     * [height] of the left-hand-side operand and the [Offset.y] dimension of
-     * the right-hand-side operand.
-     */
-    @Stable
-    operator fun plus(other: Offset) = Size(width + other.x, height + other.y)
 
     /**
      * Multiplication operator.

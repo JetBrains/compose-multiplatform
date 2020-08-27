@@ -268,9 +268,6 @@ package androidx.compose.ui.geometry {
     method public static float getWidth-impl(long $this);
     method @androidx.compose.runtime.Immutable public static inline int hashCode-impl(long p);
     method @androidx.compose.runtime.Stable public static boolean isEmpty-impl(long $this);
-    method @androidx.compose.runtime.Stable public static operator long minus-k-4lQ0M(long $this, long other);
-    method @androidx.compose.runtime.Stable public static operator long minus-uvyYCjk(long $this, long other);
-    method @androidx.compose.runtime.Stable public static operator long plus-k-4lQ0M(long $this, long other);
     method @androidx.compose.runtime.Stable public static operator long rem-impl(long $this, float operand);
     method @androidx.compose.runtime.Stable public static operator long times-impl(long $this, float operand);
     method public static String toString-impl(long $this);
@@ -282,12 +279,9 @@ package androidx.compose.ui.geometry {
   }
 
   public static final class Size.Companion {
-    method @Deprecated public long copy-uvyYCjk(long source);
     method public long getUnspecified();
-    method @Deprecated public long getUnspecifiedSize();
     method public long getZero();
     property public final long Unspecified;
-    property @Deprecated public final long UnspecifiedSize;
     property public final long Zero;
   }
 
