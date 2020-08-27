@@ -20,6 +20,9 @@ import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
@@ -1350,6 +1353,42 @@ class SwipeableTest {
 
         runOnIdle {
             assertThat(state!!.value).isEqualTo("B")
+        }
+    }
+
+    /**
+     * Tests that the `onValueChange` callback of [rememberSwipeableState] is invoked correctly.
+     */
+    @Test
+    fun swipeable_swipeableStateFor_onValueChange() {
+        var onStateChangeCallbacks = 0
+        lateinit var state: MutableState<String>
+        setSwipeableContent {
+            state = remember { mutableStateOf("A") }
+            Modifier.swipeable(
+                state = rememberSwipeableStateFor(
+                    value = state.value,
+                    onValueChange = {
+                        onStateChangeCallbacks += 1
+                        state.value = it
+                    }
+                ),
+                anchors = mapOf(0f to "A", 100f to "B"),
+                thresholds = { _, _ -> FractionalThreshold(0.5f) },
+                orientation = Orientation.Horizontal
+            )
+        }
+
+        runOnIdle {
+            assertThat(state.value).isEqualTo("A")
+            assertThat(onStateChangeCallbacks).isEqualTo(0)
+        }
+
+        swipeRight()
+
+        runOnIdle {
+            assertThat(state.value).isEqualTo("B")
+            assertThat(onStateChangeCallbacks).isEqualTo(1)
         }
     }
 
