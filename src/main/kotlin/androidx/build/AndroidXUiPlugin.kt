@@ -39,10 +39,7 @@ class AndroidXUiPlugin : Plugin<Project> {
                     val library = project.extensions.findByType(LibraryExtension::class.java)
                         ?: throw Exception("Failed to find Android extension")
 
-                    library.defaultConfig.apply {
-                        minSdkVersion(21)
-                        targetSdkVersion(29)
-                    }
+                    library.defaultConfig.minSdkVersion(21)
 
                     // TODO(148540713): remove this exclusion when Lint can support using multiple lint jars
                     project.configurations.getByName("lintChecks").exclude(
