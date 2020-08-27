@@ -70,7 +70,7 @@ fun TextFieldWithIcons() {
 
     TextField(value = text,
         onValueChange = { text = it },
-        label = { Text("Label") },
+        placeholder = { Text("placeholder") },
         leadingIcon = { Icon(Icons.Filled.Favorite) },
         trailingIcon = { Icon(Icons.Filled.Info) }
     )
