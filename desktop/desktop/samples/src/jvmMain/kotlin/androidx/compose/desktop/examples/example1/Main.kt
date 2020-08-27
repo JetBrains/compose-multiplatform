@@ -19,6 +19,7 @@ import androidx.compose.desktop.AppWindow
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,6 +31,8 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.ExperimentalLazyDsl
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExtendedFloatingActionButton
@@ -38,18 +41,27 @@ import androidx.compose.material.Slider
 import androidx.compose.material.TextField
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.res.imageResource
-import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.annotatedString
 import androidx.compose.ui.text.font.fontFamily
 import androidx.compose.ui.text.platform.font
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextDecoration.Companion.Underline
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 
 private const val title = "Desktop Compose Elements"
@@ -99,22 +111,55 @@ private fun LeftColumn(modifier: Modifier) = Column(modifier) {
                 .wrapContentSize(Alignment.Center)
         )
 
+        val inlineIndicatorId = "indicator"
+
         Text(
-            text = with(AnnotatedString.Builder("The quick ")) {
-                pushStyle(SpanStyle(color = Color(0xff964B00)))
+            text = annotatedString {
+                append("The quick ")
+                appendInlineContent(inlineIndicatorId)
+                pushStyle(SpanStyle(
+                    color = Color(0xff964B00),
+                    shadow = Shadow(Color.Green, offset = Offset(1f, 1f))
+                ))
                 append("brown fox")
                 pop()
+                pushStyle(SpanStyle(background = Color.Yellow))
                 append(" 🦊 ate a ")
-                pushStyle(SpanStyle(fontSize = 30.sp))
+                pop()
+                pushStyle(SpanStyle(fontSize = 30.sp, textDecoration = Underline))
                 append("zesty hamburgerfons")
                 pop()
                 append(" 🍔.\nThe 👩‍👩‍👧‍👧 laughed.")
                 addStyle(SpanStyle(color = Color.Green), 25, 35)
-                toAnnotatedString()
             },
-            color = Color.Black
+            color = Color.Black,
+            inlineContent = mapOf(
+                inlineIndicatorId to InlineTextContent(
+                    Placeholder(
+                        width = 1.em,
+                        height = 1.em,
+                        placeholderVerticalAlign = PlaceholderVerticalAlign.AboveBaseline
+                    )
+                ) {
+                    CircularProgressIndicator(Modifier.padding(end = 3.dp))
+                }
+            )
         )
 
+        val loremColors = listOf(
+            Color.Black,
+            Color.Yellow,
+            Color.Green,
+            Color.Blue
+        )
+        var loremColor by remember { mutableStateOf(0) }
+
+        val loremDecorations = listOf(
+            TextDecoration.None,
+            TextDecoration.Underline,
+            TextDecoration.LineThrough
+        )
+        var loremDecoration by remember { mutableStateOf(0) }
         Text(
             text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do" +
                     " eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad" +
@@ -123,7 +168,22 @@ private fun LeftColumn(modifier: Modifier) = Column(modifier) {
                     " in voluptate velit esse cillum dolore eu fugiat nulla pariatur." +
                     " Excepteur" +
                     " sint occaecat cupidatat non proident, sunt in culpa qui officia" +
-                    " deserunt mollit anim id est laborum."
+                    " deserunt mollit anim id est laborum.",
+            color = loremColors[loremColor],
+            textDecoration = loremDecorations[loremDecoration],
+            modifier = Modifier.clickable {
+                if (loremColor < loremColors.size - 1) {
+                    loremColor += 1
+                } else {
+                    loremColor = 0
+                }
+
+                if (loremDecoration < loremDecorations.size - 1) {
+                    loremDecoration += 1
+                } else {
+                    loremDecoration = 0
+                }
+            }
         )
 
         Text(

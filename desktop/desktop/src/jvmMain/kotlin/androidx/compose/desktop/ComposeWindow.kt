@@ -156,9 +156,16 @@ private class OwnersRenderer(private val owners: DesktopOwners) : SkiaRenderer {
     override fun onReshape(width: Int, height: Int) = Unit
 
     override fun onRender(canvas: Canvas, width: Int, height: Int) {
-        Thread.currentThread().contextClassLoader = ClassLoader.getSystemClassLoader()
-        DesktopUiDispatcher.Dispatcher.lockCallbacks {
-            owners.onRender(canvas, width, height)
+        try {
+            Thread.currentThread().contextClassLoader = ClassLoader.getSystemClassLoader()
+            DesktopUiDispatcher.Dispatcher.lockCallbacks {
+                owners.onRender(canvas, width, height)
+            }
+        } catch (e: Throwable) {
+            e.printStackTrace(System.err)
+            if (System.getProperty("compose.desktop.ignore.errors") == null) {
+                System.exit(1)
+            }
         }
     }
 }
