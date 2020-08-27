@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="5" by="lint 4.2.0-alpha06" client="gradle" variant="debug" version="4.2.0-alpha06">
+
+    <issue
+        id="BanSynchronizedMethods"
+        message="Use of synchronized methods is not recommended"
+        errorLine1="        @Synchronized"
+        errorLine2="        ^">
+        <location
+            file="src/androidMain/kotlin/androidx/compose/testutils/fake/FakeViewStructure.kt"
+            line="72"
+            column="9"/>
+    </issue>
+
+</issues>
