@@ -88,8 +88,7 @@ fun Switch(
                 enabled = enabled,
                 reverseDirection = isRtl,
                 interactionState = interactionState,
-                resistanceFactorAtMin = 0f,
-                resistanceFactorAtMax = 0f
+                resistance = null
             )
             .padding(DefaultSwitchPadding)
     ) {

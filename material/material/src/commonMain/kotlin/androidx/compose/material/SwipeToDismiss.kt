@@ -211,10 +211,13 @@ fun SwipeToDismiss(
         orientation = Orientation.Horizontal,
         enabled = state.value == Default,
         reverseDirection = isRtl,
-        resistanceFactorAtMin =
+        resistance = ResistanceConfig(
+            basis = width,
+            factorAtMin =
             if (EndToStart in directions) StandardResistanceFactor else StiffResistanceFactor,
-        resistanceFactorAtMax =
+            factorAtMax =
             if (StartToEnd in directions) StandardResistanceFactor else StiffResistanceFactor
+        )
     )) {
         Row(
             children = background,
