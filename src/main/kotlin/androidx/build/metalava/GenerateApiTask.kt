@@ -55,6 +55,7 @@ abstract class GenerateApiTask @Inject constructor(
         val prop = apiLocation.get()
         return listOfNotNull(
             prop.publicApiFile,
+            prop.removedApiFile,
             prop.experimentalApiFile,
             prop.restrictedApiFile
         )
