@@ -347,30 +347,34 @@ fun <T : Any> rememberSwipeableState(
 
 /**
  * Create and [remember] a [SwipeableState] which is kept in sync with another state, i.e:
- *  1. Whenever the [state] changes, the [SwipeableState] will be animated to that new value.
+ *  1. Whenever the [value] changes, the [SwipeableState] will be animated to that new value.
  *  2. Whenever the value of the [SwipeableState] changes (e.g. after a swipe), the owner of the
- *  [state] will be notified to update their state to the new value of the [SwipeableState] by
- *  invoking [onStateChange]. If the owner does not update their state to the provided value for
+ *  [value] will be notified to update their state to the new value of the [SwipeableState] by
+ *  invoking [onValueChange]. If the owner does not update their state to the provided value for
  *  some reason, then the [SwipeableState] will perform a rollback to the previous, correct value.
  */
 @Composable
 @ExperimentalMaterialApi
 internal fun <T : Any> rememberSwipeableStateFor(
-    state: T,
-    onStateChange: (T) -> Unit,
+    value: T,
+    onValueChange: (T) -> Unit,
     animationSpec: AnimationSpec<Float> = DefaultAnimationSpec
 ): SwipeableState<T> {
     val swipeableState = rememberSwipeableState(
-        initialValue = state,
+        initialValue = value,
         animationSpec = animationSpec
     )
     val forceAnimationCheck = remember { mutableStateOf(false) }
-    onCommit(state, forceAnimationCheck.value) {
-        swipeableState.animateTo(state)
+    onCommit(value, forceAnimationCheck.value) {
+        if (value != swipeableState.value) {
+            swipeableState.animateTo(value)
+        }
     }
     onCommit(swipeableState.value) {
-        onStateChange(swipeableState.value)
-        forceAnimationCheck.value = !forceAnimationCheck.value
+        if (value != swipeableState.value) {
+            onValueChange(swipeableState.value)
+            forceAnimationCheck.value = !forceAnimationCheck.value
+        }
     }
     return swipeableState
 }
