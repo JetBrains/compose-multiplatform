@@ -34,14 +34,17 @@ dependencies {
     implementation(KOTLIN_STDLIB)
     compileOnly project(":annotation:annotation-sampled")
     implementation project(":compose:animation:animation-core")
+    implementation project(":compose:runtime:runtime")
+    implementation project(":compose:ui:ui")
     implementation project(":compose:ui:ui-unit")
+    implementation project(':compose:foundation:foundation')
+    implementation project(':compose:material:material')
 }
 
 
 tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
-        // useIR = true // TODO: Should just enable IR instead of `-Xallow-jvm-ir-dependencies`
-        freeCompilerArgs += "-Xallow-jvm-ir-dependencies"
+        useIR = true
     }
 }
 

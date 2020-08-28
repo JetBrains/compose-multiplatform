@@ -22,24 +22,46 @@ import androidx.compose.integration.demos.common.DemoCategory
 val AnimationDemos = DemoCategory(
     "Animation",
     listOf(
-        ComposableDemo("Animate multi-dimensional prop") { MultiDimensionalAnimationDemo() },
-        ComposableDemo("Animate") { SingleValueAnimationDemo() },
-        ComposableDemo("Animated scrolling") { FancyScrollingDemo() },
-        ComposableDemo("Animate Content Size") { AnimateContentSizeDemo() },
-        ComposableDemo("Animate Visibility Demo") { AnimatedVisibilityDemo() },
-        ComposableDemo("Animate Visibility Lazy Column Demo") {
-            AnimatedVisibilityLazyColumnDemo()
-        },
-        ComposableDemo("Cross Fade") { CrossfadeDemo() },
-        ComposableDemo("Enter/Exit Transition Demo") { EnterExitTransitionDemo() },
-        ComposableDemo("Gesture based animation") { GestureBasedAnimationDemo() },
-        ComposableDemo("Manual animation clock") { AnimatableSeekBarDemo() },
-        ComposableDemo("Repeating rotation") { RepeatedRotationDemo() },
-        ComposableDemo("Spring back scrolling") { SpringBackScrollingDemo() },
-        ComposableDemo("State animation with interruptions") {
-            StateAnimationWithInterruptionsDemo()
-        },
-        ComposableDemo("State based ripple") { StateBasedRippleDemo() },
-        ComposableDemo("Swipe to dismiss") { SwipeToDismissDemo() }
+        DemoCategory(
+            "State Transition Demos",
+            listOf(
+                ComposableDemo("Multi-dimensional prop") { MultiDimensionalAnimationDemo() },
+                ComposableDemo("State animation with interruptions") {
+                    StateAnimationWithInterruptionsDemo()
+                },
+                ComposableDemo("State based ripple") { StateBasedRippleDemo() },
+                ComposableDemo("Repeating rotation") { RepeatedRotationDemo() },
+                ComposableDemo("Manual animation clock") { AnimatableSeekBarDemo() },
+                ComposableDemo("Gesture based animation") { GestureBasedAnimationDemo() },
+            )
+        ),
+        DemoCategory(
+            "Single Value Animation Demos",
+            listOf(
+                ComposableDemo("Animated scrolling") { FancyScrollingDemo() },
+                ComposableDemo("animate()") { SingleValueAnimationDemo() },
+                ComposableDemo("Swipe to dismiss") { SwipeToDismissDemo() }
+            )
+        ),
+        DemoCategory(
+            "Layout Animation Demos",
+            listOf(
+                ComposableDemo("Animate Content Size") { AnimateContentSizeDemo() },
+                ComposableDemo("Animate Visibility Demo") { AnimatedVisibilityDemo() },
+                ComposableDemo("Animate Visibility Lazy Column Demo") {
+                    AnimatedVisibilityLazyColumnDemo()
+                },
+                ComposableDemo("Cross Fade") { CrossfadeDemo() },
+                ComposableDemo("Enter/Exit Transition Demo") { EnterExitTransitionDemo() },
+            )
+        ),
+        DemoCategory(
+            "Suspend Animation Demos",
+            listOf(
+                ComposableDemo("Spring back scrolling") { SpringBackScrollingDemo() },
+                ComposableDemo("Follow the tap") { SuspendAnimationDemo() },
+                ComposableDemo("Infinitely Animating") { InfiniteAnimationDemo() },
+            )
+        ),
     )
 )

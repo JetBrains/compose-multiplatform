@@ -60,6 +60,9 @@ inline class Uptime(val nanoseconds: Long) : Comparable<Uptime> {
     companion object {
         /** The time at which the device booted (0 nanoseconds). */
         val Boot = Uptime(0)
+
+        /** Constant for an unspecified time. */
+        val Unspecified = Uptime(Long.MIN_VALUE)
     }
 }
 
