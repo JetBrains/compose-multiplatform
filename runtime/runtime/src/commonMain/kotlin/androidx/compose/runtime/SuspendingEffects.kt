@@ -50,17 +50,15 @@ private class SuspendingEffect(
  * frame of the composition. This can be useful for performing the next action of an animation
  * while the effect is still present in the composition.
  */
-// TODO Make this an interface once it doesn't experience compiler issues
-abstract class CompositionCoroutineScope : CoroutineScope, MonotonicFrameClock {
+interface CompositionCoroutineScope : CoroutineScope {
     // This method deliberately shadows the awaitFrame method from kotlinx-coroutines-android
     // to redirect usage to the CompositionFrameClock API in effect blocks.
-    @Suppress("RedundantSuspendModifier")
+    @Suppress("RedundantSuspendModifier", "DeprecatedCallableAddReplaceWith")
     @Deprecated(
-        "use CompositionFrameClock.awaitFrameNanos to await a composition frame",
-        replaceWith = ReplaceWith("awaitFrameNanos()", "androidx.compose.runtime.awaitFrameNanos"),
+        "use withFrameNanos to perform work on a composition frame",
         level = DeprecationLevel.ERROR
     )
-    suspend fun awaitFrame(): Long = withFrameNanos { it }
+    suspend fun awaitFrame(): Long = error("awaitFrame should not be used; use withFrameNanos")
 }
 
 /**
@@ -70,6 +68,7 @@ abstract class CompositionCoroutineScope : CoroutineScope, MonotonicFrameClock {
  * [kotlinx.coroutines.CancellationException] or the exception that failed the current
  * [kotlinx.coroutines.Job].
  */
+@Suppress("unused")
 suspend fun CompositionCoroutineScope.awaitDispose(onDispose: () -> Unit = {}): Nothing = try {
     suspendCancellableCoroutine<Nothing> { /* Suspend until cancellation */ }
 } finally {

@@ -37,7 +37,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.coroutineContext
@@ -107,7 +109,7 @@ class Recomposer(var embeddingContext: EmbeddingContext = EmbeddingContext()) {
      */
     suspend fun runRecomposeAndApplyChanges(): Nothing {
         coroutineScope {
-            recomposeAndApplyChanges(this, Long.MAX_VALUE)
+            recomposeAndApplyChanges(Long.MAX_VALUE)
         }
         error("this function never returns")
     }
@@ -122,94 +124,96 @@ class Recomposer(var embeddingContext: EmbeddingContext = EmbeddingContext()) {
      *
      * This method returns after recomposing [frameCount] times.
      */
-    suspend fun recomposeAndApplyChanges(
-        applyCoroutineScope: CoroutineScope,
-        frameCount: Long
-    ) {
+    suspend fun recomposeAndApplyChanges(frameCount: Long) {
         var framesRemaining = frameCount
         val toRecompose = mutableListOf<Composer<*>>()
-
-        if (!applyingScope.compareAndSet(null, applyCoroutineScope)) {
-            error("already recomposing and applying changes")
-        }
 
         // Cache this so we don't go looking for it each time through the loop.
         val frameClock = coroutineContext[MonotonicFrameClock] ?: DefaultMonotonicFrameClock
 
-        try {
-            idlingLatch.closeLatch()
-            while (frameCount == Long.MAX_VALUE || framesRemaining-- > 0L) {
-                // Don't hold the monitor lock across suspension.
-                val hasInvalidComposers = synchronized(invalidComposers) {
-                    invalidComposers.isNotEmpty()
-                }
-                if (!hasInvalidComposers && !broadcastFrameClock.hasAwaiters) {
-                    // Suspend until we have something to do
-                    suspendCancellableCoroutine<Unit> { co ->
-                        synchronized(invalidComposers) {
-                            if (invalidComposers.isEmpty()) {
-                                invalidComposersAwaiter = co
-                                idlingLatch.openLatch()
-                            } else {
-                                // We raced and lost, someone invalidated between our check
-                                // and suspension. Resume immediately.
-                                co.resume(Unit)
-                                return@suspendCancellableCoroutine
-                            }
-                        }
-                        co.invokeOnCancellation {
+        // Install the broadcastFrameClock so that all composition-launched coroutines use it
+        withContext(broadcastFrameClock) {
+            if (!applyingScope.compareAndSet(null, this)) {
+                error("already recomposing and applying changes")
+            }
+
+            try {
+                idlingLatch.closeLatch()
+                while (frameCount == Long.MAX_VALUE || framesRemaining-- > 0L) {
+                    // Don't hold the monitor lock across suspension.
+                    val hasInvalidComposers = synchronized(invalidComposers) {
+                        invalidComposers.isNotEmpty()
+                    }
+                    if (!hasInvalidComposers && !broadcastFrameClock.hasAwaiters) {
+                        // Suspend until we have something to do
+                        suspendCancellableCoroutine<Unit> { co ->
                             synchronized(invalidComposers) {
-                                if (invalidComposersAwaiter === co) {
-                                    invalidComposersAwaiter = null
+                                if (invalidComposers.isEmpty()) {
+                                    invalidComposersAwaiter = co
+                                    idlingLatch.openLatch()
+                                } else {
+                                    // We raced and lost, someone invalidated between our check
+                                    // and suspension. Resume immediately.
+                                    co.resume(Unit)
+                                    return@suspendCancellableCoroutine
+                                }
+                            }
+                            co.invokeOnCancellation {
+                                synchronized(invalidComposers) {
+                                    if (invalidComposersAwaiter === co) {
+                                        invalidComposersAwaiter = null
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                // Align work with the next frame to coalesce changes.
-                // Note: it is possible to resume from the above with no recompositions pending,
-                // instead someone might be awaiting our frame clock dispatch below.
-                frameClock.withFrameNanos { frameTime ->
-                    trace("recomposeFrame") {
-                        // Propagate the frame time to anyone who is awaiting from the
-                        // recomposer clock.
-                        broadcastFrameClock.sendFrame(frameTime)
+                    // Align work with the next frame to coalesce changes.
+                    // Note: it is possible to resume from the above with no recompositions pending,
+                    // instead someone might be awaiting our frame clock dispatch below.
+                    // We use the cached frame clock from above not just so that we don't locate it
+                    // each time, but because we've installed the broadcastFrameClock as the scope
+                    // clock above for user code to locate.
+                    frameClock.withFrameNanos { frameTime ->
+                        trace("recomposeFrame") {
+                            // Propagate the frame time to anyone who is awaiting from the
+                            // recomposer clock.
+                            broadcastFrameClock.sendFrame(frameTime)
 
-                        // Ensure any global changes are observed
-                        Snapshot.sendApplyNotifications()
+                            // Ensure any global changes are observed
+                            Snapshot.sendApplyNotifications()
 
-                        // ...and make sure we know about any pending invalidations the commit
-                        // may have caused before recomposing - Handler messages can't run between
-                        // input processing and the frame clock pulse!
-                        FrameManager.synchronize()
+                            // ...and make sure we know about any pending invalidations the commit
+                            // may have caused before recomposing - Handler messages can't run
+                            // between input processing and the frame clock pulse!
+                            FrameManager.synchronize()
 
-                        // ...and pick up any stragglers as a result of the above snapshot sync
-                        synchronized(invalidComposers) {
-                            toRecompose.addAll(invalidComposers)
-                            invalidComposers.clear()
-                        }
-
-                        if (toRecompose.isNotEmpty()) {
-                            for (i in 0 until toRecompose.size) {
-                                performRecompose(toRecompose[i])
+                            // ...and pick up any stragglers as a result of the above snapshot sync
+                            synchronized(invalidComposers) {
+                                toRecompose.addAll(invalidComposers)
+                                invalidComposers.clear()
                             }
-                            toRecompose.clear()
+
+                            if (toRecompose.isNotEmpty()) {
+                                for (i in 0 until toRecompose.size) {
+                                    performRecompose(toRecompose[i])
+                                }
+                                toRecompose.clear()
+                            }
                         }
                     }
                 }
+            } finally {
+                applyingScope.set(null)
+                // If we're not still running frames, we're effectively idle.
+                idlingLatch.openLatch()
             }
-        } finally {
-            applyingScope.set(null)
-            // If we're not still running frames, we're effectively idle.
-            idlingLatch.openLatch()
         }
     }
 
     private class CompositionCoroutineScopeImpl(
-        override val coroutineContext: CoroutineContext,
-        frameClock: MonotonicFrameClock
-    ) : CompositionCoroutineScope(), MonotonicFrameClock by frameClock
+        override val coroutineContext: CoroutineContext
+    ) : CompositionCoroutineScope
 
     /**
      * Implementation note: we launch effects undispatched so they can begin immediately during
@@ -221,7 +225,7 @@ class Recomposer(var embeddingContext: EmbeddingContext = EmbeddingContext()) {
     internal fun launchEffect(
         block: suspend CompositionCoroutineScope.() -> Unit
     ): Job = applyingScope.get()?.launch(start = CoroutineStart.UNDISPATCHED) {
-        CompositionCoroutineScopeImpl(coroutineContext, frameClock).block()
+        CompositionCoroutineScopeImpl(coroutineContext).block()
     } ?: error("apply scope missing; runRecomposeAndApplyChanges must be running")
 
     // TODO this is temporary until more of this logic moves to Composition

@@ -204,7 +204,7 @@ internal class AndroidComposeTestCaseRunner<T : ComposeTestCase>(
         if (hasPendingChanges()) {
             didLastRecomposeHaveChanges = true
             runBlocking(frameClock) {
-                recomposer.recomposeAndApplyChanges(this, 1)
+                recomposer.recomposeAndApplyChanges(1)
             }
         } else {
             didLastRecomposeHaveChanges = false

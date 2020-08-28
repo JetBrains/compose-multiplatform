@@ -17,11 +17,14 @@
 package androidx.compose.runtime
 
 import android.view.Choreographer
+import androidx.compose.runtime.dispatch.MonotonicFrameClock
+import androidx.compose.runtime.dispatch.withFrameNanos
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import org.junit.After
 import org.junit.Rule
 import org.junit.Test
@@ -29,6 +32,8 @@ import org.junit.runner.RunWith
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 @MediumTest
@@ -69,7 +74,7 @@ class SuspendingEffectsTests : BaseComposeTest() {
     }
 
     @Test
-    fun testAwaitFrame() {
+    fun testAwaitFrameFromLaunchInComposition() {
         var choreographerTime by mutableStateOf(Long.MIN_VALUE)
         var awaitFrameTime by mutableStateOf(Long.MAX_VALUE)
         compose {
@@ -85,7 +90,31 @@ class SuspendingEffectsTests : BaseComposeTest() {
             }
         }.then {
             assertNotEquals(choreographerTime, Long.MIN_VALUE, "Choreographer callback never ran")
-            assertNotEquals(awaitFrameTime, Long.MIN_VALUE, "awaitFrameNanos callback never ran")
+            assertNotEquals(awaitFrameTime, Long.MAX_VALUE, "awaitFrameNanos callback never ran")
+            assertEquals(choreographerTime, awaitFrameTime,
+                "expected same values from choreographer post and awaitFrameNanos")
+        }
+    }
+
+    @Test
+    fun testAwaitFrameFromRememberCoroutineScope() {
+        var choreographerTime by mutableStateOf(Long.MIN_VALUE)
+        var awaitFrameTime by mutableStateOf(Long.MAX_VALUE)
+        compose {
+            val scope = rememberCoroutineScope()
+            onCommit(true) {
+                scope.launch {
+                    withFrameNanos {
+                        awaitFrameTime = it
+                    }
+                }
+                Choreographer.getInstance().postFrameCallback { frameTimeNanos ->
+                    choreographerTime = frameTimeNanos
+                }
+            }
+        }.then {
+            assertNotEquals(choreographerTime, Long.MIN_VALUE, "Choreographer callback never ran")
+            assertNotEquals(awaitFrameTime, Long.MAX_VALUE, "awaitFrameNanos callback never ran")
             assertEquals(choreographerTime, awaitFrameTime,
                 "expected same values from choreographer post and awaitFrameNanos")
         }
@@ -122,6 +151,31 @@ class SuspendingEffectsTests : BaseComposeTest() {
         }.then {
             assertTrue(coroutineScope?.isActive == false,
                 "coroutine scope should be cancelled after leaving composition")
+        }
+    }
+
+    @OptIn(ExperimentalComposeApi::class)
+    @Test
+    fun testCoroutineScopesHaveCorrectFrameClock() {
+        var recomposerClock: MonotonicFrameClock? = null
+        var launchInCompositionClock: MonotonicFrameClock? = null
+        var rememberCoroutineScopeFrameClock: MonotonicFrameClock? = null
+
+        compose {
+            recomposerClock = currentComposer.recomposer.frameClock
+            launchInComposition {
+                launchInCompositionClock = coroutineContext[MonotonicFrameClock]
+            }
+            val rememberedScope = rememberCoroutineScope()
+            onCommit {
+                rememberCoroutineScopeFrameClock =
+                    rememberedScope.coroutineContext[MonotonicFrameClock]
+            }
+        }.then {
+            assertNotNull(recomposerClock, "Recomposer frameClock")
+            assertSame(recomposerClock, launchInCompositionClock, "launchInComposition clock")
+            assertSame(recomposerClock, rememberCoroutineScopeFrameClock,
+                "rememberCoroutineScope clock")
         }
     }
 
