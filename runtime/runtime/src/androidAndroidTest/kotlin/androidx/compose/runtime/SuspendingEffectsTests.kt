@@ -179,6 +179,24 @@ class SuspendingEffectsTests : BaseComposeTest() {
         }
     }
 
+    @Test
+    fun testLaunchInCompositionRunsAfter() {
+        var onCommitRan = false
+        var launchRanAfter = false
+        compose {
+            // Confirms that these run "out of order" with respect to one another because
+            // the launch runs dispatched.
+            launchInComposition {
+                launchRanAfter = onCommitRan
+            }
+            onCommit {
+                onCommitRan = true
+            }
+        }.then {
+            assertTrue(launchRanAfter, "expected launchInComposition to run after later onCommit")
+        }
+    }
+
     /*
     // Forced to disable test due to a bug in the Kotlin compiler
     // which caused this function to fail to build due to invalid bytecode

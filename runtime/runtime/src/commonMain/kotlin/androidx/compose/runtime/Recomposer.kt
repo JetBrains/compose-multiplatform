@@ -215,16 +215,10 @@ class Recomposer(var embeddingContext: EmbeddingContext = EmbeddingContext()) {
         override val coroutineContext: CoroutineContext
     ) : CompositionCoroutineScope
 
-    /**
-     * Implementation note: we launch effects undispatched so they can begin immediately during
-     * the apply step. This function is only called internally by [launchInComposition]
-     * implementations during [CompositionLifecycleObserver] callbacks dispatched on the
-     * applying scope, so we consider this safe.
-     */
     @OptIn(ExperimentalCoroutinesApi::class)
     internal fun launchEffect(
         block: suspend CompositionCoroutineScope.() -> Unit
-    ): Job = applyingScope.get()?.launch(start = CoroutineStart.UNDISPATCHED) {
+    ): Job = applyingScope.get()?.launch {
         CompositionCoroutineScopeImpl(coroutineContext).block()
     } ?: error("apply scope missing; runRecomposeAndApplyChanges must be running")
 
