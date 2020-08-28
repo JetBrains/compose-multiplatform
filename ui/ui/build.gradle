@@ -55,6 +55,9 @@ kotlin {
 
         androidMain.dependencies {
             implementation(KOTLIN_STDLIB)
+            // This has stub APIs for access to legacy Android APIs, so we don't want
+            // any dependency on this module.
+            compileOnly project(":compose:ui:ui-android-stubs")
             api "androidx.annotation:annotation:1.1.0"
             api "androidx.activity:activity:1.2.0-alpha02"
             implementation "androidx.autofill:autofill:1.0.0"

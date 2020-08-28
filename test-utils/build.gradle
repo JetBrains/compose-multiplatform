@@ -43,6 +43,9 @@ kotlin {
 
         androidMain.dependencies {
             api "androidx.activity:activity:1.2.0-alpha02"
+            // This has stub APIs for access to legacy Android APIs, so we don't want
+            // any dependency on this module.
+            compileOnly project(":compose:ui:ui-android-stubs")
             implementation(ANDROIDX_TEST_RULES)
         }
 
