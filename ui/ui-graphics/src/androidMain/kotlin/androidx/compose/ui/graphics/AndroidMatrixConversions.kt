@@ -66,7 +66,7 @@ fun android.graphics.Matrix.setFrom(matrix: Matrix) {
     val v01 = matrix[0, 1]
     val v03 = matrix[0, 3]
     val v11 = matrix[1, 1]
-    // val v13 = matrix[1, 3]
+    val v13 = matrix[1, 3]
     val v30 = matrix[3, 0]
     val v31 = matrix[3, 1]
     val v33 = matrix[3, 3]
@@ -79,7 +79,7 @@ fun android.graphics.Matrix.setFrom(matrix: Matrix) {
     v[4] = v11
     v[5] = v31
     v[6] = v03
-    // v[7] = v13 // math works out so we don't have to set it
+    v[7] = v13
     v[8] = v33
     setValues(v)
 
@@ -89,6 +89,6 @@ fun android.graphics.Matrix.setFrom(matrix: Matrix) {
     v[4] = v01
     v[5] = v11
     v[6] = 0f
-    // v[7] = v13
+    v[7] = v13
     v[8] = 0f
 }
