@@ -158,9 +158,8 @@ package androidx.compose.runtime {
     method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
-  public abstract class CompositionCoroutineScope implements kotlinx.coroutines.CoroutineScope androidx.compose.runtime.dispatch.MonotonicFrameClock {
-    ctor public CompositionCoroutineScope();
-    method @Deprecated public final suspend Object? awaitFrame(kotlin.coroutines.Continuation<? super java.lang.Long> p);
+  public interface CompositionCoroutineScope extends kotlinx.coroutines.CoroutineScope {
+    method @Deprecated public default suspend Object? awaitFrame(kotlin.coroutines.Continuation<? super java.lang.Long> p);
   }
 
   @Deprecated public interface CompositionFrameClock extends androidx.compose.runtime.dispatch.MonotonicFrameClock {
@@ -318,7 +317,7 @@ package androidx.compose.runtime {
     method public androidx.compose.runtime.EmbeddingContext getEmbeddingContext();
     method public androidx.compose.runtime.dispatch.MonotonicFrameClock getFrameClock();
     method public boolean hasPendingChanges();
-    method public suspend Object? recomposeAndApplyChanges(kotlinx.coroutines.CoroutineScope applyCoroutineScope, long frameCount, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
+    method public suspend Object? recomposeAndApplyChanges(long frameCount, kotlin.coroutines.Continuation<? super kotlin.Unit> p);
     method public suspend Object? runRecomposeAndApplyChanges(kotlin.coroutines.Continuation<?> p);
     method public void setEmbeddingContext(androidx.compose.runtime.EmbeddingContext p);
     property public final androidx.compose.runtime.dispatch.MonotonicFrameClock frameClock;
