@@ -210,17 +210,14 @@ private data class PainterModifier(
             Size(constrainedWidth.toFloat(), constrainedHeight.toFloat())
         )
 
-        val minWidth = if (constraints.hasFixedWidth) {
-            constraints.minWidth
-        } else {
-            scaledSize.width.roundToInt()
-        }
-
-        val minHeight = if (constraints.hasFixedHeight) {
-            constraints.minHeight
-        } else {
-            scaledSize.height.roundToInt()
-        }
+        // For both width and height constraints, consume the minimum of the scaled width
+        // and the maximum constraint as some scale types can scale larger than the maximum
+        // available size (ex ContentScale.Crop)
+        // In this case the larger of the 2 dimensions is used and the aspect ratio is
+        // maintained. Even if the size of the composable is smaller, the painter will
+        // draw its content clipped
+        val minWidth = constraints.constrainWidth(scaledSize.width.roundToInt())
+        val minHeight = constraints.constrainHeight(scaledSize.height.roundToInt())
         return constraints.copy(minWidth = minWidth, minHeight = minHeight)
     }
 
