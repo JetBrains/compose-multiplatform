@@ -87,9 +87,7 @@ class ParagraphMethodBenchmark(private val textType: TextType, private val textL
         val paragraphIntrinsics = paragraphIntrinsics(textGenerator, textLength)
         return Paragraph(
             paragraphIntrinsics = paragraphIntrinsics,
-            constraints = ParagraphConstraints(
-                width = paragraphIntrinsics.maxIntrinsicWidth / preferredLineCount
-            )
+            width = paragraphIntrinsics.maxIntrinsicWidth / preferredLineCount
         )
     }
 

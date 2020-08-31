@@ -283,7 +283,7 @@ class MultiParagraphIntegrationTextDirectionTest {
                 localeList = localeList,
                 textDirection = textDirection
             ),
-            constraints = ParagraphConstraints(width),
+            width = width,
             density = defaultDensity,
             resourceLoader = TestFontResourceLoader(context)
         )
