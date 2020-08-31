@@ -35,6 +35,18 @@ ExecutorRegistration: androidx.compose.ui.gesture.ScrollGestureFilterKt#scrollGe
     Registration methods should have overload that accepts delivery Executor: `scrollGestureFilter`
 
 
+GetterOnBuilder: androidx.compose.ui.graphics.vector.VectorAssetBuilder#getDefaultHeight():
+    Getter should be on the built object, not the builder: method androidx.compose.ui.graphics.vector.VectorAssetBuilder.getDefaultHeight()
+GetterOnBuilder: androidx.compose.ui.graphics.vector.VectorAssetBuilder#getDefaultWidth():
+    Getter should be on the built object, not the builder: method androidx.compose.ui.graphics.vector.VectorAssetBuilder.getDefaultWidth()
+GetterOnBuilder: androidx.compose.ui.graphics.vector.VectorAssetBuilder#getName():
+    Getter should be on the built object, not the builder: method androidx.compose.ui.graphics.vector.VectorAssetBuilder.getName()
+GetterOnBuilder: androidx.compose.ui.graphics.vector.VectorAssetBuilder#getViewportHeight():
+    Getter should be on the built object, not the builder: method androidx.compose.ui.graphics.vector.VectorAssetBuilder.getViewportHeight()
+GetterOnBuilder: androidx.compose.ui.graphics.vector.VectorAssetBuilder#getViewportWidth():
+    Getter should be on the built object, not the builder: method androidx.compose.ui.graphics.vector.VectorAssetBuilder.getViewportWidth()
+
+
 ListenerLast: androidx.compose.ui.gesture.ScrollGestureFilterKt#scrollGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.ScrollCallback, androidx.compose.ui.gesture.scrollorientationlocking.Orientation, kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean>, boolean) parameter #2:
     Listeners should always be at end of argument list (method `scrollGestureFilter`)
 ListenerLast: androidx.compose.ui.gesture.ScrollGestureFilterKt#scrollGestureFilter(androidx.compose.ui.Modifier, androidx.compose.ui.gesture.ScrollCallback, androidx.compose.ui.gesture.scrollorientationlocking.Orientation, kotlin.jvm.functions.Function1<? super androidx.compose.ui.gesture.Direction,java.lang.Boolean>, boolean) parameter #3:

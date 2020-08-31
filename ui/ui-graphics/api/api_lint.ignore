@@ -49,6 +49,10 @@ BuilderSetStyle: androidx.compose.ui.graphics.vector.PathBuilder#verticalLineToR
     Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.graphics.vector.PathBuilder.verticalLineToRelative(float)
 
 
+GetterOnBuilder: androidx.compose.ui.graphics.vector.PathBuilder#getNodes():
+    Getter should be on the built object, not the builder: method androidx.compose.ui.graphics.vector.PathBuilder.getNodes()
+
+
 MissingBuildMethod: androidx.compose.ui.graphics.vector.PathBuilder:
     androidx.compose.ui.graphics.vector.PathBuilder does not declare a `build()` method, but builder classes are expected to
 
