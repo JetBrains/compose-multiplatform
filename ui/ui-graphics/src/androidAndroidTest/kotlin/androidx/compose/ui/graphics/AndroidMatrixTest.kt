@@ -84,6 +84,11 @@ class AndroidMatrixTest {
         val message = "Matrix:\n$m\nPlatform:\n$p"
         assertWithMessage(message).that(point[0]).isWithin(delta).of(100f)
         assertWithMessage(message).that(point[1]).isWithin(delta).of(110f)
+        m.translate(0f, 10f)
+        val q = android.graphics.Matrix().apply { setFrom(m) }
+        q.mapPoints(point, floatArrayOf(0f, 0f))
+        assertThat(point[0]).isWithin(delta).of(0f)
+        assertThat(point[1]).isWithin(delta).of(20f)
     }
 
     @Test
