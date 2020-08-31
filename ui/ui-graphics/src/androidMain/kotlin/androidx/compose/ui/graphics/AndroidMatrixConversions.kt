@@ -89,6 +89,6 @@ fun android.graphics.Matrix.setFrom(matrix: Matrix) {
     v[4] = v01
     v[5] = v11
     v[6] = 0f
-    v[7] = v13
+    v[7] = v31
     v[8] = 0f
 }
