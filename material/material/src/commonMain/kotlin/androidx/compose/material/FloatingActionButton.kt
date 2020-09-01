@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-@file:Suppress("Deprecation")
-
 package androidx.compose.material
 
+import androidx.compose.animation.VectorConverter
+import androidx.compose.animation.animatedValue
+import androidx.compose.animation.core.AnimatedValue
+import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.ContentGravity
 import androidx.compose.foundation.IndicationAmbient
+import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.ProvideTextStyle
 import androidx.compose.foundation.clickable
@@ -33,6 +36,7 @@ import androidx.compose.foundation.layout.preferredSizeIn
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -49,30 +53,36 @@ import androidx.compose.ui.unit.dp
  *
  * See [ExtendedFloatingActionButton] for an extended FAB that contains text and an optional icon.
  *
- * @param modifier [Modifier] to be applied to this FAB.
  * @param onClick will be called when user clicked on this FAB. The FAB will be disabled
- *  when it is null.
+ * when it is null.
+ * @param modifier [Modifier] to be applied to this FAB.
+ * @param interactionState the [InteractionState] representing the different [Interaction]s
+ * present on this FAB. You can create and pass in your own remembered [InteractionState] if
+ * you want to read the [InteractionState] and customize the appearance / behavior of this FAB
+ * in different [Interaction]s, such as customizing how the [elevation] of this FAB changes when
+ * it is [Interaction.Pressed].
  * @param shape The [Shape] of this FAB
  * @param backgroundColor The background color. Use [Color.Transparent] to have no color
  * @param contentColor The preferred content color for content inside this FAB
  * @param elevation The z-coordinate at which to place this FAB. This controls the size
- * of the shadow below the button.
+ * of the shadow below the FAB. See [FloatingActionButtonConstants.defaultAnimatedElevation] for
+ * the default elevation that animates between [Interaction]s.
  * @param icon the content of this FAB
  */
 @Composable
 fun FloatingActionButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    interactionState: InteractionState = remember { InteractionState() },
     shape: Shape = MaterialTheme.shapes.small.copy(CornerSize(percent = 50)),
     backgroundColor: Color = MaterialTheme.colors.secondary,
     contentColor: Color = contentColorFor(backgroundColor),
-    elevation: Dp = 6.dp,
+    elevation: Dp = FloatingActionButtonConstants.defaultAnimatedElevation(interactionState).value,
     icon: @Composable () -> Unit
 ) {
     // TODO(aelias): Avoid manually managing the ripple once http://b/157687898
     // is fixed and we have more flexibility to move the clickable modifier
     // (see candidate approach aosp/1361921)
-    val interactionState = remember { InteractionState() }
     Surface(
         modifier = modifier.clickable(
             onClick = onClick,
@@ -110,17 +120,22 @@ fun FloatingActionButton(
  * @sample androidx.compose.material.samples.FluidExtendedFab
  *
  * @param text Text label displayed inside this FAB
- * @param icon Optional icon for this FAB, typically this will be a [androidx.compose.foundation.Icon]
- * @param modifier [Modifier] to be applied to this FAB
  * @param onClick will be called when user clicked on this FAB. The FAB will be disabled
  * when it is null.
+ * @param modifier [Modifier] to be applied to this FAB
+ * @param icon Optional icon for this FAB, typically this will be a
+ * [androidx.compose.foundation.Icon].
+ * @param interactionState the [InteractionState] representing the different [Interaction]s
+ * present on this FAB. You can create and pass in your own remembered [InteractionState] if
+ * you want to read the [InteractionState] and customize the appearance / behavior of this FAB
+ * in different [Interaction]s, such as customizing how the [elevation] of this FAB changes when
+ * it is [Interaction.Pressed].
  * @param shape The [Shape] of this FAB
- * @param onClick will be called when user clicked on the button. The button will be disabled
- * when it is null.
  * @param backgroundColor The background color. Use [Color.Transparent] to have no color
  * @param contentColor The preferred content color. Will be used by text and iconography
- * @param elevation The z-coordinate at which to place this button. This controls the size
- * of the shadow below the button.
+ * @param elevation The z-coordinate at which to place this FAB. This controls the size
+ * of the shadow below the button. See [FloatingActionButtonConstants.defaultAnimatedElevation] for
+ * the default elevation that animates between [Interaction]s.
  */
 @Composable
 fun ExtendedFloatingActionButton(
@@ -128,10 +143,11 @@ fun ExtendedFloatingActionButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     icon: @Composable (() -> Unit)? = null,
+    interactionState: InteractionState = remember { InteractionState() },
     shape: Shape = MaterialTheme.shapes.small.copy(CornerSize(percent = 50)),
     backgroundColor: Color = MaterialTheme.colors.secondary,
     contentColor: Color = contentColorFor(backgroundColor),
-    elevation: Dp = 6.dp
+    elevation: Dp = FloatingActionButtonConstants.defaultAnimatedElevation(interactionState).value
 ) {
     FloatingActionButton(
         modifier = modifier.preferredSizeIn(
@@ -139,6 +155,7 @@ fun ExtendedFloatingActionButton(
             minHeight = ExtendedFabSize
         ),
         onClick = onClick,
+        interactionState = interactionState,
         shape = shape,
         backgroundColor = backgroundColor,
         contentColor = contentColor,
@@ -161,6 +178,67 @@ fun ExtendedFloatingActionButton(
                 }
             }
         }
+    }
+}
+
+/**
+ * Contains the default values used by [FloatingActionButton]
+ */
+object FloatingActionButtonConstants {
+    /**
+     * Value holder class to cache the last [Interaction], so we can calculate which outgoing
+     * [AnimationSpec] to use.
+     *
+     * @see defaultAnimatedElevation
+     */
+    private class InteractionHolder(var interaction: Interaction?)
+
+    // TODO: b/152525426 add support for focused and hovered states
+    /**
+     * Represents the default elevation for a button in different [Interaction]s, and how the
+     * elevation animates between them.
+     *
+     * @param interactionState the [InteractionState] for this [FloatingActionButton], representing
+     * the current visual state, such as whether it is [Interaction.Pressed] or not.
+     * @param defaultElevation the elevation to use when the [FloatingActionButton] is has no
+     * [Interaction]s
+     * @param pressedElevation the elevation to use when the [FloatingActionButton] is
+     * [Interaction.Pressed].
+     */
+    @Composable
+    fun defaultAnimatedElevation(
+        interactionState: InteractionState,
+        defaultElevation: Dp = 6.dp,
+        pressedElevation: Dp = 12.dp
+        // focused: Dp = 8.dp,
+        // hovered: Dp = 8.dp,
+    ): AnimatedValue<Dp, AnimationVector1D> {
+        val interaction = interactionState.value.lastOrNull {
+            it is Interaction.Pressed
+        }
+
+        val target = when (interaction) {
+            Interaction.Pressed -> pressedElevation
+            else -> defaultElevation
+        }
+
+        val previousInteractionHolder = remember { InteractionHolder(interaction) }
+
+        val animatedElevation = animatedValue(target, Dp.VectorConverter)
+
+        onCommit(target) {
+            animatedElevation.animateElevation(
+                from = previousInteractionHolder.interaction,
+                to = interaction,
+                target = target
+            )
+
+            // Update the last interaction, so we know what AnimationSpec to use if we animate
+            // away from a state
+            previousInteractionHolder.interaction = interaction
+        }
+
+        return animatedElevation
     }
 }
 
