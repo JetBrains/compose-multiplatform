@@ -26,6 +26,7 @@ import androidx.compose.ui.input.pointer.PointerEventPass.Final
 import androidx.compose.ui.input.pointer.PointerEventPass.Initial
 import androidx.compose.ui.input.pointer.PointerEventPass.Main
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.Uptime
@@ -126,7 +127,7 @@ abstract class PointerInputFilter {
 /**
  * Describes a pointer input change event that has occurred at a particular point in time.
  */
-expect class PointerEvent internal constructor(
+expect class PointerEvent @OptIn(InternalCoreApi::class) internal constructor(
     changes: List<PointerInputChange>,
     internalPointerEvent: InternalPointerEvent?
 ) {

@@ -92,12 +92,12 @@ class DesktopCanvasTest : DesktopGraphicsTest() {
     @Test
     fun drawImage() {
         canvas.drawImage(
-            image = imageFromResource("androidx.compose.desktop/test.png"),
+            image = imageFromResource("androidx/compose/desktop/test.png"),
             topLeftOffset = Offset(2f, 4f),
             paint = redPaint
         )
         canvas.drawImage(
-            image = imageFromResource("androidx.compose.desktop/test.png"),
+            image = imageFromResource("androidx/compose/desktop/test.png"),
             topLeftOffset = Offset(-2f, 0f),
             paint = redPaint
         )
@@ -108,7 +108,7 @@ class DesktopCanvasTest : DesktopGraphicsTest() {
     @Test
     fun drawImageRect() {
         canvas.drawImageRect(
-            image = imageFromResource("androidx.compose.desktop/test.png"),
+            image = imageFromResource("androidx/compose/desktop/test.png"),
             srcOffset = IntOffset(0, 2),
             srcSize = IntSize(2, 4),
             dstOffset = IntOffset(0, 4),

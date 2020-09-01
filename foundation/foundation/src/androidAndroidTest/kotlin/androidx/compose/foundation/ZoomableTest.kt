@@ -27,8 +27,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import androidx.test.filters.SmallTest
-import androidx.ui.test.AnimationClockTestRule
 import androidx.ui.test.center
+import androidx.ui.test.createAnimationClockRule
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performGesture
@@ -54,7 +54,7 @@ class ZoomableTest {
     val composeTestRule = createComposeRule()
 
     @get:Rule
-    val clockRule = AnimationClockTestRule()
+    val clockRule = createAnimationClockRule()
 
     @Test
     fun zoomable_zoomIn() {
