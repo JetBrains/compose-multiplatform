@@ -580,7 +580,7 @@ class Composer<N>(
     }
 
     /**
-     * Record that [value] was read from. If [recordWriteOf] or [recordModificationOf] is called
+     * Record that [value] was read from. If [recordWriteOf] or [recordModificationsOf] is called
      * with [value] then the corresponding [currentRecomposeScope] is invalidated.
      *
      * This should only be called when this composition is actively composing.
@@ -620,22 +620,20 @@ class Composer<N>(
      */
     @InternalComposeApi
     fun recordModificationsOf(values: Set<Any>) {
+        var invalidated: HashSet<RecomposeScope>? = null
         for (value in values) {
-            var canRemove = true
-            val workDone = observations.forEachScopeOf(value) { scope ->
-                if (!observationsProcessed.removeValueScope(value, scope)) {
-                    if (scope.invalidate() == InvalidationResult.IGNORED) {
-                        // This scope is still in the insert table so we should keep it in
-                        // the observation list.
-                        canRemove = false
-                    }
-                } else {
-                    canRemove = false
+            observations.forEachScopeOf(value) { scope ->
+                if (!observationsProcessed.removeValueScope(value, scope) &&
+                    scope.invalidate() != InvalidationResult.IGNORED
+                ) {
+                    (invalidated ?: (HashSet<RecomposeScope>().also {
+                        invalidated = it
+                    })).add(scope)
                 }
             }
-            if (workDone && canRemove) {
-                observations.removeValue(value)
-            }
+        }
+        invalidated?.let {
+            observations.removeValueIf { _, scope -> scope in it }
         }
     }
 
