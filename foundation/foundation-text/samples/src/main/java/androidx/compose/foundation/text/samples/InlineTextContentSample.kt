@@ -34,16 +34,18 @@ import androidx.compose.ui.unit.em
 @Sampled
 @Composable
 fun InlineTextContentSample() {
+    val myId = "inlineContent"
     val text = annotatedString {
         append("Hello")
-        appendInlineContent("inlineContent", "[myBox]")
+        // Append a placeholder string "[myBox]" and attach an annotation "inlineContent" on it.
+        appendInlineContent(myId, "[myBox]")
     }
 
     val inlineContent = mapOf(
         Pair(
-            // This tells the [CoreText] to replace the text annotated with "InlineContent" with
+            // This tells the [CoreText] to replace the placeholder string "[myBox]" by
             // the composable given in the [InlineTextContent] object.
-            "InlineContent",
+            myId,
             InlineTextContent(
                 // Placeholder tells text layout the expected size and vertical alignment of
                 // children composable.
