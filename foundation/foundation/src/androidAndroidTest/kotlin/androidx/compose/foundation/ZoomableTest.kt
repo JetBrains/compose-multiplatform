@@ -35,7 +35,6 @@ import androidx.ui.test.performGesture
 import androidx.ui.test.pinch
 import androidx.ui.test.runOnIdle
 import androidx.ui.test.runOnUiThread
-import androidx.ui.test.size
 import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertWithMessage
 import org.junit.Rule
@@ -68,9 +67,9 @@ class ZoomableTest {
 
         onNodeWithTag(TEST_TAG).performGesture {
             val leftStartX = center.x - 10
-            val leftEndX = size.toSize().width * EDGE_FUZZ_FACTOR
+            val leftEndX = visibleSize.toSize().width * EDGE_FUZZ_FACTOR
             val rightStartX = center.x + 10
-            val rightEndX = size.toSize().width * (1 - EDGE_FUZZ_FACTOR)
+            val rightEndX = visibleSize.toSize().width * (1 - EDGE_FUZZ_FACTOR)
 
             pinch(
                 Offset(leftStartX, center.y),
@@ -98,9 +97,9 @@ class ZoomableTest {
         setZoomableContent { Modifier.zoomable(controller) }
 
         onNodeWithTag(TEST_TAG).performGesture {
-            val leftStartX = size.toSize().width * EDGE_FUZZ_FACTOR
+            val leftStartX = visibleSize.toSize().width * EDGE_FUZZ_FACTOR
             val leftEndX = center.x - 10
-            val rightStartX = size.toSize().width * (1 - EDGE_FUZZ_FACTOR)
+            val rightStartX = visibleSize.toSize().width * (1 - EDGE_FUZZ_FACTOR)
             val rightEndX = center.x + 10
 
             pinch(
@@ -144,9 +143,9 @@ class ZoomableTest {
         }
 
         onNodeWithTag(TEST_TAG).performGesture {
-            val leftStartX = size.toSize().width * EDGE_FUZZ_FACTOR
+            val leftStartX = visibleSize.toSize().width * EDGE_FUZZ_FACTOR
             val leftEndX = center.x - 10
-            val rightStartX = size.toSize().width * (1 - EDGE_FUZZ_FACTOR)
+            val rightStartX = visibleSize.toSize().width * (1 - EDGE_FUZZ_FACTOR)
             val rightEndX = center.x + 10
 
             pinch(
@@ -181,9 +180,9 @@ class ZoomableTest {
 
         onNodeWithTag(TEST_TAG).performGesture {
             val leftStartX = center.x - 10
-            val leftEndX = size.toSize().width * EDGE_FUZZ_FACTOR
+            val leftEndX = visibleSize.toSize().width * EDGE_FUZZ_FACTOR
             val rightStartX = center.x + 10
-            val rightEndX = size.toSize().width * (1 - EDGE_FUZZ_FACTOR)
+            val rightEndX = visibleSize.toSize().width * (1 - EDGE_FUZZ_FACTOR)
 
             pinch(
                 Offset(leftStartX, center.y),
@@ -202,9 +201,9 @@ class ZoomableTest {
         }
 
         onNodeWithTag(TEST_TAG).performGesture {
-            val leftStartX = size.toSize().width * EDGE_FUZZ_FACTOR
+            val leftStartX = visibleSize.toSize().width * EDGE_FUZZ_FACTOR
             val leftEndX = center.x - 10
-            val rightStartX = size.toSize().width * (1 - EDGE_FUZZ_FACTOR)
+            val rightStartX = visibleSize.toSize().width * (1 - EDGE_FUZZ_FACTOR)
             val rightEndX = center.x + 10
 
             pinch(
@@ -249,9 +248,9 @@ class ZoomableTest {
 
         onNodeWithTag(TEST_TAG).performGesture {
             val leftStartX = center.x - 10
-            val leftEndX = size.toSize().width * EDGE_FUZZ_FACTOR
+            val leftEndX = visibleSize.toSize().width * EDGE_FUZZ_FACTOR
             val rightStartX = center.x + 10
-            val rightEndX = size.toSize().width * (1 - EDGE_FUZZ_FACTOR)
+            val rightEndX = visibleSize.toSize().width * (1 - EDGE_FUZZ_FACTOR)
 
             pinch(
                 Offset(leftStartX, center.y),

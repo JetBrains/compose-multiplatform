@@ -860,24 +860,22 @@ class ScrollTest {
                     backgroundColor = Color.White
                 ) {
                     if (isVertical) {
-                        Box(Modifier.testTag(scrollerTag)) {
-                            ScrollableColumn(
-                                scrollState = scrollState,
-                                reverseScrollDirection = isReversed
-                            ) {
-                                content()
-                            }
+                        ScrollableColumn(
+                            Modifier.testTag(scrollerTag),
+                            scrollState = scrollState,
+                            reverseScrollDirection = isReversed
+                        ) {
+                            content()
                         }
                     } else {
                         val direction = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
                         Providers(LayoutDirectionAmbient provides direction) {
-                            Box(Modifier.testTag(scrollerTag)) {
-                                ScrollableRow(
-                                    scrollState = scrollState,
-                                    reverseScrollDirection = isReversed
-                                ) {
-                                    content()
-                                }
+                            ScrollableRow(
+                                Modifier.testTag(scrollerTag),
+                                scrollState = scrollState,
+                                reverseScrollDirection = isReversed
+                            ) {
+                                content()
                             }
                         }
                     }
