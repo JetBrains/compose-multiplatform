@@ -14,10 +14,8 @@
 * limitations under the License.
 */
 
-package androidx.compose.desktop
+package androidx.ui.desktop
 
-import androidx.compose.desktop.test.DesktopScreenshotTestRule
-import androidx.compose.desktop.test.TestSkiaWindow
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -37,6 +35,8 @@ import androidx.compose.ui.text.font.fontFamily
 import androidx.compose.ui.text.platform.font
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.ui.test.DesktopScreenshotTestRule
+import androidx.ui.test.TestSkiaWindow
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

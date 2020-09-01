@@ -1604,6 +1604,20 @@ package androidx.compose.ui.input.pointer {
     method public androidx.compose.ui.unit.Uptime? getUptime();
   }
 
+  public final class PointerInputEvent {
+    method public android.view.MotionEvent getMotionEvent();
+    method public java.util.List<androidx.compose.ui.input.pointer.PointerInputEventData> getPointers();
+    method public long getUptime();
+  }
+
+  public final class PointerInputEventData {
+    method public long component1();
+    method public androidx.compose.ui.input.pointer.PointerInputData component2();
+    method public androidx.compose.ui.input.pointer.PointerInputEventData copy-pdufZyI(long id, androidx.compose.ui.input.pointer.PointerInputData pointerInputData);
+    method public long getId();
+    method public androidx.compose.ui.input.pointer.PointerInputData getPointerInputData();
+  }
+
   public final class PointerInputEventProcessorKt {
   }
 

@@ -115,7 +115,7 @@ class DialogUiTest {
 
         // Click outside the dialog to dismiss it
         val outsideX = 0
-        val outsideY = composeTestRule.displayMetrics.heightPixels / 2
+        val outsideY = composeTestRule.displaySize.height / 2
         UiDevice.getInstance(getInstrumentation()).click(outsideX, outsideY)
 
         onNodeWithText(defaultText).assertDoesNotExist()
@@ -137,7 +137,7 @@ class DialogUiTest {
 
         // Click outside the dialog to try to dismiss it
         val outsideX = 0
-        val outsideY = composeTestRule.displayMetrics.heightPixels / 2
+        val outsideY = composeTestRule.displaySize.height / 2
         UiDevice.getInstance(getInstrumentation()).click(outsideX, outsideY)
 
         // The Dialog should still be visible

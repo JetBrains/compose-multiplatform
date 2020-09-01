@@ -17,13 +17,14 @@
 package androidx.compose.ui.input.pointer
 
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
+import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.util.fastForEach
 
 /**
  * The core element that receives [PointerInputEvent]s and process them in Compose UI.
  */
-@OptIn(ExperimentalLayoutNodeApi::class)
+@OptIn(ExperimentalLayoutNodeApi::class, InternalCoreApi::class)
 internal class PointerInputEventProcessor(val root: LayoutNode) {
 
     private val hitPathTracker = HitPathTracker()
@@ -101,6 +102,7 @@ internal class PointerInputEventProcessor(val root: LayoutNode) {
 /**
  * Produces [InternalPointerEvent]s by tracking changes between [PointerInputEvent]s
  */
+@OptIn(InternalCoreApi::class)
 private class PointerInputChangeEventProducer {
     private val previousPointerInputData: MutableMap<PointerId, PointerInputData> = mutableMapOf()
 

@@ -43,7 +43,7 @@ class DesktopUiDispatcher : CoroutineDispatcher() {
 
     private fun scheduleIfNeeded() {
         synchronized(lock) {
-            if (!scheduled && (callbacks.isNotEmpty())) {
+            if (!scheduled && hasPendingChanges()) {
                 invokeLater { tick() }
                 scheduled = true
             }
@@ -70,10 +70,17 @@ class DesktopUiDispatcher : CoroutineDispatcher() {
         }
     }
 
-    private fun tick() {
-        scheduled = false
+    fun hasPendingChanges() = callbacks.isNotEmpty()
+
+    fun runAllCallbacks() {
         val now = System.nanoTime()
         runCallbacks(now, callbacks)
+        scheduleIfNeeded()
+    }
+
+    private fun tick() {
+        scheduled = false
+        runAllCallbacks()
         scheduleIfNeeded()
     }
 

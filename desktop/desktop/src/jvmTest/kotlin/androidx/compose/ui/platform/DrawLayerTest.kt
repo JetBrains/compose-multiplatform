@@ -16,8 +16,6 @@
 
 package androidx.compose.ui.platform
 
-import androidx.compose.desktop.test.DesktopScreenshotTestRule
-import androidx.compose.desktop.test.TestSkiaWindow
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,6 +24,8 @@ import androidx.compose.ui.TransformOrigin
 import androidx.compose.ui.drawLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.ui.test.DesktopScreenshotTestRule
+import androidx.ui.test.TestSkiaWindow
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

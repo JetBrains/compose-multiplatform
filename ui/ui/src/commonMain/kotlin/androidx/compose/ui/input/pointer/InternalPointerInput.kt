@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.input.pointer
 
+import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.unit.Uptime
 
 /**
@@ -24,7 +25,8 @@ import androidx.compose.ui.unit.Uptime
  *
  * All pointer locations are relative to the device screen.
  */
-internal expect class PointerInputEvent {
+@InternalCoreApi
+expect class PointerInputEvent {
     val uptime: Uptime
     val pointers: List<PointerInputEventData>
 }
@@ -34,7 +36,7 @@ internal expect class PointerInputEvent {
  *
  * All pointer locations are relative to the device screen.
  */
-internal data class PointerInputEventData(
+data class PointerInputEventData(
     val id: PointerId,
     val pointerInputData: PointerInputData
 )
@@ -46,6 +48,7 @@ internal data class PointerInputEventData(
  * it is efficient to split the changes between those that are relevant to the sub tree and those
  * that are not.
  */
+@OptIn(InternalCoreApi::class)
 internal expect class InternalPointerEvent(
     changes: MutableMap<PointerId, PointerInputChange>,
     pointerInputEvent: PointerInputEvent
