@@ -37,7 +37,6 @@ import androidx.ui.test.moveBy
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performGesture
 import androidx.ui.test.runOnIdle
-import androidx.ui.test.size
 import androidx.ui.test.swipe
 import androidx.ui.test.swipeWithVelocity
 import androidx.ui.test.up
@@ -322,8 +321,8 @@ class DraggableTest {
 
         onNodeWithTag(draggableBoxTag)
             .performGesture {
-                down(Offset(size.width / 4f, size.height / 2f))
-                moveBy(Offset(size.width / 2f, 0f))
+                down(Offset(visibleSize.width / 4f, visibleSize.height / 2f))
+                moveBy(Offset(visibleSize.width / 2f, 0f))
             }
 
         runOnIdle {
@@ -366,8 +365,8 @@ class DraggableTest {
 
         onNodeWithTag(draggableBoxTag)
             .performGesture {
-                down(Offset(size.width / 4f, size.height / 2f))
-                moveBy(Offset(size.width / 2f, 0f))
+                down(Offset(visibleSize.width / 4f, visibleSize.height / 2f))
+                moveBy(Offset(visibleSize.width / 2f, 0f))
             }
 
         runOnIdle {
