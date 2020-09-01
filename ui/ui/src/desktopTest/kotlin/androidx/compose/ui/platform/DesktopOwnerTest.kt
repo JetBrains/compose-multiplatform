@@ -21,12 +21,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.node.ExperimentalLayoutNodeApi
 import androidx.compose.ui.node.LayoutNode
-import com.nhaarman.mockitokotlin2.doAnswer
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
 import org.jetbrains.skiko.Library
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import java.awt.Component
 
 @OptIn(ExperimentalLayoutNodeApi::class, ExperimentalComposeApi::class)
 class DesktopOwnerTest {
@@ -36,10 +34,12 @@ class DesktopOwnerTest {
 
         var invalidateCount = 0
 
-        val owners = mock<DesktopOwners> {
-            on { platformInputService } doReturn mock()
-            on { invalidate() }.doAnswer { invalidateCount++; Unit }
-        }
+        val owners = DesktopOwners(
+            component = object : Component() {},
+            invalidate = {
+                invalidateCount++
+            }
+        )
         val owner = DesktopOwner(owners)
         val node = LayoutNode()
         val state = mutableStateOf(2)

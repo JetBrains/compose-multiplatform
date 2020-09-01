@@ -47,14 +47,13 @@ kotlin {
             api(KOTLIN_COROUTINES_CORE)
 
             api(SKIKO)
-
-            implementation(KOTLIN_COROUTINES_SWING)
         }
 
         jvmTest {
             resources.srcDirs += new File(SupportConfigKt.getExternalProjectPath(project), "noto-fonts/other/")
             resources.srcDirs += "src/jvmTest/res"
             dependencies {
+                implementation(KOTLIN_COROUTINES_TEST)
                 implementation(SKIKO_CURRENT_OS)
                 implementation project(":ui:ui-test")
                 implementation(JUNIT)
