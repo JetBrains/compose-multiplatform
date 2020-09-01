@@ -18,8 +18,13 @@
 
 package androidx.compose.material
 
+import androidx.compose.animation.VectorConverter
+import androidx.compose.animation.animatedValue
+import androidx.compose.animation.core.AnimatedValue
+import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.IndicationAmbient
+import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.ProvideTextStyle
 import androidx.compose.foundation.Text
@@ -32,6 +37,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.defaultMinSizeConstraints
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -67,9 +73,14 @@ import androidx.compose.ui.unit.dp
  * @param modifier Modifier to be applied to the button
  * @param enabled Controls the enabled state of the button. When `false`, this button will not
  * be clickable
+ * @param interactionState the [InteractionState] representing the different [Interaction]s
+ * present on this Button. You can create and pass in your own remembered [InteractionState] if
+ * you want to read the [InteractionState] and customize the appearance / behavior of this Button
+ * in different [Interaction]s, such as customizing how the [elevation] of this Button changes when
+ * it is [Interaction.Pressed].
  * @param elevation The z-coordinate at which to place this button. This controls the size
- * of the shadow below the button
- * @param disabledElevation The elevation used when [enabled] is false
+ * of the shadow below the button. See [ButtonConstants.defaultAnimatedElevation] for the default
+ * elevation that animates between [Interaction]s.
  * @param shape Defines the button's shape as well as its shadow
  * @param border Border to draw around the button
  * @param backgroundColor The background color. Use [Color.Transparent] to have no color
@@ -83,8 +94,8 @@ fun Button(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    elevation: Dp = 2.dp,
-    disabledElevation: Dp = 0.dp,
+    interactionState: InteractionState = remember { InteractionState() },
+    elevation: Dp = ButtonConstants.defaultAnimatedElevation(enabled, interactionState).value,
     shape: Shape = MaterialTheme.shapes.small,
     border: BorderStroke? = null,
     backgroundColor: Color = MaterialTheme.colors.primary,
@@ -98,13 +109,12 @@ fun Button(
     // the ripple below the clip once http://b/157687898 is fixed and we have
     // more flexibility to move the clickable modifier (see candidate approach
     // aosp/1361921)
-    val interactionState = remember { InteractionState() }
     Surface(
         shape = shape,
         color = if (enabled) backgroundColor else disabledBackgroundColor,
         contentColor = if (enabled) contentColor else disabledContentColor,
         border = border,
-        elevation = if (enabled) elevation else disabledElevation,
+        elevation = elevation,
         modifier = modifier.clickable(
             onClick = onClick,
             enabled = enabled,
@@ -154,6 +164,11 @@ fun Button(
  * @param modifier Modifier to be applied to the button
  * @param enabled Controls the enabled state of the button. When `false`, this button will not
  * be clickable
+ * @param interactionState the [InteractionState] representing the different [Interaction]s
+ * present on this Button. You can create and pass in your own remembered [InteractionState] if
+ * you want to read the [InteractionState] and customize the appearance / behavior of this Button
+ * in different [Interaction]s, such as customizing how the [elevation] of this Button changes when
+ * it is [Interaction.Pressed].
  * @param elevation The z-coordinate at which to place this button. This controls the size
  * of the shadow below the button
  * @param shape Defines the button's shape as well as its shadow
@@ -168,6 +183,7 @@ inline fun OutlinedButton(
     noinline onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    interactionState: InteractionState = remember { InteractionState() },
     elevation: Dp = 0.dp,
     shape: Shape = MaterialTheme.shapes.small,
     border: BorderStroke? = ButtonConstants.defaultOutlinedBorder,
@@ -177,11 +193,11 @@ inline fun OutlinedButton(
     contentPadding: InnerPadding = ButtonConstants.DefaultContentPadding,
     noinline content: @Composable RowScope.() -> Unit
 ) = Button(
-    modifier = modifier,
     onClick = onClick,
+    modifier = modifier,
     enabled = enabled,
+    interactionState = interactionState,
     elevation = elevation,
-    disabledElevation = 0.dp,
     shape = shape,
     border = border,
     backgroundColor = backgroundColor,
@@ -213,6 +229,11 @@ inline fun OutlinedButton(
  * @param modifier Modifier to be applied to the button
  * @param enabled Controls the enabled state of the button. When `false`, this button will not
  * be clickable
+ * @param interactionState the [InteractionState] representing the different [Interaction]s
+ * present on this Button. You can create and pass in your own remembered [InteractionState] if
+ * you want to read the [InteractionState] and customize the appearance / behavior of this Button
+ * in different [Interaction]s, such as customizing how the [elevation] of this Button changes when
+ * it is [Interaction.Pressed].
  * @param elevation The z-coordinate at which to place this button. This controls the size
  * of the shadow below the button
  * @param shape Defines the button's shape as well as its shadow
@@ -227,6 +248,7 @@ inline fun TextButton(
     noinline onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    interactionState: InteractionState = remember { InteractionState() },
     elevation: Dp = 0.dp,
     shape: Shape = MaterialTheme.shapes.small,
     border: BorderStroke? = null,
@@ -236,11 +258,11 @@ inline fun TextButton(
     contentPadding: InnerPadding = ButtonConstants.DefaultTextContentPadding,
     noinline content: @Composable RowScope.() -> Unit
 ) = Button(
-    modifier = modifier,
     onClick = onClick,
+    modifier = modifier,
     enabled = enabled,
+    interactionState = interactionState,
     elevation = elevation,
-    disabledElevation = 0.dp,
     shape = shape,
     border = border,
     backgroundColor = backgroundColor,
@@ -293,6 +315,76 @@ object ButtonConstants {
      * @sample androidx.compose.material.samples.ButtonWithIconSample
      */
     val DefaultIconSpacing = 8.dp
+
+    /**
+     * Value holder class to cache the last [Interaction], so we can calculate which outgoing
+     * [AnimationSpec] to use.
+     *
+     * @see defaultAnimatedElevation
+     */
+    private class InteractionHolder(var interaction: Interaction?)
+
+    // TODO: b/152525426 add support for focused and hovered states
+    /**
+     * Represents the default elevation for a button in different [Interaction]s, and how the
+     * elevation animates between them.
+     *
+     * @param enabled whether the [Button] is enabled or not. If the [Button] is disabled then
+     * [disabledElevation] will always be used, regardless of the state of [interactionState].
+     * @param interactionState the [InteractionState] for this [Button], representing the current
+     * visual state, such as whether it is [Interaction.Pressed] or not.
+     * @param defaultElevation the elevation to use when the [Button] is [enabled], and has no
+     * other [Interaction]s
+     * @param pressedElevation the elevation to use when the [Button] is [enabled] and
+     * is [Interaction.Pressed].
+     * @param disabledElevation the elevation to use when the [Button] is not [enabled].
+     */
+    @Composable
+    fun defaultAnimatedElevation(
+        enabled: Boolean,
+        interactionState: InteractionState,
+        defaultElevation: Dp = 2.dp,
+        pressedElevation: Dp = 8.dp,
+        // focused: Dp = 4.dp,
+        // hovered: Dp = 4.dp,
+        disabledElevation: Dp = 0.dp
+    ): AnimatedValue<Dp, AnimationVector1D> {
+        val interaction = interactionState.value.lastOrNull {
+            it is Interaction.Pressed
+        }
+
+        val target = if (!enabled) {
+            disabledElevation
+        } else {
+            when (interaction) {
+                Interaction.Pressed -> pressedElevation
+                else -> defaultElevation
+            }
+        }
+
+        val previousInteractionHolder = remember { InteractionHolder(interaction) }
+
+        val animatedElevation = animatedValue(target, Dp.VectorConverter)
+
+        onCommit(target) {
+            if (!enabled) {
+                // No transition when moving to a disabled state
+                animatedElevation.snapTo(target)
+            } else {
+                animatedElevation.animateElevation(
+                    from = previousInteractionHolder.interaction,
+                    to = interaction,
+                    target = target
+                )
+            }
+
+            // Update the last interaction, so we know what AnimationSpec to use if we animate
+            // away from a state
+            previousInteractionHolder.interaction = interaction
+        }
+
+        return animatedElevation
+    }
 
     /**
      * The default disabled background color used by Contained [Button]s
