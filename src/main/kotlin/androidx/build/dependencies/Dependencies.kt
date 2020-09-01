@@ -170,5 +170,6 @@ internal const val lintMinVersion = "26.3.0"
 
 const val LINT_API_MIN = "com.android.tools.lint:lint-api:$lintMinVersion"
 val LINT_API_LATEST get() = "com.android.tools.lint:lint-api:$lintVersion"
+val LINT_CHECKS_LATEST get() = "com.android.tools.lint:lint-checks:$lintVersion"
 val LINT_CORE get() = "com.android.tools.lint:lint:$lintVersion"
 val LINT_TESTS get() = "com.android.tools.lint:lint-tests:$lintVersion"
