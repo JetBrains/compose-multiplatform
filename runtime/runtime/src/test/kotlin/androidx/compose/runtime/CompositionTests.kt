@@ -38,6 +38,8 @@ import androidx.compose.runtime.mock.reportsTo
 import androidx.compose.runtime.mock.selectContact
 import androidx.compose.runtime.mock.skip
 import androidx.compose.runtime.mock.text
+import androidx.compose.runtime.snapshots.Snapshot
+import androidx.compose.runtime.snapshots.takeMutableSnapshot
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -52,6 +54,8 @@ import kotlin.test.assertTrue
 @Composable fun Container(body: @Composable () -> Unit) = body()
 
 @Stable
+@OptIn(ExperimentalComposeApi::class, InternalComposeApi::class)
+@Suppress("unused")
 class CompositionTests {
 
     @After
@@ -2328,6 +2332,45 @@ class CompositionTests {
         result.expectChanges()
         validate()
     }
+
+    @Test
+    fun testObservationScopes() {
+        val states = mutableListOf<MutableState<Int>>()
+        var iterations = 0
+
+        @Composable fun MockComposeScope.test() {
+            val s1 = mutableStateOf(iterations++)
+            text("s1 ${s1.value}")
+            states.add(s1)
+            val s2 = mutableStateOf(iterations++)
+            text("s2 ${s2.value}")
+            states.add(s2)
+        }
+
+        val result = compose {
+            test()
+        }
+
+        result.observe {
+            fun invalidateFirst() {
+                states.first().value++
+                Snapshot.sendApplyNotifications()
+            }
+
+            fun invalidateLast() {
+                states.last().value++
+                Snapshot.sendApplyNotifications()
+            }
+
+            repeat(10) {
+                invalidateLast()
+                result.expectChanges()
+            }
+
+            invalidateFirst()
+            result.expectNoChanges()
+        }
+    }
 }
 
 private fun <T> assertArrayEquals(message: String, expected: Array<T>, received: Array<T>) {
@@ -2342,6 +2385,7 @@ private fun <T> assertArrayEquals(message: String, expected: Array<T>, received:
     }
 }
 
+@OptIn(InternalComposeApi::class, ExperimentalComposeApi::class)
 private class CompositionResult(
     val composer: Composer<*>,
     val root: View
@@ -2351,20 +2395,49 @@ private class CompositionResult(
     }
 
     fun expectNoChanges() {
-        val changes = composer.recompose() && composer.changeCount > 0
-        assertFalse(changes)
+        val changes = recompose() && composer.changeCount > 0
+        assertFalse(changes, "Changes detected when they were not expected")
     }
 
     fun expectChanges() {
-        val changes = composer.recompose() && composer.changeCount > 0
+        val changes = recompose() && composer.changeCount > 0
         assertTrue(changes, "Expected changes")
         composer.applyChanges()
+        Snapshot.notifyObjectsInitialized()
         composer.slotTable.verifyWellFormed()
     }
 
-    fun recompose(): Boolean = composer.recompose()
+    fun recompose(): Boolean = doCompose(composer) { composer.recompose() }
+
+    fun observe(block: () -> Unit) {
+        val unregister = Snapshot.registerApplyObserver { changed, _ ->
+            composer.recordModificationsOf(changed)
+        }
+        try {
+            block()
+        } finally {
+            unregister()
+        }
+    }
 }
 
+@OptIn(InternalComposeApi::class, ExperimentalComposeApi::class)
+private fun <T> doCompose(composer: Composer<*>, block: () -> T): T {
+    val snapshot = takeMutableSnapshot({
+        composer.recordReadOf(it)
+    }, {
+        composer.recordWriteOf(it)
+    })
+    return try {
+        snapshot.enter { block() }.also {
+            snapshot.apply().check()
+        }
+    } finally {
+        snapshot.dispose()
+    }
+}
+
+@OptIn(InternalComposeApi::class, ExperimentalComposeApi::class)
 private fun compose(
     block: @Composable MockComposeScope.() -> Unit
 ): CompositionResult {
@@ -2390,10 +2463,13 @@ private fun compose(
     }
 
     val mockScope = MockComposeScope()
-    composer.composeInitial {
-        mockScope.block()
+    doCompose(composer) {
+        composer.composeInitial {
+            mockScope.block()
+        }
+        Snapshot.notifyObjectsInitialized()
+        composer.applyChanges()
     }
-    composer.applyChanges()
     composer.slotTable.verifyWellFormed()
 
     return CompositionResult(composer, root)
