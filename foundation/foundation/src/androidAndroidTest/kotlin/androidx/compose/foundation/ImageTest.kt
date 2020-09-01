@@ -17,6 +17,7 @@
 package androidx.compose.foundation
 
 import android.os.Build
+import androidx.compose.foundation.layout.preferredHeightIn
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.preferredSizeIn
 import androidx.compose.foundation.layout.wrapContentSize
@@ -333,6 +334,39 @@ class ImageTest {
                 imageStartY + boxHeight - 2))
             Assert.assertEquals(imageColor, getPixel(imageStartX, imageStartY +
                     boxHeight - 2))
+        }
+    }
+
+    @Test
+    fun testContentScaleCropRespectsMaxDimension() {
+        val testTag = "testTag"
+        rule.setContent {
+            val asset = with(ImageAsset(100, 100)) {
+                with(Canvas(this)) {
+                    val paint = Paint().apply { this.color = Color.Blue }
+                    drawRect(0f, 0f, 100f, 100f, paint)
+                    drawRect(25f, 25f, 75f, 75f,
+                        paint.apply { this.color = Color.Red })
+                }
+                this
+            }
+            val heightDp = asset.height / DensityAmbient.current.density
+            Image(asset,
+                modifier = Modifier
+                    .testTag(testTag)
+                    .background(Color.Green)
+                    .preferredHeightIn(maxHeight = (heightDp / 2f).dp),
+                contentScale = ContentScale.Crop
+            )
+        }
+
+        onNodeWithTag(testTag).captureToBitmap().apply {
+            Assert.assertEquals(100, width)
+            Assert.assertEquals(50, height)
+            Assert.assertEquals(Color.Blue.toArgb(), getPixel(24, height / 2))
+            Assert.assertEquals(Color.Blue.toArgb(), getPixel(75, height / 2))
+            Assert.assertEquals(Color.Red.toArgb(), getPixel(50, 0))
+            Assert.assertEquals(Color.Red.toArgb(), getPixel(50, height - 1))
         }
     }
 }
