@@ -318,6 +318,14 @@ package androidx.compose.ui {
     method @Deprecated public static androidx.compose.ui.Modifier onPositioned(kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.LayoutCoordinates,kotlin.Unit> onPositioned);
   }
 
+  public interface OnRemeasuredModifier extends androidx.compose.ui.Modifier.Element {
+    method public void onRemeasured-ozmzZPI(long size);
+  }
+
+  public final class OnRemeasuredModifierKt {
+    method public static inline androidx.compose.ui.Modifier onSizeChanged(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.unit.IntSize,kotlin.Unit> onSizeChanged);
+  }
+
   public interface ParentDataModifier extends androidx.compose.ui.Modifier.Element {
     method public Object? modifyParentData(androidx.compose.ui.unit.Density, Object? parentData);
   }
