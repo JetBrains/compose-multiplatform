@@ -55,9 +55,6 @@ import kotlin.jvm.JvmStatic
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
-// -5185306 = 0xFFB0E0E6 = A(0xFF), R(0xB0), G(0xE0), B(0xE6)
-internal const val DEFAULT_COMPOSITION_COLOR: Int = -5185306
-
 /**
  * Computed the line height for the empty TextField.
  *
