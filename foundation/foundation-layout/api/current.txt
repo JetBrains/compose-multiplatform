@@ -246,20 +246,6 @@ package androidx.compose.foundation.layout {
     method public androidx.compose.foundation.layout.ConstrainedLayoutReference createRefFor(Object id);
   }
 
-  @androidx.compose.runtime.Immutable public abstract sealed class CrossAxisAlignment {
-    field public static final androidx.compose.foundation.layout.CrossAxisAlignment.Companion Companion;
-  }
-
-  public static final class CrossAxisAlignment.Companion {
-    method public androidx.compose.foundation.layout.CrossAxisAlignment AlignmentLine(androidx.compose.ui.AlignmentLine alignmentLine);
-    method public androidx.compose.foundation.layout.CrossAxisAlignment getCenter();
-    method public androidx.compose.foundation.layout.CrossAxisAlignment getEnd();
-    method public androidx.compose.foundation.layout.CrossAxisAlignment getStart();
-    property public final androidx.compose.foundation.layout.CrossAxisAlignment Center;
-    property public final androidx.compose.foundation.layout.CrossAxisAlignment End;
-    property public final androidx.compose.foundation.layout.CrossAxisAlignment Start;
-  }
-
   public interface Dimension {
     field public static final androidx.compose.foundation.layout.Dimension.Companion Companion;
   }
