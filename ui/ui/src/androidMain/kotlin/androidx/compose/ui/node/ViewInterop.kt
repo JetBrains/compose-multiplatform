@@ -100,6 +100,7 @@ internal fun AndroidViewHolder.toLayoutNode(): LayoutNode {
     // TODO(popam): forward pointer input, accessibility, focus
     // Prepare layout node that proxies measure and layout passes to the View.
     val layoutNode = LayoutNode()
+
     val coreModifier = Modifier
         .pointerInteropFilter(this)
         .drawBehind {
@@ -111,6 +112,9 @@ internal fun AndroidViewHolder.toLayoutNode(): LayoutNode {
         }
     layoutNode.modifier = modifier.then(coreModifier)
     onModifierChanged = { layoutNode.modifier = it.then(coreModifier) }
+
+    layoutNode.density = density
+    onDensityChanged = { layoutNode.density = it }
 
     var viewRemovedOnDetach: View? = null
     layoutNode.onAttach = { owner ->

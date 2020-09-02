@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.materialize
 import androidx.compose.ui.node.UiApplier
 import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.platform.DensityAmbient
 import androidx.viewbinding.ViewBinding
 
 /**
@@ -59,6 +60,7 @@ fun <T : ViewBinding> AndroidViewBinding(
         update = {
             set(Unit) { this.bindingBlock = bindingBlock }
             set(materialized) { this.modifier = it }
+            set(DensityAmbient.current) { this.density = it }
             set(update) { this.updateBlock = it }
         }
     )
