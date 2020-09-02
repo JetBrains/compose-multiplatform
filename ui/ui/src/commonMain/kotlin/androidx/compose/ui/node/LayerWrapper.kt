@@ -45,20 +45,11 @@ internal class LayerWrapper(
         }
 
     private val invalidateParentLayer: () -> Unit = {
-        wrappedBy?.findLayer()?.invalidate()
+        wrappedBy?.invalidateLayer()
     }
 
     val layer: OwnedLayer
-        get() {
-            return _layer ?: layoutNode.requireOwner().createLayer(
-                modifier,
-                this,
-                invalidateParentLayer
-            ).also {
-                _layer = it
-                invalidateParentLayer()
-            }
-        }
+        get() = _layer!!
 
     // TODO (njawad): This cache matrix is not thread safe
     private var _matrixCache: Matrix? = null
@@ -80,6 +71,16 @@ internal class LayerWrapper(
         layer.drawLayer(canvas)
     }
 
+    override fun attach() {
+        super.attach()
+        _layer = layoutNode.requireOwner().createLayer(
+            modifier,
+            this,
+            invalidateParentLayer
+        )
+        invalidateParentLayer()
+    }
+
     override fun detach() {
         super.detach()
         // The layer has been removed and we need to invalidate the containing layer. We've lost
@@ -87,12 +88,13 @@ internal class LayerWrapper(
         // in onModifierChanged(). Therefore the only possible layer that won't automatically be
         // invalidated is the parent's layer. We'll invalidate it here:
         @OptIn(ExperimentalLayoutNodeApi::class)
-        layoutNode.parent?.onInvalidate()
+        layoutNode.parent?.invalidateLayer()
         _layer?.destroy()
+        _layer = null
     }
 
-    override fun findLayer(): OwnedLayer? {
-        return layer
+    override fun invalidateLayer() {
+        _layer?.invalidate()
     }
 
     override fun fromParentPosition(position: Offset): Offset {

@@ -330,7 +330,7 @@ class LayoutNode : Measurable, Remeasurement {
         }
         val parentLayoutNode = parent
         if (parentLayoutNode != null) {
-            parentLayoutNode.onInvalidate()
+            parentLayoutNode.invalidateLayer()
             parentLayoutNode.requestRemeasure()
         }
         alignmentLinesQueryOwner = null
@@ -602,11 +602,18 @@ class LayoutNode : Measurable, Remeasurement {
     internal var innerLayerWrapper: LayerWrapper? = null
 
     /**
-     * Returns the inner-most layer as part of this LayoutNode or from the containing LayoutNode.
-     * This is added for performance so that LayoutNodeWrapper.findLayer() can be faster.
+     * Invalidates the inner-most layer as part of this LayoutNode or from the containing
+     * LayoutNode. This is added for performance so that LayoutNodeWrapper.invalidateLayer() can be
+     * faster.
      */
-    internal fun findLayer(): OwnedLayer? {
-        return innerLayerWrapper?.layer ?: parent?.findLayer()
+    internal fun invalidateLayer() {
+        val innerLayerWrapper = innerLayerWrapper
+        if (innerLayerWrapper != null) {
+            innerLayerWrapper.invalidateLayer()
+        } else {
+            val parent = parent
+            parent?.invalidateLayer()
+        }
     }
 
     /**
@@ -730,7 +737,7 @@ class LayoutNode : Measurable, Remeasurement {
             if (invalidateParentLayer || startZIndex != outerZIndexModifier ||
                 shouldInvalidateParentLayer()
             ) {
-                parent?.onInvalidate()
+                parent?.invalidateLayer()
             }
         }
 
@@ -989,13 +996,6 @@ class LayoutNode : Measurable, Remeasurement {
      */
     fun requestRelayout() {
         owner?.onRequestRelayout(this)
-    }
-
-    /**
-     * Used to request a new draw pass from the owner.
-     */
-    fun onInvalidate() {
-        owner?.onInvalidate(this)
     }
 
     /**

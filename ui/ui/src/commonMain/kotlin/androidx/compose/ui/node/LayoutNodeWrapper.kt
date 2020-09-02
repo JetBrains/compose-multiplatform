@@ -67,7 +67,7 @@ internal abstract class LayoutNodeWrapper(
             if (invalidateLayerOnBoundsChange &&
                 (value.width != _measureResult?.width || value.height != _measureResult?.height)
             ) {
-                findLayer()?.invalidate()
+                invalidateLayer()
             }
             _measureResult = value
             measuredSize = IntSize(measureResult.width, measureResult.height)
@@ -76,7 +76,7 @@ internal abstract class LayoutNodeWrapper(
     var position: IntOffset = IntOffset.Zero
         internal set(value) {
             if (invalidateLayerOnBoundsChange && value != field) {
-                findLayer()?.invalidate()
+                invalidateLayer()
             }
             field = value
         }
@@ -282,13 +282,13 @@ internal abstract class LayoutNodeWrapper(
     }
 
     /**
-     * Returns the layer that this wrapper will draw into.
+     * Invalidates the layer that this wrapper will draw into.
      */
-    open fun findLayer(): OwnedLayer? {
-        return if (layoutNode.innerLayerWrapper != null) {
-            wrappedBy?.findLayer()
+    open fun invalidateLayer() {
+        if (layoutNode.innerLayerWrapper != null) {
+            wrappedBy?.invalidateLayer()
         } else {
-            layoutNode.findLayer()
+            layoutNode.invalidateLayer()
         }
     }
 

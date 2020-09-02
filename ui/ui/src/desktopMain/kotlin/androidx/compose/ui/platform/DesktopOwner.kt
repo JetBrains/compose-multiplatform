@@ -154,11 +154,6 @@ class DesktopOwner(
         container.invalidate()
     }
 
-    override fun onInvalidate(layoutNode: LayoutNode) {
-        layoutNode.findLayer()?.invalidate()
-        container.invalidate()
-    }
-
     override fun onRequestMeasure(layoutNode: LayoutNode) {
         measureAndLayoutDelegate.requestRemeasure(layoutNode)
         container.invalidate()
