@@ -135,46 +135,6 @@ class Colors (
         isLight
     )
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other == null || this::class != other::class) return false
-
-        other as Colors
-
-        if (primary != other.primary) return false
-        if (primaryVariant != other.primaryVariant) return false
-        if (secondary != other.secondary) return false
-        if (secondaryVariant != other.secondaryVariant) return false
-        if (background != other.background) return false
-        if (surface != other.surface) return false
-        if (error != other.error) return false
-        if (onPrimary != other.onPrimary) return false
-        if (onSecondary != other.onSecondary) return false
-        if (onBackground != other.onBackground) return false
-        if (onSurface != other.onSurface) return false
-        if (onError != other.onError) return false
-        if (isLight != other.isLight) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = primary.hashCode()
-        result = 31 * result + primaryVariant.hashCode()
-        result = 31 * result + secondary.hashCode()
-        result = 31 * result + secondaryVariant.hashCode()
-        result = 31 * result + background.hashCode()
-        result = 31 * result + surface.hashCode()
-        result = 31 * result + error.hashCode()
-        result = 31 * result + onPrimary.hashCode()
-        result = 31 * result + onSecondary.hashCode()
-        result = 31 * result + onBackground.hashCode()
-        result = 31 * result + onSurface.hashCode()
-        result = 31 * result + onError.hashCode()
-        result = 31 * result + isLight.hashCode()
-        return result
-    }
-
     override fun toString(): String {
         return "Colors(" +
                 "primary=$primary, " +
