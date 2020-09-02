@@ -480,16 +480,17 @@ class LayoutNode : Measurable, Remeasurement {
         }
 
     /**
+     * The screen density to be used by this layout.
+     */
+    var density: Density = Density(1f)
+
+    /**
      * The scope used to run the [MeasureBlocks.measure]
      * [MeasureBlock][androidx.compose.ui.MeasureBlock].
      */
     val measureScope: MeasureScope = object : MeasureScope(), Density {
-        private val ownerDensity: Density
-            get() = owner?.density ?: Density(1f)
-        override val density: Float
-            get() = ownerDensity.density
-        override val fontScale: Float
-            get() = ownerDensity.fontScale
+        override val density: Float get() = this@LayoutNode.density.density
+        override val fontScale: Float get() = this@LayoutNode.density.fontScale
         override val layoutDirection: LayoutDirection get() = this@LayoutNode.layoutDirection
     }
 
@@ -1201,6 +1202,7 @@ class LayoutNode : Measurable, Remeasurement {
 internal object LayoutEmitHelper {
     val constructor: () -> LayoutNode = { LayoutNode() }
     val setModifier: LayoutNode.(Modifier) -> Unit = { this.modifier = it }
+    val setDensity: LayoutNode.(Density) -> Unit = { this.density = it }
     val setMeasureBlocks: LayoutNode.(LayoutNode.MeasureBlocks) -> Unit =
         { this.measureBlocks = it }
     val setRef: LayoutNode.(Ref<LayoutNode>) -> Unit = { it.value = this }

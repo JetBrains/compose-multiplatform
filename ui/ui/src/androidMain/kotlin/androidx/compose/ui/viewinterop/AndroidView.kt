@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.materialize
 import androidx.compose.ui.node.UiApplier
 import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.platform.DensityAmbient
 
 /**
  * Composes an Android [View] obtained from [viewBlock]. The [viewBlock] block will be called
@@ -55,6 +56,7 @@ fun <T : View> AndroidView(
         update = {
             set(Unit) { this.viewBlock = viewBlock }
             set(materialized) { this.modifier = it }
+            set(DensityAmbient.current) { this.density = it }
             set(update) { this.updateBlock = update }
         }
     )

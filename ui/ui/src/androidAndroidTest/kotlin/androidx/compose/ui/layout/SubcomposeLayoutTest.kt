@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onActive
 import androidx.compose.runtime.onDispose
@@ -29,12 +30,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
 import androidx.compose.ui.draw.assertColor
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
+import androidx.compose.ui.onPositioned
+import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.ui.test.assertHeightIsEqualTo
 import androidx.ui.test.assertIsDisplayed
 import androidx.ui.test.assertPositionInRootIsEqualTo
@@ -44,6 +45,10 @@ import androidx.ui.test.createComposeRule
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.runOnIdle
 import androidx.ui.test.waitForIdle
+import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntSize
+import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -433,6 +438,23 @@ class SubcomposeLayoutTest {
             assertThat(firstDisposed).isTrue()
             assertThat(secondDisposed).isTrue()
         }
+    }
+
+    @Test
+    fun propagatesDensity() {
+        rule.setContent {
+            val size = 50.dp
+            val density = Density(3f)
+            val sizeIpx = with(density) { size.toIntPx() }
+            Providers(DensityAmbient provides density) {
+                SubcomposeLayout<Unit>(Modifier.size(size).onPositioned {
+                    assertThat(it.size).isEqualTo(IntSize(sizeIpx, sizeIpx))
+                }) { constraints ->
+                    layout(constraints.maxWidth, constraints.maxHeight) {}
+                }
+            }
+        }
+        waitForIdle()
     }
 }
 

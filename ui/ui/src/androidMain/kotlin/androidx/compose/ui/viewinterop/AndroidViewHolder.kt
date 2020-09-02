@@ -23,6 +23,7 @@ import android.view.ViewGroup
 import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.snapshots.SnapshotStateObserver
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Density
 
 /**
  * A base class used to host a [View] inside Compose.
@@ -71,6 +72,19 @@ abstract class AndroidViewHolder(context: Context) : ViewGroup(context) {
         }
 
     internal var onModifierChanged: ((Modifier) -> Unit)? = null
+
+    /**
+     * The screen density of the layout.
+     */
+    var density: Density = Density(1f)
+        set(value) {
+            if (value !== field) {
+                field = value
+                onDensityChanged?.invoke(value)
+            }
+        }
+
+    internal var onDensityChanged: ((Density) -> Unit)? = null
 
     @OptIn(ExperimentalComposeApi::class)
     private val snapshotObserver = SnapshotStateObserver { command ->

@@ -1775,11 +1775,13 @@ package androidx.compose.ui.node {
 
   @kotlin.PublishedApi internal final class LayoutEmitHelper {
     method public kotlin.jvm.functions.Function0<androidx.compose.ui.node.LayoutNode> getConstructor();
+    method public kotlin.jvm.functions.Function2<androidx.compose.ui.node.LayoutNode,androidx.compose.ui.unit.Density,kotlin.Unit> getSetDensity();
     method public kotlin.jvm.functions.Function2<androidx.compose.ui.node.LayoutNode,androidx.compose.ui.unit.LayoutDirection,kotlin.Unit> getSetLayoutDirection();
     method public kotlin.jvm.functions.Function2<androidx.compose.ui.node.LayoutNode,androidx.compose.ui.node.LayoutNode.MeasureBlocks,kotlin.Unit> getSetMeasureBlocks();
     method public kotlin.jvm.functions.Function2<androidx.compose.ui.node.LayoutNode,androidx.compose.ui.Modifier,kotlin.Unit> getSetModifier();
     method public kotlin.jvm.functions.Function2<androidx.compose.ui.node.LayoutNode,androidx.compose.ui.node.Ref<androidx.compose.ui.node.LayoutNode>,kotlin.Unit> getSetRef();
     property public final kotlin.jvm.functions.Function0<androidx.compose.ui.node.LayoutNode> constructor;
+    property public final kotlin.jvm.functions.Function2<androidx.compose.ui.node.LayoutNode,androidx.compose.ui.unit.Density,kotlin.Unit> setDensity;
     property public final kotlin.jvm.functions.Function2<androidx.compose.ui.node.LayoutNode,androidx.compose.ui.unit.LayoutDirection,kotlin.Unit> setLayoutDirection;
     property public final kotlin.jvm.functions.Function2<androidx.compose.ui.node.LayoutNode,androidx.compose.ui.node.LayoutNode.MeasureBlocks,kotlin.Unit> setMeasureBlocks;
     property public final kotlin.jvm.functions.Function2<androidx.compose.ui.node.LayoutNode,androidx.compose.ui.Modifier,kotlin.Unit> setModifier;
@@ -1796,6 +1798,7 @@ package androidx.compose.ui.node {
     method @Deprecated public boolean getCanMultiMeasure();
     method public java.util.List<androidx.compose.ui.node.LayoutNode> getChildren();
     method public androidx.compose.ui.layout.LayoutCoordinates getCoordinates();
+    method public androidx.compose.ui.unit.Density getDensity();
     method public int getDepth();
     method public int getHeight();
     method public androidx.compose.ui.node.LayoutNode.MeasureBlocks getMeasureBlocks();
@@ -1825,6 +1828,7 @@ package androidx.compose.ui.node {
     method public void requestRelayout();
     method public void requestRemeasure();
     method @Deprecated public void setCanMultiMeasure(boolean p);
+    method public void setDensity(androidx.compose.ui.unit.Density p);
     method public void setDepth(int p);
     method public void setMeasureBlocks(androidx.compose.ui.node.LayoutNode.MeasureBlocks value);
     method public void setModifier(androidx.compose.ui.Modifier value);
@@ -1833,6 +1837,7 @@ package androidx.compose.ui.node {
     property @Deprecated public final boolean canMultiMeasure;
     property public final java.util.List<androidx.compose.ui.node.LayoutNode> children;
     property public final androidx.compose.ui.layout.LayoutCoordinates coordinates;
+    property public final androidx.compose.ui.unit.Density density;
     property public final int depth;
     property public final int height;
     property public final boolean isPlaced;
@@ -2481,11 +2486,14 @@ package androidx.compose.ui.viewinterop {
 
   @androidx.compose.ui.viewinterop.InternalInteropApi public abstract class AndroidViewHolder extends android.view.ViewGroup {
     ctor public AndroidViewHolder(android.content.Context context);
+    method public final androidx.compose.ui.unit.Density getDensity();
     method public final androidx.compose.ui.Modifier getModifier();
     method public final kotlin.jvm.functions.Function0<kotlin.Unit> getUpdate();
     method public final android.view.View? getView();
+    method public final void setDensity(androidx.compose.ui.unit.Density value);
     method public final void setModifier(androidx.compose.ui.Modifier value);
     method protected final void setUpdate(kotlin.jvm.functions.Function0<kotlin.Unit> value);
+    property public final androidx.compose.ui.unit.Density density;
     property public final androidx.compose.ui.Modifier modifier;
     property public final kotlin.jvm.functions.Function0<kotlin.Unit> update;
     property public final android.view.View? view;

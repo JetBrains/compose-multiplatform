@@ -17,11 +17,16 @@
 package androidx.compose.ui.viewinterop
 
 import android.os.Build
+import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.onPositioned
+import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.databinding.TestLayoutBinding
@@ -32,6 +37,8 @@ import androidx.ui.test.captureToBitmap
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.runOnIdle
+import androidx.ui.test.waitForIdle
+import com.google.common.truth.Truth
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -77,5 +84,20 @@ class AndroidViewBindingTest {
         onNodeWithTag("layout").captureToBitmap().assertPixels(IntSize(sizePx, sizePx * 2)) {
             if (it.y < sizePx) Color.Blue else color.value
         }
+    }
+
+    @Test
+    fun propagatesDensity() {
+        rule.setContent {
+            val size = 50.dp
+            val density = Density(3f)
+            val sizeIpx = with(density) { size.toIntPx() }
+            Providers(DensityAmbient provides density) {
+                AndroidViewBinding(TestLayoutBinding::inflate, Modifier.size(size).onPositioned {
+                    Truth.assertThat(it.size).isEqualTo(IntSize(sizeIpx, sizeIpx))
+                })
+            }
+        }
+        waitForIdle()
     }
 }
