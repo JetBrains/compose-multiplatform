@@ -23,7 +23,7 @@ import androidx.compose.testutils.forGivenTestCase
 import androidx.test.filters.MediumTest
 import androidx.ui.integration.test.foundation.RectsInColumnSharedModelTestCase
 import androidx.ui.test.ExperimentalTesting
-import androidx.ui.test.android.createAndroidComposeRule
+import androidx.ui.test.createAndroidComposeRule
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

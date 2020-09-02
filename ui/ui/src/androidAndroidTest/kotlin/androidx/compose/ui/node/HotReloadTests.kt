@@ -34,7 +34,7 @@ import androidx.compose.ui.semantics.accessibilityLabel
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.TestActivity
 import androidx.test.filters.MediumTest
-import androidx.ui.test.android.createAndroidComposeRule
+import androidx.ui.test.createAndroidComposeRule
 import androidx.ui.test.assertLabelEquals
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.runOnUiThread

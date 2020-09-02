@@ -25,7 +25,7 @@ import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.test.filters.SmallTest
 import androidx.ui.test.AndroidComposeTestRule
-import androidx.ui.test.android.createAndroidComposeRule
+import androidx.ui.test.createAndroidComposeRule
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
