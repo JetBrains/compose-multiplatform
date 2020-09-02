@@ -24,6 +24,7 @@ import android.graphics.Picture
 import android.graphics.RenderNode
 import android.os.Build
 import android.util.DisplayMetrics
+import android.view.DisplayListCanvas
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -69,11 +70,20 @@ internal class AndroidComposeTestCaseRunner<T : ComposeTestCase>(
     override var didLastRecomposeHaveChanges = false
         private set
 
-    private val supportsRenderNode = Build.VERSION.SDK_INT >= 29
+    private val supportsRenderNode = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+    private val supportsMRenderNode = Build.VERSION.SDK_INT < Build.VERSION_CODES.P &&
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
 
     private val screenWithSpec: Int
     private val screenHeightSpec: Int
-    private val capture = if (supportsRenderNode) RenderNodeCapture() else PictureCapture()
+    private val capture = if (supportsRenderNode) {
+        RenderNodeCapture()
+    } else if (supportsMRenderNode) {
+        MRenderNodeCapture()
+    } else {
+        PictureCapture()
+    }
+
     private var canvas: Canvas? = null
 
     private class AutoFrameClock(
@@ -356,5 +366,22 @@ private class PictureCapture : DrawCapture {
 
     override fun endRecording() {
         picture.endRecording()
+    }
+}
+
+private class MRenderNodeCapture : DrawCapture {
+    private var renderNode = android.view.RenderNode.create("Test", null)
+
+    private var canvas: DisplayListCanvas? = null
+
+    override fun beginRecording(width: Int, height: Int): Canvas {
+        renderNode.setLeftTopRightBottom(0, 0, width, height)
+        canvas = renderNode.start(width, height)
+        return canvas!!
+    }
+
+    override fun endRecording() {
+        renderNode.end(canvas!!)
+        canvas = null
     }
 }

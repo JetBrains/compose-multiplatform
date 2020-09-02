@@ -392,6 +392,10 @@ internal class AndroidComposeView constructor(
 
     private val tmpPositionArray = intArrayOf(0, 0)
 
+    // Used to track whether or not there was an exception while creating an MRenderNode
+    // so that we don't have to continue using try/catch after fails once.
+    private var isRenderNodeCompatible = true
+
     private fun dispatchOnPositioned() {
         var positionChanged = false
         getLocationOnScreen(tmpPositionArray)
@@ -424,18 +428,39 @@ internal class AndroidComposeView constructor(
         drawBlock: (Canvas) -> Unit,
         invalidateParentLayer: () -> Unit
     ): OwnedLayer {
-        val layer = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P || isInEditMode) {
-            ViewLayer(
-                this, viewLayersContainer, drawLayerModifier, drawBlock,
-                invalidateParentLayer
-            )
-        } else {
-            RenderNodeLayer(this, drawLayerModifier, drawBlock, invalidateParentLayer)
-        }
-
+        val layer = instantiateLayer(drawLayerModifier, drawBlock, invalidateParentLayer)
         updateLayerProperties(layer)
-
         return layer
+    }
+
+    private fun instantiateLayer(
+        drawLayerModifier: DrawLayerModifier,
+        drawBlock: (Canvas) -> Unit,
+        invalidateParentLayer: () -> Unit
+    ): OwnedLayer {
+        // RenderNode is supported on Q+ for certain, but may also be supported on M-O.
+        // We can't be confident that RenderNode is supported, so we try and fail over to
+        // the ViewLayer implementation. We'll try even on on P devices, but it will fail
+        // until ART allows things on the unsupported list on P.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && isRenderNodeCompatible) {
+            try {
+                return RenderNodeLayer(
+                    this,
+                    drawLayerModifier,
+                    drawBlock,
+                    invalidateParentLayer
+                )
+            } catch (_: Throwable) {
+                isRenderNodeCompatible = false
+            }
+        }
+        return ViewLayer(
+            this,
+            viewLayersContainer,
+            drawLayerModifier,
+            drawBlock,
+            invalidateParentLayer
+        )
     }
 
     override fun onSemanticsChange() {
