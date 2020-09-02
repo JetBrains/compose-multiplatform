@@ -450,7 +450,7 @@ package androidx.compose.foundation.layout {
   }
 
   public final class StackKt {
-    method @androidx.compose.runtime.Composable public static void Stack(androidx.compose.ui.Modifier modifier = Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.StackScope,kotlin.Unit> children);
+    method @androidx.compose.runtime.Composable public static void Stack(androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.ui.Alignment alignment = Alignment.TopStart, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.StackScope,kotlin.Unit> children);
   }
 
   @androidx.compose.foundation.layout.LayoutScopeMarker @androidx.compose.runtime.Immutable public final class StackScope {
