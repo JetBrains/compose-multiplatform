@@ -63,6 +63,7 @@ import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.platform.LayoutDirectionAmbient
+import androidx.compose.ui.platform.RenderNodeApi23
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.unit.Constraints
@@ -128,6 +129,24 @@ class AndroidLayoutDrawTest {
         composeSquares(model)
 
         validateSquareColors(outerColor = yellow, innerColor = red, size = 10)
+    }
+
+    // Tests that the fail-over for M RenderNode support works. Note that this would work with M
+    // and above except that our snapshots only work with O and above.
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O, maxSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun simpleDrawTestLegacyFallback() {
+        try {
+            RenderNodeApi23.testFailCreateRenderNode = true
+            val yellow = Color(0xFFFFFF00)
+            val red = Color(0xFF800000)
+            val model = SquareModel(outerColor = yellow, innerColor = red, size = 10)
+            composeSquares(model)
+
+            validateSquareColors(outerColor = yellow, innerColor = red, size = 10)
+        } finally {
+            RenderNodeApi23.testFailCreateRenderNode = false
+        }
     }
 
     // Tests that simple drawing works with draw with nested children
