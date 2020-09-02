@@ -91,13 +91,6 @@ interface Owner {
         set
 
     /**
-     * Called from a [LayoutNode], this registers with the underlying view system that a
-     * redraw of the given [layoutNode] is required. It may cause other nodes to redraw, if
-     * necessary. Note that [LayoutNode]s are able to draw due to draw modifiers applied to them.
-     */
-    fun onInvalidate(layoutNode: LayoutNode)
-
-    /**
      * Called by [LayoutNode] to request the Owner a new measurement+layout.
      */
     fun onRequestMeasure(layoutNode: LayoutNode)

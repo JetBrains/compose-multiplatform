@@ -3010,9 +3010,6 @@ private class MockOwner(
         get() = false
         set(@Suppress("UNUSED_PARAMETER") value) {}
 
-    override fun onInvalidate(layoutNode: LayoutNode) {
-    }
-
     override fun onRequestMeasure(layoutNode: LayoutNode) {
     }
 

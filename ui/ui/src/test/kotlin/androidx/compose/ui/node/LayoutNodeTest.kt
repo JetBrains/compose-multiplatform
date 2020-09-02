@@ -27,6 +27,7 @@ import androidx.compose.ui.drawBehind
 import androidx.compose.ui.drawLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.input.key.KeyEvent
@@ -41,6 +42,7 @@ import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.zIndex
 import androidx.test.filters.SmallTest
@@ -1631,11 +1633,11 @@ class LayoutNodeTest {
 
         root.modifier = Modifier.drawLayer()
 
-        assertNotNull(root.innerLayoutNodeWrapper.findLayer())
+        assertNotNull(root.innerLayerWrapper)
 
         root.modifier = Modifier
 
-        assertNull(root.innerLayoutNodeWrapper.findLayer())
+        assertNull(root.innerLayerWrapper)
     }
 
     private fun createSimpleLayout(): Triple<LayoutNode, LayoutNode, LayoutNode> {
@@ -1684,9 +1686,6 @@ private class MockOwner(
         get() = LayoutDirection.Ltr
     override var showLayoutBounds: Boolean = false
 
-    override fun onInvalidate(layoutNode: LayoutNode) {
-    }
-
     override fun onRequestMeasure(layoutNode: LayoutNode) {
         onRequestMeasureParams += layoutNode
     }
@@ -1729,7 +1728,39 @@ private class MockOwner(
         drawBlock: (Canvas) -> Unit,
         invalidateParentLayer: () -> Unit
     ): OwnedLayer {
-        TODO("Not yet implemented")
+        return object : OwnedLayer {
+            override val layerId: Long
+                get() = 0
+            @Suppress("UNUSED_PARAMETER")
+            override var modifier: DrawLayerModifier
+                get() = drawLayerModifier
+                set(value) {}
+
+            override fun updateLayerProperties() {
+            }
+
+            override fun move(position: IntOffset) {
+            }
+
+            override fun resize(size: IntSize) {
+            }
+
+            override fun drawLayer(canvas: Canvas) {
+                drawBlock(canvas)
+            }
+
+            override fun updateDisplayList() {
+            }
+
+            override fun invalidate() {
+            }
+
+            override fun destroy() {
+            }
+
+            override fun getMatrix(matrix: Matrix) {
+            }
+        }
     }
 
     override fun onSemanticsChange() {

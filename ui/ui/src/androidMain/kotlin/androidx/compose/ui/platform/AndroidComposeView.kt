@@ -245,19 +245,6 @@ internal class AndroidComposeView constructor(
         AndroidOwner.onAndroidOwnerCreatedCallback?.invoke(this)
     }
 
-    override fun onInvalidate(layoutNode: LayoutNode) {
-        invalidate(layoutNode)
-    }
-
-    private fun invalidate(node: LayoutNode) {
-        val layer = node.findLayer()
-        if (layer == null) {
-            invalidate()
-        } else {
-            layer.invalidate()
-        }
-    }
-
     override fun onAttach(node: LayoutNode) {
     }
 

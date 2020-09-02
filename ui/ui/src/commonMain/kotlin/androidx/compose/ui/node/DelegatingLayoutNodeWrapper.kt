@@ -41,7 +41,7 @@ internal open class DelegatingLayoutNodeWrapper<T : Modifier.Element>(
     override val providedAlignmentLines: Set<AlignmentLine>
         get() = wrapped.providedAlignmentLines
 
-    private var _isAttached = true
+    private var _isAttached = false
     override val isAttached: Boolean
         get() = _isAttached && layoutNode.isAttached()
 

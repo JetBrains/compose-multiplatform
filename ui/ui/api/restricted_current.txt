@@ -1821,7 +1821,6 @@ package androidx.compose.ui.node {
     method public int minIntrinsicHeight(int width);
     method public int minIntrinsicWidth(int height);
     method public void move(int from, int to, int count);
-    method public void onInvalidate();
     method public void place(int x, int y);
     method public void removeAll();
     method public void removeAt(int index, int count);
@@ -1926,7 +1925,6 @@ package androidx.compose.ui.node {
     method public void observeMeasureModelReads(androidx.compose.ui.node.LayoutNode node, kotlin.jvm.functions.Function0<kotlin.Unit> block);
     method public void onAttach(androidx.compose.ui.node.LayoutNode node);
     method public void onDetach(androidx.compose.ui.node.LayoutNode node);
-    method public void onInvalidate(androidx.compose.ui.node.LayoutNode layoutNode);
     method public void onRequestMeasure(androidx.compose.ui.node.LayoutNode layoutNode);
     method public void onRequestRelayout(androidx.compose.ui.node.LayoutNode layoutNode);
     method public void onSemanticsChange();
