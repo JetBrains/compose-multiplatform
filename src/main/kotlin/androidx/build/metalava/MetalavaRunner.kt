@@ -116,7 +116,6 @@ fun Project.getApiLintArgs(): List<String> {
 
             // The list of checks that are API lint warnings and are yet to be enabled
             "SamShouldBeLast",
-            "StaticFinalBuilder",
             "MissingGetterMatchingBuilder",
 
             // We should only treat these as warnings
@@ -145,6 +144,7 @@ fun Project.getApiLintArgs(): List<String> {
             "CommonArgsFirst",
             "GetterOnBuilder",
             "CallbackMethodName",
+            "StaticFinalBuilder",
             "HiddenSuperclass"
         ).joinToString()
     )
