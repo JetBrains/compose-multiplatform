@@ -198,9 +198,9 @@ class AndroidXPlugin : Plugin<Project> {
         }
     }
 
-    private fun configureWithAppPlugin(project: Project, extension: AndroidXExtension) {
+    private fun configureWithAppPlugin(project: Project, androidXExtension: AndroidXExtension) {
         val appExtension = project.extensions.getByType<AppExtension>().apply {
-            configureAndroidCommonOptions(project, extension)
+            configureAndroidCommonOptions(project, androidXExtension)
             configureAndroidApplicationOptions(project)
         }
 
@@ -216,6 +216,7 @@ class AndroidXPlugin : Plugin<Project> {
         // are currently dual-licensed with AL2.0 and LGPL2.1. The affected dependencies are:
         //   - net.java.dev.jna:jna:5.5.0
         appExtension.packagingOptions.exclude("/META-INF/LGPL2.1")
+        project.configureAndroidProjectForLint(appExtension.lintOptions, androidXExtension)
     }
 
     private fun configureWithLibraryPlugin(
