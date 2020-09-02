@@ -121,7 +121,7 @@ private fun StackScope.SwitchImpl(
         }
     val trackColor = SwitchDefaults.resolveTrackColor(checked, enabled, checkedColor)
     val thumbColor = SwitchDefaults.resolveThumbColor(checked, enabled, checkedColor)
-    Canvas(Modifier.gravity(Alignment.Center).preferredSize(SwitchWidth, SwitchHeight)) {
+    Canvas(Modifier.align(Alignment.Center).preferredSize(SwitchWidth, SwitchHeight)) {
         drawTrack(trackColor, TrackWidth.toPx(), TrackStrokeWidth.toPx())
     }
     Surface(
@@ -129,7 +129,7 @@ private fun StackScope.SwitchImpl(
         color = thumbColor,
         elevation = elevation,
         modifier = Modifier
-            .gravity(Alignment.CenterStart)
+            .align(Alignment.CenterStart)
             .offsetPx(x = thumbValue)
             .indication(
                 interactionState = interactionState,

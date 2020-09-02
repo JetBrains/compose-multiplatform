@@ -104,7 +104,7 @@ fun Box(
     Column(
         modifier = modifier.then(backgroundModifier).then(borderModifier).then(paddingModifier),
         verticalArrangement = columnArrangement,
-        horizontalGravity = columnGravity
+        horizontalAlignment = columnGravity
     ) {
         children()
     }

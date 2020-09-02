@@ -138,7 +138,7 @@ private object OneLine {
         Row(modifier.preferredHeightIn(minHeight = minHeight)) {
             if (icon != null) {
                 Box(
-                    Modifier.gravity(Alignment.CenterVertically)
+                    Modifier.align(Alignment.CenterVertically)
                         .preferredWidthIn(minWidth = IconLeftPadding + IconMinPaddedWidth),
                     gravity = ContentGravity.CenterStart,
                     paddingStart = IconLeftPadding,
@@ -149,14 +149,14 @@ private object OneLine {
             }
             Box(
                 Modifier.weight(1f)
-                    .gravity(Alignment.CenterVertically)
+                    .align(Alignment.CenterVertically)
                     .padding(start = ContentLeftPadding, end = ContentRightPadding),
                 gravity = ContentGravity.CenterStart,
                 children = text
             )
             if (trailing != null) {
                 Box(
-                    Modifier.gravity(Alignment.CenterVertically),
+                    Modifier.align(Alignment.CenterVertically),
                     paddingEnd = TrailingRightPadding,
                     children = trailing
                 )

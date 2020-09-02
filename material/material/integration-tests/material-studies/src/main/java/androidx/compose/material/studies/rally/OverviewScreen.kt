@@ -91,12 +91,12 @@ private fun AlertHeader(onClickSeeAll: () -> Unit) {
         Text(
             text = "Alerts",
             style = MaterialTheme.typography.subtitle2,
-            modifier = Modifier.gravity(Alignment.CenterVertically)
+            modifier = Modifier.align(Alignment.CenterVertically)
         )
         TextButton(
             onClick = onClickSeeAll,
             contentPadding = InnerPadding(0.dp),
-            modifier = Modifier.gravity(Alignment.CenterVertically)
+            modifier = Modifier.align(Alignment.CenterVertically)
         ) {
             Text("SEE ALL")
         }
@@ -117,7 +117,7 @@ private fun AlertItem(message: String) {
         )
         IconButton(
             onClick = {},
-            modifier = Modifier.gravity(Alignment.Top)
+            modifier = Modifier.align(Alignment.Top)
         ) {
             Icon(Icons.Filled.Sort)
         }

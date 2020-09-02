@@ -148,7 +148,7 @@ fun ControlledScrollableRowSample() {
             }
         }
         // Controls for scrolling
-        Row(verticalGravity = Alignment.CenterVertically) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Scroll")
             Button(onClick = { scrollState.scrollTo(scrollState.value - 1000) }) {
                 Text("< -")
@@ -157,7 +157,7 @@ fun ControlledScrollableRowSample() {
                 Text("--- >")
             }
         }
-        Row(verticalGravity = Alignment.CenterVertically) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Smooth Scroll")
             Button(onClick = { scrollState.smoothScrollTo(scrollState.value - 1000) }) {
                 Text("< -")

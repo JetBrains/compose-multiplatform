@@ -405,7 +405,7 @@ class LayoutPaddingTest : LayoutTest() {
             Stack(Modifier.fillMaxSize()) {
                 ConstrainedBox(
                     constraints = DpConstraints.fixed(sizeDp, sizeDp),
-                    modifier = Modifier.gravity(Alignment.Center)
+                    modifier = Modifier.align(Alignment.Center)
                 ) {
                     val children = @Composable {
                         Container(Modifier.onPositioned { coordinates: LayoutCoordinates ->
@@ -451,7 +451,7 @@ class LayoutPaddingTest : LayoutTest() {
             Stack(Modifier.fillMaxSize()) {
                 ConstrainedBox(
                     constraints = DpConstraints.fixed(sizeDp, sizeDp),
-                    modifier = Modifier.gravity(Alignment.Center)
+                    modifier = Modifier.align(Alignment.Center)
                 ) {
                     val children = @Composable {
                         Container(Modifier.onPositioned { coordinates: LayoutCoordinates ->
@@ -504,7 +504,7 @@ class LayoutPaddingTest : LayoutTest() {
             Stack(Modifier.fillMaxSize()) {
                 ConstrainedBox(
                     constraints = DpConstraints.fixed(sizeDp, sizeDp),
-                    modifier = Modifier.gravity(Alignment.Center)
+                    modifier = Modifier.align(Alignment.Center)
                 ) {
                     paddingContainer {
                         Container(Modifier.onPositioned { coordinates: LayoutCoordinates ->

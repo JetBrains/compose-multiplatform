@@ -41,20 +41,20 @@ fun BillsBody(bills: List<Bill>) {
         val accountsProportion = bills.extractProportions { it.amount }
         val colors = bills.map { it.color }
         AnimatedCircle(
-            Modifier.gravity(Alignment.Center).preferredHeight(300.dp).fillMaxWidth(),
+            Modifier.align(Alignment.Center).preferredHeight(300.dp).fillMaxWidth(),
             accountsProportion,
             colors
         )
-        Column(modifier = Modifier.gravity(Alignment.Center)) {
+        Column(modifier = Modifier.align(Alignment.Center)) {
             Text(
                 text = "Due",
                 style = MaterialTheme.typography.body1,
-                modifier = Modifier.gravity(Alignment.CenterHorizontally)
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
             Text(
                 text = "$1,810.00",
                 style = MaterialTheme.typography.h2,
-                modifier = Modifier.gravity(Alignment.CenterHorizontally)
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
         }
     }

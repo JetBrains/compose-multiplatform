@@ -54,30 +54,30 @@ fun SimpleColumn() {
 
 @Sampled
 @Composable
-fun SimpleGravityInColumn() {
+fun SimpleAlignInColumn() {
     Column(Modifier.fillMaxWidth()) {
-        // The child with no gravity modifier is positioned by default so that its start edge
+        // The child with no align modifier is positioned by default so that its start edge
         // aligned with the start edge of the horizontal axis.
         Box(Modifier.preferredSize(80.dp, 40.dp), backgroundColor = Color.Magenta)
-        // Gravity.Start, the child will be positioned so that its start edge is aligned with
+        // Alignment.Start, the child will be positioned so that its start edge is aligned with
         // the start edge of the horizontal axis.
         Box(
             Modifier.preferredSize(80.dp, 40.dp)
-                .gravity(Alignment.Start),
+                .align(Alignment.Start),
             backgroundColor = Color.Red
         )
-        // Gravity.Center, the child will be positioned so that its center is in the middle of
+        // Alignment.Center, the child will be positioned so that its center is in the middle of
         // the horizontal axis.
         Box(
             Modifier.preferredSize(80.dp, 40.dp)
-                .gravity(Alignment.CenterHorizontally),
+                .align(Alignment.CenterHorizontally),
             backgroundColor = Color.Yellow
         )
-        // Gravity.End, the child will be positioned so that its end edge aligned to the end of
+        // Alignment.End, the child will be positioned so that its end edge aligned to the end of
         // the horizontal axis.
         Box(
             Modifier.preferredSize(80.dp, 40.dp)
-                .gravity(Alignment.End),
+                .align(Alignment.End),
             backgroundColor = Color.Green
         )
     }

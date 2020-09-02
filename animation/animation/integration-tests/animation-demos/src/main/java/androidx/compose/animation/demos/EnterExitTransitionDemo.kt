@@ -76,7 +76,7 @@ fun EnterExitTransitionDemo() {
         var visible by remember { mutableStateOf(true) }
         val (selectedOption, onOptionSelected) = remember { mutableStateOf(0) }
         Column(Modifier.fillMaxSize()) {
-            Button(modifier = Modifier.gravity(CenterHorizontally), onClick = {
+            Button(modifier = Modifier.align(CenterHorizontally), onClick = {
                 alignment = TopCenter
                 visible = !visible
             }) {
@@ -84,19 +84,19 @@ fun EnterExitTransitionDemo() {
             }
             Row(Modifier.fillMaxWidth().weight(1f)) {
                 Stack(Modifier.fillMaxHeight().wrapContentWidth()) {
-                    Button(modifier = Modifier.gravity(TopEnd), onClick = {
+                    Button(modifier = Modifier.align(TopEnd), onClick = {
                         alignment = TopStart
                         visible = !visible
                     }) {
                         Text("Top\nStart")
                     }
-                    Button(modifier = Modifier.gravity(CenterEnd), onClick = {
+                    Button(modifier = Modifier.align(CenterEnd), onClick = {
                         alignment = CenterStart
                         visible = !visible
                     }) {
                         Text("Start")
                     }
-                    Button(modifier = Modifier.gravity(BottomEnd), onClick = {
+                    Button(modifier = Modifier.align(BottomEnd), onClick = {
                         alignment = BottomStart
                         visible = !visible
                     }) {
@@ -105,19 +105,19 @@ fun EnterExitTransitionDemo() {
                 }
                 CenterMenu(selectedOption, oppositeAlignment.value, alignment, visible)
                 Stack(Modifier.fillMaxHeight().wrapContentWidth()) {
-                    Button(modifier = Modifier.gravity(TopStart), onClick = {
+                    Button(modifier = Modifier.align(TopStart), onClick = {
                         alignment = TopEnd
                         visible = !visible
                     }) {
                         Text("Top\nEnd")
                     }
-                    Button(modifier = Modifier.gravity(CenterStart), onClick = {
+                    Button(modifier = Modifier.align(CenterStart), onClick = {
                         alignment = CenterEnd
                         visible = !visible
                     }) {
                         Text("End")
                     }
-                    Button(modifier = Modifier.gravity(BottomEnd), onClick = {
+                    Button(modifier = Modifier.align(BottomEnd), onClick = {
                         alignment = BottomEnd
                         visible = !visible
                     }) {
@@ -125,7 +125,7 @@ fun EnterExitTransitionDemo() {
                     }
                 }
             }
-            Button(modifier = Modifier.gravity(CenterHorizontally), onClick = {
+            Button(modifier = Modifier.align(CenterHorizontally), onClick = {
                 alignment = BottomCenter
                 visible = !visible
             }) {
@@ -189,7 +189,7 @@ fun CenterMenu(
         }
         AnimatedVisibility(
             visible,
-            Modifier.gravity(alignment),
+            Modifier.align(alignment),
             enter = enter,
             exit = exit
         ) {
@@ -228,7 +228,7 @@ fun FadeOptions(selectedOption: Int, onOptionSelected: (Int) -> Unit) {
                     onClick = { onOptionSelected(i) }
                 )
                 .padding(horizontal = 16.dp),
-                verticalGravity = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 RadioButton(
                     selected = (i == selectedOption),

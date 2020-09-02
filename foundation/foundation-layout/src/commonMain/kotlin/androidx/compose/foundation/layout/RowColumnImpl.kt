@@ -1401,7 +1401,7 @@ internal sealed class SiblingsAlignedModifier : ParentDataModifier {
     }
 }
 
-internal data class HorizontalGravityModifier(
+internal data class HorizontalAlignModifier(
     val horizontal: Alignment.Horizontal
 ) : ParentDataModifier {
     override fun Density.modifyParentData(parentData: Any?): RowColumnParentData {
@@ -1411,7 +1411,7 @@ internal data class HorizontalGravityModifier(
     }
 }
 
-internal data class VerticalGravityModifier(
+internal data class VerticalAlignModifier(
     val vertical: Alignment.Vertical
 ) : ParentDataModifier {
     override fun Density.modifyParentData(parentData: Any?): RowColumnParentData {

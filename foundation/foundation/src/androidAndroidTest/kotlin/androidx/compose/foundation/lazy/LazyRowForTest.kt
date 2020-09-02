@@ -269,7 +269,7 @@ class LazyRowForTest {
             LazyRowFor(
                 items = listOf(1, 2),
                 modifier = Modifier.testTag(LazyRowForTag).height(100.dp),
-                verticalGravity = verticalGravity
+                verticalAlignment = verticalGravity
             ) {
                 if (it == 1) {
                     Spacer(Modifier.preferredSize(50.dp).testTag(firstItemTag))

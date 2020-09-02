@@ -36,7 +36,7 @@ import kotlin.math.max
  * drawn in the order they are specified in the body of the [Stack].
  * When children are smaller than the parent, by default they will be positioned inside the [Stack]
  * according to the [alignment]. If individual alignment of the children is needed, apply the
- * [StackScope.gravity] modifier to a child to specify its alignment.
+ * [StackScope.align] modifier to a child to specify its alignment.
  *
  * Example usage:
  *
@@ -104,9 +104,14 @@ fun Stack(
 @Immutable
 class StackScope {
     /**
-     * Pull the content element to a specific [Alignment] within the [Stack].
+     * Pull the content element to a specific [Alignment] within the [Stack]. This alignment will
+     * have priority over the [Stack]'s `alignment` parameter.
      */
     @Stable
+    fun Modifier.align(alignment: Alignment) = this.then(StackChildData(alignment, false))
+
+    @Stable
+    @Deprecated("gravity has been renamed to align.", ReplaceWith("align(align)"))
     fun Modifier.gravity(align: Alignment) = this.then(StackChildData(align, false))
 
     /**
@@ -122,11 +127,11 @@ class StackScope {
      * available space.
      */
     @Stable
-    fun Modifier.matchParentSize() = this.then(StretchGravityModifier)
+    fun Modifier.matchParentSize() = this.then(StretchAlignModifier)
 
     internal companion object {
         @Stable
-        val StretchGravityModifier: ParentDataModifier = StackChildData(Alignment.Center, true)
+        val StretchAlignModifier: ParentDataModifier = StackChildData(Alignment.Center, true)
     }
 }
 
@@ -134,8 +139,8 @@ private val Measurable.stackChildData: StackChildData? get() = parentData as? St
 private val Measurable.stretch: Boolean get() = stackChildData?.stretch ?: false
 
 private data class StackChildData(
-    val alignment: Alignment,
-    val stretch: Boolean
+    var alignment: Alignment,
+    var stretch: Boolean = false
 ) : ParentDataModifier {
     override fun Density.modifyParentData(parentData: Any?) = this@StackChildData
 }

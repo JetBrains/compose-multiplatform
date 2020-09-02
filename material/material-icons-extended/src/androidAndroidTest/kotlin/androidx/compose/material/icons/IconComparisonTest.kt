@@ -208,7 +208,7 @@ private fun DrawVectors(programmaticVector: VectorAsset, xmlVector: VectorAsset)
         val layoutSize = with(DensityAmbient.current) {
             Modifier.preferredSize(72.toDp())
         }
-        Row(Modifier.gravity(Alignment.Center)) {
+        Row(Modifier.align(Alignment.Center)) {
             Box(
                 modifier = layoutSize.paint(
                     VectorPainter(programmaticVector),
