@@ -23,7 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import androidx.ui.test.ComposeTestRule
+import androidx.ui.test.ComposeTestRuleJUnit
 import androidx.ui.test.SemanticsNodeInteraction
 import androidx.ui.test.onNodeWithTag
 
@@ -32,7 +32,7 @@ import androidx.ui.test.onNodeWithTag
  */
 val BigTestConstraints = DpConstraints(maxWidth = 5000.dp, maxHeight = 5000.dp)
 
-fun ComposeTestRule.setContentForSizeAssertions(
+fun ComposeTestRuleJUnit.setContentForSizeAssertions(
     parentConstraints: DpConstraints = BigTestConstraints,
     children: @Composable () -> Unit
 ): SemanticsNodeInteraction {
