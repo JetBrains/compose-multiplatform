@@ -107,7 +107,7 @@ class StackScope {
      * Pull the content element to a specific [Alignment] within the [Stack].
      */
     @Stable
-    fun Modifier.gravity(align: Alignment) = this.then(StackGravityModifier(align))
+    fun Modifier.gravity(align: Alignment) = this.then(StackChildData(align, false))
 
     /**
      * Size the element to match the size of the [Stack] after all other content elements have
@@ -126,24 +126,16 @@ class StackScope {
 
     internal companion object {
         @Stable
-        val StretchGravityModifier: ParentDataModifier =
-            StackGravityModifier(Alignment.Center, true)
+        val StretchGravityModifier: ParentDataModifier = StackChildData(Alignment.Center, true)
     }
 }
-
-private data class StackChildData(
-    val alignment: Alignment,
-    val stretch: Boolean = false
-)
 
 private val Measurable.stackChildData: StackChildData? get() = parentData as? StackChildData
 private val Measurable.stretch: Boolean get() = stackChildData?.stretch ?: false
 
-private data class StackGravityModifier(
+private data class StackChildData(
     val alignment: Alignment,
-    val stretch: Boolean = false
+    val stretch: Boolean
 ) : ParentDataModifier {
-    override fun Density.modifyParentData(parentData: Any?): StackChildData {
-        return ((parentData as? StackChildData) ?: StackChildData(alignment, stretch))
-    }
+    override fun Density.modifyParentData(parentData: Any?) = this@StackChildData
 }

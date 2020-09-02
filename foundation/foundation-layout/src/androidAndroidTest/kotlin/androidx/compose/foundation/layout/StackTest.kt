@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.layout
 
+import androidx.compose.foundation.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.Alignment
@@ -403,6 +404,23 @@ class StackTest : LayoutTest() {
                     assertEquals(outerSizePx - innerSizePx, it.positionInParent.y)
                     positionedLatch.countDown()
                 }) {}
+            }
+        }
+        assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
+    }
+
+    @Test
+    fun testStack_outermostGravityWins() = with(density) {
+        val positionedLatch = CountDownLatch(1)
+        val size = 10f
+        val sizeDp = size.toDp()
+        show {
+            Stack(Modifier.size(sizeDp)) {
+                Box(Modifier.gravity(Alignment.BottomEnd).gravity(Alignment.TopStart).onPositioned {
+                    assertEquals(size, it.positionInParent.x)
+                    assertEquals(size, it.positionInParent.y)
+                    positionedLatch.countDown()
+                })
             }
         }
         assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
