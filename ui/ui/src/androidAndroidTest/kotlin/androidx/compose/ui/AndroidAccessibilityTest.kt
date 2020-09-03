@@ -51,7 +51,6 @@ import androidx.ui.test.assertTextEquals
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performClick
 import androidx.ui.test.performSemanticsAction
-import androidx.ui.test.runOnIdle
 import com.nhaarman.mockitokotlin2.argThat
 import com.nhaarman.mockitokotlin2.atLeast
 import com.nhaarman.mockitokotlin2.atLeastOnce
@@ -137,12 +136,12 @@ class AndroidAccessibilityTest {
 
     @Test
     fun sendStateChangeEvent_whenClickToggleable() {
-        onNodeWithTag(ToggleableTag)
+        rule.onNodeWithTag(ToggleableTag)
             .assertIsOn()
             .performClick()
             .assertIsOff()
 
-        val toggleableNode = onNodeWithTag(ToggleableTag)
+        val toggleableNode = rule.onNodeWithTag(ToggleableTag)
             .fetchSemanticsNode("couldn't find node with tag $ToggleableTag")
 
         val stateEvent = delegate.createEvent(
@@ -151,7 +150,7 @@ class AndroidAccessibilityTest {
         )
         stateEvent.contentChangeTypes = AccessibilityEvent.CONTENT_CHANGE_TYPE_STATE_DESCRIPTION
 
-        runOnIdle {
+        rule.runOnIdle {
             verify(container, atLeastOnce()).requestSendAccessibilityEvent(
                 eq(androidComposeView), argument.capture()
             )
@@ -162,13 +161,13 @@ class AndroidAccessibilityTest {
 
     @Test
     fun sendTextEvents_whenSetText() {
-        onNodeWithTag(TextFieldTag)
+        rule.onNodeWithTag(TextFieldTag)
             .assertTextEquals(InitialText)
             .performSemanticsAction(SemanticsActions.SetText) { it(AnnotatedString(InputText)) }
-        onNodeWithTag(TextFieldTag)
+        rule.onNodeWithTag(TextFieldTag)
             .assertTextEquals(InputText)
 
-        val textFieldNode = onNodeWithTag(TextFieldTag)
+        val textFieldNode = rule.onNodeWithTag(TextFieldTag)
             .fetchSemanticsNode("couldn't find node with tag $TextFieldTag")
 
         val textEvent = delegate.createEvent(
@@ -190,7 +189,7 @@ class AndroidAccessibilityTest {
         selectionEvent.itemCount = InputText.length
         selectionEvent.text.add(InputText)
 
-        runOnIdle {
+        rule.runOnIdle {
             verify(container, atLeastOnce()).requestSendAccessibilityEvent(
                 eq(androidComposeView), argument.capture()
             )
@@ -202,14 +201,14 @@ class AndroidAccessibilityTest {
 
     @Test
     fun sendSubtreeChangeEvents_whenNodeRemoved() {
-        onNodeWithTag(TextFieldTag)
+        rule.onNodeWithTag(TextFieldTag)
             .assertExists()
         // TextField is removed compared to setup.
         isTextFieldVisible = false
-        onNodeWithTag(TextFieldTag)
+        rule.onNodeWithTag(TextFieldTag)
             .assertDoesNotExist()
 
-        runOnIdle {
+        rule.runOnIdle {
             // One from initialization and one from text field removal.
             verify(container, atLeast(2)).requestSendAccessibilityEvent(eq(androidComposeView),
                 argThat(ArgumentMatcher {
@@ -222,7 +221,7 @@ class AndroidAccessibilityTest {
 
     @Test
     fun traverseEventBeforeSelectionEvent_whenTraverseTextField() {
-        val textFieldNode = onNodeWithTag(TextFieldTag)
+        val textFieldNode = rule.onNodeWithTag(TextFieldTag)
             .fetchSemanticsNode("couldn't find node with tag $TextFieldTag")
 
         val args = Bundle()
@@ -259,7 +258,7 @@ class AndroidAccessibilityTest {
             AccessibilityNodeInfoCompat.MOVEMENT_GRANULARITY_CHARACTER
         traverseEvent.text.add(InitialText)
 
-        runOnIdle {
+        rule.runOnIdle {
             verify(container, atLeastOnce()).requestSendAccessibilityEvent(
                 eq(androidComposeView), argument.capture()
             )

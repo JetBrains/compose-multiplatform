@@ -34,13 +34,13 @@ import org.junit.runners.JUnit4
 class ColorResourcesTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Test
     fun colorResourceTest() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
 
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(ContextAmbient provides context) {
                 assertThat(colorResource(R.color.color_resource))
                     .isEqualTo(Color(0x12345678))

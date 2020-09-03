@@ -32,7 +32,6 @@ import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestActivity
 import androidx.test.filters.MediumTest
 import androidx.ui.test.createAndroidComposeRule
-import androidx.ui.test.runOnIdle
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Rule
@@ -58,11 +57,11 @@ class PointerInteropFilterComposeHookupTest {
     private val disallowInterceptRequester = RequestDisallowInterceptTouchEvent()
 
     @get:Rule
-    val composeTestRule = createAndroidComposeRule<TestActivity>()
+    val rule = createAndroidComposeRule<TestActivity>()
 
     @Before
     fun setup() {
-        composeTestRule.activityRule.scenario.onActivity { activity ->
+        rule.activityRule.scenario.onActivity { activity ->
 
             val parent = FrameLayout(activity).apply {
                 layoutParams = ViewGroup.LayoutParams(
@@ -103,7 +102,7 @@ class PointerInteropFilterComposeHookupTest {
                 root
             )
 
-        runOnIdle {
+        rule.runOnIdle {
             root.dispatchTouchEvent(down)
         }
 
@@ -134,7 +133,7 @@ class PointerInteropFilterComposeHookupTest {
                 root
             )
 
-        runOnIdle {
+        rule.runOnIdle {
             root.dispatchTouchEvent(down)
             root.dispatchTouchEvent(up)
         }
@@ -168,7 +167,7 @@ class PointerInteropFilterComposeHookupTest {
                 root
             )
 
-        runOnIdle {
+        rule.runOnIdle {
             root.dispatchTouchEvent(down)
             root.dispatchTouchEvent(up)
         }
@@ -212,7 +211,7 @@ class PointerInteropFilterComposeHookupTest {
                 root
             )
 
-        runOnIdle {
+        rule.runOnIdle {
             root.dispatchTouchEvent(down)
             root.dispatchTouchEvent(move)
             root.dispatchTouchEvent(up)
@@ -257,7 +256,7 @@ class PointerInteropFilterComposeHookupTest {
                 root
             )
 
-        runOnIdle {
+        rule.runOnIdle {
             root.dispatchTouchEvent(down)
             root.dispatchTouchEvent(up)
             root.dispatchTouchEvent(down2)
@@ -290,7 +289,7 @@ class PointerInteropFilterComposeHookupTest {
                 root
             )
 
-        runOnIdle {
+        rule.runOnIdle {
             root.dispatchTouchEvent(down)
             eventStringLog.clear()
             root.dispatchTouchEvent(move)
@@ -326,7 +325,7 @@ class PointerInteropFilterComposeHookupTest {
                 root
             )
 
-        runOnIdle {
+        rule.runOnIdle {
             root.dispatchTouchEvent(down)
             eventStringLog.clear()
             disallowInterceptRequester.invoke(true)
@@ -373,7 +372,7 @@ class PointerInteropFilterComposeHookupTest {
                 root
             )
 
-        runOnIdle {
+        rule.runOnIdle {
             root.dispatchTouchEvent(down)
             disallowInterceptRequester.invoke(true)
             root.dispatchTouchEvent(move1)
@@ -432,7 +431,7 @@ class PointerInteropFilterComposeHookupTest {
                 root
             )
 
-        runOnIdle {
+        rule.runOnIdle {
             root.dispatchTouchEvent(down)
             disallowInterceptRequester.invoke(true)
             root.dispatchTouchEvent(up)

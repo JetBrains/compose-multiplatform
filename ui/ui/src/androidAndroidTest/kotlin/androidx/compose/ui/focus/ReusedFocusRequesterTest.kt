@@ -25,7 +25,6 @@ import androidx.compose.ui.focusObserver
 import androidx.compose.ui.focusRequester
 import androidx.test.filters.SmallTest
 import androidx.ui.test.createComposeRule
-import androidx.ui.test.runOnIdle
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -37,14 +36,14 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class ReusedFocusRequesterTest {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Test
     fun oneComponent() {
         // Arrange.
         lateinit var focusState: FocusState
         val focusRequester = FocusRequester()
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .focusObserver { focusState = it }
@@ -53,7 +52,7 @@ class ReusedFocusRequesterTest {
             )
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             // Act.
             focusRequester.requestFocus()
 
@@ -68,7 +67,7 @@ class ReusedFocusRequesterTest {
         lateinit var focusState1: FocusState
         lateinit var focusState2: FocusState
         val focusRequester = FocusRequester()
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .focusObserver { focusState1 = it }
@@ -83,7 +82,7 @@ class ReusedFocusRequesterTest {
             )
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             // Act.
             focusRequester.requestFocus()
 
@@ -100,7 +99,7 @@ class ReusedFocusRequesterTest {
         lateinit var focusState2: FocusState
         lateinit var focusState3: FocusState
         val focusRequester = FocusRequester()
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .focusObserver { focusState1 = it }
@@ -121,7 +120,7 @@ class ReusedFocusRequesterTest {
             )
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             // Act.
             focusRequester.requestFocus()
 

@@ -52,7 +52,6 @@ import androidx.compose.ui.unit.sp
 import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
 import androidx.ui.test.createAndroidComposeRule
-import androidx.ui.test.runOnIdle
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.times
@@ -70,7 +69,7 @@ import kotlin.math.max
 @RunWith(JUnit4::class)
 class SelectionContainerTest {
     @get:Rule
-    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    val rule = createAndroidComposeRule<ComponentActivity>()
 
     private lateinit var view: View
 
@@ -91,7 +90,7 @@ class SelectionContainerTest {
 
     @Before
     fun setup() {
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(
                 HapticFeedBackAmbient provides hapticFeedback
             ) {
@@ -117,7 +116,7 @@ class SelectionContainerTest {
                 }
             }
         }
-        composeTestRule.activityRule.scenario.onActivity {
+        rule.activityRule.scenario.onActivity {
             view = it.findViewById<ViewGroup>(android.R.id.content)
         }
     }
@@ -129,7 +128,7 @@ class SelectionContainerTest {
         // A reasonable number.
         val position = 50f
         longPress(x = position, y = position)
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(selection.value).isNotNull()
         }
 
@@ -137,7 +136,7 @@ class SelectionContainerTest {
         press(x = position, y = position)
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(selection.value).isNull()
             verify(
                 hapticFeedback,
@@ -160,7 +159,7 @@ class SelectionContainerTest {
         press(x = position, y = position)
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             // Press has a down event over 3 passes and then an up event over 3 passes.  We are
             // interested in looking at the final up event.
             assertThat(log.entries).hasSize(6)
@@ -173,7 +172,7 @@ class SelectionContainerTest {
     @Test
     fun long_press_select_a_word() {
         // Setup.
-        val characterSize = with(composeTestRule.density) { fontSize.toPx() }
+        val characterSize = with(rule.density) { fontSize.toPx() }
 
         // Act.
         longPress(
@@ -182,7 +181,7 @@ class SelectionContainerTest {
         )
 
         // Assert. Should select "Demo".
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(selection.value!!.start.offset).isEqualTo(textContent.indexOf('D'))
             assertThat(selection.value!!.end.offset).isEqualTo(textContent.indexOf('o') + 1)
             verify(
@@ -198,7 +197,7 @@ class SelectionContainerTest {
         // Setup. Want to selection "Dem".
         val startOffset = textContent.indexOf('D')
         val endOffset = textContent.indexOf('m') + 1
-        val characterSize = with(composeTestRule.density) { fontSize.toPx() }
+        val characterSize = with(rule.density) { fontSize.toPx() }
 
         // Act.
         longPressAndDrag(
@@ -209,7 +208,7 @@ class SelectionContainerTest {
         )
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(selection.value!!.start.offset).isEqualTo(startOffset)
             assertThat(selection.value!!.end.offset).isEqualTo("Text Demo".length)
             verify(
@@ -281,12 +280,12 @@ class SelectionContainerTest {
 
     private fun waitForLongPress(block: () -> Unit) {
         gestureCountDownLatch = CountDownLatch(1)
-        runOnIdle(block)
+        rule.runOnIdle(block)
         gestureCountDownLatch.await(750, TimeUnit.MILLISECONDS)
     }
 
     private fun waitForOtherGesture(block: () -> Unit) {
-        runOnIdle(block)
+        rule.runOnIdle(block)
     }
 }
 

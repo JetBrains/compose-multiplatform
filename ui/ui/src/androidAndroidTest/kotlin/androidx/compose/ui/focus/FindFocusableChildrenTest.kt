@@ -23,7 +23,6 @@ import androidx.compose.ui.focus.FocusState.Inactive
 import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.test.filters.SmallTest
 import androidx.ui.test.createComposeRule
-import androidx.ui.test.runOnIdle
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -35,7 +34,7 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class FindFocusableChildrenTest {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Test
     fun returnsFirstFocusNodeInModifierChain() {
@@ -44,17 +43,17 @@ class FindFocusableChildrenTest {
         val focusModifier3 = FocusModifier(Inactive)
         // Arrange.
         // layoutNode--focusNode1--focusNode2--focusNode3
-        composeTestRule.setContent {
+        rule.setContent {
             Box(modifier = focusModifier1.then(focusModifier2).then(focusModifier3))
         }
 
         // Act.
-        val focusableChildren = runOnIdle {
+        val focusableChildren = rule.runOnIdle {
             focusModifier1.focusNode.focusableChildren()
         }
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(focusableChildren).containsExactly(focusModifier2.focusNode)
         }
     }
@@ -65,17 +64,17 @@ class FindFocusableChildrenTest {
         val focusModifier2 = FocusModifier(Inactive)
         // Arrange.
         // layoutNode--focusNode1--nonFocusNode--focusNode2
-        composeTestRule.setContent {
+        rule.setContent {
             Box(focusModifier1.background(color = Red).then(focusModifier2))
         }
 
         // Act.
-        val focusableChildren = runOnIdle {
+        val focusableChildren = rule.runOnIdle {
             focusModifier1.focusNode.focusableChildren()
         }
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(focusableChildren).containsExactly(focusModifier2.focusNode)
         }
     }
@@ -91,7 +90,7 @@ class FindFocusableChildrenTest {
         val focusModifier1 = FocusModifier(Inactive)
         val focusModifier2 = FocusModifier(Inactive)
         val focusModifier3 = FocusModifier(Inactive)
-        composeTestRule.setContent {
+        rule.setContent {
             Box(modifier = parentFocusModifier) {
                 Box(modifier = focusModifier1)
                 Box(modifier = focusModifier2.then(focusModifier3))
@@ -99,12 +98,12 @@ class FindFocusableChildrenTest {
         }
 
         // Act.
-        val focusableChildren = runOnIdle {
+        val focusableChildren = rule.runOnIdle {
             parentFocusModifier.focusNode.focusableChildren()
         }
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(focusableChildren).containsExactly(
                 focusModifier1.focusNode, focusModifier2.focusNode
             )

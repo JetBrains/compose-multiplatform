@@ -36,8 +36,6 @@ import androidx.ui.test.assertPixels
 import androidx.ui.test.captureToBitmap
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.runOnIdle
-import androidx.ui.test.waitForIdle
 import com.google.common.truth.Truth
 import org.junit.Rule
 import org.junit.Test
@@ -60,7 +58,7 @@ class AndroidViewBindingTest {
 
         val size = 50.dp
         val sizePx = with(rule.density) { size.toIntPx() }
-        onNodeWithTag("layout").captureToBitmap().assertPixels(IntSize(sizePx, sizePx * 2)) {
+        rule.onNodeWithTag("layout").captureToBitmap().assertPixels(IntSize(sizePx, sizePx * 2)) {
             if (it.y < sizePx) Color.Blue else Color.Black
         }
     }
@@ -76,12 +74,12 @@ class AndroidViewBindingTest {
 
         val size = 50.dp
         val sizePx = with(rule.density) { size.toIntPx() }
-        onNodeWithTag("layout").captureToBitmap().assertPixels(IntSize(sizePx, sizePx * 2)) {
+        rule.onNodeWithTag("layout").captureToBitmap().assertPixels(IntSize(sizePx, sizePx * 2)) {
             if (it.y < sizePx) Color.Blue else color.value
         }
 
-        runOnIdle { color.value = Color.DarkGray }
-        onNodeWithTag("layout").captureToBitmap().assertPixels(IntSize(sizePx, sizePx * 2)) {
+        rule.runOnIdle { color.value = Color.DarkGray }
+        rule.onNodeWithTag("layout").captureToBitmap().assertPixels(IntSize(sizePx, sizePx * 2)) {
             if (it.y < sizePx) Color.Blue else color.value
         }
     }
@@ -98,6 +96,6 @@ class AndroidViewBindingTest {
                 })
             }
         }
-        waitForIdle()
+        rule.waitForIdle()
     }
 }

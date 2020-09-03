@@ -51,7 +51,7 @@ import kotlin.math.abs
 @RunWith(JUnit4::class)
 class AccessibilityIteratorsTest {
     @get:Rule
-    val composeTestRule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule(disableTransitions = true)
 
     private val InputText = List(500) { "Line: $it" }.joinToString("\n")
     private val TextFieldTag = "textFieldTag"
@@ -375,7 +375,7 @@ class AccessibilityIteratorsTest {
     @Test
     fun pageIterator_following() {
         val textLayoutResult = textFieldInScroller()
-        val textFieldNode = onNodeWithTag(TextFieldTag).fetchSemanticsNode()
+        val textFieldNode = rule.onNodeWithTag(TextFieldTag).fetchSemanticsNode()
         val pageIterator = AccessibilityIterators.PageTextSegmentIterator.getInstance()
         pageIterator.initialize(InputText, textLayoutResult, textFieldNode)
         var currentOffset = 0
@@ -398,7 +398,7 @@ class AccessibilityIteratorsTest {
     @Test
     fun pageIterator_preceding() {
         val textLayoutResult = textFieldInScroller()
-        val textFieldNode = onNodeWithTag(TextFieldTag).fetchSemanticsNode()
+        val textFieldNode = rule.onNodeWithTag(TextFieldTag).fetchSemanticsNode()
         val pageIterator = AccessibilityIterators.PageTextSegmentIterator.getInstance()
         pageIterator.initialize(InputText, textLayoutResult, textFieldNode)
         var currentOffset = InputText.length
@@ -424,7 +424,7 @@ class AccessibilityIteratorsTest {
         width: TextUnit = 40.sp
     ): TextLayoutResult {
         var textLayoutResult: TextLayoutResult? = null
-        composeTestRule.setContent {
+        rule.setContent {
             // TODO(yingleiw): use predefined DensityAmbient.current when b/163142237 is fixed.
             with(DensityAmbient.current) {
                 Text(
@@ -448,7 +448,7 @@ class AccessibilityIteratorsTest {
     @OptIn(ExperimentalFoundationApi::class)
     private fun textFieldInScroller(): TextLayoutResult {
         var textLayoutResult: TextLayoutResult? = null
-        composeTestRule.setContent {
+        rule.setContent {
             ScrollableColumn {
                 val state = remember { mutableStateOf(TextFieldValue(text = InputText)) }
                 BaseTextField(

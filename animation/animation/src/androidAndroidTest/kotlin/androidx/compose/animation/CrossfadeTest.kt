@@ -26,8 +26,6 @@ import androidx.compose.runtime.setValue
 import androidx.test.filters.MediumTest
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.onNodeWithText
-import androidx.ui.test.runOnIdle
-import androidx.ui.test.waitForIdle
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -39,30 +37,30 @@ import org.junit.runners.JUnit4
 class CrossfadeTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule(disableTransitions = false)
+    val rule = createComposeRule(disableTransitions = false)
 
     @Test
     fun crossfadeTest_showsContent() {
-        composeTestRule.clockTestRule.pauseClock()
+        rule.clockTestRule.pauseClock()
 
-        composeTestRule.setContent {
+        rule.setContent {
             val showFirst by remember { mutableStateOf(true) }
             Crossfade(showFirst) {
                 Text(if (it) First else Second)
             }
         }
-        composeTestRule.clockTestRule.advanceClock(DefaultDurationMillis.toLong())
+        rule.clockTestRule.advanceClock(DefaultDurationMillis.toLong())
 
-        onNodeWithText(First).assertExists()
+        rule.onNodeWithText(First).assertExists()
     }
 
     @Test
     fun crossfadeTest_disposesContentOnChange() {
-        composeTestRule.clockTestRule.pauseClock()
+        rule.clockTestRule.pauseClock()
 
         var showFirst by mutableStateOf(true)
         var disposed = false
-        composeTestRule.setContent {
+        rule.setContent {
             Crossfade(showFirst) {
                 Text(if (it) First else Second)
                 onDispose {
@@ -70,32 +68,32 @@ class CrossfadeTest {
                 }
             }
         }
-        composeTestRule.clockTestRule.advanceClock(DefaultDurationMillis.toLong())
+        rule.clockTestRule.advanceClock(DefaultDurationMillis.toLong())
 
-        runOnIdle {
+        rule.runOnIdle {
             showFirst = false
         }
 
-        waitForIdle()
+        rule.waitForIdle()
 
-        composeTestRule.clockTestRule.advanceClock(DefaultDurationMillis.toLong())
+        rule.clockTestRule.advanceClock(DefaultDurationMillis.toLong())
 
-        runOnIdle {
+        rule.runOnIdle {
             assertTrue(disposed)
         }
 
-        onNodeWithText(First).assertDoesNotExist()
-        onNodeWithText(Second).assertExists()
+        rule.onNodeWithText(First).assertDoesNotExist()
+        rule.onNodeWithText(Second).assertExists()
     }
 
     @Test
     fun crossfadeTest_durationCanBeModifierUsingAnimationSpec() {
-        composeTestRule.clockTestRule.pauseClock()
+        rule.clockTestRule.pauseClock()
 
         val duration = 100 // smaller than default 300
         var showFirst by mutableStateOf(true)
         var disposed = false
-        composeTestRule.setContent {
+        rule.setContent {
             Crossfade(
                 showFirst,
                 animation = TweenSpec(durationMillis = duration)
@@ -106,46 +104,46 @@ class CrossfadeTest {
                 }
             }
         }
-        composeTestRule.clockTestRule.advanceClock(duration.toLong())
+        rule.clockTestRule.advanceClock(duration.toLong())
 
-        runOnIdle {
+        rule.runOnIdle {
             showFirst = false
         }
 
-        waitForIdle()
+        rule.waitForIdle()
 
-        composeTestRule.clockTestRule.advanceClock(duration.toLong())
+        rule.clockTestRule.advanceClock(duration.toLong())
 
-        runOnIdle {
+        rule.runOnIdle {
             assertTrue(disposed)
         }
     }
 
     @Test
     fun nullInitialValue() {
-        composeTestRule.clockTestRule.pauseClock()
+        rule.clockTestRule.pauseClock()
         var current by mutableStateOf<String?>(null)
 
-        composeTestRule.setContent {
+        rule.setContent {
             Crossfade(current) { value ->
                 Text(if (value == null) First else Second)
             }
         }
-        composeTestRule.clockTestRule.advanceClock(DefaultDurationMillis.toLong())
+        rule.clockTestRule.advanceClock(DefaultDurationMillis.toLong())
 
-        onNodeWithText(First).assertExists()
-        onNodeWithText(Second).assertDoesNotExist()
+        rule.onNodeWithText(First).assertExists()
+        rule.onNodeWithText(Second).assertDoesNotExist()
 
-        runOnIdle {
+        rule.runOnIdle {
             current = "other"
         }
 
-        waitForIdle()
+        rule.waitForIdle()
 
-        composeTestRule.clockTestRule.advanceClock(DefaultDurationMillis.toLong())
+        rule.clockTestRule.advanceClock(DefaultDurationMillis.toLong())
 
-        onNodeWithText(First).assertDoesNotExist()
-        onNodeWithText(Second).assertExists()
+        rule.onNodeWithText(First).assertDoesNotExist()
+        rule.onNodeWithText(Second).assertExists()
     }
 
     companion object {

@@ -47,12 +47,12 @@ class StringResourcesTest {
     private val FormatValue = 100
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Test
     fun stringResource_not_localized_defaultLocale() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(ContextAmbient provides context) {
                 assertThat(stringResource(R.string.not_localized)).isEqualTo(NotLocalizedText)
             }
@@ -69,7 +69,7 @@ class StringResourcesTest {
             }
         )
 
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(ContextAmbient provides spanishContext) {
                 assertThat(stringResource(R.string.not_localized)).isEqualTo(NotLocalizedText)
             }
@@ -79,7 +79,7 @@ class StringResourcesTest {
     @Test
     fun stringResource_localized_defaultLocale() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(ContextAmbient provides context) {
                 assertThat(stringResource(R.string.localized))
                     .isEqualTo(DefaultLocalizedText)
@@ -97,7 +97,7 @@ class StringResourcesTest {
             }
         )
 
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(ContextAmbient provides spanishContext) {
                 assertThat(stringResource(R.string.localized))
                     .isEqualTo(SpanishLocalizedText)
@@ -108,7 +108,7 @@ class StringResourcesTest {
     @Test
     fun stringResource_not_localized_format_defaultLocale() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(ContextAmbient provides context) {
                 assertThat(stringResource(R.string.not_localized_format, FormatValue))
                     .isEqualTo(NotLocalizedFormatText)
@@ -126,7 +126,7 @@ class StringResourcesTest {
             }
         )
 
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(ContextAmbient provides spanishContext) {
                 assertThat(stringResource(R.string.not_localized_format, FormatValue))
                     .isEqualTo(NotLocalizedFormatText)
@@ -137,7 +137,7 @@ class StringResourcesTest {
     @Test
     fun stringResource_localized_format_defaultLocale() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(ContextAmbient provides context) {
                 assertThat(stringResource(R.string.localized_format, FormatValue))
                     .isEqualTo(DefaultLocalizedFormatText)
@@ -155,7 +155,7 @@ class StringResourcesTest {
             }
         )
 
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(ContextAmbient provides spanishContext) {
                 assertThat(stringResource(R.string.localized_format, FormatValue))
                     .isEqualTo(SpanishLocalizedFormatText)
@@ -167,7 +167,7 @@ class StringResourcesTest {
     fun stringArrayResource() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
 
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(ContextAmbient provides context) {
                 assertThat(stringArrayResource(R.array.string_array))
                     .isEqualTo(arrayOf("string1", "string2"))

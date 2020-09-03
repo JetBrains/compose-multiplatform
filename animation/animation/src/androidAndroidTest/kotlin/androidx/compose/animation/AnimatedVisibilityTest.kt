@@ -36,8 +36,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import androidx.test.filters.MediumTest
 import androidx.ui.test.createComposeRule
-import androidx.ui.test.runOnIdle
-import androidx.ui.test.waitForIdle
 import junit.framework.TestCase.assertTrue
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -51,7 +49,7 @@ import org.junit.runners.JUnit4
 class AnimatedVisibilityTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @OptIn(ExperimentalAnimationApi::class)
     @Test
@@ -61,8 +59,8 @@ class AnimatedVisibilityTest {
         var density = 0f
         var offset by mutableStateOf(Offset(0f, 0f))
         var disposed by mutableStateOf(false)
-        composeTestRule.clockTestRule.pauseClock()
-        composeTestRule.setContent {
+        rule.clockTestRule.pauseClock()
+        rule.setContent {
             AnimatedVisibility(
                 visible, testModifier,
                 enter = expandIn(
@@ -87,10 +85,10 @@ class AnimatedVisibilityTest {
             density = DensityAmbient.current.density
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             visible = true
         }
-        waitForIdle()
+        rule.waitForIdle()
 
         val startWidth = density * 100 / 4f
         val startHeight = density * 100 / 2f
@@ -107,14 +105,14 @@ class AnimatedVisibilityTest {
             // Check offset
             assertEquals(animWidth - fullSize, offset.x, 2f)
             assertEquals(animHeight - fullSize, offset.y, 2f)
-            composeTestRule.clockTestRule.advanceClock(10)
-            waitForIdle()
+            rule.clockTestRule.advanceClock(10)
+            rule.waitForIdle()
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             visible = false
         }
-        waitForIdle()
+        rule.waitForIdle()
 
         val endWidth = density * 100 / 10f
         val endHeight = density * 100 / 5f
@@ -128,19 +126,19 @@ class AnimatedVisibilityTest {
             // Check offset
             assertEquals(0f, offset.x, 2f)
             assertEquals((animHeight - fullSize) / 2f, offset.y, 2f)
-            composeTestRule.clockTestRule.advanceClock(10)
-            waitForIdle()
+            rule.clockTestRule.advanceClock(10)
+            rule.waitForIdle()
         }
 
-        waitForIdle()
+        rule.waitForIdle()
         // Check that the composable children in AnimatedVisibility are skipped after exit animation
         assertTrue(disposed)
 
         // Make it visible again, and test that it behaves the same as before
-        runOnIdle {
+        rule.runOnIdle {
             visible = true
         }
-        waitForIdle()
+        rule.waitForIdle()
 
         for (i in 0..100 step 10) {
             val fraction = LinearOutSlowInEasing.invoke(i / 100f)
@@ -152,8 +150,8 @@ class AnimatedVisibilityTest {
             // Check offset
             assertEquals(animWidth - fullSize, offset.x, 2f)
             assertEquals(animHeight - fullSize, offset.y, 2f)
-            composeTestRule.clockTestRule.advanceClock(10)
-            waitForIdle()
+            rule.clockTestRule.advanceClock(10)
+            rule.waitForIdle()
         }
     }
 
@@ -165,8 +163,8 @@ class AnimatedVisibilityTest {
         var density = 0f
         var offset by mutableStateOf(Offset(0f, 0f))
         var disposed by mutableStateOf(false)
-        composeTestRule.clockTestRule.pauseClock()
-        composeTestRule.setContent {
+        rule.clockTestRule.pauseClock()
+        rule.setContent {
             AnimatedVisibility(
                 visible, testModifier,
                 enter = slideIn(
@@ -189,10 +187,10 @@ class AnimatedVisibilityTest {
             density = DensityAmbient.current.density
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             visible = true
         }
-        waitForIdle()
+        rule.waitForIdle()
 
         val startX = density * 100 / 4f
         val startY = -density * 100 / 2f
@@ -209,14 +207,14 @@ class AnimatedVisibilityTest {
             // Check offset
             assertEquals(animX, offset.x, 2f)
             assertEquals(animY, offset.y, 2f)
-            composeTestRule.clockTestRule.advanceClock(10)
-            waitForIdle()
+            rule.clockTestRule.advanceClock(10)
+            rule.waitForIdle()
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             visible = false
         }
-        waitForIdle()
+        rule.waitForIdle()
 
         val endX = -density * 100 / 10f
         val endY = density * 100 / 5f
@@ -230,19 +228,19 @@ class AnimatedVisibilityTest {
             // Check offset
             assertEquals(animX, offset.x, 2f)
             assertEquals(animY, offset.y, 2f)
-            composeTestRule.clockTestRule.advanceClock(10)
-            waitForIdle()
+            rule.clockTestRule.advanceClock(10)
+            rule.waitForIdle()
         }
 
-        waitForIdle()
+        rule.waitForIdle()
         // Check that the composable children in AnimatedVisibility are skipped after exit animation
         assertTrue(disposed)
 
         // Make it visible again, and test that it behaves the same as before
-        runOnIdle {
+        rule.runOnIdle {
             visible = true
         }
-        waitForIdle()
+        rule.waitForIdle()
 
         for (i in 0..100 step 10) {
             val fraction = LinearOutSlowInEasing.invoke(i / 100f)
@@ -254,8 +252,8 @@ class AnimatedVisibilityTest {
             // Check offset
             assertEquals(animX, offset.x, 2f)
             assertEquals(animY, offset.y, 2f)
-            composeTestRule.clockTestRule.advanceClock(10)
-            waitForIdle()
+            rule.clockTestRule.advanceClock(10)
+            rule.waitForIdle()
         }
     }
 }

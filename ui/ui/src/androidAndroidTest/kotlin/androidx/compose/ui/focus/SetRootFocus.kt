@@ -28,7 +28,6 @@ import androidx.test.filters.MediumTest
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performClick
-import androidx.ui.test.runOnIdle
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -40,7 +39,7 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class SetRootFocus {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     private val focusable = "Focusable"
     private val nonFocusable = "NotFocusable"
@@ -49,7 +48,7 @@ class SetRootFocus {
     fun clearFocus_byClickingOutsideFocusableComponent() {
         // Arrange.
         var isFocused = false
-        composeTestRule.setContent {
+        rule.setContent {
             Column {
                 // TODO(b/163725615): Remove this after clickable is made focusable.
                 val focusRequester = FocusRequester()
@@ -70,13 +69,13 @@ class SetRootFocus {
                 )
             }
         }
-        onNodeWithTag(focusable).performClick()
-        runOnIdle { assertThat(isFocused).isTrue() }
+        rule.onNodeWithTag(focusable).performClick()
+        rule.runOnIdle { assertThat(isFocused).isTrue() }
 
         // Act.
-        onNodeWithTag(nonFocusable).performClick()
+        rule.onNodeWithTag(nonFocusable).performClick()
 
         // Assert.
-        runOnIdle { assertThat(isFocused).isFalse() }
+        rule.runOnIdle { assertThat(isFocused).isFalse() }
     }
 }

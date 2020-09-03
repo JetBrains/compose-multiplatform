@@ -28,7 +28,6 @@ import androidx.compose.ui.text.font.test.R
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.ui.test.createComposeRule
-import androidx.ui.test.runOnIdle
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -40,7 +39,7 @@ import org.junit.runners.JUnit4
 class FontResourcesTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Test
     fun loadFontResource_systemFontFamily() {
@@ -49,7 +48,7 @@ class FontResourcesTest {
         var result: DeferredResource<Typeface>? = null
         var syncLoadedTypeface: Typeface? = null
 
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(ContextAmbient provides context) {
 
                 // async API
@@ -64,7 +63,7 @@ class FontResourcesTest {
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(result).isNotNull()
             assertThat(result!!.state).isEqualTo(LoadingState.LOADED)
             assertThat(result!!.resource.resource).isEqualTo(
@@ -77,7 +76,7 @@ class FontResourcesTest {
     fun loadFontResource_systemFontFamily_FileListFamily_as_pendingFontFamily() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
 
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(ContextAmbient provides context) {
                 loadFontResource(
                     fontFamily = font(R.font.sample_font).asFontFamily(),
@@ -92,7 +91,7 @@ class FontResourcesTest {
     fun loadFontResource_systemFontFamily_FileListFamily_as_failedFontFamily() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
 
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(ContextAmbient provides context) {
                 loadFontResource(
                     fontFamily = font(R.font.sample_font).asFontFamily(),

@@ -29,7 +29,6 @@ import androidx.test.filters.SmallTest
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.onRoot
 import androidx.ui.test.performKeyPress
-import androidx.ui.test.runOnIdle
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -45,40 +44,40 @@ import org.junit.runners.JUnit4
 )
 class ProcessKeyInputTest {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Test(expected = IllegalStateException::class)
     fun noRootFocusModifier_throwsException() {
         // Arrange.
-        composeTestRule.setContent {
+        rule.setContent {
             Box(modifier = KeyInputModifier(null, null))
         }
 
         // Act.
-        onRoot().performKeyPress(keyEvent(A, KeyUp))
+        rule.onRoot().performKeyPress(keyEvent(A, KeyUp))
     }
 
     @Test(expected = IllegalStateException::class)
     fun noFocusModifier_throwsException() {
         // Arrange.
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(modifier = Modifier.keyInputFilter { true })
         }
 
         // Act.
-        onRoot().performKeyPress(keyEvent(A, KeyUp))
+        rule.onRoot().performKeyPress(keyEvent(A, KeyUp))
     }
 
     @Test(expected = IllegalStateException::class)
     fun focusModifierNotFocused_throwsException() {
 
         // Arrange.
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(modifier = Modifier.focus().keyInputFilter { true })
         }
 
         // Act.
-        onRoot().performKeyPress(keyEvent(A, KeyUp))
+        rule.onRoot().performKeyPress(keyEvent(A, KeyUp))
     }
 
     @Test
@@ -86,7 +85,7 @@ class ProcessKeyInputTest {
         // Arrange.
         val focusRequester = FocusRequester()
         lateinit var receivedKeyEvent: KeyEvent
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .focusRequester(focusRequester)
@@ -97,15 +96,15 @@ class ProcessKeyInputTest {
                     }
             )
         }
-        runOnIdle {
+        rule.runOnIdle {
             focusRequester.requestFocus()
         }
 
         // Act.
-        val keyConsumed = onRoot().performKeyPress(keyEvent(A, KeyUp))
+        val keyConsumed = rule.onRoot().performKeyPress(keyEvent(A, KeyUp))
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             receivedKeyEvent.assertEqualTo(keyEvent(A, KeyUp))
             assertThat(keyConsumed).isTrue()
         }
@@ -116,7 +115,7 @@ class ProcessKeyInputTest {
         // Arrange.
         val focusRequester = FocusRequester()
         lateinit var receivedKeyEvent: KeyEvent
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .focusRequester(focusRequester)
@@ -127,15 +126,15 @@ class ProcessKeyInputTest {
                     }
             )
         }
-        runOnIdle {
+        rule.runOnIdle {
             focusRequester.requestFocus()
         }
 
         // Act.
-        val keyConsumed = onRoot().performKeyPress(keyEvent(A, KeyUp))
+        val keyConsumed = rule.onRoot().performKeyPress(keyEvent(A, KeyUp))
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             receivedKeyEvent.assertEqualTo(keyEvent(A, KeyUp))
             assertThat(keyConsumed).isTrue()
         }
@@ -147,7 +146,7 @@ class ProcessKeyInputTest {
         val focusRequester = FocusRequester()
         lateinit var receivedPreviewKeyEvent: KeyEvent
         var receivedKeyEvent: KeyEvent? = null
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .focusRequester(focusRequester)
@@ -162,15 +161,15 @@ class ProcessKeyInputTest {
                     }
             )
         }
-        runOnIdle {
+        rule.runOnIdle {
             focusRequester.requestFocus()
         }
 
         // Act.
-        onRoot().performKeyPress(keyEvent(A, KeyUp))
+        rule.onRoot().performKeyPress(keyEvent(A, KeyUp))
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             receivedPreviewKeyEvent.assertEqualTo(keyEvent(A, KeyUp))
             assertThat(receivedKeyEvent).isNull()
         }
@@ -183,7 +182,7 @@ class ProcessKeyInputTest {
         var triggerIndex = 1
         var onKeyEventTrigger = 0
         var onPreviewKeyEventTrigger = 0
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .focusRequester(focusRequester)
@@ -198,15 +197,15 @@ class ProcessKeyInputTest {
                     }
             )
         }
-        runOnIdle {
+        rule.runOnIdle {
             focusRequester.requestFocus()
         }
 
         // Act.
-        onRoot().performKeyPress(keyEvent(A, KeyUp))
+        rule.onRoot().performKeyPress(keyEvent(A, KeyUp))
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(onPreviewKeyEventTrigger).isEqualTo(1)
             assertThat(onKeyEventTrigger).isEqualTo(2)
         }
@@ -221,7 +220,7 @@ class ProcessKeyInputTest {
         var parentOnPreviewKeyEventTrigger = 0
         var childOnKeyEventTrigger = 0
         var childOnPreviewKeyEventTrigger = 0
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .focus()
@@ -249,15 +248,15 @@ class ProcessKeyInputTest {
                 )
             }
         }
-        runOnIdle {
+        rule.runOnIdle {
             focusRequester.requestFocus()
         }
 
         // Act.
-        onRoot().performKeyPress(keyEvent(A, KeyUp))
+        rule.onRoot().performKeyPress(keyEvent(A, KeyUp))
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(parentOnPreviewKeyEventTrigger).isEqualTo(1)
             assertThat(childOnPreviewKeyEventTrigger).isEqualTo(2)
             assertThat(childOnKeyEventTrigger).isEqualTo(3)
@@ -274,7 +273,7 @@ class ProcessKeyInputTest {
         var parentOnPreviewKeyEventTrigger = 0
         var childOnKeyEventTrigger = 0
         var childOnPreviewKeyEventTrigger = 0
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .keyInputFilter {
@@ -301,15 +300,15 @@ class ProcessKeyInputTest {
                 )
             }
         }
-        runOnIdle {
+        rule.runOnIdle {
             focusRequester.requestFocus()
         }
 
         // Act.
-        onRoot().performKeyPress(keyEvent(A, KeyUp))
+        rule.onRoot().performKeyPress(keyEvent(A, KeyUp))
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(parentOnPreviewKeyEventTrigger).isEqualTo(1)
             assertThat(childOnPreviewKeyEventTrigger).isEqualTo(2)
             assertThat(childOnKeyEventTrigger).isEqualTo(3)
@@ -328,7 +327,7 @@ class ProcessKeyInputTest {
         var parentOnPreviewKeyEventTrigger = 0
         var childOnKeyEventTrigger = 0
         var childOnPreviewKeyEventTrigger = 0
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .focus()
@@ -369,15 +368,15 @@ class ProcessKeyInputTest {
                 }
             }
         }
-        runOnIdle {
+        rule.runOnIdle {
             focusRequester.requestFocus()
         }
 
         // Act.
-        onRoot().performKeyPress(keyEvent(A, KeyUp))
+        rule.onRoot().performKeyPress(keyEvent(A, KeyUp))
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(grandParentOnPreviewKeyEventTrigger).isEqualTo(1)
             assertThat(parentOnPreviewKeyEventTrigger).isEqualTo(2)
             assertThat(childOnPreviewKeyEventTrigger).isEqualTo(3)

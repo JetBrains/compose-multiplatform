@@ -49,22 +49,22 @@ import kotlin.math.roundToInt
 @RunWith(JUnit4::class)
 class VectorAssetTest {
     @get:Rule
-    val composeTestRule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule(disableTransitions = true)
 
     @Test
     fun testProgrammaticAndXmlVectorAssetsAreTheSame() {
         val xmlTestCase = XmlVectorTestCase()
         val programmaticTestCase = ProgrammaticVectorTestCase()
 
-        composeTestRule.setContent {
+        rule.setContent {
             Column {
                 xmlTestCase.emitContent()
                 programmaticTestCase.emitContent()
             }
         }
 
-        val xmlBitmap = onNodeWithTag(xmlTestCase.testTag).captureToBitmap()
-        val programmaticBitmap = onNodeWithTag(programmaticTestCase.testTag).captureToBitmap()
+        val xmlBitmap = rule.onNodeWithTag(xmlTestCase.testTag).captureToBitmap()
+        val programmaticBitmap = rule.onNodeWithTag(programmaticTestCase.testTag).captureToBitmap()
 
         assertEquals(xmlBitmap.width, programmaticBitmap.width)
         assertEquals(xmlBitmap.height, programmaticBitmap.height)
@@ -88,7 +88,7 @@ class VectorAssetTest {
     fun testEvenOddPathType() {
         val testTag = "testTag"
         var insetRectSize: Int = 0
-        composeTestRule.setContent {
+        rule.setContent {
             with(DensityAmbient.current) {
                 insetRectSize = (10f * this.density).roundToInt()
             }
@@ -97,7 +97,7 @@ class VectorAssetTest {
             Image(vectorAsset, modifier = Modifier.testTag(testTag))
         }
 
-        onNodeWithTag(testTag).captureToBitmap().apply {
+        rule.onNodeWithTag(testTag).captureToBitmap().apply {
             assertEquals(Color.Blue.toArgb(), getPixel(0, 0))
             assertEquals(Color.Blue.toArgb(), getPixel(width - 1, 0))
             assertEquals(Color.Blue.toArgb(), getPixel(0, height - 1))

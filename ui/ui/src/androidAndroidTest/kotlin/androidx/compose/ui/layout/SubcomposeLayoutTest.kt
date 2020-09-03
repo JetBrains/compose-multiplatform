@@ -30,12 +30,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
 import androidx.compose.ui.draw.assertColor
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
-import androidx.test.filters.SmallTest
 import androidx.compose.ui.onPositioned
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
+import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
+import androidx.test.filters.SdkSuppress
+import androidx.test.filters.SmallTest
 import androidx.ui.test.assertHeightIsEqualTo
 import androidx.ui.test.assertIsDisplayed
 import androidx.ui.test.assertPositionInRootIsEqualTo
@@ -43,12 +47,6 @@ import androidx.ui.test.assertWidthIsEqualTo
 import androidx.ui.test.captureToBitmap
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.runOnIdle
-import androidx.ui.test.waitForIdle
-import androidx.compose.ui.platform.DensityAmbient
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.IntSize
-import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -91,12 +89,12 @@ class SubcomposeLayoutTest {
             }
         }
 
-        onNodeWithTag(firstTag)
+        rule.onNodeWithTag(firstTag)
             .assertPositionInRootIsEqualTo(0.dp, 0.dp)
             .assertWidthIsEqualTo(50.dp)
             .assertHeightIsEqualTo(50.dp)
 
-        onNodeWithTag(secondTag)
+        rule.onNodeWithTag(secondTag)
             .assertPositionInRootIsEqualTo(25.dp, 25.dp)
             .assertWidthIsEqualTo(25.dp)
             .assertHeightIsEqualTo(25.dp)
@@ -129,17 +127,17 @@ class SubcomposeLayoutTest {
             }
         }
 
-        onNodeWithTag(firstTag)
+        rule.onNodeWithTag(firstTag)
             .assertPositionInRootIsEqualTo(0.dp, 0.dp)
             .assertWidthIsEqualTo(50.dp)
             .assertHeightIsEqualTo(50.dp)
 
-        onNodeWithTag(secondTag)
+        rule.onNodeWithTag(secondTag)
             .assertPositionInRootIsEqualTo(0.dp, 50.dp)
             .assertWidthIsEqualTo(30.dp)
             .assertHeightIsEqualTo(30.dp)
 
-        onNodeWithTag(layoutTag)
+        rule.onNodeWithTag(layoutTag)
             .assertWidthIsEqualTo(50.dp)
             .assertHeightIsEqualTo(80.dp)
     }
@@ -168,9 +166,9 @@ class SubcomposeLayoutTest {
             }
         }
 
-        runOnIdle { model.value++ }
+        rule.runOnIdle { model.value++ }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertEquals(1, measuresCount)
             assertEquals(1, recompositionsCount1)
             assertEquals(2, recompositionsCount2)
@@ -198,9 +196,9 @@ class SubcomposeLayoutTest {
             }
         }
 
-        runOnIdle { model.value++ }
+        rule.runOnIdle { model.value++ }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertEquals(2, recompositionsCount1)
             assertEquals(1, recompositionsCount2)
         }
@@ -227,22 +225,22 @@ class SubcomposeLayoutTest {
             }
         }
 
-        onNodeWithTag(layoutTag)
+        rule.onNodeWithTag(layoutTag)
             .assertWidthIsEqualTo(0.dp)
             .assertHeightIsEqualTo(0.dp)
 
-        onNodeWithTag(childTag)
+        rule.onNodeWithTag(childTag)
             .assertDoesNotExist()
 
-        runOnIdle {
+        rule.runOnIdle {
             addChild.value = true
         }
 
-        onNodeWithTag(layoutTag)
+        rule.onNodeWithTag(layoutTag)
             .assertWidthIsEqualTo(20.dp)
             .assertHeightIsEqualTo(20.dp)
 
-        onNodeWithTag(childTag)
+        rule.onNodeWithTag(childTag)
             .assertWidthIsEqualTo(20.dp)
             .assertHeightIsEqualTo(20.dp)
     }
@@ -259,13 +257,13 @@ class SubcomposeLayoutTest {
 
         val updatedTag = "updated"
 
-        runOnIdle {
+        rule.runOnIdle {
             content.value = {
                 Spacer(Modifier.size(10.dp).testTag(updatedTag))
             }
         }
 
-        onNodeWithTag(updatedTag)
+        rule.onNodeWithTag(updatedTag)
             .assertIsDisplayed()
     }
 
@@ -303,14 +301,14 @@ class SubcomposeLayoutTest {
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(composed).isTrue()
             assertThat(disposed).isFalse()
 
             addSlot.value = false
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(disposed).isTrue()
         }
     }
@@ -335,9 +333,9 @@ class SubcomposeLayoutTest {
             }
         }
 
-        waitForIdle()
+        rule.waitForIdle()
 
-        onNodeWithTag(layoutTag)
+        rule.onNodeWithTag(layoutTag)
             .captureToBitmap()
             .assertCenterPixelColor(Color.Green)
     }
@@ -365,15 +363,15 @@ class SubcomposeLayoutTest {
             }
         }
 
-        onNodeWithTag(layoutTag)
+        rule.onNodeWithTag(layoutTag)
             .captureToBitmap()
             .assertCenterPixelColor(Color.Green)
 
-        runOnIdle {
+        rule.runOnIdle {
             firstSlotIsRed.value = false
         }
 
-        onNodeWithTag(layoutTag)
+        rule.onNodeWithTag(layoutTag)
             .captureToBitmap()
             .assertCenterPixelColor(Color.Red)
     }
@@ -398,7 +396,7 @@ class SubcomposeLayoutTest {
             }
         }
 
-        onNodeWithTag(layoutTag)
+        rule.onNodeWithTag(layoutTag)
             .captureToBitmap()
             .assertCenterPixelColor(Color.Red)
     }
@@ -427,14 +425,14 @@ class SubcomposeLayoutTest {
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(firstDisposed).isFalse()
             assertThat(secondDisposed).isFalse()
 
             addLayout.value = false
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(firstDisposed).isTrue()
             assertThat(secondDisposed).isTrue()
         }
@@ -454,7 +452,7 @@ class SubcomposeLayoutTest {
                 }
             }
         }
-        waitForIdle()
+        rule.waitForIdle()
     }
 }
 

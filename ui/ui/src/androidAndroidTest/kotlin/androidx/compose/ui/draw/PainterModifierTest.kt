@@ -65,6 +65,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
+import androidx.ui.test.ComposeTestRule
 import androidx.ui.test.assertHeightIsEqualTo
 import androidx.ui.test.assertWidthIsEqualTo
 import androidx.ui.test.captureToBitmap
@@ -96,7 +97,7 @@ class PainterModifierTest {
             testPainter(colorFilter = ColorFilter(Color.Cyan, BlendMode.SrcIn))
         }
 
-        obtainScreenshotBitmap(
+        rule.obtainScreenshotBitmap(
             containerWidth.roundToInt(),
             containerHeight.roundToInt()
         ).apply {
@@ -111,7 +112,7 @@ class PainterModifierTest {
             testPainter(alpha = 0.5f)
         }
 
-        obtainScreenshotBitmap(
+        rule.obtainScreenshotBitmap(
             containerWidth.roundToInt(),
             containerHeight.roundToInt()
         ).apply {
@@ -134,7 +135,7 @@ class PainterModifierTest {
             testPainter(rtl = true)
         }
 
-        obtainScreenshotBitmap(
+        rule.obtainScreenshotBitmap(
             containerWidth.roundToInt(),
             containerHeight.roundToInt()
         ).apply {
@@ -168,7 +169,7 @@ class PainterModifierTest {
             }
         }
 
-        obtainScreenshotBitmap(
+        rule.obtainScreenshotBitmap(
             containerSizePx,
             containerSizePx
         ).apply {
@@ -223,7 +224,7 @@ class PainterModifierTest {
         val right = containerSizePx - 1
         val innerBoxTop = containerSizePx - containerWidth.roundToInt()
         val innerBoxLeft = containerSizePx - containerWidth.roundToInt()
-        obtainScreenshotBitmap(
+        rule.obtainScreenshotBitmap(
             containerSizePx,
             containerSizePx
         ).apply {
@@ -251,7 +252,7 @@ class PainterModifierTest {
             }
         }
 
-        obtainScreenshotBitmap(
+        rule.obtainScreenshotBitmap(
             containerWidth.roundToInt(),
             containerHeight.roundToInt()
         ).apply {
@@ -293,7 +294,7 @@ class PainterModifierTest {
             }
         }
 
-        obtainScreenshotBitmap(
+        rule.obtainScreenshotBitmap(
             containerWidth.roundToInt(),
             containerHeight.roundToInt()
         ).apply {
@@ -339,7 +340,7 @@ class PainterModifierTest {
             }
         }
 
-        obtainScreenshotBitmap(
+        rule.obtainScreenshotBitmap(
             containerSize,
             containerSize
         ).apply {
@@ -484,7 +485,7 @@ class PainterModifierTest {
             )
         }
 
-        onRoot()
+        rule.onRoot()
             .assertWidthIsEqualTo(composableWidth.dp)
             .assertHeightIsEqualTo(composableHeight.dp)
     }
@@ -517,7 +518,7 @@ class PainterModifierTest {
             )
         }
 
-        obtainScreenshotBitmap(
+        rule.obtainScreenshotBitmap(
             boxWidth,
             boxHeight
         ).apply {
@@ -575,7 +576,7 @@ class PainterModifierTest {
             )
         }
 
-        obtainScreenshotBitmap(
+        rule.obtainScreenshotBitmap(
             boxWidth,
             boxHeight
         ).apply {
@@ -625,7 +626,7 @@ class PainterModifierTest {
     }
 }
 
-    private fun obtainScreenshotBitmap(width: Int, height: Int = width): Bitmap {
+    private fun ComposeTestRule.obtainScreenshotBitmap(width: Int, height: Int = width): Bitmap {
         val bitmap = onRoot().captureToBitmap()
         assertEquals(width, bitmap.width)
         assertEquals(height, bitmap.height)

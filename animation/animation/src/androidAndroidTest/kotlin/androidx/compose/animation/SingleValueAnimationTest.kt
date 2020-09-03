@@ -40,8 +40,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import androidx.test.filters.MediumTest
 import androidx.ui.test.createComposeRule
-import androidx.ui.test.runOnIdle
-import androidx.ui.test.waitForIdle
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -53,7 +51,7 @@ import org.junit.runners.JUnit4
 class SingleValueAnimationTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Test
     fun animate1DTest() {
@@ -96,8 +94,8 @@ class SingleValueAnimationTest {
                 assertEquals(value, floatValue)
                 assertEquals(value.dp, dpValue)
                 assertEquals(value, pxValue)
-                composeTestRule.clockTestRule.advanceClock(50)
-                waitForIdle()
+                rule.clockTestRule.advanceClock(50)
+                rule.waitForIdle()
             }
         }
 
@@ -163,8 +161,8 @@ class SingleValueAnimationTest {
                 assertEquals(Size.VectorConverter.convertFromVector(expect), sizeValue)
                 assertEquals(Position.VectorConverter.convertFromVector(expect), positionValue)
                 assertEquals(Offset.VectorConverter.convertFromVector(expect), pxPositionValue)
-                composeTestRule.clockTestRule.advanceClock(50)
-                waitForIdle()
+                rule.clockTestRule.advanceClock(50)
+                rule.waitForIdle()
             }
         }
 
@@ -222,8 +220,8 @@ class SingleValueAnimationTest {
                 assertEquals(expect, vectorValue)
                 assertEquals(Bounds.VectorConverter.convertFromVector(expect), boundsValue)
                 assertEquals(Rect.VectorConverter.convertFromVector(expect), pxBoundsValue)
-                composeTestRule.clockTestRule.advanceClock(50)
-                waitForIdle()
+                rule.clockTestRule.advanceClock(50)
+                rule.waitForIdle()
             }
         }
 
@@ -282,8 +280,8 @@ class SingleValueAnimationTest {
                 assertEquals(expect, vectorValue)
                 assertEquals(Bounds.VectorConverter.convertFromVector(expect), boundsValue)
                 assertEquals(PxBounds.VectorConverter.convertFromVector(expect), pxBoundsValue)
-                composeTestRule.clockTestRule.advanceClock(50)
-                waitForIdle()
+                rule.clockTestRule.advanceClock(50)
+                rule.waitForIdle()
             }
         }
 
@@ -308,8 +306,8 @@ class SingleValueAnimationTest {
                 val fraction = FastOutLinearInEasing.invoke(i / 100f)
                 val expected = lerp(Color.Black, Color.Cyan, fraction)
                 assertEquals(expected, value)
-                composeTestRule.clockTestRule.advanceClock(50)
-                waitForIdle()
+                rule.clockTestRule.advanceClock(50)
+                rule.waitForIdle()
             }
         }
 
@@ -385,8 +383,8 @@ class SingleValueAnimationTest {
                     assertEquals(Bounds(100.dp, 100.dp, 100.dp, 100.dp), boundsValue)
                 }
 
-                composeTestRule.clockTestRule.advanceClock(50)
-                waitForIdle()
+                rule.clockTestRule.advanceClock(50)
+                rule.waitForIdle()
             }
         }
 
@@ -395,15 +393,15 @@ class SingleValueAnimationTest {
 
     private fun animateTest(children: @Composable() (Boolean) -> Unit, verify: () -> Unit) {
 
-        composeTestRule.clockTestRule.pauseClock()
+        rule.clockTestRule.pauseClock()
         var enabled by mutableStateOf(false)
-        composeTestRule.setContent {
+        rule.setContent {
             Box {
                 children(enabled)
             }
         }
-        runOnIdle { enabled = true }
-        waitForIdle()
+        rule.runOnIdle { enabled = true }
+        rule.waitForIdle()
 
         verify()
     }

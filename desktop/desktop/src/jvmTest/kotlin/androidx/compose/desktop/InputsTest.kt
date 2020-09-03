@@ -22,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.ui.test.assertValueEquals
 import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.runOnIdle
 
 import org.junit.Rule
 import org.junit.Test
@@ -35,12 +34,12 @@ class InputsTest {
     private val tag = "slider"
 
     @get:Rule
-    val composeTestRule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule(disableTransitions = true)
 
     @Test
     fun sliderPosition_valueCoercion() {
         val state = mutableStateOf(0f)
-        composeTestRule.setContent {
+        rule.setContent {
             Slider(
                 modifier = Modifier.testTag(tag),
                 value = state.value,
@@ -48,13 +47,13 @@ class InputsTest {
                 valueRange = 0f..1f
             )
         }
-        runOnIdle {
+        rule.runOnIdle {
             state.value = 2f
         }
-        onNodeWithTag(tag).assertValueEquals("100 percent")
-        runOnIdle {
+        rule.onNodeWithTag(tag).assertValueEquals("100 percent")
+        rule.runOnIdle {
             state.value = -123145f
         }
-        onNodeWithTag(tag).assertValueEquals("0 percent")
+        rule.onNodeWithTag(tag).assertValueEquals("0 percent")
     }
 }

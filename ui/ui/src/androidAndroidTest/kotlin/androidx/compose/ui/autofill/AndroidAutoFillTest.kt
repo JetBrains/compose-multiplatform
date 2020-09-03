@@ -40,7 +40,7 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class AndroidAutoFillTest {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     private var autofill: Autofill? = null
     private lateinit var autofillTree: AutofillTree
@@ -48,7 +48,7 @@ class AndroidAutoFillTest {
 
     @Before
     fun setup() {
-        composeTestRule.setContent {
+        rule.setContent {
             ownerView = ViewAmbient.current
             autofill = AutofillAmbient.current
             autofillTree = AutofillTreeAmbient.current

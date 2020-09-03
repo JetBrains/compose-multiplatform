@@ -25,7 +25,6 @@ import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.unit.Density
 import androidx.test.filters.SmallTest
 import androidx.ui.test.createComposeRule
-import androidx.ui.test.runOnIdle
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
@@ -56,14 +55,14 @@ class LayoutDensityTest {
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             Assert.assertEquals(ambientDensity, measureScopeDensity)
             Assert.assertEquals(ambientFontScale, measureScopeFontScale)
             ambientDensity = 9f
             ambientFontScale = 11f
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             Assert.assertEquals(ambientDensity, measureScopeDensity)
             Assert.assertEquals(ambientFontScale, measureScopeFontScale)
         }
