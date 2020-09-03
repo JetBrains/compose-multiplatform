@@ -47,6 +47,7 @@ import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.MeasureAndLayoutDelegate
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.node.Owner
+import androidx.compose.ui.node.OwnerScope
 import androidx.compose.ui.semantics.SemanticsModifierCore
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.text.input.TextInputService
@@ -181,7 +182,11 @@ class DesktopOwner(
         snapshotObserver.observeReads(node, onCommitAffectingMeasure, block)
     }
 
-    override fun <T : Any> observeReads(target: T, onChanged: (T) -> Unit, block: () -> Unit) {
+    override fun <T : OwnerScope> observeReads(
+        target: T,
+        onChanged: (T) -> Unit,
+        block: () -> Unit
+    ) {
         snapshotObserver.observeReads(target, onChanged, block)
     }
 

@@ -17,27 +17,36 @@
 package androidx.compose.runtime.snapshots
 
 import androidx.compose.runtime.ExperimentalComposeApi
-import androidx.compose.runtime.ObserverMap
+import androidx.compose.runtime.collection.ExperimentalCollectionApi
+import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.TestOnly
+import androidx.compose.runtime.collection.IdentityScopeMap
 
 @ExperimentalComposeApi
+@OptIn(ExperimentalCollectionApi::class)
 @Suppress("DEPRECATION_ERROR")
 class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit) -> Unit) {
     private val applyObserver: SnapshotApplyObserver = { applied, _ ->
         var hasValues = false
 
-        // This array is in the same order as applyMaps
-        val targetsArray = synchronized(applyMaps) {
-            Array(applyMaps.size) { index ->
-                applyMaps[index].map[applied].apply {
-                    if (isNotEmpty())
+        synchronized(applyMaps) {
+            applyMaps.forEach { applyMap ->
+                val invalidated = applyMap.invalidated
+                val map = applyMap.map
+                for (value in applied) {
+                    map.forEachScopeOf(value) { scope ->
+                        invalidated += scope
                         hasValues = true
+                    }
+                }
+                if (invalidated.isNotEmpty()) {
+                    map.removeValueIf { scope -> scope in invalidated }
                 }
             }
         }
         if (hasValues) {
             onChangedExecutor {
-                callOnChanged(targetsArray)
+                callOnChanged()
             }
         }
     }
@@ -47,9 +56,7 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
      */
     private val readObserver: SnapshotReadObserver = { state ->
         if (!isPaused) {
-            synchronized(applyMaps) {
-                currentMap!!.add(state, currentTarget!!)
-            }
+            currentMap!!.addValue(state)
         }
     }
 
@@ -57,7 +64,7 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
      * List of all [ApplyMap]s. When [observeReads] is called, there will be a [ApplyMap]
      * associated with its `onChanged` callback in this list. The list only grows.
      */
-    private val applyMaps = mutableListOf<ApplyMap<*>>()
+    private val applyMaps = mutableVectorOf<ApplyMap<*>>()
 
     /**
      * Method to call when unsubscribing from the apply observer.
@@ -77,14 +84,9 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
     private var isPaused = false
 
     /**
-     * The [ObserverMap] that should be added to when a model is read during [observeReads].
+     * The [ApplyMap] that should be added to when a model is read during [observeReads].
      */
-    private var currentMap: ObserverMap<Any, Any>? = null
-
-    /**
-     * The target associated with the active [observeReads] call.
-     */
-    private var currentTarget: Any? = null
+    private var currentMap: ApplyMap<*>? = null
 
     /**
      * Remove all hooks used to track changes.
@@ -99,29 +101,27 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
     /**
      * Executes [block], observing state object reads during its execution.
      *
-     * The [target] is stored as a weak reference to be passed to [onChanged] when a change to the
-     * state object has been detected.
+     * The [target] and [onChanged] are associated with any values that are read so that when
+     * those values change, [onChanged] can be called with the [target] parameter.
      *
      * Observation for [target] will be paused when a new [observeReads] call is made or when
      * [pauseObservingReads] is called.
      *
-     * Any previous observation with the given [target] and [onChanged] will be cleared and only
-     * the new observation on [block] will be stored. It is important that the same instance of
-     * [onChanged] is used between calls or previous references will not be cleared.
-     *
-     * The [onChanged] will be called when a state object that was accessed during [block] has been
-     * applied, and it will be called with [onChangedExecutor].
+     * Any previous observation with the given [target] and [onChanged] will be cleared when
+     * the [onChanged] is called for [target]. The [onChanged] should trigger a new [observeReads]
+     * call to resubscribe to changes. They may also be cleared using [removeObservationsFor]
+     * or [clear].
      */
     fun <T : Any> observeReads(target: T, onChanged: (T) -> Unit, block: () -> Unit) {
         val oldMap = currentMap
-        val oldTarget = currentTarget
         val oldPaused = isPaused
+        val applyMap = synchronized(applyMaps) { ensureMap(onChanged) }
+        val oldScope = applyMap.currentScope
 
-        currentMap = synchronized(applyMaps) {
-            ensureMap(onChanged).apply { removeValue(target) }
-        }
-        currentTarget = target
+        applyMap.currentScope = target
+        currentMap = applyMap
         isPaused = false
+
         if (!isObserving) {
             isObserving = true
             try {
@@ -132,8 +132,9 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
         } else {
             block()
         }
+
         currentMap = oldMap
-        currentTarget = oldTarget
+        applyMap.currentScope = oldScope
         isPaused = oldPaused
     }
 
@@ -157,8 +158,22 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
      */
     fun clear(target: Any) {
         synchronized(applyMaps) {
-            applyMaps.fastForEach { commitMap ->
-                commitMap.map.removeValue(target)
+            applyMaps.forEach { commitMap ->
+                commitMap.map.removeValueIf { scope ->
+                    scope === target
+                }
+            }
+        }
+    }
+
+    /**
+     * Remove observations using [predicate] to identify target scopes to be removed. This is
+     * used when a scope is no longer in the hierarchy and should not receive any callbacks.
+     */
+    fun removeObservationsFor(predicate: (scope: Any) -> Boolean) {
+        synchronized(applyMaps) {
+            applyMaps.forEach { applyMap ->
+                applyMap.map.removeValueIf(predicate)
             }
         }
     }
@@ -188,32 +203,44 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
     }
 
     /**
-     * Calls the `onChanged` callback for the given targets.
+     * Remove all observations.
      */
-    private fun callOnChanged(targetsArray: Array<List<Any>>) {
-        for (i in 0..targetsArray.lastIndex) {
-            val targets = targetsArray[i]
-            if (targets.isNotEmpty()) {
-                val onChangeCaller = synchronized(applyMaps) { applyMaps[i] }
-                onChangeCaller.callOnChanged(targets)
+    fun clear() {
+        synchronized(applyMaps) {
+            applyMaps.forEach { applyMap ->
+                applyMap.map.clear()
             }
         }
     }
 
     /**
-     * Returns the [ObserverMap] within [applyMaps] associated with [onChanged] or a newly-
+     * Calls the `onChanged` callback for the given targets.
+     */
+    private fun callOnChanged() {
+        applyMaps.forEach { applyMap ->
+            val targets = applyMap.invalidated
+            if (targets.isNotEmpty()) {
+                applyMap.callOnChanged(targets)
+                targets.clear()
+            }
+        }
+    }
+
+    /**
+     * Returns the [ApplyMap] within [applyMaps] associated with [onChanged] or a newly-
      * inserted one if it doesn't exist.
      *
      * Must be called inside a synchronized block.
      */
-    private fun <T : Any> ensureMap(onChanged: (T) -> Unit): ObserverMap<Any, Any> {
+    private fun <T : Any> ensureMap(onChanged: (T) -> Unit): ApplyMap<T> {
         val index = applyMaps.indexOfFirst { it.onChanged === onChanged }
         if (index == -1) {
             val commitMap = ApplyMap(onChanged)
-            applyMaps.add(commitMap)
-            return commitMap.map
+            applyMaps += commitMap
+            return commitMap
         }
-        return applyMaps[index].map
+        @Suppress("UNCHECKED_CAST")
+        return applyMaps[index] as ApplyMap<T>
     }
 
     /**
@@ -223,15 +250,32 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
     @Suppress("UNCHECKED_CAST")
     private class ApplyMap<T : Any>(val onChanged: (T) -> Unit) {
         /**
-         * ObserverMap (key = model, value = target). These are the models that have been
+         * Map (key = model, value = scope). These are the models that have been
          * read during the target's [SnapshotStateObserver.observeReads].
          */
-        val map = ObserverMap<Any, Any>()
+        val map = IdentityScopeMap<T>()
+
+        /**
+         * Scopes that were invalidated. This and cleared during the [applyObserver] call.
+         */
+        val invalidated = hashSetOf<Any>()
+
+        /**
+         * Current scope that adds to [map] will use.
+         */
+        var currentScope: T? = null
+
+        /**
+         * Adds [value]/[currentScope] to the [map].
+         */
+        fun addValue(value: Any) {
+            map.add(value, currentScope!!)
+        }
 
         /**
          * Calls the `onCommit` callback for targets affected by the given committed values.
          */
-        fun callOnChanged(targets: List<Any>) {
+        fun callOnChanged(targets: Collection<Any>) {
             targets.forEach { target ->
                 onChanged(target as T)
             }

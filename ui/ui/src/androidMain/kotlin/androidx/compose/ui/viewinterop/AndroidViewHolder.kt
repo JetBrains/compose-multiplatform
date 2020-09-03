@@ -137,7 +137,8 @@ abstract class AndroidViewHolder(context: Context) : ViewGroup(context) {
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         snapshotObserver.enableStateUpdatesObserving(false)
-        snapshotObserver.clear(this)
+        // remove all observations:
+        snapshotObserver.clear()
     }
 }
 

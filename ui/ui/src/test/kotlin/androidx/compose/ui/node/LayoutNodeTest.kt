@@ -1727,7 +1727,11 @@ private class MockOwner(
         block()
     }
 
-    override fun <T : Any> observeReads(target: T, onChanged: (T) -> Unit, block: () -> Unit) {
+    override fun <T : OwnerScope> observeReads(
+        target: T,
+        onChanged: (T) -> Unit,
+        block: () -> Unit
+    ) {
         block()
     }
 

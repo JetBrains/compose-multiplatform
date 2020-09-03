@@ -33,6 +33,7 @@ import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNodeWrapper
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.node.Owner
+import androidx.compose.ui.node.OwnerScope
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.semantics.SemanticsOwner
@@ -3026,7 +3027,11 @@ private class MockOwner(
         block()
     }
 
-    override fun <T : Any> observeReads(target: T, onChanged: (T) -> Unit, block: () -> Unit) {
+    override fun <T : OwnerScope> observeReads(
+        target: T,
+        onChanged: (T) -> Unit,
+        block: () -> Unit
+    ) {
         block()
     }
 
