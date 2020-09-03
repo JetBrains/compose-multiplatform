@@ -43,11 +43,8 @@ import androidx.ui.test.monotonicFrameAnimationClockOf
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performGesture
 import androidx.ui.test.runBlockingWithManualClock
-import androidx.ui.test.runOnIdle
-import androidx.ui.test.runOnUiThread
 import androidx.ui.test.swipe
 import androidx.ui.test.swipeWithVelocity
-import androidx.ui.test.waitForIdle
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import kotlinx.coroutines.withContext
@@ -61,7 +58,7 @@ import org.junit.runners.JUnit4
 class ScrollableTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     private val scrollableBoxTag = "scrollableBox"
 
@@ -83,7 +80,7 @@ class ScrollableTest {
                 orientation = Orientation.Horizontal
             )
         }
-        onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performGesture {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
@@ -92,11 +89,11 @@ class ScrollableTest {
         }
         advanceClockAndAwaitAnimation(clock)
 
-        val lastTotal = runOnIdle {
+        val lastTotal = rule.runOnIdle {
             assertThat(total).isGreaterThan(0)
             total
         }
-        onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performGesture {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x, this.center.y + 100f),
@@ -105,10 +102,10 @@ class ScrollableTest {
         }
         advanceClockAndAwaitAnimation(clock)
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(total).isEqualTo(lastTotal)
         }
-        onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performGesture {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x - 100f, this.center.y),
@@ -116,7 +113,7 @@ class ScrollableTest {
             )
         }
         advanceClockAndAwaitAnimation(clock)
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(total).isLessThan(0.01f)
         }
     }
@@ -139,7 +136,7 @@ class ScrollableTest {
                 orientation = Orientation.Vertical
             )
         }
-        onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performGesture {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x, this.center.y + 100f),
@@ -148,11 +145,11 @@ class ScrollableTest {
         }
         advanceClockAndAwaitAnimation(clock)
 
-        val lastTotal = runOnIdle {
+        val lastTotal = rule.runOnIdle {
             assertThat(total).isGreaterThan(0)
             total
         }
-        onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performGesture {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
@@ -161,10 +158,10 @@ class ScrollableTest {
         }
         advanceClockAndAwaitAnimation(clock)
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(total).isEqualTo(lastTotal)
         }
-        onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performGesture {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x, this.center.y - 100f),
@@ -172,7 +169,7 @@ class ScrollableTest {
             )
         }
         advanceClockAndAwaitAnimation(clock)
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(total).isLessThan(0.01f)
         }
     }
@@ -199,11 +196,11 @@ class ScrollableTest {
                 onScrollStopped = { stopTrigger++ }
             )
         }
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(startTrigger).isEqualTo(0)
             assertThat(stopTrigger).isEqualTo(0)
         }
-        onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performGesture {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
@@ -211,13 +208,13 @@ class ScrollableTest {
             )
         }
         // don't wait for animation so stop is 0, as we flinging still
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(startTrigger).isEqualTo(1)
             assertThat(stopTrigger).isEqualTo(0)
         }
         advanceClockAndAwaitAnimation(clock)
         // after wait we expect stop to trigger
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(startTrigger).isEqualTo(1)
             assertThat(stopTrigger).isEqualTo(1)
         }
@@ -243,7 +240,7 @@ class ScrollableTest {
                 enabled = enabled.value
             )
         }
-        onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performGesture {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
@@ -251,12 +248,12 @@ class ScrollableTest {
             )
         }
         advanceClockAndAwaitAnimation(clock)
-        val prevTotal = runOnIdle {
+        val prevTotal = rule.runOnIdle {
             assertThat(total).isGreaterThan(0f)
             enabled.value = false
             total
         }
-        onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performGesture {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
@@ -264,7 +261,7 @@ class ScrollableTest {
             )
         }
         advanceClockAndAwaitAnimation(clock)
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(total).isEqualTo(prevTotal)
         }
     }
@@ -291,7 +288,7 @@ class ScrollableTest {
                 }
             )
         }
-        onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performGesture {
             this.swipeWithVelocity(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
@@ -302,7 +299,7 @@ class ScrollableTest {
         }
         // don't advance clocks, so animation won't trigger yet
         // and interrupt
-        onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performGesture {
             this.swipeWithVelocity(
                 start = this.center,
                 end = Offset(this.center.x - 100f, this.center.y),
@@ -311,7 +308,7 @@ class ScrollableTest {
 
             )
         }
-        runOnIdle {
+        rule.runOnIdle {
             // should be first velocity, as fling was disrupted
             assertThat(velocityTriggered - 112f).isLessThan(0.1f)
         }
@@ -335,7 +332,7 @@ class ScrollableTest {
                 orientation = Orientation.Horizontal
             )
         }
-        onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performGesture {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
@@ -343,18 +340,18 @@ class ScrollableTest {
             )
         }
         // don't advance clocks
-        val prevTotal = runOnUiThread {
+        val prevTotal = rule.runOnUiThread {
             assertThat(total).isGreaterThan(0f)
             total
         }
-        onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performGesture {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 114f, this.center.y),
                 duration = 100.milliseconds
             )
         }
-        runOnIdle {
+        rule.runOnIdle {
             // last swipe should add exactly 114 as we don't advance clocks and already flinging
             val expected = prevTotal + 114
             assertThat(total - expected).isLessThan(0.1f)
@@ -387,14 +384,14 @@ class ScrollableTest {
                 Modifier
             }
         }
-        onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performGesture {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100, this.center.y),
                 duration = 100.milliseconds
             )
         }
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(total).isGreaterThan(0f)
             assertThat(dragStopped).isEqualTo(1f)
         }
@@ -415,21 +412,21 @@ class ScrollableTest {
         setScrollableContent {
             Modifier.scrollable(orientation = Orientation.Vertical, controller = controller)
         }
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(total).isEqualTo(0f)
         }
-        runOnIdle {
+        rule.runOnIdle {
             controller.smoothScrollBy(1000f)
         }
         advanceClockAndAwaitAnimation(clock)
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(total).isEqualTo(1000f)
         }
-        runOnIdle {
+        rule.runOnIdle {
             controller.smoothScrollBy(-200f)
         }
         advanceClockAndAwaitAnimation(clock)
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(total).isEqualTo(800f)
         }
     }
@@ -455,23 +452,23 @@ class ScrollableTest {
                 Modifier
             }
         }
-        runOnIdle {
+        rule.runOnIdle {
             controller.smoothScrollBy(300f)
         }
         advanceClockAndAwaitAnimation(clock)
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(total).isEqualTo(300f)
         }
-        runOnIdle {
+        rule.runOnIdle {
             controller.smoothScrollBy(200f)
         }
         // don't advance clocks yet, toggle disposed value
-        runOnUiThread {
+        rule.runOnUiThread {
             disposed.value = true
         }
         advanceClockAndAwaitAnimation(clock)
         // still 300 and didn't fail in onScrollConsumptionRequested.. lambda
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(total).isEqualTo(300f)
         }
     }
@@ -499,7 +496,7 @@ class ScrollableTest {
             animationClock = animationClock
         )
 
-        composeTestRule.setContent {
+        rule.setContent {
             Stack {
                 Box(
                     gravity = ContentGravity.Center,
@@ -520,14 +517,14 @@ class ScrollableTest {
                 }
             }
         }
-        onNodeWithTag(scrollableBoxTag).performGesture {
+        rule.onNodeWithTag(scrollableBoxTag).performGesture {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 200f, this.center.y),
                 duration = 300.milliseconds
             )
         }
-        val lastEqualDrag = runOnIdle {
+        val lastEqualDrag = rule.runOnIdle {
             assertThat(innerDrag).isGreaterThan(0f)
             assertThat(outerDrag).isGreaterThan(0f)
             // we consumed half delta in child, so exactly half should go to the parent
@@ -537,13 +534,13 @@ class ScrollableTest {
         advanceClockAndAwaitAnimation(clock)
         advanceClockAndAwaitAnimation(clock)
         // and nothing should change as we don't do nested fling
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(outerDrag).isEqualTo(lastEqualDrag)
         }
     }
 
     private fun setScrollableContent(scrollableModifierFactory: @Composable () -> Modifier) {
-        composeTestRule.setContent {
+        rule.setContent {
             Stack {
                 val scrollable = scrollableModifierFactory()
                 Box(
@@ -557,7 +554,7 @@ class ScrollableTest {
 
     @ExperimentalTesting
     private suspend fun advanceClockAndAwaitAnimation(clock: ManualFrameClock) {
-        waitForIdle()
+        rule.waitForIdle()
         withContext(TestUiDispatcher.Main) {
             clock.advanceClockMillis(5000L)
         }

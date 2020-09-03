@@ -40,12 +40,10 @@ import androidx.ui.test.center
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.down
 import androidx.ui.test.isToggleable
-import androidx.ui.test.onNode
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.onNodeWithText
 import androidx.ui.test.performClick
 import androidx.ui.test.performGesture
-import androidx.ui.test.runOnIdle
 import androidx.ui.test.up
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
@@ -58,11 +56,11 @@ import org.junit.runners.JUnit4
 class ToggleableTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Test
     fun toggleableTest_defaultSemantics() {
-        composeTestRule.setContent {
+        rule.setContent {
             Column {
                 Box(Modifier
                     .triStateToggleable(state = ToggleableState.On, onClick = {})
@@ -89,15 +87,15 @@ class ToggleableTest {
             FoundationSemanticsProperties.ToggleableState, ToggleableState.Indeterminate
         )
 
-        onNodeWithTag("checkedToggleable")
+        rule.onNodeWithTag("checkedToggleable")
             .assertIsEnabled()
             .assertIsOn()
             .assertHasClickAction()
-        onNodeWithTag("unCheckedToggleable")
+        rule.onNodeWithTag("unCheckedToggleable")
             .assertIsEnabled()
             .assertIsOff()
             .assertHasClickAction()
-        onNodeWithTag("indeterminateToggleable")
+        rule.onNodeWithTag("indeterminateToggleable")
             .assertIsEnabled()
             .assert(hasIndeterminateState())
             .assertHasClickAction()
@@ -105,7 +103,7 @@ class ToggleableTest {
 
     @Test
     fun toggleableTest_booleanOverload_defaultSemantics() {
-        composeTestRule.setContent {
+        rule.setContent {
             Column {
                 Box(Modifier
                     .toggleable(value = true, onValueChange = {})
@@ -122,11 +120,11 @@ class ToggleableTest {
             }
         }
 
-        onNodeWithTag("checkedToggleable")
+        rule.onNodeWithTag("checkedToggleable")
             .assertIsEnabled()
             .assertIsOn()
             .assertHasClickAction()
-        onNodeWithTag("unCheckedToggleable")
+        rule.onNodeWithTag("unCheckedToggleable")
             .assertIsEnabled()
             .assertIsOff()
             .assertHasClickAction()
@@ -134,7 +132,7 @@ class ToggleableTest {
 
     @Test
     fun toggleableTest_disabledSemantics() {
-        composeTestRule.setContent {
+        rule.setContent {
             Stack {
                 Box(
                     Modifier.triStateToggleable(
@@ -147,7 +145,7 @@ class ToggleableTest {
             }
         }
 
-        onNode(isToggleable())
+        rule.onNode(isToggleable())
             .assertIsNotEnabled()
             .assertHasNoClickAction()
     }
@@ -157,7 +155,7 @@ class ToggleableTest {
         var checked = true
         val onCheckedChange: (Boolean) -> Unit = { checked = it }
 
-        composeTestRule.setContent {
+        rule.setContent {
             Stack {
                 Box(
                     Modifier.toggleable(value = checked, onValueChange = onCheckedChange),
@@ -168,10 +166,10 @@ class ToggleableTest {
             }
         }
 
-        onNode(isToggleable())
+        rule.onNode(isToggleable())
             .performClick()
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(checked).isEqualTo(false)
         }
     }
@@ -180,7 +178,7 @@ class ToggleableTest {
     fun toggleableTest_interactionState() {
         val interactionState = InteractionState()
 
-        composeTestRule.setContent {
+        rule.setContent {
             Stack {
                 Box(Modifier.toggleable(
                     value = true,
@@ -192,21 +190,21 @@ class ToggleableTest {
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(interactionState.value).doesNotContain(Interaction.Pressed)
         }
 
-        onNodeWithText("ToggleableText")
+        rule.onNodeWithText("ToggleableText")
             .performGesture { down(center) }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(interactionState.value).contains(Interaction.Pressed)
         }
 
-        onNodeWithText("ToggleableText")
+        rule.onNodeWithText("ToggleableText")
             .performGesture { up() }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(interactionState.value).doesNotContain(Interaction.Pressed)
         }
     }
@@ -216,7 +214,7 @@ class ToggleableTest {
         val interactionState = InteractionState()
         var emitToggleableText by mutableStateOf(true)
 
-        composeTestRule.setContent {
+        rule.setContent {
             Stack {
                 if (emitToggleableText) {
                     Box(Modifier.toggleable(
@@ -230,23 +228,23 @@ class ToggleableTest {
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(interactionState.value).doesNotContain(Interaction.Pressed)
         }
 
-        onNodeWithText("ToggleableText")
+        rule.onNodeWithText("ToggleableText")
             .performGesture { down(center) }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(interactionState.value).contains(Interaction.Pressed)
         }
 
         // Dispose toggleable
-        runOnIdle {
+        rule.runOnIdle {
             emitToggleableText = false
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(interactionState.value).doesNotContain(Interaction.Pressed)
         }
     }

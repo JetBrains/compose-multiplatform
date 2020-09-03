@@ -55,13 +55,13 @@ class BorderTest(val shape: Shape) {
     }
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     val testTag = "BorderParent"
 
     @Test
     fun border_color() {
-        composeTestRule.setContent {
+        rule.setContent {
             SemanticParent {
                 Stack(
                     Modifier.preferredSize(40.0f.toDp(), 40.0f.toDp())
@@ -71,9 +71,9 @@ class BorderTest(val shape: Shape) {
                 ) {}
             }
         }
-        val bitmap = onNodeWithTag(testTag).captureToBitmap()
+        val bitmap = rule.onNodeWithTag(testTag).captureToBitmap()
         bitmap.assertShape(
-            density = composeTestRule.density,
+            density = rule.density,
             backgroundColor = Color.Red,
             shape = shape,
             backgroundShape = shape,
@@ -86,7 +86,7 @@ class BorderTest(val shape: Shape) {
 
     @Test
     fun border_brush() {
-        composeTestRule.setContent {
+        rule.setContent {
             SemanticParent {
                 Stack(
                     Modifier.preferredSize(40.0f.toDp(), 40.0f.toDp())
@@ -98,9 +98,9 @@ class BorderTest(val shape: Shape) {
                 ) {}
             }
         }
-        val bitmap = onNodeWithTag(testTag).captureToBitmap()
+        val bitmap = rule.onNodeWithTag(testTag).captureToBitmap()
         bitmap.assertShape(
-            density = composeTestRule.density,
+            density = rule.density,
             backgroundColor = Color.Red,
             shape = shape,
             backgroundShape = shape,
@@ -113,7 +113,7 @@ class BorderTest(val shape: Shape) {
 
     @Test
     fun border_biggerThanLayout_fills() {
-        composeTestRule.setContent {
+        rule.setContent {
             SemanticParent {
                 Stack(
                     Modifier.preferredSize(40.0f.toDp(), 40.0f.toDp())
@@ -122,9 +122,9 @@ class BorderTest(val shape: Shape) {
                 ) {}
             }
         }
-        val bitmap = onNodeWithTag(testTag).captureToBitmap()
+        val bitmap = rule.onNodeWithTag(testTag).captureToBitmap()
         bitmap.assertShape(
-            density = composeTestRule.density,
+            density = rule.density,
             backgroundColor = Color.White,
             shapeColor = Color.Red,
             shape = shape,
@@ -135,7 +135,7 @@ class BorderTest(val shape: Shape) {
 
     @Test
     fun border_lessThanZero_doesNothing() {
-        composeTestRule.setContent {
+        rule.setContent {
             SemanticParent {
                 Stack(
                     Modifier.preferredSize(40.0f.toDp(), 40.0f.toDp())
@@ -144,9 +144,9 @@ class BorderTest(val shape: Shape) {
                 ) {}
             }
         }
-        val bitmap = onNodeWithTag(testTag).captureToBitmap()
+        val bitmap = rule.onNodeWithTag(testTag).captureToBitmap()
         bitmap.assertShape(
-            density = composeTestRule.density,
+            density = rule.density,
             backgroundColor = Color.White,
             shapeColor = Color.Blue,
             shape = shape,
@@ -157,7 +157,7 @@ class BorderTest(val shape: Shape) {
 
     @Test
     fun border_zeroSizeLayout_drawsNothing() {
-        composeTestRule.setContent {
+        rule.setContent {
             SemanticParent {
                 Box(
                     Modifier.preferredSize(40.0f.toDp(), 40.0f.toDp()),
@@ -170,9 +170,9 @@ class BorderTest(val shape: Shape) {
                 }
             }
         }
-        val bitmap = onNodeWithTag(testTag).captureToBitmap()
+        val bitmap = rule.onNodeWithTag(testTag).captureToBitmap()
         bitmap.assertShape(
-            density = composeTestRule.density,
+            density = rule.density,
             backgroundColor = Color.White,
             shapeColor = Color.White,
             shape = RectangleShape,

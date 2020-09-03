@@ -58,7 +58,7 @@ import org.junit.runners.JUnit4
 class BoxTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     private val contentTag = "Box"
 
@@ -67,14 +67,14 @@ class BoxTest {
         var childSize: IntSize? = null
         val size = 100.dp
         val padding = 20.dp
-        composeTestRule.setContent {
+        rule.setContent {
             SemanticsParent {
                 Box(Modifier.preferredSize(size), padding = padding) {
                     Box(Modifier.fillMaxSize().onPositioned { childSize = it.size })
                 }
             }
         }
-        with(composeTestRule.density) {
+        with(rule.density) {
             val paddingSide = padding.toIntPx()
             Truth.assertThat(childSize!!.width).isEqualTo(size.toIntPx() - paddingSide * 2)
             Truth.assertThat(childSize!!.height).isEqualTo(size.toIntPx() - paddingSide * 2)
@@ -90,7 +90,7 @@ class BoxTest {
         val top = 2.dp
         val end = 5.dp
         val bottom = 8.dp
-        composeTestRule.setContent {
+        rule.setContent {
             SemanticsParent {
                 Box(
                     Modifier.preferredSize(size),
@@ -106,7 +106,7 @@ class BoxTest {
                 }
             }
         }
-        with(composeTestRule.density) {
+        with(rule.density) {
             Truth.assertThat(childSize!!.width).isEqualTo(
                 size.toIntPx() - start.toIntPx() - end.toIntPx()
             )
@@ -126,7 +126,7 @@ class BoxTest {
         val top = 2.dp
         val end = 5.dp
         val bottom = 8.dp
-        composeTestRule.setContent {
+        rule.setContent {
             SemanticsParent {
                 Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
                     Box(
@@ -144,7 +144,7 @@ class BoxTest {
                 }
             }
         }
-        with(composeTestRule.density) {
+        with(rule.density) {
             Truth.assertThat(childSize!!.width).isEqualTo(
                 size.toIntPx() - start.toIntPx() - end.toIntPx()
             )
@@ -163,7 +163,7 @@ class BoxTest {
         val left = 17.dp
         val top = 2.dp
         val bottom = 8.dp
-        composeTestRule.setContent {
+        rule.setContent {
             SemanticsParent {
                 Box(
                     Modifier.preferredSize(size),
@@ -176,7 +176,7 @@ class BoxTest {
                 }
             }
         }
-        with(composeTestRule.density) {
+        with(rule.density) {
             Truth.assertThat(childSize!!.width).isEqualTo(
                 size.toIntPx() - left.toIntPx() - padding.toIntPx()
             )
@@ -192,7 +192,7 @@ class BoxTest {
         var childPosition1: Offset? = null
         var childPosition2: Offset? = null
         var childPosition3: Offset? = null
-        composeTestRule.setContent {
+        rule.setContent {
             SemanticsParent {
                 Box(
                     modifier = Modifier.preferredSize(size),
@@ -210,7 +210,7 @@ class BoxTest {
                 }
             }
         }
-        with(composeTestRule.density) {
+        with(rule.density) {
             Truth.assertThat(childPosition1).isEqualTo(
                 Offset(
                     (size.toIntPx() - childSize.toIntPx()) / 2f,
@@ -237,7 +237,7 @@ class BoxTest {
         val size = 100.dp
         val childSize = 20.dp
         var childPosition: Offset? = null
-        composeTestRule.setContent {
+        rule.setContent {
             SemanticsParent {
                 Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
                     Box(
@@ -256,7 +256,7 @@ class BoxTest {
 
     @Test
     fun box_testBackground() {
-        composeTestRule.setContent {
+        rule.setContent {
             SemanticsParent {
                 Box(
                     Modifier.preferredSize(50.dp),
@@ -264,15 +264,15 @@ class BoxTest {
                 )
             }
         }
-        val bitmap = onNodeWithTag(contentTag).captureToBitmap()
-        bitmap.assertShape(composeTestRule.density, RectangleShape, Color.Red, Color.Red)
+        val bitmap = rule.onNodeWithTag(contentTag).captureToBitmap()
+        bitmap.assertShape(rule.density, RectangleShape, Color.Red, Color.Red)
     }
 
     @Test
     fun box_testBackground_doesntAffectPadding() {
         val size = 50.dp
         val padding = 10.dp
-        composeTestRule.setContent {
+        rule.setContent {
             SemanticsParent {
                 Box(
                     Modifier.preferredSize(size),
@@ -283,10 +283,10 @@ class BoxTest {
                 }
             }
         }
-        with(composeTestRule.density) {
-            val bitmap = onNodeWithTag(contentTag).captureToBitmap()
+        with(rule.density) {
+            val bitmap = rule.onNodeWithTag(contentTag).captureToBitmap()
             bitmap.assertShape(
-                density = composeTestRule.density,
+                density = rule.density,
                 shape = RectangleShape,
                 shapeColor = Color.Blue,
                 backgroundColor = Color.Red,
@@ -300,7 +300,7 @@ class BoxTest {
     fun box_testBackground_shape() {
         val size = 50.dp
         val padding = 10.dp
-        composeTestRule.setContent {
+        rule.setContent {
             SemanticsParent {
                 Box(
                     Modifier.preferredSize(size),
@@ -311,10 +311,10 @@ class BoxTest {
                 }
             }
         }
-        with(composeTestRule.density) {
-            val bitmap = onNodeWithTag(contentTag).captureToBitmap()
+        with(rule.density) {
+            val bitmap = rule.onNodeWithTag(contentTag).captureToBitmap()
             bitmap.assertShape(
-                density = composeTestRule.density,
+                density = rule.density,
                 shape = CircleShape,
                 shapeColor = Color.Blue,
                 backgroundColor = Color.Red,
@@ -329,7 +329,7 @@ class BoxTest {
     fun box_testBorder() {
         val size = 50.dp
         val borderSize = 10.dp
-        composeTestRule.setContent {
+        rule.setContent {
             SemanticsParent {
                 Box(
                     Modifier.preferredSize(size),
@@ -338,10 +338,10 @@ class BoxTest {
                 )
             }
         }
-        with(composeTestRule.density) {
-            val bitmap = onNodeWithTag(contentTag).captureToBitmap()
+        with(rule.density) {
+            val bitmap = rule.onNodeWithTag(contentTag).captureToBitmap()
             bitmap.assertShape(
-                density = composeTestRule.density,
+                density = rule.density,
                 shape = RectangleShape,
                 shapeColor = Color.Blue,
                 backgroundColor = Color.Red,
@@ -356,7 +356,7 @@ class BoxTest {
     fun box_testBorder_respectsShape() {
         val size = 50.dp
         val borderSize = 10.dp
-        composeTestRule.setContent {
+        rule.setContent {
             SemanticsParent {
                 Box(
                     Modifier.preferredSize(size),
@@ -371,10 +371,10 @@ class BoxTest {
                 }
             }
         }
-        with(composeTestRule.density) {
-            val bitmap = onNodeWithTag(contentTag).captureToBitmap()
+        with(rule.density) {
+            val bitmap = rule.onNodeWithTag(contentTag).captureToBitmap()
             bitmap.assertShape(
-                density = composeTestRule.density,
+                density = rule.density,
                 shape = CircleShape,
                 shapeColor = Color.Blue,
                 backgroundColor = Color.Red,
@@ -388,14 +388,14 @@ class BoxTest {
         var childSize: IntSize? = null
         val size = 50.dp
         val borderSize = 10.dp
-        composeTestRule.setContent {
+        rule.setContent {
             SemanticsParent {
                 Box(Modifier.preferredSize(size), border = BorderStroke(borderSize, Color.Red)) {
                     Box(Modifier.fillMaxSize().onPositioned { childSize = it.size })
                 }
             }
         }
-        with(composeTestRule.density) {
+        with(rule.density) {
             Truth.assertThat(childSize!!.width)
                 .isEqualTo(size.toIntPx() - borderSize.toIntPx() * 2)
             Truth.assertThat(childSize!!.height)

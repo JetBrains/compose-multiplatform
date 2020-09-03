@@ -37,13 +37,13 @@ class LazyColumnTest {
     private val LazyColumnTag = "LazyColumnTag"
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Test
     fun lazyColumnShowsItem() {
         val itemTestTag = "itemTestTag"
 
-        composeTestRule.setContent {
+        rule.setContent {
             LazyColumn {
                 item {
                     Spacer(
@@ -53,7 +53,7 @@ class LazyColumnTest {
             }
         }
 
-        onNodeWithTag(itemTestTag)
+        rule.onNodeWithTag(itemTestTag)
             .assertIsDisplayed()
     }
 
@@ -61,7 +61,7 @@ class LazyColumnTest {
     fun lazyColumnShowsItems() {
         val items = (1..4).map { it.toString() }
 
-        composeTestRule.setContent {
+        rule.setContent {
             LazyColumn(Modifier.preferredHeight(200.dp)) {
                 items(items) {
                     Spacer(Modifier.preferredHeight(101.dp).fillParentMaxWidth().testTag(it))
@@ -69,16 +69,16 @@ class LazyColumnTest {
             }
         }
 
-        onNodeWithTag("1")
+        rule.onNodeWithTag("1")
             .assertIsDisplayed()
 
-        onNodeWithTag("2")
+        rule.onNodeWithTag("2")
             .assertIsDisplayed()
 
-        onNodeWithTag("3")
+        rule.onNodeWithTag("3")
             .assertDoesNotExist()
 
-        onNodeWithTag("4")
+        rule.onNodeWithTag("4")
             .assertDoesNotExist()
     }
 
@@ -86,7 +86,7 @@ class LazyColumnTest {
     fun lazyColumnShowsIndexedItems() {
         val items = (1..4).map { it.toString() }
 
-        composeTestRule.setContent {
+        rule.setContent {
             LazyColumn(Modifier.preferredHeight(200.dp)) {
                 itemsIndexed(items) { index, item ->
                     Spacer(Modifier.preferredHeight(101.dp).fillParentMaxWidth()
@@ -95,16 +95,16 @@ class LazyColumnTest {
             }
         }
 
-        onNodeWithTag("0-1")
+        rule.onNodeWithTag("0-1")
             .assertIsDisplayed()
 
-        onNodeWithTag("1-2")
+        rule.onNodeWithTag("1-2")
             .assertIsDisplayed()
 
-        onNodeWithTag("2-3")
+        rule.onNodeWithTag("2-3")
             .assertDoesNotExist()
 
-        onNodeWithTag("3-4")
+        rule.onNodeWithTag("3-4")
             .assertDoesNotExist()
     }
 
@@ -114,7 +114,7 @@ class LazyColumnTest {
         val items = listOf(1, 2).map { it.toString() }
         val indexedItems = listOf(3, 4, 5)
 
-        composeTestRule.setContent {
+        rule.setContent {
             LazyColumn(Modifier.preferredHeight(200.dp)) {
                 item {
                     Spacer(
@@ -133,22 +133,22 @@ class LazyColumnTest {
             }
         }
 
-        onNodeWithTag(itemTestTag)
+        rule.onNodeWithTag(itemTestTag)
             .assertIsDisplayed()
 
-        onNodeWithTag("1")
+        rule.onNodeWithTag("1")
             .assertIsDisplayed()
 
-        onNodeWithTag("2")
+        rule.onNodeWithTag("2")
             .assertIsDisplayed()
 
-        onNodeWithTag("0-3")
+        rule.onNodeWithTag("0-3")
             .assertIsDisplayed()
 
-        onNodeWithTag("1-4")
+        rule.onNodeWithTag("1-4")
             .assertIsDisplayed()
 
-        onNodeWithTag("2-5")
+        rule.onNodeWithTag("2-5")
             .assertDoesNotExist()
     }
 
@@ -156,7 +156,7 @@ class LazyColumnTest {
     fun lazyColumnShowsItemsOnScroll() {
         val items = (1..4).map { it.toString() }
 
-        composeTestRule.setContent {
+        rule.setContent {
             LazyColumn(Modifier.preferredHeight(200.dp).testTag(LazyColumnTag)) {
                 items(items) {
                     Spacer(Modifier.preferredHeight(101.dp).fillParentMaxWidth().testTag(it))
@@ -164,19 +164,19 @@ class LazyColumnTest {
             }
         }
 
-        onNodeWithTag(LazyColumnTag)
-            .scrollBy(y = 50.dp, density = composeTestRule.density)
+        rule.onNodeWithTag(LazyColumnTag)
+            .scrollBy(y = 50.dp, density = rule.density)
 
-        onNodeWithTag("1")
+        rule.onNodeWithTag("1")
             .assertIsDisplayed()
 
-        onNodeWithTag("2")
+        rule.onNodeWithTag("2")
             .assertIsDisplayed()
 
-        onNodeWithTag("3")
+        rule.onNodeWithTag("3")
             .assertIsDisplayed()
 
-        onNodeWithTag("4")
+        rule.onNodeWithTag("4")
             .assertDoesNotExist()
     }
 
@@ -184,7 +184,7 @@ class LazyColumnTest {
     fun lazyColumnScrollHidesItem() {
         val items = (1..3).map { it.toString() }
 
-        composeTestRule.setContent {
+        rule.setContent {
             LazyColumn(Modifier.preferredHeight(200.dp).testTag(LazyColumnTag)) {
                 items(items) {
                     Spacer(Modifier.preferredHeight(101.dp).fillParentMaxWidth().testTag(it))
@@ -192,16 +192,16 @@ class LazyColumnTest {
             }
         }
 
-        onNodeWithTag(LazyColumnTag)
-            .scrollBy(y = 102.dp, density = composeTestRule.density)
+        rule.onNodeWithTag(LazyColumnTag)
+            .scrollBy(y = 102.dp, density = rule.density)
 
-        onNodeWithTag("1")
+        rule.onNodeWithTag("1")
             .assertDoesNotExist()
 
-        onNodeWithTag("2")
+        rule.onNodeWithTag("2")
             .assertIsDisplayed()
 
-        onNodeWithTag("3")
+        rule.onNodeWithTag("3")
             .assertIsDisplayed()
     }
 }

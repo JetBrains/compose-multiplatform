@@ -47,13 +47,13 @@ import org.junit.runners.JUnit4
 class BackgroundTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     private val contentTag = "Content"
 
     @Test
     fun background_colorRect() {
-        composeTestRule.setContent {
+        rule.setContent {
             SemanticParent {
                 Box(
                     Modifier.preferredSize(40f.toDp()).background(Color.Magenta),
@@ -63,9 +63,9 @@ class BackgroundTest {
                 }
             }
         }
-        val bitmap = onNodeWithTag(contentTag).captureToBitmap()
+        val bitmap = rule.onNodeWithTag(contentTag).captureToBitmap()
         bitmap.assertShape(
-            density = composeTestRule.density,
+            density = rule.density,
             backgroundColor = Color.Magenta,
             shape = RectangleShape,
             shapeSizeX = 20.0f,
@@ -76,7 +76,7 @@ class BackgroundTest {
 
     @Test
     fun background_brushRect() {
-        composeTestRule.setContent {
+        rule.setContent {
             SemanticParent {
                 Box(
                     Modifier.preferredSize(40f.toDp()).background(Color.Magenta),
@@ -89,9 +89,9 @@ class BackgroundTest {
                 }
             }
         }
-        val bitmap = onNodeWithTag(contentTag).captureToBitmap()
+        val bitmap = rule.onNodeWithTag(contentTag).captureToBitmap()
         bitmap.assertShape(
-            density = composeTestRule.density,
+            density = rule.density,
             backgroundColor = Color.Magenta,
             shape = RectangleShape,
             shapeSizeX = 20.0f,
@@ -102,7 +102,7 @@ class BackgroundTest {
 
     @Test
     fun background_colorCircle() {
-        composeTestRule.setContent {
+        rule.setContent {
             SemanticParent {
                 Box(
                     Modifier.preferredSize(40f.toDp())
@@ -111,9 +111,9 @@ class BackgroundTest {
                 )
             }
         }
-        val bitmap = onNodeWithTag(contentTag).captureToBitmap()
+        val bitmap = rule.onNodeWithTag(contentTag).captureToBitmap()
         bitmap.assertShape(
-            density = composeTestRule.density,
+            density = rule.density,
             backgroundColor = Color.Magenta,
             shape = CircleShape,
             shapeColor = Color.White,
@@ -123,7 +123,7 @@ class BackgroundTest {
 
     @Test
     fun background_brushCircle() {
-        composeTestRule.setContent {
+        rule.setContent {
             SemanticParent {
                 Box(
                     Modifier.preferredSize(40f.toDp())
@@ -135,9 +135,9 @@ class BackgroundTest {
                 )
             }
         }
-        val bitmap = onNodeWithTag(contentTag).captureToBitmap()
+        val bitmap = rule.onNodeWithTag(contentTag).captureToBitmap()
         bitmap.assertShape(
-            density = composeTestRule.density,
+            density = rule.density,
             backgroundColor = Color.Magenta,
             shape = CircleShape,
             shapeColor = Color.White,

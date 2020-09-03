@@ -33,22 +33,22 @@ import org.junit.Test
 class LazyForIndexedTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Test
     fun columnWithIndexesComposedWithCorrectIndexAndItem() {
         val items = (0..1).map { it.toString() }
 
-        composeTestRule.setContent {
+        rule.setContent {
             LazyColumnForIndexed(items, Modifier.preferredHeight(200.dp)) { index, item ->
                 Text("${index}x$item", Modifier.fillParentMaxWidth().height(100.dp))
             }
         }
 
-        onNodeWithText("0x0")
+        rule.onNodeWithText("0x0")
             .assertTopPositionInRootIsEqualTo(0.dp)
 
-        onNodeWithText("1x1")
+        rule.onNodeWithText("1x1")
             .assertTopPositionInRootIsEqualTo(100.dp)
     }
 
@@ -56,16 +56,16 @@ class LazyForIndexedTest {
     fun rowWithIndexesComposedWithCorrectIndexAndItem() {
         val items = (0..1).map { it.toString() }
 
-        composeTestRule.setContent {
+        rule.setContent {
             LazyRowForIndexed(items, Modifier.preferredWidth(200.dp)) { index, item ->
                 Text("${index}x$item", Modifier.fillParentMaxHeight().width(100.dp))
             }
         }
 
-        onNodeWithText("0x0")
+        rule.onNodeWithText("0x0")
             .assertLeftPositionInRootIsEqualTo(0.dp)
 
-        onNodeWithText("1x1")
+        rule.onNodeWithText("1x1")
             .assertLeftPositionInRootIsEqualTo(100.dp)
     }
 }

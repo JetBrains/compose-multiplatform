@@ -32,7 +32,6 @@ import androidx.ui.test.assertTextEquals
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performSemanticsAction
-import androidx.ui.test.runOnIdle
 import com.google.common.truth.Truth
 import org.junit.Rule
 import org.junit.Test
@@ -44,7 +43,7 @@ import org.junit.runners.JUnit4
 class TextTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     private val ExpectedTextStyle = TextStyle(
         color = Color.Blue,
@@ -63,7 +62,7 @@ class TextTest {
         var fontSize: TextUnit? = null
         var fontStyle: FontStyle? = null
         var letterSpacing: TextUnit? = null
-        composeTestRule.setContent {
+        rule.setContent {
             ProvideTextStyle(ExpectedTextStyle) {
                 Box(backgroundColor = Color.White) {
                     Text(
@@ -80,7 +79,7 @@ class TextTest {
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             Truth.assertThat(textColor).isEqualTo(ExpectedTextStyle.color)
             Truth.assertThat(textAlign).isEqualTo(ExpectedTextStyle.textAlign)
             Truth.assertThat(fontSize).isEqualTo(ExpectedTextStyle.fontSize)
@@ -103,7 +102,7 @@ class TextTest {
             fontStyle = FontStyle.Normal,
             letterSpacing = 0.6.em
         )
-        composeTestRule.setContent {
+        rule.setContent {
             ProvideTextStyle(ExpectedTextStyle) {
                 Box(backgroundColor = Color.White) {
                     Text(
@@ -121,7 +120,7 @@ class TextTest {
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             Truth.assertThat(textColor).isEqualTo(testStyle.color)
             Truth.assertThat(textAlign).isEqualTo(testStyle.textAlign)
             Truth.assertThat(fontSize).isEqualTo(testStyle.fontSize)
@@ -143,7 +142,7 @@ class TextTest {
         val expectedFontStyle = FontStyle.Normal
         val expectedLetterSpacing = 0.6.em
 
-        composeTestRule.setContent {
+        rule.setContent {
             ProvideTextStyle(ExpectedTextStyle) {
                 Box(backgroundColor = Color.White) {
                     Text(
@@ -165,7 +164,7 @@ class TextTest {
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             // explicit parameters should override values from the style.
             Truth.assertThat(textColor).isEqualTo(expectedColor)
             Truth.assertThat(textAlign).isEqualTo(expectedTextAlign)
@@ -188,7 +187,7 @@ class TextTest {
         val expectedFontSize = 16.sp
         val expectedFontStyle = FontStyle.Normal
         val expectedLetterSpacing = 0.6.em
-        composeTestRule.setContent {
+        rule.setContent {
             ProvideTextStyle(ExpectedTextStyle) {
                 Box(backgroundColor = Color.White) {
                     // Set both color and style
@@ -212,7 +211,7 @@ class TextTest {
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             // explicit parameters should override values from the style.
             Truth.assertThat(textColor).isEqualTo(expectedColor)
             Truth.assertThat(textAlign).isEqualTo(expectedTextAlign)
@@ -224,7 +223,7 @@ class TextTest {
 
     @Test
     fun testSemantics() {
-        composeTestRule.setContent {
+        rule.setContent {
             ProvideTextStyle(ExpectedTextStyle) {
                 Box(backgroundColor = Color.White) {
                     Text(
@@ -236,7 +235,7 @@ class TextTest {
         }
 
         val textLayoutResults = mutableListOf<TextLayoutResult>()
-        onNodeWithTag("text")
+        rule.onNodeWithTag("text")
             .assertTextEquals(TestText)
             .performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(textLayoutResults) }
         assert(textLayoutResults.size == 1) { "TextLayoutResult is null" }

@@ -23,7 +23,6 @@ import androidx.test.filters.SmallTest
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performClick
-import androidx.ui.test.runOnIdle
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.times
@@ -37,12 +36,12 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class ClickableTextTest {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Test
     fun onclick_callback() {
         val onClick: (Int) -> Unit = mock()
-        composeTestRule.setContent {
+        rule.setContent {
             ClickableText(
                 modifier = Modifier.testTag("clickableText"),
                 text = AnnotatedString("android"),
@@ -50,9 +49,9 @@ class ClickableTextTest {
             )
         }
 
-        onNodeWithTag("clickableText").performClick()
+        rule.onNodeWithTag("clickableText").performClick()
 
-        runOnIdle {
+        rule.runOnIdle {
             verify(onClick, times(1)).invoke(any())
         }
     }
