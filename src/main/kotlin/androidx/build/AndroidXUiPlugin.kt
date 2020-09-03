@@ -63,9 +63,6 @@ class AndroidXUiPlugin : Plugin<Project> {
                     val conf = project.configurations.create("kotlinPlugin")
 
                     project.tasks.withType(KotlinCompile::class.java).configureEach { compile ->
-                        // TODO(b/157230246): remove when this is enabled by default in Kotlin 1.4
-                        compile.kotlinOptions.freeCompilerArgs +=
-                            "-XXLanguage:+NonParenthesizedAnnotationsOnFunctionalTypes"
                         // TODO(b/157230235): remove when this is enabled by default
                         compile.kotlinOptions.freeCompilerArgs +=
                             "-Xopt-in=kotlin.RequiresOptIn"
