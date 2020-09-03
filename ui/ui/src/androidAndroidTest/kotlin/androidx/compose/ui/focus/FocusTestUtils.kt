@@ -21,13 +21,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.ui.test.ComposeTestRule
+import androidx.ui.test.ComposeTestRuleJUnit
 
 /**
  * This function adds a parent composable which has size. [View.requestFocus()][android.view.View
  * .requestFocus] will not take focus if the view has no size.
  */
-internal fun ComposeTestRule.setFocusableContent(children: @Composable () -> Unit) {
+internal fun ComposeTestRuleJUnit.setFocusableContent(children: @Composable () -> Unit) {
     setContent {
         Box(modifier = Modifier.size(10.dp, 10.dp), children = children)
     }

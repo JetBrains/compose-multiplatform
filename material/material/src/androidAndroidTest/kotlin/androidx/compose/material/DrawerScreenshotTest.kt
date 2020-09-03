@@ -28,7 +28,7 @@ import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
 import androidx.test.screenshot.assertAgainstGolden
-import androidx.ui.test.ComposeTestRule
+import androidx.ui.test.ComposeTestRuleJUnit
 import androidx.ui.test.captureToBitmap
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.onNodeWithTag
@@ -48,7 +48,7 @@ class DrawerScreenshotTest {
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL)
 
-    private fun ComposeTestRule.setBottomDrawer(drawerValue: BottomDrawerValue) {
+    private fun ComposeTestRuleJUnit.setBottomDrawer(drawerValue: BottomDrawerValue) {
         setMaterialContent {
             Box(Modifier.size(10.dp, 100.dp).testTag("container")) {
                 BottomDrawerLayout(
@@ -60,7 +60,7 @@ class DrawerScreenshotTest {
         }
     }
 
-    private fun ComposeTestRule.setModalDrawer(drawerValue: DrawerValue) {
+    private fun ComposeTestRuleJUnit.setModalDrawer(drawerValue: DrawerValue) {
         setMaterialContent {
             Box(Modifier.size(100.dp, 10.dp).testTag("container")) {
                 ModalDrawerLayout(
