@@ -59,7 +59,7 @@ import androidx.compose.ui.util.annotation.FloatRange
  *
  * @param modifier The modifier to be applied to the Column.
  * @param verticalArrangement The vertical arrangement of the layout's children.
- * @param horizontalGravity The horizontal gravity of the layout's children.
+ * @param horizontalAlignment The horizontal alignment of the layout's children.
  *
  * @see Column
  */
@@ -68,10 +68,10 @@ import androidx.compose.ui.util.annotation.FloatRange
 inline fun Column(
     modifier: Modifier = Modifier,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
-    horizontalGravity: Alignment.Horizontal = Alignment.Start,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     children: @Composable ColumnScope.() -> Unit
 ) {
-    val measureBlocks = columnMeasureBlocks(verticalArrangement, horizontalGravity)
+    val measureBlocks = columnMeasureBlocks(verticalArrangement, horizontalAlignment)
     Layout(
         children = { ColumnScope.children() },
         measureBlocks = measureBlocks,
@@ -96,9 +96,9 @@ internal val DefaultColumnMeasureBlocks = rowColumnMeasureBlocks(
 @OptIn(InternalLayoutApi::class)
 internal fun columnMeasureBlocks(
     verticalArrangement: Arrangement.Vertical,
-    horizontalGravity: Alignment.Horizontal
-) = remember(verticalArrangement, horizontalGravity) {
-    if (verticalArrangement == Arrangement.Top && horizontalGravity == Alignment.Start) {
+    horizontalAlignment: Alignment.Horizontal
+) = remember(verticalArrangement, horizontalAlignment) {
+    if (verticalArrangement == Arrangement.Top && horizontalAlignment == Alignment.Start) {
         DefaultColumnMeasureBlocks
     } else {
         rowColumnMeasureBlocks(
@@ -107,7 +107,7 @@ internal fun columnMeasureBlocks(
                 verticalArrangement.arrange(totalSize, size, density, outPosition)
             },
             arrangementSpacing = verticalArrangement.spacing,
-            crossAxisAlignment = CrossAxisAlignment.horizontal(horizontalGravity),
+            crossAxisAlignment = CrossAxisAlignment.horizontal(horizontalAlignment),
             crossAxisSize = SizeMode.Wrap
         )
     }
@@ -120,26 +120,32 @@ internal fun columnMeasureBlocks(
 @Immutable
 object ColumnScope {
     /**
-     * Position the element horizontally within the [Column] according to [align].
+     * Align the element horizontally within the [Column]. This alignment will have priority over
+     * the [Column]'s `horizontalAlignment` parameter.
      *
      * Example usage:
-     * @sample androidx.compose.foundation.layout.samples.SimpleGravityInColumn
+     * @sample androidx.compose.foundation.layout.samples.SimpleAlignInColumn
      */
     @Stable
-    fun Modifier.gravity(align: Alignment.Horizontal) = this.then(HorizontalGravityModifier(align))
+    fun Modifier.align(alignment: Alignment.Horizontal) =
+        this.then(HorizontalAlignModifier(alignment))
+
+    @Stable
+    @Deprecated("gravity has been renamed to align.", ReplaceWith("align(align)"))
+    fun Modifier.gravity(align: Alignment.Horizontal) = this.then(HorizontalAlignModifier(align))
 
     /**
      * Position the element horizontally such that its [alignmentLine] aligns with sibling elements
-     * also configured to [alignWithSiblings]. [alignWithSiblings] is a form of [gravity],
+     * also configured to [alignWithSiblings]. [alignWithSiblings] is a form of [align],
      * so both modifiers will not work together if specified for the same layout.
      * Within a [Column], all components with [alignWithSiblings] will align horizontally using
      * the specified [VerticalAlignmentLine]s or values provided using the other
      * [alignWithSiblings] overload, forming a sibling group.
-     * At least one element of the sibling group will be placed as it had [Alignment.Start] gravity
+     * At least one element of the sibling group will be placed as it had [Alignment.Start] align
      * in [Column], and the alignment of the other siblings will be then determined such that
      * the alignment lines coincide. Note that if only one element in a [Column] has the
      * [alignWithSiblings] modifier specified the element will be positioned
-     * as if it had [Alignment.Start] gravity.
+     * as if it had [Alignment.Start] align.
      *
      * Example usage:
      * @sample androidx.compose.foundation.layout.samples.SimpleRelativeToSiblingsInColumn
@@ -171,16 +177,16 @@ object ColumnScope {
     /**
      * Position the element horizontally such that the alignment line for the content as
      * determined by [alignmentLineBlock] aligns with sibling elements also configured to
-     * [alignWithSiblings]. [alignWithSiblings] is a form of [gravity], so both modifiers
+     * [alignWithSiblings]. [alignWithSiblings] is a form of [align], so both modifiers
      * will not work together if specified for the same layout.
      * Within a [Column], all components with [alignWithSiblings] will align horizontally using
      * the specified [VerticalAlignmentLine]s or values obtained from [alignmentLineBlock],
      * forming a sibling group.
-     * At least one element of the sibling group will be placed as it had [Alignment.Start] gravity
+     * At least one element of the sibling group will be placed as it had [Alignment.Start] align
      * in [Column], and the alignment of the other siblings will be then determined such that
      * the alignment lines coincide. Note that if only one element in a [Column] has the
      * [alignWithSiblings] modifier specified the element will be positioned
-     * as if it had [Alignment.Start] gravity.
+     * as if it had [Alignment.Start] align.
      *
      * Example usage:
      * @sample androidx.compose.foundation.layout.samples.SimpleRelativeToSiblings

@@ -39,15 +39,15 @@ fun SimpleStack() {
         )
         Box(Modifier.matchParentSize().padding(40.dp), backgroundColor = Color.Magenta)
         Box(
-            Modifier.gravity(Alignment.Center).preferredSize(300.dp, 300.dp),
+            Modifier.align(Alignment.Center).preferredSize(300.dp, 300.dp),
             backgroundColor = Color.Green
         )
         Box(
-            Modifier.gravity(Alignment.TopStart).preferredSize(150.dp, 150.dp),
+            Modifier.align(Alignment.TopStart).preferredSize(150.dp, 150.dp),
             backgroundColor = Color.Red
         )
         Box(
-            Modifier.gravity(Alignment.BottomEnd).preferredSize(150.dp, 150.dp),
+            Modifier.align(Alignment.BottomEnd).preferredSize(150.dp, 150.dp),
             backgroundColor = Color.Blue
         )
     }

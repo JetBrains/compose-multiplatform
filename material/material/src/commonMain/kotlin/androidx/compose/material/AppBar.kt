@@ -83,14 +83,14 @@ fun TopAppBar(
         if (navigationIcon == null) {
             Spacer(TitleInsetWithoutIcon)
         } else {
-            Row(TitleIconModifier, verticalGravity = ContentGravity.CenterVertically) {
+            Row(TitleIconModifier, verticalAlignment = ContentGravity.CenterVertically) {
                 ProvideEmphasis(emphasisLevels.high, navigationIcon)
             }
         }
 
         Row(
             Modifier.fillMaxHeight().weight(1f),
-            verticalGravity = ContentGravity.CenterVertically
+            verticalAlignment = ContentGravity.CenterVertically
         ) {
             ProvideTextStyle(value = MaterialTheme.typography.h6) {
                 ProvideEmphasis(emphasisLevels.high, title)
@@ -101,7 +101,7 @@ fun TopAppBar(
             Row(
                 Modifier.fillMaxHeight(),
                 horizontalArrangement = Arrangement.End,
-                verticalGravity = ContentGravity.CenterVertically,
+                verticalAlignment = ContentGravity.CenterVertically,
                 children = actions
             )
         }
@@ -185,7 +185,7 @@ fun BottomAppBar(
         // TODO: b/150609566 clarify emphasis for children
         Row(
             Modifier.fillMaxSize(),
-            verticalGravity = ContentGravity.CenterVertically,
+            verticalAlignment = ContentGravity.CenterVertically,
             children = content
         )
     }

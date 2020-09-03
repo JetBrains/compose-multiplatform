@@ -32,7 +32,7 @@ import androidx.lifecycle.ViewModel
 @Composable
 fun ViewModelDemo() {
     Column(
-        horizontalGravity = Alignment.CenterHorizontally,
+        horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
         val countViewModel = viewModel<CountViewModel>()

@@ -128,7 +128,7 @@ fun RadioGroupSample() {
                     onClick = { onOptionSelected(text) }
                 )
                 .padding(horizontal = 16.dp),
-                verticalGravity = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 RadioButton(
                     selected = (text == selectedOption),

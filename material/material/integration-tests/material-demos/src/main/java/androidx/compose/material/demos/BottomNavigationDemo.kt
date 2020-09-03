@@ -50,7 +50,7 @@ fun BottomNavigationDemo() {
                     selected = !alwaysShowLabels,
                     onClick = { alwaysShowLabels = false }
                 ),
-            verticalGravity = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically
         ) {
             RadioButton(
                 selected = !alwaysShowLabels,
@@ -67,7 +67,7 @@ fun BottomNavigationDemo() {
                     selected = alwaysShowLabels,
                     onClick = { alwaysShowLabels = true }
                 ),
-            verticalGravity = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically
         ) {
             RadioButton(
                 selected = alwaysShowLabels,

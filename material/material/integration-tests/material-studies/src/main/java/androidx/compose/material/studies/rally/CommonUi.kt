@@ -74,33 +74,33 @@ private fun BaseRow(
 ) {
     Row(Modifier.preferredHeight(68.dp)) {
         val typography = MaterialTheme.typography
-        AccountIndicator(color = color, modifier = Modifier.gravity(Alignment.CenterVertically))
+        AccountIndicator(color = color, modifier = Modifier.align(Alignment.CenterVertically))
         Spacer(Modifier.preferredWidth(8.dp))
-        Column(Modifier.gravity(Alignment.CenterVertically)) {
+        Column(Modifier.align(Alignment.CenterVertically)) {
             Text(text = title, style = typography.body1)
             Text(text = subtitle, style = typography.subtitle1)
         }
         Spacer(Modifier.weight(1f))
         Row(
-            modifier = Modifier.gravity(Alignment.CenterVertically).preferredWidth(113.dp),
+            modifier = Modifier.align(Alignment.CenterVertically).preferredWidth(113.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
                 text = if (negative) "–$ " else "$ ",
                 style = typography.h6,
-                modifier = Modifier.gravity(Alignment.CenterVertically)
+                modifier = Modifier.align(Alignment.CenterVertically)
             )
             Text(
                 text = formatAmount(amount),
                 style = typography.h6,
-                modifier = Modifier.gravity(Alignment.CenterVertically)
+                modifier = Modifier.align(Alignment.CenterVertically)
             )
         }
         Spacer(Modifier.preferredWidth(16.dp))
         Icon(
             Icons.Filled.ArrowForwardIos,
             tintColor = Color.White.copy(alpha = 0.6f),
-            modifier = Modifier.gravity(Alignment.CenterVertically),
+            modifier = Modifier.align(Alignment.CenterVertically),
             size = 12.dp
         )
     }

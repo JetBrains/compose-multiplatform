@@ -44,7 +44,7 @@ fun LinearProgressIndicatorSample() {
         animSpec = ProgressIndicatorConstants.DefaultProgressAnimationSpec
     )
 
-    Column(horizontalGravity = Alignment.CenterHorizontally) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         LinearProgressIndicator(progress = animatedProgress)
         Spacer(Modifier.height(30.dp))
         OutlinedButton(onClick = {
@@ -64,7 +64,7 @@ fun CircularProgressIndicatorSample() {
         animSpec = ProgressIndicatorConstants.DefaultProgressAnimationSpec
     )
 
-    Column(horizontalGravity = Alignment.CenterHorizontally) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         CircularProgressIndicator(progress = animatedProgress)
         Spacer(Modifier.height(30.dp))
         OutlinedButton(onClick = {

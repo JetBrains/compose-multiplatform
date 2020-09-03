@@ -21,7 +21,7 @@ import androidx.compose.foundation.Box
 import androidx.compose.foundation.ContentGravity
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope.gravity
+import androidx.compose.foundation.layout.ColumnScope.align
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -57,7 +57,7 @@ fun content() {
         modifier = Modifier.fillMaxSize(),
         color = Color.White
     ) {
-        Column(Modifier.gravity(Alignment.CenterHorizontally)) {
+        Column(Modifier.align(Alignment.CenterHorizontally)) {
             Spacer(modifier = Modifier.height(50.dp))
             Row(modifier = Modifier.preferredHeight(40.dp)) {
                 Button("Popup", { popupState.value = true })
@@ -145,7 +145,7 @@ fun PopupContent(onDismiss: () -> Unit) {
             Spacer(modifier = Modifier.height(50.dp))
             Button(
                 onClick = { onDismiss.invoke() },
-                modifier = Modifier.gravity(Alignment.CenterHorizontally)
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
                 Text(text = "Yes")
             }
@@ -161,7 +161,7 @@ fun WindowContent(amount: MutableState<Int>, onClose: () -> Unit) {
         gravity = ContentGravity.Center
     ) {
         Box(
-            Modifier.preferredSize(300.dp, 150.dp).gravity(Alignment.CenterHorizontally),
+            Modifier.preferredSize(300.dp, 150.dp).align(Alignment.CenterHorizontally),
             backgroundColor = Color.Gray,
             shape = RoundedCornerShape(4.dp),
             gravity = ContentGravity.Center

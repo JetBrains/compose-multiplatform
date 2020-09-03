@@ -133,7 +133,7 @@ fun Button(
                     .indication(interactionState, IndicationAmbient.current())
                     .padding(contentPadding),
                 horizontalArrangement = Arrangement.Center,
-                verticalGravity = Alignment.CenterVertically,
+                verticalAlignment = Alignment.CenterVertically,
                 children = content
             )
         }

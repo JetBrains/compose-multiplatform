@@ -43,7 +43,7 @@ fun ModalDrawerSample() {
         drawerState = drawerState,
         drawerContent = {
             Button(
-                modifier = Modifier.gravity(Alignment.CenterHorizontally).padding(top = 16.dp),
+                modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 16.dp),
                 onClick = { drawerState.close() },
                 content = { Text("Close Drawer") }
             )
@@ -51,7 +51,7 @@ fun ModalDrawerSample() {
         bodyContent = {
             Column(
                 modifier = Modifier.fillMaxSize().padding(16.dp),
-                horizontalGravity = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(text = if (drawerState.isClosed) ">>> Swipe >>>" else "<<< Swipe <<<")
                 Spacer(Modifier.preferredHeight(20.dp))
@@ -71,7 +71,7 @@ fun BottomDrawerSample() {
         drawerState = drawerState,
         drawerContent = {
             Button(
-                modifier = Modifier.gravity(Alignment.CenterHorizontally).padding(top = 16.dp),
+                modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 16.dp),
                 onClick = { drawerState.close() },
                 content = { Text("Close Drawer") }
             )
@@ -79,7 +79,7 @@ fun BottomDrawerSample() {
         bodyContent = {
             Column(
                 modifier = Modifier.fillMaxSize().padding(16.dp),
-                horizontalGravity = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(text = if (drawerState.isClosed) "▲▲▲ Pull up ▲▲▲" else "▼▼▼ Drag down ▼▼▼")
                 Spacer(Modifier.preferredHeight(20.dp))

@@ -171,7 +171,7 @@ fun ExtendedFloatingActionButton(
             if (icon == null) {
                 text()
             } else {
-                Row(verticalGravity = ContentGravity.CenterVertically) {
+                Row(verticalAlignment = ContentGravity.CenterVertically) {
                     icon()
                     Spacer(Modifier.preferredWidth(ExtendedFabIconPadding))
                     text()

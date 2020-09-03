@@ -167,7 +167,7 @@ private class LazyListScopeImpl : LazyListScope {
  *
  * @param modifier the modifier to apply to this layout
  * @param contentPadding specify a padding around the whole content
- * @param verticalGravity the vertical gravity applied to the items
+ * @param verticalAlignment the vertical alignment applied to the items
  * @param content the [LazyListScope] which describes the content
  */
 @Composable
@@ -175,7 +175,7 @@ private class LazyListScopeImpl : LazyListScope {
 fun LazyRow(
     modifier: Modifier = Modifier,
     contentPadding: InnerPadding = InnerPadding(0.dp),
-    verticalGravity: Alignment.Vertical = Alignment.Top,
+    verticalAlignment: Alignment.Vertical = Alignment.Top,
     content: LazyListScope.() -> Unit
 ) {
     val scope = LazyListScopeImpl()
@@ -185,7 +185,7 @@ fun LazyRow(
         itemsCount = scope.totalSize,
         modifier = modifier,
         contentPadding = contentPadding,
-        verticalGravity = verticalGravity,
+        verticalAlignment = verticalAlignment,
         isVertical = false
     ) { index -> scope.contentFor(index, this) }
 }
@@ -197,7 +197,7 @@ fun LazyRow(
  *
  * @param modifier the modifier to apply to this layout
  * @param contentPadding specify a padding around the whole content
- * @param horizontalGravity the horizontal gravity applied to the items
+ * @param horizontalAlignment the horizontal alignment applied to the items
  * @param content the [LazyListScope] which describes the content
  */
 @Composable
@@ -205,7 +205,7 @@ fun LazyRow(
 fun LazyColumn(
     modifier: Modifier = Modifier,
     contentPadding: InnerPadding = InnerPadding(0.dp),
-    horizontalGravity: Alignment.Horizontal = Alignment.Start,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     content: LazyListScope.() -> Unit
 ) {
     val scope = LazyListScopeImpl()
@@ -215,7 +215,7 @@ fun LazyColumn(
         itemsCount = scope.totalSize,
         modifier = modifier,
         contentPadding = contentPadding,
-        horizontalGravity = horizontalGravity,
+        horizontalAlignment = horizontalAlignment,
         isVertical = true
     ) {
         index -> scope.contentFor(index, this)

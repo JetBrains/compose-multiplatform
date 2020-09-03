@@ -57,7 +57,7 @@ import androidx.compose.ui.util.annotation.FloatRange
  *
  * @param modifier The modifier to be applied to the Row.
  * @param horizontalArrangement The horizontal arrangement of the layout's children.
- * @param verticalGravity The vertical gravity of the layout's children.
+ * @param verticalAlignment The vertical alignment of the layout's children.
  *
  * @see Column
  */
@@ -66,12 +66,12 @@ import androidx.compose.ui.util.annotation.FloatRange
 inline fun Row(
     modifier: Modifier = Modifier,
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
-    verticalGravity: Alignment.Vertical = Alignment.Top,
+    verticalAlignment: Alignment.Vertical = Alignment.Top,
     children: @Composable RowScope.() -> Unit
 ) {
     val measureBlocks = rowMeasureBlocks(
         horizontalArrangement,
-        verticalGravity
+        verticalAlignment
     )
     Layout(
         children = { RowScope.children() },
@@ -81,7 +81,7 @@ inline fun Row(
 }
 
 /**
- * MeasureBlocks to use when horizontalArrangement and verticalGravity are not provided.
+ * MeasureBlocks to use when horizontalArrangement and verticalAlignment are not provided.
  */
 @PublishedApi
 @OptIn(InternalLayoutApi::class)
@@ -100,9 +100,9 @@ internal val DefaultRowMeasureBlocks = rowColumnMeasureBlocks(
 @OptIn(InternalLayoutApi::class)
 internal fun rowMeasureBlocks(
     horizontalArrangement: Arrangement.Horizontal,
-    verticalGravity: Alignment.Vertical
-) = remember(horizontalArrangement, verticalGravity) {
-    if (horizontalArrangement == Arrangement.Start && verticalGravity == Alignment.Top) {
+    verticalAlignment: Alignment.Vertical
+) = remember(horizontalArrangement, verticalAlignment) {
+    if (horizontalArrangement == Arrangement.Start && verticalAlignment == Alignment.Top) {
         DefaultRowMeasureBlocks
     } else {
         rowColumnMeasureBlocks(
@@ -112,7 +112,7 @@ internal fun rowMeasureBlocks(
                     .arrange(totalSize, size, layoutDirection, density, outPosition)
             },
             arrangementSpacing = horizontalArrangement.spacing,
-            crossAxisAlignment = CrossAxisAlignment.vertical(verticalGravity),
+            crossAxisAlignment = CrossAxisAlignment.vertical(verticalAlignment),
             crossAxisSize = SizeMode.Wrap
         )
     }
@@ -125,28 +125,33 @@ internal fun rowMeasureBlocks(
 @Immutable
 object RowScope {
     /**
-     * Position the element vertically within the [Row] according to [align].
+     * Align the element vertically within the [Row]. This alignment will have priority over the
+     * [Row]'s `verticalAlignment` parameter.
      *
      * Example usage:
-     * @sample androidx.compose.foundation.layout.samples.SimpleGravityInRow
+     * @sample androidx.compose.foundation.layout.samples.SimpleAlignInRow
      */
     @Stable
-    fun Modifier.gravity(align: Alignment.Vertical) = this.then(VerticalGravityModifier(align))
+    fun Modifier.align(alignment: Alignment.Vertical) = this.then(VerticalAlignModifier(alignment))
+
+    @Stable
+    @Deprecated("gravity has been renamed to align.", ReplaceWith("align(align)"))
+    fun Modifier.gravity(align: Alignment.Vertical) = this.then(VerticalAlignModifier(align))
 
     /**
      * Position the element vertically such that its [alignmentLine] aligns with sibling elements
-     * also configured to [alignWithSiblings]. [alignWithSiblings] is a form of [gravity],
+     * also configured to [alignWithSiblings]. [alignWithSiblings] is a form of [align],
      * so both modifiers will not work together if specified for the same layout.
      * [alignWithSiblings] can be used to align two layouts by baseline inside a [Row],
      * using `alignWithSiblings(FirstBaseline)`.
      * Within a [Row], all components with [alignWithSiblings] will align vertically using
      * the specified [HorizontalAlignmentLine]s or values provided using the other
      * [alignWithSiblings] overload, forming a sibling group.
-     * At least one element of the sibling group will be placed as it had [Alignment.Top] gravity
+     * At least one element of the sibling group will be placed as it had [Alignment.Top] align
      * in [Row], and the alignment of the other siblings will be then determined such that
      * the alignment lines coincide. Note that if only one element in a [Row] has the
      * [alignWithSiblings] modifier specified the element will be positioned
-     * as if it had [Alignment.Top] gravity.
+     * as if it had [Alignment.Top] align.
      *
      * Example usage:
      * @sample androidx.compose.foundation.layout.samples.SimpleRelativeToSiblingsInRow
@@ -176,16 +181,16 @@ object RowScope {
     /**
      * Position the element vertically such that the alignment line for the content as
      * determined by [alignmentLineBlock] aligns with sibling elements also configured to
-     * [alignWithSiblings]. [alignWithSiblings] is a form of [gravity], so both modifiers
+     * [alignWithSiblings]. [alignWithSiblings] is a form of [align], so both modifiers
      * will not work together if specified for the same layout.
      * Within a [Row], all components with [alignWithSiblings] will align vertically using
      * the specified [HorizontalAlignmentLine]s or values obtained from [alignmentLineBlock],
      * forming a sibling group.
-     * At least one element of the sibling group will be placed as it had [Alignment.Top] gravity
+     * At least one element of the sibling group will be placed as it had [Alignment.Top] align
      * in [Row], and the alignment of the other siblings will be then determined such that
      * the alignment lines coincide. Note that if only one element in a [Row] has the
      * [alignWithSiblings] modifier specified the element will be positioned
-     * as if it had [Alignment.Top] gravity.
+     * as if it had [Alignment.Top] align.
      *
      * Example usage:
      * @sample androidx.compose.foundation.layout.samples.SimpleRelativeToSiblings

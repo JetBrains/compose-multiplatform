@@ -41,20 +41,20 @@ fun AccountsBody(accounts: List<Account>) {
         val accountsProportion = accounts.extractProportions { it.balance }
         val colors = accounts.map { it.color }
         AnimatedCircle(
-            Modifier.preferredHeight(300.dp).gravity(Alignment.Center).fillMaxWidth(),
+            Modifier.preferredHeight(300.dp).align(Alignment.Center).fillMaxWidth(),
             accountsProportion,
             colors
         )
-        Column(modifier = Modifier.gravity(Alignment.Center)) {
+        Column(modifier = Modifier.align(Alignment.Center)) {
             Text(
                 text = "Total",
                 style = MaterialTheme.typography.body1,
-                modifier = Modifier.gravity(Alignment.CenterHorizontally)
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
             Text(
                 text = "$12,132.49",
                 style = MaterialTheme.typography.h2,
-                modifier = Modifier.gravity(Alignment.CenterHorizontally)
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
         }
     }

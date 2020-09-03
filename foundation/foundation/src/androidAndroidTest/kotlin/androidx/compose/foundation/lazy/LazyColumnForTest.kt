@@ -430,7 +430,7 @@ class LazyColumnForTest {
             LazyColumnFor(
                 items = listOf(1, 2),
                 modifier = Modifier.testTag(LazyColumnForTag).width(100.dp),
-                horizontalGravity = horizontalGravity
+                horizontalAlignment = horizontalGravity
             ) {
                 if (it == 1) {
                     Spacer(Modifier.preferredSize(50.dp).testTag(firstItemTag))

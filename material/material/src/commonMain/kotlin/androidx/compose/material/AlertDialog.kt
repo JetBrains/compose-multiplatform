@@ -144,7 +144,7 @@ fun AlertDialog(
             val emphasisLevels = EmphasisAmbient.current
             Column {
                 if (title != null) {
-                    Box(TitlePadding.gravity(Alignment.Start)) {
+                    Box(TitlePadding.align(Alignment.Start)) {
                         ProvideEmphasis(emphasisLevels.high) {
                             val textStyle = MaterialTheme.typography.subtitle1
                             ProvideTextStyle(textStyle, title)
@@ -157,7 +157,7 @@ fun AlertDialog(
                 }
 
                 if (text != null) {
-                    Box(TextPadding.gravity(Alignment.Start)) {
+                    Box(TextPadding.align(Alignment.Start)) {
                         ProvideEmphasis(emphasisLevels.medium) {
                             val textStyle = MaterialTheme.typography.body2
                             ProvideTextStyle(textStyle, text)

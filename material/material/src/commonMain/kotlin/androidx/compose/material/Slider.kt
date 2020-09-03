@@ -226,7 +226,7 @@ private fun SliderImpl(
     Stack(modifier.then(DefaultSliderConstraints)) {
         val thumbSize = ThumbRadius * 2
         val offset = (widthDp - thumbSize) * positionFraction
-        val center = Modifier.gravity(Alignment.CenterStart)
+        val center = Modifier.align(Alignment.CenterStart)
 
         val trackStrokeWidth: Float
         val thumbPx: Float

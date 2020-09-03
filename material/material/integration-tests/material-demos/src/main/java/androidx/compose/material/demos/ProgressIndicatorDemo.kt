@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.dp
 fun ProgressIndicatorDemo() {
     ScrollableColumn {
         val modifier = Modifier.weight(1f, true)
-            .gravity(Alignment.CenterHorizontally)
+            .align(Alignment.CenterHorizontally)
             .fillMaxWidth()
             .border(1.dp, MaterialTheme.colors.primary)
         // Determinate indicators
@@ -50,7 +50,7 @@ fun ProgressIndicatorDemo() {
         Row(
             modifier,
             horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalGravity = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically
         ) {
             // Indeterminate indicators
             LinearProgressIndicator()

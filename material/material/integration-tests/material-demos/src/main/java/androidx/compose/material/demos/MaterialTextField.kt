@@ -21,7 +21,7 @@ import androidx.compose.foundation.Icon
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope.gravity
+import androidx.compose.foundation.layout.ColumnScope.align
 import androidx.compose.foundation.layout.InnerPadding
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -123,7 +123,7 @@ fun MaterialTextFieldDemo() {
             }
         }
 
-        Box(Modifier.preferredHeight(150.dp).gravity(Alignment.CenterHorizontally)) {
+        Box(Modifier.preferredHeight(150.dp).align(Alignment.CenterHorizontally)) {
             if (selectedOption == Option.None) {
                 textField()
             } else {
@@ -237,7 +237,7 @@ private fun Title(title: String) {
     Text(
         text = title,
         style = MaterialTheme.typography.body1,
-        modifier = Modifier.gravity(Alignment.CenterHorizontally)
+        modifier = Modifier.align(Alignment.CenterHorizontally)
     )
     Spacer(Modifier.preferredHeight(10.dp))
 }

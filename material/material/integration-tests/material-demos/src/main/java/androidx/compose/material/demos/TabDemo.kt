@@ -64,7 +64,7 @@ fun TabDemo() {
         }
         Spacer(Modifier.height(24.dp))
         Button(
-            modifier = Modifier.gravity(Alignment.CenterHorizontally),
+            modifier = Modifier.align(Alignment.CenterHorizontally),
             onClick = {
                 showingSimple.value = !showingSimple.value
             },
