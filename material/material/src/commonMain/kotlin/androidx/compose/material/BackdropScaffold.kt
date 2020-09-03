@@ -313,9 +313,7 @@ fun BackdropScaffold(
                 ),
                 thresholds = { _, _ -> FixedThreshold(56.dp) },
                 orientation = Orientation.Vertical,
-                enabled = gesturesEnabled,
-                resistanceFactorAtMin = SwipeableConstants.StiffResistanceFactor,
-                resistanceFactorAtMax = SwipeableConstants.StiffResistanceFactor
+                enabled = gesturesEnabled
             )
 
             // Front layer

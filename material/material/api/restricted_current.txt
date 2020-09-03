@@ -362,6 +362,18 @@ package androidx.compose.material {
     method @androidx.compose.runtime.Composable public static void RadioButton-PKiHyag(boolean selected, kotlin.jvm.functions.Function0<kotlin.Unit> onClick, androidx.compose.ui.Modifier modifier = Modifier, boolean enabled = true, long selectedColor = MaterialTheme.colors.secondary, long unselectedColor = RadioButtonConstants.defaultUnselectedColor, long disabledColor = RadioButtonConstants.defaultDisabledColor);
   }
 
+  @androidx.compose.runtime.Immutable public final class ResistanceConfig {
+    ctor public ResistanceConfig(@FloatRange(from=0.0, to=3.4E38, fromInclusive=false) float basis, @FloatRange(from=0.0, to=3.4E38) float factorAtMin, @FloatRange(from=0.0, to=3.4E38) float factorAtMax);
+    method public float component1();
+    method public float component2();
+    method public float component3();
+    method public float computeResistance(float overflow);
+    method @androidx.compose.runtime.Immutable public androidx.compose.material.ResistanceConfig copy(float basis, float factorAtMin, float factorAtMax);
+    method public float getBasis();
+    method public float getFactorAtMax();
+    method public float getFactorAtMin();
+  }
+
   public final class ScaffoldKt {
     method @androidx.compose.runtime.Composable public static void Scaffold-6SxdeRQ(androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.material.ScaffoldState scaffoldState = rememberScaffoldState(), kotlin.jvm.functions.Function0<kotlin.Unit>? topBar = null, kotlin.jvm.functions.Function0<kotlin.Unit>? bottomBar = null, kotlin.jvm.functions.Function1<? super androidx.compose.material.SnackbarHostState,kotlin.Unit> snackbarHost = { SnackbarHost(it) }, kotlin.jvm.functions.Function0<kotlin.Unit>? floatingActionButton = null, androidx.compose.material.FabPosition floatingActionButtonPosition = androidx.compose.material.FabPosition.End, boolean isFloatingActionButtonDocked = false, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit>? drawerContent = null, androidx.compose.ui.graphics.Shape drawerShape = large, float drawerElevation = DrawerConstants.DefaultElevation, long drawerBackgroundColor = MaterialTheme.colors.surface, long drawerContentColor = contentColorFor(drawerBackgroundColor), long drawerScrimColor = MaterialTheme.colors.onSurface.copy(DrawerConstants.ScrimDefaultOpacity), long backgroundColor = MaterialTheme.colors.background, long contentColor = contentColorFor(backgroundColor), kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.InnerPadding,kotlin.Unit> bodyContent);
     method @androidx.compose.runtime.Composable public static androidx.compose.material.ScaffoldState rememberScaffoldState(androidx.compose.material.DrawerState drawerState = rememberDrawerState(DrawerValue.Closed), androidx.compose.material.SnackbarHostState snackbarHostState = androidx.compose.material.SnackbarHostState(), boolean isDrawerGesturesEnabled = true);
@@ -473,6 +485,7 @@ package androidx.compose.material {
   }
 
   public final class SwipeableConstants {
+    method public androidx.compose.material.ResistanceConfig? defaultResistanceConfig(java.util.Set<java.lang.Float> anchors, float factorAtMin = 10.0f, float factorAtMax = 10.0f);
     method public androidx.compose.animation.core.SpringSpec<java.lang.Float> getDefaultAnimationSpec();
     method public float getDefaultVelocityThreshold();
     property public final androidx.compose.animation.core.SpringSpec<java.lang.Float> DefaultAnimationSpec;
@@ -484,7 +497,7 @@ package androidx.compose.material {
 
   public final class SwipeableKt {
     method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static <T> androidx.compose.material.SwipeableState<T> rememberSwipeableState(T initialValue, androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec = DefaultAnimationSpec, kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> confirmStateChange = { return true });
-    method @androidx.compose.material.ExperimentalMaterialApi public static <T> androidx.compose.ui.Modifier swipeable-gqDAvWg(androidx.compose.ui.Modifier, androidx.compose.material.SwipeableState<T> state, java.util.Map<java.lang.Float,? extends T> anchors, kotlin.jvm.functions.Function2<? super T,? super T,? extends androidx.compose.material.ThresholdConfig> thresholds, androidx.compose.ui.gesture.scrollorientationlocking.Orientation orientation, boolean enabled = true, boolean reverseDirection = false, androidx.compose.foundation.InteractionState? interactionState = null, float velocityThreshold = DefaultVelocityThreshold, float resistanceFactorAtMin = 10.0f, float resistanceFactorAtMax = 10.0f);
+    method @androidx.compose.material.ExperimentalMaterialApi public static <T> androidx.compose.ui.Modifier swipeable-VaXUQxo(androidx.compose.ui.Modifier, androidx.compose.material.SwipeableState<T> state, java.util.Map<java.lang.Float,? extends T> anchors, kotlin.jvm.functions.Function2<? super T,? super T,? extends androidx.compose.material.ThresholdConfig> thresholds, androidx.compose.ui.gesture.scrollorientationlocking.Orientation orientation, boolean enabled = true, boolean reverseDirection = false, androidx.compose.foundation.InteractionState? interactionState = null, androidx.compose.material.ResistanceConfig? resistance = defaultResistanceConfig(anchors.keys), float velocityThreshold = DefaultVelocityThreshold);
   }
 
   @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public class SwipeableState<T> {
