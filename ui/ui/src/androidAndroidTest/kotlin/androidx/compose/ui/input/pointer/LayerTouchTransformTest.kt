@@ -122,7 +122,7 @@ class LayerTouchTransformTest {
         // its bounds
 
         val mappedPosition = Offset(342.0f, 168.0f)
-        val node = onNodeWithTag(testTag).performGesture { down(mappedPosition) }
+        val node = rule.onNodeWithTag(testTag).performGesture { down(mappedPosition) }
 
         latch = CountDownLatch(1).apply {
             await(5, TimeUnit.SECONDS)

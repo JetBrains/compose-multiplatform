@@ -82,8 +82,6 @@ import androidx.ui.test.assertIsDisplayed
 import androidx.ui.test.assertPixels
 import androidx.ui.test.captureToBitmap
 import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.runOnIdle
-import androidx.ui.test.runOnUiThread
 import junit.framework.TestCase.assertNotNull
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.allOf
@@ -106,14 +104,14 @@ import kotlin.math.roundToInt
 @RunWith(JUnit4::class)
 class AndroidViewCompatTest {
     @get:Rule
-    val composeTestRule = createAndroidComposeRule<TestActivity>()
+    val rule = createAndroidComposeRule<TestActivity>()
 
     @Test
     fun simpleLayoutTest() {
         val squareRef = Ref<ColoredSquareView>()
         val squareSize = mutableStateOf(100)
         var expectedSize = 100
-        composeTestRule.setContent {
+        rule.setContent {
             Align {
                 Layout(
                     modifier = Modifier.testTag("content"),
@@ -136,7 +134,7 @@ class AndroidViewCompatTest {
                 }
             }
         }
-        onNodeWithTag("content").assertIsDisplayed()
+        rule.onNodeWithTag("content").assertIsDisplayed()
         val squareView = squareRef.value
         assertNotNull(squareView)
         Espresso
@@ -144,23 +142,23 @@ class AndroidViewCompatTest {
             .check(matches(isDescendantOfA(instanceOf(Owner::class.java))))
             .check(matches(`is`(squareView)))
 
-        runOnUiThread {
+        rule.runOnUiThread {
             // Change view attribute using recomposition.
             squareSize.value = 200
             expectedSize = 200
         }
-        onNodeWithTag("content").assertIsDisplayed()
+        rule.onNodeWithTag("content").assertIsDisplayed()
         Espresso
             .onView(instanceOf(ColoredSquareView::class.java))
             .check(matches(isDescendantOfA(instanceOf(Owner::class.java))))
             .check(matches(`is`(squareView)))
 
-        runOnUiThread {
+        rule.runOnUiThread {
             // Change view attribute using the View reference.
             squareView!!.size = 300
             expectedSize = 300
         }
-        onNodeWithTag("content").assertIsDisplayed()
+        rule.onNodeWithTag("content").assertIsDisplayed()
         Espresso
             .onView(instanceOf(ColoredSquareView::class.java))
             .check(matches(isDescendantOfA(instanceOf(Owner::class.java))))
@@ -174,7 +172,7 @@ class AndroidViewCompatTest {
         val colorModel = mutableStateOf(Color.Blue)
         val squareSize = 100
         var expectedColor = Color.Blue
-        composeTestRule.setContent {
+        rule.setContent {
             Align {
                 Container(Modifier.testTag("content").drawLayer()) {
                     AndroidView(::ColoredSquareView) {
@@ -197,12 +195,12 @@ class AndroidViewCompatTest {
                 Color.White
             }
         }
-        onNodeWithTag("content")
+        rule.onNodeWithTag("content")
             .assertIsDisplayed()
             .captureToBitmap()
             .assertPixels(expectedColorProvider = expectedPixelColor)
 
-        runOnUiThread {
+        rule.runOnUiThread {
             // Change view attribute using recomposition.
             colorModel.value = Color.Green
             expectedColor = Color.Green
@@ -211,12 +209,12 @@ class AndroidViewCompatTest {
             .onView(instanceOf(ColoredSquareView::class.java))
             .check(matches(isDescendantOfA(instanceOf(Owner::class.java))))
             .check(matches(`is`(squareView)))
-        onNodeWithTag("content")
+        rule.onNodeWithTag("content")
             .assertIsDisplayed()
             .captureToBitmap()
             .assertPixels(expectedColorProvider = expectedPixelColor)
 
-        runOnUiThread {
+        rule.runOnUiThread {
             // Change view attribute using the View reference.
             colorModel.value = Color.Red
             expectedColor = Color.Red
@@ -225,7 +223,7 @@ class AndroidViewCompatTest {
             .onView(instanceOf(ColoredSquareView::class.java))
             .check(matches(isDescendantOfA(instanceOf(Owner::class.java))))
             .check(matches(`is`(squareView)))
-        onNodeWithTag("content")
+        rule.onNodeWithTag("content")
             .assertIsDisplayed()
             .captureToBitmap()
             .assertPixels(expectedColorProvider = expectedPixelColor)
@@ -366,7 +364,7 @@ class AndroidViewCompatTest {
         // guaranteed.
         val constraintsHolder = mutableStateOf(Constraints.fixed(1234, 5678))
 
-        composeTestRule.setContent {
+        rule.setContent {
             Container(LayoutConstraints(constraintsHolder.value)) {
                 AndroidView(::MeasureSpecSaverView) {
                     it.ref = viewRef
@@ -376,12 +374,12 @@ class AndroidViewCompatTest {
             }
         }
 
-        runOnUiThread {
+        rule.runOnUiThread {
             constraintsHolder.value = constraints
             viewRef.value?.layoutParams = layoutParams
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertEquals(expectedWidthSpec, widthMeasureSpecRef.value)
             assertEquals(expectedHeightSpec, heightMeasureSpecRef.value)
         }
@@ -391,16 +389,16 @@ class AndroidViewCompatTest {
     fun testMeasurement_isDoneWithCorrectMinimumDimensionsSetOnView() {
         val viewRef = Ref<MeasureSpecSaverView>()
         val constraintsHolder = mutableStateOf(Constraints())
-        composeTestRule.setContent {
+        rule.setContent {
             Container(LayoutConstraints(constraintsHolder.value)) {
                 AndroidView(::MeasureSpecSaverView) { it.ref = viewRef }
             }
         }
-        runOnUiThread {
+        rule.runOnUiThread {
             constraintsHolder.value = Constraints(minWidth = 20, minHeight = 30)
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertEquals(20, viewRef.value!!.minimumWidth)
             assertEquals(30, viewRef.value!!.minimumHeight)
         }
@@ -410,7 +408,7 @@ class AndroidViewCompatTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun testRedrawing_onSubsequentRemeasuring() {
         var size by mutableStateOf(20)
-        composeTestRule.setContent {
+        rule.setContent {
             Box(Modifier.drawLayer().fillMaxSize()) {
                 val context = ContextAmbient.current
                 val view = remember { View(context) }
@@ -419,13 +417,16 @@ class AndroidViewCompatTest {
                 view.setBackgroundColor(android.graphics.Color.BLUE)
             }
         }
-        onNodeWithTag("view").captureToBitmap().assertPixels(IntSize(size, size)) { Color.Blue }
+        rule.onNodeWithTag("view").captureToBitmap()
+            .assertPixels(IntSize(size, size)) { Color.Blue }
 
-        runOnIdle { size += 20 }
-        onNodeWithTag("view").captureToBitmap().assertPixels(IntSize(size, size)) { Color.Blue }
+        rule.runOnIdle { size += 20 }
+        rule.onNodeWithTag("view").captureToBitmap()
+            .assertPixels(IntSize(size, size)) { Color.Blue }
 
-        runOnIdle { size += 20 }
-        onNodeWithTag("view").captureToBitmap().assertPixels(IntSize(size, size)) { Color.Blue }
+        rule.runOnIdle { size += 20 }
+        rule.onNodeWithTag("view").captureToBitmap()
+            .assertPixels(IntSize(size, size)) { Color.Blue }
     }
 
     @Test
@@ -435,7 +436,7 @@ class AndroidViewCompatTest {
         var outer: Offset = Offset.Zero
         var inner: Offset = Offset.Zero
 
-        composeTestRule.setContent {
+        rule.setContent {
             Box(Modifier.onPositioned { outer = it.globalPosition }) {
                 val paddingDp = with(DensityAmbient.current) { padding.toDp() }
                 Box(Modifier.padding(paddingDp)) {
@@ -449,7 +450,7 @@ class AndroidViewCompatTest {
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertEquals(outer.x + padding * 2, inner.x)
             assertEquals(outer.y + padding * 2, inner.y)
         }
@@ -464,7 +465,7 @@ class AndroidViewCompatTest {
         lateinit var coordinates: LayoutCoordinates
         var startX = 0
 
-        composeTestRule.activityRule.scenario.onActivity {
+        rule.activityRule.scenario.onActivity {
             val root = LinearLayout(it)
             it.setContentView(root)
 
@@ -486,11 +487,11 @@ class AndroidViewCompatTest {
                 }
             }
         }
-        runOnIdle { startX = coordinates.globalPosition.x.roundToInt() }
+        rule.runOnIdle { startX = coordinates.globalPosition.x.roundToInt() }
 
-        runOnIdle { topView.visibility = View.GONE }
+        rule.runOnIdle { topView.visibility = View.GONE }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertEquals(100, startX - coordinates.globalPosition.x.roundToInt())
         }
     }
@@ -499,14 +500,14 @@ class AndroidViewCompatTest {
     @Suppress("Deprecation")
     fun testComposeInsideView_simpleLayout() {
         val padding = 10f
-        val paddingDp = with(composeTestRule.density) { padding.toDp() }
+        val paddingDp = with(rule.density) { padding.toDp() }
         val size = 20f
-        val sizeDp = with(composeTestRule.density) { size.toDp() }
+        val sizeDp = with(rule.density) { size.toDp() }
 
         var outer: Offset = Offset.Zero
         var inner1: Offset = Offset.Zero
         var inner2: Offset = Offset.Zero
-        composeTestRule.setContent {
+        rule.setContent {
             Box(Modifier.onPositioned { outer = it.globalPosition }) {
                 Box(paddingStart = paddingDp, paddingTop = paddingDp) {
                     emitView(::LinearLayout, {}) {
@@ -521,7 +522,7 @@ class AndroidViewCompatTest {
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertEquals(Offset(padding, padding), inner1 - outer)
             assertEquals(Offset(padding + size, padding), inner2 - outer)
         }
@@ -532,11 +533,11 @@ class AndroidViewCompatTest {
     @Suppress("Deprecation")
     fun testComposeInsideView_simpleDraw() {
         val padding = 10f
-        val paddingDp = with(composeTestRule.density) { padding.toDp() }
+        val paddingDp = with(rule.density) { padding.toDp() }
         val size = 20f
-        val sizeDp = with(composeTestRule.density) { size.toDp() }
+        val sizeDp = with(rule.density) { size.toDp() }
 
-        composeTestRule.setContent {
+        rule.setContent {
             Box(Modifier.testTag("box")) {
                 Box(padding = paddingDp, backgroundColor = Color.Blue) {
                     emitView(::LinearLayout, {}) {
@@ -547,7 +548,7 @@ class AndroidViewCompatTest {
             }
         }
 
-        onNodeWithTag("box").captureToBitmap().assertPixels(
+        rule.onNodeWithTag("box").captureToBitmap().assertPixels(
             IntSize((padding * 2 + size * 2).roundToInt(), (padding * 2 + size).roundToInt())
         ) { offset ->
             if (offset.y < padding || offset.y >= padding + size || offset.x < padding ||
@@ -566,7 +567,7 @@ class AndroidViewCompatTest {
     fun testComposeInsideView_attachingAndDetaching() {
         var composeContent by mutableStateOf(true)
         var node: LayoutNode? = null
-        composeTestRule.setContent {
+        rule.setContent {
             if (composeContent) {
                 Box {
                     AndroidView(::LinearLayout) {
@@ -611,10 +612,10 @@ class AndroidViewCompatTest {
         assertNotNull(node)
         assertTrue(node!!.isAttached())
 
-        runOnIdle { composeContent = false }
+        rule.runOnIdle { composeContent = false }
 
         // The composition has been disposed.
-        runOnIdle {
+        rule.runOnIdle {
             assertFalse(innerAndroidComposeView!!.isAttachedToWindow)
             assertFalse(node!!.isAttached())
         }
@@ -625,10 +626,10 @@ class AndroidViewCompatTest {
     @Suppress("Deprecation")
     fun testComposeInsideView_remove() {
         val size = 40.dp
-        val sizePx = with(composeTestRule.density) { size.toIntPx() }
+        val sizePx = with(rule.density) { size.toIntPx() }
 
         var first by mutableStateOf(true)
-        composeTestRule.setContent {
+        rule.setContent {
             Box(Modifier.testTag("view")) {
                 emitView(::LinearLayout, {}) {
                     if (first) {
@@ -640,12 +641,12 @@ class AndroidViewCompatTest {
             }
         }
 
-        onNodeWithTag("view")
+        rule.onNodeWithTag("view")
             .captureToBitmap().assertPixels(IntSize(sizePx, sizePx)) { Color.Green }
 
-        runOnIdle { first = false }
+        rule.runOnIdle { first = false }
 
-        onNodeWithTag("view")
+        rule.onNodeWithTag("view")
             .captureToBitmap().assertPixels(IntSize(sizePx, sizePx)) { Color.Blue }
     }
 
@@ -654,10 +655,10 @@ class AndroidViewCompatTest {
     @Suppress("Deprecation")
     fun testComposeInsideView_move() {
         val size = 40.dp
-        val sizePx = with(composeTestRule.density) { size.toIntPx() }
+        val sizePx = with(rule.density) { size.toIntPx() }
 
         var first by mutableStateOf(true)
-        composeTestRule.setContent {
+        rule.setContent {
             Box(Modifier.testTag("view")) {
                 emitView(::LinearLayout, {}) {
                     if (first) {
@@ -679,14 +680,14 @@ class AndroidViewCompatTest {
             }
         }
 
-        onNodeWithTag("view").captureToBitmap()
+        rule.onNodeWithTag("view").captureToBitmap()
             .assertPixels(IntSize(sizePx * 2, sizePx)) {
                 if (it.x < sizePx) Color.Green else Color.Blue
             }
 
-        runOnIdle { first = false }
+        rule.runOnIdle { first = false }
 
-        onNodeWithTag("view").captureToBitmap()
+        rule.onNodeWithTag("view").captureToBitmap()
             .assertPixels(IntSize(sizePx * 2, sizePx)) {
                 if (it.x < sizePx) Color.Blue else Color.Green
             }

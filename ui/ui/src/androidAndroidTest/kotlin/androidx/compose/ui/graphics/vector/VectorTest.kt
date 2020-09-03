@@ -47,8 +47,6 @@ import androidx.ui.test.createComposeRule
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.onRoot
 import androidx.ui.test.performClick
-import androidx.ui.test.runOnUiThread
-import androidx.ui.test.waitForIdle
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -106,11 +104,11 @@ class VectorTest {
         }
 
         testCase.latch = latch2
-        runOnUiThread {
+        rule.runOnUiThread {
             testCase.toggle()
         }
 
-        waitForIdle()
+        rule.waitForIdle()
 
         takeScreenShot(size).apply {
             assertEquals(Color.White.toArgb(), getPixel(5, size - 5))
@@ -226,7 +224,7 @@ class VectorTest {
             )
         }
 
-        onNodeWithTag(testTag).apply {
+        rule.onNodeWithTag(testTag).apply {
             captureToBitmap().apply {
                 assertEquals(Color.Red.toArgb(), getPixel(width - 2, 0))
                 assertEquals(Color.Red.toArgb(), getPixel(2, 0))
@@ -239,9 +237,9 @@ class VectorTest {
             performClick()
         }
 
-        waitForIdle()
+        rule.waitForIdle()
 
-        onNodeWithTag(testTag).captureToBitmap().apply {
+        rule.onNodeWithTag(testTag).captureToBitmap().apply {
             assertEquals(Color.Black.toArgb(), getPixel(width - 2, 0))
             assertEquals(Color.Black.toArgb(), getPixel(2, 0))
             assertEquals(Color.Black.toArgb(), getPixel(width - 1, height - 2))
@@ -382,7 +380,7 @@ class VectorTest {
     }
 
     private fun takeScreenShot(width: Int, height: Int = width): Bitmap {
-        val bitmap = onRoot().captureToBitmap()
+        val bitmap = rule.onRoot().captureToBitmap()
         Assert.assertEquals(width, bitmap.width)
         Assert.assertEquals(height, bitmap.height)
         return bitmap

@@ -28,7 +28,6 @@ import androidx.compose.ui.focusRequester
 import androidx.compose.ui.platform.ViewAmbient
 import androidx.test.filters.SmallTest
 import androidx.ui.test.createComposeRule
-import androidx.ui.test.runOnIdle
 import com.google.common.truth.Truth.assertThat
 import org.junit.Ignore
 import org.junit.Rule
@@ -41,14 +40,14 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class OwnerFocusTest {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Test
     fun requestFocus_bringsViewInFocus() {
         // Arrange.
         lateinit var ownerView: View
         val focusRequester = FocusRequester()
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             ownerView = getOwner()
             Box(
                 modifier = Modifier
@@ -58,12 +57,12 @@ class OwnerFocusTest {
         }
 
         // Act.
-        runOnIdle {
+        rule.runOnIdle {
             focusRequester.requestFocus()
         }
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(ownerView.isFocused).isTrue()
         }
     }
@@ -75,7 +74,7 @@ class OwnerFocusTest {
         lateinit var ownerView: View
         var focusState = Inactive
         val focusRequester = FocusRequester()
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             ownerView = getOwner()
             Box(
                 modifier = Modifier
@@ -86,12 +85,12 @@ class OwnerFocusTest {
         }
 
         // Act.
-        runOnIdle {
+        rule.runOnIdle {
             ownerView.requestFocus()
         }
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(focusState).isEqualTo(Active)
         }
     }
@@ -103,7 +102,7 @@ class OwnerFocusTest {
         lateinit var ownerView: View
         var focusState = Inactive
         val focusRequester = FocusRequester()
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             ownerView = getOwner()
             Box(
                 modifier = Modifier
@@ -114,12 +113,12 @@ class OwnerFocusTest {
         }
 
         // Act.
-        runOnIdle {
+        rule.runOnIdle {
             ownerView.dispatchWindowFocusChanged(true)
         }
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(focusState).isEqualTo(Active)
         }
     }
@@ -130,7 +129,7 @@ class OwnerFocusTest {
         lateinit var ownerView: View
         var focusState = Inactive
         val focusRequester = FocusRequester()
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             ownerView = getOwner()
             Box(
                 modifier = Modifier
@@ -139,17 +138,17 @@ class OwnerFocusTest {
                     .focus()
             )
         }
-        runOnIdle {
+        rule.runOnIdle {
             focusRequester.requestFocus()
         }
 
         // Act.
-        runOnIdle {
+        rule.runOnIdle {
             ownerView.clearFocus()
         }
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(focusState).isEqualTo(Inactive)
         }
     }
@@ -160,7 +159,7 @@ class OwnerFocusTest {
         lateinit var ownerView: View
         var focusState = Inactive
         val focusRequester = FocusRequester()
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             ownerView = getOwner()
             Box(
                 modifier = Modifier
@@ -169,17 +168,17 @@ class OwnerFocusTest {
                     .focus()
             )
         }
-        runOnIdle {
+        rule.runOnIdle {
             focusRequester.requestFocus()
         }
 
         // Act.
-        runOnIdle {
+        rule.runOnIdle {
             ownerView.dispatchWindowFocusChanged(false)
         }
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(focusState).isEqualTo(Active)
         }
     }

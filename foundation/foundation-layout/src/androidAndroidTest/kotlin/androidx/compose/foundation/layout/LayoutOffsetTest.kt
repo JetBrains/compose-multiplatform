@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.test.filters.SmallTest
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.runOnIdle
 import org.junit.Assert
 import org.junit.Assume
 import org.junit.Before
@@ -47,7 +46,7 @@ import kotlin.math.roundToInt
 @RunWith(JUnit4::class)
 class LayoutOffsetTest : LayoutTest() {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Before
     fun before() {
@@ -63,7 +62,7 @@ class LayoutOffsetTest : LayoutTest() {
         val offsetY = 20.dp
         var positionX = 0
         var positionY = 0
-        composeTestRule.setContent {
+        rule.setContent {
             Stack(
                 Modifier.testTag("stack")
                     .wrapContentSize(Alignment.TopStart)
@@ -76,8 +75,8 @@ class LayoutOffsetTest : LayoutTest() {
             }
         }
 
-        onNodeWithTag("stack").assertExists()
-        runOnIdle {
+        rule.onNodeWithTag("stack").assertExists()
+        rule.runOnIdle {
             assertEquals(offsetX.toIntPx(), positionX)
             assertEquals(offsetY.toIntPx(), positionY)
         }
@@ -91,7 +90,7 @@ class LayoutOffsetTest : LayoutTest() {
         val offsetY = 20.dp
         var positionX = 0
         var positionY = 0
-        composeTestRule.setContent {
+        rule.setContent {
             Providers((LayoutDirectionAmbient provides LayoutDirection.Rtl)) {
                 Stack(
                     Modifier.testTag("stack")
@@ -110,8 +109,8 @@ class LayoutOffsetTest : LayoutTest() {
             }
         }
 
-        onNodeWithTag("stack").assertExists()
-        runOnIdle {
+        rule.onNodeWithTag("stack").assertExists()
+        rule.runOnIdle {
             assertEquals(containerWidth.toIntPx() - offsetX.toIntPx() - boxSize, positionX)
             assertEquals(offsetY.toIntPx(), positionY)
         }
@@ -123,7 +122,7 @@ class LayoutOffsetTest : LayoutTest() {
         val offsetY = 20.dp
         var positionX = 0
         var positionY = 0
-        composeTestRule.setContent {
+        rule.setContent {
             Stack(
                 Modifier.testTag("stack")
                     .wrapContentSize(Alignment.TopStart)
@@ -136,8 +135,8 @@ class LayoutOffsetTest : LayoutTest() {
             }
         }
 
-        onNodeWithTag("stack").assertExists()
-        runOnIdle {
+        rule.onNodeWithTag("stack").assertExists()
+        rule.runOnIdle {
             assertEquals(offsetX.toIntPx(), positionX)
             assertEquals(offsetY.toIntPx(), positionY)
         }
@@ -151,7 +150,7 @@ class LayoutOffsetTest : LayoutTest() {
         val offsetY = 20.dp
         var positionX = 0
         var positionY = 0
-        composeTestRule.setContent {
+        rule.setContent {
             Providers((LayoutDirectionAmbient provides LayoutDirection.Rtl)) {
                 Stack(
                     Modifier.testTag("stack")
@@ -170,8 +169,8 @@ class LayoutOffsetTest : LayoutTest() {
             }
         }
 
-        onNodeWithTag("stack").assertExists()
-        runOnIdle {
+        rule.onNodeWithTag("stack").assertExists()
+        rule.runOnIdle {
             assertEquals(containerWidth.toIntPx() - boxSize + offsetX.toIntPx(), positionX)
             assertEquals(offsetY.toIntPx(), positionY)
         }
@@ -183,7 +182,7 @@ class LayoutOffsetTest : LayoutTest() {
         val offsetY = 20f
         var positionX = 0f
         var positionY = 0f
-        composeTestRule.setContent {
+        rule.setContent {
             Stack(
                 Modifier.testTag("stack")
                     .wrapContentSize(Alignment.TopStart)
@@ -199,8 +198,8 @@ class LayoutOffsetTest : LayoutTest() {
             }
         }
 
-        onNodeWithTag("stack").assertExists()
-        runOnIdle {
+        rule.onNodeWithTag("stack").assertExists()
+        rule.runOnIdle {
             Assert.assertEquals(offsetX, positionX)
             Assert.assertEquals(offsetY, positionY)
         }
@@ -214,7 +213,7 @@ class LayoutOffsetTest : LayoutTest() {
         val offsetY = 20f
         var positionX = 0f
         var positionY = 0f
-        composeTestRule.setContent {
+        rule.setContent {
             Providers((LayoutDirectionAmbient provides LayoutDirection.Rtl)) {
                 Stack(
                     Modifier.testTag("stack")
@@ -236,8 +235,8 @@ class LayoutOffsetTest : LayoutTest() {
             }
         }
 
-        onNodeWithTag("stack").assertExists()
-        runOnIdle {
+        rule.onNodeWithTag("stack").assertExists()
+        rule.runOnIdle {
             Assert.assertEquals(
                 containerWidth.toIntPx() - offsetX.roundToInt() - boxSize,
                 positionX
@@ -252,7 +251,7 @@ class LayoutOffsetTest : LayoutTest() {
         val offsetY = 20f
         var positionX = 0f
         var positionY = 0f
-        composeTestRule.setContent {
+        rule.setContent {
             Stack(
                 Modifier.testTag("stack")
                     .wrapContentSize(Alignment.TopStart)
@@ -268,8 +267,8 @@ class LayoutOffsetTest : LayoutTest() {
             }
         }
 
-        onNodeWithTag("stack").assertExists()
-        runOnIdle {
+        rule.onNodeWithTag("stack").assertExists()
+        rule.runOnIdle {
             Assert.assertEquals(offsetX, positionX)
             Assert.assertEquals(offsetY, positionY)
         }
@@ -283,7 +282,7 @@ class LayoutOffsetTest : LayoutTest() {
         val offsetY = 20f
         var positionX = 0f
         var positionY = 0f
-        composeTestRule.setContent {
+        rule.setContent {
             Providers((LayoutDirectionAmbient provides LayoutDirection.Rtl)) {
                 Stack(
                     Modifier.testTag("stack")
@@ -305,8 +304,8 @@ class LayoutOffsetTest : LayoutTest() {
             }
         }
 
-        onNodeWithTag("stack").assertExists()
-        runOnIdle {
+        rule.onNodeWithTag("stack").assertExists()
+        rule.runOnIdle {
             Assert.assertEquals(
                 containerWidth.toIntPx() - boxSize + offsetX.roundToInt(),
                 positionX

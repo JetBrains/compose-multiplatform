@@ -28,7 +28,6 @@ import androidx.compose.ui.focusRequester
 import androidx.compose.ui.platform.ViewAmbient
 import androidx.test.filters.SmallTest
 import androidx.ui.test.createComposeRule
-import androidx.ui.test.runOnIdle
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -40,14 +39,14 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class FocusRequesterTest {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Test
     fun requestFocus_noFocusModifierInLayoutNode() {
         // Arrange.
         var focusState = Inactive
         val focusRequester = FocusRequester()
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .focusObserver { focusState = it }
@@ -55,7 +54,7 @@ class FocusRequesterTest {
             )
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             // Act.
             focusRequester.requestFocus()
 
@@ -69,7 +68,7 @@ class FocusRequesterTest {
         // Arrange.
         var focusState = Inactive
         val focusRequester = FocusRequester()
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .focusObserver { focusState = it }
@@ -78,7 +77,7 @@ class FocusRequesterTest {
             )
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             // Act.
             focusRequester.requestFocus()
 
@@ -92,7 +91,7 @@ class FocusRequesterTest {
         // Arrange.
         var focusState = Inactive
         val focusRequester = FocusRequester()
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .focusObserver { focusState = it }
@@ -101,7 +100,7 @@ class FocusRequesterTest {
             )
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             // Act.
             focusRequester.requestFocus()
 
@@ -115,7 +114,7 @@ class FocusRequesterTest {
         // Arrange.
         var focusState = Inactive
         val focusRequester = FocusRequester()
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .focusRequester(focusRequester)
@@ -125,7 +124,7 @@ class FocusRequesterTest {
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             // Act.
             focusRequester.requestFocus()
 
@@ -139,7 +138,7 @@ class FocusRequesterTest {
         // Arrange.
         var focusState = Inactive
         val focusRequester = FocusRequester()
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(
                 modifier = Modifier.focusObserver { focusState = it }
             ) {
@@ -151,7 +150,7 @@ class FocusRequesterTest {
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             // Act.
             focusRequester.requestFocus()
 
@@ -165,7 +164,7 @@ class FocusRequesterTest {
         // Arrange.
         var focusState = Inactive
         val focusRequester = FocusRequester()
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(
                 modifier = Modifier.focusRequester(focusRequester)
             ) {
@@ -177,7 +176,7 @@ class FocusRequesterTest {
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             // Act.
             focusRequester.requestFocus()
 
@@ -191,7 +190,7 @@ class FocusRequesterTest {
         // Arrange.
         var focusState = Inactive
         val focusRequester = FocusRequester()
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .focusObserver { focusState = it }
@@ -213,7 +212,7 @@ class FocusRequesterTest {
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             // Act.
             focusRequester.requestFocus()
 
@@ -228,7 +227,7 @@ class FocusRequesterTest {
         var focusState1 = Inactive
         var focusState2 = Inactive
         val focusRequester = FocusRequester()
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Column(
                 modifier = Modifier.focusRequester(focusRequester)
             ) {
@@ -245,7 +244,7 @@ class FocusRequesterTest {
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             // Act.
             focusRequester.requestFocus()
 
@@ -262,7 +261,7 @@ class FocusRequesterTest {
         var focusState = Inactive
         val focusRequester1 = FocusRequester()
         val focusRequester2 = FocusRequester()
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             hostView = ViewAmbient.current
             Column(
                 modifier = Modifier.focusObserver { focusState = it }
@@ -281,7 +280,7 @@ class FocusRequesterTest {
         }
 
         // Request focus for first child.
-        runOnIdle {
+        rule.runOnIdle {
             // Arrange.
             hostView.clearFocus()
             assertThat(focusState).isEqualTo(Inactive)
@@ -294,7 +293,7 @@ class FocusRequesterTest {
         }
 
         // Request focus for second child.
-        runOnIdle {
+        rule.runOnIdle {
             // Arrange.
             hostView.clearFocus()
             assertThat(focusState).isEqualTo(Inactive)

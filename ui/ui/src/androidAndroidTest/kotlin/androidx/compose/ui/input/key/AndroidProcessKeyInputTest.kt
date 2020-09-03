@@ -33,7 +33,6 @@ import androidx.compose.ui.input.key.KeyEventType.KeyUp
 import androidx.compose.ui.platform.ViewAmbient
 import androidx.test.filters.SmallTest
 import androidx.ui.test.createComposeRule
-import androidx.ui.test.runOnIdle
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -53,7 +52,7 @@ import android.view.KeyEvent as AndroidKeyEvent
 )
 class AndroidProcessKeyInputTest(val keyEventAction: Int) {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     companion object {
         @JvmStatic
@@ -67,7 +66,7 @@ class AndroidProcessKeyInputTest(val keyEventAction: Int) {
         lateinit var ownerView: View
         lateinit var receivedKeyEvent: KeyEvent
         val focusRequester = FocusRequester()
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             ownerView = ViewAmbient.current
             Box(
                 modifier = Modifier
@@ -79,17 +78,17 @@ class AndroidProcessKeyInputTest(val keyEventAction: Int) {
                     }
             )
         }
-        runOnIdle {
+        rule.runOnIdle {
             focusRequester.requestFocus()
         }
 
         // Act.
-        val keyConsumed = runOnIdle {
+        val keyConsumed = rule.runOnIdle {
             ownerView.dispatchKeyEvent(AndroidKeyEvent(keyEventAction, KEYCODE_A))
         }
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             val keyEventType = when (keyEventAction) {
                 ACTION_UP -> KeyUp
                 ACTION_DOWN -> KeyDown

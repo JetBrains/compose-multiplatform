@@ -34,14 +34,11 @@ import androidx.ui.test.createAndroidComposeRule
 import androidx.ui.test.assertTextEquals
 import androidx.ui.test.performClick
 import androidx.ui.test.performScrollTo
-import androidx.ui.test.onNode
-import androidx.ui.test.onAllNodes
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.onNodeWithText
 import androidx.ui.test.hasClickAction
 import androidx.ui.test.hasText
 import androidx.ui.test.isDialog
-import androidx.ui.test.waitForIdle
 import com.google.common.truth.Truth.assertThat
 import org.junit.Ignore
 import org.junit.Rule
@@ -52,7 +49,7 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class DemoTest {
     @get:Rule
-    val composeTestRule = createAndroidComposeRule<DemoActivity>(disableTransitions = true).also {
+    val rule = createAndroidComposeRule<DemoActivity>(disableTransitions = true).also {
         it.clockTestRule.pauseClock()
     }
 
@@ -62,10 +59,10 @@ class DemoTest {
     fun testFiltering() {
         assertIsOnRootScreen()
         // Enter filtering mode
-        onNodeWithTag(Tags.FilterButton).performClick()
-        waitForIdle()
+        rule.onNodeWithTag(Tags.FilterButton).performClick()
+        rule.waitForIdle()
 
-        composeTestRule.clockTestRule.advanceClock(5000)
+        rule.clockTestRule.advanceClock(5000)
         // TODO: use keyboard input APIs when available to actually filter the list
         val testDemo = AllDemosCategory.allLaunchableDemos()
             // ActivityDemos don't set the title in the AppBar, so we can't verify if we've
@@ -75,16 +72,16 @@ class DemoTest {
             .first()
         // Click on the first demo
         val demoTitle = testDemo.title
-        onNodeWithText(demoTitle).performScrollTo().performClick()
-        waitForIdle()
+        rule.onNodeWithText(demoTitle).performScrollTo().performClick()
+        rule.waitForIdle()
 
         assertAppBarHasTitle(demoTitle)
         Espresso.pressBack()
         assertIsOnRootScreen()
-        waitForIdle()
+        rule.waitForIdle()
 
-        composeTestRule.clockTestRule.advanceClock(5000)
-        waitForIdle()
+        rule.clockTestRule.advanceClock(5000)
+        rule.waitForIdle()
     }
 
     @MediumTest
@@ -158,13 +155,13 @@ class DemoTest {
             path.drop(1).joinToString(" > ")
         }
 
-        onNode(hasText(title) and hasClickAction())
+        rule.onNode(hasText(title) and hasClickAction())
             .assertExists("Couldn't find \"$title\" in \"$navigationTitle\"")
             .performScrollTo()
             .performClick()
 
-        waitForIdle()
-        composeTestRule.clockTestRule.advanceClock(5000)
+        rule.waitForIdle()
+        rule.clockTestRule.advanceClock(5000)
 
         if (this is DemoCategory) {
             if (visitAll) {
@@ -180,33 +177,33 @@ class DemoTest {
             ?.activityClass != ComposeInAndroidDialogDismissDialogDuringDispatch::class
 
         if (hasComposeView) {
-            while (onAllNodes(isDialog()).isNotEmpty()) {
-                waitForIdle()
+            while (rule.onAllNodes(isDialog()).isNotEmpty()) {
+                rule.waitForIdle()
                 Espresso.pressBack()
             }
         }
 
-        waitForIdle()
+        rule.waitForIdle()
         Espresso.pressBack()
-        waitForIdle()
+        rule.waitForIdle()
 
-        composeTestRule.clockTestRule.advanceClock(5000)
+        rule.clockTestRule.advanceClock(5000)
 
         assertAppBarHasTitle(navigationTitle)
     }
-}
 
-/**
- * Asserts that the app bar title matches the root category title, so we are on the root screen.
- */
-private fun assertIsOnRootScreen() = assertAppBarHasTitle(AllDemosCategory.title)
+    /**
+     * Asserts that the app bar title matches the root category title, so we are on the root screen.
+     */
+    private fun assertIsOnRootScreen() = assertAppBarHasTitle(AllDemosCategory.title)
 
-/**
- * Asserts that the app bar title matches the given [title].
- */
-private fun assertAppBarHasTitle(title: String) =
-    onNodeWithTag(Tags.AppBarTitle).assertTextEquals(title)
+    /**
+     * Asserts that the app bar title matches the given [title].
+     */
+    private fun assertAppBarHasTitle(title: String) =
+        rule.onNodeWithTag(Tags.AppBarTitle).assertTextEquals(title)
 
-private fun SemanticsNodeInteractionCollection.isNotEmpty(): Boolean {
-    return fetchSemanticsNodes().isNotEmpty()
+    private fun SemanticsNodeInteractionCollection.isNotEmpty(): Boolean {
+        return fetchSemanticsNodes().isNotEmpty()
+    }
 }

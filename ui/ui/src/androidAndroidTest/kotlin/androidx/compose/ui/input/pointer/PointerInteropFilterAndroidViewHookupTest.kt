@@ -32,7 +32,6 @@ import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.test.filters.MediumTest
 import androidx.ui.test.createAndroidComposeRule
-import androidx.ui.test.runOnIdle
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Rule
@@ -56,11 +55,11 @@ class PointerInteropFilterAndroidViewHookupTest {
     }
 
     @get:Rule
-    val composeTestRule = createAndroidComposeRule<TestActivity>()
+    val rule = createAndroidComposeRule<TestActivity>()
 
     @Before
     fun setup() {
-        composeTestRule.activityRule.scenario.onActivity { activity ->
+        rule.activityRule.scenario.onActivity { activity ->
 
             child = CustomView2(activity, motionEventCallback).apply {
                 layoutParams = ViewGroup.LayoutParams(100, 100)
@@ -96,7 +95,7 @@ class PointerInteropFilterAndroidViewHookupTest {
                 root
             )
 
-        runOnIdle {
+        rule.runOnIdle {
             root.dispatchTouchEvent(down)
         }
 
@@ -127,7 +126,7 @@ class PointerInteropFilterAndroidViewHookupTest {
                 root
             )
 
-        runOnIdle {
+        rule.runOnIdle {
             root.dispatchTouchEvent(down)
             root.dispatchTouchEvent(up)
         }
@@ -161,7 +160,7 @@ class PointerInteropFilterAndroidViewHookupTest {
                 root
             )
 
-        runOnIdle {
+        rule.runOnIdle {
             root.dispatchTouchEvent(down)
             root.dispatchTouchEvent(up)
         }
@@ -205,7 +204,7 @@ class PointerInteropFilterAndroidViewHookupTest {
                 root
             )
 
-        runOnIdle {
+        rule.runOnIdle {
             root.dispatchTouchEvent(down)
             root.dispatchTouchEvent(move)
             root.dispatchTouchEvent(up)
@@ -250,7 +249,7 @@ class PointerInteropFilterAndroidViewHookupTest {
                 root
             )
 
-        runOnIdle {
+        rule.runOnIdle {
             root.dispatchTouchEvent(down)
             root.dispatchTouchEvent(up)
             root.dispatchTouchEvent(down2)
@@ -283,7 +282,7 @@ class PointerInteropFilterAndroidViewHookupTest {
                 root
             )
 
-        runOnIdle {
+        rule.runOnIdle {
             root.dispatchTouchEvent(down)
             eventStringLog.clear()
             root.dispatchTouchEvent(move)
@@ -319,7 +318,7 @@ class PointerInteropFilterAndroidViewHookupTest {
                 root
             )
 
-        runOnIdle {
+        rule.runOnIdle {
             root.dispatchTouchEvent(down)
             eventStringLog.clear()
             child.requestDisallowInterceptTouchEvent(true)
@@ -366,7 +365,7 @@ class PointerInteropFilterAndroidViewHookupTest {
                 root
             )
 
-        runOnIdle {
+        rule.runOnIdle {
             root.dispatchTouchEvent(down)
             child.requestDisallowInterceptTouchEvent(true)
             root.dispatchTouchEvent(move1)
@@ -425,7 +424,7 @@ class PointerInteropFilterAndroidViewHookupTest {
                 root
             )
 
-        runOnIdle {
+        rule.runOnIdle {
             root.dispatchTouchEvent(down)
             child.requestDisallowInterceptTouchEvent(true)
             root.dispatchTouchEvent(up)

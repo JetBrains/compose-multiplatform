@@ -43,8 +43,6 @@ import androidx.test.screenshot.matchers.MSSIMMatcher
 import androidx.ui.test.createAndroidComposeRule
 import androidx.ui.test.captureToBitmap
 import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.runOnUiThread
-import androidx.ui.test.waitForIdle
 import com.google.common.truth.Truth
 import org.junit.Rule
 import org.junit.Test
@@ -92,7 +90,7 @@ class IconComparisonTest(
     }
 
     @get:Rule
-    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    val rule = createAndroidComposeRule<ComponentActivity>()
 
     private val matcher = MSSIMMatcher(threshold = 0.99)
 
@@ -103,27 +101,27 @@ class IconComparisonTest(
             val programmaticVector = property.get()
             var composition: Composition? = null
 
-            composeTestRule.activityRule.scenario.onActivity {
+            rule.activityRule.scenario.onActivity {
                 composition = it.setContent {
                     xmlVector = drawableName.toVectorAsset()
                     DrawVectors(programmaticVector, xmlVector!!)
                 }
             }
 
-            waitForIdle()
+            rule.waitForIdle()
 
             val iconName = property.javaGetter!!.declaringClass.canonicalName!!
 
             assertVectorAssetsAreEqual(xmlVector!!, programmaticVector, iconName)
 
             matcher.assertBitmapsAreEqual(
-                onNodeWithTag(XmlTestTag).captureToBitmap(),
-                onNodeWithTag(ProgrammaticTestTag).captureToBitmap(),
+                rule.onNodeWithTag(XmlTestTag).captureToBitmap(),
+                rule.onNodeWithTag(ProgrammaticTestTag).captureToBitmap(),
                 iconName
             )
 
             // Dispose between composing each pair of icons to ensure correctness
-            runOnUiThread {
+            rule.runOnUiThread {
                 composition?.dispose()
             }
         }

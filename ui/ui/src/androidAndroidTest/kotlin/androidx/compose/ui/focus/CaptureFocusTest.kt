@@ -23,7 +23,6 @@ import androidx.compose.ui.focusObserver
 import androidx.compose.ui.focusRequester
 import androidx.test.filters.SmallTest
 import androidx.ui.test.createComposeRule
-import androidx.ui.test.runOnIdle
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -35,14 +34,14 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class CaptureFocusTest {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Test
     fun active_captureFocus_changesStateToCaptured() {
         // Arrange.
         lateinit var focusState: FocusState
         val focusRequester = FocusRequester()
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .focusObserver { focusState = it }
@@ -52,12 +51,12 @@ class CaptureFocusTest {
         }
 
         // Act.
-        val success = runOnIdle {
+        val success = rule.runOnIdle {
             focusRequester.captureFocus()
         }
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(success).isTrue()
             assertThat(focusState).isEqualTo(FocusState.Captured)
         }
@@ -68,7 +67,7 @@ class CaptureFocusTest {
         // Arrange.
         var focusState: FocusState = FocusState.ActiveParent
         val focusRequester = FocusRequester()
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .focusObserver { focusState = it }
@@ -78,12 +77,12 @@ class CaptureFocusTest {
         }
 
         // Act.
-        val success = runOnIdle {
+        val success = rule.runOnIdle {
             focusRequester.captureFocus()
         }
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(success).isFalse()
             assertThat(focusState).isEqualTo(FocusState.ActiveParent)
         }
@@ -94,7 +93,7 @@ class CaptureFocusTest {
         // Arrange.
         var focusState = FocusState.Captured
         val focusRequester = FocusRequester()
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .focusObserver { focusState = it }
@@ -103,12 +102,12 @@ class CaptureFocusTest {
         }
 
         // Act.
-        val success = runOnIdle {
+        val success = rule.runOnIdle {
             focusRequester.captureFocus()
         }
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(success).isTrue()
             assertThat(focusState).isEqualTo(FocusState.Captured)
         }
@@ -119,7 +118,7 @@ class CaptureFocusTest {
         // Arrange.
         var focusState = FocusState.Disabled
         val focusRequester = FocusRequester()
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .focusObserver { focusState = it }
@@ -128,12 +127,12 @@ class CaptureFocusTest {
         }
 
         // Act.
-        val success = runOnIdle {
+        val success = rule.runOnIdle {
             focusRequester.captureFocus()
         }
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(success).isFalse()
             assertThat(focusState).isEqualTo(FocusState.Disabled)
         }
@@ -144,7 +143,7 @@ class CaptureFocusTest {
         // Arrange.
         var focusState = FocusState.Inactive
         val focusRequester = FocusRequester()
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .focusObserver { focusState = it }
@@ -153,12 +152,12 @@ class CaptureFocusTest {
         }
 
         // Act.
-        val success = runOnIdle {
+        val success = rule.runOnIdle {
             focusRequester.captureFocus()
         }
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(success).isFalse()
             assertThat(focusState).isEqualTo(FocusState.Inactive)
         }

@@ -51,8 +51,6 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import androidx.ui.test.createComposeRule
-import androidx.ui.test.runOnIdle
-import androidx.ui.test.runOnUiThread
 import com.google.common.truth.Truth
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.Description
@@ -70,7 +68,7 @@ import java.util.concurrent.TimeUnit
 @FlakyTest(bugId = 150214184)
 class PopupTest {
     @get:Rule
-    val composeTestRule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule(disableTransitions = true)
     private val testTag = "testedPopup"
 
     private val parentBounds = IntBounds(50, 50, 150, 150)
@@ -89,13 +87,13 @@ class PopupTest {
     ) {
         val measureLatch = CountDownLatch(1)
 
-        with(composeTestRule.density) {
+        with(rule.density) {
             val popupWidthDp = popupSize.width.toDp()
             val popupHeightDp = popupSize.height.toDp()
             val parentWidthDp = parentSize.width.toDp()
             val parentHeightDp = parentSize.height.toDp()
 
-            composeTestRule.setContent {
+            rule.setContent {
                 // Get the compose view position on screen
                 val composeView = ViewAmbient.current
                 val positionArray = IntArray(2)
@@ -134,10 +132,10 @@ class PopupTest {
         measureLatch.await(1, TimeUnit.SECONDS)
     }
 
-    // TODO(b/139861182): Remove all of this and provide helpers on ComposeTestRule
+    // TODO(b/139861182): Remove all of this and provide helpers on rule
     private fun popupMatches(viewMatcher: Matcher<in View>) {
         // Make sure that current measurement/drawing is finished
-        runOnIdle { }
+        rule.runOnIdle { }
         Espresso.onView(instanceOf(Owner::class.java))
             .inRoot(PopupLayoutMatcher())
             .check(matches(viewMatcher))
@@ -179,7 +177,7 @@ class PopupTest {
 
     @Test
     fun popup_isShowing() {
-        composeTestRule.setContent {
+        rule.setContent {
             SimpleContainer {
                 PopupTestTag(testTag) {
                     Popup(alignment = Alignment.Center) {
@@ -194,14 +192,14 @@ class PopupTest {
 
     @Test
     fun popup_hasActualSize() {
-        val popupWidthDp = with(composeTestRule.density) {
+        val popupWidthDp = with(rule.density) {
             popupSize.width.toDp()
         }
-        val popupHeightDp = with(composeTestRule.density) {
+        val popupHeightDp = with(rule.density) {
             popupSize.height.toDp()
         }
 
-        composeTestRule.setContent {
+        rule.setContent {
             SimpleContainer {
                 PopupTestTag(testTag) {
                     Popup(alignment = Alignment.Center) {
@@ -222,7 +220,7 @@ class PopupTest {
     fun changeParams_assertNoLeaks() {
         val measureLatch = CountDownLatch(1)
         var isFocusable by mutableStateOf(false)
-        composeTestRule.setContent {
+        rule.setContent {
             Stack {
                 PopupTestTag(testTag) {
                     Popup(
@@ -244,7 +242,7 @@ class PopupTest {
         measureLatch.await(1, TimeUnit.SECONDS)
 
         fun assertSinglePopupExists() {
-            runOnIdle { }
+            rule.runOnIdle { }
             val counterMatcher = PopupsCounterMatcher()
             Espresso.onView(instanceOf(Owner::class.java))
                 .inRoot(counterMatcher)
@@ -255,7 +253,7 @@ class PopupTest {
 
         assertSinglePopupExists()
 
-        runOnUiThread {
+        rule.runOnUiThread {
             isFocusable = true
         }
 
@@ -895,7 +893,7 @@ class PopupTest {
 
     @Test
     fun popup_hasViewTreeLifecycleOwner() {
-        composeTestRule.setContent {
+        rule.setContent {
             PopupTestTag(testTag) {
                 Popup {}
             }
@@ -1006,14 +1004,14 @@ class PopupTest {
     fun popup_preservesAmbients() {
         val ambient = ambientOf<Float>()
         var value = 0f
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(ambient provides 1f) {
                 Popup {
                     value = ambient.current
                 }
             }
         }
-        runOnIdle {
+        rule.runOnIdle {
             Truth.assertThat(value).isEqualTo(1f)
         }
     }
