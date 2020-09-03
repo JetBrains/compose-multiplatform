@@ -18,6 +18,7 @@ package androidx.compose.material
 
 import android.os.Build
 import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
@@ -28,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
@@ -118,6 +120,16 @@ class SwitchScreenshotTest {
             }
         }
         assertToggeableAgainstGolden("switch_unchecked_rtl")
+    }
+
+    @Test
+    fun switchTest_bigSizeSpecified() {
+        rule.setMaterialContent {
+            Box(wrapperModifier.size(50.dp)) {
+                Switch(checked = true, onCheckedChange = { })
+            }
+        }
+        assertToggeableAgainstGolden("switch_bigger_size")
     }
 
     @Test
