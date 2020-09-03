@@ -50,7 +50,7 @@ import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
 import androidx.test.screenshot.assertAgainstGolden
-import androidx.ui.test.ComposeTestRule
+import androidx.ui.test.ComposeTestRuleJUnit
 import androidx.ui.test.captureToBitmap
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.onNodeWithTag
@@ -649,7 +649,7 @@ private fun RippleBox(interactionState: InteractionState, rippleIndication: Ripp
  * @param lightTheme whether the theme is light or dark
  * @param contentColor the contentColor that will be used for the ripple color
  */
-private fun ComposeTestRule.setRippleContent(
+private fun ComposeTestRuleJUnit.setRippleContent(
     interactionState: InteractionState,
     bounded: Boolean,
     lightTheme: Boolean,

@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.ui.test.ComposeTestRule
+import androidx.ui.test.ComposeTestRuleJUnit
 import androidx.ui.test.SemanticsNodeInteraction
 import androidx.ui.test.assertHeightIsEqualTo
 import androidx.ui.test.assertIsEqualTo
@@ -37,9 +38,8 @@ import androidx.ui.test.assertWidthIsEqualTo
 import androidx.ui.test.getAlignmentLinePosition
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.onRoot
-import androidx.ui.test.runOnIdle
 
-fun ComposeTestRule.setMaterialContent(
+fun ComposeTestRuleJUnit.setMaterialContent(
     modifier: Modifier = Modifier,
     composable: @Composable () -> Unit
 ) {
@@ -102,7 +102,7 @@ fun rootHeight(): Dp {
  */
 val BigTestConstraints = DpConstraints(maxWidth = 5000.dp, maxHeight = 5000.dp)
 
-fun ComposeTestRule.setMaterialContentForSizeAssertions(
+fun ComposeTestRuleJUnit.setMaterialContentForSizeAssertions(
     parentConstraints: DpConstraints = BigTestConstraints,
     // TODO : figure out better way to make it flexible
     children: @Composable () -> Unit
