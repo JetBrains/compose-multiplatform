@@ -32,7 +32,8 @@ internal class LayoutTreeConsistencyChecker(
     fun assertConsistent() {
         val inconsistencyFound = !isTreeConsistent(root)
         if (inconsistencyFound) {
-            throw IllegalStateException("Inconsistency found! ${logTree()}")
+            println(logTree())
+            throw IllegalStateException("Inconsistency found!")
         }
     }
 
@@ -61,12 +62,14 @@ internal class LayoutTreeConsistencyChecker(
             val parentLayoutState = parent?.layoutState
             if (layoutState == LayoutNode.LayoutState.NeedsRemeasure) {
                 return relayoutNodes.contains(this) ||
-                        parentLayoutState == LayoutNode.LayoutState.NeedsRemeasure
+                        parentLayoutState == LayoutNode.LayoutState.NeedsRemeasure ||
+                        parentLayoutState == LayoutNode.LayoutState.Measuring
             }
             if (layoutState == LayoutNode.LayoutState.NeedsRelayout) {
                 return relayoutNodes.contains(this) ||
                         parentLayoutState == LayoutNode.LayoutState.NeedsRemeasure ||
-                        parentLayoutState == LayoutNode.LayoutState.NeedsRelayout
+                        parentLayoutState == LayoutNode.LayoutState.NeedsRelayout ||
+                        parentLayoutState == LayoutNode.LayoutState.Measuring
             }
         }
         return true
