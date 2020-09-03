@@ -64,13 +64,13 @@ class ElevationOverlayTest(private val elevation: Dp?, overlayColor: Color?) {
     }
 
     @get:Rule
-    val composeTestRule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule(disableTransitions = true)
 
     @Test
     fun correctElevationOverlayInDarkTheme() {
         setupSurfaceForTesting(elevation!!, darkColors())
 
-        onNodeWithTag(Tag)
+        rule.onNodeWithTag(Tag)
             .captureToBitmap()
             .assertPixels(SurfaceSize) {
                 expectedOverlayColor
@@ -84,7 +84,7 @@ class ElevationOverlayTest(private val elevation: Dp?, overlayColor: Color?) {
         // No overlay should be applied in light theme
         val expectedSurfaceColor = Color.White
 
-        onNodeWithTag(Tag)
+        rule.onNodeWithTag(Tag)
             .captureToBitmap()
             .assertPixels(SurfaceSize) {
                 expectedSurfaceColor
@@ -92,8 +92,8 @@ class ElevationOverlayTest(private val elevation: Dp?, overlayColor: Color?) {
     }
 
     private fun setupSurfaceForTesting(elevation: Dp, colors: Colors) {
-        with(composeTestRule.density) {
-            composeTestRule.setContent {
+        with(rule.density) {
+            rule.setContent {
                 MaterialTheme(colors) {
                     Box {
                         Surface(elevation = elevation) {

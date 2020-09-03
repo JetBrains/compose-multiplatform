@@ -52,14 +52,14 @@ class OutlinedTextFieldScreenshotTest {
     private val TextFieldTag = "OutlinedTextField"
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL)
 
     @Test
     fun outlinedTextField_withInput() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(TextFieldTag)) {
                 OutlinedTextField(
                     value = "Text",
@@ -74,7 +74,7 @@ class OutlinedTextFieldScreenshotTest {
 
     @Test
     fun outlinedTextField_notFocused() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(TextFieldTag)) {
                 OutlinedTextField(
                     value = "",
@@ -89,7 +89,7 @@ class OutlinedTextFieldScreenshotTest {
 
     @Test
     fun outlinedTextField_focused() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(TextFieldTag)) {
                 OutlinedTextField(
                     value = "",
@@ -99,7 +99,7 @@ class OutlinedTextFieldScreenshotTest {
             }
         }
 
-        onNodeWithTag(TextFieldTag)
+        rule.onNodeWithTag(TextFieldTag)
             // split click into (down) and (move, up) to enforce a composition in between
             .performGesture { down(center) }
             .performGesture { move(); up() }
@@ -109,7 +109,7 @@ class OutlinedTextFieldScreenshotTest {
 
     @Test
     fun outlinedTextField_focused_rtl() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
                 Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(TextFieldTag)) {
                     OutlinedTextField(
@@ -121,7 +121,7 @@ class OutlinedTextFieldScreenshotTest {
             }
         }
 
-        onNodeWithTag(TextFieldTag)
+        rule.onNodeWithTag(TextFieldTag)
             // split click into (down) and (move, up) to enforce a composition in between
             .performGesture { down(center) }
             .performGesture { move(); up() }
@@ -130,7 +130,7 @@ class OutlinedTextFieldScreenshotTest {
     }
 
     private fun assertAgainstGolden(goldenIdentifier: String) {
-        onNodeWithTag(TextFieldTag)
+        rule.onNodeWithTag(TextFieldTag)
             .captureToBitmap()
             .assertAgainstGolden(screenshotRule, goldenIdentifier)
     }

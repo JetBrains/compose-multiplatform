@@ -29,7 +29,6 @@ import androidx.ui.test.assertValueEquals
 import androidx.ui.test.assertWidthIsEqualTo
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.runOnUiThread
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -43,28 +42,27 @@ class ProgressIndicatorTest {
     private val ExpectedLinearHeight = 4.dp
 
     @get:Rule
-    val composeTestRule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule(disableTransitions = true)
 
     @Test
     fun determinateLinearProgressIndicator_Progress() {
         val tag = "linear"
         val progress = mutableStateOf(0f)
 
-        composeTestRule
-            .setMaterialContent {
+        rule.setMaterialContent {
                 LinearProgressIndicator(modifier = Modifier.testTag(tag), progress = progress.value)
             }
 
-        onNodeWithTag(tag)
+        rule.onNodeWithTag(tag)
             .assertIsDisplayed()
             .assertValueEquals("0 percent")
             .assertRangeInfoEquals(AccessibilityRangeInfo(0f, 0f..1f))
 
-        runOnUiThread {
+        rule.runOnUiThread {
             progress.value = 0.5f
         }
 
-        onNodeWithTag(tag)
+        rule.onNodeWithTag(tag)
             .assertIsDisplayed()
             .assertValueEquals("50 percent")
             .assertRangeInfoEquals(AccessibilityRangeInfo(0.5f, 0f..1f))
@@ -72,7 +70,7 @@ class ProgressIndicatorTest {
 
     @Test
     fun determinateLinearProgressIndicator_Size() {
-        composeTestRule
+        rule
             .setMaterialContentForSizeAssertions {
                 LinearProgressIndicator(progress = 0f)
             }
@@ -84,18 +82,17 @@ class ProgressIndicatorTest {
     fun indeterminateLinearProgressIndicator_progress() {
         val tag = "linear"
 
-        composeTestRule
-            .setMaterialContent {
+        rule.setMaterialContent {
                 LinearProgressIndicator(modifier = Modifier.testTag(tag))
             }
 
-        onNodeWithTag(tag)
+        rule.onNodeWithTag(tag)
             .assertValueEquals(Strings.InProgress)
     }
 
     @Test
     fun indeterminateLinearProgressIndicator_Size() {
-        composeTestRule
+        rule
             .setMaterialContentForSizeAssertions {
                 LinearProgressIndicator()
             }
@@ -108,24 +105,23 @@ class ProgressIndicatorTest {
         val tag = "circular"
         val progress = mutableStateOf(0f)
 
-        composeTestRule
-            .setMaterialContent {
+        rule.setMaterialContent {
                 CircularProgressIndicator(
                     modifier = Modifier.testTag(tag),
                     progress = progress.value
                 )
             }
 
-        onNodeWithTag(tag)
+        rule.onNodeWithTag(tag)
             .assertIsDisplayed()
             .assertValueEquals("0 percent")
             .assertRangeInfoEquals(AccessibilityRangeInfo(0f, 0f..1f))
 
-        runOnUiThread {
+        rule.runOnUiThread {
             progress.value = 0.5f
         }
 
-        onNodeWithTag(tag)
+        rule.onNodeWithTag(tag)
             .assertIsDisplayed()
             .assertValueEquals("50 percent")
             .assertRangeInfoEquals(AccessibilityRangeInfo(0.5f, 0f..1f))
@@ -133,7 +129,7 @@ class ProgressIndicatorTest {
 
     @Test
     fun determinateCircularProgressIndicator_Size() {
-        composeTestRule
+        rule
             .setMaterialContentForSizeAssertions {
                 CircularProgressIndicator(progress = 0f)
             }
@@ -144,18 +140,17 @@ class ProgressIndicatorTest {
     fun indeterminateCircularProgressIndicator_progress() {
         val tag = "circular"
 
-        composeTestRule
-            .setMaterialContent {
+        rule.setMaterialContent {
                 CircularProgressIndicator(modifier = Modifier.testTag(tag))
             }
 
-        onNodeWithTag(tag)
+        rule.onNodeWithTag(tag)
             .assertValueEquals(Strings.InProgress)
     }
 
     @Test
     fun indeterminateCircularProgressIndicator_Size() {
-        composeTestRule
+        rule
             .setMaterialContentForSizeAssertions {
                 CircularProgressIndicator()
             }

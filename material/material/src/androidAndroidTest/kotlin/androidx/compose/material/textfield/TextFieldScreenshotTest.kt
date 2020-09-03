@@ -52,14 +52,14 @@ class TextFieldScreenshotTest {
     private val TextFieldTag = "TextField"
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL)
 
     @Test
     fun textField_withInput() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(TextFieldTag)) {
                 TextField(value = "Text",
                     onValueChange = {},
@@ -73,7 +73,7 @@ class TextFieldScreenshotTest {
 
     @Test
     fun textField_notFocused() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(TextFieldTag)) {
                 TextField(value = "",
                     onValueChange = {},
@@ -87,7 +87,7 @@ class TextFieldScreenshotTest {
 
     @Test
     fun textField_focused() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(TextFieldTag)) {
                 TextField(value = "",
                     onValueChange = {},
@@ -96,7 +96,7 @@ class TextFieldScreenshotTest {
             }
         }
 
-        onNodeWithTag(TextFieldTag)
+        rule.onNodeWithTag(TextFieldTag)
             // split click into (down) and (move, up) to enforce a composition in between
             .performGesture { down(center) }
             .performGesture { move(); up() }
@@ -106,7 +106,7 @@ class TextFieldScreenshotTest {
 
     @Test
     fun textField_focused_rtl() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
                 Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(TextFieldTag)) {
                     TextField(value = "",
@@ -117,7 +117,7 @@ class TextFieldScreenshotTest {
             }
         }
 
-        onNodeWithTag(TextFieldTag)
+        rule.onNodeWithTag(TextFieldTag)
             // split click into (down) and (move, up) to enforce a composition in between
             .performGesture { down(center) }
             .performGesture { move(); up() }
@@ -126,7 +126,7 @@ class TextFieldScreenshotTest {
     }
 
     private fun assertAgainstGolden(goldenIdentifier: String) {
-        onNodeWithTag(TextFieldTag)
+        rule.onNodeWithTag(TextFieldTag)
             .captureToBitmap()
             .assertAgainstGolden(screenshotRule, goldenIdentifier)
     }

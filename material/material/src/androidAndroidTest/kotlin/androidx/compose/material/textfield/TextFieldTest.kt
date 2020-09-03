@@ -69,7 +69,6 @@ import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performClick
 import androidx.ui.test.performGesture
 import androidx.ui.test.performImeAction
-import androidx.ui.test.runOnIdle
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.atLeastOnce
@@ -98,11 +97,11 @@ class TextFieldTest {
     private val TextfieldTag = "textField"
 
     @get:Rule
-    val testRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Test
     fun testTextField_minimumHeight() {
-        testRule.setMaterialContentForSizeAssertions {
+        rule.setMaterialContentForSizeAssertions {
             TextField(
                 value = "input",
                 onValueChange = {},
@@ -121,7 +120,7 @@ class TextFieldTest {
         var textField2Focused = false
         val textField2Tag = "TextField2"
 
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             Column {
                 TextField(
                     modifier = Modifier
@@ -142,16 +141,16 @@ class TextFieldTest {
             }
         }
 
-        onNodeWithTag(textField1Tag).performClick()
+        rule.onNodeWithTag(textField1Tag).performClick()
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(textField1Focused).isTrue()
             assertThat(textField2Focused).isFalse()
         }
 
-        onNodeWithTag(textField2Tag).performClick()
+        rule.onNodeWithTag(textField2Tag).performClick()
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(textField1Focused).isFalse()
             assertThat(textField2Focused).isTrue()
         }
@@ -160,7 +159,7 @@ class TextFieldTest {
     @Test
     fun testTextField_getFocus_whenClickedOnSurfaceArea() {
         var focused = false
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             Box {
                 TextField(
                     modifier = Modifier
@@ -174,11 +173,11 @@ class TextFieldTest {
         }
 
         // Click on (2, 2) which is Surface area and outside input area
-        onNodeWithTag(TextfieldTag).performGesture {
+        rule.onNodeWithTag(TextfieldTag).performGesture {
             click(Offset(2f, 2f))
         }
 
-        testRule.runOnIdleWithDensity {
+        rule.runOnIdleWithDensity {
             assertThat(focused).isTrue()
         }
     }
@@ -187,7 +186,7 @@ class TextFieldTest {
     fun testTextField_labelPosition_initial_withDefaultHeight() {
         val labelSize = Ref<IntSize>()
         val labelPosition = Ref<Offset>()
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             Box {
                 TextField(
                     value = "",
@@ -208,7 +207,7 @@ class TextFieldTest {
             }
         }
 
-        testRule.runOnIdleWithDensity {
+        rule.runOnIdleWithDensity {
             // size
             assertThat(labelSize.value).isNotNull()
             assertThat(labelSize.value?.height).isGreaterThan(0)
@@ -229,7 +228,7 @@ class TextFieldTest {
         val height = 80.dp
         val labelSize = Ref<IntSize>()
         val labelPosition = Ref<Offset>()
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             Box {
                 TextField(
                     value = "",
@@ -245,7 +244,7 @@ class TextFieldTest {
             }
         }
 
-        testRule.runOnIdleWithDensity {
+        rule.runOnIdleWithDensity {
             // size
             assertThat(labelSize.value).isNotNull()
             assertThat(labelSize.value?.height).isGreaterThan(0)
@@ -265,7 +264,7 @@ class TextFieldTest {
         val labelSize = Ref<IntSize>()
         val labelPosition = Ref<Offset>()
         val baseline = Ref<Float>()
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             Box {
                 TextField(
                     modifier = Modifier.testTag(TextfieldTag),
@@ -285,7 +284,7 @@ class TextFieldTest {
         // click to focus
         clickAndAdvanceClock()
 
-        testRule.runOnIdleWithDensity {
+        rule.runOnIdleWithDensity {
             // size
             assertThat(labelSize.value).isNotNull()
             assertThat(labelSize.value?.height).isGreaterThan(0)
@@ -305,7 +304,7 @@ class TextFieldTest {
         val labelSize = Ref<IntSize>()
         val labelPosition = Ref<Offset>()
         val baseline = Ref<Float>()
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             Box {
                 TextField(
                     value = "input",
@@ -322,7 +321,7 @@ class TextFieldTest {
             }
         }
 
-        testRule.runOnIdleWithDensity {
+        rule.runOnIdleWithDensity {
             // size
             assertThat(labelSize.value).isNotNull()
             assertThat(labelSize.value?.height).isGreaterThan(0)
@@ -341,7 +340,7 @@ class TextFieldTest {
     fun testTextField_placeholderPosition_withLabel() {
         val placeholderSize = Ref<IntSize>()
         val placeholderPosition = Ref<Offset>()
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             Box {
                 TextField(
                     modifier = Modifier
@@ -362,7 +361,7 @@ class TextFieldTest {
         // click to focus
         clickAndAdvanceClock()
 
-        testRule.runOnIdleWithDensity {
+        rule.runOnIdleWithDensity {
             // size
             assertThat(placeholderSize.value).isNotNull()
             assertThat(placeholderSize.value?.height).isGreaterThan(0)
@@ -384,7 +383,7 @@ class TextFieldTest {
         val placeholderSize = Ref<IntSize>()
         val placeholderPosition = Ref<Offset>()
         val height = 60.dp
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             Box {
                 TextField(
                     modifier = Modifier.preferredHeight(height).testTag(TextfieldTag),
@@ -403,7 +402,7 @@ class TextFieldTest {
         // click to focus
         clickAndAdvanceClock()
 
-        testRule.runOnIdleWithDensity {
+        rule.runOnIdleWithDensity {
             // size
             assertThat(placeholderSize.value).isNotNull()
             assertThat(placeholderSize.value?.height).isEqualTo(20.dp.toIntPx())
@@ -424,7 +423,7 @@ class TextFieldTest {
     fun testTextField_noPlaceholder_whenInputNotEmpty() {
         val placeholderSize = Ref<IntSize>()
         val placeholderPosition = Ref<Offset>()
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             Column {
                 TextField(
                     modifier = Modifier.testTag(TextfieldTag),
@@ -444,7 +443,7 @@ class TextFieldTest {
         // click to focus
         clickAndAdvanceClock()
 
-        testRule.runOnIdleWithDensity {
+        rule.runOnIdleWithDensity {
             assertThat(placeholderSize.value).isNull()
             assertThat(placeholderPosition.value).isNull()
         }
@@ -452,7 +451,7 @@ class TextFieldTest {
 
     @Test
     fun testTextField_placeholderColorAndTextStyle() {
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             TextField(
                 modifier = Modifier.testTag(TextfieldTag),
                 value = "",
@@ -472,7 +471,7 @@ class TextFieldTest {
         }
 
         // click to focus
-        onNodeWithTag(TextfieldTag).performClick()
+        rule.onNodeWithTag(TextfieldTag).performClick()
     }
 
     @Test
@@ -485,7 +484,7 @@ class TextFieldTest {
         val trailingPosition = Ref<Offset>()
         val trailingSize = Ref<IntSize>()
 
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             TextField(
                 value = "text",
                 onValueChange = {},
@@ -506,7 +505,7 @@ class TextFieldTest {
             )
         }
 
-        testRule.runOnIdleWithDensity {
+        rule.runOnIdleWithDensity {
             // leading
             assertThat(leadingSize.value).isEqualTo(IntSize(size.toIntPx(), size.toIntPx()))
             assertThat(leadingPosition.value?.x).isEqualTo(IconPadding.toIntPx().toFloat())
@@ -533,7 +532,7 @@ class TextFieldTest {
         val height = 60.dp
         val iconSize = 30.dp
         val labelPosition = Ref<Offset>()
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             Box {
                 TextField(
                     value = "",
@@ -550,7 +549,7 @@ class TextFieldTest {
             }
         }
 
-        testRule.runOnIdleWithDensity {
+        rule.runOnIdleWithDensity {
             assertThat(labelPosition.value?.x).isEqualTo(
                 (ExpectedPadding.toIntPx() + IconPadding.toIntPx() + iconSize.toIntPx())
                     .toFloat()
@@ -562,7 +561,7 @@ class TextFieldTest {
     fun testTextField_labelPositionX_initial_withEmptyTrailingAndLeading() {
         val height = 60.dp
         val labelPosition = Ref<Offset>()
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             Box {
                 TextField(
                     value = "",
@@ -579,7 +578,7 @@ class TextFieldTest {
             }
         }
 
-        testRule.runOnIdleWithDensity {
+        rule.runOnIdleWithDensity {
             assertThat(labelPosition.value?.x).isEqualTo(
                 ExpectedPadding.toIntPx().toFloat()
             )
@@ -588,7 +587,7 @@ class TextFieldTest {
 
     @Test
     fun testTextField_colorInLeadingTrailing_whenValidInput() {
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             TextField(
                 value = "",
                 onValueChange = {},
@@ -616,7 +615,7 @@ class TextFieldTest {
 
     @Test
     fun testTextField_colorInLeadingTrailing_whenInvalidInput() {
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             TextField(
                 value = "",
                 onValueChange = {},
@@ -640,7 +639,7 @@ class TextFieldTest {
     @Test
     fun testTextField_imeActionAndKeyboardTypePropagatedDownstream() {
         val textInputService = mock<TextInputService>()
-        testRule.setContent {
+        rule.setContent {
             Providers(
                 TextInputServiceAmbient provides textInputService
             ) {
@@ -658,7 +657,7 @@ class TextFieldTest {
 
         clickAndAdvanceClock()
 
-        runOnIdle {
+        rule.runOnIdle {
             verify(textInputService, atLeastOnce()).startInput(
                 value = any(),
                 keyboardType = eq(KeyboardType.Email),
@@ -672,7 +671,7 @@ class TextFieldTest {
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun testTextField_visualTransformationPropagated() {
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             TextField(
                 modifier = Modifier.testTag(TextfieldTag),
                 value = "qwerty",
@@ -684,15 +683,15 @@ class TextFieldTest {
             )
         }
 
-        onNodeWithTag(TextfieldTag)
+        rule.onNodeWithTag(TextfieldTag)
             .captureToBitmap()
             .assertShape(
-                density = testRule.density,
+                density = rule.density,
                 backgroundColor = Color.White,
                 shapeColor = Color.White,
                 shape = RectangleShape,
                 // avoid elevation artifacts
-                shapeOverlapPixelCount = with(testRule.density) { 3.dp.toPx() }
+                shapeOverlapPixelCount = with(rule.density) { 3.dp.toPx() }
             )
     }
 
@@ -701,7 +700,7 @@ class TextFieldTest {
     fun testTextField_alphaNotSet_toBackgroundColorAndTransparentColors() {
         val latch = CountDownLatch(1)
 
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             Stack(Modifier.background(color = Color.White)) {
                 TextField(
                     modifier = Modifier
@@ -720,29 +719,29 @@ class TextFieldTest {
 
         val expectedColor = Color.Blue.copy(alpha = 0.12f).compositeOver(Color.White)
 
-        onNodeWithTag(TextfieldTag)
+        rule.onNodeWithTag(TextfieldTag)
             .captureToBitmap()
             .assertShape(
-                density = testRule.density,
+                density = rule.density,
                 backgroundColor = Color.White,
                 shapeColor = expectedColor,
                 shape = RectangleShape,
                 // avoid elevation artifacts
-                shapeOverlapPixelCount = with(testRule.density) { 1.dp.toPx() }
+                shapeOverlapPixelCount = with(rule.density) { 1.dp.toPx() }
             )
 
-        onNodeWithTag(TextfieldTag).performClick()
+        rule.onNodeWithTag(TextfieldTag).performClick()
         assert(latch.await(1, TimeUnit.SECONDS))
 
-        onNodeWithTag(TextfieldTag)
+        rule.onNodeWithTag(TextfieldTag)
             .captureToBitmap()
             .assertShape(
-                density = testRule.density,
+                density = rule.density,
                 backgroundColor = Color.White,
                 shapeColor = expectedColor,
                 shape = RectangleShape,
                 // avoid elevation artifacts
-                shapeOverlapPixelCount = with(testRule.density) { 1.dp.toPx() }
+                shapeOverlapPixelCount = with(rule.density) { 1.dp.toPx() }
             )
     }
 
@@ -750,7 +749,7 @@ class TextFieldTest {
     fun testTextField_onTextInputStartedCallback() {
         var controller: SoftwareKeyboardController? = null
 
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             TextField(
                 modifier = Modifier.testTag(TextfieldTag),
                 value = "",
@@ -763,10 +762,10 @@ class TextFieldTest {
         }
         assertThat(controller).isNull()
 
-        onNodeWithTag(TextfieldTag)
+        rule.onNodeWithTag(TextfieldTag)
             .performClick()
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(controller).isNotNull()
         }
     }
@@ -775,7 +774,7 @@ class TextFieldTest {
     fun testTextField_imeActionCallback_withSoftwareKeyboardController() {
         var controller: SoftwareKeyboardController? = null
 
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             TextField(
                 modifier = Modifier.testTag(TextfieldTag),
                 value = "",
@@ -789,16 +788,16 @@ class TextFieldTest {
         }
         assertThat(controller).isNull()
 
-        onNodeWithTag(TextfieldTag)
+        rule.onNodeWithTag(TextfieldTag)
             .performImeAction()
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(controller).isNotNull()
         }
     }
 
     private fun clickAndAdvanceClock() {
-        onNodeWithTag(TextfieldTag).performClick()
-        testRule.clockTestRule.advanceClock(200L)
+        rule.onNodeWithTag(TextfieldTag).performClick()
+        rule.clockTestRule.advanceClock(200L)
     }
 }

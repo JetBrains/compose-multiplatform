@@ -45,8 +45,6 @@ import androidx.ui.test.isPopup
 import androidx.ui.test.onNode
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performClick
-import androidx.ui.test.runOnIdle
-import androidx.ui.test.waitForIdle
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -57,14 +55,14 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class MenuTest {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Test
     fun menu_canBeTriggered() {
         var expanded by mutableStateOf(false)
 
-        composeTestRule.clockTestRule.pauseClock()
-        composeTestRule.setContent {
+        rule.clockTestRule.pauseClock()
+        rule.setContent {
             DropdownMenu(
                 expanded = expanded,
                 toggle = {
@@ -77,27 +75,27 @@ class MenuTest {
                 }
             }
         }
-        onNodeWithTag("MenuContent").assertDoesNotExist()
+        rule.onNodeWithTag("MenuContent").assertDoesNotExist()
 
-        runOnIdle { expanded = true }
-        waitForIdle()
-        composeTestRule.clockTestRule.advanceClock(InTransitionDuration.toLong())
-        onNodeWithTag("MenuContent").assertExists()
+        rule.runOnIdle { expanded = true }
+        rule.waitForIdle()
+        rule.clockTestRule.advanceClock(InTransitionDuration.toLong())
+        rule.onNodeWithTag("MenuContent").assertExists()
 
-        runOnIdle { expanded = false }
-        waitForIdle()
-        composeTestRule.clockTestRule.advanceClock(OutTransitionDuration.toLong())
-        onNodeWithTag("MenuContent").assertDoesNotExist()
+        rule.runOnIdle { expanded = false }
+        rule.waitForIdle()
+        rule.clockTestRule.advanceClock(OutTransitionDuration.toLong())
+        rule.onNodeWithTag("MenuContent").assertDoesNotExist()
 
-        runOnIdle { expanded = true }
-        waitForIdle()
-        composeTestRule.clockTestRule.advanceClock(InTransitionDuration.toLong())
-        onNodeWithTag("MenuContent").assertExists()
+        rule.runOnIdle { expanded = true }
+        rule.waitForIdle()
+        rule.clockTestRule.advanceClock(InTransitionDuration.toLong())
+        rule.onNodeWithTag("MenuContent").assertExists()
     }
 
     @Test
     fun menu_hasExpectedSize() {
-        composeTestRule.setContent {
+        rule.setContent {
             with(DensityAmbient.current) {
                 DropdownMenu(
                     expanded = true,
@@ -112,13 +110,13 @@ class MenuTest {
             }
         }
 
-        onNodeWithTag("MenuContent1").assertExists()
-        onNodeWithTag("MenuContent2").assertExists()
+        rule.onNodeWithTag("MenuContent1").assertExists()
+        rule.onNodeWithTag("MenuContent2").assertExists()
         val node = onNode(
             isPopup() and hasAnyDescendant(hasTestTag("MenuContent1")) and
                     hasAnyDescendant(hasTestTag("MenuContent2"))
         ).assertExists().fetchSemanticsNode()
-        with(composeTestRule.density) {
+        with(rule.density) {
             assertThat(node.size.width).isEqualTo(130 + MenuElevationInset.toIntPx() * 2)
             assertThat(node.size.height).isEqualTo(200 +
                     DropdownMenuVerticalPadding.toIntPx() * 2 + MenuElevationInset.toIntPx() * 2
@@ -270,7 +268,7 @@ class MenuTest {
         lateinit var enabledEmphasis: Emphasis
         lateinit var disabledEmphasis: Emphasis
 
-        composeTestRule.setContent {
+        rule.setContent {
             onSurface = MaterialTheme.colors.onSurface
             enabledEmphasis = EmphasisAmbient.current.high
             disabledEmphasis = EmphasisAmbient.current.disabled
@@ -297,7 +295,7 @@ class MenuTest {
         var clicked = false
         val onClick: () -> Unit = { clicked = true }
 
-        composeTestRule.setContent {
+        rule.setContent {
             DropdownMenuItem(
                 onClick,
                 modifier = Modifier.testTag("MenuItem").clickable(onClick = onClick)
@@ -306,9 +304,9 @@ class MenuTest {
             }
         }
 
-        onNodeWithTag("MenuItem").performClick()
+        rule.onNodeWithTag("MenuItem").performClick()
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(clicked).isTrue()
         }
     }

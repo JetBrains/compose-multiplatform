@@ -54,8 +54,6 @@ import androidx.ui.test.ComposeTestRuleJUnit
 import androidx.ui.test.captureToBitmap
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.runOnUiThread
-import androidx.ui.test.waitForIdle
 import com.google.common.truth.Truth
 import org.junit.Rule
 import org.junit.Test
@@ -69,7 +67,7 @@ import org.junit.runners.JUnit4
 class RippleIndicationTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL)
@@ -80,7 +78,7 @@ class RippleIndicationTest {
 
         val contentColor = Color.White
 
-        composeTestRule.setRippleContent(
+        rule.setRippleContent(
             interactionState = interactionState,
             bounded = true,
             lightTheme = true,
@@ -101,7 +99,7 @@ class RippleIndicationTest {
 
         val contentColor = Color.White
 
-        composeTestRule.setRippleContent(
+        rule.setRippleContent(
             interactionState = interactionState,
             bounded = true,
             lightTheme = true,
@@ -122,7 +120,7 @@ class RippleIndicationTest {
 
         val contentColor = Color.Black
 
-        composeTestRule.setRippleContent(
+        rule.setRippleContent(
             interactionState = interactionState,
             bounded = true,
             lightTheme = true,
@@ -143,7 +141,7 @@ class RippleIndicationTest {
 
         val contentColor = Color.Black
 
-        composeTestRule.setRippleContent(
+        rule.setRippleContent(
             interactionState = interactionState,
             bounded = true,
             lightTheme = true,
@@ -164,7 +162,7 @@ class RippleIndicationTest {
 
         val contentColor = Color.White
 
-        composeTestRule.setRippleContent(
+        rule.setRippleContent(
             interactionState = interactionState,
             bounded = true,
             lightTheme = false,
@@ -185,7 +183,7 @@ class RippleIndicationTest {
 
         val contentColor = Color.White
 
-        composeTestRule.setRippleContent(
+        rule.setRippleContent(
             interactionState = interactionState,
             bounded = true,
             lightTheme = false,
@@ -206,7 +204,7 @@ class RippleIndicationTest {
 
         val contentColor = Color.Black
 
-        composeTestRule.setRippleContent(
+        rule.setRippleContent(
             interactionState = interactionState,
             bounded = true,
             lightTheme = false,
@@ -228,7 +226,7 @@ class RippleIndicationTest {
 
         val contentColor = Color.Black
 
-        composeTestRule.setRippleContent(
+        rule.setRippleContent(
             interactionState = interactionState,
             bounded = true,
             lightTheme = false,
@@ -250,7 +248,7 @@ class RippleIndicationTest {
 
         val contentColor = Color.White
 
-        composeTestRule.setRippleContent(
+        rule.setRippleContent(
             interactionState = interactionState,
             bounded = false,
             lightTheme = true,
@@ -271,7 +269,7 @@ class RippleIndicationTest {
 
         val contentColor = Color.White
 
-        composeTestRule.setRippleContent(
+        rule.setRippleContent(
             interactionState = interactionState,
             bounded = false,
             lightTheme = true,
@@ -292,7 +290,7 @@ class RippleIndicationTest {
 
         val contentColor = Color.Black
 
-        composeTestRule.setRippleContent(
+        rule.setRippleContent(
             interactionState = interactionState,
             bounded = false,
             lightTheme = true,
@@ -313,7 +311,7 @@ class RippleIndicationTest {
 
         val contentColor = Color.Black
 
-        composeTestRule.setRippleContent(
+        rule.setRippleContent(
             interactionState = interactionState,
             bounded = false,
             lightTheme = true,
@@ -334,7 +332,7 @@ class RippleIndicationTest {
 
         val contentColor = Color.White
 
-        composeTestRule.setRippleContent(
+        rule.setRippleContent(
             interactionState = interactionState,
             bounded = false,
             lightTheme = false,
@@ -355,7 +353,7 @@ class RippleIndicationTest {
 
         val contentColor = Color.White
 
-        composeTestRule.setRippleContent(
+        rule.setRippleContent(
             interactionState = interactionState,
             bounded = false,
             lightTheme = false,
@@ -376,7 +374,7 @@ class RippleIndicationTest {
 
         val contentColor = Color.Black
 
-        composeTestRule.setRippleContent(
+        rule.setRippleContent(
             interactionState = interactionState,
             bounded = false,
             lightTheme = false,
@@ -398,7 +396,7 @@ class RippleIndicationTest {
 
         val contentColor = Color.Black
 
-        composeTestRule.setRippleContent(
+        rule.setRippleContent(
             interactionState = interactionState,
             bounded = false,
             lightTheme = false,
@@ -433,7 +431,7 @@ class RippleIndicationTest {
             }
         }
 
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(RippleThemeAmbient provides rippleTheme) {
                 MaterialTheme {
                     Surface(contentColor = contentColor) {
@@ -474,7 +472,7 @@ class RippleIndicationTest {
             }
         }
 
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(RippleThemeAmbient provides rippleTheme) {
                 MaterialTheme {
                     Surface(contentColor = contentColor) {
@@ -515,7 +513,7 @@ class RippleIndicationTest {
 
         var rippleTheme by mutableStateOf(createRippleTheme(initialColor, initialAlpha))
 
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(RippleThemeAmbient provides rippleTheme) {
                 MaterialTheme {
                     Surface(contentColor = Color.Black) {
@@ -527,11 +525,11 @@ class RippleIndicationTest {
             }
         }
 
-        runOnUiThread {
+        rule.runOnUiThread {
             interactionState.addInteraction(Interaction.Pressed, Offset(10f, 10f))
         }
 
-        with(onNodeWithTag(Tag)) {
+        with(rule.onNodeWithTag(Tag)) {
             val centerPixel = captureToBitmap()
                 .run {
                     getPixel(width / 2, height / 2)
@@ -546,11 +544,11 @@ class RippleIndicationTest {
         val newColor = Color.Green
         val newAlpha = 0.2f
 
-        runOnUiThread {
+        rule.runOnUiThread {
             rippleTheme = createRippleTheme(newColor, newAlpha)
         }
 
-        with(onNodeWithTag(Tag)) {
+        with(rule.onNodeWithTag(Tag)) {
             val centerPixel = captureToBitmap()
                 .run {
                     getPixel(width / 2, height / 2)
@@ -579,10 +577,10 @@ class RippleIndicationTest {
         goldenIdentifier: String,
         expectedCenterPixelColor: Color
     ) {
-        composeTestRule.clockTestRule.pauseClock()
+        rule.clockTestRule.pauseClock()
 
         // Start ripple
-        runOnUiThread {
+        rule.runOnUiThread {
             if (interaction is Interaction.Pressed) {
                 interactionState.addInteraction(interaction, Offset(10f, 10f))
             } else {
@@ -592,21 +590,21 @@ class RippleIndicationTest {
 
         // Advance to somewhere in the middle of the animation for a ripple, or at the end of a
         // state layer transition
-        waitForIdle()
-        composeTestRule.clockTestRule.advanceClock(50)
+        rule.waitForIdle()
+        rule.clockTestRule.advanceClock(50)
 
         // Capture and compare screenshots
-        onNodeWithTag(Tag)
+        rule.onNodeWithTag(Tag)
             .captureToBitmap()
             .assertAgainstGolden(screenshotRule, goldenIdentifier)
 
         // Advance until after the end of the ripple animation, so we have a stable final opacity
-        waitForIdle()
-        composeTestRule.clockTestRule.advanceClock(50)
-        waitForIdle()
+        rule.waitForIdle()
+        rule.clockTestRule.advanceClock(50)
+        rule.waitForIdle()
 
         // Compare expected and actual pixel color
-        val centerPixel = onNodeWithTag(Tag)
+        val centerPixel = rule.onNodeWithTag(Tag)
             .captureToBitmap()
             .run {
                 getPixel(width / 2, height / 2)

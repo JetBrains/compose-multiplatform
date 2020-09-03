@@ -42,7 +42,6 @@ import androidx.ui.test.onNode
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performGesture
 import androidx.ui.test.up
-import androidx.ui.test.waitForIdle
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -54,7 +53,7 @@ import org.junit.runners.JUnit4
 class SwitchScreenshotTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL)
@@ -69,7 +68,7 @@ class SwitchScreenshotTest {
 
     @Test
     fun switchTest_checked() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Box(wrapperModifier) {
                 Switch(checked = true, onCheckedChange = { })
             }
@@ -79,7 +78,7 @@ class SwitchScreenshotTest {
 
     @Test
     fun switchTest_checked_rtl() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Box(wrapperModifier) {
                 Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
                     Switch(checked = true, onCheckedChange = { })
@@ -91,7 +90,7 @@ class SwitchScreenshotTest {
 
     @Test
     fun switchTest_checked_customColor() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Box(wrapperModifier) {
                 Switch(checked = true, onCheckedChange = { }, color = Color.Red)
             }
@@ -101,7 +100,7 @@ class SwitchScreenshotTest {
 
     @Test
     fun switchTest_unchecked() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Box(wrapperModifier) {
                 Switch(checked = false, onCheckedChange = { })
             }
@@ -111,7 +110,7 @@ class SwitchScreenshotTest {
 
     @Test
     fun switchTest_unchecked_rtl() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Box(wrapperModifier) {
                 Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
                     Switch(checked = false, onCheckedChange = { })
@@ -123,13 +122,13 @@ class SwitchScreenshotTest {
 
     @Test
     fun switchTest_pressed() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Box(wrapperModifier) {
                 Switch(checked = false, enabled = true, onCheckedChange = { })
             }
         }
 
-        onNodeWithTag(wrapperTestTag).performGesture {
+        rule.onNodeWithTag(wrapperTestTag).performGesture {
             down(center)
         }
         assertToggeableAgainstGolden("switch_pressed")
@@ -137,7 +136,7 @@ class SwitchScreenshotTest {
 
     @Test
     fun switchTest_disabled_checked() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Box(wrapperModifier) {
                 Switch(checked = true, enabled = false, onCheckedChange = { })
             }
@@ -147,7 +146,7 @@ class SwitchScreenshotTest {
 
     @Test
     fun switchTest_disabled_unchecked() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Box(wrapperModifier) {
                 Switch(checked = false, enabled = false, onCheckedChange = { })
             }
@@ -157,7 +156,7 @@ class SwitchScreenshotTest {
 
     @Test
     fun switchTest_unchecked_animateToChecked() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             val isChecked = remember { mutableStateOf(false) }
             Box(wrapperModifier) {
                 Switch(
@@ -167,23 +166,23 @@ class SwitchScreenshotTest {
             }
         }
 
-        composeTestRule.clockTestRule.pauseClock()
+        rule.clockTestRule.pauseClock()
 
         onNode(isToggleable())
             // split click into (down) and (move, up) to enforce a composition in between
             .performGesture { down(center) }
             .performGesture { move(); up() }
 
-        waitForIdle()
+        rule.waitForIdle()
 
-        composeTestRule.clockTestRule.advanceClock(60)
+        rule.clockTestRule.advanceClock(60)
 
         assertToggeableAgainstGolden("switch_animateToChecked")
     }
 
     @Test
     fun switchTest_checked_animateToUnchecked() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             val isChecked = remember { mutableStateOf(true) }
             Box(wrapperModifier) {
                 Switch(
@@ -193,23 +192,23 @@ class SwitchScreenshotTest {
             }
         }
 
-        composeTestRule.clockTestRule.pauseClock()
+        rule.clockTestRule.pauseClock()
 
         onNode(isToggleable())
             // split click into (down) and (move, up) to enforce a composition in between
             .performGesture { down(center) }
             .performGesture { move(); up() }
 
-        waitForIdle()
+        rule.waitForIdle()
 
-        composeTestRule.clockTestRule.advanceClock(60)
+        rule.clockTestRule.advanceClock(60)
 
         assertToggeableAgainstGolden("switch_animateToUnchecked")
     }
 
     private fun assertToggeableAgainstGolden(goldenName: String) {
         // TODO: replace with find(isToggeable()) after b/157687898 is fixed
-        onNodeWithTag(wrapperTestTag)
+        rule.onNodeWithTag(wrapperTestTag)
             .captureToBitmap()
             .assertAgainstGolden(screenshotRule, goldenName)
     }

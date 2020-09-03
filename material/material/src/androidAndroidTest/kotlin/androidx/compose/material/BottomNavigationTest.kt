@@ -58,12 +58,12 @@ import org.junit.runners.JUnit4
  */
 class BottomNavigationTest {
     @get:Rule
-    val composeTestRule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule(disableTransitions = true)
 
     @Test
     fun bottomNavigation_size() {
         val height = 56.dp
-        composeTestRule.setMaterialContentForSizeAssertions {
+        rule.setMaterialContentForSizeAssertions {
             BottomNavigationSample()
         }
             .assertWidthFillsRoot()
@@ -74,7 +74,7 @@ class BottomNavigationTest {
     fun bottomNavigationItem_sizeAndPositions() {
         lateinit var parentCoords: LayoutCoordinates
         val itemCoords = mutableMapOf<Int, LayoutCoordinates>()
-        composeTestRule.setMaterialContent(Modifier.onPositioned { coords: LayoutCoordinates ->
+        rule.setMaterialContent(Modifier.onPositioned { coords: LayoutCoordinates ->
             parentCoords = coords
         }) {
             Box {
@@ -94,7 +94,7 @@ class BottomNavigationTest {
             }
         }
 
-        composeTestRule.runOnIdleWithDensity {
+        rule.runOnIdleWithDensity {
             val totalWidth = parentCoords.size.width
 
             val expectedItemWidth = totalWidth / 4
@@ -113,7 +113,7 @@ class BottomNavigationTest {
 
     @Test
     fun bottomNavigationItemContent_withLabel_sizeAndPosition() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Box {
                 BottomNavigation {
                     BottomNavigationItem(
@@ -133,16 +133,17 @@ class BottomNavigationTest {
             }
         }
 
-        val itemBounds = onNodeWithTag("item").getUnclippedBoundsInRoot()
-        val iconBounds = onNodeWithTag("icon", useUnmergedTree = true).getUnclippedBoundsInRoot()
-        val textBounds = onNodeWithText("ItemText").getUnclippedBoundsInRoot()
+        val itemBounds = rule.onNodeWithTag("item").getUnclippedBoundsInRoot()
+        val iconBounds = rule.onNodeWithTag("icon", useUnmergedTree = true)
+            .getUnclippedBoundsInRoot()
+        val textBounds = rule.onNodeWithText("ItemText").getUnclippedBoundsInRoot()
 
         // Distance from the bottom to the text baseline and from the text baseline to the
         // bottom of the icon
         val textBaseline = 12.dp
 
         // Relative position of the baseline to the top of text
-        val relativeTextBaseline = onNodeWithText("ItemText").getLastBaselinePosition()
+        val relativeTextBaseline = rule.onNodeWithText("ItemText").getLastBaselinePosition()
         // Absolute y position of the text baseline
         val absoluteTextBaseline = textBounds.top + relativeTextBaseline
 
@@ -150,7 +151,7 @@ class BottomNavigationTest {
         // Text baseline should be 12.dp from the bottom of the item
         absoluteTextBaseline.assertIsEqualTo(itemBottom - textBaseline)
 
-        onNodeWithTag("icon", useUnmergedTree = true)
+        rule.onNodeWithTag("icon", useUnmergedTree = true)
             // The icon should be centered in the item
             .assertLeftPositionInRootIsEqualTo((itemBounds.width - iconBounds.width) / 2)
             // The bottom of the icon is 12.dp above the text baseline
@@ -159,7 +160,7 @@ class BottomNavigationTest {
 
     @Test
     fun bottomNavigationItemContent_withLabel_unselected_sizeAndPosition() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Box {
                 BottomNavigation {
                     BottomNavigationItem(
@@ -182,19 +183,20 @@ class BottomNavigationTest {
 
         // The text should not be placed, since the item is not selected and alwaysShowLabels
         // is false
-        onNodeWithText("ItemText", useUnmergedTree = true).assertIsNotDisplayed()
+        rule.onNodeWithText("ItemText", useUnmergedTree = true).assertIsNotDisplayed()
 
-        val itemBounds = onNodeWithTag("item").getUnclippedBoundsInRoot()
-        val iconBounds = onNodeWithTag("icon", useUnmergedTree = true).getUnclippedBoundsInRoot()
+        val itemBounds = rule.onNodeWithTag("item").getUnclippedBoundsInRoot()
+        val iconBounds = rule.onNodeWithTag("icon", useUnmergedTree = true)
+            .getUnclippedBoundsInRoot()
 
-        onNodeWithTag("icon", useUnmergedTree = true)
+        rule.onNodeWithTag("icon", useUnmergedTree = true)
             .assertLeftPositionInRootIsEqualTo((itemBounds.width - iconBounds.width) / 2)
             .assertTopPositionInRootIsEqualTo((itemBounds.height - iconBounds.height) / 2)
     }
 
     @Test
     fun bottomNavigationItemContent_withoutLabel_sizeAndPosition() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Box {
                 BottomNavigation {
                     BottomNavigationItem(
@@ -212,18 +214,19 @@ class BottomNavigationTest {
             }
         }
 
-        val itemBounds = onNodeWithTag("item").getUnclippedBoundsInRoot()
-        val iconBounds = onNodeWithTag("icon", useUnmergedTree = true).getUnclippedBoundsInRoot()
+        val itemBounds = rule.onNodeWithTag("item").getUnclippedBoundsInRoot()
+        val iconBounds = rule.onNodeWithTag("icon", useUnmergedTree = true)
+            .getUnclippedBoundsInRoot()
 
         // The icon should be centered in the item, as there is no text placeable provided
-        onNodeWithTag("icon", useUnmergedTree = true)
+        rule.onNodeWithTag("icon", useUnmergedTree = true)
             .assertLeftPositionInRootIsEqualTo((itemBounds.width - iconBounds.width) / 2)
             .assertTopPositionInRootIsEqualTo((itemBounds.height - iconBounds.height) / 2)
     }
 
     @Test
     fun bottomNavigation_selectNewItem() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             BottomNavigationSample()
         }
 

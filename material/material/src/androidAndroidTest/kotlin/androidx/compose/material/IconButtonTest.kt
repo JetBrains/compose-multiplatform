@@ -47,13 +47,13 @@ import org.junit.runners.JUnit4
  */
 class IconButtonTest {
     @get:Rule
-    val composeTestRule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule(disableTransitions = true)
 
     @Test
     fun iconButton_size() {
         val width = 48.dp
         val height = 48.dp
-        composeTestRule
+        rule
             .setMaterialContentForSizeAssertions {
                 IconButtonSample()
             }
@@ -64,7 +64,7 @@ class IconButtonTest {
     @Test
     fun iconButton_materialIconSize_iconPositioning() {
         val diameter = 24.dp
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Box {
                 IconButton(onClick = {}) {
                     Box(
@@ -76,7 +76,7 @@ class IconButtonTest {
         }
 
         // Icon should be centered inside the IconButton
-        onNodeWithTag("icon", useUnmergedTree = true)
+        rule.onNodeWithTag("icon", useUnmergedTree = true)
             .assertLeftPositionInRootIsEqualTo(24.dp / 2)
             .assertTopPositionInRootIsEqualTo(24.dp / 2)
     }
@@ -85,7 +85,7 @@ class IconButtonTest {
     fun iconButton_customIconSize_iconPositioning() {
         val width = 36.dp
         val height = 14.dp
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Box {
                 IconButton(onClick = {}) {
                     Box(
@@ -97,7 +97,7 @@ class IconButtonTest {
         }
 
         // Icon should be centered inside the IconButton
-        onNodeWithTag("icon", useUnmergedTree = true)
+        rule.onNodeWithTag("icon", useUnmergedTree = true)
             .assertLeftPositionInRootIsEqualTo((48.dp - width) / 2)
             .assertTopPositionInRootIsEqualTo((48.dp - height) / 2)
     }
@@ -106,7 +106,7 @@ class IconButtonTest {
     fun iconToggleButton_size() {
         val width = 48.dp
         val height = 48.dp
-        composeTestRule
+        rule
             .setMaterialContentForSizeAssertions {
                 IconToggleButtonSample()
             }
@@ -117,7 +117,7 @@ class IconButtonTest {
     @Test
     fun iconToggleButton_materialIconSize_iconPositioning() {
         val diameter = 24.dp
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Box {
                 IconToggleButton(checked = false, onCheckedChange = {}) {
                     Box(
@@ -129,7 +129,7 @@ class IconButtonTest {
         }
 
         // Icon should be centered inside the IconButton
-        onNodeWithTag("icon", useUnmergedTree = true)
+        rule.onNodeWithTag("icon", useUnmergedTree = true)
             .assertLeftPositionInRootIsEqualTo(24.dp / 2)
             .assertTopPositionInRootIsEqualTo(24.dp / 2)
     }
@@ -138,7 +138,7 @@ class IconButtonTest {
     fun iconToggleButton_customIconSize_iconPositioning() {
         val width = 36.dp
         val height = 14.dp
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Box {
                 IconToggleButton(checked = false, onCheckedChange = {}) {
                     Box(
@@ -149,14 +149,14 @@ class IconButtonTest {
         }
 
         // Icon should be centered inside the IconButton
-        onNodeWithTag("icon", useUnmergedTree = true)
+        rule.onNodeWithTag("icon", useUnmergedTree = true)
             .assertLeftPositionInRootIsEqualTo((48.dp - width) / 2)
             .assertTopPositionInRootIsEqualTo((48.dp - height) / 2)
     }
 
     @Test
     fun iconToggleButton_semantics() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             IconToggleButtonSample()
         }
         onNode(isToggleable()).apply {

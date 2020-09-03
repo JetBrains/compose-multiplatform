@@ -32,7 +32,6 @@ import androidx.ui.test.click
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performGesture
-import androidx.ui.test.runOnIdle
 import androidx.ui.test.swipeDown
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
@@ -47,7 +46,7 @@ import org.junit.runners.JUnit4
 class BackdropScaffoldTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule(disableTransitions = true)
 
     private val peekHeight = 75.dp
     private val headerHeight = 100.dp
@@ -68,7 +67,7 @@ class BackdropScaffoldTest {
 
     @Test
     fun backdropScaffold_testOffset_whenConcealed() {
-        composeTestRule.setContent {
+        rule.setContent {
             BackdropScaffold(
                 backdropScaffoldState = rememberBackdropState(Concealed),
                 peekHeight = peekHeight,
@@ -79,13 +78,13 @@ class BackdropScaffoldTest {
             )
         }
 
-        onNodeWithTag(frontLayer)
+        rule.onNodeWithTag(frontLayer)
             .assertTopPositionInRootIsEqualTo(peekHeight)
     }
 
     @Test
     fun backdropScaffold_testOffset_whenRevealed() {
-        composeTestRule.setContent {
+        rule.setContent {
             BackdropScaffold(
                 backdropScaffoldState = rememberBackdropState(Revealed),
                 peekHeight = peekHeight,
@@ -96,13 +95,13 @@ class BackdropScaffoldTest {
             )
         }
 
-        onNodeWithTag(frontLayer)
+        rule.onNodeWithTag(frontLayer)
             .assertTopPositionInRootIsEqualTo(peekHeight + contentHeight)
     }
 
     @Test
     fun backdropScaffold_testOffset_whenRevealed_backContentTooLarge() {
-        composeTestRule.setContent {
+        rule.setContent {
             BackdropScaffold(
                 backdropScaffoldState = rememberBackdropState(Revealed),
                 peekHeight = peekHeight,
@@ -113,13 +112,13 @@ class BackdropScaffoldTest {
             )
         }
 
-        onNodeWithTag(frontLayer)
-            .assertTopPositionInRootIsEqualTo(rootHeight() - headerHeight)
+        rule.onNodeWithTag(frontLayer)
+            .assertTopPositionInRootIsEqualTo(rule.rootHeight() - headerHeight)
     }
 
     @Test
     fun backdropScaffold_testOffset_whenRevealed_nonPersistentAppBar() {
-        composeTestRule.setContent {
+        rule.setContent {
             BackdropScaffold(
                 backdropScaffoldState = rememberBackdropState(Revealed),
                 peekHeight = peekHeight,
@@ -131,13 +130,13 @@ class BackdropScaffoldTest {
             )
         }
 
-        onNodeWithTag(frontLayer)
+        rule.onNodeWithTag(frontLayer)
             .assertTopPositionInRootIsEqualTo(contentHeight)
     }
 
     @Test
     fun backdropScaffold_testOffset_whenRevealed_nonStickyFrontLayer() {
-        composeTestRule.setContent {
+        rule.setContent {
             BackdropScaffold(
                 backdropScaffoldState = rememberBackdropState(Revealed),
                 peekHeight = peekHeight,
@@ -149,14 +148,14 @@ class BackdropScaffoldTest {
             )
         }
 
-        onNodeWithTag(frontLayer)
-            .assertTopPositionInRootIsEqualTo(rootHeight() - headerHeight)
+        rule.onNodeWithTag(frontLayer)
+            .assertTopPositionInRootIsEqualTo(rule.rootHeight() - headerHeight)
     }
 
     @Test
     fun backdropScaffold_revealAndConceal_manually() {
         val backdropState = BackdropScaffoldState(Concealed, clock = clock)
-        composeTestRule.setContent {
+        rule.setContent {
             BackdropScaffold(
                 backdropScaffoldState = backdropState,
                 peekHeight = peekHeight,
@@ -167,32 +166,32 @@ class BackdropScaffoldTest {
             )
         }
 
-        onNodeWithTag(frontLayer)
+        rule.onNodeWithTag(frontLayer)
             .assertTopPositionInRootIsEqualTo(peekHeight)
 
-        runOnIdle {
+        rule.runOnIdle {
             backdropState.reveal()
         }
 
         advanceClock()
 
-        onNodeWithTag(frontLayer)
+        rule.onNodeWithTag(frontLayer)
             .assertTopPositionInRootIsEqualTo(peekHeight + contentHeight)
 
-        runOnIdle {
+        rule.runOnIdle {
             backdropState.conceal()
         }
 
         advanceClock()
 
-        onNodeWithTag(frontLayer)
+        rule.onNodeWithTag(frontLayer)
             .assertTopPositionInRootIsEqualTo(peekHeight)
     }
 
     @Test
     fun backdropScaffold_revealBySwiping() {
         val backdropState = BackdropScaffoldState(Concealed, clock)
-        composeTestRule.setContent {
+        rule.setContent {
             BackdropScaffold(
                 backdropScaffoldState = backdropState,
                 peekHeight = peekHeight,
@@ -203,16 +202,16 @@ class BackdropScaffoldTest {
             )
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(backdropState.value).isEqualTo(Concealed)
         }
 
-        onNodeWithTag(frontLayer)
+        rule.onNodeWithTag(frontLayer)
             .performGesture { swipeDown() }
 
         advanceClock()
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(backdropState.value).isEqualTo(Revealed)
         }
     }
@@ -220,7 +219,7 @@ class BackdropScaffoldTest {
     @Test
     fun backdropScaffold_concealByTapingOnFrontLayer() {
         val backdropState = BackdropScaffoldState(Revealed, clock)
-        composeTestRule.setContent {
+        rule.setContent {
             BackdropScaffold(
                 backdropScaffoldState = backdropState,
                 peekHeight = peekHeight,
@@ -231,16 +230,16 @@ class BackdropScaffoldTest {
             )
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(backdropState.value).isEqualTo(Revealed)
         }
 
-        onNodeWithTag(frontLayer)
+        rule.onNodeWithTag(frontLayer)
             .performGesture { click() }
 
         advanceClock()
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(backdropState.value).isEqualTo(Concealed)
         }
     }

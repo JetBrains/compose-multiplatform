@@ -42,14 +42,14 @@ import org.junit.runners.JUnit4
 class SnackbarHostTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule(disableTransitions = true)
 
     @Test
     fun snackbarHost_observePushedData() {
         var resultedInvocation = ""
         val hostState = SnackbarHostState()
         lateinit var scope: CoroutineScope
-        composeTestRule.setContent {
+        rule.setContent {
             scope = rememberCoroutineScope()
             SnackbarHost(hostState) { data ->
                 remember(data) {
@@ -76,7 +76,7 @@ class SnackbarHostTest {
         var resultedInvocation = ""
         val hostState = SnackbarHostState()
         lateinit var scope: CoroutineScope
-        composeTestRule.setContent {
+        rule.setContent {
             scope = rememberCoroutineScope()
             SnackbarHost(hostState) { data ->
                 remember(data) {
@@ -106,7 +106,7 @@ class SnackbarHostTest {
     fun snackbarHost_returnedResult() {
         val hostState = SnackbarHostState()
         lateinit var scope: CoroutineScope
-        composeTestRule.setContent {
+        rule.setContent {
             scope = rememberCoroutineScope()
             SnackbarHost(hostState) { data ->
                 Snackbar(data)
@@ -116,7 +116,7 @@ class SnackbarHostTest {
             val result = hostState.showSnackbar("1", actionLabel = "press")
             Truth.assertThat(result).isEqualTo(SnackbarResult.ActionPerformed)
         }
-        onNodeWithText("press")
+        rule.onNodeWithText("press")
             .performClick()
         runBlocking {
             job1.join()
@@ -138,7 +138,7 @@ class SnackbarHostTest {
         val switchState = mutableStateOf(true)
         val hostState = SnackbarHostState()
         lateinit var scope: CoroutineScope
-        composeTestRule.setContent {
+        rule.setContent {
             if (switchState.value) {
                 scope = rememberCoroutineScope()
             }
