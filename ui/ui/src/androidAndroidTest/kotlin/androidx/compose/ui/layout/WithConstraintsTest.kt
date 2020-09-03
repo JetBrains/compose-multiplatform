@@ -20,8 +20,6 @@ package androidx.compose.ui.layout
 
 import android.graphics.Bitmap
 import android.os.Build
-import androidx.compose.foundation.layout.Constraints
-import androidx.compose.foundation.layout.DpConstraints
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.emptyContent
@@ -54,8 +52,6 @@ import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.runOnUiThreadIR
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.waitAndScreenShot
@@ -665,46 +661,41 @@ class WithConstraintsTest {
 
     @Test
     fun dpOverloadsHaveCorrectValues() {
-        val dpConstraints = DpConstraints(
-            minWidth = 5.dp,
-            maxWidth = 7.dp,
-            minHeight = 9.dp,
-            maxHeight = 12.dp
-        )
         val latch = CountDownLatch(1)
-        var actualMinWidth: Dp = 0.dp
-        var actualMaxWidth: Dp = 0.dp
-        var actualMinHeight: Dp = 0.dp
-        var actualMaxHeight: Dp = 0.dp
-        var density: Density? = null
         rule.runOnUiThreadIR {
             activity.setContent {
+                val minWidthConstraint = 5.dp
+                val maxWidthConstraint = 7.dp
+                val minHeightConstraint = 9.dp
+                val maxHeightConstraint = 12.dp
                 Layout(
                     children = @Composable {
                         WithConstraints {
-                            density = DensityAmbient.current
-                            actualMinWidth = minWidth
-                            actualMaxWidth = maxWidth
-                            actualMinHeight = minHeight
-                            actualMaxHeight = maxHeight
+                            with(DensityAmbient.current) {
+                                assertEquals(minWidthConstraint.toIntPx(), minWidth.toIntPx())
+                                assertEquals(maxWidthConstraint.toIntPx(), maxWidth.toIntPx())
+                                assertEquals(minHeightConstraint.toIntPx(), minHeight.toIntPx())
+                                assertEquals(maxHeightConstraint.toIntPx(), maxHeight.toIntPx())
+                            }
                             latch.countDown()
                         }
                     }
                 ) { m, _ ->
                     layout(0, 0) {
-                        m.first().measure(Constraints(dpConstraints)).place(Offset.Zero)
+                        m.first().measure(
+                            Constraints(
+                                minWidth = minWidthConstraint.toIntPx(),
+                                maxWidth = maxWidthConstraint.toIntPx(),
+                                minHeight = minHeightConstraint.toIntPx(),
+                                maxHeight = maxHeightConstraint.toIntPx()
+                            )
+                        ).place(Offset.Zero)
                     }
                 }
             }
         }
 
         assertTrue(latch.await(1, TimeUnit.SECONDS))
-        with(density!!) {
-            assertEquals(dpConstraints.minWidth.toIntPx(), actualMinWidth.toIntPx())
-            assertEquals(dpConstraints.maxWidth.toIntPx(), actualMaxWidth.toIntPx())
-            assertEquals(dpConstraints.minHeight.toIntPx(), actualMinHeight.toIntPx())
-            assertEquals(dpConstraints.maxHeight.toIntPx(), actualMaxHeight.toIntPx())
-        }
     }
 
     private fun takeScreenShot(size: Int): Bitmap {

@@ -23,7 +23,6 @@ import androidx.compose.animation.core.SpringSpec
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.DpConstraints
 import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offsetPx
@@ -336,9 +335,7 @@ fun ModalDrawerLayout(
         if (!constraints.hasBoundedWidth) {
             throw IllegalStateException("Drawer shouldn't have infinite width")
         }
-        val dpConstraints = with(DensityAmbient.current) {
-            DpConstraints(constraints)
-        }
+
         val minValue = -constraints.maxWidth.toFloat()
         val maxValue = 0f
 
@@ -365,10 +362,14 @@ fun ModalDrawerLayout(
                 color = scrimColor
             )
             Surface(
-                modifier = Modifier
-                    .preferredSizeIn(dpConstraints)
-                    .offsetPx(x = drawerState.offset)
-                    .padding(end = VerticalDrawerPadding),
+                modifier = with(DensityAmbient.current) {
+                    Modifier.preferredSizeIn(
+                        minWidth = constraints.minWidth.toDp(),
+                        minHeight = constraints.minHeight.toDp(),
+                        maxWidth = constraints.maxWidth.toDp(),
+                        maxHeight = constraints.maxHeight.toDp()
+                    )
+                }.offsetPx(x = drawerState.offset).padding(end = VerticalDrawerPadding),
                 shape = drawerShape,
                 color = drawerBackgroundColor,
                 contentColor = drawerContentColor,
@@ -430,9 +431,7 @@ fun BottomDrawerLayout(
         if (!constraints.hasBoundedHeight) {
             throw IllegalStateException("Drawer shouldn't have infinite height")
         }
-        val dpConstraints = with(DensityAmbient.current) {
-            DpConstraints(constraints)
-        }
+
         val minValue = 0f
         val maxValue = constraints.maxHeight.toFloat()
 
@@ -479,14 +478,19 @@ fun BottomDrawerLayout(
                 color = scrimColor
             )
             Surface(
-                modifier = Modifier
-                    .preferredSizeIn(dpConstraints)
-                    .offsetPx(y = drawerState.offset),
+                modifier = with(DensityAmbient.current) {
+                    Modifier.preferredSizeIn(
+                        minWidth = constraints.minWidth.toDp(),
+                        minHeight = constraints.minHeight.toDp(),
+                        maxWidth = constraints.maxWidth.toDp(),
+                        maxHeight = constraints.maxHeight.toDp()
+                    )
+                }.offsetPx(y = drawerState.offset),
                 shape = drawerShape,
                 color = drawerBackgroundColor,
                 contentColor = drawerContentColor,
                 elevation = drawerElevation
-                ) {
+            ) {
                 Column(Modifier.fillMaxSize(), children = drawerContent)
             }
         }
