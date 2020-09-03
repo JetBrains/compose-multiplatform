@@ -36,12 +36,12 @@ import org.junit.runners.JUnit4
 class ViewModelTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Test
     fun viewModelCreatedViaDefaultFactory() {
         val owner = FakeViewModelStoreOwner()
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(ViewModelStoreOwnerAmbient provides owner) {
                 viewModel<TestViewModel>()
             }
@@ -54,7 +54,7 @@ class ViewModelTest {
     fun viewModelCreatedViaDefaultFactoryWithKey() {
         val owner = FakeViewModelStoreOwner()
         var createdInComposition: Any? = null
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(ViewModelStoreOwnerAmbient provides owner) {
                 createdInComposition = viewModel<TestViewModel>()
             }
@@ -69,7 +69,7 @@ class ViewModelTest {
     fun createdViewModelIsEqualsToCreatedManually() {
         val owner = FakeViewModelStoreOwner()
         var createdInComposition: Any? = null
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(ViewModelStoreOwnerAmbient provides owner) {
                 createdInComposition = viewModel<TestViewModel>()
             }
@@ -84,7 +84,7 @@ class ViewModelTest {
     fun createdViewModelIsEqualsToCreatedManuallyWithKey() {
         val owner = FakeViewModelStoreOwner()
         var createdInComposition: Any? = null
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(ViewModelStoreOwnerAmbient provides owner) {
                 createdInComposition = viewModel<TestViewModel>(key = "test")
             }
@@ -99,7 +99,7 @@ class ViewModelTest {
     fun customFactoryIsUsedWhenProvided() {
         val owner = FakeViewModelStoreOwner()
         val customFactory = FakeViewModelProviderFactory()
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(ViewModelStoreOwnerAmbient provides owner) {
                 viewModel<TestViewModel>(factory = customFactory)
             }
@@ -112,7 +112,7 @@ class ViewModelTest {
     fun defaultFactoryIsNotUsedWhenCustomProvided() {
         val owner = FakeViewModelStoreOwner()
         val customFactory = FakeViewModelProviderFactory()
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(ViewModelStoreOwnerAmbient provides owner) {
                 viewModel<TestViewModel>(factory = customFactory)
             }
@@ -126,7 +126,7 @@ class ViewModelTest {
         val owner = FakeViewModelStoreOwner()
         var createdInComposition: Any? = null
         val customFactory = FakeViewModelProviderFactory()
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(ViewModelStoreOwnerAmbient provides owner) {
                 createdInComposition = viewModel<TestViewModel>()
             }
@@ -142,7 +142,7 @@ class ViewModelTest {
         val owner = FakeViewModelStoreOwner()
         var createdInComposition: Any? = null
         val customFactory = FakeViewModelProviderFactory()
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(ViewModelStoreOwnerAmbient provides owner) {
                 createdInComposition = viewModel<TestViewModel>(key = "test")
             }

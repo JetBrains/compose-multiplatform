@@ -37,7 +37,6 @@ import androidx.test.filters.MediumTest
 import androidx.ui.test.createAndroidComposeRule
 import androidx.ui.test.assertLabelEquals
 import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.runOnUiThread
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
@@ -88,7 +87,7 @@ class HotReloadTests {
 
         val composeLatch = CountDownLatch(1)
 
-        runOnUiThread {
+        rule.runOnUiThread {
             activity.setContent {
                 column {
                     text(text = "Hello", id = 101)
@@ -109,7 +108,7 @@ class HotReloadTests {
 
         val hotReloadLatch = CountDownLatch(1)
 
-        runOnUiThread {
+        rule.runOnUiThread {
             simulateHotReload(activity)
             hotReloadLatch.countDown()
         }
@@ -137,7 +136,7 @@ class HotReloadTests {
         val composeLatch = CountDownLatch(1)
 
         // Set the content of the view
-        runOnUiThread {
+        rule.runOnUiThread {
             activity.setContent {
                 columnNode {
                     semanticsNode(text = value, id = 103)
@@ -150,7 +149,7 @@ class HotReloadTests {
 
         assertTrue(composeLatch.await(1, TimeUnit.SECONDS))
 
-        fun target() = onNodeWithTag("text103")
+        fun target() = rule.onNodeWithTag("text103")
 
         // Assert that the composition has the correct value
         target().assertLabelEquals(value)
@@ -160,7 +159,7 @@ class HotReloadTests {
         val hotReloadLatch = CountDownLatch(1)
 
         // Simulate hot-reload
-        runOnUiThread {
+        rule.runOnUiThread {
             simulateHotReload(activity)
             hotReloadLatch.countDown()
         }

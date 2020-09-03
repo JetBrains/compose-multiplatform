@@ -21,7 +21,6 @@ import androidx.compose.foundation.background
 import androidx.compose.ui.graphics.Color
 import androidx.test.filters.SmallTest
 import androidx.ui.test.createComposeRule
-import androidx.ui.test.runOnIdle
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -32,7 +31,7 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class FindParentKeyInputNodeTest {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Test
     fun returnsImmediateParentFromModifierChain() {
@@ -43,7 +42,7 @@ class FindParentKeyInputNodeTest {
         lateinit var modifier3: KeyInputModifier
         lateinit var modifier4: KeyInputModifier
         lateinit var modifier5: KeyInputModifier
-        composeTestRule.setContent {
+        rule.setContent {
             modifier1 = KeyInputModifier(null, null)
             modifier2 = KeyInputModifier(null, null)
             modifier3 = KeyInputModifier(null, null)
@@ -53,12 +52,12 @@ class FindParentKeyInputNodeTest {
         }
 
         // Act.
-        val parent = runOnIdle {
+        val parent = rule.runOnIdle {
             modifier3.keyInputNode.findParentKeyInputNode()
         }
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(parent).isEqualTo(modifier2.keyInputNode)
         }
     }
@@ -70,7 +69,7 @@ class FindParentKeyInputNodeTest {
         lateinit var modifier1: KeyInputModifier
         lateinit var modifier2: KeyInputModifier
         lateinit var modifier3: KeyInputModifier
-        composeTestRule.setContent {
+        rule.setContent {
             modifier1 = KeyInputModifier(null, null)
             modifier2 = KeyInputModifier(null, null)
             modifier3 = KeyInputModifier(null, null)
@@ -83,12 +82,12 @@ class FindParentKeyInputNodeTest {
         }
 
         // Act.
-        val parent = runOnIdle {
+        val parent = rule.runOnIdle {
             modifier3.keyInputNode.findParentKeyInputNode()
         }
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(parent).isEqualTo(modifier2.keyInputNode)
         }
     }
@@ -102,7 +101,7 @@ class FindParentKeyInputNodeTest {
         lateinit var parentKeyInputModifier1: KeyInputModifier
         lateinit var parentKeyInputModifier2: KeyInputModifier
         lateinit var keyInputModifier: KeyInputModifier
-        composeTestRule.setContent {
+        rule.setContent {
             parentKeyInputModifier1 = KeyInputModifier(null, null)
             parentKeyInputModifier2 = KeyInputModifier(null, null)
             keyInputModifier = KeyInputModifier(null, null)
@@ -112,12 +111,12 @@ class FindParentKeyInputNodeTest {
         }
 
         // Act.
-        val parent = runOnIdle {
+        val parent = rule.runOnIdle {
             keyInputModifier.keyInputNode.findParentKeyInputNode()
         }
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(parent).isEqualTo(parentKeyInputModifier2.keyInputNode)
         }
     }
@@ -133,7 +132,7 @@ class FindParentKeyInputNodeTest {
         lateinit var grandparentKeyInputModifier: KeyInputModifier
         lateinit var parentKeyInputModifier: KeyInputModifier
         lateinit var keyInputModifier: KeyInputModifier
-        composeTestRule.setContent {
+        rule.setContent {
             grandparentKeyInputModifier = KeyInputModifier(null, null)
             parentKeyInputModifier = KeyInputModifier(null, null)
             keyInputModifier = KeyInputModifier(null, null)
@@ -145,12 +144,12 @@ class FindParentKeyInputNodeTest {
         }
 
         // Act.
-        val parent = runOnIdle {
+        val parent = rule.runOnIdle {
             keyInputModifier.keyInputNode.findParentKeyInputNode()
         }
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(parent).isEqualTo(parentKeyInputModifier.keyInputNode)
         }
     }
@@ -165,7 +164,7 @@ class FindParentKeyInputNodeTest {
         // layoutNode--keyInputNode
         lateinit var grandparentKeyInputModifier: KeyInputModifier
         lateinit var keyInputModifier: KeyInputModifier
-        composeTestRule.setContent {
+        rule.setContent {
             grandparentKeyInputModifier = KeyInputModifier(null, null)
             keyInputModifier = KeyInputModifier(null, null)
             Box(modifier = grandparentKeyInputModifier) {
@@ -176,12 +175,12 @@ class FindParentKeyInputNodeTest {
         }
 
         // Act.
-        val parent = runOnIdle {
+        val parent = rule.runOnIdle {
             keyInputModifier.keyInputNode.findParentKeyInputNode()
         }
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(parent).isEqualTo(grandparentKeyInputModifier.keyInputNode)
         }
     }

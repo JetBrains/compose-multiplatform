@@ -37,7 +37,6 @@ import androidx.test.filters.SmallTest
 import androidx.ui.test.createAndroidComposeRule
 import androidx.ui.test.assertTextEquals
 import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.runOnUiThread
 import org.hamcrest.CoreMatchers.instanceOf
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
@@ -50,11 +49,11 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class ComposeViewTest {
     @get:Rule
-    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    val rule = createAndroidComposeRule<ComponentActivity>()
 
     @Test
     fun composeViewComposedContent() {
-        composeTestRule.activityRule.scenario.onActivity { activity ->
+        rule.activityRule.scenario.onActivity { activity ->
             val composeView = ComposeView(activity)
             activity.setContentView(composeView)
             composeView.setContent {
@@ -68,13 +67,13 @@ class ComposeViewTest {
                 assertTrue("has children", view.childCount > 0)
             }
 
-        onNodeWithTag("text").assertTextEquals("Hello, World!")
+        rule.onNodeWithTag("text").assertTextEquals("Hello, World!")
     }
 
     @Test
     fun composeDifferentViewContent() {
         val id = View.generateViewId()
-        composeTestRule.activityRule.scenario.onActivity { activity ->
+        rule.activityRule.scenario.onActivity { activity ->
             val composeView = ComposeView(activity).also { it.id = id }
             activity.setContentView(composeView)
             composeView.setContent {
@@ -82,32 +81,32 @@ class ComposeViewTest {
             }
         }
 
-        onNodeWithTag("text").assertTextEquals("Hello")
+        rule.onNodeWithTag("text").assertTextEquals("Hello")
 
-        composeTestRule.activityRule.scenario.onActivity { activity ->
+        rule.activityRule.scenario.onActivity { activity ->
             val composeView: ComposeView = activity.findViewById(id)
             composeView.setContent {
                 Text("World", Modifier.testTag("text"))
             }
         }
 
-        onNodeWithTag("text").assertTextEquals("World")
+        rule.onNodeWithTag("text").assertTextEquals("World")
 
-        composeTestRule.activityRule.scenario.onActivity { activity ->
+        rule.activityRule.scenario.onActivity { activity ->
             val composeView: ComposeView = activity.findViewById(id)
             composeView.disposeComposition()
         }
 
-        onNodeWithTag("text").assertDoesNotExist()
+        rule.onNodeWithTag("text").assertDoesNotExist()
     }
 
     @Test
     fun disposeOnLifecycleDestroyed() {
-        val lco = runOnUiThread { TestLifecycleOwner().apply {
+        val lco = rule.runOnUiThread { TestLifecycleOwner().apply {
             registry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
         } }
         var composeViewCapture: ComposeView? = null
-        composeTestRule.activityRule.scenario.onActivity { activity ->
+        rule.activityRule.scenario.onActivity { activity ->
             val composeView = ComposeView(activity).also {
                 ViewTreeLifecycleOwner.set(it, lco)
                 composeViewCapture = it
@@ -118,9 +117,9 @@ class ComposeViewTest {
             }
         }
 
-        onNodeWithTag("text").assertTextEquals("Hello")
+        rule.onNodeWithTag("text").assertTextEquals("Hello")
 
-        composeTestRule.activityRule.scenario.onActivity {
+        rule.activityRule.scenario.onActivity {
             lco.registry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
         }
 
@@ -130,7 +129,7 @@ class ComposeViewTest {
 
     @Test
     fun throwsOnAddView() {
-        composeTestRule.activityRule.scenario.onActivity { activity ->
+        rule.activityRule.scenario.onActivity { activity ->
             with(TestComposeView(activity)) {
                 assertUnsupported("addView(View)") {
                     addView(View(activity))

@@ -46,7 +46,7 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class PointerInteropFilterTest {
     @get:Rule
-    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    val rule = createAndroidComposeRule<ComponentActivity>()
 
     private lateinit var pointerInteropFilter: PointerInteropFilter
     private val dispatchedMotionEvents = mutableListOf<MotionEvent>()

@@ -34,13 +34,13 @@ import org.junit.runners.JUnit4
 class PrimitiveResourcesTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Test
     fun integerResourceTest() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
 
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(ContextAmbient provides context) {
                 assertThat(integerResource(R.integer.integer_value)).isEqualTo(123)
             }
@@ -51,7 +51,7 @@ class PrimitiveResourcesTest {
     fun integerArrayResourceTest() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
 
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(ContextAmbient provides context) {
                 assertThat(integerArrayResource(R.array.integer_array))
                     .isEqualTo(intArrayOf(234, 345))
@@ -63,7 +63,7 @@ class PrimitiveResourcesTest {
     fun boolArrayResourceTest() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
 
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(ContextAmbient provides context) {
                 assertThat(booleanResource(R.bool.boolean_value)).isTrue()
             }
@@ -74,7 +74,7 @@ class PrimitiveResourcesTest {
     fun dimensionResourceTest() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
 
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(ContextAmbient provides context) {
                 assertThat(dimensionResource(R.dimen.dimension_value)).isEqualTo(32.dp)
             }

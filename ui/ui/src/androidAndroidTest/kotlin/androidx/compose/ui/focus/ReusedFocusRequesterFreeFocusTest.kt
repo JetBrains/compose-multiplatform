@@ -26,7 +26,6 @@ import androidx.compose.ui.focusObserver
 import androidx.compose.ui.focusRequester
 import androidx.test.filters.SmallTest
 import androidx.ui.test.createComposeRule
-import androidx.ui.test.runOnIdle
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -38,14 +37,14 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class ReusedFocusRequesterFreeFocusTest {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Test
     fun oneActiveComponent_returnsTrue() {
         // Arrange.
         var focusState = Active
         val focusRequester = FocusRequester()
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .focusObserver { focusState = it }
@@ -54,7 +53,7 @@ class ReusedFocusRequesterFreeFocusTest {
             )
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             // Act.
             val success = focusRequester.freeFocus()
 
@@ -69,7 +68,7 @@ class ReusedFocusRequesterFreeFocusTest {
         // Arrange.
         var focusState = Captured
         val focusRequester = FocusRequester()
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .focusObserver { focusState = it }
@@ -78,7 +77,7 @@ class ReusedFocusRequesterFreeFocusTest {
             )
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             // Act.
             val success = focusRequester.freeFocus()
 
@@ -93,7 +92,7 @@ class ReusedFocusRequesterFreeFocusTest {
         // Arrange.
         var focusState = Inactive
         val focusRequester = FocusRequester()
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .focusObserver { focusState = it }
@@ -102,7 +101,7 @@ class ReusedFocusRequesterFreeFocusTest {
             )
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             // Act.
             val success = focusRequester.freeFocus()
 
@@ -118,7 +117,7 @@ class ReusedFocusRequesterFreeFocusTest {
         var focusState1 = Inactive
         var focusState2 = Active
         val focusRequester = FocusRequester()
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .focusObserver { focusState1 = it }
@@ -133,7 +132,7 @@ class ReusedFocusRequesterFreeFocusTest {
             )
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             // Act.
             val success = focusRequester.freeFocus()
 
@@ -150,7 +149,7 @@ class ReusedFocusRequesterFreeFocusTest {
         var focusState1 = Inactive
         var focusState2 = Captured
         val focusRequester = FocusRequester()
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .focusObserver { focusState1 = it }
@@ -165,7 +164,7 @@ class ReusedFocusRequesterFreeFocusTest {
             )
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             // Act.
             val success = focusRequester.freeFocus()
 
@@ -182,7 +181,7 @@ class ReusedFocusRequesterFreeFocusTest {
         var focusState1 = Inactive
         var focusState2 = Inactive
         val focusRequester = FocusRequester()
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(
                 modifier = Modifier
                     .focusObserver { focusState1 = it }
@@ -197,7 +196,7 @@ class ReusedFocusRequesterFreeFocusTest {
             )
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             // Act.
             val success = focusRequester.freeFocus()
 

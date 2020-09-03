@@ -23,7 +23,6 @@ import androidx.compose.ui.focus.FocusState.Inactive
 import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.test.filters.SmallTest
 import androidx.ui.test.createComposeRule
-import androidx.ui.test.runOnIdle
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -35,23 +34,23 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class FindParentFocusNodeTest {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Test
     fun noParentReturnsNull() {
         // Arrange.
         val focusModifier = FocusModifier(Inactive)
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(modifier = focusModifier)
         }
 
         // Act.
-        val rootFocusNode = runOnIdle {
+        val rootFocusNode = rule.runOnIdle {
             focusModifier.focusNode.findParentFocusNode()!!.findParentFocusNode()
         }
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(rootFocusNode).isNull()
         }
     }
@@ -65,17 +64,17 @@ class FindParentFocusNodeTest {
         val modifier3 = FocusModifier(Inactive)
         val modifier4 = FocusModifier(Inactive)
         val modifier5 = FocusModifier(Inactive)
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(modifier1.then(modifier2).then(modifier3).then(modifier4).then(modifier5)) {}
         }
 
         // Act.
-        val parent = runOnIdle {
+        val parent = rule.runOnIdle {
             modifier3.focusNode.findParentFocusNode()
         }
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(parent).isEqualTo(modifier2.focusNode)
         }
     }
@@ -87,7 +86,7 @@ class FindParentFocusNodeTest {
         val modifier1 = FocusModifier(Inactive)
         val modifier2 = FocusModifier(Inactive)
         val modifier3 = FocusModifier(Inactive)
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(
                 modifier = modifier1
                     .then(modifier2)
@@ -97,12 +96,12 @@ class FindParentFocusNodeTest {
         }
 
         // Act.
-        val parent = runOnIdle {
+        val parent = rule.runOnIdle {
             modifier3.focusNode.findParentFocusNode()
         }
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(parent).isEqualTo(modifier2.focusNode)
         }
     }
@@ -116,19 +115,19 @@ class FindParentFocusNodeTest {
         val parentFocusModifier1 = FocusModifier(Inactive)
         val parentFocusModifier2 = FocusModifier(Inactive)
         val focusModifier = FocusModifier(Inactive)
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(modifier = parentFocusModifier1.then(parentFocusModifier2)) {
                 Box(modifier = focusModifier)
             }
         }
 
         // Act.
-        val parent = runOnIdle {
+        val parent = rule.runOnIdle {
             focusModifier.focusNode.findParentFocusNode()
         }
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(parent).isEqualTo(parentFocusModifier2.focusNode)
         }
     }
@@ -144,7 +143,7 @@ class FindParentFocusNodeTest {
         val grandparentFocusModifier = FocusModifier(Inactive)
         val parentFocusModifier = FocusModifier(Inactive)
         val focusModifier = FocusModifier(Inactive)
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(modifier = grandparentFocusModifier) {
                 Box(modifier = parentFocusModifier) {
                     Box(modifier = focusModifier)
@@ -153,12 +152,12 @@ class FindParentFocusNodeTest {
         }
 
         // Act.
-        val parent = runOnIdle {
+        val parent = rule.runOnIdle {
             focusModifier.focusNode.findParentFocusNode()
         }
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(parent).isEqualTo(parentFocusModifier.focusNode)
         }
     }
@@ -173,7 +172,7 @@ class FindParentFocusNodeTest {
         // layoutNode--focusNode
         val grandparentFocusModifier = FocusModifier(Inactive)
         val focusModifier = FocusModifier(Inactive)
-        composeTestRule.setFocusableContent {
+        rule.setFocusableContent {
             Box(modifier = grandparentFocusModifier) {
                 Box {
                     Box(modifier = focusModifier)
@@ -182,12 +181,12 @@ class FindParentFocusNodeTest {
         }
 
         // Act.
-        val parent = runOnIdle {
+        val parent = rule.runOnIdle {
             focusModifier.focusNode.findParentFocusNode()
         }
 
         // Assert.
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(parent).isEqualTo(grandparentFocusModifier.focusNode)
         }
     }

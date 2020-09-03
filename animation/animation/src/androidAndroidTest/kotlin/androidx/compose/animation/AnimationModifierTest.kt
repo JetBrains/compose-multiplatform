@@ -32,8 +32,6 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
 import androidx.ui.test.createComposeRule
-import androidx.ui.test.runOnIdle
-import androidx.ui.test.waitForIdle
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNotNull
 import junit.framework.TestCase.assertNull
@@ -47,7 +45,7 @@ import org.junit.runners.JUnit4
 class AnimationModifierTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Test
     fun animateContentSizeTest() {
@@ -63,8 +61,8 @@ class AnimationModifierTest {
         var animationStartSize: IntSize? = null
         var animationEndSize: IntSize? = null
 
-        composeTestRule.clockTestRule.pauseClock()
-        composeTestRule.setContent {
+        rule.clockTestRule.pauseClock()
+        rule.setContent {
             Box(
                 testModifier
                     .animateContentSize(
@@ -81,11 +79,11 @@ class AnimationModifierTest {
             density = DensityAmbient.current.density
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             width = endWidth
             height = endHeight
         }
-        waitForIdle()
+        rule.waitForIdle()
 
         for (i in 0..200 step 20) {
             val fraction = LinearOutSlowInEasing.invoke(i / 200f)
@@ -113,8 +111,8 @@ class AnimationModifierTest {
                 assertNull(animationEndSize)
             }
 
-            composeTestRule.clockTestRule.advanceClock(20)
-            waitForIdle()
+            rule.clockTestRule.advanceClock(20)
+            rule.waitForIdle()
         }
     }
 }
