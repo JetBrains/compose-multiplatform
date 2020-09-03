@@ -30,7 +30,7 @@ import androidx.compose.integration.demos.common.DemoCategory
 import androidx.compose.integration.demos.common.allDemos
 import androidx.compose.integration.demos.common.allLaunchableDemos
 import androidx.ui.test.SemanticsNodeInteractionCollection
-import androidx.ui.test.android.createAndroidComposeRule
+import androidx.ui.test.createAndroidComposeRule
 import androidx.ui.test.assertTextEquals
 import androidx.ui.test.performClick
 import androidx.ui.test.performScrollTo

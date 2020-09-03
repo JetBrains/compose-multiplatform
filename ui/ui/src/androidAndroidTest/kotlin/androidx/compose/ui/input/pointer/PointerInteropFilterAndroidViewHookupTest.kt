@@ -31,7 +31,7 @@ import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.test.filters.MediumTest
-import androidx.ui.test.android.createAndroidComposeRule
+import androidx.ui.test.createAndroidComposeRule
 import androidx.ui.test.runOnIdle
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before

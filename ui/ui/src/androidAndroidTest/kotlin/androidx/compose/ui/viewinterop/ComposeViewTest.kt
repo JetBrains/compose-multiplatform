@@ -34,7 +34,7 @@ import androidx.test.espresso.Espresso
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.filters.SmallTest
-import androidx.ui.test.android.createAndroidComposeRule
+import androidx.ui.test.createAndroidComposeRule
 import androidx.ui.test.assertTextEquals
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.runOnUiThread

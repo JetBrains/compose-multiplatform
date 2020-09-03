@@ -77,7 +77,7 @@ import androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA
 import androidx.test.espresso.matcher.ViewMatchers.withClassName
 import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
-import androidx.ui.test.android.createAndroidComposeRule
+import androidx.ui.test.createAndroidComposeRule
 import androidx.ui.test.assertIsDisplayed
 import androidx.ui.test.assertPixels
 import androidx.ui.test.captureToBitmap

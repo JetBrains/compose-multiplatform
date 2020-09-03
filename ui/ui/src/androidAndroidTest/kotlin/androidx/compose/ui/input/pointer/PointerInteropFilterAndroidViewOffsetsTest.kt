@@ -31,7 +31,7 @@ import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.test.filters.MediumTest
-import androidx.ui.test.android.createAndroidComposeRule
+import androidx.ui.test.createAndroidComposeRule
 import com.nhaarman.mockitokotlin2.clearInvocations
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
