@@ -834,8 +834,7 @@ class SwipeableTest {
                 anchors = mapOf(0f to "A"),
                 thresholds = { _, _ -> FractionalThreshold(0.5f) },
                 orientation = Orientation.Horizontal,
-                resistanceFactorAtMin = 0f,
-                resistanceFactorAtMax = 0f
+                resistance = null
             )
         }
 
@@ -879,24 +878,22 @@ class SwipeableTest {
     @Test
     fun swipeable_resistance_atMinBound() {
         val state = SwipeableState("A", clock)
+        val resistance = ResistanceConfig(100f, 5f, 0f)
         setSwipeableContent {
             Modifier.swipeable(
                 state = state,
                 anchors = mapOf(0f to "A"),
                 thresholds = { _, _ -> FractionalThreshold(0.5f) },
                 orientation = Orientation.Horizontal,
-                resistanceFactorAtMin = 5f,
-                resistanceFactorAtMax = 0f
+                resistance = resistance
             )
         }
-
-        val width = with(rule.density) { rule.rootWidth().toPx() }
 
         swipeLeft()
 
         rule.runOnIdle {
             assertThat(state.offset.value).isEqualTo(
-                computeResistance(width, 5f, state.overflow.value)
+                resistance.computeResistance(state.overflow.value)
             )
         }
 
@@ -913,24 +910,22 @@ class SwipeableTest {
     @Test
     fun swipeable_resistance_atMaxBound() {
         val state = SwipeableState("A", clock)
+        val resistance = ResistanceConfig(100f, 0f, 5f)
         setSwipeableContent {
             Modifier.swipeable(
                 state = state,
                 anchors = mapOf(0f to "A"),
                 thresholds = { _, _ -> FractionalThreshold(0.5f) },
                 orientation = Orientation.Horizontal,
-                resistanceFactorAtMin = 0f,
-                resistanceFactorAtMax = 5f
+                resistance = resistance
             )
         }
-
-        val width = with(rule.density) { rule.rootWidth().toPx() }
 
         swipeRight()
 
         rule.runOnIdle {
             assertThat(state.offset.value).isEqualTo(
-                computeResistance(width, 5f, state.overflow.value)
+                resistance.computeResistance(state.overflow.value)
             )
         }
 
