@@ -47,7 +47,7 @@ import androidx.compose.ui.unit.dp
  * @param contentPadding convenience param to specify a padding around the whole content. This will
  * add padding for the content after it has been clipped, which is not possible via [modifier]
  * param. Note that it is *not* a padding applied for each item's content
- * @param horizontalGravity the horizontal gravity applied to the items
+ * @param horizontalAlignment the horizontal alignment applied to the items
  * @param itemContent emits the UI for an item from [items] list. May emit any number of components,
  * which will be stacked vertically. Note that [LazyColumnFor] can start scrolling incorrectly
  * if you emit nothing and then lazily recompose with the real content, so even if you load the
@@ -59,14 +59,14 @@ fun <T> LazyColumnFor(
     items: List<T>,
     modifier: Modifier = Modifier,
     contentPadding: InnerPadding = InnerPadding(0.dp),
-    horizontalGravity: Alignment.Horizontal = Alignment.Start,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     itemContent: @Composable LazyItemScope.(T) -> Unit
 ) {
     LazyFor(
         itemsCount = items.size,
         modifier = modifier,
         contentPadding = contentPadding,
-        horizontalGravity = horizontalGravity,
+        horizontalAlignment = horizontalAlignment,
         isVertical = true
     ) { index ->
         val item = items[index]
@@ -93,7 +93,7 @@ fun <T> LazyColumnFor(
  * @param contentPadding convenience param to specify a padding around the whole content. This will
  * add padding for the content after it has been clipped, which is not possible via [modifier]
  * param. Note that it is *not* a padding applied for each item's content
- * @param horizontalGravity the horizontal gravity applied to the items
+ * @param horizontalAlignment the horizontal alignment applied to the items
  * @param itemContent emits the UI for an item from [items] list. It has two params: first one is
  * an index in the [items] list, and the second one is the item at this index from [items] list.
  * May emit any number of components, which will be stacked vertically. Note that
@@ -106,14 +106,14 @@ fun <T> LazyColumnForIndexed(
     items: List<T>,
     modifier: Modifier = Modifier,
     contentPadding: InnerPadding = InnerPadding(0.dp),
-    horizontalGravity: Alignment.Horizontal = Alignment.Start,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
 ) {
     LazyFor(
         itemsCount = items.size,
         modifier = modifier,
         contentPadding = contentPadding,
-        horizontalGravity = horizontalGravity,
+        horizontalAlignment = horizontalAlignment,
         isVertical = true
     ) { index ->
         val item = items[index]
@@ -141,7 +141,7 @@ fun <T> LazyColumnItems(
         items = items,
         modifier = modifier,
         contentPadding = contentPadding,
-        horizontalGravity = horizontalGravity
+        horizontalAlignment = horizontalGravity
     ) {
         itemContent(it)
     }
@@ -160,7 +160,7 @@ fun <T> LazyColumnItems(
  * @param contentPadding convenience param to specify a padding around the whole content. This will
  * add padding for the content after it has been clipped, which is not possible via [modifier]
  * param. Note that it is *not* a padding applied for each item's content
- * @param verticalGravity the vertical gravity applied to the items
+ * @param verticalAlignment the vertical alignment applied to the items
  * @param itemContent emits the UI for an item from [items] list. May emit any number of components,
  * which will be stacked horizontally. Note that [LazyRowFor] can start scrolling incorrectly
  * if you emit nothing and then lazily recompose with the real content, so even if you load the
@@ -172,14 +172,14 @@ fun <T> LazyRowFor(
     items: List<T>,
     modifier: Modifier = Modifier,
     contentPadding: InnerPadding = InnerPadding(0.dp),
-    verticalGravity: Alignment.Vertical = Alignment.Top,
+    verticalAlignment: Alignment.Vertical = Alignment.Top,
     itemContent: @Composable LazyItemScope.(T) -> Unit
 ) {
     LazyFor(
         itemsCount = items.size,
         modifier = modifier,
         contentPadding = contentPadding,
-        verticalGravity = verticalGravity,
+        verticalAlignment = verticalAlignment,
         isVertical = false
     ) { index ->
         val item = items[index]
@@ -205,7 +205,7 @@ fun <T> LazyRowFor(
  * @param contentPadding convenience param to specify a padding around the whole content. This will
  * add padding for the content after it has been clipped, which is not possible via [modifier]
  * param. Note that it is *not* a padding applied for each item's content
- * @param verticalGravity the vertical gravity applied to the items
+ * @param verticalAlignment the vertical alignment applied to the items
  * @param itemContent emits the UI for an item from [items] list. It has two params: first one is
  * an index in the [items] list, and the second one is the item at this index from [items] list.
  * May emit any number of components, which will be stacked horizontally. Note that
@@ -218,14 +218,14 @@ fun <T> LazyRowForIndexed(
     items: List<T>,
     modifier: Modifier = Modifier,
     contentPadding: InnerPadding = InnerPadding(0.dp),
-    verticalGravity: Alignment.Vertical = Alignment.Top,
+    verticalAlignment: Alignment.Vertical = Alignment.Top,
     itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
 ) {
     LazyFor(
         itemsCount = items.size,
         modifier = modifier,
         contentPadding = contentPadding,
-        verticalGravity = verticalGravity,
+        verticalAlignment = verticalAlignment,
         isVertical = false
     ) { index ->
         val item = items[index]
@@ -253,7 +253,7 @@ fun <T> LazyRowItems(
         items = items,
         modifier = modifier,
         contentPadding = contentPadding,
-        verticalGravity = verticalGravity
+        verticalAlignment = verticalGravity
     ) {
         itemContent(it)
     }
@@ -266,8 +266,8 @@ internal inline fun LazyFor(
     itemsCount: Int,
     modifier: Modifier = Modifier,
     contentPadding: InnerPadding,
-    horizontalGravity: Alignment.Horizontal = Alignment.Start,
-    verticalGravity: Alignment.Vertical = Alignment.Top,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    verticalAlignment: Alignment.Vertical = Alignment.Top,
     isVertical: Boolean,
     noinline itemContentFactory: LazyItemScope.(Int) -> @Composable () -> Unit
 ) {
@@ -289,8 +289,8 @@ internal inline fun LazyFor(
         state.measure(
             this,
             constraints,
-            horizontalGravity,
-            verticalGravity,
+            horizontalAlignment,
+            verticalAlignment,
             itemsCount,
             itemContentFactory
         )

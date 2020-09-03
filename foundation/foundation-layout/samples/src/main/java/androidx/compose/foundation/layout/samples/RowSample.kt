@@ -50,30 +50,30 @@ fun SimpleRow() {
 
 @Sampled
 @Composable
-fun SimpleGravityInRow() {
+fun SimpleAlignInRow() {
     Row(Modifier.fillMaxHeight()) {
-        // The child with no gravity modifier is positioned by default so that its top edge is
+        // The child with no align modifier is positioned by default so that its top edge is
         // aligned to the top of the vertical axis.
         Box(Modifier.preferredSize(80.dp, 40.dp), backgroundColor = Color.Magenta)
         // Gravity.Top, the child will be positioned so that its top edge is aligned to the top
         // of the vertical axis.
         Box(
             Modifier.preferredSize(80.dp, 40.dp)
-                .gravity(Alignment.Top),
+                .align(Alignment.Top),
             backgroundColor = Color.Red
         )
         // Gravity.Center, the child will be positioned so that its center is in the middle of
         // the vertical axis.
         Box(
             Modifier.preferredSize(80.dp, 40.dp)
-                .gravity(Alignment.CenterVertically),
+                .align(Alignment.CenterVertically),
             backgroundColor = Color.Yellow
         )
         // Gravity.Bottom, the child will be positioned so that its bottom edge is aligned to the
         // bottom of the vertical axis.
         Box(
             Modifier.preferredSize(80.dp, 40.dp)
-                .gravity(Alignment.Bottom),
+                .align(Alignment.Bottom),
             backgroundColor = Color.Green
         )
     }

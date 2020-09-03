@@ -129,7 +129,7 @@ fun Tab(
             modifier = modifier
                 .selectable(selected = selected, onClick = onClick)
                 .fillMaxWidth(),
-            horizontalGravity = Alignment.CenterHorizontally,
+            horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
             children = content
         )

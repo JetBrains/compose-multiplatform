@@ -116,7 +116,7 @@ internal class RadioGroupTestCase : ComposeTestCase, ToggleableTestCase {
                             selected = (select.value == item),
                             onClick = { select.value = item }
                         ),
-                        verticalGravity = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(item.toString())
                         RadioButton(

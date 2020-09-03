@@ -72,8 +72,8 @@ fun SimpleLayoutDemo() {
         Spacer(Modifier.preferredHeight(24.dp))
         Stack(Modifier.preferredWidth(ExampleSize).background(color = lightGrey)) {
             Row(Modifier.fillMaxWidth()) {
-                PurpleSquare(Modifier.gravity(Alignment.Bottom))
-                CyanSquare(Modifier.gravity(Alignment.Bottom))
+                PurpleSquare(Modifier.align(Alignment.Bottom))
+                CyanSquare(Modifier.align(Alignment.Bottom))
             }
         }
         Spacer(Modifier.preferredHeight(24.dp))
@@ -109,8 +109,8 @@ fun SimpleLayoutDemo() {
             Spacer(Modifier.preferredWidth(24.dp))
             Stack(Modifier.preferredHeight(ExampleSize).background(color = lightGrey)) {
                 Column(Modifier.fillMaxHeight()) {
-                    PurpleSquare(Modifier.gravity(Alignment.End))
-                    CyanSquare(Modifier.gravity(Alignment.End))
+                    PurpleSquare(Modifier.align(Alignment.End))
+                    CyanSquare(Modifier.align(Alignment.End))
                 }
             }
         }

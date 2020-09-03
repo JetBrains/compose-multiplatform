@@ -85,13 +85,13 @@ fun FilterAppBar(
             primary.copy(alpha = 0.08f).compositeOver(surface)
         }
         TopAppBar(backgroundColor = appBarColor, contentColor = onSurface) {
-            IconButton(modifier = Modifier.gravity(Alignment.CenterVertically), onClick = onClose) {
+            IconButton(modifier = Modifier.align(Alignment.CenterVertically), onClick = onClose) {
                 Icon(Icons.Filled.Close)
             }
             FilterField(
                 filterText,
                 onFilter,
-                Modifier.fillMaxWidth().gravity(Alignment.CenterVertically)
+                Modifier.fillMaxWidth().align(Alignment.CenterVertically)
             )
         }
     }

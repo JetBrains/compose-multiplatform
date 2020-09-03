@@ -208,7 +208,7 @@ fun Scaffold(
                 }
                 Stack(Modifier.weight(1f, fill = true)) {
                     ScaffoldContent(Modifier.fillMaxSize(), scaffoldState, bodyContent)
-                    Column(Modifier.gravity(Alignment.BottomCenter)) {
+                    Column(Modifier.align(Alignment.BottomCenter)) {
                         snackbarHost(scaffoldState.snackbarHostState)
                         ScaffoldBottom(
                             scaffoldState = scaffoldState,
@@ -265,7 +265,7 @@ private fun ScaffoldBottom(
         Column(Modifier.fillMaxWidth()) {
             if (fab != null) {
                 FabContainer(
-                    Modifier.gravity(fabPos.toColumnAlign())
+                    Modifier.align(fabPos.toColumnAlign())
                         .padding(start = FabSpacing, end = FabSpacing, bottom = FabSpacing),
                     scaffoldState,
                     fab

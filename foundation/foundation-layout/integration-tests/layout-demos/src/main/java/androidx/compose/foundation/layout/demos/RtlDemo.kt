@@ -42,25 +42,25 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun RtlDemo() {
     Column(verticalArrangement = Arrangement.SpaceEvenly) {
-        Text("TEXT", Modifier.gravity(Alignment.CenterHorizontally))
+        Text("TEXT", Modifier.align(Alignment.CenterHorizontally))
         testText()
-        Text("ROW", Modifier.gravity(Alignment.CenterHorizontally))
+        Text("ROW", Modifier.align(Alignment.CenterHorizontally))
         testRow()
-        Text("ROW WITH LTR ROW IN BETWEEN", Modifier.gravity(Alignment.CenterHorizontally))
+        Text("ROW WITH LTR ROW IN BETWEEN", Modifier.align(Alignment.CenterHorizontally))
         testRow_modifier()
-        Text("RELATIVE TO SIBLINGS", Modifier.gravity(Alignment.CenterHorizontally))
+        Text("RELATIVE TO SIBLINGS", Modifier.align(Alignment.CenterHorizontally))
         testSiblings()
         Text(
             "PLACE WITH AUTO RTL SUPPORT IN CUSTOM LAYOUT",
-            Modifier.gravity(Alignment.CenterHorizontally)
+            Modifier.align(Alignment.CenterHorizontally)
         )
         CustomLayout(true)
         Text(
             "PLACE WITHOUT RTL SUPPORT IN CUSTOM LAYOUT",
-            Modifier.gravity(Alignment.CenterHorizontally)
+            Modifier.align(Alignment.CenterHorizontally)
         )
         CustomLayout(false)
-        Text("WITH CONSTRAINTS", Modifier.gravity(Alignment.CenterHorizontally))
+        Text("WITH CONSTRAINTS", Modifier.align(Alignment.CenterHorizontally))
         Providers(LayoutDirectionAmbient provides LayoutDirection.Ltr) {
             LayoutWithConstraints("LD: set LTR via ambient")
         }
@@ -68,7 +68,7 @@ fun RtlDemo() {
             LayoutWithConstraints("LD: set RTL via ambient")
         }
         LayoutWithConstraints(text = "LD: locale")
-        Text("STACK EXAMPLE", Modifier.gravity(Alignment.CenterHorizontally))
+        Text("STACK EXAMPLE", Modifier.align(Alignment.CenterHorizontally))
         StackExample()
     }
 }
@@ -182,7 +182,7 @@ private fun LayoutWithConstraints(text: String) {
             Color.Magenta
         }
         Stack(Modifier.preferredSize(w, 20.dp).background(color)) {
-            Text(text, Modifier.gravity(Alignment.Center))
+            Text(text, Modifier.align(Alignment.Center))
         }
     }
 }

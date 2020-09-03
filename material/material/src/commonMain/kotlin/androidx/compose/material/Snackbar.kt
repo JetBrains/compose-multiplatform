@@ -281,7 +281,7 @@ private fun NewLineButtonSnackbar(
                 .padding(end = HorizontalSpacingButtonSide),
             children = text
         )
-        Box(Modifier.gravity(Alignment.End), children = action)
+        Box(Modifier.align(Alignment.End), children = action)
     }
 }
 

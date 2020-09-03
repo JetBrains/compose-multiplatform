@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.layout
 
+import androidx.compose.foundation.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.ui.Alignment
@@ -57,7 +58,7 @@ class StackTest : LayoutTest() {
             Container(alignment = Alignment.TopStart) {
                 Stack {
                     Container(
-                        Modifier.gravity(Alignment.BottomEnd)
+                        Modifier.align(Alignment.BottomEnd)
                             .saveLayoutInfo(alignedChildSize, alignedChildPosition, positionedLatch)
                             .onPositioned { coordinates: LayoutCoordinates ->
                                 stackSize.value = coordinates.size
@@ -108,7 +109,7 @@ class StackTest : LayoutTest() {
                     positionedLatch.countDown()
                 }) {
                     Container(
-                        modifier = Modifier.gravity(Alignment.BottomEnd)
+                        modifier = Modifier.align(Alignment.BottomEnd)
                             .saveLayoutInfo(
                                 childSize[0],
                                 childPosition[0],
@@ -119,7 +120,7 @@ class StackTest : LayoutTest() {
                     ) {
                     }
                     Container(
-                        modifier = Modifier.gravity(Alignment.BottomEnd)
+                        modifier = Modifier.align(Alignment.BottomEnd)
                             .saveLayoutInfo(
                                 size = childSize[1],
                                 position = childPosition[1],
@@ -163,7 +164,7 @@ class StackTest : LayoutTest() {
                     positionedLatch.countDown()
                 }) {
                     Container(
-                        Modifier.gravity(Alignment.Center)
+                        Modifier.align(Alignment.Center)
                             .saveLayoutInfo(
                                 childSize[0],
                                 childPosition[0],
@@ -245,55 +246,55 @@ class StackTest : LayoutTest() {
                             }
                     ) {
                         Stack(
-                            Modifier.gravity(Alignment.TopStart)
+                            Modifier.align(Alignment.TopStart)
                                 .preferredSize(sizeDp, sizeDp)
                                 .saveLayoutInfo(childSize[0], childPosition[0], positionedLatch)
                         ) {
                         }
                         Stack(
-                            Modifier.gravity(Alignment.TopCenter)
+                            Modifier.align(Alignment.TopCenter)
                                 .preferredSize(sizeDp)
                                 .saveLayoutInfo(childSize[1], childPosition[1], positionedLatch)
                         ) {
                         }
                         Stack(
-                            Modifier.gravity(Alignment.TopEnd)
+                            Modifier.align(Alignment.TopEnd)
                                 .preferredSize(sizeDp)
                                 .saveLayoutInfo(childSize[2], childPosition[2], positionedLatch)
                         ) {
                         }
                         Stack(
-                            Modifier.gravity(Alignment.CenterStart)
+                            Modifier.align(Alignment.CenterStart)
                                 .preferredSize(sizeDp)
                                 .saveLayoutInfo(childSize[3], childPosition[3], positionedLatch)
                         ) {
                         }
                         Stack(
-                            Modifier.gravity(Alignment.Center)
+                            Modifier.align(Alignment.Center)
                                 .preferredSize(sizeDp)
                                 .saveLayoutInfo(childSize[4], childPosition[4], positionedLatch)
                         ) {
                         }
                         Stack(
-                            Modifier.gravity(Alignment.CenterEnd)
+                            Modifier.align(Alignment.CenterEnd)
                                 .preferredSize(sizeDp)
                                 .saveLayoutInfo(childSize[5], childPosition[5], positionedLatch)
                         ) {
                         }
                         Stack(
-                            Modifier.gravity(Alignment.BottomStart)
+                            Modifier.align(Alignment.BottomStart)
                                 .preferredSize(sizeDp)
                                 .saveLayoutInfo(childSize[6], childPosition[6], positionedLatch)
                         ) {
                         }
                         Stack(
-                            Modifier.gravity(Alignment.BottomCenter)
+                            Modifier.align(Alignment.BottomCenter)
                                 .preferredSize(sizeDp)
                                 .saveLayoutInfo(childSize[7], childPosition[7], positionedLatch)
                         ) {
                         }
                         Stack(
-                            Modifier.gravity(Alignment.BottomEnd)
+                            Modifier.align(Alignment.BottomEnd)
                                 .preferredSize(sizeDp)
                                 .saveLayoutInfo(childSize[8], childPosition[8], positionedLatch)
                         ) {
@@ -360,7 +361,7 @@ class StackTest : LayoutTest() {
                         ) {
                         }
                         Container(
-                            Modifier.gravity(Alignment.BottomEnd)
+                            Modifier.align(Alignment.BottomEnd)
                                 .saveLayoutInfo(childSize[1], childPosition[1], positionedLatch),
                             width = halfSizeDp,
                             height = halfSizeDp
@@ -409,6 +410,23 @@ class StackTest : LayoutTest() {
     }
 
     @Test
+    fun testStack_outermostGravityWins() = with(density) {
+        val positionedLatch = CountDownLatch(1)
+        val size = 10f
+        val sizeDp = size.toDp()
+        show {
+            Stack(Modifier.size(sizeDp)) {
+                Box(Modifier.align(Alignment.BottomEnd).align(Alignment.TopStart).onPositioned {
+                    assertEquals(size, it.positionInParent.x)
+                    assertEquals(size, it.positionInParent.y)
+                    positionedLatch.countDown()
+                })
+            }
+        }
+        assertTrue(positionedLatch.await(1, TimeUnit.SECONDS))
+    }
+
+    @Test
     fun testStack_hasCorrectIntrinsicMeasurements() = with(density) {
         val testWidth = 90.toDp()
         val testHeight = 80.toDp()
@@ -421,10 +439,10 @@ class StackTest : LayoutTest() {
 
         testIntrinsics(@Composable {
             Stack {
-                Container(Modifier.gravity(Alignment.TopStart).aspectRatio(2f)) { }
+                Container(Modifier.align(Alignment.TopStart).aspectRatio(2f)) { }
                 ConstrainedBox(
                     DpConstraints.fixed(testWidth, testHeight),
-                    Modifier.gravity(Alignment.BottomCenter)
+                    Modifier.align(Alignment.BottomCenter)
                 ) { }
                 ConstrainedBox(
                     DpConstraints.fixed(200.dp, 200.dp),

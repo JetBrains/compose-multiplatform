@@ -147,7 +147,7 @@ private fun LeftColumn(modifier: Modifier) = Column(modifier) {
 
         Row(
             modifier = Modifier.padding(vertical = 10.dp),
-            verticalGravity = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Button(
                 onClick = {

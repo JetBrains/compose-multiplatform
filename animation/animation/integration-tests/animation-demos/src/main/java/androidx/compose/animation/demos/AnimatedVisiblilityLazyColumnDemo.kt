@@ -74,7 +74,7 @@ fun AnimatedVisibilityLazyColumnDemo() {
 
         Button({
             itemNum = 0
-        }, modifier = Modifier.gravity(End).padding(15.dp)) {
+        }, modifier = Modifier.align(End).padding(15.dp)) {
             Text("Clear All")
         }
     }
