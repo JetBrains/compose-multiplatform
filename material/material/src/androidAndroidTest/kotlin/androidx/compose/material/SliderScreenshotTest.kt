@@ -47,7 +47,7 @@ import org.junit.runners.JUnit4
 class SliderScreenshotTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL)
@@ -58,7 +58,7 @@ class SliderScreenshotTest {
 
     @Test
     fun sliderTest_origin() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Box(wrap.testTag(wrapperTestTag)) {
                 var position by remember { mutableStateOf(0f) }
                 Slider(position, { position = it })
@@ -69,7 +69,7 @@ class SliderScreenshotTest {
 
     @Test
     fun sliderTest_middle() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Box(wrap.testTag(wrapperTestTag)) {
                 var position by remember { mutableStateOf(0.5f) }
                 Slider(position, { position = it })
@@ -80,7 +80,7 @@ class SliderScreenshotTest {
 
     @Test
     fun sliderTest_end() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Box(wrap.testTag(wrapperTestTag)) {
                 var position by remember { mutableStateOf(1f) }
                 Slider(position, { position = it })
@@ -91,7 +91,7 @@ class SliderScreenshotTest {
 
     @Test
     fun sliderTest_middle_steps() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Box(wrap.testTag(wrapperTestTag)) {
                 var position by remember { mutableStateOf(0.5f) }
                 Slider(position, { position = it }, steps = 5)
@@ -102,7 +102,7 @@ class SliderScreenshotTest {
 
     @Test
     fun sliderTest_customColors() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Box(wrap.testTag(wrapperTestTag)) {
                 var position by remember { mutableStateOf(0.5f) }
                 Slider(
@@ -120,7 +120,7 @@ class SliderScreenshotTest {
     }
 
     private fun assertSliderAgainstGolden(goldenName: String) {
-        onNodeWithTag(wrapperTestTag)
+        rule.onNodeWithTag(wrapperTestTag)
             .captureToBitmap()
             .assertAgainstGolden(screenshotRule, goldenName)
     }

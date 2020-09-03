@@ -39,7 +39,6 @@ import androidx.ui.test.createComposeRule
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performClick
 import androidx.ui.test.performGesture
-import androidx.ui.test.runOnIdle
 import androidx.ui.test.swipeLeft
 import androidx.ui.test.swipeRight
 import com.google.common.truth.Truth
@@ -53,13 +52,13 @@ import org.junit.runners.JUnit4
 class SwitchTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule(disableTransitions = true)
 
     private val defaultSwitchTag = "switch"
 
     @Test
     fun switch_defaultSemantics() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Column {
                 Switch(modifier = Modifier.testTag("checked"), checked = true, onCheckedChange = {})
                 Switch(
@@ -70,11 +69,11 @@ class SwitchTest {
             }
         }
 
-        onNodeWithTag("checked")
+        rule.onNodeWithTag("checked")
             .assertIsEnabled()
             .assertIsOn()
             .assertValueEquals(Strings.Checked)
-        onNodeWithTag("unchecked")
+        rule.onNodeWithTag("unchecked")
             .assertIsEnabled()
             .assertIsOff()
             .assertValueEquals(Strings.Unchecked)
@@ -82,7 +81,7 @@ class SwitchTest {
 
     @Test
     fun switch_toggle() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             val (checked, onChecked) = remember { mutableStateOf(false) }
 
             // Stack is needed because otherwise the control will be expanded to fill its parent
@@ -94,7 +93,7 @@ class SwitchTest {
                 )
             }
         }
-        onNodeWithTag(defaultSwitchTag)
+        rule.onNodeWithTag(defaultSwitchTag)
             .assertIsOff()
             .performClick()
             .assertIsOn()
@@ -102,7 +101,7 @@ class SwitchTest {
 
     @Test
     fun switch_toggleTwice() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             val (checked, onChecked) = remember { mutableStateOf(false) }
 
             // Stack is needed because otherwise the control will be expanded to fill its parent
@@ -114,7 +113,7 @@ class SwitchTest {
                 )
             }
         }
-        onNodeWithTag(defaultSwitchTag)
+        rule.onNodeWithTag(defaultSwitchTag)
             .assertIsOff()
             .performClick()
             .assertIsOn()
@@ -124,7 +123,7 @@ class SwitchTest {
 
     @Test
     fun switch_uncheckableWithNoLambda() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             val (checked, _) = remember { mutableStateOf(false) }
             Switch(
                 modifier = Modifier.testTag(defaultSwitchTag),
@@ -133,7 +132,7 @@ class SwitchTest {
                 enabled = false
             )
         }
-        onNodeWithTag(defaultSwitchTag)
+        rule.onNodeWithTag(defaultSwitchTag)
             .assertHasNoClickAction()
     }
 
@@ -150,7 +149,7 @@ class SwitchTest {
     @Test
     fun switch_testDraggable() {
         val state = mutableStateOf(false)
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
 
             // Stack is needed because otherwise the control will be expanded to fill its parent
             Stack {
@@ -162,17 +161,17 @@ class SwitchTest {
             }
         }
 
-        onNodeWithTag(defaultSwitchTag)
+        rule.onNodeWithTag(defaultSwitchTag)
             .performGesture { swipeRight() }
 
-        runOnIdle {
+        rule.runOnIdle {
             Truth.assertThat(state.value).isEqualTo(true)
         }
 
-        onNodeWithTag(defaultSwitchTag)
+        rule.onNodeWithTag(defaultSwitchTag)
             .performGesture { swipeLeft() }
 
-        runOnIdle {
+        rule.runOnIdle {
             Truth.assertThat(state.value).isEqualTo(false)
         }
     }
@@ -180,7 +179,7 @@ class SwitchTest {
     @Test
     fun switch_testDraggable_rtl() {
         val state = mutableStateOf(false)
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
 
             // Stack is needed because otherwise the control will be expanded to fill its parent
             Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
@@ -194,23 +193,23 @@ class SwitchTest {
             }
         }
 
-        onNodeWithTag(defaultSwitchTag)
+        rule.onNodeWithTag(defaultSwitchTag)
             .performGesture { swipeLeft() }
 
-        runOnIdle {
+        rule.runOnIdle {
             Truth.assertThat(state.value).isEqualTo(true)
         }
 
-        onNodeWithTag(defaultSwitchTag)
+        rule.onNodeWithTag(defaultSwitchTag)
             .performGesture { swipeRight() }
 
-        runOnIdle {
+        rule.runOnIdle {
             Truth.assertThat(state.value).isEqualTo(false)
         }
     }
 
     private fun materialSizesTestForValue(checked: Boolean) {
-        composeTestRule.setMaterialContentForSizeAssertions {
+        rule.setMaterialContentForSizeAssertions {
             Switch(checked = checked, onCheckedChange = {}, enabled = false)
         }
             .assertWidthIsEqualTo(34.dp + 2.dp * 2)

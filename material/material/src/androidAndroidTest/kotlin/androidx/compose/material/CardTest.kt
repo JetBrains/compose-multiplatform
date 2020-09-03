@@ -43,7 +43,7 @@ import org.junit.runners.JUnit4
 class CardTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
@@ -51,7 +51,7 @@ class CardTest {
         val shape = CutCornerShape(8.dp)
         val background = Color.Yellow
         var cardColor = Color.Transparent
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Surface(color = background) {
                 Stack {
                     cardColor = MaterialTheme.colors.surface
@@ -68,14 +68,14 @@ class CardTest {
             }
         }
 
-        onNodeWithTag("card")
+        rule.onNodeWithTag("card")
             .captureToBitmap()
             .assertShape(
-                density = composeTestRule.density,
+                density = rule.density,
                 shape = shape,
                 shapeColor = cardColor,
                 backgroundColor = background,
-                shapeOverlapPixelCount = with(composeTestRule.density) { 1.dp.toPx() }
+                shapeOverlapPixelCount = with(rule.density) { 1.dp.toPx() }
             )
     }
 }

@@ -40,7 +40,6 @@ import androidx.ui.test.captureToBitmap
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performGesture
-import androidx.ui.test.runOnIdle
 import androidx.ui.test.swipeDown
 import androidx.ui.test.swipeUp
 import com.google.common.truth.Truth.assertThat
@@ -63,12 +62,12 @@ class TextFieldImplTest {
             "fugiat nulla pariatur."
 
     @get:Rule
-    val testRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Test
     fun testTextField_scrollable_withLongInput() {
         val scrollerPosition = TextFieldScrollerPosition()
-        testRule.setContent {
+        rule.setContent {
             Stack {
                 TextFieldScroller(
                     remember { scrollerPosition },
@@ -82,7 +81,7 @@ class TextFieldImplTest {
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(scrollerPosition.maximum).isLessThan(Float.POSITIVE_INFINITY)
             assertThat(scrollerPosition.maximum).isGreaterThan(0f)
         }
@@ -92,7 +91,7 @@ class TextFieldImplTest {
     fun testTextField_notScrollable_withShortInput() {
         val text = "text"
         val scrollerPosition = TextFieldScrollerPosition()
-        testRule.setContent {
+        rule.setContent {
             Stack {
                 TextFieldScroller(
                     remember { scrollerPosition },
@@ -106,7 +105,7 @@ class TextFieldImplTest {
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(scrollerPosition.maximum).isEqualTo(0f)
         }
     }
@@ -119,8 +118,8 @@ class TextFieldImplTest {
         val parentSize = 200
         val textFieldSize = 50
 
-        with(testRule.density) {
-            testRule.setContent {
+        with(rule.density) {
+            rule.setContent {
                 Stack(
                     Modifier
                         .preferredSize(parentSize.toDp())
@@ -140,9 +139,9 @@ class TextFieldImplTest {
             }
         }
 
-        runOnIdle {}
+        rule.runOnIdle {}
 
-        onNodeWithTag(TextfieldTag)
+        rule.onNodeWithTag(TextfieldTag)
             .captureToBitmap()
             .assertPixels(expectedSize = IntSize(parentSize, parentSize)) { position ->
                 if (position.x > textFieldSize && position.y > textFieldSize) Color.White else null
@@ -153,7 +152,7 @@ class TextFieldImplTest {
     fun testTextField_swipe_whenLongInput() {
         val scrollerPosition = TextFieldScrollerPosition()
 
-        testRule.setContent {
+        rule.setContent {
             Stack {
                 TextFieldScroller(
                     remember { scrollerPosition },
@@ -167,28 +166,28 @@ class TextFieldImplTest {
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(scrollerPosition.current).isEqualTo(0f)
         }
 
-        onNodeWithTag(TextfieldTag)
+        rule.onNodeWithTag(TextfieldTag)
             .performGesture { swipeDown() }
 
-        val firstSwipePosition = runOnIdle {
+        val firstSwipePosition = rule.runOnIdle {
             scrollerPosition.current
         }
         assertThat(firstSwipePosition).isGreaterThan(0f)
 
-        onNodeWithTag(TextfieldTag)
+        rule.onNodeWithTag(TextfieldTag)
             .performGesture { swipeUp() }
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(scrollerPosition.current).isLessThan(firstSwipePosition)
         }
     }
 
     @Test
     fun textFieldScroller_restoresScrollerPosition() {
-        val restorationTester = StateRestorationTester(testRule)
+        val restorationTester = StateRestorationTester(rule)
         var scrollerPosition = TextFieldScrollerPosition()
 
         restorationTester.setContent {
@@ -208,22 +207,22 @@ class TextFieldImplTest {
             }
         }
 
-        onNodeWithTag(TextfieldTag)
+        rule.onNodeWithTag(TextfieldTag)
             .performGesture { swipeDown() }
 
-        val swipePosition = runOnIdle {
+        val swipePosition = rule.runOnIdle {
             scrollerPosition.current
         }
         assertThat(swipePosition).isGreaterThan(0f)
 
-        runOnIdle {
+        rule.runOnIdle {
             scrollerPosition = TextFieldScrollerPosition()
             assertThat(scrollerPosition.current).isEqualTo(0f)
         }
 
         restorationTester.emulateSavedInstanceStateRestore()
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(scrollerPosition.current).isEqualTo(swipePosition)
         }
     }

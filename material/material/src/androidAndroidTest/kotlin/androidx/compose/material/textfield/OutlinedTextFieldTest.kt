@@ -62,8 +62,6 @@ import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performClick
 import androidx.ui.test.performGesture
 import androidx.ui.test.performImeAction
-import androidx.ui.test.runOnIdle
-import androidx.ui.test.waitForIdle
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.atLeastOnce
@@ -87,7 +85,7 @@ class OutlinedTextFieldTest {
     private val TextfieldTag = "textField"
 
     @get:Rule
-    val testRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Test
     fun testOutlinedTextFields_singleFocus() {
@@ -97,7 +95,7 @@ class OutlinedTextFieldTest {
         var textField2Focused = false
         val textField2Tag = "TextField2"
 
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             Column {
                 OutlinedTextField(
                     modifier = Modifier
@@ -118,16 +116,16 @@ class OutlinedTextFieldTest {
             }
         }
 
-        onNodeWithTag(textField1Tag).performClick()
+        rule.onNodeWithTag(textField1Tag).performClick()
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(textField1Focused).isTrue()
             assertThat(textField2Focused).isFalse()
         }
 
-        onNodeWithTag(textField2Tag).performClick()
+        rule.onNodeWithTag(textField2Tag).performClick()
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(textField1Focused).isFalse()
             assertThat(textField2Focused).isTrue()
         }
@@ -136,7 +134,7 @@ class OutlinedTextFieldTest {
     @Test
     fun testOutlinedTextField_getFocus_whenClickedOnInternalArea() {
         var focused = false
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             Box {
                 OutlinedTextField(
                     modifier = Modifier
@@ -150,11 +148,11 @@ class OutlinedTextFieldTest {
         }
 
         // Click on (2, 2) which is a background area and outside input area
-        onNodeWithTag(TextfieldTag).performGesture {
+        rule.onNodeWithTag(TextfieldTag).performGesture {
             click(Offset(2f, 2f))
         }
 
-        testRule.runOnIdleWithDensity {
+        rule.runOnIdleWithDensity {
             assertThat(focused).isTrue()
         }
     }
@@ -163,7 +161,7 @@ class OutlinedTextFieldTest {
     fun testOutlinedTextField_labelPosition_initial_withDefaultHeight() {
         val labelSize = Ref<IntSize>()
         val labelPosition = Ref<Offset>()
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             Box {
                 OutlinedTextField(
                     value = "",
@@ -178,7 +176,7 @@ class OutlinedTextFieldTest {
             }
         }
 
-        testRule.runOnIdleWithDensity {
+        rule.runOnIdleWithDensity {
             // size
             assertThat(labelSize.value).isNotNull()
             assertThat(labelSize.value?.height).isGreaterThan(0)
@@ -199,7 +197,7 @@ class OutlinedTextFieldTest {
         val labelSize = Ref<IntSize>()
         val labelPosition = Ref<Offset>()
 
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             OutlinedTextField(
                 modifier = Modifier.testTag(TextfieldTag),
                 value = "",
@@ -216,7 +214,7 @@ class OutlinedTextFieldTest {
         // click to focus
         clickAndAdvanceClock(TextfieldTag, 200)
 
-        testRule.runOnIdleWithDensity {
+        rule.runOnIdleWithDensity {
             // size
             assertThat(labelSize.value).isNotNull()
             assertThat(labelSize.value?.height).isGreaterThan(0)
@@ -233,7 +231,7 @@ class OutlinedTextFieldTest {
     fun testOutlinedTextField_labelPosition_whenInput() {
         val labelSize = Ref<IntSize>()
         val labelPosition = Ref<Offset>()
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             OutlinedTextField(
                 value = "input",
                 onValueChange = {},
@@ -246,7 +244,7 @@ class OutlinedTextFieldTest {
             )
         }
 
-        testRule.runOnIdleWithDensity {
+        rule.runOnIdleWithDensity {
             // size
             assertThat(labelSize.value).isNotNull()
             assertThat(labelSize.value?.height).isGreaterThan(0)
@@ -263,7 +261,7 @@ class OutlinedTextFieldTest {
     fun testOutlinedTextField_placeholderPosition_withLabel() {
         val placeholderSize = Ref<IntSize>()
         val placeholderPosition = Ref<Offset>()
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             Box {
                 OutlinedTextField(
                     modifier = Modifier.testTag(TextfieldTag),
@@ -282,7 +280,7 @@ class OutlinedTextFieldTest {
         // click to focus
         clickAndAdvanceClock(TextfieldTag, 200)
 
-        testRule.runOnIdleWithDensity {
+        rule.runOnIdleWithDensity {
             // size
             assertThat(placeholderSize.value).isNotNull()
             assertThat(placeholderSize.value?.height).isGreaterThan(0)
@@ -305,7 +303,7 @@ class OutlinedTextFieldTest {
     fun testOutlinedTextField_placeholderPosition_whenNoLabel() {
         val placeholderSize = Ref<IntSize>()
         val placeholderPosition = Ref<Offset>()
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             Box {
                 OutlinedTextField(
                     modifier = Modifier.testTag(TextfieldTag),
@@ -324,7 +322,7 @@ class OutlinedTextFieldTest {
         // click to focus
         clickAndAdvanceClock(TextfieldTag, 200)
 
-        testRule.runOnIdleWithDensity {
+        rule.runOnIdleWithDensity {
             // size
             assertThat(placeholderSize.value).isNotNull()
             assertThat(placeholderSize.value?.height).isGreaterThan(0)
@@ -347,7 +345,7 @@ class OutlinedTextFieldTest {
     fun testOutlinedTextField_noPlaceholder_whenInputNotEmpty() {
         val placeholderSize = Ref<IntSize>()
         val placeholderPosition = Ref<Offset>()
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             Column {
                 OutlinedTextField(
                     modifier = Modifier.testTag(TextfieldTag),
@@ -367,7 +365,7 @@ class OutlinedTextFieldTest {
         // click to focus
         clickAndAdvanceClock(TextfieldTag, 200)
 
-        testRule.runOnIdleWithDensity {
+        rule.runOnIdleWithDensity {
             assertThat(placeholderSize.value).isNull()
             assertThat(placeholderPosition.value).isNull()
         }
@@ -375,7 +373,7 @@ class OutlinedTextFieldTest {
 
     @Test
     fun testOutlinedTextField_placeholderColorAndTextStyle() {
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             OutlinedTextField(
                 modifier = Modifier.testTag(TextfieldTag),
                 value = "",
@@ -395,7 +393,7 @@ class OutlinedTextFieldTest {
         }
 
         // click to focus
-        onNodeWithTag(TextfieldTag).performClick()
+        rule.onNodeWithTag(TextfieldTag).performClick()
     }
 
     @Test
@@ -407,7 +405,7 @@ class OutlinedTextFieldTest {
         val trailingPosition = Ref<Offset>()
         val trailingSize = Ref<IntSize>()
 
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             OutlinedTextField(
                 value = "text",
                 onValueChange = {},
@@ -428,7 +426,7 @@ class OutlinedTextFieldTest {
             )
         }
 
-        testRule.runOnIdleWithDensity {
+        rule.runOnIdleWithDensity {
             val minimumHeight = ExpectedMinimumTextFieldHeight.toIntPx()
             // leading
             assertThat(leadingSize.value).isEqualTo(IntSize(size.toIntPx(), size.toIntPx()))
@@ -452,7 +450,7 @@ class OutlinedTextFieldTest {
     fun testOutlinedTextField_labelPositionX_initial_withTrailingAndLeading() {
         val iconSize = 30.dp
         val labelPosition = Ref<Offset>()
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             Box {
                 OutlinedTextField(
                     value = "",
@@ -468,7 +466,7 @@ class OutlinedTextFieldTest {
             }
         }
 
-        testRule.runOnIdleWithDensity {
+        rule.runOnIdleWithDensity {
             assertThat(labelPosition.value?.x).isEqualTo(
                 (ExpectedPadding.toIntPx() + IconPadding.toIntPx() + iconSize.toIntPx())
                     .toFloat()
@@ -479,7 +477,7 @@ class OutlinedTextFieldTest {
     @Test
     fun testOutlinedTextField_labelPositionX_initial_withEmptyTrailingAndLeading() {
         val labelPosition = Ref<Offset>()
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             Box {
                 OutlinedTextField(
                     value = "",
@@ -495,7 +493,7 @@ class OutlinedTextFieldTest {
             }
         }
 
-        testRule.runOnIdleWithDensity {
+        rule.runOnIdleWithDensity {
             assertThat(labelPosition.value?.x).isEqualTo(
                 ExpectedPadding.toIntPx().toFloat()
             )
@@ -504,7 +502,7 @@ class OutlinedTextFieldTest {
 
     @Test
     fun testOutlinedTextField_colorInLeadingTrailing_whenValidInput() {
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             OutlinedTextField(
                 value = "",
                 onValueChange = {},
@@ -532,7 +530,7 @@ class OutlinedTextFieldTest {
 
     @Test
     fun testOutlinedTextField_colorInLeadingTrailing_whenInvalidInput() {
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             OutlinedTextField(
                 value = "",
                 onValueChange = {},
@@ -556,7 +554,7 @@ class OutlinedTextFieldTest {
     @Test
     fun testOutlinedTextField_imeActionAndKeyboardTypePropagatedDownstream() {
         val textInputService = mock<TextInputService>()
-        testRule.setContent {
+        rule.setContent {
             Providers(
                 TextInputServiceAmbient provides textInputService
             ) {
@@ -574,7 +572,7 @@ class OutlinedTextFieldTest {
 
         clickAndAdvanceClock(TextfieldTag, 200)
 
-        runOnIdle {
+        rule.runOnIdle {
             verify(textInputService, atLeastOnce()).startInput(
                 value = any(),
                 keyboardType = eq(KeyboardType.Email),
@@ -588,7 +586,7 @@ class OutlinedTextFieldTest {
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun testOutlinedTextField_visualTransformationPropagated() {
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             Box(Modifier.background(color = Color.White)) {
                 OutlinedTextField(
                     modifier = Modifier.testTag(TextfieldTag),
@@ -600,15 +598,15 @@ class OutlinedTextFieldTest {
             }
         }
 
-        onNodeWithTag(TextfieldTag)
+        rule.onNodeWithTag(TextfieldTag)
             .captureToBitmap()
             .assertShape(
-                density = testRule.density,
+                density = rule.density,
                 backgroundColor = Color.White,
                 shapeColor = Color.White,
                 shape = RectangleShape,
                 // avoid elevation artifacts
-                shapeOverlapPixelCount = with(testRule.density) { 3.dp.toPx() }
+                shapeOverlapPixelCount = with(rule.density) { 3.dp.toPx() }
             )
     }
 
@@ -616,7 +614,7 @@ class OutlinedTextFieldTest {
     fun testOutlinedTextField_onTextInputStartedCallback() {
         var controller: SoftwareKeyboardController? = null
 
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             OutlinedTextField(
                 modifier = Modifier.testTag(TextfieldTag),
                 value = "",
@@ -629,10 +627,10 @@ class OutlinedTextFieldTest {
         }
         assertThat(controller).isNull()
 
-        onNodeWithTag(TextfieldTag)
+        rule.onNodeWithTag(TextfieldTag)
             .performClick()
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(controller).isNotNull()
         }
     }
@@ -641,7 +639,7 @@ class OutlinedTextFieldTest {
     fun testOutlinedTextField_imeActionCallback_withSoftwareKeyboardController() {
         var controller: SoftwareKeyboardController? = null
 
-        testRule.setMaterialContent {
+        rule.setMaterialContent {
             OutlinedTextField(
                 modifier = Modifier.testTag(TextfieldTag),
                 value = "",
@@ -655,18 +653,18 @@ class OutlinedTextFieldTest {
         }
         assertThat(controller).isNull()
 
-        onNodeWithTag(TextfieldTag)
+        rule.onNodeWithTag(TextfieldTag)
             .performImeAction()
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(controller).isNotNull()
         }
     }
 
     private fun clickAndAdvanceClock(tag: String, time: Long) {
-        onNodeWithTag(tag).performClick()
-        waitForIdle()
-        testRule.clockTestRule.pauseClock()
-        testRule.clockTestRule.advanceClock(time)
+        rule.onNodeWithTag(tag).performClick()
+        rule.waitForIdle()
+        rule.clockTestRule.pauseClock()
+        rule.clockTestRule.advanceClock(time)
     }
 }

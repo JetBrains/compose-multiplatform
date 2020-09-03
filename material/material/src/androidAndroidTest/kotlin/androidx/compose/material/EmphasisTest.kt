@@ -48,11 +48,11 @@ class EmphasisTest(private val colors: Colors, private val debugParameterName: S
     }
 
     @get:Rule
-    val composeTestRule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule(disableTransitions = true)
 
     @Test
     fun noEmphasisSpecified_contentColorUnmodified_surface() {
-        composeTestRule.setContent {
+        rule.setContent {
             MaterialTheme(colors) {
                 Surface {
                     val onSurface = MaterialTheme.colors.onSurface
@@ -65,7 +65,7 @@ class EmphasisTest(private val colors: Colors, private val debugParameterName: S
 
     @Test
     fun highEmphasis_contentColorSet_surface() {
-        composeTestRule.setContent {
+        rule.setContent {
             MaterialTheme(colors) {
                 Surface {
                     ProvideEmphasis(EmphasisAmbient.current.high) {
@@ -83,7 +83,7 @@ class EmphasisTest(private val colors: Colors, private val debugParameterName: S
 
     @Test
     fun mediumEmphasis_contentColorSet_surface() {
-        composeTestRule.setContent {
+        rule.setContent {
             MaterialTheme(colors) {
                 Surface {
                     ProvideEmphasis(EmphasisAmbient.current.medium) {
@@ -101,7 +101,7 @@ class EmphasisTest(private val colors: Colors, private val debugParameterName: S
 
     @Test
     fun disabledEmphasis_contentColorSet_surface() {
-        composeTestRule.setContent {
+        rule.setContent {
             MaterialTheme(colors) {
                 Surface {
                     ProvideEmphasis(EmphasisAmbient.current.disabled) {
@@ -119,7 +119,7 @@ class EmphasisTest(private val colors: Colors, private val debugParameterName: S
 
     @Test
     fun noEmphasisSpecified_contentColorUnmodified_primary() {
-        composeTestRule.setContent {
+        rule.setContent {
             MaterialTheme(colors) {
                 Surface(color = colors.primary) {
                     val onPrimary = MaterialTheme.colors.onPrimary
@@ -132,7 +132,7 @@ class EmphasisTest(private val colors: Colors, private val debugParameterName: S
 
     @Test
     fun highEmphasis_contentColorSet_primary() {
-        composeTestRule.setContent {
+        rule.setContent {
             MaterialTheme(colors) {
                 Surface(color = colors.primary) {
                     ProvideEmphasis(EmphasisAmbient.current.high) {
@@ -150,7 +150,7 @@ class EmphasisTest(private val colors: Colors, private val debugParameterName: S
 
     @Test
     fun mediumEmphasis_contentColorSet_primary() {
-        composeTestRule.setContent {
+        rule.setContent {
             MaterialTheme(colors) {
                 Surface(color = colors.primary) {
                     ProvideEmphasis(EmphasisAmbient.current.medium) {
@@ -168,7 +168,7 @@ class EmphasisTest(private val colors: Colors, private val debugParameterName: S
 
     @Test
     fun disabledEmphasis_contentColorSet_primary() {
-        composeTestRule.setContent {
+        rule.setContent {
             MaterialTheme(colors) {
                 Surface(color = colors.primary) {
                     ProvideEmphasis(EmphasisAmbient.current.disabled) {
@@ -186,7 +186,7 @@ class EmphasisTest(private val colors: Colors, private val debugParameterName: S
 
     @Test
     fun noEmphasisSpecified_contentColorUnmodified_colorNotFromTheme() {
-        composeTestRule.setContent {
+        rule.setContent {
             MaterialTheme(colors) {
                 Surface(contentColor = Color.Yellow) {
                     assertThat(contentColor()).isEqualTo(Color.Yellow)
@@ -197,7 +197,7 @@ class EmphasisTest(private val colors: Colors, private val debugParameterName: S
 
     @Test
     fun highEmphasis_contentColorSet_highLuminanceColorNotFromTheme() {
-        composeTestRule.setContent {
+        rule.setContent {
             MaterialTheme(colors) {
                 val contentColor = Color(0.9f, 0.9f, 0.9f)
                 Surface(contentColor = contentColor) {
@@ -218,7 +218,7 @@ class EmphasisTest(private val colors: Colors, private val debugParameterName: S
 
     @Test
     fun mediumEmphasis_contentColorSet_highLuminanceColorNotFromTheme() {
-        composeTestRule.setContent {
+        rule.setContent {
             MaterialTheme(colors) {
                 val contentColor = Color(0.9f, 0.9f, 0.9f)
                 Surface(contentColor = contentColor) {
@@ -239,7 +239,7 @@ class EmphasisTest(private val colors: Colors, private val debugParameterName: S
 
     @Test
     fun disabledEmphasis_contentColorSet_highLuminanceColorNotFromTheme() {
-        composeTestRule.setContent {
+        rule.setContent {
             MaterialTheme(colors) {
                 val contentColor = Color(0.9f, 0.9f, 0.9f)
                 Surface(contentColor = contentColor) {
@@ -260,7 +260,7 @@ class EmphasisTest(private val colors: Colors, private val debugParameterName: S
 
     @Test
     fun highEmphasis_contentColorSet_lowLuminanceColorNotFromTheme() {
-        composeTestRule.setContent {
+        rule.setContent {
             MaterialTheme(colors) {
                 val contentColor = Color(0.1f, 0.1f, 0.1f)
                 Surface(contentColor = contentColor) {
@@ -281,7 +281,7 @@ class EmphasisTest(private val colors: Colors, private val debugParameterName: S
 
     @Test
     fun mediumEmphasis_contentColorSet_lowLuminanceColorNotFromTheme() {
-        composeTestRule.setContent {
+        rule.setContent {
             MaterialTheme(colors) {
                 val contentColor = Color(0.1f, 0.1f, 0.1f)
                 Surface(contentColor = contentColor) {
@@ -302,7 +302,7 @@ class EmphasisTest(private val colors: Colors, private val debugParameterName: S
 
     @Test
     fun disabledEmphasis_contentColorSet_lowLuminanceColorNotFromTheme() {
-        composeTestRule.setContent {
+        rule.setContent {
             MaterialTheme(colors) {
                 val contentColor = Color(0.1f, 0.1f, 0.1f)
                 Surface(contentColor = contentColor) {
@@ -323,7 +323,7 @@ class EmphasisTest(private val colors: Colors, private val debugParameterName: S
 
     @Test
     fun translucentColor_emphasisNotApplied() {
-        composeTestRule.setContent {
+        rule.setContent {
             MaterialTheme(colors) {
                 val contentColor = Color(0.5f, 0.5f, 0.5f, 0.5f)
                 Surface(contentColor = contentColor) {

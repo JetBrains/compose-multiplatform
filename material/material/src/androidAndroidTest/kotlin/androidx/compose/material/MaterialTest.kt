@@ -75,7 +75,7 @@ fun SemanticsNodeInteraction.assertWidthFillsRoot(): SemanticsNodeInteraction {
     return this
 }
 
-fun rootWidth(): Dp {
+fun ComposeTestRule.rootWidth(): Dp {
     val nodeInteraction = onRoot()
     val node = nodeInteraction.fetchSemanticsNode("Failed to get screen width")
     @OptIn(ExperimentalLayoutNodeApi::class)
@@ -86,7 +86,7 @@ fun rootWidth(): Dp {
     }
 }
 
-fun rootHeight(): Dp {
+fun ComposeTestRule.rootHeight(): Dp {
     val nodeInteraction = onRoot()
     val node = nodeInteraction.fetchSemanticsNode("Failed to get screen height")
     @OptIn(ExperimentalLayoutNodeApi::class)

@@ -38,14 +38,14 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class IconTest {
     @get:Rule
-    val composeTestRule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule(disableTransitions = true)
 
     @Test
     fun vector_materialIconSize_dimensions() {
         val width = 24.dp
         val height = 24.dp
         val vector = Icons.Filled.Menu
-        composeTestRule
+        rule
             .setMaterialContentForSizeAssertions {
                 Icon(vector)
             }
@@ -59,7 +59,7 @@ class IconTest {
         val height = 83.dp
         val vector = VectorAssetBuilder(defaultWidth = width, defaultHeight = height,
             viewportWidth = width.value, viewportHeight = height.value).build()
-        composeTestRule
+        rule
             .setMaterialContentForSizeAssertions {
                 Icon(vector)
             }
@@ -71,7 +71,7 @@ class IconTest {
     fun image_noIntrinsicSize_dimensions() {
         val width = 24.dp
         val height = 24.dp
-        composeTestRule
+        rule
             .setMaterialContentForSizeAssertions {
                 val dummyImage = with(DensityAmbient.current) {
                     ImageAsset(width.toIntPx(), height.toIntPx())
@@ -88,7 +88,7 @@ class IconTest {
         val width = 35.dp
         val height = 83.dp
 
-        composeTestRule
+        rule
             .setMaterialContentForSizeAssertions {
                 val dummyImage = with(DensityAmbient.current) {
                     ImageAsset(width.toIntPx(), height.toIntPx())
@@ -105,7 +105,7 @@ class IconTest {
         val width = 24.dp
         val height = 24.dp
         val painter = ColorPainter(Color.Red)
-        composeTestRule
+        rule
             .setMaterialContentForSizeAssertions {
                 Icon(painter)
             }
@@ -118,7 +118,7 @@ class IconTest {
         val width = 35.dp
         val height = 83.dp
 
-        composeTestRule
+        rule
             .setMaterialContentForSizeAssertions {
                 val dummyImage = with(DensityAmbient.current) {
                     ImageAsset(width.toIntPx(), height.toIntPx())

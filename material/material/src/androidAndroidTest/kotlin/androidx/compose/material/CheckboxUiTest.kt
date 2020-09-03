@@ -45,25 +45,25 @@ import org.junit.runners.JUnit4
 class CheckboxUiTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule(disableTransitions = true)
 
     private val defaultTag = "myCheckbox"
 
     @Test
     fun checkBoxTest_defaultSemantics() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Column {
                 Checkbox(false, {}, modifier = Modifier.testTag(tag = "checkboxUnchecked"))
                 Checkbox(true, {}, modifier = Modifier.testTag("checkboxChecked"))
             }
         }
 
-        onNodeWithTag("checkboxUnchecked")
+        rule.onNodeWithTag("checkboxUnchecked")
             .assertIsEnabled()
             .assertIsOff()
             .assertValueEquals(Strings.Unchecked)
 
-        onNodeWithTag("checkboxChecked")
+        rule.onNodeWithTag("checkboxChecked")
             .assertIsEnabled()
             .assertIsOn()
             .assertValueEquals(Strings.Checked)
@@ -71,12 +71,12 @@ class CheckboxUiTest {
 
     @Test
     fun checkBoxTest_toggle() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             val (checked, onCheckedChange) = remember { mutableStateOf(false) }
             Checkbox(checked, onCheckedChange, modifier = Modifier.testTag(defaultTag))
         }
 
-        onNodeWithTag(defaultTag)
+        rule.onNodeWithTag(defaultTag)
             .assertIsOff()
             .performClick()
             .assertIsOn()
@@ -84,12 +84,12 @@ class CheckboxUiTest {
 
     @Test
     fun checkBoxTest_toggle_twice() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             val (checked, onCheckedChange) = remember { mutableStateOf(false) }
             Checkbox(checked, onCheckedChange, modifier = Modifier.testTag(defaultTag))
         }
 
-        onNodeWithTag(defaultTag)
+        rule.onNodeWithTag(defaultTag)
             .assertIsOff()
             .performClick()
             .assertIsOn()
@@ -100,12 +100,12 @@ class CheckboxUiTest {
     @Test
     fun checkBoxTest_untoggleable_whenNoLambda() {
 
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             val (checked, _) = remember { mutableStateOf(false) }
             Checkbox(checked, {}, enabled = false, modifier = Modifier.testTag(defaultTag))
         }
 
-        onNodeWithTag(defaultTag)
+        rule.onNodeWithTag(defaultTag)
             .assertHasNoClickAction()
     }
 
@@ -125,7 +125,7 @@ class CheckboxUiTest {
     }
 
     private fun materialSizeTestForValue(checkboxValue: ToggleableState) {
-        composeTestRule
+        rule
             .setMaterialContentForSizeAssertions {
                 TriStateCheckbox(state = checkboxValue, onClick = {}, enabled = false)
             }
