@@ -16,11 +16,8 @@
 
 package androidx.compose.material
 
-import androidx.compose.animation.ColorPropKey
-import androidx.compose.animation.DpPropKey
-import androidx.compose.animation.core.transitionDefinition
+import androidx.compose.animation.animate
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.transition
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
@@ -31,7 +28,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.ripple.RippleIndication
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -56,9 +52,9 @@ import androidx.compose.ui.unit.dp
  * @param modifier Modifier to be applied to the radio button
  * @param enabled Controls the enabled state of the [RadioButton]. When `false`, this button will
  * not be selectable and appears in the disabled ui state
- * @param selectedColor color of the RadioButton when selected
- * @param unselectedColor color of the RadioButton when not selected
- * @param disabledColor color of the RadioButton when disabled
+ * @param color color of the RadioButton. See [RadioButtonConstants.animateDefaultColor] for
+ * customizing the color of the RadioButton in one / multiple states, such as when [selected] or
+ * not [enabled].
  */
 @Composable
 fun RadioButton(
@@ -66,14 +62,12 @@ fun RadioButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    selectedColor: Color = MaterialTheme.colors.secondary,
-    unselectedColor: Color = RadioButtonConstants.defaultUnselectedColor,
-    disabledColor: Color = RadioButtonConstants.defaultDisabledColor
+    color: Color = RadioButtonConstants.animateDefaultColor(selected, enabled)
 ) {
-    val definition = remember(selectedColor, unselectedColor) {
-        generateTransitionDefinition(selectedColor, unselectedColor)
-    }
-    val state = transition(definition = definition, toState = selected)
+    val dotRadius = animate(
+        target = if (selected) RadioButtonDotSize / 2 else 0.dp,
+        animSpec = tween(durationMillis = RadioAnimationDuration)
+    )
     Canvas(
         modifier
             .selectable(
@@ -86,8 +80,7 @@ fun RadioButton(
             .padding(RadioButtonPadding)
             .size(RadioButtonSize)
     ) {
-        val color = if (enabled) state[ColorProp] else disabledColor
-        drawRadio(color, state[DotRadiusProp])
+        drawRadio(color, dotRadius)
     }
 }
 
@@ -95,26 +88,52 @@ fun RadioButton(
  * Constants used in [RadioButton].
  */
 object RadioButtonConstants {
-
     /**
-     * Default color that will be used for [RadioButton] when disabled
+     * Represents the default color used for a [RadioButton] as it animates between states.
+     *
+     * @param selected whether the RadioButton is selected
+     * @param enabled whether the RadioButton is enabled
+     * @param selectedColor the color to use for the RadioButton when selected and enabled.
+     * @param unselectedColor the color to use for the RadioButton when unselected and enabled.
+     * @param disabledColor the color to use for the RadioButton when disabled.
+     * @return the resulting [Color] used for the RadioButton
      */
     @Composable
-    val defaultDisabledColor: Color
-        get() {
-            return EmphasisAmbient.current.disabled.applyEmphasis(
-                MaterialTheme.colors.onSurface
-            )
+    fun animateDefaultColor(
+        selected: Boolean,
+        enabled: Boolean,
+        selectedColor: Color = MaterialTheme.colors.secondary,
+        unselectedColor: Color = defaultUnselectedColor,
+        disabledColor: Color = defaultDisabledColor
+    ): Color {
+        val target = when {
+            !enabled -> disabledColor
+            !selected -> unselectedColor
+            else -> selectedColor
         }
 
+        // If not enabled 'snap' to the disabled state, as there should be no animations between
+        // enabled / disabled.
+        return if (enabled) {
+            animate(target, tween(durationMillis = RadioAnimationDuration))
+        } else {
+            target
+        }
+    }
+
     /**
-     * Default color that will be used for [RadioButton] when unselected
+     * Default color that will be used for a RadioButton when unselected
      */
     @Composable
     val defaultUnselectedColor: Color
-        get() {
-            return MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
-        }
+        get() = MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
+
+    /**
+     * Default color that will be used for a RadioButton when disabled
+     */
+    @Composable
+    val defaultDisabledColor: Color
+        get() = EmphasisAmbient.current.disabled.applyEmphasis(MaterialTheme.colors.onSurface)
 }
 
 private fun DrawScope.drawRadio(color: Color, dotRadius: Dp) {
@@ -125,29 +144,7 @@ private fun DrawScope.drawRadio(color: Color, dotRadius: Dp) {
     }
 }
 
-private val DotRadiusProp = DpPropKey()
-private val ColorProp = ColorPropKey()
 private const val RadioAnimationDuration = 100
-
-private fun generateTransitionDefinition(selectedColor: Color, unselectedColor: Color) =
-    transitionDefinition<Boolean> {
-        state(false) {
-            this[DotRadiusProp] = 0.dp
-            this[ColorProp] = unselectedColor
-        }
-        state(true) {
-            this[DotRadiusProp] = RadioButtonDotSize / 2
-            this[ColorProp] = selectedColor
-        }
-        transition {
-            ColorProp using tween(
-                durationMillis = RadioAnimationDuration
-            )
-            DotRadiusProp using tween(
-                durationMillis = RadioAnimationDuration
-            )
-        }
-    }
 
 private val RadioButtonRippleRadius = 24.dp
 private val RadioButtonPadding = 2.dp
