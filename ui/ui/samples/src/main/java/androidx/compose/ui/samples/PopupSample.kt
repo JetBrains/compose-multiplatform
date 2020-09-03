@@ -18,6 +18,7 @@ package androidx.compose.ui.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.foundation.Box
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -38,9 +39,9 @@ fun PopupSample() {
         Popup(alignment = Alignment.Center) {
             // Draw a rectangle shape with rounded corners inside the popup
             Box(
-                Modifier.preferredSize(popupWidth, popupHeight),
-                shape = RoundedCornerShape(cornerSize),
-                backgroundColor = Color.White
+                Modifier
+                    .preferredSize(popupWidth, popupHeight)
+                    .background(Color.White, RoundedCornerShape(cornerSize))
             )
         }
     }

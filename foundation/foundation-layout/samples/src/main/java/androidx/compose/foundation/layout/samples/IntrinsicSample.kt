@@ -19,6 +19,7 @@ package androidx.compose.foundation.layout.samples
 import androidx.annotation.Sampled
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayout
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -49,16 +50,19 @@ fun SameWidthBoxes() {
     Stack {
         Column(Modifier.preferredWidth(IntrinsicSize.Min).fillMaxHeight()) {
             Box(
-                modifier = Modifier.fillMaxWidth().preferredSize(20.dp, 10.dp),
-                backgroundColor = Color.Gray
+                modifier = Modifier.fillMaxWidth()
+                    .preferredSize(20.dp, 10.dp)
+                    .background(Color.Gray)
             )
             Box(
-                modifier = Modifier.fillMaxWidth().preferredSize(30.dp, 10.dp),
-                backgroundColor = Color.Blue
+                modifier = Modifier.fillMaxWidth()
+                    .preferredSize(30.dp, 10.dp)
+                    .background(Color.Blue)
             )
             Box(
-                modifier = Modifier.fillMaxWidth().preferredSize(10.dp, 10.dp),
-                backgroundColor = Color.Magenta
+                modifier = Modifier.fillMaxWidth()
+                    .preferredSize(10.dp, 10.dp)
+                    .background(Color.Magenta)
             )
         }
     }
@@ -82,7 +86,7 @@ fun MatchParentDividerForText() {
                 text = "This is a really short text",
                 modifier = Modifier.weight(1f).fillMaxHeight()
             )
-            Box(Modifier.preferredWidth(1.dp).fillMaxHeight(), backgroundColor = Color.Black)
+            Box(Modifier.preferredWidth(1.dp).fillMaxHeight().background(Color.Black))
             Text(
                 text = "This is a much much much much much much much much much much" +
                         " much much much much much much longer text",
@@ -106,13 +110,13 @@ fun SameWidthTextBoxes() {
 
     Stack {
         Column(Modifier.preferredWidth(IntrinsicSize.Max).fillMaxHeight()) {
-            Box(Modifier.fillMaxWidth(), backgroundColor = Color.Gray) {
+            Box(Modifier.fillMaxWidth().background(Color.Gray)) {
                 Text("Short text")
             }
-            Box(Modifier.fillMaxWidth(), backgroundColor = Color.Blue) {
+            Box(Modifier.fillMaxWidth().background(Color.Blue)) {
                 Text("Extremely long text giving the width of its siblings")
             }
-            Box(Modifier.fillMaxWidth(), backgroundColor = Color.Magenta) {
+            Box(Modifier.fillMaxWidth().background(Color.Magenta)) {
                 Text("Medium length text")
             }
         }
@@ -135,9 +139,9 @@ fun MatchParentDividerForAspectRatio() {
     Stack {
         Row(Modifier.preferredHeight(IntrinsicSize.Max)) {
             val modifier = Modifier.fillMaxHeight().weight(1f)
-            Box(modifier.aspectRatio(2f), backgroundColor = Color.Gray)
-            Box(Modifier.preferredWidth(1.dp).fillMaxHeight(), backgroundColor = Color.Black)
-            Box(modifier.aspectRatio(1f), backgroundColor = Color.Blue)
+            Box(modifier.aspectRatio(2f).background(Color.Gray))
+            Box(Modifier.preferredWidth(1.dp).fillMaxHeight().background(Color.Black))
+            Box(modifier.aspectRatio(1f).background(Color.Blue))
         }
     }
 }

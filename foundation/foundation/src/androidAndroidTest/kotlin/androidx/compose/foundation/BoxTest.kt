@@ -19,6 +19,7 @@ package androidx.compose.foundation
 import android.os.Build
 import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -69,7 +70,7 @@ class BoxTest {
         val padding = 20.dp
         rule.setContent {
             SemanticsParent {
-                Box(Modifier.preferredSize(size), padding = padding) {
+                Box(Modifier.preferredSize(size).padding(padding)) {
                     Box(Modifier.fillMaxSize().onPositioned { childSize = it.size })
                 }
             }
@@ -93,11 +94,7 @@ class BoxTest {
         rule.setContent {
             SemanticsParent {
                 Box(
-                    Modifier.preferredSize(size),
-                    paddingStart = start,
-                    paddingEnd = end,
-                    paddingTop = top,
-                    paddingBottom = bottom
+                    Modifier.preferredSize(size).padding(start, top, end, bottom)
                 ) {
                     Box(Modifier.fillMaxSize().onPositioned {
                         childSize = it.size
@@ -130,11 +127,7 @@ class BoxTest {
             SemanticsParent {
                 Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
                     Box(
-                        Modifier.preferredSize(size),
-                        paddingStart = start,
-                        paddingEnd = end,
-                        paddingTop = top,
-                        paddingBottom = bottom
+                        Modifier.preferredSize(size).padding(start, top, end, bottom)
                     ) {
                         Box(Modifier.fillMaxSize().onPositioned {
                             childSize = it.size
@@ -166,11 +159,9 @@ class BoxTest {
         rule.setContent {
             SemanticsParent {
                 Box(
-                    Modifier.preferredSize(size),
-                    padding = padding,
-                    paddingStart = left,
-                    paddingTop = top,
-                    paddingBottom = bottom
+                    Modifier
+                        .preferredSize(size)
+                        .padding(start = left, top = top, bottom = bottom, end = padding)
                 ) {
                     Box(Modifier.fillMaxSize().onPositioned { childSize = it.size })
                 }
@@ -196,7 +187,7 @@ class BoxTest {
             SemanticsParent {
                 Box(
                     modifier = Modifier.preferredSize(size),
-                    gravity = Alignment.TopCenter
+                    alignment = Alignment.TopCenter
                 ) {
                     Box(Modifier.size(childSize).onPositioned {
                         childPosition1 = it.positionInRoot
@@ -242,7 +233,7 @@ class BoxTest {
                 Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
                     Box(
                         modifier = Modifier.preferredSize(size),
-                        gravity = AbsoluteAlignment.TopLeft
+                        alignment = AbsoluteAlignment.TopLeft
                     ) {
                         Box(Modifier.size(childSize).onPositioned {
                             childPosition = it.positionInRoot
@@ -258,10 +249,7 @@ class BoxTest {
     fun box_testBackground() {
         rule.setContent {
             SemanticsParent {
-                Box(
-                    Modifier.preferredSize(50.dp),
-                    backgroundColor = Color.Red
-                )
+                Box(Modifier.preferredSize(50.dp).background(Color.Red))
             }
         }
         val bitmap = rule.onNodeWithTag(contentTag).captureToBitmap()
@@ -275,11 +263,9 @@ class BoxTest {
         rule.setContent {
             SemanticsParent {
                 Box(
-                    Modifier.preferredSize(size),
-                    backgroundColor = Color.Red,
-                    padding = padding
+                    Modifier.preferredSize(size).background(Color.Red).padding(padding)
                 ) {
-                    Box(Modifier.fillMaxSize(), backgroundColor = Color.Blue)
+                    Box(Modifier.fillMaxSize().background(Color.Blue))
                 }
             }
         }
@@ -302,12 +288,8 @@ class BoxTest {
         val padding = 10.dp
         rule.setContent {
             SemanticsParent {
-                Box(
-                    Modifier.preferredSize(size),
-                    backgroundColor = Color.Red,
-                    padding = padding
-                ) {
-                    Box(Modifier.fillMaxSize(), backgroundColor = Color.Blue, shape = CircleShape)
+                Box(Modifier.preferredSize(size).background(Color.Red).padding(padding)) {
+                    Box(Modifier.fillMaxSize().background(Color.Blue, CircleShape))
                 }
             }
         }
@@ -332,9 +314,11 @@ class BoxTest {
         rule.setContent {
             SemanticsParent {
                 Box(
-                    Modifier.preferredSize(size),
-                    backgroundColor = Color.Blue,
-                    border = BorderStroke(borderSize, Color.Red)
+                    Modifier
+                        .preferredSize(size)
+                        .background(Color.Blue)
+                        .border(BorderStroke(borderSize, Color.Red))
+                        .padding(borderSize)
                 )
             }
         }
@@ -359,14 +343,13 @@ class BoxTest {
         rule.setContent {
             SemanticsParent {
                 Box(
-                    Modifier.preferredSize(size),
-                    backgroundColor = Color.Red
+                    Modifier.preferredSize(size).background(Color.Red)
                 ) {
                     Box(
-                        Modifier.fillMaxSize(),
-                        backgroundColor = Color.Blue,
-                        shape = CircleShape,
-                        border = BorderStroke(borderSize, Color.Blue)
+                        Modifier
+                            .fillMaxSize()
+                            .background(Color.Blue, CircleShape)
+                            .border(BorderStroke(borderSize, Color.Blue), CircleShape)
                     )
                 }
             }
@@ -390,7 +373,11 @@ class BoxTest {
         val borderSize = 10.dp
         rule.setContent {
             SemanticsParent {
-                Box(Modifier.preferredSize(size), border = BorderStroke(borderSize, Color.Red)) {
+                Box(
+                    Modifier.preferredSize(size)
+                        .border(BorderStroke(borderSize, Color.Red))
+                        .padding(borderSize)
+                ) {
                     Box(Modifier.fillMaxSize().onPositioned { childSize = it.size })
                 }
             }
@@ -405,9 +392,10 @@ class BoxTest {
 
     @Composable
     private fun SemanticsParent(children: @Composable Density.() -> Unit) {
-        Stack(Modifier
-            .testTag(contentTag)
-            .wrapContentSize(Alignment.TopStart)
+        Stack(
+            Modifier
+                .testTag(contentTag)
+                .wrapContentSize(Alignment.TopStart)
         ) {
             DensityAmbient.current.children()
         }

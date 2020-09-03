@@ -35,6 +35,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.layout.wrapContentSize
@@ -311,9 +312,7 @@ private fun TabBaselineLayout(
     Layout(
         {
             Box(
-                Modifier.layoutId("text"),
-                paddingStart = HorizontalTextPadding,
-                paddingEnd = HorizontalTextPadding,
+                Modifier.layoutId("text").padding(horizontal = HorizontalTextPadding),
                 children = text
             )
             Box(Modifier.layoutId("icon"), children = icon)

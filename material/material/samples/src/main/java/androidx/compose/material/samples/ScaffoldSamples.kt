@@ -23,6 +23,7 @@ import androidx.compose.foundation.Box
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -105,8 +106,10 @@ fun SimpleScaffoldWithTopBar() {
             ScrollableColumn(contentPadding = innerPadding) {
                 repeat(100) {
                     Box(
-                        Modifier.fillMaxWidth().preferredHeight(50.dp),
-                        backgroundColor = colors[it % colors.size]
+                        Modifier
+                            .fillMaxWidth()
+                            .preferredHeight(50.dp)
+                            .background(colors[it % colors.size])
                     )
                 }
             }
@@ -172,8 +175,10 @@ fun ScaffoldWithBottomBarAndCutout() {
             ScrollableColumn(contentPadding = innerPadding) {
                 repeat(100) {
                     Box(
-                        Modifier.fillMaxWidth().preferredHeight(50.dp),
-                        backgroundColor = colors[it % colors.size]
+                        Modifier
+                            .fillMaxWidth()
+                            .preferredHeight(50.dp)
+                            .background(colors[it % colors.size])
                     )
                 }
             }

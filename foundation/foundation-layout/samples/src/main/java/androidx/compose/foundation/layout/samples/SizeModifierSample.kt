@@ -18,7 +18,6 @@ package androidx.compose.foundation.layout.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.foundation.Box
-import androidx.compose.foundation.ContentGravity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.layout.aspectRatio
@@ -52,8 +51,8 @@ fun SimpleSizeModifier() {
     Box(
         Modifier
             .size(100.dp, 100.dp)
-            .size(50.dp, 50.dp),
-        backgroundColor = Color.Red
+            .size(50.dp, 50.dp)
+            .background(Color.Red)
     )
 }
 
@@ -67,8 +66,8 @@ fun SimpleWidthModifier() {
         Modifier
             .width(100.dp)
             .width(50.dp)
-            .aspectRatio(1f),
-        backgroundColor = Color.Magenta
+            .aspectRatio(1f)
+            .background(Color.Magenta)
     )
 }
 
@@ -82,8 +81,8 @@ fun SimpleHeightModifier() {
         Modifier
             .height(100.dp)
             .height(50.dp)
-            .aspectRatio(1f),
-        backgroundColor = Color.Blue
+            .aspectRatio(1f)
+            .background(Color.Blue)
     )
 }
 
@@ -91,7 +90,7 @@ fun SimpleHeightModifier() {
 @Composable
 fun SimplePreferredSizeModifier() {
     Stack {
-        Box(Modifier.preferredSize(100.dp, 100.dp), backgroundColor = Color.Red)
+        Box(Modifier.preferredSize(100.dp, 100.dp).background(Color.Red))
     }
 }
 
@@ -99,7 +98,7 @@ fun SimplePreferredSizeModifier() {
 @Composable
 fun SimplePreferredWidthModifier() {
     Stack {
-        Box(Modifier.preferredWidth(100.dp).aspectRatio(1f), backgroundColor = Color.Magenta)
+        Box(Modifier.preferredWidth(100.dp).aspectRatio(1f).background(Color.Magenta))
     }
 }
 
@@ -107,14 +106,14 @@ fun SimplePreferredWidthModifier() {
 @Composable
 fun SimplePreferredHeightModifier() {
     Stack {
-        Box(Modifier.preferredHeight(100.dp).aspectRatio(1f), backgroundColor = Color.Blue)
+        Box(Modifier.preferredHeight(100.dp).aspectRatio(1f).background(Color.Blue))
     }
 }
 
 @Sampled
 @Composable
 fun SimpleFillWidthModifier() {
-    Box(Modifier.fillMaxWidth(), backgroundColor = Color.Red, gravity = ContentGravity.Center) {
+    Box(Modifier.fillMaxWidth().background(Color.Red), alignment = Alignment.Center) {
         Box(Modifier.preferredSize(100.dp).background(color = Color.Magenta))
     }
 }
@@ -122,7 +121,7 @@ fun SimpleFillWidthModifier() {
 @Sampled
 @Composable
 fun FillHalfWidthModifier() {
-    Box(Modifier.size(100.dp), backgroundColor = Color.Red, gravity = ContentGravity.Center) {
+    Box(Modifier.size(100.dp).background(Color.Red), alignment = Alignment.Center) {
         // The inner Box will be (50.dp x 30.dp).
         Box(
             Modifier.fillMaxWidth(fraction = 0.5f)
@@ -135,7 +134,7 @@ fun FillHalfWidthModifier() {
 @Sampled
 @Composable
 fun SimpleFillHeightModifier() {
-    Box(Modifier.fillMaxHeight(), backgroundColor = Color.Red, gravity = ContentGravity.Center) {
+    Box(Modifier.fillMaxHeight().background(Color.Red), alignment = Alignment.Center) {
         Box(Modifier.preferredSize(100.dp).background(color = Color.Magenta))
     }
 }
@@ -143,7 +142,7 @@ fun SimpleFillHeightModifier() {
 @Sampled
 @Composable
 fun FillHalfHeightModifier() {
-    Box(Modifier.size(100.dp), backgroundColor = Color.Red, gravity = ContentGravity.Center) {
+    Box(Modifier.size(100.dp).background(Color.Red), alignment = Alignment.Center) {
         // The inner Box will be (30.dp x 50.dp).
         Box(
             Modifier.width(30.dp)
@@ -156,7 +155,7 @@ fun FillHalfHeightModifier() {
 @Sampled
 @Composable
 fun SimpleFillModifier() {
-    Box(Modifier.fillMaxSize(), backgroundColor = Color.Red, gravity = ContentGravity.Center) {
+    Box(Modifier.fillMaxSize().background(Color.Red), alignment = Alignment.Center) {
         Box(Modifier.preferredSize(100.dp).background(color = Color.Magenta))
     }
 }
@@ -164,7 +163,7 @@ fun SimpleFillModifier() {
 @Sampled
 @Composable
 fun FillHalfSizeModifier() {
-    Box(Modifier.size(100.dp), backgroundColor = Color.Red, gravity = ContentGravity.Center) {
+    Box(Modifier.size(100.dp).background(Color.Red), alignment = Alignment.Center) {
         // The inner Box will be (50.dp x 50.dp).
         Box(
             Modifier.width(30.dp)
@@ -186,8 +185,8 @@ fun SimpleWrapContentAlignedModifier() {
     Box(
         Modifier.preferredSizeIn(minWidth = 40.dp, minHeight = 40.dp)
             .wrapContentSize(Alignment.TopCenter)
-            .preferredSize(20.dp),
-        backgroundColor = Color.Blue
+            .preferredSize(20.dp)
+            .background(Color.Blue)
     )
 }
 
@@ -203,8 +202,8 @@ fun SimpleWrapContentVerticallyAlignedModifier() {
     Box(
         Modifier.preferredSize(50.dp)
             .wrapContentHeight(Alignment.CenterVertically)
-            .preferredHeight(20.dp),
-        backgroundColor = Color.Blue
+            .preferredHeight(20.dp)
+            .background(Color.Blue)
     )
 }
 
@@ -221,8 +220,8 @@ fun SimpleWrapContentHorizontallyAlignedModifier() {
     Box(
         Modifier.preferredSize(50.dp)
             .wrapContentWidth(Alignment.CenterHorizontally)
-            .preferredWidth(20.dp),
-        backgroundColor = Color.Blue
+            .preferredWidth(20.dp)
+            .background(Color.Blue)
     )
 }
 
@@ -232,8 +231,8 @@ fun DefaultMinSizeConstraintsSample() {
     @Composable
     fun DefaultMinBox(modifier: Modifier = Modifier) {
         Box(
-            modifier.defaultMinSizeConstraints(minWidth = 100.dp, minHeight = 100.dp),
-            backgroundColor = Color.Blue
+            modifier.defaultMinSizeConstraints(minWidth = 100.dp, minHeight = 100.dp)
+                .background(Color.Blue)
         )
     }
     // This will be a 100.dp x 100.dp blue box. Because we are not providing any min constraints

@@ -36,14 +36,15 @@ import androidx.compose.ui.unit.dp
 fun SimpleRow() {
     Row {
         // The child with no weight will have the specified size.
-        Box(Modifier.preferredSize(40.dp, 80.dp), backgroundColor = Color.Magenta)
+        Box(Modifier.preferredSize(40.dp, 80.dp).background(Color.Magenta))
         // Has weight, the child will occupy half of the remaining width.
-        Box(Modifier.preferredHeight(40.dp).weight(1f), backgroundColor = Color.Yellow)
+        Box(Modifier.preferredHeight(40.dp).weight(1f).background(Color.Yellow))
         // Has weight and does not fill, the child will occupy at most half of the remaining width.
         // Therefore it will occupy 80.dp (its preferred width) if the assigned width is larger.
         Box(
-            Modifier.preferredSize(80.dp, 40.dp).weight(1f, fill = false),
-            backgroundColor = Color.Green
+            Modifier.preferredSize(80.dp, 40.dp)
+                .weight(1f, fill = false)
+                .background(Color.Green)
         )
     }
 }
@@ -54,27 +55,27 @@ fun SimpleAlignInRow() {
     Row(Modifier.fillMaxHeight()) {
         // The child with no align modifier is positioned by default so that its top edge is
         // aligned to the top of the vertical axis.
-        Box(Modifier.preferredSize(80.dp, 40.dp), backgroundColor = Color.Magenta)
+        Box(Modifier.preferredSize(80.dp, 40.dp).background(Color.Magenta))
         // Gravity.Top, the child will be positioned so that its top edge is aligned to the top
         // of the vertical axis.
         Box(
             Modifier.preferredSize(80.dp, 40.dp)
-                .align(Alignment.Top),
-            backgroundColor = Color.Red
+                .align(Alignment.Top)
+                .background(Color.Red)
         )
         // Gravity.Center, the child will be positioned so that its center is in the middle of
         // the vertical axis.
         Box(
             Modifier.preferredSize(80.dp, 40.dp)
-                .align(Alignment.CenterVertically),
-            backgroundColor = Color.Yellow
+                .align(Alignment.CenterVertically)
+                .background(Color.Yellow)
         )
         // Gravity.Bottom, the child will be positioned so that its bottom edge is aligned to the
         // bottom of the vertical axis.
         Box(
             Modifier.preferredSize(80.dp, 40.dp)
-                .align(Alignment.Bottom),
-            backgroundColor = Color.Green
+                .align(Alignment.Bottom)
+                .background(Color.Green)
         )
     }
 }
@@ -85,9 +86,9 @@ fun SimpleRelativeToSiblingsInRow() {
     Row(Modifier.fillMaxHeight()) {
         // Center of the colored rectangle is aligned to first baseline of the text.
         Box(
-            backgroundColor = Color.Red,
             modifier = Modifier.preferredSize(80.dp, 40.dp)
                 .alignWithSiblings { it.height / 2 }
+                .background(Color.Red)
         )
         Text(
             text = "Text.",

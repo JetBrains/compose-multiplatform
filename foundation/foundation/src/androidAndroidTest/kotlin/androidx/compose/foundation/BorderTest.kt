@@ -160,8 +160,7 @@ class BorderTest(val shape: Shape) {
         rule.setContent {
             SemanticParent {
                 Box(
-                    Modifier.preferredSize(40.0f.toDp(), 40.0f.toDp()),
-                    backgroundColor = Color.White
+                    Modifier.preferredSize(40.0f.toDp(), 40.0f.toDp()).background(Color.White)
                 ) {
                     Stack(
                         Modifier.preferredSize(0.0f.toDp(), 40.0f.toDp())

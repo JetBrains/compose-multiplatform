@@ -18,8 +18,8 @@ package androidx.compose.desktop.examples.popupexample
 import androidx.compose.desktop.AppManager
 import androidx.compose.desktop.AppWindow
 import androidx.compose.foundation.Box
-import androidx.compose.foundation.ContentGravity
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -93,8 +93,7 @@ fun content() {
     if (popupState.value) {
         // To make sure the popup is displayed on the top.
         Box(
-            Modifier.fillMaxSize(),
-            backgroundColor = Color(10, 162, 232, 200)
+            Modifier.fillMaxSize().background(Color(10, 162, 232, 200))
         )
     }
 
@@ -134,10 +133,8 @@ fun PopupSample(displayed: Boolean, onDismiss: () -> Unit) {
 @Composable
 fun PopupContent(onDismiss: () -> Unit) {
     Box(
-        Modifier.preferredSize(300.dp, 150.dp),
-        backgroundColor = Color.Gray,
-        shape = RoundedCornerShape(4.dp),
-        gravity = ContentGravity.Center
+        Modifier.preferredSize(300.dp, 150.dp).background(Color.Gray, RoundedCornerShape(4.dp)),
+        alignment = Alignment.Center
     ) {
         Column {
             Text(text = "Are you sure?")
@@ -155,15 +152,13 @@ fun PopupContent(onDismiss: () -> Unit) {
 @Composable
 fun WindowContent(amount: MutableState<Int>, onClose: () -> Unit) {
     Box(
-        Modifier.fillMaxSize(),
-        backgroundColor = Color.White,
-        gravity = ContentGravity.Center
+        Modifier.fillMaxSize().background(Color.White),
+        alignment = Alignment.Center
     ) {
         Box(
-            Modifier.preferredSize(300.dp, 150.dp),
-            backgroundColor = Color.Gray,
-            shape = RoundedCornerShape(4.dp),
-            gravity = ContentGravity.Center
+            Modifier.preferredSize(300.dp, 150.dp)
+                .background(Color.Gray, RoundedCornerShape(4.dp)),
+            alignment = Alignment.Center
         ) {
             Column() {
                 Text(text = "Increment value?")

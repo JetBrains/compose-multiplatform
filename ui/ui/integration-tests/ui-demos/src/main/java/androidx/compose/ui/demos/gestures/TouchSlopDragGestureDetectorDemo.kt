@@ -18,6 +18,7 @@ package androidx.compose.ui.demos.gestures
 
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -120,8 +121,8 @@ fun DragGestureFilterDemo() {
                 .fillMaxSize()
                 .wrapContentSize(Alignment.Center)
                 .preferredSize(192.dp)
-                .dragGestureFilter(dragObserver, canDrag),
-            backgroundColor = color
+                .dragGestureFilter(dragObserver, canDrag)
+                .background(color)
         )
     }
 }

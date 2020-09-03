@@ -18,7 +18,6 @@ package androidx.compose.material.ripple
 
 import android.os.Build
 import androidx.compose.foundation.Box
-import androidx.compose.foundation.ContentGravity
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.indication
@@ -39,6 +38,7 @@ import androidx.compose.runtime.emptyContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -435,7 +435,7 @@ class RippleIndicationTest {
             Providers(RippleThemeAmbient provides rippleTheme) {
                 MaterialTheme {
                     Surface(contentColor = contentColor) {
-                        Box(Modifier.fillMaxSize(), gravity = ContentGravity.Center) {
+                        Box(Modifier.fillMaxSize(), alignment = Alignment.Center) {
                             RippleBox(interactionState, RippleIndication())
                         }
                     }
@@ -476,7 +476,7 @@ class RippleIndicationTest {
             Providers(RippleThemeAmbient provides rippleTheme) {
                 MaterialTheme {
                     Surface(contentColor = contentColor) {
-                        Box(Modifier.fillMaxSize(), gravity = ContentGravity.Center) {
+                        Box(Modifier.fillMaxSize(), alignment = Alignment.Center) {
                             RippleBox(interactionState, RippleIndication())
                         }
                     }
@@ -517,7 +517,7 @@ class RippleIndicationTest {
             Providers(RippleThemeAmbient provides rippleTheme) {
                 MaterialTheme {
                     Surface(contentColor = Color.Black) {
-                        Box(Modifier.fillMaxSize(), gravity = ContentGravity.Center) {
+                        Box(Modifier.fillMaxSize(), alignment = Alignment.Center) {
                             RippleBox(interactionState, RippleIndication())
                         }
                     }
@@ -658,7 +658,7 @@ private fun ComposeTestRuleJUnit.setRippleContent(
 
         MaterialTheme(colors) {
             Surface(contentColor = contentColor) {
-                Box(Modifier.fillMaxSize(), gravity = ContentGravity.Center) {
+                Box(Modifier.fillMaxSize(), alignment = Alignment.Center) {
                     RippleBox(interactionState, RippleIndication(bounded))
                 }
             }

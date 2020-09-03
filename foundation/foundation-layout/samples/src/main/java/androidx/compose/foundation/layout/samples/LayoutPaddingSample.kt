@@ -35,8 +35,8 @@ fun PaddingModifier() {
     Stack(Modifier.background(color = Color.Gray)) {
         Box(
             Modifier.padding(start = 20.dp, top = 30.dp, end = 20.dp, bottom = 30.dp)
-                .preferredSize(50.dp),
-            backgroundColor = Color.Blue
+                .preferredSize(50.dp)
+                .background(Color.Blue)
         )
     }
 }
@@ -46,8 +46,10 @@ fun PaddingModifier() {
 fun SymmetricPaddingModifier() {
     Stack(Modifier.background(color = Color.Gray)) {
         Box(
-            Modifier.padding(horizontal = 20.dp, vertical = 30.dp).preferredSize(50.dp),
-            backgroundColor = Color.Blue
+            Modifier
+                .padding(horizontal = 20.dp, vertical = 30.dp)
+                .preferredSize(50.dp)
+                .background(Color.Blue)
         )
     }
 }
@@ -56,7 +58,7 @@ fun SymmetricPaddingModifier() {
 @Composable
 fun PaddingAllModifier() {
     Stack(Modifier.background(color = Color.Gray)) {
-        Box(Modifier.padding(all = 20.dp).preferredSize(50.dp), backgroundColor = Color.Blue)
+        Box(Modifier.padding(all = 20.dp).preferredSize(50.dp).background(Color.Blue))
     }
 }
 
@@ -65,7 +67,7 @@ fun PaddingAllModifier() {
 fun PaddingValuesModifier() {
     val innerPadding = PaddingValues(top = 10.dp, start = 15.dp)
     Stack(Modifier.background(color = Color.Gray)) {
-        Box(Modifier.padding(innerPadding).preferredSize(50.dp), backgroundColor = Color.Blue)
+        Box(Modifier.padding(innerPadding).preferredSize(50.dp).background(Color.Blue))
     }
 }
 
@@ -75,8 +77,8 @@ fun AbsolutePaddingModifier() {
     Stack(Modifier.background(color = Color.Gray)) {
         Box(
             Modifier.absolutePadding(left = 20.dp, top = 30.dp, right = 20.dp, bottom = 30.dp)
-                .preferredSize(50.dp),
-            backgroundColor = Color.Blue
+                .preferredSize(50.dp)
+                .background(Color.Blue)
         )
     }
 }

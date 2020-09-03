@@ -39,6 +39,44 @@ import androidx.compose.ui.unit.dp
  * modifiers can be used.
  * The [Box] will try to be only as small as its content. However, if it is constrained
  * otherwise, [Box] will allow its content to be smaller and will position the content inside,
+ * according to [alignment].
+ *
+ * The specified [padding] will be applied inside the [Box]. In order to apply padding outside
+ * the [Box], the [androidx.compose.foundation.layout.padding] modifier should be used.
+ *
+ * @sample androidx.compose.foundation.samples.SimpleCircleBox
+ *
+ * @param modifier The modifier to be applied to the Box
+ * @param alignment The gravity of the content inside Box
+ */
+// TODO: Mihai to delete when your part is done
+@Composable
+fun Box(
+    modifier: Modifier = Modifier,
+    alignment: Alignment = Alignment.TopStart,
+    children: @Composable () -> Unit = emptyContent()
+) {
+    // TODO(malkov): support ContentColor prorogation (b/148129218)
+
+    val columnArrangement = alignment.toColumnArrangement()
+    val columnGravity = alignment.toColumnGravity()
+    Column(
+        modifier = modifier,
+        verticalArrangement = columnArrangement,
+        horizontalAlignment = columnGravity
+    ) {
+        children()
+    }
+}
+
+/**
+ * A convenience composable that combines common layout and draw logic.
+ *
+ * In order to define the size of the [Box], the [androidx.compose.foundation.layout.width],
+ * [androidx.compose.foundation.layout.height] and [androidx.compose.foundation.layout.size]
+ * modifiers can be used.
+ * The [Box] will try to be only as small as its content. However, if it is constrained
+ * otherwise, [Box] will allow its content to be smaller and will position the content inside,
  * according to [gravity].
  *
  * The specified [padding] will be applied inside the [Box]. In order to apply padding outside
@@ -64,6 +102,32 @@ import androidx.compose.ui.unit.dp
  * for the bottom edge
  * @param gravity The gravity of the content inside Box
  */
+@Deprecated(
+    "All Box parameters have been removed (and gravity has been renamed to alignment). Use " +
+            "Modifier.background, Modifier.border and Modifier.padding instead",
+    replaceWith = ReplaceWith(
+        "Box(\n" +
+                "        modifier" +
+                "           .background(backgroundColor, shape)" +
+                "           .border(border, shape)" +
+                "           .padding(" +
+                "               start = if (paddingStart != Dp.Unspecified) paddingStart else " +
+                "padding," +
+                "               top = if (paddingTop != Dp.Unspecified) paddingTop else padding," +
+                "               end = if (paddingEnd != Dp.Unspecified) paddingEnd else padding," +
+                "               bottom = if (paddingBottom != Dp.Unspecified) paddingBottom else " +
+                "padding" +
+                "           ),\n" +
+                "        gravity,\n" +
+                "        children\n" +
+                "    )",
+        "androidx.compose.foundation.background",
+        "androidx.compose.foundation.border",
+        "androidx.compose.foundation.layout.padding",
+        "androidx.compose.ui.unit.Dp"
+    )
+)
+@Suppress("DEPRECATION")
 @Composable
 fun Box(
     modifier: Modifier = Modifier,
@@ -78,39 +142,34 @@ fun Box(
     gravity: ContentGravity = ContentGravity.TopStart,
     children: @Composable () -> Unit = emptyContent()
 ) {
-    val borderModifier =
-        if (border != null) Modifier.border(border, shape) else Modifier
-    val backgroundModifier =
-        if (backgroundColor != Color.Transparent) {
-            Modifier.background(color = backgroundColor, shape = shape)
-        } else {
-            Modifier
-        }
-    val paddingModifier =
-        if (needsPadding(padding, paddingStart, paddingTop, paddingEnd, paddingBottom)) {
-            Modifier.padding(
-                if (paddingStart != Dp.Unspecified) paddingStart else padding,
-                if (paddingTop != Dp.Unspecified) paddingTop else padding,
-                if (paddingEnd != Dp.Unspecified) paddingEnd else padding,
-                if (paddingBottom != Dp.Unspecified) paddingBottom else padding
+    Box(
+        modifier
+            .then(
+                if (backgroundColor != Color.Transparent) {
+                    Modifier.background(color = backgroundColor, shape = shape)
+                } else {
+                    Modifier
+                }
             )
-        } else {
-            Modifier
-        }
-    // TODO(malkov): support ContentColor prorogation (b/148129218)
-
-    val columnArrangement = gravity.toColumnArrangement()
-    val columnGravity = gravity.toColumnGravity()
-    Column(
-        modifier = modifier.then(backgroundModifier).then(borderModifier).then(paddingModifier),
-        verticalArrangement = columnArrangement,
-        horizontalAlignment = columnGravity
-    ) {
-        children()
-    }
+            .then(if (border != null) Modifier.border(border, shape) else Modifier)
+            .then(
+                if (needsPadding(padding, paddingStart, paddingTop, paddingEnd, paddingBottom)) {
+                    Modifier.padding(
+                        if (paddingStart != Dp.Unspecified) paddingStart else padding,
+                        if (paddingTop != Dp.Unspecified) paddingTop else padding,
+                        if (paddingEnd != Dp.Unspecified) paddingEnd else padding,
+                        if (paddingBottom != Dp.Unspecified) paddingBottom else padding
+                    )
+                } else {
+                    Modifier
+                }
+            ),
+        gravity,
+        children
+    )
 }
 
-// TODO(popam/148014745): add a Gravity class consistent with cross axis alignment for Row/Column
+@Deprecated("Use Alignment instead", replaceWith = ReplaceWith("Alignment"))
 typealias ContentGravity = Alignment
 
 private fun needsPadding(

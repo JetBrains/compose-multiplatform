@@ -64,7 +64,7 @@ class TextTest {
         var letterSpacing: TextUnit? = null
         rule.setContent {
             ProvideTextStyle(ExpectedTextStyle) {
-                Box(backgroundColor = Color.White) {
+                Box(Modifier.background(Color.White)) {
                     Text(
                         TestText,
                         onTextLayout = {
@@ -104,7 +104,7 @@ class TextTest {
         )
         rule.setContent {
             ProvideTextStyle(ExpectedTextStyle) {
-                Box(backgroundColor = Color.White) {
+                Box(Modifier.background(Color.White)) {
                     Text(
                         TestText,
                         style = testStyle,
@@ -144,7 +144,7 @@ class TextTest {
 
         rule.setContent {
             ProvideTextStyle(ExpectedTextStyle) {
-                Box(backgroundColor = Color.White) {
+                Box(Modifier.background(Color.White)) {
                     Text(
                         TestText,
                         color = expectedColor,
@@ -189,7 +189,7 @@ class TextTest {
         val expectedLetterSpacing = 0.6.em
         rule.setContent {
             ProvideTextStyle(ExpectedTextStyle) {
-                Box(backgroundColor = Color.White) {
+                Box(Modifier.background(Color.White)) {
                     // Set both color and style
                     Text(
                         TestText,
@@ -225,7 +225,7 @@ class TextTest {
     fun testSemantics() {
         rule.setContent {
             ProvideTextStyle(ExpectedTextStyle) {
-                Box(backgroundColor = Color.White) {
+                Box(Modifier.background(Color.White)) {
                     Text(
                         TestText,
                         modifier = Modifier.testTag("text")

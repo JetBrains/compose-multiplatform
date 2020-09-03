@@ -119,12 +119,12 @@ fun SimpleLayoutDemo() {
 
 @Composable
 private fun PurpleSquare(modifier: Modifier = Modifier) {
-    Box(modifier.preferredSize(48.dp), backgroundColor = Color(0xFF6200EE))
+    Box(modifier.preferredSize(48.dp).background(Color(0xFF6200EE)))
 }
 
 @Composable
 private fun CyanSquare(modifier: Modifier = Modifier) {
-    Box(modifier.preferredSize(24.dp), backgroundColor = Color(0xFF03DAC6))
+    Box(modifier.preferredSize(24.dp).background(Color(0xFF03DAC6)))
 }
 
 private val ExampleSize = 140.dp

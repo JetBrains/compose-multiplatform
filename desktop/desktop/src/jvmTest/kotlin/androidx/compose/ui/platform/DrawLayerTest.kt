@@ -17,6 +17,7 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.foundation.Box
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Modifier
@@ -47,8 +48,7 @@ class DrawLayerTest {
                         scaleY = 0.5f,
                         transformOrigin = TransformOrigin(0f, 0f)
                     )
-                    .size(10f.dp, 10f.dp),
-                backgroundColor = Color.Red
+                    .size(10f.dp, 10f.dp).background(Color.Red)
             )
             Box(
                 Modifier
@@ -58,8 +58,7 @@ class DrawLayerTest {
                         scaleX = 2f,
                         scaleY = 0.5f
                     )
-                    .size(10f.dp, 10f.dp),
-                backgroundColor = Color.Blue
+                    .size(10f.dp, 10f.dp).background(Color.Blue)
             )
         }
         screenshotRule.snap(window.surface)
@@ -78,8 +77,7 @@ class DrawLayerTest {
                         scaleY = 0.5f,
                         transformOrigin = TransformOrigin(0f, 0f)
                     )
-                    .size(10f.dp, 10f.dp),
-                backgroundColor = Color.Red
+                    .size(10f.dp, 10f.dp).background(Color.Red)
             )
             Box(
                 Modifier
@@ -88,8 +86,7 @@ class DrawLayerTest {
                         translationY = 20f,
                         rotationZ = 45f
                     )
-                    .size(10f.dp, 10f.dp),
-                backgroundColor = Color.Blue
+                    .size(10f.dp, 10f.dp).background(Color.Blue)
             )
         }
         screenshotRule.snap(window.surface)
@@ -107,8 +104,7 @@ class DrawLayerTest {
                         transformOrigin = TransformOrigin(0f, 0f),
                         clip = false
                     )
-                    .size(10f.dp, 10f.dp),
-                backgroundColor = Color.Red
+                    .size(10f.dp, 10f.dp).background(Color.Red)
             ) {
                 Box(
                     Modifier
@@ -116,8 +112,8 @@ class DrawLayerTest {
                             transformOrigin = TransformOrigin(0f, 0f),
                             clip = false
                         )
-                        .size(20f.dp, 2f.dp),
-                    backgroundColor = Color.Blue
+                        .size(20f.dp, 2f.dp)
+                        .background(Color.Blue)
                 )
             }
 
@@ -129,8 +125,7 @@ class DrawLayerTest {
                         transformOrigin = TransformOrigin(0f, 0f),
                         clip = true
                     )
-                    .size(10f.dp, 10f.dp),
-                backgroundColor = Color.Red
+                    .size(10f.dp, 10f.dp).background(Color.Red)
             ) {
                 Box(
                     Modifier
@@ -138,8 +133,8 @@ class DrawLayerTest {
                             transformOrigin = TransformOrigin(0f, 0f),
                             clip = false
                         )
-                        .size(20f.dp, 2f.dp),
-                    backgroundColor = Color.Blue
+                        .size(20f.dp, 2f.dp)
+                        .background(Color.Blue)
                 )
             }
 
@@ -152,8 +147,7 @@ class DrawLayerTest {
                         clip = true,
                         shape = RoundedCornerShape(5.dp)
                     )
-                    .size(10f.dp, 10f.dp),
-                backgroundColor = Color.Red
+                    .size(10f.dp, 10f.dp).background(Color.Red)
             ) {
                 Box(
                     Modifier
@@ -161,8 +155,8 @@ class DrawLayerTest {
                             transformOrigin = TransformOrigin(0f, 0f),
                             clip = false
                         )
-                        .size(20f.dp, 2f.dp),
-                    backgroundColor = Color.Blue
+                        .size(20f.dp, 2f.dp)
+                        .background(Color.Blue)
                 )
             }
         }

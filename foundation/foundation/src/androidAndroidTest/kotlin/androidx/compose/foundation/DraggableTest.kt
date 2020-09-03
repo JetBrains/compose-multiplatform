@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
@@ -272,7 +273,7 @@ class DraggableTest {
         var outerDrag = 0f
         rule.setContent {
             Stack {
-                Box(gravity = ContentGravity.Center,
+                Box(alignment = Alignment.Center,
                     modifier = Modifier
                         .testTag(draggableBoxTag)
                         .preferredSize(300.dp)

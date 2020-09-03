@@ -19,6 +19,7 @@ package androidx.compose.animation.demos
 import android.util.Log
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Box
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -48,14 +49,14 @@ fun CrossfadeDemo() {
                         }
                     )
                         .weight(1f, true)
-                        .preferredHeight(48.dp),
-                    backgroundColor = tab.color
+                        .preferredHeight(48.dp)
+                        .background(tab.color)
                 )
             }
         }
         Crossfade(current = current) { tab ->
             tab.lastInt = remember { Random.nextInt() }
-            Box(Modifier.fillMaxSize(), backgroundColor = tab.color)
+            Box(Modifier.fillMaxSize().background(tab.color))
         }
     }
 }

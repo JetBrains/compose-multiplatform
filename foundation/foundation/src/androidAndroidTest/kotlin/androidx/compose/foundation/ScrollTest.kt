@@ -754,8 +754,9 @@ class ScrollTest {
                     ) {
                         colors.forEach { color ->
                             Box(
-                                Modifier.preferredSize(width.toDp(), rowHeight.toDp()),
-                                backgroundColor = color
+                                Modifier
+                                    .preferredSize(width.toDp(), rowHeight.toDp())
+                                    .background(color)
                             )
                         }
                     }
@@ -790,8 +791,9 @@ class ScrollTest {
                         ) {
                             colors.forEach { color ->
                                 Box(
-                                    Modifier.preferredSize(defaultCellSize.toDp(), height.toDp()),
-                                    backgroundColor = color
+                                    Modifier
+                                        .preferredSize(defaultCellSize.toDp(), height.toDp())
+                                        .background(color)
                                 )
                             }
                         }
@@ -854,8 +856,7 @@ class ScrollTest {
             }
             Stack {
                 Box(
-                    Modifier.preferredSize(width, height),
-                    backgroundColor = Color.White
+                    Modifier.preferredSize(width, height).background(Color.White)
                 ) {
                     if (isVertical) {
                         ScrollableColumn(

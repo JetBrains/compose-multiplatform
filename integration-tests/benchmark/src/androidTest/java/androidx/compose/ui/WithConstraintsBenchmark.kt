@@ -17,7 +17,6 @@
 package androidx.compose.ui
 
 import androidx.compose.foundation.Box
-import androidx.compose.foundation.ContentGravity
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.preferredSize
@@ -72,7 +71,7 @@ private class NoWithConstraintsTestCase : ComposeTestCase, ToggleableTestCase {
     override fun emitContent() {
         val size = remember { mutableStateOf(200.dp) }
         this.state = size
-        Box(Modifier.preferredSize(300.dp), gravity = ContentGravity.Center) {
+        Box(Modifier.preferredSize(300.dp), alignment = Alignment.Center) {
             Spacer(Modifier.preferredSize(width = size.value, height = size.value))
         }
     }
@@ -91,7 +90,7 @@ private class WithConstraintsTestCase : ComposeTestCase, ToggleableTestCase {
         val size = remember { mutableStateOf(200.dp) }
         this.state = size
         WithConstraints {
-            Box(Modifier.preferredSize(300.dp), gravity = ContentGravity.Center) {
+            Box(Modifier.preferredSize(300.dp), alignment = Alignment.Center) {
                 Spacer(Modifier.preferredSize(width = size.value, height = size.value))
             }
         }

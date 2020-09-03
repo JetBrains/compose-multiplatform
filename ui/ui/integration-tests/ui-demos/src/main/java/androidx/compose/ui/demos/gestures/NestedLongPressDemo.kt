@@ -18,14 +18,16 @@ package androidx.compose.ui.demos.gestures
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Box
-import androidx.compose.foundation.ContentGravity
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.gesture.longPressGestureFilter
@@ -77,10 +79,12 @@ private fun LongPressableContainer(
     }
 
     Box(
-        modifier.longPressGestureFilter(onLongPress),
-        backgroundColor = color,
-        gravity = ContentGravity.Center,
-        border = BorderStroke(2.dp, BorderColor),
+        modifier
+            .longPressGestureFilter(onLongPress)
+            .background(color)
+            .border(BorderStroke(2.dp, BorderColor))
+            .padding(2.dp),
+        alignment = Alignment.Center,
         children = children
     )
 }

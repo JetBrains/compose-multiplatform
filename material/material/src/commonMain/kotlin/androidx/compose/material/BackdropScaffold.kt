@@ -24,7 +24,6 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.ContentGravity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.savedinstancestate.Saver
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawLayer
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
@@ -340,10 +340,11 @@ fun BackdropScaffold(
 
             // Snackbar host
             Box(
-                Modifier.zIndex(Float.POSITIVE_INFINITY),
-                gravity = ContentGravity.BottomCenter,
-                paddingBottom = if (scaffoldState.isRevealed &&
-                    revealedHeight == fullHeight - headerHeightPx) headerHeight else 0.dp
+                Modifier
+                    .zIndex(Float.POSITIVE_INFINITY)
+                    .padding(bottom = if (scaffoldState.isRevealed &&
+                        revealedHeight == fullHeight - headerHeightPx) headerHeight else 0.dp),
+                alignment = Alignment.BottomCenter
             ) {
                 snackbarHost(scaffoldState.snackbarHostState)
             }

@@ -17,8 +17,8 @@
 package androidx.compose.ui.demos.gestures
 
 import androidx.compose.foundation.Box
-import androidx.compose.foundation.ContentGravity
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.layout.preferredSize
@@ -61,10 +61,9 @@ fun PopupDragDemo() {
                 Box(
                     Modifier
                         .dragGestureFilter(observer)
-                        .preferredSize(70.dp),
-                    shape = CircleShape,
-                    backgroundColor = Color.Green,
-                    gravity = ContentGravity.Center
+                        .preferredSize(70.dp)
+                        .background(Color.Green, CircleShape),
+                    alignment = Alignment.Center
                 ) {
                     Text(
                         text = "This is a popup!",

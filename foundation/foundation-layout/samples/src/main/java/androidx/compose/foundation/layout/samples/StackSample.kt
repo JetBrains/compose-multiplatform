@@ -18,6 +18,7 @@ package androidx.compose.foundation.layout.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.foundation.Box
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -32,23 +33,31 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun SimpleStack() {
     Stack {
-        Box(Modifier.fillMaxSize(), backgroundColor = Color.Cyan)
+        Box(Modifier.fillMaxSize().background(Color.Cyan))
         Box(
-            Modifier.matchParentSize().padding(top = 20.dp, bottom = 20.dp),
-            backgroundColor = Color.Yellow
-        )
-        Box(Modifier.matchParentSize().padding(40.dp), backgroundColor = Color.Magenta)
-        Box(
-            Modifier.align(Alignment.Center).preferredSize(300.dp, 300.dp),
-            backgroundColor = Color.Green
+            Modifier.matchParentSize()
+                .padding(top = 20.dp, bottom = 20.dp)
+                .background(Color.Yellow)
         )
         Box(
-            Modifier.align(Alignment.TopStart).preferredSize(150.dp, 150.dp),
-            backgroundColor = Color.Red
+            Modifier.matchParentSize()
+                .padding(40.dp)
+                .background(Color.Magenta)
         )
         Box(
-            Modifier.align(Alignment.BottomEnd).preferredSize(150.dp, 150.dp),
-            backgroundColor = Color.Blue
+            Modifier.align(Alignment.Center)
+                .preferredSize(300.dp, 300.dp)
+                .background(Color.Green)
+        )
+        Box(
+            Modifier.align(Alignment.TopStart)
+                .preferredSize(150.dp, 150.dp)
+                .background(Color.Red)
+        )
+        Box(
+            Modifier.align(Alignment.BottomEnd)
+                .preferredSize(150.dp, 150.dp)
+                .background(Color.Blue)
         )
     }
 }

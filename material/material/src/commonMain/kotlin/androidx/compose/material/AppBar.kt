@@ -15,7 +15,6 @@
  */
 package androidx.compose.material
 
-import androidx.compose.foundation.ContentGravity
 import androidx.compose.foundation.ProvideTextStyle
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -29,6 +28,7 @@ import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.layout.preferredWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -83,14 +83,14 @@ fun TopAppBar(
         if (navigationIcon == null) {
             Spacer(TitleInsetWithoutIcon)
         } else {
-            Row(TitleIconModifier, verticalAlignment = ContentGravity.CenterVertically) {
+            Row(TitleIconModifier, verticalAlignment = Alignment.CenterVertically) {
                 ProvideEmphasis(emphasisLevels.high, navigationIcon)
             }
         }
 
         Row(
             Modifier.fillMaxHeight().weight(1f),
-            verticalAlignment = ContentGravity.CenterVertically
+            verticalAlignment = Alignment.CenterVertically
         ) {
             ProvideTextStyle(value = MaterialTheme.typography.h6) {
                 ProvideEmphasis(emphasisLevels.high, title)
@@ -101,7 +101,7 @@ fun TopAppBar(
             Row(
                 Modifier.fillMaxHeight(),
                 horizontalArrangement = Arrangement.End,
-                verticalAlignment = ContentGravity.CenterVertically,
+                verticalAlignment = Alignment.CenterVertically,
                 children = actions
             )
         }
@@ -185,7 +185,7 @@ fun BottomAppBar(
         // TODO: b/150609566 clarify emphasis for children
         Row(
             Modifier.fillMaxSize(),
-            verticalAlignment = ContentGravity.CenterVertically,
+            verticalAlignment = Alignment.CenterVertically,
             children = content
         )
     }

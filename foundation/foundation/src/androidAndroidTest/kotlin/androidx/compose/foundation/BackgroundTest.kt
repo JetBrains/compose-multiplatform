@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -57,7 +58,7 @@ class BackgroundTest {
             SemanticParent {
                 Box(
                     Modifier.preferredSize(40f.toDp()).background(Color.Magenta),
-                    gravity = ContentGravity.Center
+                    alignment = Alignment.Center
                 ) {
                     Box(Modifier.preferredSize(20f.toDp()).background(Color.White))
                 }
@@ -80,7 +81,7 @@ class BackgroundTest {
             SemanticParent {
                 Box(
                     Modifier.preferredSize(40f.toDp()).background(Color.Magenta),
-                    gravity = ContentGravity.Center
+                    alignment = Alignment.Center
                 ) {
                     Box(
                         Modifier.preferredSize(20f.toDp())

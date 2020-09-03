@@ -18,6 +18,7 @@ package androidx.compose.ui.demos.gestures
 
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.preferredSize
@@ -95,8 +96,8 @@ fun DragSlopExceededGestureFilterDemo() {
             Modifier.fillMaxSize()
                 .wrapContentSize(Alignment.Center)
                 .preferredSize(192.dp)
-                .dragSlopExceededGestureFilter(onTouchSlopExceeded, canDrag),
-            backgroundColor = color
+                .dragSlopExceededGestureFilter(onTouchSlopExceeded, canDrag)
+                .background(color)
         )
     }
 }

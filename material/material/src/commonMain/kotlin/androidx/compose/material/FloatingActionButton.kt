@@ -19,7 +19,6 @@ package androidx.compose.material
 import androidx.compose.animation.VectorConverter
 import androidx.compose.animation.animatedValue
 import androidx.compose.foundation.Box
-import androidx.compose.foundation.ContentGravity
 import androidx.compose.foundation.IndicationAmbient
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
@@ -36,6 +35,7 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -96,7 +96,7 @@ fun FloatingActionButton(
                 modifier = Modifier
                     .defaultMinSizeConstraints(minWidth = FabSize, minHeight = FabSize)
                     .indication(interactionState, IndicationAmbient.current()),
-                gravity = ContentGravity.Center,
+                alignment = Alignment.Center,
                 children = icon
             )
         }
@@ -164,12 +164,12 @@ fun ExtendedFloatingActionButton(
                 start = ExtendedFabTextPadding,
                 end = ExtendedFabTextPadding
             ),
-            gravity = ContentGravity.Center
+            alignment = Alignment.Center
         ) {
             if (icon == null) {
                 text()
             } else {
-                Row(verticalAlignment = ContentGravity.CenterVertically) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     icon()
                     Spacer(Modifier.preferredWidth(ExtendedFabIconPadding))
                     text()

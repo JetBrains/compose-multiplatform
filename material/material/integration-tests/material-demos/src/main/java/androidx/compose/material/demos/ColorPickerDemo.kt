@@ -24,9 +24,9 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.transition
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Box
-import androidx.compose.foundation.ContentGravity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.background
 import androidx.compose.foundation.currentTextStyle
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -50,6 +50,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.WithConstraints
 import androidx.compose.ui.draw.drawOpacity
@@ -184,13 +185,13 @@ private fun Magnifier(visible: Boolean, position: Offset, color: Color) {
             offset.preferredSize(width = MagnifierWidth, height = MagnifierHeight)
                 .drawOpacity(opacity)
         ) {
-            Box(Modifier.fillMaxWidth(), gravity = ContentGravity.Center) {
+            Box(Modifier.fillMaxWidth(), alignment = Alignment.Center) {
                 MagnifierLabel(Modifier.preferredSize(labelWidth, MagnifierLabelHeight), color)
             }
             Spacer(Modifier.weight(1f))
             Box(
                 Modifier.fillMaxWidth().preferredHeight(SelectionCircleDiameter),
-                gravity = ContentGravity.Center
+                alignment = Alignment.Center
             ) {
                 MagnifierSelectionCircle(Modifier.preferredSize(selectionDiameter), color)
             }
@@ -257,7 +258,7 @@ private val OpacityPropKey = FloatPropKey()
 private fun MagnifierLabel(modifier: Modifier, color: Color) {
     Surface(shape = MagnifierPopupShape, elevation = 4.dp) {
         Row(modifier) {
-            Box(Modifier.weight(0.25f).fillMaxHeight(), backgroundColor = color)
+            Box(Modifier.weight(0.25f).fillMaxHeight().background(color))
             // Add `#` and drop alpha characters
             val text = "#" + Integer.toHexString(color.toArgb()).toUpperCase(Locale.ROOT).drop(2)
             val textStyle = currentTextStyle().copy(textAlign = TextAlign.Center)

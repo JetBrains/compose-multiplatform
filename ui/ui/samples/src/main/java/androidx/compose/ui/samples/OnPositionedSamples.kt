@@ -18,6 +18,7 @@ package androidx.compose.ui.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.foundation.Box
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.preferredSize
 import androidx.compose.runtime.Composable
@@ -43,7 +44,7 @@ fun OnPositionedSample() {
         // This will a LayoutCoordinates instance corresponding to the parent of Column.
         coordinates.parentCoordinates
     }) {
-        Box(Modifier.preferredSize(20.dp), backgroundColor = Color.Green)
-        Box(Modifier.preferredSize(20.dp), backgroundColor = Color.Blue)
+        Box(Modifier.preferredSize(20.dp).background(Color.Green))
+        Box(Modifier.preferredSize(20.dp).background(Color.Blue))
     }
 }

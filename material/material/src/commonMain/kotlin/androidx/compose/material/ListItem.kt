@@ -17,7 +17,6 @@
 package androidx.compose.material
 
 import androidx.compose.foundation.Box
-import androidx.compose.foundation.ContentGravity
 import androidx.compose.foundation.ProvideTextStyle
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Row
@@ -139,11 +138,13 @@ private object OneLine {
             if (icon != null) {
                 Box(
                     Modifier.align(Alignment.CenterVertically)
-                        .preferredWidthIn(min = IconLeftPadding + IconMinPaddedWidth),
-                    gravity = ContentGravity.CenterStart,
-                    paddingStart = IconLeftPadding,
-                    paddingTop = IconVerticalPadding,
-                    paddingBottom = IconVerticalPadding,
+                        .preferredWidthIn(min = IconLeftPadding + IconMinPaddedWidth)
+                        .padding(
+                            start = IconLeftPadding,
+                            top = IconVerticalPadding,
+                            bottom = IconVerticalPadding
+                        ),
+                    alignment = Alignment.CenterStart,
                     children = icon
                 )
             }
@@ -151,13 +152,14 @@ private object OneLine {
                 Modifier.weight(1f)
                     .align(Alignment.CenterVertically)
                     .padding(start = ContentLeftPadding, end = ContentRightPadding),
-                gravity = ContentGravity.CenterStart,
+                alignment = Alignment.CenterStart,
                 children = text
             )
             if (trailing != null) {
                 Box(
-                    Modifier.align(Alignment.CenterVertically),
-                    paddingEnd = TrailingRightPadding,
+                    Modifier
+                        .align(Alignment.CenterVertically)
+                        .padding(end = TrailingRightPadding),
                     children = trailing
                 )
             }
@@ -204,14 +206,17 @@ private object TwoLine {
 
             if (icon != null) {
                 Box(
-                    Modifier.preferredSizeIn(
-                        minWidth = IconLeftPadding + IconMinPaddedWidth,
-                        minHeight = minHeight
-                    ),
-                    gravity = ContentGravity.TopStart,
-                    paddingStart = IconLeftPadding,
-                    paddingTop = IconVerticalPadding,
-                    paddingBottom = IconVerticalPadding,
+                    Modifier
+                        .preferredSizeIn(
+                            minWidth = IconLeftPadding + IconMinPaddedWidth,
+                            minHeight = minHeight
+                        )
+                        .padding(
+                            start = IconLeftPadding,
+                            top = IconVerticalPadding,
+                            bottom = IconVerticalPadding
+                        ),
+                    alignment = Alignment.TopStart,
                     children = icon
                 )
             }
@@ -256,7 +261,7 @@ private object TwoLine {
                         // TODO(popam): find way to center and wrap content without minHeight
                         Modifier.preferredHeightIn(min = minHeight)
                             .padding(end = TrailingRightPadding),
-                        gravity = ContentGravity.Center,
+                        alignment = Alignment.Center,
                         children = trailing
                     )
                 }
@@ -298,11 +303,14 @@ private object ThreeLine {
             if (icon != null) {
                 val minSize = IconLeftPadding + IconMinPaddedWidth
                 Box(
-                    Modifier.preferredSizeIn(minWidth = minSize, minHeight = minSize),
-                    gravity = ContentGravity.CenterStart,
-                    paddingStart = IconLeftPadding,
-                    paddingTop = IconThreeLineVerticalPadding,
-                    paddingBottom = IconThreeLineVerticalPadding,
+                    Modifier
+                        .preferredSizeIn(minWidth = minSize, minHeight = minSize)
+                        .padding(
+                            start = IconLeftPadding,
+                            top = IconThreeLineVerticalPadding,
+                            bottom = IconThreeLineVerticalPadding
+                        ),
+                    alignment = Alignment.CenterStart,
                     children = icon
                 )
             }
