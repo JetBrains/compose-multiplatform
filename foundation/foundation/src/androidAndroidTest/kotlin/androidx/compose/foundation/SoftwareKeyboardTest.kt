@@ -28,9 +28,7 @@ import androidx.compose.ui.text.input.TextInputService
 import androidx.test.filters.SmallTest
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.hasInputMethodsSupport
-import androidx.ui.test.onNode
 import androidx.ui.test.performClick
-import androidx.ui.test.runOnIdle
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.times
@@ -46,7 +44,7 @@ import org.junit.runners.JUnit4
 @OptIn(ExperimentalFoundationApi::class)
 class SoftwareKeyboardTest {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Test
     fun textField_onTextLayoutCallback() {
@@ -57,7 +55,7 @@ class SoftwareKeyboardTest {
             .thenReturn(inputSessionToken)
 
         val onTextInputStarted: (SoftwareKeyboardController) -> Unit = mock()
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(
                 TextInputServiceAmbient provides textInputService
             ) {
@@ -74,10 +72,10 @@ class SoftwareKeyboardTest {
         }
 
         // Perform click to focus in.
-        onNode(hasInputMethodsSupport())
+        rule.onNode(hasInputMethodsSupport())
             .performClick()
 
-        runOnIdle {
+        rule.runOnIdle {
             verify(onTextInputStarted, times(1)).invoke(any())
         }
     }

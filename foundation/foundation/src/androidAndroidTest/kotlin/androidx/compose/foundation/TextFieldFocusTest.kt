@@ -32,8 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.LargeTest
 import androidx.ui.test.createComposeRule
-import androidx.ui.test.runOnIdle
-import androidx.ui.test.runOnUiThread
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -45,7 +43,7 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class TextFieldFocusTest {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Composable
     private fun TextFieldApp(dataList: List<FocusTestData>) {
@@ -71,8 +69,8 @@ class TextFieldFocusTest {
     fun requestFocus() {
         lateinit var testDataList: List<FocusTestData>
 
-        runOnUiThread {
-            composeTestRule.setContent {
+        rule.runOnUiThread {
+            rule.setContent {
                 testDataList = listOf(
                     FocusTestData(FocusRequester()),
                     FocusTestData(FocusRequester()),
@@ -83,23 +81,23 @@ class TextFieldFocusTest {
             }
         }
 
-        runOnIdle { testDataList[0].focusRequester.requestFocus() }
+        rule.runOnIdle { testDataList[0].focusRequester.requestFocus() }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(testDataList[0].focused).isTrue()
             assertThat(testDataList[1].focused).isFalse()
             assertThat(testDataList[2].focused).isFalse()
         }
 
-        runOnIdle { testDataList[1].focusRequester.requestFocus() }
-        runOnIdle {
+        rule.runOnIdle { testDataList[1].focusRequester.requestFocus() }
+        rule.runOnIdle {
             assertThat(testDataList[0].focused).isFalse()
             assertThat(testDataList[1].focused).isTrue()
             assertThat(testDataList[2].focused).isFalse()
         }
 
-        runOnIdle { testDataList[2].focusRequester.requestFocus() }
-        runOnIdle {
+        rule.runOnIdle { testDataList[2].focusRequester.requestFocus() }
+        rule.runOnIdle {
             assertThat(testDataList[0].focused).isFalse()
             assertThat(testDataList[1].focused).isFalse()
             assertThat(testDataList[2].focused).isTrue()

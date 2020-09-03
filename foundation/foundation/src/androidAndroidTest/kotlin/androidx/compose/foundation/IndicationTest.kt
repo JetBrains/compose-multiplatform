@@ -29,7 +29,6 @@ import androidx.ui.test.createComposeRule
 import androidx.ui.test.down
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performGesture
-import androidx.ui.test.runOnIdle
 import androidx.ui.test.up
 import com.google.common.truth.Truth.assertThat
 import org.junit.Ignore
@@ -45,7 +44,7 @@ import java.util.concurrent.TimeUnit
 class IndicationTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     val testTag = "indication"
 
@@ -59,7 +58,7 @@ class IndicationTest {
                 countDownLatch.countDown()
             }
         }
-        composeTestRule.setContent {
+        rule.setContent {
             Box(Modifier.testTag(testTag).preferredSize(100.dp).indication(state, indication))
         }
         assertThat(countDownLatch.await(1000, TimeUnit.MILLISECONDS)).isTrue()
@@ -73,7 +72,7 @@ class IndicationTest {
             it.value // value read
             countDownLatch.countDown()
         }
-        composeTestRule.setContent {
+        rule.setContent {
             Box(Modifier
                 .testTag(testTag)
                 .preferredSize(100.dp)
@@ -81,15 +80,15 @@ class IndicationTest {
             )
         }
         assertThat(countDownLatch.count).isEqualTo(2)
-        onNodeWithTag(testTag)
+        rule.onNodeWithTag(testTag)
             .assertExists()
             .performGesture {
                 down(center)
             }
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(countDownLatch.count).isEqualTo(1)
         }
-        onNodeWithTag(testTag)
+        rule.onNodeWithTag(testTag)
             .assertExists()
             .performGesture {
                 up()
@@ -106,16 +105,16 @@ class IndicationTest {
             onDispose = { countDownLatch.countDown() },
             onDraw = { countDownLatch.countDown() }
         )
-        composeTestRule.setContent {
+        rule.setContent {
             val switchableIndication =
                 if (switchState.value) Modifier.indication(state, indication) else Modifier
             Box(Modifier.testTag(testTag).preferredSize(100.dp).then(switchableIndication))
         }
         assertThat(countDownLatch.count).isEqualTo(1)
-        runOnIdle {
+        rule.runOnIdle {
             switchState.value = !switchState.value
         }
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(countDownLatch.await(1000, TimeUnit.MILLISECONDS)).isTrue()
         }
     }
@@ -128,7 +127,7 @@ class IndicationTest {
             it.value // value read
             lastPosition = it.interactionPositionFor(Interaction.Pressed)
         }
-        composeTestRule.setContent {
+        rule.setContent {
             Box(Modifier
                 .testTag(testTag)
                 .preferredSize(100.dp)
@@ -137,17 +136,17 @@ class IndicationTest {
         }
         assertThat(lastPosition).isNull()
         var position1: Offset? = null
-        onNodeWithTag(testTag)
+        rule.onNodeWithTag(testTag)
             .assertExists()
             .performGesture {
                 position1 = Offset(center.x, center.y + 20f)
                 // pointer 1, when we have multitouch
                 down(position1!!)
             }
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(lastPosition).isEqualTo(position1!!)
         }
-        onNodeWithTag(testTag)
+        rule.onNodeWithTag(testTag)
             .assertExists()
             .performGesture {
                 val position2 = Offset(center.x + 20f, center.y)
@@ -155,19 +154,19 @@ class IndicationTest {
                 down(position2)
             }
         // should be still position1
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(lastPosition).isEqualTo(position1!!)
         }
-        onNodeWithTag(testTag)
+        rule.onNodeWithTag(testTag)
             .assertExists()
             .performGesture {
                 // pointer 1, when we have multitouch
                 up()
             }
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(lastPosition).isNull()
         }
-        onNodeWithTag(testTag)
+        rule.onNodeWithTag(testTag)
             .assertExists()
             .performGesture {
                 // pointer 2, when we have multitouch

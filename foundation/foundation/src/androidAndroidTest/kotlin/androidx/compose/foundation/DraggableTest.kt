@@ -36,7 +36,6 @@ import androidx.ui.test.down
 import androidx.ui.test.moveBy
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performGesture
-import androidx.ui.test.runOnIdle
 import androidx.ui.test.swipe
 import androidx.ui.test.swipeWithVelocity
 import androidx.ui.test.up
@@ -51,7 +50,7 @@ import org.junit.runners.JUnit4
 class DraggableTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     private val draggableBoxTag = "dragTag"
 
@@ -61,35 +60,35 @@ class DraggableTest {
         setDraggableContent {
             Modifier.draggable(Orientation.Horizontal) { total += it }
         }
-        onNodeWithTag(draggableBoxTag).performGesture {
+        rule.onNodeWithTag(draggableBoxTag).performGesture {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
                 duration = 100.milliseconds
             )
         }
-        val lastTotal = runOnIdle {
+        val lastTotal = rule.runOnIdle {
             assertThat(total).isGreaterThan(0)
             total
         }
-        onNodeWithTag(draggableBoxTag).performGesture {
+        rule.onNodeWithTag(draggableBoxTag).performGesture {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x, this.center.y + 100f),
                 duration = 100.milliseconds
             )
         }
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(total).isEqualTo(lastTotal)
         }
-        onNodeWithTag(draggableBoxTag).performGesture {
+        rule.onNodeWithTag(draggableBoxTag).performGesture {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x - 100f, this.center.y),
                 duration = 100.milliseconds
             )
         }
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(total).isLessThan(0.01f)
         }
     }
@@ -100,35 +99,35 @@ class DraggableTest {
         setDraggableContent {
             Modifier.draggable(Orientation.Vertical) { total += it }
         }
-        onNodeWithTag(draggableBoxTag).performGesture {
+        rule.onNodeWithTag(draggableBoxTag).performGesture {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x, this.center.y + 100f),
                 duration = 100.milliseconds
             )
         }
-        val lastTotal = runOnIdle {
+        val lastTotal = rule.runOnIdle {
             assertThat(total).isGreaterThan(0)
             total
         }
-        onNodeWithTag(draggableBoxTag).performGesture {
+        rule.onNodeWithTag(draggableBoxTag).performGesture {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
                 duration = 100.milliseconds
             )
         }
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(total).isEqualTo(lastTotal)
         }
-        onNodeWithTag(draggableBoxTag).performGesture {
+        rule.onNodeWithTag(draggableBoxTag).performGesture {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x, this.center.y - 100f),
                 duration = 100.milliseconds
             )
         }
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(total).isLessThan(0.01f)
         }
     }
@@ -144,18 +143,18 @@ class DraggableTest {
                 onDragStopped = { stopTrigger += 1 }
             ) {}
         }
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(startTrigger).isEqualTo(0)
             assertThat(stopTrigger).isEqualTo(0)
         }
-        onNodeWithTag(draggableBoxTag).performGesture {
+        rule.onNodeWithTag(draggableBoxTag).performGesture {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
                 duration = 100.milliseconds
             )
         }
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(startTrigger).isEqualTo(1)
             assertThat(stopTrigger).isEqualTo(1)
         }
@@ -170,26 +169,26 @@ class DraggableTest {
                 total += it
             }
         }
-        onNodeWithTag(draggableBoxTag).performGesture {
+        rule.onNodeWithTag(draggableBoxTag).performGesture {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
                 duration = 100.milliseconds
             )
         }
-        val prevTotal = runOnIdle {
+        val prevTotal = rule.runOnIdle {
             assertThat(total).isGreaterThan(0f)
             enabled.value = false
             total
         }
-        onNodeWithTag(draggableBoxTag).performGesture {
+        rule.onNodeWithTag(draggableBoxTag).performGesture {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
                 duration = 100.milliseconds
             )
         }
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(total).isEqualTo(prevTotal)
         }
     }
@@ -205,7 +204,7 @@ class DraggableTest {
                 }
             ) {}
         }
-        onNodeWithTag(draggableBoxTag).performGesture {
+        rule.onNodeWithTag(draggableBoxTag).performGesture {
             this.swipeWithVelocity(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
@@ -214,7 +213,7 @@ class DraggableTest {
 
             )
         }
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(velocityTriggered - 112f).isLessThan(0.1f)
         }
     }
@@ -227,14 +226,14 @@ class DraggableTest {
                 total += it
             }
         }
-        onNodeWithTag(draggableBoxTag).performGesture {
+        rule.onNodeWithTag(draggableBoxTag).performGesture {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
                 duration = 100.milliseconds
             )
         }
-        runOnIdle {
+        rule.runOnIdle {
             // should be exactly 100 as there's no slop
             assertThat(total).isEqualTo(100f)
         }
@@ -253,14 +252,14 @@ class DraggableTest {
                 ) { total += it }
             } else Modifier
         }
-        onNodeWithTag(draggableBoxTag).performGesture {
+        rule.onNodeWithTag(draggableBoxTag).performGesture {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 100f, this.center.y),
                 duration = 100.milliseconds
             )
         }
-        runOnIdle {
+        rule.runOnIdle {
             // should be exactly 100 as there's no slop
             assertThat(total).isGreaterThan(0f)
             assertThat(dragStopped).isEqualTo(1f)
@@ -271,7 +270,7 @@ class DraggableTest {
     fun draggable_noNestedDrag() {
         var innerDrag = 0f
         var outerDrag = 0f
-        composeTestRule.setContent {
+        rule.setContent {
             Stack {
                 Box(gravity = ContentGravity.Center,
                     modifier = Modifier
@@ -290,14 +289,14 @@ class DraggableTest {
                 }
             }
         }
-        onNodeWithTag(draggableBoxTag).performGesture {
+        rule.onNodeWithTag(draggableBoxTag).performGesture {
             this.swipe(
                 start = this.center,
                 end = Offset(this.center.x + 200f, this.center.y),
                 duration = 300.milliseconds
             )
         }
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(innerDrag).isGreaterThan(0f)
             // draggable doesn't participate in nested scrolling, so outer should receive 0 events
             assertThat(outerDrag).isEqualTo(0f)
@@ -315,26 +314,26 @@ class DraggableTest {
             ) {}
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(interactionState.value).doesNotContain(Interaction.Dragged)
         }
 
-        onNodeWithTag(draggableBoxTag)
+        rule.onNodeWithTag(draggableBoxTag)
             .performGesture {
                 down(Offset(visibleSize.width / 4f, visibleSize.height / 2f))
                 moveBy(Offset(visibleSize.width / 2f, 0f))
             }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(interactionState.value).contains(Interaction.Dragged)
         }
 
-        onNodeWithTag(draggableBoxTag)
+        rule.onNodeWithTag(draggableBoxTag)
             .performGesture {
                 up()
             }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(interactionState.value).doesNotContain(Interaction.Dragged)
         }
     }
@@ -344,7 +343,7 @@ class DraggableTest {
         val interactionState = InteractionState()
         var emitDraggableBox by mutableStateOf(true)
 
-        composeTestRule.setContent {
+        rule.setContent {
             Stack {
                 if (emitDraggableBox) {
                     Box(modifier = Modifier
@@ -359,32 +358,32 @@ class DraggableTest {
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(interactionState.value).doesNotContain(Interaction.Dragged)
         }
 
-        onNodeWithTag(draggableBoxTag)
+        rule.onNodeWithTag(draggableBoxTag)
             .performGesture {
                 down(Offset(visibleSize.width / 4f, visibleSize.height / 2f))
                 moveBy(Offset(visibleSize.width / 2f, 0f))
             }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(interactionState.value).contains(Interaction.Dragged)
         }
 
         // Dispose draggable
-        runOnIdle {
+        rule.runOnIdle {
             emitDraggableBox = false
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(interactionState.value).doesNotContain(Interaction.Dragged)
         }
     }
 
     private fun setDraggableContent(draggableFactory: @Composable () -> Modifier) {
-        composeTestRule.setContent {
+        rule.setContent {
             Stack {
                 val draggable = draggableFactory()
                 Box(

@@ -72,13 +72,11 @@ import androidx.ui.test.hasImeAction
 import androidx.ui.test.hasInputMethodsSupport
 import androidx.ui.test.isFocused
 import androidx.ui.test.isNotFocused
-import androidx.ui.test.onNode
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performClick
 import androidx.ui.test.performSemanticsAction
 import androidx.ui.test.performTextClearance
 import androidx.ui.test.performTextInput
-import androidx.ui.test.runOnIdle
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
@@ -101,7 +99,7 @@ import org.junit.runners.JUnit4
 )
 class TextFieldTest {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     private val DefaultTextFieldWidth = 280.dp
     private val Tag = "textField"
@@ -111,7 +109,7 @@ class TextFieldTest {
         val inputService = mock<TextInputService>()
 
         var isFocused = false
-        composeTestRule.setContent {
+        rule.setContent {
             val state = remember { mutableStateOf(TextFieldValue("")) }
             Providers(
                 TextInputServiceAmbient provides inputService
@@ -124,9 +122,9 @@ class TextFieldTest {
             }
         }
 
-        onNode(hasInputMethodsSupport()).performClick()
+        rule.onNode(hasInputMethodsSupport()).performClick()
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(isFocused).isTrue()
         }
     }
@@ -151,7 +149,7 @@ class TextFieldTest {
         whenever(textInputService.startInput(any(), any(), any(), any(), any()))
             .thenReturn(inputSessionToken)
 
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(
                 TextInputServiceAmbient provides textInputService
             ) {
@@ -159,10 +157,10 @@ class TextFieldTest {
             }
         }
 
-        onNode(hasInputMethodsSupport()).performClick()
+        rule.onNode(hasInputMethodsSupport()).performClick()
 
         var onEditCommandCallback: ((List<EditOperation>) -> Unit)? = null
-        runOnIdle {
+        rule.runOnIdle {
             // Verify startInput is called and capture the callback.
             val onEditCommandCaptor = argumentCaptor<(List<EditOperation>) -> Unit>()
             verify(textInputService, times(1)).startInput(
@@ -188,10 +186,10 @@ class TextFieldTest {
             // TODO: This should work only with runOnUiThread. But it seems that these events are
             // not buffered and chaining multiple of them before composition happens makes them to
             // get lost.
-            runOnIdle { onEditCommandCallback!!.invoke(it) }
+            rule.runOnIdle { onEditCommandCallback!!.invoke(it) }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             val stateCaptor = argumentCaptor<TextFieldValue>()
             verify(textInputService, atLeastOnce())
                 .onStateUpdated(eq(inputSessionToken), stateCaptor.capture())
@@ -223,7 +221,7 @@ class TextFieldTest {
         whenever(textInputService.startInput(any(), any(), any(), any(), any()))
             .thenReturn(inputSessionToken)
 
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(
                 TextInputServiceAmbient provides textInputService
             ) {
@@ -231,10 +229,10 @@ class TextFieldTest {
             }
         }
 
-        onNode(hasInputMethodsSupport()).performClick()
+        rule.onNode(hasInputMethodsSupport()).performClick()
 
         var onEditCommandCallback: ((List<EditOperation>) -> Unit)? = null
-        runOnIdle {
+        rule.runOnIdle {
             // Verify startInput is called and capture the callback.
             val onEditCommandCaptor = argumentCaptor<(List<EditOperation>) -> Unit>()
             verify(textInputService, times(1)).startInput(
@@ -260,10 +258,10 @@ class TextFieldTest {
             // TODO: This should work only with runOnUiThread. But it seems that these events are
             // not buffered and chaining multiple of them before composition happens makes them to
             // get lost.
-            runOnIdle { onEditCommandCallback!!.invoke(it) }
+            rule.runOnIdle { onEditCommandCallback!!.invoke(it) }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             val stateCaptor = argumentCaptor<TextFieldValue>()
             verify(textInputService, atLeastOnce())
                 .onStateUpdated(eq(inputSessionToken), stateCaptor.capture())
@@ -283,7 +281,7 @@ class TextFieldTest {
             .thenReturn(inputSessionToken)
 
         val onTextLayout: (TextLayoutResult) -> Unit = mock()
-        composeTestRule.setContent {
+        rule.setContent {
             Providers(
                 TextInputServiceAmbient provides textInputService
             ) {
@@ -299,10 +297,10 @@ class TextFieldTest {
             }
         }
 
-        onNode(hasInputMethodsSupport()).performClick()
+        rule.onNode(hasInputMethodsSupport()).performClick()
 
         var onEditCommandCallback: ((List<EditOperation>) -> Unit)? = null
-        runOnIdle {
+        rule.runOnIdle {
             // Verify startInput is called and capture the callback.
             val onEditCommandCaptor = argumentCaptor<(List<EditOperation>) -> Unit>()
             verify(textInputService, times(1)).startInput(
@@ -326,10 +324,10 @@ class TextFieldTest {
             // TODO: This should work only with runOnUiThread. But it seems that these events are
             // not buffered and chaining multiple of them before composition happens makes them to
             // get lost.
-            runOnIdle { onEditCommandCallback!!.invoke(it) }
+            rule.runOnIdle { onEditCommandCallback!!.invoke(it) }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             val layoutCaptor = argumentCaptor<TextLayoutResult>()
             verify(onTextLayout, atLeastOnce()).invoke(layoutCaptor.capture())
 
@@ -341,7 +339,7 @@ class TextFieldTest {
     @Test
     fun textField_hasDefaultWidth() {
         var size: Int? = null
-        composeTestRule.setContent {
+        rule.setContent {
             Box {
                 BaseTextField(
                     value = TextFieldValue(),
@@ -353,7 +351,7 @@ class TextFieldTest {
             }
         }
 
-        with(composeTestRule.density) {
+        with(rule.density) {
             assertThat(size).isEqualTo(DefaultTextFieldWidth.toIntPx())
         }
     }
@@ -362,7 +360,7 @@ class TextFieldTest {
     fun textField_respectsWidthSetByModifier() {
         val textFieldWidth = 100.dp
         var size: Int? = null
-        composeTestRule.setContent {
+        rule.setContent {
             Box {
                 BaseTextField(
                     value = TextFieldValue(),
@@ -376,7 +374,7 @@ class TextFieldTest {
             }
         }
 
-        with(composeTestRule.density) {
+        with(rule.density) {
             assertThat(size).isEqualTo(textFieldWidth.toIntPx())
         }
     }
@@ -386,7 +384,7 @@ class TextFieldTest {
         val parentSize = 300.dp
         val boxSize = 50.dp
         var size: Int? = null
-        composeTestRule.setContent {
+        rule.setContent {
             Box(Modifier.preferredSize(parentSize)) {
                 Row {
                     BaseTextField(
@@ -403,7 +401,7 @@ class TextFieldTest {
             }
         }
 
-        with(composeTestRule.density) {
+        with(rule.density) {
             assertThat(size).isEqualTo(parentSize.toIntPx() - boxSize.toIntPx())
         }
     }
@@ -412,14 +410,14 @@ class TextFieldTest {
     fun textFieldValue_saverRestoresState() {
         var state: MutableState<TextFieldValue>? = null
 
-        val restorationTester = StateRestorationTester(composeTestRule)
+        val restorationTester = StateRestorationTester(rule)
         restorationTester.setContent {
             state = savedInstanceState(saver = Saver) {
                 TextFieldValue()
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             state!!.value = TextFieldValue("test", TextRange(1, 2))
 
             // we null it to ensure recomposition happened
@@ -428,7 +426,7 @@ class TextFieldTest {
 
         restorationTester.emulateSavedInstanceStateRestore()
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(state!!.value).isEqualTo(
                 TextFieldValue("test", TextRange(1, 2))
             )
@@ -438,7 +436,7 @@ class TextFieldTest {
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun textFieldNotFocused_cursorNotRendered() {
-        composeTestRule.setContent {
+        rule.setContent {
             BaseTextField(
                 value = TextFieldValue(),
                 onValueChange = {},
@@ -448,10 +446,10 @@ class TextFieldTest {
             )
         }
 
-        onNode(hasInputMethodsSupport())
+        rule.onNode(hasInputMethodsSupport())
             .captureToBitmap()
             .assertShape(
-                density = composeTestRule.density,
+                density = rule.density,
                 shape = RectangleShape,
                 shapeColor = Color.White,
                 backgroundColor = Color.White,
@@ -461,7 +459,7 @@ class TextFieldTest {
 
     @Test
     fun defaultSemantics() {
-        composeTestRule.setContent {
+        rule.setContent {
             BaseTextField(
                 modifier = Modifier.testTag("textField"),
                 value = TextFieldValue(),
@@ -469,7 +467,7 @@ class TextFieldTest {
             )
         }
 
-        onNodeWithTag("textField")
+        rule.onNodeWithTag("textField")
             .assertTextEquals("")
             .assertHasClickAction()
             .assert(hasInputMethodsSupport())
@@ -482,14 +480,14 @@ class TextFieldTest {
             .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.GetTextLayoutResult))
 
         val textLayoutResults = mutableListOf<TextLayoutResult>()
-        onNodeWithTag("textField")
+        rule.onNodeWithTag("textField")
             .performSemanticsAction(SemanticsActions.GetTextLayoutResult) { it(textLayoutResults) }
         assert(textLayoutResults.size == 1) { "TextLayoutResult is null" }
     }
 
     @Test
     fun semantics_clickAction() {
-        composeTestRule.setContent {
+        rule.setContent {
             var value by remember { mutableStateOf(TextFieldValue()) }
             BaseTextField(
                 modifier = Modifier.testTag("textField"),
@@ -498,16 +496,16 @@ class TextFieldTest {
             )
         }
 
-        onNodeWithTag("textField")
+        rule.onNodeWithTag("textField")
             .assert(isNotFocused())
             .performSemanticsAction(SemanticsActions.OnClick)
-        onNodeWithTag("textField")
+        rule.onNodeWithTag("textField")
             .assert(isFocused())
     }
 
     @Test
     fun semantics_setTextSetSelectionActions() {
-        composeTestRule.setContent {
+        rule.setContent {
             var value by remember { mutableStateOf(TextFieldValue()) }
             BaseTextField(
                 modifier = Modifier.testTag("textField"),
@@ -517,24 +515,24 @@ class TextFieldTest {
         }
 
         val hello = AnnotatedString("Hello")
-        onNodeWithTag("textField")
+        rule.onNodeWithTag("textField")
             .assertTextEquals("")
             .performSemanticsAction(SemanticsActions.SetText) { it(hello) }
-        onNodeWithTag("textField")
+        rule.onNodeWithTag("textField")
             .assertTextEquals(hello.text)
             .assert(SemanticsMatcher.expectValue(SemanticsProperties.TextSelectionRange,
                 TextRange(hello.length)))
 
-        onNodeWithTag("textField")
+        rule.onNodeWithTag("textField")
             .performSemanticsAction(SemanticsActions.SetSelection) { it(1, 3, true) }
-        onNodeWithTag("textField")
+        rule.onNodeWithTag("textField")
             .assert(SemanticsMatcher.expectValue(SemanticsProperties.TextSelectionRange,
                 TextRange(1, 3)))
     }
 
     @Test
     fun setImeAction_isReflectedInSemantics() {
-        composeTestRule.setContent {
+        rule.setContent {
             BaseTextField(
                 value = TextFieldValue(),
                 imeAction = ImeAction.Search,
@@ -542,14 +540,14 @@ class TextFieldTest {
             )
         }
 
-        onNode(hasInputMethodsSupport())
+        rule.onNode(hasInputMethodsSupport())
             .assert(hasImeAction(ImeAction.Search))
     }
 
     @Test
     fun stringOverrideTextField_canDeleteLastSymbol() {
         var lastSeenText = ""
-        composeTestRule.setContent {
+        rule.setContent {
             var text by remember { mutableStateOf("") }
             TextFieldStringOverride(
                 value = text,
@@ -561,17 +559,17 @@ class TextFieldTest {
             )
         }
 
-        onNodeWithTag(Tag)
+        rule.onNodeWithTag(Tag)
             .performTextInput("A")
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(lastSeenText).isEqualTo("A")
         }
 
-        onNodeWithTag(Tag)
+        rule.onNodeWithTag(Tag)
             .performTextClearance(true)
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(lastSeenText).isEqualTo("")
         }
     }

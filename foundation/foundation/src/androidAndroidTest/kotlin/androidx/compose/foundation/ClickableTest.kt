@@ -37,7 +37,6 @@ import androidx.ui.test.onNodeWithSubstring
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performClick
 import androidx.ui.test.performGesture
-import androidx.ui.test.runOnIdle
 import androidx.ui.test.up
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
@@ -52,24 +51,24 @@ import java.util.concurrent.TimeUnit
 class ClickableTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Test
     fun clickableTest_defaultSemantics() {
-        composeTestRule.setContent {
+        rule.setContent {
             Stack {
                 Text("ClickableText", modifier = Modifier.testTag("myClickable").clickable {})
             }
         }
 
-        onNodeWithTag("myClickable")
+        rule.onNodeWithTag("myClickable")
             .assertIsEnabled()
             .assertHasClickAction()
     }
 
     @Test
     fun clickableTest_disabledSemantics() {
-        composeTestRule.setContent {
+        rule.setContent {
             Stack {
                 Text(
                     "ClickableText",
@@ -78,7 +77,7 @@ class ClickableTest {
             }
         }
 
-        onNodeWithTag("myClickable")
+        rule.onNodeWithTag("myClickable")
             .assertIsNotEnabled()
             .assertHasNoClickAction()
     }
@@ -90,7 +89,7 @@ class ClickableTest {
             ++counter
         }
 
-        composeTestRule.setContent {
+        rule.setContent {
             Stack {
                 Text(
                     "ClickableText",
@@ -99,17 +98,17 @@ class ClickableTest {
             }
         }
 
-        onNodeWithTag("myClickable")
+        rule.onNodeWithTag("myClickable")
             .performClick()
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(counter).isEqualTo(1)
         }
 
-        onNodeWithTag("myClickable")
+        rule.onNodeWithTag("myClickable")
             .performClick()
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(counter).isEqualTo(2)
         }
     }
@@ -119,25 +118,25 @@ class ClickableTest {
         var counter = 0
         val onClick: () -> Unit = { ++counter }
 
-        composeTestRule.setContent {
+        rule.setContent {
             Stack(modifier = Modifier.clickable(onClick = onClick)) {
                 Text("Foo")
                 Text("Bar")
             }
         }
 
-        onNodeWithSubstring("Foo").assertExists()
-        onNodeWithSubstring("Bar").assertExists()
+        rule.onNodeWithSubstring("Foo").assertExists()
+        rule.onNodeWithSubstring("Bar").assertExists()
 
-        onNodeWithSubstring("Foo").performClick()
+        rule.onNodeWithSubstring("Foo").performClick()
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(counter).isEqualTo(1)
         }
 
-        onNodeWithSubstring("Bar").performClick()
+        rule.onNodeWithSubstring("Bar").performClick()
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(counter).isEqualTo(2)
         }
     }
@@ -147,7 +146,7 @@ class ClickableTest {
         var counter = 0
         val onClick: () -> Unit = { ++counter }
 
-        composeTestRule.setContent {
+        rule.setContent {
             Stack {
                 Text(
                     "ClickableText",
@@ -156,21 +155,21 @@ class ClickableTest {
             }
         }
 
-        onNodeWithTag("myClickable")
+        rule.onNodeWithTag("myClickable")
             .performGesture {
                 longClick()
             }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(counter).isEqualTo(1)
         }
 
-        onNodeWithTag("myClickable")
+        rule.onNodeWithTag("myClickable")
             .performGesture {
                 longClick()
             }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(counter).isEqualTo(2)
         }
     }
@@ -182,7 +181,7 @@ class ClickableTest {
         val onClick: () -> Unit = { ++clickCounter }
         val onLongClick: () -> Unit = { ++longClickCounter }
 
-        composeTestRule.setContent {
+        rule.setContent {
             Stack {
                 Text(
                     "ClickableText",
@@ -196,22 +195,22 @@ class ClickableTest {
             }
         }
 
-        onNodeWithTag("myClickable")
+        rule.onNodeWithTag("myClickable")
             .performGesture {
                 click()
             }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(clickCounter).isEqualTo(1)
             assertThat(longClickCounter).isEqualTo(0)
         }
 
-        onNodeWithTag("myClickable")
+        rule.onNodeWithTag("myClickable")
             .performGesture {
                 longClick()
             }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(clickCounter).isEqualTo(1)
             assertThat(longClickCounter).isEqualTo(1)
         }
@@ -224,7 +223,7 @@ class ClickableTest {
         val onClick: () -> Unit = { clickLatch.countDown() }
         val onDoubleClick: () -> Unit = { ++doubleClickCounter }
 
-        composeTestRule.setContent {
+        rule.setContent {
             Stack {
                 Text(
                     "ClickableText",
@@ -238,21 +237,21 @@ class ClickableTest {
             }
         }
 
-        onNodeWithTag("myClickable")
+        rule.onNodeWithTag("myClickable")
             .performClick()
 
         val res = clickLatch.await(1000, TimeUnit.MILLISECONDS)
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(doubleClickCounter).isEqualTo(0)
             assertThat(res).isTrue()
         }
 
-        onNodeWithTag("myClickable")
+        rule.onNodeWithTag("myClickable")
             .performGesture {
                 doubleClick()
             }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(doubleClickCounter).isEqualTo(1)
             assertThat(clickLatch.await(1000, TimeUnit.MILLISECONDS)).isTrue()
         }
@@ -267,7 +266,7 @@ class ClickableTest {
         val onDoubleClick: () -> Unit = { ++doubleClickCounter }
         val onLongClick: () -> Unit = { ++longClickCounter }
 
-        composeTestRule.setContent {
+        rule.setContent {
             Stack {
                 Text(
                     "ClickableText",
@@ -282,33 +281,33 @@ class ClickableTest {
             }
         }
 
-        onNodeWithTag("myClickable")
+        rule.onNodeWithTag("myClickable")
             .performClick()
 
         val res = clickLatch.await(1000, TimeUnit.MILLISECONDS)
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(doubleClickCounter).isEqualTo(0)
             assertThat(longClickCounter).isEqualTo(0)
             assertThat(res).isTrue()
         }
 
-        onNodeWithTag("myClickable")
+        rule.onNodeWithTag("myClickable")
             .performGesture {
                 doubleClick()
             }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(doubleClickCounter).isEqualTo(1)
             assertThat(longClickCounter).isEqualTo(0)
             assertThat(clickLatch.await(1000, TimeUnit.MILLISECONDS)).isTrue()
         }
 
-        onNodeWithTag("myClickable")
+        rule.onNodeWithTag("myClickable")
             .performGesture {
                 longClick()
             }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(doubleClickCounter).isEqualTo(1)
             assertThat(longClickCounter).isEqualTo(1)
             assertThat(clickLatch.await(1000, TimeUnit.MILLISECONDS)).isTrue()
@@ -320,7 +319,7 @@ class ClickableTest {
         var counter = 0
         val onClick: () -> Unit = { ++counter }
 
-        composeTestRule.setContent {
+        rule.setContent {
             Stack {
                 Text(
                     "ClickableText",
@@ -329,21 +328,21 @@ class ClickableTest {
             }
         }
 
-        onNodeWithTag("myClickable")
+        rule.onNodeWithTag("myClickable")
             .performGesture {
                 doubleClick()
             }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(counter).isEqualTo(1)
         }
 
-        onNodeWithTag("myClickable")
+        rule.onNodeWithTag("myClickable")
             .performGesture {
                 doubleClick()
             }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(counter).isEqualTo(2)
         }
     }
@@ -352,7 +351,7 @@ class ClickableTest {
     fun clickableTest_interactionState() {
         val interactionState = InteractionState()
 
-        composeTestRule.setContent {
+        rule.setContent {
             Stack {
                 Text(
                     "ClickableText",
@@ -363,21 +362,21 @@ class ClickableTest {
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(interactionState.value).doesNotContain(Interaction.Pressed)
         }
 
-        onNodeWithTag("myClickable")
+        rule.onNodeWithTag("myClickable")
             .performGesture { down(center) }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(interactionState.value).contains(Interaction.Pressed)
         }
 
-        onNodeWithTag("myClickable")
+        rule.onNodeWithTag("myClickable")
             .performGesture { up() }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(interactionState.value).doesNotContain(Interaction.Pressed)
         }
     }
@@ -387,7 +386,7 @@ class ClickableTest {
         val interactionState = InteractionState()
         var emitClickableText by mutableStateOf(true)
 
-        composeTestRule.setContent {
+        rule.setContent {
             Stack {
                 if (emitClickableText) {
                     Text(
@@ -400,23 +399,23 @@ class ClickableTest {
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(interactionState.value).doesNotContain(Interaction.Pressed)
         }
 
-        onNodeWithTag("myClickable")
+        rule.onNodeWithTag("myClickable")
             .performGesture { down(center) }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(interactionState.value).contains(Interaction.Pressed)
         }
 
         // Dispose clickable
-        runOnIdle {
+        rule.runOnIdle {
             emitClickableText = false
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(interactionState.value).doesNotContain(Interaction.Pressed)
         }
     }
@@ -431,7 +430,7 @@ class ClickableTest {
         val onDoubleClick: () -> Unit = { ++doubleClickCounter }
         val onLongClick: () -> Unit = { ++longClickCounter }
 
-        composeTestRule.setContent {
+        rule.setContent {
             Stack {
                 Text(
                     "ClickableText",
@@ -447,65 +446,65 @@ class ClickableTest {
             }
         }
 
-        onNodeWithTag("myClickable")
+        rule.onNodeWithTag("myClickable")
             .performClick()
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(doubleClickCounter).isEqualTo(0)
             assertThat(longClickCounter).isEqualTo(0)
             assertThat(clickLatch.count).isEqualTo(1)
         }
 
-        onNodeWithTag("myClickable")
+        rule.onNodeWithTag("myClickable")
             .performGesture {
                 doubleClick()
             }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(doubleClickCounter).isEqualTo(0)
             assertThat(longClickCounter).isEqualTo(0)
             assertThat(clickLatch.count).isEqualTo(1)
         }
 
-        onNodeWithTag("myClickable")
+        rule.onNodeWithTag("myClickable")
             .performGesture {
                 longClick()
             }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(doubleClickCounter).isEqualTo(0)
             assertThat(longClickCounter).isEqualTo(0)
             assertThat(clickLatch.count).isEqualTo(1)
             enabled.value = true
         }
 
-        onNodeWithTag("myClickable")
+        rule.onNodeWithTag("myClickable")
             .performClick()
 
         val res = clickLatch.await(1000, TimeUnit.MILLISECONDS)
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(doubleClickCounter).isEqualTo(0)
             assertThat(longClickCounter).isEqualTo(0)
             assertThat(res).isTrue()
         }
 
-        onNodeWithTag("myClickable")
+        rule.onNodeWithTag("myClickable")
             .performGesture {
                 doubleClick()
             }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(doubleClickCounter).isEqualTo(1)
             assertThat(longClickCounter).isEqualTo(0)
             assertThat(clickLatch.await(1000, TimeUnit.MILLISECONDS)).isTrue()
         }
 
-        onNodeWithTag("myClickable")
+        rule.onNodeWithTag("myClickable")
             .performGesture {
                 longClick()
             }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(doubleClickCounter).isEqualTo(1)
             assertThat(longClickCounter).isEqualTo(1)
             assertThat(clickLatch.await(1000, TimeUnit.MILLISECONDS)).isTrue()

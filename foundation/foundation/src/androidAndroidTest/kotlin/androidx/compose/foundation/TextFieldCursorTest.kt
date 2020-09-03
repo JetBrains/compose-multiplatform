@@ -39,9 +39,7 @@ import androidx.ui.test.assertShape
 import androidx.ui.test.captureToBitmap
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.hasInputMethodsSupport
-import androidx.ui.test.onNode
 import androidx.ui.test.performClick
-import androidx.ui.test.waitForIdle
 import org.junit.Rule
 import org.junit.Test
 import java.util.concurrent.CountDownLatch
@@ -55,17 +53,17 @@ import java.util.concurrent.TimeUnit
 class TextFieldCursorTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule(disableBlinkingCursor = false).also {
+    val rule = createComposeRule(disableBlinkingCursor = false).also {
         it.clockTestRule.pauseClock()
     }
 
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-    fun textFieldFocused_cursorRendered() = with(composeTestRule.density) {
+    fun textFieldFocused_cursorRendered() = with(rule.density) {
         val width = 10.dp
         val height = 20.dp
         val latch = CountDownLatch(1)
-        composeTestRule.setContent {
+        rule.setContent {
             BaseTextField(
                 value = TextFieldValue(),
                 onValueChange = {},
@@ -77,14 +75,14 @@ class TextFieldCursorTest {
                 cursorColor = Color.Red
             )
         }
-        onNode(hasInputMethodsSupport()).performClick()
+        rule.onNode(hasInputMethodsSupport()).performClick()
         assert(latch.await(1, TimeUnit.SECONDS))
 
-        waitForIdle()
+        rule.waitForIdle()
 
-        composeTestRule.clockTestRule.advanceClock(100)
-        with(composeTestRule.density) {
-            onNode(hasInputMethodsSupport())
+        rule.clockTestRule.advanceClock(100)
+        with(rule.density) {
+            rule.onNode(hasInputMethodsSupport())
                 .captureToBitmap()
                 .assertCursor(2.dp, this)
         }
@@ -92,11 +90,11 @@ class TextFieldCursorTest {
 
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-    fun cursorBlinkingAnimation() = with(composeTestRule.density) {
+    fun cursorBlinkingAnimation() = with(rule.density) {
         val width = 10.dp
         val height = 20.dp
         val latch = CountDownLatch(1)
-        composeTestRule.setContent {
+        rule.setContent {
             // The padding helps if the test is run accidentally in landscape. Landscape makes
             // the cursor to be next to the navigation bar which affects the red color to be a bit
             // different - possibly anti-aliasing.
@@ -114,25 +112,25 @@ class TextFieldCursorTest {
             }
         }
 
-        onNode(hasInputMethodsSupport()).performClick()
+        rule.onNode(hasInputMethodsSupport()).performClick()
         assert(latch.await(1, TimeUnit.SECONDS))
 
-        waitForIdle()
+        rule.waitForIdle()
 
         // cursor visible first 500 ms
-        composeTestRule.clockTestRule.advanceClock(100)
-        with(composeTestRule.density) {
-            onNode(hasInputMethodsSupport())
+        rule.clockTestRule.advanceClock(100)
+        with(rule.density) {
+            rule.onNode(hasInputMethodsSupport())
                 .captureToBitmap()
                 .assertCursor(2.dp, this)
         }
 
         // cursor invisible during next 500 ms
-        composeTestRule.clockTestRule.advanceClock(700)
-        onNode(hasInputMethodsSupport())
+        rule.clockTestRule.advanceClock(700)
+        rule.onNode(hasInputMethodsSupport())
             .captureToBitmap()
             .assertShape(
-                density = composeTestRule.density,
+                density = rule.density,
                 shape = RectangleShape,
                 shapeColor = Color.White,
                 backgroundColor = Color.White,

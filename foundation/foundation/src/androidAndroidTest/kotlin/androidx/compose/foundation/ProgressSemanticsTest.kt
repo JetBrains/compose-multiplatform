@@ -28,7 +28,6 @@ import androidx.ui.test.assertRangeInfoEquals
 import androidx.ui.test.assertValueEquals
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.runOnUiThread
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -39,15 +38,14 @@ import org.junit.runners.JUnit4
 class ProgressSemanticsTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Test
     fun determinateProgress_testSemantics() {
         val tag = "linear"
         val progress = mutableStateOf(0f)
 
-        composeTestRule
-            .setContent {
+        rule.setContent {
                 Box(
                     Modifier
                         .testTag(tag)
@@ -57,23 +55,23 @@ class ProgressSemanticsTest {
                 )
             }
 
-        onNodeWithTag(tag)
+        rule.onNodeWithTag(tag)
             .assertValueEquals("0 percent")
             .assertRangeInfoEquals(AccessibilityRangeInfo(0f, 0f..1f))
 
-        runOnUiThread {
+        rule.runOnUiThread {
             progress.value = 0.005f
         }
 
-        onNodeWithTag(tag)
+        rule.onNodeWithTag(tag)
             .assertValueEquals("1 percent")
             .assertRangeInfoEquals(AccessibilityRangeInfo(0.005f, 0f..1f))
 
-        runOnUiThread {
+        rule.runOnUiThread {
             progress.value = 0.5f
         }
 
-        onNodeWithTag(tag)
+        rule.onNodeWithTag(tag)
             .assertValueEquals("50 percent")
             .assertRangeInfoEquals(AccessibilityRangeInfo(0.5f, 0f..1f))
     }
@@ -82,8 +80,7 @@ class ProgressSemanticsTest {
     fun indeterminateProgress_testSemantics() {
         val tag = "linear"
 
-        composeTestRule
-            .setContent {
+        rule.setContent {
                 Box(
                     Modifier
                         .testTag(tag)
@@ -93,7 +90,7 @@ class ProgressSemanticsTest {
                 )
             }
 
-        onNodeWithTag(tag)
+        rule.onNodeWithTag(tag)
             .assertValueEquals(Strings.InProgress)
     }
 }

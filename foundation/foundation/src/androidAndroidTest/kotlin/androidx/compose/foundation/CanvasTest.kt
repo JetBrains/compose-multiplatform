@@ -53,12 +53,12 @@ class CanvasTest {
     val containerSize = boxWidth
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Test
     fun testCanvas() {
         val strokeWidth = 5.0f
-        composeTestRule.setContent {
+        rule.setContent {
             val density = DensityAmbient.current.density
             val containerSize = (containerSize * 2 / density).dp
             val minWidth = (boxWidth / density).dp
@@ -80,7 +80,7 @@ class CanvasTest {
         val paintBoxColor = Color.Red.toArgb()
         val containerBgColor = Color.White.toArgb()
         val strokeOffset = (strokeWidth / 2).toInt() + 3
-        onRoot().captureToBitmap().apply {
+        rule.onRoot().captureToBitmap().apply {
             val imageStartX = width / 2 - boxWidth / 2
             val imageStartY = height / 2 - boxHeight / 2
 
@@ -127,7 +127,7 @@ class CanvasTest {
 
     @Test
     fun canvas_noSize_emptyCanvas() {
-        composeTestRule.setContentForSizeAssertions {
+        rule.setContentForSizeAssertions {
             Canvas(modifier = Modifier) {
                 drawRect(Color.Black)
             }
@@ -138,7 +138,7 @@ class CanvasTest {
 
     @Test
     fun canvas_exactSizes() {
-        composeTestRule.setContentForSizeAssertions {
+        rule.setContentForSizeAssertions {
             Canvas(Modifier.preferredSize(100.dp)) {
                 drawRect(Color.Red)
             }
@@ -147,7 +147,7 @@ class CanvasTest {
             .assertHeightIsEqualTo(100.dp)
             .captureToBitmap()
             .assertShape(
-                density = composeTestRule.density,
+                density = rule.density,
                 backgroundColor = Color.Red,
                 shapeColor = Color.Red,
                 shape = RectangleShape
@@ -156,7 +156,7 @@ class CanvasTest {
 
     @Test
     fun canvas_exactSizes_drawCircle() {
-        composeTestRule.setContentForSizeAssertions {
+        rule.setContentForSizeAssertions {
             Canvas(Modifier.preferredSize(100.dp)) {
                 drawRect(Color.Red)
                 drawCircle(
@@ -169,7 +169,7 @@ class CanvasTest {
             .assertHeightIsEqualTo(100.dp)
             .captureToBitmap()
             .assertShape(
-                density = composeTestRule.density,
+                density = rule.density,
                 backgroundColor = Color.Red,
                 shapeColor = Color.Blue,
                 shape = CircleShape,

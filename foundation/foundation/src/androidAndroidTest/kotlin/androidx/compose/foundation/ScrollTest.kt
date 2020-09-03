@@ -50,8 +50,6 @@ import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.onNodeWithText
 import androidx.ui.test.performGesture
 import androidx.ui.test.performScrollTo
-import androidx.ui.test.runOnIdle
-import androidx.ui.test.runOnUiThread
 import androidx.ui.test.swipeDown
 import androidx.ui.test.swipeLeft
 import androidx.ui.test.swipeRight
@@ -73,7 +71,7 @@ import java.util.concurrent.TimeUnit
 class ScrollTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     private val scrollerTag = "ScrollerTest"
 
@@ -112,7 +110,7 @@ class ScrollTest {
 
         composeVerticalScroller(scrollState)
 
-        runOnIdle {
+        rule.runOnIdle {
             assertTrue(scrollState.maxValue == 0f)
         }
     }
@@ -142,12 +140,12 @@ class ScrollTest {
 
         validateVerticalScroller(height = height)
 
-        runOnIdle {
+        rule.runOnIdle {
             assertEquals(scrollDistance.toFloat(), scrollState.maxValue)
             scrollState.scrollTo(scrollDistance.toFloat())
         }
 
-        runOnIdle {} // Just so the block below is correct
+        rule.runOnIdle {} // Just so the block below is correct
         validateVerticalScroller(offset = scrollDistance, height = height)
     }
 
@@ -181,11 +179,11 @@ class ScrollTest {
 
         composeVerticalScroller(scrollState, height = height, isReversed = true)
 
-        runOnIdle {
+        rule.runOnIdle {
             scrollState.scrollTo(scrollDistance.toFloat())
         }
 
-        runOnIdle {} // Just so the block below is correct
+        rule.runOnIdle {} // Just so the block below is correct
         validateVerticalScroller(offset = expectedOffset, height = height)
     }
 
@@ -245,12 +243,12 @@ class ScrollTest {
 
         validateHorizontalScroller(width = width)
 
-        runOnIdle {
+        rule.runOnIdle {
             assertEquals(scrollDistance.toFloat(), scrollState.maxValue)
             scrollState.scrollTo(scrollDistance.toFloat())
         }
 
-        runOnIdle {} // Just so the block below is correct
+        rule.runOnIdle {} // Just so the block below is correct
         validateHorizontalScroller(offset = scrollDistance, width = width)
     }
 
@@ -270,12 +268,12 @@ class ScrollTest {
 
         validateHorizontalScroller(width = width, checkInRtl = true)
 
-        runOnIdle {
+        rule.runOnIdle {
             assertEquals(scrollDistance.toFloat(), scrollState.maxValue)
             scrollState.scrollTo(scrollDistance.toFloat())
         }
 
-        runOnIdle {} // Just so the block below is correct
+        rule.runOnIdle {} // Just so the block below is correct
         validateHorizontalScroller(offset = scrollDistance, width = width, checkInRtl = true)
     }
 
@@ -327,11 +325,11 @@ class ScrollTest {
 
         composeHorizontalScroller(scrollState, width = width, isReversed = true)
 
-        runOnIdle {
+        rule.runOnIdle {
             scrollState.scrollTo(scrollDistance.toFloat())
         }
 
-        runOnIdle {} // Just so the block below is correct
+        rule.runOnIdle {} // Just so the block below is correct
         validateHorizontalScroller(offset = expectedOffset, width = width)
     }
 
@@ -351,11 +349,11 @@ class ScrollTest {
 
         composeHorizontalScroller(scrollState, width = width, isReversed = true, isRtl = true)
 
-        runOnIdle {
+        rule.runOnIdle {
             scrollState.scrollTo(scrollDistance.toFloat())
         }
 
-        runOnIdle {} // Just so the block below is correct
+        rule.runOnIdle {} // Just so the block below is correct
         validateHorizontalScroller(offset = expectedOffset, width = width, checkInRtl = true)
     }
 
@@ -363,7 +361,7 @@ class ScrollTest {
     fun verticalScroller_scrollTo_scrollForward() {
         createScrollableContent(isVertical = true)
 
-        onNodeWithText("50")
+        rule.onNodeWithText("50")
             .assertIsNotDisplayed()
             .performScrollTo()
             .assertIsDisplayed()
@@ -373,7 +371,7 @@ class ScrollTest {
     fun horizontalScroller_scrollTo_scrollForward() {
         createScrollableContent(isVertical = false)
 
-        onNodeWithText("50")
+        rule.onNodeWithText("50")
             .assertIsNotDisplayed()
             .performScrollTo()
             .assertIsDisplayed()
@@ -384,7 +382,7 @@ class ScrollTest {
     fun horizontalScroller_rtl_scrollTo_scrollForward() {
         createScrollableContent(isVertical = false, isRtl = true)
 
-        onNodeWithText("50")
+        rule.onNodeWithText("50")
             .assertIsNotDisplayed()
             .performScrollTo()
             .assertIsDisplayed()
@@ -403,7 +401,7 @@ class ScrollTest {
             isReversed = true
         )
 
-        onNodeWithText("50")
+        rule.onNodeWithText("50")
             .assertIsNotDisplayed()
             .performScrollTo()
             .assertIsDisplayed()
@@ -422,7 +420,7 @@ class ScrollTest {
             isReversed = true
         )
 
-        onNodeWithText("50")
+        rule.onNodeWithText("50")
             .assertIsNotDisplayed()
             .performScrollTo()
             .assertIsDisplayed()
@@ -433,12 +431,12 @@ class ScrollTest {
     fun verticalScroller_scrollTo_scrollBack() {
         createScrollableContent(isVertical = true)
 
-        onNodeWithText("50")
+        rule.onNodeWithText("50")
             .assertIsNotDisplayed()
             .performScrollTo()
             .assertIsDisplayed()
 
-        onNodeWithText("20")
+        rule.onNodeWithText("20")
             .assertIsNotDisplayed()
             .performScrollTo()
             .assertIsDisplayed()
@@ -449,12 +447,12 @@ class ScrollTest {
     fun horizontalScroller_scrollTo_scrollBack() {
         createScrollableContent(isVertical = false)
 
-        onNodeWithText("50")
+        rule.onNodeWithText("50")
             .assertIsNotDisplayed()
             .performScrollTo()
             .assertIsDisplayed()
 
-        onNodeWithText("20")
+        rule.onNodeWithText("20")
             .assertIsNotDisplayed()
             .performScrollTo()
             .assertIsDisplayed()
@@ -491,38 +489,38 @@ class ScrollTest {
 
         createScrollableContent(isVertical = true, scrollState = scrollState)
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(scrollState.value).isEqualTo(0f)
             assertThat(scrollState.maxValue).isGreaterThan(0f)
         }
-        runOnUiThread {
+        rule.runOnUiThread {
             scrollState.scrollTo(-100f)
         }
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(scrollState.value).isEqualTo(0f)
         }
-        runOnUiThread {
+        rule.runOnUiThread {
             scrollState.scrollBy(-100f)
         }
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(scrollState.value).isEqualTo(0f)
         }
-        runOnUiThread {
+        rule.runOnUiThread {
             scrollState.scrollTo(scrollState.maxValue)
         }
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(scrollState.value).isEqualTo(scrollState.maxValue)
         }
-        runOnUiThread {
+        rule.runOnUiThread {
             scrollState.scrollTo(scrollState.maxValue + 1000)
         }
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(scrollState.value).isEqualTo(scrollState.maxValue)
         }
-        runOnUiThread {
+        rule.runOnUiThread {
             scrollState.scrollBy(100f)
         }
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(scrollState.value).isEqualTo(scrollState.maxValue)
         }
     }
@@ -536,7 +534,7 @@ class ScrollTest {
             animationClock = clock
         )
         val itemCount = mutableStateOf(100)
-        composeTestRule.setContent {
+        rule.setContent {
             Stack {
                 ScrollableColumn(
                     scrollState = scrollState,
@@ -549,19 +547,19 @@ class ScrollTest {
             }
         }
 
-        val max = runOnIdle {
+        val max = rule.runOnIdle {
             assertThat(scrollState.value).isEqualTo(0f)
             assertThat(scrollState.maxValue).isGreaterThan(0f)
             scrollState.maxValue
         }
 
-        runOnUiThread {
+        rule.runOnUiThread {
             scrollState.scrollTo(max)
         }
-        runOnUiThread {
+        rule.runOnUiThread {
             itemCount.value -= 2
         }
-        runOnIdle {
+        rule.runOnIdle {
             val newMax = scrollState.maxValue
             assertThat(newMax).isLessThan(max)
             assertThat(scrollState.value).isEqualTo(newMax)
@@ -579,7 +577,7 @@ class ScrollTest {
 
         createScrollableContent(isVertical = true, scrollState = scrollState)
 
-        val max = runOnIdle {
+        val max = rule.runOnIdle {
             assertThat(scrollState.value).isEqualTo(0f)
             assertThat(scrollState.maxValue).isGreaterThan(0f)
             scrollState.maxValue
@@ -616,31 +614,31 @@ class ScrollTest {
 
         createScrollableContent(isVertical = true, scrollState = scrollState)
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(scrollState.value).isEqualTo(0f)
             assertThat(scrollState.isAnimationRunning).isEqualTo(false)
         }
 
-        onNodeWithTag(scrollerTag)
+        rule.onNodeWithTag(scrollerTag)
             .performGesture { swipeUp() }
 
-        runOnIdle {
+        rule.runOnIdle {
             clock.clockTimeMillis += 100
             assertThat(scrollState.isAnimationRunning).isEqualTo(true)
         }
 
         // TODO (matvei/jelle): this should be down, and not click to be 100% fair
-        onNodeWithTag(scrollerTag)
+        rule.onNodeWithTag(scrollerTag)
             .performGesture { click() }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(scrollState.isAnimationRunning).isEqualTo(false)
         }
     }
 
     @Test
     fun scroller_restoresScrollerPosition() {
-        val restorationTester = StateRestorationTester(composeTestRule)
+        val restorationTester = StateRestorationTester(rule)
         var scrollState: ScrollState? = null
 
         restorationTester.setContent {
@@ -652,14 +650,14 @@ class ScrollTest {
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             scrollState!!.scrollTo(70f)
             scrollState = null
         }
 
         restorationTester.emulateSavedInstanceStateRestore()
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(scrollState!!.value).isEqualTo(70f)
         }
     }
@@ -670,15 +668,15 @@ class ScrollTest {
         clock: ManualAnimationClock,
         uiAction: () -> Unit
     ) {
-        runOnUiThread {
+        rule.runOnUiThread {
             uiAction.invoke()
         }
-        runOnIdle {
+        rule.runOnIdle {
             clock.clockTimeMillis += 5000
         }
 
-        onNodeWithTag(scrollerTag).awaitScrollAnimation(scrollState)
-        runOnIdle {
+        rule.onNodeWithTag(scrollerTag).awaitScrollAnimation(scrollState)
+        rule.runOnIdle {
             assertThat(scrollState.value).isEqualTo(assertValue)
         }
     }
@@ -698,36 +696,36 @@ class ScrollTest {
 
         createScrollableContent(isVertical, scrollState = scrollState, isRtl = isRtl)
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(scrollState.value).isEqualTo(0f)
         }
 
-        onNodeWithTag(scrollerTag)
+        rule.onNodeWithTag(scrollerTag)
             .performGesture { firstSwipe() }
 
-        runOnIdle {
+        rule.runOnIdle {
             clock.clockTimeMillis += 5000
         }
 
-        onNodeWithTag(scrollerTag)
+        rule.onNodeWithTag(scrollerTag)
             .awaitScrollAnimation(scrollState)
 
-        val scrolledValue = runOnIdle {
+        val scrolledValue = rule.runOnIdle {
             scrollState.value
         }
         assertThat(scrolledValue).isGreaterThan(0f)
 
-        onNodeWithTag(scrollerTag)
+        rule.onNodeWithTag(scrollerTag)
             .performGesture { secondSwipe() }
 
-        runOnIdle {
+        rule.runOnIdle {
             clock.clockTimeMillis += 5000
         }
 
-        onNodeWithTag(scrollerTag)
+        rule.onNodeWithTag(scrollerTag)
             .awaitScrollAnimation(scrollState)
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(scrollState.value).isLessThan(scrolledValue)
         }
     }
@@ -744,8 +742,8 @@ class ScrollTest {
         rowHeight: Int = defaultCellSize
     ) {
         // We assume that the height of the device is more than 45 px
-        with(composeTestRule.density) {
-            composeTestRule.setContent {
+        with(rule.density) {
+            rule.setContent {
                 Stack {
                     ScrollableColumn(
                         scrollState = scrollState,
@@ -778,8 +776,8 @@ class ScrollTest {
         isRtl: Boolean = false
     ) {
         // We assume that the height of the device is more than 45 px
-        with(composeTestRule.density) {
-            composeTestRule.setContent {
+        with(rule.density) {
+            rule.setContent {
                 val direction = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
                 Providers(LayoutDirectionAmbient provides direction) {
                     Stack {
@@ -810,7 +808,7 @@ class ScrollTest {
         height: Int = 40,
         rowHeight: Int = 5
     ) {
-        onNodeWithTag(scrollerTag)
+        rule.onNodeWithTag(scrollerTag)
             .captureToBitmap()
             .assertPixels(expectedSize = IntSize(width, height)) { pos ->
                 val colorIndex = (offset + pos.y) / rowHeight
@@ -827,7 +825,7 @@ class ScrollTest {
     ) {
         val scrollerWidth = colors.size * defaultCellSize
         val absoluteOffset = if (checkInRtl) scrollerWidth - width - offset else offset
-        onNodeWithTag(scrollerTag)
+        rule.onNodeWithTag(scrollerTag)
             .captureToBitmap()
             .assertPixels(expectedSize = IntSize(width, height)) { pos ->
                 val colorIndex = (absoluteOffset + pos.x) / defaultCellSize
@@ -848,7 +846,7 @@ class ScrollTest {
         ),
         isRtl: Boolean = false
     ) {
-        composeTestRule.setContent {
+        rule.setContent {
             val content = @Composable {
                 repeat(itemCount) {
                     Text(text = "$it")

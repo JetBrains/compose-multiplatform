@@ -32,13 +32,10 @@ import androidx.ui.test.center
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.down
 import androidx.ui.test.isInMutuallyExclusiveGroup
-import androidx.ui.test.onAllNodes
 import androidx.ui.test.onFirst
-import androidx.ui.test.onNode
 import androidx.ui.test.onNodeWithText
 import androidx.ui.test.performClick
 import androidx.ui.test.performGesture
-import androidx.ui.test.runOnIdle
 import androidx.ui.test.up
 import com.google.common.truth.Truth
 import org.junit.Rule
@@ -51,18 +48,18 @@ import org.junit.runners.JUnit4
 class SelectableTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Test
     fun selectable_defaultSemantics() {
-        composeTestRule.setContent {
+        rule.setContent {
             Text(
                 "Text in item",
                 modifier = Modifier.selectable(selected = true, onClick = {})
             )
         }
 
-        onAllNodes(isInMutuallyExclusiveGroup())
+        rule.onAllNodes(isInMutuallyExclusiveGroup())
             .assertCountEquals(1)
             .onFirst()
             .assertIsInMutuallyExclusiveGroup()
@@ -71,7 +68,7 @@ class SelectableTest {
 
     @Test
     fun selectable_defaultClicks() {
-        composeTestRule.setContent {
+        rule.setContent {
             val (selected, onSelected) = remember { mutableStateOf(false) }
             Text(
                 "Text in item",
@@ -82,7 +79,7 @@ class SelectableTest {
             )
         }
 
-        onNode(isInMutuallyExclusiveGroup())
+        rule.onNode(isInMutuallyExclusiveGroup())
             .assertIsNotSelected()
             .performClick()
             .assertIsSelected()
@@ -92,7 +89,7 @@ class SelectableTest {
 
     @Test
     fun selectable_noClicksNoChanges() {
-        composeTestRule.setContent {
+        rule.setContent {
             val (selected, _) = remember { mutableStateOf(false) }
             Text(
                 "Text in item",
@@ -102,7 +99,7 @@ class SelectableTest {
             )
         }
 
-        onNode(isInMutuallyExclusiveGroup())
+        rule.onNode(isInMutuallyExclusiveGroup())
             .assertIsNotSelected()
             .performClick()
             .assertIsNotSelected()
@@ -112,7 +109,7 @@ class SelectableTest {
     fun selectableTest_interactionState() {
         val interactionState = InteractionState()
 
-        composeTestRule.setContent {
+        rule.setContent {
             Stack {
                 Box(Modifier.selectable(
                     selected = true,
@@ -124,21 +121,21 @@ class SelectableTest {
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             Truth.assertThat(interactionState.value).doesNotContain(Interaction.Pressed)
         }
 
-        onNodeWithText("SelectableText")
+        rule.onNodeWithText("SelectableText")
             .performGesture { down(center) }
 
-        runOnIdle {
+        rule.runOnIdle {
             Truth.assertThat(interactionState.value).contains(Interaction.Pressed)
         }
 
-        onNodeWithText("SelectableText")
+        rule.onNodeWithText("SelectableText")
             .performGesture { up() }
 
-        runOnIdle {
+        rule.runOnIdle {
             Truth.assertThat(interactionState.value).doesNotContain(Interaction.Pressed)
         }
     }
@@ -148,7 +145,7 @@ class SelectableTest {
         val interactionState = InteractionState()
         var emitSelectableText by mutableStateOf(true)
 
-        composeTestRule.setContent {
+        rule.setContent {
             Stack {
                 if (emitSelectableText) {
                     Box(Modifier.selectable(
@@ -162,23 +159,23 @@ class SelectableTest {
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             Truth.assertThat(interactionState.value).doesNotContain(Interaction.Pressed)
         }
 
-        onNodeWithText("SelectableText")
+        rule.onNodeWithText("SelectableText")
             .performGesture { down(center) }
 
-        runOnIdle {
+        rule.runOnIdle {
             Truth.assertThat(interactionState.value).contains(Interaction.Pressed)
         }
 
         // Dispose selectable
-        runOnIdle {
+        rule.runOnIdle {
             emitSelectableText = false
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             Truth.assertThat(interactionState.value).doesNotContain(Interaction.Pressed)
         }
     }
