@@ -439,14 +439,16 @@ fun <T> Modifier.swipeable(
         "You cannot have two anchors mapped to the same state."
     }
     val density = DensityAmbient.current
-    state.anchors = anchors
-    state.thresholds = { a, b ->
-        val from = anchors.getValue(a)
-        val to = anchors.getValue(b)
-        with(thresholds(from, to)) { density.computeThreshold(a, b) }
+    onCommit {
+        state.anchors = anchors
+        state.thresholds = { a, b ->
+            val from = anchors.getValue(a)
+            val to = anchors.getValue(b)
+            with(thresholds(from, to)) { density.computeThreshold(a, b) }
+        }
+        state.resistanceFactorAtMin = resistanceFactorAtMin
+        state.resistanceFactorAtMax = resistanceFactorAtMax
     }
-    state.resistanceFactorAtMin = resistanceFactorAtMin
-    state.resistanceFactorAtMax = resistanceFactorAtMax
 
     val draggable = Modifier.draggable(
         orientation = orientation,
