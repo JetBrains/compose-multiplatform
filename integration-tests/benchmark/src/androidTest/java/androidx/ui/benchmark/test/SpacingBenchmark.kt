@@ -16,7 +16,7 @@
 
 package androidx.ui.benchmark.test
 
-import androidx.compose.foundation.layout.InnerPadding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -232,7 +232,7 @@ private fun Padding(
     all: Dp,
     children: @Composable () -> Unit
 ) {
-    val padding = InnerPadding(all)
+    val padding = PaddingValues(all)
     Layout(children) { measurables, constraints ->
         val measurable = measurables.firstOrNull()
         if (measurable == null) {

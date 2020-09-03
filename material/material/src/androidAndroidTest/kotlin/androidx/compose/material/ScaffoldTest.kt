@@ -21,7 +21,7 @@ import androidx.compose.foundation.Box
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.InnerPadding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.preferredHeight
@@ -499,7 +499,7 @@ class ScaffoldTest {
     @Test
     fun scaffold_innerPadding_lambdaParam() {
         var bottomBarSize: IntSize = IntSize.Zero
-        lateinit var innerPadding: InnerPadding
+        lateinit var innerPadding: PaddingValues
 
         lateinit var scaffoldState: ScaffoldState
         rule.setContent {

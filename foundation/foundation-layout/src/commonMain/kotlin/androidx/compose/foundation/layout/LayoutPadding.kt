@@ -99,16 +99,16 @@ fun Modifier.padding(all: Dp) =
     this.then(PaddingModifier(start = all, top = all, end = all, bottom = all, rtlAware = true))
 
 /**
- * Apply [InnerPadding] to the component as additional space along each edge of the content's left,
+ * Apply [PaddingValues] to the component as additional space along each edge of the content's left,
  * top, right and bottom. Padding is applied before content measurement and takes precedence;
  * content may only be as large as the remaining space.
  *
  * Negative padding is not permitted. See [offset].
  *
  * Example usage:
- * @sample androidx.compose.foundation.layout.samples.PaddingInnerPaddingModifier
+ * @sample androidx.compose.foundation.layout.samples.PaddingValuesModifier
  */
-fun Modifier.padding(padding: InnerPadding) =
+fun Modifier.padding(padding: PaddingValues) =
     this.then(
         PaddingModifier(
             start = padding.start,
@@ -197,7 +197,7 @@ private data class PaddingModifier(
  * Describes a padding to be applied along the edges inside a box.
  */
 @Immutable
-data class InnerPadding(
+data class PaddingValues(
     @Stable
     val start: Dp = 0.dp,
     @Stable
@@ -209,3 +209,6 @@ data class InnerPadding(
 ) {
     constructor(all: Dp) : this(all, all, all, all)
 }
+
+@Deprecated("InnerPadding was renamed to PaddingValues.", ReplaceWith("PaddingValues"))
+typealias InnerPadding = PaddingValues

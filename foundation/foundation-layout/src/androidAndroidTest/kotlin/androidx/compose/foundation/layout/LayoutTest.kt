@@ -357,7 +357,7 @@ open class LayoutTest {
     @Composable
     internal fun Container(
         modifier: Modifier = Modifier,
-        padding: InnerPadding = InnerPadding(0.dp),
+        padding: PaddingValues = PaddingValues(0.dp),
         alignment: Alignment = Alignment.Center,
         expanded: Boolean = false,
         constraints: DpConstraints = DpConstraints(),

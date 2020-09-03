@@ -87,7 +87,7 @@ package androidx.compose.material {
 
   public final class ButtonConstants {
     method @androidx.compose.runtime.Composable public androidx.compose.animation.core.AnimatedValue<androidx.compose.ui.unit.Dp,androidx.compose.animation.core.AnimationVector1D> defaultAnimatedElevation-hoVAPrg(boolean enabled, androidx.compose.foundation.InteractionState interactionState, float defaultElevation = 2.dp, float pressedElevation = 8.dp, float disabledElevation = 0.dp);
-    method public androidx.compose.foundation.layout.InnerPadding getDefaultContentPadding();
+    method public androidx.compose.foundation.layout.PaddingValues getDefaultContentPadding();
     method public long getDefaultDisabledBackgroundColor();
     method public long getDefaultDisabledContentColor();
     method public float getDefaultIconSize();
@@ -95,14 +95,14 @@ package androidx.compose.material {
     method public float getDefaultMinHeight();
     method public float getDefaultMinWidth();
     method public androidx.compose.foundation.BorderStroke getDefaultOutlinedBorder();
-    method public androidx.compose.foundation.layout.InnerPadding getDefaultTextContentPadding();
+    method public androidx.compose.foundation.layout.PaddingValues getDefaultTextContentPadding();
     method public float getOutlinedBorderSize();
-    property public final androidx.compose.foundation.layout.InnerPadding DefaultContentPadding;
+    property public final androidx.compose.foundation.layout.PaddingValues DefaultContentPadding;
     property public final float DefaultIconSize;
     property public final float DefaultIconSpacing;
     property public final float DefaultMinHeight;
     property public final float DefaultMinWidth;
-    property public final androidx.compose.foundation.layout.InnerPadding DefaultTextContentPadding;
+    property public final androidx.compose.foundation.layout.PaddingValues DefaultTextContentPadding;
     property public final float OutlinedBorderSize;
     property public final long defaultDisabledBackgroundColor;
     property public final long defaultDisabledContentColor;
@@ -112,15 +112,15 @@ package androidx.compose.material {
   }
 
   public final class ButtonKt {
-    method @androidx.compose.runtime.Composable public static void Button--f9kBgA(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, androidx.compose.ui.Modifier modifier = Modifier, boolean enabled = true, androidx.compose.foundation.InteractionState interactionState = remember({ 
+    method @androidx.compose.runtime.Composable public static void Button-Vgmpx9w(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, androidx.compose.ui.Modifier modifier = Modifier, boolean enabled = true, androidx.compose.foundation.InteractionState interactionState = remember({ 
     return <init>()
-}), float elevation = ButtonConstants.defaultAnimatedElevation(enabled, interactionState).value, androidx.compose.ui.graphics.Shape shape = small, androidx.compose.foundation.BorderStroke? border = null, long backgroundColor = MaterialTheme.colors.primary, long disabledBackgroundColor = ButtonConstants.defaultDisabledBackgroundColor, long contentColor = contentColorFor(backgroundColor), long disabledContentColor = ButtonConstants.defaultDisabledContentColor, androidx.compose.foundation.layout.InnerPadding contentPadding = ButtonConstants.DefaultContentPadding, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
-    method @androidx.compose.runtime.Composable public static inline void OutlinedButton-_lLhFrU(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, androidx.compose.ui.Modifier modifier = Modifier, boolean enabled = true, androidx.compose.foundation.InteractionState interactionState = remember({ 
+}), float elevation = ButtonConstants.defaultAnimatedElevation(enabled, interactionState).value, androidx.compose.ui.graphics.Shape shape = small, androidx.compose.foundation.BorderStroke? border = null, long backgroundColor = MaterialTheme.colors.primary, long disabledBackgroundColor = ButtonConstants.defaultDisabledBackgroundColor, long contentColor = contentColorFor(backgroundColor), long disabledContentColor = ButtonConstants.defaultDisabledContentColor, androidx.compose.foundation.layout.PaddingValues contentPadding = ButtonConstants.DefaultContentPadding, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static inline void OutlinedButton-UavO1Bo(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, androidx.compose.ui.Modifier modifier = Modifier, boolean enabled = true, androidx.compose.foundation.InteractionState interactionState = remember({ 
     return <init>()
-}), float elevation = 0.dp, androidx.compose.ui.graphics.Shape shape = small, androidx.compose.foundation.BorderStroke? border = ButtonConstants.defaultOutlinedBorder, long backgroundColor = MaterialTheme.colors.surface, long contentColor = MaterialTheme.colors.primary, long disabledContentColor = ButtonConstants.defaultDisabledContentColor, androidx.compose.foundation.layout.InnerPadding contentPadding = ButtonConstants.DefaultContentPadding, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
-    method @androidx.compose.runtime.Composable public static inline void TextButton-_lLhFrU(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, androidx.compose.ui.Modifier modifier = Modifier, boolean enabled = true, androidx.compose.foundation.InteractionState interactionState = remember({ 
+}), float elevation = 0.dp, androidx.compose.ui.graphics.Shape shape = small, androidx.compose.foundation.BorderStroke? border = ButtonConstants.defaultOutlinedBorder, long backgroundColor = MaterialTheme.colors.surface, long contentColor = MaterialTheme.colors.primary, long disabledContentColor = ButtonConstants.defaultDisabledContentColor, androidx.compose.foundation.layout.PaddingValues contentPadding = ButtonConstants.DefaultContentPadding, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static inline void TextButton-UavO1Bo(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, androidx.compose.ui.Modifier modifier = Modifier, boolean enabled = true, androidx.compose.foundation.InteractionState interactionState = remember({ 
     return <init>()
-}), float elevation = 0.dp, androidx.compose.ui.graphics.Shape shape = small, androidx.compose.foundation.BorderStroke? border = null, long backgroundColor = Color.Transparent, long contentColor = MaterialTheme.colors.primary, long disabledContentColor = ButtonConstants.defaultDisabledContentColor, androidx.compose.foundation.layout.InnerPadding contentPadding = ButtonConstants.DefaultTextContentPadding, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
+}), float elevation = 0.dp, androidx.compose.ui.graphics.Shape shape = small, androidx.compose.foundation.BorderStroke? border = null, long backgroundColor = Color.Transparent, long contentColor = MaterialTheme.colors.primary, long disabledContentColor = ButtonConstants.defaultDisabledContentColor, androidx.compose.foundation.layout.PaddingValues contentPadding = ButtonConstants.DefaultTextContentPadding, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
   }
 
   public final class CardKt {
@@ -375,7 +375,7 @@ package androidx.compose.material {
   }
 
   public final class ScaffoldKt {
-    method @androidx.compose.runtime.Composable public static void Scaffold-6SxdeRQ(androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.material.ScaffoldState scaffoldState = rememberScaffoldState(), kotlin.jvm.functions.Function0<kotlin.Unit>? topBar = null, kotlin.jvm.functions.Function0<kotlin.Unit>? bottomBar = null, kotlin.jvm.functions.Function1<? super androidx.compose.material.SnackbarHostState,kotlin.Unit> snackbarHost = { SnackbarHost(it) }, kotlin.jvm.functions.Function0<kotlin.Unit>? floatingActionButton = null, androidx.compose.material.FabPosition floatingActionButtonPosition = androidx.compose.material.FabPosition.End, boolean isFloatingActionButtonDocked = false, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit>? drawerContent = null, androidx.compose.ui.graphics.Shape drawerShape = large, float drawerElevation = DrawerConstants.DefaultElevation, long drawerBackgroundColor = MaterialTheme.colors.surface, long drawerContentColor = contentColorFor(drawerBackgroundColor), long drawerScrimColor = MaterialTheme.colors.onSurface.copy(DrawerConstants.ScrimDefaultOpacity), long backgroundColor = MaterialTheme.colors.background, long contentColor = contentColorFor(backgroundColor), kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.InnerPadding,kotlin.Unit> bodyContent);
+    method @androidx.compose.runtime.Composable public static void Scaffold-6SxdeRQ(androidx.compose.ui.Modifier modifier = Modifier, androidx.compose.material.ScaffoldState scaffoldState = rememberScaffoldState(), kotlin.jvm.functions.Function0<kotlin.Unit>? topBar = null, kotlin.jvm.functions.Function0<kotlin.Unit>? bottomBar = null, kotlin.jvm.functions.Function1<? super androidx.compose.material.SnackbarHostState,kotlin.Unit> snackbarHost = { SnackbarHost(it) }, kotlin.jvm.functions.Function0<kotlin.Unit>? floatingActionButton = null, androidx.compose.material.FabPosition floatingActionButtonPosition = androidx.compose.material.FabPosition.End, boolean isFloatingActionButtonDocked = false, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit>? drawerContent = null, androidx.compose.ui.graphics.Shape drawerShape = large, float drawerElevation = DrawerConstants.DefaultElevation, long drawerBackgroundColor = MaterialTheme.colors.surface, long drawerContentColor = contentColorFor(drawerBackgroundColor), long drawerScrimColor = MaterialTheme.colors.onSurface.copy(DrawerConstants.ScrimDefaultOpacity), long backgroundColor = MaterialTheme.colors.background, long contentColor = contentColorFor(backgroundColor), kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.PaddingValues,kotlin.Unit> bodyContent);
     method @androidx.compose.runtime.Composable public static androidx.compose.material.ScaffoldState rememberScaffoldState(androidx.compose.material.DrawerState drawerState = rememberDrawerState(DrawerValue.Closed), androidx.compose.material.SnackbarHostState snackbarHostState = androidx.compose.material.SnackbarHostState(), boolean isDrawerGesturesEnabled = true);
   }
 

@@ -17,7 +17,7 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.InnerPadding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.layout.height
@@ -172,7 +172,7 @@ class LazyRowForTest {
                 items = listOf(1),
                 modifier = Modifier.size(100.dp)
                     .testTag(LazyRowForTag),
-                contentPadding = InnerPadding(
+                contentPadding = PaddingValues(
                     start = 50.dp,
                     top = 10.dp,
                     end = 50.dp,

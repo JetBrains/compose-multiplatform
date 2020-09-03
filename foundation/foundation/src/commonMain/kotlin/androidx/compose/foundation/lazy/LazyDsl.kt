@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation.lazy
 
-import androidx.compose.foundation.layout.InnerPadding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -174,7 +174,7 @@ private class LazyListScopeImpl : LazyListScope {
 @ExperimentalLazyDsl
 fun LazyRow(
     modifier: Modifier = Modifier,
-    contentPadding: InnerPadding = InnerPadding(0.dp),
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     verticalAlignment: Alignment.Vertical = Alignment.Top,
     content: LazyListScope.() -> Unit
 ) {
@@ -204,7 +204,7 @@ fun LazyRow(
 @ExperimentalLazyDsl
 fun LazyColumn(
     modifier: Modifier = Modifier,
-    contentPadding: InnerPadding = InnerPadding(0.dp),
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     content: LazyListScope.() -> Unit
 ) {

@@ -22,7 +22,7 @@ import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope.align
-import androidx.compose.foundation.layout.InnerPadding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -61,7 +61,7 @@ import androidx.compose.ui.unit.dp
 fun TextFieldsDemo() {
     ScrollableColumn(
         modifier = Modifier.fillMaxHeight(),
-        contentPadding = InnerPadding(10.dp)
+        contentPadding = PaddingValues(10.dp)
     ) {
         Text("Password text field")
         PasswordTextField()
@@ -84,7 +84,7 @@ fun TextFieldsDemo() {
 
 @Composable
 fun MaterialTextFieldDemo() {
-    ScrollableColumn(contentPadding = InnerPadding(10.dp)) {
+    ScrollableColumn(contentPadding = PaddingValues(10.dp)) {
         var text by savedInstanceState { "" }
         var leadingChecked by savedInstanceState { false }
         var trailingChecked by savedInstanceState { false }
