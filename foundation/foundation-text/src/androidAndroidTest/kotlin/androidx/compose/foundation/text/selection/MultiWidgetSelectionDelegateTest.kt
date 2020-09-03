@@ -45,7 +45,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.res.ResourcesCompat
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.ui.test.android.createAndroidComposeRule
+import androidx.ui.test.createAndroidComposeRule
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever

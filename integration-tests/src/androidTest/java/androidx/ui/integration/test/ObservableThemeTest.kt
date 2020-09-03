@@ -35,7 +35,7 @@ import androidx.compose.testutils.forGivenTestCase
 import androidx.compose.ui.graphics.Color
 import androidx.test.filters.MediumTest
 import androidx.ui.test.ExperimentalTesting
-import androidx.ui.test.android.createAndroidComposeRule
+import androidx.ui.test.createAndroidComposeRule
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test

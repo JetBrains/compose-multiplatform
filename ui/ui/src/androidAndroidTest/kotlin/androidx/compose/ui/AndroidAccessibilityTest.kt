@@ -44,7 +44,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.ui.test.android.createAndroidComposeRule
+import androidx.ui.test.createAndroidComposeRule
 import androidx.ui.test.assertIsOff
 import androidx.ui.test.assertIsOn
 import androidx.ui.test.assertTextEquals

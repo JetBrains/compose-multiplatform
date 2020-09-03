@@ -51,7 +51,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.sp
 import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
-import androidx.ui.test.android.createAndroidComposeRule
+import androidx.ui.test.createAndroidComposeRule
 import androidx.ui.test.runOnIdle
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.mock

@@ -40,7 +40,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.matchers.MSSIMMatcher
-import androidx.ui.test.android.createAndroidComposeRule
+import androidx.ui.test.createAndroidComposeRule
 import androidx.ui.test.captureToBitmap
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.runOnUiThread
