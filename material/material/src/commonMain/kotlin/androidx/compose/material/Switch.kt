@@ -23,9 +23,11 @@ import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.layout.StackScope
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offsetPx
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ripple.RippleIndication
@@ -90,7 +92,9 @@ fun Switch(
                 interactionState = interactionState,
                 resistance = null
             )
+            .wrapContentSize(Alignment.Center)
             .padding(DefaultSwitchPadding)
+            .size(SwitchWidth, SwitchHeight)
     ) {
         SwitchImpl(
             checked = checked,
@@ -120,7 +124,7 @@ private fun StackScope.SwitchImpl(
         }
     val trackColor = SwitchDefaults.resolveTrackColor(checked, enabled, checkedColor)
     val thumbColor = SwitchDefaults.resolveThumbColor(checked, enabled, checkedColor)
-    Canvas(Modifier.align(Alignment.Center).preferredSize(SwitchWidth, SwitchHeight)) {
+    Canvas(Modifier.align(Alignment.Center).fillMaxSize()) {
         drawTrack(trackColor, TrackWidth.toPx(), TrackStrokeWidth.toPx())
     }
     Surface(
@@ -134,7 +138,7 @@ private fun StackScope.SwitchImpl(
                 interactionState = interactionState,
                 indication = RippleIndication(radius = ThumbRippleRadius, bounded = false)
             )
-            .preferredSize(ThumbDiameter)
+            .size(ThumbDiameter)
     ) {}
 }
 
