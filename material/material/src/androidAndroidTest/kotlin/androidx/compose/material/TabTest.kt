@@ -65,11 +65,11 @@ class TabTest {
     private val icon = Icons.Filled.Favorite
 
     @get:Rule
-    val composeTestRule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule(disableTransitions = true)
 
     @Test
     fun textTab_height() {
-        composeTestRule
+        rule
             .setMaterialContentForSizeAssertions {
                 Tab(text = { Text("Text") }, selected = true, onClick = {})
             }
@@ -78,7 +78,7 @@ class TabTest {
 
     @Test
     fun iconTab_height() {
-        composeTestRule
+        rule
             .setMaterialContentForSizeAssertions {
                 Tab(icon = { Icon(icon) }, selected = true, onClick = {})
             }
@@ -87,7 +87,7 @@ class TabTest {
 
     @Test
     fun textAndIconTab_height() {
-        composeTestRule
+        rule
             .setMaterialContentForSizeAssertions {
                 Surface {
                     Tab(
@@ -105,7 +105,7 @@ class TabTest {
     fun fixedTabRow_indicatorPosition() {
         val indicatorHeight = 1.dp
 
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             var state by remember { mutableStateOf(0) }
             val titles = listOf("TAB 1", "TAB 2")
 
@@ -136,9 +136,9 @@ class TabTest {
             }
         }
 
-        val tabRowBounds = onNodeWithTag("tabRow").getUnclippedBoundsInRoot()
+        val tabRowBounds = rule.onNodeWithTag("tabRow").getUnclippedBoundsInRoot()
 
-        onNodeWithTag("indicator")
+        rule.onNodeWithTag("indicator")
             .assertPositionInRootIsEqualTo(
                 expectedLeft = 0.dp,
                 expectedTop = tabRowBounds.height - indicatorHeight
@@ -149,7 +149,7 @@ class TabTest {
 
         // Indicator should now be placed in the bottom left of the second tab, so its x coordinate
         // should be in the middle of the TabRow
-        onNodeWithTag("indicator")
+        rule.onNodeWithTag("indicator")
             .assertPositionInRootIsEqualTo(
                 expectedLeft = (tabRowBounds.width / 2),
                 expectedTop = tabRowBounds.height - indicatorHeight
@@ -158,7 +158,7 @@ class TabTest {
 
     @Test
     fun singleLineTab_textBaseline() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             var state by remember { mutableStateOf(0) }
             val titles = listOf("TAB")
 
@@ -184,11 +184,11 @@ class TabTest {
         val indicatorHeight = 2.dp
         val expectedBaselineDistance = expectedBaseline + indicatorHeight
 
-        val tabRowBounds = onNodeWithTag("tabRow").getUnclippedBoundsInRoot()
+        val tabRowBounds = rule.onNodeWithTag("tabRow").getUnclippedBoundsInRoot()
         val textBounds =
-            onNodeWithTag("text", useUnmergedTree = true).getUnclippedBoundsInRoot()
+            rule.onNodeWithTag("text", useUnmergedTree = true).getUnclippedBoundsInRoot()
         val textBaselinePos =
-            onNodeWithTag("text", useUnmergedTree = true).getLastBaselinePosition()
+            rule.onNodeWithTag("text", useUnmergedTree = true).getLastBaselinePosition()
 
         val baselinePositionY = textBounds.top + textBaselinePos
         val expectedPositionY = tabRowBounds.height - expectedBaselineDistance
@@ -197,7 +197,7 @@ class TabTest {
 
     @Test
     fun singleLineTab_withIcon_textBaseline() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             var state by remember { mutableStateOf(0) }
             val titles = listOf("TAB")
 
@@ -224,11 +224,11 @@ class TabTest {
         val indicatorHeight = 2.dp
         val expectedBaselineDistance = expectedBaseline + indicatorHeight
 
-        val tabRowBounds = onNodeWithTag("tabRow").getUnclippedBoundsInRoot()
+        val tabRowBounds = rule.onNodeWithTag("tabRow").getUnclippedBoundsInRoot()
         val textBounds =
-            onNodeWithTag("text", useUnmergedTree = true).getUnclippedBoundsInRoot()
+            rule.onNodeWithTag("text", useUnmergedTree = true).getUnclippedBoundsInRoot()
         val textBaselinePos =
-            onNodeWithTag("text", useUnmergedTree = true).getLastBaselinePosition()
+            rule.onNodeWithTag("text", useUnmergedTree = true).getLastBaselinePosition()
 
         val baselinePositionY = textBounds.top + textBaselinePos
         val expectedPositionY = tabRowBounds.height - expectedBaselineDistance
@@ -237,7 +237,7 @@ class TabTest {
 
     @Test
     fun twoLineTab_textBaseline() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             var state by remember { mutableStateOf(0) }
             val titles = listOf("Two line \n text")
 
@@ -262,11 +262,11 @@ class TabTest {
         val expectedBaseline = 10.dp
         val indicatorHeight = 2.dp
 
-        val tabRowBounds = onNodeWithTag("tabRow").getUnclippedBoundsInRoot()
+        val tabRowBounds = rule.onNodeWithTag("tabRow").getUnclippedBoundsInRoot()
         val textBounds =
-            onNodeWithTag("text", useUnmergedTree = true).getUnclippedBoundsInRoot()
+            rule.onNodeWithTag("text", useUnmergedTree = true).getUnclippedBoundsInRoot()
         val textBaselinePos =
-            onNodeWithTag("text", useUnmergedTree = true).getLastBaselinePosition()
+            rule.onNodeWithTag("text", useUnmergedTree = true).getLastBaselinePosition()
 
         val expectedBaselineDistance = expectedBaseline + indicatorHeight
 
@@ -280,7 +280,7 @@ class TabTest {
         val indicatorHeight = 1.dp
         val minimumTabWidth = 90.dp
 
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             var state by remember { mutableStateOf(0) }
             val titles = listOf("TAB 1", "TAB 2")
 
@@ -312,10 +312,10 @@ class TabTest {
             }
         }
 
-        val tabRowBounds = onNodeWithTag("tabRow").getUnclippedBoundsInRoot()
+        val tabRowBounds = rule.onNodeWithTag("tabRow").getUnclippedBoundsInRoot()
 
         // Indicator should be placed in the bottom left of the first tab
-        onNodeWithTag("indicator")
+        rule.onNodeWithTag("indicator")
             .assertPositionInRootIsEqualTo(
                 // Tabs in a scrollable tab row are offset 52.dp from each end
                 expectedLeft = TabConstants.DefaultScrollableTabRowPadding,
@@ -327,7 +327,7 @@ class TabTest {
 
         // Indicator should now be placed in the bottom left of the second tab, so its x coordinate
         // should be in the middle of the TabRow
-        onNodeWithTag("indicator")
+        rule.onNodeWithTag("indicator")
             .assertPositionInRootIsEqualTo(
                 expectedLeft = TabConstants.DefaultScrollableTabRowPadding + minimumTabWidth,
                 expectedTop = tabRowBounds.height - indicatorHeight
@@ -336,7 +336,7 @@ class TabTest {
 
     @Test
     fun fixedTabRow_initialTabSelected() {
-        composeTestRule
+        rule
             .setMaterialContent {
                 TextTabs()
             }
@@ -353,7 +353,7 @@ class TabTest {
 
     @Test
     fun fixedTabRow_selectNewTab() {
-        composeTestRule
+        rule
             .setMaterialContent {
                 TextTabs()
             }
@@ -382,7 +382,7 @@ class TabTest {
 
     @Test
     fun scrollableTabRow_initialTabSelected() {
-        composeTestRule
+        rule
             .setMaterialContent {
                 ScrollingTextTabs()
             }
@@ -400,7 +400,7 @@ class TabTest {
 
     @Test
     fun scrollableTabRow_selectNewTab() {
-        composeTestRule
+        rule
             .setMaterialContent {
                 ScrollingTextTabs()
             }

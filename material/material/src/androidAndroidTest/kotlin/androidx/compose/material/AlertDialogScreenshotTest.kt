@@ -37,14 +37,14 @@ import org.junit.runners.JUnit4
 class AlertDialogScreenshotTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL)
 
     @Test
     fun sideBySideButtons() {
-        composeTestRule.setContent {
+        rule.setContent {
             AlertDialog(
                 onDismissRequest = {},
                 title = { Text("Title") },
@@ -69,7 +69,7 @@ class AlertDialogScreenshotTest {
 
     @Test
     fun stackedButtons() {
-        composeTestRule.setContent {
+        rule.setContent {
             AlertDialog(
                 onDismissRequest = {},
                 title = { Text("Title") },

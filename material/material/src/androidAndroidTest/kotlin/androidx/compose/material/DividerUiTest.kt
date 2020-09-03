@@ -30,13 +30,13 @@ import org.junit.runners.JUnit4
 class DividerUiTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     private val defaultHeight = 1.dp
 
     @Test
     fun divider_DefaultSizes() {
-        composeTestRule
+        rule
             .setMaterialContentForSizeAssertions {
                 Divider()
             }
@@ -47,7 +47,7 @@ class DividerUiTest {
     @Test
     fun divider_CustomSizes() {
         val height = 20.dp
-        composeTestRule
+        rule
             .setMaterialContentForSizeAssertions {
                 Divider(thickness = height)
             }
@@ -60,7 +60,7 @@ class DividerUiTest {
         val indent = 75.dp
         val height = 21.dp
 
-        composeTestRule
+        rule
             .setMaterialContentForSizeAssertions {
                 Divider(startIndent = indent, thickness = height)
             }

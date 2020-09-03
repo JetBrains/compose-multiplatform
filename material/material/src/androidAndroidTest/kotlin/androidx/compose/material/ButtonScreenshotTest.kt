@@ -35,7 +35,6 @@ import androidx.ui.test.onNode
 import androidx.ui.test.onNodeWithText
 import androidx.ui.test.onRoot
 import androidx.ui.test.performGesture
-import androidx.ui.test.waitForIdle
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -47,14 +46,14 @@ import org.junit.runners.JUnit4
 class ButtonScreenshotTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL)
 
     @Test
     fun default_button() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Button(onClick = { }) {
                 Text("Button")
             }
@@ -67,36 +66,36 @@ class ButtonScreenshotTest {
 
     @Test
     fun disabled_button() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Button(onClick = { }, enabled = false) {
                 Text("Button")
             }
         }
 
-        onNodeWithText("Button")
+        rule.onNodeWithText("Button")
             .captureToBitmap()
             .assertAgainstGolden(screenshotRule, "button_disabled")
     }
 
     @Test
     fun ripple() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Stack(Modifier.size(200.dp, 100.dp).wrapContentSize()) {
                 Button(onClick = { }) { }
             }
         }
 
-        composeTestRule.clockTestRule.pauseClock()
+        rule.clockTestRule.pauseClock()
 
         // Start ripple
         onNode(hasClickAction())
             .performGesture { down(center) }
 
         // Let ripple propagate
-        waitForIdle()
-        composeTestRule.clockTestRule.advanceClock(50)
+        rule.waitForIdle()
+        rule.clockTestRule.advanceClock(50)
 
-        onRoot()
+        rule.onRoot()
             .captureToBitmap()
             .assertAgainstGolden(screenshotRule, "button_ripple")
     }

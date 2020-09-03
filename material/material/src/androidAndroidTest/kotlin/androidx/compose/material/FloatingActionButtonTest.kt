@@ -49,7 +49,6 @@ import androidx.ui.test.createComposeRule
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.onNodeWithText
 import androidx.ui.test.performClick
-import androidx.ui.test.runOnIdle
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -61,11 +60,11 @@ import org.junit.runners.JUnit4
 class FloatingActionButtonTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @Test
     fun fabDefaultSemantics() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Stack {
                 FloatingActionButton(modifier = Modifier.testTag("myButton"), onClick = {}) {
                     Icon(Icons.Filled.Favorite)
@@ -73,7 +72,7 @@ class FloatingActionButtonTest {
             }
         }
 
-        onNodeWithTag("myButton")
+        rule.onNodeWithTag("myButton")
             .assertIsEnabled()
     }
 
@@ -83,23 +82,23 @@ class FloatingActionButtonTest {
         val onClick: () -> Unit = { ++counter }
         val text = "myButton"
 
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Stack {
                 ExtendedFloatingActionButton(text = { Text(text) }, onClick = onClick)
             }
         }
 
-        onNodeWithText(text)
+        rule.onNodeWithText(text)
             .performClick()
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(counter).isEqualTo(1)
         }
     }
 
     @Test
     fun defaultFabHasSizeFromSpec() {
-        composeTestRule
+        rule
             .setMaterialContentForSizeAssertions {
                 FloatingActionButton(onClick = {}) {
                     Icon(Icons.Filled.Favorite)
@@ -110,7 +109,7 @@ class FloatingActionButtonTest {
 
     @Test
     fun extendedFab_longText_HasHeightFromSpec() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             ExtendedFloatingActionButton(
                 modifier = Modifier.testTag("FAB"),
                 text = { Text("Extended FAB Text") },
@@ -119,14 +118,14 @@ class FloatingActionButtonTest {
             )
         }
 
-        onNodeWithTag("FAB")
+        rule.onNodeWithTag("FAB")
             .assertHeightIsEqualTo(48.dp)
             .assertWidthIsAtLeast(48.dp)
     }
 
     @Test
     fun extendedFab_shortText_HasMinimumSizeFromSpec() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             ExtendedFloatingActionButton(
                 modifier = Modifier.testTag("FAB"),
                 text = { Text(".") },
@@ -134,7 +133,7 @@ class FloatingActionButtonTest {
             )
         }
 
-        onNodeWithTag("FAB")
+        rule.onNodeWithTag("FAB")
             .assertWidthIsEqualTo(48.dp)
             .assertHeightIsEqualTo(48.dp)
     }
@@ -143,7 +142,7 @@ class FloatingActionButtonTest {
     fun fab_weightModifier() {
         var item1Bounds = Rect(0f, 0f, 0f, 0f)
         var buttonBounds = Rect(0f, 0f, 0f, 0f)
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Column {
                 Spacer(Modifier.size(10.dp).weight(1f).onPositioned {
                     item1Bounds = it.boundsInRoot
@@ -170,7 +169,7 @@ class FloatingActionButtonTest {
         val realShape = CutCornerShape(50)
         var surface = Color.Transparent
         var fabColor = Color.Transparent
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Stack {
                 surface = MaterialTheme.colors.surface
                 fabColor = MaterialTheme.colors.secondary
@@ -186,14 +185,14 @@ class FloatingActionButtonTest {
             }
         }
 
-        onNodeWithTag("myButton")
+        rule.onNodeWithTag("myButton")
             .captureToBitmap()
             .assertShape(
-                density = composeTestRule.density,
+                density = rule.density,
                 shape = realShape,
                 shapeColor = fabColor,
                 backgroundColor = surface,
-                shapeOverlapPixelCount = with(composeTestRule.density) { 1.dp.toPx() }
+                shapeOverlapPixelCount = with(rule.density) { 1.dp.toPx() }
             )
     }
 
@@ -204,7 +203,7 @@ class FloatingActionButtonTest {
         val realShape = CutCornerShape(50)
         var surface = Color.Transparent
         var fabColor = Color.Transparent
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Stack {
                 surface = MaterialTheme.colors.surface
                 fabColor = MaterialTheme.colors.secondary
@@ -219,14 +218,14 @@ class FloatingActionButtonTest {
             }
         }
 
-        onNodeWithTag("myButton")
+        rule.onNodeWithTag("myButton")
             .captureToBitmap()
             .assertShape(
-                density = composeTestRule.density,
+                density = rule.density,
                 shape = realShape,
                 shapeColor = fabColor,
                 backgroundColor = surface,
-                shapeOverlapPixelCount = with(composeTestRule.density) { 1.dp.toPx() }
+                shapeOverlapPixelCount = with(rule.density) { 1.dp.toPx() }
             )
     }
 
@@ -234,7 +233,7 @@ class FloatingActionButtonTest {
     fun contentIsWrappedAndCentered() {
         var buttonCoordinates: LayoutCoordinates? = null
         var contentCoordinates: LayoutCoordinates? = null
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Stack {
                 FloatingActionButton({}, Modifier.onPositioned { buttonCoordinates = it }) {
                     Box(Modifier.preferredSize(2.dp)
@@ -244,12 +243,12 @@ class FloatingActionButtonTest {
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             val buttonBounds = buttonCoordinates!!.boundsInRoot
             val contentBounds = contentCoordinates!!.boundsInRoot
             assertThat(contentBounds.width).isLessThan(buttonBounds.width)
             assertThat(contentBounds.height).isLessThan(buttonBounds.height)
-            with(composeTestRule.density) {
+            with(rule.density) {
                 assertThat(contentBounds.width).isEqualTo(2.dp.toIntPx().toFloat())
                 assertThat(contentBounds.height).isEqualTo(2.dp.toIntPx().toFloat())
             }
@@ -261,7 +260,7 @@ class FloatingActionButtonTest {
     fun extendedFabTextIsWrappedAndCentered() {
         var buttonCoordinates: LayoutCoordinates? = null
         var contentCoordinates: LayoutCoordinates? = null
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Stack {
                 ExtendedFloatingActionButton(
                     text = {
@@ -275,12 +274,12 @@ class FloatingActionButtonTest {
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             val buttonBounds = buttonCoordinates!!.boundsInRoot
             val contentBounds = contentCoordinates!!.boundsInRoot
             assertThat(contentBounds.width).isLessThan(buttonBounds.width)
             assertThat(contentBounds.height).isLessThan(buttonBounds.height)
-            with(composeTestRule.density) {
+            with(rule.density) {
                 assertThat(contentBounds.width).isEqualTo(2.dp.toIntPx().toFloat())
                 assertThat(contentBounds.height).isEqualTo(2.dp.toIntPx().toFloat())
             }
@@ -293,7 +292,7 @@ class FloatingActionButtonTest {
         var buttonCoordinates: LayoutCoordinates? = null
         var textCoordinates: LayoutCoordinates? = null
         var iconCoordinates: LayoutCoordinates? = null
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Stack {
                 ExtendedFloatingActionButton(
                     text = {
@@ -312,11 +311,11 @@ class FloatingActionButtonTest {
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             val buttonBounds = buttonCoordinates!!.boundsInRoot
             val textBounds = textCoordinates!!.boundsInRoot
             val iconBounds = iconCoordinates!!.boundsInRoot
-            with(composeTestRule.density) {
+            with(rule.density) {
                 assertThat(textBounds.width).isEqualTo(2.dp.toIntPx().toFloat())
                 assertThat(textBounds.height).isEqualTo(2.dp.toIntPx().toFloat())
                 assertThat(iconBounds.width).isEqualTo(10.dp.toIntPx().toFloat())

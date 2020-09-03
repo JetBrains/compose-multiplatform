@@ -41,7 +41,7 @@ import org.junit.runners.JUnit4
 class RadioButtonTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule(disableTransitions = true)
 
     private val itemOne = "Bar"
     private val itemTwo = "Foo"
@@ -63,7 +63,7 @@ class RadioButtonTest {
     fun radioGroupTest_defaultSemantics() {
         val selected = mutableStateOf(itemOne)
 
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Column {
                 options.forEach { item ->
                     RadioButton(
@@ -75,16 +75,16 @@ class RadioButtonTest {
             }
         }
 
-        onNodeWithTag(itemOne).assertHasSelectedSemantics()
-        onNodeWithTag(itemTwo).assertHasUnSelectedSemantics()
-        onNodeWithTag(itemThree).assertHasUnSelectedSemantics()
+        rule.onNodeWithTag(itemOne).assertHasSelectedSemantics()
+        rule.onNodeWithTag(itemTwo).assertHasUnSelectedSemantics()
+        rule.onNodeWithTag(itemThree).assertHasUnSelectedSemantics()
     }
 
     @Test
     fun radioGroupTest_ensureUnselectable() {
         val selected = mutableStateOf(itemOne)
 
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Column {
                 options.forEach { item ->
                     RadioButton(
@@ -96,22 +96,22 @@ class RadioButtonTest {
             }
         }
 
-        onNodeWithTag(itemOne)
+        rule.onNodeWithTag(itemOne)
             .assertHasSelectedSemantics()
             .performClick()
             .assertHasSelectedSemantics()
 
-        onNodeWithTag(itemTwo)
+        rule.onNodeWithTag(itemTwo)
             .assertHasUnSelectedSemantics()
 
-        onNodeWithTag(itemThree)
+        rule.onNodeWithTag(itemThree)
             .assertHasUnSelectedSemantics()
     }
 
     @Test
     fun radioGroupTest_clickSelect() {
         val selected = mutableStateOf(itemOne)
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Column {
                 options.forEach { item ->
                     RadioButton(
@@ -122,15 +122,15 @@ class RadioButtonTest {
                 }
             }
         }
-        onNodeWithTag(itemTwo)
+        rule.onNodeWithTag(itemTwo)
             .assertHasUnSelectedSemantics()
             .performClick()
             .assertHasSelectedSemantics()
 
-        onNodeWithTag(itemOne)
+        rule.onNodeWithTag(itemOne)
             .assertHasUnSelectedSemantics()
 
-        onNodeWithTag(itemThree)
+        rule.onNodeWithTag(itemThree)
             .assertHasUnSelectedSemantics()
     }
 
@@ -138,7 +138,7 @@ class RadioButtonTest {
     fun radioGroupTest_clickSelectTwoDifferentItems() {
         val selected = mutableStateOf(itemOne)
 
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Column {
                 options.forEach { item ->
                     RadioButton(
@@ -150,23 +150,23 @@ class RadioButtonTest {
             }
         }
 
-        onNodeWithTag(itemTwo)
+        rule.onNodeWithTag(itemTwo)
             .assertHasUnSelectedSemantics()
             .performClick()
             .assertHasSelectedSemantics()
 
-        onNodeWithTag(itemOne)
+        rule.onNodeWithTag(itemOne)
             .assertHasUnSelectedSemantics()
 
-        onNodeWithTag(itemThree)
+        rule.onNodeWithTag(itemThree)
             .assertHasUnSelectedSemantics()
             .performClick()
             .assertHasSelectedSemantics()
 
-        onNodeWithTag(itemOne)
+        rule.onNodeWithTag(itemOne)
             .assertHasUnSelectedSemantics()
 
-        onNodeWithTag(itemTwo)
+        rule.onNodeWithTag(itemTwo)
             .assertHasUnSelectedSemantics()
     }
 
@@ -181,7 +181,7 @@ class RadioButtonTest {
     }
 
     private fun materialSizesTestForValue(selected: Boolean) {
-        composeTestRule
+        rule
             .setMaterialContentForSizeAssertions {
                 RadioButton(selected = selected, onClick = {})
             }

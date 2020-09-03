@@ -45,12 +45,12 @@ import org.junit.runners.JUnit4
 class SurfaceTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun zOrderingBasedOnElevationIsApplied() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Stack(Modifier
                 .preferredSize(10.dp, 10.dp)
                 .semantics(mergeAllDescendants = true) {}
@@ -64,10 +64,10 @@ class SurfaceTest {
             }
         }
 
-        onNodeWithTag("stack")
+        rule.onNodeWithTag("stack")
             .captureToBitmap()
             .assertShape(
-                density = composeTestRule.density,
+                density = rule.density,
                 shape = RectangleShape,
                 shapeColor = Color.Yellow,
                 backgroundColor = Color.White
@@ -77,7 +77,7 @@ class SurfaceTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun originalOrderingWhenTheDefaultElevationIsUsed() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Stack(Modifier
                 .preferredSize(10.dp, 10.dp)
                 .semantics(mergeAllDescendants = true) {}
@@ -91,10 +91,10 @@ class SurfaceTest {
             }
         }
 
-        onNodeWithTag("stack")
+        rule.onNodeWithTag("stack")
             .captureToBitmap()
             .assertShape(
-                density = composeTestRule.density,
+                density = rule.density,
                 shape = RectangleShape,
                 shapeColor = Color.Green,
                 backgroundColor = Color.White
@@ -104,7 +104,7 @@ class SurfaceTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun elevationRawValueIsUsedAsZIndex_drawsBelow() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Stack(Modifier
                 .preferredSize(10.dp, 10.dp)
                 .semantics(mergeAllDescendants = true) {}
@@ -116,10 +116,10 @@ class SurfaceTest {
             }
         }
 
-        onNodeWithTag("stack")
+        rule.onNodeWithTag("stack")
             .captureToBitmap()
             .assertShape(
-                density = composeTestRule.density,
+                density = rule.density,
                 shape = RectangleShape,
                 shapeColor = Color.Green,
                 backgroundColor = Color.Green
@@ -129,7 +129,7 @@ class SurfaceTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun elevationRawValueIsUsedAsZIndex_drawsAbove() {
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Stack(Modifier
                 .preferredSize(10.dp, 10.dp)
                 .semantics(mergeAllDescendants = true) {}
@@ -141,10 +141,10 @@ class SurfaceTest {
             }
         }
 
-        onNodeWithTag("stack")
+        rule.onNodeWithTag("stack")
             .captureToBitmap()
             .assertShape(
-                density = composeTestRule.density,
+                density = rule.density,
                 shape = RectangleShape,
                 shapeColor = Color.Yellow,
                 backgroundColor = Color.Yellow

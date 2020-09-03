@@ -39,8 +39,6 @@ import androidx.ui.test.moveBy
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performGesture
 import androidx.ui.test.right
-import androidx.ui.test.runOnIdle
-import androidx.ui.test.runOnUiThread
 import androidx.ui.test.up
 import com.google.common.truth.Truth
 import org.junit.Rule
@@ -55,12 +53,12 @@ class SliderTest {
     private val tag = "slider"
 
     @get:Rule
-    val composeTestRule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule(disableTransitions = true)
 
     @Test
     fun sliderPosition_valueCoercion() {
         val state = mutableStateOf(0f)
-        composeTestRule.setContent {
+        rule.setContent {
             Slider(
                 modifier = Modifier.testTag(tag),
                 value = state.value,
@@ -68,19 +66,19 @@ class SliderTest {
                 valueRange = 0f..1f
             )
         }
-        runOnIdle {
+        rule.runOnIdle {
             state.value = 2f
         }
-        onNodeWithTag(tag).assertValueEquals("100 percent")
-        runOnIdle {
+        rule.onNodeWithTag(tag).assertValueEquals("100 percent")
+        rule.runOnIdle {
             state.value = -123145f
         }
-        onNodeWithTag(tag).assertValueEquals("0 percent")
+        rule.onNodeWithTag(tag).assertValueEquals("0 percent")
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun sliderPosition_stepsThrowWhenLessThanZero() {
-        composeTestRule.setContent {
+        rule.setContent {
             Slider(value = 0f, onValueChange = {}, steps = -1)
         }
     }
@@ -89,20 +87,19 @@ class SliderTest {
     fun slider_semantics() {
         val state = mutableStateOf(0f)
 
-        composeTestRule
-            .setMaterialContent {
+        rule.setMaterialContent {
                 Slider(modifier = Modifier.testTag(tag), value = state.value,
                     onValueChange = { state.value = it })
             }
 
-        onNodeWithTag(tag)
+        rule.onNodeWithTag(tag)
             .assertValueEquals("0 percent")
 
-        runOnUiThread {
+        rule.runOnUiThread {
             state.value = 0.5f
         }
 
-        onNodeWithTag(tag)
+        rule.onNodeWithTag(tag)
             .assertValueEquals("50 percent")
     }
 
@@ -110,8 +107,7 @@ class SliderTest {
     fun slider_drag() {
         val state = mutableStateOf(0f)
 
-        composeTestRule
-            .setMaterialContent {
+        rule.setMaterialContent {
                 Slider(
                     modifier = Modifier.testTag(tag),
                     value = state.value,
@@ -119,20 +115,20 @@ class SliderTest {
                 )
             }
 
-        runOnUiThread {
+        rule.runOnUiThread {
             Truth.assertThat(state.value).isEqualTo(0f)
         }
 
         var expected = 0f
 
-        onNodeWithTag(tag)
+        rule.onNodeWithTag(tag)
             .performGesture {
                 down(center)
                 moveBy(Offset(100f, 0f))
                 up()
                 expected = calculateFraction(left, right, centerX + 100)
             }
-        runOnIdle {
+        rule.runOnIdle {
             Truth.assertThat(abs(state.value - expected)).isLessThan(0.001f)
         }
     }
@@ -141,8 +137,7 @@ class SliderTest {
     fun slider_tap() {
         val state = mutableStateOf(0f)
 
-        composeTestRule
-            .setMaterialContent {
+        rule.setMaterialContent {
                 Slider(
                     modifier = Modifier.testTag(tag),
                     value = state.value,
@@ -150,19 +145,19 @@ class SliderTest {
                 )
             }
 
-        runOnUiThread {
+        rule.runOnUiThread {
             Truth.assertThat(state.value).isEqualTo(0f)
         }
 
         var expected = 0f
 
-        onNodeWithTag(tag)
+        rule.onNodeWithTag(tag)
             .performGesture {
                 down(Offset(centerX + 50, centerY))
                 up()
                 expected = calculateFraction(left, right, centerX + 50)
             }
-        runOnIdle {
+        rule.runOnIdle {
             Truth.assertThat(abs(state.value - expected)).isLessThan(0.001f)
         }
     }
@@ -171,8 +166,7 @@ class SliderTest {
     fun slider_drag_rtl() {
         val state = mutableStateOf(0f)
 
-        composeTestRule
-            .setMaterialContent {
+        rule.setMaterialContent {
                 Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
                     Slider(
                         modifier = Modifier.testTag(tag),
@@ -182,13 +176,13 @@ class SliderTest {
                 }
             }
 
-        runOnUiThread {
+        rule.runOnUiThread {
             Truth.assertThat(state.value).isEqualTo(0f)
         }
 
         var expected = 0f
 
-        onNodeWithTag(tag)
+        rule.onNodeWithTag(tag)
             .performGesture {
                 down(center)
                 moveBy(Offset(100f, 0f))
@@ -196,7 +190,7 @@ class SliderTest {
                 // subtract here as we're in rtl and going in the opposite direction
                 expected = calculateFraction(left, right, centerX - 100)
             }
-        runOnIdle {
+        rule.runOnIdle {
             Truth.assertThat(abs(state.value - expected)).isLessThan(0.001f)
         }
     }
@@ -205,8 +199,7 @@ class SliderTest {
     fun slider_tap_rtl() {
         val state = mutableStateOf(0f)
 
-        composeTestRule
-            .setMaterialContent {
+        rule.setMaterialContent {
                 Providers(LayoutDirectionAmbient provides LayoutDirection.Rtl) {
                     Slider(
                         modifier = Modifier.testTag(tag),
@@ -216,19 +209,19 @@ class SliderTest {
                 }
             }
 
-        runOnUiThread {
+        rule.runOnUiThread {
             Truth.assertThat(state.value).isEqualTo(0f)
         }
 
         var expected = 0f
 
-        onNodeWithTag(tag)
+        rule.onNodeWithTag(tag)
             .performGesture {
                 down(Offset(centerX + 50, centerY))
                 up()
                 expected = calculateFraction(left, right, centerX - 50)
             }
-        runOnIdle {
+        rule.runOnIdle {
             Truth.assertThat(abs(state.value - expected)).isLessThan(0.001f)
         }
     }
@@ -239,7 +232,7 @@ class SliderTest {
     @Test
     fun slider_sizes() {
         val state = mutableStateOf(0f)
-        composeTestRule
+        rule
             .setMaterialContentForSizeAssertions(
                 parentConstraints = DpConstraints(maxWidth = 100.dp, maxHeight = 100.dp)
             ) { Slider(value = state.value, onValueChange = { state.value = it }) }

@@ -31,11 +31,11 @@ import org.junit.runners.JUnit4
 class SurfaceContentColorTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule(disableTransitions = true)
 
     @Test
     fun surfaceSetsCorrectContentColors_primary() {
-        composeTestRule.setContent {
+        rule.setContent {
             MaterialTheme {
                 Surface(color = MaterialTheme.colors.primary) {
                     assertThat(contentColor()).isEqualTo(MaterialTheme.colors.onPrimary)
@@ -46,7 +46,7 @@ class SurfaceContentColorTest {
 
     @Test
     fun surfaceSetsCorrectContentColors_secondary() {
-        composeTestRule.setContent {
+        rule.setContent {
             MaterialTheme {
                 Surface(color = MaterialTheme.colors.secondary) {
                     assertThat(contentColor()).isEqualTo(MaterialTheme.colors.onSecondary)
@@ -57,7 +57,7 @@ class SurfaceContentColorTest {
 
     @Test
     fun surfaceSetsCorrectContentColors_background() {
-        composeTestRule.setContent {
+        rule.setContent {
             MaterialTheme {
                 Surface(color = MaterialTheme.colors.background) {
                     assertThat(contentColor()).isEqualTo(MaterialTheme.colors.onBackground)
@@ -68,7 +68,7 @@ class SurfaceContentColorTest {
 
     @Test
     fun surfaceSetsCorrectContentColors_surface() {
-        composeTestRule.setContent {
+        rule.setContent {
             MaterialTheme {
                 Surface(color = MaterialTheme.colors.surface) {
                     assertThat(contentColor()).isEqualTo(MaterialTheme.colors.onSurface)
@@ -79,7 +79,7 @@ class SurfaceContentColorTest {
 
     @Test
     fun surfaceDoesNotSetContentColor_withCustomColor() {
-        composeTestRule.setContent {
+        rule.setContent {
             MaterialTheme {
                 Surface(color = Color.Yellow) {
                     assertThat(contentColor()).isEqualTo(Color.Black)
@@ -90,7 +90,7 @@ class SurfaceContentColorTest {
 
     @Test
     fun surfaceInheritsParent_withCustomColor() {
-        composeTestRule.setContent {
+        rule.setContent {
             MaterialTheme {
                 // This surface sets contentColor to be onSurface
                 Surface {

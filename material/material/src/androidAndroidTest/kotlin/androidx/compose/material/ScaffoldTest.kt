@@ -51,8 +51,6 @@ import androidx.ui.test.captureToBitmap
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performGesture
-import androidx.ui.test.runOnIdle
-import androidx.ui.test.runOnUiThread
 import androidx.ui.test.swipeLeft
 import androidx.ui.test.swipeRight
 import com.google.common.truth.Truth.assertThat
@@ -67,13 +65,13 @@ import org.junit.runners.JUnit4
 class ScaffoldTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule(disableTransitions = true)
+    val rule = createComposeRule(disableTransitions = true)
 
     private val scaffoldTag = "Scaffold"
 
     @Test
     fun scaffold_onlyContent_takesWholeScreen() {
-        composeTestRule.setMaterialContentForSizeAssertions(
+        rule.setMaterialContentForSizeAssertions(
             parentConstraints = DpConstraints(maxWidth = 100.dp, maxHeight = 100.dp)
         ) {
             Scaffold {
@@ -88,7 +86,7 @@ class ScaffoldTest {
     fun scaffold_onlyContent_stackSlot() {
         var child1: Offset = Offset.Zero
         var child2: Offset = Offset.Zero
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Scaffold {
                 Text("One",
                     Modifier.onPositioned { child1 = it.positionInParent }
@@ -107,7 +105,7 @@ class ScaffoldTest {
         var appbarPosition: Offset = Offset.Zero
         var appbarSize: IntSize = IntSize.Zero
         var contentPosition: Offset = Offset.Zero
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Scaffold(
                 topBar = {
                     Box(Modifier
@@ -139,7 +137,7 @@ class ScaffoldTest {
         var appbarSize: IntSize = IntSize.Zero
         var contentPosition: Offset = Offset.Zero
         var contentSize: IntSize = IntSize.Zero
-        composeTestRule.setMaterialContent {
+        rule.setMaterialContent {
             Scaffold(
                 bottomBar = {
                     Box(Modifier
@@ -174,7 +172,7 @@ class ScaffoldTest {
     fun scaffold_drawer_gestures() {
         var drawerChildPosition: Offset = Offset.Zero
         lateinit var scaffoldState: ScaffoldState
-        composeTestRule.setContent {
+        rule.setContent {
             scaffoldState = rememberScaffoldState(isDrawerGesturesEnabled = false)
             Box(Modifier.testTag(scaffoldTag)) {
                 Scaffold(
@@ -200,24 +198,24 @@ class ScaffoldTest {
             }
         }
         assertThat(drawerChildPosition.x).isLessThan(0f)
-        onNodeWithTag(scaffoldTag).performGesture {
+        rule.onNodeWithTag(scaffoldTag).performGesture {
             swipeRight()
         }
         assertThat(drawerChildPosition.x).isLessThan(0f)
-        onNodeWithTag(scaffoldTag).performGesture {
+        rule.onNodeWithTag(scaffoldTag).performGesture {
             swipeLeft()
         }
         assertThat(drawerChildPosition.x).isLessThan(0f)
 
-        runOnUiThread {
+        rule.runOnUiThread {
             scaffoldState.isDrawerGesturesEnabled = true
         }
 
-        onNodeWithTag(scaffoldTag).performGesture {
+        rule.onNodeWithTag(scaffoldTag).performGesture {
             swipeRight()
         }
         assertThat(drawerChildPosition.x).isEqualTo(0f)
-        onNodeWithTag(scaffoldTag).performGesture {
+        rule.onNodeWithTag(scaffoldTag).performGesture {
             swipeLeft()
         }
         assertThat(drawerChildPosition.x).isLessThan(0f)
@@ -228,7 +226,7 @@ class ScaffoldTest {
     fun scaffold_drawer_manualControl() {
         var drawerChildPosition: Offset = Offset.Zero
         lateinit var scaffoldState: ScaffoldState
-        composeTestRule.setContent {
+        rule.setContent {
             scaffoldState = rememberScaffoldState()
             Box(Modifier.testTag(scaffoldTag)) {
                 Scaffold(
@@ -254,11 +252,11 @@ class ScaffoldTest {
             }
         }
         assertThat(drawerChildPosition.x).isLessThan(0f)
-        runOnUiThread {
+        rule.runOnUiThread {
             scaffoldState.drawerState.open()
         }
         assertThat(drawerChildPosition.x).isLessThan(0f)
-        runOnUiThread {
+        rule.runOnUiThread {
             scaffoldState.drawerState.close()
         }
         assertThat(drawerChildPosition.x).isLessThan(0f)
@@ -269,7 +267,7 @@ class ScaffoldTest {
         var fabPosition: Offset = Offset.Zero
         var fabSize: IntSize = IntSize.Zero
         var bottomBarPosition: Offset = Offset.Zero
-        composeTestRule.setContent {
+        rule.setContent {
             Scaffold(
                 floatingActionButton = {
                     FloatingActionButton(
@@ -307,7 +305,7 @@ class ScaffoldTest {
         var fabPosition: Offset = Offset.Zero
         var fabSize: IntSize = IntSize.Zero
         var bottomBarPosition: Offset = Offset.Zero
-        composeTestRule.setContent {
+        rule.setContent {
             Scaffold(
                 floatingActionButton = {
                     FloatingActionButton(
@@ -344,7 +342,7 @@ class ScaffoldTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun scaffold_topAppBarIsDrawnOnTopOfContent() {
-        composeTestRule.setContent {
+        rule.setContent {
             Stack(
                 Modifier
                     .size(10.dp, 20.dp)
@@ -368,7 +366,7 @@ class ScaffoldTest {
             }
         }
 
-        onNodeWithTag("Scaffold")
+        rule.onNodeWithTag("Scaffold")
             .captureToBitmap().apply {
                 // asserts the appbar(top half part) has the shadow
                 val yPos = height / 2 + 2
@@ -383,7 +381,7 @@ class ScaffoldTest {
         var fabSize: IntSize = IntSize.Zero
         val showFab = mutableStateOf(true)
         lateinit var scaffoldState: ScaffoldState
-        composeTestRule.setContent {
+        rule.setContent {
             scaffoldState = rememberScaffoldState()
             val fab: @Composable (() -> Unit)? = if (showFab.value) {
                 @Composable {
@@ -407,13 +405,13 @@ class ScaffoldTest {
                 Text("body")
             }
         }
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(scaffoldState.scaffoldGeometry.fabBounds?.size)
                 .isEqualTo(fabSize.toSize())
             showFab.value = false
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(scaffoldState.scaffoldGeometry.fabBounds?.size).isEqualTo(null)
         }
     }
@@ -423,7 +421,7 @@ class ScaffoldTest {
         var bottomBarSize: IntSize = IntSize.Zero
         val showBottom = mutableStateOf(true)
         lateinit var scaffoldState: ScaffoldState
-        composeTestRule.setContent {
+        rule.setContent {
             scaffoldState = rememberScaffoldState()
             val bottom: @Composable (() -> Unit)? = if (showBottom.value) {
                 @Composable {
@@ -446,13 +444,13 @@ class ScaffoldTest {
                 Text("body")
             }
         }
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(scaffoldState.scaffoldGeometry.bottomBarBounds?.size)
                 .isEqualTo(bottomBarSize.toSize())
             showBottom.value = false
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(scaffoldState.scaffoldGeometry.bottomBarBounds?.size)
                 .isEqualTo(null)
         }
@@ -463,7 +461,7 @@ class ScaffoldTest {
         var topBarSize: IntSize = IntSize.Zero
         val showTop = mutableStateOf(true)
         lateinit var scaffoldState: ScaffoldState
-        composeTestRule.setContent {
+        rule.setContent {
             scaffoldState = rememberScaffoldState()
             val top: @Composable (() -> Unit)? = if (showTop.value) {
                 @Composable {
@@ -486,13 +484,13 @@ class ScaffoldTest {
                 Text("body")
             }
         }
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(scaffoldState.scaffoldGeometry.topBarBounds?.size)
                 .isEqualTo(topBarSize.toSize())
             showTop.value = false
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(scaffoldState.scaffoldGeometry.topBarBounds?.size)
                 .isEqualTo(null)
         }
@@ -504,7 +502,7 @@ class ScaffoldTest {
         lateinit var innerPadding: InnerPadding
 
         lateinit var scaffoldState: ScaffoldState
-        composeTestRule.setContent {
+        rule.setContent {
             scaffoldState = rememberScaffoldState()
             Scaffold(
                 scaffoldState = scaffoldState,
@@ -523,8 +521,8 @@ class ScaffoldTest {
                 Text("body")
             }
         }
-        runOnIdle {
-            with(composeTestRule.density) {
+        rule.runOnIdle {
+            with(rule.density) {
                 assertThat(innerPadding.bottom).isEqualTo(bottomBarSize.toSize().height.toDp())
             }
         }
@@ -536,7 +534,7 @@ class ScaffoldTest {
         lateinit var geometry: ScaffoldGeometry
 
         lateinit var scaffoldState: ScaffoldState
-        composeTestRule.setContent {
+        rule.setContent {
             scaffoldState = rememberScaffoldState()
             Scaffold(
                 scaffoldState = scaffoldState,
@@ -555,7 +553,7 @@ class ScaffoldTest {
                 Text("body")
             }
         }
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(geometry.bottomBarBounds?.size).isEqualTo(bottomBarSize.toSize())
             assertThat(geometry.bottomBarBounds?.width).isNotEqualTo(0f)
         }

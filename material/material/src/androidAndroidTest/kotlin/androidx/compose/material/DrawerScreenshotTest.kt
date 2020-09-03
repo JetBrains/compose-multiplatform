@@ -43,7 +43,7 @@ import org.junit.runners.JUnit4
 class DrawerScreenshotTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL)
@@ -74,30 +74,30 @@ class DrawerScreenshotTest {
 
     @Test
     fun bottomDrawer_closed() {
-        composeTestRule.setBottomDrawer(BottomDrawerValue.Closed)
+        rule.setBottomDrawer(BottomDrawerValue.Closed)
         assertScreenshotAgainstGolden("bottomDrawer_closed")
     }
 
     @Test
     fun modalDrawer_closed() {
-        composeTestRule.setModalDrawer(DrawerValue.Closed)
+        rule.setModalDrawer(DrawerValue.Closed)
         assertScreenshotAgainstGolden("modalDrawer_closed")
     }
 
     @Test
     fun bottomDrawer_open() {
-        composeTestRule.setBottomDrawer(BottomDrawerValue.Open)
+        rule.setBottomDrawer(BottomDrawerValue.Open)
         assertScreenshotAgainstGolden("bottomDrawer_opened")
     }
 
     @Test
     fun modalDrawer_open() {
-        composeTestRule.setModalDrawer(DrawerValue.Open)
+        rule.setModalDrawer(DrawerValue.Open)
         assertScreenshotAgainstGolden("modalDrawer_opened")
     }
 
     private fun assertScreenshotAgainstGolden(goldenName: String) {
-        onNodeWithTag("container")
+        rule.onNodeWithTag("container")
             .captureToBitmap()
             .assertAgainstGolden(screenshotRule, goldenName)
     }
