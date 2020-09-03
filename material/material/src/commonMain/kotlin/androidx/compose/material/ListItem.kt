@@ -135,11 +135,11 @@ private object OneLine {
         trailing: @Composable (() -> Unit)?
     ) {
         val minHeight = if (icon == null) MinHeight else MinHeightWithIcon
-        Row(modifier.preferredHeightIn(minHeight = minHeight)) {
+        Row(modifier.preferredHeightIn(min = minHeight)) {
             if (icon != null) {
                 Box(
                     Modifier.align(Alignment.CenterVertically)
-                        .preferredWidthIn(minWidth = IconLeftPadding + IconMinPaddedWidth),
+                        .preferredWidthIn(min = IconLeftPadding + IconMinPaddedWidth),
                     gravity = ContentGravity.CenterStart,
                     paddingStart = IconLeftPadding,
                     paddingTop = IconVerticalPadding,
@@ -198,7 +198,7 @@ private object TwoLine {
         trailing: @Composable (() -> Unit)?
     ) {
         val minHeight = if (icon == null) MinHeight else MinHeightWithIcon
-        Row(modifier.preferredHeightIn(minHeight = minHeight)) {
+        Row(modifier.preferredHeightIn(min = minHeight)) {
             val columnModifier = Modifier.weight(1f)
                 .padding(start = ContentLeftPadding, end = ContentRightPadding)
 
@@ -254,7 +254,7 @@ private object TwoLine {
                 ) {
                     Box(
                         // TODO(popam): find way to center and wrap content without minHeight
-                        Modifier.preferredHeightIn(minHeight = minHeight)
+                        Modifier.preferredHeightIn(min = minHeight)
                             .padding(end = TrailingRightPadding),
                         gravity = ContentGravity.Center,
                         children = trailing
@@ -294,7 +294,7 @@ private object ThreeLine {
         overlineText: @Composable (() -> Unit)?,
         trailing: @Composable (() -> Unit)?
     ) {
-        Row(modifier.preferredHeightIn(minHeight = MinHeight)) {
+        Row(modifier.preferredHeightIn(min = MinHeight)) {
             if (icon != null) {
                 val minSize = IconLeftPadding + IconMinPaddedWidth
                 Box(

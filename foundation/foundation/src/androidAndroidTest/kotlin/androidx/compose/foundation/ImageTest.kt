@@ -355,7 +355,7 @@ class ImageTest {
                 modifier = Modifier
                     .testTag(testTag)
                     .background(Color.Green)
-                    .preferredHeightIn(maxHeight = (heightDp / 2f).dp),
+                    .preferredHeightIn(max = (heightDp / 2f).dp),
                 contentScale = ContentScale.Crop
             )
         }

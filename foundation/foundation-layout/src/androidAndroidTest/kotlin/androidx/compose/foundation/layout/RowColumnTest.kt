@@ -377,7 +377,7 @@ class RowColumnTest : LayoutTest() {
             Row(
                 Modifier.wrapContentSize(Alignment.TopStart)
                     .padding(start = leftPadding.toDp())
-                    .preferredWidthIn(maxWidth = expectedRowWidth.toDp())
+                    .preferredWidthIn(max = expectedRowWidth.toDp())
                     .onPositioned { coordinates: LayoutCoordinates ->
                         rowWidth = coordinates.size.width.toFloat()
                     }
@@ -423,7 +423,7 @@ class RowColumnTest : LayoutTest() {
             Row(
                 Modifier.wrapContentSize(Alignment.TopStart)
                     .padding(start = leftPadding.toDp())
-                    .preferredWidthIn(maxWidth = expectedRowWidth.toDp())
+                    .preferredWidthIn(max = expectedRowWidth.toDp())
                     .onPositioned { coordinates: LayoutCoordinates ->
                         rowWidth = coordinates.size.width.toFloat()
                     }
@@ -479,7 +479,7 @@ class RowColumnTest : LayoutTest() {
             Column(
                 Modifier.wrapContentSize(Alignment.TopStart)
                     .padding(top = topPadding.toDp())
-                    .preferredHeightIn(maxHeight = expectedColumnHeight.toDp())
+                    .preferredHeightIn(max = expectedColumnHeight.toDp())
                     .onPositioned { coordinates: LayoutCoordinates ->
                         columnHeight = coordinates.size.height.toFloat()
                     }
@@ -535,7 +535,7 @@ class RowColumnTest : LayoutTest() {
             Column(
                 Modifier.wrapContentSize(Alignment.TopStart)
                     .padding(top = topPadding.toDp())
-                    .preferredHeightIn(maxHeight = expectedColumnHeight.toDp())
+                    .preferredHeightIn(max = expectedColumnHeight.toDp())
                     .onPositioned { coordinates: LayoutCoordinates ->
                         columnHeight = coordinates.size.height.toFloat()
                     }
@@ -2008,7 +2008,7 @@ class RowColumnTest : LayoutTest() {
             Center {
                 ConstrainedBox(constraints = DpConstraints(minHeight = columnHeightDp)) {
                     // TODO: add maxHeight(Constraints.Infinity) modifier
-                    Column(Modifier.preferredHeightIn(maxHeight = Dp.Infinity)
+                    Column(Modifier.preferredHeightIn(max = Dp.Infinity)
                         .onPositioned { coordinates: LayoutCoordinates ->
                             columnSize = coordinates.size
                             drawLatch.countDown()
