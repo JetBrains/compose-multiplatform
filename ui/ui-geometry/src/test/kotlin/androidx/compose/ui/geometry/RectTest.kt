@@ -104,8 +104,8 @@ class RectTest {
     }
 
     @Test
-    fun `rect shift`() {
-        val shifted = Rect(0f, 5f, 10f, 15f).shift(Offset(10f, 15f))
+    fun `rect translate offset`() {
+        val shifted = Rect(0f, 5f, 10f, 15f).translate(Offset(10f, 15f))
         assertEquals(Rect(10f, 20f, 20f, 30f), shifted)
     }
 
@@ -132,21 +132,6 @@ class RectTest {
         val intersected = Rect(0f, 0f, 20f, 20f).intersect(
             Rect(10f, 10f, 30f, 30f))
         assertEquals(Rect(10f, 10f, 20f, 20f), intersected)
-    }
-
-    @Test
-    fun `rect expandToInclude`() {
-        val expanded = Rect(0f, 0f, 20f, 20f).expandToInclude(
-            Rect(10f, 10f, 30f, 30f))
-        assertEquals(Rect(0f, 0f, 30f, 30f), expanded)
-    }
-
-    @Test
-    fun `rect join`() {
-        val rect1 = Rect.Zero
-        val rect2 = Rect(12f, 24f, 64f, 128f)
-        assertEquals(rect2, rect2.join(rect1))
-        assertEquals(rect2, rect1.join(rect2))
     }
 
     @Test

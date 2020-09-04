@@ -236,7 +236,7 @@ private data class BottomAppBarCutoutShape(
         val cutoutStartY = -cutoutRadius
 
         addOutline(cutoutShape.createOutline(cutoutSize, density))
-        shift(Offset(cutoutStartX, cutoutStartY))
+        translate(Offset(cutoutStartX, cutoutStartY))
 
         // TODO: consider exposing the custom cutout shape instead of just replacing circle shapes?
         if (cutoutShape == CircleShape) {

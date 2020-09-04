@@ -153,7 +153,7 @@ class DesktopPath(
         internalPath.reset()
     }
 
-    override fun shift(offset: Offset) {
+    override fun translate(offset: Offset) {
         internalPath.transform(Matrix33.makeTranslate(offset.x, offset.y))
     }
 

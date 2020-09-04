@@ -231,7 +231,16 @@ expect class NativePathEffect
     /**
      * Translates all the segments of every subpath by the given offset.
      */
-    fun shift(offset: Offset)
+    @Deprecated(
+        "Use translate(offset) instead",
+        ReplaceWith("translate(offset)", "androidx.compose.ui.graphics.Path")
+    )
+    fun shift(offset: Offset) = translate(offset)
+
+    /**
+     * Translates all the segments of every subpath by the given offset.
+     */
+    fun translate(offset: Offset)
 
     /**
      * Compute the bounds of the control points of the path, and write the

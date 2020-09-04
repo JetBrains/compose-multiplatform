@@ -126,7 +126,7 @@ package androidx.compose.ui.graphics {
     method public void relativeQuadraticBezierTo(float dx1, float dy1, float dx2, float dy2);
     method public void reset();
     method public void setFillType(androidx.compose.ui.graphics.PathFillType value);
-    method public void shift-k-4lQ0M(long offset);
+    method public void translate-k-4lQ0M(long offset);
     property public androidx.compose.ui.graphics.PathFillType fillType;
     property public boolean isConvex;
     property public boolean isEmpty;
@@ -532,7 +532,8 @@ package androidx.compose.ui.graphics {
     method public void relativeQuadraticBezierTo(float dx1, float dy1, float dx2, float dy2);
     method public void reset();
     method public void setFillType(androidx.compose.ui.graphics.PathFillType p);
-    method public void shift-k-4lQ0M(long offset);
+    method @Deprecated public default void shift-k-4lQ0M(long offset);
+    method public void translate-k-4lQ0M(long offset);
     property public abstract androidx.compose.ui.graphics.PathFillType fillType;
     property public abstract boolean isConvex;
     property public abstract boolean isEmpty;
@@ -915,9 +916,11 @@ package androidx.compose.ui.graphics.drawscope {
   public final class DrawScopeKt {
     method public static inline void clipPath(androidx.compose.ui.graphics.drawscope.DrawScope, androidx.compose.ui.graphics.Path path, androidx.compose.ui.graphics.ClipOp clipOp = androidx.compose.ui.graphics.ClipOp.Intersect, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
     method public static inline void clipRect(androidx.compose.ui.graphics.drawscope.DrawScope, float left = 0.0f, float top = 0.0f, float right = size.width, float bottom = size.height, androidx.compose.ui.graphics.ClipOp clipOp = androidx.compose.ui.graphics.ClipOp.Intersect, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
-    method public static inline void drawCanvas(androidx.compose.ui.graphics.drawscope.DrawScope, kotlin.jvm.functions.Function2<? super androidx.compose.ui.graphics.Canvas,? super androidx.compose.ui.geometry.Size,kotlin.Unit> block);
+    method @Deprecated public static inline void drawCanvas(androidx.compose.ui.graphics.drawscope.DrawScope, kotlin.jvm.functions.Function2<? super androidx.compose.ui.graphics.Canvas,? super androidx.compose.ui.geometry.Size,kotlin.Unit> block);
+    method public static inline void drawIntoCanvas(androidx.compose.ui.graphics.drawscope.DrawScope, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.Canvas,kotlin.Unit> block);
     method public static inline void inset(androidx.compose.ui.graphics.drawscope.DrawScope, float left, float top, float right, float bottom, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
-    method public static inline void inset(androidx.compose.ui.graphics.drawscope.DrawScope, float dx = 0.0f, float dy = 0.0f, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
+    method public static inline void inset(androidx.compose.ui.graphics.drawscope.DrawScope, float inset, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
+    method public static inline void inset(androidx.compose.ui.graphics.drawscope.DrawScope, float horizontal = 0.0f, float vertical = 0.0f, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
     method public static inline void rotate(androidx.compose.ui.graphics.drawscope.DrawScope, float degrees, float pivotX = center.x, float pivotY = center.y, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
     method public static inline void rotateRad(androidx.compose.ui.graphics.drawscope.DrawScope, float radians, float pivotX = center.x, float pivotY = center.y, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
     method public static inline void scale(androidx.compose.ui.graphics.drawscope.DrawScope, float scaleX, float scaleY = scaleX, float pivotX = center.x, float pivotY = center.y, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.drawscope.DrawScope,kotlin.Unit> block);
@@ -946,7 +949,8 @@ package androidx.compose.ui.graphics.drawscope {
   }
 
   public final class DrawTransformKt {
-    method public static inline void inset(androidx.compose.ui.graphics.drawscope.DrawTransform, float dx = 0.0f, float dy = 0.0f);
+    method public static inline void inset(androidx.compose.ui.graphics.drawscope.DrawTransform, float horizontal = 0.0f, float vertical = 0.0f);
+    method public static inline void inset(androidx.compose.ui.graphics.drawscope.DrawTransform, float inset);
     method public static inline void rotateRad(androidx.compose.ui.graphics.drawscope.DrawTransform, float radians, float pivotX = center.x, float pivotY = center.y);
   }
 

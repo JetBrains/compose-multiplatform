@@ -40,7 +40,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.drawCanvas
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.input.key.KeyInputModifier
 import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
@@ -1344,9 +1344,7 @@ internal class LayoutNodeDrawScope : ContentDrawScope() {
     private var wrapped: LayoutNodeWrapper? = null
 
     override fun drawContent() {
-        drawCanvas { canvas, _ ->
-            wrapped?.draw(canvas)
-        }
+        drawIntoCanvas { canvas -> wrapped?.draw(canvas) }
     }
 
     internal fun draw(

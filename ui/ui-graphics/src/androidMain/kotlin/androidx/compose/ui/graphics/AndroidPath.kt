@@ -184,7 +184,7 @@ inline fun Path.asAndroidPath(): android.graphics.Path =
         internalPath.reset()
     }
 
-    override fun shift(offset: Offset) {
+    override fun translate(offset: Offset) {
         mMatrix.reset()
         mMatrix.setTranslate(offset.x, offset.y)
         internalPath.transform(mMatrix)

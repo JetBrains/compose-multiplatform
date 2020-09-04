@@ -43,7 +43,7 @@ import androidx.compose.ui.gesture.LongPressDragObserver
 import androidx.compose.ui.gesture.dragGestureFilter
 import androidx.compose.ui.gesture.longPressDragGestureFilter
 import androidx.compose.ui.gesture.pressIndicatorGestureFilter
-import androidx.compose.ui.graphics.drawscope.drawCanvas
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.onPositioned
 import androidx.compose.ui.platform.ClipboardManagerAmbient
@@ -274,7 +274,7 @@ fun CoreTextField(
 
         val drawModifier = Modifier.drawBehind {
             state.layoutResult?.let { layoutResult ->
-                drawCanvas { canvas, _ ->
+                drawIntoCanvas { canvas ->
                     TextFieldDelegate.draw(
                         canvas,
                         value,
