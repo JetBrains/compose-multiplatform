@@ -21,7 +21,7 @@ import androidx.compose.animation.core.MonotonicFrameAnimationClock
 import androidx.compose.animation.core.advanceClockMillis
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.yield
 
 /**
  * Runs a new coroutine and blocks the current thread interruptibly until it completes, passing a
@@ -75,15 +75,15 @@ import kotlinx.coroutines.withContext
 fun <R> runBlockingWithManualClock(
     compatibleWithManualAnimationClock: Boolean = false,
     block: suspend CoroutineScope.(clock: ManualFrameClock) -> R
-) = runBlocking {
+) {
     @Suppress("DEPRECATION")
     val clock = ManualFrameClock(0L, compatibleWithManualAnimationClock)
-    block(clock)
-    while (clock.hasAwaiters) {
-        withContext(TestUiDispatcher.Main) {
+    return runBlocking(clock) {
+        block(clock)
+        while (clock.hasAwaiters) {
             clock.advanceClockMillis(10_000L)
+            // Give awaiters the chance to await again
+            yield()
         }
-        // Give awaiters the chance to await again
-        withContext(TestUiDispatcher.Main) {}
     }
 }

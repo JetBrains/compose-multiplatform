@@ -24,12 +24,17 @@ import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.SpringSpec
+import androidx.compose.animation.core.VectorConverter
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Interaction
 import androidx.compose.foundation.InteractionState
 import androidx.compose.foundation.animation.FlingConfig
 import androidx.compose.foundation.animation.defaultFlingConfig
 import androidx.compose.foundation.animation.fling
+import androidx.compose.runtime.AtomicReference
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.dispatch.withFrameMillis
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.onDispose
 import androidx.compose.runtime.remember
@@ -41,6 +46,10 @@ import androidx.compose.ui.gesture.ScrollCallback
 import androidx.compose.ui.gesture.scrollorientationlocking.Orientation
 import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.compose.ui.platform.debugInspectorInfo
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 /**
  * Create and remember [ScrollableController] for [scrollable] with default [FlingConfig] and
@@ -63,6 +72,18 @@ fun rememberScrollableController(
     return remember(clocks, flingConfig, interactionState) {
         ScrollableController(consumeScrollDelta, flingConfig, clocks, interactionState)
     }
+}
+
+/**
+ * Scope used for suspending scroll blocks
+ */
+interface ScrollScope {
+    /**
+     * Attempts to scroll forward by [pixels] px.
+     *
+     * @return the amount of the requested scroll that was consumed (that is, how far it scrolled)
+     */
+    fun scrollBy(pixels: Float): Float
 }
 
 /**
@@ -100,6 +121,90 @@ class ScrollableController(
         animatedFloat.animateTo(to, anim = spec, onEnd = onEnd)
     }
 
+    /**
+     * Smooth scroll by [value] pixels.
+     *
+     * Cancels the currently running scroll, if any, and suspends until the cancellation is
+     * complete.
+     *
+     * @param value delta to scroll by
+     * @param spec [AnimationSpec] to be used for this smooth scrolling
+     *
+     * @return the amount of scroll consumed
+     */
+    @OptIn(ExperimentalFoundationApi::class)
+    suspend fun smoothScrollBy(
+        value: Float,
+        spec: AnimationSpec<Float> = spring()
+    ): Float {
+        val animSpec = spec.vectorize(Float.VectorConverter)
+        val conv = Float.VectorConverter
+        val zeroVector = conv.convertToVector(0f)
+        val targetVector = conv.convertToVector(value)
+        var previousValue = 0f
+
+        scroll {
+            val startTimeMillis = withFrameMillis { it }
+            do {
+                val finished = withFrameMillis { frameTimeMillis ->
+                    val newValue = conv.convertFromVector(
+                        animSpec.getValue(
+                            playTime = frameTimeMillis - startTimeMillis,
+                            start = zeroVector,
+                            end = targetVector,
+                            // TODO: figure out if/how we should incorporate existing velocity
+                            startVelocity = zeroVector
+                        )
+                    )
+                    val delta = newValue - previousValue
+                    val consumed = scrollBy(delta)
+
+                    if (consumed != delta) {
+                        previousValue += consumed
+                        true
+                    } else {
+                        previousValue = newValue
+                        previousValue == value
+                    }
+                }
+            } while (!finished)
+        }
+        return previousValue
+    }
+
+    private val scrollControlJob = AtomicReference<Job?>(null)
+    private val scrollControlMutex = Mutex()
+
+    private val scrollScope: ScrollScope = object : ScrollScope {
+        override fun scrollBy(pixels: Float): Float = consumeScrollDelta(pixels)
+    }
+
+    /**
+     * Call this function to take control of scrolling and gain the ability to send scroll events
+     * via [ScrollScope.scrollBy]. All actions that change the logical scroll position must be
+     * performed within a [scroll] block (even if they don't call any other methods on this
+     * object) in order to guarantee that mutual exclusion is enforced.
+     *
+     * Cancels the currently running scroll, if any, and suspends until the cancellation is
+     * complete.
+     *
+     * If [scroll] is called from elsewhere, this will be canceled.
+     */
+    suspend fun scroll(
+        block: suspend ScrollScope.() -> Unit
+    ): Unit = coroutineScope {
+        stopFlingAnimation()
+        val currentJob = coroutineContext[Job]
+        scrollControlJob.getAndSet(currentJob)?.cancel()
+        scrollControlMutex.withLock(currentJob) {
+            // TODO: this is a workaround to make isAnimationRunning work for now by considering all
+            //  suspend scrolls to be animations
+            isAnimationRunningState.value = true
+            scrollScope.block()
+            isAnimationRunningState.value = false
+        }
+    }
+
     private val isAnimationRunningState = mutableStateOf(false)
 
     private val clocksProxy: AnimationClockObservable = object : AnimationClockObservable {
@@ -115,18 +220,41 @@ class ScrollableController(
     }
 
     /**
-     * whether this [ScrollableController] is currently animating/flinging
+     * whether this [ScrollableController] is currently scrolling via [scroll].
+     *
+     * Note: **all** scrolls initiated via [scroll] are considered to be animations, regardless of
+     * whether they are actually performing an animation.  For instance, gestures that perform
+     * scrolls via `scroll
      */
     val isAnimationRunning
         get() = isAnimationRunningState.value
+
+    /**
+     * The current velocity of the fling animation.
+     *
+     * Useful for handoff between animations
+     */
+    internal val velocity: Float
+        get() = animatedFloat.velocity
 
     /**
      * Stop any ongoing animation, smooth scrolling or fling
      *
      * Call this to stop receiving scrollable deltas in [consumeScrollDelta]
      */
-    fun stopAnimation() {
+    internal fun stopFlingAnimation() {
         animatedFloat.stop()
+    }
+
+    /**
+     * Stop any ongoing animation, smooth scrolling, fling, or any other scroll occurring via
+     * [scroll].
+     *
+     * Call this to stop receiving scrollable deltas in [consumeScrollDelta]
+     */
+    fun stopAnimation() {
+        stopFlingAnimation()
+        scrollControlJob.getAndSet(null)?.cancel()
     }
 
     private val animatedFloat =
@@ -196,7 +324,7 @@ fun Modifier.scrollable(
 
             override fun onStart(downPosition: Offset) {
                 if (enabled) {
-                    controller.stopAnimation()
+                    controller.stopFlingAnimation()
                     controller.interactionState?.addInteraction(Interaction.Dragged)
                     onScrollStarted(downPosition)
                 }
@@ -204,7 +332,7 @@ fun Modifier.scrollable(
 
             override fun onScroll(scrollDistance: Float): Float {
                 if (!enabled) return 0f
-                controller.stopAnimation()
+                controller.stopFlingAnimation()
                 val toConsume = if (reverseDirection) scrollDistance * -1 else scrollDistance
                 val consumed = controller.consumeScrollDelta(toConsume)
                 controller.value = controller.value + consumed
