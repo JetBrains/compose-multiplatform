@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 internal fun LazyGrid(
     columns: Int,
     modifier: Modifier = Modifier,
+    state: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
     content: LazyListScope.() -> Unit
 ) {
@@ -49,6 +50,7 @@ internal fun LazyGrid(
     LazyFor(
         itemsCount = rows,
         modifier = modifier,
+        state = state,
         contentPadding = contentPadding,
         isVertical = true
     ) { rowIndex ->

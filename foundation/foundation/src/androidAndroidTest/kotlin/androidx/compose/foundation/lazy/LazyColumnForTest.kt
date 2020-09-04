@@ -16,8 +16,8 @@
 
 package androidx.compose.foundation.lazy
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -71,6 +71,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import java.util.concurrent.CountDownLatch
+import kotlin.math.roundToInt
 
 @LargeTest
 @RunWith(JUnit4::class)
@@ -720,6 +721,65 @@ class LazyColumnForTest {
         rule.runOnIdle {
             assertThat(firstItemRecomposed).isEqualTo(1)
             assertThat(secondItemRecomposed).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun onlyOneMeasurePassForScrollEvent() {
+        val items by mutableStateOf ((1..20).toList())
+        lateinit var state: LazyListState
+        rule.setContent {
+            state = rememberLazyListState()
+            LazyColumnFor(
+                items = items,
+                modifier = Modifier.size(100.dp).testTag(LazyColumnForTag),
+                state = state
+            ) {
+                Spacer(Modifier.size(20.dp).testTag("$it"))
+            }
+        }
+
+        val initialMeasurePasses = state.numMeasurePasses
+
+        rule.runOnIdle {
+            with(rule.density) {
+                state.onScroll(110.dp.toPx())
+            }
+        }
+
+        rule.waitForIdle()
+
+        assertThat(state.numMeasurePasses).isEqualTo(initialMeasurePasses + 1)
+    }
+
+    @Test
+    fun stateUpdatedAfterScroll() {
+        val items by mutableStateOf ((1..20).toList())
+        lateinit var state: LazyListState
+        rule.setContent {
+            state = rememberLazyListState()
+            LazyColumnFor(
+                items = items,
+                modifier = Modifier.size(100.dp).testTag(LazyColumnForTag),
+                state = state
+            ) {
+                Spacer(Modifier.size(20.dp).testTag("$it"))
+            }
+        }
+
+        assertThat(state.firstVisibleItemIndex).isEqualTo(0)
+        assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+
+        rule.onNodeWithTag(LazyColumnForTag)
+            .scrollBy(y = 30.dp, density = rule.density)
+
+        assertThat(state.firstVisibleItemIndex).isEqualTo(1)
+
+        with (rule.density) {
+            // TODO(b/169232491): test scrolling doesn't appear to be scrolling exactly the right
+            //  number of pixels
+            //  assertThat(state.firstVisibleItemScrollOffset).isEqualTo(10.dp.toPx().roundToInt())
+            assertThat(state.firstVisibleItemScrollOffset).isGreaterThan(5.dp.toPx().roundToInt())
         }
     }
 
