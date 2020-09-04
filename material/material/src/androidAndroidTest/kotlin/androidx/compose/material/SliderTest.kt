@@ -23,9 +23,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LayoutDirectionAmbient
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.AccessibilityRangeInfo
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
+import androidx.ui.test.SemanticsMatcher
+import androidx.ui.test.assert
 import androidx.ui.test.assertHeightIsEqualTo
 import androidx.ui.test.assertValueEquals
 import androidx.ui.test.assertWidthIsEqualTo
@@ -38,6 +43,7 @@ import androidx.ui.test.left
 import androidx.ui.test.moveBy
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performGesture
+import androidx.ui.test.performSemanticsAction
 import androidx.ui.test.right
 import androidx.ui.test.up
 import com.google.common.truth.Truth
@@ -84,7 +90,7 @@ class SliderTest {
     }
 
     @Test
-    fun slider_semantics() {
+    fun slider_semantics_continuous() {
         val state = mutableStateOf(0f)
 
         rule.setMaterialContent {
@@ -94,6 +100,9 @@ class SliderTest {
 
         rule.onNodeWithTag(tag)
             .assertValueEquals("0 percent")
+            .assert(SemanticsMatcher.expectValue(
+                SemanticsProperties.AccessibilityRangeInfo, AccessibilityRangeInfo(0f, 0f..1f, 0)))
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.SetProgress))
 
         rule.runOnUiThread {
             state.value = 0.5f
@@ -101,6 +110,41 @@ class SliderTest {
 
         rule.onNodeWithTag(tag)
             .assertValueEquals("50 percent")
+
+        onNodeWithTag(tag)
+            .performSemanticsAction(SemanticsActions.SetProgress) { it(0.7f) }
+
+        onNodeWithTag(tag)
+            .assertValueEquals("70 percent")
+    }
+
+    @Test
+    fun slider_semantics_stepped() {
+        val state = mutableStateOf(0f)
+
+        rule.setMaterialContent {
+                Slider(modifier = Modifier.testTag(tag), value = state.value,
+                    onValueChange = { state.value = it }, steps = 4)
+            }
+
+        onNodeWithTag(tag)
+            .assertValueEquals("0 percent")
+            .assert(SemanticsMatcher.expectValue(
+                SemanticsProperties.AccessibilityRangeInfo, AccessibilityRangeInfo(0f, 0f..1f, 4)))
+            .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.SetProgress))
+
+        rule.runOnUiThread {
+            state.value = 0.6f
+        }
+
+        onNodeWithTag(tag)
+            .assertValueEquals("60 percent")
+
+        onNodeWithTag(tag)
+            .performSemanticsAction(SemanticsActions.SetProgress) { it(0.75f) }
+
+        onNodeWithTag(tag)
+            .assertValueEquals("80 percent")
     }
 
     @Test
