@@ -42,8 +42,14 @@ private val MainAndroidUiContext: CoroutineContext by lazy {
 }
 
 internal actual object Trace {
-    actual fun beginSection(name: String) = android.os.Trace.beginSection(name)
-    actual fun endSection() = android.os.Trace.endSection()
+    actual fun beginSection(name: String): Any? {
+        android.os.Trace.beginSection(name)
+        return null
+    }
+
+    actual fun endSection(token: Any?) {
+        android.os.Trace.endSection()
+    }
 }
 
 internal actual typealias MainThread = androidx.annotation.MainThread

@@ -17,8 +17,25 @@
 package androidx.compose.runtime
 
 internal expect object Trace {
-    fun beginSection(name: String)
-    fun endSection()
+    /**
+     * Writes a trace message to indicate that a given section of code has begun.
+     * This call must be followed by a corresponding call to [endSection] on the same thread.
+     *
+     * @return An arbitrary token which will be supplied to the corresponding call
+     * to [endSection]. May be null.
+     */
+    fun beginSection(name: String): Any?
+
+    /**
+     * Writes a trace message to indicate that a given section of code has ended.
+     * This call must be preceded by a corresponding call to [beginSection].
+     * Calling this method will mark the end of the most recently begun section of code, so care
+     * must be taken to ensure that `beginSection` / `endSection` pairs are properly nested and
+     * called from the same thread.
+     *
+     * @param token The instance returned from the corresponding call to [beginSection].
+     */
+    fun endSection(token: Any?)
 }
 
 /**
@@ -26,10 +43,10 @@ internal expect object Trace {
  * and [Trace.endSection].
  */
 internal inline fun <T> trace(sectionName: String, block: () -> T): T {
-    Trace.beginSection(sectionName)
+    val token = Trace.beginSection(sectionName)
     try {
         return block()
     } finally {
-        Trace.endSection()
+        Trace.endSection(token)
     }
 }
