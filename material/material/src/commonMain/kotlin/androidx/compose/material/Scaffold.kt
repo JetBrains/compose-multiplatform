@@ -18,7 +18,7 @@ package androidx.compose.material
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.InnerPadding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -172,7 +172,7 @@ enum class FabPosition {
  * @param contentColor color of the content in scaffold body. Defaults to either the matching
  * `onFoo` color for [backgroundColor], or, if it is not a color from the theme, this will keep
  * the same value set above this Surface.
- * @param bodyContent content of your screen. The lambda receives an [InnerPadding] that should be
+ * @param bodyContent content of your screen. The lambda receives an [PaddingValues] that should be
  * applied to the content root via [Modifier.padding] to properly offset top and bottom bars. If
  * you're using VerticalScroller, apply this modifier to the child of the scroller, and not on
  * the scroller itself.
@@ -197,7 +197,7 @@ fun Scaffold(
         .copy(alpha = DrawerConstants.ScrimDefaultOpacity),
     backgroundColor: Color = MaterialTheme.colors.background,
     contentColor: Color = contentColorFor(backgroundColor),
-    bodyContent: @Composable (InnerPadding) -> Unit
+    bodyContent: @Composable (PaddingValues) -> Unit
 ) {
     scaffoldState.scaffoldGeometry.isFabDocked = isFloatingActionButtonDocked
     val child = @Composable { childModifier: Modifier ->
@@ -320,12 +320,12 @@ private fun DockedBottomBar(
 private fun ScaffoldContent(
     modifier: Modifier,
     scaffoldState: ScaffoldState,
-    content: @Composable (InnerPadding) -> Unit
+    content: @Composable (PaddingValues) -> Unit
 ) {
     ScaffoldSlot(modifier) {
         val innerPadding = with(DensityAmbient.current) {
             val bottom = scaffoldState.scaffoldGeometry.bottomBarBounds?.height?.toDp() ?: 0.dp
-            InnerPadding(bottom = bottom)
+            PaddingValues(bottom = bottom)
         }
         content(innerPadding)
     }

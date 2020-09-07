@@ -18,7 +18,7 @@ package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.gestures.rememberScrollableController
 import androidx.compose.foundation.gestures.scrollable
-import androidx.compose.foundation.layout.InnerPadding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -58,7 +58,7 @@ import androidx.compose.ui.unit.dp
 fun <T> LazyColumnFor(
     items: List<T>,
     modifier: Modifier = Modifier,
-    contentPadding: InnerPadding = InnerPadding(0.dp),
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     itemContent: @Composable LazyItemScope.(T) -> Unit
 ) {
@@ -105,7 +105,7 @@ fun <T> LazyColumnFor(
 fun <T> LazyColumnForIndexed(
     items: List<T>,
     modifier: Modifier = Modifier,
-    contentPadding: InnerPadding = InnerPadding(0.dp),
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
 ) {
@@ -133,7 +133,7 @@ fun <T> LazyColumnForIndexed(
 fun <T> LazyColumnItems(
     items: List<T>,
     modifier: Modifier = Modifier,
-    contentPadding: InnerPadding = InnerPadding(0.dp),
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     horizontalGravity: Alignment.Horizontal = Alignment.Start,
     itemContent: @Composable (T) -> Unit
 ) {
@@ -171,7 +171,7 @@ fun <T> LazyColumnItems(
 fun <T> LazyRowFor(
     items: List<T>,
     modifier: Modifier = Modifier,
-    contentPadding: InnerPadding = InnerPadding(0.dp),
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     verticalAlignment: Alignment.Vertical = Alignment.Top,
     itemContent: @Composable LazyItemScope.(T) -> Unit
 ) {
@@ -217,7 +217,7 @@ fun <T> LazyRowFor(
 fun <T> LazyRowForIndexed(
     items: List<T>,
     modifier: Modifier = Modifier,
-    contentPadding: InnerPadding = InnerPadding(0.dp),
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     verticalAlignment: Alignment.Vertical = Alignment.Top,
     itemContent: @Composable LazyItemScope.(index: Int, item: T) -> Unit
 ) {
@@ -245,7 +245,7 @@ fun <T> LazyRowForIndexed(
 fun <T> LazyRowItems(
     items: List<T>,
     modifier: Modifier = Modifier,
-    contentPadding: InnerPadding = InnerPadding(0.dp),
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     verticalGravity: Alignment.Vertical = Alignment.Top,
     itemContent: @Composable (T) -> Unit
 ) {
@@ -265,7 +265,7 @@ fun <T> LazyRowItems(
 internal inline fun LazyFor(
     itemsCount: Int,
     modifier: Modifier = Modifier,
-    contentPadding: InnerPadding,
+    contentPadding: PaddingValues,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     verticalAlignment: Alignment.Vertical = Alignment.Top,
     isVertical: Boolean,

@@ -79,7 +79,7 @@ class ContainerTest : LayoutTest() {
         show {
             Stack {
                 Container(
-                    padding = InnerPadding(paddingDp),
+                    padding = PaddingValues(paddingDp),
                     modifier = Modifier.onPositioned { coordinates ->
                         containerSize.value = coordinates.size
                         positionedLatch.countDown()
@@ -265,7 +265,7 @@ class ContainerTest : LayoutTest() {
         val latch = CountDownLatch(1)
         show {
             Stack {
-                Container(width = sizeDp, height = sizeDp, padding = InnerPadding(10.dp),
+                Container(width = sizeDp, height = sizeDp, padding = PaddingValues(10.dp),
                     modifier = Modifier.onPositioned { coordinates: LayoutCoordinates ->
                         containerSize.value = coordinates.size
                         latch.countDown()
@@ -285,7 +285,7 @@ class ContainerTest : LayoutTest() {
         val paddingTop = 7.toDp()
         val paddingRight = 5.toDp()
         val paddingBottom = 10.toDp()
-        val innerPadding = InnerPadding(
+        val innerPadding = PaddingValues(
             start = paddingLeft,
             top = paddingTop,
             end = paddingRight,
@@ -321,7 +321,7 @@ class ContainerTest : LayoutTest() {
         val containerSize = 50.toDp()
         val padding = 10.toDp()
         val childSize = 5.toDp()
-        val innerPadding = InnerPadding(padding)
+        val innerPadding = PaddingValues(padding)
 
         var childCoordinates: LayoutCoordinates? = null
         val latch = CountDownLatch(1)

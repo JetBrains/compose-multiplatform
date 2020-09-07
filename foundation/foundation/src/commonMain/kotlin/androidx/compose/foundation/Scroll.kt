@@ -29,7 +29,7 @@ import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.InnerPadding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.InternalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -243,7 +243,7 @@ fun ScrollableColumn(
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     reverseScrollDirection: Boolean = false,
     isScrollEnabled: Boolean = true,
-    contentPadding: InnerPadding = InnerPadding(0.dp),
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     children: @Composable ColumnScope.() -> Unit
 ) {
     Column(
@@ -288,7 +288,7 @@ fun ScrollableRow(
     verticalAlignment: Alignment.Vertical = Alignment.Top,
     reverseScrollDirection: Boolean = false,
     isScrollEnabled: Boolean = true,
-    contentPadding: InnerPadding = InnerPadding(0.dp),
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     children: @Composable RowScope.() -> Unit
 ) {
     Row(

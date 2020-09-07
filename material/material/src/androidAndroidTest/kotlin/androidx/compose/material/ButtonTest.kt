@@ -21,7 +21,7 @@ import androidx.compose.foundation.Text
 import androidx.compose.foundation.contentColor
 import androidx.compose.foundation.currentTextStyle
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.InnerPadding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.Stack
@@ -589,8 +589,11 @@ class ButtonTest {
     @Test
     fun minHeightAndMinWidthCanBeOverridden() {
         rule.setMaterialContent {
-            Button(onClick = {}, contentPadding = InnerPadding(), modifier = Modifier.widthIn(20.dp)
-                .heightIn(15.dp).testTag("button")) {
+            Button(
+                onClick = {},
+                contentPadding = PaddingValues(),
+                modifier = Modifier.widthIn(20.dp).heightIn(15.dp).testTag("button")
+            ) {
                 Spacer(Modifier.size(10.dp))
             }
         }

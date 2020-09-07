@@ -18,7 +18,7 @@ package androidx.compose.material.studies.rally
 
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.InnerPadding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.AlertDialog
@@ -49,7 +49,7 @@ fun RallyAlertDialog(
                     TextButton(
                         onClick = onDismiss,
                         shape = RectangleShape,
-                        contentPadding = InnerPadding(16.dp),
+                        contentPadding = PaddingValues(16.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(buttonText)

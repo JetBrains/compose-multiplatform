@@ -19,7 +19,7 @@ package androidx.compose.material.demos
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.InnerPadding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.MaterialTheme
@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.dp
 fun SelectionControlsDemo() {
     val headerStyle = MaterialTheme.typography.h6
     ScrollableColumn(
-        contentPadding = InnerPadding(10.dp),
+        contentPadding = PaddingValues(10.dp),
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
         Text(text = "Checkbox", style = headerStyle)

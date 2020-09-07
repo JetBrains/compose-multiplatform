@@ -31,7 +31,7 @@ import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.InnerPadding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.defaultMinSizeConstraints
@@ -102,7 +102,7 @@ fun Button(
     disabledBackgroundColor: Color = ButtonConstants.defaultDisabledBackgroundColor,
     contentColor: Color = contentColorFor(backgroundColor),
     disabledContentColor: Color = ButtonConstants.defaultDisabledContentColor,
-    contentPadding: InnerPadding = ButtonConstants.DefaultContentPadding,
+    contentPadding: PaddingValues = ButtonConstants.DefaultContentPadding,
     content: @Composable RowScope.() -> Unit
 ) {
     // TODO(aelias): Avoid manually putting the clickable above the clip and
@@ -190,7 +190,7 @@ inline fun OutlinedButton(
     backgroundColor: Color = MaterialTheme.colors.surface,
     contentColor: Color = MaterialTheme.colors.primary,
     disabledContentColor: Color = ButtonConstants.defaultDisabledContentColor,
-    contentPadding: InnerPadding = ButtonConstants.DefaultContentPadding,
+    contentPadding: PaddingValues = ButtonConstants.DefaultContentPadding,
     noinline content: @Composable RowScope.() -> Unit
 ) = Button(
     onClick = onClick,
@@ -255,7 +255,7 @@ inline fun TextButton(
     backgroundColor: Color = Color.Transparent,
     contentColor: Color = MaterialTheme.colors.primary,
     disabledContentColor: Color = ButtonConstants.defaultDisabledContentColor,
-    contentPadding: InnerPadding = ButtonConstants.DefaultTextContentPadding,
+    contentPadding: PaddingValues = ButtonConstants.DefaultTextContentPadding,
     noinline content: @Composable RowScope.() -> Unit
 ) = Button(
     onClick = onClick,
@@ -283,7 +283,7 @@ object ButtonConstants {
     /**
      * The default content padding used by [Button]
      */
-    val DefaultContentPadding = InnerPadding(
+    val DefaultContentPadding = PaddingValues(
         start = ButtonHorizontalPadding,
         top = ButtonVerticalPadding,
         end = ButtonHorizontalPadding,

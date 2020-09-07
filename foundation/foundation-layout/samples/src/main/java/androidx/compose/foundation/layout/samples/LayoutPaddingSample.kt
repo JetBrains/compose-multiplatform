@@ -19,7 +19,7 @@ package androidx.compose.foundation.layout.samples
 import androidx.annotation.Sampled
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.InnerPadding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.padding
@@ -62,8 +62,8 @@ fun PaddingAllModifier() {
 
 @Sampled
 @Composable
-fun PaddingInnerPaddingModifier() {
-    val innerPadding = InnerPadding(top = 10.dp, start = 15.dp)
+fun PaddingValuesModifier() {
+    val innerPadding = PaddingValues(top = 10.dp, start = 15.dp)
     Stack(Modifier.background(color = Color.Gray)) {
         Box(Modifier.padding(innerPadding).preferredSize(50.dp), backgroundColor = Color.Blue)
     }

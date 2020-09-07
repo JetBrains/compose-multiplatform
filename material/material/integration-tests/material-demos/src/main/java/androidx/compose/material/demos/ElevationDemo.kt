@@ -23,7 +23,7 @@ import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.InnerPadding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -46,7 +46,7 @@ fun ElevationDemo() {
         }
         ScrollableColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = InnerPadding(25.dp)
+            contentPadding = PaddingValues(25.dp)
         ) {
             elevations.forEach { elevation ->
                 ElevatedCard(elevation)
