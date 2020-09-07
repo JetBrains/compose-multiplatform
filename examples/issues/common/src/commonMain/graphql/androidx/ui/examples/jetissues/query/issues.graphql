@@ -1,0 +1,35 @@
+query Issues($owner: String!, $repo: String!, $direction: OrderDirection!, $after: String, $state: IssueState!) {
+  repository(owner: $owner, name: $repo) {
+    issues(first: 20, orderBy: { direction: $direction, field: CREATED_AT}, after: $after, filterBy: {states: [$state]}) {
+      nodes {
+        number,
+        title,
+        createdAt,
+        closed,
+        author {
+          login
+        },
+        comments {
+          totalCount
+        }
+        labels(first: 5) {
+          nodes {
+            name, color
+          }
+        }
+      }
+      pageInfo {
+        endCursor
+      }
+      totalCount
+    }
+  }
+}
+
+query Issue($owner: String!, $repo: String!, $number: Int!) {
+  repository(owner: $owner, name: $repo) {
+    issue(number: $number) {
+      body
+    }
+  }
+}
