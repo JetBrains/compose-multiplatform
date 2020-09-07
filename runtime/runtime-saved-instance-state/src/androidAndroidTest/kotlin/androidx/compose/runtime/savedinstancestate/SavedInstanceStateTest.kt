@@ -20,7 +20,6 @@ import androidx.compose.runtime.MutableState
 import androidx.test.filters.MediumTest
 import androidx.ui.test.StateRestorationTester
 import androidx.ui.test.createComposeRule
-import androidx.ui.test.runOnIdle
 import androidx.ui.test.runOnUiThread
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
@@ -33,9 +32,9 @@ import org.junit.runners.JUnit4
 class SavedInstanceStateTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
-    private val restorationTester = StateRestorationTester(composeTestRule)
+    private val restorationTester = StateRestorationTester(rule)
 
     @Test
     fun simpleRestore() {
@@ -44,7 +43,7 @@ class SavedInstanceStateTest {
             state = savedInstanceState { 0 }
         }
 
-        runOnUiThread {
+        rule.runOnUiThread {
             assertThat(state!!.value).isEqualTo(0)
 
             state!!.value = 1
@@ -54,7 +53,7 @@ class SavedInstanceStateTest {
 
         restorationTester.emulateSavedInstanceStateRestore()
 
-        runOnUiThread {
+        rule.runOnUiThread {
             assertThat(state!!.value).isEqualTo(1)
         }
     }
@@ -68,7 +67,7 @@ class SavedInstanceStateTest {
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(state!!.value).isEqualTo(Holder(0))
 
             state!!.value.value = 1
@@ -78,7 +77,7 @@ class SavedInstanceStateTest {
 
         restorationTester.emulateSavedInstanceStateRestore()
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(state!!.value).isEqualTo(Holder(1))
         }
     }
@@ -90,7 +89,7 @@ class SavedInstanceStateTest {
             state = savedInstanceState<String?> { null }
         }
 
-        runOnUiThread {
+        rule.runOnUiThread {
             assertThat(state!!.value).isNull()
 
             state!!.value = "value"
@@ -100,7 +99,7 @@ class SavedInstanceStateTest {
 
         restorationTester.emulateSavedInstanceStateRestore()
 
-        runOnUiThread {
+        rule.runOnUiThread {
             assertThat(state!!.value).isEqualTo("value")
         }
     }
@@ -112,7 +111,7 @@ class SavedInstanceStateTest {
             state = savedInstanceState<String?> { "initial" }
         }
 
-        runOnUiThread {
+        rule.runOnUiThread {
             assertThat(state!!.value).isEqualTo("initial")
 
             state!!.value = null
@@ -122,7 +121,7 @@ class SavedInstanceStateTest {
 
         restorationTester.emulateSavedInstanceStateRestore()
 
-        runOnUiThread {
+        rule.runOnUiThread {
             assertThat(state!!.value).isNull()
         }
     }

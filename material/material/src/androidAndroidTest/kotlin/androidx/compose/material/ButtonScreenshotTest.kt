@@ -31,7 +31,6 @@ import androidx.ui.test.center
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.down
 import androidx.ui.test.hasClickAction
-import androidx.ui.test.onNode
 import androidx.ui.test.onNodeWithText
 import androidx.ui.test.onRoot
 import androidx.ui.test.performGesture
@@ -59,7 +58,7 @@ class ButtonScreenshotTest {
             }
         }
 
-        onNode(hasClickAction())
+        rule.onNode(hasClickAction())
             .captureToBitmap()
             .assertAgainstGolden(screenshotRule, "button_default")
     }
@@ -88,7 +87,7 @@ class ButtonScreenshotTest {
         rule.clockTestRule.pauseClock()
 
         // Start ripple
-        onNode(hasClickAction())
+        rule.onNode(hasClickAction())
             .performGesture { down(center) }
 
         // Let ripple propagate

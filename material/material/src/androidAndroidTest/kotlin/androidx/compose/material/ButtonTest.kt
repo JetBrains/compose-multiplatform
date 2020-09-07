@@ -68,7 +68,6 @@ import androidx.ui.test.assertWidthIsEqualTo
 import androidx.ui.test.captureToBitmap
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.hasClickAction
-import androidx.ui.test.onNode
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.onNodeWithText
 import androidx.ui.test.performClick
@@ -215,7 +214,7 @@ class ButtonTest {
             }
         }
 
-        onNode(hasClickAction())
+        rule.onNode(hasClickAction())
             .assertHeightIsEqualTo(36.dp)
     }
 
@@ -230,7 +229,7 @@ class ButtonTest {
             }
         }
 
-        onNode(hasClickAction())
+        rule.onNode(hasClickAction())
             .assertHeightIsAtLeast(37.dp)
     }
 

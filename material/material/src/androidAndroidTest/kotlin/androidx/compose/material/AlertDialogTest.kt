@@ -29,7 +29,6 @@ import androidx.ui.test.assertContainsColor
 import androidx.ui.test.captureToBitmap
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.isDialog
-import androidx.ui.test.onNode
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -62,7 +61,7 @@ class AlertDialogTest {
         }
 
         // Assert background
-        onNode(isDialog())
+        rule.onNode(isDialog())
             .captureToBitmap()
             .assertContainsColor(Color.Yellow) // Background
             .assertContainsColor(Color.Blue) // Modifier border

@@ -22,7 +22,6 @@ import androidx.compose.runtime.key
 import androidx.test.filters.MediumTest
 import androidx.ui.test.StateRestorationTester
 import androidx.ui.test.createComposeRule
-import androidx.ui.test.runOnIdle
 import androidx.ui.test.runOnUiThread
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
@@ -35,9 +34,9 @@ import org.junit.runners.JUnit4
 class RestorationInVariousScenariosTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
-    private val restorationTester = StateRestorationTester(composeTestRule)
+    private val restorationTester = StateRestorationTester(rule)
 
     @Test
     fun insideForLoop() {
@@ -48,7 +47,7 @@ class RestorationInVariousScenariosTest {
             }
         }
 
-        runOnUiThread {
+        rule.runOnUiThread {
             assertThat(states[0]!!.value).isEqualTo(0)
             assertThat(states[1]!!.value).isEqualTo(0)
 
@@ -62,7 +61,7 @@ class RestorationInVariousScenariosTest {
 
         restorationTester.emulateSavedInstanceStateRestore()
 
-        runOnUiThread {
+        rule.runOnUiThread {
             assertThat(states[0]!!.value).isEqualTo(1)
             assertThat(states[1]!!.value).isEqualTo(2)
         }
@@ -79,7 +78,7 @@ class RestorationInVariousScenariosTest {
             }
         }
 
-        runOnUiThread {
+        rule.runOnUiThread {
             assertThat(states[0]!!.value).isEqualTo(0)
             assertThat(states[1]!!.value).isEqualTo(0)
 
@@ -93,7 +92,7 @@ class RestorationInVariousScenariosTest {
 
         restorationTester.emulateSavedInstanceStateRestore()
 
-        runOnUiThread {
+        rule.runOnUiThread {
             assertThat(states[0]!!.value).isEqualTo(1)
             assertThat(states[1]!!.value).isEqualTo(2)
         }
@@ -108,7 +107,7 @@ class RestorationInVariousScenariosTest {
             }
         }
 
-        runOnUiThread {
+        rule.runOnUiThread {
             assertThat(states[0]!!.value).isEqualTo(0)
             assertThat(states[1]!!.value).isEqualTo(0)
 
@@ -122,7 +121,7 @@ class RestorationInVariousScenariosTest {
 
         restorationTester.emulateSavedInstanceStateRestore()
 
-        runOnUiThread {
+        rule.runOnUiThread {
             assertThat(states[0]!!.value).isEqualTo(1)
             assertThat(states[1]!!.value).isEqualTo(2)
         }
@@ -140,7 +139,7 @@ class RestorationInVariousScenariosTest {
             stateOutside = savedInstanceState { "0" }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             statesInLoop[0]!!.value = 1
             statesInLoop[0] = null
             stateOutside!!.value = "1"
@@ -150,7 +149,7 @@ class RestorationInVariousScenariosTest {
 
         restorationTester.emulateSavedInstanceStateRestore()
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(statesInLoop[0]?.value).isEqualTo(1)
             assertThat(stateOutside?.value).isEqualTo("1")
         }
@@ -164,7 +163,7 @@ class RestorationInVariousScenariosTest {
             states[1] = savedInstanceState { 0 }
         }
 
-        runOnUiThread {
+        rule.runOnUiThread {
             assertThat(states[0]!!.value).isEqualTo(0)
             assertThat(states[1]!!.value).isEqualTo(0)
 
@@ -178,7 +177,7 @@ class RestorationInVariousScenariosTest {
 
         restorationTester.emulateSavedInstanceStateRestore()
 
-        runOnUiThread {
+        rule.runOnUiThread {
             assertThat(states[0]!!.value).isEqualTo(1)
             assertThat(states[1]!!.value).isEqualTo(2)
         }
@@ -195,7 +194,7 @@ class RestorationInVariousScenariosTest {
             states[1] = savedInstanceState { 0 }
         }
 
-        runOnUiThread {
+        rule.runOnUiThread {
             assertThat(states[0]!!.value).isEqualTo(0)
             assertThat(states[1]!!.value).isEqualTo(0)
 
@@ -210,7 +209,7 @@ class RestorationInVariousScenariosTest {
 
         restorationTester.emulateSavedInstanceStateRestore()
 
-        runOnUiThread {
+        rule.runOnUiThread {
             assertThat(states[0]).isNull()
             assertThat(states[1]!!.value).isEqualTo(1)
         }
@@ -224,7 +223,7 @@ class RestorationInVariousScenariosTest {
             FunctionWithState(states, 1)
         }
 
-        runOnUiThread {
+        rule.runOnUiThread {
             assertThat(states[0]!!.value).isEqualTo(0)
             assertThat(states[1]!!.value).isEqualTo(0)
 
@@ -238,7 +237,7 @@ class RestorationInVariousScenariosTest {
 
         restorationTester.emulateSavedInstanceStateRestore()
 
-        runOnUiThread {
+        rule.runOnUiThread {
             assertThat(states[0]!!.value).isEqualTo(1)
             assertThat(states[1]!!.value).isEqualTo(2)
         }
@@ -255,7 +254,7 @@ class RestorationInVariousScenariosTest {
             FunctionWithState(states, 1)
         }
 
-        runOnUiThread {
+        rule.runOnUiThread {
             assertThat(states[0]!!.value).isEqualTo(0)
             assertThat(states[1]!!.value).isEqualTo(0)
 
@@ -270,7 +269,7 @@ class RestorationInVariousScenariosTest {
 
         restorationTester.emulateSavedInstanceStateRestore()
 
-        runOnUiThread {
+        rule.runOnUiThread {
             assertThat(states[0]).isNull()
             assertThat(states[1]!!.value).isEqualTo(1)
         }

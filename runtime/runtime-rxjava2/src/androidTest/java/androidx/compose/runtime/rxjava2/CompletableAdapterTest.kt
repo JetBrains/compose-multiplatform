@@ -18,7 +18,6 @@ package androidx.compose.runtime.rxjava2
 
 import androidx.test.filters.MediumTest
 import androidx.ui.test.createComposeRule
-import androidx.ui.test.runOnIdle
 import com.google.common.truth.Truth
 import io.reactivex.Completable
 import io.reactivex.CompletableEmitter
@@ -66,11 +65,11 @@ class CompletableAdapterTest {
             realValue = stream.completable.subscribeAsState().value
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             stream.onComplete()
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             Truth.assertThat(realValue).isTrue()
         }
     }
