@@ -58,33 +58,33 @@ class LayoutSizeTest : LayoutTest() {
             Stack {
                 Column {
                     Container(
-                        Modifier.preferredWidthIn(minWidth = sizeDp, maxWidth = sizeDp * 2)
+                        Modifier.preferredWidthIn(min = sizeDp, max = sizeDp * 2)
                             .preferredHeight(sizeDp)
                             .saveLayoutInfo(size[0], position[0], positionedLatch)
                     ) {
                     }
                     Container(
-                        Modifier.preferredWidthIn(maxWidth = sizeDp * 2)
+                        Modifier.preferredWidthIn(max = sizeDp * 2)
                             .preferredHeight(sizeDp)
                             .saveLayoutInfo(size[1], position[1], positionedLatch)
                     ) {
                     }
                     Container(
-                        Modifier.preferredWidthIn(minWidth = sizeDp)
+                        Modifier.preferredWidthIn(min = sizeDp)
                             .preferredHeight(sizeDp)
                             .saveLayoutInfo(size[2], position[2], positionedLatch)
                     ) {
                     }
                     Container(
-                        Modifier.preferredWidthIn(maxWidth = sizeDp)
-                            .preferredWidthIn(minWidth = sizeDp * 2)
+                        Modifier.preferredWidthIn(max = sizeDp)
+                            .preferredWidthIn(min = sizeDp * 2)
                             .preferredHeight(sizeDp)
                             .saveLayoutInfo(size[3], position[3], positionedLatch)
                     ) {
                     }
                     Container(
-                        Modifier.preferredWidthIn(minWidth = sizeDp * 2)
-                            .preferredWidthIn(maxWidth = sizeDp)
+                        Modifier.preferredWidthIn(min = sizeDp * 2)
+                            .preferredWidthIn(max = sizeDp)
                             .preferredHeight(sizeDp)
                             .saveLayoutInfo(size[4], position[4], positionedLatch)
                     ) {
@@ -130,33 +130,33 @@ class LayoutSizeTest : LayoutTest() {
             Stack {
                 Row {
                     Container(
-                        Modifier.preferredHeightIn(minHeight = sizeDp, maxHeight = sizeDp * 2)
+                        Modifier.preferredHeightIn(min = sizeDp, max = sizeDp * 2)
                             .preferredWidth(sizeDp)
                             .saveLayoutInfo(size[0], position[0], positionedLatch)
                     ) {
                     }
                     Container(
-                        Modifier.preferredHeightIn(maxHeight = sizeDp * 2)
+                        Modifier.preferredHeightIn(max = sizeDp * 2)
                             .preferredWidth(sizeDp)
                             .saveLayoutInfo(size[1], position[1], positionedLatch)
                     ) {
                     }
                     Container(
-                        Modifier.preferredHeightIn(minHeight = sizeDp)
+                        Modifier.preferredHeightIn(min = sizeDp)
                             .preferredWidth(sizeDp)
                             .saveLayoutInfo(size[2], position[2], positionedLatch)
                     ) {
                     }
                     Container(
-                        Modifier.preferredHeightIn(maxHeight = sizeDp)
-                            .preferredHeightIn(minHeight = sizeDp * 2)
+                        Modifier.preferredHeightIn(max = sizeDp)
+                            .preferredHeightIn(min = sizeDp * 2)
                             .preferredWidth(sizeDp)
                             .saveLayoutInfo(size[3], position[3], positionedLatch)
                     ) {
                     }
                     Container(
-                        Modifier.preferredHeightIn(minHeight = sizeDp * 2)
-                            .preferredHeightIn(maxHeight = sizeDp)
+                        Modifier.preferredHeightIn(min = sizeDp * 2)
+                            .preferredHeightIn(max = sizeDp)
                             .preferredWidth(sizeDp)
                             .saveLayoutInfo(size[4], position[4], positionedLatch)
                     ) {
@@ -305,14 +305,14 @@ class LayoutSizeTest : LayoutTest() {
         show {
             Stack {
                 Row {
-                    Container(Modifier.preferredWidthIn(maxWidth = Dp.Infinity)) {
+                    Container(Modifier.preferredWidthIn(max = Dp.Infinity)) {
                         Container(width = sizeDp, height = sizeDp,
                             modifier = Modifier.saveLayoutInfo(size[0], position[0],
                                 positionedLatch)
                         ) {
                         }
                     }
-                    Container(Modifier.preferredHeightIn(maxHeight = Dp.Infinity)) {
+                    Container(Modifier.preferredHeightIn(max = Dp.Infinity)) {
                         Container(width = sizeDp, height = sizeDp,
                             modifier = Modifier.saveLayoutInfo(
                                 size[1],
@@ -325,8 +325,8 @@ class LayoutSizeTest : LayoutTest() {
                     Container(
                         Modifier.preferredWidth(sizeDp)
                             .preferredHeight(sizeDp)
-                            .preferredWidthIn(maxWidth = Dp.Infinity)
-                            .preferredHeightIn(maxHeight = Dp.Infinity)
+                            .preferredWidthIn(max = Dp.Infinity)
+                            .preferredHeightIn(max = Dp.Infinity)
                             .saveLayoutInfo(size[2], position[2], positionedLatch)
                     ) {
                     }
@@ -638,7 +638,7 @@ class LayoutSizeTest : LayoutTest() {
     @Test
     fun testMinWidthModifier_hasCorrectIntrinsicMeasurements() = with(density) {
         testIntrinsics(@Composable {
-            Container(Modifier.preferredWidthIn(minWidth = 10.toDp())) {
+            Container(Modifier.preferredWidthIn(min = 10.toDp())) {
                 Container(Modifier.aspectRatio(1f)) { }
             }
         }) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
@@ -668,7 +668,7 @@ class LayoutSizeTest : LayoutTest() {
     @Test
     fun testMaxWidthModifier_hasCorrectIntrinsicMeasurements() = with(density) {
         testIntrinsics(@Composable {
-            Container(Modifier.preferredWidthIn(maxWidth = 20.toDp())) {
+            Container(Modifier.preferredWidthIn(max = 20.toDp())) {
                 Container(Modifier.aspectRatio(1f)) { }
             }
         }) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
@@ -698,7 +698,7 @@ class LayoutSizeTest : LayoutTest() {
     @Test
     fun testMinHeightModifier_hasCorrectIntrinsicMeasurements() = with(density) {
         testIntrinsics(@Composable {
-            Container(Modifier.preferredHeightIn(minHeight = 30.toDp())) {
+            Container(Modifier.preferredHeightIn(min = 30.toDp())) {
                 Container(Modifier.aspectRatio(1f)) { }
             }
         }) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->
@@ -728,7 +728,7 @@ class LayoutSizeTest : LayoutTest() {
     @Test
     fun testMaxHeightModifier_hasCorrectIntrinsicMeasurements() = with(density) {
         testIntrinsics(@Composable {
-            Container(Modifier.preferredHeightIn(maxHeight = 40.toDp())) {
+            Container(Modifier.preferredHeightIn(max = 40.toDp())) {
                 Container(Modifier.aspectRatio(1f)) { }
             }
         }) { minIntrinsicWidth, minIntrinsicHeight, maxIntrinsicWidth, maxIntrinsicHeight ->

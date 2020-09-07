@@ -471,7 +471,7 @@ internal val TrackHeight = 4.dp
 private val SliderHeight = 48.dp
 private val SliderMinWidth = 144.dp // TODO: clarify min width
 private val DefaultSliderConstraints =
-    Modifier.preferredWidthIn(minWidth = SliderMinWidth)
-        .preferredHeightIn(maxHeight = SliderHeight)
+    Modifier.preferredWidthIn(min = SliderMinWidth)
+        .preferredHeightIn(max = SliderHeight)
 
 private val SliderToTickAnimation = TweenSpec<Float>(durationMillis = 100)

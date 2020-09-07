@@ -102,28 +102,28 @@ fun Modifier.preferredSize(width: Dp, height: Dp) = preferredSizeIn(
 )
 
 /**
- * Constrain the width of the content to be between [minWidth]dp and [maxWidth]dp as permitted
+ * Constrain the width of the content to be between [min]dp and [max]dp as permitted
  * by the incoming measurement [Constraints]. If the incoming constraints are more restrictive
  * the requested size will obey the incoming constraints and attempt to be as close as possible
  * to the preferred size.
  */
 @Stable
 fun Modifier.preferredWidthIn(
-    minWidth: Dp = Dp.Unspecified,
-    maxWidth: Dp = Dp.Unspecified
-) = preferredSizeIn(minWidth = minWidth, maxWidth = maxWidth)
+    min: Dp = Dp.Unspecified,
+    max: Dp = Dp.Unspecified
+) = preferredSizeIn(minWidth = min, maxWidth = max)
 
 /**
- * Constrain the height of the content to be between [minHeight]dp and [maxHeight]dp as permitted
+ * Constrain the height of the content to be between [min]dp and [max]dp as permitted
  * by the incoming measurement [Constraints]. If the incoming constraints are more restrictive
  * the requested size will obey the incoming constraints and attempt to be as close as possible
  * to the preferred size.
  */
 @Stable
 fun Modifier.preferredHeightIn(
-    minHeight: Dp = Dp.Unspecified,
-    maxHeight: Dp = Dp.Unspecified
-) = preferredSizeIn(minHeight = minHeight, maxHeight = maxHeight)
+    min: Dp = Dp.Unspecified,
+    max: Dp = Dp.Unspecified
+) = preferredSizeIn(minHeight = min, maxHeight = max)
 
 /**
  * Constrain the size of the content to be within [constraints] as permitted by the incoming
@@ -231,7 +231,7 @@ fun Modifier.size(width: Dp, height: Dp) = sizeIn(
 )
 
 /**
- * Constrain the width of the content to be between [minWidth]dp and [maxWidth]dp.
+ * Constrain the width of the content to be between [min]dp and [max]dp.
  * If the content chooses a size that does not satisfy the incoming [Constraints], the
  * parent layout will be reported a size coerced in the [Constraints], and the position
  * of the content will be automatically offset to be centered on the space assigned to
@@ -239,12 +239,12 @@ fun Modifier.size(width: Dp, height: Dp) = sizeIn(
  */
 @Stable
 fun Modifier.widthIn(
-    minWidth: Dp = Dp.Unspecified,
-    maxWidth: Dp = Dp.Unspecified
-) = sizeIn(minWidth = minWidth, maxWidth = maxWidth)
+    min: Dp = Dp.Unspecified,
+    max: Dp = Dp.Unspecified
+) = sizeIn(minWidth = min, maxWidth = max)
 
 /**
- * Constrain the height of the content to be between [minHeight]dp and [maxHeight]dp.
+ * Constrain the height of the content to be between [min]dp and [max]dp.
  * If the content chooses a size that does not satisfy the incoming [Constraints], the
  * parent layout will be reported a size coerced in the [Constraints], and the position
  * of the content will be automatically offset to be centered on the space assigned to
@@ -252,9 +252,9 @@ fun Modifier.widthIn(
  */
 @Stable
 fun Modifier.heightIn(
-    minHeight: Dp = Dp.Unspecified,
-    maxHeight: Dp = Dp.Unspecified
-) = sizeIn(minHeight = minHeight, maxHeight = maxHeight)
+    min: Dp = Dp.Unspecified,
+    max: Dp = Dp.Unspecified
+) = sizeIn(minHeight = min, maxHeight = max)
 
 /**
  * Constrain the size of the content to be within [constraints].
