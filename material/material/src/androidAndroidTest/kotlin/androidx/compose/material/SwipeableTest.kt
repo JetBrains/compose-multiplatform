@@ -16,6 +16,7 @@
 
 package androidx.compose.material
 
+import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -1318,6 +1319,30 @@ class SwipeableTest {
         assertThat(endValue).isNull()
         advanceClock()
         assertThat(endValue).isEqualTo("B")
+    }
+
+    /**
+     * Tests that the 'onEnd' callback of 'animateTo' is invoked if the animation is interrupted.
+     */
+    @Test
+    fun swipeable_animateTo_onEnd_interrupted() {
+        val state = SwipeableState("A", clock)
+        setSwipeableContent {
+            Modifier.swipeable(
+                state = state,
+                anchors = mapOf(0f to "A", 100f to "B"),
+                thresholds = { _, _ -> FractionalThreshold(0.5f) },
+                orientation = Orientation.Horizontal
+            )
+        }
+
+        var endReason: AnimationEndReason? = null
+        state.animateTo("B",
+            onEnd = { reason, _ -> endReason = reason }
+        )
+        assertThat(endReason).isNull()
+        swipeRight()
+        assertThat(endReason).isEqualTo(AnimationEndReason.Interrupted)
     }
 
     /**

@@ -256,10 +256,9 @@ open class SwipeableState<T>(
             "The target value must have an associated anchor."
         }
         holder.animateTo(targetOffset, anim) { endReason, endOffset ->
-            anchors[endOffset]?.let {
-                value = it
-                onEnd?.invoke(endReason, it)
-            }
+            val endValue = anchors[endOffset] ?: value
+            value = endValue
+            onEnd?.invoke(endReason, endValue)
         }
     }
 
