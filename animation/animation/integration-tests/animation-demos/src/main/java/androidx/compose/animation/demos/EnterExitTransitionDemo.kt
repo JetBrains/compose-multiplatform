@@ -30,7 +30,7 @@ import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope.weight
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -157,7 +157,7 @@ fun CenterMenu(
     alignment: Alignment,
     visible: Boolean
 ) {
-    Stack(Modifier.fillMaxHeight().weight(1f)) {
+    Stack(with(RowScope) { Modifier.fillMaxHeight().weight(1f) }) {
 
         val animationAlignment = if (oppositeDirection) opposite(alignment) else alignment
         val enter = when (animationAlignment) {

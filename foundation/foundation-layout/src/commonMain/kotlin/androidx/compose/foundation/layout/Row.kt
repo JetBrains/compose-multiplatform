@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.layout
 
-import androidx.compose.foundation.layout.RowScope.weight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
@@ -123,7 +122,7 @@ internal fun rowMeasureBlocks(
  */
 @LayoutScopeMarker
 @Immutable
-object RowScope {
+interface RowScope {
     /**
      * Align the element vertically within the [Row]. This alignment will have priority over the
      * [Row]'s `verticalAlignment` parameter.
@@ -199,4 +198,6 @@ object RowScope {
     fun Modifier.alignWithSiblings(
         alignmentLineBlock: (Measured) -> Int
     ) = this.then(SiblingsAlignedModifier.WithAlignmentLineBlock(alignmentLineBlock))
+
+    companion object : RowScope
 }

@@ -51,7 +51,7 @@ fun Stack(
     alignment: Alignment = Alignment.TopStart,
     children: @Composable StackScope.() -> Unit
 ) {
-    val stackChildren: @Composable () -> Unit = { StackScope().children() }
+    val stackChildren: @Composable () -> Unit = { StackScope.children() }
 
     Layout(stackChildren, modifier = modifier) { measurables, constraints ->
         val placeables = arrayOfNulls<Placeable>(measurables.size)
@@ -102,7 +102,7 @@ fun Stack(
  */
 @LayoutScopeMarker
 @Immutable
-class StackScope {
+interface StackScope {
     /**
      * Pull the content element to a specific [Alignment] within the [Stack]. This alignment will
      * have priority over the [Stack]'s `alignment` parameter.
@@ -129,11 +129,11 @@ class StackScope {
     @Stable
     fun Modifier.matchParentSize() = this.then(StretchAlignModifier)
 
-    internal companion object {
-        @Stable
-        val StretchAlignModifier: ParentDataModifier = StackChildData(Alignment.Center, true)
-    }
+    companion object : StackScope
 }
+
+@Stable
+private val StretchAlignModifier: ParentDataModifier = StackChildData(Alignment.Center, true)
 
 private val Measurable.stackChildData: StackChildData? get() = parentData as? StackChildData
 private val Measurable.stretch: Boolean get() = stackChildData?.stretch ?: false

@@ -16,9 +16,6 @@
 
 package androidx.compose.foundation.layout
 
-import androidx.compose.foundation.layout.ColumnScope.alignWithSiblings
-import androidx.compose.foundation.layout.ColumnScope.weight
-import androidx.compose.foundation.layout.RowScope.alignWithSiblings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
@@ -118,7 +115,7 @@ internal fun columnMeasureBlocks(
  */
 @LayoutScopeMarker
 @Immutable
-object ColumnScope {
+interface ColumnScope {
     /**
      * Align the element horizontally within the [Column]. This alignment will have priority over
      * the [Column]'s `horizontalAlignment` parameter.
@@ -195,4 +192,6 @@ object ColumnScope {
     fun Modifier.alignWithSiblings(
         alignmentLineBlock: (Measured) -> Int
     ) = this.then(SiblingsAlignedModifier.WithAlignmentLineBlock(alignmentLineBlock))
+
+    companion object : ColumnScope
 }
