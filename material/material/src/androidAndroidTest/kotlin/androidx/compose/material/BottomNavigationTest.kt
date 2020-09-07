@@ -41,7 +41,6 @@ import androidx.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.getUnclippedBoundsInRoot
 import androidx.ui.test.isInMutuallyExclusiveGroup
-import androidx.ui.test.onAllNodes
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.onNodeWithText
 import androidx.ui.test.performClick
@@ -231,7 +230,7 @@ class BottomNavigationTest {
         }
 
         // Find all items and ensure there are 3
-        onAllNodes(isInMutuallyExclusiveGroup())
+        rule.onAllNodes(isInMutuallyExclusiveGroup())
             .assertCountEquals(3)
             // Ensure semantics match for selected state of the items
             .apply {

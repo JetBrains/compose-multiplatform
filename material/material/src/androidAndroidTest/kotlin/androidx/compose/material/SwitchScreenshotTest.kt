@@ -40,7 +40,6 @@ import androidx.ui.test.createComposeRule
 import androidx.ui.test.down
 import androidx.ui.test.isToggleable
 import androidx.ui.test.move
-import androidx.ui.test.onNode
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performGesture
 import androidx.ui.test.up
@@ -180,7 +179,7 @@ class SwitchScreenshotTest {
 
         rule.clockTestRule.pauseClock()
 
-        onNode(isToggleable())
+        rule.onNode(isToggleable())
             // split click into (down) and (move, up) to enforce a composition in between
             .performGesture { down(center) }
             .performGesture { move(); up() }
@@ -206,7 +205,7 @@ class SwitchScreenshotTest {
 
         rule.clockTestRule.pauseClock()
 
-        onNode(isToggleable())
+        rule.onNode(isToggleable())
             // split click into (down) and (move, up) to enforce a composition in between
             .performGesture { down(center) }
             .performGesture { move(); up() }

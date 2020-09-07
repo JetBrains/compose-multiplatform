@@ -25,7 +25,6 @@ import androidx.test.screenshot.assertAgainstGolden
 import androidx.ui.test.captureToBitmap
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.isDialog
-import androidx.ui.test.onNode
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -62,7 +61,7 @@ class AlertDialogScreenshotTest {
             )
         }
 
-        onNode(isDialog())
+        rule.onNode(isDialog())
             .captureToBitmap()
             .assertAgainstGolden(screenshotRule, "dialog_sideBySideButtons")
     }
@@ -87,7 +86,7 @@ class AlertDialogScreenshotTest {
             )
         }
 
-        onNode(isDialog())
+        rule.onNode(isDialog())
             .captureToBitmap()
             .assertAgainstGolden(screenshotRule, "dialog_stackedButtons")
     }

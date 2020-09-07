@@ -42,7 +42,6 @@ import androidx.ui.test.createComposeRule
 import androidx.ui.test.hasAnyDescendant
 import androidx.ui.test.hasTestTag
 import androidx.ui.test.isPopup
-import androidx.ui.test.onNode
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performClick
 import com.google.common.truth.Truth.assertThat
@@ -112,7 +111,7 @@ class MenuTest {
 
         rule.onNodeWithTag("MenuContent1").assertExists()
         rule.onNodeWithTag("MenuContent2").assertExists()
-        val node = onNode(
+        val node = rule.onNode(
             isPopup() and hasAnyDescendant(hasTestTag("MenuContent1")) and
                     hasAnyDescendant(hasTestTag("MenuContent2"))
         ).assertExists().fetchSemanticsNode()

@@ -47,7 +47,6 @@ import androidx.ui.test.assertPositionInRootIsEqualTo
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.getUnclippedBoundsInRoot
 import androidx.ui.test.isInMutuallyExclusiveGroup
-import androidx.ui.test.onAllNodes
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performClick
 import org.junit.Rule
@@ -145,7 +144,7 @@ class TabTest {
             )
 
         // Click the second tab
-        onAllNodes(isInMutuallyExclusiveGroup())[1].performClick()
+        rule.onAllNodes(isInMutuallyExclusiveGroup())[1].performClick()
 
         // Indicator should now be placed in the bottom left of the second tab, so its x coordinate
         // should be in the middle of the TabRow
@@ -323,7 +322,7 @@ class TabTest {
             )
 
         // Click the second tab
-        onAllNodes(isInMutuallyExclusiveGroup())[1].performClick()
+        rule.onAllNodes(isInMutuallyExclusiveGroup())[1].performClick()
 
         // Indicator should now be placed in the bottom left of the second tab, so its x coordinate
         // should be in the middle of the TabRow
@@ -342,7 +341,7 @@ class TabTest {
             }
 
         // Only the first tab should be selected
-        onAllNodes(isInMutuallyExclusiveGroup())
+        rule.onAllNodes(isInMutuallyExclusiveGroup())
             .assertCountEquals(3)
             .apply {
                 get(0).assertIsSelected()
@@ -359,7 +358,7 @@ class TabTest {
             }
 
         // Only the first tab should be selected
-        onAllNodes(isInMutuallyExclusiveGroup())
+        rule.onAllNodes(isInMutuallyExclusiveGroup())
             .assertCountEquals(3)
             .apply {
                 get(0).assertIsSelected()
@@ -368,10 +367,10 @@ class TabTest {
             }
 
         // Click the last tab
-        onAllNodes(isInMutuallyExclusiveGroup())[2].performClick()
+        rule.onAllNodes(isInMutuallyExclusiveGroup())[2].performClick()
 
         // Now only the last tab should be selected
-        onAllNodes(isInMutuallyExclusiveGroup())
+        rule.onAllNodes(isInMutuallyExclusiveGroup())
             .assertCountEquals(3)
             .apply {
                 get(0).assertIsNotSelected()
@@ -388,7 +387,7 @@ class TabTest {
             }
 
         // Only the first tab should be selected
-        onAllNodes(isInMutuallyExclusiveGroup())
+        rule.onAllNodes(isInMutuallyExclusiveGroup())
             .assertCountEquals(10)
             .apply {
                 get(0).assertIsSelected()
@@ -406,7 +405,7 @@ class TabTest {
             }
 
         // Only the first tab should be selected
-        onAllNodes(isInMutuallyExclusiveGroup())
+        rule.onAllNodes(isInMutuallyExclusiveGroup())
             .assertCountEquals(10)
             .apply {
                 get(0).assertIsSelected()
@@ -416,10 +415,10 @@ class TabTest {
             }
 
         // Click the second tab
-        onAllNodes(isInMutuallyExclusiveGroup())[1].performClick()
+        rule.onAllNodes(isInMutuallyExclusiveGroup())[1].performClick()
 
         // Now only the second tab should be selected
-        onAllNodes(isInMutuallyExclusiveGroup())
+        rule.onAllNodes(isInMutuallyExclusiveGroup())
             .assertCountEquals(10)
             .apply {
                 get(0).assertIsNotSelected()

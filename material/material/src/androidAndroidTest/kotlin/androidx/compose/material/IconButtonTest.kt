@@ -32,7 +32,6 @@ import androidx.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.ui.test.assertWidthIsEqualTo
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.isToggleable
-import androidx.ui.test.onNode
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performClick
 import org.junit.Rule
@@ -159,7 +158,7 @@ class IconButtonTest {
         rule.setMaterialContent {
             IconToggleButtonSample()
         }
-        onNode(isToggleable()).apply {
+        rule.onNode(isToggleable()).apply {
             assertIsOff()
             performClick()
             assertIsOn()

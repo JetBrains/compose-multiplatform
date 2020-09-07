@@ -24,8 +24,6 @@ import androidx.compose.runtime.setValue
 import androidx.test.filters.MediumTest
 import androidx.ui.test.StateRestorationTester
 import androidx.ui.test.createComposeRule
-import androidx.ui.test.runOnIdle
-import androidx.ui.test.runOnUiThread
 import com.google.common.truth.Truth.assertThat
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -41,9 +39,9 @@ import java.util.concurrent.TimeUnit
 class RememberSavedInstanceStateTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val rule = createComposeRule()
 
-    private val restorationTester = StateRestorationTester(composeTestRule)
+    private val restorationTester = StateRestorationTester(rule)
 
     @Test
     fun simpleRestore() {
@@ -56,7 +54,7 @@ class RememberSavedInstanceStateTest {
 
         assertThat(array).isEqualTo(intArrayOf(0))
 
-        runOnUiThread {
+        rule.runOnUiThread {
             array!![0] = 1
             // we null it to ensure recomposition happened
             array = null
@@ -78,7 +76,7 @@ class RememberSavedInstanceStateTest {
 
         assertThat(holder).isEqualTo(Holder(0))
 
-        runOnUiThread {
+        rule.runOnUiThread {
             holder!!.value = 1
             // we null it to ensure recomposition happened
             holder = null
@@ -177,7 +175,7 @@ class RememberSavedInstanceStateTest {
             }
         )
 
-        composeTestRule.setContent {
+        rule.setContent {
             WrapRegistry(
                 wrap = {
                     registryFactory(it)
@@ -190,7 +188,7 @@ class RememberSavedInstanceStateTest {
 
         val latch = CountDownLatch(1)
 
-        runOnUiThread {
+        rule.runOnUiThread {
             registryFactory = {
                 object : DelegateRegistry(it) {
                     override fun registerProvider(key: String, valueProvider: () -> Any?) {
@@ -213,7 +211,7 @@ class RememberSavedInstanceStateTest {
         val registeredKeys = mutableSetOf<String>()
         var registerLatch = CountDownLatch(1)
 
-        composeTestRule.setContent {
+        rule.setContent {
             WrapRegistry(
                 wrap = {
                     object : DelegateRegistry(it) {
@@ -238,7 +236,7 @@ class RememberSavedInstanceStateTest {
         assertTrue(registerLatch.await(1, TimeUnit.SECONDS))
         registerLatch = CountDownLatch(1)
 
-        runOnUiThread {
+        rule.runOnUiThread {
             key = "key2"
         }
 
@@ -259,7 +257,7 @@ class RememberSavedInstanceStateTest {
 
         val latch = CountDownLatch(1)
 
-        runOnIdle {
+        rule.runOnIdle {
             saver = Saver(
                 save = {
                     latch.countDown()
@@ -278,7 +276,7 @@ class RememberSavedInstanceStateTest {
         var doEmit by mutableStateOf(true)
         val latch = CountDownLatch(1)
 
-        composeTestRule.setContent {
+        rule.setContent {
             WrapRegistry(
                 wrap = {
                     object : DelegateRegistry(it) {
@@ -295,7 +293,7 @@ class RememberSavedInstanceStateTest {
             }
         }
 
-        runOnUiThread {
+        rule.runOnUiThread {
             // assert that unregister is not yet called
             assertThat(latch.count).isEqualTo(1)
             doEmit = false
@@ -308,7 +306,7 @@ class RememberSavedInstanceStateTest {
     fun customKey() {
         val passedKey = "test"
         var actualKey: String? = null
-        composeTestRule.setContent {
+        rule.setContent {
             WrapRegistry(
                 wrap = {
                     object : DelegateRegistry(it) {
@@ -330,7 +328,7 @@ class RememberSavedInstanceStateTest {
     @Test
     fun emptyKeyIsNotUsed() {
         var actualKey: String? = null
-        composeTestRule.setContent {
+        rule.setContent {
             WrapRegistry(
                 wrap = {
                     object : DelegateRegistry(it) {

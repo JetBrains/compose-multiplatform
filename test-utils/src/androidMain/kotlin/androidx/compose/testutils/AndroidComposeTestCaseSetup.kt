@@ -17,14 +17,13 @@
 package androidx.compose.testutils
 
 import androidx.activity.ComponentActivity
-import androidx.ui.test.runOnUiThread
 
 class AndroidComposeTestCaseSetup(
     private val testCase: ComposeTestCase,
     private val activity: ComponentActivity
 ) : ComposeTestCaseSetup {
     override fun performTestWithEventsControl(block: ComposeExecutionControl.() -> Unit) {
-        runOnUiThread {
+        activity.runOnUiThread {
             // TODO: Ensure that no composition exists at this stage!
             val runner = AndroidComposeTestCaseRunner({ testCase }, activity)
             try {

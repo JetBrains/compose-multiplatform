@@ -31,7 +31,6 @@ import androidx.navigation.testing.TestNavHostController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.ui.test.createComposeRule
-import androidx.ui.test.runOnUiThread
 import com.google.common.truth.Truth.assertWithMessage
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Rule
@@ -82,7 +81,7 @@ class NavHostControllerTest {
             .that(currentBackStackEntry.value?.destination?.id)
             .isEqualTo(FIRST_DESTINATION)
 
-        runOnUiThread {
+        composeTestRule.runOnUiThread {
             navController.navigate(SECOND_DESTINATION)
         }
 
@@ -106,7 +105,7 @@ class NavHostControllerTest {
             currentBackStackEntry = navController.currentBackStackEntryAsState()
         }
 
-        runOnUiThread {
+        composeTestRule.runOnUiThread {
             navController.setCurrentDestination(SECOND_DESTINATION)
             navController.popBackStack()
         }

@@ -23,8 +23,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.test.filters.MediumTest
 import androidx.ui.test.createComposeRule
-import androidx.ui.test.runOnIdle
-import androidx.ui.test.runOnUiThread
 import com.google.common.truth.Truth.assertThat
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Maybe
@@ -91,11 +89,11 @@ class RxJava2AdapterTest(private val factory: () -> Stream) {
             realValue = stream.subscribeAsState(null).value
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             stream.onNext("value")
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(realValue).isEqualTo("value")
         }
     }
@@ -111,11 +109,11 @@ class RxJava2AdapterTest(private val factory: () -> Stream) {
             realValue = stream.subscribeAsState(null).value
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             stream.onNext("value2")
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(realValue).isEqualTo("value2")
         }
     }
@@ -131,13 +129,13 @@ class RxJava2AdapterTest(private val factory: () -> Stream) {
             }
         }
 
-        runOnIdle { emit = false }
+        rule.runOnIdle { emit = false }
 
-        runOnIdle {
+        rule.runOnIdle {
             stream.onNext("value")
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(realValue).isNull()
         }
     }
@@ -172,7 +170,7 @@ class RxJava2AdapterTest(private val factory: () -> Stream) {
 
         assertThat(latch.await(5, TimeUnit.SECONDS)).isTrue()
 
-        runOnUiThread {
+        rule.runOnUiThread {
             assertThat(realValue).isEqualTo("value")
         }
     }

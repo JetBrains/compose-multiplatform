@@ -34,7 +34,6 @@ import androidx.ui.test.createComposeRule
 import androidx.ui.test.down
 import androidx.ui.test.isInMutuallyExclusiveGroup
 import androidx.ui.test.move
-import androidx.ui.test.onNode
 import androidx.ui.test.onNodeWithTag
 import androidx.ui.test.performGesture
 import androidx.ui.test.up
@@ -127,7 +126,7 @@ class RadioButtonScreenshotTest {
 
         rule.clockTestRule.pauseClock()
 
-        onNode(isInMutuallyExclusiveGroup())
+        rule.onNode(isInMutuallyExclusiveGroup())
             // split click into (down) and (move, up) to enforce a composition in between
             .performGesture { down(center) }
             .performGesture { move(); up() }
@@ -153,7 +152,7 @@ class RadioButtonScreenshotTest {
 
         rule.clockTestRule.pauseClock()
 
-        onNode(isInMutuallyExclusiveGroup())
+        rule.onNode(isInMutuallyExclusiveGroup())
             // split click into (down) and (move, up) to enforce a composition in between
             .performGesture { down(center) }
             .performGesture { move(); up() }
