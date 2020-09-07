@@ -63,7 +63,7 @@ internal fun DisposableUiSavedStateRegistry(
     id: Int,
     savedStateRegistryOwner: SavedStateRegistryOwner
 ): DisposableUiSavedStateRegistry {
-    val key = "${UiSavedStateRegistry::javaClass}:$id}"
+    val key = "${UiSavedStateRegistry::class.java.simpleName}:$id"
 
     val androidxRegistry = savedStateRegistryOwner.savedStateRegistry
     val bundle = androidxRegistry.consumeRestoredStateForKey(key)
