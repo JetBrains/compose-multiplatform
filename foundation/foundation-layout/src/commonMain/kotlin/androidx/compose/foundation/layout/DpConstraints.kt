@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package androidx.compose.foundation.layout
 
 import androidx.compose.runtime.Immutable
@@ -30,6 +32,7 @@ import androidx.compose.ui.unit.isFinite
  * Similar to [Constraints], but with constraint values expressed in [Dp].
  */
 @Immutable
+@Deprecated("DpConstraints and APIs using it will be removed.")
 data class DpConstraints(
     @Stable
     val minWidth: Dp = 0.dp,
@@ -64,12 +67,14 @@ data class DpConstraints(
          * Creates constraints tight in both dimensions.
          */
         @Stable
+        @Deprecated("DpConstraints and APIs using it will be removed.")
         fun fixed(width: Dp, height: Dp) = DpConstraints(width, width, height, height)
 
         /**
          * Creates constraints with tight width and loose height.
          */
         @Stable
+        @Deprecated("DpConstraints and APIs using it will be removed.")
         fun fixedWidth(width: Dp) = DpConstraints(
             minWidth = width,
             maxWidth = width,
@@ -81,6 +86,7 @@ data class DpConstraints(
          * Creates constraints with tight height and loose width.
          */
         @Stable
+        @Deprecated("DpConstraints and APIs using it will be removed.")
         fun fixedHeight(height: Dp) = DpConstraints(
             minWidth = 0.dp,
             maxWidth = Dp.Infinity,
@@ -95,6 +101,7 @@ data class DpConstraints(
  * @see hasBoundedWidth
  */
 @Stable
+@Deprecated("DpConstraints and APIs using it will be removed.")
 val DpConstraints.hasBoundedHeight get() = maxHeight.isFinite()
 
 /**
@@ -102,18 +109,21 @@ val DpConstraints.hasBoundedHeight get() = maxHeight.isFinite()
  * @see hasBoundedHeight
  */
 @Stable
+@Deprecated("DpConstraints and APIs using it will be removed.")
 val DpConstraints.hasBoundedWidth get() = maxWidth.isFinite()
 
 /**
  * Whether there is exactly one width value that satisfies the constraints.
  */
 @Stable
+@Deprecated("DpConstraints and APIs using it will be removed.")
 val DpConstraints.hasFixedWidth get() = maxWidth == minWidth
 
 /**
  * Whether there is exactly one height value that satisfies the constraints.
  */
 @Stable
+@Deprecated("DpConstraints and APIs using it will be removed.")
 val DpConstraints.hasFixedHeight get() = maxHeight == minHeight
 
 /**
@@ -121,18 +131,21 @@ val DpConstraints.hasFixedHeight get() = maxHeight == minHeight
  * This is true when at least one of maxWidth and maxHeight are 0.
  */
 @Stable
+@Deprecated("DpConstraints and APIs using it will be removed.")
 val DpConstraints.isZero get() = maxWidth == 0.dp || maxHeight == 0.dp
 
 /**
  * Whether there is any size that satisfies the current constraints.
  */
 @Stable
+@Deprecated("DpConstraints and APIs using it will be removed.")
 val DpConstraints.satisfiable get() = minWidth <= maxWidth && minHeight <= maxHeight
 
 /**
  * Returns the result of coercing the current constraints in a different set of constraints.
  */
 @Stable
+@Deprecated("DpConstraints and APIs using it will be removed.")
 fun DpConstraints.enforce(otherConstraints: DpConstraints) = DpConstraints(
     minWidth = minWidth.coerceIn(otherConstraints.minWidth, otherConstraints.maxWidth),
     maxWidth = maxWidth.coerceIn(otherConstraints.minWidth, otherConstraints.maxWidth),
@@ -144,6 +157,7 @@ fun DpConstraints.enforce(otherConstraints: DpConstraints) = DpConstraints(
  * Returns the DpConstraints obtained by offsetting the current instance with the given values.
  */
 @Stable
+@Deprecated("DpConstraints and APIs using it will be removed.")
 fun DpConstraints.offset(horizontal: Dp = 0.dp, vertical: Dp = 0.dp) = DpConstraints(
     (minWidth + horizontal).coerceAtLeast(0.dp),
     (maxWidth + horizontal).coerceAtLeast(0.dp),
@@ -155,6 +169,7 @@ fun DpConstraints.offset(horizontal: Dp = 0.dp, vertical: Dp = 0.dp) = DpConstra
  * Creates the [Constraints] corresponding to the current [DpConstraints].
  */
 @Stable
+@Deprecated("DpConstraints and APIs using it will be removed.")
 fun Density.Constraints(dpConstraints: DpConstraints) = Constraints(
     minWidth = dpConstraints.minWidth.toIntPx(),
     maxWidth = dpConstraints.maxWidth.toIntPx(),
@@ -166,6 +181,7 @@ fun Density.Constraints(dpConstraints: DpConstraints) = Constraints(
  * Creates the [DpConstraints] corresponding to the current [Constraints].
  */
 @Stable
+@Deprecated("DpConstraints and APIs using it will be removed.")
 fun Density.DpConstraints(constraints: Constraints) = DpConstraints(
     minWidth = constraints.minWidth.toDp(),
     maxWidth = constraints.maxWidth.toDp(),

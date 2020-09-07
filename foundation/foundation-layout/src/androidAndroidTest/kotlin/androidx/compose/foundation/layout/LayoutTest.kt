@@ -23,7 +23,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Recomposer
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.AlignmentLine
 import androidx.compose.ui.Layout
@@ -46,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.enforce
 import androidx.compose.ui.unit.hasFixedHeight
 import androidx.compose.ui.unit.hasFixedWidth
+import androidx.compose.ui.unit.isFinite
 import androidx.compose.ui.unit.offset
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -236,6 +239,59 @@ open class LayoutTest {
             }
         }
     }
+
+    /**
+     * Similar to [Constraints], but with constraint values expressed in [Dp].
+     */
+    @Immutable
+    data class DpConstraints(
+        @Stable
+        val minWidth: Dp = 0.dp,
+        @Stable
+        val maxWidth: Dp = Dp.Infinity,
+        @Stable
+        val minHeight: Dp = 0.dp,
+        @Stable
+        val maxHeight: Dp = Dp.Infinity
+    ) {
+        init {
+            require(minWidth.isFinite()) { "Constraints#minWidth should be finite" }
+            require(minHeight.isFinite()) { "Constraints#minHeight should be finite" }
+            require(!minWidth.value.isNaN()) { "Constraints#minWidth should not be NaN" }
+            require(!maxWidth.value.isNaN()) { "Constraints#maxWidth should not be NaN" }
+            require(!minHeight.value.isNaN()) { "Constraints#minHeight should not be NaN" }
+            require(!maxHeight.value.isNaN()) { "Constraints#maxHeight should not be NaN" }
+            require(minWidth <= maxWidth) {
+                "Constraints should be satisfiable, but minWidth > maxWidth"
+            }
+            require(minHeight <= maxHeight) {
+                "Constraints should be satisfiable, but minHeight > maxHeight"
+            }
+            require(minWidth >= 0.dp) { "Constraints#minWidth should be non-negative" }
+            require(maxWidth >= 0.dp) { "Constraints#maxWidth should be non-negative" }
+            require(minHeight >= 0.dp) { "Constraints#minHeight should be non-negative" }
+            require(maxHeight >= 0.dp) { "Constraints#maxHeight should be non-negative" }
+        }
+
+        companion object {
+            /**
+             * Creates constraints tight in both dimensions.
+             */
+            @Stable
+            fun fixed(width: Dp, height: Dp) = DpConstraints(width, width, height, height)
+        }
+    }
+
+    /**
+     * Creates the [Constraints] corresponding to the current [DpConstraints].
+     */
+    @Stable
+    fun Density.Constraints(dpConstraints: DpConstraints) = Constraints(
+        minWidth = dpConstraints.minWidth.toIntPx(),
+        maxWidth = dpConstraints.maxWidth.toIntPx(),
+        minHeight = dpConstraints.minHeight.toIntPx(),
+        maxHeight = dpConstraints.maxHeight.toIntPx()
+    )
 
     internal fun assertEquals(expected: Size?, actual: Size?) {
         assertNotNull("Null expected size", expected)

@@ -16,7 +16,6 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.layout.DpConstraints
 import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.layout.preferredSizeIn
 import androidx.compose.foundation.text.FirstBaseline
@@ -100,10 +99,12 @@ fun ComposeTestRule.rootHeight(): Dp {
 /**
  * Constant to emulate very big but finite constraints
  */
-val BigTestConstraints = DpConstraints(maxWidth = 5000.dp, maxHeight = 5000.dp)
+val BigTestMaxWidth = 5000.dp
+val BigTestMaxHeight = 5000.dp
 
 fun ComposeTestRuleJUnit.setMaterialContentForSizeAssertions(
-    parentConstraints: DpConstraints = BigTestConstraints,
+    parentMaxWidth: Dp = BigTestMaxWidth,
+    parentMaxHeight: Dp = BigTestMaxHeight,
     // TODO : figure out better way to make it flexible
     children: @Composable () -> Unit
 ): SemanticsNodeInteraction {
@@ -111,8 +112,12 @@ fun ComposeTestRuleJUnit.setMaterialContentForSizeAssertions(
         MaterialTheme {
             Surface {
                 Stack {
-                    Stack(Modifier.preferredSizeIn(parentConstraints)
-                        .testTag("containerForSizeAssertion")) {
+                    Stack(
+                        Modifier.preferredSizeIn(
+                            maxWidth = parentMaxWidth,
+                            maxHeight = parentMaxHeight
+                        ).testTag("containerForSizeAssertion")
+                    ) {
                         children()
                     }
                 }

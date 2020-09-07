@@ -16,12 +16,12 @@
 
 package androidx.compose.foundation
 
-import androidx.compose.foundation.layout.DpConstraints
 import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.layout.preferredSizeIn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.ui.test.ComposeTestRuleJUnit
 import androidx.ui.test.SemanticsNodeInteraction
@@ -30,16 +30,18 @@ import androidx.ui.test.onNodeWithTag
 /**
  * Constant to emulate very big but finite constraints
  */
-val BigTestConstraints = DpConstraints(maxWidth = 5000.dp, maxHeight = 5000.dp)
+val BigTestMaxWidth = 5000.dp
+val BigTestMaxHeight = 5000.dp
 
 fun ComposeTestRuleJUnit.setContentForSizeAssertions(
-    parentConstraints: DpConstraints = BigTestConstraints,
+    parentMaxWidth: Dp = BigTestMaxWidth,
+    parentMaxHeight: Dp = BigTestMaxHeight,
     children: @Composable () -> Unit
 ): SemanticsNodeInteraction {
     setContent {
         Stack {
             Stack(
-                Modifier.preferredSizeIn(parentConstraints)
+                Modifier.preferredSizeIn(maxWidth = parentMaxWidth, maxHeight = parentMaxHeight)
                     .testTag("containerForSizeAssertion")) {
                 children()
             }

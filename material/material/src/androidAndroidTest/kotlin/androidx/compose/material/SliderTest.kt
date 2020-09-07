@@ -16,7 +16,6 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.layout.DpConstraints
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
@@ -278,7 +277,8 @@ class SliderTest {
         val state = mutableStateOf(0f)
         rule
             .setMaterialContentForSizeAssertions(
-                parentConstraints = DpConstraints(maxWidth = 100.dp, maxHeight = 100.dp)
+                parentMaxWidth = 100.dp,
+                parentMaxHeight = 100.dp
             ) { Slider(value = state.value, onValueChange = { state.value = it }) }
             .assertHeightIsEqualTo(48.dp)
             .assertWidthIsEqualTo(100.dp)

@@ -18,7 +18,6 @@ package androidx.compose.material
 
 import android.os.Build
 import androidx.compose.foundation.Text
-import androidx.compose.foundation.layout.DpConstraints
 import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.text.FirstBaseline
@@ -91,7 +90,7 @@ class SnackbarTest {
     @Test
     fun snackbar_shortTextOnly_defaultSizes() {
         val snackbar = rule.setMaterialContentForSizeAssertions(
-            DpConstraints(maxWidth = 300.dp)
+            parentMaxWidth = 300.dp
         ) {
             Snackbar(
                 text = {
@@ -119,7 +118,7 @@ class SnackbarTest {
     @Test
     fun snackbar_shortTextOnly_bigFont_centered() {
         val snackbar = rule.setMaterialContentForSizeAssertions(
-            DpConstraints(maxWidth = 300.dp)
+            parentMaxWidth = 300.dp
         ) {
             Snackbar(
                 text = {
@@ -146,7 +145,7 @@ class SnackbarTest {
     @Test
     fun snackbar_shortTextAndButton_alignment() {
         val snackbar = rule.setMaterialContentForSizeAssertions(
-            DpConstraints(maxWidth = 300.dp)
+            parentMaxWidth = 300.dp
         ) {
             Snackbar(
                 text = {
@@ -185,7 +184,7 @@ class SnackbarTest {
     @Test
     fun snackbar_shortTextAndButton_bigFont_alignment() {
         val snackbar = rule.setMaterialContentForSizeAssertions(
-            DpConstraints(maxWidth = 400.dp)
+            parentMaxWidth = 400.dp
         ) {
             val fontSize = 30.sp
             Snackbar(
@@ -223,7 +222,7 @@ class SnackbarTest {
     @Test
     fun snackbar_longText_sizes() {
         val snackbar = rule.setMaterialContentForSizeAssertions(
-            DpConstraints(maxWidth = 300.dp)
+            parentMaxWidth = 300.dp
         ) {
             Snackbar(
                 text = {
@@ -253,7 +252,7 @@ class SnackbarTest {
     @Test
     fun snackbar_longTextAndButton_alignment() {
         val snackbar = rule.setMaterialContentForSizeAssertions(
-            DpConstraints(maxWidth = 300.dp)
+            parentMaxWidth = 300.dp
         ) {
             Snackbar(
                 text = {
@@ -292,7 +291,7 @@ class SnackbarTest {
     @Test
     fun snackbar_textAndButtonOnSeparateLine_alignment() {
         val snackbar = rule.setMaterialContentForSizeAssertions(
-            DpConstraints(maxWidth = 300.dp)
+            parentMaxWidth = 300.dp
         ) {
             Snackbar(
                 text = {
