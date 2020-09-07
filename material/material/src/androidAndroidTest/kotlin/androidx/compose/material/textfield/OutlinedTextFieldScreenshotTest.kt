@@ -129,6 +129,43 @@ class OutlinedTextFieldScreenshotTest {
         assertAgainstGolden("outlined_textField_focused_rtl")
     }
 
+    @Test
+    fun outlinedTextField_error_focused() {
+        rule.setMaterialContent {
+            Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(TextFieldTag)) {
+                OutlinedTextField(
+                    value = "Input",
+                    onValueChange = {},
+                    label = { Text("Label") },
+                    isErrorValue = true
+                )
+            }
+        }
+
+        rule.onNodeWithTag(TextFieldTag)
+            // split click into (down) and (move, up) to enforce a composition in between
+            .performGesture { down(center) }
+            .performGesture { move(); up() }
+
+        assertAgainstGolden("outlined_textField_focused_errorState")
+    }
+
+    @Test
+    fun outlinedTextField_error_notFocused() {
+        rule.setMaterialContent {
+            Box(Modifier.semantics(mergeAllDescendants = true) {}.testTag(TextFieldTag)) {
+                OutlinedTextField(
+                    value = "",
+                    onValueChange = {},
+                    label = { Text("Label") },
+                    isErrorValue = true
+                )
+            }
+        }
+
+        assertAgainstGolden("outlined_textField_notFocused_errorState")
+    }
+
     private fun assertAgainstGolden(goldenIdentifier: String) {
         rule.onNodeWithTag(TextFieldTag)
             .captureToBitmap()
