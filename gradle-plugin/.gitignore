@@ -1,0 +1,39 @@
+build/
+/unbundled-build
+.classpath
+.gradle
+**/.idea/**
+!**/.idea/codeStyleSettings.xml
+!**/.idea/copyright
+!**/.idea/codeStyles
+!.idea/codeStyles/Project.xml
+!.idea/codeStyles/codeStyleConfig.xml
+!.idea/copyright/AndroidCopyright.xml
+!.idea/copyright/profiles_settings.xml
+!.idea/inspectionProfiles/Project_Default.xml
+!.idea/vcs.xml
+.project
+.settings/
+project.properties
+local.properties
+**/bin
+**/gen
+*.iml
+**/out
+buildSrc/build
+buildSrc/lint-checks/build
+buildSrc/jetpad-integration/build
+lifecycle/common/build
+jacoco.exec
+/studio
+/ui/studio
+
+# When Gradle configuration fails with the --profile option enabled it creates this folder.
+/reports
+
+# Mac Desktop Services Store files.
+.DS_Store
+
+# Layout Inspector creates it.
+captures/
+__pycache__
