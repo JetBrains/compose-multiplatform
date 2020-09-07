@@ -18,7 +18,6 @@ package androidx.compose.runtime
 
 import androidx.test.filters.MediumTest
 import androidx.ui.test.createComposeRule
-import androidx.ui.test.runOnIdle
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -57,11 +56,11 @@ class FlowAdapterTest {
             realValue = stream.flow.collectAsState(initial = null).value
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             stream.channel.offer("value")
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(realValue).isEqualTo("value")
         }
     }
@@ -75,16 +74,16 @@ class FlowAdapterTest {
             realValue = stream.flow.collectAsState(initial = null).value
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             stream.channel.offer("value")
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(realValue).isEqualTo("value")
             stream.channel.offer("value2")
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(realValue).isEqualTo("value2")
         }
     }
@@ -100,13 +99,13 @@ class FlowAdapterTest {
             }
         }
 
-        runOnIdle { emit = false }
+        rule.runOnIdle { emit = false }
 
-        runOnIdle {
+        rule.runOnIdle {
             stream.channel.offer("value")
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(realValue).isNull()
         }
     }
@@ -130,11 +129,11 @@ class FlowAdapterTest {
             realValue = stream.flow.collectAsState("value").value
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             stream.channel.offer("value2")
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(realValue).isEqualTo("value2")
         }
     }
@@ -149,11 +148,11 @@ class FlowAdapterTest {
             realValue = stream.flow.collectAsState(initial).value
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             initial = "initial2"
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(realValue).isEqualTo("initial1")
         }
     }
@@ -169,19 +168,19 @@ class FlowAdapterTest {
             realValue = stream.flow.collectAsState(initial = null).value
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             stream = stream2
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             stream2.channel.offer("stream2")
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             stream1.channel.offer("stream1")
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(realValue).isEqualTo("stream2")
         }
     }
@@ -197,15 +196,15 @@ class FlowAdapterTest {
             realValue = stream.flow.collectAsState(initial = null).value
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             stream1.channel.offer("value")
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             stream = stream2
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(realValue).isEqualTo("value")
         }
     }
@@ -223,13 +222,13 @@ class FlowAdapterTest {
             }
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             stream.channel.offer("value")
         }
 
         assertThat(latch.await(5, TimeUnit.SECONDS)).isTrue()
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(realValue).isEqualTo("value")
         }
     }
@@ -244,15 +243,15 @@ class FlowAdapterTest {
             realValue = stream.flow.collectAsState(null, context).value
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             stream.channel.offer("value")
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             context = Dispatchers.IO
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(realValue).isEqualTo("value")
         }
     }
@@ -265,7 +264,7 @@ class FlowAdapterTest {
             realValue = flow.collectAsState().value
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(realValue).isEqualTo("initial")
         }
     }
@@ -278,7 +277,7 @@ class FlowAdapterTest {
             realValue = flow.collectAsState().value
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(realValue).isNull()
         }
     }
@@ -291,11 +290,11 @@ class FlowAdapterTest {
             realValue = flow.collectAsState().value
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             flow.value = "updated"
         }
 
-        runOnIdle {
+        rule.runOnIdle {
             assertThat(realValue).isEqualTo("updated")
         }
     }

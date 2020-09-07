@@ -110,10 +110,10 @@ class SliderTest {
         rule.onNodeWithTag(tag)
             .assertValueEquals("50 percent")
 
-        onNodeWithTag(tag)
+        rule.onNodeWithTag(tag)
             .performSemanticsAction(SemanticsActions.SetProgress) { it(0.7f) }
 
-        onNodeWithTag(tag)
+        rule.onNodeWithTag(tag)
             .assertValueEquals("70 percent")
     }
 
@@ -126,7 +126,7 @@ class SliderTest {
                     onValueChange = { state.value = it }, steps = 4)
             }
 
-        onNodeWithTag(tag)
+        rule.onNodeWithTag(tag)
             .assertValueEquals("0 percent")
             .assert(SemanticsMatcher.expectValue(
                 SemanticsProperties.AccessibilityRangeInfo, AccessibilityRangeInfo(0f, 0f..1f, 4)))
@@ -136,13 +136,13 @@ class SliderTest {
             state.value = 0.6f
         }
 
-        onNodeWithTag(tag)
+        rule.onNodeWithTag(tag)
             .assertValueEquals("60 percent")
 
-        onNodeWithTag(tag)
+        rule.onNodeWithTag(tag)
             .performSemanticsAction(SemanticsActions.SetProgress) { it(0.75f) }
 
-        onNodeWithTag(tag)
+        rule.onNodeWithTag(tag)
             .assertValueEquals("80 percent")
     }
 
